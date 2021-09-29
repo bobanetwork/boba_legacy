@@ -6,10 +6,10 @@
   "workspaces": {
     "packages": [
       "packages/*",
+      "packages/boba/*",
       "l2geth",
       "integration-tests",
-      "specs",
-      "go/gas-oracle"
+      "specs"
     ],
     "nohoist": [
       "examples/*"

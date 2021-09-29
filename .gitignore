@@ -19,6 +19,8 @@ packages/contracts/hardhat*
 
 packages/data-transport-layer/db
 
+packages/boba/gas-price-oracle/data
+
 # vim
 *.swp
 
