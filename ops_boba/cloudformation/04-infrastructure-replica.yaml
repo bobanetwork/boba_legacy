@@ -1,0 +1,276 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enya Application Infrastructure"
+
+Parameters:
+
+  EcsImageId:
+    # TODO: Implement automatic update or notifications: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS-AMI-SubscribeTopic.html
+    Description: Image ID for running the ECS Cluster instances
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
+
+  EcsInstanceType:
+    # https://aws.amazon.com/ec2/instance-types/
+    # The types of instances is limited to avoid mistakes generating huge costs by putting the wrong instance type.
+    Description: Type of instances to be added to the ECS cluster
+    Type: String
+    Default: t3a.xlarge
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-core
+
+Resources:
+
+  FileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}"
+
+  LoadBalancerReplicaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} Replica LB"
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8545
+        ToPort: 8545
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8545
+        ToPort: 8545
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8546
+        ToPort: 8546
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8546
+        ToPort: 8546
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 6001
+        ToPort: 6001
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 6001
+        ToPort: 6001
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 5001
+        ToPort: 5001
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 5001
+        ToPort: 5001
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8081
+        ToPort: 8081
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8081
+        ToPort: 8081
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8000
+        ToPort: 8000
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8000
+        ToPort: 8000
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8001
+        ToPort: 8001
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8001
+        ToPort: 8001
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8030
+        ToPort: 8030
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8030
+        ToPort: 8030
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8040
+        ToPort: 8040
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8040
+        ToPort: 8040
+        CidrIpv6: ::/0
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Replica-LB"
+
+  LoadBalancerReplica:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '3600'
+      SecurityGroups:
+      - !Ref LoadBalancerReplicaSecurityGroup
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+
+  EcsInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [!Sub "ec2.${AWS::URLSuffix}"]
+          Action: ["sts:AssumeRole"]
+      Policies:
+        - PolicyName: AllowAccessToELB
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:*"
+                  - "ec2:Describe*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticfilesystem:ClientMount"
+                  - "elasticfilesystem:ClientRootAccess"
+                  - "elasticfilesystem:ClientWrite"
+                  - "elasticfilesystem:DescribeMountTargets"
+                Resource: "*"
+
+  EcsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref EcsInstanceRole]
+
+  EcsSecurityGroupReplica:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} Landscape ECS Cluster Replica"
+      VpcId:
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
+      SecurityGroupIngress:
+      - SourceSecurityGroupId: !Ref LoadBalancerReplicaSecurityGroup
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 65535
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Replica-ECS-Cluster"
+
+  EcsLaunchConfigurationReplica:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            '/etc/ecs/ecs.config':
+              content: !Sub |
+                ECS_CLUSTER=${EcsCluster}
+                ECS_ENABLE_TASK_IAM_ROLE=true
+              mode: "000644"
+              owner: root
+              group: root
+    Properties:
+      InstanceType: !Ref EcsInstanceType
+      SecurityGroups:
+      - !Ref EcsSecurityGroupReplica
+      IamInstanceProfile: !Ref EcsInstanceProfile
+      ImageId: !Ref EcsImageId
+      UserData:
+        Fn::Base64: !Sub |
+            #!/bin/bash -ex
+            yum -y install aws-cfn-bootstrap amazon-ssm-agent amazon-efs-utils
+            systemctl enable --now amazon-ssm-agent
+            mkdir -p /mnt/efs /mnt/efs/db
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EcsLaunchConfigurationReplica --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroupReplica --region ${AWS::Region} || true
+
+  AutoScalingGroupReplica:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref EcsLaunchConfigurationReplica
+      MetricsCollection:
+      - Granularity: 1Minute
+        Metrics:
+        - GroupTotalInstances
+      MinSize: 1
+      MaxSize: 1
+      DesiredCapacity: 1
+      VPCZoneIdentifier:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Replica-ECS"
+          PropagateAtLaunch: true
+Outputs:
+  EcsCluster:
+    Value: !Ref EcsCluster
+    Export:
+      Name: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+  EcsSecurityGroup:
+    Value: !Ref EcsSecurityGroupReplica
+    Export:
+      Name: !Sub "${InfrastructureStackName}:EcsSecurityGroupReplica"
+  LoadBalancerReplicaDNSName:
+    Value: !GetAtt LoadBalancerReplica.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
+  LoadBalancerReplicaArn:
+    Value: !Ref LoadBalancerReplica
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
+  EFSFilesystem:
+    Value: !Ref FileSystem
+    Export:
+      Name: !Sub "${InfrastructureStackName}:EFSFilesystemReplica"
