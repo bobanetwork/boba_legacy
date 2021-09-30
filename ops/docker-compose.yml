@@ -93,14 +93,14 @@ version: "3"
 services:
   # base service builder
   builder:
-    image: boba/builder:latest
+    image: bobanetwork/builder:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.monorepo
 
   # this is a helper service used because there's no official hardhat image
   l1_chain:
-    image: boba/hardhat:latest
+    image: bobanetwork/hardhat:latest
     build:
       context: ./docker/hardhat
       dockerfile: Dockerfile
@@ -111,7 +111,7 @@ services:
   deployer:
     depends_on:
       - l1_chain
-    image: boba/deployer:latest
+    image: bobanetwork/deployer:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.deployer
@@ -149,7 +149,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: boba/boba_deployer
+    image: bobanetwork/boba_deployer
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_deployer
@@ -173,7 +173,7 @@ services:
       - l1_chain
       - deployer
       - l2geth
-    image: boba/data-transport-layer:latest
+    image: bobanetwork/data-transport-layer:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.data-transport-layer
@@ -198,7 +198,7 @@ services:
     depends_on:
       - l1_chain
       - deployer
-    image: boba/l2geth:latest
+    image: bobanetwork/l2geth:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.geth
@@ -226,7 +226,7 @@ services:
       - l1_chain
       - deployer
       - l2geth
-    image: boba/message-relayer:latest
+    image: bobanetwork/message-relayer:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.message-relayer
@@ -246,7 +246,7 @@ services:
       - l1_chain
       - deployer
       - l2geth
-    image: boba/batch-submitter:latest
+    image: bobanetwork/batch-submitter:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter
@@ -265,7 +265,7 @@ services:
       - l1_chain
       - deployer
       - dtl
-    image: boba/l2geth:latest
+    image: bobanetwork/l2geth:latest
     deploy:
       replicas: 0
     build:
@@ -289,7 +289,7 @@ services:
   replica:
     depends_on:
       - dtl
-    image: boba/l2geth:latest
+    image: bobanetwork/l2geth:latest
     deploy:
       replicas: 0
     build:
@@ -311,7 +311,7 @@ services:
       - ${L2GETH_WS_PORT:-8550}:8546
 
   integration_tests:
-    image: boba/integration-tests:latest
+    image: bobanetwork/integration-tests:latest
     deploy:
        replicas: 0
     build:
@@ -331,7 +331,7 @@ services:
     depends_on:
       - l1_chain
       - l2geth
-    image: boba/boba_gas-price-oracle
+    image: bobanetwork/boba_gas-price-oracle
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_gas-price-oracle
