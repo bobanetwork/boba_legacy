@@ -1,7 +1,7 @@
 {
-  "name": "@omgx/contracts",
+  "name": "@boba/contracts",
   "version": "0.0.1",
-  "description": "OMGX Smart Contracts and Deployer HTTP Server",
+  "description": "BOBA Smart Contracts and Deployer HTTP Server",
   "private": true,
   "author": "OMG",
   "license": "MIT",

@@ -4,7 +4,7 @@ import { Watcher } from './watcher'
 
 import {
   getAddressManager,
-  getOMGXDeployerAddresses,
+  getBOBADeployerAddresses,
   l1Provider,
   l2Provider,
   bobl1Wallet,
@@ -28,7 +28,7 @@ import { TransactionResponse } from '@ethersproject/providers'
 export class OptimismEnv {
   // L1 Contracts
   addressManager: Contract
-  addressesOMGX
+  addressesBOBA
 
   l2ETHAddress: String
 
@@ -57,7 +57,7 @@ export class OptimismEnv {
 
   constructor(args: any) {
     this.addressManager = args.addressManager
-    this.addressesOMGX = args.addressesOMGX
+    this.addressesBOBA = args.addressesBOBA
     this.l2ETHAddress = args.l2ETHAddress
     this.l1Messenger = args.l1Messenger
     this.l2Messenger = args.l2Messenger
@@ -78,7 +78,7 @@ export class OptimismEnv {
 
     const addressManager = await getAddressManager(bobl1Wallet)
 
-    const addressesOMGX = await getOMGXDeployerAddresses()
+    const addressesBOBA = await getBOBADeployerAddresses()
 
     const watcher = await initWatcher(l1Provider, l2Provider, addressManager)
 
@@ -102,7 +102,7 @@ export class OptimismEnv {
 
     return new OptimismEnv({
       addressManager,
-      addressesOMGX,
+      addressesBOBA,
 
       l1Messenger,
       l2Messenger,

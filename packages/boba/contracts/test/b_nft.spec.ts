@@ -38,13 +38,13 @@ describe('NFT Test\n', async () => {
     a3a = env.katel2Wallet.address;
 
     ERC721 = new Contract(
-      env.addressesOMGX.L2ERC721,
+      env.addressesBOBA.L2ERC721,
       L2ERC721Json.abi,
       env.bobl2Wallet
     )
 
     ERC721Reg = new Contract(
-      env.addressesOMGX.L2ERC721Reg,
+      env.addressesBOBA.L2ERC721Reg,
       L2ERC721RegJson.abi,
       env.bobl2Wallet
     )
@@ -163,7 +163,7 @@ describe('NFT Test\n', async () => {
       BigNumber.from(String(0)), //starting index for the tokenIDs
       ERC721.address,
       UUID,
-      'OMGX_Rinkeby_28'
+      'BOBA_Rinkeby_28'
     )
     await ERC721_D.deployTransaction.wait()
     console.log(` 🌕 ${chalk.red('NFT ERC721_D deployed to:')} ${chalk.green(ERC721_D.address)}`)

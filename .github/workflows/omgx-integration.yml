@@ -1,4 +1,4 @@
-name: omgx_integration
+name: boba
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
 
-  omgx_integration:
+  boba_integration:
     needs: start-runner
     runs-on: ${{ needs.start-runner.outputs.label }}
     env:
@@ -49,7 +49,7 @@ jobs:
       L1_NODE_WEB3_URL: http://localhost:9545
       L2_NODE_WEB3_URL: http://localhost:8545
       URL: http://127.0.0.1:8080/addresses.json
-      OMGX_URL: http://127.0.0.1:8078/addresses.json
+      BOBA_URL: http://127.0.0.1:8078/addresses.json
       TARGET_GAS_LIMIT: 9000000000
       CHAIN_ID: 28
 
@@ -93,8 +93,8 @@ jobs:
         working-directory: ./ops
         run: ./scripts/wait-for-sequencer.sh
 
-      # this test jitters - in any case, later tests will fail if the OMGX_deployer does not come up
-      - name: Test serving OMGX contracts
+      # this test jitters - in any case, later tests will fail if the boba_deployer does not come up
+      - name: Test serving BOBA contracts
         working-directory: ./
         run: |
           RETRIES=60
@@ -108,7 +108,7 @@ jobs:
               exit 1
             fi
           done
-          echo "OMGX contracts are deployed"
+          echo "BOBA contracts are deployed"
           L2LIQUIDITY_POOL=$(curl --silent $URL | jq -r .L2LiquidityPool)
           echo $L2LIQUIDITY_POOL
           if [[ $L2LIQUIDITY_POOL =~ "0x" ]]; then
@@ -117,13 +117,13 @@ jobs:
             exit 1
           fi
 
-      # - name: Test the base OMGX contracts
-      #   working-directory: ./packages/omgx/contracts
+      # - name: Test the base boba contracts
+      #   working-directory: ./packages/boba/contracts
       #   run: |
       #     yarn test:integration
 
       # - name: Test the message-relayer-fast
-      #   working-directory: ./packages/omgx/message-relayer-fast
+      #   working-directory: ./packages/boba/message-relayer-fast
       #   run: |
       #     yarn test:integration
 
@@ -131,7 +131,7 @@ jobs:
     name: Stop self-hosted EC2 runner
     needs:
       - start-runner # required to get output from the start-runner job
-      - omgx_integration # required to wait when the main job is done
+      - boba_integration # required to wait when the main job is done
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:

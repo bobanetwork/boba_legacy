@@ -44,13 +44,13 @@ describe('NFT Bridge Test', async () => {
     )
 
     L1Bridge = new Contract(
-        env.addressesOMGX.Proxy__L1NFTBridge,
+        env.addressesBOBA.Proxy__L1NFTBridge,
         L1NFTBridge.abi,
         env.bobl1Wallet
     )
 
     L2Bridge = new Contract(
-        env.addressesOMGX.Proxy__L2NFTBridge,
+        env.addressesBOBA.Proxy__L2NFTBridge,
         L2NFTBridge.abi,
         env.bobl2Wallet
     )

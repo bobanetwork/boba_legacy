@@ -39,7 +39,7 @@ describe('System setup', async () => {
 
     //let's tap into the contract we just deployed
     L1ERC20 = new Contract(
-      env.addressesOMGX.TOKENS.TEST.L1,
+      env.addressesBOBA.TOKENS.TEST.L1,
       L1ERC20Json.abi,
       env.bobl1Wallet
     )
@@ -52,7 +52,7 @@ describe('System setup', async () => {
 
     //let's tap into the contract we just deployed
     L2ERC20 = new Contract(
-      env.addressesOMGX.TOKENS.TEST.L2,
+      env.addressesBOBA.TOKENS.TEST.L2,
       Factory__L2ERC20.interface,
       env.bobl2Wallet
     )

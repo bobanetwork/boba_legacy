@@ -6,7 +6,7 @@ The L2 liquidity pool is the main pool. It provides a way to deposit and withdra
 
 The L1 liquidity pool is the sub pool. Swap users can do fast onramp. When swap users do a fast exit via the L2 liquidity pool, it sends funds to the swap users.
 
-For OMGX, there are no delays for users to move funds from L1 to L2. The liquidity pool is used to help users quickly exit L2.
+For BOBA, there are no delays for users to move funds from L1 to L2. The liquidity pool is used to help users quickly exit L2.
 
 ## Calculation
 
@@ -76,7 +76,7 @@ For OMGX, there are no delays for users to move funds from L1 to L2. The liquidi
   | ------------- | ------------------------------------------------------------ | -------------------- |
   | 15            | 10 / 100 + (increased_rewards) / total_deposit_amount = 10 / 100 + 5 / 200 | 200                  |
 
-  The rewards for A is 
+  The rewards for A is
 
   ```
   deposit_amount * reward_per_share - reward_debet = 100 * (10 / 100 + 5 / 200 ) - 0 = 12.5
@@ -98,4 +98,3 @@ For OMGX, there are no delays for users to move funds from L1 to L2. The liquidi
   deposit_amount * reward_per_share - reward_debet = 100 * (10 / 100 + 5 / 200 ) - 10 = 2.5
   ```
 
-  

@@ -1,5 +1,5 @@
 {
-  "name": "@omgx/gas-price-oracle",
+  "name": "@boba/gas-price-oracle",
   "version": "0.1.0",
   "private": true,
   "description": "Gas Price Oracle service",

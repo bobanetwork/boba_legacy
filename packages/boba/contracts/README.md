@@ -1,4 +1,4 @@
-# OMGX Smart Contracts
+# BOBA Smart Contracts
 
 
 ## 1. Automatic contract deployment and serving
@@ -7,19 +7,19 @@ This spins up the entire stack, with all contracts deployed, and all the right t
 
 ```bash
 
-$ cd ops 
+$ cd ops
 $ ./up_local.sh
 
 ```
 
 **Note - please provide syntax for setting the .env variables (BUILD: 1, DAEMON: 1)**
 
-To get the contract addresses for the basic stack, and the OMGX-specific contracts:
+To get the contract addresses for the basic stack, and the BOBA-specific contracts:
 
 ```bash
 
 curl http://127.0.0.1:8078/addresses.json | jq #basic stack
-curl http://127.0.0.1:8080/addresses.json | jq #OMGX-specific contracts
+curl http://127.0.0.1:8080/addresses.json | jq #BOBA-specific contracts
 
 ```
 
@@ -68,7 +68,7 @@ You will now see this, if everything worked correctly:
  % yarn deploy
 yarn run v1.22.10
 $ ts-node "./bin/deploy.ts"
-Starting OMGX core contracts deployment...
+Starting BOBA core contracts deployment...
 ADDRESS_MANAGER_ADDRESS was set to 0x5FbDB2315678afecb367f032d93F642f64180aa3
 Nothing to compile
 Deploying...

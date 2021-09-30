@@ -7,7 +7,7 @@ import hre from 'hardhat'
 
 const main = async () => {
 
-  console.log('Starting OMGX core contracts deployment...')
+  console.log('Starting BOBA core contracts deployment...')
 
   //const config = parseEnv()
   //not clear if the output is used anywhere?

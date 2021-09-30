@@ -62,15 +62,15 @@ if(!process.env.URL) {
   console.log(`process.env.URL set to:`,process.env.URL)
 }
 
-if(!process.env.OMGX_URL) {
-  console.log(`!!You did not set process.env.OMGX_URL!!`)
+if(!process.env.BOBA_URL) {
+  console.log(`!!You did not set process.env.BOBA_URL!!`)
   console.log(`Setting to default value of http://127.0.0.1:8078/addresses.json`)
 } else {
-  console.log(`process.env.OMGX_URL set to:`,process.env.OMGX_URL)
+  console.log(`process.env.BOBA_URL set to:`,process.env.BOBA_URL)
 }
 
 export const DEPLOYER = process.env.URL || 'http://127.0.0.1:8080/addresses.json'
-export const OMGX_URL = process.env.OMGX_URL || 'http://127.0.0.1:8078/addresses.json'
+export const BOBA_URL = process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
 
 //export const addressManagerAddress = process.env.ADDRESS_MANAGER_ADDRESS
 export let addressManagerAddress = process.env.ADDRESS_MANAGER_ADDRESS
@@ -100,9 +100,9 @@ export const getDeployerAddresses = async () => {
    return JSON.parse(result)
  }
 
- export const getOMGXDeployerAddresses = async () => {
+ export const getBOBADeployerAddresses = async () => {
    var options = {
-       uri: OMGX_URL,
+       uri: BOBA_URL,
    }
    const result = await request.get(options)
    return JSON.parse(result)

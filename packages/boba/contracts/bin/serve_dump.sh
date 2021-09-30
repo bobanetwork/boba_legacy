@@ -10,14 +10,14 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 
 PYTHON=${PYTHON:-python}
 HOST=${HOST:-0.0.0.0}
-PORT=${OMGX_DEPLOYER_PORT:-8079}
+PORT=${BOBA_DEPLOYER_PORT:-8079}
 DIRECTORY=$DIR/../dist/dumps
 
 if [ "$SERVE_ONLY" == 1 ]
 then
     DIRECTORY=$DIR/../deployment/$IF_SERVE_ONLY_EQ_1_THEN_SERVE
     echo "Serving STATIC addresses.json in $DIRECTORY"
-else 
+else
     echo "Serving FRESH addresses.json in $DIRECTORY"
 fi
 
