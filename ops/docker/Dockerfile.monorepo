@@ -36,6 +36,9 @@ COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
 COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
 # COPY packages/boba/message-relayer-fast/package.json ./packages/boba/message-relayer-fast/package.json
 
+# copy over the patches, if any...
+# needs to happen before `yarn` otherwise patch-packages does not apply the patches
+COPY ./patches ./patches
 
 RUN yarn install --frozen-lockfile
 
