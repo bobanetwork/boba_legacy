@@ -149,7 +149,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/boba_deployer
+    image: bobanetwork/boba_deployer:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_deployer
