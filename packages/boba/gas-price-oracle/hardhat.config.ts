@@ -8,7 +8,7 @@ const config: HardhatUserConfig = {
     timeout: 200000,
   },
   networks: {
-    omgx: {
+    boba: {
       url: 'http://localhost:8545',
       // This sets the gas price to 0 for all transactions on L2. We do this
       // because account balances are not automatically initiated with an ETH

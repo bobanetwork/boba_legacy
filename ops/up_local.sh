@@ -39,7 +39,7 @@ if [[ $BUILD == 1 ]]; then
     docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
     #docker-compose build -- omgx_message-relayer-fast
     docker-compose build -- gas_oracle
-    #docker-compose build -- omgx_deployer
+    docker-compose build -- omgx_deployer
 elif [[ $BUILD == 0 ]]; then
     docker-compose -f $DIR/$DOCKERFILE pull
 fi

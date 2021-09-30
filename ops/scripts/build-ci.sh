@@ -2,7 +2,7 @@ yarn
 yarn build
 
 docker-compose build -- builder
-#docker-compose build -- omgx_deployer
+docker-compose build -- omgx_deployer
 #docker-compose build -- omgx_message-relayer-fast
 docker-compose build -- gas_oracle
 docker-compose build -- deployer
