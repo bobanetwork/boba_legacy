@@ -143,6 +143,30 @@ services:
         # expose the service to the host for getting the contract addrs
       - ${DEPLOYER_PORT:-8080}:8081
 
+  # deploys boba contracts and serves contract addresses
+  omgx_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: omgx/omgx_deployer
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.omgx_deployer
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      #URL: http://deployer:8081/addresses.json
+      # DO NOT use in production
+      << : *deployer_pk
+      << : *relayer_pk
+      << : *fast-relayer_pk
+      RETRIES: 70
+      #DTL_REGISTRY_URL: http://dtl:8081/omgx-addr.json
+    ports:
+        # expose the service to the host for getting the contract addrs
+      - ${OMGX_DEPLOYER_PORT:-8078}:8079
+
   dtl:
     depends_on:
       - l1_chain
