@@ -20,8 +20,8 @@ jobs:
     - uses: repo-sync/pull-request@v2
       name: Create pull request
       with:
-        source_branch: experimental
-        destination_branch: tmp-repo-sync
+        source_branch: tmp-repo-sync
+        destination_branch: develop
         github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         pr_title: "Pulling experimental ${{ github.ref }} into develop" # Title of pull request
         pr_body: ":crown: *An automated PR*"              # Full markdown support, requires pr_title to be set
