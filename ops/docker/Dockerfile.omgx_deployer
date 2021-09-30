@@ -34,21 +34,21 @@ COPY packages/contracts/test/helpers/constants.ts ./test/helpers/constants.ts
 COPY packages/contracts/scripts ./scripts
 
 # get the built artifacts
-WORKDIR /opt/optimism/packages/omgx/contracts
-COPY --from=builder /optimism/packages/omgx/contracts/tsconfig.json ./tsconfig.json
-COPY --from=builder /optimism/packages/omgx/contracts/package.json ./package.json
-COPY --from=builder /optimism/packages/omgx/contracts/node_modules ./node_modules
-COPY --from=builder /optimism/packages/omgx/contracts/artifacts ./artifacts
+WORKDIR /opt/optimism/packages/boba/contracts
+COPY --from=builder /optimism/packages/boba/contracts/tsconfig.json ./tsconfig.json
+COPY --from=builder /optimism/packages/boba/contracts/package.json ./package.json
+COPY --from=builder /optimism/packages/boba/contracts/node_modules ./node_modules
+COPY --from=builder /optimism/packages/boba/contracts/artifacts ./artifacts
 
 # get static artifacts from the host
-COPY packages/omgx/contracts/bin ./bin
-COPY packages/omgx/contracts/contracts ./contracts
-COPY packages/omgx/contracts/hardhat.config.ts ./
-COPY packages/omgx/contracts/deploy ./deploy
-COPY packages/omgx/contracts/tasks ./tasks
-COPY packages/omgx/contracts/scripts ./scripts
-COPY packages/omgx/contracts/deployment ./deployment
-COPY packages/omgx/contracts/preSupportedTokens.json ./
-COPY packages/omgx/contracts/preSupportedNFTs.json ./
+COPY packages/boba/contracts/bin ./bin
+COPY packages/boba/contracts/contracts ./contracts
+COPY packages/boba/contracts/hardhat.config.ts ./
+COPY packages/boba/contracts/deploy ./deploy
+COPY packages/boba/contracts/tasks ./tasks
+COPY packages/boba/contracts/scripts ./scripts
+COPY packages/boba/contracts/deployment ./deployment
+COPY packages/boba/contracts/preSupportedTokens.json ./
+COPY packages/boba/contracts/preSupportedNFTs.json ./
 
 ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
