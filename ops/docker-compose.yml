@@ -84,9 +84,9 @@ x-relayer_pk: &relayer_pk
 x-fast-relayer_pk: &fast-relayer_pk
   FAST_RELAYER_PRIVATE_KEY: '0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0'
 
-# Account 10
+# Account #0 - allows the fee test
 x-integration_pk: &integration_pk
-  PRIVATE_KEY: '0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897'
+  PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 version: "3"
 
