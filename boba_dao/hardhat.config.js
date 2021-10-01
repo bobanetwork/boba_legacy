@@ -59,9 +59,6 @@ module.exports = {
       }
     }
   },
-  ovm: {
-    solcVersion: '0.7.6'
-  },
   namedAccounts: {
     deployer: 0
   },
