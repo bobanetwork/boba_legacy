@@ -66,7 +66,7 @@ x-deployer_pk: &deployer_pk
 # Account #19
 # Same as the deployer - allows the deployer to bypass the fee enforcement
 x-gas-price-oracle_pk: &gas-price-oracle_pk
-  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
+  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 # Account #1
 x-sequencer_pk: &sequencer_pk
@@ -86,7 +86,7 @@ x-fast-relayer_pk: &fast-relayer_pk
 
 # Account #19 - allows the fee test
 x-integration_pk: &integration_pk
-  PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
+  PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 version: "3"
 
@@ -130,7 +130,7 @@ services:
         L2_CHAIN_ID: 31338
         L2_BLOCK_GAS_LIMIT: 11000000
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-        GAS_PRICE_ORACLE_OWNER: "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+        GAS_PRICE_ORACLE_OWNER: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
         GAS_PRICE_ORACLE_OVERHEAD: "2750"
         GAS_PRICE_ORACLE_SCALAR: "1500000"
         GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
@@ -347,5 +347,5 @@ services:
       GAS_PRICE_ORACLE_FLOOR_PRICE:
       GAS_PRICE_ORACLE_ROOF_PRICE:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
-      POLLING_INTERVAL:
+      POLLING_INTERVAL: 3600000
       RETRIES: 70
