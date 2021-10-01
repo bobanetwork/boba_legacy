@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-//import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 /**
@@ -57,11 +56,6 @@ contract ERC721Genesis is Ownable, ERC721URIStorage {
         string memory) {
         return(genesis.cAddress, genesis.id, genesis.chain);
     }
-
-    // //for a specific tokenId, get the associated NFT
-    // function tokenURI(uint256 tokenId) external view returns (string memory) {
-    //     return tokenURI(tokenId);
-    // }
 
     function exists(uint256 tokenId) external view returns (bool) {
         return _exists(tokenId);
