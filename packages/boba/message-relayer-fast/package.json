@@ -1,5 +1,5 @@
 {
-  "name": "@omgx/message-relayer-fast",
+  "name": "@boba/message-relayer-fast",
   "version": "0.1.1",
   "private": true,
   "description": "Fast Cross Domain Message Relayer service",
@@ -14,7 +14,7 @@
     "start": "yarn start:service",
     "build": "tsc -p ./tsconfig.build.json",
     "clean": "rimraf  dist/ ./tsconfig.build.tsbuildinfo",
-    "test:integration": "hardhat --network omgx test",
+    "test:integration": "hardhat --network boba test",
     "lint": "yarn lint:fix && yarn lint:check",
     "lint:fix": "prettier --config .prettierrc.json --write \"{src,exec,test}/**/*.ts\"",
     "lint:check": "tslint --format stylish --project ."

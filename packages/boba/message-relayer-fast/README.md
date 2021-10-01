@@ -1,4 +1,4 @@
-# OMGX_Messenger_Relayer_Fast
+# BOBA_Messenger_Relayer_Fast
 
 Customized L1 Cross Domain Messenger without dispute period time restrictions and associated message relayer service.
 

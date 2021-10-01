@@ -3,7 +3,7 @@ yarn build
 
 docker-compose build -- builder
 docker-compose build -- boba_deployer
-#docker-compose build -- boba_message-relayer-fast
+docker-compose build -- boba_message-relayer-fast
 docker-compose build -- gas_oracle
 docker-compose build -- deployer
 
