@@ -29,7 +29,6 @@ contract ERC721Genesis is Ownable, ERC721URIStorage {
         string memory origin_chain
     )
         ERC721(name, symbol) {
-        _setTokenURI(tID_start, '');
         tID = tID_start;
         genesis = Ancestor(
             origin_cAddress,
