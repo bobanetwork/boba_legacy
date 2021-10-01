@@ -7053,7 +7053,7 @@ ethers@^5.0.0, ethers@^5.0.1, ethers@^5.0.2, ethers@^5.4.0, ethers@^5.4.5:
     "@ethersproject/web" "5.4.0"
     "@ethersproject/wordlists" "5.4.0"
 
-ethers@^5.1.0:
+ethers@^5.0.32, ethers@^5.1.0:
   version "5.4.7"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.4.7.tgz#0fd491a5da7c9793de2d6058d76b41b1e7efba8f"
   integrity sha512-iZc5p2nqfWK1sj8RabwsPM28cr37Bpq7ehTQ5rWExBr2Y09Sn1lDKZOED26n+TsZMye7Y6mIgQ/1cwpSD8XZew==
@@ -8255,7 +8255,7 @@ hard-rejection@^2.1.0:
   resolved "https://registry.yarnpkg.com/hard-rejection/-/hard-rejection-2.1.0.tgz#1c6eda5c1685c63942766d79bb40ae773cecd883"
   integrity sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==
 
-hardhat-deploy@^0.7.4:
+hardhat-deploy@^0.7.10, hardhat-deploy@^0.7.4:
   version "0.7.11"
   resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.7.11.tgz#93f79dfbb529eeda24ac963e23a19064d536be2f"
   integrity sha512-ONLH3NH8Biuhky44KRFyaINVHM8JI4Ihy1TpntIRZUpIFHlz9h3gieq46H7iwdp6z3CqMsOCChF0riUF3CFpmQ==
