@@ -5,10 +5,12 @@ import chalk from 'chalk';
 import { getContractFactory } from '@eth-optimism/contracts';
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import preSupportedTokens from '../preSupportedTokens.json';
 
 let Factory__L1ERC20: ContractFactory
 let Factory__L2ERC20: ContractFactory
+let Factory__L2Boba: ContractFactory
 
 let L1ERC20: Contract
 let L2ERC20: Contract
@@ -26,6 +28,12 @@ const deployFn: DeployFunction = async (hre) => {
 
   Factory__L2ERC20 = getContractFactory(
     "L2StandardERC20",
+    (hre as any).deployConfig.deployer_l2
+  )
+
+  Factory__L2Boba = new ContractFactory(
+    L2GovernanceERC20Json.abi,
+    L2GovernanceERC20Json.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
 
@@ -67,23 +75,42 @@ const deployFn: DeployFunction = async (hre) => {
 
     //Set up things on L2 for this token
 
-    L2ERC20 = await Factory__L2ERC20.deploy(
-      (hre as any).deployConfig.L2StandardBridgeAddress,
-      tokenAddress,
-      //((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST' ) ? L1ERC20.address : token.address,
-      token.name,
-      token.symbol
-    )
-    await L2ERC20.deployTransaction.wait()
+    if (token.symbol !== 'BOBA') {
+      L2ERC20 = await Factory__L2ERC20.deploy(
+        (hre as any).deployConfig.L2StandardBridgeAddress,
+        tokenAddress,
+        //((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST' ) ? L1ERC20.address : token.address,
+        token.name,
+        token.symbol
+      )
+      await L2ERC20.deployTransaction.wait()
 
-    const L2ERC20DeploymentSubmission: DeploymentSubmission = {
-      ...L2ERC20,
-      receipt: L2ERC20.receipt,
-      address: L2ERC20.address,
-      abi: L2ERC20.abi,
-    };
-    await hre.deployments.save(`TK_L2${token.symbol}`, L2ERC20DeploymentSubmission)
-    console.log(`🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(L2ERC20.address)}`)
+      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
+        ...L2ERC20,
+        receipt: L2ERC20.receipt,
+        address: L2ERC20.address,
+        abi: L2ERC20.abi,
+      };
+      await hre.deployments.save(`TK_L2${token.symbol}`, L2ERC20DeploymentSubmission)
+      console.log(`🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(L2ERC20.address)}`)
+    } else {
+      L2ERC20 = await Factory__L2Boba.deploy(
+        (hre as any).deployConfig.L2StandardBridgeAddress,
+        tokenAddress,
+        token.name,
+        token.symbol
+      )
+      await L2ERC20.deployTransaction.wait()
+
+      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
+        ...L2ERC20,
+        receipt: L2ERC20.receipt,
+        address: L2ERC20.address,
+        abi: L2ERC20.abi,
+      };
+      await hre.deployments.save(`TK_L2${token.symbol}`, L2ERC20DeploymentSubmission)
+      console.log(`🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(L2ERC20.address)}`)
+    }
   }
 }
 
