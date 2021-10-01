@@ -8,7 +8,7 @@ import { iL2NFTBridge } from "./interfaces/iL2NFTBridge.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /* Library Imports */
-import { ERC165Checker } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
 
 /* Contract Imports */

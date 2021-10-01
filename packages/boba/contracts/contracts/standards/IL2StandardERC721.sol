@@ -2,7 +2,7 @@
 pragma solidity >0.7.5;
 
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { IERC165 } from "@openzeppelin/contracts/introspection/IERC165.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IL2StandardERC721 is IERC165, IERC721 {
     function l1Contract() external returns (address);

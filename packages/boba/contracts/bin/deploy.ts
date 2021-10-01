@@ -77,22 +77,3 @@ main()
     )
     process.exit(1)
   })
-
-//Based on the code, does not seem to be used?
-// function parseEnv() {
-
-//   function ensure(env, type) {
-//     if (typeof process.env[env] === 'undefined')
-//       return undefined
-//     if (type === 'number')
-//       return parseInt(process.env[env], 10)
-//     return process.env[env]
-//   }
-
-//   return {
-//     l1provider: ensure('L1_NODE_WEB3_URL', 'string'),
-//     l2provider: ensure('L2_NODE_WEB3_URL', 'string'),
-//     deployer: ensure('DEPLOYER_PRIVATE_KEY', 'string'),
-//     emOvmChainId: ensure('CHAIN_ID', 'number'),
-//   }
-// }

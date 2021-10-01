@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import "./IL2StandardERC721.sol";
 
-contract L2StandardERC721 is IL2StandardERC721, ERC721 {
+contract L2StandardERC721 is IL2StandardERC721, ERC721URIStorage {
     address public override l1Contract;
     address public l2Bridge;
 
@@ -32,7 +32,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
     }
 
     // ERC165 check interface
-    function supportsInterface(bytes4 _interfaceId) public override(ERC165, IERC165) pure returns (bool) {
+    function supportsInterface(bytes4 _interfaceId) public override(IERC165, ERC721) pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
         bytes4 secondSupportedInterface = IL2StandardERC721.l1Contract.selector
             ^ IL2StandardERC721.mint.selector
