@@ -685,9 +685,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         delay: this.options.resubmissionTimeout,
       })
 
-      this.logger.info('Relay message transaction sent', {
-        transactionHash: receipt.hash,
-      })
+      this.logger.info('Relay message transaction sent', { receipt })
     } catch (err) {
       this.logger.error('Relay attempt failed, skipping.', {
         message: err.toString(),
@@ -726,9 +724,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         delay: this.options.resubmissionTimeout,
       })
 
-      this.logger.info('Relay message transaction sent', {
-        transactionHash: receipt.hash,
-      })
+      this.logger.info('Relay message transaction sent', { receipt })
     } catch (err) {
       this.logger.error('Relay attempt failed, skipping.', {
         message: err.toString(),
