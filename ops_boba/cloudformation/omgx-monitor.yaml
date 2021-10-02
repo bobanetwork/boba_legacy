@@ -70,16 +70,12 @@ Resources:
       ContainerDefinitions:
         - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${OmgxMonitorImage}:${ImageTag}"
           Name: omgx_monitor
-          Environment:
-            - Name: SECRETNAME
-              Value: !Ref SecretName
-            - Name: L2_NODE_WEB3_WS
-              Value: !Sub
-                - "wss://${EndpointAddress}/ws"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-          EntryPoint:
-            - "/usr/local/bin/entrypoint.sh"
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3Bucket}/omgx-monitor.env"
+              - S3Bucket:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+            - Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["omgx-monitor"]'
             com.datadoghq.ad.init_configs: '[{}]'

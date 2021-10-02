@@ -76,24 +76,20 @@ Resources:
           Name: deployer
           PortMappings:
             - ContainerPort: 8081
-              HostPort: 0
-          Environment:
-            - Name: SECRETNAME
-              Value: !Ref SecretName
-            - Name: DTL_REGISTRY_URL
-              Value: !Sub
-                - "https://${EndpointAddress}:8081/addresses.json"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-          EntryPoint:
-            - "./bin/serve_dump.sh"
+              HostPort: 8082
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3Bucket}/deployer-rinkeby.env"
+              - S3Bucket:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+            - Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["deployer"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "deployer", "service": "deployer"}]'
           Essential: true
           Memory: "64"
-      NetworkMode: bridge
+      NetworkMode: host
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "deployer"
   ECSService:

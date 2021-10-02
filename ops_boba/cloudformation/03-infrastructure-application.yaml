@@ -19,23 +19,23 @@ Parameters:
   EcsMinSize:
     Description: Minimum number of instances in the ECS cluster
     Type: Number
-    Default: 2
-    MinValue: 2
-    MaxValue: 2 # This is set to prevent accidental huge costs
+    Default: 1
+    MinValue: 1
+    MaxValue: 1 # This is set to prevent accidental huge costs
 
   EcsMaxSize:
     Description: Maximum number of instances in the ECS cluster
     Type: Number
-    Default: 2
-    MinValue: 2
-    MaxValue: 2 # This is set to prevent accidental huge costs
+    Default: 1
+    MinValue: 1
+    MaxValue: 1 # This is set to prevent accidental huge costs
 
   EcsDesiredCapacity:
     Description: Default number of instances in the ECS cluster
     Type: Number
-    Default: 2
-    MinValue: 2
-    MaxValue: 2 # This is set to prevent accidental huge costs
+    Default: 1
+    MinValue: 1
+    MaxValue: 1 # This is set to prevent accidental huge costs
 
   DomainName:
     Description: The domain for the Common Name of the wildcard certificate on the Load Balancer listener
@@ -70,6 +70,12 @@ Metadata:
         default: Default number of instances in the ECS cluster
 
 Resources:
+
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-S3"
 
   FileSystem:
     Type: AWS::EFS::FileSystem
@@ -216,50 +222,30 @@ Resources:
   LoadBalancerGraph:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      IpAddressType: ipv4
       Scheme: internet-facing
-      SecurityGroups:
-      - !Ref LoadBalancerSecurityGroup
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      Type: network
 
   LoadBalancerInt:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internal
-      LoadBalancerAttributes:
-      - Key: idle_timeout.timeout_seconds
-        Value: '3600'
-      SecurityGroups:
-      - !Ref LoadBalancerIntSecurityGroup
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      Type: network
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       IpAddressType: dualstack
       Scheme: internet-facing
-      SecurityGroups:
-      - !Ref LoadBalancerSecurityGroup
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
-
-  DataTransportLayerListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn: !Ref LoadBalancerInt
-      Port: 80
-      Protocol: HTTP
-      DefaultActions:
-      - Type: fixed-response
-        FixedResponseConfig:
-          ContentType: text/html
-          MessageBody: ""
-          StatusCode: 404
+      Type: network
 
   EcsCluster:
     Type: AWS::ECS::Cluster
@@ -410,11 +396,11 @@ Outputs:
     Value: !GetAtt LoadBalancerInt.CanonicalHostedZoneID
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
-  DataTransportLayerListener:
-    Value: !Ref DataTransportLayerListener
-    Export:
-      Name: !Sub "${InfrastructureStackName}:DataTransportLayerListener"
   EFSFilesystem:
     Value: !Ref FileSystem
     Export:
       Name: !Sub "${InfrastructureStackName}:EFSFilesystem"
+  S3Bucket:
+    Value: !Ref S3Bucket
+    Export:
+      Name: !Sub "${InfrastructureStackName}:S3Bucket"

@@ -124,6 +124,7 @@ Resources:
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      Type: network
 
   DNSRecordV4Graph:
     Type: AWS::Route53::RecordSet
@@ -151,20 +152,12 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 4000
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: 200
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "instance"
 
   BlockscoutListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -179,20 +172,6 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref BlockscoutLBTargetGroup
 
-  BlockscoutLBListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref BlockscoutLBTargetGroup
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-            - !Ref DNSRecordV4Graph
-      ListenerArn: !Ref BlockscoutListener
-      Priority: 1
-
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -205,52 +184,24 @@ Resources:
               HardLimit: 0
           PortMappings:
             - ContainerPort: 4000
-              HostPort: 0
-          Environment:
-            - Name: SECRETNAME
-              Value: !Ref SecretName
-            - Name: COIN
-              Value: ETH
-            - Name: NETWORK
-              Value: Boba
-            - Name: PORT
-              Value: 4000
-            - Name: SUBNETWORK
-              Value: Rinkeby
-            - Name: MIX_ENV
-              Value: prod
-            - Name: ETHEREUM_JSONRPC_VARIANT
-              Value: geth
-            - Name: LOGO
-              Value: /images/boba_logo.svg
-            - Name: SUPPORTED_CHAINS
-              Value: '[{"title":"Boba Mainnet","url":"https://blockexplorer.boba.network","hide_in_dropdown?": false},{"title":"Boba Rinkeby","url":"https://blockexplorer.rinkeby.boba.network","test_net?":true},{"title":"Boba Rinkeby Integration","url":"https://blockexplorer.rinkeby-integration.boba.network","test_net?":true,"hide_in_dropdown?": true}]'
-            - Name: ETHEREUM_JSONRPC_TRACE_URL
-              Value: !Sub
-                - "http://${EndpointAddress}:8545/"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
-            - Name: ETHEREUM_JSONRPC_WS_URL
-              Value: !Sub
-                - "ws://${EndpointAddress}:8545/ws/"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
-            - Name: BLOCKSCOUT_VERSION
-              Value: 1.0.0
-          EntryPoint:
-            - "/entrypoint.sh"
+              HostPort: 4000
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3Bucket}/blockexplorer-blockscout.env"
+              - S3Bucket:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+            - Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["blockscout"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "blockscout", "service": "blockscout"}]'
           Essential: true
           Memory: "512"
-      NetworkMode: bridge
+      NetworkMode: host
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "blockscout-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: BlockscoutLBListenerRule
     Properties:
       Cluster:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"

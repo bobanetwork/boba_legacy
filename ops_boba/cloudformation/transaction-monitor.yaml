@@ -80,16 +80,12 @@ Resources:
       ContainerDefinitions:
         - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${TransactionMonitorImage}:${ImageTag}"
           Name: transaction-monitor
-          Environment:
-            - Name: SECRETNAME
-              Value: !Ref SecretName
-            - Name: L2_NODE_WEB3_URL
-              Value: !Sub
-                - "https://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-          EntryPoint:
-            - "/start_service.sh"
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3Bucket}/transaction-monitor.env"
+              - S3Bucket:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+            - Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["transaction-monitor"]'
             com.datadoghq.ad.init_configs: '[{}]'
