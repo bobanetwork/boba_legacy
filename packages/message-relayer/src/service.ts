@@ -193,6 +193,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.options.fromL2TransactionIndex || 0
     this.state.lastFilterPollingTimestamp = 0
 
+    // filter
+    this.state.filter = []
+
     //batch system
     this.state.timeOfLastRelayS = Date.now()
     this.state.timeSinceLastRelayS = 0
