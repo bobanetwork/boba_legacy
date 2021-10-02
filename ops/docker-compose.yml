@@ -240,6 +240,7 @@ services:
         RETRIES: 60
         POLLING_INTERVAL: 500
         GET_LOGS_INTERVAL: 500
+        MAX_WAIT_TIME_S: 1
 
   batch_submitter:
     depends_on:
