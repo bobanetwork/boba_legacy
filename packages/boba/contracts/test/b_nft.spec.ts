@@ -6,8 +6,8 @@ import chalk from 'chalk';
 
 import { Contract, ContractFactory, BigNumber } from 'ethers'
 
-import L2ERC721Json from '../artifacts-ovm/contracts/ERC721Genesis.sol/ERC721Genesis.json'
-import L2ERC721RegJson from '../artifacts-ovm/contracts/ERC721Registry.sol/ERC721Registry.json'
+import L2ERC721Json from '../artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
+import L2ERC721RegJson from '../artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'
 
 import { OptimismEnv } from './shared/env'
 

@@ -44,11 +44,7 @@ describe('System setup', async () => {
       env.bobl1Wallet
     )
 
-    Factory__L2ERC20 = getContractFactory(
-      "L2StandardERC20",
-      env.bobl2Wallet,
-      true,
-    )
+    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.bobl2Wallet)
 
     //let's tap into the contract we just deployed
     L2ERC20 = new Contract(

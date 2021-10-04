@@ -2,14 +2,13 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 import { Contract, ContractFactory, utils } from 'ethers'
-import chalk from 'chalk';
 
 import { Direction } from './shared/watcher-utils'
 
-import L1NFTBridge from '../artifacts/contracts/bridges/OVM_L1NFTBridge.sol/OVM_L1NFTBridge.json'
-import L2NFTBridge from '../artifacts-ovm/contracts/bridges/OVM_L2NFTBridge.sol/OVM_L2NFTBridge.json'
+import L1NFTBridge from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridge from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
 import L1ERC721Json from '../artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
-import L2ERC721Json from '../artifacts-ovm/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
+import L2ERC721Json from '../artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
 
 import { OptimismEnv } from './shared/env'
 import * as fs from 'fs'
