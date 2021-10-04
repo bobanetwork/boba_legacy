@@ -241,6 +241,30 @@ services:
         POLLING_INTERVAL: 500
         GET_LOGS_INTERVAL: 500
 
+  # a second relay system for messages that need to get to L1 quickly
+  # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
+  boba_message-relayer-fast:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: boba/boba_message-relayer-fast
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      # This is who pays for the fast message relayer
+      << : *fast-relayer_pk
+      RETRIES: 70
+      POLLING_INTERVAL: 1500
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_POLLING_INTERVAL: 30000
+
   batch_submitter:
     depends_on:
       - l1_chain
