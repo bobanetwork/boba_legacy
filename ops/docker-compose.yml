@@ -248,7 +248,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: boba/boba_message-relayer-fast
+    image: bobanetwork/boba_message-relayer-fast
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
