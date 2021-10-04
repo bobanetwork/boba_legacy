@@ -114,9 +114,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.options.l1RpcProvider
     )
 
-    this.logger.info('Connecting to OVM_StateCommitmentChain...')
-    this.state.OVM_StateCommitmentChain = await loadContractFromManager({
-      name: 'OVM_StateCommitmentChain',
+    this.logger.info('Connecting to StateCommitmentChain...')
+    this.state.StateCommitmentChain = await loadContractFromManager({
+      name: 'StateCommitmentChain',
       Lib_AddressManager: this.state.Lib_AddressManager,
       provider: this.options.l1RpcProvider,
     })
@@ -129,20 +129,20 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.options.l1MessengerFast ||
       (await this.state.Lib_AddressManager.getAddress(
       'Proxy__L1CrossDomainMessengerFast'
-    )
+      ))
     this.state.L1CrossDomainMessenger = loadContract(
       'L1CrossDomainMessenger',
       l1MessengerAddress,
       this.options.l1RpcProvider
     )
-    this.logger.info('Connected to OVM_L1CrossDomainMessenger', {
+    this.logger.info('Connected to L1CrossDomainMessenger', {
       address: this.state.L1CrossDomainMessenger.address,
     })
 
     this.logger.info('Connecting to L1MultiMessageRelayerFast...')
     const l1MultiMessageRelayerFastAddress = await this.state.Lib_AddressManager.getAddress(
-      'L1MultiMessageRelayerFast'
-    )
+        'L1MultiMessageRelayerFast'
+      )
     this.state.L1MultiMessageRelayerFast = loadContract(
       'L1MultiMessageRelayer',
       l1MultiMessageRelayerFastAddress,
@@ -475,7 +475,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     // decode to get timestamp and check for time elapsed for non-zero dispute period messenger
 
-    // return !(await this.state.OVM_StateCommitmentChain.insideFraudProofWindow(
+    // return !(await this.state.StateCommitmentChain.insideFraudProofWindow(
     //   header.batch
     // ))
     return true
