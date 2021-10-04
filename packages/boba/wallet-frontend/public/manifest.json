@@ -1,0 +1,15 @@
+{
+  "short_name": "BOBA Web Wallet",
+  "name": "BOBA Web Wallet",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "type": "image/png",
+      "sizes": "42x40"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
