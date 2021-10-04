@@ -9,10 +9,10 @@ mkdir -p src/deployment/artifacts-ovm &&
 #cp -Rf ./deployment/rinkeby ../wallet-frontend/src/deployment &&
 
 #these are the Base L1 contracts
-cp -Rf ../../contracts/artifacts/contracts/optimistic-ethereum src/deployment/artifacts &&
+cp -Rf ../../contracts/artifacts/contracts/L1/optimistic-ethereum src/deployment/artifacts &&
 
 #these are the Base L2 contracts
-cp -Rf ../../contracts/artifacts-ovm/contracts/optimistic-ethereum src/deployment/artifacts-ovm &&
+cp -Rf ../../contracts/artifacts/contracts/L2/optimistic-ethereum src/deployment/artifacts-ovm &&
 
 #these are the BOBA L1 contracts
 cp -Rf ../contracts/artifacts/contracts src/deployment/artifacts &&
