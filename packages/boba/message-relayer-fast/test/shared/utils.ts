@@ -76,7 +76,7 @@ export const katel2Wallet = new Wallet(process.env.TEST_PRIVATE_KEY_3).connect(
 export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =
   '0x4200000000000000000000000000000000000004'
 export const OVM_ETH_ADDRESS = '0x4200000000000000000000000000000000000006'
-export const Proxy__OVM_L2CrossDomainMessenger =
+export const Proxy__L2CrossDomainMessenger =
   '0x4200000000000000000000000000000000000007'
 
 export const DEPLOYER =

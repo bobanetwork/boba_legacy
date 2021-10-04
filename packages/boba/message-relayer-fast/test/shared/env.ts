@@ -85,15 +85,15 @@ export class OptimismEnv {
       addressManager
     )
 
-    const l1Messenger = getContractFactory('iOVM_L1CrossDomainMessenger')
+    const l1Messenger = getContractFactory('IL1CrossDomainMessenger')
       .connect(bobl1Wallet)
       .attach(watcher.l1.messengerAddress)
 
-    const l1MessengerFast = getContractFactory('iOVM_L1CrossDomainMessenger')
+    const l1MessengerFast = getContractFactory('IL1CrossDomainMessenger')
       .connect(bobl1Wallet)
       .attach(watcherFast.l1.messengerAddress)
 
-    const l2Messenger = getContractFactory('iOVM_L2CrossDomainMessenger')
+    const l2Messenger = getContractFactory('IL2CrossDomainMessenger')
       .connect(bobl2Wallet)
       .attach(watcher.l2.messengerAddress)
 

@@ -44,8 +44,8 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
-import L1StandardBridgeJson from '../deployment/artifacts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json'
-import L2StandardBridgeJson from '../deployment/artifacts-ovm/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json'
+import L1StandardBridgeJson from '../deployment/artifacts/optimistic-ethereum/OVM/bridge/tokens/L1StandardBridge.sol/L1StandardBridge.json'
+import L2StandardBridgeJson from '../deployment/artifacts-ovm/optimistic-ethereum/OVM/bridge/tokens/L2StandardBridge.sol/L2StandardBridge.json'
 
 //BOBA LP contracts
 import L1LPJson from '../deployment/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
@@ -409,18 +409,18 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      //this.L1MessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessenger
+      //this.L1MessengerAddress = addresses.Proxy__L1CrossDomainMessenger
       //backwards compat
-      if (addresses.hasOwnProperty('Proxy__OVM_L1CrossDomainMessenger')) {
-        this.L1MessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessenger
+      if (addresses.hasOwnProperty('Proxy__L1CrossDomainMessenger')) {
+        this.L1MessengerAddress = addresses.Proxy__L1CrossDomainMessenger
         console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
       }
 
-      if(addresses.hasOwnProperty('Proxy__OVM_L1CrossDomainMessengerFast')) {
-        this.L1FastMessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessengerFast
+      if(addresses.hasOwnProperty('Proxy__L1CrossDomainMessengerFast')) {
+        this.L1FastMessengerAddress = addresses.Proxy__L1CrossDomainMessengerFast
       }
-      else if (addresses.hasOwnProperty('OVM_L1CrossDomainMessengerFast')) {
-        this.L1FastMessengerAddress = addresses.OVM_L1CrossDomainMessengerFast
+      else if (addresses.hasOwnProperty('L1CrossDomainMessengerFast')) {
+        this.L1FastMessengerAddress = addresses.L1CrossDomainMessengerFast
       }
       else {
         this.L1FastMessengerAddress = addresses.L1FastMessengerAddress
@@ -428,8 +428,8 @@ class NetworkService {
       console.log('L1FastMessengerAddress set to:',this.L1FastMessengerAddress)
 
       //backwards compat
-      if (addresses.hasOwnProperty('Proxy__OVM_L1StandardBridge'))
-        this.L1StandardBridgeAddress = addresses.Proxy__OVM_L1StandardBridge
+      if (addresses.hasOwnProperty('Proxy__L1StandardBridge'))
+        this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
       else
         this.L1StandardBridgeAddress = addresses.L1StandardBridge
 

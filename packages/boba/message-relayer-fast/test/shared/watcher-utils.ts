@@ -12,7 +12,7 @@ export const initWatcher = async (
   AddressManager: Contract
 ) => {
   const l1MessengerAddress = await AddressManager.getAddress(
-    'Proxy__OVM_L1CrossDomainMessenger'
+    'Proxy__L1CrossDomainMessenger'
   )
   console.log('l1MessengerAddress:', l1MessengerAddress)
 
@@ -34,7 +34,7 @@ export const initWatcherFast = async (
   AddressManager: Contract
 ) => {
   const l1MessengerAddressFast = await AddressManager.getAddress(
-    'Proxy__OVM_L1CrossDomainMessengerFast'
+    'Proxy__L1CrossDomainMessengerFast'
   )
   console.log('l1MessengerAddressFast:', l1MessengerAddressFast)
 

@@ -60,7 +60,10 @@ export const waitForXDomainTransaction = async (
     const [xDomainMsgHash] = await watcher.getMessageHashesFromL1Tx(tx.hash)
     console.log(' Got L1->L2 message hash', xDomainMsgHash)
     remoteReceipt = await watcher.getL2TransactionReceipt(xDomainMsgHash)
-    console.log(' Completed Deposit - L2 tx hash:', remoteReceipt.transactionHash)
+    console.log(
+      ' Completed Deposit - L2 tx hash:',
+      remoteReceipt.transactionHash
+    )
   } else {
     // WITHDRAWAL
     console.log(' Looking for L2 to L1')

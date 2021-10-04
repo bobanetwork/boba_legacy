@@ -30,23 +30,23 @@ All configuration is done via environment variables. See all variables at [.env.
 
 ## L2 Gas Fee
 
-The L2 gas fee is 
+The L2 gas fee is
 
 ```
 gasFee = gasPrice * gasLimit
 ```
 
-**GAS PRICE** The gas price is fixed and is equal to **0.015 GWei**. **DON'T CHANGE IT!** Notably, the way fees are calculated on L2 differ from what you might be used to on L1, where the gas price can be adjusted e.g. to ensure faster mining. Since there is no mining on L2, the gas price is fixed. 
+**GAS PRICE** The gas price is fixed and is equal to **0.015 GWei**. **DON'T CHANGE IT!** Notably, the way fees are calculated on L2 differ from what you might be used to on L1, where the gas price can be adjusted e.g. to ensure faster mining. Since there is no mining on L2, the gas price is fixed.
 
-**GAS LIMIT** On L2, we vary the gas limit to accommodate the ever-changing costs of running the L2. This can be confusing, since on L1, the gas limits are constants that depend only on the _type_ of transaction - e.g. on L1, a standard ETH transfer requires a gas limit of 21,000 units of gas. 
+**GAS LIMIT** On L2, we vary the gas limit to accommodate the ever-changing costs of running the L2. This can be confusing, since on L1, the gas limits are constants that depend only on the _type_ of transaction - e.g. on L1, a standard ETH transfer requires a gas limit of 21,000 units of gas.
 
-**GAS LIMIT SETTINGS** You _could_ use the maximum gas limit, but that would incur wasteful spending. We provide an oracle to help you pick a smaller, more cost effective setting. The estimated gas limit is based on `rollup_gasPrices`, which is composed of `L1GasPrice` and `L2GasPrice` based on the following expression: 
+**GAS LIMIT SETTINGS** You _could_ use the maximum gas limit, but that would incur wasteful spending. We provide an oracle to help you pick a smaller, more cost effective setting. The estimated gas limit is based on `rollup_gasPrices`, which is composed of `L1GasPrice` and `L2GasPrice` based on the following expression:
 
 ```
 estimatedGasLimit = calculateL1GasLimit(data) * L1GasPrice + L2GasPrice * L2EstimatedExecutionGasLimit
 ```
 
-The `L2GasPrice` changes gradually to reflect our service cost, primarily, the cost of writing state roots into L1, and the significant cost of relaying messages from L1 to L2 (e.g. deposits) and back from L2 to L1 (e.g. exits). _Unlike other L2's, we include the cost of relaying messages in our gas limits_, so you do not have to pay two different fees or have to worry about relaying your messages. 
+The `L2GasPrice` changes gradually to reflect our service cost, primarily, the cost of writing state roots into L1, and the significant cost of relaying messages from L1 to L2 (e.g. deposits) and back from L2 to L1 (e.g. exits). _Unlike other L2's, we include the cost of relaying messages in our gas limits_, so you do not have to pay two different fees or have to worry about relaying your messages.
 
 ## Algorithm
 

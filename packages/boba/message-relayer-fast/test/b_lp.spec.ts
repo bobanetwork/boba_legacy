@@ -43,11 +43,11 @@ describe('Liquidity Pool Test', async () => {
     )
 
     const L1StandardBridgeAddress = await env.addressManager.getAddress(
-      'Proxy__OVM_L1StandardBridge'
+      'Proxy__L1StandardBridge'
     )
 
     L1StandardBridge = getContractFactory(
-      'OVM_L1StandardBridge',
+      'L1StandardBridge',
       env.bobl1Wallet
     ).attach(L1StandardBridgeAddress)
 
@@ -63,8 +63,7 @@ describe('Liquidity Pool Test', async () => {
 
     Factory__L2ERC20 = getContractFactory(
       'L2StandardERC20',
-      env.bobl2Wallet,
-      true
+      env.bobl2Wallet
     )
 
     L2ERC20 = await Factory__L2ERC20.deploy(

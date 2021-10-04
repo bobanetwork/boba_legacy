@@ -15,7 +15,7 @@ export interface WatcherOptions {
 export class Watcher {
 
   public NUM_BLOCKS_TO_FETCH: number = 10000
-  
+
   public l1: Layer
   public l2: Layer
 
@@ -52,9 +52,8 @@ export class Watcher {
     layer: Layer,
     txHash: string
   ): Promise<string[]> {
-
     const receipt = await layer.provider.getTransactionReceipt(txHash)
-    
+
     if (!receipt) {
       return []
     }
@@ -81,9 +80,9 @@ export class Watcher {
     msgHash: string,
     pollForPending: boolean = true
   ): Promise<TransactionReceipt> {
-    
+
     //console.log(" Watcher::getTransactionReceipt")
-    
+
     const blockNumber = await layer.provider.getBlockNumber()
     const startingBlock = Math.max(blockNumber - this.NUM_BLOCKS_TO_FETCH, 0)
 
@@ -92,13 +91,13 @@ export class Watcher {
       topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
       fromBlock: startingBlock,
     }
-    
+
     const logs = await layer.provider.getLogs(filter)
     //console.log("Looking for:", msgHash)
     //console.log("Current logs:", logs)
 
     const matches = logs.filter((log: any) => log.data === msgHash)
-        
+
     // Message was relayed in the past
     if (matches.length > 0) {
       if (matches.length > 1) {
@@ -108,7 +107,7 @@ export class Watcher {
       }
       return layer.provider.getTransactionReceipt(matches[0].transactionHash)
     }
- 
+
     if (!pollForPending) {
       return Promise.resolve(undefined)
     }

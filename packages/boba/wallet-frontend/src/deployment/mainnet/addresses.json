@@ -1,6 +1,6 @@
 {
   "AddressManager": "0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089",
-  "OVM_L1CrossDomainMessenger": "0x25109139f8C4F9f7b4E4d5452A067feaE3a537F3",
+  "L1CrossDomainMessenger": "0x25109139f8C4F9f7b4E4d5452A067feaE3a537F3",
   "Proxy__OVM_L1CrossDomainMessenger": "0x6D4528d192dB72E282265D6092F4B872f9Dff69e",
   "Proxy__OVM_L1StandardBridge": "0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00",
   "TOKENS": {
