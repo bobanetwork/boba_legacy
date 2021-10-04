@@ -110,7 +110,7 @@ func TestCalculateFee(t *testing.T) {
 			// Ignore the error here because the tx isn't signed
 			msg, _ := tx.AsMessage(signer)
 
-			l1MsgFee, err := fees.CalculateL1MsgFee(msg, state, &addr)
+			l1MsgFee, _ := fees.CalculateL1MsgFee(msg, state, &addr)
 			if l1MsgFee.Cmp(expectL1Fee) != 0 {
 				t.Fatal("l1 msg fee not computed correctly")
 			}
