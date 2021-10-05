@@ -11,18 +11,18 @@ export const initWatcher = async (
   l2Provider: JsonRpcProvider,
   AddressManager: Contract
 ) => {
-
-  const l1MessengerAddress = await AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
-  console.log("l1MessengerAddress:",l1MessengerAddress)
+  const l1MessengerAddress = await AddressManager.getAddress(
+    'Proxy__L1CrossDomainMessenger'
+  )
 
   return new Watcher({
     l1: {
       provider: l1Provider,
-      messengerAddress: l1MessengerAddress
+      messengerAddress: l1MessengerAddress,
     },
     l2: {
       provider: l2Provider,
-      messengerAddress: "0x4200000000000000000000000000000000000007"
+      messengerAddress: '0x4200000000000000000000000000000000000007',
     },
   })
 }
@@ -41,9 +41,8 @@ export enum Direction {
 export const waitForXDomainTransaction = async (
   watcher: Watcher,
   tx: Promise<TransactionResponse> | TransactionResponse,
-  direction: Direction,
+  direction: Direction
 ): Promise<CrossDomainMessagePair> => {
-
   // await it if needed
   tx = await tx
 
@@ -56,9 +55,10 @@ export const waitForXDomainTransaction = async (
 
   if (direction === Direction.L1ToL2) {
     // DEPOSIT
-    console.log(' Looking for L1 to L2')
+    console.log(tx)
     const [xDomainMsgHash] = await watcher.getMessageHashesFromL1Tx(tx.hash)
-    console.log(' Got L1->L2 message hash', xDomainMsgHash)
+    console.log('xDomainMsgHash')
+    console.log(xDomainMsgHash)
     remoteReceipt = await watcher.getL2TransactionReceipt(xDomainMsgHash)
     console.log(
       ' Completed Deposit - L2 tx hash:',
@@ -70,7 +70,10 @@ export const waitForXDomainTransaction = async (
     const [xDomainMsgHash] = await watcher.getMessageHashesFromL2Tx(tx.hash)
     console.log(' Got L2->L1 message hash', xDomainMsgHash)
     remoteReceipt = await watcher.getL1TransactionReceipt(xDomainMsgHash)
-    console.log(' Completed Withdrawal - L1 tx hash:', remoteReceipt.transactionHash)
+    console.log(
+      ' Completed Withdrawal - L1 tx hash:',
+      remoteReceipt.transactionHash
+    )
   }
 
   return {

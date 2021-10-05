@@ -13,7 +13,6 @@ export interface WatcherOptions {
 }
 
 export class Watcher {
-
   public NUM_BLOCKS_TO_FETCH: number = 10000
 
   public l1: Layer
@@ -59,19 +58,44 @@ export class Watcher {
     }
 
     const msgHashes = []
+    const sentMessageEventId = ethers.utils.id(
+      'SentMessage(address,address,bytes,uint256,uint256)'
+    )
+    const l2CrossDomainMessengerRelayAbi = [
+      'function relayMessage(address _target,address _sender,bytes memory _message,uint256 _messageNonce)',
+    ]
+    const l2CrossDomainMessengerRelayinterface = new ethers.utils.Interface(
+      l2CrossDomainMessengerRelayAbi
+    )
 
     for (const log of receipt.logs) {
       if (
         log.address === layer.messengerAddress &&
-        log.topics[0] === ethers.utils.id('SentMessage(bytes)')
+        log.topics[0] === sentMessageEventId
       ) {
-        const [message] = ethers.utils.defaultAbiCoder.decode(
-          ['bytes'],
-          log.data
+        const [sender, message, messageNonce] =
+          ethers.utils.defaultAbiCoder.decode(
+            ['address', 'bytes', 'uint256'],
+            log.data
+          )
+
+        const [target] = ethers.utils.defaultAbiCoder.decode(
+          ['address'],
+          log.topics[1]
         )
-        msgHashes.push(ethers.utils.solidityKeccak256(['bytes'], [message]))
+
+        const encodedMessage =
+          l2CrossDomainMessengerRelayinterface.encodeFunctionData(
+            'relayMessage',
+            [target, sender, message, messageNonce]
+          )
+
+        msgHashes.push(
+          ethers.utils.solidityKeccak256(['bytes'], [encodedMessage])
+        )
       }
     }
+
     return msgHashes
   }
 
@@ -80,7 +104,6 @@ export class Watcher {
     msgHash: string,
     pollForPending: boolean = true
   ): Promise<TransactionReceipt> {
-
     //console.log(" Watcher::getTransactionReceipt")
 
     const blockNumber = await layer.provider.getBlockNumber()
@@ -93,11 +116,15 @@ export class Watcher {
     }
 
     const logs = await layer.provider.getLogs(filter)
-    //console.log("Looking for:", msgHash)
-    //console.log("Current logs:", logs)
+    // console.log('Looking for:', msgHash)
+    // console.log('Current logs:', logs)
 
-    const matches = logs.filter((log: any) => log.data === msgHash)
+    const matches = logs.filter(
+      (log: ethers.providers.Log) => log.topics[1] === msgHash
+    )
+    console.log('matches')
 
+    console.log(matches)
     // Message was relayed in the past
     if (matches.length > 0) {
       if (matches.length > 1) {
@@ -121,7 +148,9 @@ export class Watcher {
         //console.log(log)
         if (log.data === msgHash) {
           try {
-            const txReceipt = await layer.provider.getTransactionReceipt(log.transactionHash)
+            const txReceipt = await layer.provider.getTransactionReceipt(
+              log.transactionHash
+            )
             layer.provider.off(filter)
             resolve(txReceipt)
           } catch (e) {

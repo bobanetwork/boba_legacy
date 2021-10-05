@@ -61,8 +61,8 @@ export class OptimismEnv {
     this.l2ETHAddress = args.l2ETHAddress
     this.l1Messenger = args.l1Messenger
     this.l2Messenger = args.l2Messenger
-    this.L1StandardBridge = args.L1StandardBridge,
-    this.L2StandardBridge = args.L2StandardBridge,
+    this.L1StandardBridge = args.L1StandardBridge
+    this.L2StandardBridge = args.L2StandardBridge
     this.watcher = args.watcher
     this.bobl1Wallet = args.bobl1Wallet
     this.bobl2Wallet = args.bobl2Wallet
@@ -75,7 +75,6 @@ export class OptimismEnv {
   }
 
   static async new(): Promise<OptimismEnv> {
-
     const addressManager = await getAddressManager(bobl1Wallet)
 
     const addressesBOBA = await getBOBADeployerAddresses()
@@ -90,7 +89,9 @@ export class OptimismEnv {
       .connect(bobl2Wallet)
       .attach(watcher.l2.messengerAddress)
 
-    const L1StandardBridgeAddress = await addressManager.getAddress('Proxy__L1StandardBridge')
+    const L1StandardBridgeAddress = await addressManager.getAddress(
+      'Proxy__L1StandardBridge'
+    )
     const L1StandardBridge = getContractFactory('L1StandardBridge')
       .connect(bobl1Wallet)
       .attach(L1StandardBridgeAddress)
@@ -122,24 +123,32 @@ export class OptimismEnv {
       katel2Wallet,
 
       l1Provider,
-      l2Provider
+      l2Provider,
     })
   }
 
   async waitForXDomainTransaction(
     tx: Promise<TransactionResponse> | TransactionResponse,
-    direction: Direction,
+    direction: Direction
   ): Promise<CrossDomainMessagePair> {
     return waitForXDomainTransaction(this.watcher, tx, direction)
   }
 
   async waitForRevertXDomainTransaction(
-     tx: Promise<TransactionResponse> | TransactionResponse,
-     direction: Direction
-   ) {
-     const {remoteReceipt} = await waitForXDomainTransaction(this.watcher, tx, direction)
-     const [xDomainMsgHash] = await this.watcher.getMessageHashesFromL1Tx(remoteReceipt.transactionHash)
-     await this.watcher.getL2TransactionReceipt(xDomainMsgHash)
-   }
+    tx: Promise<TransactionResponse> | TransactionResponse,
+    direction: Direction
+  ) {
+    const { remoteReceipt } = await waitForXDomainTransaction(
+      this.watcher,
+      tx,
+      direction
+    )
+    console.log('lalal2')
+    const [xDomainMsgHash] = await this.watcher.getMessageHashesFromL1Tx(
+      remoteReceipt.transactionHash
+    )
 
+    console.log('lalal3')
+    await this.watcher.getL2TransactionReceipt(xDomainMsgHash)
+  }
 }
