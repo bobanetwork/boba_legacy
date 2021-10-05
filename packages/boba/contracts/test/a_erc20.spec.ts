@@ -48,105 +48,105 @@ describe('System setup', async () => {
     )
   })
 
-  it.only('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
-     const preL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
-    const preL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
-    console.log(
-      `🌕 ${chalk.red(
-        'L1ERC20 TEST token balance for Deployer PK:'
-      )} ${chalk.green(preL1ERC20Balance.toString())}`
-    )
-    console.log(
-      `🌕 ${chalk.red(
-        'L2ERC20 TEST token balance for Deployer PK:'
-      )} ${chalk.green(preL2ERC20Balance.toString())}`
-    )
+  // it.only('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
+  //    const preL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
+  //   const preL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
+  //   console.log(
+  //     `🌕 ${chalk.red(
+  //       'L1ERC20 TEST token balance for Deployer PK:'
+  //     )} ${chalk.green(preL1ERC20Balance.toString())}`
+  //   )
+  //   console.log(
+  //     `🌕 ${chalk.red(
+  //       'L2ERC20 TEST token balance for Deployer PK:'
+  //     )} ${chalk.green(preL2ERC20Balance.toString())}`
+  //   )
 
-    const depositL2ERC20Amount = utils.parseEther('12345')
+  //   const depositL2ERC20Amount = utils.parseEther('12345')
 
-    const approveL1ERC20TX = await L1ERC20.approve(
-      L1StandardBridgeAddress,
-      depositL2ERC20Amount
-    )
-    await approveL1ERC20TX.wait()
+  //   const approveL1ERC20TX = await L1ERC20.approve(
+  //     L1StandardBridgeAddress,
+  //     depositL2ERC20Amount
+  //   )
+  //   await approveL1ERC20TX.wait()
 
-    const deposit = L1StandardBridge.depositERC20(
-      L1ERC20.address,
-      L2ERC20.address,
-      depositL2ERC20Amount,
-      9999999,
-      utils.formatBytes32String(new Date().getTime().toString())
-    )
-      console.log('4444')
-    await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
-    console.log('5555')
-    const postL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
-    const postL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
+  //   const deposit = L1StandardBridge.depositERC20(
+  //     L1ERC20.address,
+  //     L2ERC20.address,
+  //     depositL2ERC20Amount,
+  //     9999999,
+  //     utils.formatBytes32String(new Date().getTime().toString())
+  //   )
+  //     console.log('4444')
+  //   await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+  //   console.log('5555')
+  //   const postL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
+  //   const postL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
 
-    console.log(
-      `🌕 ${chalk.red(
-        'L1ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL1ERC20Balance.toString())}`
-    )
-    console.log(
-      `🌕 ${chalk.red(
-        'L2ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL2ERC20Balance.toString())}`
-    )
+  //   console.log(
+  //     `🌕 ${chalk.red(
+  //       'L1ERC20 TEST token balance for Deployer PK now:'
+  //     )} ${chalk.green(postL1ERC20Balance.toString())}`
+  //   )
+  //   console.log(
+  //     `🌕 ${chalk.red(
+  //       'L2ERC20 TEST token balance for Deployer PK now:'
+  //     )} ${chalk.green(postL2ERC20Balance.toString())}`
+  //   )
 
-    expect(preL1ERC20Balance).to.deep.eq(
-      postL1ERC20Balance.add(depositL2ERC20Amount)
-    )
+  //   expect(preL1ERC20Balance).to.deep.eq(
+  //     postL1ERC20Balance.add(depositL2ERC20Amount)
+  //   )
 
-    expect(preL2ERC20Balance).to.deep.eq(
-      postL2ERC20Balance.sub(depositL2ERC20Amount)
-    )
-  })
+  //   expect(preL2ERC20Balance).to.deep.eq(
+  //     postL2ERC20Balance.sub(depositL2ERC20Amount)
+  //   )
+  // })
 
-  it('should transfer ERC20 TEST token to Kate', async () => {
-    const transferL2ERC20Amount = utils.parseEther('999')
+  // it('should transfer ERC20 TEST token to Kate', async () => {
+  //   const transferL2ERC20Amount = utils.parseEther('999')
 
-    const preKateL2ERC20Balance = await L2ERC20.balanceOf(
-      env.katel2Wallet.address
-    )
+  //   const preKateL2ERC20Balance = await L2ERC20.balanceOf(
+  //     env.katel2Wallet.address
+  //   )
 
-    const transferToKateTX = await L2ERC20.transfer(
-      env.katel2Wallet.address,
-      transferL2ERC20Amount
-    )
-    await transferToKateTX.wait()
+  //   const transferToKateTX = await L2ERC20.transfer(
+  //     env.katel2Wallet.address,
+  //     transferL2ERC20Amount
+  //   )
+  //   await transferToKateTX.wait()
 
-    const postKateL2ERC20Balance = await L2ERC20.balanceOf(
-      env.katel2Wallet.address
-    )
+  //   const postKateL2ERC20Balance = await L2ERC20.balanceOf(
+  //     env.katel2Wallet.address
+  //   )
 
-    expect(postKateL2ERC20Balance).to.deep.eq(
-      preKateL2ERC20Balance.add(transferL2ERC20Amount)
-    )
-  })
+  //   expect(postKateL2ERC20Balance).to.deep.eq(
+  //     preKateL2ERC20Balance.add(transferL2ERC20Amount)
+  //   )
+  // })
 
-  it('should transfer ERC20 TEST token to Alice', async () => {
-    const transferL2ERC20Amount = utils.parseEther('1111')
+  // it('should transfer ERC20 TEST token to Alice', async () => {
+  //   const transferL2ERC20Amount = utils.parseEther('1111')
 
-    const preBobL2ERC20Balance = await L2ERC20.balanceOf(
-      env.bobl2Wallet.address
-    )
-    const preAliceL2ERC20Balance = await L2ERC20.balanceOf(
-      env.alicel2Wallet.address
-    )
+  //   const preBobL2ERC20Balance = await L2ERC20.balanceOf(
+  //     env.bobl2Wallet.address
+  //   )
+  //   const preAliceL2ERC20Balance = await L2ERC20.balanceOf(
+  //     env.alicel2Wallet.address
+  //   )
 
-    const tranferToAliceTX = await L2ERC20.transfer(
-      env.alicel2Wallet.address,
-      transferL2ERC20Amount
-    )
-    await tranferToAliceTX.wait()
+  //   const tranferToAliceTX = await L2ERC20.transfer(
+  //     env.alicel2Wallet.address,
+  //     transferL2ERC20Amount
+  //   )
+  //   await tranferToAliceTX.wait()
 
-    const postBobL2ERC20Balance = await L2ERC20.balanceOf(
-      env.bobl2Wallet.address
-    )
+  //   const postBobL2ERC20Balance = await L2ERC20.balanceOf(
+  //     env.bobl2Wallet.address
+  //   )
 
-    expect(postBobL2ERC20Balance).to.deep.eq(
-      preBobL2ERC20Balance.sub(transferL2ERC20Amount)
-    )
-  })
+  //   expect(postBobL2ERC20Balance).to.deep.eq(
+  //     preBobL2ERC20Balance.sub(transferL2ERC20Amount)
+  //   )
+  // })
 })

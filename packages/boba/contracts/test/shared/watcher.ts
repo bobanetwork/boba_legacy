@@ -109,16 +109,19 @@ export class Watcher {
     const blockNumber = await layer.provider.getBlockNumber()
     const startingBlock = Math.max(blockNumber - this.NUM_BLOCKS_TO_FETCH, 0)
 
-    const filter = {
+    const successFilter: ethers.providers.Filter = {
       address: layer.messengerAddress,
       topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
       fromBlock: startingBlock,
     }
-
-    const logs = await layer.provider.getLogs(filter)
-    // console.log('Looking for:', msgHash)
-    // console.log('Current logs:', logs)
-
+    const failureFilter: ethers.providers.Filter = {
+      address: layer.messengerAddress,
+      topics: [ethers.utils.id(`FailedRelayedMessage(bytes32)`)],
+      fromBlock: startingBlock,
+    }
+    const successLogs = await layer.provider.getLogs(successFilter)
+    const failureLogs = await layer.provider.getLogs(failureFilter)
+    const logs = successLogs.concat(failureLogs)
     const matches = logs.filter(
       (log: ethers.providers.Log) => log.topics[1] === msgHash
     )
