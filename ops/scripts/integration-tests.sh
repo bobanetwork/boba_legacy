@@ -10,6 +10,12 @@ if [[ ! -z "$URL" ]]; then
     export ADDRESS_MANAGER=$(echo $ADDRESSES | jq -r '.AddressManager')
 fi
 
+if [[ ! -z "$BOBA_URL" ]]; then
+    # get the addrs from the URL provided
+    ADDRESSES=$(curl --fail --show-error --silent --retry-connrefused --retry $RETRIES --retry-delay 5 $BOBA_URL)
+    echo $ADDRESSES | jq -r '.L2LiquidityPool'
+fi
+
 # wait for the sequencer to be up
 curl \
     --silent \

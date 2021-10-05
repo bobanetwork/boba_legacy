@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 
 /* Imports: External */
+import * as request from 'request-promise-native'
 import {
   Contract,
   Wallet,
@@ -41,6 +42,10 @@ const env = cleanEnv(process.env, {
     default:
       '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
   }),
+  PRIVATE_KEY_2: str({
+    default:
+      '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
+  }),
   ADDRESS_MANAGER: str({
     default: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   }),
@@ -63,10 +68,12 @@ replicaProvider.pollingInterval = env.REPLICA_POLLING_INTERVAL
 
 // The sequencer private key which is funded on L1
 export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
+export const l1Wallet_2 = new Wallet(env.PRIVATE_KEY_2, l1Provider)
 
 // A random private key which should always be funded with deposits from L1 -> L2
 // if it's using non-0 gas price
 export const l2Wallet = l1Wallet.connect(l2Provider)
+export const l2Wallet_2 = l1Wallet_2.connect(l2Provider)
 
 // Predeploys
 export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =
@@ -81,6 +88,18 @@ export const getAddressManager = (provider: any) => {
     .connect(provider)
     .attach(env.ADDRESS_MANAGER)
 }
+
+if (!process.env.BOBA_URL) {
+  console.log(`!!You did not set process.env.BOBA_URL!!`)
+  console.log(
+    `Setting to default value of http://127.0.0.1:8078/addresses.json`
+  )
+} else {
+  console.log(`process.env.BOBA_URL set to:`, process.env.BOBA_URL)
+}
+
+export const BOBA_URL =
+  process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, AddressManager: Contract) => {
@@ -167,4 +186,12 @@ export const waitForL2Geth = async (
     }
   }
   return injectL2Context(provider)
+}
+
+export const getBOBADeployerAddresses = async () => {
+  const options = {
+    uri: BOBA_URL,
+  }
+  const result = await request.get(options)
+  return JSON.parse(result)
 }

@@ -12,11 +12,14 @@ import {
   l2Provider,
   l1Wallet,
   l2Wallet,
+  l1Wallet_2,
+  l2Wallet_2,
   fundUser,
   getOvmEth,
   getL1Bridge,
   getL2Bridge,
   IS_LIVE_NETWORK,
+  getBOBADeployerAddresses,
   sleep,
 } from './utils'
 import {
@@ -30,6 +33,7 @@ import {
 export class OptimismEnv {
   // L1 Contracts
   addressManager: Contract
+  addressesBOBA
   l1Bridge: Contract
   l1Messenger: Contract
   ctc: Contract
@@ -48,6 +52,8 @@ export class OptimismEnv {
   // The wallets
   l1Wallet: Wallet
   l2Wallet: Wallet
+  l1Wallet_2: Wallet
+  l2Wallet_2: Wallet
 
   // The providers
   l1Provider: providers.JsonRpcProvider
@@ -55,6 +61,7 @@ export class OptimismEnv {
 
   constructor(args: any) {
     this.addressManager = args.addressManager
+    this.addressesBOBA = args.addressesBOBA
     this.l1Bridge = args.l1Bridge
     this.l1Messenger = args.l1Messenger
     this.ovmEth = args.ovmEth
@@ -65,6 +72,8 @@ export class OptimismEnv {
     this.watcher = args.watcher
     this.l1Wallet = args.l1Wallet
     this.l2Wallet = args.l2Wallet
+    this.l1Wallet_2 = args.l1Wallet_2
+    this.l2Wallet_2 = args.l2Wallet_2
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
     this.ctc = args.ctc
@@ -73,6 +82,7 @@ export class OptimismEnv {
 
   static async new(): Promise<OptimismEnv> {
     const addressManager = getAddressManager(l1Wallet)
+    const addressesBOBA = await getBOBADeployerAddresses()
     const watcher = await initWatcher(l1Provider, l2Provider, addressManager)
     const l1Bridge = await getL1Bridge(l1Wallet, addressManager)
 
@@ -112,6 +122,7 @@ export class OptimismEnv {
 
     return new OptimismEnv({
       addressManager,
+      addressesBOBA,
       l1Bridge,
       ctc,
       scc,
@@ -124,6 +135,8 @@ export class OptimismEnv {
       watcher,
       l1Wallet,
       l2Wallet,
+      l1Wallet_2,
+      l2Wallet_2,
       l1Provider,
       l2Provider,
     })
@@ -228,3 +241,4 @@ export const useDynamicTimeoutForWithdrawals = async (
   )
   testctx.timeout(timeoutMs)
 }
+

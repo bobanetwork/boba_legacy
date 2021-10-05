@@ -47,7 +47,9 @@ const deployFn: DeployFunction = async (hre) => {
     )}`
   )
 
-  L2Message = await Factory__L2Message.deploy((hre as any).deployConfig.l2MessengerAddress)
+  L2Message = await Factory__L2Message.deploy(
+    (hre as any).deployConfig.l2MessengerAddress
+  )
   await L2Message.deployTransaction.wait()
   const L2MessageDeploymentSubmission: DeploymentSubmission = {
     ...L2Message,
