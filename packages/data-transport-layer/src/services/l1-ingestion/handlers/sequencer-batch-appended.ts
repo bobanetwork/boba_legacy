@@ -121,7 +121,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           origin: null,
           data: toHexString(sequencerTransaction),
           queueOrigin: 'sequencer',
-          value: decoded.value,
+          value: decoded ? decoded.value : '0x0',
           queueIndex: null,
           decoded,
           confirmed: true,
@@ -252,20 +252,24 @@ const parseSequencerBatchTransaction = (
 const decodeSequencerBatchTransaction = (
   transaction: Buffer,
   l2ChainId: number
-): DecodedSequencerBatchTransaction => {
-  const decodedTx = ethers.utils.parseTransaction(transaction)
+): DecodedSequencerBatchTransaction | null => {
+  try {
+    const decodedTx = ethers.utils.parseTransaction(transaction)
 
-  return {
-    nonce: BigNumber.from(decodedTx.nonce).toString(),
-    gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
-    gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
-    value: toRpcHexString(decodedTx.value),
-    target: decodedTx.to ? toHexString(decodedTx.to) : null,
-    data: toHexString(decodedTx.data),
-    sig: {
-      v: parseSignatureVParam(decodedTx.v, l2ChainId),
-      r: toHexString(decodedTx.r),
-      s: toHexString(decodedTx.s),
-    },
+    return {
+      nonce: BigNumber.from(decodedTx.nonce).toString(),
+      gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
+      gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
+      value: toRpcHexString(decodedTx.value),
+      target: decodedTx.to ? toHexString(decodedTx.to) : null, // Maybe null this out for creations?
+      data: toHexString(decodedTx.data),
+      sig: {
+        v: parseSignatureVParam(decodedTx.v, l2ChainId),
+        r: toHexString(decodedTx.r),
+        s: toHexString(decodedTx.s),
+      },
+    }
+  } catch (err) {
+    return null
   }
 }
