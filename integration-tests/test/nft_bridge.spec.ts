@@ -8,10 +8,9 @@ import { Direction } from './shared/watcher-utils'
 import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
 import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
-import L1ERC721Json from '../artifacts/contracts/L1ERC721.sol/L1ERC721.json'
+import L1ERC721Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
 
 import { OptimismEnv } from './shared/env'
-import * as fs from 'fs'
 
 describe('NFT Bridge Test', async () => {
   let Factory__L1ERC721: ContractFactory
