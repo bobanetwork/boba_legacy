@@ -9,7 +9,12 @@ import { fromHexString, sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 
 import { loadContract, loadContractFromManager } from '@eth-optimism/contracts'
-import { StateRootBatchHeader, SentMessage, SentMessageProof, BatchMessage } from './types'
+import {
+  StateRootBatchHeader,
+  SentMessage,
+  SentMessageProof,
+  BatchMessage,
+} from './types'
 
 interface MessageRelayerOptions {
   // Providers for interacting with L1 and L2.

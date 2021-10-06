@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
@@ -64,8 +64,7 @@ describe('Liquidity Pool Test', async () => {
       L2StandardBridgeAddress,
       L1ERC20.address,
       tokenName,
-      tokenSymbol,
-      { gasLimit: 85390000 }
+      tokenSymbol
     )
     await L2ERC20.deployTransaction.wait()
 
@@ -88,7 +87,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
+  it.only('should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
     const depositL2ERC20Amount = utils.parseEther('10000')
 
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -123,7 +122,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
+  it.only('should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
     const transferL2ERC20Amount = utils.parseEther('150')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -171,7 +170,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should add 1000 ERC20 TEST tokens to the L2 token pool', async () => {
+  it.only('should add 1000 ERC20 TEST tokens to the L2 token pool', async () => {
     const addL2TPAmount = utils.parseEther('1000')
 
     const approveL2TPTX = await L2ERC20.approve(
@@ -193,7 +192,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L2TPBalance).to.deep.eq(addL2TPAmount)
   })
 
-  it('should register L1 the pool', async () => {
+  it.only('should register L1 the pool', async () => {
     const registerPoolERC20TX = await L1LiquidityPool.registerPool(
       L1ERC20.address,
       L2ERC20.address
@@ -216,7 +215,7 @@ describe('Liquidity Pool Test', async () => {
     //expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.l2ETHAddress)
   })
 
-  it('should register L2 the pool', async () => {
+  it.only('should register L2 the pool', async () => {
     const registerPoolERC20TX = await L2LiquidityPool.registerPool(
       L1ERC20.address,
       L2ERC20.address
@@ -245,7 +244,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(registerPoolTX.wait()).to.be.eventually.rejected
   })
 
-  it('should add L1 liquidity', async () => {
+  it.only('should add L1 liquidity', async () => {
     const addLiquidityAmount = utils.parseEther('100')
 
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -275,7 +274,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L1LPERC20Balance).to.deep.eq(addLiquidityAmount)
   })
 
-  it('should add L2 liquidity', async () => {
+  it.only('should add L2 liquidity', async () => {
     const addLiquidityAmount = utils.parseEther('100')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -341,7 +340,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L2LPERC20Balance).to.deep.eq(addLiquidityAmount.mul(2))
   })
 
-  it('should fast exit L2', async () => {
+  it.only('should fast exit L2', async () => {
     const fastExitAmount = utils.parseEther('10')
 
     const preKateL1ERC20Balance = await L1ERC20.balanceOf(
@@ -429,7 +428,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should withdraw liquidity', async () => {
+  it.only('should withdraw liquidity', async () => {
     const withdrawAmount = utils.parseEther('10')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -487,7 +486,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(withdrawTX.wait()).to.be.eventually.rejected
   })
 
-  it('should withdraw reward from L2 pool', async () => {
+  it.only('should withdraw reward from L2 pool', async () => {
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preBobUserInfo = await L2LiquidityPool.userInfo(
       L2ERC20.address,
@@ -516,7 +515,7 @@ describe('Liquidity Pool Test', async () => {
     expect(preL2ERC20Balance).to.deep.eq(postL2ERC20Balance.sub(pendingReward))
   })
 
-  it('should withdraw reward from L1 pool', async () => {
+  it.only('should withdraw reward from L1 pool', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preBobUserInfo = await L1LiquidityPool.userInfo(
       L1ERC20.address,
@@ -561,7 +560,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(withdrawRewardTX.wait()).to.be.eventually.rejected
   })
 
-  it('should fast onramp', async () => {
+  it.only('should fast onramp', async () => {
     const depositAmount = utils.parseEther('10')
 
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -627,7 +626,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should revert unfulfillable swap-offs', async () => {
+  it.only('should revert unfulfillable swap-offs', async () => {
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const requestedLiquidity = (
@@ -660,7 +659,7 @@ describe('Liquidity Pool Test', async () => {
     expect(postBobL2ERC20Balance).to.deep.eq(preBobL2ERC20Balance.sub(exitFees))
   })
 
-  it('should revert unfulfillable swap-ons', async () => {
+  it.only('should revert unfulfillable swap-ons', async () => {
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
 
@@ -689,7 +688,7 @@ describe('Liquidity Pool Test', async () => {
     expect(postBobL1ERC20Balance).to.deep.eq(preL1ERC20Balance.sub(swapOnFees))
   })
 
-  it('should be able to pause L1LiquidityPool contract', async function () {
+  it.only('should be able to pause L1LiquidityPool contract', async function () {
     const poolOwner = await L1LiquidityPool.owner()
 
     // since tests are with deployed contracts
@@ -736,7 +735,7 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('should be able to pause L2LiquidityPool contract', async function () {
+  it.only('should be able to pause L2LiquidityPool contract', async function () {
     const poolOwner = await L2LiquidityPool.owner()
 
     // since tests are with deployed contracts
