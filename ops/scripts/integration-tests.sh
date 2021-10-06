@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-RETRIES=${RETRIES:-60}
+RETRIES=${RETRIES:-120}
 JSON='{"jsonrpc":"2.0","id":0,"method":"rollup_getInfo","params":[]}'
 
 if [[ ! -z "$URL" ]]; then

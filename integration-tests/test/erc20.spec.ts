@@ -131,5 +131,4 @@ describe('System setup', async () => {
       preKateL2ERC20Balance.add(transferL2ERC20Amount)
     )
   })
-
 })
