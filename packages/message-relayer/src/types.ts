@@ -32,10 +32,15 @@ export interface StateRootProof {
   siblings: string[]
 }
 
-export interface BatchMessage {
+interface BatchMessagePayload {
   target: string
   message: string
   sender: string
   messageNonce: number
   proof: SentMessageProof
+}
+
+export interface BatchMessage {
+  payload: BatchMessagePayload
+  message: SentMessage
 }

@@ -55,6 +55,10 @@ const main = async () => {
     'max-wait-time-s',
     parseInt(env.MAX_WAIT_TIME_S, 10) || 60
   )
+  const MAX_WAIT_TX_TIME_S = config.uint(
+    'max-wait-tx-time-s',
+    parseInt(env.MAX_WAIT_TX_TIME_S, 10) || 180
+  )
   const RELAY_GAS_LIMIT = config.uint(
     'relay-gas-limit',
     parseInt(env.RELAY_GAS_LIMIT, 10) || 4000000
@@ -136,6 +140,7 @@ const main = async () => {
     //batch system
     minBatchSize: MIN_BATCH_SIZE,
     maxWaitTimeS: MAX_WAIT_TIME_S,
+    maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
     l2BlockOffset: L2_BLOCK_OFFSET,

@@ -30,6 +30,17 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
  */
 contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResolver, OwnableUpgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
 
+    /**********
+     * Events *
+     **********/
+
+    event MessageBlocked(
+        bytes32 indexed _xDomainCalldataHash
+    );
+
+    event MessageAllowed(
+        bytes32 indexed _xDomainCalldataHash
+    );
 
     /*************
      * Constants *
@@ -47,6 +58,7 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
     mapping (bytes32 => bool) public blockedMessages;
     mapping (bytes32 => bool) public relayedMessages;
     mapping (bytes32 => bool) public successfulMessages;
+    mapping (bytes32 => bool) public failedMessages;
 
     address internal xDomainMsgSender = DEFAULT_XDOMAIN_SENDER;
 
@@ -116,6 +128,34 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
     }
 
     /**
+     * Block a message.
+     * @param _xDomainCalldataHash Hash of the message to block.
+     */
+    function blockMessage(
+        bytes32 _xDomainCalldataHash
+    )
+        external
+        onlyOwner
+    {
+        blockedMessages[_xDomainCalldataHash] = true;
+        emit MessageBlocked(_xDomainCalldataHash);
+    }
+
+    /**
+     * Allow a message.
+     * @param _xDomainCalldataHash Hash of the message to block.
+     */
+    function allowMessage(
+        bytes32 _xDomainCalldataHash
+    )
+        external
+        onlyOwner
+    {
+        blockedMessages[_xDomainCalldataHash] = false;
+        emit MessageAllowed(_xDomainCalldataHash);
+    }
+
+    /**
      * Sends a cross domain message to the target messenger.
      * @param _target Target contract address.
      * @param _message Message to send to the target.
@@ -175,6 +215,11 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
             "Provided message has already been received."
         );
 
+        require(
+            blockedMessages[xDomainCalldataHash] == false,
+            "Provided message has been blocked."
+        );
+
         xDomainMsgSender = _sender;
         (bool success, ) = _target.call(_message);
         xDomainMsgSender = DEFAULT_XDOMAIN_SENDER;
@@ -184,6 +229,9 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
         if (success == true) {
             successfulMessages[xDomainCalldataHash] = true;
             emit RelayedMessage(xDomainCalldataHash);
+        } else {
+            failedMessages[xDomainCalldataHash] == true;
+            emit FailedRelayedMessage(xDomainCalldataHash);
         }
 
         // Store an identifier that can be used to prove that the given message was relayed by some

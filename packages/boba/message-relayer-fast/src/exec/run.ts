@@ -33,6 +33,10 @@ const main = async () => {
     'max-wait-time-s',
     parseInt(env.MAX_WAIT_TIME_S, 10) || 60
   )
+  const MAX_WAIT_TX_TIME_S = config.uint(
+    'max-wait-tx-time-s',
+    parseInt(env.MAX_WAIT_TX_TIME_S, 10) || 180
+  )
   const RELAY_GAS_LIMIT = config.uint(
     'relay-gas-limit',
     parseInt(env.RELAY_GAS_LIMIT, 10) || 4000000
@@ -57,13 +61,27 @@ const main = async () => {
     'from-l2-transaction-index',
     parseInt(env.FROM_L2_TRANSACTION_INDEX, 10) || 0
   )
-  const FILTER_ENDPOINT = config.str(
-    'filter-endpoint',
-    env.FILTER_ENDPOINT
-  ) || ''
+  const FILTER_ENDPOINT =
+    config.str('filter-endpoint', env.FILTER_ENDPOINT) || ''
   const FILTER_POLLING_INTERVAL = config.uint(
     'filter-polling-interval',
     parseInt(env.FILTER_POLLING_INTERVAL, 10) || 60000
+  )
+  const MAX_GAS_PRICE_IN_GWEI = config.uint(
+    'max-gas-price-in-gwei',
+    parseInt(env.MAX_GAS_PRICE_IN_GWEI, 10) || 100
+  )
+  const GAS_RETRY_INCREMENT = config.uint(
+    'gas-retry-increment',
+    parseInt(env.GAS_RETRY_INCREMENT, 10) || 5
+  )
+  const RESUBMISSION_TIMEOUT = config.uint(
+    'resubmission-timeout',
+    parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
+  )
+  const NUM_CONFIRMATIONS = config.uint(
+    'num-confirmations',
+    parseInt(env.NUM_CONFIRMATIONS, 10) || 0
   )
 
   if (!ADDRESS_MANAGER_ADDRESS) {
@@ -99,6 +117,7 @@ const main = async () => {
     //batch system
     minBatchSize: MIN_BATCH_SIZE,
     maxWaitTimeS: MAX_WAIT_TIME_S,
+    maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
     l2BlockOffset: L2_BLOCK_OFFSET,
@@ -106,6 +125,11 @@ const main = async () => {
     getLogsInterval: GET_LOGS_INTERVAL,
     filterEndpoint: FILTER_ENDPOINT,
     filterPollingInterval: FILTER_POLLING_INTERVAL,
+    // gas price
+    maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
+    gasRetryIncrement: GAS_RETRY_INCREMENT,
+    numConfirmations: NUM_CONFIRMATIONS,
+    resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
   })
 
   await service.start()

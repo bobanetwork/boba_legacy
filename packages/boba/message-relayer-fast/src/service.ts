@@ -3,6 +3,7 @@ import { Contract, ethers, Wallet, BigNumber, providers } from 'ethers'
 import * as rlp from 'rlp'
 import { MerkleTree } from 'merkletreejs'
 import fetch from 'node-fetch';
+import * as ynatm from '@eth-optimism/ynatm';
 
 /* Imports: Internal */
 import { fromHexString, sleep } from '@eth-optimism/core-utils'
@@ -52,6 +53,17 @@ interface MessageRelayerOptions {
   filterEndpoint?: string
 
   filterPollingInterval?: number
+
+  // gas fee
+  maxGasPriceInGwei?: number
+
+  gasRetryIncrement?: number
+
+  numConfirmations?: number
+
+  resubmissionTimeout?: number
+
+  maxWaitTxTimeS: number
 }
 
 const optionSettings = {
@@ -65,6 +77,7 @@ const optionSettings = {
   l1StartOffset: { default: 0 },
   getLogsInterval: { default: 2000 },
   filterPollingInterval: { default: 60000 },
+  maxWaitTxTimeS: { default: 180 },
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -89,6 +102,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     timeSinceLastRelayS: number
     timeOfLastRelayS: number
     messageBuffer: Array<BatchMessage>
+    timeOfLastPendingRelay: any
   }
 
   protected async _init(): Promise<void> {
@@ -184,12 +198,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.timeOfLastRelayS = Date.now()
     this.state.timeSinceLastRelayS = 0
     this.state.messageBuffer = []
+    this.state.timeOfLastPendingRelay = false
   }
 
   protected async _start(): Promise<void> {
     while (this.running) {
       await sleep(this.options.pollingInterval)
-      await this._getFilter();
+      await this._getFilter()
 
       try {
         // The message is relayed directly, no need to keep cache
@@ -218,30 +233,67 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         const timeOut =
           secondsElapsed > this.options.maxWaitTimeS ? true : false
 
+        let pendingTXTimeOut = true
+        if (this.state.timeOfLastPendingRelay !== false) {
+          const pendingTXSecondsElapsed = Math.floor(
+            (Date.now() - this.state.timeOfLastPendingRelay) / 1000
+          )
+          console.log('\n***********************************')
+          console.log('Next tx since last tx submitted', pendingTXSecondsElapsed)
+          pendingTXTimeOut =
+            pendingTXSecondsElapsed > this.options.maxWaitTxTimeS ? true : false
+        }
+
         //console.log('Current buffer size:', this.state.messageBuffer.length)
         const bufferFull =
           this.state.messageBuffer.length >= this.options.minBatchSize
             ? true : false
 
-        if (this.state.messageBuffer.length !== 0 && (bufferFull || timeOut)) {
-          if (bufferFull) {
-            console.log('Buffer full: flushing')
-          }
-          if (timeOut) {
-            console.log('Buffer timeout: flushing')
-          }
+        // check gas price
+        const gasPrice = await this.options.l1RpcProvider.getGasPrice()
+        const gasPriceGwei = Number(ethers.utils.formatUnits(gasPrice, 'gwei'))
+        const gasPriceAcceptable =
+          gasPriceGwei < this.options.maxGasPriceInGwei ? true : false
 
-          const receipt = await this._relayMultiMessageToL1(
-            this.state.messageBuffer
-          )
+        if (this.state.messageBuffer.length !== 0 && (bufferFull || timeOut) && pendingTXTimeOut) {
+          if (gasPriceAcceptable) {
+            if (bufferFull) {
+              console.log('Buffer full: flushing')
+            }
+            if (timeOut) {
+              console.log('Buffer timeout: flushing')
+            }
 
-          console.log('Receipt:', receipt)
+            /* parse this to make sure that the mesaage was actually relayed */
+            // clear out buffer only if the messages are relayed to L1 successfully
+            if (
+              await this._wereMessagesRelayed(
+                this.state.messageBuffer.reduce((acc, cur) => {
+                  acc.push(cur.message)
+                  return acc
+                }, [])
+              )
+            ) {
+              //clear out the buffer so we do not double relay, which will just
+              // waste gas
+              this.state.messageBuffer = []
+              this.state.timeOfLastPendingRelay = false
+            } else {
+              const receipt = await this._relayMultiMessageToL1(
+                this.state.messageBuffer.reduce((acc, cur) => {
+                  acc.push(cur.payload)
+                  return acc
+                }, [])
+              )
 
-          /* parse this to make sure that the mesaage was actually relayed */
-          if (/*everything went well*/ true) {
-            //clear out the buffer so we do not double relay, which will just
-            //led to reversion at the SCC level
-            this.state.messageBuffer = []
+              console.log('Receipt:', receipt)
+              // add the time interval between two tx
+              this.state.timeOfLastPendingRelay = Date.now()
+            }
+          } else {
+            console.log('Current gas price is unacceptable')
+            // add the time interval between two tx
+            this.state.timeOfLastPendingRelay = Date.now()
           }
 
           this.state.timeOfLastRelayS = Date.now()
@@ -254,115 +306,134 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           console.log('***********************************\n')
         }
 
-        this.logger.info('Checking for newly finalized transactions...')
-        if (
-          !(await this._isTransactionFinalized(
-            this.state.nextUnfinalizedTxHeight
-          ))
-        ) {
-          this.logger.info('Did not find any newly finalized transactions', {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+        // scanning the new messages only if the pending messages are relayed
+        // to l1
+        if (this.state.timeOfLastPendingRelay === false) {
+          this.logger.info('Checking for newly finalized transactions...')
+          if (
+            !(await this._isTransactionFinalized(
+              this.state.nextUnfinalizedTxHeight
+            ))
+          ) {
+            this.logger.info('Did not find any newly finalized transactions', {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            })
+
+            continue
+          }
+
+          this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
+          while (
+            await this._isTransactionFinalized(this.state.nextUnfinalizedTxHeight)
+          ) {
+            const size = (
+              await this._getStateBatchHeader(this.state.nextUnfinalizedTxHeight)
+            ).batch.batchSize.toNumber()
+            this.logger.info(
+              'Found a batch of finalized transaction(s), checking for more...',
+              { batchSize: size }
+            )
+            this.state.nextUnfinalizedTxHeight += size
+
+            // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
+            // need to keep in memory. We operate on full batches at a time so the actual amount
+            // depends on the size of the batches we're processing.
+            const numTransactionsToProcess =
+              this.state.nextUnfinalizedTxHeight -
+              this.state.lastFinalizedTxHeight
+
+            if (numTransactionsToProcess > 1000) {
+              break
+            }
+          }
+
+          this.logger.info('Found finalized transactions', {
+            totalNumber:
+              this.state.nextUnfinalizedTxHeight -
+              this.state.lastFinalizedTxHeight,
           })
 
-          continue
-        }
-
-        this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
-        while (
-          await this._isTransactionFinalized(this.state.nextUnfinalizedTxHeight)
-        ) {
-          const size = (
-            await this._getStateBatchHeader(this.state.nextUnfinalizedTxHeight)
-          ).batch.batchSize.toNumber()
-          this.logger.info(
-            'Found a batch of finalized transaction(s), checking for more...',
-            { batchSize: size }
-          )
-          this.state.nextUnfinalizedTxHeight += size
-
-          // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
-          // need to keep in memory. We operate on full batches at a time so the actual amount
-          // depends on the size of the batches we're processing.
-          const numTransactionsToProcess =
-            this.state.nextUnfinalizedTxHeight -
-            this.state.lastFinalizedTxHeight
-
-          if (numTransactionsToProcess > 1000) {
-            break
-          }
-        }
-
-        this.logger.info('Found finalized transactions', {
-          totalNumber:
-            this.state.nextUnfinalizedTxHeight -
+          const messages = await this._getSentMessages(
             this.state.lastFinalizedTxHeight,
-        })
+            this.state.nextUnfinalizedTxHeight
+          )
 
-        const messages = await this._getSentMessages(
-          this.state.lastFinalizedTxHeight,
-          this.state.nextUnfinalizedTxHeight
-        )
+          for (const message of messages) {
+            this.logger.info('Found a message sent during transaction', {
+              index: message.parentTransactionIndex,
+            })
+            if (await this._wasMessageRelayed(message)) {
+              this.logger.info('Message has already been relayed, skipping.')
+              continue
+            }
 
-        for (const message of messages) {
-          this.logger.info('Found a message sent during transaction', {
-            index: message.parentTransactionIndex,
-          })
-          if (await this._wasMessageRelayed(message)) {
-            this.logger.info('Message has already been relayed, skipping.')
-            continue
+            if (await this._wasMessageBlocked(message)) {
+              this.logger.info('Message has been blocked, skipping.')
+              continue
+            }
+
+            if (await this._wasMessageFailed(message)) {
+              this.logger.info('Last message was failed, skipping.')
+              continue
+            }
+
+            if (!this.state.filter.includes(message.target)) {
+              this.logger.info('Message not intended for target, skipping.')
+              continue
+            }
+
+            this.logger.info(
+              'Message not yet relayed. Attempting to generate a proof...'
+            )
+            const proof = await this._getMessageProof(message)
+            this.logger.info(
+              'Successfully generated a proof. Attempting to relay to Layer 1...'
+            )
+
+            // await this._relayMessageToL1(message, proof)
+            const messageToSend = {
+              payload: {
+                target: message.target,
+                message: message.message,
+                sender: message.sender,
+                messageNonce: message.messageNonce,
+                proof,
+              },
+              message,
+            }
+            this.state.messageBuffer.push(messageToSend)
           }
 
-          if (!this.state.filter.includes(message.target)) {
-            this.logger.info('Message not intended for target, skipping.')
-            continue
+          if (messages.length === 0) {
+            this.logger.info('Did not find any L2->L1 messages', {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            })
+          } else {
+            // Clear the event cache to avoid keeping every single event in memory and eventually
+            // getting OOM killed. Messages are already sorted in ascending order so the last message
+            // will have the highest batch index.
+            const lastMessage = messages[messages.length - 1]
+
+            // Find the batch corresponding to the last processed message.
+            const lastProcessedBatch = await this._getStateBatchHeader(
+              lastMessage.parentTransactionIndex
+            )
+
+            // Remove any events from the cache for batches that should've been processed by now.
+            this.state.eventCache = this.state.eventCache.filter((event) => {
+              return event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+            })
           }
 
           this.logger.info(
-            'Message not yet relayed. Attempting to generate a proof...'
+            'Finished searching through newly finalized transactions',
+            {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            }
           )
-          const proof = await this._getMessageProof(message)
-          this.logger.info(
-            'Successfully generated a proof. Attempting to relay to Layer 1...'
-          )
-
-          // await this._relayMessageToL1(message, proof)
-          const messageToSend = {
-            target: message.target,
-            message: message.message,
-            sender: message.sender,
-            messageNonce: message.messageNonce,
-            proof,
-          }
-          this.state.messageBuffer.push(messageToSend)
-        }
-
-        if (messages.length === 0) {
-          this.logger.info('Did not find any L2->L1 messages', {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
-          })
         } else {
-          // Clear the event cache to avoid keeping every single event in memory and eventually
-          // getting OOM killed. Messages are already sorted in ascending order so the last message
-          // will have the highest batch index.
-          const lastMessage = messages[messages.length - 1]
-
-          // Find the batch corresponding to the last processed message.
-          const lastProcessedBatch = await this._getStateBatchHeader(
-            lastMessage.parentTransactionIndex
-          )
-
-          // Remove any events from the cache for batches that should've been processed by now.
-          this.state.eventCache = this.state.eventCache.filter((event) => {
-            return event.args._batchIndex > lastProcessedBatch.batch.batchIndex
-          })
+          this.logger.info('Waiting for the pending tx to be finailized')
         }
-
-        this.logger.info(
-          'Finished searching through newly finalized transactions',
-          {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
-          }
-        )
       } catch (err) {
         this.logger.error('Caught an unhandled error', {
           message: err.toString(),
@@ -529,6 +600,31 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     )
   }
 
+  private async _wasMessageBlocked(message: SentMessage): Promise<boolean> {
+    return this.state.OVM_L1CrossDomainMessenger.blockedMessages(
+      message.encodedMessageHash
+    )
+  }
+
+  private async _wasMessageFailed(message: SentMessage): Promise<boolean> {
+    return this.state.OVM_L1CrossDomainMessenger.failedMessages(
+      message.encodedMessageHash
+    )
+  }
+
+  private async _wereMessagesRelayed(
+    messages: Array<SentMessage>
+  ): Promise<boolean> {
+    this.logger.info('Relay messages: ', { messages })
+    const promisePayload = messages.reduce((acc, cur) => {
+      acc.push(this._wasMessageRelayed(cur), this._wasMessageFailed(cur))
+      return acc
+    }, [])
+    const messageRelayedStatus = await Promise.all(promisePayload)
+    this.logger.info('Relay messages status: ', { messageRelayedStatus })
+    return messageRelayedStatus.some((ele) => ele)
+  }
+
   private async _getMessageProof(
     message: SentMessage
   ): Promise<SentMessageProof> {
@@ -627,69 +723,37 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       return
     }
 
-    const result = await this.state.OVM_L1CrossDomainMessenger.connect(
-      this.options.l1Wallet
-    ).relayMessage(
-      message.target,
-      message.sender,
-      message.message,
-      message.messageNonce,
-      proof,
-      {
-        gasLimit: this.options.relayGasLimit,
-      }
-    )
-
-    this.logger.info('Relay message transaction sent', {
-      transactionHash: result,
-    })
-
-    try {
-      const receipt = await result.wait()
-
-      this.logger.info('Relay message included in block', {
-        transactionHash: receipt.transactionHash,
-        blockNumber: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString(),
-        confirmations: receipt.confirmations,
-        status: receipt.status,
-      })
-    } catch (err) {
-      this.logger.error('Real relay attempt failed, skipping.', {
-        message: err.toString(),
-        stack: err.stack,
-        code: err.code,
-      })
-      return
+    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
+      const txResponse = await this.state.OVM_L1CrossDomainMessenger.connect(
+        this.options.l1Wallet
+      ).relayMessage(
+        message.target,
+        message.sender,
+        message.message,
+        message.messageNonce,
+        proof,
+        { gasPrice }
+      )
+      const tx = await this.options.l1Wallet.provider.waitForTransaction(
+        txResponse.hash,
+        this.options.numConfirmations
+      )
+      return tx
     }
-    this.logger.info('Message successfully relayed to Layer 1!')
-  }
 
-  private async _relayMultiMessageToL1(
-    messages: Array<BatchMessage>
-  ): Promise<any> {
-    const result = await this.state.OVM_L1MultiMessageRelayerFast.connect(
-      this.options.l1Wallet
-    ).batchRelayMessages(messages, {
-      gasLimit: this.options.relayGasLimit,
-    })
-
-    this.logger.info('Relay message transaction sent', {
-      transactionHash: result,
-    })
+    const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
 
     let receipt
-
     try {
-      receipt = await result.wait()
-
-      this.logger.info('Relay messages included in block', {
-        transactionHash: receipt.transactionHash,
-        blockNumber: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString(),
-        confirmations: receipt.confirmations,
-        status: receipt.status,
+      receipt = await ynatm.send({
+        sendTransactionFunction: sendTxAndWaitForReceipt,
+        minGasPrice: ynatm.toGwei(minGasPrice),
+        maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+        gasPriceScalingFunction: ynatm.LINEAR(this.options.gasRetryIncrement),
+        delay: this.options.resubmissionTimeout,
       })
+
+      this.logger.info('Relay message transaction sent', { receipt })
     } catch (err) {
       this.logger.error('Relay attempt failed, skipping.', {
         message: err.toString(),
@@ -698,8 +762,58 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       })
       return
     }
+
+    this.logger.info('Message successfully relayed to Layer 1!')
+  }
+
+  private async _relayMultiMessageToL1(
+    messages: Array<BatchMessage>
+  ): Promise<any> {
+
+    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
+      // Generate the transaction we will repeatedly submit
+      const nonce = await this.options.l1Wallet.getTransactionCount()
+      this.logger.info('Relay message nonce', { nonce })
+      const txResponse = await this.state.OVM_L1MultiMessageRelayerFast.connect(
+        this.options.l1Wallet
+      ).batchRelayMessages(messages, { gasPrice, nonce })
+      const tx = await this.options.l1Wallet.provider.waitForTransaction(
+        txResponse.hash,
+        this.options.numConfirmations
+      )
+      return tx
+    }
+
+    const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
+
+    let receipt
+    try {
+      receipt = await ynatm.send({
+        sendTransactionFunction: sendTxAndWaitForReceipt,
+        minGasPrice: ynatm.toGwei(minGasPrice),
+        maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+        gasPriceScalingFunction: ynatm.LINEAR(this.options.gasRetryIncrement),
+        delay: this.options.resubmissionTimeout,
+      })
+
+      this.logger.info('Relay message transaction sent', { receipt })
+    } catch (err) {
+      this.logger.error('Relay attempt failed, skipping.', {
+        message: err.toString(),
+        stack: err.stack,
+        code: err.code,
+      })
+      return
+    }
+
     this.logger.info('Message Batch successfully relayed to Layer 1!')
     return receipt
+  }
+
+  private async _getGasPriceInGwei(signer): Promise<number> {
+    return parseInt(
+      ethers.utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10
+    )
   }
 
   private async _getFilter(): Promise<void> {
