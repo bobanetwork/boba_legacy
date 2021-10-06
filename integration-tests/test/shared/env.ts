@@ -14,6 +14,8 @@ import {
   l2Wallet,
   l1Wallet_2,
   l2Wallet_2,
+  l1Wallet_3,
+  l2Wallet_3,
   fundUser,
   getOvmEth,
   getL1Bridge,
@@ -54,6 +56,8 @@ export class OptimismEnv {
   l2Wallet: Wallet
   l1Wallet_2: Wallet
   l2Wallet_2: Wallet
+  l1Wallet_3: Wallet
+  l2Wallet_3: Wallet
 
   // The providers
   l1Provider: providers.JsonRpcProvider
@@ -74,6 +78,8 @@ export class OptimismEnv {
     this.l2Wallet = args.l2Wallet
     this.l1Wallet_2 = args.l1Wallet_2
     this.l2Wallet_2 = args.l2Wallet_2
+    this.l1Wallet_3 = args.l1Wallet_3
+    this.l2Wallet_3 = args.l2Wallet_3
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
     this.ctc = args.ctc
@@ -137,6 +143,8 @@ export class OptimismEnv {
       l2Wallet,
       l1Wallet_2,
       l2Wallet_2,
+      l1Wallet_3,
+      l2Wallet_3,
       l1Provider,
       l2Provider,
     })

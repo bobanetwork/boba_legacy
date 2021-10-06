@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-import { Contract, ContractFactory, utils } from 'ethers'
+import { Contract, ContractFactory, utils, Wallet } from 'ethers'
 import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { Direction } from './shared/watcher-utils'
@@ -18,6 +18,26 @@ describe('System setup', async () => {
   let Factory__L2ERC20: ContractFactory
 
   let env: OptimismEnv
+
+  const depositERC20ToL2 = async (toWallet: Wallet) => {
+    const depositL2ERC20Amount = utils.parseEther('12345')
+
+    const approveL1ERC20TX = await L1ERC20.approve(
+      env.l1Bridge.address,
+      depositL2ERC20Amount
+    )
+    await approveL1ERC20TX.wait()
+
+    const deposit = env.l1Bridge.depositERC20To(
+      L1ERC20.address,
+      L2ERC20.address,
+      toWallet.address,
+      depositL2ERC20Amount,
+      9999999,
+      utils.formatBytes32String(new Date().getTime().toString())
+    )
+    await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+  }
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -90,37 +110,26 @@ describe('System setup', async () => {
     )
   })
 
-  it.only('should transfer ERC20 TEST token to Kate', async () => {
-    const transferL2ERC20Amount = utils.parseEther('999')
-
-    const preKateL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet_2.address)
-console.log(preKateL2ERC20Balance)
-    const transferToKateTX = await L2ERC20.transfer(
-      env.l2Wallet.address,
-      transferL2ERC20Amount,
-      { gasLimit: 6440000 }
+  it('should transfer ERC20 TEST token to Kate', async () => {
+    const transferL2ERC20Amount = utils.parseEther('9')
+    await depositERC20ToL2(env.l2Wallet)
+    const preKateL2ERC20Balance = await L2ERC20.balanceOf(
+      env.l2Wallet_2.address
     )
-    console.log(await transferToKateTX.wait())
+    const transferToKateTX = await L2ERC20.transfer(
+      env.l2Wallet_2.address,
+      transferL2ERC20Amount,
+      { gasLimit: 9440000 }
+    )
+    await transferToKateTX.wait()
 
-    const postKateL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet_2.address)
+    const postKateL2ERC20Balance = await L2ERC20.balanceOf(
+      env.l2Wallet_2.address
+    )
+
     expect(postKateL2ERC20Balance).to.deep.eq(
       preKateL2ERC20Balance.add(transferL2ERC20Amount)
     )
   })
 
-  it('should transfer ERC20 TEST token to Alice', async () => {
-    const transferL2ERC20Amount = utils.parseEther('1111')
-    const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-    const tranferToAliceTX = await L2ERC20.transfer(
-      env.l2Wallet.address,
-      transferL2ERC20Amount
-    )
-    await tranferToAliceTX.wait()
-
-    const postBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-
-    expect(postBobL2ERC20Balance).to.deep.eq(
-      preBobL2ERC20Balance.sub(transferL2ERC20Amount)
-    )
-  })
 })
