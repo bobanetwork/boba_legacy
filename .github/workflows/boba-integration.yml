@@ -117,11 +117,6 @@ jobs:
             exit 1
           fi
 
-      - name: Test the base boba contracts
-        working-directory: ./packages/boba/contracts
-        run: |
-          yarn test:integration
-
       - name: Test the message-relayer-fast
         working-directory: ./packages/boba/message-relayer-fast
         run: |
