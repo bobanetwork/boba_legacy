@@ -1,4 +1,4 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers'
+import { JsonRpcProvider } from '@ethersproject/providers'
 import { BigNumber, Event } from 'ethers'
 
 import { TransportDB } from '../db/transport-db'
@@ -15,7 +15,7 @@ export type TypedEthersEvent<T> = Event & {
 
 export type GetExtraDataHandler<TEventArgs, TExtraData> = (
   event?: TypedEthersEvent<TEventArgs>,
-  l1RpcProvider?: StaticJsonRpcProvider
+  l1RpcProvider?: JsonRpcProvider
 ) => Promise<TExtraData>
 
 export type ParseEventHandler<TEventArgs, TExtraData, TParsedEvent> = (
