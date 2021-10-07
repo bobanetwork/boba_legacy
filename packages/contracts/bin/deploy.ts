@@ -20,6 +20,7 @@ import hre from 'hardhat'
 const sequencer = new Wallet(process.env.SEQUENCER_PRIVATE_KEY)
 const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
 const proposer = new Wallet(process.env.PROPOSER_PRIVATE_KEY)
+const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY)
 
 const parseEnv = () => {
   const ensure = (env, type) => {
@@ -57,6 +58,7 @@ const main = async () => {
     sccSequencerPublishWindow: config.sccFraudProofWindow,
     ovmSequencerAddress: sequencer.address,
     ovmProposerAddress: proposer.address,
+    ovmRelayerAddress: relayer.address,
     ovmAddressManagerOwner: deployer.address,
     noCompile: process.env.NO_COMPILE ? true : false,
   })

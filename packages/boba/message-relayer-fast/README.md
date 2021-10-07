@@ -2,7 +2,7 @@
 
 Customized L1 Cross Domain Messenger without dispute period time restrictions and associated message relayer service.
 
-The custom `OVM_L1CrossDomainMessenger` works with the default `OVM_L2CrossDomainMessenger`. The messages from the L2_Messenger can be relayed by the custom messenger instead to skip the dispute period and to do that, the bridge/token contract should specify the custom messenger to be the messenger for relays. The custom messenger cannot be used to send cross domain messages. For sending messages the bridge contracts use the default L1_Messenger.
+The custom `L1CrossDomainMessenger` works with the default `L2CrossDomainMessenger`. The messages from the L2_Messenger can be relayed by the custom messenger instead to skip the dispute period and to do that, the bridge/token contract should specify the custom messenger to be the messenger for relays. The custom messenger cannot be used to send cross domain messages. For sending messages the bridge contracts use the default L1_Messenger.
 
 ## Using the custom messenger
 

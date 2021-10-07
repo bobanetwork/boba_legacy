@@ -37,7 +37,7 @@ DOCKERFILE="docker-compose.yml"
 if [[ $BUILD == 1 ]]; then
     docker-compose build --parallel -- builder l2geth l1_chain
     docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
-    #docker-compose build -- boba_message-relayer-fast
+    docker-compose build -- boba_message-relayer-fast
     docker-compose build -- gas_oracle
     docker-compose build -- boba_deployer
 elif [[ $BUILD == 0 ]]; then
