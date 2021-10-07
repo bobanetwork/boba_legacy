@@ -215,7 +215,7 @@ services:
     environment:
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
-        # Need Micheal help here
+        # Need help here
         # state-dump.latest.json is blank in dtl
         # Generating the state-dump first is not working here ???
         # ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
@@ -403,8 +403,8 @@ services:
       << : *proposer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
-      GAS_PRICE_ORACLE_ROOF_PRICE: 100
+      GAS_PRICE_ORACLE_FLOOR_PRICE:
+      GAS_PRICE_ORACLE_ROOF_PRICE:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 70
