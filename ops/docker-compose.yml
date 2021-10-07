@@ -270,8 +270,7 @@ services:
       RETRIES: 60
       POLLING_INTERVAL: 500
       GET_LOGS_INTERVAL: 500
-      #FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
-      FILTER_ENDPOINT: http://boba_deployer:8079/addresses.json
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
       FILTER_POLLING_INTERVAL: 30000
 
   # a second relay system for messages that need to get to L1 quickly
@@ -289,16 +288,15 @@ services:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      #BOBA_URL: http://dtl:8081/boba-addr.json
-      BOBA_URL: http://boba_deployer:8079/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
       RETRIES: 70
       POLLING_INTERVAL: 1500
       GET_LOGS_INTERVAL: 500
-      #FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
-      FILTER_ENDPOINT: http://boba_deployer:8079/addresses.json
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
 
   batch_submitter:
     depends_on:
@@ -380,8 +378,7 @@ services:
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      #BOBA_URL: http://dtl:8081/boba-addr.json
-      BOBA_URL: http://boba_deployer:8079/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID

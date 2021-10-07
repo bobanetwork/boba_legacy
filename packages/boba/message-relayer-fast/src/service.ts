@@ -506,19 +506,24 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     )
 
     const messages = events.map((event) => {
-      const message = event.args.message
-      const decoded = this.state.L2CrossDomainMessenger.interface.decodeFunctionData(
-        'relayMessage',
-        message
-      )
+      const encodedMessage =
+        this.state.L2CrossDomainMessenger.interface.encodeFunctionData(
+          'relayMessage',
+          [
+            event.args.target,
+            event.args.sender,
+            event.args.message,
+            event.args.messageNonce,
+          ]
+        )
 
       return {
-        target: decoded._target,
-        sender: decoded._sender,
-        message: decoded._message,
-        messageNonce: decoded._messageNonce,
-        encodedMessage: message,
-        encodedMessageHash: ethers.utils.keccak256(message),
+        target: event.args.target,
+        sender: event.args.sender,
+        message: event.args.message,
+        messageNonce: event.args.messageNonce,
+        encodedMessage,
+        encodedMessageHash: ethers.utils.keccak256(encodedMessage),
         parentTransactionIndex: event.blockNumber - this.options.l2BlockOffset,
         parentTransactionHash: event.transactionHash,
       }
