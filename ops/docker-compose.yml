@@ -148,6 +148,7 @@ services:
         # were already compiled in the builder step
         NO_COMPILE: 1
         DTL_REGISTRY_URL: http://dtl:8081/addresses.json
+        DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
     ports:
       - ${DEPLOYER_PORT:-8099}:8081 # Can eventually remove this now that DTL is serving stuff
 
@@ -214,7 +215,11 @@ services:
     environment:
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
-        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        # Need Micheal help here
+        # state-dump.latest.json is blank in dtl
+        # Generating the state-dump first is not working here ???
+        # ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_STATE_DUMP_PATH: http://deployer:8081/state-dump.latest.json
         # connecting to the DTL
         ROLLUP_CLIENT_HTTP: http://dtl:7878
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
@@ -265,7 +270,8 @@ services:
       RETRIES: 60
       POLLING_INTERVAL: 500
       GET_LOGS_INTERVAL: 500
-      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
+      #FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
+      FILTER_ENDPOINT: http://boba_deployer:8079/addresses.json
       FILTER_POLLING_INTERVAL: 30000
 
   # a second relay system for messages that need to get to L1 quickly
@@ -283,13 +289,15 @@ services:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      BOBA_URL: http://dtl:8081/boba-addr.json
+      #BOBA_URL: http://dtl:8081/boba-addr.json
+      BOBA_URL: http://boba_deployer:8079/addresses.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
       RETRIES: 70
       POLLING_INTERVAL: 1500
       GET_LOGS_INTERVAL: 500
-      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      #FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_ENDPOINT: http://boba_deployer:8079/addresses.json
       FILTER_POLLING_INTERVAL: 30000
 
   batch_submitter:
@@ -372,7 +380,8 @@ services:
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      BOBA_URL: http://dtl:8081/boba-addr.json
+      #BOBA_URL: http://dtl:8081/boba-addr.json
+      BOBA_URL: http://boba_deployer:8079/addresses.json
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
