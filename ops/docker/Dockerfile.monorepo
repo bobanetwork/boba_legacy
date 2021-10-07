@@ -68,6 +68,9 @@ RUN yarn build
 # build integration tests' contracts
 RUN yarn workspace @eth-optimism/integration-tests build
 
+# get the dump
+RUN yarn --cwd ./packages/contracts ts-node bin/take-dump.ts
+
 # TODO: Consider thinning up the container by trimming non-production
 # dependencies
 # so that it can be used in docker-compose

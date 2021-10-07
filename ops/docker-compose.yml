@@ -214,8 +214,7 @@ services:
     environment:
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
-        # ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-        ROLLUP_STATE_DUMP_PATH: http://deployer:8081/state-dump.latest.json
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
         # connecting to the DTL
         ROLLUP_CLIENT_HTTP: http://dtl:7878
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
@@ -398,8 +397,8 @@ services:
       << : *proposer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      GAS_PRICE_ORACLE_FLOOR_PRICE:
-      GAS_PRICE_ORACLE_ROOF_PRICE:
+      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
+      GAS_PRICE_ORACLE_ROOF_PRICE: 100
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 70
