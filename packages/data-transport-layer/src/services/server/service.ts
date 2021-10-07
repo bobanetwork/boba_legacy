@@ -231,6 +231,7 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
           url: req.url,
           elapsed,
         })
+
         this.logger.debug('Response body', {
           method: req.method,
           url: req.url,
@@ -437,7 +438,7 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
             this.state.baseBlock = l1Synced
             this.state.baseTime = block.timestamp
           } else {
-            this.logger.error("Error querying highestSyncedL1Block timestamp")
+            this.logger.error('Error querying highestSyncedL1Block timestamp')
             // FIXME - Should find a way to return a 500-class error here. For now this
             // results in a "400 Bad Request" which is incorrect.
             throw new Error('Error querying highestSyncedL1Block timestamp')
