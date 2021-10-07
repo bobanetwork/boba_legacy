@@ -163,34 +163,6 @@ contract L1CrossDomainMessengerFast is
     }
 
     /**
-     * Block a message.
-     * @param _xDomainCalldataHash Hash of the message to block.
-     */
-    function blockMessage(
-        bytes32 _xDomainCalldataHash
-    )
-        external
-        onlyOwner
-    {
-        blockedMessages[_xDomainCalldataHash] = true;
-        emit MessageBlocked(_xDomainCalldataHash);
-    }
-
-    /**
-     * Allow a message.
-     * @param _xDomainCalldataHash Hash of the message to block.
-     */
-    function allowMessage(
-        bytes32 _xDomainCalldataHash
-    )
-        external
-        onlyOwner
-    {
-        blockedMessages[_xDomainCalldataHash] = false;
-        emit MessageAllowed(_xDomainCalldataHash);
-    }
-
-    /**
      * Sends a cross domain message to the target messenger.
      * @param _target Target contract address.
      * @param _message Message to send to the target.

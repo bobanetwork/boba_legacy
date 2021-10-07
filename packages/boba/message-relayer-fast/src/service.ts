@@ -613,13 +613,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   }
 
   private async _wasMessageBlocked(message: SentMessage): Promise<boolean> {
-    return this.state.OVM_L1CrossDomainMessenger.blockedMessages(
+    return this.state.L1CrossDomainMessenger.blockedMessages(
       message.encodedMessageHash
     )
   }
 
   private async _wasMessageFailed(message: SentMessage): Promise<boolean> {
-    return this.state.OVM_L1CrossDomainMessenger.failedMessages(
+    return this.state.L1CrossDomainMessenger.failedMessages(
       message.encodedMessageHash
     )
   }
@@ -735,18 +735,23 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       return
     }
 
-    const result = await this.state.L1CrossDomainMessenger.connect(
-      this.options.l1Wallet
-    ).relayMessage(
-      message.target,
-      message.sender,
-      message.message,
-      message.messageNonce,
-      proof,
-      {
-        gasLimit: this.options.relayGasLimit,
-      }
-    )
+    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
+      const txResponse = await this.state.L1CrossDomainMessenger.connect(
+        this.options.l1Wallet
+      ).relayMessage(
+        message.target,
+        message.sender,
+        message.message,
+        message.messageNonce,
+        proof,
+        { gasPrice }
+      )
+      const tx = await this.options.l1Wallet.provider.waitForTransaction(
+        txResponse.hash,
+        this.options.numConfirmations
+      )
+      return tx
+    }
 
     const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
 
