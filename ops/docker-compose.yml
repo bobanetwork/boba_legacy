@@ -148,6 +148,7 @@ services:
         # were already compiled in the builder step
         NO_COMPILE: 1
         DTL_REGISTRY_URL: http://dtl:8081/addresses.json
+        DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
     ports:
       - ${DEPLOYER_PORT:-8099}:8081 # Can eventually remove this now that DTL is serving stuff
 
@@ -214,6 +215,9 @@ services:
     environment:
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
+        # Need help here
+        # state-dump.latest.json is blank in dtl
+        # Generating the state-dump first is not working here ???
         # ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
         ROLLUP_STATE_DUMP_PATH: http://deployer:8081/state-dump.latest.json
         # connecting to the DTL
@@ -292,6 +296,7 @@ services:
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
 
   batch_submitter:
     depends_on:

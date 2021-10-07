@@ -211,7 +211,7 @@ describe('Liquidity Pool Test', async () => {
     expect(poolETHInfo.l1TokenAddress).to.deep.eq(
       '0x0000000000000000000000000000000000000000'
     )
-    console.log(poolETHInfo.l2TokenAddress)
+    // console.log(poolETHInfo.l2TokenAddress)
     //expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.l2ETHAddress)
   })
 
@@ -346,15 +346,13 @@ describe('Liquidity Pool Test', async () => {
     const preKateL1ERC20Balance = await L1ERC20.balanceOf(
       env.l1Wallet_3.address
     )
-console.log(preKateL1ERC20Balance)
     const approveKateL2TX = await L2ERC20.connect(env.l2Wallet_3).approve(
       L2LiquidityPool.address,
       fastExitAmount,
       { gasLimit: 7000000 }
     )
 
-    console.log(await approveKateL2TX.wait())
-console.log('were here')
+    await approveKateL2TX.wait()
     const depositTx = await env.waitForXDomainTransactionFast(
       L2LiquidityPool.connect(env.l2Wallet_3).clientDepositL2(
         fastExitAmount,
