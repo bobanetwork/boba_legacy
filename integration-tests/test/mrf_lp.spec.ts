@@ -346,14 +346,15 @@ describe('Liquidity Pool Test', async () => {
     const preKateL1ERC20Balance = await L1ERC20.balanceOf(
       env.l1Wallet_3.address
     )
-
+console.log(preKateL1ERC20Balance)
     const approveKateL2TX = await L2ERC20.connect(env.l2Wallet_3).approve(
       L2LiquidityPool.address,
       fastExitAmount,
       { gasLimit: 7000000 }
     )
-    await approveKateL2TX.wait()
 
+    console.log(await approveKateL2TX.wait())
+console.log('were here')
     const depositTx = await env.waitForXDomainTransactionFast(
       L2LiquidityPool.connect(env.l2Wallet_3).clientDepositL2(
         fastExitAmount,

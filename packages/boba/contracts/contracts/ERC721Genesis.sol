@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  * @title ERC721Genesis
  *
  */
-contract ERC721Genesis is ERC721Enumerable, ERC721URIStorage, Ownable {
+contract ERC721Genesis is Ownable, ERC721Enumerable, ERC721URIStorage {
 
     uint256 tID;
 

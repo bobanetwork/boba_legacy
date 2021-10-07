@@ -7,7 +7,7 @@
 cmd="$@"
 JSON='{"jsonrpc":"2.0","id":0,"method":"net_version","params":[]}'
 
-RETRIES=${RETRIES:-20}
+RETRIES=${RETRIES:-40}
 until $(curl --silent --fail \
     --output /dev/null \
     -H "Content-Type: application/json" \
