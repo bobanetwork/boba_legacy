@@ -20,9 +20,9 @@ let NETWORKS;
 
 NETWORKS = {
   rinkeby: {
-    addressUrl:       `https://rinkeby.boba.network:8080/addresses.json`,
-    addressOMGXUrl:   `https://rinkeby.boba.network:8078/addresses.json`,
-    OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
+    addressUrl:       `https://rinkeby-v2.boba.network:8080/addresses.json`,
+    addressOMGXUrl:   `https://rinkeby-v2.boba.network:8078/addresses.json`,
+    OMGX_WATCHER_URL: null,
     MM_Label:         `Rinkeby`,
     L1: {
       name: "Rinkeby",
@@ -32,11 +32,11 @@ NETWORKS = {
       transaction: `https://rinkeby.etherscan.io/tx/`,
     },
     L2: {
-      name: "BOBA Rinkeby L2",
-      chainId: 28,
-      rpcUrl: `https://rinkeby.boba.network`,
-      blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
-      transaction: `https://blockexplorer.rinkeby.boba.network/tx/`,
+      name: "BOBA Rinkeby2 L2",
+      chainId: 420,
+      rpcUrl: `https://rinkeby-v2.boba.network`,
+      blockExplorer: `https://blockexplorer.rinkeby-v2.boba.network/`,
+      transaction: null,
     }
   },
   mainnet: {
