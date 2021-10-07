@@ -12,7 +12,6 @@
     "build": "./scripts/build.sh",
     "build:contracts": "hardhat compile",
     "deploy": "ts-node \"./bin/deploy.ts\"",
-    "test:integration": "./scripts/build.sh && hardhat --network optimism test",
     "postinstall": "patch-package",
     "clean": "rm -rf ./dist ./artifacts ./artifacts-ovm ./cache ./cache-ovm ./tsconfig.build.tsbuildinfo"
   },

@@ -3,11 +3,12 @@ pragma solidity >0.7.5;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 /**
  * @title ERC721Genesis
  *
  */
-contract ERC721Genesis is Ownable, ERC721URIStorage {
+contract ERC721Genesis is Ownable, ERC721Enumerable, ERC721URIStorage {
 
     uint256 tID;
 
@@ -37,10 +38,10 @@ contract ERC721Genesis is Ownable, ERC721URIStorage {
         );
     }
 
-    function mintNFT(address recipient, string memory tokenURI) external onlyOwner returns (uint256)
+    function mintNFT(address recipient, string memory tokenURIArg) external onlyOwner returns (uint256)
     {
         _mint(recipient, tID);
-        _setTokenURI(tID, tokenURI);
+        _setTokenURI(tID, tokenURIArg);
         tID += 1;
         return tID;
     }
@@ -67,5 +68,20 @@ contract ERC721Genesis is Ownable, ERC721URIStorage {
     function burn(uint256 tokenId) external {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Caller is not owner nor approved");
         _burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721URIStorage,ERC721) returns (string memory) {
+        super.tokenURI(tokenId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721URIStorage,ERC721) {
+        super._burn(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable,ERC721) returns (bool) {
+        super.supportsInterface(interfaceId);
+    }
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override(ERC721Enumerable,ERC721) {
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 }

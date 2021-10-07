@@ -19,7 +19,7 @@
 | OVM_ECDSAContractAccount    | 0x4200000000000000000000000000000000000003 |
 | OVM_SequencerEntrypoint     | 0x4200000000000000000000000000000000000005 |
 | OVM_ETH                     | 0x4200000000000000000000000000000000000006 |
-| OVM_L2CrossDomainMessenger  | 0x4200000000000000000000000000000000000007 |
+| L2CrossDomainMessenger  | 0x4200000000000000000000000000000000000007 |
 | Lib_AddressManager          | 0x4200000000000000000000000000000000000008 |
 | OVM_ProxyEOA                | 0x4200000000000000000000000000000000000009 |
 | OVM_ExecutionManagerWrapper | 0x420000000000000000000000000000000000000B |
@@ -76,7 +76,7 @@ Network : **mainnet (chain id: 1)**
 Implementation addresses. DO NOT use these addresses directly.
 Use their proxied counterparts seen above.
 
-OVM_L1CrossDomainMessenger:
+L1CrossDomainMessenger:
  - 0xbfba066b5cA610Fe70AdCE45FcB622F945891bb0
  - https://etherscan.io/address/0xbfba066b5cA610Fe70AdCE45FcB622F945891bb0)
 -->
@@ -109,7 +109,7 @@ Network : **kovan (chain id: 42)**
 Implementation addresses. DO NOT use these addresses directly.
 Use their proxied counterparts seen above.
 
-OVM_L1CrossDomainMessenger:
+L1CrossDomainMessenger:
  - 0x333d2674E2D7e1e7327dc076030ce9615183709C
  - https://kovan.etherscan.io/address/0x333d2674E2D7e1e7327dc076030ce9615183709C)
 -->
@@ -143,7 +143,7 @@ Network : **goerli (chain id: 5)**
 Implementation addresses. DO NOT use these addresses directly.
 Use their proxied counterparts seen above.
 
-OVM_L1CrossDomainMessenger:
+L1CrossDomainMessenger:
  - 0x3B1D4DE5F7Fe8487980Ee7608BE302dC60a9caE9
  - https://goerli.etherscan.io/address/0x3B1D4DE5F7Fe8487980Ee7608BE302dC60a9caE9)
 OVM_L1ETHGateway:
