@@ -61,7 +61,7 @@ jobs:
 
       - name: Bring the stack up
         working-directory: ./ops
-        run: docker-compose up --no-build -d --scale boba_deployer=0
+        run: docker-compose up --no-build -d
 
       - name: Wait for the Sequencer node
         working-directory: ./ops
