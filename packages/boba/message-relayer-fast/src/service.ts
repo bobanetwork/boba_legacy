@@ -10,7 +10,12 @@ import { fromHexString, sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 
 import { loadContract, loadContractFromManager } from '@eth-optimism/contracts'
-import { StateRootBatchHeader, SentMessage, SentMessageProof, BatchMessage } from './types'
+import {
+  StateRootBatchHeader,
+  SentMessage,
+  SentMessageProof,
+  BatchMessage,
+} from './types'
 
 interface MessageRelayerOptions {
   // Providers for interacting with L1 and L2.
@@ -91,10 +96,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     lastQueriedL1Block: number
     eventCache: ethers.Event[]
     Lib_AddressManager: Contract
-    OVM_StateCommitmentChain: Contract
-    OVM_L1CrossDomainMessenger: Contract
-    OVM_L1MultiMessageRelayerFast: Contract
-    OVM_L2CrossDomainMessenger: Contract
+    StateCommitmentChain: Contract
+    L1CrossDomainMessenger: Contract
+    L1MultiMessageRelayerFast: Contract
+    L2CrossDomainMessenger: Contract
     OVM_L2ToL1MessagePasser: Contract
     filter: Array<any>
     lastFilterPollingTimestamp: number
@@ -128,50 +133,52 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.options.l1RpcProvider
     )
 
-    this.logger.info('Connecting to OVM_StateCommitmentChain...')
-    this.state.OVM_StateCommitmentChain = await loadContractFromManager({
-      name: 'OVM_StateCommitmentChain',
+    this.logger.info('Connecting to StateCommitmentChain...')
+    this.state.StateCommitmentChain = await loadContractFromManager({
+      name: 'StateCommitmentChain',
       Lib_AddressManager: this.state.Lib_AddressManager,
       provider: this.options.l1RpcProvider,
     })
-    this.logger.info('Connected to OVM_StateCommitmentChain', {
-      address: this.state.OVM_StateCommitmentChain.address,
+    this.logger.info('Connected to StateCommitmentChain', {
+      address: this.state.StateCommitmentChain.address,
     })
 
-    this.logger.info('Connecting to OVM_L1CrossDomainMessenger...')
-    const l1MessengerAddress = this.options.l1MessengerFast || await this.state.Lib_AddressManager.getAddress(
-      'Proxy__OVM_L1CrossDomainMessengerFast'
-    )
-    this.state.OVM_L1CrossDomainMessenger = loadContract(
-      'OVM_L1CrossDomainMessenger',
+    this.logger.info('Connecting to L1CrossDomainMessenger...')
+    const l1MessengerAddress =
+      this.options.l1MessengerFast ||
+      (await this.state.Lib_AddressManager.getAddress(
+      'Proxy__L1CrossDomainMessengerFast'
+      ))
+    this.state.L1CrossDomainMessenger = loadContract(
+      'L1CrossDomainMessenger',
       l1MessengerAddress,
       this.options.l1RpcProvider
     )
-    this.logger.info('Connected to OVM_L1CrossDomainMessenger', {
-      address: this.state.OVM_L1CrossDomainMessenger.address,
+    this.logger.info('Connected to L1CrossDomainMessenger', {
+      address: this.state.L1CrossDomainMessenger.address,
     })
 
-    this.logger.info('Connecting to OVM_L1MultiMessageRelayerFast...')
+    this.logger.info('Connecting to L1MultiMessageRelayerFast...')
     const l1MultiMessageRelayerFastAddress = await this.state.Lib_AddressManager.getAddress(
-      'OVM_L1MultiMessageRelayerFast'
-    )
-    this.state.OVM_L1MultiMessageRelayerFast = loadContract(
-      'OVM_L1MultiMessageRelayer',
+        'L1MultiMessageRelayerFast'
+      )
+    this.state.L1MultiMessageRelayerFast = loadContract(
+      'L1MultiMessageRelayer',
       l1MultiMessageRelayerFastAddress,
       this.options.l1RpcProvider
     )
-    this.logger.info('Connected to OVM_L1MultiMessageRelayerFast', {
-      address: this.state.OVM_L1MultiMessageRelayerFast.address,
+    this.logger.info('Connected to L1MultiMessageRelayerFast', {
+      address: this.state.L1MultiMessageRelayerFast.address,
     })
 
-    this.logger.info('Connecting to OVM_L2CrossDomainMessenger...')
-    this.state.OVM_L2CrossDomainMessenger = await loadContractFromManager({
-      name: 'OVM_L2CrossDomainMessenger',
+    this.logger.info('Connecting to L2CrossDomainMessenger...')
+    this.state.L2CrossDomainMessenger = await loadContractFromManager({
+      name: 'L2CrossDomainMessenger',
       Lib_AddressManager: this.state.Lib_AddressManager,
       provider: this.options.l2RpcProvider,
     })
-    this.logger.info('Connected to OVM_L2CrossDomainMessenger', {
-      address: this.state.OVM_L2CrossDomainMessenger.address,
+    this.logger.info('Connected to L2CrossDomainMessenger', {
+      address: this.state.L2CrossDomainMessenger.address,
     })
 
     this.logger.info('Connecting to OVM_L2ToL1MessagePasser...')
@@ -469,8 +476,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         return undefined
       }
       // query the new SCC event. event.args._extraData in eventCache might be wrong
-      const SCCEvent: ethers.Event[] = await this.state.OVM_StateCommitmentChain.queryFilter(
-        this.state.OVM_StateCommitmentChain.filters.StateBatchAppended(),
+      const SCCEvent: ethers.Event[] = await this.state.StateCommitmentChain.queryFilter(
+        this.state.StateCommitmentChain.filters.StateBatchAppended(),
         selectedEvent.blockNumber,
         selectedEvent.blockNumber
       )
@@ -487,8 +494,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         endBlock: startingBlock + this.options.getLogsInterval,
       })
 
-      const events: ethers.Event[] = await this.state.OVM_StateCommitmentChain.queryFilter(
-        this.state.OVM_StateCommitmentChain.filters.StateBatchAppended(),
+      const events: ethers.Event[] = await this.state.StateCommitmentChain.queryFilter(
+        this.state.StateCommitmentChain.filters.StateBatchAppended(),
         startingBlock,
         startingBlock + this.options.getLogsInterval
       )
@@ -514,7 +521,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     const [
       stateRoots,
-    ] = this.state.OVM_StateCommitmentChain.interface.decodeFunctionData(
+    ] = this.state.StateCommitmentChain.interface.decodeFunctionData(
       'appendStateBatch',
       transaction.data
     )
@@ -544,7 +551,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     // decode to get timestamp and check for time elapsed for non-zero dispute period messenger
 
-    // return !(await this.state.OVM_StateCommitmentChain.insideFraudProofWindow(
+    // return !(await this.state.StateCommitmentChain.insideFraudProofWindow(
     //   header.batch
     // ))
     return true
@@ -562,27 +569,32 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     startHeight: number,
     endHeight: number
   ): Promise<SentMessage[]> {
-    const filter = this.state.OVM_L2CrossDomainMessenger.filters.SentMessage()
-    const events = await this.state.OVM_L2CrossDomainMessenger.queryFilter(
+    const filter = this.state.L2CrossDomainMessenger.filters.SentMessage()
+    const events = await this.state.L2CrossDomainMessenger.queryFilter(
       filter,
       startHeight + this.options.l2BlockOffset,
       endHeight + this.options.l2BlockOffset - 1
     )
 
     const messages = events.map((event) => {
-      const message = event.args.message
-      const decoded = this.state.OVM_L2CrossDomainMessenger.interface.decodeFunctionData(
-        'relayMessage',
-        message
-      )
+      const encodedMessage =
+        this.state.L2CrossDomainMessenger.interface.encodeFunctionData(
+          'relayMessage',
+          [
+            event.args.target,
+            event.args.sender,
+            event.args.message,
+            event.args.messageNonce,
+          ]
+        )
 
       return {
-        target: decoded._target,
-        sender: decoded._sender,
-        message: decoded._message,
-        messageNonce: decoded._messageNonce,
-        encodedMessage: message,
-        encodedMessageHash: ethers.utils.keccak256(message),
+        target: event.args.target,
+        sender: event.args.sender,
+        message: event.args.message,
+        messageNonce: event.args.messageNonce,
+        encodedMessage,
+        encodedMessageHash: ethers.utils.keccak256(encodedMessage),
         parentTransactionIndex: event.blockNumber - this.options.l2BlockOffset,
         parentTransactionHash: event.transactionHash,
       }
@@ -595,7 +607,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   }
 
   private async _wasMessageRelayed(message: SentMessage): Promise<boolean> {
-    return this.state.OVM_L1CrossDomainMessenger.successfulMessages(
+    return this.state.L1CrossDomainMessenger.successfulMessages(
       message.encodedMessageHash
     )
   }
@@ -631,7 +643,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     const messageSlot = ethers.utils.keccak256(
       ethers.utils.keccak256(
         message.encodedMessage +
-          this.state.OVM_L2CrossDomainMessenger.address.slice(2)
+          this.state.L2CrossDomainMessenger.address.slice(2)
       ) + '00'.repeat(32)
     )
 
@@ -700,7 +712,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     try {
       this.logger.info('Dry-run, checking to make sure proof would succeed...')
 
-      await this.state.OVM_L1CrossDomainMessenger.connect(
+      await this.state.L1CrossDomainMessenger.connect(
         this.options.l1Wallet
       ).callStatic.relayMessage(
         message.target,
@@ -723,23 +735,18 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       return
     }
 
-    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
-      const txResponse = await this.state.OVM_L1CrossDomainMessenger.connect(
-        this.options.l1Wallet
-      ).relayMessage(
-        message.target,
-        message.sender,
-        message.message,
-        message.messageNonce,
-        proof,
-        { gasPrice }
-      )
-      const tx = await this.options.l1Wallet.provider.waitForTransaction(
-        txResponse.hash,
-        this.options.numConfirmations
-      )
-      return tx
-    }
+    const result = await this.state.L1CrossDomainMessenger.connect(
+      this.options.l1Wallet
+    ).relayMessage(
+      message.target,
+      message.sender,
+      message.message,
+      message.messageNonce,
+      proof,
+      {
+        gasLimit: this.options.relayGasLimit,
+      }
+    )
 
     const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
 
@@ -774,7 +781,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       // Generate the transaction we will repeatedly submit
       const nonce = await this.options.l1Wallet.getTransactionCount()
       this.logger.info('Relay message nonce', { nonce })
-      const txResponse = await this.state.OVM_L1MultiMessageRelayerFast.connect(
+      const txResponse = await this.state.L1MultiMessageRelayerFast.connect(
         this.options.l1Wallet
       ).batchRelayMessages(messages, { gasPrice, nonce })
       const tx = await this.options.l1Wallet.provider.waitForTransaction(

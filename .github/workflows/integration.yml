@@ -61,7 +61,7 @@ jobs:
 
       - name: Bring the stack up
         working-directory: ./ops
-        run: docker-compose up --no-build -d --scale boba_deployer=0
+        run: docker-compose up --no-build -d
 
       - name: Wait for the Sequencer node
         working-directory: ./ops
@@ -70,6 +70,30 @@ jobs:
       - name: Start background logging
         working-directory: ./ops
         run: docker-compose -f docker-compose.yml logs --follow &
+
+      # this test jitters - in any case, later tests will fail if the boba_deployer does not come up
+      - name: Test serving BOBA contracts
+        working-directory: ./
+        run: |
+          RETRIES=60
+          URL=http://127.0.0.1:8078/addresses.json
+          until $(curl --silent --fail --output /dev/null "$URL"); do
+            sleep 20s
+            echo "Will wait $((RETRIES--)) more times for $URL to be up..."
+
+            if [ "$RETRIES" -lt 0 ]; then
+              echo "Timeout waiting for contract deployment"
+              exit 1
+            fi
+          done
+          echo "BOBA contracts are deployed"
+          L2LIQUIDITY_POOL=$(curl --silent $URL | jq -r .L2LiquidityPool)
+          echo $L2LIQUIDITY_POOL
+          if [[ $L2LIQUIDITY_POOL =~ "0x" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
 
       - name: Run the integration tests
         working-directory: ./ops

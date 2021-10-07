@@ -53,7 +53,7 @@ contract L1MultiMessageRelayer is Lib_AddressResolver {
         require(
             msg.sender == resolve("L2BatchMessageRelayer"),
             // solhint-disable-next-line max-line-length
-            "OVM_L1MultiMessageRelayer: Function can only be called by the L2BatchMessageRelayer"
+            "L1MultiMessageRelayer: Function can only be called by the L2BatchMessageRelayer"
         );
         _;
     }

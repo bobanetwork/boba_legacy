@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 
 /* Imports: External */
+import * as request from 'request-promise-native'
 import {
   Contract,
   Wallet,
@@ -18,7 +19,7 @@ import {
 import { injectL2Context, remove0x, Watcher } from '@eth-optimism/core-utils'
 import { cleanEnv, str, num, bool } from 'envalid'
 import dotenv from 'dotenv'
-
+import { expectEvent } from '@openzeppelin/test-helpers'
 /* Imports: Internal */
 import { Direction, waitForXDomainTransaction } from './watcher-utils'
 
@@ -40,6 +41,14 @@ const env = cleanEnv(process.env, {
   PRIVATE_KEY: str({
     default:
       '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+  }),
+  PRIVATE_KEY_2: str({
+    default:
+      '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
+  }),
+  PRIVATE_KEY_3: str({
+    default:
+      '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
   }),
   ADDRESS_MANAGER: str({
     default: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
@@ -63,10 +72,14 @@ replicaProvider.pollingInterval = env.REPLICA_POLLING_INTERVAL
 
 // The sequencer private key which is funded on L1
 export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
+export const l1Wallet_2 = new Wallet(env.PRIVATE_KEY_2, l1Provider)
+export const l1Wallet_3 = new Wallet(env.PRIVATE_KEY_3, l1Provider)
 
 // A random private key which should always be funded with deposits from L1 -> L2
 // if it's using non-0 gas price
 export const l2Wallet = l1Wallet.connect(l2Provider)
+export const l2Wallet_2 = l1Wallet_2.connect(l2Provider)
+export const l2Wallet_3 = l1Wallet_3.connect(l2Provider)
 
 // Predeploys
 export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =
@@ -81,6 +94,18 @@ export const getAddressManager = (provider: any) => {
     .connect(provider)
     .attach(env.ADDRESS_MANAGER)
 }
+
+if (!process.env.BOBA_URL) {
+  console.log(`!!You did not set process.env.BOBA_URL!!`)
+  console.log(
+    `Setting to default value of http://127.0.0.1:8078/addresses.json`
+  )
+} else {
+  console.log(`process.env.BOBA_URL set to:`, process.env.BOBA_URL)
+}
+
+export const BOBA_URL =
+  process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, AddressManager: Contract) => {
@@ -167,4 +192,51 @@ export const waitForL2Geth = async (
     }
   }
   return injectL2Context(provider)
+}
+
+export const getBOBADeployerAddresses = async () => {
+  const options = {
+    uri: BOBA_URL,
+  }
+  const result = await request.get(options)
+  return JSON.parse(result)
+}
+
+export const expectLogs = async (
+  receipt,
+  emitterAbi,
+  emitterAddress,
+  eventName,
+  eventArgs = {}
+) => {
+  let eventABI = emitterAbi.filter(
+    (x) => x.type === 'event' && x.name === eventName
+  )
+  if (eventABI.length === 0) {
+    throw new Error(`No ABI entry for event '${eventName}'`)
+  } else if (eventABI.length > 1) {
+    throw new Error(
+      `Multiple ABI entries for event '${eventName}', only uniquely named events are supported`
+    )
+  }
+
+  eventABI = eventABI[0]
+  const eventSignature = `${eventName}(${eventABI.inputs
+    .map((input) => input.type)
+    .join(',')})`
+  const eventTopic = utils.keccak256(utils.toUtf8Bytes(eventSignature))
+  const logs = receipt.logs
+  const filterdLogs = logs
+    .filter(
+      (log) =>
+        log.topics.length > 0 &&
+        log.topics[0] === eventTopic &&
+        (!emitterAddress || log.address === emitterAddress)
+    )
+    .map((log) =>
+      abiCoder.decode(eventABI.inputs, log.data, log.topics.slice(1))
+    )
+    .map((decoded) => ({ event: eventName, args: decoded }))
+
+  return expectEvent.inLogs(filterdLogs, eventName, eventArgs)
 }

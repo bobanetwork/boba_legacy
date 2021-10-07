@@ -120,11 +120,11 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         })
       }
     })
-    this.state.addressRegistry['get']("/omgx-addr.json", async (req, res) => {
+    this.state.addressRegistry['get']("/boba-addr.json", async (req, res) => {
       try {
         let aList
         try {
-          aList = JSON.parse(await this.state.db.get("omgx-addr"))
+          aList = JSON.parse(await this.state.db.get("boba-addr"))
         } catch(e) {
           if (e.notFound) {
             this.logger.warn("Address Registry is not yet ready to serve OMGX addresses (db notFound)")
@@ -175,7 +175,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         })
       }
     })
-    this.state.addressRegistry['put']("/omgx-addr.json", async (req, res) => {
+    this.state.addressRegistry['put']("/boba-addr.json", async (req, res) => {
       try {
         const rb = req.body
 
@@ -184,9 +184,9 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         // As with the base list, we could add future restrictions on changing
         // certain critical addresses. For now we allow anything.
 
-        this.logger.info("Will store new omgx-addr.json", rb)
-        await this.state.db.put("omgx-addr", JSON.stringify(rb))
-        this.logger.info("Stored omgx-addr.json")
+        this.logger.info("Will store new boba-addr.json", rb)
+        await this.state.db.put("boba-addr", JSON.stringify(rb))
+        this.logger.info("Stored boba-addr.json")
         return res.sendStatus(201).end()
       } catch (e) {
         return res.status(500).json({

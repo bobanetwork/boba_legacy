@@ -30,6 +30,28 @@ export const initWatcher = async (
   })
 }
 
+export const initWatcherFast = async (
+  l1Provider: JsonRpcProvider,
+  l2Provider: JsonRpcProvider,
+  AddressManager: Contract
+) => {
+  const l1MessengerAddressFast = await AddressManager.getAddress(
+    'Proxy__L1CrossDomainMessengerFast'
+  )
+  console.log('l1MessengerAddressFast:', l1MessengerAddressFast)
+
+  return new Watcher({
+    l1: {
+      provider: l1Provider,
+      messengerAddress: l1MessengerAddressFast,
+    },
+    l2: {
+      provider: l2Provider,
+      messengerAddress: '0x4200000000000000000000000000000000000007',
+    },
+  })
+}
+
 export interface CrossDomainMessagePair {
   tx: Transaction
   receipt: TransactionReceipt
@@ -40,6 +62,14 @@ export interface CrossDomainMessagePair {
 export enum Direction {
   L1ToL2,
   L2ToL1,
+}
+
+export const waitForXDomainTransactionFast = async (
+  watcherFast: Watcher,
+  tx: Promise<TransactionResponse> | TransactionResponse,
+  direction: Direction
+): Promise<CrossDomainMessagePair> => {
+  return waitForXDomainTransaction(watcherFast, tx, direction)
 }
 
 export const waitForXDomainTransaction = async (
