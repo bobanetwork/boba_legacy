@@ -34,18 +34,12 @@ const main = async () => {
     'proposer-private-key',
     env.PROPOSER_PRIVATE_KEY
   )
-  const PROPOSER_ADDRESS = config.str(
-    'proposer-address',
-    env.PROPOSER_ADDRESS
-  )
+  const PROPOSER_ADDRESS = config.str('proposer-address', env.PROPOSER_ADDRESS)
   const RELAYER_PRIVATE_KEY = config.str(
     'relayer-private-key',
     env.RELAYER_PRIVATE_KEY
   )
-  const RELAYER_ADDRESS = config.str(
-    'relayer-address',
-    env.RELAYER_ADDRESS
-  )
+  const RELAYER_ADDRESS = config.str('relayer-address', env.RELAYER_ADDRESS)
   const FAST_RELAYER_PRIVATE_KEY = config.str(
     'fast-relayer-private-key',
     env.FAST_RELAYER_PRIVATE_KEY
@@ -73,7 +67,6 @@ const main = async () => {
     'gas-price-oracle-min-percent-change',
     parseFloat(env.GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE) || 0.1
   )
-  parseInt(env.GAS_PRICE_ORACLE_SCALAR)
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
     parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60 * 5
@@ -101,26 +94,35 @@ const main = async () => {
     throw new Error('Must pass RELAYER_ADDRESS or RELAYER_PRIVATE_KEY')
   }
   if (!FAST_RELAYER_ADDRESS && !FAST_RELAYER_PRIVATE_KEY) {
-    throw new Error('Must pass FAST_RELAYER_ADDRESS or FAST_RELAYER_PRIVATE_KEY')
+    throw new Error(
+      'Must pass FAST_RELAYER_ADDRESS or FAST_RELAYER_PRIVATE_KEY'
+    )
   }
 
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
 
-  const gasPriceOracleOwnerWallet = new Wallet(GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY, l2Provider)
+  const gasPriceOracleOwnerWallet = new Wallet(
+    GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY,
+    l2Provider
+  )
 
   // Fixed address
-  const OVM_SequencerFeeVault = "0x4200000000000000000000000000000000000011"
+  const OVM_SequencerFeeVault = '0x4200000000000000000000000000000000000011'
 
   // sequencer, proposer, relayer and fast relayer addresses
-  const sequencerAddress = SEQUENCER_ADDRESS ? SEQUENCER_ADDRESS:
-    (new Wallet(SEQUENCER_PRIVATE_KEY, l2Provider)).address;
-  const proposerAddress = PROPOSER_ADDRESS ? PROPOSER_ADDRESS:
-    (new Wallet(PROPOSER_PRIVATE_KEY, l2Provider)).address;
-  const relayerAddress = RELAYER_ADDRESS ? RELAYER_ADDRESS:
-    (new Wallet(RELAYER_PRIVATE_KEY, l2Provider)).address;
-  const fastRelayerAddress = FAST_RELAYER_ADDRESS ? FAST_RELAYER_ADDRESS:
-    (new Wallet(FAST_RELAYER_PRIVATE_KEY, l2Provider)).address;
+  const sequencerAddress = SEQUENCER_ADDRESS
+    ? SEQUENCER_ADDRESS
+    : new Wallet(SEQUENCER_PRIVATE_KEY, l2Provider).address
+  const proposerAddress = PROPOSER_ADDRESS
+    ? PROPOSER_ADDRESS
+    : new Wallet(PROPOSER_PRIVATE_KEY, l2Provider).address
+  const relayerAddress = RELAYER_ADDRESS
+    ? RELAYER_ADDRESS
+    : new Wallet(RELAYER_PRIVATE_KEY, l2Provider).address
+  const fastRelayerAddress = FAST_RELAYER_ADDRESS
+    ? FAST_RELAYER_ADDRESS
+    : new Wallet(FAST_RELAYER_PRIVATE_KEY, l2Provider).address;
 
   const service = new GasPriceOracleService({
     l1RpcProvider: l1Provider,
@@ -135,7 +137,7 @@ const main = async () => {
     gasFloorPrice: GAS_PRICE_ORACLE_FLOOR_PRICE,
     gasRoofPrice: GAS_PRICE_ORACLE_ROOF_PRICE,
     gasPriceMinPercentChange: GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE,
-    pollingInterval: POLLING_INTERVAL
+    pollingInterval: POLLING_INTERVAL,
   })
 
   await service.start()

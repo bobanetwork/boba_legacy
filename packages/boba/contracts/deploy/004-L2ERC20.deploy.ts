@@ -27,7 +27,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   Factory__L2ERC20 = getContractFactory(
-    "L2StandardERC20",
+    'L2StandardERC20',
     (hre as any).deployConfig.deployer_l2
   )
 
@@ -39,9 +39,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   let tokenAddress = null;
 
-  for (let token of preSupportedTokens.supportedTokens) {
-
-    if ((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST') {
+  for (const token of preSupportedTokens.supportedTokens) {
+    if (
+      (hre as any).deployConfig.network === 'local' ||
+      token.symbol === 'TEST'
+    ) {
       //do not deploy existing tokens on Rinkeby or Mainnet
       //only deploy tokens if it's the TEST token or we are on local
 

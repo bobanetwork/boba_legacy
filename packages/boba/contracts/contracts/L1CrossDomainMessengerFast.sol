@@ -7,6 +7,7 @@ import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries
 import { Lib_OVMCodec } from "@eth-optimism/contracts/contracts/libraries/codec/Lib_OVMCodec.sol";
 import { Lib_AddressManager } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
 import { Lib_SecureMerkleTrie } from "@eth-optimism/contracts/contracts/libraries/trie/Lib_SecureMerkleTrie.sol";
+import { Lib_DefaultValues } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_DefaultValues.sol";
 import { Lib_PredeployAddresses } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 import { Lib_CrossDomainUtils } from "@eth-optimism/contracts/contracts/libraries/bridge/Lib_CrossDomainUtils.sol";
 /* Interface Imports */
@@ -28,17 +29,27 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
  * Compiler used: solc
  * Runtime target: EVM
  */
-contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResolver, OwnableUpgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
+contract L1CrossDomainMessengerFast is
+    IL1CrossDomainMessenger,
+    Lib_AddressResolver,
+    OwnableUpgradeable,
+    PausableUpgradeable,
+    ReentrancyGuardUpgradeable
+{
+
+    /**********
+     * Events *
+     **********/
 
 
-    /*************
-     * Constants *
-     *************/
+    event MessageBlocked(
+        bytes32 indexed _xDomainCalldataHash
+    );
 
-    // The default x-domain message sender being set to a non-zero value makes
-    // deployment a bit more expensive, but in exchange the refund on every call to
-    // `relayMessage` by the L1 and L2 messengers will be higher.
-    address internal constant DEFAULT_XDOMAIN_SENDER = 0x000000000000000000000000000000000000dEaD;
+    event MessageAllowed(
+        bytes32 indexed _xDomainCalldataHash
+    );
+
 
     /**********************
      * Contract Variables *
@@ -47,15 +58,18 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
     mapping (bytes32 => bool) public blockedMessages;
     mapping (bytes32 => bool) public relayedMessages;
     mapping (bytes32 => bool) public successfulMessages;
+    mapping (bytes32 => bool) public failedMessages;
 
-    address internal xDomainMsgSender = DEFAULT_XDOMAIN_SENDER;
+    address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
     /***************
      * Constructor *
      ***************/
 
     /**
-     * Pass a default zero address to the address resolver. This will be updated when initialized.
+     * This contract is intended to be behind a delegate proxy.
+     * We pass the zero address to the address resolver just to satisfy the constructor.
+     * We still need to set this value in initialize().
      */
     constructor()
         Lib_AddressResolver(address(0))
@@ -66,18 +80,20 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
      **********************/
 
     /**
-     * Modifier to enforce that, if configured, only the L2MessageRelayer contract may successfully call a method.
+     * Modifier to enforce that, if configured, only the OVM_L2MessageRelayer contract may
+     * successfully call a method.
      */
     modifier onlyRelayer() {
-        address relayer = resolve("L2MessageRelayer");
+        address relayer = resolve("OVM_L2MessageRelayer");
         if (relayer != address(0)) {
             require(
                 msg.sender == relayer,
-                "Only L2MessageRelayer can relay L2-to-L1 messages."
+                "Only OVM_L2MessageRelayer can relay L2-to-L1 messages."
             );
         }
         _;
     }
+
 
     /********************
      * Public Functions *
@@ -92,16 +108,47 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
         public
         initializer
     {
-        require(address(libAddressManager) == address(0), "L1CrossDomainMessenger already intialized.");
+        require(
+            address(libAddressManager) == address(0),
+            "L1CrossDomainMessenger already intialized."
+        );
         libAddressManager = Lib_AddressManager(_libAddressManager);
-        xDomainMsgSender = DEFAULT_XDOMAIN_SENDER;
+        xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
-        __Context_init_unchained();
+        // Initialize upgradable OZ contracts
+        __Context_init_unchained(); // Context is a dependency for both Ownable and Pausable
         __Ownable_init_unchained();
         __Pausable_init_unchained();
         __ReentrancyGuard_init_unchained();
     }
 
+    /**
+     * Block a message.
+     * @param _xDomainCalldataHash Hash of the message to block.
+     */
+    function blockMessage(
+        bytes32 _xDomainCalldataHash
+    )
+        external
+        onlyOwner
+    {
+        blockedMessages[_xDomainCalldataHash] = true;
+        emit MessageBlocked(_xDomainCalldataHash);
+    }
+
+    /**
+     * Allow a message.
+     * @param _xDomainCalldataHash Hash of the message to block.
+     */
+    function allowMessage(
+        bytes32 _xDomainCalldataHash
+    )
+        external
+        onlyOwner
+    {
+        blockedMessages[_xDomainCalldataHash] = false;
+        emit MessageAllowed(_xDomainCalldataHash);
+    }
 
     function xDomainMessageSender()
         public
@@ -111,7 +158,7 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
             address
         )
     {
-        require(xDomainMsgSender != DEFAULT_XDOMAIN_SENDER, "xDomainMessageSender is not set");
+        require(xDomainMsgSender != Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER, "xDomainMessageSender is not set");
         return xDomainMsgSender;
     }
 
@@ -175,15 +222,28 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
             "Provided message has already been received."
         );
 
+        require(
+            blockedMessages[xDomainCalldataHash] == false,
+            "Provided message has been blocked."
+        );
+
+        require(
+            _target != resolve("CanonicalTransactionChain"),
+            "Cannot send L2->L1 messages to L1 system contracts."
+        );
+
         xDomainMsgSender = _sender;
         (bool success, ) = _target.call(_message);
-        xDomainMsgSender = DEFAULT_XDOMAIN_SENDER;
+        xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
         // Mark the message as received if the call was successful. Ensures that a message can be
         // relayed multiple times in the case that the call reverted.
         if (success == true) {
             successfulMessages[xDomainCalldataHash] = true;
             emit RelayedMessage(xDomainCalldataHash);
+        } else {
+            failedMessages[xDomainCalldataHash] == true;
+            emit FailedRelayedMessage(xDomainCalldataHash);
         }
 
         // Store an identifier that can be used to prove that the given message was relayed by some
@@ -212,17 +272,16 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
         override
         public
     {
-
         // Verify that the message is in the queue:
         address canonicalTransactionChain = resolve("CanonicalTransactionChain");
-        Lib_OVMCodec.QueueElement memory element = ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
+        Lib_OVMCodec.QueueElement memory element =
+            ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
 
-        address l2CrossDomainMessenger = resolve("L2CrossDomainMessenger");
         // Compute the transactionHash
         bytes32 transactionHash = keccak256(
             abi.encode(
                 address(this),
-                l2CrossDomainMessenger,
+                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
                 _gasLimit,
                 _message
             )
@@ -240,7 +299,11 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
             _queueIndex
         );
 
-        _sendXDomainMessage(canonicalTransactionChain, l2CrossDomainMessenger, xDomainCalldata, _gasLimit);
+        _sendXDomainMessage(
+            canonicalTransactionChain,
+            xDomainCalldata,
+            _gasLimit
+        );
     }
 
     /**
@@ -298,7 +361,9 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
             bool
         )
     {
-        IStateCommitmentChain ovmStateCommitmentChain = IStateCommitmentChain(resolve("StateCommitmentChain"));
+        IStateCommitmentChain ovmStateCommitmentChain = IStateCommitmentChain(
+            resolve("StateCommitmentChain")
+        );
 
         return (
             ovmStateCommitmentChain.verifyStateCommitment(
@@ -330,7 +395,7 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
                 keccak256(
                     abi.encodePacked(
                         _xDomainCalldata,
-                        resolve("L2CrossDomainMessenger")
+                        Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER
                     )
                 ),
                 uint256(0)
@@ -365,12 +430,12 @@ contract L1CrossDomainMessengerFast is IL1CrossDomainMessenger, Lib_AddressResol
 
     /**
      * Sends a cross domain message.
+     * @param _canonicalTransactionChain Address of the CanonicalTransactionChain instance.
      * @param _message Message to send.
      * @param _gasLimit OVM gas limit for the message.
      */
     function _sendXDomainMessage(
         address _canonicalTransactionChain,
-        address _l2CrossDomainMessenger,
         bytes memory _message,
         uint256 _gasLimit
     )

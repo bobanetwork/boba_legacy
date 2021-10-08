@@ -17,6 +17,7 @@ COPY --from=builder /optimism/packages/message-relayer/package.json ./packages/m
 COPY --from=builder /optimism/packages/message-relayer/dist ./packages/message-relayer/dist
 
 COPY --from=builder /optimism/packages/contracts ./packages/contracts
+COPY --from=builder /optimism/packages/boba/contracts ./packages/boba/contracts
 
 # get the needed built artifacts
 WORKDIR /opt/optimism/integration-tests
