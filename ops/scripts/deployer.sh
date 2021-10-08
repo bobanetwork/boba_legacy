@@ -51,6 +51,22 @@ fi
 # build the dump file
 yarn run build:dump
 
+if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
+  echo "Will upload state-dump.latest.json to DTL"
+  curl \
+      --fail \
+      --show-error \
+      --silent \
+      -H "Content-Type: application/json" \
+      --retry-connrefused \
+      --retry $RETRIES \
+      --retry-delay 5 \
+      -T dist/dumps/state-dump.latest.json \
+      "$DTL_STATE_DUMP_REGISTRY_URL"
+  echo
+  echo "Upload done."
+fi
+
 # service the addresses and dumps
 cd ./dist/dumps
 exec python -c \
