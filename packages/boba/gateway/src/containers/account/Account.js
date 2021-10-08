@@ -116,12 +116,12 @@ function Account () {
   ]
 
   useEffect(()=>{
-    getLookupPrice()
+    //getLookupPrice()
   },[childBalance, rootBalance, getLookupPrice])
 
   useInterval(() => {
     batch(() => {
-      dispatch(fetchTransactions())
+      //dispatch(fetchTransactions())
     })
   }, POLL_INTERVAL)
 

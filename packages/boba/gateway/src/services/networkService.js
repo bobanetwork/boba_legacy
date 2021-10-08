@@ -44,6 +44,7 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
+import AddressManagerJson from '../deployment/artifacts/contracts/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-ovm/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json'
 
@@ -111,6 +112,9 @@ class NetworkService {
     this.fastWatcher = null
 
     // addresses
+    //this.AddressManagerAddress = null
+    this.AddressManager = null
+
     this.L1StandardBridgeAddress = null
     this.L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 
@@ -349,8 +353,6 @@ class NetworkService {
 
       this.masterSystemConfig = masterSystemConfig
 
-      this.tokenAddresses = addresses.TOKENS
-
       console.log('NS: network:', network)
       console.log('NS: masterConfig:', this.masterSystemConfig)
       console.log('NS: this.chainID:', this.chainID)
@@ -373,7 +375,7 @@ class NetworkService {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 28) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 420) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
@@ -409,71 +411,86 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      //this.L1MessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessenger
-      //backwards compat
-      if (addresses.hasOwnProperty('Proxy__OVM_L1CrossDomainMessenger')) {
-        this.L1MessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessenger
-        console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
+      this.AddressManager = new ethers.Contract(
+        addresses.AddressManager,
+        AddressManagerJson.abi,
+        this.L1Provider
+      )
+      //console.log("this.AddressManager",this.AddressManager)
+
+      this.L1MessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
+      console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
+
+      this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
+      console.log('L2MessengerAddress set to:', this.L2MessengerAddress)
+
+      if(addresses.hasOwnProperty('Proxy__L1CrossDomainMessengerFast')) {
+        this.L1FastMessengerAddress = addresses.Proxy__L1CrossDomainMessengerFast
+        console.log('L1FastMessengerAddress set to:',this.L1FastMessengerAddress)
+      } else {
+        console.log('L1FastMessengerAddress NOT SET')
       }
-
-      if(addresses.hasOwnProperty('Proxy__OVM_L1CrossDomainMessengerFast')) {
-        this.L1FastMessengerAddress = addresses.Proxy__OVM_L1CrossDomainMessengerFast
-      }
-      else if (addresses.hasOwnProperty('OVM_L1CrossDomainMessengerFast')) {
-        this.L1FastMessengerAddress = addresses.OVM_L1CrossDomainMessengerFast
-      }
-      else {
-        this.L1FastMessengerAddress = addresses.L1FastMessengerAddress
-      }
-      console.log('L1FastMessengerAddress set to:',this.L1FastMessengerAddress)
-
-      //backwards compat
-      if (addresses.hasOwnProperty('Proxy__OVM_L1StandardBridge'))
-        this.L1StandardBridgeAddress = addresses.Proxy__OVM_L1StandardBridge
-      else
-        this.L1StandardBridgeAddress = addresses.L1StandardBridge
-
-      Object.keys(addresses.TOKENS).forEach((key) => {
-        this["L1_" + key + "_Address"] = addresses.TOKENS[key].L1;
-        this["L2_" + key + "_Address"] = addresses.TOKENS[key].L2;
-      })
-
-      this.L1LPAddress = addresses.Proxy__L1LiquidityPool
-      this.L2LPAddress = addresses.Proxy__L2LiquidityPool
-
-      this.L1Message = addresses.L1Message
-      this.L2Message = addresses.L2Message
-
-      //backwards compat
-      if (addresses.hasOwnProperty('L2ERC721'))
-        this.ERC721Address = addresses.L2ERC721
-      else
-        this.ERC721Address = addresses.ERC721
-
-      //backwards compat
-      if (addresses.hasOwnProperty('L2ERC721Reg'))
-        this.ERC721RegAddress = addresses.L2ERC721Reg
-      else
-        this.ERC721RegAddress = addresses.ERC721Reg
-
-      this.L2TokenPoolAddress = addresses.L2TokenPool
-      this.AtomicSwapAddress = addresses.AtomicSwap
-
-      this.addresses = addresses
-
+      
+      //The L1 Standard Bridge 
+      this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
+      console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
+      
       this.L1StandardBridgeContract = new ethers.Contract(
         this.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
         this.provider.getSigner()
       )
-      //console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
+      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      this.L2StandardBridgeContract = new ethers.Contract(
-        this.L2StandardBridgeAddress,
-        L2StandardBridgeJson.abi,
-        this.provider.getSigner()
-      )
+      // if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
+      //   this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
+      //   console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
+      // }
+      // else {
+      //   console.log('L1StandardBridgeAddress NOT SET')
+      // }
+
+      if (addresses.hasOwnProperty('TOKENS')) {
+        this.tokenAddresses = addresses.TOKENS
+        Object.keys(addresses.TOKENS).forEach((key) => {
+          this["L1_" + key + "_Address"] = addresses.TOKENS[key].L1;
+          this["L2_" + key + "_Address"] = addresses.TOKENS[key].L2;
+        })
+      }
+
+      if (addresses.hasOwnProperty('Proxy__L1LiquidityPool')) {
+        this.L1LPAddress = addresses.Proxy__L1LiquidityPool
+      }
+      if (addresses.hasOwnProperty('Proxy__L2LiquidityPool')) {
+        this.L2LPAddress = addresses.Proxy__L2LiquidityPool
+      }
+
+      //this.L1Message = addresses.L1Message
+      //this.L2Message = addresses.L2Message
+
+      //backwards compat
+      // if (addresses.hasOwnProperty('L2ERC721'))
+      //   this.ERC721Address = addresses.L2ERC721
+
+      // //backwards compat
+      // if (addresses.hasOwnProperty('L2ERC721Reg'))
+      //   this.ERC721RegAddress = addresses.L2ERC721Reg
+
+      // this.L2TokenPoolAddress = addresses.L2TokenPool
+      // this.AtomicSwapAddress = addresses.AtomicSwap
+
+      this.addresses = addresses
+
+      if(this.L2StandardBridgeAddress !== null) {
+        this.L2StandardBridgeContract = new ethers.Contract(
+          this.L2StandardBridgeAddress,
+          L2StandardBridgeJson.abi,
+          this.provider.getSigner()
+        )
+      }
       //console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
+
+      //return
 
       this.L2_ETH_Contract = new ethers.Contract(
         this.L2_ETH_Address,
@@ -483,58 +500,71 @@ class NetworkService {
       //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
 
       /*The test token*/
-      this.L1_TEST_Contract = new ethers.Contract(
-        addresses.TOKENS.TEST.L1,
-        L1ERC20Json.abi,
-        this.provider.getSigner()
-      )
-      console.log('L1_TEST_Contract:', this.L1_TEST_Contract.address)
+      if(addresses.TOKENS && addresses.TOKENS.TEST.L1 !== null) {
+        this.L1_TEST_Contract = new ethers.Contract(
+          addresses.TOKENS.TEST.L1,
+          L1ERC20Json.abi,
+          this.provider.getSigner()
+        )
+      }
+      //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
-      /*The test token*/
-      this.L1_OMG_Contract = new ethers.Contract(
-        addresses.TOKENS.OMG.L1,
-        OMGJson,
-        this.provider.getSigner()
-      )
-      console.log('L1_TEST_Contract:', this.L1_TEST_Contract.address)
+      if(addresses.TOKENS && addresses.TOKENS.TEST.L2 !== null) {
+        this.L2_TEST_Contract = new ethers.Contract(
+          addresses.TOKENS.TEST.L2,
+          L2ERC20Json.abi,
+          this.provider.getSigner()
+        )
+      }
+      //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
-      this.L2_TEST_Contract = new ethers.Contract(
-        addresses.TOKENS.TEST.L2,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
-      console.log('L2_TEST_Contract:', this.L2_TEST_Contract.address)
+      /*The OMG token*/
+      if(addresses.TOKENS && addresses.TOKENS.OMG.L1 !== null) {
+        this.L1_OMG_Contract = new ethers.Contract(
+          addresses.TOKENS.OMG.L1,
+          OMGJson,
+          this.provider.getSigner()
+        )
+      }
+      //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
-      this.L1LPContract = new ethers.Contract(
-        this.L1LPAddress,
-        L1LPJson.abi,
-        this.provider.getSigner()
-      )
 
-      this.L2LPContract = new ethers.Contract(
-        this.L2LPAddress,
-        L2LPJson.abi,
-        this.provider.getSigner()
-      )
+      console.log('this.L1LPAddress:',this.L1LPAddress)
 
-      this.ERC721Contract = new ethers.Contract(
-        this.ERC721Address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
+      if(this.L1LPAddress !== null) {
+        this.L1LPContract = new ethers.Contract(
+          this.L1LPAddress,
+          L1LPJson.abi,
+          this.provider.getSigner()
+        )
+      }
 
-      this.L2TokenPoolContract = new ethers.Contract(
-        this.L2TokenPoolAddress,
-        L2TokenPoolJson.abi,
-        this.provider.getSigner()
-      )
+      if(this.L2LPAddress !== null) {
+        this.L2LPContract = new ethers.Contract(
+          this.L2LPAddress,
+          L2LPJson.abi,
+          this.provider.getSigner()
+        )
+      }
+      
+      // this.ERC721Contract = new ethers.Contract(
+      //   this.ERC721Address,
+      //   L2ERC721Json.abi,
+      //   this.L2Provider
+      // )
 
-      this.AtomicSwapContract = new ethers.Contract(
-        this.AtomicSwapAddress,
-        AtomicSwapJson.abi,
-        this.provider.getSigner()
-      )
+      // this.L2TokenPoolContract = new ethers.Contract(
+      //   this.L2TokenPoolAddress,
+      //   L2TokenPoolJson.abi,
+      //   this.provider.getSigner()
+      // )
+
+      // this.AtomicSwapContract = new ethers.Contract(
+      //   this.AtomicSwapAddress,
+      //   AtomicSwapJson.abi,
+      //   this.provider.getSigner()
+      // )
 
       this.watcher = new Watcher({
         l1: {
@@ -554,35 +584,35 @@ class NetworkService {
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress,
+          messengerAddress: this.L2MessengerAddress, //intentional?
         },
       })
 
       if(masterSystemConfig === 'rinkeby') {
 
-        this.comp = new ethers.Contract(
-          addresses.DAO_Comp,
-          Comp.abi,
-          this.provider.getSigner()
-        )
+        // this.comp = new ethers.Contract(
+        //   addresses.DAO_Comp,
+        //   Comp.abi,
+        //   this.provider.getSigner()
+        // )
 
-        this.delegate = new ethers.Contract(
-          addresses.DAO_GovernorBravoDelegate,
-          GovernorBravoDelegate.abi,
-          this.provider.getSigner()
-        )
+        // this.delegate = new ethers.Contract(
+        //   addresses.DAO_GovernorBravoDelegate,
+        //   GovernorBravoDelegate.abi,
+        //   this.provider.getSigner()
+        // )
 
-        this.delegator = new ethers.Contract(
-          addresses.DAO_GovernorBravoDelegator,
-          GovernorBravoDelegator.abi,
-          this.provider.getSigner()
-        )
+        // this.delegator = new ethers.Contract(
+        //   addresses.DAO_GovernorBravoDelegator,
+        //   GovernorBravoDelegator.abi,
+        //   this.provider.getSigner()
+        // )
 
-        this.timelock = new ethers.Contract(
-          addresses.DAO_Timelock,
-          Timelock.abi,
-          this.provider.getSigner()
-        )
+        // this.timelock = new ethers.Contract(
+        //   addresses.DAO_Timelock,
+        //   Timelock.abi,
+        //   this.provider.getSigner()
+        // )
 
       }
 
@@ -638,95 +668,22 @@ class NetworkService {
       blockExplorerUrls: [nw[masterConfig].L2.blockExplorer.slice(0, -1)],
     }
 
-    // connect to the wallet
+    const targetIDHex = nw[masterConfig][targetLayer].chainIdHex
+
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    /********************* Switch to Mainnet L2 ****************/
-    if (masterConfig === 'mainnet' && targetLayer === 'L2') {
-      //ok, so then, we want to switch to 'mainnet' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x120' }]) //ChainID 288
-      } catch (error) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
+    try {
+      await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
+    } catch (error) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (error.code === 4902) {
+        try {
+          await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
+        } catch (addError) {
+          console.log("MetaMask - Error adding new RPC: ", addError)
         }
-      }
-    } else if ( masterConfig === 'mainnet' && targetLayer === 'L1') {
-      //ok, so then, we want to switch to 'mainnet' && 'L1' - no need to add
-      //if(fail) since mainnet L1 is always there unless the planet
-      //has been vaporized by space aliens with a blaster ray
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x1' }]) //ChainID 1
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Ethereum Mainchain. Needless to say, this should never happen.")
-      }
-    } else if (masterConfig === 'rinkeby' && targetLayer === 'L2') {
-      //ok, so then, we want to switch to 'rinkeby' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x1C' }]) //ChainID 28
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if (masterConfig === 'rinkeby_integration' && targetLayer === 'L2') {
-      //ok, so then, we want to switch to 'rinkeby_integration' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x1D' }]) //ChainID 29
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if ((masterConfig === 'rinkeby' || masterConfig === 'rinkeby_integration') && targetLayer === 'L1') {
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x4' }]) //ChainID 4
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Rinkeby. Needless to say, this should never happen.")
-      }
-    } else if (masterConfig === 'local' && targetLayer === 'L2') {
-      //ok, so then, we want to switch to 'local' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x7A6A' }]) //ChainID 31338
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if (masterConfig === 'local' && targetLayer === 'L1') {
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x7A69' }]) //ChainID 31337
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Local L1")
+      } else { //some other error code
+        console.log("MetaMask - Switch Error: ", error.code)
       }
     }
   }
@@ -738,107 +695,8 @@ class NetworkService {
       return
     }
 
-    const nw = getAllNetworks()
-    const masterConfig = store.getState().setup.masterConfig
+    this.correctChain( layer )
 
-    const chainParam = {
-      chainId: '0x' + nw[masterConfig].L2.chainId.toString(16),
-      chainName: nw[masterConfig].L2.name,
-      rpcUrls: [nw[masterConfig].L2.rpcUrl],
-      blockExplorerUrls: [nw[masterConfig].L2.blockExplorer.slice(0, -1)],
-    }
-
-    // connect to the wallet
-    this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
-    /********************* Switch to Mainnet L2 ****************/
-    if (masterConfig === 'mainnet' && this.L1orL2 === 'L1') {
-      //ok, so then, we want to switch to 'mainnet' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x120' }]) //ChainID 288
-      } catch (error) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if ( masterConfig === 'mainnet' && this.L1orL2 === 'L2') {
-      //ok, so then, we want to switch to 'mainnet' && 'L1' - no need to add
-      //if(fail) since mainnet L1 is always there unless the planet
-      //has been vaporized by space aliens with a blaster ray
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x1' }]) //ChainID 1
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Ethereum Mainchain. Needless to say, this should never happen.")
-      }
-    } else if (masterConfig === 'rinkeby' && this.L1orL2 === 'L1') {
-      //ok, so then, we want to switch to 'rinkeby' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x1C' }]) //ChainID 28
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if (masterConfig === 'rinkeby_integration' && this.L1orL2 === 'L1') {
-      //ok, so then, we want to switch to 'rinkeby_integration' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x1D' }]) //ChainID 29
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if ((masterConfig === 'rinkeby' || masterConfig === 'rinkeby_integration') && this.L1orL2 === 'L2') {
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x4' }]) //ChainID 4
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Rinkeby. Needless to say, this should never happen.")
-      }
-    } else if (masterConfig === 'local' && this.L1orL2 === 'L1') {
-      //ok, so then, we want to switch to 'local' && 'L2'
-      try {
-        await this.provider.send('wallet_switchEthereumChain', [{ chainId: '0x7A6A' }]) //ChainID 31338
-      } catch (error) {
-        if (error.code === 4902) {
-          try {
-            await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          } catch (addError) {
-            console.log("MetaMask - Error adding new RPC: ", addError)
-            // handle "add" error via alert message
-          }
-        } else { //some other error code
-          console.log("MetaMask - Switch Error: ", error.code)
-        }
-      }
-    } else if (masterConfig === 'local' && this.L1orL2 === 'L2') {
-      try {
-        await this.provider.send('wallet_switchEthereumChain',[{ chainId: '0x7A69' }]) //ChainID 31337
-      } catch (switchError) {
-        console.log("MetaMask - could not switch to Local L1")
-      }
-    }
   }
 
   async getTransactions() {
@@ -876,7 +734,12 @@ class NetworkService {
 
     const responseL2 = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    ).post('get.l2.transactions', {
+    )
+    console.log("responseL2",responseL2)
+
+    if(typeof(responseL2) === 'undefined') return
+
+    responseL2.post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
       toRange: 1000,
@@ -1012,11 +875,17 @@ class NetworkService {
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    ).post('get.l2.transactions', {
+    )
+    console.log("response",response)
+
+    if(typeof(response) === 'undefined') return
+
+    response.post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
       toRange: 1000,
     })
+
     if (response.status === 201) {
       const transactions = response.data
       const filteredTransactions = transactions.filter(
@@ -1034,6 +903,8 @@ class NetworkService {
 
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
+
+    if(this.ERC721RegAddress === null) return
 
     //the current list of contracts we know about
     //based in part on the cache and anything we recently generated in this session
@@ -1198,6 +1069,8 @@ class NetworkService {
     // Add the token to our master list, if we do not have it yet
     // if the token is already in the list, then this function does nothing
     // but if a new token shows up, then it will get added
+    if(this.tokenAddresses === null) return
+    
     Object.keys(this.tokenAddresses).forEach((token, i) => {
       getToken(this.tokenAddresses[token].L1)
     })
@@ -1217,8 +1090,8 @@ class NetworkService {
   }
 
   async getBalances() {
-    try {
 
+    try {
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
       const layer2Balance = await this.L2Provider.getBalance(this.account)
@@ -1245,6 +1118,9 @@ class NetworkService {
         },
       ]
 
+      console.log("l1b:",layer1Balances)
+      console.log("l2b:",layer2Balances)
+
       const state = store.getState()
       const tA = Object.values(state.tokenList)
 
@@ -1260,18 +1136,24 @@ class NetworkService {
           ...token, balance: new BN(balance.toString()),
           layer, address: layer === 'L1' ? token.addressL1: token.addressL2,
           symbol: token.symbolL1
-        };
+        }
       }
 
-      const getBalancePromise = [];
+      const getBalancePromise = []
+
+      console.log("tA:",tA)
 
       tA.forEach((token) => {
-        if (token.addressL1 === this.L1_ETH_Address) return;
+        if (token.addressL1 === this.L1_ETH_Address) return
+        if (token.addressL2 === this.L2_ETH_Address) return
+        if (token.addressL1 === null) return
+        if (token.addressL2 === null) return
         getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1"))
         getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
       })
 
       const tokenBalances = await Promise.all(getBalancePromise)
+
       tokenBalances.forEach((token) => {
         if (token.layer === 'L1' && token.balance.gt(new BN(0))) {
           layer1Balances.push(token)
@@ -1304,8 +1186,11 @@ class NetworkService {
 
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
+
     updateSignatureStatus_depositTRAD(false)
+    
     try {
+
       const depositTxStatus = await this.L1StandardBridgeContract.depositETH(
         this.L2GasLimit,
         utils.formatBytes32String(new Date().getTime().toString()),
@@ -1339,6 +1224,7 @@ class NetworkService {
 
   //Transfer funds from one account to another, on the L2
   async transfer(address, value_Wei_String, currency) {
+    console.log("currency:",currency)
     try {
       //any ERC20 json will do....
       const tx = await this.L2_TEST_Contract.attach(currency).transfer(

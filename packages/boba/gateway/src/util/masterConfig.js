@@ -27,6 +27,7 @@ NETWORKS = {
     L1: {
       name: "Rinkeby",
       chainId: 4,
+      chainIdHex: '0x4',
       rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
       blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
       transaction: `https://rinkeby.etherscan.io/tx/`,
@@ -34,6 +35,7 @@ NETWORKS = {
     L2: {
       name: "BOBA Rinkeby2 L2",
       chainId: 420,
+      chainIdHex: '0x1A4',
       rpcUrl: `https://rinkeby-v2.boba.network`,
       blockExplorer: `https://blockexplorer.rinkeby-v2.boba.network/`,
       transaction: null,
@@ -47,6 +49,7 @@ NETWORKS = {
     L1: {
       name: "Mainnet",
       chainId: 1,
+      chainIdHex: '0x1',
       rpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
       blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
       transaction: ` https://etherscan.io/tx/`,
@@ -54,6 +57,7 @@ NETWORKS = {
     L2: {
       name: "BOBA L2",
       chainId: 288,
+      chainIdHex: '0x120',
       rpcUrl: `https://mainnet.boba.network`,
       blockExplorer: `https://blockexplorer.boba.network/`,
       transaction: `https://blockexplorer.boba.network/tx/`,
@@ -71,12 +75,14 @@ if (env === 'dev') {
       L1: {
         name: "Local L1",
         chainId: 31337,
+        chainIdHex: '0x7A69',
         rpcUrl: `http://${window.location.hostname}:9545`,
         blockExplorer: null, //does not exist on local
       },
       L2: {
         name: "Local L2",
         chainId: 31338,
+        chainIdHex: '0x7A6A',
         rpcUrl: `http://${window.location.hostname}:8545`,
         blockExplorer: null, //does not exist on local
       },
@@ -89,6 +95,7 @@ if (env === 'dev') {
       L1: {
         name: "Rinkeby",
         chainId: 4,
+        chainIdHex: '0x4',
         rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
         blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://rinkeby.etherscan.io/tx/`,
@@ -96,6 +103,7 @@ if (env === 'dev') {
       L2: {
         name: "BOBA Rinkeby Int L2",
         chainId: 29,
+        chainIdHex: '0x1D',
         rpcUrl: `https://rinkeby-integration.boba.network`,
         blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
         transaction: `https://blockexplorer.rinkeby.boba.network/tx/`,

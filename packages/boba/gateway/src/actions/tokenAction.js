@@ -31,21 +31,23 @@ const ETHL1 = '0x0000000000000000000000000000000000000000'
 const ETHL2 = '0x4200000000000000000000000000000000000006'
 
 export async function getToken ( tokenContractAddressL1 ) {
+  
+  if( tokenContractAddressL1 === null) return
 
   //this *might* be coming from a person, and or copy-paste from Etherscan
   //so need toLowerCase()
   /*****************************************************************/
-  const _tokenContractAddressL1 = tokenContractAddressL1.toLowerCase();
+  const _tokenContractAddressL1 = tokenContractAddressL1.toLowerCase()
   /*****************************************************************/
 
   const state = store.getState()
   
   if (state.tokenList[_tokenContractAddressL1]) {
-    return state.tokenList[_tokenContractAddressL1];
+    return state.tokenList[_tokenContractAddressL1]
   } else {
     console.log("Adding new token:",_tokenContractAddressL1)
     const tokenInfo = await addToken(_tokenContractAddressL1)
-    return tokenInfo;
+    return tokenInfo
   }
 }
 
@@ -54,12 +56,14 @@ Get the token info from networkService.web3.eth.Contract
 */
 export async function addToken ( tokenContractAddressL1 ) {
 
-  const state = store.getState();
+  if( tokenContractAddressL1 === null) return
+
+  const state = store.getState()
 
   //this *might* be coming from a person, and or copy-past from Etherscan
   //so need to toLowerCase()
   /*****************************************************************/
-  const _tokenContractAddressL1 = tokenContractAddressL1.toLowerCase();
+  const _tokenContractAddressL1 = tokenContractAddressL1.toLowerCase()
   /*****************************************************************/
     
   //if we already have looked it up, no need to look up again. 
@@ -104,7 +108,8 @@ export async function addToken ( tokenContractAddressL1 ) {
     Object.keys(tA).forEach((token, i) => {
       //let's see if we know about this Token
       if(_tokenContractAddressL1 === tA[token].L1.toLowerCase()) {
-        _tokenContractAddressL2 = tA[token].L2.toLowerCase()
+        if( tA[token].L2 !== null) 
+          _tokenContractAddressL2 = tA[token].L2.toLowerCase()
       }
     })
 

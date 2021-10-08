@@ -122,26 +122,26 @@ function Home () {
   useEffect(() => {
     window.scrollTo(0, 0)
     //dispatch(fetchDeposits())
+    dispatch(addTokenList()) //only need to do this boot
   }, [ dispatch ])
 
   useInterval(() => {
     batch(() => {
-      dispatch(fetchExits())
+      //dispatch(fetchExits())
     })
   }, POLL_INTERVAL)
 
   //get all account balances
   useInterval(() => {
-    dispatch(fetchBalances())
-    dispatch(addTokenList())
-    dispatch(fetchNFTs())
+    dispatch(fetchBalances()) //check the balances
+    //dispatch(fetchNFTs())
 
     // get Dao balance / Votes
-    dispatch(fetchDaoBalance())
-    dispatch(fetchDaoVotes())
-    dispatch(fetchDaoProposals())
-    dispatch(getProposalThreshold())
-  }, POLL_INTERVAL);
+    //dispatch(fetchDaoBalance())
+    //dispatch(fetchDaoVotes())
+    //dispatch(fetchDaoProposals())
+    //dispatch(getProposalThreshold())
+  }, POLL_INTERVAL)
 
   useEffect(() => {
     checkVersion()
