@@ -104,16 +104,16 @@ describe('NFT Bridge Test', async () => {
   //   expect(ownerL2).to.deep.eq(env.l2Wallet.address)
   // })
 
-  it('should not be able to withdraw non-owned NFT', async () => {
-    await expect(
-      L2Bridge.connect(env.l2Wallet).withdraw(
-        L2ERC721.address,
-        DUMMY_TOKEN_ID,
-        9999999,
-        utils.formatBytes32String(new Date().getTime().toString())
-      )
-    ).to.be.reverted
-  })
+  // it('should not be able to withdraw non-owned NFT', async () => {
+  //   await expect(
+  //     L2Bridge.connect(env.l2Wallet).withdraw(
+  //       L2ERC721.address,
+  //       DUMMY_TOKEN_ID,
+  //       9999999,
+  //       utils.formatBytes32String(new Date().getTime().toString())
+  //     )
+  //   ).to.be.reverted
+  // })
 
   // it('should withdraw NFT', async () => {
   //   await env.waitForXDomainTransaction(
