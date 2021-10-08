@@ -168,7 +168,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled {
      ************************************/
 
     // /**
-    //  * @inheritdoc iOVM_L2ERC20Bridge
+    //  * @inheritdoc IL2ERC20Bridge
     //  */
     function finalizeDeposit(
         address _l1Contract,

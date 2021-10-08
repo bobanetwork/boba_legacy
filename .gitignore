@@ -26,3 +26,6 @@ packages/boba/gas-price-oracle/data
 
 .env
 *.log
+
+# boba_examples
+boba_examples/init-fund-l2/yarn.lock

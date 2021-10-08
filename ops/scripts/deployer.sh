@@ -18,6 +18,20 @@ curl \
 
 yarn run deploy
 
+if [ -n "$DTL_REGISTRY_URL" ] ; then
+  echo "Will upload addresses.json to DTL"
+  curl \
+      --fail \
+      --show-error \
+      --silent \
+      -H "Content-Type: application/json" \
+      --retry-connrefused \
+      --retry $RETRIES \
+      --retry-delay 5 \
+      -T dist/dumps/addresses.json \
+      "$DTL_REGISTRY_URL"
+fi
+
 function envSet() {
     VAR=$1
     export $VAR=$(cat ./dist/dumps/addresses.json | jq -r ".$2")

@@ -25,15 +25,13 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  const OVM_L1CrossDomainMessengerFastAddress = await (
+  const L1CrossDomainMessengerFastAddress = await (
     hre as any
-  ).deployConfig.addressManager.getAddress(
-    'Proxy__OVM_L1CrossDomainMessengerFast'
-  )
+  ).deployConfig.addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
 
   L1Message = await Factory__L1Message.deploy(
     (hre as any).deployConfig.l1MessengerAddress,
-    OVM_L1CrossDomainMessengerFastAddress
+    L1CrossDomainMessengerFastAddress
   )
   await L1Message.deployTransaction.wait()
   const L1MessageDeploymentSubmission: DeploymentSubmission = {
@@ -49,7 +47,9 @@ const deployFn: DeployFunction = async (hre) => {
     )}`
   )
 
-  L2Message = await Factory__L2Message.deploy((hre as any).deployConfig.l2MessengerAddress)
+  L2Message = await Factory__L2Message.deploy(
+    (hre as any).deployConfig.l2MessengerAddress
+  )
   await L2Message.deployTransaction.wait()
   const L2MessageDeploymentSubmission: DeploymentSubmission = {
     ...L2Message,
