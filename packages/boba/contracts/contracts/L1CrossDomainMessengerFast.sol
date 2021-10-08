@@ -41,6 +41,7 @@ contract L1CrossDomainMessengerFast is
      * Events *
      **********/
 
+
     event MessageBlocked(
         bytes32 indexed _xDomainCalldataHash
     );
@@ -57,6 +58,7 @@ contract L1CrossDomainMessengerFast is
     mapping (bytes32 => bool) public blockedMessages;
     mapping (bytes32 => bool) public relayedMessages;
     mapping (bytes32 => bool) public successfulMessages;
+    mapping (bytes32 => bool) public failedMessages;
 
     address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
@@ -240,6 +242,7 @@ contract L1CrossDomainMessengerFast is
             successfulMessages[xDomainCalldataHash] = true;
             emit RelayedMessage(xDomainCalldataHash);
         } else {
+            failedMessages[xDomainCalldataHash] == true;
             emit FailedRelayedMessage(xDomainCalldataHash);
         }
 

@@ -59,6 +59,7 @@ contract L1CrossDomainMessenger is
     mapping (bytes32 => bool) public blockedMessages;
     mapping (bytes32 => bool) public relayedMessages;
     mapping (bytes32 => bool) public successfulMessages;
+    mapping (bytes32 => bool) public failedMessages;
 
     address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
@@ -263,6 +264,7 @@ contract L1CrossDomainMessenger is
             successfulMessages[xDomainCalldataHash] = true;
             emit RelayedMessage(xDomainCalldataHash);
         } else {
+            failedMessages[xDomainCalldataHash] = true;
             emit FailedRelayedMessage(xDomainCalldataHash);
         }
 

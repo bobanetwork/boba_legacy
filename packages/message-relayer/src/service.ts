@@ -1,7 +1,9 @@
 /* Imports: External */
-import { Contract, ethers, Wallet, BigNumber, providers } from 'ethers'
+import { Contract, ethers, Wallet, BigNumber, providers, Signer } from 'ethers'
 import * as rlp from 'rlp'
 import { MerkleTree } from 'merkletreejs'
+import fetch from 'node-fetch';
+import * as ynatm from '@eth-optimism/ynatm';
 
 /* Imports: Internal */
 import { fromHexString, sleep } from '@eth-optimism/core-utils'
@@ -12,7 +14,7 @@ import {
   loadContractFromManager,
   predeploys,
 } from '@eth-optimism/contracts'
-import { StateRootBatchHeader, SentMessage, SentMessageProof } from './types'
+import { StateRootBatchHeader, SentMessage, SentMessageProof, BatchMessage } from './types'
 
 interface MessageRelayerOptions {
   // Providers for interacting with L1 and L2.
@@ -28,6 +30,10 @@ interface MessageRelayerOptions {
 
   // Max gas to relay messages with.
   relayGasLimit: number
+
+  //batch system
+  minBatchSize: number
+  maxWaitTimeS: number
 
   // Height of the L2 transaction to start searching for L2->L1 messages.
   fromL2TransactionIndex?: number
@@ -50,15 +56,36 @@ interface MessageRelayerOptions {
 
   // A custom metrics tracker to manage metrics; default undefined
   metrics?: Metrics
+
+  // filter
+  filterEndpoint?: string
+
+  filterPollingInterval?: number
+
+  // gas fee
+  maxGasPriceInGwei?: number
+
+  gasRetryIncrement?: number
+
+  numConfirmations?: number
+
+  resubmissionTimeout?: number
+
+  maxWaitTxTimeS: number
 }
 
 const optionSettings = {
   relayGasLimit: { default: 4_000_000 },
+  //batch system
+  minBatchSize: { default: 2 },
+  maxWaitTimeS: { default: 60 },
   fromL2TransactionIndex: { default: 0 },
   pollingInterval: { default: 5000 },
   l2BlockOffset: { default: 1 },
   l1StartOffset: { default: 0 },
   getLogsInterval: { default: 2000 },
+  filterPollingInterval: { default: 60000 },
+  maxWaitTxTimeS: { default: 180 },
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -74,8 +101,16 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     Lib_AddressManager: Contract
     StateCommitmentChain: Contract
     L1CrossDomainMessenger: Contract
+    L1MultiMessageRelayer: Contract
     L2CrossDomainMessenger: Contract
     OVM_L2ToL1MessagePasser: Contract
+    filter: Array<any>
+    lastFilterPollingTimestamp: number
+    //batch system
+    timeSinceLastRelayS: number
+    timeOfLastRelayS: number
+    messageBuffer: Array<BatchMessage>
+    timeOfLastPendingRelay: any
   }
 
   protected async _init(): Promise<void> {
@@ -85,6 +120,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       pollingInterval: this.options.pollingInterval,
       l2BlockOffset: this.options.l2BlockOffset,
       getLogsInterval: this.options.getLogsInterval,
+      filterPollingInterval: this.options.filterPollingInterval,
+      minBatchSize: this.options.minBatchSize,
+      maxWaitTimeS: this.options.maxWaitTimeS,
     })
     // Need to improve this, sorry.
     this.state = {} as any
@@ -129,6 +167,16 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       address: this.state.L2CrossDomainMessenger.address,
     })
 
+    this.logger.info('Connecting to L1MultiMessageRelayer...')
+    this.state.L1MultiMessageRelayer = await loadContractFromManager({
+      name: 'L1MultiMessageRelayer',
+      Lib_AddressManager: this.state.Lib_AddressManager,
+      provider: this.options.l1RpcProvider,
+    })
+    this.logger.info('Connected to L1MultiMessageRelayer', {
+      address: this.state.L1MultiMessageRelayer.address,
+    })
+
     this.logger.info('Connecting to OVM_L2ToL1MessagePasser...')
     this.state.OVM_L2ToL1MessagePasser = loadContract(
       'OVM_L2ToL1MessagePasser',
@@ -147,11 +195,22 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.lastFinalizedTxHeight = this.options.fromL2TransactionIndex || 0
     this.state.nextUnfinalizedTxHeight =
       this.options.fromL2TransactionIndex || 0
+    this.state.lastFilterPollingTimestamp = 0
+
+    // filter
+    this.state.filter = []
+
+    //batch system
+    this.state.timeOfLastRelayS = Date.now()
+    this.state.timeSinceLastRelayS = 0
+    this.state.messageBuffer = []
+    this.state.timeOfLastPendingRelay = false
   }
 
   protected async _start(): Promise<void> {
     while (this.running) {
       await sleep(this.options.pollingInterval)
+      await this._getFilter()
 
       try {
         // Check that the correct address is set in the address manager
@@ -168,102 +227,222 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           }
         }
 
-        this.logger.info('Checking for newly finalized transactions...')
-        if (
-          !(await this._isTransactionFinalized(
-            this.state.nextUnfinalizedTxHeight
-          ))
-        ) {
-          this.logger.info('Did not find any newly finalized transactions', {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
-          })
-
-          continue
-        }
-
-        this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
-        while (
-          await this._isTransactionFinalized(this.state.nextUnfinalizedTxHeight)
-        ) {
-          const size = (
-            await this._getStateBatchHeader(this.state.nextUnfinalizedTxHeight)
-          ).batch.batchSize.toNumber()
-          this.logger.info(
-            'Found a batch of finalized transaction(s), checking for more...',
-            { batchSize: size }
-          )
-          this.state.nextUnfinalizedTxHeight += size
-
-          // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
-          // need to keep in memory. We operate on full batches at a time so the actual amount
-          // depends on the size of the batches we're processing.
-          const numTransactionsToProcess =
-            this.state.nextUnfinalizedTxHeight -
-            this.state.lastFinalizedTxHeight
-
-          if (numTransactionsToProcess > 1000) {
-            break
-          }
-        }
-
-        this.logger.info('Found finalized transactions', {
-          totalNumber:
-            this.state.nextUnfinalizedTxHeight -
-            this.state.lastFinalizedTxHeight,
-        })
-
-        const messages = await this._getSentMessages(
-          this.state.lastFinalizedTxHeight,
-          this.state.nextUnfinalizedTxHeight
+        //Batch flushing logic
+        const secondsElapsed = Math.floor(
+          (Date.now() - this.state.timeOfLastRelayS) / 1000
         )
+        console.log('\n***********************************')
+        console.log('Seconds elapsed since last batch push:', secondsElapsed)
+        const timeOut =
+          secondsElapsed > this.options.maxWaitTimeS ? true : false
 
-        for (const message of messages) {
-          this.logger.info('Found a message sent during transaction', {
-            index: message.parentTransactionIndex,
-          })
-          if (await this._wasMessageRelayed(message)) {
-            this.logger.info('Message has already been relayed, skipping.')
+        let pendingTXTimeOut = true
+        if (this.state.timeOfLastPendingRelay !== false) {
+          const pendingTXSecondsElapsed = Math.floor(
+            (Date.now() - this.state.timeOfLastPendingRelay) / 1000
+          )
+          console.log('\n***********************************')
+          console.log('Next tx since last tx submitted', pendingTXSecondsElapsed)
+          pendingTXTimeOut =
+            pendingTXSecondsElapsed > this.options.maxWaitTxTimeS ? true : false
+        }
+
+        //console.log('Current buffer size:', this.state.messageBuffer.length)
+        const bufferFull =
+          this.state.messageBuffer.length >= this.options.minBatchSize
+            ? true : false
+
+        // check gas price
+        const gasPrice = await this.options.l1RpcProvider.getGasPrice()
+        const gasPriceGwei = Number(ethers.utils.formatUnits(gasPrice, 'gwei'))
+        const gasPriceAcceptable =
+          gasPriceGwei < this.options.maxGasPriceInGwei ? true : false
+
+        if (this.state.messageBuffer.length !== 0 && (bufferFull || timeOut) && pendingTXTimeOut) {
+          if (gasPriceAcceptable) {
+            if (bufferFull) {
+              console.log('Buffer full: flushing')
+            }
+            if (timeOut) {
+              console.log('Buffer timeout: flushing')
+            }
+
+            /* parse this to make sure that the mesaage was actually relayed */
+            // clear out buffer only if the messages are relayed to L1 successfully
+            if (
+              await this._wereMessagesRelayed(
+                this.state.messageBuffer.reduce((acc, cur) => {
+                  acc.push(cur.message)
+                  return acc
+                }, [])
+              )
+            ) {
+              //clear out the buffer so we do not double relay, which will just
+              // waste gas
+              this.state.messageBuffer = []
+              this.state.timeOfLastPendingRelay = false
+            } else {
+              const receipt = await this._relayMultiMessageToL1(
+                this.state.messageBuffer.reduce((acc, cur) => {
+                  acc.push(cur.payload)
+                  return acc
+                }, [])
+              )
+
+              console.log('Receipt:', receipt)
+              // add the time interval between two tx
+              this.state.timeOfLastPendingRelay = Date.now()
+            }
+          } else {
+            console.log('Current gas price is unacceptable')
+            // add the time interval between two tx
+            this.state.timeOfLastPendingRelay = Date.now()
+          }
+
+          this.state.timeOfLastRelayS = Date.now()
+        } else {
+          console.log(
+            'Buffer still too small - current buffer length:',
+            this.state.messageBuffer.length
+          )
+          console.log('Buffer flush size set to:', this.options.minBatchSize)
+          console.log('***********************************\n')
+        }
+
+        // scanning the new messages only if the pending messages are relayed
+        // to l1
+        if (this.state.timeOfLastPendingRelay === false) {
+          this.logger.info('Checking for newly finalized transactions...')
+          if (
+            !(await this._isTransactionFinalized(
+              this.state.nextUnfinalizedTxHeight
+            ))
+          ) {
+            this.logger.info('Did not find any newly finalized transactions', {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            })
+
             continue
           }
 
-          this.logger.info(
-            'Message not yet relayed. Attempting to generate a proof...'
-          )
-          const proof = await this._getMessageProof(message)
-          this.logger.info(
-            'Successfully generated a proof. Attempting to relay to Layer 1...'
-          )
+          this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
+          while (
+            await this._isTransactionFinalized(this.state.nextUnfinalizedTxHeight)
+          ) {
+            const size = (
+              await this._getStateBatchHeader(this.state.nextUnfinalizedTxHeight)
+            ).batch.batchSize.toNumber()
+            this.logger.info(
+              'Found a batch of finalized transaction(s), checking for more...',
+              { batchSize: size }
+            )
+            this.state.nextUnfinalizedTxHeight += size
 
-          await this._relayMessageToL1(message, proof)
-        }
+            // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
+            // need to keep in memory. We operate on full batches at a time so the actual amount
+            // depends on the size of the batches we're processing.
+            const numTransactionsToProcess =
+              this.state.nextUnfinalizedTxHeight -
+              this.state.lastFinalizedTxHeight
 
-        if (messages.length === 0) {
-          this.logger.info('Did not find any L2->L1 messages', {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
-          })
-        } else {
-          // Clear the event cache to avoid keeping every single event in memory and eventually
-          // getting OOM killed. Messages are already sorted in ascending order so the last message
-          // will have the highest batch index.
-          const lastMessage = messages[messages.length - 1]
-
-          // Find the batch corresponding to the last processed message.
-          const lastProcessedBatch = await this._getStateBatchHeader(
-            lastMessage.parentTransactionIndex
-          )
-
-          // Remove any events from the cache for batches that should've been processed by now.
-          this.state.eventCache = this.state.eventCache.filter((event) => {
-            return event.args._batchIndex > lastProcessedBatch.batch.batchIndex
-          })
-        }
-
-        this.logger.info(
-          'Finished searching through newly finalized transactions',
-          {
-            retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            if (numTransactionsToProcess > 1000) {
+              break
+            }
           }
-        )
+
+          this.logger.info('Found finalized transactions', {
+            totalNumber:
+              this.state.nextUnfinalizedTxHeight -
+              this.state.lastFinalizedTxHeight,
+          })
+
+          const messages = await this._getSentMessages(
+            this.state.lastFinalizedTxHeight,
+            this.state.nextUnfinalizedTxHeight
+          )
+
+          for (const message of messages) {
+            this.logger.info('Found a message sent during transaction', {
+              index: message.parentTransactionIndex,
+            })
+            if (await this._wasMessageRelayed(message)) {
+              this.logger.info('Message has already been relayed, skipping.')
+              continue
+            }
+
+            if (await this._wasMessageBlocked(message)) {
+              this.logger.info('Message has been blocked, skipping.')
+              continue
+            }
+
+            if (await this._wasMessageFailed(message)) {
+              this.logger.info('Last message was failed, skipping.')
+              continue
+            }
+
+            if (this.state.filter.includes(message.target)) {
+              this.logger.info('Message not intended for target, skipping.')
+              continue
+            }
+
+            this.logger.info(
+              'Message not yet relayed. Attempting to generate a proof...'
+            )
+            const proof = await this._getMessageProof(message)
+            this.logger.info(
+              'Successfully generated a proof. Attempting to relay to Layer 1...'
+            )
+
+            // await this._relayMessageToL1(message, proof)
+            const messageToSend = {
+              payload: {
+                target: message.target,
+                message: message.message,
+                sender: message.sender,
+                messageNonce: message.messageNonce,
+                proof,
+              },
+              message,
+            }
+            this.state.messageBuffer.push(messageToSend)
+          }
+
+          if (messages.length === 0) {
+            this.logger.info('Did not find any L2->L1 messages', {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            })
+          } else {
+            // Clear the event cache to avoid keeping every single event in memory and eventually
+            // getting OOM killed. Messages are already sorted in ascending order so the last message
+            // will have the highest batch index.
+            const lastMessage = messages[messages.length - 1]
+
+            // Find the batch corresponding to the last processed message.
+            const lastProcessedBatch = await this._getStateBatchHeader(
+              lastMessage.parentTransactionIndex
+            )
+
+            // Remove any events from the cache for batches that should've been processed by now.
+            const oldSize = this.state.eventCache.length
+            this.state.eventCache = this.state.eventCache.filter((event) => {
+              return event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+            })
+            const newSize = this.state.eventCache.length
+            this.logger.info("Trimmed eventCache", {
+              oldSize,
+              newSize,
+            })
+          }
+
+          this.logger.info(
+            'Finished searching through newly finalized transactions',
+            {
+              retryAgainInS: Math.floor(this.options.pollingInterval / 1000),
+            }
+          )
+        } else {
+          this.logger.info('Waiting for the pending tx to be finailized')
+        }
       } catch (err) {
         this.logger.error('Caught an unhandled error', {
           message: err.toString(),
@@ -281,10 +460,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       }
     | undefined
   > {
-    const getStateBatchAppendedEventForIndex = (
+    const getStateBatchAppendedEventForIndex = async (
       txIndex: number
-    ): ethers.Event => {
-      return this.state.eventCache.find((cachedEvent) => {
+    ): Promise <ethers.Event> => {
+      const selectedEvent = this.state.eventCache.find((cachedEvent) => {
         const prevTotalElements = cachedEvent.args._prevTotalElements.toNumber()
         const batchSize = cachedEvent.args._batchSize.toNumber()
 
@@ -294,16 +473,28 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           txIndex < prevTotalElements + batchSize
         )
       })
+      // No event found
+      if (selectedEvent === undefined) {
+        return undefined
+      }
+      // query the new SCC event. event.args._extraData in eventCache might be wrong
+      const SCCEvent: ethers.Event[] = await this.state.StateCommitmentChain.queryFilter(
+        this.state.StateCommitmentChain.filters.StateBatchAppended(),
+        selectedEvent.blockNumber,
+        selectedEvent.blockNumber
+      )
+      return SCCEvent[0]
     }
 
     let startingBlock = this.state.lastQueriedL1Block
+    const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
     while (
-      startingBlock < (await this.options.l1RpcProvider.getBlockNumber())
+      startingBlock < maxBlock
     ) {
-      this.state.lastQueriedL1Block = startingBlock
       this.logger.info('Querying events', {
         startingBlock,
         endBlock: startingBlock + this.options.getLogsInterval,
+        maxBlock,
       })
 
       const events: ethers.Event[] =
@@ -312,18 +503,24 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           startingBlock,
           startingBlock + this.options.getLogsInterval
         )
+        this.state.lastQueriedL1Block = Math.min(startingBlock + this.options.getLogsInterval, maxBlock)
 
       this.state.eventCache = this.state.eventCache.concat(events)
+      this.logger.info("Added events to eventCache", {
+        added:events.length,
+        newSize:this.state.eventCache.length,
+      })
+
       startingBlock += this.options.getLogsInterval
 
       // We need to stop syncing early once we find the event we're looking for to avoid putting
       // *all* events into memory at the same time. Otherwise we'll get OOM killed.
-      if (getStateBatchAppendedEventForIndex(height) !== undefined) {
+      if (await getStateBatchAppendedEventForIndex(height) !== undefined) {
         break
       }
     }
 
-    const event = getStateBatchAppendedEventForIndex(height)
+    const event = await getStateBatchAppendedEventForIndex(height)
     if (event === undefined) {
       return undefined
     }
@@ -420,6 +617,30 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     return this.state.L1CrossDomainMessenger.successfulMessages(
       message.encodedMessageHash
     )
+  }
+
+  private async _wasMessageBlocked(message: SentMessage): Promise<boolean> {
+    return this.state.L1CrossDomainMessenger.blockedMessages(
+      message.encodedMessageHash
+    )
+  }
+
+  private async _wasMessageFailed(message: SentMessage): Promise<boolean> {
+    return this.state.L1CrossDomainMessenger.failedMessages(
+      message.encodedMessageHash
+    )
+  }
+
+
+  private async _wereMessagesRelayed(
+    messages: Array<SentMessage>
+  ): Promise<boolean> {
+    const promisePayload = messages.reduce((acc, cur) => {
+      acc.push(this._wasMessageRelayed(cur), this._wasMessageFailed(cur))
+      return acc
+    }, [])
+    const messageRelayedStatus = await Promise.all(promisePayload)
+    return messageRelayedStatus.some((ele) => ele)
   }
 
   private async _getMessageProof(
@@ -520,41 +741,117 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       return
     }
 
-    const result = await this.state.L1CrossDomainMessenger.connect(
-      this.options.l1Wallet
-    ).relayMessage(
-      message.target,
-      message.sender,
-      message.message,
-      message.messageNonce,
-      proof,
-      {
-        gasLimit: this.options.relayGasLimit,
-      }
-    )
+    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
+      const txResponse = await this.state.L1CrossDomainMessenger.connect(
+        this.options.l1Wallet
+      ).relayMessage(
+        message.target,
+        message.sender,
+        message.message,
+        message.messageNonce,
+        proof,
+        { gasPrice }
+      )
+      return this.options.l1Wallet.provider.waitForTransaction(
+        txResponse.hash,
+        this.options.numConfirmations
+      )
+    }
 
-    this.logger.info('Relay message transaction sent', {
-      transactionHash: result,
-    })
+    const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
 
+    let receipt
     try {
-      const receipt = await result.wait()
-
-      this.logger.info('Relay message included in block', {
-        transactionHash: receipt.transactionHash,
-        blockNumber: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString(),
-        confirmations: receipt.confirmations,
-        status: receipt.status,
+      receipt = await ynatm.send({
+        sendTransactionFunction: sendTxAndWaitForReceipt,
+        minGasPrice: ynatm.toGwei(minGasPrice),
+        maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+        gasPriceScalingFunction: ynatm.LINEAR(this.options.gasRetryIncrement),
+        delay: this.options.resubmissionTimeout,
       })
+
+      this.logger.info('Relay message transaction sent', { receipt })
     } catch (err) {
-      this.logger.error('Real relay attempt failed, skipping.', {
+      this.logger.error('Relay attempt failed, skipping.', {
         message: err.toString(),
         stack: err.stack,
         code: err.code,
       })
       return
     }
+
     this.logger.info('Message successfully relayed to Layer 1!')
+  }
+
+  private async _relayMultiMessageToL1(
+    messages: Array<BatchMessage>
+  ): Promise<any> {
+    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
+      // Generate the transaction we will repeatedly submit
+      const nonce = await this.options.l1Wallet.getTransactionCount()
+      const txResponse = await this.state.L1MultiMessageRelayer.connect(
+        this.options.l1Wallet
+      ).batchRelayMessages(messages, { gasPrice, nonce })
+      const tx = await this.options.l1Wallet.provider.waitForTransaction(
+        txResponse.hash,
+        this.options.numConfirmations
+      )
+      return tx
+    }
+
+    const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
+
+    let receipt
+    try {
+      receipt = await ynatm.send({
+        sendTransactionFunction: sendTxAndWaitForReceipt,
+        minGasPrice: ynatm.toGwei(minGasPrice),
+        maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+        gasPriceScalingFunction: ynatm.LINEAR(this.options.gasRetryIncrement),
+        delay: this.options.resubmissionTimeout,
+      })
+
+      this.logger.info('Relay message transaction sent', { receipt })
+    } catch (err) {
+      this.logger.error('Relay attempt failed, skipping.', {
+        message: err.toString(),
+        stack: err.stack,
+        code: err.code,
+      })
+      return
+    }
+
+    this.logger.info('Message Batch successfully relayed to Layer 1!')
+    return receipt
+  }
+
+  private async _getGasPriceInGwei(signer): Promise<number> {
+    return parseInt(
+      ethers.utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10
+    )
+  }
+
+  private async _getFilter(): Promise<void> {
+    try {
+      if (this.options.filterEndpoint) {
+        if (this.state.lastFilterPollingTimestamp === 0 ||
+          new Date().getTime() > this.state.lastFilterPollingTimestamp + this.options.filterPollingInterval
+        ) {
+          const response = await fetch(this.options.filterEndpoint)
+          const filter:any = await response.json()
+
+          // export L1LIQPOOL=$(echo $ADDRESSES | jq -r '.L1LiquidityPool')
+          // export L1M=$(echo $ADDRESSES | jq -r '.L1Message')
+          // echo '["'$L1LIQPOOL'", "'$L1M'"]' > dist/dumps/whitelist.json
+          const filterSelect = [ filter.Proxy__L1LiquidityPool, filter.L1Message ]
+
+          this.state.lastFilterPollingTimestamp = new Date().getTime()
+          this.state.filter = filterSelect
+          this.logger.info('Found the filter', { filterSelect })
+        }
+      }
+    } catch {
+      this.logger.error('CRITICAL ERROR: Failed to fetch the Filter')
+    }
   }
 }
