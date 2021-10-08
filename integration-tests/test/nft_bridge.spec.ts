@@ -115,20 +115,20 @@ describe('NFT Bridge Test', async () => {
     ).to.be.reverted
   })
 
-//   it('should withdraw NFT', async () => {
-//     await env.waitForXDomainTransaction(
-//       L2Bridge.connect(env.l2Wallet).withdraw(
-//         L2ERC721.address,
-//         DUMMY_TOKEN_ID,
-//         9999999,
-//         utils.formatBytes32String(new Date().getTime().toString())
-//       ),
-//       Direction.L2ToL1
-//     )
+  // it('should withdraw NFT', async () => {
+  //   await env.waitForXDomainTransaction(
+  //     L2Bridge.connect(env.l2Wallet).withdraw(
+  //       L2ERC721.address,
+  //       DUMMY_TOKEN_ID,
+  //       9999999,
+  //       utils.formatBytes32String(new Date().getTime().toString())
+  //     ),
+  //     Direction.L2ToL1
+  //   )
 
-//     await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
+  //   await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
 
-//     const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
-//     expect(ownerL1).to.be.deep.eq(env.l2Wallet.address)
-//   })
-// })
+  //   const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
+  //   expect(ownerL1).to.be.deep.eq(env.l2Wallet.address)
+  // })
+})
