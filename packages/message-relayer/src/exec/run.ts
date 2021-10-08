@@ -43,9 +43,22 @@ const main = async () => {
     'address-manager-address',
     env.ADDRESS_MANAGER_ADDRESS
   )
-  const L1_WALLET_KEY = config.str('l1-wallet-key', env.RELAYER_PRIVATE_KEY)
+  const RELAYER_PRIVATE_KEY = config.str('relayer-private-key', env.RELAYER_PRIVATE_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
+  //batch system
+  const MIN_BATCH_SIZE = config.uint(
+    'min-batch-size',
+    parseInt(env.MIN_BATCH_SIZE, 10) || 2
+  )
+  const MAX_WAIT_TIME_S = config.uint(
+    'max-wait-time-s',
+    parseInt(env.MAX_WAIT_TIME_S, 10) || 60
+  )
+  const MAX_WAIT_TX_TIME_S = config.uint(
+    'max-wait-tx-time-s',
+    parseInt(env.MAX_WAIT_TX_TIME_S, 10) || 180
+  )
   const RELAY_GAS_LIMIT = config.uint(
     'relay-gas-limit',
     parseInt(env.RELAY_GAS_LIMIT, 10) || 4000000
@@ -70,6 +83,28 @@ const main = async () => {
     'from-l2-transaction-index',
     parseInt(env.FROM_L2_TRANSACTION_INDEX, 10) || 0
   )
+  const FILTER_ENDPOINT =
+    config.str('filter-endpoint', env.FILTER_ENDPOINT) || ''
+  const FILTER_POLLING_INTERVAL = config.uint(
+    'filter-polling-interval',
+    parseInt(env.FILTER_POLLING_INTERVAL, 10) || 60000
+  )
+  const MAX_GAS_PRICE_IN_GWEI = config.uint(
+    'max-gas-price-in-gwei',
+    parseInt(env.MAX_GAS_PRICE_IN_GWEI, 10) || 100
+  )
+  const GAS_RETRY_INCREMENT = config.uint(
+    'gas-retry-increment',
+    parseInt(env.GAS_RETRY_INCREMENT, 10) || 5
+  )
+  const RESUBMISSION_TIMEOUT = config.uint(
+    'resubmission-timeout',
+    parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
+  )
+  const NUM_CONFIRMATIONS = config.uint(
+    'num-confirmations',
+    parseInt(env.NUM_CONFIRMATIONS, 10) ||  0
+  )
 
   if (!ADDRESS_MANAGER_ADDRESS) {
     throw new Error('Must pass ADDRESS_MANAGER_ADDRESS')
@@ -85,8 +120,8 @@ const main = async () => {
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
 
   let wallet: Wallet
-  if (L1_WALLET_KEY) {
-    wallet = new Wallet(L1_WALLET_KEY, l1Provider)
+  if (RELAYER_PRIVATE_KEY) {
+    wallet = new Wallet(RELAYER_PRIVATE_KEY, l1Provider)
   } else if (MNEMONIC) {
     wallet = Wallet.fromMnemonic(MNEMONIC, HD_PATH)
     wallet = wallet.connect(l1Provider)
@@ -100,12 +135,23 @@ const main = async () => {
     addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
     l1Wallet: wallet,
     relayGasLimit: RELAY_GAS_LIMIT,
+    //batch system
+    minBatchSize: MIN_BATCH_SIZE,
+    maxWaitTimeS: MAX_WAIT_TIME_S,
+    maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
     l2BlockOffset: L2_BLOCK_OFFSET,
     l1StartOffset: L1_START_OFFSET,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
+    filterEndpoint: FILTER_ENDPOINT,
+    filterPollingInterval: FILTER_POLLING_INTERVAL,
+    // gas price
+    maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
+    gasRetryIncrement: GAS_RETRY_INCREMENT,
+    numConfirmations: NUM_CONFIRMATIONS,
+    resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
   })
 
   await service.start()
