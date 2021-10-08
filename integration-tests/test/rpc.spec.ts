@@ -240,7 +240,6 @@ describe('Basic RPC tests', () => {
     it('includes L1 gas price and L1 gas used', async () => {
       const tx = await env.l2Wallet.populateTransaction({
         to: env.l2Wallet.address,
-        gasPrice: 1,
       })
 
       const raw = serialize({
