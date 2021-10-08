@@ -242,27 +242,6 @@ services:
       dockerfile: ./ops/docker/Dockerfile.message-relayer
     entrypoint: ./relayer.sh
     environment:
-        L1_NODE_WEB3_URL: http://l1_chain:8545
-        L2_NODE_WEB3_URL: http://l2geth:8545
-        URL: http://dtl:8081/addresses.json
-        # a funded hardhat account
-        << : *relayer_pk
-        RETRIES: 60
-        POLLING_INTERVAL: 500
-        GET_LOGS_INTERVAL: 500
-        MAX_WAIT_TIME_S: 5
-
-  relayer:
-    depends_on:
-      - l1_chain
-      - dtl
-      - l2geth
-    image: bobanetwork/message-relayer:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.message-relayer
-    entrypoint: ./relayer.sh
-    environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
@@ -273,6 +252,8 @@ services:
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
       FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
 
   # a second relay system for messages that need to get to L1 quickly
   # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
@@ -298,6 +279,7 @@ services:
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
 
   batch_submitter:
     depends_on:

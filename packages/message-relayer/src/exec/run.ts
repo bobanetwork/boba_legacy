@@ -83,10 +83,8 @@ const main = async () => {
     'from-l2-transaction-index',
     parseInt(env.FROM_L2_TRANSACTION_INDEX, 10) || 0
   )
-  const FILTER_ENDPOINT = config.str(
-    'filter-endpoint',
-    env.FILTER_ENDPOINT
-  ) || ''
+  const FILTER_ENDPOINT =
+    config.str('filter-endpoint', env.FILTER_ENDPOINT) || ''
   const FILTER_POLLING_INTERVAL = config.uint(
     'filter-polling-interval',
     parseInt(env.FILTER_POLLING_INTERVAL, 10) || 60000
