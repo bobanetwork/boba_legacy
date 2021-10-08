@@ -1224,20 +1224,43 @@ class NetworkService {
 
   //Transfer funds from one account to another, on the L2
   async transfer(address, value_Wei_String, currency) {
-    console.log("currency:",currency)
+    
+    let tx = null
+
     try {
-      //any ERC20 json will do....
-      const tx = await this.L2_TEST_Contract.attach(currency).transfer(
-        address,
-        value_Wei_String
-      )
-      await tx.wait()
+      
+      if(currency === this.L2_ETH_Address) {
+        //we are sending ETH
+
+        let wei = BigNumber.from(value_Wei_String)
+
+        tx = await this.provider.send('eth_sendTransaction', 
+          [
+            { 
+              from: this.account,
+              to: address,
+              value: ethers.utils.hexlify(wei)
+            }
+          ]
+        )
+
+      } else {
+        //any ERC20 json will do....
+        tx = await this.L2_TEST_Contract.attach(currency).transfer(
+          address,
+          value_Wei_String
+        )
+        await tx.wait()
+      }
+      
       return tx
     } catch (error) {
       console.log("NS: transfer error:", error)
       return error
     }
   }
+
+
 
   //figure out which layer we are on right now
   confirmLayer = (layerToConfirm) => async (dispatch) => {
