@@ -1,0 +1,72 @@
+@import 'index.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  padding-top: 0px;
+
+  .header {
+    h2 {
+      margin-bottom: 0;
+      padding-left: 10px;
+      color: $white;
+    }
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .content {
+    margin: 10px auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .action {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: row;
+
+      &.isMobile {
+        flex-direction: column;
+      }
+
+      .transferContainer,
+      .delegateContainer {
+        /*margin: auto;*/
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        max-width: 48%;
+        width: 48%;
+        min-width: 350px;
+        margin: 5px;
+        min-height: 200px;
+        .info {
+          text-align: center;
+          .title {
+            font-size: 1.4em;
+            color: $white;
+          }
+          .subTitle {
+            font-size: 1.2em;
+            color: $white700;
+            margin: 10px;
+          }
+          .helpText {
+            font-size: 0.8em;
+            margin: 10px;
+            opacity: 0.7;
+            margin: 10px;
+          }
+        }
+      }
+    }
+  }
+}

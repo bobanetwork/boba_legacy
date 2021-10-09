@@ -1,0 +1,87 @@
+@import 'index.scss';
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+    justify-content: flex-end;
+  
+    .button {
+      border-radius: 8px;
+      margin-right: 10px;
+      min-width: 0;
+      &:last-child {
+        margin-right: 0px;
+      }
+    }
+  }
+  
+
+.modalContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  .proposalAction {
+    align-self: flex-start;
+    .actionTitle  {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 { 
+        flex: 1;
+        margin: 0px;
+      }
+
+    }
+    .actionPicker {
+      flex: 1;
+      height: 50px;
+      width: 100%;
+      padding: 0px 5px;
+      margin: 10px 0px;
+      line-height: 40px;
+      border: 2px solid #5E6170;
+      color: $white700;
+      border-radius: 8px;
+      font-size: 16px;
+      background: rgba(9, 22, 43, 0.5);
+      box-shadow: -13px 15px 19px rgba(0, 0, 0, 0.15), inset 53px 36px 120px rgba(255, 255, 255, 0.06);
+      
+      &:focus-within {
+        box-shadow: 0 0 0 1px $blue inset;
+      }
+    }
+  }
+  .proposalAction, .proposalDetail {
+    margin: 10px;
+    padding: 5px;
+    flex: 1;
+  }
+
+}  
+
+
+.actionContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid $background400;
+  width: 100%;
+  padding: 10px;
+
+  h4 {
+    align-self: flex-start;
+  }
+
+  .actionContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 90%;
+    select {
+      margin-bottom: 5px;
+    }
+  }
+}
