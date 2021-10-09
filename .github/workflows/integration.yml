@@ -77,13 +77,24 @@ jobs:
         run: |
           RETRIES=60
           URL=http://127.0.0.1:8080/addresses.json
-          URL2=http://127.0.0.1:8080/boba-addr.json
           until $(curl --silent --fail --output /dev/null "$URL"); do
             sleep 20s
             echo "Will wait $((RETRIES--)) more times for $URL to be up..."
 
             if [ "$RETRIES" -lt 0 ]; then
-              echo "Timeout waiting for contract deployment"
+              echo "Timeout waiting for base contract deployment"
+              exit 1
+            fi
+          done
+          echo "BOBA base contracts are deployed"
+          RETRIES=60
+          URL2=http://127.0.0.1:8080/boba-addr.json
+          until $(curl --silent --fail --output /dev/null "$URL2"); do
+            sleep 20s
+            echo "Will wait $((RETRIES--)) more times for $URL2 to be up..."
+
+            if [ "$RETRIES" -lt 0 ]; then
+              echo "Timeout waiting for Boba contract deployment"
               exit 1
             fi
           done

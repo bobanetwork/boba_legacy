@@ -127,7 +127,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
           aList = JSON.parse(await this.state.db.get("boba-addr"))
         } catch(e) {
           if (e.notFound) {
-            this.logger.warn("Address Registry is not yet ready to serve OMGX addresses (db notFound)")
+            this.logger.warn("Address Registry is not yet ready to serve BOBA addresses (db notFound)")
             return res.status(503).json({error: "Address Registry is not yet populated"})
           } else { throw e }
         }
@@ -179,7 +179,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
       try {
         const rb = req.body
 
-        this.logger.info("addressRegistry PUT request for OMGX addresses", {rb})
+        this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
 
         // As with the base list, we could add future restrictions on changing
         // certain critical addresses. For now we allow anything.
