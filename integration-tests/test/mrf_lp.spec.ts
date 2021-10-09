@@ -212,7 +212,7 @@ describe('Liquidity Pool Test', async () => {
       '0x0000000000000000000000000000000000000000'
     )
     // console.log(poolETHInfo.l2TokenAddress)
-    //expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.l2ETHAddress)
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.ovmEth.address)
   })
 
   it('should register L2 the pool', async () => {
@@ -227,12 +227,12 @@ describe('Liquidity Pool Test', async () => {
     expect(poolERC20Info.l1TokenAddress).to.deep.eq(L1ERC20.address)
     expect(poolERC20Info.l2TokenAddress).to.deep.eq(L2ERC20.address)
 
-    //const poolETHInfo = await L2LiquidityPool.poolInfo(env.l2ETHAddress)
+    const poolETHInfo = await L2LiquidityPool.poolInfo(env.ovmEth.address)
 
-    // expect(poolETHInfo.l1TokenAddress).to.deep.eq(
-    //   '0x0000000000000000000000000000000000000000'
-    // )
-    //expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.l2ETHAddress)
+    expect(poolETHInfo.l1TokenAddress).to.deep.eq(
+      '0x0000000000000000000000000000000000000000'
+    )
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(env.ovmEth.address)
   })
 
   it("shouldn't update the pool", async () => {
@@ -779,5 +779,258 @@ describe('Liquidity Pool Test', async () => {
     } else {
       this.skip()
     }
+  })
+
+  describe('OVM_ETH tests', async () => {
+    it('should add L1 liquidity', async () => {
+      const addLiquidityAmount = utils.parseEther('100')
+
+      const preL1LPEthBalance = await env.l1Provider.getBalance(L1LiquidityPool.address)
+
+      const BobAddLiquidity = await L1LiquidityPool.addLiquidity(
+        addLiquidityAmount,
+        ethers.constants.AddressZero,
+        { value: addLiquidityAmount }
+      )
+      await BobAddLiquidity.wait()
+
+      // Pool Balance
+      const postL1LPEthBalance = await env.l1Provider.getBalance(L1LiquidityPool.address)
+
+      expect(postL1LPEthBalance).to.deep.eq(preL1LPEthBalance.add(addLiquidityAmount))
+    })
+
+    it('should add L2 liquidity', async () => {
+      const addLiquidityAmount = utils.parseEther('100')
+
+      const deposit = env.l1Bridge.depositETH(
+        9999999,
+        utils.formatBytes32String(new Date().getTime().toString()),
+        { value: utils.parseEther('100') }
+      )
+      await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+
+      const preBobPoolAmount = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address
+      )
+      const preL2LPEthBalance = await env.l2Provider.getBalance(L2LiquidityPool.address)
+
+      const BobAddLiquidity = await L2LiquidityPool.addLiquidity(
+        addLiquidityAmount,
+        env.ovmEth.address,
+        { value: addLiquidityAmount }
+      )
+      await BobAddLiquidity.wait()
+
+      // expect(preBobL2EthBalance).to.deep.eq(
+      //   postBobL2EthBalance.add(addLiquidityAmount)
+      // )
+
+      // User deposit amount
+      const postBobPoolAmount = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address
+      )
+
+      expect(postBobPoolAmount.amount).to.deep.eq(preBobPoolAmount.amount.add(addLiquidityAmount))
+
+      // Pool Balance
+      const postL2LPEthBalance = await env.l2Provider.getBalance(L2LiquidityPool.address)
+
+      expect(postL2LPEthBalance).to.deep.eq(preL2LPEthBalance.add(addLiquidityAmount))
+    })
+
+    it('should fast exit L2', async () => {
+      const fastExitAmount = utils.parseEther('10')
+
+      const prebobL1EthBalance = await env.l1Wallet.getBalance()
+
+      const depositTx = await env.waitForXDomainTransactionFast(
+        L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
+          fastExitAmount,
+          env.ovmEth.address,
+          { value: fastExitAmount }
+        ),
+        Direction.L2ToL1
+      )
+
+      const postBobL1EthBalance = await env.l1Wallet.getBalance()
+
+      expect(postBobL1EthBalance).to.deep.eq(
+        prebobL1EthBalance.add(fastExitAmount.mul(95).div(100))
+      )
+
+      // Update the user reward per share
+      const updateRewardPerShareTX =
+        await L1LiquidityPool.updateUserRewardPerShare(ethers.constants.AddressZero)
+      await updateRewardPerShareTX.wait()
+
+      // check event ClientDepositL2 is emitted
+      await expectLogs(
+        depositTx.receipt,
+        L2LiquidityPoolJson.abi,
+        L2LiquidityPool.address,
+        'ClientDepositL2',
+        {
+          sender: env.l2Wallet.address,
+          receivedAmount: fastExitAmount,
+          tokenAddress: env.ovmEth.address,
+        }
+      )
+
+      // check event ClientPayL1 is emitted
+      await expectLogs(
+        depositTx.remoteReceipt,
+        L1LiquidityPoolJson.abi,
+        L1LiquidityPool.address,
+        'ClientPayL1',
+        {
+          sender: env.l2Wallet.address,
+          amount: fastExitAmount.mul(95).div(100),
+          tokenAddress: ethers.constants.AddressZero,
+        }
+      )
+    })
+
+    it('should withdraw liquidity', async () => {
+      const withdrawAmount = utils.parseEther('10')
+
+      const preBobUserInfo = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address
+      )
+
+      const withdrawTX = await L2LiquidityPool.withdrawLiquidity(
+        withdrawAmount,
+        env.ovmEth.address,
+        env.l2Wallet.address,
+        { gasLimit: 7000000 }
+      )
+      await withdrawTX.wait()
+
+      const postBobUserInfo = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address
+      )
+
+      expect(preBobUserInfo.amount).to.deep.eq(
+        postBobUserInfo.amount.add(withdrawAmount)
+      )
+    })
+
+    it('should withdraw reward from L2 pool', async () => {
+      const preBobUserInfo = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address
+      )
+      const pendingReward = BigNumber.from(preBobUserInfo.pendingReward).div(2)
+
+      const withdrawRewardTX = await L2LiquidityPool.withdrawReward(
+        pendingReward,
+        env.ovmEth.address,
+        env.l2Wallet.address,
+        { gasLimit: 7000000 }
+      )
+      await withdrawRewardTX.wait()
+
+      const postBobUserInfo = await L2LiquidityPool.userInfo(
+        env.ovmEth.address,
+        env.l2Wallet.address,
+        { gasLimit: 7000000 }
+      )
+
+      expect(postBobUserInfo.pendingReward).to.deep.eq(
+        preBobUserInfo.pendingReward.sub(pendingReward)
+      )
+    })
+
+    it('should fast onramp', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL2EthBalance = await env.l2Wallet.getBalance()
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1(depositAmount, env.ovmEth.address, {
+          value: depositAmount,
+        }),
+        Direction.L1ToL2
+      )
+
+      const postL2EthBalance = await env.l2Wallet.getBalance()
+
+      expect(postL2EthBalance).to.deep.eq(
+        preL2EthBalance.add(depositAmount.mul(95).div(100))
+      )
+
+      // expect(postL1EthBalance).to.deep.eq(preL1EthBalance.sub(depositAmount))
+
+      // check event ClientDepositL1 is emitted
+      await expectLogs(
+        depositTx.receipt,
+        L1LiquidityPoolJson.abi,
+        L1LiquidityPool.address,
+        'ClientDepositL1',
+        {
+          sender: env.l1Wallet.address,
+          receivedAmount: depositAmount,
+          tokenAddress: ethers.constants.AddressZero,
+        }
+      )
+
+      // check event ClientPayL2 is emitted
+      await expectLogs(
+        depositTx.remoteReceipt,
+        L2LiquidityPoolJson.abi,
+        L2LiquidityPool.address,
+        'ClientPayL2',
+        {
+          sender: env.l1Wallet.address,
+          amount: depositAmount.mul(95).div(100),
+          tokenAddress: env.ovmEth.address,
+        }
+      )
+    })
+
+    it('should revert unfulfillable swap-offs', async () => {
+      const preBobL1EthBalance = await env.l1Wallet.getBalance()
+      const requestedLiquidity = (
+        await env.l1Provider.getBalance(L1LiquidityPool.address)
+      ).add(10)
+      const fastExitAmount = requestedLiquidity.mul(100).div(95)
+
+      await env.waitForRevertXDomainTransactionFast(
+        L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
+          fastExitAmount,
+          env.ovmEth.address,
+          { value: fastExitAmount }
+        ),
+        Direction.L2ToL1
+      )
+
+      const postBobL1EthBalance = await env.l1Wallet.getBalance()
+
+      expect(preBobL1EthBalance).to.deep.eq(postBobL1EthBalance)
+    })
+
+    it('should revert unfulfillable swap-ons', async () => {
+      const preL2EthBalance = await env.l2Wallet.getBalance()
+
+      const requestedLiquidity = (
+        await env.l2Provider.getBalance(L2LiquidityPool.address)
+      ).add(10)
+      const swapOnAmount = requestedLiquidity.mul(100).div(95)
+
+      await env.waitForRevertXDomainTransaction(
+        L1LiquidityPool.clientDepositL1(swapOnAmount, ethers.constants.AddressZero, {
+          value: swapOnAmount,
+        }),
+        Direction.L1ToL2
+      )
+
+      const postBobL2EthBalance = await env.l2Wallet.getBalance()
+
+      expect(preL2EthBalance).to.deep.eq(postBobL2EthBalance)
+    })
   })
 })
