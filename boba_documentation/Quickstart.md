@@ -3,8 +3,8 @@
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
-git clone git@github.com:omgnetwork/optimism.git
-cd optimism
+git clone git@github.com:omgnetwork/optimism-v2.git
+cd optimism-v2
 yarn clean
 yarn install
 yarn build
@@ -16,15 +16,6 @@ Build and run the entire stack:
 $ cd ops
 $ BUILD=1 DAEMON=0 ./up_local.sh
 ```
-
-If you need a L1 that advances blocks even without transactions, then you can use an upstream Geth with a 5s blocktime
-
-```bash
-$ cd ops
-$ BUILD=1 DAEMON=0 ./up_local_g5.sh
-```
-
-That one takes a while to spin up all the right services, and you can help it along in Docker, by restarting needed services that time out.
 
 Helpful commands:
 
