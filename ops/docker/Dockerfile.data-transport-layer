@@ -28,7 +28,9 @@ WORKDIR /opt/optimism/packages/data-transport-layer
 # For development, comment out the next COPY and uncomment the ADD. This will
 # build the image from the current tree instead of the old builder files.
 COPY --from=builder /optimism/packages/data-transport-layer/dist ./dist
-#COPY --from=builder /optimism/packages/contracts/dist/dumps ./state-dumps
+#ADD ./packages/data-transport-layer/dist ./dist
+
+RUN mkdir ./state-dumps
 COPY --from=builder /optimism/packages/data-transport-layer/package.json .
 COPY --from=builder /optimism/packages/data-transport-layer/node_modules ./node_modules
 

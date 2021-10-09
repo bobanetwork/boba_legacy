@@ -127,7 +127,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
           aList = JSON.parse(await this.state.db.get("boba-addr"))
         } catch(e) {
           if (e.notFound) {
-            this.logger.warn("Address Registry is not yet ready to serve OMGX addresses (db notFound)")
+            this.logger.warn("Address Registry is not yet ready to serve BOBA addresses (db notFound)")
             return res.status(503).json({error: "Address Registry is not yet populated"})
           } else { throw e }
         }
@@ -179,7 +179,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
       try {
         const rb = req.body
 
-        this.logger.info("addressRegistry PUT request for OMGX addresses", {rb})
+        this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
 
         // As with the base list, we could add future restrictions on changing
         // certain critical addresses. For now we allow anything.
@@ -197,6 +197,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
 
     this.state.addressRegistry['get']("/state-dump.latest.json", async (req, res) => {
       try {
+        // This does not work with a relative path, although the PUT method does.
         return res.sendFile("/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json")
       } catch (e) {
         return res.status(500).json({
@@ -209,18 +210,16 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
       try {
         this.logger.info("addressRegistry PUT request for state-dump file")
 
-        req.pipe(fs.createWriteStream("/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json_TMP"))
+        req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json_TMP"))
 
         await fs.rename(
-          "/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json_TMP",
-          "/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json",
+          "./state-dumps/state-dump.latest.json_TMP",
+          "./state-dumps/state-dump.latest.json",
           (err) => { if (err) { throw err; } }
         )
 
         this.logger.info("Saved new state-dump.latest.json")
         return res.sendStatus(201).end()
-
-        //return res.sendFile("/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json")
 
       } catch (e) {
         return res.status(500).json({
