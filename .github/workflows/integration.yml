@@ -88,11 +88,14 @@ jobs:
             fi
           done
           echo "BOBA contracts are deployed"
+          echo $(curl --silent $URL2)
           L2LIQUIDITY_POOL=$(curl --silent $URL2 | jq -r .L2LiquidityPool)
           echo $L2LIQUIDITY_POOL
           if [[ $L2LIQUIDITY_POOL =~ "0x" ]]; then
+            echo "Pass: Found L2 Liquidity Pool contract address"
             exit 0
           else
+            echo "Error: Did not find L2 Liquidity Pool contract address"
             exit 1
           fi
 
