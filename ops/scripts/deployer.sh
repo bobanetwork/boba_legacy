@@ -21,7 +21,6 @@ yarn run deploy
 if [ -n "$DTL_REGISTRY_URL" ] ; then
   echo "Will upload addresses.json to DTL"
   curl \
-      --fail \
       --show-error \
       --silent \
       -H "Content-Type: application/json" \
@@ -54,10 +53,9 @@ yarn run build:dump
 if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
   echo "Will upload state-dump.latest.json to DTL"
   curl \
-      --fail \
       --show-error \
       --silent \
-      -H "Content-Type: application/json" \
+      -H "Content-Type: application/octet-stream" \
       --retry-connrefused \
       --retry $RETRIES \
       --retry-delay 5 \
