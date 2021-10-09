@@ -76,7 +76,7 @@ jobs:
         working-directory: ./
         run: |
           RETRIES=60
-          URL=http://127.0.0.1:8081/addresses.json
+          URL=http://127.0.0.1:8080/addresses.json
           until $(curl --silent --fail --output /dev/null "$URL"); do
             sleep 20s
             echo "Will wait $((RETRIES--)) more times for $URL to be up..."
