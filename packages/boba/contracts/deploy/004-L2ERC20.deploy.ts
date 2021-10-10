@@ -6,6 +6,8 @@ import { getContractFactory } from '@eth-optimism/contracts';
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import preSupportedTokens from '../preSupportedTokens.json';
 
 let Factory__L1ERC20: ContractFactory
@@ -14,6 +16,8 @@ let Factory__L2Boba: ContractFactory
 
 let L1ERC20: Contract
 let L2ERC20: Contract
+let Proxy__L1LiquidityPool: Contract
+let Proxy__L2LiquidityPool: Contract
 
 //Test ERC20
 const initialSupply = utils.parseEther("10000000000")
@@ -113,6 +117,34 @@ const deployFn: DeployFunction = async (hre) => {
       await hre.deployments.save(`TK_L2${token.symbol}`, L2ERC20DeploymentSubmission)
       console.log(`🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(L2ERC20.address)}`)
     }
+
+    // Register tokens in LPs
+    const Proxy__L1LiquidityPoolDeployment = await hre.deployments.getOrNull('Proxy__L1LiquidityPool')
+    const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull('Proxy__L2LiquidityPool')
+
+    Proxy__L1LiquidityPool = new Contract(
+      Proxy__L1LiquidityPoolDeployment.address,
+      L1LiquidityPoolJson.abi,
+      (hre as any).deployConfig.deployer_l1
+    )
+    Proxy__L2LiquidityPool = new Contract(
+      Proxy__L2LiquidityPoolDeployment.address,
+      L2LiquidityPoolJson.abi,
+      (hre as any).deployConfig.deployer_l2
+    )
+
+    const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
+      tokenAddress,
+      L2ERC20.address
+    )
+    await registerL1LP.wait()
+
+    const registerL2LP = await Proxy__L2LiquidityPool.registerPool(
+      tokenAddress,
+      L2ERC20.address
+    )
+    await registerL2LP.wait()
+    console.log(`🌕 ${chalk.red(`${token.name} was registered in LPs`)}`)
   }
 }
 
