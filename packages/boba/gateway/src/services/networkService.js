@@ -15,13 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
-
-import { Watcher } from '@eth-optimism/watcher'
-
+import { Watcher } from '@eth-optimism/core-utils'
 import { ethers, BigNumber, utils, ContractFactory } from 'ethers'
 
 import store from 'store'
-
 import { orderBy } from 'lodash'
 import BN from 'bn.js'
 
@@ -70,7 +67,6 @@ import Comp from "../deployment/rinkeby/json/Comp.json"
 import GovernorBravoDelegate from "../deployment/rinkeby/json/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/rinkeby/json/GovernorBravoDelegator.json"
 import Timelock from "../deployment/rinkeby/json/Timelock.json"
-
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -519,6 +515,7 @@ class NetworkService {
       //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
       /*The OMG token*/
+      //We need this seperately because OMG is not ERC20 compliant
       if(addresses.TOKENS && addresses.TOKENS.OMG.L1 !== null) {
         this.L1_OMG_Contract = new ethers.Contract(
           addresses.TOKENS.OMG.L1,
@@ -660,12 +657,19 @@ class NetworkService {
     const nw = getAllNetworks()
     const masterConfig = store.getState().setup.masterConfig
 
+    let blockExplorerUrls = null
+
+    //local does not have a blockexplorer
+    if( masterConfig !== 'local') {
+      blockExplorerUrls = [nw[masterConfig].L2.blockExplorer.slice(0, -1)]
+    } 
+
     //the chainParams are only needed for the L2's
     const chainParam = {
       chainId: '0x' + nw[masterConfig].L2.chainId.toString(16),
       chainName: nw[masterConfig].L2.name,
       rpcUrls: [nw[masterConfig].L2.rpcUrl],
-      blockExplorerUrls: [nw[masterConfig].L2.blockExplorer.slice(0, -1)],
+      blockExplorerUrls
     }
 
     const targetIDHex = nw[masterConfig][targetLayer].chainIdHex
@@ -675,7 +679,7 @@ class NetworkService {
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
     } catch (error) {
-      // This error code indicates that the chain has not been added to MetaMask.
+      // 4902 = the chain has not been added to MetaMask.
       if (error.code === 4902) {
         try {
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
