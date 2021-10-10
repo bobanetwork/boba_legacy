@@ -41,26 +41,27 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
-import AddressManagerJson from '../deployment/artifacts/contracts/Lib_AddressManager.json'
-import L1StandardBridgeJson from '../deployment/artifacts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json'
-import L2StandardBridgeJson from '../deployment/artifacts-ovm/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json'
+import AddressManagerJson   from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
+import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
+import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 
 //OMGX LP contracts
-import L1LPJson from '../deployment/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LPJson from '../deployment/artifacts-ovm/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LPJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
 //Standard ERC20 jsons - should be very similar?
-import L1ERC20Json from '../deployment/artifacts/contracts/L1ERC20.sol/L1ERC20.json'
-import L2ERC20Json from '../deployment/artifacts-ovm/optimistic-ethereum/libraries/standards/L2StandardERC20.sol/L2StandardERC20.json'
+import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
+import L2ERC20Json from '../deployment/artifacts-base/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 
-import OMGJson from '../deployment/contracts/OMG/OMG.json'
+//special one-off location
+import OMGJson from '../deployment/contracts/OMG.json'
 
-//OMGX L2 Contracts
-import L2ERC721Json from '../deployment/artifacts-ovm/contracts/ERC721Genesis.sol/ERC721Genesis.json'
-import L2ERC721RegJson from '../deployment/artifacts-ovm/contracts/ERC721Registry.sol/ERC721Registry.json'
+//BOBA L2 Contracts
+import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
+import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
-import L2TokenPoolJson from '../deployment/artifacts-ovm/contracts/TokenPool.sol/TokenPool.json'
-import AtomicSwapJson from '../deployment/artifacts-ovm/contracts/AtomicSwap.sol/AtomicSwap.json'
+import L2TokenPoolJson from '../deployment/artifacts-boba/contracts/TokenPool.sol/TokenPool.json'
+import AtomicSwapJson  from '../deployment/artifacts-boba/contracts/AtomicSwap.sol/AtomicSwap.json'
 
 // DAO
 import Comp from "../deployment/rinkeby/json/Comp.json"

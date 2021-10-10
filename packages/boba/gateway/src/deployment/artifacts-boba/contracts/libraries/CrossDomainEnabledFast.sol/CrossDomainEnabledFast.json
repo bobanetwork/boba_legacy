@@ -1,0 +1,53 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "CrossDomainEnabledFast",
+  "sourceName": "contracts/libraries/CrossDomainEnabledFast.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_senderMessenger",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_relayerMessenger",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "relayerMessenger",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "senderMessenger",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060405161016838038061016883398101604081905261002f9161007c565b600080546001600160a01b039384166001600160a01b031991821617909155600180549290931691161790556100af565b80516001600160a01b038116811461007757600080fd5b919050565b6000806040838503121561008f57600080fd5b61009883610060565b91506100a660208401610060565b90509250929050565b60ab806100bd6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c8063508e01c4146037578063818c021e14607f575b600080fd5b60005460569073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60015460569073ffffffffffffffffffffffffffffffffffffffff168156fea164736f6c6343000808000a",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c8063508e01c4146037578063818c021e14607f575b600080fd5b60005460569073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60015460569073ffffffffffffffffffffffffffffffffffffffff168156fea164736f6c6343000808000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
