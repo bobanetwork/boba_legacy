@@ -5,24 +5,29 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IL2StandardERC20.sol";
 
 contract L2StandardERC20 is IL2StandardERC20, ERC20 {
+
     address public l1Token;
     address public l2Bridge;
-
+    uint8 private immutable _decimals;
+    
     /**
      * @param _l2Bridge Address of the L2 standard bridge.
      * @param _l1Token Address of the corresponding L1 token.
      * @param _name ERC20 name.
      * @param _symbol ERC20 symbol.
+     * @param decimals_ ERC20 decimals.
      */
     constructor(
         address _l2Bridge,
         address _l1Token,
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+        uint8 decimals_
     )
         ERC20(_name, _symbol) {
         l1Token = _l1Token;
         l2Bridge = _l2Bridge;
+        _decimals = decimals_;
     }
 
     modifier onlyL2Bridge {
@@ -48,5 +53,9 @@ contract L2StandardERC20 is IL2StandardERC20, ERC20 {
         _burn(_from, _amount);
 
         emit Burn(_from, _amount);
+    }
+
+    function decimals() public view virtual override returns (uint8) {
+        return _decimals;
     }
 }

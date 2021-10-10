@@ -1,6 +1,6 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils} from 'ethers'
+import { Contract, ContractFactory, utils } from 'ethers'
 import chalk from 'chalk';
 import { getContractFactory } from '@eth-optimism/contracts';
 
@@ -55,6 +55,7 @@ const deployFn: DeployFunction = async (hre) => {
         initialSupply,
         token.name,
         token.symbol,
+        token.decimals,
       )
       await L1ERC20.deployTransaction.wait()
 
@@ -87,7 +88,8 @@ const deployFn: DeployFunction = async (hre) => {
         tokenAddress,
         //((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST' ) ? L1ERC20.address : token.address,
         token.name,
-        token.symbol
+        token.symbol,
+        token.decimals
       )
       await L2ERC20.deployTransaction.wait()
 
@@ -104,7 +106,8 @@ const deployFn: DeployFunction = async (hre) => {
         (hre as any).deployConfig.L2StandardBridgeAddress,
         tokenAddress,
         token.name,
-        token.symbol
+        token.symbol,
+        token.decimals
       )
       await L2ERC20.deployTransaction.wait()
 

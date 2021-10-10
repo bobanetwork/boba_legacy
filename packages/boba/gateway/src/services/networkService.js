@@ -1669,6 +1669,8 @@ class NetworkService {
       return acc;
     }, [this.L1_ETH_Address]);
 
+    console.log("tokenAddressList",tokenAddressList)
+
     const L1LPContract = new ethers.Contract(
       this.L1LPAddress,
       L1LPJson.abi,
@@ -1678,13 +1680,16 @@ class NetworkService {
     const poolInfo = {}
     const userInfo = {}
 
-    const L1LPInfoPromise = [];
+    const L1LPInfoPromise = []
 
     const getL1LPInfoPromise = async(tokenAddress) => {
+      
       let tokenBalance
       let tokenSymbol
       let tokenName
       let decimals
+      
+      console.log("tokenAddress",tokenAddress)
 
       if (tokenAddress === this.L1_ETH_Address) {
         tokenBalance = await this.L1Provider.getBalance(this.L1LPAddress)
@@ -1692,18 +1697,28 @@ class NetworkService {
         tokenName = 'Ethereum'
         decimals = 18
       } else {
+        console.log("looking up",tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(this.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
+        console.log("looking up - symbol",tokenSymbol)
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
         decimals = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).decimals()
+        console.log("looking up - decimals",decimals)
       }
+
+      console.log("TA LUP",tokenAddress)
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
+      console.log("poolTokenInfo",poolTokenInfo)
+
       const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
-    const L1LPInfo = await Promise.all(L1LPInfoPromise);
+    
+    const L1LPInfo = await Promise.all(L1LPInfoPromise)
+
+    console.log("L1LPInfo",L1LPInfo)
 
     L1LPInfo.forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
