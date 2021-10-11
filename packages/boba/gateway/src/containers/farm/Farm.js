@@ -197,8 +197,6 @@ class Farm extends React.Component {
       dropDownBox,
     } = this.state
 
-    console.log("poolinfo",poolInfo)
-
     const { isMobile } = this.props
 
     const networkLayer = networkService.L1orL2
