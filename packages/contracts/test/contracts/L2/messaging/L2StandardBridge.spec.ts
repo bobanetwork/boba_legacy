@@ -199,7 +199,8 @@ describe('L2StandardBridge', () => {
         L2StandardBridge.address,
         DUMMY_L1TOKEN_ADDRESS,
         'L2Token',
-        'L2T'
+        'L2T',
+        18
       )
 
       // Populate the initial state with a total supply and some money in alice's balance
