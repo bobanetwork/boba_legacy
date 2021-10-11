@@ -45,6 +45,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   let tokenAddress = null;
+  let tokenDecimals = null;
 
   for (const token of preSupportedTokens.supportedTokens) {
     if (
@@ -53,9 +54,9 @@ const deployFn: DeployFunction = async (hre) => {
     ) {
       //do not deploy existing tokens on Rinkeby or Mainnet
       //only deploy tokens if it's the TEST token or we are on local
-      
+
       let supply = initialSupply_18
-      
+
       if(token.decimals === 6) {
         supply = initialSupply_6
       } else if (token.symbol === 'BOBA') {
@@ -91,6 +92,16 @@ const deployFn: DeployFunction = async (hre) => {
       console.log(`🌕 ${chalk.red(`L1 ${token.name} is located at`)} ${chalk.green(tokenAddress)}`)
     }
 
+    // fetch decimal info from L1 token
+    L1ERC20 = new Contract(
+      tokenAddress,
+      L1ERC20Json.abi,
+      (hre as any).deployConfig.deployer_l1
+    )
+
+    tokenDecimals = await L1ERC20.decimals()
+    console.log(tokenDecimals)
+
     //Set up things on L2 for this token
 
     if (token.symbol !== 'BOBA') {
@@ -101,7 +112,7 @@ const deployFn: DeployFunction = async (hre) => {
         //((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST' ) ? L1ERC20.address : token.address,
         token.name,
         token.symbol,
-        token.decimals
+        tokenDecimals
       )
       await L2ERC20.deployTransaction.wait()
 
@@ -119,7 +130,7 @@ const deployFn: DeployFunction = async (hre) => {
         tokenAddress,
         token.name,
         token.symbol,
-        token.decimals
+        tokenDecimals
       )
       await L2ERC20.deployTransaction.wait()
 
