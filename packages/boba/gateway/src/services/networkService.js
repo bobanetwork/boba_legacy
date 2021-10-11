@@ -1579,7 +1579,8 @@ class NetworkService {
       this.L2StandardBridgeAddress
     )
 
-    if ( allowance.lt(value) ) {
+    //no need to approve L2 ETH
+    if( currencyAddress !== this.L2_ETH_Address && allowance.lt(value) ) {
       const res = await this.approveERC20(
         value_Wei_String,
         currencyAddress,
