@@ -430,7 +430,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('should withdraw liquidity', async () => {
-    const withdrawAmount = utils.parseEther('100')
+    const withdrawAmount = utils.parseEther('10')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preBobUserInfo = await L2LiquidityPool.userInfo(
@@ -476,7 +476,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it("shouldn't withdraw liquidity", async () => {
-    const withdrawAmount = utils.parseEther('10')
+    const withdrawAmount = utils.parseEther('100')
 
     const withdrawTX = await L2LiquidityPool.withdrawLiquidity(
       withdrawAmount,
