@@ -11,6 +11,7 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
     address public l1Token;
     address public l2Bridge;
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
+    uint8 private immutable _decimals;
 
     /**
      * @param _l2Bridge Address of the L2 standard bridge.
@@ -22,11 +23,13 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
         address _l2Bridge,
         address _l1Token,
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+         uint8 decimals_
     )
         ERC20(_name, _symbol) ERC20Permit(_name) {
         l1Token = _l1Token;
         l2Bridge = _l2Bridge;
+        _decimals = decimals_;
     }
 
     modifier onlyL2Bridge {
@@ -34,6 +37,10 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
         _;
     }
 
+    function decimals() public view virtual override returns (uint8) {
+        return _decimals;
+    }
+    
     function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
         bytes4 secondSupportedInterface = IL2StandardERC20.l1Token.selector
