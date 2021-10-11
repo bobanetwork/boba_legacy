@@ -54,7 +54,8 @@ describe('Liquidity Pool Test', async () => {
     L1ERC20 = await Factory__L1ERC20.deploy(
       initialSupply,
       tokenName,
-      tokenSymbol
+      tokenSymbol,
+      18
     )
     await L1ERC20.deployTransaction.wait()
 
@@ -64,7 +65,8 @@ describe('Liquidity Pool Test', async () => {
       L2StandardBridgeAddress,
       L1ERC20.address,
       tokenName,
-      tokenSymbol
+      tokenSymbol,
+      18
     )
     await L2ERC20.deployTransaction.wait()
 
