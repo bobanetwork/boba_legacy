@@ -127,7 +127,7 @@ function Home () {
 
   useInterval(() => {
     batch(() => {
-      //dispatch(fetchExits())
+      dispatch(fetchExits())
     })
   }, POLL_INTERVAL)
 
