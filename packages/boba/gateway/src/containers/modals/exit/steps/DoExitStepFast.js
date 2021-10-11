@@ -113,7 +113,8 @@ function DoExitStepFast({ handleClose, token }) {
       dispatch(
           openAlert(
             `${token.symbol} was bridged. You will receive
-            ${receivableAmount(value)} ${token.symbol} minus gas fees (if bridging ETH) on L1.`
+            ${receivableAmount(value)} ${token.symbol} 
+            minus gas fees (if bridging ETH) on L1.`
           )
         )
       handleClose()
@@ -127,13 +128,13 @@ function DoExitStepFast({ handleClose, token }) {
         setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
       })
       networkService.getL1TotalFeeRate().then((feeRate) => {
-        setFeeRate(feeRate)
+       setFeeRate(feeRate)
       })
       networkService.getFastExitCost(token.address).then((fee) => {
-        setl1gas(fee)
+       setl1gas(fee)
       })
       networkService.getL2FeeBalance().then((ETHbalance) => {
-        setL2FeeBalance(ETHbalance)
+       setL2FeeBalance(ETHbalance)
       })
     }
     // to clean up state and fix the
