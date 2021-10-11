@@ -71,7 +71,7 @@ describe('System setup', async () => {
       )} ${chalk.green(preL2ERC20Balance.toString())}`
     )
 
-    const depositL2ERC20Amount = utils.parseEther('12345')
+    const depositL2ERC20Amount = utils.parseEther('12')
 
     const approveL1ERC20TX = await L1ERC20.approve(
       env.l1Bridge.address,
@@ -111,7 +111,7 @@ describe('System setup', async () => {
   })
 
   it('should transfer ERC20 TEST token to Kate', async () => {
-    const transferL2ERC20Amount = utils.parseEther('9')
+    const transferL2ERC20Amount = utils.parseEther('0.09')
     await depositERC20ToL2(env.l2Wallet)
     const preKateL2ERC20Balance = await L2ERC20.balanceOf(
       env.l2Wallet_2.address
