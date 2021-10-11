@@ -66,9 +66,6 @@ function Account () {
 
   const disabled = depositLoading || exitLoading
 
-  //console.log("disabled:",disabled)
-  //console.log("loading:",loading)
-
   const getLookupPrice = useCallback(()=>{
     const symbolList = Object.values(tokenList).map((i)=> {
       if(i.symbolL1 === 'ETH') {
@@ -116,12 +113,12 @@ function Account () {
   ]
 
   useEffect(()=>{
-    //getLookupPrice()
+    getLookupPrice()
   },[childBalance, rootBalance, getLookupPrice])
 
   useInterval(() => {
     batch(() => {
-      //dispatch(fetchTransactions())
+      dispatch(fetchTransactions())
     })
   }, POLL_INTERVAL)
 
@@ -137,9 +134,6 @@ function Account () {
       <NetworkSwitcherIcon active={active} /> <Typography variant="overline">Active</Typography>
     </Box>
   )
-
-  // const mobileL1 = network + ' L1'
-  // const mobileL2 = 'BOBA L2 ' + network
 
   let label_L1 = 'Ethereum L1'
   if(network === 'rinkeby') label_L1 = 'Rinkeby L1'

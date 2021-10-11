@@ -168,8 +168,6 @@ class FarmDepositModal extends React.Component {
       loading,
     } = this.state
 
-    console.log("staketoken",stakeToken)
-
     let allowanceGTstake = false
 
     if ( Number(approvedAllowance) > 0 &&

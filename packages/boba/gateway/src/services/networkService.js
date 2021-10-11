@@ -1123,9 +1123,6 @@ class NetworkService {
         },
       ]
 
-      console.log("l1b:",layer1Balances)
-      console.log("l2b:",layer2Balances)
-
       const state = store.getState()
       const tA = Object.values(state.tokenList)
 
@@ -1145,8 +1142,6 @@ class NetworkService {
       }
 
       const getBalancePromise = []
-
-      console.log("tA:",tA)
 
       tA.forEach((token) => {
         if (token.addressL1 === this.L1_ETH_Address) return
