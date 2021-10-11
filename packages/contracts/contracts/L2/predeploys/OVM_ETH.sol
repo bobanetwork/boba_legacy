@@ -23,7 +23,8 @@ contract OVM_ETH is L2StandardERC20 {
             Lib_PredeployAddresses.L2_STANDARD_BRIDGE,
             address(0),
             "Ether",
-            "ETH"
+            "ETH",
+            18
         )
     {}
 
