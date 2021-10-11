@@ -20,9 +20,10 @@ let L2ERC20: Contract
 let Proxy__L1LiquidityPool: Contract
 let Proxy__L2LiquidityPool: Contract
 
-//Test ERC20
-const initialSupply_18 = utils.parseEther("10000000000")
 const initialSupply_6 = utils.parseUnits("10000",6)
+const initialSupply_8 = utils.parseUnits("10000",8)
+const initialSupply_18 = utils.parseEther("10000000000")
+
 const initialSupply_BOBA = utils.parseEther("500000000")
 
 const deployFn: DeployFunction = async (hre) => {
@@ -44,8 +45,8 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  let tokenAddress = null;
-  let tokenDecimals = null;
+  let tokenAddress = null
+  let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
     if (
@@ -59,6 +60,8 @@ const deployFn: DeployFunction = async (hre) => {
 
       if(token.decimals === 6) {
         supply = initialSupply_6
+      } else if (token.decimals === 8) {
+        supply = initialSupply_8
       } else if (token.symbol === 'BOBA') {
         supply = initialSupply_BOBA
       }
@@ -101,7 +104,7 @@ const deployFn: DeployFunction = async (hre) => {
 
     tokenDecimals = await L1ERC20.decimals()
 
-    //Set up things on L2 for this token
+    //Set up things on L2 for these tokens
 
     if (token.symbol !== 'BOBA') {
 
