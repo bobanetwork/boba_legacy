@@ -66,7 +66,12 @@ describe('L2StandardBridge', () => {
     // Deploy an L2 ERC20
     L2ERC20 = await (
       await ethers.getContractFactory('L2StandardERC20', alice)
-    ).deploy(L2StandardBridge.address, DUMMY_L1TOKEN_ADDRESS, 'L2Token', 'L2T')
+    ).deploy(
+      L2StandardBridge.address, 
+      DUMMY_L1TOKEN_ADDRESS, 
+      'L2Token', 
+      'L2T',
+      18)
   })
 
   // test the transfer flow of moving a token from L2 to L1
