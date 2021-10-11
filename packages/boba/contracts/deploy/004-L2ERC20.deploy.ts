@@ -100,7 +100,6 @@ const deployFn: DeployFunction = async (hre) => {
     )
 
     tokenDecimals = await L1ERC20.decimals()
-    console.log(tokenDecimals)
 
     //Set up things on L2 for this token
 
