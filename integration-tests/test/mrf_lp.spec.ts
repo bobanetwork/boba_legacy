@@ -26,7 +26,7 @@ describe('Liquidity Pool Test', async () => {
 
   let env: OptimismEnv
 
-  const initialSupply = utils.parseEther('10000')
+  const initialSupply = utils.parseEther('10000000000')
   const tokenName = 'JLKN'
   const tokenSymbol = 'JLKN'
 
@@ -89,8 +89,8 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should deposit 100 TEST ERC20 token from L1 to L2', async () => {
-    const depositL2ERC20Amount = utils.parseEther('100')
+  it('should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
+    const depositL2ERC20Amount = utils.parseEther('10000')
 
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -125,7 +125,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
-    const transferL2ERC20Amount = utils.parseEther('1.5')
+    const transferL2ERC20Amount = utils.parseEther('150')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preAliceL2ERC20Balance = await L2ERC20.balanceOf(
@@ -172,8 +172,8 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('should add 1.2 ERC20 TEST tokens to the L2 token pool', async () => {
-    const addL2TPAmount = utils.parseEther('1.2')
+  it('should add 1000 ERC20 TEST tokens to the L2 token pool', async () => {
+    const addL2TPAmount = utils.parseEther('1000')
 
     const approveL2TPTX = await L2ERC20.approve(
       L2TokenPool.address,
@@ -277,7 +277,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('should add L2 liquidity', async () => {
-    const addLiquidityAmount = utils.parseEther('1.8')
+    const addLiquidityAmount = utils.parseEther('100')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preAliceL2ERC20Balance = await L2ERC20.balanceOf(
@@ -343,7 +343,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('should fast exit L2', async () => {
-    const fastExitAmount = utils.parseEther('0.9')
+    const fastExitAmount = utils.parseEther('10')
 
     const preKateL1ERC20Balance = await L1ERC20.balanceOf(
       env.l1Wallet_3.address
@@ -368,7 +368,7 @@ describe('Liquidity Pool Test', async () => {
 
     expect(poolInfo.accOwnerReward).to.deep.eq(fastExitAmount.mul(15).div(1000))
     expect(poolInfo.accUserReward).to.deep.eq(fastExitAmount.mul(35).div(1000))
-    expect(poolInfo.userDepositAmount).to.deep.eq(utils.parseEther('0.9'))
+    expect(poolInfo.userDepositAmount).to.deep.eq(utils.parseEther('100'))
 
     const postKateL1ERC20Balance = await L1ERC20.balanceOf(
       env.l1Wallet_3.address
@@ -430,7 +430,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('should withdraw liquidity', async () => {
-    const withdrawAmount = utils.parseEther('10')
+    const withdrawAmount = utils.parseEther('100')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preBobUserInfo = await L2LiquidityPool.userInfo(
@@ -550,7 +550,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it("shouldn't withdraw reward from L2 pool", async () => {
-    const withdrawRewardAmount = utils.parseEther('10')
+    const withdrawRewardAmount = utils.parseEther('100')
 
     const withdrawRewardTX = await L2LiquidityPool.withdrawReward(
       withdrawRewardAmount,
@@ -711,7 +711,7 @@ describe('Liquidity Pool Test', async () => {
       expect(pauseStatus).to.eq(true)
 
       // check addLiquidity is paused
-      const addLiquidityAmount = utils.parseEther('10')
+      const addLiquidityAmount = utils.parseEther('100')
 
       const approveBobL1TX = await L1ERC20.approve(
         L1LiquidityPool.address,
@@ -758,7 +758,7 @@ describe('Liquidity Pool Test', async () => {
       expect(pauseStatus).to.eq(true)
 
       // check addLiquidity is paused
-      const addLiquidityAmount = utils.parseEther('10')
+      const addLiquidityAmount = utils.parseEther('100')
 
       const approveBobL2TX = await L2ERC20.approve(
         L2LiquidityPool.address,
@@ -785,7 +785,7 @@ describe('Liquidity Pool Test', async () => {
 
   describe('OVM_ETH tests', async () => {
     it('should add L1 liquidity', async () => {
-      const addLiquidityAmount = utils.parseEther('10')
+      const addLiquidityAmount = utils.parseEther('100')
 
       const preL1LPEthBalance = await env.l1Provider.getBalance(L1LiquidityPool.address)
 
@@ -803,7 +803,7 @@ describe('Liquidity Pool Test', async () => {
     })
 
     it('should add L2 liquidity', async () => {
-      const addLiquidityAmount = utils.parseEther('10')
+      const addLiquidityAmount = utils.parseEther('100')
 
       const deposit = env.l1Bridge.depositETH(
         9999999,

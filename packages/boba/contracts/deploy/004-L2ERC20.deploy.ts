@@ -21,7 +21,7 @@ let Proxy__L1LiquidityPool: Contract
 let Proxy__L2LiquidityPool: Contract
 
 //Test ERC20
-const initialSupply_18 = utils.parseEther("10000")
+const initialSupply_18 = utils.parseEther("10000000000")
 const initialSupply_6 = utils.parseUnits("10000",6)
 const initialSupply_BOBA = utils.parseEther("500000000")
 
