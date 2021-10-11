@@ -2076,7 +2076,7 @@ class NetworkService {
     let approvalCost_BN = BigNumber.from('0')
     let balance_BN = BigNumber.from('0')
 
-    const gasPrice = await this.L2Provider.getGasPrice()
+    let gasPrice = await this.L2Provider.getGasPrice()
     console.log("Fast exit gas price", gasPrice.toString())
 
     if( currencyAddress === this.L2_ETH_Address ) {
@@ -2137,13 +2137,16 @@ class NetworkService {
     )
     //console.log("tx2",tx2)
 
-    const despositGas_BN = await this.L2Provider.estimateGas(tx2)
+    let despositGas_BN = await this.L2Provider.estimateGas(tx2)
+    
+    //returns 94082, which is too low?
+    //add 40...
+    //BUG BUG BUG - this should not be needed
+    despositGas_BN = despositGas_BN.add('40')
+
     console.log("Deposit gas", despositGas_BN.toString())
     let depositCost_BN = despositGas_BN.mul(gasPrice)
     console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
-
-    //BUG BUG BUG - this should not be needed
-    depositCost_BN = depositCost_BN.add(utils.parseEther('0.000000001'))
 
     if(currencyAddress === this.L2_ETH_Address) {
       //if fee token, need to consider cost to exit
@@ -2154,7 +2157,6 @@ class NetworkService {
     console.log("Balance:", utils.formatEther(ccBal))
     console.log("Cost to exit:", utils.formatEther(depositCost_BN))
     console.log("Amount to exit:", utils.formatEther(balance_BN))
-
     console.log("Should be zero:", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
 
     const depositTX = await this.L2LPContract.clientDepositL2(
