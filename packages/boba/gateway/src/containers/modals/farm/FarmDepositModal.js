@@ -51,8 +51,9 @@ class FarmDepositModal extends React.Component {
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
       let approvedAllowance = powAmount(10, 50)
       // Set to some very big number
-      // There is no need to query allowance for depositing ETH
-      if (stakeToken.currency !== networkService.L1_ETH_Address) {
+      // There is no need to query allowance for depositing ETH on the L1 or the L2
+      console.log("staketoken",stakeToken)
+      if ( stakeToken.symbol !== 'ETH' ) {
         approvedAllowance = await networkService.checkAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
@@ -119,15 +120,11 @@ class FarmDepositModal extends React.Component {
 
     if (approveTX) {
       this.props.dispatch(openAlert("Amount was approved"))
-      let approvedAllowance = powAmount(10, 50)
-      // There is no need to query allowance for depositing ETH
-      if (stakeToken.currency !== networkService.L1_ETH_Address) {
-        approvedAllowance = await networkService.checkAllowance(
-          stakeToken.currency,
-          stakeToken.LPAddress
-        )
-        approvedAllowance = approvedAllowance.toString()
-      }
+      let approvedAllowance = await networkService.checkAllowance(
+        stakeToken.currency,
+        stakeToken.LPAddress
+      )
+      approvedAllowance = approvedAllowance.toString()
 
       this.setState({ approvedAllowance, loading: false })
     } else {
@@ -171,13 +168,17 @@ class FarmDepositModal extends React.Component {
       loading,
     } = this.state
 
-
     let allowanceGTstake = false
 
     if ( Number(approvedAllowance) > 0 &&
          Number(stakeValue) > 0 &&
          new BN(approvedAllowance).gte(powAmount(stakeValue, stakeToken.decimals))
     ) {
+      allowanceGTstake = true
+    }
+
+    //do not need to approve ETH
+    if ( Number(stakeValue) > 0 && stakeToken.symbol === 'ETH' ) {
       allowanceGTstake = true
     }
 
@@ -207,7 +208,7 @@ class FarmDepositModal extends React.Component {
           />
         </Box>
 
-        {!allowanceGTstake &&
+        {!allowanceGTstake && stakeToken.symbol !== 'ETH' &&
           <>
             {stakeValueValid &&
               <Typography variant="body2" sx={{mt: 2}}>
@@ -240,9 +241,11 @@ class FarmDepositModal extends React.Component {
 
         {(stakeValueValid && allowanceGTstake) &&
           <>
-            <Typography variant="body2" sx={{mt: 2}}>
-              Your allowance has been approved. You can now stake your funds into the pool.
-            </Typography>
+            {stakeToken.symbol !== 'ETH' &&
+              <Typography variant="body2" sx={{mt: 2}}>
+                Your allowance has been approved. You can now stake your funds into the pool.
+              </Typography>
+            }
             <WrapperActionsModal>
               <Button
                 onClick={()=>{this.handleClose()}}

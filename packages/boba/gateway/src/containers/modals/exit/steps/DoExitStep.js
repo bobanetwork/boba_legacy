@@ -54,16 +54,11 @@ function DoExitStep({ handleClose, token }) {
   console.log("maxValue",maxValue) //this is now a float represented as a string
 
   function setAmount(value) {
-    //this function can accomadate strings, numbers, 
+    //this function can accommadate strings, numbers, 
     //and BigNumbers since it's based on "bignumber.js"
-
-    //console.log("setAmount")
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
-
-    //console.log("tooSmall",tooSmall)
-    //console.log("tooBig",tooBig)
 
     if (tooSmall || tooBig) {
       setValidValue(false)
