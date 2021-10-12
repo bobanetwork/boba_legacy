@@ -98,9 +98,9 @@ function DAO() {
                             }}
                         >
                             <div className={styles.info}>
-                                <Typography variant="h3">{balance} Comp</Typography>
+                                <Typography variant="h3">{balance} Boba</Typography>
                                 <Typography variant="h4">Wallet Balance</Typography>
-                                <Typography variant="body2" className={styles.helpText}>To transfer governance tokens to another wallet, select "Transfer".</Typography>
+                                <Typography variant="body2" className={styles.helpText}>To transfer Boba governance tokens to another wallet, select "Transfer".</Typography>
                             </div>
                             <Button
                                 color="primary"
