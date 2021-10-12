@@ -137,9 +137,6 @@ class Farm extends React.Component {
     if (typeof (layer1) === 'undefined') return [0, 0]
     if (typeof (layer2) === 'undefined') return [0, 0]
 
-    console.log("Farm:",layer1)
-    console.log("Farm:",layer2)
-
     if (chain === 'L1') {
       let tokens = Object.entries(layer1)
       for (let i = 0; i < tokens.length; i++) {
@@ -199,8 +196,6 @@ class Farm extends React.Component {
       showMSO,
       dropDownBox,
     } = this.state
-
-    console.log("poolinfo",poolInfo)
 
     const { isMobile } = this.props
 
@@ -347,7 +342,7 @@ class Farm extends React.Component {
             <Box>
               {Object.keys(poolInfo.L1LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L1')
-                console.log("ret L1:",ret)
+                if(showMDO && Number(ret[0]) === 0) return
                 return (
                   <ListFarm
                     key={i}
@@ -357,7 +352,6 @@ class Farm extends React.Component {
                     balance={ret[0]}
                     decimals={ret[1]}
                     isMobile={isMobile}
-                    showAll={!showMDO}
                     showStakes={!showMSO}
                   />
                 )
@@ -368,7 +362,7 @@ class Farm extends React.Component {
             <Box>
               {Object.keys(poolInfo.L2LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L2')
-                console.log("ret L2:",ret)
+                if(showMDO && Number(ret[0]) === 0) return
                 return (
                   <ListFarm
                     key={i}
@@ -378,7 +372,6 @@ class Farm extends React.Component {
                     balance={ret[0]}
                     decimals={ret[1]}
                     isMobile={isMobile}
-                    showAll={!showMDO}
                     showStakes={!showMSO}
                   />
                 )
