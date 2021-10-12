@@ -64,10 +64,10 @@ import L2TokenPoolJson from '../deployment/artifacts-boba/contracts/TokenPool.so
 import AtomicSwapJson  from '../deployment/artifacts-boba/contracts/AtomicSwap.sol/AtomicSwap.json'
 
 // DAO
-import Comp from "../deployment/rinkeby/json/Comp.json"
-import GovernorBravoDelegate from "../deployment/rinkeby/json/GovernorBravoDelegate.json"
-import GovernorBravoDelegator from "../deployment/rinkeby/json/GovernorBravoDelegator.json"
-import Timelock from "../deployment/rinkeby/json/Timelock.json"
+import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json" 
+import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
+import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
+import Timelock from "../deployment/contracts/Timelock.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -153,7 +153,7 @@ class NetworkService {
     this.L2GasLimit = 10000000
 
     // Dao
-    this.comp = null
+    this.boba = null
     this.delegate = null
     this.delegator = null
     this.timelock = null
@@ -299,7 +299,7 @@ class NetworkService {
 
     console.log('NS: initializeAccounts() for', masterSystemConfig)
 
-    let resOMGX = null
+    let resBOBA = null
     let resBase = null
     let addresses = null
 
@@ -310,7 +310,7 @@ class NetworkService {
       if (masterSystemConfig === 'local') {
 
         try {
-          resOMGX = await addressOMGXAxiosInstance('local').get()
+          resBOBA = await addressOMGXAxiosInstance('local').get()
         } catch (error) {
           console.log(error)
         }
@@ -321,8 +321,14 @@ class NetworkService {
           console.log(error)
         }
 
-        if (resOMGX !== null && resBase !== null) {
-          addresses = { ...resBase.data, ...resOMGX.data }
+        if (resBOBA !== null && resBase !== null) {
+          addresses = { 
+            ...resBase.data, 
+            ...resBOBA.data,
+            "DAO_GovernorBravoDelegate": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
+            "DAO_GovernorBravoDelegator": "0x36C02dA8a0983159322a80FFE9F24b1acfF8B570",
+            "DAO_Timelock": "0x9d4454B023096f34B160D6B654540c56A1F81688" 
+          }
         } else {
           addresses = localAddresses //emergency fallback
         }
@@ -586,31 +592,31 @@ class NetworkService {
         },
       })
 
-      if(masterSystemConfig === 'rinkeby') {
+      if( masterSystemConfig === 'rinkeby' || masterSystemConfig === 'local' ) {
 
-        // this.comp = new ethers.Contract(
-        //   addresses.DAO_Comp,
-        //   Comp.abi,
-        //   this.provider.getSigner()
-        // )
+        this.boba = new ethers.Contract(
+          addresses.TOKENS.BOBA.L2,
+          Boba.abi,
+          this.provider.getSigner()
+        )
 
-        // this.delegate = new ethers.Contract(
-        //   addresses.DAO_GovernorBravoDelegate,
-        //   GovernorBravoDelegate.abi,
-        //   this.provider.getSigner()
-        // )
+        this.delegate = new ethers.Contract(
+          addresses.DAO_GovernorBravoDelegate,
+          GovernorBravoDelegate.abi,
+          this.provider.getSigner()
+        )
 
-        // this.delegator = new ethers.Contract(
-        //   addresses.DAO_GovernorBravoDelegator,
-        //   GovernorBravoDelegator.abi,
-        //   this.provider.getSigner()
-        // )
+        this.delegator = new ethers.Contract(
+          addresses.DAO_GovernorBravoDelegator,
+          GovernorBravoDelegator.abi,
+          this.provider.getSigner()
+        )
 
-        // this.timelock = new ethers.Contract(
-        //   addresses.DAO_Timelock,
-        //   Timelock.abi,
-        //   this.provider.getSigner()
-        // )
+        this.timelock = new ethers.Contract(
+          addresses.DAO_Timelock,
+          Timelock.abi,
+          this.provider.getSigner()
+        )
 
       }
 
@@ -2249,10 +2255,11 @@ class NetworkService {
   // get DAO Balance
   async getDaoBalance() {
 
-    if(this.masterSystemConfig !== 'rinkeby' || this.L1orL2 !== 'L2') return
+    if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.L1orL2 !== 'L2' ) return
 
     try {
-      let balance = await this.comp.balanceOf(this.account)
+      let balance = await this.boba.balanceOf(this.account)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: DAO Balance', error)
@@ -2262,9 +2269,12 @@ class NetworkService {
 
   // get DAO Votes
   async getDaoVotes() {
-    if(this.masterSystemConfig !== 'rinkeby' || this.L1orL2 !== 'L2') return
+
+    if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.L1orL2 !== 'L2' ) return
+    
     try {
-      let votes = await this.comp.getCurrentVotes(this.account)
+      let votes = await this.boba.getCurrentVotes(this.account)
       return { votes: formatEther(votes) }
     } catch (error) {
       console.log('Error: DAO Votes', error)
@@ -2275,7 +2285,7 @@ class NetworkService {
   //Transfer DAO Funds
   async transferDao({ recipient, amount }) {
     try {
-      const tx = await this.comp.transfer(recipient, parseEther(amount.toString()))
+      const tx = await this.boba.transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
       return tx
     } catch (error) {
@@ -2287,7 +2297,7 @@ class NetworkService {
   //Delegate DAO Authority
   async delegateVotes({ recipient }) {
     try {
-      const tx = await this.comp.delegate(recipient)
+      const tx = await this.boba.delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
@@ -2297,10 +2307,10 @@ class NetworkService {
   }
 
   // Proposal Create Threshold
-
   async getProposalThreshold() {
 
-    if(this.masterSystemConfig !== 'rinkeby' || this.L1orL2 !== 'L2') return
+    if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.L1orL2 !== 'L2' ) return
 
     try {
       // get the threshold proposal only in case of L2
@@ -2323,7 +2333,6 @@ class NetworkService {
     try {
       const delegateCheck = await this.delegate.attach(this.delegator.address)
 
-      //console.log(":",delegateCheck)
       let address = [delegateCheck.address];
       let values = [0];
       let signatures = !text ? ['_setProposalThreshold(uint256)'] : [''] // the function that will carry out the proposal
@@ -2334,30 +2343,25 @@ class NetworkService {
       )]
       let description = !text ? `# Changing Proposal Threshold to ${votingThreshold} Comp` : text;
 
-      //let setGas = {
-      //  gasPrice: 15000000,
-      //  gasLimit: 8000000
-      //};
-
       let res = await delegateCheck.propose(
         address,
         values,
         signatures,
         calldatas,
-        description//,
-        //setGas
+        description
       )
-      return res;
+      return res
     } catch (error) {
-      console.log(error);
-      throw new Error(error.message);
+      console.log(error)
+      throw new Error(error.message)
     }
   }
 
   //Fetch Proposals
   async fetchProposals() {
 
-    if(this.masterSystemConfig !== 'rinkeby' || this.L1orL2 !== 'L2') return
+    if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.L1orL2 !== 'L2' ) return
 
     const delegateCheck = await this.delegate.attach(this.delegator.address)
 
@@ -2399,7 +2403,6 @@ class NetworkService {
         ]
 
         let state = await delegateCheck.state(proposalID)
-        //console.log("State:", proposalStates[state])
 
         let againstVotes = parseInt(formatEther(proposalData.againstVotes))
         let forVotes = parseInt(formatEther(proposalData.forVotes))
@@ -2411,8 +2414,6 @@ class NetworkService {
         let proposal = await delegateCheck.getActions(i+2)
 
         const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)//delegateCheck.address)
-
-        //console.log("Has voted:", hasVoted)
 
         let description = descriptionList[i].args[8].toString()
 
@@ -2443,17 +2444,11 @@ class NetworkService {
     try {
 
       const delegateCheck = await this.delegate.attach(this.delegator.address);
-      let res = delegateCheck.castVote(id, userVote
-      //,
-      //{
-      //  gasPrice: 15000000,
-      //  gasLimit: 8000000
-      //}
-      )
-      return res;
+      let res = delegateCheck.castVote(id, userVote)
+      return res
     } catch(error) {
-      console.log('Error: cast vote', error);
-      throw new Error(error.message);
+      console.log('Error: cast vote', error)
+      throw new Error(error.message)
     }
   }
 

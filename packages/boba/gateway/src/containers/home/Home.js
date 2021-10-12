@@ -137,10 +137,10 @@ function Home () {
     //dispatch(fetchNFTs())
 
     // get Dao balance / Votes
-    //dispatch(fetchDaoBalance())
-    //dispatch(fetchDaoVotes())
-    //dispatch(fetchDaoProposals())
-    //dispatch(getProposalThreshold())
+    dispatch(fetchDaoBalance())
+    dispatch(fetchDaoVotes())
+    dispatch(fetchDaoProposals())
+    dispatch(getProposalThreshold())
   }, POLL_INTERVAL)
 
   useEffect(() => {
