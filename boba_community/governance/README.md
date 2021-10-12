@@ -57,17 +57,17 @@ In `GovernorBravoDelegate.sol`, modify the `_initiate` function:
 - Delete parameter (`address governorAlpha`) in line 323
 
 ```
-    /**
-      * @notice Initiate the GovernorBravo contract
-      * @dev Admin only. Sets initial proposal id which initiates the contract, ensuring a continuous proposal id count
-      */
-    function _initiate() external {
-        require(msg.sender == admin, "GovernorBravo::_initiate: admin only");
-        require(initialProposalId == 0, "GovernorBravo::_initiate: can only initiate once");
-        proposalCount = 1;
-        initialProposalId = proposalCount;
-        timelock.acceptAdmin();
-    }
+/**
+  * @notice Initiate the GovernorBravo contract
+  * @dev Admin only. Sets initial proposal id which initiates the contract, ensuring a continuous proposal id count
+  */
+function _initiate() external {
+    require(msg.sender == admin, "GovernorBravo::_initiate: admin only");
+    require(initialProposalId == 0, "GovernorBravo::_initiate: can only initiate once");
+    proposalCount = 1;
+    initialProposalId = proposalCount;
+    timelock.acceptAdmin();
+}
 ```
 
 In `GovernorBravoInterfaces.sol`, delete `GovernorAlpha` Interface:
@@ -79,11 +79,18 @@ In `GovernorBravoInterfaces.sol`, delete `GovernorAlpha` Interface:
 - MINIMUM_DELAY in Timelock.sol set to 0 to allow for timely testing
 - MIN_VOTING_PERIOD in GovernorBravoDelegate.sol set to 0 to allow for timely testing
 
+# Deploying on Local-Boba L2 Network and Initiating
+
+**PLEASE BE PATIENT - THIS TAKES A LONG TIME** First, create a `.env` file that follows the structure of `.env.example`. Then, run
+
+```bash
+$ yarn
+$ yarn migrate:local
+```
+
 # Deploying on Rinkeby-Boba Network and Initiating
 
-Instructions or Deploying Compound Governance Protocol on Rinkeby-Boba. 
-**PLEASE BE PATIENT - THIS TAKES A LONG TIME** 
-First create a `.env` file that follows the structure of `.env.example`. Then, run
+**PLEASE BE PATIENT - THIS TAKES A LONG TIME** First create a `.env` file that follows the structure of `.env.example`. Then, run
 
 ```bash
 $ yarn

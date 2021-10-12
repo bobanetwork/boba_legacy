@@ -20,28 +20,31 @@ async function  getTimestamp(){
   return timestamp;
 }
 
-
 module.exports = async function (deployer) {
 
-  const accounts = await web3.eth.getAccounts();
+  const accounts = await web3.eth.getAccounts()
 
   const Comp = artifacts.require('Comp')
   const Timelock = artifacts.require('Timelock')
   const GovernorBravoDelegate = artifacts.require('GovernorBravoDelegate')
   const GovernorBravoDelegator = artifacts.require('GovernorBravoDelegator')
 
-  const user = accounts[0]
+  const admin = accounts[0]
 
   console.log('STARTING HERE')
-  console.log(user)
+  console.log(admin)
   
+  //bobaAddress = '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB'
   // Deploy Comp
-  await deployer.deploy(Comp, user)
+  await deployer.deploy(Comp, admin)
   const comp = await Comp.deployed()
   console.log('deployed comp')
+  const compAddress = comp.address
 
   // Deploy Timelock
-  await deployer.deploy(Timelock, user, 0)
+  //delay = how long the Timelock contract needs to wait before executing a transaction
+  const delay_before_execute_s = 10; //seconds - normally set to 172800 aka 2 days, for example
+  await deployer.deploy(Timelock, admin, delay_before_execute_s)
   const timelock = await Timelock.deployed()
   console.log('deployed timelock')
 
@@ -54,22 +57,23 @@ module.exports = async function (deployer) {
   await deployer.deploy(
     GovernorBravoDelegator,
     timelock.address,
-    comp.address,
+    compAddress,
     timelock.address,
     governorBravoDelegate.address,
-    100, // the duration of the voting period in blocks - these are L1 blocks
-    10,  // the duration of the time between when a proposal is proposed and when the voting period starts
-    ethers.utils.parseEther('100000') // the votes necessary to make a proposal
+    10, // VOTING PERIOD - duration of the voting period in seconds
+    1,  // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
+    ethers.utils.parseEther('100000') // the votes necessary to propose
   )
   const governorBravoDelegator = await GovernorBravoDelegator.deployed()
+  
   console.log('deployed delegator')
 
-  console.log('Saving Contract Addresses')
+  console.log('\nSaving Contract Addresses')
 
   let contracts = {
     DAO_GovernorBravoDelegate: governorBravoDelegate.address,
     DAO_GovernorBravoDelegator: governorBravoDelegator.address,
-    DAO_Comp: comp.address,
+    DAO_Comp: compAddress,
     DAO_Timelock: timelock.address,
   }
 
@@ -86,7 +90,7 @@ module.exports = async function (deployer) {
 
   console.log('Queue setPendingAdmin')
 
-  let eta = (await getTimestamp()) + 300
+  let eta = (await getTimestamp()) + 30
   
   const setPendingAdminData = ethers.utils.defaultAbiCoder.encode( // the parameters for the setPendingAdmin function
     ['address'],
@@ -99,17 +103,17 @@ module.exports = async function (deployer) {
 
   await timelock.queueTransaction(
     timelock.address,
-    0,
+    0, //is the amount of ETH you want to send with an execution to the Timelock
     'setPendingAdmin(address)', // the function to be called
     setPendingAdminData,
-    eta
+    eta // end of voting in unix time
   )
 
   console.log(`Time transaction was made: ${await getTimestamp()}`)
   console.log(`Time at which transaction may be executed: ${eta}`)
-  console.log(`Please be patient and wait for 300 seconds...`)
+  console.log(`Please be patient and wait for 30 seconds...`)
 
-  await sleep(300 * 1000)
+  await sleep(10 * 1000)
 
   for(let i = 0; i < 30; i++){
     
@@ -128,6 +132,7 @@ module.exports = async function (deployer) {
       console.log('\texecuted setPendingAdmin')
       break;
     } catch(error) {
+      console.log(error)
       if(i === 29){
         console.log("\tFailed. Please try again.\n");
         return;
@@ -135,17 +140,18 @@ module.exports = async function (deployer) {
       // console.log(error);
       console.log("\tTransaction hasn't surpassed time lock\n");
     }
-    await sleep(15 * 1000)
+    await sleep(3 * 1000)
   }
 
-  eta = (await getTimestamp()) + 300;
-    var initiateData = ethers.utils.defaultAbiCoder.encode( // parameters to initate the GovernorBravoDelegate contract
+  eta = (await getTimestamp()) + 30;
+  
+  var initiateData = ethers.utils.defaultAbiCoder.encode( // parameters to initate the GovernorBravoDelegate contract
     ['bytes'],
     [[]]
   )
 
   console.log(`Current time: ${await getTimestamp()}`);
-  console.log(`Time at which transaction can be executed: ${(await getTimestamp()) + 300}`);
+  console.log(`Time at which transaction can be executed: ${(await getTimestamp()) + 30}`);
 
   await timelock.queueTransaction(
     governorBravo.address,
@@ -158,28 +164,30 @@ module.exports = async function (deployer) {
   console.log('queued initiate')
   console.log('execute initiate')
     
-  await sleep(300 * 1000)
+  await sleep(20 * 1000)
     
-    for(let i = 0; i < 30; i++ ) {
-        console.log(`Timestamp: ${await getTimestamp()}`);
-        try{
-            await timelock.executeTransaction(
-                governorBravo.address,
-                0,
-                '_initiate()',
-                initiateData,
-                eta
-            )
-            console.log('Executed initiate');
-            break;
-        }catch(error){
-          if(i === 29){
-            console.log("\tFailed. Please try again.\n");
-            return;
-          }
-            // console.log(error)
-            console.log("\tTransaction hasn't surpassed time lock\n");
-        }
-        await sleep(15 * 1000);
+  for(let i = 0; i < 30; i++ ) {
+    
+    console.log(`Timestamp: ${await getTimestamp()}`);
+    
+    try{
+        await timelock.executeTransaction(
+            governorBravo.address,
+            0,
+            '_initiate()',
+            initiateData,
+            eta
+        )
+        console.log('Executed initiate');
+        break;
+    }catch(error){
+      if(i === 29){
+        console.log("\tFailed. Please try again.\n");
+        return;
+      }
+        // console.log(error)
+        console.log("\tTransaction hasn't surpassed time lock\n");
     }
+    await sleep(3 * 1000);
+  }
 }

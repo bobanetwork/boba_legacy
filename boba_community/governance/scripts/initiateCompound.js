@@ -67,8 +67,6 @@ async function main(){
     console.log('queued setPendingAdmin');
     console.log('execute setPendingAdmin');
 
-
-
     await sleep(300 * 1000);
     for(let i = 0; i < 30; i++){
       console.log(`Attempt: ${i + 1}`)
