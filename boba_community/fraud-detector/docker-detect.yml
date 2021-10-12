@@ -1,0 +1,120 @@
+version: "3.4"
+
+x-var: &L1_NODE_WEB3_URL
+  L1_NODE_WEB3_URL=${L1_NODE_WEB3_URL}
+
+x-var: &DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT=${L1_NODE_WEB3_URL}
+
+x-var: &DEPLOYER_HTTP
+  DEPLOYER_HTTP=http://replica.boba.network:8081
+
+x-var: &ADDRESS_MANAGER_ADDRESS
+  ADDRESS_MANAGER_ADDRESS=${ADDRESS_MANAGER_ADDRESS}
+
+x-var: &DATA_TRANSPORT_LAYER__ADDRESS_MANAGER
+  DATA_TRANSPORT_LAYER__ADDRESS_MANAGER=${ADDRESS_MANAGER_ADDRESS}
+
+x-var: &L1_MAINNET_DEPLOYMENT_BLOCK
+  L1_MAINNET_DEPLOYMENT_BLOCK=${L1_MAINNET_DEPLOYMENT_BLOCK}
+
+x-var: &ETH1_CTC_DEPLOYMENT_HEIGHT
+  ETH1_CTC_DEPLOYMENT_HEIGHT=${L1_MAINNET_DEPLOYMENT_BLOCK}
+
+services:
+
+  data_transport_layer:
+    image: omgx/data-transport-layer:rc1.0-surgery
+    environment:
+      - *L1_NODE_WEB3_URL
+      - *DEPLOYER_HTTP
+      - *DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT
+      - *DATA_TRANSPORT_LAYER__ADDRESS_MANAGER
+      - DATA_TRANSPORT_LAYER__SYNC_FROM_L1=true
+      - DATA_TRANSPORT_LAYER__SYNC_FROM_L2=false
+      - DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT=https://replica.boba.network
+      - DATA_TRANSPORT_LAYER__L2_CHAIN_ID=288
+      - DATA_TRANSPORT_LAYER__DB_PATH=/db
+      - DATA_TRANSPORT_LAYER__SERVER_PORT=7878
+      - DATA_TRANSPORT_LAYER__TRANSACTIONS_PER_POLLING_INTERVAL=1000
+      - DATA_TRANSPORT_LAYER__CONFIRMATIONS=4
+      - DATA_TRANSPORT_LAYER__POLLING_INTERVAL=5000
+      - DATA_TRANSPORT_LAYER__LOGS_PER_POLLING_INTERVAL=2000
+      - DATA_TRANSPORT_LAYER__DANGEROUSLY_CATCH_ALL_ERRORS=true
+      - DATA_TRANSPORT_LAYER__SERVER_HOSTNAME=0.0.0.0
+      - URL=http://replica.boba.network:8081/addresses.json
+      - RETRIES=1000
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - 7879:7878
+
+  geth_l2:
+    image: omgx/l2geth:rc1.0
+    environment:
+      - *DEPLOYER_HTTP
+      - *L1_NODE_WEB3_URL
+      - *ETH1_CTC_DEPLOYMENT_HEIGHT
+      - ETH1_SYNC_SERVICE_ENABLE=true
+      - ETH1_CONFIRMATION_DEPTH=0
+      - ROLLUP_CLIENT_HTTP=http://data_transport_layer:7878
+      - ROLLUP_POLL_INTERVAL_FLAG=3s
+      - USING_OVM=true
+      - CHAIN_ID=288
+      - NETWORK_ID=288
+      - DEV=true
+      - DATADIR=/root/.ethereum
+      - RPC_ENABLE=true
+      - RPC_ADDR=geth_l2
+      - RPC_CORS_DOMAIN=*
+      - RPC_VHOSTS=*
+      - RPC_PORT=8545
+      - WS=true
+      - WS_ADDR=0.0.0.0
+      - IPC_DISABLE=true
+      - TARGET_GAS_LIMIT=11000000
+      - RPC_API=eth,net,rollup,web3,txpool,debug,db,personal
+      - WS_API=eth,net,rollup,web3,txpool,debug,db,personal
+      - WS_ORIGINS=*
+      - GASPRICE=0
+      - NO_USB=true
+      - GCMODE=archive
+      - NO_DISCOVER=true
+      - ROLLUP_STATE_DUMP_PATH=https://replica.boba.network:8081/state-dump.latest.json
+      - URL=https://replica.boba.network:8081/addresses.json
+      - ROLLUP_ENABLE_L2_GAS_POLLING=true
+      - ROLLUP_ENFORCE_FEES=true
+      - ETH1_L1_FEE_WALLET_ADDRESS=0xbF159Ba5E5917551c70E377ADf21eD3736209fCE
+      - ROLLUP_GAS_PRICE_ORACLE_OWNER_ADDRESS=0xd86D22c02E301BE7C35e3Ef20962f614cAf32B76
+      - ROLLUP_BACKEND=l1
+      - ROLLUP_VERIFIER_ENABLE=true
+      - RETRIES=1000
+    restart: always
+    entrypoint: sh ./geth.sh
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - 8547:8545
+      - 8548:8546
+
+  fraud_detector:
+    image: omgx/fraud-detector:latest
+    environment:
+      - *L1_NODE_WEB3_URL
+      - *ADDRESS_MANAGER_ADDRESS
+      - *DEPLOYER_HTTP
+      - *L1_MAINNET_DEPLOYMENT_BLOCK
+      - VERIFIER_WEB3_URL=http://geth_l2:8545
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
