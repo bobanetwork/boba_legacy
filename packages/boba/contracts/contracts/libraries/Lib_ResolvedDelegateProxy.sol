@@ -78,7 +78,6 @@ contract Lib_ResolvedDelegateProxy {
         proxyCallIfNotOwner
         external
     {
-        require(addressManager["proxyOwner"] == msg.sender);
         addressManager["proxyOwner"] = _newOwner;
     }
 
