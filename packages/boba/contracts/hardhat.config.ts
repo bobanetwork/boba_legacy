@@ -25,6 +25,20 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
+        version: '0.8.9',
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
+          metadata: {
+            bytecodeHash: 'none',
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
+      },
+      {
         version: '0.8.8',
         settings: {
           optimizer: { enabled: true, runs: 10_000 },
