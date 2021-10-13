@@ -5,10 +5,6 @@ const logger = require('./utilities/logger')
 const configs = require('./utilities/configs')
 
 let l1PoolBalance
-let l1RelayerBalance
-let l1SequencerBalance
-let l1ProposerBalance
-let l1FastRelayerBalance
 let l1BlockNumber
 let l1GasPrice
 let l2PoolBalance
@@ -37,23 +33,20 @@ const logBalance = (provider, blockNumber, networkName) => {
     networkName === configs.OMGXNetwork.L1
       ? [
           provider.getBalance(configs.l1PoolAddress),
-          provider.getBalance(configs.relayerAddress),
-          provider.getBalance(configs.sequencerAddress),
-          provider.getBalance(configs.proposerAddress),
-          provider.getBalance(configs.fastRelayerAddress),
           provider.getGasPrice(),
+          networkName,
         ]
-      : [provider.getBalance(configs.l2PoolAddress), provider.getGasPrice()]
+      : [
+          provider.getBalance(configs.l2PoolAddress),
+          provider.getGasPrice(),
+          networkName,
+        ]
 
   return Promise.all(promiseData)
     .then((values) => {
-      if (values.length === 6) {
+      if (values[2] === configs.OMGXNetwork.L1) {
         l1PoolBalance = convertWeiToEther(values[0])
-        l1RelayerBalance = convertWeiToEther(values[1])
-        l1SequencerBalance = convertWeiToEther(values[2])
-        l1ProposerBalance = convertWeiToEther(values[3])
-        l1FastRelayerBalance = convertWeiToEther(values[4])
-        l1GasPrice = parseFloat(values[5].toString())
+        l1GasPrice = parseFloat(values[1].toString())
         l1BlockNumber = blockNumber
       } else {
         l2PoolBalance = convertWeiToEther(values[0])
@@ -69,10 +62,6 @@ const logBalance = (provider, blockNumber, networkName) => {
           data: {
             poolAddress: configs.l1PoolAddress,
             poolBalance: l1PoolBalance,
-            relayerBalance: l1RelayerBalance,
-            fastRerlayerBalance: l1FastRelayerBalance,
-            sequencerBalance: l1SequencerBalance,
-            proposerBalance: l1ProposerBalance,
             gasPrice: l1GasPrice,
             blockNumber: l1BlockNumber,
           },
@@ -210,13 +199,11 @@ module.exports.validateMonitoring = () => {
     configs.l2WsUrl !== undefined &&
     configs.l1PoolAddress !== undefined &&
     configs.l2PoolAddress !== undefined &&
-    configs.relayerAddress !== undefined &&
-    configs.sequencerAddress !== undefined &&
     configs.monitoringReconnectSecs !== undefined
   )
 }
 
-module.exports.setupProvider = (networkName, url) => {
+const setupProvider = (networkName, url) => {
   const provider = new WebSocketProvider(url)
   provider._websocket.addEventListener('open', onConnected(networkName))
   provider._websocket.addEventListener('error', onError(networkName, provider))
@@ -236,3 +223,5 @@ module.exports.setupProvider = (networkName, url) => {
     })
     .catch()
 }
+
+module.exports.setupProvider = setupProvider
