@@ -1,8 +1,8 @@
 version: "3.4"
 
 services:
-  gas_oracle:
-    image: omg/transaction-monitor:production-v1
+  boba-monitor:
+    image: omg/boba-monitor:production-v1
     environment:
       L1_NODE_WEB3_URL: ${L1_NODE_WEB3_URL}
       L2_NODE_WEB3_URL: ${L2_NODE_WEB3_URL}
@@ -15,3 +15,17 @@ services:
       L2_MESSENGER_ADDRESS: ${L2_MESSENGER_ADDRESS}
       DEPLOYER_PRIVATE_KEY: ${DEPLOYER_PRIVATE_KEY}
       TRANSACTION_MONITOR_INTERVAL: ${TRANSACTION_MONITOR_INTERVAL}
+      L1_NODE_WEB3_WS: ${L1_NODE_WEB3_WS}
+      L2_NODE_WEB3_WS: ${L2_NODE_WEB3_WS}
+      L1_LIQUIDITY_POOL_ADDRESS: ${L1_LIQUIDITY_POOL_ADDRESS}
+      L2_LIQUIDITY_POOL_ADDRESS: ${L2_LIQUIDITY_POOL_ADDRESS}
+      RELAYER_ADDRESS: ${RELAYER_ADDRESS}
+      SEQUENCER_ADDRESS: ${SEQUENCER_ADDRESS}
+      PROPOSER_ADDRESS: ${PROPOSER_ADDRESS}
+      FAST_RELAYER_ADDRESS: ${FAST_RELAYER_ADDRESS}
+      MONITORING_RECONNECT_SECS: ${MONITORING_RECONNECT_SECS}
+      MONITORING_HANG_TIMEOUT_MINS: ${MONITORING_HANG_TIMEOUT_MINS}
+    labels:
+      - "com.datadoghq.tags.env=production"
+      - "com.datadoghq.tags.service=boba-monitor"
+      - "com.datadoghq.tags.version=production-v1"
