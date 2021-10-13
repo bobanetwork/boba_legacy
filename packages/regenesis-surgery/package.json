@@ -11,7 +11,7 @@
     "lint:check": "eslint .",
     "pre-commit": "lint-staged",
     "surgery:v1-to-v2":"ts-node scripts/v1-to-v2-surgery.ts",
-    "surgery:v1-to-v2:test":"ts-node scripts/erc20-verifier.ts"
+    "surgery:v1-to-v2:test":"ts-node scripts/contracts-verifier.ts"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
