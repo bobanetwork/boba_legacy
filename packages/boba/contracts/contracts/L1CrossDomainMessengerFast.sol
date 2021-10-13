@@ -288,7 +288,7 @@ contract L1CrossDomainMessengerFast is
         // Compute the transactionHash
         bytes32 transactionHash = keccak256(
             abi.encode(
-                address(this),
+                AddressAliasHelper.applyL1ToL2Alias(address(this)),
                 Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
                 _oldGasLimit,
                 _message
