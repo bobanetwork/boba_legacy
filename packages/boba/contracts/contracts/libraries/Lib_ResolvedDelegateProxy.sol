@@ -72,11 +72,14 @@ contract Lib_ResolvedDelegateProxy {
     /**
      * Transfer owner
      */
-    function transferProxyOwnership()
+    function transferProxyOwnership(
+        address _newOwner
+    )
         proxyCallIfNotOwner
         external
     {
-        addressManager["proxyOwner"] = msg.sender;
+        require(addressManager["proxyOwner"] == msg.sender);
+        addressManager["proxyOwner"] = _newOwner;
     }
 
     /**
