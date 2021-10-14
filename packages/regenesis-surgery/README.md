@@ -34,8 +34,15 @@ $ yarn surgery:v1-to-v2
 ### Test ERC20s
 
 ```bash
-$ yarn surgery:v1-to-v2:test
+$ yarn surgery:v1-to-v2:boba
 ```
 
 It checks the `decimals()`, `name()`, `symbol()` and `l1Token()` of L2 ERC20s to make sure it is consistent with L1 ERC20s.
 
+### Test Core
+
+```bash
+$ yarn surgery:v1-to-v2:core
+```
+
+It checks the params inside the core contracts.
