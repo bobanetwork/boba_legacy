@@ -205,6 +205,13 @@ module.exports.validateMonitoring = () => {
 
 const setupProvider = (networkName, url) => {
   const provider = new WebSocketProvider(url)
+  if (networkName === configs.OMGXNetwork.L1) {
+    provider.on('debug', (info) => {
+      if (info.action === 'request') {
+        logger.info('ethers', info.request)
+      }
+    })
+  }
   provider._websocket.addEventListener('open', onConnected(networkName))
   provider._websocket.addEventListener('error', onError(networkName, provider))
   provider
