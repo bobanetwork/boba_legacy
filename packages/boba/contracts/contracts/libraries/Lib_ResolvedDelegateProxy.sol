@@ -78,6 +78,10 @@ contract Lib_ResolvedDelegateProxy {
         proxyCallIfNotOwner
         external
     {
+        require(
+            _newOwner != address(0),
+            "New owner cannot be the zero address."
+        );
         addressManager["proxyOwner"] = _newOwner;
     }
 
