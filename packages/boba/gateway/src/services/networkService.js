@@ -305,7 +305,7 @@ class NetworkService {
 
     try {
 
-      console.log('Loading OMGX contract addresses')
+      console.log('Loading BOBA contract addresses')
 
       if (masterSystemConfig === 'local') {
 
@@ -414,17 +414,18 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      this.AddressManager = new ethers.Contract(
-        addresses.AddressManager,
-        AddressManagerJson.abi,
-        this.L1Provider
-      )
-      //console.log("this.AddressManager",this.AddressManager)
+      // this.AddressManager = new ethers.Contract(
+      //   addresses.AddressManager,
+      //   AddressManagerJson.abi,
+      //   this.L1Provider
+      // )
+      // console.log("this.AddressManager",this.AddressManager)
+      // console.log(addresses)
 
-      this.L1MessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
+      this.L1MessengerAddress = addresses.Proxy__L1CrossDomainMessenger
       console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
 
-      this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
+      //this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
       console.log('L2MessengerAddress set to:', this.L2MessengerAddress)
 
       if(addresses.hasOwnProperty('Proxy__L1CrossDomainMessengerFast')) {
@@ -434,24 +435,24 @@ class NetworkService {
         console.log('L1FastMessengerAddress NOT SET')
       }
       
-      //The L1 Standard Bridge 
-      this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
-      console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
+      // //The L1 Standard Bridge 
+      // this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
+      // console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
       
-      this.L1StandardBridgeContract = new ethers.Contract(
-        this.L1StandardBridgeAddress,
-        L1StandardBridgeJson.abi,
-        this.provider.getSigner()
-      )
-      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
+      // this.L1StandardBridgeContract = new ethers.Contract(
+      //   this.L1StandardBridgeAddress,
+      //   L1StandardBridgeJson.abi,
+      //   this.provider.getSigner()
+      // )
+      // console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      // if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
-      //   this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
-      //   console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
-      // }
-      // else {
-      //   console.log('L1StandardBridgeAddress NOT SET')
-      // }
+      if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
+        this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
+        console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
+      }
+      else {
+        console.log('L1StandardBridgeAddress NOT SET')
+      }
 
       if (addresses.hasOwnProperty('TOKENS')) {
         this.tokenAddresses = addresses.TOKENS
