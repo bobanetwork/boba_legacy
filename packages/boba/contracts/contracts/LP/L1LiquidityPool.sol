@@ -210,7 +210,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         relayerMessenger = _l1CrossDomainMessengerFast;
         L2LiquidityPoolAddress = _L2LiquidityPoolAddress;
         owner = msg.sender;
-        configureFee(35, 15);
+        _configureFee(35, 15);
         configureGas(1400000, 2300);
 
         __Context_init_unchained();
@@ -219,19 +219,11 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
     }
 
-    /**
-     * @dev Configure fee of this contract.
-     *
-     * @param _userRewardFeeRate fee rate that users get
-     * @param _ownerRewardFeeRate fee rate that contract owner gets
-     */
-    function configureFee(
+    function _configureFee(
         uint256 _userRewardFeeRate,
         uint256 _ownerRewardFeeRate
     )
-        public
-        onlyOwner()
-        onlyInitialized()
+        internal
     {
         userRewardFeeRate = _userRewardFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
@@ -686,5 +678,22 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         totalFee,
         _tokenAddress
         );
+    }
+
+    /**
+     * @dev Configure fee of this contract. called from L2
+     *
+     * @param _userRewardFeeRate fee rate that users get
+     * @param _ownerRewardFeeRate fee rate that contract owner gets
+     */
+    function configureFee(
+        uint256 _userRewardFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+        external
+        onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
+        onlyInitialized()
+    {
+        _configureFee(_userRewardFeeRate,_ownerRewardFeeRate);
     }
 }
