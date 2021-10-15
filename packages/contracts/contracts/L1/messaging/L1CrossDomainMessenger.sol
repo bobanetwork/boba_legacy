@@ -2,6 +2,7 @@
 pragma solidity ^0.8.8;
 
 /* Library Imports */
+import { AddressAliasHelper } from "../../standards/AddressAliasHelper.sol";
 import { Lib_AddressResolver } from "../../libraries/resolver/Lib_AddressResolver.sol";
 import { Lib_OVMCodec } from "../../libraries/codec/Lib_OVMCodec.sol";
 import { Lib_AddressManager } from "../../libraries/resolver/Lib_AddressManager.sol";
@@ -32,11 +33,11 @@ import { ReentrancyGuardUpgradeable } from
  * Runtime target: EVM
  */
 contract L1CrossDomainMessenger is
-        IL1CrossDomainMessenger,
-        Lib_AddressResolver,
-        OwnableUpgradeable,
-        PausableUpgradeable,
-        ReentrancyGuardUpgradeable
+    IL1CrossDomainMessenger,
+    Lib_AddressResolver,
+    OwnableUpgradeable,
+    PausableUpgradeable,
+    ReentrancyGuardUpgradeable
 {
 
     /**********
@@ -63,6 +64,7 @@ contract L1CrossDomainMessenger is
 
     address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
+
     /***************
      * Constructor *
      ***************/
@@ -75,25 +77,6 @@ contract L1CrossDomainMessenger is
     constructor()
         Lib_AddressResolver(address(0))
     {}
-
-    /**********************
-     * Function Modifiers *
-     **********************/
-
-    /**
-     * Modifier to enforce that, if configured, only the OVM_L2MessageRelayer contract may
-     * successfully call a method.
-     */
-    modifier onlyRelayer() {
-        address relayer = resolve("OVM_L2MessageRelayer");
-        if (relayer != address(0)) {
-            require(
-                msg.sender == relayer,
-                "Only OVM_L2MessageRelayer can relay L2-to-L1 messages."
-            );
-        }
-        _;
-    }
 
 
     /********************
@@ -219,7 +202,6 @@ contract L1CrossDomainMessenger is
     )
         public
         nonReentrant
-        onlyRelayer
         whenNotPaused
     {
         bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
@@ -289,7 +271,8 @@ contract L1CrossDomainMessenger is
         address _sender,
         bytes memory _message,
         uint256 _queueIndex,
-        uint32 _gasLimit
+        uint32 _oldGasLimit,
+        uint32 _newGasLimit
     )
         public
     {
@@ -298,21 +281,7 @@ contract L1CrossDomainMessenger is
         Lib_OVMCodec.QueueElement memory element =
             ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
 
-        // Compute the transactionHash
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                address(this),
-                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _gasLimit,
-                _message
-            )
-        );
-
-        require(
-            transactionHash == element.transactionHash,
-            "Provided message has not been enqueued."
-        );
-
+        // Compute the calldata that was originally used to send the message.
         bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
             _target,
             _sender,
@@ -320,10 +289,27 @@ contract L1CrossDomainMessenger is
             _queueIndex
         );
 
+        // Compute the transactionHash
+        bytes32 transactionHash = keccak256(
+            abi.encode(
+                AddressAliasHelper.applyL1ToL2Alias(address(this)),
+                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
+                _oldGasLimit,
+                xDomainCalldata
+            )
+        );
+
+        // Now check that the provided message data matches the one in the queue element.
+        require(
+            transactionHash == element.transactionHash,
+            "Provided message has not been enqueued."
+        );
+
+        // Send the same message but with the new gas limit.
         _sendXDomainMessage(
             canonicalTransactionChain,
             xDomainCalldata,
-            _gasLimit
+            _newGasLimit
         );
     }
 
