@@ -89,6 +89,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     uint256 private constant SAFE_GAS_STIPEND = 2300;
 
+    address public DAO;
+
     /********************
      *       Event      *
      ********************/
@@ -161,6 +163,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         _;
     }
 
+    modifier onlyDAO() {
+        require(msg.sender == DAO, 'caller is not the DAO');
+        _;
+    }
+
     modifier onlyNotInitialized() {
         require(address(L1LiquidityPoolAddress) == address(0), "Contract has been initialized");
         _;
@@ -186,7 +193,23 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         public
         onlyOwner()
     {
+        require(_newOwner != address(0), 'New owner cannot be the zero address');
         owner = _newOwner;
+    }
+
+    /**
+     * @dev transfer priviledges to DAO
+     *
+     * @param _newDAO new fee setter
+     */
+    function transferDAORole(
+        address _newDAO
+    )
+        public
+        onlyDAO()
+    {
+        require(_newDAO != address(0), 'New DAO address cannot be the zero address');
+        DAO = _newDAO;
     }
 
     /**
@@ -207,6 +230,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         messenger = _l2CrossDomainMessenger;
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
+        DAO = msg.sender;
         configureFee(35, 15);
         configureGas(100000);
 
@@ -226,11 +250,41 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         uint256 _ownerRewardFeeRate
     )
         public
-        onlyOwner()
+        onlyDAO()
         onlyInitialized()
     {
+        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         userRewardFeeRate = _userRewardFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
+    }
+
+    /**
+     * @dev Configure fee of the L1LP contract
+     *
+     * @param _userRewardFeeRate fee rate that users get
+     * @param _ownerRewardFeeRate fee rate that contract owner gets
+     */
+    function configureFeeExits(
+        uint256 _userRewardFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+        external
+        onlyDAO()
+        onlyInitialized()
+    {
+        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
+        bytes memory data = abi.encodeWithSelector(
+            iL1LiquidityPool.configureFee.selector,
+            _userRewardFeeRate,
+            _ownerRewardFeeRate
+        );
+
+        // Send calldata into L1
+        sendCrossDomainMessage(
+            address(L1LiquidityPoolAddress),
+            getFinalizeDepositL1Gas(),
+            data
+        );
     }
 
     /**

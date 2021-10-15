@@ -79,4 +79,10 @@ interface iL1LiquidityPool {
         address _tokenAddress
     )
         external;
+
+    function configureFee(
+        uint256 _userRewardFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+        external;
 }

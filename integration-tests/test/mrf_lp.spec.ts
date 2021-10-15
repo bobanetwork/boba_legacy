@@ -783,6 +783,96 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
+  it('the DAO should be able to configure fee for L2LP', async function () {
+    // admin will be set to the DAO/timelock in the future
+    const poolAdmin = await L2LiquidityPool.DAO()
+
+    // since tests are with deployed contracts
+    if (env.l2Wallet.address === poolAdmin) {
+      const initialUserRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
+      const initialOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+
+      // update fee rate
+      await L2LiquidityPool.configureFee(initialUserRewardFeeRate.add(10), initialOwnerRewardFeeRate.add(10))
+
+      const updatedUserRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
+      const updatedOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+
+      expect(updatedUserRewardFeeRate).to.deep.eq(initialUserRewardFeeRate.add(10))
+      expect(updatedOwnerRewardFeeRate).to.deep.eq(initialOwnerRewardFeeRate.add(10))
+
+      // change to fee back to default
+      await L2LiquidityPool.configureFee(initialUserRewardFeeRate, initialOwnerRewardFeeRate)
+    } else {
+      this.skip()
+    }
+  })
+
+  it('should fail configuring L2LP fee for non DAO', async () => {
+    await expect(
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35,15)
+    ).to.be.revertedWith('caller is not the DAO')
+  })
+
+  it('should fail configuring L2LP fee for incorrect fee rates', async () => {
+    await expect(
+      L2LiquidityPool.configureFee(55,15)
+    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
+  })
+
+  it('the DAO should be able to configure fee for L1LP', async function () {
+    // admin will be set to the DAO timelock in the future
+    const poolAdmin = await L2LiquidityPool.DAO()
+
+    // since tests are with deployed contracts
+    if (env.l2Wallet.address === poolAdmin) {
+      const initialUserRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
+      const initialOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+
+      // update fee rate
+      await env.waitForXDomainTransactionFast(
+        L2LiquidityPool.configureFeeExits(
+          initialUserRewardFeeRate.add(10),
+          initialOwnerRewardFeeRate.add(10)
+        ),
+        Direction.L2ToL1
+      )
+
+      const updatedUserRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
+      const updatedOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+
+      expect(updatedUserRewardFeeRate).to.deep.eq(initialUserRewardFeeRate.add(10))
+      expect(updatedOwnerRewardFeeRate).to.deep.eq(initialOwnerRewardFeeRate.add(10))
+
+      // change to fee back to default
+      await env.waitForXDomainTransactionFast(
+        L2LiquidityPool.configureFeeExits(
+          initialUserRewardFeeRate,
+          initialOwnerRewardFeeRate
+        ),
+        Direction.L2ToL1
+      )
+    } else {
+      this.skip()
+    }
+  })
+
+  it('should fail configuring L1LP fee for non DAO', async () => {
+    await expect(
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35,15)
+    ).to.be.revertedWith('caller is not the DAO')
+
+    await expect(
+      L1LiquidityPool.configureFee(35,15)
+    ).to.be.revertedWith('XCHAIN: messenger contract unauthenticated')
+  })
+
+  it('should fail configuring L1LP fee for incorrect fee rates', async () => {
+    await expect(
+      L2LiquidityPool.configureFeeExits(35,55)
+    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
+  })
+
   describe('OVM_ETH tests', async () => {
     it('should add L1 liquidity', async () => {
       const addLiquidityAmount = utils.parseEther('100')
