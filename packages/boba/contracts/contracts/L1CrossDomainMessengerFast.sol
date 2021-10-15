@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.7.5;
-pragma experimental ABIEncoderV2;
+pragma solidity >0.8.8;
 
 /* Library Imports */
+import { AddressAliasHelper } from "@eth-optimism/contracts/contracts/standards/AddressAliasHelper.sol";
 import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
 import { Lib_OVMCodec } from "@eth-optimism/contracts/contracts/libraries/codec/Lib_OVMCodec.sol";
 import { Lib_AddressManager } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
@@ -10,15 +10,19 @@ import { Lib_SecureMerkleTrie } from "@eth-optimism/contracts/contracts/librarie
 import { Lib_DefaultValues } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_DefaultValues.sol";
 import { Lib_PredeployAddresses } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 import { Lib_CrossDomainUtils } from "@eth-optimism/contracts/contracts/libraries/bridge/Lib_CrossDomainUtils.sol";
+
 /* Interface Imports */
 import { IL1CrossDomainMessenger } from "@eth-optimism/contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
 import { ICanonicalTransactionChain } from "@eth-optimism/contracts/contracts/L1/rollup/ICanonicalTransactionChain.sol";
 import { IStateCommitmentChain } from "@eth-optimism/contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
 
 /* External Imports */
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import { OwnableUpgradeable } from 
+    "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { PausableUpgradeable } from 
+    "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from 
+    "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 /**
  * @title L1CrossDomainMessengerFast
@@ -50,7 +54,6 @@ contract L1CrossDomainMessengerFast is
         bytes32 indexed _xDomainCalldataHash
     );
 
-
     /**********************
      * Contract Variables *
      **********************/
@@ -74,26 +77,6 @@ contract L1CrossDomainMessengerFast is
     constructor()
         Lib_AddressResolver(address(0))
     {}
-
-    /**********************
-     * Function Modifiers *
-     **********************/
-
-    /**
-     * Modifier to enforce that, if configured, only the OVM_L2MessageRelayer contract may
-     * successfully call a method.
-     */
-    modifier onlyRelayer() {
-        address relayer = resolve("OVM_L2MessageRelayer");
-        if (relayer != address(0)) {
-            require(
-                msg.sender == relayer,
-                "Only OVM_L2MessageRelayer can relay L2-to-L1 messages."
-            );
-        }
-        _;
-    }
-
 
     /********************
      * Public Functions *
@@ -120,6 +103,24 @@ contract L1CrossDomainMessengerFast is
         __Ownable_init_unchained();
         __Pausable_init_unchained();
         __ReentrancyGuard_init_unchained();
+    }
+
+    /**
+     * Pause fast exit relays
+     */
+    function pause() 
+        external 
+        onlyOwner() {
+        _pause();
+    }
+
+    /**
+     * UnPause fast exit relays
+     */
+    function unpause() 
+        external 
+        onlyOwner() {
+        _unpause();
     }
 
     /**
@@ -196,7 +197,6 @@ contract L1CrossDomainMessengerFast is
     )
         override
         public
-        onlyRelayer
         nonReentrant
         whenNotPaused
     {
@@ -267,7 +267,8 @@ contract L1CrossDomainMessengerFast is
         address _sender,
         bytes memory _message,
         uint256 _queueIndex,
-        uint32 _gasLimit
+        uint32 _oldGasLimit,
+        uint32 _newGasLimit
     )
         override
         public
@@ -277,12 +278,19 @@ contract L1CrossDomainMessengerFast is
         Lib_OVMCodec.QueueElement memory element =
             ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
 
+        bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
+            _target,
+            _sender,
+            _message,
+            _queueIndex
+        );
+        
         // Compute the transactionHash
         bytes32 transactionHash = keccak256(
             abi.encode(
-                address(this),
+                AddressAliasHelper.applyL1ToL2Alias(address(this)),
                 Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _gasLimit,
+                _oldGasLimit,
                 _message
             )
         );
@@ -292,34 +300,12 @@ contract L1CrossDomainMessengerFast is
             "Provided message has not been enqueued."
         );
 
-        bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
-            _target,
-            _sender,
-            _message,
-            _queueIndex
-        );
-
         _sendXDomainMessage(
             canonicalTransactionChain,
             xDomainCalldata,
-            _gasLimit
+            _newGasLimit
         );
     }
-
-    /**
-     * Pause fast exit relays
-     */
-    function pause() external onlyOwner() {
-        _pause();
-    }
-
-    /**
-     * UnPause fast exit relays
-     */
-    function unpause() external onlyOwner() {
-        _unpause();
-    }
-
 
     /**********************
      * Internal Functions *
