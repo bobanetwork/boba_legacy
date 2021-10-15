@@ -14,11 +14,15 @@
     "@eth-optimism/contracts": "^0.2.4",
     "@eth-optimism/core-utils": "0.3.2",
     "@eth-optimism/watcher": "^0.0.1-alpha.9",
+    "@ethersproject/providers": "5.4.5",
     "async-mutex": "^0.3.1",
     "dotenv": "^9.0.0",
     "ethers": "^5.1.4",
+    "lodash": "4.17.21",
     "mysql": "^2.18.1",
-    "node-fetch": "^3.0.0"
+    "node-fetch": "^3.0.0",
+    "web3": "1.6.0",
+    "winston": "3.3.3"
   },
   "devDependencies": {
     "eslint": "^7.2.0",
