@@ -9,7 +9,10 @@
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint .",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "surgery:v1-to-v2": "ts-node scripts/v1-to-v2-surgery.ts",
+    "surgery:v1-to-v2:boba": "ts-node scripts/boba-contracts-verifier.ts",
+    "surgery:v1-to-v2:core": "ts-node scripts/core-contracts-verifier.ts"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
@@ -21,6 +24,7 @@
     "@discoveryjs/json-ext": "^0.5.3",
     "@eth-optimism/contracts": "^0.4.10",
     "@uniswap/v3-core-optimism": "^1.0.0-rc.0",
+    "chalk": "^4.1.2",
     "dotenv": "^10.0.0",
     "ethers": "^5.4.5"
   }

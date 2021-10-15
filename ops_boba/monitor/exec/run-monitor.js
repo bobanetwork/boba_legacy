@@ -6,6 +6,9 @@ const exitMonitorService = require('../services/exitMonitor');
 const l1BridgeMonitorService = require('../services/l1BridgeMonitor');
 const messageMonitorService = require('../services/messageMonitor');
 const { sleep } = require('@eth-optimism/core-utils');
+const { setupProvider, validateMonitoring } = require('../services/monitoring');
+const logger = require('../services/utilities/logger');
+const configs = require('../services/utilities/configs');
 
 const loop = async (func) => {
   while (true) {
@@ -23,6 +26,16 @@ const loop = async (func) => {
 }
 
 const main = async () => {
+  if (validateMonitoring()) {
+    logger.info('Start addresses monitoring service!')
+    setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl)
+    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
+  } else {
+    logger.error(
+      'Addresses Monitoring: Env variables for monitoring is missing!'
+    )
+  }
+
   // l1 message monitor
   const messageService = new messageMonitorService();
   await messageService.initConnection();

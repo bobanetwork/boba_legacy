@@ -15,6 +15,7 @@ const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPoo
 const L2LiquidityPoolJson = require('../../artifacts-ovm/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
 const OVM_L1StandardBridgeJson = require('../../artifacts/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json')
 const OVM_L2StandardBridgeJson = require('../../artifacts-ovm/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json')
+const logger = require('./utilities/logger')
 
 require('dotenv').config()
 const env = process.env
@@ -85,6 +86,11 @@ class OptimismEnv {
     this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
       L1_NODE_WEB3_URL
     )
+    this.L1Provider.on('debug', (info) => {
+      if (info.action === 'request') {
+        logger.info('ethers', info.request)
+      }
+    })
     this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
       L2_NODE_WEB3_URL
     )
