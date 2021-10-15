@@ -579,7 +579,7 @@ func TestSyncServiceMinL2GasPrice(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Sanity check the L2 gas limit
-	if tx.L2Gas() > service.minL2GasLimit.Uint64() {
+	if tx.Gas() > service.minL2GasLimit.Uint64() {
 		t.Fatal("L2 gas limit expected to be smaller than min accepted by sequencer")
 	}
 	// Verify the fee of the signed tx, ensure it does not error

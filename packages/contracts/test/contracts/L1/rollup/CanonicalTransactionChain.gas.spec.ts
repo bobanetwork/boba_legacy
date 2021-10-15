@@ -41,18 +41,6 @@ const appendSequencerBatch = async (
   })
 }
 
-const printGasSavings = (gasUsed: number, regenesis040Cost: number): void => {
-  console.log('    - Gas used:', gasUsed)
-  console.log(
-    '    - Absolute savings vs regenesis/0.4.0:',
-    regenesis040Cost - gasUsed
-  )
-  console.log(
-    '    - Relative savings vs regenesis/0.4.0:',
-    (((regenesis040Cost - gasUsed) / regenesis040Cost) * 100).toFixed(2) + '%'
-  )
-}
-
 describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
   let sequencer: Signer
   before(async () => {
@@ -163,7 +151,6 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      printGasSavings(gasUsed, 1_616_390)
 
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
@@ -171,10 +158,10 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
         (gasUsed - fixedCalldataCost) / numTxs
       )
       expectApprox(gasUsed, 1_422_181, {
-        upperPercentDeviation: 0,
+        absoluteUpperDeviation: 1000,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!
-        lowerPercentDeviation: 1,
+        percentLowerDeviation: 1,
       })
     }).timeout(10_000_000)
 
@@ -211,18 +198,17 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      printGasSavings(gasUsed, 1_632_687)
 
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
         'Non-calldata overhead gas cost per transaction:',
         (gasUsed - fixedCalldataCost) / numTxs
       )
-      expectApprox(gasUsed, 1_632_687, {
-        upperPercentDeviation: 0,
+      expectApprox(gasUsed, 1_619_781, {
+        absoluteUpperDeviation: 1000,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!
-        lowerPercentDeviation: 1,
+        percentLowerDeviation: 1,
       })
     }).timeout(10_000_000)
 
@@ -269,29 +255,33 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      printGasSavings(gasUsed, 2_099_387)
 
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
         'Non-calldata overhead gas cost per transaction:',
         (gasUsed - fixedCalldataCost) / numTxs
       )
-      expectApprox(gasUsed, 1_293_611, { upperPercentDeviation: 0 })
+      expectApprox(gasUsed, 891_158, {
+        absoluteUpperDeviation: 1000,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     }).timeout(10_000_000)
   })
 
   describe('enqueue [ @skip-on-coverage ]', () => {
-    let ENQUEUE_L2_GAS_PREPAID
+    let enqueueL2GasPrepaid
     let data
     beforeEach(async () => {
       CanonicalTransactionChain = CanonicalTransactionChain.connect(sequencer)
-      ENQUEUE_L2_GAS_PREPAID =
-        await CanonicalTransactionChain.ENQUEUE_L2_GAS_PREPAID()
+      enqueueL2GasPrepaid =
+        await CanonicalTransactionChain.enqueueL2GasPrepaid()
       data = '0x' + '12'.repeat(1234)
     })
 
     it('cost to enqueue a transaction above the prepaid threshold', async () => {
-      const l2GasLimit = 2 * ENQUEUE_L2_GAS_PREPAID
+      const l2GasLimit = 2 * enqueueL2GasPrepaid
 
       const res = await CanonicalTransactionChain.enqueue(
         NON_ZERO_ADDRESS,
@@ -302,18 +292,17 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', gasUsed)
 
-      expectApprox(gasUsed, 219_896, {
-        upperPercentDeviation: 0,
+      expectApprox(gasUsed, 189_487, {
+        absoluteUpperDeviation: 500,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!
-        lowerPercentDeviation: 1,
+        percentLowerDeviation: 1,
       })
     })
 
     it('cost to enqueue a transaction below the prepaid threshold', async () => {
-      const l2GasLimit = ENQUEUE_L2_GAS_PREPAID - 1
+      const l2GasLimit = enqueueL2GasPrepaid - 1
 
       const res = await CanonicalTransactionChain.enqueue(
         NON_ZERO_ADDRESS,
@@ -324,13 +313,12 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', gasUsed)
 
-      expectApprox(gasUsed, 158_709, {
-        upperPercentDeviation: 0,
+      expectApprox(gasUsed, 127_500, {
+        absoluteUpperDeviation: 500,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!
-        lowerPercentDeviation: 1,
+        percentLowerDeviation: 1,
       })
     })
   })

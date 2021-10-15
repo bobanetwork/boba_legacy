@@ -1,4 +1,6 @@
 /* External Imports */
+import { promisify } from 'util'
+import { exec } from 'child_process'
 import {
   computeStorageSlots,
   getStorageLayout,
@@ -79,12 +81,31 @@ export const makeL2GenesisFile = async (
       _symbol: 'ETH',
     },
     L2CrossDomainMessenger: {
-      _status: 1,
+      // We default the xDomainMsgSender to this value to save gas.
+      // See usage of this default in the L2CrossDomainMessenger contract.
+      xDomainMsgSender: '0x000000000000000000000000000000000000dEaD',
       l1CrossDomainMessenger: cfg.l1CrossDomainMessengerAddress,
+      // Set the messageNonce to a high value to avoid overwriting old sent messages.
+      messageNonce: 100000,
+    },
+    WETH9: {
+      name: 'Wrapped Ether',
+      symbol: 'WETH',
+      decimals: 18,
     },
   }
 
   const dump = {}
+  // Add the precompiles. Only safe for up to 9
+  for (let i = 1; i <= 9; i++) {
+    const addr = `0x000000000000000000000000000000000000000${i}`
+    if (addr.length !== 42) {
+      throw new Error(`Address length incorrect: ${addr.length}`)
+    }
+    dump[addr] = {
+      balance: '01',
+    }
+  }
   for (const predeployName of Object.keys(predeploys)) {
     const predeployAddress = predeploys[predeployName]
     dump[predeployAddress] = {
@@ -92,14 +113,11 @@ export const makeL2GenesisFile = async (
       storage: {},
     }
 
-    if (predeployName === 'OVM_L1MessageSender') {
-      // OVM_L1MessageSender is a special case where we just inject a specific bytecode string.
-      // We do this because it uses the custom L1MESSAGESENDER opcode (0x4A) which cannot be
-      // directly used in Solidity (yet). This bytecode string simply executes the 0x4A opcode
+    if (predeployName === 'OVM_L1BlockNumber') {
+      // OVM_L1BlockNumber is a special case where we just inject a specific bytecode string.
+      // We do this because it uses the custom L1BLOCKNUMBER opcode (0x4B) which cannot be
+      // directly used in Solidity (yet). This bytecode string simply executes the 0x4B opcode
       // and returns the address given by that opcode.
-      dump[predeployAddress].code = '0x4A60005260206000F3'
-    } else if (predeployName === 'OVM_L1BlockNumber') {
-      // Same as above but for OVM_L1BlockNumber (0x4B).
       dump[predeployAddress].code = '0x4B60005260206000F3'
     } else {
       const artifact = getContractArtifact(predeployName)
@@ -116,7 +134,18 @@ export const makeL2GenesisFile = async (
     }
   }
 
+  // Grab the commit hash so we can stick it in the genesis file.
+  let commit: string
+  try {
+    const { stdout } = await promisify(exec)('git rev-parse HEAD')
+    commit = stdout.replace('\n', '')
+  } catch {
+    console.log('unable to get commit hash, using empty hash instead')
+    commit = '0000000000000000000000000000000000000000'
+  }
+
   return {
+    commit,
     config: {
       chainId: cfg.l2ChainId,
       homesteadBlock: 0,

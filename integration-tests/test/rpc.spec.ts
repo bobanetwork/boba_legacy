@@ -240,6 +240,7 @@ describe('Basic RPC tests', () => {
     it('includes L1 gas price and L1 gas used', async () => {
       const tx = await env.l2Wallet.populateTransaction({
         to: env.l2Wallet.address,
+        gasPrice: 20000000,
       })
 
       const raw = serialize({
@@ -379,7 +380,7 @@ describe('Basic RPC tests', () => {
         value: 0,
       })
       // Expect gas to be less than or equal to the target plus 1%
-      expectApprox(estimate, 21000, { upperPercentDeviation: 1 })
+      expectApprox(estimate, 21000, { percentUpperDeviation: 1 })
     })
 
     it('should fail for a reverting call transaction', async () => {

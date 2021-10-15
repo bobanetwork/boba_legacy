@@ -29,3 +29,7 @@ packages/boba/gas-price-oracle/data
 
 # boba_examples
 boba_examples/init-fund-l2/yarn.lock
+
+# regensis
+packages/regenesis-surgery/deployment
+packages/regenesis-surgery/state-dump
