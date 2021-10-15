@@ -1,11 +1,11 @@
-## Front End Development
+## Gateway Development
 
-- [Front End Development](#front-end-development)
-  * [1. Starting a local L1/L2](#1-starting-a-local-l1-l2)
+- [Gateway Development](#gateway-development)
+  * [1. Start a local L1/L2](#1-start-a-local-l1-l2)
   * [2. Initial state of preconfigured accounts](#2-initial-state-of-preconfigured-accounts)
-  * [3. Advanced configuration of test accounts](#3-advanced-configuration-of-test-accounts)
-  * [4. Test accounts for the swap on/off and the liquidity pools](#4-test-accounts-for-the-swap-on-off-and-the-liquidity-pools)
-  * [5. Starting the react app](#5-starting-the-react-app)
+  * [3. Starting the React App](#3-starting-the-react-app)
+  * [4. Metamask Configuration](#4-metamask-configuration)
+  * [5. Developing on other Chains, such as Rinkeby](#5-developing-on-other-chains--such-as-rinkeby)
 
 ### 1. Start a local L1/L2
 
@@ -64,7 +64,7 @@ Then run
 $ yarn start
 ```
 
-and the frontend should start up in a local browser (at localhost:3000). When you use the `Deployer` account (address ending in `2266`, see above for PK) then your gateway will start out with many tokens of various kinds. 
+and the gateway should start up in a local browser (at localhost:3000). When you use the `Deployer` account (address ending in `2266`, see above for PK) then your gateway will start out with many tokens of various kinds. 
 
 ### 4. Metamask Configuration
 
