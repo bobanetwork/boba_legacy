@@ -89,7 +89,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     uint256 private constant SAFE_GAS_STIPEND = 2300;
 
-    address public admin;
+    address public DAO;
 
     /********************
      *       Event      *
@@ -163,8 +163,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         _;
     }
 
-    modifier onlyAdmin() {
-        require(msg.sender == admin, 'caller is not the admin');
+    modifier onlyDAO() {
+        require(msg.sender == DAO, 'caller is not the DAO');
         _;
     }
 
@@ -198,18 +198,18 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /**
-     * @dev transfer admin priviledges to new address
+     * @dev transfer priviledges to DAO
      *
-     * @param _newAdmin new admin of this contract
+     * @param _newDAO new fee setter
      */
-    function transferAdminRole(
-        address _newAdmin
+    function transferDAORole(
+        address _newDAO
     )
         public
-        onlyAdmin()
+        onlyDAO()
     {
-        require(_newAdmin != address(0), 'New admin cannot be the zero address');
-        admin = _newAdmin;
+        require(_newDAO != address(0), 'New DAO address cannot be the zero address');
+        DAO = _newDAO;
     }
 
     /**
@@ -230,7 +230,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         messenger = _l2CrossDomainMessenger;
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
-        admin = msg.sender;
+        DAO = msg.sender;
         configureFee(35, 15);
         configureGas(100000);
 
@@ -250,7 +250,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         uint256 _ownerRewardFeeRate
     )
         public
-        onlyAdmin()
+        onlyDAO()
         onlyInitialized()
     {
         userRewardFeeRate = _userRewardFeeRate;
@@ -268,7 +268,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         uint256 _ownerRewardFeeRate
     )
         external
-        onlyAdmin()
+        onlyDAO()
         onlyInitialized()
     {
         bytes memory data = abi.encodeWithSelector(
