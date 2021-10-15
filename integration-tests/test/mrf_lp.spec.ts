@@ -814,6 +814,12 @@ describe('Liquidity Pool Test', async () => {
     ).to.be.revertedWith('caller is not the DAO')
   })
 
+  it('should fail configuring L2LP fee for incorrect fee rates', async () => {
+    await expect(
+      L2LiquidityPool.configureFee(55,15)
+    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
+  })
+
   it('the DAO should be able to configure fee for L1LP', async function () {
     // admin will be set to the DAO timelock in the future
     const poolAdmin = await L2LiquidityPool.DAO()
@@ -859,6 +865,12 @@ describe('Liquidity Pool Test', async () => {
     await expect(
       L1LiquidityPool.configureFee(35,15)
     ).to.be.revertedWith('XCHAIN: messenger contract unauthenticated')
+  })
+
+  it('should fail configuring L1LP fee for incorrect fee rates', async () => {
+    await expect(
+      L2LiquidityPool.configureFeeExits(35,55)
+    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
   })
 
   describe('OVM_ETH tests', async () => {

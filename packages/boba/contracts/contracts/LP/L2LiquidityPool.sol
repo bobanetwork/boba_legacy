@@ -253,6 +253,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyDAO()
         onlyInitialized()
     {
+        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         userRewardFeeRate = _userRewardFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
     }
@@ -271,6 +272,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyDAO()
         onlyInitialized()
     {
+        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         bytes memory data = abi.encodeWithSelector(
             iL1LiquidityPool.configureFee.selector,
             _userRewardFeeRate,
