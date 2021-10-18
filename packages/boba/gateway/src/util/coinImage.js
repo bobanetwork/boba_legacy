@@ -14,7 +14,7 @@ import uniLogo from 'images/uni.png';
 import omgLogo from 'images/omg.png';
 import fraxLogo from 'images/frax.png';
 import fxsLogo from 'images/fxs.svg';
-import bobaLogo from 'images/boba.png';
+import bobaLogo from 'images/boba-token-glow.png';
 
 export const getCoinImage = (symbol) => {
   
