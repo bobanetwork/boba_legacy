@@ -13,7 +13,11 @@
     "build:contracts": "hardhat compile",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "postinstall": "patch-package",
-    "clean": "rm -rf ./dist ./artifacts ./artifacts-ovm ./cache ./cache-ovm ./tsconfig.build.tsbuildinfo"
+    "clean": "rm -rf ./dist ./artifacts ./artifacts-ovm ./cache ./cache-ovm ./tsconfig.build.tsbuildinfo",
+    "lint": "yarn lint:check",
+    "lint:check": "eslint . --ext js,jsx,ts,tsx",
+    "lint:fix": "yarn lint:check --fix",
+    "lint:contracts": "yarn solhint -f table contracts/**/*.sol"
   },
   "devDependencies": {
     "@eth-optimism/core-utils": "^0.5.1",
@@ -35,6 +39,8 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "@eth-optimism/contracts": "^0.4.13",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "4.3.2",
     "chalk": "^4.1.1",
     "dotenv": "^8.2.0",

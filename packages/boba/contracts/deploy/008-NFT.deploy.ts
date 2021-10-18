@@ -29,7 +29,7 @@ const deployFn: DeployFunction = async (hre) => {
     BigNumber.from(String(0)), //starting index for the tokenIDs
     '0x0000000000000000000000000000000000000000',
     'Genesis',
-    'BOBA_Rinkeby_28',
+    'BOBA_Rinkeby_28'
   )
   await L2ERC721.deployTransaction.wait()
   console.log(

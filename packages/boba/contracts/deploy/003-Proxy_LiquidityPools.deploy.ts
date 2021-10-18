@@ -33,9 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
   const L2LiquidityPool = await (hre as any).deployments.get('L2LiquidityPool')
   const L1CrossDomainMessengerFastAddress = await (
     hre as any
-  ).deployConfig.addressManager.getAddress(
-    'Proxy__L1CrossDomainMessengerFast'
-  )
+  ).deployConfig.addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
 
   Proxy__L1LiquidityPool = await Factory__Proxy__L1LiquidityPool.deploy(
     L1LiquidityPool.address

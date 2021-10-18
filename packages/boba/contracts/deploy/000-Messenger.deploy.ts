@@ -3,6 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import chalk from 'chalk'
 
+/* eslint-disable */
 require('dotenv').config()
 
 import L1_MessengerJson from '../artifacts/contracts/L1CrossDomainMessengerFast.sol/L1CrossDomainMessengerFast.json'

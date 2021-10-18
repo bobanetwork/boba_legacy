@@ -35,8 +35,15 @@ const deployFn: DeployFunction = async (hre) => {
     address: L2LiquidityPool.address,
     abi: L1LiquidityPoolJson.abi,
   }
-  await hre.deployments.save('L2LiquidityPool',L2LiquidityPoolDeploymentSubmission)
-  console.log(`🌕 ${chalk.red('L2LiquidityPool deployed to:')} ${chalk.green(L2LiquidityPool.address)}`)
+  await hre.deployments.save(
+    'L2LiquidityPool',
+    L2LiquidityPoolDeploymentSubmission
+  )
+  console.log(
+    `🌕 ${chalk.red('L2LiquidityPool deployed to:')} ${chalk.green(
+      L2LiquidityPool.address
+    )}`
+  )
 
   // const L1CrossDomainMessengerFastAddress = await (hre as any).deployConfig.addressManager.getAddress(
   //   'Proxy__L1CrossDomainMessengerFast'

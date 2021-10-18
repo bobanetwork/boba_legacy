@@ -1,12 +1,12 @@
 import { Wallet, providers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 
+/* eslint-disable */
 require('dotenv').config()
 
 import hre from 'hardhat'
 
 const main = async () => {
-
   console.log('Starting BOBA core contracts deployment...')
 
   //const config = parseEnv()
@@ -23,7 +23,10 @@ const main = async () => {
   const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY, l1Provider)
   const relayerAddress = relayer.address
 
-  const fastRelayer = new Wallet(process.env.FAST_RELAYER_PRIVATE_KEY, l1Provider)
+  const fastRelayer = new Wallet(
+    process.env.FAST_RELAYER_PRIVATE_KEY,
+    l1Provider
+  )
   const fastRelayerAddress = fastRelayer.address
 
   const getAddressManager = (provider: any, addressManagerAddress: any) => {
@@ -32,8 +35,13 @@ const main = async () => {
       .attach(addressManagerAddress) as any
   }
 
-  console.log(`ADDRESS_MANAGER_ADDRESS was set to ${process.env.ADDRESS_MANAGER_ADDRESS}`)
-  const addressManager = getAddressManager(deployer_l1, process.env.ADDRESS_MANAGER_ADDRESS);
+  console.log(
+    `ADDRESS_MANAGER_ADDRESS was set to ${process.env.ADDRESS_MANAGER_ADDRESS}`
+  )
+  const addressManager = getAddressManager(
+    deployer_l1,
+    process.env.ADDRESS_MANAGER_ADDRESS
+  )
 
   const l1MessengerAddress = await addressManager.getAddress(
     'Proxy__L1CrossDomainMessenger'
@@ -66,7 +74,6 @@ const main = async () => {
     fastRelayerAddress,
     //noCompile: process.env.NO_COMPILE ? true : false, //not clear how/where this is connected
   })
-
 }
 
 main()
