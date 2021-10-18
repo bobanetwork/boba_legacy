@@ -790,19 +790,31 @@ describe('Liquidity Pool Test', async () => {
     // since tests are with deployed contracts
     if (env.l2Wallet.address === poolAdmin) {
       const initialUserRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
-      const initialOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+      const initialOwnerRewardFeeRate =
+        await L2LiquidityPool.ownerRewardFeeRate()
 
       // update fee rate
-      await L2LiquidityPool.configureFee(initialUserRewardFeeRate.add(10), initialOwnerRewardFeeRate.add(10))
+      await L2LiquidityPool.configureFee(
+        initialUserRewardFeeRate.add(10),
+        initialOwnerRewardFeeRate.add(10)
+      )
 
       const updatedUserRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
-      const updatedOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+      const updatedOwnerRewardFeeRate =
+        await L2LiquidityPool.ownerRewardFeeRate()
 
-      expect(updatedUserRewardFeeRate).to.deep.eq(initialUserRewardFeeRate.add(10))
-      expect(updatedOwnerRewardFeeRate).to.deep.eq(initialOwnerRewardFeeRate.add(10))
+      expect(updatedUserRewardFeeRate).to.deep.eq(
+        initialUserRewardFeeRate.add(10)
+      )
+      expect(updatedOwnerRewardFeeRate).to.deep.eq(
+        initialOwnerRewardFeeRate.add(10)
+      )
 
       // change to fee back to default
-      await L2LiquidityPool.configureFee(initialUserRewardFeeRate, initialOwnerRewardFeeRate)
+      await L2LiquidityPool.configureFee(
+        initialUserRewardFeeRate,
+        initialOwnerRewardFeeRate
+      )
     } else {
       this.skip()
     }
@@ -810,14 +822,14 @@ describe('Liquidity Pool Test', async () => {
 
   it('should fail configuring L2LP fee for non DAO', async () => {
     await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35,15)
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35, 15)
     ).to.be.revertedWith('caller is not the DAO')
   })
 
   it('should fail configuring L2LP fee for incorrect fee rates', async () => {
-    await expect(
-      L2LiquidityPool.configureFee(55,15)
-    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
+    await expect(L2LiquidityPool.configureFee(55, 15)).to.be.revertedWith(
+      'user and owner fee rates should be lower than 5 percent each'
+    )
   })
 
   it('the DAO should be able to configure fee for L1LP', async function () {
@@ -827,7 +839,8 @@ describe('Liquidity Pool Test', async () => {
     // since tests are with deployed contracts
     if (env.l2Wallet.address === poolAdmin) {
       const initialUserRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
-      const initialOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+      const initialOwnerRewardFeeRate =
+        await L1LiquidityPool.ownerRewardFeeRate()
 
       // update fee rate
       await env.waitForXDomainTransactionFast(
@@ -839,10 +852,15 @@ describe('Liquidity Pool Test', async () => {
       )
 
       const updatedUserRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
-      const updatedOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+      const updatedOwnerRewardFeeRate =
+        await L1LiquidityPool.ownerRewardFeeRate()
 
-      expect(updatedUserRewardFeeRate).to.deep.eq(initialUserRewardFeeRate.add(10))
-      expect(updatedOwnerRewardFeeRate).to.deep.eq(initialOwnerRewardFeeRate.add(10))
+      expect(updatedUserRewardFeeRate).to.deep.eq(
+        initialUserRewardFeeRate.add(10)
+      )
+      expect(updatedOwnerRewardFeeRate).to.deep.eq(
+        initialOwnerRewardFeeRate.add(10)
+      )
 
       // change to fee back to default
       await env.waitForXDomainTransactionFast(
@@ -859,25 +877,27 @@ describe('Liquidity Pool Test', async () => {
 
   it('should fail configuring L1LP fee for non DAO', async () => {
     await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35,15)
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35, 15)
     ).to.be.revertedWith('caller is not the DAO')
 
-    await expect(
-      L1LiquidityPool.configureFee(35,15)
-    ).to.be.revertedWith('XCHAIN: messenger contract unauthenticated')
+    await expect(L1LiquidityPool.configureFee(35, 15)).to.be.revertedWith(
+      'XCHAIN: messenger contract unauthenticated'
+    )
   })
 
   it('should fail configuring L1LP fee for incorrect fee rates', async () => {
-    await expect(
-      L2LiquidityPool.configureFeeExits(35,55)
-    ).to.be.revertedWith('user and owner fee rates should be lower than 5 percent each')
+    await expect(L2LiquidityPool.configureFeeExits(35, 55)).to.be.revertedWith(
+      'user and owner fee rates should be lower than 5 percent each'
+    )
   })
 
   describe('OVM_ETH tests', async () => {
     it('should add L1 liquidity', async () => {
       const addLiquidityAmount = utils.parseEther('100')
 
-      const preL1LPEthBalance = await env.l1Provider.getBalance(L1LiquidityPool.address)
+      const preL1LPEthBalance = await env.l1Provider.getBalance(
+        L1LiquidityPool.address
+      )
 
       const BobAddLiquidity = await L1LiquidityPool.addLiquidity(
         addLiquidityAmount,
@@ -887,9 +907,13 @@ describe('Liquidity Pool Test', async () => {
       await BobAddLiquidity.wait()
 
       // Pool Balance
-      const postL1LPEthBalance = await env.l1Provider.getBalance(L1LiquidityPool.address)
+      const postL1LPEthBalance = await env.l1Provider.getBalance(
+        L1LiquidityPool.address
+      )
 
-      expect(postL1LPEthBalance).to.deep.eq(preL1LPEthBalance.add(addLiquidityAmount))
+      expect(postL1LPEthBalance).to.deep.eq(
+        preL1LPEthBalance.add(addLiquidityAmount)
+      )
     })
 
     it('should add L2 liquidity', async () => {
@@ -906,7 +930,9 @@ describe('Liquidity Pool Test', async () => {
         env.ovmEth.address,
         env.l2Wallet.address
       )
-      const preL2LPEthBalance = await env.l2Provider.getBalance(L2LiquidityPool.address)
+      const preL2LPEthBalance = await env.l2Provider.getBalance(
+        L2LiquidityPool.address
+      )
 
       const BobAddLiquidity = await L2LiquidityPool.addLiquidity(
         addLiquidityAmount,
@@ -925,12 +951,18 @@ describe('Liquidity Pool Test', async () => {
         env.l2Wallet.address
       )
 
-      expect(postBobPoolAmount.amount).to.deep.eq(preBobPoolAmount.amount.add(addLiquidityAmount))
+      expect(postBobPoolAmount.amount).to.deep.eq(
+        preBobPoolAmount.amount.add(addLiquidityAmount)
+      )
 
       // Pool Balance
-      const postL2LPEthBalance = await env.l2Provider.getBalance(L2LiquidityPool.address)
+      const postL2LPEthBalance = await env.l2Provider.getBalance(
+        L2LiquidityPool.address
+      )
 
-      expect(postL2LPEthBalance).to.deep.eq(preL2LPEthBalance.add(addLiquidityAmount))
+      expect(postL2LPEthBalance).to.deep.eq(
+        preL2LPEthBalance.add(addLiquidityAmount)
+      )
     })
 
     it('should fast exit L2', async () => {
@@ -955,7 +987,9 @@ describe('Liquidity Pool Test', async () => {
 
       // Update the user reward per share
       const updateRewardPerShareTX =
-        await L1LiquidityPool.updateUserRewardPerShare(ethers.constants.AddressZero)
+        await L1LiquidityPool.updateUserRewardPerShare(
+          ethers.constants.AddressZero
+        )
       await updateRewardPerShareTX.wait()
 
       // check event ClientDepositL2 is emitted
@@ -1114,9 +1148,13 @@ describe('Liquidity Pool Test', async () => {
       const swapOnAmount = requestedLiquidity.mul(100).div(95)
 
       await env.waitForRevertXDomainTransaction(
-        L1LiquidityPool.clientDepositL1(swapOnAmount, ethers.constants.AddressZero, {
-          value: swapOnAmount,
-        }),
+        L1LiquidityPool.clientDepositL1(
+          swapOnAmount,
+          ethers.constants.AddressZero,
+          {
+            value: swapOnAmount,
+          }
+        ),
         Direction.L1ToL2
       )
 

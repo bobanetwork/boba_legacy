@@ -2,8 +2,8 @@
 import { Contract, ethers, Wallet, BigNumber, providers, Signer } from 'ethers'
 import * as rlp from 'rlp'
 import { MerkleTree } from 'merkletreejs'
-import fetch from 'node-fetch';
-import * as ynatm from '@eth-optimism/ynatm';
+import fetch from 'node-fetch'
+import * as ynatm from '@eth-optimism/ynatm'
 
 /* Imports: Internal */
 import { fromHexString, sleep } from '@eth-optimism/core-utils'
@@ -14,7 +14,12 @@ import {
   loadContractFromManager,
   predeploys,
 } from '@eth-optimism/contracts'
-import { StateRootBatchHeader, SentMessage, SentMessageProof, BatchMessage } from './types'
+import {
+  StateRootBatchHeader,
+  SentMessage,
+  SentMessageProof,
+  BatchMessage,
+} from './types'
 
 interface MessageRelayerOptions {
   // Providers for interacting with L1 and L2.
@@ -242,7 +247,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             (Date.now() - this.state.timeOfLastPendingRelay) / 1000
           )
           console.log('\n***********************************')
-          console.log('Next tx since last tx submitted', pendingTXSecondsElapsed)
+          console.log(
+            'Next tx since last tx submitted',
+            pendingTXSecondsElapsed
+          )
           pendingTXTimeOut =
             pendingTXSecondsElapsed > this.options.maxWaitTxTimeS ? true : false
         }
@@ -250,7 +258,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         //console.log('Current buffer size:', this.state.messageBuffer.length)
         const bufferFull =
           this.state.messageBuffer.length >= this.options.minBatchSize
-            ? true : false
+            ? true
+            : false
 
         // check gas price
         const gasPrice = await this.options.l1RpcProvider.getGasPrice()
@@ -258,7 +267,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         const gasPriceAcceptable =
           gasPriceGwei < this.options.maxGasPriceInGwei ? true : false
 
-        if (this.state.messageBuffer.length !== 0 && (bufferFull || timeOut) && pendingTXTimeOut) {
+        if (
+          this.state.messageBuffer.length !== 0 &&
+          (bufferFull || timeOut) &&
+          pendingTXTimeOut
+        ) {
           if (gasPriceAcceptable) {
             if (bufferFull) {
               console.log('Buffer full: flushing')
@@ -327,10 +340,14 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
           this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
           while (
-            await this._isTransactionFinalized(this.state.nextUnfinalizedTxHeight)
+            await this._isTransactionFinalized(
+              this.state.nextUnfinalizedTxHeight
+            )
           ) {
             const size = (
-              await this._getStateBatchHeader(this.state.nextUnfinalizedTxHeight)
+              await this._getStateBatchHeader(
+                this.state.nextUnfinalizedTxHeight
+              )
             ).batch.batchSize.toNumber()
             this.logger.info(
               'Found a batch of finalized transaction(s), checking for more...',
@@ -425,10 +442,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Remove any events from the cache for batches that should've been processed by now.
             const oldSize = this.state.eventCache.length
             this.state.eventCache = this.state.eventCache.filter((event) => {
-              return event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+              return (
+                event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+              )
             })
             const newSize = this.state.eventCache.length
-            this.logger.info("Trimmed eventCache", {
+            this.logger.info('Trimmed eventCache', {
               oldSize,
               newSize,
             })
@@ -462,7 +481,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   > {
     const getStateBatchAppendedEventForIndex = async (
       txIndex: number
-    ): Promise <ethers.Event> => {
+    ): Promise<ethers.Event> => {
       const selectedEvent = this.state.eventCache.find((cachedEvent) => {
         const prevTotalElements = cachedEvent.args._prevTotalElements.toNumber()
         const batchSize = cachedEvent.args._batchSize.toNumber()
@@ -478,19 +497,18 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         return undefined
       }
       // query the new SCC event. event.args._extraData in eventCache might be wrong
-      const SCCEvent: ethers.Event[] = await this.state.StateCommitmentChain.queryFilter(
-        this.state.StateCommitmentChain.filters.StateBatchAppended(),
-        selectedEvent.blockNumber,
-        selectedEvent.blockNumber
-      )
+      const SCCEvent: ethers.Event[] =
+        await this.state.StateCommitmentChain.queryFilter(
+          this.state.StateCommitmentChain.filters.StateBatchAppended(),
+          selectedEvent.blockNumber,
+          selectedEvent.blockNumber
+        )
       return SCCEvent[0]
     }
 
     let startingBlock = this.state.lastQueriedL1Block
     const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
-    while (
-      startingBlock < maxBlock
-    ) {
+    while (startingBlock < maxBlock) {
       this.logger.info('Querying events', {
         startingBlock,
         endBlock: startingBlock + this.options.getLogsInterval,
@@ -503,19 +521,22 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           startingBlock,
           startingBlock + this.options.getLogsInterval
         )
-        this.state.lastQueriedL1Block = Math.min(startingBlock + this.options.getLogsInterval, maxBlock)
+      this.state.lastQueriedL1Block = Math.min(
+        startingBlock + this.options.getLogsInterval,
+        maxBlock
+      )
 
       this.state.eventCache = this.state.eventCache.concat(events)
-      this.logger.info("Added events to eventCache", {
-        added:events.length,
-        newSize:this.state.eventCache.length,
+      this.logger.info('Added events to eventCache', {
+        added: events.length,
+        newSize: this.state.eventCache.length,
       })
 
       startingBlock += this.options.getLogsInterval
 
       // We need to stop syncing early once we find the event we're looking for to avoid putting
       // *all* events into memory at the same time. Otherwise we'll get OOM killed.
-      if (await getStateBatchAppendedEventForIndex(height) !== undefined) {
+      if ((await getStateBatchAppendedEventForIndex(height)) !== undefined) {
         break
       }
     }
@@ -630,7 +651,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       message.encodedMessageHash
     )
   }
-
 
   private async _wereMessagesRelayed(
     messages: Array<SentMessage>
@@ -827,23 +847,27 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   private async _getGasPriceInGwei(signer): Promise<number> {
     return parseInt(
-      ethers.utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10
+      ethers.utils.formatUnits(await signer.getGasPrice(), 'gwei'),
+      10
     )
   }
 
   private async _getFilter(): Promise<void> {
     try {
       if (this.options.filterEndpoint) {
-        if (this.state.lastFilterPollingTimestamp === 0 ||
-          new Date().getTime() > this.state.lastFilterPollingTimestamp + this.options.filterPollingInterval
+        if (
+          this.state.lastFilterPollingTimestamp === 0 ||
+          new Date().getTime() >
+            this.state.lastFilterPollingTimestamp +
+              this.options.filterPollingInterval
         ) {
           const response = await fetch(this.options.filterEndpoint)
-          const filter:any = await response.json()
+          const filter: any = await response.json()
 
           // export L1LIQPOOL=$(echo $ADDRESSES | jq -r '.L1LiquidityPool')
           // export L1M=$(echo $ADDRESSES | jq -r '.L1Message')
           // echo '["'$L1LIQPOOL'", "'$L1M'"]' > dist/dumps/whitelist.json
-          const filterSelect = [ filter.Proxy__L1LiquidityPool, filter.L1Message ]
+          const filterSelect = [filter.Proxy__L1LiquidityPool, filter.L1Message]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()
           this.state.filter = filterSelect
