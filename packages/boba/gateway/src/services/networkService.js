@@ -78,6 +78,7 @@ import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import addressAxiosInstance from 'api/addressAxios'
 import addressOMGXAxiosInstance from 'api/addressOMGXAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
+import { sortRawTokens } from 'util/common'
 
 //All the current addresses for fallback purposes, or live network
 const localAddresses = require(`../deployment/local/addresses.json`)
@@ -1713,7 +1714,7 @@ class NetworkService {
     
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
 
-    L1LPInfo.forEach((token) => {
+    sortRawTokens(L1LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -1804,7 +1805,7 @@ class NetworkService {
 
     const L2LPInfo = await Promise.all(L2LPInfoPromise)
 
-    L2LPInfo.forEach((token) => {
+    sortRawTokens(L2LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
