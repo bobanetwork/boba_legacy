@@ -32,7 +32,7 @@ class ListFarm extends React.Component {
       L1orL2Pool,
       balance,
       showAll,
-      showStakes
+      showStakesOnly
     } = this.props;
 
     this.state = {
@@ -42,7 +42,7 @@ class ListFarm extends React.Component {
       poolInfo,
       userInfo,
       showAll,
-      showStakes,
+      showStakesOnly,
       //drop down box
       dropDownBox: false,
       dropDownBoxInit: true,
@@ -53,7 +53,7 @@ class ListFarm extends React.Component {
 
   componentDidUpdate(prevState) {
 
-    const { poolInfo, userInfo, balance, showAll, showStakes } = this.props;
+    const { poolInfo, userInfo, balance, showAll, showStakesOnly } = this.props
 
     if (!isEqual(prevState.poolInfo, poolInfo)) {
       this.setState({ poolInfo });
@@ -71,8 +71,8 @@ class ListFarm extends React.Component {
       this.setState({ showAll });
     }
 
-    if (!isEqual(prevState.showStakes, showStakes)) {
-      this.setState({ showStakes });
+    if (!isEqual(prevState.showStakesOnly, showStakesOnly)) {
+      this.setState({ showStakesOnly });
     }
 
   }
@@ -152,7 +152,7 @@ class ListFarm extends React.Component {
 
     const {
       poolInfo, userInfo,
-      dropDownBox, showAll, showStakes,
+      dropDownBox, showAll, showStakesOnly,
       loading, L1orL2Pool
     } = this.state;
 
@@ -185,15 +185,15 @@ class ListFarm extends React.Component {
       logo = getCoinImage('REP')
     }
 
-    if(!showAll) {
-      if(!Number(logAmount(poolInfo.tokenBalance, decimals, 2))) {
-        return null;
+    if(showAll === false) {
+      if(Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
+        return null
       }
     }
 
-    if(!showStakes) {
-      if(!Number(logAmount(userInfo.amount, decimals, 2))) {
-        return null;
+    if(showStakesOnly === true) {
+      if(Number(logAmount(userInfo.amount, decimals, 2)) < 0.001) {
+        return null
       }
     }
 
