@@ -112,8 +112,8 @@ func TestCalculateFee(t *testing.T) {
 
 			l1MsgFee, err := fees.CalculateL1MsgFee(msg, state, &addr)
 			if err != nil {
- 				t.Fatal(err)
- 			}
+				t.Fatal(err)
+			}
 			if l1MsgFee.Cmp(expectL1Fee) != 0 {
 				t.Fatal("l1 msg fee not computed correctly")
 			}
