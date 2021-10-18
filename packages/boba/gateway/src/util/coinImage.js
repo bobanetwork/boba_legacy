@@ -12,11 +12,14 @@ import linkLogo from 'images/link.svg';
 import dodoLogo from 'images/dodo.svg';
 import uniLogo from 'images/uni.png';
 import omgLogo from 'images/omg.png';
+import fraxLogo from 'images/frax.png';
+import fxsLogo from 'images/fxs.svg';
+import bobaLogo from 'images/boba-token-glow.png';
 
 export const getCoinImage = (symbol) => {
   
   let logo = null
-
+  
   switch (symbol) {
     case "TEST":
       logo = TESTLogo;
@@ -62,6 +65,15 @@ export const getCoinImage = (symbol) => {
       break;
     case "OMG":
       logo = omgLogo;
+      break;
+    case "FRAX":
+      logo = fraxLogo;
+      break;
+    case "FXS":
+      logo = fxsLogo;
+      break;
+    case "BOBA":
+      logo = bobaLogo;
       break;
     default:
       logo = ethLogo;
