@@ -379,7 +379,7 @@ class NetworkService {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 420) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 28) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
@@ -440,13 +440,6 @@ class NetworkService {
       // this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
       // console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
       
-      // this.L1StandardBridgeContract = new ethers.Contract(
-      //   this.L1StandardBridgeAddress,
-      //   L1StandardBridgeJson.abi,
-      //   this.provider.getSigner()
-      // )
-      // console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
-
       if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
         this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
         console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
@@ -454,6 +447,13 @@ class NetworkService {
       else {
         console.log('L1StandardBridgeAddress NOT SET')
       }
+
+      this.L1StandardBridgeContract = new ethers.Contract(
+        this.L1StandardBridgeAddress,
+        L1StandardBridgeJson.abi,
+        this.provider.getSigner()
+      )
+      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       if (addresses.hasOwnProperty('TOKENS')) {
         this.tokenAddresses = addresses.TOKENS
@@ -594,11 +594,11 @@ class NetworkService {
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress, //intentional?
+          messengerAddress: this.L2MessengerAddress,
         },
       })
 
-      if( masterSystemConfig === 'rinkeby' || masterSystemConfig === 'local' ) {
+      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
         this.boba = new ethers.Contract(
           addresses.TOKENS.BOBA.L2,
@@ -720,6 +720,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     console.log("Getting transactions...")
 
@@ -889,6 +890,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -1198,6 +1200,8 @@ class NetworkService {
 
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
+
+    console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
 
     updateSignatureStatus_depositTRAD(false)
     
@@ -2260,6 +2264,7 @@ class NetworkService {
   async getDaoBalance() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2275,6 +2280,7 @@ class NetworkService {
   async getDaoVotes() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
     
     try {
@@ -2314,6 +2320,7 @@ class NetworkService {
   async getProposalThreshold() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2365,6 +2372,7 @@ class NetworkService {
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     const delegateCheck = await this.delegate.attach(this.delegator.address)
@@ -2446,7 +2454,6 @@ class NetworkService {
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
     try {
-
       const delegateCheck = await this.delegate.attach(this.delegator.address);
       let res = delegateCheck.castVote(id, userVote)
       return res
