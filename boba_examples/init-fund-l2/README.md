@@ -24,8 +24,8 @@ Add .env in `/boba-examples/init-fund-l2`
 
 ```bash
 L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/INFURA_KEY
-L2_NODE_WEB3_URL=https://rinkeby-v2.boba.network
-ADDRESS_MANAGER_ADDRESS=0xE8cbD28a5cc96ca86513ad8847D344EE634D0A9D
+L2_NODE_WEB3_URL=https://rinkeby.boba.network
+ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
 PRIVATE_KEY=
 ```
 
