@@ -43,7 +43,10 @@ const main = async () => {
     'address-manager-address',
     env.ADDRESS_MANAGER_ADDRESS
   )
-  const RELAYER_PRIVATE_KEY = config.str('relayer-private-key', env.RELAYER_PRIVATE_KEY)
+  const RELAYER_PRIVATE_KEY = config.str(
+    'relayer-private-key',
+    env.RELAYER_PRIVATE_KEY
+  )
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
   //batch system
@@ -103,7 +106,7 @@ const main = async () => {
   )
   const NUM_CONFIRMATIONS = config.uint(
     'num-confirmations',
-    parseInt(env.NUM_CONFIRMATIONS, 10) ||  0
+    parseInt(env.NUM_CONFIRMATIONS, 10) || 0
   )
 
   if (!ADDRESS_MANAGER_ADDRESS) {

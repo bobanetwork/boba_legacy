@@ -27,7 +27,7 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
       hostname: config.str('server-hostname', 'localhost'),
       confirmations: config.uint('confirmations', 35),
       l1RpcProvider: config.str('l1-rpc-endpoint'),
-      cfgAddressManager: config.str('address-manager'),  // Legacy option. New method sets this when the deployer registers it
+      cfgAddressManager: config.str('address-manager'), // Legacy option. New method sets this when the deployer registers it
       pollingInterval: config.uint('polling-interval', 5000),
       logsPerPollingInterval: config.uint('logs-per-polling-interval', 2000),
       dangerouslyCatchAllErrors: config.bool(

@@ -216,8 +216,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    if(batchParams.totalElementsToAppend === 0) {
-      this.logger.error("Will not submit tx_chain batch with 0 elements")
+    if (batchParams.totalElementsToAppend === 0) {
+      this.logger.error('Will not submit tx_chain batch with 0 elements')
       return
     }
 
@@ -227,8 +227,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       startBlock,
       endBlock,
       l1tipHeight,
-      batchStart:batchParams.shouldStartAtElement,
-      batchElements:batchParams.totalElementsToAppend
+      batchStart: batchParams.shouldStartAtElement,
+      batchElements: batchParams.totalElementsToAppend,
     })
     this.logger.info('Submitting batch.', {
       calldata: batchParams,

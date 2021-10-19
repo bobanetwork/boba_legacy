@@ -3,7 +3,7 @@ import { Bcfg } from '@eth-optimism/core-utils'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 
-import { GasPriceOracleService } from '../service';
+import { GasPriceOracleService } from '../service'
 
 dotenv.config()
 
@@ -122,7 +122,7 @@ const main = async () => {
     : new Wallet(RELAYER_PRIVATE_KEY, l2Provider).address
   const fastRelayerAddress = FAST_RELAYER_ADDRESS
     ? FAST_RELAYER_ADDRESS
-    : new Wallet(FAST_RELAYER_PRIVATE_KEY, l2Provider).address;
+    : new Wallet(FAST_RELAYER_PRIVATE_KEY, l2Provider).address
 
   const service = new GasPriceOracleService({
     l1RpcProvider: l1Provider,

@@ -40,7 +40,9 @@ const deployFn: DeployFunction = async (hre) => {
     )
   } else {
     //Register ERC20 token address in L2 token pool
-    const registerL2TokenPoolTX = await L2TokenPool.registerTokenAddress(TK_L2TEST.address)
+    const registerL2TokenPoolTX = await L2TokenPool.registerTokenAddress(
+      TK_L2TEST.address
+    )
     await registerL2TokenPoolTX.wait()
     console.log(
       `⭐️ ${chalk.blue('L2 TokenPool registered:')} ${chalk.green(

@@ -20,8 +20,14 @@ const main = async () => {
     'address-manager-address',
     env.ADDRESS_MANAGER_ADDRESS
   )
-  const L1_MESSENGER_FAST = config.str('l1-messenger-fast', env.L1_MESSENGER_FAST)
-  const FAST_RELAYER_PRIVATE_KEY = config.str('fast-relayer-private-key', env.FAST_RELAYER_PRIVATE_KEY)
+  const L1_MESSENGER_FAST = config.str(
+    'l1-messenger-fast',
+    env.L1_MESSENGER_FAST
+  )
+  const FAST_RELAYER_PRIVATE_KEY = config.str(
+    'fast-relayer-private-key',
+    env.FAST_RELAYER_PRIVATE_KEY
+  )
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
   //batch system

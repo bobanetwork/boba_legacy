@@ -8,7 +8,7 @@
     "clean": "rimraf ./dist ./tsconfig.build.tsbuildinfo",
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
-    "lint:check": "eslint .",
+    "lint:check": "eslint . --ext js,jsx,ts,tsx",
     "pre-commit": "lint-staged",
     "surgery:v1-to-v2": "ts-node scripts/v1-to-v2-surgery.ts",
     "surgery:v1-to-v2:boba": "ts-node scripts/boba-contracts-verifier.ts",
