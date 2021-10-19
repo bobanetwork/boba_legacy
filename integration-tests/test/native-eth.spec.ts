@@ -4,15 +4,12 @@ import { expect } from 'chai'
 import { Wallet, utils, BigNumber } from 'ethers'
 import { serialize } from '@ethersproject/transactions'
 import { predeploys } from '@eth-optimism/contracts'
+import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
 import { Direction } from './shared/watcher-utils'
 
-import {
-  expectApprox,
-  fundUser,
-  PROXY_SEQUENCER_ENTRYPOINT_ADDRESS,
-} from './shared/utils'
+import { fundUser, PROXY_SEQUENCER_ENTRYPOINT_ADDRESS } from './shared/utils'
 import { OptimismEnv, useDynamicTimeoutForWithdrawals } from './shared/env'
 
 const DEFAULT_TEST_GAS_L1 = 330_000
@@ -65,7 +62,7 @@ describe('Native ETH Integration Tests', async () => {
         '0xFFFF'
       )
       // Expect gas to be less than or equal to the target plus 1%
-      expectApprox(gas, 6700060, { upperPercentDeviation: 1 })
+      expectApprox(gas, 6700060, { absoluteUpperDeviation: 1000 })
     })
   })
 
@@ -216,17 +213,17 @@ describe('Native ETH Integration Tests', async () => {
     expectApprox(
       postBalances.l1BridgeBalance,
       preBalances.l1BridgeBalance.sub(withdrawAmount),
-      { upperPercentDeviation: 1 }
+      { percentUpperDeviation: 1 }
     )
     expectApprox(
       postBalances.l2UserBalance,
       preBalances.l2UserBalance.sub(withdrawAmount.add(fee)),
-      { upperPercentDeviation: 1 }
+      { percentUpperDeviation: 1 }
     )
     expectApprox(
       postBalances.l1UserBalance,
       preBalances.l1UserBalance.add(withdrawAmount),
-      { upperPercentDeviation: 1 }
+      { percentUpperDeviation: 1 }
     )
   })
 

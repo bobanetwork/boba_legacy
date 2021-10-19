@@ -1,0 +1,50 @@
+{
+  "name": "@boba/fraud-detector",
+  "version": "0.0.4",
+  "description": "Fraud Detector Service",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist/index"
+  ],
+  "scripts": {
+    "start": "node ./exec/run-fraud-detector.js",
+    "build": "tsc -p ./tsconfig.build.json"
+  },
+  "keywords": [
+    "optimism",
+    "ethereum",
+    "boba",
+    "omgnetwork",
+    "fraud-detector"
+  ],
+  "homepage": "https://github.com/omgnetwork/optimism/blob/develop/boba_community/fraud-detector#readme",
+  "license": "MIT",
+  "author": "OMG/Boba",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omgnetwork/optimism.git"
+  },
+  "dependencies": {
+    "@eth-optimism/common-ts": "^0.1.5",
+    "@eth-optimism/contracts": "^0.4.12",
+    "@eth-optimism/core-utils": "^0.5.5",
+    "bcfg": "^0.1.6",
+    "chalk": "^4.1.2",
+    "dotenv": "^8.2.0",
+    "merkle-patricia-tree": "4.0.0",
+    "merkletreejs": "^0.2.10",
+    "rlp": "^2.2.6",
+    "sqlite3": "^5.0.2",
+    "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@ethersproject/abstract-provider": "^5.0.9",
+    "@ethersproject/providers": "^5.0.21",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "chai": "^4.3.0",
+    "ethereumjs-util": "^7.0.5",
+    "ethers": "^5.0.31",
+    "mocha": "^8.3.0"
+  }
+}

@@ -11,11 +11,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  integration:
+
+  start-runner:
+    name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
-    env:
-        DOCKER_BUILDKIT: 1
-        COMPOSE_DOCKER_CLI_BUILD: 1
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-00b46fa1102c70ff2
+          ec2-instance-type: t2.xlarge
+          subnet-id: subnet-905870ae
+          security-group-id: sg-0855631d714870b32
+
+  integration:
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
     steps:
       # Monorepo tests
       - uses: actions/checkout@v2
@@ -38,32 +61,77 @@ jobs:
 
       - name: Bring the stack up
         working-directory: ./ops
-        run: |
-          ./scripts/stats.sh &
-          docker-compose up -d
+        run: docker-compose up -d
 
       - name: Wait for the Sequencer node
         working-directory: ./ops
         run: ./scripts/wait-for-sequencer.sh
 
+      - name: Start background logging
+        working-directory: ./ops
+        run: docker-compose -f docker-compose.yml logs --follow &
+
+      # this test jitters - in any case, later tests will fail if the boba_deployer does not come up
+      - name: Test serving BOBA contracts
+        working-directory: ./
+        run: |
+          RETRIES=60
+          URL=http://127.0.0.1:8080/addresses.json
+          until $(curl --silent --fail --output /dev/null "$URL"); do
+            sleep 20s
+            echo "Will wait $((RETRIES--)) more times for $URL to be up..."
+
+            if [ "$RETRIES" -lt 0 ]; then
+              echo "Timeout waiting for base contract deployment"
+              exit 1
+            fi
+          done
+          echo "BOBA base contracts are deployed"
+          RETRIES=60
+          URL2=http://127.0.0.1:8080/boba-addr.json
+          until $(curl --silent --fail --output /dev/null "$URL2"); do
+            sleep 20s
+            echo "Will wait $((RETRIES--)) more times for $URL2 to be up..."
+
+            if [ "$RETRIES" -lt 0 ]; then
+              echo "Timeout waiting for Boba contract deployment"
+              exit 1
+            fi
+          done
+          echo "BOBA contracts are deployed"
+          echo $(curl --silent $URL2)
+          L2LIQUIDITY_POOL=$(curl --silent $URL2 | jq -r .L2LiquidityPool)
+          echo $L2LIQUIDITY_POOL
+          if [[ $L2LIQUIDITY_POOL =~ "0x" ]]; then
+            echo "Pass: Found L2 Liquidity Pool contract address"
+            exit 0
+          else
+            echo "Error: Did not find L2 Liquidity Pool contract address"
+            exit 1
+          fi
+
       - name: Run the integration tests
         working-directory: ./ops
         run: docker-compose run integration_tests
 
-      - name: Collect docker logs on failure
-        if: failure()
-        uses: jwalton/gh-docker-logs@v1
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner # required to get output from the start-runner job
+      - integration # required to wait when the main job is done
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          images: 'ethereumoptimism/builder,ethereumoptimism/hardhat,ethereumoptimism/deployer,ethereumoptimism/data-transport-layer,ethereumoptimism/l2geth,ethereumoptimism/message-relayer,ethereumoptimism/batch-submitter,ethereumoptimism/l2geth,ethereumoptimism/integration-tests'
-          dest: '/home/runner/logs'
-
-      - name: Tar logs
-        if: failure()
-        run: tar cvzf ./logs.tgz ~/logs
-
-      - name: Upload logs to GitHub
-        if: failure()
-        uses: actions/upload-artifact@master
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
         with:
-          name: logs.tgz
-          path: ./logs.tgz
+          mode: stop
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}

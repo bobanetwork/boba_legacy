@@ -1,0 +1,39 @@
+{
+    "name": "@boba/hardhat-ERC20CompVote",
+    "private": true,
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Enya",
+    "license": "MIT",
+    "scripts": {
+      "clean": "rimraf ./cache-ovm ./cache ./artifacts-ovm ./artifacts ./deployments",
+      "compile": "hardhat compile",
+      "test:integration": "hardhat test",
+      "test:integration:rinkeby": "hardhat test --network rinkeby",
+      "test:integration:boba": "hardhat test --network boba_rinkeby",
+      "test:integration:l1": "hardhat test --network l1",
+      "test:integration:l2": "hardhat test --network l2",
+      "deploy": "hardhat deploy",
+      "deploy:rinkeby": "hardhat deploy --network rinkeby",
+      "deploy:l1": "hardhat deploy --network l1"
+    },
+    "devDependencies": {
+      "@nomiclabs/hardhat-ethers": "^2.0.1",
+      "@nomiclabs/hardhat-waffle": "^2.0.1",
+      "@types/chai": "4.2.17",
+      "@types/mocha": "^8.2.2",
+      "chai": "4.3.4",
+      "ethereum-waffle": "^3.3.0",
+      "ethers": "^5.1.4",
+      "hardhat": "^2.2.0",
+      "hardhat-deploy": "^0.7.5",
+      "mocha": "^8.2.1"
+    },
+    "dependencies": {
+      "@eth-optimism/hardhat-ovm": "^0.2.3",
+      "@nomiclabs/hardhat-etherscan": "^2.1.6",
+      "@openzeppelin/contracts": "^4.3.1",
+      "chai-as-promised": "^7.1.1",
+      "dotenv": "^10.0.0"
+    }
+  }

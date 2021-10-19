@@ -1,0 +1,29 @@
+name: Repo Sync
+
+on:
+  schedule:
+  - cron: "*/5 * * * *" # every 15 minutes. set to whatever interval you like
+
+jobs:
+  repo-sync:
+    name: Repo Sync
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: repo-sync/github-sync@v2
+      name: Sync repo to branch
+      with:
+        source_repo: https://github.com/ethereum-optimism/optimism
+        source_branch: experimental
+        destination_branch: tmp-repo-sync
+        github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+    - uses: repo-sync/pull-request@v2
+      name: Create pull request
+      with:
+        source_branch: tmp-repo-sync
+        destination_branch: develop
+        github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+        pr_title: "Pulling experimental into develop" # Title of pull request
+        pr_body: ":crown: *An automated PR*"              # Full markdown support, requires pr_title to be set
+        pr_draft: false                                    # Creates pull request as draft
+        pr_allow_empty: false                              # Creates pull request even if there are no changes

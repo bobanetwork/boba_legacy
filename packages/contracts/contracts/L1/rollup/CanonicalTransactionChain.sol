@@ -2,16 +2,13 @@
 pragma solidity ^0.8.8;
 
 /* Library Imports */
+import { AddressAliasHelper } from "../../standards/AddressAliasHelper.sol";
 import { Lib_OVMCodec } from "../../libraries/codec/Lib_OVMCodec.sol";
 import { Lib_AddressResolver } from "../../libraries/resolver/Lib_AddressResolver.sol";
-import { Lib_MerkleTree } from "../../libraries/utils/Lib_MerkleTree.sol";
 
 /* Interface Imports */
 import { ICanonicalTransactionChain } from "./ICanonicalTransactionChain.sol";
 import { IChainStorageContainer } from "./IChainStorageContainer.sol";
-
-/* External Imports */
-import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * @title CanonicalTransactionChain
@@ -20,8 +17,6 @@ import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
  * writing them to the 'CTC:batches' instance of the Chain Storage Container.
  * The CTC also allows any account to 'enqueue' an L2 transaction, which will require that the
  * Sequencer will eventually append it to the rollup state.
- * If the Sequencer does not include an enqueued transaction within the 'force inclusion period',
- * then any account may force it to be included by calling appendQueueBatch().
  *
  * Runtime target: EVM
  */
@@ -34,9 +29,15 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
     // L2 tx gas-related
     uint256 constant public MIN_ROLLUP_TX_GAS = 100000;
     uint256 constant public MAX_ROLLUP_TX_SIZE = 50000;
-    uint256 immutable public L2_GAS_DISCOUNT_DIVISOR;
-    uint256 immutable public ENQUEUE_GAS_COST;
-    uint256 immutable public ENQUEUE_L2_GAS_PREPAID;
+
+    // The approximate cost of calling the enqueue function
+    uint256 public enqueueGasCost;
+    // The ratio of the cost of L1 gas to the cost of L2 gas
+    uint256 public l2GasDiscountDivisor;
+    // The amount of L2 gas which can be forwarded to L2 without spam prevention via 'gas burn'.
+    // Calculated as the product of l2GasDiscountDivisor * enqueueGasCost.
+    // See comments in enqueue() for further detail.
+    uint256 public enqueueL2GasPrepaid;
 
     // Encoding-related (all in bytes)
     uint256 constant internal BATCH_CONTEXT_SIZE = 16;
@@ -50,9 +51,15 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * Variables *
      *************/
 
-    uint256 public forceInclusionPeriodSeconds;
-    uint256 public forceInclusionPeriodBlocks;
     uint256 public maxTransactionGasLimit;
+
+
+    /***************
+     * Queue State *
+     ***************/
+
+    uint40 private _nextQueueIndex; // index of the first queue element not yet included
+    Lib_OVMCodec.QueueElement[] queueElements;
 
 
     /***************
@@ -61,20 +68,58 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
 
     constructor(
         address _libAddressManager,
-        uint256 _forceInclusionPeriodSeconds,
-        uint256 _forceInclusionPeriodBlocks,
         uint256 _maxTransactionGasLimit,
         uint256 _l2GasDiscountDivisor,
         uint256 _enqueueGasCost
     )
         Lib_AddressResolver(_libAddressManager)
     {
-        forceInclusionPeriodSeconds = _forceInclusionPeriodSeconds;
-        forceInclusionPeriodBlocks = _forceInclusionPeriodBlocks;
         maxTransactionGasLimit = _maxTransactionGasLimit;
-        L2_GAS_DISCOUNT_DIVISOR = _l2GasDiscountDivisor;
-        ENQUEUE_GAS_COST  = _enqueueGasCost;
-        ENQUEUE_L2_GAS_PREPAID = _l2GasDiscountDivisor * _enqueueGasCost;
+        l2GasDiscountDivisor = _l2GasDiscountDivisor;
+        enqueueGasCost  = _enqueueGasCost;
+        enqueueL2GasPrepaid = _l2GasDiscountDivisor * _enqueueGasCost;
+    }
+
+
+
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    /**
+     * Modifier to enforce that, if configured, only the Burn Admin may
+     * successfully call a method.
+     */
+    modifier onlyBurnAdmin() {
+        require(
+            msg.sender == libAddressManager.owner(),
+            "Only callable by the Burn Admin."
+        );
+        _;
+    }
+
+    /*******************************
+     * Authorized Setter Functions *
+     *******************************/
+
+    /**
+     * Allows the Burn Admin to update the parameters which determine the amount of gas to burn.
+     * The value of enqueueL2GasPrepaid is immediately updated as well.
+     */
+    function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost)
+        external
+        onlyBurnAdmin
+    {
+        enqueueGasCost = _enqueueGasCost;
+        l2GasDiscountDivisor = _l2GasDiscountDivisor;
+        // See the comment in enqueue() for the rationale behind this formula.
+        enqueueL2GasPrepaid = _l2GasDiscountDivisor * _enqueueGasCost;
+
+        emit L2GasParamsUpdated(
+            l2GasDiscountDivisor,
+            enqueueGasCost,
+            enqueueL2GasPrepaid
+        );
     }
 
 
@@ -154,8 +199,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             uint40
         )
     {
-        (,uint40 nextQueueIndex,,) = _getBatchExtraData();
-        return nextQueueIndex;
+        return _nextQueueIndex;
     }
 
     /**
@@ -202,10 +246,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             Lib_OVMCodec.QueueElement memory _element
         )
     {
-        return _getQueueElement(
-            _index,
-            queue()
-        );
+        return queueElements[_index];
     }
 
     /**
@@ -219,7 +260,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             uint40
         )
     {
-        return getQueueLength() - getNextQueueIndex();
+        return uint40(queueElements.length) - _nextQueueIndex;
     }
 
    /**
@@ -234,9 +275,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             uint40
         )
     {
-        return _getQueueLength(
-            queue()
-        );
+        return uint40(queueElements.length);
     }
 
     /**
@@ -250,7 +289,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
         uint256 _gasLimit,
         bytes memory _data
     )
-        public
+        external
     {
         require(
             _data.length <= MAX_ROLLUP_TX_SIZE,
@@ -269,13 +308,18 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
 
         // Transactions submitted to the queue lack a method for paying gas fees to the Sequencer.
         // So we need to prevent spam attacks by ensuring that the cost of enqueueing a transaction
-        // from L1 to L2 is not underpriced. Therefore, we define 'ENQUEUE_L2_GAS_PREPAID' as a
-        // threshold. If the _gasLimit for the enqueued transaction is above this threshold, then we
-        // 'charge' to user by burning additional L1 gas. Since gas is cheaper on L2 than L1, we
-        // only need to burn a fraction of the provided L1 gas, which is determined by the
-        // L2_GAS_DISCOUNT_DIVISOR.
-        if(_gasLimit > ENQUEUE_L2_GAS_PREPAID) {
-            uint256 gasToConsume = (_gasLimit - ENQUEUE_L2_GAS_PREPAID) / L2_GAS_DISCOUNT_DIVISOR;
+        // from L1 to L2 is not underpriced. For transaction with a high L2 gas limit, we do this by
+        // burning some extra gas on L1. Of course there is also some intrinsic cost to enqueueing a
+        // transaction, so we want to make sure not to over-charge (by burning too much L1 gas).
+        // Therefore, we define 'enqueueL2GasPrepaid' as the L2 gas limit above which we must burn
+        // additional gas on L1. This threshold is the product of two inputs:
+        // 1. enqueueGasCost: the base cost of calling this function.
+        // 2. l2GasDiscountDivisor: the ratio between the cost of gas on L1 and L2. This is a
+        //    positive integer, meaning we assume L2 gas is always less costly.
+        // The calculation below for gasToConsume can be seen as converting the difference (between
+        // the specified L2 gas limit and the prepaid L2 gas limit) to an L1 gas amount.
+        if(_gasLimit > enqueueL2GasPrepaid) {
+            uint256 gasToConsume = (_gasLimit - enqueueL2GasPrepaid) / l2GasDiscountDivisor;
             uint256 startingGas = gasleft();
 
             // Although this check is not necessary (burn below will run out of gas if not true), it
@@ -291,91 +335,43 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             }
         }
 
+        // Apply an aliasing unless msg.sender == tx.origin. This prevents an attack in which a
+        // contract on L1 has the same address as a contract on L2 but doesn't have the same code.
+        // We can safely ignore this for EOAs because they're guaranteed to have the same "code"
+        // (i.e. no code at all). This also makes it possible for users to interact with contracts
+        // on L2 even when the Sequencer is down.
+        address sender;
+        if (msg.sender == tx.origin) {
+            sender = msg.sender;
+        } else {
+            sender = AddressAliasHelper.applyL1ToL2Alias(msg.sender);
+        }
+
         bytes32 transactionHash = keccak256(
             abi.encode(
-                msg.sender,
+                sender,
                 _target,
                 _gasLimit,
                 _data
             )
         );
 
-        bytes32 timestampAndBlockNumber;
-        assembly {
-            timestampAndBlockNumber := timestamp()
-            timestampAndBlockNumber := or(timestampAndBlockNumber, shl(40, number()))
-        }
-
-        IChainStorageContainer queueRef = queue();
-
-        queueRef.push(transactionHash);
-        queueRef.push(timestampAndBlockNumber);
-
-        // The underlying queue data structure stores 2 elements
-        // per insertion, so to get the real queue length we need
-        // to divide by 2 and subtract 1.
-        uint256 queueIndex = queueRef.length() / 2 - 1;
+        queueElements.push(
+            Lib_OVMCodec.QueueElement({
+                transactionHash: transactionHash,
+                timestamp: uint40(block.timestamp),
+                blockNumber: uint40(block.number)
+            })
+        );
+        uint256 queueIndex = queueElements.length - 1;
         emit TransactionEnqueued(
-            msg.sender,
+            sender,
             _target,
             _gasLimit,
             _data,
             queueIndex,
             block.timestamp
         );
-    }
-
-    /**
-     * Appends a given number of queued transactions as a single batch.
-     * param _numQueuedTransactions Number of transactions to append.
-     */
-    function appendQueueBatch(
-        uint256 // _numQueuedTransactions
-    )
-        public
-        pure
-    {
-        // TEMPORARY: Disable `appendQueueBatch` for minnet
-        revert("appendQueueBatch is currently disabled.");
-
-        // solhint-disable max-line-length
-        // _numQueuedTransactions = Math.min(_numQueuedTransactions, getNumPendingQueueElements());
-        // require(
-        //     _numQueuedTransactions > 0,
-        //     "Must append more than zero transactions."
-        // );
-
-        // bytes32[] memory leaves = new bytes32[](_numQueuedTransactions);
-        // uint40 nextQueueIndex = getNextQueueIndex();
-
-        // for (uint256 i = 0; i < _numQueuedTransactions; i++) {
-        //     if (msg.sender != resolve("OVM_Sequencer")) {
-        //         Lib_OVMCodec.QueueElement memory el = getQueueElement(nextQueueIndex);
-        //         require(
-        //             el.timestamp + forceInclusionPeriodSeconds < block.timestamp,
-        //             "Queue transactions cannot be submitted during the sequencer inclusion period."
-        //         );
-        //     }
-        //     leaves[i] = _getQueueLeafHash(nextQueueIndex);
-        //     nextQueueIndex++;
-        // }
-
-        // Lib_OVMCodec.QueueElement memory lastElement = getQueueElement(nextQueueIndex - 1);
-
-        // _appendBatch(
-        //     Lib_MerkleTree.getMerkleRoot(leaves),
-        //     _numQueuedTransactions,
-        //     _numQueuedTransactions,
-        //     lastElement.timestamp,
-        //     lastElement.blockNumber
-        // );
-
-        // emit QueueBatchAppended(
-        //     nextQueueIndex - _numQueuedTransactions,
-        //     _numQueuedTransactions,
-        //     getTotalElements()
-        // );
-        // solhint-enable max-line-length
     }
 
     /**
@@ -387,7 +383,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * .param _transactionDataFields Array of raw transaction data.
      */
     function appendSequencerBatch()
-        public
+        external
     {
         uint40 shouldStartAtElement;
         uint24 totalElementsToAppend;
@@ -417,29 +413,13 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             "Not enough BatchContexts provided."
         );
 
-        // Take a reference to the queue and its length so we don't have to keep resolving it.
-        // Length isn't going to change during the course of execution, so it's fine to simply
-        // resolve this once at the start. Saves gas.
-        IChainStorageContainer queueRef = queue();
-        uint40 queueLength = _getQueueLength(queueRef);
-
-        // Reserve some memory to save gas on hashing later on. This is a relatively safe estimate
-        // for the average transaction size that will prevent having to resize this chunk of memory
-        // later on. Saves gas.
-        bytes memory hashMemory = new bytes((msg.data.length / totalElementsToAppend) * 2);
-
-        // Initialize the array of canonical chain leaves that we will append.
-        bytes32[] memory leaves = new bytes32[](totalElementsToAppend);
-
-        // Each leaf index corresponds to a tx, either sequenced or enqueued.
-        uint32 leafIndex = 0;
-
         // Counter for number of sequencer transactions appended so far.
         uint32 numSequencerTransactions = 0;
 
-        // We will sequentially append leaves which are pointers to the queue.
-        // The initial queue index is what is currently in storage.
-        uint40 nextQueueIndex = getNextQueueIndex();
+        // Cache the _nextQueueIndex storage variable to a temporary stack variable.
+        // This is safe as long as nothing reads or writes to the storage variable
+        // until it is updated by the temp variable.
+        uint40 nextQueueIndex = _nextQueueIndex;
 
         BatchContext memory curContext;
         for (uint32 i = 0; i < numContexts; i++) {
@@ -449,40 +429,16 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             curContext = nextContext;
 
             // Process sequencer transactions first.
-            for (uint32 j = 0; j < curContext.numSequencedTransactions; j++) {
-                uint256 txDataLength;
-                assembly {
-                    txDataLength := shr(232, calldataload(nextTransactionPtr))
-                }
-                require(
-                    txDataLength <= MAX_ROLLUP_TX_SIZE,
-                    "Transaction data size exceeds maximum for rollup transaction."
-                );
-
-                leaves[leafIndex] = _getSequencerLeafHash(
-                    curContext,
-                    nextTransactionPtr,
-                    txDataLength,
-                    hashMemory
-                );
-
-                nextTransactionPtr += uint40(TX_DATA_HEADER_SIZE + txDataLength);
-                numSequencerTransactions++;
-                leafIndex++;
-            }
+            numSequencerTransactions += uint32(curContext.numSequencedTransactions);
 
             // Now process any subsequent queue transactions.
-            for (uint32 j = 0; j < curContext.numSubsequentQueueTransactions; j++) {
-                require(
-                    nextQueueIndex < queueLength,
-                    "Not enough queued transactions to append."
-                );
-
-                leaves[leafIndex] = _getQueueLeafHash(nextQueueIndex);
-                nextQueueIndex++;
-                leafIndex++;
-            }
+            nextQueueIndex += uint40(curContext.numSubsequentQueueTransactions);
         }
+
+        require(
+            nextQueueIndex <= queueElements.length,
+            "Attempted to append more elements than are available in the queue."
+        );
 
         // Generate the required metadata that we need to append this batch
         uint40 numQueuedTransactions = totalElementsToAppend - numSequencerTransactions;
@@ -499,20 +455,15 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             // curContext.numSubsequentQueueTransactions > 0 which means that we've processed at
             // least one queue element. We increment nextQueueIndex after processing each queue
             // element, so the index of the last element we processed is nextQueueIndex - 1.
-            Lib_OVMCodec.QueueElement memory lastElement = _getQueueElement(
-                nextQueueIndex - 1,
-                queueRef
-            );
+            Lib_OVMCodec.QueueElement memory lastElement = queueElements[nextQueueIndex - 1];
 
             blockTimestamp = lastElement.timestamp;
             blockNumber = lastElement.blockNumber;
         }
 
-        // For efficiency reasons getMerkleRoot modifies the `leaves` argument in place
-        // while calculating the root hash therefore any arguments passed to it must not
-        // be used again afterwards
+        // Cache the previous blockhash to ensure all transaction data can be retrieved efficiently.
         _appendBatch(
-            Lib_MerkleTree.getMerkleRoot(leaves),
+            blockhash(block.number-1),
             totalElementsToAppend,
             numQueuedTransactions,
             blockTimestamp,
@@ -524,45 +475,10 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
             numQueuedTransactions,
             getTotalElements()
         );
-    }
 
-    /**
-     * Verifies whether a transaction is included in the chain.
-     * @param _transaction Transaction to verify.
-     * @param _txChainElement Transaction chain element corresponding to the transaction.
-     * @param _batchHeader Header of the batch the transaction was included in.
-     * @param _inclusionProof Inclusion proof for the provided transaction chain element.
-     * @return True if the transaction exists in the CTC, false if not.
-     */
-    function verifyTransaction(
-        Lib_OVMCodec.Transaction memory _transaction,
-        Lib_OVMCodec.TransactionChainElement memory _txChainElement,
-        Lib_OVMCodec.ChainBatchHeader memory _batchHeader,
-        Lib_OVMCodec.ChainInclusionProof memory _inclusionProof
-    )
-        public
-        view
-        returns (
-            bool
-        )
-    {
-        if (_txChainElement.isSequenced == true) {
-            return _verifySequencerTransaction(
-                _transaction,
-                _txChainElement,
-                _batchHeader,
-                _inclusionProof
-            );
-        } else {
-            return _verifyQueueTransaction(
-                _transaction,
-                _txChainElement.queueIndex,
-                _batchHeader,
-                _inclusionProof
-            );
-        }
+        // Update the _nextQueueIndex storage variable.
+        _nextQueueIndex = nextQueueIndex;
     }
-
 
     /**********************
      * Internal Functions *
@@ -629,7 +545,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
         assembly {
             extraData       :=  shr(40, extraData)
             totalElements   :=  and(extraData, 0x000000000000000000000000000000000000000000000000000000FFFFFFFFFF)
-            nextQueueIndex  :=  shr(40, and(extraData, 0x00000000000000000000000000000000000000000000FFFFFFFFFF0000000000))
+            nextQueueIndex    :=  shr(40, and(extraData, 0x00000000000000000000000000000000000000000000FFFFFFFFFF0000000000))
             lastTimestamp   :=  shr(80, and(extraData, 0x0000000000000000000000000000000000FFFFFFFFFF00000000000000000000))
             lastBlockNumber :=  shr(120, and(extraData, 0x000000000000000000000000FFFFFFFFFF000000000000000000000000000000))
         }
@@ -646,14 +562,14 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
     /**
      * Encodes the batch context for the extra data.
      * @param _totalElements Total number of elements submitted.
-     * @param _nextQueueIndex Index of the next queue element.
+     * @param _nextQueueIdx Index of the next queue element.
      * @param _timestamp Timestamp for the last batch.
      * @param _blockNumber Block number of the last batch.
      * @return Encoded batch context.
      */
     function _makeBatchExtraData(
         uint40 _totalElements,
-        uint40 _nextQueueIndex,
+        uint40 _nextQueueIdx,
         uint40 _timestamp,
         uint40 _blockNumber
     )
@@ -666,185 +582,13 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
         bytes27 extraData;
         assembly {
             extraData := _totalElements
-            extraData := or(extraData, shl(40, _nextQueueIndex))
+            extraData := or(extraData, shl(40, _nextQueueIdx))
             extraData := or(extraData, shl(80, _timestamp))
             extraData := or(extraData, shl(120, _blockNumber))
             extraData := shl(40, extraData)
         }
 
         return extraData;
-    }
-
-    /**
-     * Retrieves the hash of a queue element.
-     * @param _index Index of the queue element to retrieve a hash for.
-     * @return Hash of the queue element.
-     */
-    function _getQueueLeafHash(
-        uint256 _index
-    )
-        internal
-        pure
-        returns (
-            bytes32
-        )
-    {
-        return _hashTransactionChainElement(
-            Lib_OVMCodec.TransactionChainElement({
-                isSequenced: false,
-                queueIndex: _index,
-                timestamp: 0,
-                blockNumber: 0,
-                txData: hex""
-            })
-        );
-    }
-
-    /**
-     * Gets the queue element at a particular index.
-     * @param _index Index of the queue element to access.
-     * @return _element Queue element at the given index.
-     */
-    function _getQueueElement(
-        uint256 _index,
-        IChainStorageContainer _queueRef
-    )
-        internal
-        view
-        returns (
-            Lib_OVMCodec.QueueElement memory _element
-        )
-    {
-        // The underlying queue data structure stores 2 elements
-        // per insertion, so to get the actual desired queue index
-        // we need to multiply by 2.
-        uint40 trueIndex = uint40(_index * 2);
-        bytes32 transactionHash = _queueRef.get(trueIndex);
-        bytes32 timestampAndBlockNumber = _queueRef.get(trueIndex + 1);
-
-        uint40 elementTimestamp;
-        uint40 elementBlockNumber;
-        // solhint-disable max-line-length
-        assembly {
-            elementTimestamp   :=         and(timestampAndBlockNumber, 0x000000000000000000000000000000000000000000000000000000FFFFFFFFFF)
-            elementBlockNumber := shr(40, and(timestampAndBlockNumber, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000000000))
-        }
-        // solhint-enable max-line-length
-
-        return Lib_OVMCodec.QueueElement({
-            transactionHash: transactionHash,
-            timestamp: elementTimestamp,
-            blockNumber: elementBlockNumber
-        });
-    }
-
-    /**
-     * Retrieves the length of the queue.
-     * @return Length of the queue.
-     */
-    function _getQueueLength(
-        IChainStorageContainer _queueRef
-    )
-        internal
-        view
-        returns (
-            uint40
-        )
-    {
-        // The underlying queue data structure stores 2 elements
-        // per insertion, so to get the real queue length we need
-        // to divide by 2.
-        return uint40(_queueRef.length() / 2);
-    }
-
-    /**
-     * Retrieves the hash of a sequencer element.
-     * @param _context Batch context for the given element.
-     * @param _nextTransactionPtr Pointer to the next transaction in the calldata.
-     * @param _txDataLength Length of the transaction item.
-     * @return Hash of the sequencer element.
-     */
-    function _getSequencerLeafHash(
-        BatchContext memory _context,
-        uint256 _nextTransactionPtr,
-        uint256 _txDataLength,
-        bytes memory _hashMemory
-    )
-        internal
-        pure
-        returns (
-            bytes32
-        )
-    {
-        // Only allocate more memory if we didn't reserve enough to begin with.
-        if (BYTES_TILL_TX_DATA + _txDataLength > _hashMemory.length) {
-            _hashMemory = new bytes(BYTES_TILL_TX_DATA + _txDataLength);
-        }
-
-        uint256 ctxTimestamp = _context.timestamp;
-        uint256 ctxBlockNumber = _context.blockNumber;
-
-        bytes32 leafHash;
-        assembly {
-            let chainElementStart := add(_hashMemory, 0x20)
-
-            // Set the first byte equal to `1` to indicate this is a sequencer chain element.
-            // This distinguishes sequencer ChainElements from queue ChainElements because
-            // all queue ChainElements are ABI encoded and the first byte of ABI encoded
-            // elements is always zero
-            mstore8(chainElementStart, 1)
-
-            mstore(add(chainElementStart, 1), ctxTimestamp)
-            mstore(add(chainElementStart, 33), ctxBlockNumber)
-            // solhint-disable-next-line max-line-length
-            calldatacopy(add(chainElementStart, BYTES_TILL_TX_DATA), add(_nextTransactionPtr, 3), _txDataLength)
-
-            leafHash := keccak256(chainElementStart, add(BYTES_TILL_TX_DATA, _txDataLength))
-        }
-
-        return leafHash;
-    }
-
-    /**
-     * Retrieves the hash of a sequencer element.
-     * @param _txChainElement The chain element which is hashed to calculate the leaf.
-     * @return Hash of the sequencer element.
-     */
-    function _getSequencerLeafHash(
-        Lib_OVMCodec.TransactionChainElement memory _txChainElement
-    )
-        internal
-        view
-        returns(
-            bytes32
-        )
-    {
-        bytes memory txData = _txChainElement.txData;
-        uint256 txDataLength = _txChainElement.txData.length;
-
-        bytes memory chainElement = new bytes(BYTES_TILL_TX_DATA + txDataLength);
-        uint256 ctxTimestamp = _txChainElement.timestamp;
-        uint256 ctxBlockNumber = _txChainElement.blockNumber;
-
-        bytes32 leafHash;
-        assembly {
-            let chainElementStart := add(chainElement, 0x20)
-
-            // Set the first byte equal to `1` to indicate this is a sequencer chain element.
-            // This distinguishes sequencer ChainElements from queue ChainElements because
-            // all queue ChainElements are ABI encoded and the first byte of ABI encoded
-            // elements is always zero
-            mstore8(chainElementStart, 1)
-
-            mstore(add(chainElementStart, 1), ctxTimestamp)
-            mstore(add(chainElementStart, 33), ctxBlockNumber)
-            // solhint-disable-next-line max-line-length
-            pop(staticcall(gas(), 0x04, add(txData, 0x20), txDataLength, add(chainElementStart, BYTES_TILL_TX_DATA), txDataLength))
-
-            leafHash := keccak256(chainElementStart, add(BYTES_TILL_TX_DATA, txDataLength))
-        }
-
-        return leafHash;
     }
 
     /**
@@ -892,165 +636,5 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
         );
 
         batchesRef.push(batchHeaderHash, latestBatchContext);
-    }
-
-
-    /**
-     * Hashes a transaction chain element.
-     * @param _element Chain element to hash.
-     * @return Hash of the chain element.
-     */
-    function _hashTransactionChainElement(
-        Lib_OVMCodec.TransactionChainElement memory _element
-    )
-        internal
-        pure
-        returns (
-            bytes32
-        )
-    {
-        return keccak256(
-            abi.encode(
-                _element.isSequenced,
-                _element.queueIndex,
-                _element.timestamp,
-                _element.blockNumber,
-                _element.txData
-            )
-        );
-    }
-
-    /**
-     * Verifies a sequencer transaction, returning true if it was indeed included in the CTC
-     * @param _transaction The transaction we are verifying inclusion of.
-     * @param _txChainElement The chain element that the transaction is claimed to be a part of.
-     * @param _batchHeader Header of the batch the transaction was included in.
-     * @param _inclusionProof An inclusion proof into the CTC at a particular index.
-     * @return True if the transaction was included in the specified location, else false.
-     */
-    function _verifySequencerTransaction(
-        Lib_OVMCodec.Transaction memory _transaction,
-        Lib_OVMCodec.TransactionChainElement memory _txChainElement,
-        Lib_OVMCodec.ChainBatchHeader memory _batchHeader,
-        Lib_OVMCodec.ChainInclusionProof memory _inclusionProof
-    )
-        internal
-        view
-        returns (
-            bool
-        )
-    {
-        bytes32 leafHash = _getSequencerLeafHash(_txChainElement);
-
-        require(
-            _verifyElement(
-                leafHash,
-                _batchHeader,
-                _inclusionProof
-            ),
-            "Invalid Sequencer transaction inclusion proof."
-        );
-
-        require(
-            _transaction.blockNumber        == _txChainElement.blockNumber
-            && _transaction.timestamp       == _txChainElement.timestamp
-            && _transaction.entrypoint      == address(0)
-            && _transaction.gasLimit        == maxTransactionGasLimit
-            && _transaction.l1TxOrigin      == address(0)
-            && _transaction.l1QueueOrigin   == Lib_OVMCodec.QueueOrigin.SEQUENCER_QUEUE
-            && keccak256(_transaction.data) == keccak256(_txChainElement.txData),
-            "Invalid Sequencer transaction."
-        );
-
-        return true;
-    }
-
-    /**
-     * Verifies a queue transaction, returning true if it was indeed included in the CTC
-     * @param _transaction The transaction we are verifying inclusion of.
-     * @param _queueIndex The queueIndex of the queued transaction.
-     * @param _batchHeader Header of the batch the transaction was included in.
-     * @param _inclusionProof An inclusion proof into the CTC at a particular index (should point to
-     * queue tx).
-     * @return True if the transaction was included in the specified location, else false.
-     */
-    function _verifyQueueTransaction(
-        Lib_OVMCodec.Transaction memory _transaction,
-        uint256 _queueIndex,
-        Lib_OVMCodec.ChainBatchHeader memory _batchHeader,
-        Lib_OVMCodec.ChainInclusionProof memory _inclusionProof
-    )
-        internal
-        view
-        returns (
-            bool
-        )
-    {
-        bytes32 leafHash = _getQueueLeafHash(_queueIndex);
-
-        require(
-            _verifyElement(
-                leafHash,
-                _batchHeader,
-                _inclusionProof
-            ),
-            "Invalid Queue transaction inclusion proof."
-        );
-
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                _transaction.l1TxOrigin,
-                _transaction.entrypoint,
-                _transaction.gasLimit,
-                _transaction.data
-            )
-        );
-
-        Lib_OVMCodec.QueueElement memory el = getQueueElement(_queueIndex);
-        require(
-            el.transactionHash      == transactionHash
-            && el.timestamp   == _transaction.timestamp
-            && el.blockNumber == _transaction.blockNumber,
-            "Invalid Queue transaction."
-        );
-
-        return true;
-    }
-
-    /**
-     * Verifies a batch inclusion proof.
-     * @param _element Hash of the element to verify a proof for.
-     * @param _batchHeader Header of the batch in which the element was included.
-     * @param _proof Merkle inclusion proof for the element.
-     */
-    function _verifyElement(
-        bytes32 _element,
-        Lib_OVMCodec.ChainBatchHeader memory _batchHeader,
-        Lib_OVMCodec.ChainInclusionProof memory _proof
-    )
-        internal
-        view
-        returns (
-            bool
-        )
-    {
-        require(
-            Lib_OVMCodec.hashBatchHeader(_batchHeader) ==
-                batches().get(uint32(_batchHeader.batchIndex)),
-            "Invalid batch header."
-        );
-
-        require(
-            Lib_MerkleTree.verify(
-                _batchHeader.batchRoot,
-                _element,
-                _proof.index,
-                _proof.siblings,
-                _batchHeader.batchSize
-            ),
-            "Invalid inclusion proof."
-        );
-
-        return true;
     }
 }

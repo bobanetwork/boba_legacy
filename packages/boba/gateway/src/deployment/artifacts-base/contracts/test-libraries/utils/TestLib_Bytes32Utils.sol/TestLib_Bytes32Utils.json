@@ -1,0 +1,87 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "TestLib_Bytes32Utils",
+  "sourceName": "contracts/test-libraries/utils/TestLib_Bytes32Utils.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_in",
+          "type": "address"
+        }
+      ],
+      "name": "fromAddress",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_out",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_in",
+          "type": "bool"
+        }
+      ],
+      "name": "fromBool",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_out",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_in",
+          "type": "bytes32"
+        }
+      ],
+      "name": "toAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "_out",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_in",
+          "type": "bytes32"
+        }
+      ],
+      "name": "toBool",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "_out",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506101c1806100206000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c8063341f6623146100515780638f03f7fd1461008e578063934e03a4146100af578063b72e717d146100d2575b600080fd5b61006461005f36600461013c565b6100e5565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b6100a161009c366004610155565b6100ef565b604051908152602001610085565b6100c26100bd36600461013c565b6100fa565b6040519015158152602001610085565b6100a16100e036600461017e565b610104565b6000815b92915050565b60006100e982610122565b60008115156100e9565b600073ffffffffffffffffffffffffffffffffffffffff82166100e9565b600081610130576000610133565b60015b60ff1692915050565b60006020828403121561014e57600080fd5b5035919050565b60006020828403121561016757600080fd5b8135801515811461017757600080fd5b9392505050565b60006020828403121561019057600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461017757600080fdfea164736f6c6343000808000a",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c8063341f6623146100515780638f03f7fd1461008e578063934e03a4146100af578063b72e717d146100d2575b600080fd5b61006461005f36600461013c565b6100e5565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b6100a161009c366004610155565b6100ef565b604051908152602001610085565b6100c26100bd36600461013c565b6100fa565b6040519015158152602001610085565b6100a16100e036600461017e565b610104565b6000815b92915050565b60006100e982610122565b60008115156100e9565b600073ffffffffffffffffffffffffffffffffffffffff82166100e9565b600081610130576000610133565b60015b60ff1692915050565b60006020828403121561014e57600080fd5b5035919050565b60006020828403121561016757600080fd5b8135801515811461017757600080fd5b9392505050565b60006020828403121561019057600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461017757600080fdfea164736f6c6343000808000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -19,8 +19,17 @@ packages/contracts/hardhat*
 
 packages/data-transport-layer/db
 
+packages/boba/gas-price-oracle/data
+
 # vim
 *.swp
 
 .env
 *.log
+
+# boba_examples
+boba_examples/init-fund-l2/yarn.lock
+
+# regenesis
+packages/regenesis-surgery/deployment
+packages/regenesis-surgery/state-dump

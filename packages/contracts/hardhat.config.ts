@@ -59,23 +59,31 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.8',
+        version: '0.8.9',
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
+          metadata: {
+            bytecodeHash: 'none',
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
       },
       {
         version: '0.5.17', // Required for WETH9
-      },
-    ],
-    settings: {
-      optimizer: { enabled: true, runs: 200 },
-      metadata: {
-        bytecodeHash: 'none',
-      },
-      outputSelection: {
-        '*': {
-          '*': ['storageLayout'],
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
         },
       },
-    },
+    ],
   },
   typechain: {
     outDir: 'dist/types',

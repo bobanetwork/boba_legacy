@@ -2,12 +2,11 @@
 import { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract, constants } from 'ethers'
 import { smoddit } from '@eth-optimism/smock'
+import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Internal Imports */
 import {
   makeAddressManager,
-  FORCE_INCLUSION_PERIOD_SECONDS,
-  FORCE_INCLUSION_PERIOD_BLOCKS,
   L2_GAS_DISCOUNT_DIVISOR,
   ENQUEUE_GAS_COST,
   NON_ZERO_ADDRESS,
@@ -46,8 +45,6 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       await ethers.getContractFactory('CanonicalTransactionChain')
     ).deploy(
       AddressManager.address,
-      FORCE_INCLUSION_PERIOD_SECONDS,
-      FORCE_INCLUSION_PERIOD_BLOCKS,
       MAX_GAS_LIMIT,
       L2_GAS_DISCOUNT_DIVISOR,
       ENQUEUE_GAS_COST
@@ -147,7 +144,14 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       )
 
       const receipt = await res.wait()
-      console.log('    - Gas used:', receipt.gasUsed.toNumber())
+      const gasUsed = receipt.gasUsed.toNumber()
+      console.log('    - Gas used:', gasUsed)
+      expectApprox(gasUsed, 116_781, {
+        absoluteUpperDeviation: 500,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
       // Sanity check that the message was enqueued.
       expect(await CanonicalTransactionChain.getQueueLength()).to.equal(2)
     })
@@ -167,7 +171,15 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       )
 
       const receipt = await res.wait()
-      console.log('    - Gas used:', receipt.gasUsed.toNumber())
+      const gasUsed = receipt.gasUsed.toNumber()
+      console.log('    - Gas used:', gasUsed)
+      expectApprox(gasUsed, 164_622, {
+        absoluteUpperDeviation: 500,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
+
       // Sanity check that the message was enqueued.
       expect(await CanonicalTransactionChain.getQueueLength()).to.equal(3)
     })

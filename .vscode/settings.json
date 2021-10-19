@@ -12,7 +12,7 @@
     {"directory": "packages/message-relayer", "changeProcessCWD": true },
   ],
   "eslint.nodePath": "./node_modules/eslint/bin/",
-  "eslint.format.enable": true,
+  "eslint.format.enable": false,
   "editorconfig.generateAuto": false,
   "files.trimTrailingWhitespace": true,
 }

@@ -6,6 +6,7 @@ import {
   AppendSequencerBatchParams,
   BatchContext,
   encodeAppendSequencerBatch,
+  expectApprox,
 } from '@eth-optimism/core-utils'
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { keccak256 } from 'ethers/lib/utils'
@@ -80,13 +81,8 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
 
   let CanonicalTransactionChain: Contract
   beforeEach(async () => {
-    // Use a larger FIP for blocks so that we can send a large number of
-    // enqueue() transactions without having to manipulate the block number.
-    const forceInclusionPeriodBlocks = 101
     CanonicalTransactionChain = await Factory__CanonicalTransactionChain.deploy(
       AddressManager.address,
-      FORCE_INCLUSION_PERIOD_SECONDS,
-      forceInclusionPeriodBlocks,
       MAX_GAS_LIMIT,
       L2_GAS_DISCOUNT_DIVISOR,
       ENQUEUE_GAS_COST
@@ -152,14 +148,21 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       })
 
       const receipt = await res.wait()
+      const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', receipt.gasUsed.toNumber())
+
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
         'Non-calldata overhead gas cost per transaction:',
-        (receipt.gasUsed.toNumber() - fixedCalldataCost) / numTxs
+        (gasUsed - fixedCalldataCost) / numTxs
       )
+      expectApprox(gasUsed, 1_422_181, {
+        absoluteUpperDeviation: 1000,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     }).timeout(10_000_000)
 
     it('200 transactions in 200 contexts', async () => {
@@ -192,14 +195,21 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       })
 
       const receipt = await res.wait()
+      const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', receipt.gasUsed.toNumber())
+
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
         'Non-calldata overhead gas cost per transaction:',
-        (receipt.gasUsed.toNumber() - fixedCalldataCost) / numTxs
+        (gasUsed - fixedCalldataCost) / numTxs
       )
+      expectApprox(gasUsed, 1_619_781, {
+        absoluteUpperDeviation: 1000,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     }).timeout(10_000_000)
 
     it('100 Sequencer transactions and 100 Queue transactions in 100 contexts', async () => {
@@ -242,29 +252,36 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
       })
 
       const receipt = await res.wait()
+      const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', receipt.gasUsed.toNumber())
+
       console.log('Fixed calldata cost:', fixedCalldataCost)
       console.log(
         'Non-calldata overhead gas cost per transaction:',
-        (receipt.gasUsed.toNumber() - fixedCalldataCost) / numTxs
+        (gasUsed - fixedCalldataCost) / numTxs
       )
+      expectApprox(gasUsed, 891_158, {
+        absoluteUpperDeviation: 1000,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     }).timeout(10_000_000)
   })
 
   describe('enqueue [ @skip-on-coverage ]', () => {
-    let ENQUEUE_L2_GAS_PREPAID
+    let enqueueL2GasPrepaid
     let data
     beforeEach(async () => {
       CanonicalTransactionChain = CanonicalTransactionChain.connect(sequencer)
-      ENQUEUE_L2_GAS_PREPAID =
-        await CanonicalTransactionChain.ENQUEUE_L2_GAS_PREPAID()
+      enqueueL2GasPrepaid =
+        await CanonicalTransactionChain.enqueueL2GasPrepaid()
       data = '0x' + '12'.repeat(1234)
     })
 
     it('cost to enqueue a transaction above the prepaid threshold', async () => {
-      const l2GasLimit = 2 * ENQUEUE_L2_GAS_PREPAID
+      const l2GasLimit = 2 * enqueueL2GasPrepaid
 
       const res = await CanonicalTransactionChain.enqueue(
         NON_ZERO_ADDRESS,
@@ -272,13 +289,20 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
         data
       )
       const receipt = await res.wait()
+      const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', receipt.gasUsed.toNumber())
+
+      expectApprox(gasUsed, 189_487, {
+        absoluteUpperDeviation: 500,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     })
 
     it('cost to enqueue a transaction below the prepaid threshold', async () => {
-      const l2GasLimit = ENQUEUE_L2_GAS_PREPAID - 1
+      const l2GasLimit = enqueueL2GasPrepaid - 1
 
       const res = await CanonicalTransactionChain.enqueue(
         NON_ZERO_ADDRESS,
@@ -286,9 +310,16 @@ describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
         data
       )
       const receipt = await res.wait()
+      const gasUsed = receipt.gasUsed.toNumber()
 
       console.log('Benchmark complete.')
-      console.log('Gas used:', receipt.gasUsed.toNumber())
+
+      expectApprox(gasUsed, 127_500, {
+        absoluteUpperDeviation: 500,
+        // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
+        // contracts are too efficient, consider updating the target value!
+        percentLowerDeviation: 1,
+      })
     })
   })
 })

@@ -18,6 +18,19 @@ curl \
 
 yarn run deploy
 
+if [ -n "$DTL_REGISTRY_URL" ] ; then
+  echo "Will upload addresses.json to DTL"
+  curl \
+      --show-error \
+      --silent \
+      -H "Content-Type: application/json" \
+      --retry-connrefused \
+      --retry $RETRIES \
+      --retry-delay 5 \
+      -T dist/dumps/addresses.json \
+      "$DTL_REGISTRY_URL"
+fi
+
 function envSet() {
     VAR=$1
     export $VAR=$(cat ./dist/dumps/addresses.json | jq -r ".$2")
@@ -36,6 +49,21 @@ fi
 
 # build the dump file
 yarn run build:dump
+
+if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
+  echo "Will upload state-dump.latest.json to DTL"
+  curl \
+      --show-error \
+      --silent \
+      -H "Content-Type: application/octet-stream" \
+      --retry-connrefused \
+      --retry $RETRIES \
+      --retry-delay 5 \
+      -T dist/dumps/state-dump.latest.json \
+      "$DTL_STATE_DUMP_REGISTRY_URL"
+  echo
+  echo "Upload done."
+fi
 
 # service the addresses and dumps
 cd ./dist/dumps

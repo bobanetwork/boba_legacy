@@ -16,6 +16,12 @@ interface ICanonicalTransactionChain {
      * Events *
      **********/
 
+    event L2GasParamsUpdated(
+        uint256 l2GasDiscountDivisor,
+        uint256 enqueueGasCost,
+        uint256 enqueueL2GasPrepaid
+    );
+
     event TransactionEnqueued(
         address indexed _l1TxOrigin,
         address indexed _target,
@@ -57,11 +63,20 @@ interface ICanonicalTransactionChain {
         uint256 blockNumber;
     }
 
+    /*******************************
+     * Authorized Setter Functions *
+     *******************************/
+
+    /**
+     * Allows the Burn Admin to update the parameters which determine the amount of gas to burn.
+     * The value of enqueueL2GasPrepaid is immediately updated as well.
+     */
+    function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost)
+        external;
 
     /********************
      * Public Functions *
      ********************/
-
 
     /**
      * Accesses the batch storage container.
@@ -192,15 +207,6 @@ interface ICanonicalTransactionChain {
         external;
 
     /**
-     * Appends a given number of queued transactions as a single batch.
-     * @param _numQueuedTransactions Number of transactions to append.
-     */
-    function appendQueueBatch(
-        uint256 _numQueuedTransactions
-    )
-        external;
-
-    /**
      * Allows the sequencer to append a batch of transactions.
      * @dev This function uses a custom encoding scheme for efficiency reasons.
      * .param _shouldStartAtElement Specific batch we expect to start appending to.
@@ -215,24 +221,4 @@ interface ICanonicalTransactionChain {
         // bytes[] _transactionDataFields
     )
         external;
-
-    /**
-     * Verifies whether a transaction is included in the chain.
-     * @param _transaction Transaction to verify.
-     * @param _txChainElement Transaction chain element corresponding to the transaction.
-     * @param _batchHeader Header of the batch the transaction was included in.
-     * @param _inclusionProof Inclusion proof for the provided transaction chain element.
-     * @return True if the transaction exists in the CTC, false if not.
-     */
-    function verifyTransaction(
-        Lib_OVMCodec.Transaction memory _transaction,
-        Lib_OVMCodec.TransactionChainElement memory _txChainElement,
-        Lib_OVMCodec.ChainBatchHeader memory _batchHeader,
-        Lib_OVMCodec.ChainInclusionProof memory _inclusionProof
-    )
-        external
-        view
-        returns (
-            bool
-        );
 }
