@@ -464,9 +464,11 @@ class NetworkService {
       }
 
       if (addresses.hasOwnProperty('Proxy__L1LiquidityPool')) {
+        console.log('Proxy__L1LiquidityPool set to:',addresses.Proxy__L1LiquidityPool)
         this.L1LPAddress = addresses.Proxy__L1LiquidityPool
       }
       if (addresses.hasOwnProperty('Proxy__L2LiquidityPool')) {
+        console.log('Proxy__L2LiquidityPool set to:',addresses.Proxy__L2LiquidityPool)
         this.L2LPAddress = addresses.Proxy__L2LiquidityPool
       }
 
@@ -536,9 +538,10 @@ class NetworkService {
 
       // Liquidity pools
 
-      console.log('this.L1LPAddress:',this.L1LPAddress)
+      //console.log('this.L1LPAddress:',this.L1LPAddress)
 
       if(this.L1LPAddress !== null) {
+        console.log('Setting up contract for L1LP at:',this.L1LPAddress)
         this.L1LPContract = new ethers.Contract(
           this.L1LPAddress,
           L1LPJson.abi,
@@ -547,6 +550,7 @@ class NetworkService {
       }
 
       if(this.L2LPAddress !== null) {
+        console.log('Setting up contract for L2LP at:',this.L2LPAddress)
         this.L2LPContract = new ethers.Contract(
           this.L2LPAddress,
           L2LPJson.abi,
@@ -659,7 +663,7 @@ class NetworkService {
 
   }
 
-  /* Yes, this almost complete dupicates async switchChain( layer )
+  /* Yes, this almost complete duplicates async switchChain( layer )
   but that's safest for now */
   async correctChain( targetLayer ) {
 
@@ -1673,8 +1677,6 @@ class NetworkService {
       return acc;
     }, [this.L1_ETH_Address]);
 
-    console.log("tokenAddressList",tokenAddressList)
-
     const L1LPContract = new ethers.Contract(
       this.L1LPAddress,
       L1LPJson.abi,
@@ -1765,7 +1767,7 @@ class NetworkService {
     }, [{
       L1: this.L1_ETH_Address,
       L2: this.L2_ETH_Address
-    }]);
+    }])
 
     const L2LPContract = new ethers.Contract(
       this.L2LPAddress,
