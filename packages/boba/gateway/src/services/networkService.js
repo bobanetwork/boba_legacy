@@ -362,40 +362,45 @@ class NetworkService {
       console.log('NS: this.chainID:', this.chainID)
       console.log('NS: this.networkName:', this.networkName)
 
+      // defines the set of possible networks along with chainId for L1 and L2
+      const nw = getAllNetworks()
+      const L1ChainId = nw[masterSystemConfig]['L1']['chainId'];
+      const L2ChainId = nw[masterSystemConfig]['L2']['chainId'];
+
       //there are numerous possible chains we could be on
       //either local, rinkeby etc
       //and then, also, either L1 or L2
 
       //at this point, we only know whether we want to be on local or rinkeby etc
-      if (masterSystemConfig === 'local' && network.chainId === 31338) {
+      if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //local deployment, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'local' && network.chainId === 31337) {
+      } else if (masterSystemConfig === 'local' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 28) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 29) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 1) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 288) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
@@ -405,8 +410,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      // defines the set of possible networks
-      const nw = getAllNetworks()
+      
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[masterSystemConfig]['L1']['rpcUrl']
