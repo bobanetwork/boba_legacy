@@ -4,14 +4,14 @@ FROM base as build
 
 RUN apt-get update && apt-get install -y bash git python build-essential
 
-COPY . /transaction-monitor
-RUN cd /transaction-monitor && yarn install
+WORKDIR /
 
-FROM base
+COPY ops_boba ./ops_boba
+COPY packages/core-utils ./packages/core-utils
 
-COPY --from=build /transaction-monitor /transaction-monitor
+RUN cd packages/core-utils && yarn install
+RUN cd ops_boba/monitor/ && yarn install
 
-RUN ln -s /transaction-monitor/exec/run-monitor.js /usr/local/bin/
-RUN chmod +x /usr/local/bin/run-monitor.js
+WORKDIR /ops_boba/monitor
 
-ENTRYPOINT ["run-monitor.js"]
+ENTRYPOINT yarn start

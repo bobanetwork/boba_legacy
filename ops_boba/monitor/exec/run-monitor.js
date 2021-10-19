@@ -26,15 +26,15 @@ const loop = async (func) => {
 }
 
 const main = async () => {
-  if (validateMonitoring()) {
-    logger.info('Start addresses monitoring service!')
-    setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl)
-    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
-  } else {
-    logger.error(
-      'Addresses Monitoring: Env variables for monitoring is missing!'
-    )
-  }
+  // if (validateMonitoring()) {
+  //   logger.info('Start addresses monitoring service!')
+  //   setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl)
+  //   setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
+  // } else {
+  //   logger.error(
+  //     'Addresses Monitoring: Env variables for monitoring is missing!'
+  //   )
+  // }
 
   // l1 message monitor
   const messageService = new messageMonitorService();

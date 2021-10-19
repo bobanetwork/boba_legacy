@@ -279,23 +279,27 @@ class BlockMonitorService extends OptimismEnv {
     const filteredLogData = receiptData.logs.filter(
       (i) =>
         i.address === this.OVM_L2CrossDomainMessenger &&
-        i.topics[0] === ethers.utils.id('SentMessage(bytes)')
+        i.topics[0] === ethers.utils.id(
+          'SentMessage(address,address,bytes,uint256,uint256)'
+        )
     )
 
     if (filteredLogData.length) {
       crossDomainMessage = true
       // Get message hashes from L2 TX
       for (const logData of filteredLogData) {
-        const [message] = ethers.utils.defaultAbiCoder.decode(
-          ['bytes'],
-          logData.data
-        )
-        const decoded =
-          this.OVM_L2CrossDomainMessengerContract.interface.decodeFunctionData(
-            'relayMessage',
-            message
+        const [sender, message, messageNonce] =
+          ethers.utils.defaultAbiCoder.decode(
+            ['address', 'bytes', 'uint256'],
+            logData.data
           )
-        if (this.whitelist.includes(decoded._target)) {
+
+        const [target] = ethers.utils.defaultAbiCoder.decode(
+          ['address'],
+          logData.topics[1]
+        )
+
+        if (this.whitelist.includes(target)) {
           fastRelay = true
         }
       }
@@ -442,14 +446,14 @@ class BlockMonitorService extends OptimismEnv {
 
     const filter = {
       address: fast
-        ? this.OVM_L1CrossDomainMessengerFast
-        : this.OVM_L1CrossDomainMessenger,
+        ? this.L1CrossDomainMessengerFast
+        : this.L1CrossDomainMessenger,
       topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
       fromBlock: startingBlock,
     }
 
     const logs = await this.L1Provider.getLogs(filter)
-    const matches = logs.filter((i) => i.data === msgHash)
+    const matches = logs.filter((i) => i.topics[1] === msgHash)
 
     if (matches.length > 0) {
       if (matches.length > 1) {
@@ -469,8 +473,8 @@ class BlockMonitorService extends OptimismEnv {
       const filterSelect = [filter.Proxy__L1LiquidityPool, filter.L1Message]
       this.whitelist = filterSelect
       this.logger.info('Found the filter', { filterSelect })
-    } catch {
-      this.logger.error('CRITICAL ERROR: Failed to fetch the Filter')
+    } catch (error) {
+      this.logger.error(`CRITICAL ERROR: Failed to fetch the Filter - error: ${error}`)
     }
   }
 
