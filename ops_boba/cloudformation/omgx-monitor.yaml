@@ -24,7 +24,7 @@ Parameters:
 
   ECRRegistry:
     Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
+    Default: hub.docker.com
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -51,31 +51,37 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
+        - PolicyName: AllowAccessToS3
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/omgx-monitor.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${OmgxMonitorImage}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${OmgxMonitorImage}:${ImageTag}"
           Name: omgx_monitor
-          EnvironmentFiles:
+          EnvironmentFile:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/omgx-monitor.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
-            - Type: "s3"
+              - "arn:aws:s3:::${S3BucketV2}/omgx-monitor.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: L2_NODE_WEB3_WS
+              Value: !Sub
+                - "wss://${EndpointAddress}/ws"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
           DockerLabels:
             com.datadoghq.ad.check_names: '["omgx-monitor"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -84,6 +90,7 @@ Resources:
           Memory: "256"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: "omgx-monitor"
   ECSService:
     Type: AWS::ECS::Service

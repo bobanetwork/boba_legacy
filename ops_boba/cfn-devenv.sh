@@ -5,6 +5,7 @@ set -o nounset -o errexit
 # Global variables
 PATH_TO_CFN="$PWD/cloudformation"
 PATH_TO_DOCKER="$PWD/docker"
+PATH_TO_ENV="$PWD/docker_env"
 REGION=us-east-1
 REGISTRY_PREFIX=omgx
 SERVICE_NAME=
@@ -73,6 +74,8 @@ function print_usage_and_exit {
         ssh                              does ssh to the ECS Cluster and then lets you run commands there, writing sudo su will drop you in a root shell
             --stack-name <stack-name>       the name of the stack, in which you want to login to
 
+        envgenerate                     does generate the environment files for each of the services and deployes the file to the S3 Bucket for the environment
+
 
 
     Examples:
@@ -136,84 +139,6 @@ function info {
     log_output INFO "${@}"
 }
 
-function verify_images_in_ecr {
-#  set -x
-# cached old docker images makes docker refuse to pull latest!
-  #docker system prune -a -f --volumes
-  info "Login to AWS ECR and start building image"
-  aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ECR} 2> /dev/null
-
-    if [[ -z ${FROMTAG} ]]; then
-      info "Verifying whether there are images for all services in AWS ECR"
-      for image in ${DOCKER_IMAGES_LIST}; do
-        local IMAGE_META="$( aws ecr describe-images --region us-east-2 --repository-name=${REGISTRY_PREFIX}/$image --image-ids=imageTag=${DEPLOYTAG} 2> /dev/null )"
-        local IMAGE_TAG="$( echo ${IMAGE_META} | jq '.imageDetails[0].imageTags[0]' -r )"
-          if [[ ${DEPLOYTAG} == $IMAGE_TAG ]]; then
-              info "${image}:${DEPLOYTAG} found"
-          else
-              warn "${image}:${DEPLOYTAG} not found"
-              cd ${PATH_TO_DOCKER}/${image}
-              cp -fRv ../../secret2env .
-              if [[ ${image} == "omgx-gas-price-oracle" ]]; then
-                  docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/omgx_gas-price-oracle" --build-arg BUILD_IMAGE_VERSION="${DEPLOYTAG}"
-              else
-              docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/${image}" --build-arg BUILD_IMAGE_VERSION="${DEPLOYTAG}"
-              fi
-              docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG}
-              cd ../..
-          fi
-        done
-        info "Verified all images exist in AWS ECR"
-     elif [[ -z ${SERVICE_NAME} ]]; then
-        for image in ${DOCKER_IMAGES_LIST}; do
-          cd ${PATH_TO_DOCKER}/${image}
-          cp -fRv ../../secret2env .
-          if [[ ${image} == "omgx-gas-price-oracle" ]]; then
-              docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/omgx_gas-price-oracle" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-	        elif
-	           [[ ${image} == "message-relayer-fast" ]]; then
-	           docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/omgx_message-relayer-fast" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-          elif
-             [[ ${image} == "replica-l2" ]]; then
-             docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/l2geth" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-          else
-          docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/${image}" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-          fi
-          docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG}
-          cd ../..
-        done
-      else
-        info "Rebuilding ${SERVICE_NAME} from ${FROMTAG} tag from hub.docker.com"
-        cd ${PATH_TO_DOCKER}/${SERVICE_NAME}
-        cp -fRv ../../secret2env .
-        if [ -z ${FROMTAG} ]; then
-          if [[ ${SERVICE_NAME} == "replica-l2" ]]; then
-            docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/l2geth" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-            docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          elif [[ ${SERVICE_NAME} == "omgx-gas-price-oracle" ]]; then
-              docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${image}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/omgx_gas-price-oracle" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-              docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          else
-            docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/${image}" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-            docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          fi
-        else
-          if [[ ${SERVICE_NAME} == "replica-l2" ]]; then
-            docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/l2geth" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-            docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          elif [[ ${SERVICE_NAME} == "omgx-gas-price-oracle" ]]; then
-            docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/omgx_gas-price-oracle" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-            docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          else
-            docker build . -t ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG} --build-arg BUILD_IMAGE="${REGISTRY_PREFIX}/${SERVICE_NAME}" --build-arg BUILD_IMAGE_VERSION="${FROMTAG}"
-            docker push ${AWS_ECR}/${REGISTRY_PREFIX}/${SERVICE_NAME}:${DEPLOYTAG}
-          fi
-        fi
-        cd ../..
-        info "${SERVICE_NAME} rebuild and pushed to AWS ECR"
-        exit
-     fi
-}
 
 function check_dev_environment {
     info "Check for existing VPC and ECS Cluster"
@@ -221,6 +146,8 @@ function check_dev_environment {
             grep ${ENV_PREFIX}-infrastructure-core | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
     local CFN_APP_STACK="$(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE | \
             grep ${ENV_PREFIX}-infrastructure-application | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
+    local CFN_APP_REPLICA_STACK="$(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE | \
+            grep ${ENV_PREFIX}-replica | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
     if [ -z "$CFN_INFRASTRUCTURE_STACK" ]; then
           warn "VPC does not exist ... creating one"
           cd ${PATH_TO_CFN}
@@ -230,7 +157,7 @@ function check_dev_environment {
               --template-body=file://00-infrastructure-core.yaml \
               --region ${REGION} \
               --parameters \
-                  ParameterKey=Route53HostedZoneName,ParameterValue=${ENV_PREFIX}.omgx.network | jq '.StackId'
+                  ParameterKey=Route53HostedZoneName,ParameterValue=${ENV_PREFIX}.boba.network | jq '.StackId'
           info "Waiting for the ${ENV_PREFIX}-infrastructure-core to create"
           aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-infrastructure-core
           info "${ENV_PREFIX}-infrastructure-core created .... provisioning ECS Cluster"
@@ -241,7 +168,7 @@ function check_dev_environment {
                --region ${REGION} \
                --parameters \
                    ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
-                   ParameterKey=DomainName,ParameterValue=${ENV_PREFIX}.omgx.network | jq '.StackId'
+                   ParameterKey=DomainName,ParameterValue=${ENV_PREFIX}.boba.network | jq '.StackId'
           info "Waiting for the ${ENV_PREFIX}-infrastructure-application to create"
           aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-infrastructure-application
           info "${ENV_PREFIX}-infrastructure-application created"
@@ -254,15 +181,24 @@ function check_dev_environment {
                --parameters \
                    ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
             aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog
-            info "Adding L1-Proxy to the ECS Cluster"
+            info "Adding Replica ECS Cluster"
             aws cloudformation create-stack \
-                 --stack-name ${ENV_PREFIX}-l1-proxy \
+                 --stack-name ${ENV_PREFIX}-replica \
                  --capabilities CAPABILITY_IAM \
-                 --template-body=file://06-l1-proxy.yaml \
+                 --template-body=file://04-infrastructure-replica.yaml \
                  --region ${REGION} \
                  --parameters \
                      ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
-              aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-l1-proxy
+              aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-replica
+              info "Adding Datadog to the Replica ECS Cluster"
+              aws cloudformation create-stack \
+                   --stack-name ${ENV_PREFIX}-datadog-replica \
+                   --capabilities CAPABILITY_IAM \
+                   --template-body=file://datadog-replica.yaml \
+                   --region ${REGION} \
+                   --parameters \
+                       ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog-replica
               info "Adding Graph to the ECS Cluster"
               aws cloudformation create-stack \
                    --stack-name ${ENV_PREFIX}-graph \
@@ -273,38 +209,47 @@ function check_dev_environment {
                        ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                 aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
           cd ..
-      else
-          info "VPC exists ... checking ECS Cluster"
-          if [ -z "$CFN_APP_STACK" ]; then
-            warn "ECS Cluster does not exist ... creating one"
-            cd ${PATH_TO_CFN}
-            aws cloudformation create-stack \
-                 --stack-name ${ENV_PREFIX}-infrastructure-application \
-                 --capabilities CAPABILITY_IAM \
-                 --template-body=file://03-infrastructure-application.yaml \
-                 --region ${REGION} \
-                 --parameters \
-                     ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
-                     ParameterKey=DomainName,ParameterValue=${ENV_PREFIX}.omgx.network | jq '.StackId'
-            aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-infrastructure-application
-            info "Adding Datadog to the ECS Cluster"
-            aws cloudformation create-stack \
-                 --stack-name ${ENV_PREFIX}-datadog \
-                 --capabilities CAPABILITY_IAM \
-                 --template-body=file://datadog.yaml \
-                 --region ${REGION} \
-                 --parameters \
-                     ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
-              aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog
-              info "Adding L1-Proxy to the ECS Cluster"
+      elif [ ! -z "$CFN_APP_STACK" ]; then
+          warn "ECS Cluster does not exist ... creating one"
+          cd ${PATH_TO_CFN}
+          aws cloudformation create-stack \
+               --stack-name ${ENV_PREFIX}-infrastructure-application \
+               --capabilities CAPABILITY_IAM \
+               --template-body=file://03-infrastructure-application.yaml \
+               --region ${REGION} \
+               --parameters \
+                   ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
+                   ParameterKey=DomainName,ParameterValue=${ENV_PREFIX}.boba.network | jq '.StackId'
+          aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-infrastructure-application
+          info "Adding Datadog to the ECS Cluster"
+          aws cloudformation create-stack \
+               --stack-name ${ENV_PREFIX}-datadog \
+               --capabilities CAPABILITY_IAM \
+               --template-body=file://datadog.yaml \
+               --region ${REGION} \
+               --parameters \
+                   ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+            aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog
+      elif [ -z "$CFN_APP_REPLICA_STACK" ]; then
+              info "Adding Replica ECS Cluster"
+              cd ${PATH_TO_CFN}
               aws cloudformation create-stack \
-                   --stack-name ${ENV_PREFIX}-l1-proxy \
+                   --stack-name ${ENV_PREFIX}-replica \
                    --capabilities CAPABILITY_IAM \
-                   --template-body=file://06-l1-proxy.yaml \
+                   --template-body=file://04-infrastructure-replica.yaml \
                    --region ${REGION} \
                    --parameters \
                        ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
-                aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-l1-proxy
+                aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-replica
+                info "Adding Datadog to the Replica ECS Cluster"
+                aws cloudformation create-stack \
+                     --stack-name ${ENV_PREFIX}-datadog-replica \
+                     --capabilities CAPABILITY_IAM \
+                     --template-body=file://datadog-replica.yaml \
+                     --region ${REGION} \
+                     --parameters \
+                         ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                  aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog-replica
                 info "Adding Graph to the ECS Cluster"
                 aws cloudformation create-stack \
                      --stack-name ${ENV_PREFIX}-graph \
@@ -317,7 +262,6 @@ function check_dev_environment {
             cd ..
           else
             info "ECS Cluster exists"
-          fi
       fi
 }
 
@@ -329,14 +273,13 @@ function deploy_dev_services {
         info "$SERVICE provisioning ..."
         aws cloudformation create-stack \
             --stack-name ${ENV_PREFIX}-$SERVICE \
-            --capabilities CAPABILITY_IAM \
+            --capabilities CAPABILITY_NAMED_IAM \
             --template-body=file://${SERVICE}.yaml \
             --region ${REGION} \
             --parameters \
                 ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
                 ParameterKey=ImageTag,ParameterValue=${DEPLOYTAG} \
                 ParameterKey=EnvironmentName,ParameterValue=${ENV_PREFIX} \
-                ParameterKey=SecretName,ParameterValue=${SECRETNAME} \
                 ParameterKey=DockerPrefix,ParameterValue=${REGISTRY_PREFIX} | jq '.StackId'
         info "$SERVICE provisioning ..."
         cd ..
@@ -350,14 +293,13 @@ function deploy_dev_services {
       cd ${PATH_TO_CFN}
       aws cloudformation create-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME} \
-          --capabilities CAPABILITY_IAM \
+          --capabilities CAPABILITY_NAMED_IAM \
           --template-body=file://${SERVICE_NAME}.yaml \
           --region ${REGION} \
           --parameters \
               ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
               ParameterKey=ImageTag,ParameterValue=${DEPLOYTAG} \
               ParameterKey=EnvironmentName,ParameterValue=${ENV_PREFIX} \
-              ParameterKey=SecretName,ParameterValue=${SECRETNAME} \
               ParameterKey=DockerPrefix,ParameterValue=${REGISTRY_PREFIX} | jq '.StackId'
       aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-${SERVICE_NAME}
       info "${SERVICE_NAME} provisioned"
@@ -373,14 +315,13 @@ function update_dev_services {
         info "Updating $SERVICE"
         aws cloudformation update-stack \
             --stack-name ${ENV_PREFIX}-$SERVICE \
-            --capabilities CAPABILITY_IAM \
+            --capabilities CAPABILITY_NAMED_IAM \
             --template-body=file://${SERVICE}.yaml \
             --region ${REGION} \
             --parameters \
                 ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
                 ParameterKey=ImageTag,ParameterValue=${DEPLOYTAG} \
                 ParameterKey=EnvironmentName,ParameterValue=${ENV_PREFIX} \
-                ParameterKey=SecretName,ParameterValue=${SECRETNAME} \
                 ParameterKey=DockerPrefix,ParameterValue=${REGISTRY_PREFIX} | jq '.StackId'
         info "Waiting for update to complete ..."
         aws cloudformation wait stack-update-complete --stack-name=${ENV_PREFIX}-$SERVICE
@@ -392,14 +333,13 @@ function update_dev_services {
       cd ${PATH_TO_CFN}
       aws cloudformation update-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME} \
-          --capabilities CAPABILITY_IAM \
+          --capabilities CAPABILITY_NAMED_IAM \
           --template-body=file://${SERVICE_NAME}.yaml \
           --region ${REGION} \
           --parameters \
               ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core \
               ParameterKey=ImageTag,ParameterValue=${DEPLOYTAG} \
               ParameterKey=EnvironmentName,ParameterValue=${ENV_PREFIX} \
-              ParameterKey=SecretName,ParameterValue=${SECRETNAME} \
               ParameterKey=DockerPrefix,ParameterValue=${REGISTRY_PREFIX} | jq '.StackId'
       info "Waiting for update to complete"
       aws cloudformation wait stack-update-complete --stack-name=${ENV_PREFIX}-${SERVICE_NAME}
@@ -436,6 +376,7 @@ function destroy_dev_services {
   }
 
   function restart_service {
+    set -x
       local force="${1:-}"
       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
       if [[ ${ENV_PREFIX} == *"-replica"* ]];then
@@ -454,9 +395,9 @@ function destroy_dev_services {
             aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
           done
           aws ecs list-tasks --cluster $ECS_CLUSTER | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
-          sleep 10
-          #  aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/*" --region ${REGION} --output text
-          #  aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/*" --region ${REGION} --output text
+          sleep 30
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text
           for num in $SERVICE4RESTART; do
             aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 1 >> /dev/null
           done
@@ -466,7 +407,7 @@ function destroy_dev_services {
             aws ecs update-service  --region ${REGION} --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
           done
           aws ecs list-tasks --cluster $ECS_CLUSTER | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
-          sleep 10
+          sleep 30
           for num in $SERVICE4RESTART; do
             aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 1 >> /dev/null
           done
@@ -477,7 +418,12 @@ function destroy_dev_services {
         SRV=`echo ${SERVICE_NAME}`
         SERVICE2RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|sed 's#"##g'|grep -i $SRV|tail -1`
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
-        sleep 10
+        sleep 30
+        if [[ "${SERVICE_NAME}" == "l2geth" ]]; then
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text
+        elif [[ "${SERVICE_NAME}" == "data-transport-layer" ]]; then
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text
+        fi
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 1 >> /dev/null
         info "Restarted ${SERVICE_NAME} on ${ECS_CLUSTER}"
       fi
@@ -530,6 +476,21 @@ function destroy_dev_services {
         }
 
 
+     function generate_environment {
+        cd $PATH_TO_ENV
+        VARS_ALL=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'`
+        VAR_LIST=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'|cut -d= -f1`
+        for variable in $VAR_LIST; do
+          VALUE=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'|grep -w $variable|cut -d= -f2`
+          VALUELONG=`echo ${variable}_VALUE`
+          sed -i "s#$VALUELONG#$VALUE#g" *.env
+        done
+        aws s3 cp --recursive `pwd` s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+
+        git checkout HEAD -- `ls *.env`
+
+      }
+
 
 if [[ $# -gt 0 ]]; then
     while [[ $# -gt 0 ]]; do
@@ -537,7 +498,7 @@ if [[ $# -gt 0 ]]; then
             -h|--help)
                 print_usage_and_exit
                 ;;
-            create|deploy|update|destroy|restoredb|push2aws|restart|ssh|list-clusters|stop)
+            create|deploy|update|destroy|restoredb|push2aws|restart|ssh|list-clusters|envgenerate|stop)
                 SUBCMD="${1}"
                 shift
                 ;;
@@ -597,13 +558,11 @@ case "${SUBCMD}" in
         ;;
     deploy)
         [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
-        [[ -z "${SECRETNAME}" ]] && warn 'Missing option --secret-name, defaulting to --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         deploy_dev_services
         ;;
     update)
         [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
-        [[ -z "${SECRETNAME}" ]] && warn 'Missing option --secret-name, defaulting to --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         update_dev_services
         ;;
@@ -623,6 +582,11 @@ case "${SUBCMD}" in
         ;;
     list-clusters)
         list_clusters
+        ;;
+    envgenerate)
+        [[ -z "${SECRETNAME}" ]] && warn 'Missing option --secret-name, defaulting to --deploy-tag'
+        [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
+        generate_environment
         ;;
     push2aws)
         [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'

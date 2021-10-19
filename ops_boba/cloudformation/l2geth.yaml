@@ -22,22 +22,10 @@ Parameters:
     Type: String
     Default: omgx
 
-  ECRRegistry:
-    Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:
@@ -51,18 +39,6 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
         - PolicyName: AllowAccessToELB
           PolicyDocument:
             Version: 2012-10-17
@@ -71,6 +47,7 @@ Resources:
                 Action:
                   - "ec2:AuthorizeSecurityGroupIngress"
                   - "ec2:Describe*"
+                  - "ec2:*"
                   - "elasticloadbalancing:*"
                   - "elasticloadbalancing:Describe*"
                   - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
@@ -79,7 +56,39 @@ Resources:
                   - "elasticloadbalancing:DescribeTargetHealth"
                   - "elasticloadbalancing:RegisterTargets"
                   - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
                 Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/l2geth.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+  DNSRecordV4:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName:
+          Fn::Sub:
+            - "dualstack.${DomainName}."
+            - DomainName:
+                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:DNSName"
+        HostedZoneId:
+          Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
+      HostedZoneName:
+        Fn::Sub:
+          - "${DomainName}."
+          - DomainName:
+              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+      Name:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
 
   GoEthereumLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -93,18 +102,35 @@ Resources:
           Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
-  GoEthereumListener1:
+  GoEthereumLBTargetGroupWS:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8546
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  GoEthereumListenerWS:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
-      Port: 8545
-      Protocol: TCP
+      Port: 8546
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumLBTargetGroup
+        TargetGroupArn: !Ref GoEthereumLBTargetGroupWS
 
   GoEthereumListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -112,10 +138,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
       Port: 443
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GoEthereumLBTargetGroup
@@ -128,7 +154,7 @@ Resources:
           Host:
             SourcePath: "/mnt/efs/geth_l2"
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${GoEthereumImage}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${GoEthereumImage}:${ImageTag}"
           Name: geth_l2
           PortMappings:
             - ContainerPort: 8545
@@ -137,10 +163,31 @@ Resources:
               HostPort: 8546
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/l2geth.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
-            - Type: "s3"
+              - "arn:aws:s3:::${S3BucketV2}/l2geth.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: DEPLOYER_HTTP
+              Value: !Sub
+                - "https://${EndpointAddress}:8081"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+            - Name: URL
+              Value: !Sub
+                - "https://${EndpointAddress}:8081/addresses.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+            - Name: ROLLUP_CLIENT_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}:7878"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+            - Name: ROLLUP_STATE_DUMP_PATH
+              Value: !Sub
+                - "https://${EndpointAddress}:8081/state-dump.latest.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
           MountPoints:
             - ContainerPath: "/root/.ethereum"
               SourceVolume: l2-node
@@ -150,7 +197,8 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "geth_l2", "service": "geth_l2"}]'
           Essential: true
           Memory: "6000"
-      NetworkMode: host
+      NetworkMode: awsvpc
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "L2Geth-${EnvironmentName}"
   ECSService:
@@ -162,6 +210,18 @@ Resources:
         - ContainerName: geth_l2
           ContainerPort: 8545
           TargetGroupArn: !Ref GoEthereumLBTargetGroup
+        - ContainerName: geth_l2
+          ContainerPort: 8546
+          TargetGroupArn: !Ref GoEthereumLBTargetGroupWS
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 30
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

@@ -45,7 +45,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
-      LogGroupName: !Sub "/omgx/${InfrastructureStackName}/datadog/latest"
+      LogGroupName: !Sub "/omgx/${InfrastructureStackName}/datadog-replica/latest"
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -114,7 +114,7 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsCluster"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
       LaunchType: EC2
       SchedulingStrategy: REPLICA
       ServiceName: !Sub "Datadog-${EnvironmentName}"

@@ -26,22 +26,10 @@ Parameters:
     Type: String
     Default: omgx
 
-  ECRRegistry:
-    Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:
@@ -55,54 +43,84 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
+        - PolicyName: AllowAccessToELB
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:Describe*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
+                Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/data-transport-layer.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
   DataTransportLayerLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 8081
+      Port: 7878
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
-  DataTransportLayerDeployerListener1:
+#  DataTransportLayerDeployerListener1:
+#    Type: AWS::ElasticLoadBalancingV2::Listener
+#    Properties:
+#      LoadBalancerArn:
+#        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
+#      Port: 8081
+#      Protocol: TLS
+#      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+#      DefaultActions:
+#      - Type: forward
+#        TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
+
+#  DataTransportLayerDeployerLBTargetGroup1:
+#    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+#    Properties:
+#      Port: 8081
+#      Protocol: TCP
+#      VpcId:
+#        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+#      HealthCheckProtocol: TCP
+#      HealthCheckPort: "traffic-port"
+#      TargetType: "ip"
+
+  DataTransportLayerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
-      Port: 8081
-      Protocol: HTTPS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:ARN"
+      Port: 7878
+      Protocol: TCP
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref DataTransportLayerLBTargetGroup
-
-  DataTransportLayerDeployerLBTargetGroup1:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Port: 8081
-      Protocol: TCP
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "instance"
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -115,7 +133,7 @@ Resources:
           Host:
             SourcePath: "/mnt/efs/addresses"
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${DataTransportLayerImage}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${DataTransportLayerImage}:${ImageTag}"
           Name: data_transport_layer
           PortMappings:
             - ContainerPort: 7878
@@ -124,10 +142,26 @@ Resources:
               HostPort: 8081
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/data-transport-layer.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
-            - Type: "s3"
+              - "arn:aws:s3:::${S3BucketV2}/data-transport-layer.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: DEPLOYER_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}:8081"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+            - Name: URL
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/addresses.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
           MountPoints:
             - ContainerPath: "/db"
               SourceVolume: db
@@ -139,8 +173,9 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "data_transport_layer", "service": "data_transport_layer"}]'
           Essential: true
           Memory: "200"
-      NetworkMode: host
+      NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "DataTransportLayer-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
@@ -151,9 +186,18 @@ Resources:
         - ContainerName: data_transport_layer
           ContainerPort: 7878
           TargetGroupArn: !Ref DataTransportLayerLBTargetGroup
-        - ContainerName: data_transport_layer
-          ContainerPort: 8081
-          TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
+#        - ContainerName: data_transport_layer
+#          ContainerPort: 8081
+#          TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 30
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

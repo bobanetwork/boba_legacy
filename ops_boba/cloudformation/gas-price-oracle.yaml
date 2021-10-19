@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Enya Batch Submitter Deployment"
+Description: "Enya OMGX Gas Price Oracle Deployment"
 
 Parameters:
   EnvironmentName:
@@ -14,10 +14,9 @@ Parameters:
     Type: String
     Default: push2aws
 
-
-  BatchSubmitterImage:
+  GASPRICEImage:
     Type: String
-    Default: batch-submitter
+    Default: gas-price-oracle
 
   DockerPrefix:
     Type: String
@@ -57,53 +56,38 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/bath-submitter.env"
+                    - "arn:aws:s3:::${S3BucketV2}/gas-price-oracle.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-  BatchSubmitterLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 7
-      LogGroupName: !Sub "/omgx/${EnvironmentName}/batch-submitter/${ImageTag}"
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/${BatchSubmitterImage}:${ImageTag}"
-          Name: batch_submitter
+        - Image: !Sub "${DockerPrefix}/${GASPRICEImage}:${ImageTag}"
+          Name: gas-price-oracle
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/batch-submitter.env"
+              - "arn:aws:s3:::${S3BucketV2}/gas-price-oracle.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: URL
-              Value: !Sub
-                - "https://${EndpointAddress}:8081/addresses.json"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
             - Name: L2_NODE_WEB3_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-            - Name: DEPLOYER_HTTP
-              Value: !Sub
-                - "https://${EndpointAddress}:8081"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
           DockerLabels:
-            com.datadoghq.ad.check_names: '["batch_submitter"]'
+            com.datadoghq.ad.check_names: '["gas-price-oracle"]'
             com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "batch_submitter", "service": "batch_submitter"}]'
+            com.datadoghq.ad.logs: '[{"source": "gas-price-oracle", "service": "gas-price-oracle"}]'
           Essential: true
-          Memory: "300"
+          Memory: "128"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
-      Family: !Sub "BatchSubmitter-${EnvironmentName}"
+      Family: "gas-price-oracle"
   ECSService:
     Type: AWS::ECS::Service
     Properties:
@@ -112,5 +96,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "batch-submitter"
+      ServiceName: "gas-price-oracle"
       TaskDefinition: !Ref TaskDefinition

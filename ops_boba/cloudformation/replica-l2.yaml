@@ -24,7 +24,7 @@ Parameters:
 
   ECRRegistry:
     Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
+    Default: hub.docker.com
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -51,18 +51,6 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
         - PolicyName: AllowAccessToELB
           PolicyDocument:
             Version: 2012-10-17
@@ -80,6 +68,18 @@ Resources:
                   - "elasticloadbalancing:RegisterTargets"
                   - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
                 Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
   ReplicaL2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -123,7 +123,7 @@ Resources:
           Host:
             SourcePath: "/mnt/efs/replica_l2"
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${ReplicaL2Image}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${ReplicaL2Image}:${ImageTag}"
           Name: geth_l2
           Hostname: geth-l2
           PortMappings:
@@ -131,12 +131,53 @@ Resources:
               HostPort: 8545
             - ContainerPort: 8546
               HostPort: 8545
-          EnvironmentFiles:
+          EnvironmentFile:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/replica-l2.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+              - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
             - Type: "s3"
+          Environment:
+            - Name: RPC_API
+              Value: eth,net,rollup,web3,txpool,debug,db,personal
+            - Name: WS_API
+              Value: eth,net,rollup,web3,txpool,debug,db,personal
+            - Name: ROLLUP_BACKEND
+              Value: l2
+            - Name: ROLLUP_VERIFIER_ENABLE
+              Value: true
+            - Name: DEPLOYER_HTTP
+              Value: !Sub
+                - "https://${EndpointAddress}:8081"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer"
+            - Name: URL
+              Value: !Sub
+                - "https://${EndpointAddress}:8081/addresses.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer"
+            - Name: ROLLUP_CLIENT_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
+            - Name: ROLLUP_STATE_DUMP_PATH
+              Value: !Sub
+                - "https://${EndpointAddress}:8081/state-dump.latest.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer"
+            - Name: ROLLUP_ENABLE_L2_GAS_POLLING
+              Value: true
+            - Name: ROLLUP_ENFORCE_FEES
+              Value: true
+            - Name: GCMODE
+              Value: archive
+            - Name: NO_DISCOVER
+              Value: true
+            - Name: ETH1_SYNC_SERVICE_ENABLE
+              Value: true
+            - Name: ETH1_CONFIRMATION_DEPTH
+              Value: 0
           MountPoints:
             - ContainerPath: "/root/.ethereum"
               SourceVolume: l2-node
@@ -149,6 +190,8 @@ Resources:
       NetworkMode: host
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "L2Replica-${EnvironmentName}"
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+
   ECSService:
     Type: AWS::ECS::Service
     Properties:

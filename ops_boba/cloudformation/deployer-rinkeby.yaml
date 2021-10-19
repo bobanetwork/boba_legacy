@@ -26,22 +26,10 @@ Parameters:
     Type: String
     Default: omgx
 
-  ECRRegistry:
-    Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:
@@ -55,48 +43,115 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
+        - PolicyName: AllowAccessToELB
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:Describe*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/deployer-rinkeby.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
+  DeployerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:ARN"
+      Port: 8081
+      Protocol: HTTP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref DeployerLBTargetGroup
+
+  DeployerLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8081
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckIntervalSeconds: 20
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 10
+      Matcher:
+        HttpCode: 200
+
+  DeployerLBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref DeployerLBTargetGroup
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+      ListenerArn: !Ref DeployerListener
+      Priority: 1
+
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      NetworkMode: bridge
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+      Family: "deployer"
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${DeployerImage}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${DeployerImage}:${ImageTag}"
           Name: deployer
           PortMappings:
             - ContainerPort: 8081
-              HostPort: 8082
+              HostPort: 0
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/deployer-rinkeby.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
-            - Type: "s3"
+              - "arn:aws:s3:::${S3BucketV2}/deployer-rinkeby.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["deployer"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "deployer", "service": "deployer"}]'
           Essential: true
           Memory: "64"
-      NetworkMode: host
-      TaskRoleArn: !GetAtt TaskRole.Arn
-      Family: !Sub "deployer"
   ECSService:
     Type: AWS::ECS::Service
+    DependsOn: DeployerListener
     Properties:
       Cluster:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsCluster"
+      LoadBalancers:
+        - ContainerName: deployer
+          ContainerPort: 8081
+          TargetGroupArn: !Ref DeployerLBTargetGroup
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

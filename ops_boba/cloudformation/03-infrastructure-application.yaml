@@ -47,6 +47,10 @@ Parameters:
     Type: String
     Default: infrastructure-core
 
+  Route53HostedZoneName:
+    Description: The Route 53 zone to create
+    Type: String
+    Default: rinkeby-integration-v2.boba.network
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -71,11 +75,16 @@ Metadata:
 
 Resources:
 
-  S3Bucket:
+  Route53HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref Route53HostedZoneName
+
+  S3BucketV2:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub "${AWS::StackName}-S3"
+      BucketName: !Sub "${AWS::StackName}-s3"
 
   FileSystem:
     Type: AWS::EFS::FileSystem
@@ -92,22 +101,9 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
+      - Description: Allow all outbound traffic
+        IpProtocol: "-1"
         CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 8081
-        ToPort: 8081
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 8081
-        ToPort: 8081
-        CidrIpv6: ::/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIpv6: ::/0
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-IntLB"
@@ -247,6 +243,19 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
       Type: network
 
+  LoadBalancerDeployer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '3600'
+      SecurityGroups:
+        - !Ref LoadBalancerIntSecurityGroup
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
   EcsCluster:
     Type: AWS::ECS::Cluster
 
@@ -282,6 +291,7 @@ Resources:
                   - "elasticfilesystem:ClientRootAccess"
                   - "elasticfilesystem:ClientWrite"
                   - "elasticfilesystem:DescribeMountTargets"
+                  - "s3:*"
                 Resource: "*"
 
   EcsInstanceProfile:
@@ -296,6 +306,9 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       SecurityGroupIngress:
+      - Description: Allow all outbound traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
       - SourceSecurityGroupId: !Ref LoadBalancerIntSecurityGroup
         IpProtocol: tcp
         FromPort: 22
@@ -304,6 +317,11 @@ Resources:
         IpProtocol: tcp
         FromPort: 22
         ToPort: 65535
+      SecurityGroupEgress:
+      - Description: Allow all outbound traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
+
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-ECS-Cluster"
@@ -364,6 +382,10 @@ Outputs:
     Value: !Ref EcsSecurityGroup
     Export:
       Name: !Sub "${InfrastructureStackName}:EcsSecurityGroup"
+  LoadBalancerIntSecurityGroup:
+    Value: !Ref LoadBalancerIntSecurityGroup
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
   DomainName:
     Value: !Ref DomainName
     Export:
@@ -388,6 +410,14 @@ Outputs:
     Value: !Ref LoadBalancer
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
+  LoadBalancerDeployer:
+    Value: !Ref LoadBalancerDeployer
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:ARN"
+  LoadBalancerDeployerDNS:
+    Value: !GetAtt LoadBalancerDeployer.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
   LoadBalancerGraphArn:
     Value: !Ref LoadBalancerGraph
     Export:
@@ -400,7 +430,7 @@ Outputs:
     Value: !Ref FileSystem
     Export:
       Name: !Sub "${InfrastructureStackName}:EFSFilesystem"
-  S3Bucket:
-    Value: !Ref S3Bucket
+  S3BucketV2:
+    Value: !Ref S3BucketV2
     Export:
-      Name: !Sub "${InfrastructureStackName}:S3Bucket"
+      Name: !Sub "${InfrastructureStackName}:S3BucketV2"

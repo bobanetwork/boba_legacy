@@ -18,23 +18,10 @@ Parameters:
     Type: String
     Default: omgx
 
-  ECRRegistry:
-    Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
-    Default: integration-v2
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:
@@ -48,18 +35,6 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
         - PolicyName: AllowAccessToELB
           PolicyDocument:
             Version: 2012-10-17
@@ -77,6 +52,18 @@ Resources:
                   - "elasticloadbalancing:RegisterTargets"
                   - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
                 Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/graph.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
   DNSRecordV4Graph:
     Type: AWS::Route53::RecordSet
@@ -110,7 +97,7 @@ Resources:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
   GraphListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -118,7 +105,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 443
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/7488423e-1d39-4fd3-9422-bf9a80fa7e28
@@ -135,7 +122,7 @@ Resources:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
   GraphListener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -143,7 +130,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8001
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/7488423e-1d39-4fd3-9422-bf9a80fa7e28
@@ -160,7 +147,7 @@ Resources:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
   GraphListener3:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -168,7 +155,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8030
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
@@ -188,7 +175,7 @@ Resources:
           Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
+      TargetType: "ip"
 
   GraphListener4:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -196,7 +183,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8040
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
@@ -225,8 +212,8 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
-          Memory: "64"
-        - Image: 942431445534.dkr.ecr.us-east-1.amazonaws.com/omgx/graph:latest
+          Memory: "512"
+        - Image: graphprotocol/graph-node
           Name: graph
           Ulimits:
             - Name: core
@@ -243,19 +230,19 @@ Resources:
               HostPort: 8040
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/graph.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
+              - "arn:aws:s3:::${S3BucketV2}/graph.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
             - Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "graph", "service": "graph"}]'
           Essential: true
-          Memory: "64"
+          Memory: "1200"
           Links:
             - ipfs
-      NetworkMode: host
+      NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "Graph-${EnvironmentName}"
   ECSService:
@@ -276,6 +263,14 @@ Resources:
         - ContainerName: graph
           ContainerPort: 8040
           TargetGroupArn: !Ref GraphLBTargetGroup4
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

@@ -22,18 +22,10 @@ Parameters:
     Type: String
     Default: omgx
 
-  ECRRegistry:
-    Type: String
-    Default: 942431445534.dkr.ecr.us-east-1.amazonaws.com
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
 
 Conditions:
   IsProduction:
@@ -51,30 +43,41 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: AllowAccessToSecrets
+        - PolicyName: AllowAccessToS3
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - "secretsmanager:GetResourcePolicy"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:DescribeSecret"
-                  - "secretsmanager:ListSecretVersionIds"
-                Resource:
-                  - arn:aws:secretsmanager:us-east-1:942431445534:secret:*
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/message-relayer-fast.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: !Sub "${ECRRegistry}/${DockerPrefix}/${MessageRelayerFastImage}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${MessageRelayerFastImage}:${ImageTag}"
           Name: custom_message_relayer
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3Bucket}/message-relayer-fast.env"
-              - S3Bucket:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3Bucket"
-            - Type: "s3"
+              - "arn:aws:s3:::${S3BucketV2}/message-relayer-fast.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: DEPLOYER_HTTP
+              Value: !Sub
+                - "https://${EndpointAddress}:8081"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer"
+            - Name: L2_NODE_WEB3_URL
+              Value: !Sub
+                - "https://${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
           DockerLabels:
             com.datadoghq.ad.check_names: '["custom-message_relayer"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -83,6 +86,7 @@ Resources:
           Memory: "4096"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "MessageRelayerFast-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
