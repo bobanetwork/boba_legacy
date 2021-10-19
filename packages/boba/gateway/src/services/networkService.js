@@ -362,40 +362,45 @@ class NetworkService {
       console.log('NS: this.chainID:', this.chainID)
       console.log('NS: this.networkName:', this.networkName)
 
+      // defines the set of possible networks along with chainId for L1 and L2
+      const nw = getAllNetworks()
+      const L1ChainId = nw[masterSystemConfig]['L1']['chainId'];
+      const L2ChainId = nw[masterSystemConfig]['L2']['chainId'];
+
       //there are numerous possible chains we could be on
       //either local, rinkeby etc
       //and then, also, either L1 or L2
 
       //at this point, we only know whether we want to be on local or rinkeby etc
-      if (masterSystemConfig === 'local' && network.chainId === 31338) {
+      if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //local deployment, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'local' && network.chainId === 31337) {
+      } else if (masterSystemConfig === 'local' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 420) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 29) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 1) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 288) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
@@ -405,8 +410,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      // defines the set of possible networks
-      const nw = getAllNetworks()
+      
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[masterSystemConfig]['L1']['rpcUrl']
@@ -440,13 +444,6 @@ class NetworkService {
       // this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
       // console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
       
-      // this.L1StandardBridgeContract = new ethers.Contract(
-      //   this.L1StandardBridgeAddress,
-      //   L1StandardBridgeJson.abi,
-      //   this.provider.getSigner()
-      // )
-      // console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
-
       if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
         this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
         console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
@@ -454,6 +451,13 @@ class NetworkService {
       else {
         console.log('L1StandardBridgeAddress NOT SET')
       }
+
+      this.L1StandardBridgeContract = new ethers.Contract(
+        this.L1StandardBridgeAddress,
+        L1StandardBridgeJson.abi,
+        this.provider.getSigner()
+      )
+      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       if (addresses.hasOwnProperty('TOKENS')) {
         this.tokenAddresses = addresses.TOKENS
@@ -594,11 +598,11 @@ class NetworkService {
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress, //intentional?
+          messengerAddress: this.L2MessengerAddress,
         },
       })
 
-      if( masterSystemConfig === 'rinkeby' || masterSystemConfig === 'local' ) {
+      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
         this.boba = new ethers.Contract(
           addresses.TOKENS.BOBA.L2,
@@ -720,6 +724,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     console.log("Getting transactions...")
 
@@ -889,6 +894,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -1198,6 +1204,8 @@ class NetworkService {
 
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
+
+    console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
 
     updateSignatureStatus_depositTRAD(false)
     
@@ -2260,6 +2268,7 @@ class NetworkService {
   async getDaoBalance() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2275,6 +2284,7 @@ class NetworkService {
   async getDaoVotes() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
     
     try {
@@ -2314,6 +2324,7 @@ class NetworkService {
   async getProposalThreshold() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2365,6 +2376,7 @@ class NetworkService {
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     const delegateCheck = await this.delegate.attach(this.delegator.address)
@@ -2446,7 +2458,6 @@ class NetworkService {
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
     try {
-
       const delegateCheck = await this.delegate.attach(this.delegator.address);
       let res = delegateCheck.castVote(id, userVote)
       return res

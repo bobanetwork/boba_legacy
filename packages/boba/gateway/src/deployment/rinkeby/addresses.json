@@ -1,4 +1,9 @@
-{
+{   
+  "L1CrossDomainMessenger":"0x04059a546419f54db4bfafFae9d4af3b081C2a8D",
+  "L1MultiMessageRelayer":"0x5C6263BCAa00C7f5988E148dB3CA178e1262E69f",
+  "AddressManager":"0x93A96D6A5beb1F661cf052722A1424CDDA3e9418",
+  "Proxy__L1CrossDomainMessenger":"0xF10EEfC14eB5b7885Ea9F7A631a21c7a82cf5D76",
+  "Proxy__L1StandardBridge":"0xDe085C82536A06b40D20654c2AbA342F2abD7077",
   "TOKENS": {
     "TEST": {
       "L1": "0xBA294FdF79d3917f76411df968Bdf5ce3cf45376",
