@@ -352,7 +352,7 @@ class Farm extends React.Component {
                     balance={ret[0]}
                     decimals={ret[1]}
                     isMobile={isMobile}
-                    showStakes={!showMSO}
+                    showStakesOnly={showMSO}
                   />
                 )
               })}
@@ -372,7 +372,7 @@ class Farm extends React.Component {
                     balance={ret[0]}
                     decimals={ret[1]}
                     isMobile={isMobile}
-                    showStakes={!showMSO}
+                    showStakesOnly={showMSO}
                   />
                 )
               })}
