@@ -10,11 +10,12 @@ const {
 const fetch = require('node-fetch')
 const { Watcher } = require('../../../../packages/core-utils/dist/watcher')
 
-const addressManagerJSON = require('../../artifacts/contracts/optimistic-ethereum/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
+const addressManagerJSON = require('../../artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
 const L2LiquidityPoolJson = require('../../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const OVM_L1StandardBridgeJson = require('../../artifacts/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json')
-const OVM_L2StandardBridgeJson = require('../../artifacts/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json')
+const L1StandardBridgeJson = require('../../artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
+const L2StandardBridgeJson = require('../../artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
+const StateCommitmentChainJson = require('../../artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 const env = process.env
@@ -133,8 +134,7 @@ class OptimismEnv {
     this.databaseConnected = false
     this.databaseConnectedMutex = new Mutex()
 
-    this.OVM_L2CrossDomainMessengerContract = null
-    this.OVM_StateCommitmentChainContract = null
+    this.StateCommitmentChainContract = null
     this.L1LiquidityPoolContract = null
     this.L2LiquidityPoolContract = null
     this.OVM_L1StandardBridgeContract = null
@@ -178,6 +178,9 @@ class OptimismEnv {
     this.Proxy__L1StandardBridge = await addressManager.getAddress(
       'Proxy__L1StandardBridge'
     )
+    this.StateCommitmentChain = await addressManager.getAddress(
+      'StateCommitmentChain'
+    )
 
     this.logger.info(
       'Found L1CrossDomainMessenger, L1CrossDomainMessengerFast and Proxy__L1StandardBridge',
@@ -188,22 +191,16 @@ class OptimismEnv {
       }
     )
 
-    // Load L2 CDM
-    this.OVM_L2CrossDomainMessengerContract = await loadContractFromManager({
-      name: 'OVM_L2CrossDomainMessenger',
-      Lib_AddressManager: addressManager,
-      provider: this.L2Provider,
-    })
     // Load SCC
-    this.OVM_StateCommitmentChainContract = await loadContractFromManager({
-      name: 'OVM_StateCommitmentChain',
-      Lib_AddressManager: addressManager,
-      provider: this.L1Provider,
-    })
+    this.StateCommitmentChainContract = new ethers.Contract(
+      this.StateCommitmentChain,
+      StateCommitmentChainJson.abi,
+      this.L1Provider
+    )
     // Load L1 Standard Bridge
     this.OVM_L1StandardBridgeContract = new ethers.Contract(
       this.Proxy__L1StandardBridge,
-      OVM_L1StandardBridgeJson.abi,
+      L1StandardBridgeJson.abi,
       this.L1Provider
     )
     // Interface
@@ -211,7 +208,7 @@ class OptimismEnv {
       L1LiquidityPoolJson.abi
     )
     this.OVM_L1StandardBridgeInterface = new ethers.utils.Interface(
-      OVM_L1StandardBridgeJson.abi
+      L1StandardBridgeJson.abi
     )
 
     if (BOBA_DEPLOYER_URL) {
@@ -243,7 +240,7 @@ class OptimismEnv {
     // Load L2 Standard Bridge
     this.OVM_L2StandardBridgeContract = new ethers.Contract(
       this.OVM_L2StandardBridge,
-      OVM_L2StandardBridgeJson.abi,
+      L2StandardBridgeJson.abi,
       this.L2Provider
     )
 
