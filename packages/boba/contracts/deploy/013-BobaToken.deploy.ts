@@ -167,7 +167,7 @@ const deployFn: DeployFunction = async (hre) => {
   console.log('Queue setPendingAdmin...')
 
   // set eta to be the current timestamp for local and rinkeby
-  let eta1 = (await getTimestamp(hre)) + eta_delay_s
+  const eta1 = (await getTimestamp(hre)) + eta_delay_s
   // if (process.env.NETWORK === 'mainnet') {
   //   eta = (await getTimestamp(hre)) + eta_delay_s
   // }
@@ -196,7 +196,7 @@ const deployFn: DeployFunction = async (hre) => {
   console.log('Queue Initiate...')
   // call initiate() to complete setAdmin
   // set eta to be the current timestamp for local and rinkeby
-  let eta2 = (await getTimestamp(hre)) + eta_delay_s
+  const eta2 = (await getTimestamp(hre)) + eta_delay_s
   // if (process.env.NETWORK === 'mainnet') {
   //   eta = (await getTimestamp(hre)) + eta_delay_s
   // }
