@@ -20,9 +20,9 @@ let NETWORKS;
 
 NETWORKS = {
   rinkeby: {
-    addressUrl:       `https://rinkeby-v2.boba.network:8080/addresses.json`,
-    addressOMGXUrl:   `https://rinkeby-v2.boba.network:8080/boba-addr.json`,
-    OMGX_WATCHER_URL: null,
+    addressUrl:       null,
+    addressOMGXUrl:   null,
+    OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
     MM_Label:         `Rinkeby`,
     L1: {
       name: "Rinkeby",
@@ -30,15 +30,15 @@ NETWORKS = {
       chainIdHex: '0x4',
       rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
       blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
-      transaction: `https://rinkeby.etherscan.io/tx/`,
+      transaction: `https://rinkeby.etherscan.io/tx/`
     },
     L2: {
-      name: "BOBA Rinkeby2 L2",
-      chainId: 420,
-      chainIdHex: '0x1A4',
-      rpcUrl: `https://rinkeby-v2.boba.network`,
-      blockExplorer: `https://blockexplorer.rinkeby-v2.boba.network/`,
-      transaction: null,
+      name: "BOBA Rinkeby L2",
+      chainId: 28,
+      chainIdHex: '0x1C',
+      rpcUrl: `https://rinkeby.boba.network`,
+      blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
+      transaction: `https://blockexplorer.rinkeby.boba.network/tx/`
     }
   },
   mainnet: {
