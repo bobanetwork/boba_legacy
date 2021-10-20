@@ -24,7 +24,7 @@ import {
   fetchBalances,
   addTokenList,
   fetchNFTs,
-  fetchExits,
+  fetchExits
 } from 'actions/networkAction'
 
 import { checkVersion } from 'actions/serviceAction';
@@ -121,7 +121,6 @@ function Home () {
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)
-    //dispatch(fetchDeposits())
     dispatch(addTokenList()) //only need to do this boot
   }, [ dispatch ])
 
