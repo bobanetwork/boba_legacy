@@ -1,7 +1,7 @@
 # Watcher API
 
-> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/
-> Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/
+> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/   
+> Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  
 
 ## Methods
 
