@@ -59,7 +59,7 @@ const ERC2470 = '0xce0042B868300000d44A59004Da54A005ffdcf9f'
   ]
 
   // Fix oETH bytecode
-  allocLatest[OETH_ADDRESS].code = v2PredeployedContractBtyecode.oETH
+  allocLatest[OETH_ADDRESS].code = v2PredeployedContractBtyecode['oETH']
 
   for (const eachToken of Object.keys(contractList['TOKENS'])) {
     console.log(`Adding token - ${eachToken}`)
