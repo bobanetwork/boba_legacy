@@ -718,7 +718,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     console.log("Getting transactions...")
 
@@ -751,7 +751,7 @@ class NetworkService {
     const responseL2 = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
     )
-    console.log("responseL2",responseL2)
+    //console.log("responseL2",responseL2)
 
     if(typeof(responseL2) === 'undefined') return
 
@@ -826,7 +826,7 @@ class NetworkService {
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
       }
 
-      if (to === this.L1_TEST_Address.toLowerCase()) {
+      if (to === this.L1_BOBA_Address.toLowerCase()) {
         //console.log("L1 ERC20 Amount Approval")
         return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
       }
@@ -836,17 +836,17 @@ class NetworkService {
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L1' })
       }
 
-      if (to === this.L1Message.toLowerCase()) {
-        //console.log("L1 Message")
-        return Object.assign({}, item, { typeTX: 'L1 Message' })
-      }
+      // if (to === this.L1Message.toLowerCase()) {
+      //   //console.log("L1 Message")
+      //   return Object.assign({}, item, { typeTX: 'L1 Message' })
+      // }
 
-      if (to === this.L2Message.toLowerCase()) {
-        //console.log("L2 Message")
-        return Object.assign({}, item, { typeTX: 'L2 Message' })
-      }
+      // if (to === this.L2Message.toLowerCase()) {
+      //   //console.log("L2 Message")
+      //   return Object.assign({}, item, { typeTX: 'L2 Message' })
+      // }
 
-      if (to === this.L2_TEST_Address.toLowerCase()) {
+      if (to === this.L2_BOBA_Address.toLowerCase()) {
         //console.log("L2 TEST Message")
         return Object.assign({}, item, { typeTX: 'L2 TEST Token' })
       }
@@ -888,12 +888,12 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
     )
-    console.log("response",response)
+    //console.log("response",response)
 
     if(typeof(response) === 'undefined') return
 
@@ -1273,8 +1273,6 @@ class NetworkService {
       return error
     }
   }
-
-
 
   //figure out which layer we are on right now
   confirmLayer = (layerToConfirm) => async (dispatch) => {
