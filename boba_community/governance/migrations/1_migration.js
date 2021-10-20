@@ -23,7 +23,6 @@ async function  getTimestamp(){
 module.exports = async function (deployer) {
 
   const accounts = await web3.eth.getAccounts()
-
   const Comp = artifacts.require('Comp')
   const Timelock = artifacts.require('Timelock')
   const GovernorBravoDelegate = artifacts.require('GovernorBravoDelegate')
@@ -33,7 +32,7 @@ module.exports = async function (deployer) {
 
   console.log('STARTING HERE')
   console.log(admin)
-  
+
   //bobaAddress = '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB'
   // Deploy Comp
   await deployer.deploy(Comp, admin)
@@ -43,7 +42,11 @@ module.exports = async function (deployer) {
 
   // Deploy Timelock
   //delay = how long the Timelock contract needs to wait before executing a transaction
-  const delay_before_execute_s = 10; //seconds - normally set to 172800 aka 2 days, for example
+  // set to 0 for local and rinkeby
+  let delay_before_execute_s = 0; //seconds - normally set to 172800 aka 2 days, for example
+  if (process.env.network === 'mainnet') {
+    delay_before_execute_s = 172800
+  }
   await deployer.deploy(Timelock, admin, delay_before_execute_s)
   const timelock = await Timelock.deployed()
   console.log('deployed timelock')
@@ -65,7 +68,7 @@ module.exports = async function (deployer) {
     ethers.utils.parseEther('100000') // the votes necessary to propose
   )
   const governorBravoDelegator = await GovernorBravoDelegator.deployed()
-  
+
   console.log('deployed delegator')
 
   console.log('\nSaving Contract Addresses')
@@ -90,8 +93,11 @@ module.exports = async function (deployer) {
 
   console.log('Queue setPendingAdmin')
 
-  let eta = (await getTimestamp()) + 30
-  
+  // set eta to be the current timestamp for local and rinkeby
+  let eta = (await getTimestamp()) + 0
+  if (process.env.network === 'mainnet') {
+    eta = (await getTimestamp()) + 182800
+  }
   const setPendingAdminData = ethers.utils.defaultAbiCoder.encode( // the parameters for the setPendingAdmin function
     ['address'],
     [governorBravoDelegator.address]
@@ -116,10 +122,10 @@ module.exports = async function (deployer) {
   await sleep(10 * 1000)
 
   for(let i = 0; i < 30; i++){
-    
+
     console.log(`Attempt: ${i + 1}`)
     console.log(`\tTimestamp: ${await getTimestamp()}`);
-    
+
     try{
       // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
       await timelock.executeTransaction(
@@ -143,15 +149,19 @@ module.exports = async function (deployer) {
     await sleep(3 * 1000)
   }
 
-  eta = (await getTimestamp()) + 30;
-  
+  // set eta to be the current timestamp for local and rinkeby
+  eta = (await getTimestamp()) + 0;
+  if (process.env.network === 'mainnet') {
+    eta = (await getTimestamp()) + 182800
+  }
+
   var initiateData = ethers.utils.defaultAbiCoder.encode( // parameters to initate the GovernorBravoDelegate contract
     ['bytes'],
     [[]]
   )
 
   console.log(`Current time: ${await getTimestamp()}`);
-  console.log(`Time at which transaction can be executed: ${(await getTimestamp()) + 30}`);
+  console.log(`Time at which transaction can be executed: ${eta}`);
 
   await timelock.queueTransaction(
     governorBravo.address,
@@ -163,13 +173,13 @@ module.exports = async function (deployer) {
 
   console.log('queued initiate')
   console.log('execute initiate')
-    
+
   await sleep(20 * 1000)
-    
+
   for(let i = 0; i < 30; i++ ) {
-    
+
     console.log(`Timestamp: ${await getTimestamp()}`);
-    
+
     try{
         await timelock.executeTransaction(
             governorBravo.address,
@@ -178,7 +188,7 @@ module.exports = async function (deployer) {
             initiateData,
             eta
         )
-        console.log('Executed initiate');
+        console.log('Executed initiate, acceptAdmin() completed');
         break;
     }catch(error){
       if(i === 29){
