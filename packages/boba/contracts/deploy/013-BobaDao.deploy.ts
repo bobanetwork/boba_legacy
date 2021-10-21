@@ -7,6 +7,7 @@ import chalk from 'chalk'
 import GovernorBravoDelegateJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json'
 import GovernorBravoDelegatorJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 import TimelockJson from '../artifacts/contracts/DAO/governance/Timelock.sol/Timelock.json'
+import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
 // let Factory__Comp: ContractFactory
 // let Comp: Contract
@@ -20,6 +21,8 @@ let GovernorBravoDelegator: Contract
 let Factory__Timelock: ContractFactory
 let Timelock: Contract
 
+let Proxy__L2LiquidityPool: Contract
+
 const getTimestamp = async (hre) => {
     const blockNumber = await (hre as any).deployConfig.l2Provider.getBlockNumber()
     const block = await (hre as any).deployConfig.l2Provider.getBlock(blockNumber);
@@ -30,18 +33,27 @@ const deployFn: DeployFunction = async (hre) => {
 
   let delay_before_execute_s
   let eta_delay_s
+  let governor_voting_period_s
+  let governor_voting_delay_s
+  let governor_proposal_threshold
 
   if (process.env.NETWORK === 'mainnet') {
     // set config for mainnet
-    delay_before_execute_s = 172800
+    delay_before_execute_s = 172800 // 2 days
     eta_delay_s = 182800
+    governor_voting_period_s = 3 * 24 * 60 * 60 // 3 days
+    governor_voting_delay_s = 2 * 24 * 60 * 60 // 2 days
+    governor_proposal_threshold = utils.parseEther('50000')
   } else {
     // set config for local/rinkeby
     delay_before_execute_s = 0
     eta_delay_s = 0
+    governor_voting_period_s = 1000
+    governor_voting_delay_s = 1
+    governor_proposal_threshold = utils.parseEther('50000')
   }
 
-// deploy comp -- has to be changed to BOBA
+// get deployed BOBA L2
 
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
 
@@ -142,9 +154,9 @@ const deployFn: DeployFunction = async (hre) => {
     BobaL2.address,
     Timelock.address,
     GovernorBravoDelegate.address,
-    1000, // VOTING PERIOD - duration of the voting period in seconds
-    1, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
-    utils.parseEther('50000') // the votes necessary to propose
+    governor_voting_period_s, // VOTING PERIOD - duration of the voting period in seconds
+    governor_voting_delay_s, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
+    governor_proposal_threshold // the votes necessary to propose
   )
   await GovernorBravoDelegator.deployTransaction.wait()
   console.log(
@@ -161,6 +173,21 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('GovernorBravoDelegator', GovernorBravoDelegatorDeploymentSubmission)
+
+  // set Dao in LP
+
+  const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
+    'Proxy__L2LiquidityPool'
+  )
+
+  Proxy__L2LiquidityPool = new Contract(
+    Proxy__L2LiquidityPoolDeployment.address,
+    L2LiquidityPoolJson.abi,
+    (hre as any).deployConfig.deployer_l2
+  )
+
+  await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
+  console.log(` ⭐️ ${chalk.blue('LP Dao role transferred to Timelock')}`)
 
   // set admin Timelock
 
