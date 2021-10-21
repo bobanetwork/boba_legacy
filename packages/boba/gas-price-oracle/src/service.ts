@@ -385,20 +385,28 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     }
 
-    if (
-      gasPriceInt !== targetGasPrice &&
-      (targetGasPrice >
-        (1 + this.options.gasPriceMinPercentChange) * gasPriceInt ||
-        targetGasPrice <
-          (1 - this.options.gasPriceMinPercentChange) * gasPriceInt)
-    ) {
+    if (gasPriceInt !== targetGasPrice) {
+      let targetUpdatedGasPrice = targetGasPrice
+      if (targetGasPrice > gasPriceInt) {
+        targetUpdatedGasPrice = Math.min(
+          Math.floor((1 + this.options.gasPriceMinPercentChange) * gasPriceInt),
+          targetGasPrice
+        )
+      } else {
+        targetUpdatedGasPrice = Math.max(
+          Math.floor((1 - this.options.gasPriceMinPercentChange) * gasPriceInt),
+          targetGasPrice
+        )
+      }
       this.logger.debug('Updating L2 gas price...')
       const tx = await this.state.OVM_GasPriceOracle.setGasPrice(
-        targetGasPrice,
+        targetUpdatedGasPrice,
         { gasPrice: 0 }
       )
       await tx.wait()
-      this.logger.info('Updated L2 gas price', { gasPrice: targetGasPrice })
+      this.logger.info('Updated L2 gas price', {
+        gasPrice: targetUpdatedGasPrice,
+      })
     } else {
       this.logger.info('No need to update L2 gas price', {
         gasPrice: gasPriceInt,
