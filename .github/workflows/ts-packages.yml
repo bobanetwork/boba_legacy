@@ -163,4 +163,4 @@ jobs:
 
       - name: Lint Solidity
         working-directory: ./packages/contracts
-        run: yarn lint:contracts
+        run: yarn lint:contracts:check
