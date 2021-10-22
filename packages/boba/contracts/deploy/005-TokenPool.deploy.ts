@@ -1,13 +1,20 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L2TokenPoolJson from '../artifacts/contracts/TokenPool.sol/TokenPool.json'
 let Factory__L2TokenPool: ContractFactory
 let L2TokenPool: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+  .connect((hre as any).deployConfig.deployer_l1)
+  .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L2TokenPool = new ContractFactory(
     L2TokenPoolJson.abi,
     L2TokenPoolJson.bytecode,
@@ -31,6 +38,12 @@ const deployFn: DeployFunction = async (hre) => {
       L2TokenPool.address
     )}`
   )
+
+  await registerAddress({
+    addressManager,
+    name: 'L2TokenPool',
+    address: L2TokenPool.address,
+  })
 
   if (TK_L2TEST === undefined) {
     console.log(

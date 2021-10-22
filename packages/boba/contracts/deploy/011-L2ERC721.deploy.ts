@@ -1,7 +1,9 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import preSupportedNFTs from '../preSupportedNFTs.json'
 import L1ERC721Json from '../artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
@@ -12,6 +14,11 @@ let Factory__L2ERC721: ContractFactory
 let L2ERC721: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L2ERC721 = new ContractFactory(
     L2ERC721Json.abi,
     L2ERC721Json.bytecode,

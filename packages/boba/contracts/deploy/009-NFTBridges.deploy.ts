@@ -1,7 +1,9 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
@@ -13,6 +15,11 @@ let L1NFTBridge: Contract
 let L2NFTBridge: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+    
   Factory__L1NFTBridge = new ContractFactory(
     L1NFTBridgeJson.abi,
     L1NFTBridgeJson.bytecode,

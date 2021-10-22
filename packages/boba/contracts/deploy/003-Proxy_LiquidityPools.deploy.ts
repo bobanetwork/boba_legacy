@@ -1,7 +1,9 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, ethers } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
@@ -14,6 +16,11 @@ let Proxy__L1LiquidityPool: Contract
 let Proxy__L2LiquidityPool: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__Proxy__L1LiquidityPool = new ContractFactory(
     ProxyJson.abi,
     ProxyJson.bytecode,
@@ -123,7 +130,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const registerL2LPETHTX = await Proxy__L2LiquidityPool.registerPool(
     '0x0000000000000000000000000000000000000000',
-    '0x4200000000000000000000000000000000000006' //,
+    '0x4200000000000000000000000000000000000006'
   )
   await registerL2LPETHTX.wait()
   console.log(
@@ -131,6 +138,19 @@ const deployFn: DeployFunction = async (hre) => {
       registerL2LPETHTX.hash
     )}`
   )
+
+  await registerAddress({
+    addressManager,
+    name: 'Proxy__L1LiquidityPool',
+    address: Proxy__L1LiquidityPool.address,
+  })
+
+  await registerAddress({
+    addressManager,
+    name: 'Proxy__L2LiquidityPool',
+    address: Proxy__L2LiquidityPool.address,
+  })
+
 }
 
 deployFn.tags = ['Proxy__L1LiquidityPool', 'Proxy__L2LiquidityPool', 'required']

@@ -1,7 +1,9 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L1MessageJson from '../artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
 import L2MessageJson from '../artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
@@ -13,6 +15,11 @@ let L1Message: Contract
 let L2Message: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L1Message = new ContractFactory(
     L1MessageJson.abi,
     L1MessageJson.bytecode,
@@ -46,6 +53,11 @@ const deployFn: DeployFunction = async (hre) => {
       L1Message.address
     )}`
   )
+  await registerAddress({
+    addressManager,
+    name: 'L1Message',
+    address: L1Message.address,
+  })
 
   L2Message = await Factory__L2Message.deploy(
     (hre as any).deployConfig.l2MessengerAddress
@@ -63,6 +75,11 @@ const deployFn: DeployFunction = async (hre) => {
       L2Message.address
     )}`
   )
+  await registerAddress({
+    addressManager,
+    name: 'L2Message',
+    address: L2Message.address,
+  })
 
   // Initialize L1 message
   const L1MessageTX = await L1Message.init(L2Message.address)

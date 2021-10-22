@@ -3,6 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L2ERC721Json from '../artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'
@@ -17,6 +18,11 @@ const nftName = 'TestNFT'
 const nftSymbol = 'TST'
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+    
   Factory__L2ERC721 = new ContractFactory(
     L2ERC721Json.abi,
     L2ERC721Json.bytecode,

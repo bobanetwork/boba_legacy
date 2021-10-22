@@ -1,7 +1,9 @@
 import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -13,6 +15,7 @@ let Factory__L1_MultiMessageRelayerFast: ContractFactory
 let L1_MultiMessageRelayerFast: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any

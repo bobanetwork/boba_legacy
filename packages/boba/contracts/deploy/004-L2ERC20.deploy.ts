@@ -3,6 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
 import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -27,6 +28,11 @@ const initialSupply_18 = utils.parseEther('10000000000')
 const initialSupply_BOBA = utils.parseEther('500000000')
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L1ERC20 = new ContractFactory(
     L1ERC20Json.abi,
     L1ERC20Json.bytecode,
@@ -48,6 +54,7 @@ const deployFn: DeployFunction = async (hre) => {
   let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
+    
     if (
       (hre as any).deployConfig.network === 'local' ||
       token.symbol === 'TEST'
@@ -92,6 +99,7 @@ const deployFn: DeployFunction = async (hre) => {
         )} ${chalk.green(tokenAddress)}`
       )
     } else if ((hre as any).deployConfig.network === 'rinkeby') {
+      
       tokenAddress = token.address.rinkeby
       await hre.deployments.save(`TK_L1${token.symbol}`, {
         abi: L1ERC20Json.abi,

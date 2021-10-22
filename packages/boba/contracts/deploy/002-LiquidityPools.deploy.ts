@@ -1,7 +1,9 @@
 /* Imports: External */
+import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import chalk from 'chalk'
+import { registerAddress } from './000-Messenger.deploy'
 
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -13,6 +15,11 @@ let L1LiquidityPool: Contract
 let L2LiquidityPool: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L1LiquidityPool = new ContractFactory(
     L1LiquidityPoolJson.abi,
     L1LiquidityPoolJson.bytecode,
@@ -45,10 +52,6 @@ const deployFn: DeployFunction = async (hre) => {
     )}`
   )
 
-  // const L1CrossDomainMessengerFastAddress = await (hre as any).deployConfig.addressManager.getAddress(
-  //   'Proxy__L1CrossDomainMessengerFast'
-  // )
-
   // Deploy L1 liquidity pool
   L1LiquidityPool = await Factory__L1LiquidityPool.deploy()
   await L1LiquidityPool.deployTransaction.wait()
@@ -68,49 +71,18 @@ const deployFn: DeployFunction = async (hre) => {
     )}`
   )
 
-  // const initL1LPTX = await L1LiquidityPool.initialize(
-  //   (hre as any).deployConfig.l1MessengerAddress,
-  //   L1CrossDomainMessengerFastAddress
-  // )
-  // await initL1LPTX.wait()
-  // console.log(`⭐️ ${chalk.red('L1LiquidityPool initialized:')} ${chalk.green(initL1LPTX.hash)}`)
+  await registerAddress({
+    addressManager,
+    name: 'L1LiquidityPool',
+    address: L1LiquidityPool.address,
+  })
 
-  // const confL1LPTX = await L1LiquidityPool.configure(
-  //   /* userRewardFeeRate 3.5% */ 35,
-  //   /* ownerRewardFeeRate 1.5% */ 15,
-  //   L2LiquidityPool.address
-  // )
-  // await confL1LPTX.wait()
-  // console.log(`⭐️ ${chalk.red('L1LiquidityPool configured:')} ${chalk.green(confL1LPTX.hash)}`)
+  await registerAddress({
+    addressManager,
+    name: 'L2LiquidityPool',
+    address: L2LiquidityPool.address,
+  })
 
-  // const initL2LPTX = await L2LiquidityPool.initialize(
-  //   (hre as any).deployConfig.l2MessengerAddress,
-  //   { gasLimit: 250000000 }
-  // )
-  // await initL2LPTX.wait()
-  // console.log(`⭐️ ${chalk.red('L2LiquidityPool initialized:')} ${chalk.green(initL2LPTX.hash)}`)
-
-  // const confL2LPTX = await L2LiquidityPool.configure(
-  //   /* userRewardFeeRate 3.5% */ 35,
-  //   /* ownerRewardFeeRate 1.5% */ 15,
-  //   L1LiquidityPool.address
-  // )
-  // await confL2LPTX.wait()
-  // console.log(`⭐️ ${chalk.red('L2LiquidityPool configured:')} ${chalk.green(confL2LPTX.hash)}`)
-
-  // const registerL1LPETHTX = await L1LiquidityPool.registerPool(
-  //   "0x0000000000000000000000000000000000000000",
-  //   "0x4200000000000000000000000000000000000006",
-  // )
-  // await registerL1LPETHTX.wait()
-  // console.log(`⭐️ ${chalk.red('L1LiquidityPool registered:')} ${chalk.green(registerL1LPETHTX.hash)}`)
-
-  // const registerL2LPETHTX = await L2LiquidityPool.registerPool(
-  //   "0x0000000000000000000000000000000000000000",
-  //   "0x4200000000000000000000000000000000000006"//,
-  // )
-  // await registerL2LPETHTX.wait()
-  // console.log(`⭐️ ${chalk.red('L2LiquidityPool registered:')} ${chalk.green(registerL2LPETHTX.hash)}`)
 }
 
 deployFn.tags = ['L1LiquidityPool', 'L2LiquidityPool', 'required']
