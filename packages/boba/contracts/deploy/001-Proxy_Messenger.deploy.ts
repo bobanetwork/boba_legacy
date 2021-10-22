@@ -2,8 +2,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import chalk from 'chalk'
-
-import { registerAddress } from './000-Messenger.deploy'
+import registerAddress from './000-Messenger.deploy'
 
 /* eslint-disable */
 require('dotenv').config()

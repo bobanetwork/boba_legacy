@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
-import { registerAddress } from './000-Messenger.deploy'
+import registerAddress from './000-Messenger.deploy'
 
 import L2TokenPoolJson from '../artifacts/contracts/TokenPool.sol/TokenPool.json'
 let Factory__L2TokenPool: ContractFactory

@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
-import { registerAddress } from './000-Messenger.deploy'
+import registerAddress from './000-Messenger.deploy'
 
 import L2ERC721Json from '../artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'

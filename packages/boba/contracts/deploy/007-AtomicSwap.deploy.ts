@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
-import { registerAddress } from './000-Messenger.deploy'
+import registerAddress from './000-Messenger.deploy'
 
 import AtomicSwapJson from '../artifacts/contracts/AtomicSwap.sol/AtomicSwap.json'
 

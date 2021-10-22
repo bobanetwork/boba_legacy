@@ -1,9 +1,10 @@
 import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
+import { Provider } from '@ethersproject/abstract-provider'
+import { Signer } from '@ethersproject/abstract-signer'
+import { sleep, hexStringEquals } from '@eth-optimism/core-utils'
 import chalk from 'chalk'
-
-//import { registerAddress } from '../helpers/hardhat-deploy-ethers'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -12,11 +13,6 @@ import L1_MessengerJson from '../artifacts/contracts/L1CrossDomainMessengerFast.
 
 let Factory__L1_Messenger: ContractFactory
 let L1_Messenger: Contract
-
-//import { Contract } from 'ethers'
-import { Provider } from '@ethersproject/abstract-provider'
-import { Signer } from '@ethersproject/abstract-signer'
-import { sleep, hexStringEquals } from '@eth-optimism/core-utils'
 
 const waitUntilTrue = async (
   check: () => Promise<boolean>,
