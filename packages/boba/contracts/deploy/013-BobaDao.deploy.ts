@@ -33,23 +33,23 @@ const deployFn: DeployFunction = async (hre) => {
 
   let delay_before_execute_s
   let eta_delay_s
-  let governor_voting_period_s
-  let governor_voting_delay_s
+  let governor_voting_period
+  let governor_voting_delay
   let governor_proposal_threshold
 
   if (process.env.NETWORK === 'mainnet') {
     // set config for mainnet
     delay_before_execute_s = 172800 // 2 days
     eta_delay_s = 182800
-    governor_voting_period_s = 3 * 24 * 60 * 60 // 3 days
-    governor_voting_delay_s = 2 * 24 * 60 * 60 // 2 days
+    governor_voting_period = 17280 // 3 days
+    governor_voting_delay = 11520 // 2 days
     governor_proposal_threshold = utils.parseEther('50000')
   } else {
     // set config for local/rinkeby
     delay_before_execute_s = 0
     eta_delay_s = 0
-    governor_voting_period_s = 1000
-    governor_voting_delay_s = 1
+    governor_voting_period = 6
+    governor_voting_delay = 1
     governor_proposal_threshold = utils.parseEther('50000')
   }
 
@@ -154,8 +154,8 @@ const deployFn: DeployFunction = async (hre) => {
     BobaL2.address,
     Timelock.address,
     GovernorBravoDelegate.address,
-    governor_voting_period_s, // VOTING PERIOD - duration of the voting period in seconds
-    governor_voting_delay_s, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
+    governor_voting_period, // VOTING PERIOD - duration of the voting period in blocks
+    governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in blocks
     governor_proposal_threshold // the votes necessary to propose
   )
   await GovernorBravoDelegator.deployTransaction.wait()
@@ -174,7 +174,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   await hre.deployments.save('GovernorBravoDelegator', GovernorBravoDelegatorDeploymentSubmission)
 
-  // set Dao in LP
+  // set Dao in L2LP
 
   const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
     'Proxy__L2LiquidityPool'
@@ -207,13 +207,15 @@ const deployFn: DeployFunction = async (hre) => {
 //     GovernorBravoDelegator.address
 //   )
 
-  await Timelock.queueTransaction(
+  const setPendingAdminTx = await Timelock.queueTransaction(
     Timelock.address,
     0, //is the amount of ETH you want to send with an execution to the Timelock
     'setPendingAdmin(address)', // the function to be called
     setPendingAdminData,
     eta1 // end of timelock in unix time
   )
+
+  await setPendingAdminTx.wait()
 
   console.log('Queued setPendingAdmin!')
   console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
@@ -234,13 +236,15 @@ const deployFn: DeployFunction = async (hre) => {
     [[]]
   )
 
-  await Timelock.queueTransaction(
+  const initiateTx = await Timelock.queueTransaction(
     GovernorBravoDelegator.address,
     0,
     '_initiate()',
     initiateData,
     eta2
   )
+
+  await initiateTx.wait()
 
   console.log('Queued Initiate!')
   console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
