@@ -41,7 +41,7 @@ const STATE_DUMP_OUTPUT_PATH =
 const OETH_ADDRESS =
   env.OETH_ADDRESS || '0x4200000000000000000000000000000000000006'
 // DON'T TOUCH
-const balance = '00'
+const balance = ''
 const ERC2470 = '0xce0042B868300000d44A59004Da54A005ffdcf9f'
 
 ;(async () => {
