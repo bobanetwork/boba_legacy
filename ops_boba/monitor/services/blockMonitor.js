@@ -392,11 +392,11 @@ class BlockMonitorService extends OptimismEnv {
         Number(receiptData.l1BlockNumber),
         Number(receiptData.l1BlockNumber)
       )
-
-      const filteredL1LiquidityPoolLog = L1LiquidityPoolLog.filter(
-        (i) => i.transactionHash === matches[0].transactionHash
-      )
-      if (filteredL1LiquidityPoolLog.length) {
+      const tokenReceivers = L1LiquidityPoolLog.reduce((acc, cur) => {
+        acc.push(this.L1LiquidityPoolInterface.parseLog(cur).args.sender)
+        return acc
+      }, [])
+      if (tokenReceivers.includes(receiptData.from)) {
         this.logger.info('Found successful L2 exit', {
           status: 'succeeded',
           blockNumber: receiptData.blockNumber,
