@@ -445,10 +445,10 @@ class NetworkService {
 
       let tokens = {}
 
-// await Promise.all(files.map(async (file) => {
-//     const contents = await fs.readFile(file, 'utf8')
-//     console.log(contents)
-//   }));
+      // await Promise.all(files.map(async (file) => {
+      //     const contents = await fs.readFile(file, 'utf8')
+      //     console.log(contents)
+      //   }));
 
       const supportedTokens = [ 'TEST', 'USDT', 'BOBA' ]
 

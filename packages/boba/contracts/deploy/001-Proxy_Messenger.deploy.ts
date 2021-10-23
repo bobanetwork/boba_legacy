@@ -60,5 +60,4 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 deployFn.tags = ['Proxy_FastMessenger', 'required']
-
 export default deployFn

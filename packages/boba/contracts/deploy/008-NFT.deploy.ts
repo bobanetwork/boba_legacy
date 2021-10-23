@@ -39,25 +39,19 @@ const deployFn: DeployFunction = async (hre) => {
   )
   await L2ERC721.deployTransaction.wait()
   console.log(
-    ` 🌕 ${chalk.red('NFT L2ERC721 deployed to:')} ${chalk.green(
-      L2ERC721.address
-    )}`
-  )
+    ` 🌕 ${chalk.red('NFT L2ERC721 deployed to: ${
+      L2ERC721.address})
 
   const L2ERC721DeploymentSubmission: DeploymentSubmission = {
     ...L2ERC721,
-    receipt: L2ERC721.receipt,
-    address: L2ERC721.address,
+    receipt: L2ERC721.receipt, L2ERC721.address,
     abi: L2ERC721.abi,
   }
 
   const owner = await L2ERC721.owner()
-  console.log(` 🔒 ${chalk.red('ERC721 owner:')} ${chalk.green(owner)}`)
+  console.log(` 🔒 ${chalk.red('ERC721 owner: ${owner)}`)
 
-  await registerBobaAddress({
-    addressManager,
-    name: 'L2ERC721',
-    address: L2ERC721.address,
+registerBobaAddress( addressManager, 'L2ERC721', L2ERC721.address,
   })
   await hre.deployments.save('L2ERC721', L2ERC721DeploymentSubmission)
 
@@ -70,21 +64,15 @@ const deployFn: DeployFunction = async (hre) => {
   L2ERC721Reg = await Factory__L2ERC721Reg.deploy()
   await L2ERC721Reg.deployTransaction.wait()
   console.log(
-    ` 🌕 ${chalk.red('NFT L2ERC721 Reg deployed to:')} ${chalk.green(
-      L2ERC721Reg.address
-    )}`
-  )
+    ` 🌕 ${chalk.red('NFT L2ERC721 Reg deployed to: ${
+      L2ERC721Reg.address})
 
   const L2ERC721RegDeploymentSubmission: DeploymentSubmission = {
     ...L2ERC721Reg,
-    receipt: L2ERC721Reg.receipt,
-    address: L2ERC721Reg.address,
+    receipt: L2ERC721Reg.receipt, L2ERC721Reg.address,
     abi: L2ERC721Reg.abi,
   }
-  await registerBobaAddress({
-    addressManager,
-    name: 'L2ERC721Reg',
-    address: L2ERC721Reg.address,
+registerBobaAddress( addressManager, 'L2ERC721Reg', L2ERC721Reg.address,
   })
   await hre.deployments.save('L2ERC721Reg', L2ERC721RegDeploymentSubmission)
 }

@@ -4,7 +4,6 @@ import { Contract, ContractFactory } from 'ethers'
 import { Provider } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { sleep, hexStringEquals } from '@eth-optimism/core-utils'
-import chalk from 'chalk'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -85,12 +84,7 @@ const deployFn: DeployFunction = async (hre) => {
   
   await registerBobaAddress(addressManager, 'L1CrossDomainMessengerFast', L1_Messenger.address)
   await hre.deployments.save('L1CrossDomainMessengerFast',L1_MessengerDeploymentSubmission)
-  
-  console.log(
-    `🌕 ${chalk.red('L1CrossDomainMessengerFast deployed to:')} ${chalk.green(
-      L1_Messenger.address
-    )}`
-  )
+  console.log(`L1CrossDomainMessengerFast deployed to: ${L1_Messenger.address}`)
 
   const L1_Messenger_Deployed = await Factory__L1_Messenger.attach(
     L1_Messenger.address
@@ -101,11 +95,7 @@ const deployFn: DeployFunction = async (hre) => {
     addressManager.address
   )
   await L1MessagerTX.wait()
-  console.log(
-    `⭐️ ${chalk.blue('L1CrossDomainMessengerFast initialized:')} ${chalk.green(
-      L1MessagerTX.hash
-    )}`
-  )
+  console.log(`L1CrossDomainMessengerFast initialized: ${L1MessagerTX.hash}`)
 
 }
 

@@ -34,7 +34,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   // Deploy proxy contracts
-  console.log(`💿 ${chalk.green('Deploying LP Proxy...')}`)
+  console.log(`'Deploying LP Proxy...`)
 
   const L1LiquidityPool = await (hre as any).deployments.get('L1LiquidityPool')
   const L2LiquidityPool = await (hre as any).deployments.get('L2LiquidityPool')
@@ -52,11 +52,7 @@ const deployFn: DeployFunction = async (hre) => {
     abi: Proxy__L1LiquidityPool.abi,
   }
 
-  console.log(
-    `🌕 ${chalk.red('Proxy__L1LiquidityPool deployed to:')} ${chalk.green(
-      Proxy__L1LiquidityPool.address
-    )}`
-  )
+  console.log(`Proxy__L1LiquidityPool deployed to: ${Proxy__L1LiquidityPool.address}`)
 
   Proxy__L2LiquidityPool = await Factory__Proxy__L2LiquidityPool.deploy(
     L2LiquidityPool.address
@@ -67,11 +63,7 @@ const deployFn: DeployFunction = async (hre) => {
     receipt: Proxy__L2LiquidityPool.receipt, Proxy__L2LiquidityPool.address,
     abi: Proxy__L2LiquidityPool.abi,
   }
-  console.log(
-    `🌕 ${chalk.red('Proxy__L2LiquidityPool deployed to:')} ${chalk.green(
-      Proxy__L2LiquidityPool.address
-    )}`
-  )
+  console.log(`Proxy__L2LiquidityPool deployed to: ${Proxy__L2LiquidityPool.address}`)
 
   Proxy__L1LiquidityPool = new ethers.Contract(
     Proxy__L1LiquidityPool.address,
@@ -85,11 +77,7 @@ const deployFn: DeployFunction = async (hre) => {
     Proxy__L2LiquidityPool.address
   )
   await initL1LPTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L1LiquidityPool initialized:')} ${chalk.green(
-      initL1LPTX.hash
-    )}`
-  )
+  console.log(`Proxy__L1LiquidityPool initialized: ${initL1LPTX.hash}`)
 
   Proxy__L2LiquidityPool = new ethers.Contract(
     Proxy__L2LiquidityPool.address,
@@ -102,33 +90,21 @@ const deployFn: DeployFunction = async (hre) => {
     Proxy__L1LiquidityPool.address
   )
   await initL2LPTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L2LiquidityPool initialized:')} ${chalk.green(
-      initL2LPTX.hash
-    )}`
-  )
+  console.log(`Proxy__L2LiquidityPool initialized: ${initL2LPTX.hash}`)
 
   const registerL1LPETHTX = await Proxy__L1LiquidityPool.registerPool(
     '0x0000000000000000000000000000000000000000',
     '0x4200000000000000000000000000000000000006'
   )
   await registerL1LPETHTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L1LiquidityPool registered:')} ${chalk.green(
-      registerL1LPETHTX.hash
-    )}`
-  )
+  console.log(`Proxy__L1LiquidityPool registered: ${registerL1LPETHTX.hash}`)
 
   const registerL2LPETHTX = await Proxy__L2LiquidityPool.registerPool(
     '0x0000000000000000000000000000000000000000',
     '0x4200000000000000000000000000000000000006'
   )
   await registerL2LPETHTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L2LiquidityPool registered:')} ${chalk.green(
-      registerL2LPETHTX.hash
-    )}`
-  )
+  console.log(`Proxy__L2LiquidityPool registered: ${registerL2LPETHTX.hash}`)
 
   await hre.deployments.save('Proxy__L1LiquidityPool', Proxy__L1LiquidityPoolDeploymentSubmission)
   await hre.deployments.save('Proxy__L2LiquidityPool', Proxy__L2LiquidityPoolDeploymentSubmission)
