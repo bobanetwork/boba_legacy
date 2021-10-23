@@ -443,39 +443,36 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
+      const supportedTokens = [ 'TEST', 'USDT', 'DAI', 'USDC', 
+                                'WBTC', 'REP',  'BAT', 'ZRX',
+                                'SUSHI', 'LINK', 'UNI', 'BOBA',
+                                'OMG' ]
+
       let tokens = {}
+      await Promise.all(supportedTokens.map(async (key) => {
+          //console.log("Creating token entry for:", key)
+          
+          const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+          const L2a = await this.AddressManager.getAddress('TK_L2'+key)
 
-      // await Promise.all(files.map(async (file) => {
-      //     const contents = await fs.readFile(file, 'utf8')
-      //     console.log(contents)
-      //   }));
+          tokens[key] = {
+            'L1': L1a,
+            'L2': L2a
+          }
 
-      const supportedTokens = [ 'TEST', 'USDT', 'BOBA' ]
-
-      if (addresses.hasOwnProperty('TOKENS')) {
-        this.tokenAddresses = addresses.TOKENS
-        //async Object.keys(addresses.TOKENS).forEach((key) => {
-        await Promise.all(supportedTokens.map(async (key) => {
-            //tokens[key
-            const L1a = await this.AddressManager.getAddress('TK_L1'+key)
-            console.log(L1a)
-            //tokens[key]['L1'] = L1a
-            this["L1_" + key + "_Address"] = L1a //addresses.TOKENS[key].L1;
-            this["L2_" + key + "_Address"] = await this.AddressManager.getAddress('TK_L2'+key)
-          })
-        )
-      }
+          this["L1_" + key + "_Address"] = L1a
+          this["L2_" + key + "_Address"] = L2a
+        })
+      )
 
       console.log("tokens:",tokens)
+      this.tokenAddresses = tokens
 
-      if (addresses.hasOwnProperty('Proxy__L1LiquidityPool')) {
-        console.log('Proxy__L1LiquidityPool set to:',addresses.Proxy__L1LiquidityPool)
-        this.L1LPAddress = addresses.Proxy__L1LiquidityPool
-      }
-      if (addresses.hasOwnProperty('Proxy__L2LiquidityPool')) {
-        console.log('Proxy__L2LiquidityPool set to:',addresses.Proxy__L2LiquidityPool)
-        this.L2LPAddress = addresses.Proxy__L2LiquidityPool
-      }
+      this.L1LPAddress = await this.AddressManager.getAddress('Proxy__L1LiquidityPool')
+      console.log('L1StandardBridgeAddress pulled from AddressManager and set to:', this.L1LPAddress)
+
+      this.L2LPAddress = await this.AddressManager.getAddress('Proxy__L2LiquidityPool')
+      console.log('L2StandardBridgeAddress pulled from AddressManager and set to:', this.L2LPAddress)
 
       //this.L1Message = addresses.L1Message
       //this.L2Message = addresses.L2Message
@@ -491,8 +488,6 @@ class NetworkService {
       // this.L2TokenPoolAddress = addresses.L2TokenPool
       // this.AtomicSwapAddress = addresses.AtomicSwap
 
-      this.addresses = addresses
-
       if(this.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
           this.L2StandardBridgeAddress,
@@ -500,68 +495,56 @@ class NetworkService {
           this.provider.getSigner()
         )
       }
-      //console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
-
-      //return
+      console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
 
       this.L2_ETH_Contract = new ethers.Contract(
         this.L2_ETH_Address,
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
-      //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
+      console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
 
       /*The test token*/
-      if(addresses.TOKENS && addresses.TOKENS.BOBA.L1 !== null) {
-        this.L1_TEST_Contract = new ethers.Contract(
-          addresses.TOKENS.BOBA.L1,
-          L1ERC20Json.abi,
-          this.provider.getSigner()
-        )
-      }
-      //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
+      this.L1_TEST_Contract = new ethers.Contract(
+        this.tokenAddresses.BOBA.L1,
+        L1ERC20Json.abi,
+        this.provider.getSigner()
+      )
+      console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
-      if(addresses.TOKENS && addresses.TOKENS.BOBA.L2 !== null) {
-        this.L2_TEST_Contract = new ethers.Contract(
-          addresses.TOKENS.BOBA.L2,
-          L2ERC20Json.abi,
-          this.provider.getSigner()
-        )
-      }
-      //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
+      this.L2_TEST_Contract = new ethers.Contract(
+        this.tokenAddresses.BOBA.L2,
+        L2ERC20Json.abi,
+        this.provider.getSigner()
+      )
+      console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
       /*The OMG token*/
       //We need this seperately because OMG is not ERC20 compliant
-      if(addresses.TOKENS && addresses.TOKENS.OMG.L1 !== null) {
-        this.L1_OMG_Contract = new ethers.Contract(
-          addresses.TOKENS.OMG.L1,
-          OMGJson,
-          this.provider.getSigner()
-        )
-      }
-      //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
+      this.L1_OMG_Contract = new ethers.Contract(
+        this.tokenAddresses.OMG.L1,
+        OMGJson,
+        this.provider.getSigner()
+      )
+      console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
 
       //console.log('this.L1LPAddress:',this.L1LPAddress)
 
-      if(this.L1LPAddress !== null) {
-        console.log('Setting up contract for L1LP at:',this.L1LPAddress)
-        this.L1LPContract = new ethers.Contract(
-          this.L1LPAddress,
-          L1LPJson.abi,
-          this.provider.getSigner()
-        )
-      }
+      console.log('Setting up contract for L1LP at:',this.L1LPAddress)
+      this.L1LPContract = new ethers.Contract(
+        this.L1LPAddress,
+        L1LPJson.abi,
+        this.provider.getSigner()
+      )
 
-      if(this.L2LPAddress !== null) {
-        console.log('Setting up contract for L2LP at:',this.L2LPAddress)
-        this.L2LPContract = new ethers.Contract(
-          this.L2LPAddress,
-          L2LPJson.abi,
-          this.provider.getSigner()
-        )
-      }
+      console.log('Setting up contract for L2LP at:',this.L2LPAddress)
+      this.L2LPContract = new ethers.Contract(
+        this.L2LPAddress,
+        L2LPJson.abi,
+        this.provider.getSigner()
+      )
       
       // this.ERC721Contract = new ethers.Contract(
       //   this.ERC721Address,
