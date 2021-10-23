@@ -15,7 +15,6 @@ let Proxy__L1NFTBridge: Contract
 let Proxy__L2NFTBridge: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -44,14 +43,21 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L1NFTBridge.deployTransaction.wait()
   const Proxy__L1NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L1NFTBridge,
-    receipt: Proxy__L1NFTBridge.receipt, 
+    receipt: Proxy__L1NFTBridge.receipt,
     address: Proxy__L1NFTBridge.address,
     abi: Proxy__L1NFTBridge.abi,
   }
-  
-  await registerBobaAddress( addressManager, 'Proxy__L1NFTBridge', Proxy__L1NFTBridge.address )
-  await hre.deployments.save( 'Proxy__L1NFTBridge', Proxy__L1NFTBridgeDeploymentSubmission )
-  console.log( `Proxy__L1NFTBridge deployed to: ${Proxy__L1NFTBridge.address}`)
+
+  await registerBobaAddress(
+    addressManager,
+    'Proxy__L1NFTBridge',
+    Proxy__L1NFTBridge.address
+  )
+  await hre.deployments.save(
+    'Proxy__L1NFTBridge',
+    Proxy__L1NFTBridgeDeploymentSubmission
+  )
+  console.log(`Proxy__L1NFTBridge deployed to: ${Proxy__L1NFTBridge.address}`)
 
   Proxy__L2NFTBridge = await Factory__Proxy__L2NFTBridge.deploy(
     L2NFTBridge.address
@@ -59,13 +65,20 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L2NFTBridge.deployTransaction.wait()
   const Proxy__L2NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L2NFTBridge,
-    receipt: Proxy__L2NFTBridge.receipt, 
+    receipt: Proxy__L2NFTBridge.receipt,
     address: Proxy__L2NFTBridge.address,
     abi: Proxy__L2NFTBridge.abi,
   }
 
-  await registerBobaAddress( addressManager, 'Proxy__L2NFTBridge', Proxy__L2NFTBridge.address )
-  await hre.deployments.save( 'Proxy__L2NFTBridge', Proxy__L2NFTBridgeDeploymentSubmission )
+  await registerBobaAddress(
+    addressManager,
+    'Proxy__L2NFTBridge',
+    Proxy__L2NFTBridge.address
+  )
+  await hre.deployments.save(
+    'Proxy__L2NFTBridge',
+    Proxy__L2NFTBridgeDeploymentSubmission
+  )
   console.log(`Proxy__L2NFTBridge deployed to: ${Proxy__L2NFTBridge.address}`)
 
   Proxy__L1NFTBridge = new ethers.Contract(

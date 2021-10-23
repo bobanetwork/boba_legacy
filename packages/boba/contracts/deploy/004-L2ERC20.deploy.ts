@@ -28,7 +28,6 @@ const initialSupply_18 = utils.parseEther('10000000000')
 const initialSupply_BOBA = utils.parseEther('500000000')
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -54,7 +53,6 @@ const deployFn: DeployFunction = async (hre) => {
   let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
-    
     if (
       (hre as any).deployConfig.network === 'local' ||
       token.symbol === 'TEST'
@@ -89,29 +87,47 @@ const deployFn: DeployFunction = async (hre) => {
         abi: L1ERC20Json.abi,
       }
 
-      await hre.deployments.save('TK_L1'+token.symbol, L1ERC20DeploymentSubmission)
-      await registerBobaAddress( addressManager, 'TK_L1'+token.symbol, tokenAddressL1 )
+      await hre.deployments.save(
+        'TK_L1' + token.symbol,
+        L1ERC20DeploymentSubmission
+      )
+      await registerBobaAddress(
+        addressManager,
+        'TK_L1' + token.symbol,
+        tokenAddressL1
+      )
 
-      console.log(`TK_L1${token.symbol} was newly deployed to ${tokenAddressL1}`)
-
+      console.log(
+        `TK_L1${token.symbol} was newly deployed to ${tokenAddressL1}`
+      )
     } else if ((hre as any).deployConfig.network === 'rinkeby') {
-      
       tokenAddressL1 = token.address.rinkeby
 
-      await hre.deployments.save('TK_L1'+token.symbol, { abi: L1ERC20Json.abi, address: tokenAddressL1 })
-      await registerBobaAddress( addressManager, 'TK_L1'+token.symbol, tokenAddressL1 )
+      await hre.deployments.save('TK_L1' + token.symbol, {
+        abi: L1ERC20Json.abi,
+        address: tokenAddressL1,
+      })
+      await registerBobaAddress(
+        addressManager,
+        'TK_L1' + token.symbol,
+        tokenAddressL1
+      )
 
       console.log(`TK_L1${token.name} is located at ${tokenAddressL1}`)
-
     } else if ((hre as any).deployConfig.network === 'mainnet') {
-      
       tokenAddressL1 = token.address.mainnet
-      
-      await hre.deployments.save('TK_L1'+token.symbol, { abi: L1ERC20Json.abi, address: tokenAddressL1 })
-      await registerBobaAddress( addressManager, 'TK_L1'+token.symbol, tokenAddressL1 )
-  
+
+      await hre.deployments.save('TK_L1' + token.symbol, {
+        abi: L1ERC20Json.abi,
+        address: tokenAddressL1,
+      })
+      await registerBobaAddress(
+        addressManager,
+        'TK_L1' + token.symbol,
+        tokenAddressL1
+      )
+
       console.log(`TK_L1${token.name} is located at ${tokenAddressL1}`)
-    
     }
 
     // fetch decimal info from L1 token
@@ -126,7 +142,6 @@ const deployFn: DeployFunction = async (hre) => {
     //Set up things on L2 for these tokens
 
     if (token.symbol !== 'BOBA') {
-
       L2ERC20 = await Factory__L2ERC20.deploy(
         (hre as any).deployConfig.L2StandardBridgeAddress,
         tokenAddressL1,
@@ -142,12 +157,17 @@ const deployFn: DeployFunction = async (hre) => {
         address: L2ERC20.address,
         abi: L2ERC20.abi,
       }
-      await hre.deployments.save( 'TK_L2' + token.symbol, L2ERC20DeploymentSubmission )
-      await registerBobaAddress( addressManager, 'TK_L2' + token.symbol, L2ERC20.address )
+      await hre.deployments.save(
+        'TK_L2' + token.symbol,
+        L2ERC20DeploymentSubmission
+      )
+      await registerBobaAddress(
+        addressManager,
+        'TK_L2' + token.symbol,
+        L2ERC20.address
+      )
       console.log(`TK_L2${token.symbol} was deployed to ${L2ERC20.address}`)
-    
     } else {
-
       L2ERC20 = await Factory__L2Boba.deploy(
         (hre as any).deployConfig.L2StandardBridgeAddress,
         tokenAddressL1,
@@ -163,8 +183,15 @@ const deployFn: DeployFunction = async (hre) => {
         address: L2ERC20.address,
         abi: L2ERC20.abi,
       }
-      await hre.deployments.save('TK_L2' + token.symbol, L2ERC20DeploymentSubmission )
-      await registerBobaAddress( addressManager, 'TK_L2' + token.symbol, L2ERC20.address )
+      await hre.deployments.save(
+        'TK_L2' + token.symbol,
+        L2ERC20DeploymentSubmission
+      )
+      await registerBobaAddress(
+        addressManager,
+        'TK_L2' + token.symbol,
+        L2ERC20.address
+      )
       console.log(`TK_L2${token.name} was deployed to ${L2ERC20.address}`)
     }
 

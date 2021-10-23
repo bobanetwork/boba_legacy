@@ -18,11 +18,10 @@ const nftName = 'TestNFT'
 const nftSymbol = 'TST'
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
-    
+
   Factory__L2ERC721 = new ContractFactory(
     L2ERC721Json.abi,
     L2ERC721Json.bytecode,
@@ -42,7 +41,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L2ERC721DeploymentSubmission: DeploymentSubmission = {
     ...L2ERC721,
-    receipt: L2ERC721.receipt, 
+    receipt: L2ERC721.receipt,
     address: L2ERC721.address,
     abi: L2ERC721.abi,
   }
@@ -50,7 +49,7 @@ const deployFn: DeployFunction = async (hre) => {
   const owner = await L2ERC721.owner()
   console.log(`ERC721 owner: ${owner}`)
 
-  await registerBobaAddress( addressManager, 'L2ERC721', L2ERC721.address )
+  await registerBobaAddress(addressManager, 'L2ERC721', L2ERC721.address)
   await hre.deployments.save('L2ERC721', L2ERC721DeploymentSubmission)
 
   Factory__L2ERC721Reg = new ContractFactory(
@@ -65,11 +64,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L2ERC721RegDeploymentSubmission: DeploymentSubmission = {
     ...L2ERC721Reg,
-    receipt: L2ERC721Reg.receipt, 
+    receipt: L2ERC721Reg.receipt,
     address: L2ERC721Reg.address,
     abi: L2ERC721Reg.abi,
   }
-  await registerBobaAddress( addressManager, 'L2ERC721Reg', L2ERC721Reg.address )
+  await registerBobaAddress(addressManager, 'L2ERC721Reg', L2ERC721Reg.address)
   await hre.deployments.save('L2ERC721Reg', L2ERC721RegDeploymentSubmission)
 }
 

@@ -15,7 +15,6 @@ let Proxy__L1LiquidityPool: Contract
 let Proxy__L2LiquidityPool: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -47,12 +46,14 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L1LiquidityPool.deployTransaction.wait()
   const Proxy__L1LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L1LiquidityPool,
-    receipt: Proxy__L1LiquidityPool.receipt, 
+    receipt: Proxy__L1LiquidityPool.receipt,
     address: Proxy__L1LiquidityPool.address,
     abi: Proxy__L1LiquidityPool.abi,
   }
 
-  console.log(`Proxy__L1LiquidityPool deployed to: ${Proxy__L1LiquidityPool.address}`)
+  console.log(
+    `Proxy__L1LiquidityPool deployed to: ${Proxy__L1LiquidityPool.address}`
+  )
 
   Proxy__L2LiquidityPool = await Factory__Proxy__L2LiquidityPool.deploy(
     L2LiquidityPool.address
@@ -60,11 +61,13 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L2LiquidityPool.deployTransaction.wait()
   const Proxy__L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L2LiquidityPool,
-    receipt: Proxy__L2LiquidityPool.receipt, 
+    receipt: Proxy__L2LiquidityPool.receipt,
     address: Proxy__L2LiquidityPool.address,
     abi: Proxy__L2LiquidityPool.abi,
   }
-  console.log(`Proxy__L2LiquidityPool deployed to: ${Proxy__L2LiquidityPool.address}`)
+  console.log(
+    `Proxy__L2LiquidityPool deployed to: ${Proxy__L2LiquidityPool.address}`
+  )
 
   Proxy__L1LiquidityPool = new ethers.Contract(
     Proxy__L1LiquidityPool.address,
@@ -107,11 +110,24 @@ const deployFn: DeployFunction = async (hre) => {
   await registerL2LPETHTX.wait()
   console.log(`Proxy__L2LiquidityPool registered: ${registerL2LPETHTX.hash}`)
 
-  await hre.deployments.save('Proxy__L1LiquidityPool', Proxy__L1LiquidityPoolDeploymentSubmission)
-  await hre.deployments.save('Proxy__L2LiquidityPool', Proxy__L2LiquidityPoolDeploymentSubmission)
-  await registerBobaAddress( addressManager, 'Proxy__L1LiquidityPool', Proxy__L1LiquidityPool.address )
-  await registerBobaAddress( addressManager, 'Proxy__L2LiquidityPool', Proxy__L2LiquidityPool.address )
-
+  await hre.deployments.save(
+    'Proxy__L1LiquidityPool',
+    Proxy__L1LiquidityPoolDeploymentSubmission
+  )
+  await hre.deployments.save(
+    'Proxy__L2LiquidityPool',
+    Proxy__L2LiquidityPoolDeploymentSubmission
+  )
+  await registerBobaAddress(
+    addressManager,
+    'Proxy__L1LiquidityPool',
+    Proxy__L1LiquidityPool.address
+  )
+  await registerBobaAddress(
+    addressManager,
+    'Proxy__L2LiquidityPool',
+    Proxy__L2LiquidityPool.address
+  )
 }
 
 deployFn.tags = ['Proxy__L1LiquidityPool', 'Proxy__L2LiquidityPool', 'required']

@@ -14,11 +14,10 @@ let L1NFTBridge: Contract
 let L2NFTBridge: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
-    
+
   Factory__L1NFTBridge = new ContractFactory(
     L1NFTBridgeJson.abi,
     L1NFTBridgeJson.bytecode,
@@ -38,24 +37,24 @@ const deployFn: DeployFunction = async (hre) => {
   await L1NFTBridge.deployTransaction.wait()
   const L1NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...L1NFTBridge,
-    receipt: L1NFTBridge.receipt, 
+    receipt: L1NFTBridge.receipt,
     address: L1NFTBridge.address,
     abi: L1NFTBridgeJson.abi,
   }
 
-  await registerBobaAddress( addressManager, 'L1NFTBridge', L1NFTBridge.address )
-  await hre.deployments.save( 'L1NFTBridge', L1NFTBridgeDeploymentSubmission )
+  await registerBobaAddress(addressManager, 'L1NFTBridge', L1NFTBridge.address)
+  await hre.deployments.save('L1NFTBridge', L1NFTBridgeDeploymentSubmission)
   console.log(`L1NFTBridge deployed to: ${L1NFTBridge.address}`)
 
   L2NFTBridge = await Factory__L2NFTBridge.deploy()
   await L2NFTBridge.deployTransaction.wait()
   const L2NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...L2NFTBridge,
-    receipt: L2NFTBridge.receipt, 
+    receipt: L2NFTBridge.receipt,
     address: L2NFTBridge.address,
     abi: L2NFTBridgeJson.abi,
   }
-  await registerBobaAddress( addressManager, 'L2NFTBridge', L2NFTBridge.address )
+  await registerBobaAddress(addressManager, 'L2NFTBridge', L2NFTBridge.address)
   await hre.deployments.save('L2NFTBridge', L2NFTBridgeDeploymentSubmission)
   console.log(`L2NFTBridge deployed to: ${L2NFTBridge.address}`)
 }
