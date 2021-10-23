@@ -83,6 +83,15 @@ const rinkebyAddresses = require(`../deployment/rinkeby/addresses.json`)
 const mainnetAddresses = require(`../deployment/mainnet/addresses.json`)
 const rinkebyIntegrationAddresses = require(`../deployment/rinkeby-integration/addresses.json`)
 
+const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
+const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
+const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
+const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
+const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
+
+let allAdresses = {}
+let allTokens = {}
+
 class NetworkService {
 
   constructor() {
@@ -94,7 +103,6 @@ class NetworkService {
     this.environment = null
 
     this.ERC721Contract = null
-
     this.L2TokenPoolContract = null
     this.AtomicSwapContract = null
 
@@ -110,36 +118,15 @@ class NetworkService {
     this.AddressManagerAddress = null
     this.AddressManager = null
 
-    this.L1StandardBridgeAddress = null
-    this.L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
-
     this.ERC721Address = null
     this.ERC721RegAddress = null
 
-    this.L1_TEST_Address = null
-    this.L2_TEST_Address = null
-
     this.L1_TEST_Contract = null
     this.L2_TEST_Contract = null
-
     this.L1_OMG_Contract = null
-
-    this.L1LPAddress = null
-    this.L2LPAddress = null
-
-    this.L1_ETH_Address = '0x0000000000000000000000000000000000000000'
-    this.L2_ETH_Address = '0x4200000000000000000000000000000000000006'
     this.L2_ETH_Contract = null
 
-    this.L1MessengerAddress = null
-    this.L2MessengerAddress = '0x4200000000000000000000000000000000000007'
-
-    this.L1Message = null
-    this.L2Message = null
-
     this.tokenAddresses = null
-
-    // address
     this.addresses = null
 
     // chain ID
@@ -293,6 +280,21 @@ class NetworkService {
 
   }
 
+  async getAddress(contractName, varToSet) {
+    const address = await this.AddressManager.getAddress(contractName)
+    if (address === ERROR_ADDRESS) {
+      console.log(contractName + ' ERROR: NOT IN ADDRESSMANAGER')
+      return false
+    } else {
+      allAdresses = {
+        ...allAdresses, 
+        [varToSet]: address
+      }
+      console.log(contractName +' pulled from AddressManager and set to:', address)
+      return true
+    }
+  }
+
   async initializeAccounts( masterSystemConfig ) {
 
     console.log('NS: initializeAccounts() for', masterSystemConfig)
@@ -361,8 +363,8 @@ class NetworkService {
 
       // defines the set of possible networks along with chainId for L1 and L2
       const nw = getAllNetworks()
-      const L1ChainId = nw[masterSystemConfig]['L1']['chainId'];
-      const L2ChainId = nw[masterSystemConfig]['L2']['chainId'];
+      const L1ChainId = nw[masterSystemConfig]['L1']['chainId']
+      const L2ChainId = nw[masterSystemConfig]['L2']['chainId']
 
       //there are numerous possible chains we could be on
       //either local, rinkeby etc
@@ -424,20 +426,37 @@ class NetworkService {
       )
       console.log("AddressManager Contract:",this.AddressManager)
 
-      this.L1MessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
-      console.log('L1MessengerAddress pulled from AddressManager and set to:', this.L1MessengerAddress)
+      if (!(await this.getAddress('Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
+      if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
+      if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
+      if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
 
-      this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
-      console.log('L2MessengerAddress pulled from AddressManager and set to:', this.L2MessengerAddress)
+      //L2StandardBridgeAddress is a predeploy, so add by hand....
+      allAdresses = {
+        ...allAdresses, 
+        'L2StandardBridgeAddress': L2StandardBridgeAddress
+      }
 
-      this.L1FastMessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
-      console.log('L1FastMessengerAddress pulled from AddressManager and set to:', this.L1FastMessengerAddress)
+      //L2MessengerAddress is a predeploy, so add by hand....
+      allAdresses = {
+        ...allAdresses, 
+        'L2MessengerAddress': L2MessengerAddress
+      }
 
-      this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
-      console.log('L1StandardBridgeAddress pulled from AddressManager and set to:', this.L1StandardBridgeAddress)
+      //L2_ETH_Address is a predeploy, so add by hand....
+      allAdresses = {
+        ...allAdresses, 
+        'L2_ETH_Address': L2_ETH_Address
+      }
 
+      //L1_ETH_Address is a predeploy, so add by hand....
+      allAdresses = {
+        ...allAdresses, 
+        'L1_ETH_Address': L1_ETH_Address
+      }
+     
       this.L1StandardBridgeContract = new ethers.Contract(
-        this.L1StandardBridgeAddress,
+        allAdresses.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
         this.provider.getSigner()
       )
@@ -448,49 +467,43 @@ class NetworkService {
                                 'SUSHI', 'LINK', 'UNI', 'BOBA',
                                 'OMG' ]
 
-      let tokens = {}
       await Promise.all(supportedTokens.map(async (key) => {
-          //console.log("Creating token entry for:", key)
           
-          const L1a = await this.AddressManager.getAddress('TK_L1'+key)
-          const L2a = await this.AddressManager.getAddress('TK_L2'+key)
+        const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+        const L2a = await this.AddressManager.getAddress('TK_L2'+key)
 
-          tokens[key] = {
+        if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
+          console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+          return false
+        } else {
+          allTokens[key] = {
             'L1': L1a,
             'L2': L2a
           }
+        }
 
-          this["L1_" + key + "_Address"] = L1a
-          this["L2_" + key + "_Address"] = L2a
-        })
-      )
+      }))
 
-      console.log("tokens:",tokens)
-      this.tokenAddresses = tokens
+      console.log("tokens:",allTokens)
+      this.tokenAddresses = allTokens
 
-      this.L1LPAddress = await this.AddressManager.getAddress('Proxy__L1LiquidityPool')
-      console.log('L1StandardBridgeAddress pulled from AddressManager and set to:', this.L1LPAddress)
-
-      this.L2LPAddress = await this.AddressManager.getAddress('Proxy__L2LiquidityPool')
-      console.log('L2StandardBridgeAddress pulled from AddressManager and set to:', this.L2LPAddress)
+      if (!(await this.getAddress('Proxy__L1LiquidityPool', 'L1LPAddress'))) return
+      if (!(await this.getAddress('Proxy__L2LiquidityPool', 'L2LPAddress'))) return
 
       //this.L1Message = addresses.L1Message
       //this.L2Message = addresses.L2Message
-
       //backwards compat
       // if (addresses.hasOwnProperty('L2ERC721'))
       //   this.ERC721Address = addresses.L2ERC721
-
       // //backwards compat
       // if (addresses.hasOwnProperty('L2ERC721Reg'))
       //   this.ERC721RegAddress = addresses.L2ERC721Reg
-
       // this.L2TokenPoolAddress = addresses.L2TokenPool
       // this.AtomicSwapAddress = addresses.AtomicSwap
 
-      if(this.L2StandardBridgeAddress !== null) {
+      if(allAdresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
-          this.L2StandardBridgeAddress,
+          allAdresses.L2StandardBridgeAddress,
           L2StandardBridgeJson.abi,
           this.provider.getSigner()
         )
@@ -498,7 +511,7 @@ class NetworkService {
       console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
 
       this.L2_ETH_Contract = new ethers.Contract(
-        this.L2_ETH_Address,
+        allAdresses.L2_ETH_Address,
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
@@ -506,14 +519,14 @@ class NetworkService {
 
       /*The test token*/
       this.L1_TEST_Contract = new ethers.Contract(
-        this.tokenAddresses.BOBA.L1,
+        allTokens.BOBA.L1,
         L1ERC20Json.abi,
         this.provider.getSigner()
       )
       console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
       this.L2_TEST_Contract = new ethers.Contract(
-        this.tokenAddresses.BOBA.L2,
+        allTokens.BOBA.L2,
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
@@ -522,26 +535,23 @@ class NetworkService {
       /*The OMG token*/
       //We need this seperately because OMG is not ERC20 compliant
       this.L1_OMG_Contract = new ethers.Contract(
-        this.tokenAddresses.OMG.L1,
+        allTokens.OMG.L1,
         OMGJson,
         this.provider.getSigner()
       )
       console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
-
-      //console.log('this.L1LPAddress:',this.L1LPAddress)
-
-      console.log('Setting up contract for L1LP at:',this.L1LPAddress)
+      console.log('Setting up contract for L1LP at:',allAdresses.L1LPAddress)
       this.L1LPContract = new ethers.Contract(
-        this.L1LPAddress,
+        allAdresses.L1LPAddress,
         L1LPJson.abi,
         this.provider.getSigner()
       )
 
-      console.log('Setting up contract for L2LP at:',this.L2LPAddress)
+      console.log('Setting up contract for L2LP at:',allAdresses.L2LPAddress)
       this.L2LPContract = new ethers.Contract(
-        this.L2LPAddress,
+        allAdresses.L2LPAddress,
         L2LPJson.abi,
         this.provider.getSigner()
       )
@@ -567,25 +577,26 @@ class NetworkService {
       this.watcher = new Watcher({
         l1: {
           provider: this.L1Provider,
-          messengerAddress: this.L1MessengerAddress,
+          messengerAddress: allAdresses.L1MessengerAddress,
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress,
+          messengerAddress: allAdresses.L2MessengerAddress,
         },
       })
 
       this.fastWatcher = new Watcher({
         l1: {
           provider: this.L1Provider,
-          messengerAddress: this.L1FastMessengerAddress,
+          messengerAddress: allAdresses.L1FastMessengerAddress,
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress,
+          messengerAddress: allAdresses.L2MessengerAddress,
         },
       })
 
+      //DAO related
       // if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
       //   this.boba = new ethers.Contract(
@@ -801,27 +812,27 @@ class NetworkService {
 
       to = to.toLowerCase()
 
-      if (to === this.L2LPAddress.toLowerCase()) {
+      if (to === allAdresses.L2LPAddress.toLowerCase()) {
         //console.log("L2->L1 Swap Off")
         return Object.assign({}, item, { typeTX: 'Fast Bridge to L1' })
       }
 
-      if (to === this.L1LPAddress.toLowerCase()) {
+      if (to === allAdresses.L1LPAddress.toLowerCase()) {
         //console.log("L1->L2 Swap On")
         return Object.assign({}, item, { typeTX: 'Fast Bridge to L2' })
       }
 
-      if (to === this.L1StandardBridgeAddress.toLowerCase()) {
+      if (to === allAdresses.L1StandardBridgeAddress.toLowerCase()) {
         //console.log("L1->L2 Traditional Deposit")
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
       }
 
-      if (to === this.L1_BOBA_Address.toLowerCase()) {
+      if (to === allTokens.BOBA.L1.toLowerCase()) {
         //console.log("L1 ERC20 Amount Approval")
         return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
       }
 
-      if (to === this.L2StandardBridgeAddress.toLowerCase()) {
+      if (to === allAdresses.L2StandardBridgeAddress.toLowerCase()) {
         //console.log("L2 Standard Bridge")
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L1' })
       }
@@ -836,31 +847,31 @@ class NetworkService {
       //   return Object.assign({}, item, { typeTX: 'L2 Message' })
       // }
 
-      if (to === this.L2_BOBA_Address.toLowerCase()) {
+      if (to === allTokens.BOBA.L2.toLowerCase()) {
         //console.log("L2 TEST Message")
         return Object.assign({}, item, { typeTX: 'L2 TEST Token' })
       }
 
-      if (to === this.L2_ETH_Address.toLowerCase()) {
+      if (to === allAdresses.L2_ETH_Address.toLowerCase()) {
         //console.log("L2 ETH Message")
         return Object.assign({}, item, { typeTX: 'L2 ETH Ops (such as a L2->L2 Transfer)' })
       }
 
-      // if (to === this.L2_ETH_Address.toLowerCase()) {
+      // if (to === allAdresses.L2_ETH_Address.toLowerCase()) {
       //   //console.log("L2 ETH Message")
       //   return Object.assign({}, item, { typeTX: 'L2 ETH Token' })
       // }
 
       if (item.crossDomainMessage) {
-        if(to === this.L2LPAddress.toLowerCase()) {
+        if(to === allAdresses.L2LPAddress.toLowerCase()) {
           //console.log("Found EXIT: L2LPAddress")
           return Object.assign({}, item, { typeTX: 'FAST EXIT via L2LP' })
         }
-        else if (to === this.L2_TEST_Address.toLowerCase()) {
+        else if (to === allTokens.TEST.L2.toLowerCase()) {
           //console.log("Found EXIT: L2_TEST_Address")
           return Object.assign({}, item, { typeTX: 'EXIT (TEST Token)' })
         }
-        else if (to === this.L2_ETH_Address.toLowerCase()) {
+        else if (to === allAdresses.L2_ETH_Address.toLowerCase()) {
           //console.log("Found EXIT: L2_ETH_Address")
           return Object.assign({}, item, { typeTX: 'EXIT ETH' })
         }
@@ -898,9 +909,9 @@ class NetworkService {
       const filteredTransactions = transactions.filter(
         (i) =>
           [
-            this.L2LPAddress.toLowerCase(),
-            this.L2_TEST_Address.toLowerCase(),
-            this.L2_ETH_Address.toLowerCase(),
+            allAdresses.L2LPAddress.toLowerCase(),
+            allTokens.TEST.L2.toLowerCase(),
+            allAdresses.L2_ETH_Address.toLowerCase(),
           ].includes(i.to ? i.to.toLowerCase() : null) && i.crossDomainMessage
       )
       return { exited: filteredTransactions }
@@ -1076,10 +1087,11 @@ class NetworkService {
     // Add the token to our master list, if we do not have it yet
     // if the token is already in the list, then this function does nothing
     // but if a new token shows up, then it will get added
-    if(this.tokenAddresses === null) return
+    if(allTokens === null) return
     
-    Object.keys(this.tokenAddresses).forEach((token, i) => {
-      getToken(this.tokenAddresses[token].L1)
+    Object.keys(allTokens).forEach((token, i) => {
+      //console.log("allTokens[token].L1:",allTokens[token].L1)
+      getToken(allTokens[token].L1)
     })
   }
 
@@ -1105,9 +1117,9 @@ class NetworkService {
 
       const layer1Balances = [
         {
-          address: this.L1_ETH_Address,
-          addressL2: this.L2_ETH_Address,
-          currency: this.L1_ETH_Address,
+          address: allAdresses.L1_ETH_Address,
+          addressL2: allAdresses.L2_ETH_Address,
+          currency: allAdresses.L1_ETH_Address,
           symbol: 'ETH',
           decimals: 18,
           balance: new BN(layer1Balance.toString()),
@@ -1116,9 +1128,9 @@ class NetworkService {
 
       const layer2Balances = [
         {
-          address: this.L2_ETH_Address,
-          addressL1: this.L1_ETH_Address,
-          currency: this.L1_ETH_Address,
+          address: allAdresses.L2_ETH_Address,
+          addressL1: allAdresses.L1_ETH_Address,
+          currency: allAdresses.L1_ETH_Address,
           symbol: 'ETH',
           decimals: 18,
           balance: new BN(layer2Balance.toString()),
@@ -1129,7 +1141,7 @@ class NetworkService {
       const tA = Object.values(state.tokenList)
 
       const tokenC = new ethers.Contract(
-        this.L1_ETH_Address,
+        allAdresses.L1_ETH_Address,
         L1ERC20Json.abi,
         this.L1Provider
       )
@@ -1137,8 +1149,10 @@ class NetworkService {
       const getERC20Balance = async(token, tokenAddress, layer, provider=this.L1Provider) => {
         const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account);
         return {
-          ...token, balance: new BN(balance.toString()),
-          layer, address: layer === 'L1' ? token.addressL1: token.addressL2,
+          ...token, 
+          balance: new BN(balance.toString()),
+          layer, 
+          address: layer === 'L1' ? token.addressL1: token.addressL2,
           symbol: token.symbolL1
         }
       }
@@ -1146,8 +1160,8 @@ class NetworkService {
       const getBalancePromise = []
 
       tA.forEach((token) => {
-        if (token.addressL1 === this.L1_ETH_Address) return
-        if (token.addressL2 === this.L2_ETH_Address) return
+        if (token.addressL1 === allAdresses.L1_ETH_Address) return
+        if (token.addressL2 === allAdresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
         getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1"))
@@ -1233,7 +1247,7 @@ class NetworkService {
 
     try {
       
-      if(currency === this.L2_ETH_Address) {
+      if(currency === allAdresses.L2_ETH_Address) {
         //we are sending ETH
 
         let wei = BigNumber.from(value_Wei_String)
@@ -1315,7 +1329,7 @@ class NetworkService {
 
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,
-        this.L2LPAddress
+        allAdresses.L2LPAddress
       )
 
       //let depositAmount_BN = new BN(value_Wei_String)
@@ -1323,7 +1337,7 @@ class NetworkService {
 
       if (depositAmount_BN.gt(allowance_BN)) {
         const approveStatus = await L2ERC20Contract.approve(
-          this.L2LPAddress,
+          allAdresses.L2LPAddress,
           value_Wei_String
         )
         await approveStatus.wait()
@@ -1343,7 +1357,7 @@ class NetworkService {
   ) {
 
     console.log("approveERC20_L1LP")
-    const approveContractAddress = this.L1LPAddress
+    const approveContractAddress = allAdresses.L1LPAddress
 
     let allowance_BN = BigNumber.from("0")
     let allowed = false
@@ -1356,7 +1370,7 @@ class NetworkService {
         this.provider.getSigner()
       )
 
-      if( currency !== this.L1_ETH_Address ) {
+      if( currency !== allAdresses.L1_ETH_Address ) {
 
         let allowance_BN = await ERC20Contract.allowance(
           this.account,
@@ -1367,7 +1381,7 @@ class NetworkService {
         /* OMG IS A SPECIAL CASE - allowance needs to be
         set to zero, and then set to actual amount */
         if( allowance_BN.gt(BigNumber.from(0)) &&
-            (currency.toLowerCase() === this["L1_OMG_Address"].toLowerCase())
+            (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
           console.log("OMG Token allowance reset")
@@ -1414,7 +1428,7 @@ class NetworkService {
   async approveERC20(
     value_Wei_String,
     currency,
-    approveContractAddress = this.L1StandardBridgeAddress,
+    approveContractAddress = allAdresses.L1StandardBridgeAddress,
     contractABI = L1ERC20Json.abi
   ) {
 
@@ -1437,7 +1451,7 @@ class NetworkService {
       /* OMG IS A SPECIAL CASE - allowance needs to be
       set to zero, and then set to actual amount */
       if( allowance_BN.gt(BigNumber.from(0)) &&
-          (currency.toLowerCase() === this["L1_OMG_Address"].toLowerCase())
+          (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
         console.log("OMG Token allowance reset")
@@ -1479,13 +1493,11 @@ class NetworkService {
 
     updateSignatureStatus_depositTRAD(false)
 
-    //console.log("Depositing ERC20")
-
     const L1_TEST_Contract = this.L1_TEST_Contract.attach(currency)
 
     let allowance_BN = await L1_TEST_Contract.allowance(
       this.account,
-      this.L1StandardBridgeAddress
+      allAdresses.L1StandardBridgeAddress
     )
     //console.log("Allowance:",allowance_BN)
 
@@ -1498,7 +1510,7 @@ class NetworkService {
       {
         console.log("OMG Token allowance reset")
         const approveOMG = await L1_TEST_Contract.approve(
-          this.L1StandardBridgeAddress,
+          allAdresses.L1StandardBridgeAddress,
           ethers.utils.parseEther("0")
         )
         await approveOMG.wait()
@@ -1508,7 +1520,7 @@ class NetworkService {
       //recheck the allowance
       allowance_BN = await L1_TEST_Contract.allowance(
         this.account,
-        this.L1StandardBridgeAddress
+        allAdresses.L1StandardBridgeAddress
       )
 
       const allowed = allowance_BN.gte(BigNumber.from(value_Wei_String))
@@ -1516,7 +1528,7 @@ class NetworkService {
       if(!allowed) {
         //and now, the normal allowance transaction
         const approveStatus = await L1_TEST_Contract.approve(
-          this.L1StandardBridgeAddress,
+          allAdresses.L1StandardBridgeAddress,
           value_Wei_String
         )
         await approveStatus.wait()
@@ -1573,11 +1585,11 @@ class NetworkService {
 
     const allowance = await this.checkAllowance(
       currencyAddress,
-      this.L2StandardBridgeAddress
+      allAdresses.L2StandardBridgeAddress
     )
 
     //no need to approve L2 ETH
-    if( currencyAddress !== this.L2_ETH_Address && allowance.lt(value) ) {
+    if( currencyAddress !== allAdresses.L2_ETH_Address && allowance.lt(value) ) {
       const res = await this.approveERC20(
         value_Wei_String,
         currencyAddress,
@@ -1616,7 +1628,7 @@ class NetworkService {
 
   async getL1TotalFeeRate() {
     const L1LPContract = new ethers.Contract(
-      this.L1LPAddress,
+      allAdresses.L1LPAddress,
       L1LPJson.abi,
       this.L1Provider
     )
@@ -1632,7 +1644,7 @@ class NetworkService {
   // Total exit fee
   async getTotalFeeRate() {
     const L2LPContract = new ethers.Contract(
-      this.L2LPAddress,
+      allAdresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
@@ -1649,7 +1661,7 @@ class NetworkService {
 
   async getUserRewardFeeRate() {
     const L2LPContract = new ethers.Contract(
-      this.L2LPAddress,
+      allAdresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
@@ -1662,13 +1674,13 @@ class NetworkService {
   /*****************************************************/
   async getL1LPInfo() {
 
-    const tokenAddressList = Object.keys(this.addresses.TOKENS).reduce((acc, cur) => {
-      acc.push(this["L1_" + cur + "_Address"].toLowerCase());
+    const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
+      acc.push(allTokens[cur].L1.toLowerCase());
       return acc;
-    }, [this.L1_ETH_Address]);
+    }, [allAdresses.L1_ETH_Address])
 
     const L1LPContract = new ethers.Contract(
-      this.L1LPAddress,
+      allAdresses.L1LPAddress,
       L1LPJson.abi,
       this.L1Provider
     )
@@ -1685,13 +1697,13 @@ class NetworkService {
       let tokenName
       let decimals
       
-      if (tokenAddress === this.L1_ETH_Address) {
-        tokenBalance = await this.L1Provider.getBalance(this.L1LPAddress)
+      if (tokenAddress === allAdresses.L1_ETH_Address) {
+        tokenBalance = await this.L1Provider.getBalance(allAdresses.L1LPAddress)
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
       } else {
-        tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(this.L1LPAddress)
+        tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAdresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
         decimals = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).decimals()
@@ -1748,19 +1760,19 @@ class NetworkService {
 
   async getL2LPInfo() {
 
-    const tokenAddressList = Object.keys(this.addresses.TOKENS).reduce((acc, cur) => {
+    const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       acc.push({
-        L1: this["L1_" + cur + "_Address"].toLowerCase(),
-        L2: this["L2_" + cur + "_Address"].toLowerCase()
+        L1: allTokens[cur].L1.toLowerCase(),
+        L2: allTokens[cur].L2.toLowerCase()
       });
       return acc;
     }, [{
-      L1: this.L1_ETH_Address,
-      L2: this.L2_ETH_Address
+      L1: allAdresses.L1_ETH_Address,
+      L2: allAdresses.L2_ETH_Address
     }])
 
     const L2LPContract = new ethers.Contract(
-      this.L2LPAddress,
+      allAdresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
@@ -1777,13 +1789,13 @@ class NetworkService {
       let tokenName
       let decimals
 
-      if (tokenAddress === this.L2_ETH_Address) {
-        tokenBalance = await this.L2Provider.getBalance(this.L2LPAddress)
+      if (tokenAddress === allAdresses.L2_ETH_Address) {
+        tokenBalance = await this.L2Provider.getBalance(allAdresses.L2LPAddress)
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
       } else {
-        tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(this.L2LPAddress)
+        tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(allAdresses.L2LPAddress)
         tokenSymbol = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).symbol()
         tokenName = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).name()
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
@@ -1849,7 +1861,7 @@ class NetworkService {
 
     let otherField = {}
 
-    if( currency === this.L1_ETH_Address || currency === this.L2_ETH_Address ) {
+    if( currency === allAdresses.L1_ETH_Address || currency === allAdresses.L2_ETH_Address ) {
       //console.log("Yes we have ETH")
       otherField = { value: value_Wei_String }
     }
@@ -1878,7 +1890,7 @@ class NetworkService {
   async getRewardL1(currencyL1Address, value_Wei_String) {
 
     try {
-      const withdrawRewardTX = await this.L1LPContract.withdrawReward(
+      const withdrawRewardTX = await allAdresses.L1LPContract.withdrawReward(
         value_Wei_String,
         currencyL1Address,
         this.account
@@ -1896,7 +1908,7 @@ class NetworkService {
   async getRewardL2(currencyL2Address, value_Wei_String) {
 
     try {
-      const withdrawRewardTX = await this.L2LPContract.withdrawReward(
+      const withdrawRewardTX = await allAdresses.L2LPContract.withdrawReward(
         value_Wei_String,
         currencyL2Address,
         this.account
@@ -1915,8 +1927,8 @@ class NetworkService {
 
     try {
       const withdrawLiquidityTX = await (L1orL2Pool === 'L1LP'
-        ? this.L1LPContract
-        : this.L2LPContract
+        ? allAdresses.L1LPContract
+        : allAdresses.L2LPContract
       ).withdrawLiquidity(
         value_Wei_String,
         currency,
@@ -1936,10 +1948,10 @@ class NetworkService {
 
     updateSignatureStatus_depositLP(false)
 
-    const depositTX = await this.L1LPContract.clientDepositL1(
+    const depositTX = await allAdresses.L1LPContract.clientDepositL1(
       value_Wei_String,
       currency,
-      currency === this.L1_ETH_Address ? { value: value_Wei_String } : {}
+      currency === allAdresses.L1_ETH_Address ? { value: value_Wei_String } : {}
     )
 
     //at this point the tx has been submitted, and we are waiting...
@@ -1968,13 +1980,13 @@ class NetworkService {
     let tokenAddressLC = tokenAddress.toLowerCase()
 
     if (
-      tokenAddressLC === this.L2_ETH_Address ||
-      tokenAddressLC === this.L1_ETH_Address
+      tokenAddressLC === allAdresses.L2_ETH_Address ||
+      tokenAddressLC === allAdresses.L1_ETH_Address
     ) {
-      balance = await this.L1Provider.getBalance(this.L1LPAddress)
+      balance = await this.L1Provider.getBalance(allAdresses.L1LPAddress)
     } else {
       balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
-        this.L1LPAddress
+        allAdresses.L1LPAddress
       )
     }
 
@@ -1991,16 +2003,16 @@ class NetworkService {
     let tokenAddressLC = tokenAddress.toLowerCase()
 
     if (
-      tokenAddressLC === this.L2_ETH_Address ||
-      tokenAddressLC === this.L1_ETH_Address
+      tokenAddressLC === allAdresses.L2_ETH_Address ||
+      tokenAddressLC === allAdresses.L1_ETH_Address
     ) {
       //We are dealing with ETH
       balance = await this.L2_ETH_Contract.connect(this.L2Provider).balanceOf(
-        this.L2LPAddress
+        allAdresses.L2LPAddress
       )
     } else {
       balance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(
-        this.L2LPAddress
+        allAdresses.L2LPAddress
       )
     }
 
@@ -2015,7 +2027,7 @@ class NetworkService {
     const gasPrice = await this.L2Provider.getGasPrice()
     console.log("Fast exit gas price", gasPrice.toString())
 
-    if( currencyAddress !== this.L2_ETH_Address ) {
+    if( currencyAddress !== allAdresses.L2_ETH_Address ) {
 
       const L2ERC20Contract = new ethers.Contract(
         currencyAddress,
@@ -2024,7 +2036,7 @@ class NetworkService {
       )
 
       const tx = await L2ERC20Contract.populateTransaction.approve(
-        this.L2LPAddress,
+        allAdresses.L2LPAddress,
         utils.parseEther('1.0')
       )
 
@@ -2035,9 +2047,9 @@ class NetworkService {
 
     //in soem cases zero not allowed
     const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
-      currencyAddress === this.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
+      currencyAddress === allAdresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
       currencyAddress,
-      currencyAddress === this.L2_ETH_Address ? { value : '1'} : {}
+      currencyAddress === allAdresses.L2_ETH_Address ? { value : '1'} : {}
     )
 
     const despositGas_BN = await this.L2Provider.estimateGas(tx2)
@@ -2064,12 +2076,12 @@ class NetworkService {
     let gasPrice = await this.L2Provider.getGasPrice()
     console.log("Fast exit gas price", gasPrice.toString())
 
-    if( currencyAddress === this.L2_ETH_Address ) {
+    if( currencyAddress === allAdresses.L2_ETH_Address ) {
       balance_BN = await this.L2Provider.getBalance(this.account)
     }
 
     //console.log("Address:",currencyAddress)
-    if( currencyAddress !== this.L2_ETH_Address ) {
+    if( currencyAddress !== allAdresses.L2_ETH_Address ) {
 
       const L2ERC20Contract = new ethers.Contract(
         currencyAddress,
@@ -2084,7 +2096,7 @@ class NetworkService {
 
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,
-        this.L2LPAddress
+        allAdresses.L2LPAddress
       )
       console.log("Allowance:",utils.formatEther(allowance_BN))
 
@@ -2092,7 +2104,7 @@ class NetworkService {
 
         //Estimate gas
         const tx = await L2ERC20Contract.populateTransaction.approve(
-          this.L2LPAddress,
+          allAdresses.L2LPAddress,
           balance_BN
         )
 
@@ -2101,7 +2113,7 @@ class NetworkService {
         console.log("Cost to Approve (ETH):", utils.formatEther(approvalCost_BN))
 
         const approveStatus = await L2ERC20Contract.approve(
-          this.L2LPAddress,
+          allAdresses.L2LPAddress,
           balance_BN
         )
         await approveStatus.wait()
@@ -2118,7 +2130,7 @@ class NetworkService {
     const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
       balance_BN,
       currencyAddress,
-      currencyAddress === this.L2_ETH_Address ? { value : balance_BN } : {}
+      currencyAddress === allAdresses.L2_ETH_Address ? { value : balance_BN } : {}
     )
     //console.log("tx2",tx2)
 
@@ -2133,7 +2145,7 @@ class NetworkService {
     let depositCost_BN = despositGas_BN.mul(gasPrice)
     console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
 
-    if(currencyAddress === this.L2_ETH_Address) {
+    if(currencyAddress === allAdresses.L2_ETH_Address) {
       //if fee token, need to consider cost to exit
       balance_BN = balance_BN.sub(depositCost_BN)
     }
@@ -2147,7 +2159,7 @@ class NetworkService {
     const depositTX = await this.L2LPContract.clientDepositL2(
       balance_BN,
       currencyAddress,
-      currencyAddress === this.L2_ETH_Address ? { value : balance_BN } : {}
+      currencyAddress === allAdresses.L2_ETH_Address ? { value : balance_BN } : {}
     )
 
     //at this point the tx has been submitted, and we are waiting...
@@ -2179,7 +2191,7 @@ class NetworkService {
 
     console.log("depositL2LP currencyAddress",currencyAddress)
 
-    if( currencyAddress !== this.L2_ETH_Address ) {
+    if( currencyAddress !== allAdresses.L2_ETH_Address ) {
 
       const L2ERC20Contract = new ethers.Contract(
         currencyAddress,
@@ -2189,14 +2201,14 @@ class NetworkService {
       
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,
-        this.L2LPAddress
+        allAdresses.L2LPAddress
       )
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
 
       if (depositAmount_BN.gt(allowance_BN)) {
         const approveStatus = await L2ERC20Contract.approve(
-          this.L2LPAddress,
+          allAdresses.L2LPAddress,
           value_Wei_String
         )
         await approveStatus.wait()
@@ -2207,7 +2219,7 @@ class NetworkService {
     const depositTX = await this.L2LPContract.clientDepositL2(
       value_Wei_String,
       currencyAddress,
-      currencyAddress === this.L2_ETH_Address ? { value: value_Wei_String } : {}
+      currencyAddress === allAdresses.L2_ETH_Address ? { value: value_Wei_String } : {}
     )
 
     //at this point the tx has been submitted, and we are waiting...
