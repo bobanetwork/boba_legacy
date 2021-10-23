@@ -475,11 +475,17 @@ function destroy_dev_services {
 
 
      function generate_environment {
-       #set -x
-              for srv in $DOCKER_IMAGES_LIST; do
-                aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
-                aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
-              done
+        if [ -z ${SERVICE_NAME} ]; then
+           info "Missing ${SERVICE_NAME} going to re-generate all environment files"
+           for srv in $DOCKER_IMAGES_LIST; do
+              aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+              aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+            done
+        else
+            info "Generating environment file for ${SERVICE_NAME}"
+            aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+            aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+        fi
       }
 
 
@@ -511,10 +517,6 @@ if [[ $# -gt 0 ]]; then
                 ;;
             --from-tag)
                 FROMTAG="${2}"
-                shift 2
-                ;;
-            --secret-name)
-                SECRETNAME="${2}"
                 shift 2
                 ;;
             --registry-prefix)
