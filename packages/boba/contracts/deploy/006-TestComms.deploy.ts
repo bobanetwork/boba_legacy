@@ -2,7 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1MessageJson from '../artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
 import L2MessageJson from '../artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
@@ -42,7 +42,8 @@ const deployFn: DeployFunction = async (hre) => {
   await L1Message.deployTransaction.wait()
   const L1MessageDeploymentSubmission: DeploymentSubmission = {
     ...L1Message,
-    receipt: L1Message.receipt, L1Message.address,
+    receipt: L1Message.receipt, 
+    address: L1Message.address,
     abi: L1MessageJson.abi,
   }
   await hre.deployments.save('L1Message', L1MessageDeploymentSubmission)

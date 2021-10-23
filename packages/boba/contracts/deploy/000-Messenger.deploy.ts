@@ -78,7 +78,8 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L1_MessengerDeploymentSubmission: DeploymentSubmission = {
     ...L1_Messenger,
-    receipt: L1_Messenger.receipt, L1_Messenger.address,
+    receipt: L1_Messenger.receipt, 
+    address: L1_Messenger.address,
     abi: L1_MessengerJson.abi,
   }
   

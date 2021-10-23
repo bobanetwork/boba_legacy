@@ -2,7 +2,7 @@
 import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -39,7 +39,8 @@ const deployFn: DeployFunction = async (hre) => {
   
   const L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...L2LiquidityPool,
-    receipt: L2LiquidityPool.receipt, L2LiquidityPool.address,
+    receipt: L2LiquidityPool.receipt, 
+    address: L2LiquidityPool.address,
     abi: L1LiquidityPoolJson.abi,
   }
   
@@ -54,7 +55,8 @@ const deployFn: DeployFunction = async (hre) => {
   
   const L1LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...L1LiquidityPool,
-    receipt: L1LiquidityPool.receipt, L1LiquidityPool.address,
+    receipt: L1LiquidityPool.receipt, 
+    address: L1LiquidityPool.address,
     abi: L2LiquidityPoolJson.abi,
   }
   

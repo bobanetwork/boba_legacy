@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
 import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'

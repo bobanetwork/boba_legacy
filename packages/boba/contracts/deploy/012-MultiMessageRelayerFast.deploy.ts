@@ -1,7 +1,7 @@
 import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -31,7 +31,8 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L1_MultiMessageRelayerFastDeploymentSubmission: DeploymentSubmission = {
     ...L1_MultiMessageRelayerFast,
-    receipt: L1_MultiMessageRelayerFast.receipt, L1_MultiMessageRelayerFast.address,
+    receipt: L1_MultiMessageRelayerFast.receipt, 
+    address: L1_MultiMessageRelayerFast.address,
     abi: L1_MultiMessageRelayerFastJson.abi,
   }
 

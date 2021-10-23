@@ -2,8 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, ethers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import chalk from 'chalk'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
@@ -48,7 +47,8 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L1LiquidityPool.deployTransaction.wait()
   const Proxy__L1LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L1LiquidityPool,
-    receipt: Proxy__L1LiquidityPool.receipt, Proxy__L1LiquidityPool.address,
+    receipt: Proxy__L1LiquidityPool.receipt, 
+    address: Proxy__L1LiquidityPool.address,
     abi: Proxy__L1LiquidityPool.abi,
   }
 
@@ -60,7 +60,8 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L2LiquidityPool.deployTransaction.wait()
   const Proxy__L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L2LiquidityPool,
-    receipt: Proxy__L2LiquidityPool.receipt, Proxy__L2LiquidityPool.address,
+    receipt: Proxy__L2LiquidityPool.receipt, 
+    address: Proxy__L2LiquidityPool.address,
     abi: Proxy__L2LiquidityPool.abi,
   }
   console.log(`Proxy__L2LiquidityPool deployed to: ${Proxy__L2LiquidityPool.address}`)

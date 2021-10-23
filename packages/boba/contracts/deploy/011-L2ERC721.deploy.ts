@@ -2,7 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import registerBobaAddress from './000-Messenger.deploy'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import preSupportedNFTs from '../preSupportedNFTs.json'
 import L1ERC721Json from '../artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
