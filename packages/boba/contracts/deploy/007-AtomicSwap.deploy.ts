@@ -2,13 +2,11 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import AtomicSwapJson from '../artifacts/contracts/AtomicSwap.sol/AtomicSwap.json'
 
 let Factory__AtomicSwap: ContractFactory
-
 let AtomicSwap: Contract
 
 const deployFn: DeployFunction = async (hre) => {
@@ -27,23 +25,13 @@ const deployFn: DeployFunction = async (hre) => {
   await AtomicSwap.deployTransaction.wait()
   const AtomicSwapDeploymentSubmission: DeploymentSubmission = {
     ...AtomicSwap,
-    receipt: AtomicSwap.receipt,
-    address: AtomicSwap.address,
+    receipt: AtomicSwap.receipt, AtomicSwap.address,
     abi: AtomicSwapJson.abi,
   }
   await hre.deployments.save('AtomicSwap', AtomicSwapDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('AtomicSwap deployed to:')} ${chalk.green(
-      AtomicSwap.address
-    )}`
-  )
-  await registerAddress({
-    addressManager,
-    name: 'AtomicSwap',
-    address: AtomicSwap.address,
-  })
+  await registerBobaAddress( addressManager, 'AtomicSwap', AtomicSwap.address )
+  console.log(`AtomicSwap deployed to: ${AtomicSwap.address}`)
 }
 
 deployFn.tags = ['AtomicSwap', 'required']
-
 export default deployFn

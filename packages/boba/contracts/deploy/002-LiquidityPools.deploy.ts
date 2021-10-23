@@ -3,7 +3,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -38,14 +38,13 @@ const deployFn: DeployFunction = async (hre) => {
   await L2LiquidityPool.deployTransaction.wait()
   const L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...L2LiquidityPool,
-    receipt: L2LiquidityPool.receipt,
-    address: L2LiquidityPool.address,
+    receipt: L2LiquidityPool.receipt, L2LiquidityPool.address,
     abi: L1LiquidityPoolJson.abi,
   }
-  await hre.deployments.save(
-    'L2LiquidityPool',
-    L2LiquidityPoolDeploymentSubmission
-  )
+  
+  await registerBobaAddress( addressManager, 'L2LiquidityPool', L2LiquidityPool.address )
+  await hre.deployments.save( 'L2LiquidityPool', L2LiquidityPoolDeploymentSubmission )
+
   console.log(
     `🌕 ${chalk.red('L2LiquidityPool deployed to:')} ${chalk.green(
       L2LiquidityPool.address
@@ -57,31 +56,18 @@ const deployFn: DeployFunction = async (hre) => {
   await L1LiquidityPool.deployTransaction.wait()
   const L1LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
     ...L1LiquidityPool,
-    receipt: L1LiquidityPool.receipt,
-    address: L1LiquidityPool.address,
+    receipt: L1LiquidityPool.receipt, L1LiquidityPool.address,
     abi: L2LiquidityPoolJson.abi,
   }
-  await hre.deployments.save(
-    'L1LiquidityPool',
-    L1LiquidityPoolDeploymentSubmission
-  )
+  
+  await registerBobaAddress( addressManager, 'L1LiquidityPool', L1LiquidityPool.address )
+  await hre.deployments.save( 'L1LiquidityPool', L1LiquidityPoolDeploymentSubmission )
+  
   console.log(
     `🌕 ${chalk.red('L1LiquidityPool deployed to:')} ${chalk.green(
       L1LiquidityPool.address
     )}`
   )
-
-  await registerAddress({
-    addressManager,
-    name: 'L1LiquidityPool',
-    address: L1LiquidityPool.address,
-  })
-
-  await registerAddress({
-    addressManager,
-    name: 'L2LiquidityPool',
-    address: L2LiquidityPool.address,
-  })
 
 }
 

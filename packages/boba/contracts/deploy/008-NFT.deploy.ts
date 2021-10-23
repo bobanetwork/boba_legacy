@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import L2ERC721Json from '../artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'
@@ -54,6 +54,11 @@ const deployFn: DeployFunction = async (hre) => {
   const owner = await L2ERC721.owner()
   console.log(` 🔒 ${chalk.red('ERC721 owner:')} ${chalk.green(owner)}`)
 
+  await registerBobaAddress({
+    addressManager,
+    name: 'L2ERC721',
+    address: L2ERC721.address,
+  })
   await hre.deployments.save('L2ERC721', L2ERC721DeploymentSubmission)
 
   Factory__L2ERC721Reg = new ContractFactory(
@@ -76,7 +81,11 @@ const deployFn: DeployFunction = async (hre) => {
     address: L2ERC721Reg.address,
     abi: L2ERC721Reg.abi,
   }
-
+  await registerBobaAddress({
+    addressManager,
+    name: 'L2ERC721Reg',
+    address: L2ERC721Reg.address,
+  })
   await hre.deployments.save('L2ERC721Reg', L2ERC721RegDeploymentSubmission)
 }
 

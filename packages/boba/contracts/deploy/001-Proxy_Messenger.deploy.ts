@@ -1,8 +1,7 @@
 import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
-import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -39,19 +38,13 @@ const deployFn: DeployFunction = async (hre) => {
 
   const Proxy_L1_MessengerDeploymentSubmission: DeploymentSubmission = {
     ...Proxy_L1_Messenger,
-    receipt: Proxy_L1_Messenger.receipt,
-    address: Proxy_L1_Messenger.address,
+    receipt: Proxy_L1_Messenger.receipt, Proxy_L1_Messenger.address,
     abi: Proxy_L1_Messenger.abi,
   }
-  await hre.deployments.save(
-    'Proxy__L1CrossDomainMessengerFast',
-    Proxy_L1_MessengerDeploymentSubmission
-  )
-  console.log(
-    `🌕 ${chalk.red(
-      'Proxy__L1CrossDomainMessengerFast deployed to:'
-    )} ${chalk.green(Proxy_L1_Messenger.address)}`
-  )
+  
+  await registerBobaAddress( addressManager, 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_Messenger.address )
+  await hre.deployments.save( 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_MessengerDeploymentSubmission ) 
+  console.log(`Proxy__L1CrossDomainMessengerFast deployed to: ${Proxy_L1_Messenger.address}`)
 
   const Proxy_L1_Messenger_Deployed = Factory__L1_Messenger.attach(
     Proxy_L1_Messenger.address
@@ -62,17 +55,7 @@ const deployFn: DeployFunction = async (hre) => {
     addressManager.address
   )
   await ProxyL1MessengerTX.wait()
-  console.log(
-    `⭐️ ${chalk.blue('Proxy Fast L1 Messenger initialized:')} ${chalk.green(
-      ProxyL1MessengerTX.hash
-    )}`
-  )
-
-  await registerAddress({
-    addressManager,
-    name: 'Proxy__L1CrossDomainMessengerFast',
-    address: Proxy_L1_Messenger.address,
-  })
+  console.log(`Proxy Fast L1 Messenger initialized: ${ProxyL1MessengerTX.hash}`)
 
 }
 

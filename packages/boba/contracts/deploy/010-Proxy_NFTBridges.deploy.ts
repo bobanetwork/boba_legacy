@@ -2,8 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, ethers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
 import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
@@ -34,7 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   // Deploy proxy contracts
-  console.log(`💿 ${chalk.green('Deploying NFT Bridge Proxys...')}`)
+  console.log(`Deploying NFT Bridge Proxys...`)
 
   const L1NFTBridge = await (hre as any).deployments.get('L1NFTBridge')
   const L2NFTBridge = await (hre as any).deployments.get('L2NFTBridge')
@@ -45,19 +44,13 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L1NFTBridge.deployTransaction.wait()
   const Proxy__L1NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L1NFTBridge,
-    receipt: Proxy__L1NFTBridge.receipt,
-    address: Proxy__L1NFTBridge.address,
+    receipt: Proxy__L1NFTBridge.receipt, Proxy__L1NFTBridge.address,
     abi: Proxy__L1NFTBridge.abi,
   }
-  await hre.deployments.save(
-    'Proxy__L1NFTBridge',
-    Proxy__L1NFTBridgeDeploymentSubmission
-  )
-  console.log(
-    `🌕 ${chalk.red('Proxy__L1NFTBridge deployed to:')} ${chalk.green(
-      Proxy__L1NFTBridge.address
-    )}`
-  )
+  
+  await registerBobaAddress( addressManager, 'Proxy__L1NFTBridge', Proxy__L1NFTBridge.address )
+  await hre.deployments.save( 'Proxy__L1NFTBridge', Proxy__L1NFTBridgeDeploymentSubmission )
+  console.log( `Proxy__L1NFTBridge deployed to: ${Proxy__L1NFTBridge.address}`)
 
   Proxy__L2NFTBridge = await Factory__Proxy__L2NFTBridge.deploy(
     L2NFTBridge.address
@@ -65,19 +58,13 @@ const deployFn: DeployFunction = async (hre) => {
   await Proxy__L2NFTBridge.deployTransaction.wait()
   const Proxy__L2NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...Proxy__L2NFTBridge,
-    receipt: Proxy__L2NFTBridge.receipt,
-    address: Proxy__L2NFTBridge.address,
+    receipt: Proxy__L2NFTBridge.receipt, Proxy__L2NFTBridge.address,
     abi: Proxy__L2NFTBridge.abi,
   }
-  await hre.deployments.save(
-    'Proxy__L2NFTBridge',
-    Proxy__L2NFTBridgeDeploymentSubmission
-  )
-  console.log(
-    `🌕 ${chalk.red('Proxy__L2NFTBridge deployed to:')} ${chalk.green(
-      Proxy__L2NFTBridge.address
-    )}`
-  )
+
+  await registerBobaAddress( addressManager, 'Proxy__L2NFTBridge', Proxy__L2NFTBridge.address )
+  await hre.deployments.save( 'Proxy__L2NFTBridge', Proxy__L2NFTBridgeDeploymentSubmission )
+  console.log(`Proxy__L2NFTBridge deployed to: ${Proxy__L2NFTBridge.address}`)
 
   Proxy__L1NFTBridge = new ethers.Contract(
     Proxy__L1NFTBridge.address,
@@ -90,11 +77,7 @@ const deployFn: DeployFunction = async (hre) => {
     Proxy__L2NFTBridge.address
   )
   await initL1NFTBridgeTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L1NFTBridge initialized:')} ${chalk.green(
-      initL1NFTBridgeTX.hash
-    )}`
-  )
+  console.log(`Proxy__L1NFTBridge initialized: ${initL1NFTBridgeTX.hash}`)
 
   Proxy__L2NFTBridge = new ethers.Contract(
     Proxy__L2NFTBridge.address,
@@ -107,13 +90,8 @@ const deployFn: DeployFunction = async (hre) => {
     Proxy__L1NFTBridge.address
   )
   await initL2NFTBridgeTX.wait()
-  console.log(
-    `⭐️ ${chalk.red('Proxy__L2NFTBridge initialized:')} ${chalk.green(
-      initL2NFTBridgeTX.hash
-    )}`
-  )
+  console.log(`Proxy__L2NFTBridge initialized: ${initL2NFTBridgeTX.hash}`)
 }
 
 deployFn.tags = ['Proxy__L1NFTBridge', 'Proxy__L2NFTBridge', 'required']
-
 export default deployFn

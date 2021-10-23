@@ -34,11 +34,11 @@ const waitUntilTrue = async (
   }
 }
 
-export const registerAddress = async ({
-  addressManager,
-  name,
-  address,
-}): Promise<void> => {
+export const registerBobaAddress = async (
+  addressManager: any,
+  name: string,
+  address: string
+): Promise<void> => {
 
   console.log("AddressManager address:",addressManager.address)
 
@@ -79,14 +79,13 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L1_MessengerDeploymentSubmission: DeploymentSubmission = {
     ...L1_Messenger,
-    receipt: L1_Messenger.receipt,
-    address: L1_Messenger.address,
+    receipt: L1_Messenger.receipt, L1_Messenger.address,
     abi: L1_MessengerJson.abi,
   }
-  await hre.deployments.save(
-    'L1CrossDomainMessengerFast',
-    L1_MessengerDeploymentSubmission
-  )
+  
+  await registerBobaAddress(addressManager, 'L1CrossDomainMessengerFast', L1_Messenger.address)
+  await hre.deployments.save('L1CrossDomainMessengerFast',L1_MessengerDeploymentSubmission)
+  
   console.log(
     `🌕 ${chalk.red('L1CrossDomainMessengerFast deployed to:')} ${chalk.green(
       L1_Messenger.address
@@ -107,12 +106,6 @@ const deployFn: DeployFunction = async (hre) => {
       L1MessagerTX.hash
     )}`
   )
-
-  await registerAddress({
-    addressManager,
-    name: 'L1CrossDomainMessengerFast',
-    address: L1_Messenger.address,
-  })
 
 }
 

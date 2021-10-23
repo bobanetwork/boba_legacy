@@ -2,8 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import L1MessageJson from '../artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
 import L2MessageJson from '../artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
@@ -43,21 +42,12 @@ const deployFn: DeployFunction = async (hre) => {
   await L1Message.deployTransaction.wait()
   const L1MessageDeploymentSubmission: DeploymentSubmission = {
     ...L1Message,
-    receipt: L1Message.receipt,
-    address: L1Message.address,
+    receipt: L1Message.receipt, L1Message.address,
     abi: L1MessageJson.abi,
   }
   await hre.deployments.save('L1Message', L1MessageDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L1 Message deployed to:')} ${chalk.green(
-      L1Message.address
-    )}`
-  )
-  await registerAddress({
-    addressManager,
-    name: 'L1Message',
-    address: L1Message.address,
-  })
+  console.log(`L1 Message deployed to: ${L1Message.address}`)
+  await registerBobaAddress( addressManager, 'L1Message', L1Message.address )
 
   L2Message = await Factory__L2Message.deploy(
     (hre as any).deployConfig.l2MessengerAddress
@@ -65,41 +55,24 @@ const deployFn: DeployFunction = async (hre) => {
   await L2Message.deployTransaction.wait()
   const L2MessageDeploymentSubmission: DeploymentSubmission = {
     ...L2Message,
-    receipt: L2Message.receipt,
+    receipt: L2Message.receipt, 
     address: L2Message.address,
     abi: L2MessageJson.abi,
   }
   await hre.deployments.save('L2Message', L2MessageDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L2 Message deployed to:')} ${chalk.green(
-      L2Message.address
-    )}`
-  )
-  await registerAddress({
-    addressManager,
-    name: 'L2Message',
-    address: L2Message.address,
-  })
+  console.log(`L2 Message deployed to: ${L2Message.address}`)
+  await registerBobaAddress( addressManager, 'L2Message', L2Message.address )
 
   // Initialize L1 message
   const L1MessageTX = await L1Message.init(L2Message.address)
   await L1MessageTX.wait()
-  console.log(
-    `⭐️ ${chalk.blue('L1 Message initialized:')} ${chalk.green(
-      L1MessageTX.hash
-    )}`
-  )
+  console.log(`L1 Message initialized: ${L1MessageTX.hash}`)
 
   // Initialize L2 message
   const L2MessageTX = await L2Message.init(L1Message.address)
   await L2MessageTX.wait()
-  console.log(
-    `⭐️ ${chalk.blue('L2 Message initialized:')} ${chalk.green(
-      L2MessageTX.hash
-    )}`
-  )
+  console.log(`L2 Message initialized: ${L2MessageTX.hash}`)
 }
 
 deployFn.tags = ['L1Message', 'L2Message', 'required']
-
 export default deployFn

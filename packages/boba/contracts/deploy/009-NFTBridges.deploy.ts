@@ -2,8 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import chalk from 'chalk'
-import registerAddress from './000-Messenger.deploy'
+import registerBobaAddress from './000-Messenger.deploy'
 
 import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
@@ -39,32 +38,26 @@ const deployFn: DeployFunction = async (hre) => {
   await L1NFTBridge.deployTransaction.wait()
   const L1NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...L1NFTBridge,
-    receipt: L1NFTBridge.receipt,
+    receipt: L1NFTBridge.receipt, 
     address: L1NFTBridge.address,
     abi: L1NFTBridgeJson.abi,
   }
-  await hre.deployments.save('L1NFTBridge', L1NFTBridgeDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L1NFTBridge deployed to:')} ${chalk.green(
-      L1NFTBridge.address
-    )}`
-  )
+
+  await registerBobaAddress( addressManager, 'L1NFTBridge', L1NFTBridge.address )
+  await hre.deployments.save( 'L1NFTBridge', L1NFTBridgeDeploymentSubmission )
+  console.log(`L1NFTBridge deployed to: ${L1NFTBridge.address}`)
 
   L2NFTBridge = await Factory__L2NFTBridge.deploy()
   await L2NFTBridge.deployTransaction.wait()
   const L2NFTBridgeDeploymentSubmission: DeploymentSubmission = {
     ...L2NFTBridge,
-    receipt: L2NFTBridge.receipt,
+    receipt: L2NFTBridge.receipt, 
     address: L2NFTBridge.address,
     abi: L2NFTBridgeJson.abi,
   }
+  await registerBobaAddress( addressManager, 'L2NFTBridge', L2NFTBridge.address )
   await hre.deployments.save('L2NFTBridge', L2NFTBridgeDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L2NFTBridge deployed to:')} ${chalk.green(
-      L2NFTBridge.address
-    )}`
-  )
-}
+  console.log(`L2NFTBridge deployed to: ${L2NFTBridge.address}`)
 
 deployFn.tags = ['L1NFTBridge', 'L2NFTBridge', 'required']
 
