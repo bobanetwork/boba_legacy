@@ -50,7 +50,7 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  let tokenAddress = null
+  let tokenAddressL1 = null
   let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
@@ -80,7 +80,7 @@ const deployFn: DeployFunction = async (hre) => {
       )
       await L1ERC20.deployTransaction.wait()
 
-      tokenAddress = L1ERC20.address
+      tokenAddressL1 = L1ERC20.address
 
       const L1ERC20DeploymentSubmission: DeploymentSubmission = {
         ...L1ERC20,
@@ -90,61 +90,63 @@ const deployFn: DeployFunction = async (hre) => {
       }
 
       await hre.deployments.save(
-        `TK_L1${token.symbol}`,
+        'TK_L1'+token.symbol,
         L1ERC20DeploymentSubmission
       )
       
       await registerAddress({
         addressManager,
-        name: `TK_L1${token.symbol}`,
-        address: tokenAddress,
+        name: 'TK_L1'+token.symbol,
+        address: tokenAddressL1,
       })
 
       console.log(
-        `🌕 ${chalk.red(`L1 ${token.name} was newly deployed to`)} ${chalk.green(tokenAddress)}`
+        `🌕 ${chalk.red(`TK_L1${token.symbol} was newly deployed to`)} ${chalk.green(tokenAddressL1)}`
       )
+
     } else if ((hre as any).deployConfig.network === 'rinkeby') {
       
-      tokenAddress = token.address.rinkeby
+      tokenAddressL1 = token.address.rinkeby
+
       await hre.deployments.save(
-        `TK_L1${token.symbol}`, 
-        { abi: L1ERC20Json.abi, address: tokenAddress }
+        'TK_L1'+token.symbol, 
+        { abi: L1ERC20Json.abi, address: tokenAddressL1 }
       )
       
       await registerAddress({
         addressManager,
-        name: `TK_L1${token.symbol}`,
-        address: tokenAddress,
+        name: 'TK_L1'+token.symbol,
+        address: tokenAddressL1,
       })
 
       console.log(
-        `🌕 ${chalk.red(`L1 ${token.name} is located at`)} ${chalk.green(tokenAddress)}`
+        `🌕 ${chalk.red(`TK_L1${token.name} is located at`)} ${chalk.green(tokenAddressL1)}`
       )
     } else if ((hre as any).deployConfig.network === 'mainnet') {
       
-      tokenAddress = token.address.mainnet
+      tokenAddressL1 = token.address.mainnet
       
-      await hre.deployments.save(`TK_L1${token.symbol}`, {
-        abi: L1ERC20Json.abi,
-        address: tokenAddress,
-      })
+      await hre.deployments.save(
+        'TK_L1'+token.symbol, 
+        {
+          abi: L1ERC20Json.abi,
+          address: tokenAddressL1,
+        }
+      )
 
       await registerAddress({
         addressManager,
-        name: `TK_L1${token.symbol}`,
-        address: tokenAddress,
+        name: 'TK_L1'+token.symbol,
+        address: tokenAddressL1,
       })
       
-      console.log(
-        `🌕 ${chalk.red(`L1 ${token.name} is located at`)} ${chalk.green(
-          tokenAddress
-        )}`
-      )
+      console.log(`🌕 ${chalk.red(`L1 ${token.name} is located at`)} ${chalk.green(tokenAddressL1)}`)
+    
     }
 
     // fetch decimal info from L1 token
     L1ERC20 = new Contract(
-      tokenAddress,
+      tokenAddressL1,
       L1ERC20Json.abi,
       (hre as any).deployConfig.deployer_l1
     )
@@ -157,8 +159,7 @@ const deployFn: DeployFunction = async (hre) => {
 
       L2ERC20 = await Factory__L2ERC20.deploy(
         (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddress,
-        //((hre as any).deployConfig.network === 'local' || token.symbol === 'TEST' ) ? L1ERC20.address : token.address,
+        tokenAddressL1,
         token.name,
         token.symbol,
         tokenDecimals
@@ -172,24 +173,22 @@ const deployFn: DeployFunction = async (hre) => {
         abi: L2ERC20.abi,
       }
       await hre.deployments.save(
-        `TK_L2${token.symbol}`,
+        'TK_L2' + token.symbol,
         L2ERC20DeploymentSubmission
       )
       await registerAddress({
         addressManager,
-        name: `TK_L2${token.symbol}`,
+        name: 'TK_L2' + token.symbol,
         address: L2ERC20.address,
       })
       console.log(
-        `🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(
-          L2ERC20.address
-        )}`
+        `🌕 ${chalk.red(`TK_L2${token.symbol} was deployed to`)} ${chalk.green(L2ERC20.address)}`
       )
     } else {
 
       L2ERC20 = await Factory__L2Boba.deploy(
         (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddress,
+        tokenAddressL1,
         token.name,
         token.symbol,
         tokenDecimals
@@ -203,19 +202,15 @@ const deployFn: DeployFunction = async (hre) => {
         abi: L2ERC20.abi,
       }
       await hre.deployments.save(
-        `TK_L2${token.symbol}`,
+        'TK_L2' + token.symbol,
         L2ERC20DeploymentSubmission
       )
       await registerAddress({
         addressManager,
-        name: `TK_L2${token.symbol}`,
+        name: 'TK_L2' + token.symbol,
         address: L2ERC20.address,
       })
-      console.log(
-        `🌕 ${chalk.red(`L2 ${token.name} was deployed to`)} ${chalk.green(
-          L2ERC20.address
-        )}`
-      )
+      console.log(`🌕 ${chalk.red(`TK_L2${token.name} was deployed to`)} ${chalk.green(L2ERC20.address)}`)
     }
 
     // Register tokens in LPs

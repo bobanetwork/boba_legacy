@@ -41,6 +41,7 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
+import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json' 
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 
@@ -106,7 +107,7 @@ class NetworkService {
     this.fastWatcher = null
 
     // addresses
-    //this.AddressManagerAddress = null
+    this.AddressManagerAddress = null
     this.AddressManager = null
 
     this.L1StandardBridgeAddress = null
@@ -365,7 +366,7 @@ class NetworkService {
 
       //there are numerous possible chains we could be on
       //either local, rinkeby etc
-      //and then, also, either L1 or L2
+      //also, either L1 or L2
 
       //at this point, we only know whether we want to be on local or rinkeby etc
       if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
@@ -413,38 +414,27 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      // this.AddressManager = new ethers.Contract(
-      //   addresses.AddressManager,
-      //   AddressManagerJson.abi,
-      //   this.L1Provider
-      // )
-      // console.log("this.AddressManager",this.AddressManager)
-      // console.log(addresses)
+      this.AddressManagerAddress = nw[masterSystemConfig].addressManager
+      console.log("AddressManager address:",this.AddressManagerAddress)
 
-      this.L1MessengerAddress = addresses.Proxy__L1CrossDomainMessenger
-      console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
+      this.AddressManager = new ethers.Contract(
+        this.AddressManagerAddress,
+        AddressManagerJson.abi,
+        this.L1Provider
+      )
+      console.log("AddressManager Contract:",this.AddressManager)
 
-      //this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
-      console.log('L2MessengerAddress set to:', this.L2MessengerAddress)
+      this.L1MessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
+      console.log('L1MessengerAddress pulled from AddressManager and set to:', this.L1MessengerAddress)
 
-      if(addresses.hasOwnProperty('Proxy__L1CrossDomainMessengerFast')) {
-        this.L1FastMessengerAddress = addresses.Proxy__L1CrossDomainMessengerFast
-        console.log('L1FastMessengerAddress set to:',this.L1FastMessengerAddress)
-      } else {
-        console.log('L1FastMessengerAddress NOT SET')
-      }
-      
-      // //The L1 Standard Bridge 
-      // this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
-      // console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
-      
-      if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
-        this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
-        console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
-      }
-      else {
-        console.log('L1StandardBridgeAddress NOT SET')
-      }
+      this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
+      console.log('L2MessengerAddress pulled from AddressManager and set to:', this.L2MessengerAddress)
+
+      this.L1FastMessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
+      console.log('L1FastMessengerAddress pulled from AddressManager and set to:', this.L1FastMessengerAddress)
+
+      this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
+      console.log('L1StandardBridgeAddress pulled from AddressManager and set to:', this.L1StandardBridgeAddress)
 
       this.L1StandardBridgeContract = new ethers.Contract(
         this.L1StandardBridgeAddress,
@@ -453,13 +443,30 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
+      let tokens = {}
+
+// await Promise.all(files.map(async (file) => {
+//     const contents = await fs.readFile(file, 'utf8')
+//     console.log(contents)
+//   }));
+
+      const supportedTokens = [ 'TEST', 'USDT', 'BOBA' ]
+
       if (addresses.hasOwnProperty('TOKENS')) {
         this.tokenAddresses = addresses.TOKENS
-        Object.keys(addresses.TOKENS).forEach((key) => {
-          this["L1_" + key + "_Address"] = addresses.TOKENS[key].L1;
-          this["L2_" + key + "_Address"] = addresses.TOKENS[key].L2;
-        })
+        //async Object.keys(addresses.TOKENS).forEach((key) => {
+        await Promise.all(supportedTokens.map(async (key) => {
+            //tokens[key
+            const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+            console.log(L1a)
+            //tokens[key]['L1'] = L1a
+            this["L1_" + key + "_Address"] = L1a //addresses.TOKENS[key].L1;
+            this["L2_" + key + "_Address"] = await this.AddressManager.getAddress('TK_L2'+key)
+          })
+        )
       }
+
+      console.log("tokens:",tokens)
 
       if (addresses.hasOwnProperty('Proxy__L1LiquidityPool')) {
         console.log('Proxy__L1LiquidityPool set to:',addresses.Proxy__L1LiquidityPool)
@@ -596,33 +603,33 @@ class NetworkService {
         },
       })
 
-      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
+      // if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
-        this.boba = new ethers.Contract(
-          addresses.TOKENS.BOBA.L2,
-          Boba.abi,
-          this.provider.getSigner()
-        )
+      //   this.boba = new ethers.Contract(
+      //     addresses.TOKENS.BOBA.L2,
+      //     Boba.abi,
+      //     this.provider.getSigner()
+      //   )
 
-        this.delegate = new ethers.Contract(
-          addresses.DAO_GovernorBravoDelegate,
-          GovernorBravoDelegate.abi,
-          this.provider.getSigner()
-        )
+      //   this.delegate = new ethers.Contract(
+      //     addresses.DAO_GovernorBravoDelegate,
+      //     GovernorBravoDelegate.abi,
+      //     this.provider.getSigner()
+      //   )
 
-        this.delegator = new ethers.Contract(
-          addresses.DAO_GovernorBravoDelegator,
-          GovernorBravoDelegator.abi,
-          this.provider.getSigner()
-        )
+      //   this.delegator = new ethers.Contract(
+      //     addresses.DAO_GovernorBravoDelegator,
+      //     GovernorBravoDelegator.abi,
+      //     this.provider.getSigner()
+      //   )
 
-        this.timelock = new ethers.Contract(
-          addresses.DAO_Timelock,
-          Timelock.abi,
-          this.provider.getSigner()
-        )
+      //   this.timelock = new ethers.Contract(
+      //     addresses.DAO_Timelock,
+      //     Timelock.abi,
+      //     this.provider.getSigner()
+      //   )
 
-      }
+      //}
 
       this.bindProviderListeners()
 

@@ -15,6 +15,8 @@ limitations under the License. */
 
 require('dotenv').config()
 const env = process.env.REACT_APP_ENV;
+console.log(process.env)
+console.log(`https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`)
 
 let NETWORKS;
 
@@ -24,6 +26,7 @@ NETWORKS = {
     addressOMGXUrl:   null,
     OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
     MM_Label:         `Rinkeby`,
+    addressManager:   `0x987A11987743826FCCb16E72C0Cddf6C125E5e0C`, 
     L1: {
       name: "Rinkeby",
       chainId: 4,
@@ -72,6 +75,7 @@ if (env === 'dev') {
       addressOMGXUrl:   `http://${window.location.hostname}:8080/boba-addr.json`,
       OMGX_WATCHER_URL: null, //Does not exist on local
       MM_Label:         `Local`,
+      addressManager:   `0x5FbDB2315678afecb367f032d93F642f64180aa3`, 
       L1: {
         name: "Local L1",
         chainId: 31337,

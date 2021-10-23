@@ -30,7 +30,7 @@ if (netLayerCache) {
 
 const initialState = {
   walletMethod: null,
-  masterConfig: masterConfigCache ? masterConfigCache : 'rinkeby',
+  masterConfig: masterConfigCache ? masterConfigCache : 'local',
   blockexplorerURL: '',
   etherscan: '',
   minter: false,
