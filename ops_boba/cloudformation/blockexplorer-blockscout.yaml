@@ -193,6 +193,11 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "blockscout", "service": "blockscout"}]'
           Essential: true
           Memory: "512"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       Family: !Sub "blockscout-${EnvironmentName}"

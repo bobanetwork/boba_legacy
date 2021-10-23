@@ -20,7 +20,7 @@ Parameters:
 
   DockerPrefix:
     Type: String
-    Default: omgx
+    Default: bobanetwork
 
   LogsRetention:
     Type: Number
@@ -84,6 +84,11 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "gas-price-oracle", "service": "gas-price-oracle"}]'
           Essential: true
           Memory: "128"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"

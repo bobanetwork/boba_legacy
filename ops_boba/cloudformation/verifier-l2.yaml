@@ -20,16 +20,12 @@ Parameters:
 
   DockerPrefix:
     Type: String
-    Default: bobanetwork
+    Default: omgx
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-  SecretName:
-    Description: AWS Secret Name used for the service
-    Type: String
 
 Conditions:
   IsProduction:
@@ -73,11 +69,11 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+                    - "arn:aws:s3:::${S3BucketV2}/verifier-l2.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  ReplicaL2Listener:
+  VerifierL2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
@@ -86,9 +82,9 @@ Resources:
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
+        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
 
-  GoEthereumReplicaLBTargetGroup:
+  GoEthereumVerifierLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8545
@@ -103,12 +99,12 @@ Resources:
       TargetType: "instance"
 
 
-  GoEthereumReplicaLBListenerRule:
+  GoEthereumVerifierLBListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
+          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
       ListenerArn: !Ref ReplicaL2Listener
 
   TaskDefinition:
@@ -127,7 +123,7 @@ Resources:
               HostPort: 8545
             - ContainerPort: 8546
               HostPort: 8545
-          EnvironmentFiles:
+          EnvironmentFile:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
               - S3BucketV2:
@@ -182,7 +178,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "replica_l2", "service": "replica_l2"}]'
           Essential: true
-          Memory: "6000"
+          Memory: "4000"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -201,9 +197,9 @@ Resources:
       LoadBalancers:
         - ContainerName: geth_l2
           ContainerPort: 8545
-          TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
+          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "replica-l2"
+      ServiceName: "verifier-l2"
       TaskDefinition: !Ref TaskDefinition

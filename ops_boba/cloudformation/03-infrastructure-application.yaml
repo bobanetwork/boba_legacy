@@ -47,11 +47,6 @@ Parameters:
     Type: String
     Default: infrastructure-core
 
-  Route53HostedZoneName:
-    Description: The Route 53 zone to create
-    Type: String
-    Default: rinkeby-integration-v2.boba.network
-
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -74,11 +69,6 @@ Metadata:
         default: Default number of instances in the ECS cluster
 
 Resources:
-
-  Route53HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref Route53HostedZoneName
 
   S3BucketV2:
     Type: 'AWS::S3::Bucket'

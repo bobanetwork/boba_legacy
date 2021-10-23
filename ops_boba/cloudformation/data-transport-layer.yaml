@@ -24,7 +24,7 @@ Parameters:
 
   DockerPrefix:
     Type: String
-    Default: omgx
+    Default: bobanetwork
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -86,30 +86,27 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-#  DataTransportLayerDeployerListener1:
-#    Type: AWS::ElasticLoadBalancingV2::Listener
-#    Properties:
-#      LoadBalancerArn:
-#        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:ARN"
-#      Port: 8081
-#      Protocol: TLS
-#      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-#      Certificates:
-#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-#      DefaultActions:
-#      - Type: forward
-#        TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
+  DataTransportLayerDeployerListener1:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:ARN"
+      Port: 8081
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
 
-#  DataTransportLayerDeployerLBTargetGroup1:
-#    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-#    Properties:
-#      Port: 8081
-#      Protocol: TCP
-#      VpcId:
-#        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-#      HealthCheckProtocol: TCP
-#      HealthCheckPort: "traffic-port"
-#      TargetType: "ip"
+  DataTransportLayerDeployerLBTargetGroup1:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8081
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   DataTransportLayerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -161,11 +158,11 @@ Resources:
               Value: !Sub
                 - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
           MountPoints:
             - ContainerPath: "/db"
               SourceVolume: db
-            - ContainerPath: "/opt/optimism/packages/data-transport-layer/dist/dumps/"
+            - ContainerPath: "/opt/optimism/packages/data-transport-layer/state-dumps/"
               SourceVolume: addresses
           DockerLabels:
             com.datadoghq.ad.check_names: '["data_transport_layer"]'
@@ -173,6 +170,11 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "data_transport_layer", "service": "data_transport_layer"}]'
           Essential: true
           Memory: "200"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
@@ -186,9 +188,9 @@ Resources:
         - ContainerName: data_transport_layer
           ContainerPort: 7878
           TargetGroupArn: !Ref DataTransportLayerLBTargetGroup
-#        - ContainerName: data_transport_layer
-#          ContainerPort: 8081
-#          TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
+        - ContainerName: data_transport_layer
+          ContainerPort: 8081
+          TargetGroupArn: !Ref DataTransportLayerDeployerLBTargetGroup1
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED

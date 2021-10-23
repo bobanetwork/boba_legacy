@@ -99,6 +99,28 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
+  IPFSLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 5001
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  IPFSListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
+      Port: 5001
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref IPFSLBTargetGroup
+
   GraphListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -203,7 +225,7 @@ Resources:
           Name: ipfs
           PortMappings:
             - ContainerPort: 5001
-              HostPort: 0
+              HostPort: 5001
           MountPoints:
             - ContainerPath: "/data/ipfs"
               SourceVolume: ipfs
@@ -233,17 +255,21 @@ Resources:
               - "arn:aws:s3:::${S3BucketV2}/graph.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-            - Type: "s3"
+              Type: "s3"
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "graph", "service": "graph"}]'
           Essential: true
           Memory: "1200"
-          Links:
-            - ipfs
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "Graph-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
@@ -263,6 +289,9 @@ Resources:
         - ContainerName: graph
           ContainerPort: 8040
           TargetGroupArn: !Ref GraphLBTargetGroup4
+        - ContainerName: ipfs
+          ContainerPort: 5001
+          TargetGroupArn: !Ref IPFSLBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED

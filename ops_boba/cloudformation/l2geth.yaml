@@ -20,7 +20,7 @@ Parameters:
 
   DockerPrefix:
     Type: String
-    Default: omgx
+    Default: bobanetwork
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -172,12 +172,12 @@ Resources:
               Value: !Sub
                 - "https://${EndpointAddress}:8081"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
               Value: !Sub
                 - "https://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_CLIENT_HTTP
               Value: !Sub
                 - "http://${EndpointAddress}:7878"
@@ -187,7 +187,7 @@ Resources:
               Value: !Sub
                 - "https://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
           MountPoints:
             - ContainerPath: "/root/.ethereum"
               SourceVolume: l2-node
@@ -197,6 +197,11 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "geth_l2", "service": "geth_l2"}]'
           Essential: true
           Memory: "6000"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
       NetworkMode: awsvpc
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       TaskRoleArn: !GetAtt TaskRole.Arn
