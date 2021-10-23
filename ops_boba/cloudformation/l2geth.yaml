@@ -175,7 +175,7 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
               Value: !Sub
-                - "https://${EndpointAddress}:8081/addresses.json"
+                - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_CLIENT_HTTP
@@ -185,7 +185,7 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_STATE_DUMP_PATH
               Value: !Sub
-                - "https://${EndpointAddress}:8081/state-dump.latest.json"
+                - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
           MountPoints:

@@ -16,7 +16,7 @@ Parameters:
 
   GASPRICEImage:
     Type: String
-    Default: gas-price-oracle
+    Default: boba_gas-price-oracle
 
   DockerPrefix:
     Type: String

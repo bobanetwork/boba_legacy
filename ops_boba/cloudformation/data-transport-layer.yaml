@@ -153,7 +153,7 @@ Resources:
               Value: !Sub
                 - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
               Value: !Sub
                 - "http://${EndpointAddress}:8081/addresses.json"
@@ -199,7 +199,7 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 30
+      HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

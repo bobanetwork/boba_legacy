@@ -7,7 +7,7 @@ PATH_TO_CFN="$PWD/cloudformation"
 PATH_TO_DOCKER="$PWD/docker"
 PATH_TO_ENV="$PWD/docker_env"
 REGION=us-east-1
-REGISTRY_PREFIX=omgx
+REGISTRY_PREFIX=bobanetwork
 SERVICE_NAME=
 SECRETNAME=
 DEPLOYTAG=
@@ -52,13 +52,11 @@ function print_usage_and_exit {
         update                          update an environment, e.g. update the containers to certain deploy-tag
             --deploy-tag <deploy-tag>           The Git Tag or Branch Name of all of the services
             --service-name <service-name>       The name of the service you want to update, if not specified - all services are deployed with the <deploy-tag>
-            --secret-name <secret-name>         The name of the secret to be used for rebuilding the container, if not specified - the deploy tag is being taken as secret name
             --stack-name <stack-name>                       Stack Name to create
 
         deploy                          deploy to an environment, e.g. perform a deployment, for example, you've removed one service OR would like to add new to your dev env
             --deploy-tag <deploy-tag>           The Git Tag or Branch Name of all of the services
             --service-name <service-name>       The name of the service you want to update, if not specified - all services are deployed with the <deploy-tag>
-            --secret-name <secret-name>         The name of the secret to be used for rebuilding the container, if not specified - the deploy tag is being taken as secret name
             --stack-name <stack-name>                       Stack Name to create
 
         destroy                         destroy the deployment of all services
@@ -85,9 +83,9 @@ function print_usage_and_exit {
 
             $(basename $0) update --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag> --service-name <service-name>
 
-            $(basename $0) update --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag> --secret-name <AwsSecretName>
+            $(basename $0) update --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag>
 
-            $(basename $0) deploy --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag> --service-name <service-name> --secret-name <AwsSecretName>
+            $(basename $0) deploy --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag> --service-name <service-name>
 
             $(basename $0) deploy --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag>
 
@@ -96,7 +94,7 @@ function print_usage_and_exit {
 
             $(basename $0) push2aws --region <Region>  --deploy-tag <DeployTag> --from-tag <FromTag>
 
-            $(basename $0) push2aws --region <Region>  --deploy-tag <DeployTag> --from-tag <FromTag> --secret-name <secret-name>
+            $(basename $0) push2aws --region <Region>  --deploy-tag <DeployTag> --from-tag <FromTag>
 
         Destroy an environment/service
             $(basename $0) destroy --stack-name <stack-name> --service-name <service-name> --region <Region> --deploy-tag <DeployTag> [Note: Remove the service from the ECS Cluster]
@@ -253,7 +251,7 @@ function check_dev_environment {
                 info "Adding Graph to the ECS Cluster"
                 aws cloudformation create-stack \
                      --stack-name ${ENV_PREFIX}-graph \
-                     --capabilities CAPABILITY_IAM \
+                     --capabilities CAPABILITY_NAMED_IAM \
                      --template-body=file://05-graph.yaml \
                      --region ${REGION} \
                      --parameters \
@@ -376,7 +374,7 @@ function destroy_dev_services {
   }
 
   function restart_service {
-    set -x
+    #set -x
       local force="${1:-}"
       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
       if [[ ${ENV_PREFIX} == *"-replica"* ]];then
@@ -433,9 +431,9 @@ function destroy_dev_services {
         local force="${1:-}"
         CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
         if [[ ${ENV_PREFIX} == *"-replica"* ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
         SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
         DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
@@ -477,18 +475,11 @@ function destroy_dev_services {
 
 
      function generate_environment {
-        cd $PATH_TO_ENV
-        VARS_ALL=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'`
-        VAR_LIST=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'|cut -d= -f1`
-        for variable in $VAR_LIST; do
-          VALUE=`aws secretsmanager get-secret-value --secret-id ${SECRETNAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g'|grep -w $variable|cut -d= -f2`
-          VALUELONG=`echo ${variable}_VALUE`
-          sed -i "s#$VALUELONG#$VALUE#g" *.env
-        done
-        aws s3 cp --recursive `pwd` s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
-
-        git checkout HEAD -- `ls *.env`
-
+       #set -x
+              for srv in $DOCKER_IMAGES_LIST; do
+                aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+                aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+              done
       }
 
 
@@ -584,7 +575,6 @@ case "${SUBCMD}" in
         list_clusters
         ;;
     envgenerate)
-        [[ -z "${SECRETNAME}" ]] && warn 'Missing option --secret-name, defaulting to --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         generate_environment
         ;;

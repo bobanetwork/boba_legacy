@@ -80,6 +80,17 @@ Resources:
                 - "https://${EndpointAddress}"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: FILTER_ENDPOINT
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/boba-addr.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+            - Name: BOBA_DEPLOYER_URL
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/boba-addr.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+
           DockerLabels:
             com.datadoghq.ad.check_names: '["monitor"]'
             com.datadoghq.ad.init_configs: '[{}]'
