@@ -26,7 +26,7 @@ NETWORKS = {
     addressOMGXUrl:   null,
     OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
     MM_Label:         `Rinkeby`,
-    addressManager:   `0x987A11987743826FCCb16E72C0Cddf6C125E5e0C`, 
+    addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`, 
     L1: {
       name: "Rinkeby",
       chainId: 4,

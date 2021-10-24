@@ -59,8 +59,6 @@ function Account () {
 
   const tokenList = useSelector(selectTokens)
 
-  console.log("tokenList:",tokenList)
-
   const network = useSelector(selectNetwork())
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
@@ -70,7 +68,6 @@ function Account () {
 
   const getLookupPrice = useCallback(()=>{
     const symbolList = Object.values(tokenList).map((i)=> {
-      console.log("i:",i)
       if(i.symbolL1 === 'ETH') {
         return 'ethereum'
       } else if(i.symbolL1 === 'OMG') {
