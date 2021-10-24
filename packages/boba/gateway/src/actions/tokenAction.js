@@ -56,10 +56,7 @@ Get the token info from networkService.web3.eth.Contract
 */
 export async function addToken ( tokenContractAddressL1 ) {
 
-  //Adding token: 
-  console.log("tokenContractAddressL1:",tokenContractAddressL1)
-
-  if( tokenContractAddressL1 === null) return
+  if( tokenContractAddressL1 === null ) return
 
   const state = store.getState()
 
@@ -91,6 +88,8 @@ export async function addToken ( tokenContractAddressL1 ) {
       tokenContract.name()
     ]).catch(e => [ null, null, null ])
     
+    console.log("Decimals:", _decimals)
+
     const decimals = _decimals ? Number(_decimals.toString()) : 'NOT ON ETHEREUM'
     const symbolL1 = _symbolL1 || 'NOT ON ETHEREUM'
     const symbolL2 = _symbolL1 || 'NOT ON ETHEREUM'
@@ -104,7 +103,7 @@ export async function addToken ( tokenContractAddressL1 ) {
     
     /********* DO WE HAVE L2 DATA?? *************/
     // Let's go see
-    //console.log("Addresses for lookup:", networkService.tokenAddresses)
+    // console.log("Addresses for lookup:", networkService.tokenAddresses)
 
     let tA = networkService.tokenAddresses
 

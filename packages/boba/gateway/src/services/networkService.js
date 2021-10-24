@@ -72,16 +72,8 @@ import { getAllNetworks } from 'util/masterConfig'
 
 import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
-import addressAxiosInstance from 'api/addressAxios'
-import addressOMGXAxiosInstance from 'api/addressOMGXAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import { sortRawTokens } from 'util/common'
-
-//All the current addresses for fallback purposes, or live network
-const localAddresses = require(`../deployment/local/addresses.json`)
-const rinkebyAddresses = require(`../deployment/rinkeby/addresses.json`)
-const mainnetAddresses = require(`../deployment/mainnet/addresses.json`)
-const rinkebyIntegrationAddresses = require(`../deployment/rinkeby-integration/addresses.json`)
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -299,51 +291,7 @@ class NetworkService {
 
     console.log('NS: initializeAccounts() for', masterSystemConfig)
 
-    let resBOBA = null
-    let resBase = null
-    let addresses = null
-
     try {
-
-      console.log('Loading BOBA contract addresses')
-
-      if (masterSystemConfig === 'local') {
-
-        try {
-          resBOBA = await addressOMGXAxiosInstance('local').get()
-        } catch (error) {
-          console.log(error)
-        }
-
-        try {
-          resBase = await addressAxiosInstance('local').get()
-        } catch (error) {
-          console.log(error)
-        }
-
-        if (resBOBA !== null && resBase !== null) {
-          addresses = { 
-            ...resBase.data, 
-            ...resBOBA.data,
-            "DAO_GovernorBravoDelegate": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
-            "DAO_GovernorBravoDelegator": "0x36C02dA8a0983159322a80FFE9F24b1acfF8B570",
-            "DAO_Timelock": "0x9d4454B023096f34B160D6B654540c56A1F81688" 
-          }
-        } else {
-          addresses = localAddresses //emergency fallback
-        }
-
-        console.log('Final Local Addresses:', addresses)
-      } else if (masterSystemConfig === 'rinkeby') {
-        addresses = rinkebyAddresses
-        console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'mainnet') {
-        addresses = mainnetAddresses
-        console.log('Mainnet Addresses:', addresses)
-      } else if (masterSystemConfig === 'rinkeby-integration') {
-        addresses = rinkebyIntegrationAddresses
-        console.log('Rinkeby Integration Addresses:', addresses)
-      }
 
       //at this point, the wallet should be connected
       this.account = await this.provider.getSigner().getAddress()
@@ -1146,13 +1094,14 @@ class NetworkService {
         this.L1Provider
       )
 
-      const getERC20Balance = async(token, tokenAddress, layer, provider=this.L1Provider) => {
-        const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account);
+      const getERC20Balance = async(token, tokenAddress, layer, provider) => {
+        console.log("tokenAddress:",tokenAddress)
+        const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
         return {
           ...token, 
           balance: new BN(balance.toString()),
           layer, 
-          address: layer === 'L1' ? token.addressL1: token.addressL2,
+          address: layer === 'L1' ? token.addressL1 : token.addressL2,
           symbol: token.symbolL1
         }
       }
@@ -1160,11 +1109,12 @@ class NetworkService {
       const getBalancePromise = []
 
       tA.forEach((token) => {
+        console.log("token.:",token)
         if (token.addressL1 === allAdresses.L1_ETH_Address) return
         if (token.addressL2 === allAdresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1"))
+        getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
         getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
       })
 
@@ -1620,11 +1570,8 @@ class NetworkService {
   /***********************************************/
   /*****                  Fee                *****/
   /***** Fees are reported as integers,      *****/
-  /***** where every int                     *****/
-  /***** represents 0.1%                     *****/
+  /***** where every int represents 0.1%     *****/
   /***********************************************/
-
-  // Total exit fee for L1
 
   async getL1TotalFeeRate() {
     const L1LPContract = new ethers.Contract(
