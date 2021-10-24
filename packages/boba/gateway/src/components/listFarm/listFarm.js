@@ -81,7 +81,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = await networkService.getAllAddresses()
+    const allAddresses = networkService.getAllAddresses()
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
@@ -99,7 +99,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = await networkService.getAllAddresses()
+    const allAddresses = networkService.getAllAddresses()
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,

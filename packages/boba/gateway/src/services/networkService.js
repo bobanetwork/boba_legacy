@@ -287,8 +287,8 @@ class NetworkService {
     }
   }
 
-  async getAllAddresses() {
-    return allAddresses
+  getAllAddresses() {
+     return allAddresses
   }
 
   async initializeAccounts( masterSystemConfig ) {
