@@ -65,7 +65,7 @@ const main = async () => {
   )
   const GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE = config.uint(
     'gas-price-oracle-min-percent-change',
-    parseFloat(env.GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE) || 0.1
+    parseFloat(env.GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE) || 0.05
   )
   const POLLING_INTERVAL = config.uint(
     'polling-interval',

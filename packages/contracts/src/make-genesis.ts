@@ -96,16 +96,6 @@ export const makeL2GenesisFile = async (
   }
 
   const dump = {}
-  // Add the precompiles. Only safe for up to 9
-  for (let i = 1; i <= 9; i++) {
-    const addr = `0x000000000000000000000000000000000000000${i}`
-    if (addr.length !== 42) {
-      throw new Error(`Address length incorrect: ${addr.length}`)
-    }
-    dump[addr] = {
-      balance: '01',
-    }
-  }
   for (const predeployName of Object.keys(predeploys)) {
     const predeployAddress = predeploys[predeployName]
     dump[predeployAddress] = {
