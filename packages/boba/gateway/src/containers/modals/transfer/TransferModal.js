@@ -84,10 +84,8 @@ function TransferModal ({ open, token, minHeight }) {
         )
         if (transferResponseGood) {
           dispatch(openAlert('Transaction submitted'))
-          handleClose()
-        } else {
-          handleClose()
         }
+        handleClose()
       } catch (err) {
         //guess not really?
       }
