@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /* Library Imports */
-import { Lib_Buffer } from "../../libraries/utils/Lib_Buffer.sol";
-import { Lib_AddressResolver } from "../../libraries/resolver/Lib_AddressResolver.sol";
+import {Lib_Buffer} from '../../libraries/utils/Lib_Buffer.sol';
+import {Lib_AddressResolver} from '../../libraries/resolver/Lib_AddressResolver.sol';
 
 /* Interface Imports */
-import { IChainStorageContainer } from "./IChainStorageContainer.sol";
+import {IChainStorageContainer} from './IChainStorageContainer.sol';
 
 /**
  * @title ChainStorageContainer
@@ -22,162 +22,105 @@ import { IChainStorageContainer } from "./IChainStorageContainer.sol";
  * Runtime target: EVM
  */
 contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
+  /*************
+   * Libraries *
+   *************/
 
-    /*************
-     * Libraries *
-     *************/
+  using Lib_Buffer for Lib_Buffer.Buffer;
 
-    using Lib_Buffer for Lib_Buffer.Buffer;
+  /*************
+   * Variables *
+   *************/
 
+  string public owner;
+  Lib_Buffer.Buffer internal buffer;
 
-    /*************
-     * Variables *
-     *************/
+  /***************
+   * Constructor *
+   ***************/
 
-    string public owner;
-    Lib_Buffer.Buffer internal buffer;
+  /**
+   * @param _libAddressManager Address of the Address Manager.
+   * @param _owner Name of the contract that owns this container (will be resolved later).
+   */
+  constructor(address _libAddressManager, string memory _owner)
+    Lib_AddressResolver(_libAddressManager)
+  {
+    owner = _owner;
+  }
 
+  /**********************
+   * Function Modifiers *
+   **********************/
 
-    /***************
-     * Constructor *
-     ***************/
+  modifier onlyOwner() {
+    require(
+      msg.sender == resolve(owner),
+      'ChainStorageContainer: Function can only be called by the owner.'
+    );
+    _;
+  }
 
-    /**
-     * @param _libAddressManager Address of the Address Manager.
-     * @param _owner Name of the contract that owns this container (will be resolved later).
-     */
-    constructor(
-        address _libAddressManager,
-        string memory _owner
-    )
-        Lib_AddressResolver(_libAddressManager)
-    {
-        owner = _owner;
-    }
+  /********************
+   * Public Functions *
+   ********************/
 
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function setGlobalMetadata(bytes27 _globalMetadata) public onlyOwner {
+    return buffer.setExtraData(_globalMetadata);
+  }
 
-    /**********************
-     * Function Modifiers *
-     **********************/
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function getGlobalMetadata() public view returns (bytes27) {
+    return buffer.getExtraData();
+  }
 
-    modifier onlyOwner() {
-        require(
-            msg.sender == resolve(owner),
-            "ChainStorageContainer: Function can only be called by the owner."
-        );
-        _;
-    }
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function length() public view returns (uint256) {
+    return uint256(buffer.getLength());
+  }
 
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function push(bytes32 _object) public onlyOwner {
+    buffer.push(_object);
+  }
 
-    /********************
-     * Public Functions *
-     ********************/
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function push(bytes32 _object, bytes27 _globalMetadata) public onlyOwner {
+    buffer.push(_object, _globalMetadata);
+  }
 
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function setGlobalMetadata(
-        bytes27 _globalMetadata
-    )
-        public
-        onlyOwner
-    {
-        return buffer.setExtraData(_globalMetadata);
-    }
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function get(uint256 _index) public view returns (bytes32) {
+    return buffer.get(uint40(_index));
+  }
 
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function getGlobalMetadata()
-        public
-        view
-        returns (
-            bytes27
-        )
-    {
-        return buffer.getExtraData();
-    }
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function deleteElementsAfterInclusive(uint256 _index) public onlyOwner {
+    buffer.deleteElementsAfterInclusive(uint40(_index));
+  }
 
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function length()
-        public
-        view
-        returns (
-            uint256
-        )
-    {
-        return uint256(buffer.getLength());
-    }
-
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function push(
-        bytes32 _object
-    )
-        public
-        onlyOwner
-    {
-        buffer.push(_object);
-    }
-
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function push(
-        bytes32 _object,
-        bytes27 _globalMetadata
-    )
-        public
-        onlyOwner
-    {
-        buffer.push(_object, _globalMetadata);
-    }
-
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function get(
-        uint256 _index
-    )
-        public
-        view
-        returns (
-            bytes32
-        )
-    {
-        return buffer.get(uint40(_index));
-    }
-
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function deleteElementsAfterInclusive(
-        uint256 _index
-    )
-        public
-        onlyOwner
-    {
-        buffer.deleteElementsAfterInclusive(
-            uint40(_index)
-        );
-    }
-
-    /**
-     * @inheritdoc IChainStorageContainer
-     */
-    function deleteElementsAfterInclusive(
-        uint256 _index,
-        bytes27 _globalMetadata
-    )
-        public
-        onlyOwner
-    {
-        buffer.deleteElementsAfterInclusive(
-            uint40(_index),
-            _globalMetadata
-        );
-    }
+  /**
+   * @inheritdoc IChainStorageContainer
+   */
+  function deleteElementsAfterInclusive(uint256 _index, bytes27 _globalMetadata)
+    public
+    onlyOwner
+  {
+    buffer.deleteElementsAfterInclusive(uint40(_index), _globalMetadata);
+  }
 }

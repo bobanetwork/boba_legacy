@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /**
  * @title IBondManager
  */
 interface IBondManager {
+  /********************
+   * Public Functions *
+   ********************/
 
-    /********************
-     * Public Functions *
-     ********************/
-
-    function isCollateralized(
-        address _who
-    ) external view returns (bool);
+  function isCollateralized(address _who) external view returns (bool);
 }
