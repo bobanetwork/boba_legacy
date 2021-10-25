@@ -897,7 +897,6 @@ type mockClient struct {
 	getLatestEnqueueInfo           []func() (*EnqueueInfo, error)
 }
 
-
 //GetLatestEnqueueInfo() (*EnqueueInfo, error)
 
 func setupMockClient(service *SyncService, responses map[string]interface{}) {

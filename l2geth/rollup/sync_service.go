@@ -416,8 +416,8 @@ func (s *SyncService) sequence() error {
 }
 
 func (s *SyncService) syncQueueToTip() error {
-	indexWrapper := func(inf *EnqueueInfo)(indexGetter) {
-		return func()(*uint64, error) {
+	indexWrapper := func(inf *EnqueueInfo) indexGetter {
+		return func() (*uint64, error) {
 			return inf.QueueIndex, nil
 		}
 	}
@@ -437,7 +437,7 @@ func (s *SyncService) syncQueueToTip() error {
 		return fmt.Errorf("Cannot sync queue to tip: %w", err)
 	}
 
-	if  s.GetNextEnqueueIndex() == *inf.QueueIndex+1 && *inf.BaseBlock > s.GetLatestL1BlockNumber() {
+	if s.GetNextEnqueueIndex() == *inf.QueueIndex+1 && *inf.BaseBlock > s.GetLatestL1BlockNumber() {
 		// moved from the updateContext() function
 		current := time.Unix(int64(s.GetLatestL1Timestamp()), 0)
 		next := time.Unix(int64(*inf.BaseTime), 0)
@@ -803,8 +803,8 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		bn := s.GetLatestL1BlockNumber()
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
-	// In a testing environment with an "automine" L1, we may receive two blocks with the same L1Timestamp.
-	// Checking for L1BLockNumber() as well as Timestamp() will ensure that the context is updated in this situation.
+		// In a testing environment with an "automine" L1, we may receive two blocks with the same L1Timestamp.
+		// Checking for L1BLockNumber() as well as Timestamp() will ensure that the context is updated in this situation.
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() || tx.L1BlockNumber().Uint64() > s.GetLatestL1BlockNumber() {
 		if tx.L1Timestamp() == s.GetLatestL1Timestamp() {
 			log.Warn("Duplicate L1Timestamp() detected in applyTransactionToTip", "ts", tx.L1Timestamp(), "l1block", tx.L1BlockNumber().Uint64())

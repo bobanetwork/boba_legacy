@@ -94,12 +94,13 @@ type Enqueue struct {
 	QueueIndex  *uint64         `json:"index"`
 }
 
+// EnqueueInfo is used in GetLatestEnqueueInfo()
 type EnqueueInfo struct {
-	QueueIndex  *uint64         `json:"index"`
-	BlockNumber *uint64         `json:"blockNumber"`
-	Timestamp   *uint64         `json:"timestamp"`
-	BaseBlock   *uint64         `json:"baseBlock"`
-	BaseTime    *uint64         `json:"baseTime"`
+	QueueIndex  *uint64 `json:"index"`
+	BlockNumber *uint64 `json:"blockNumber"`
+	Timestamp   *uint64 `json:"timestamp"`
+	BaseBlock   *uint64 `json:"baseBlock"`
+	BaseTime    *uint64 `json:"baseTime"`
 }
 
 // signature represents a secp256k1 ECDSA signature
