@@ -39,7 +39,7 @@ class FarmWithdrawModal extends React.Component {
       userInfo,
       loading: false,
       //each value has an approximate version and a precise version
-      value: 0,
+      value: '',
       value_Wei_String: '',
       maxValue: 0,
       maxValue_Wei_String: '',
@@ -59,8 +59,6 @@ class FarmWithdrawModal extends React.Component {
     } else {
       LPBalance_Wei_String = await networkService.L2LPBalance(withdrawToken.currency)
     }
-
-    //console.log("LPBalance current", LPBalance_Wei_String)
 
     this.setState({
       LPBalance: logAmount(LPBalance_Wei_String, withdrawToken.decimals),
@@ -154,6 +152,8 @@ class FarmWithdrawModal extends React.Component {
 
     this.setState({ loading: true })
 
+    console.log("Dispatch withdraw")
+
     const withdrawLiquidityTX = await this.props.dispatch(withdrawLiquidity(
       withdrawToken.currency,
       value_Wei_String,
@@ -223,7 +223,7 @@ class FarmWithdrawModal extends React.Component {
 
         {Number(value) > Number(LPBalance) &&
           <Typography variant="body2" sx={{mt: 2}}>
-            Note: There is currently insufficient {withdrawToken.symbol} in the {' '}
+            Insufficient {withdrawToken.symbol} in the {' '}
             {withdrawToken.L1orL2Pool === 'L1LP' ? 'L1' : 'L2'} liquidity pool
             to withdraw your full stake. At this time, you can only withdraw up to
             {Number(LPBalance).toFixed(2)} {withdrawToken.symbol}.
