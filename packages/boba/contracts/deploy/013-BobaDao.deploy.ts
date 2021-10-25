@@ -69,7 +69,7 @@ const deployFn: DeployFunction = async (hre) => {
   // )
   // await Comp.deployTransaction.wait()
   console.log(
-    ` 🌕 ${chalk.red('BobaL2 is located at:')} ${chalk.green(
+    ` 🌕 ${chalk.red('L2_BOBA is located at:')} ${chalk.green(
       BobaL2.address
     )}`
   )

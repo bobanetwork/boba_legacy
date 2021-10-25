@@ -213,28 +213,34 @@ describe('Dao Action Test', async () => {
     })
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
-      await moveTimeForward()
-      const proposalID = (await Governor.proposalCount())._hex
-
-      await Governor.castVote(proposalID, 1)
-
-      // const proposal = await Governor.proposals(proposalID)
-      // console.log(`Proposal End Block:`, proposal.endBlock.toString())
-
-      const stateAfterVote = await Governor.state(proposalID)
-      expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
-
-      // wait till voting period ends
-      console.log("\twaiting for voting period to end...")
-
-      let i = 0
-      while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
+      try {
         await moveTimeForward()
-        i++
-      }
+        const proposalID = (await Governor.proposalCount())._hex
 
-      const stateAfterVotingPeriod = await Governor.state(proposalID)
-      expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+        await Governor.castVote(proposalID, 1)
+
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal End Block:`, proposal.endBlock.toString())
+
+        const stateAfterVote = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
+
+        // wait till voting period ends
+        console.log("\twaiting for voting period to end...")
+
+        let i = 0
+        while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
+          await moveTimeForward()
+          i++
+        }
+
+        const stateAfterVotingPeriod = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+      } catch (error) {
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
     }).timeout(100000)
 
     it('should queue the proposal successfully', async () => {
@@ -305,27 +311,33 @@ describe('Dao Action Test', async () => {
     })
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
-      await moveTimeForward()
-      const proposalID = (await Governor.proposalCount())._hex
-
-      await Governor.castVote(proposalID, 1)
-
-      // const proposal = await Governor.proposals(proposalID)
-      // console.log(`Proposal End Block:`, proposal.endBlock.toString())
-
-      const stateAfterVote = await Governor.state(proposalID)
-      expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
-
-      // wait till voting period ends
-      console.log("\twaiting for voting period to end...")
-      let i = 0
-      while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
+      try {
         await moveTimeForward()
-        i++
-      }
+        const proposalID = (await Governor.proposalCount())._hex
 
-      const stateAfterVotingPeriod = await Governor.state(proposalID)
-      expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+        await Governor.castVote(proposalID, 1)
+
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal End Block:`, proposal.endBlock.toString())
+
+        const stateAfterVote = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
+
+        // wait till voting period ends
+        console.log("\twaiting for voting period to end...")
+        let i = 0
+        while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
+          await moveTimeForward()
+          i++
+        }
+
+        const stateAfterVotingPeriod = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+      } catch (error) {
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
     }).timeout(100000)
 
     it('should queue the proposal successfully', async () => {
