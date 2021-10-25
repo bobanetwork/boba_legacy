@@ -1,7 +1,8 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
-import chalk from 'chalk'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
@@ -13,6 +14,10 @@ let L1NFTBridge: Contract
 let L2NFTBridge: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   Factory__L1NFTBridge = new ContractFactory(
     L1NFTBridgeJson.abi,
     L1NFTBridgeJson.bytecode,
@@ -36,12 +41,10 @@ const deployFn: DeployFunction = async (hre) => {
     address: L1NFTBridge.address,
     abi: L1NFTBridgeJson.abi,
   }
+
+  await registerBobaAddress(addressManager, 'L1NFTBridge', L1NFTBridge.address)
   await hre.deployments.save('L1NFTBridge', L1NFTBridgeDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L1NFTBridge deployed to:')} ${chalk.green(
-      L1NFTBridge.address
-    )}`
-  )
+  console.log(`L1NFTBridge deployed to: ${L1NFTBridge.address}`)
 
   L2NFTBridge = await Factory__L2NFTBridge.deploy()
   await L2NFTBridge.deployTransaction.wait()
@@ -51,14 +54,10 @@ const deployFn: DeployFunction = async (hre) => {
     address: L2NFTBridge.address,
     abi: L2NFTBridgeJson.abi,
   }
+  await registerBobaAddress(addressManager, 'L2NFTBridge', L2NFTBridge.address)
   await hre.deployments.save('L2NFTBridge', L2NFTBridgeDeploymentSubmission)
-  console.log(
-    `🌕 ${chalk.red('L2NFTBridge deployed to:')} ${chalk.green(
-      L2NFTBridge.address
-    )}`
-  )
+  console.log(`L2NFTBridge deployed to: ${L2NFTBridge.address}`)
 }
 
 deployFn.tags = ['L1NFTBridge', 'L2NFTBridge', 'required']
-
 export default deployFn

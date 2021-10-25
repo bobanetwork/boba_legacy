@@ -12,7 +12,7 @@ import Button from 'components/button/Button';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import RemoveIcon from '@material-ui/icons/Remove';
 
-import networkService from 'services/networkService';
+import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
 
@@ -77,14 +77,16 @@ class ListFarm extends React.Component {
 
   }
 
-  handleStakeToken() {
+  async handleStakeToken() {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
+
+    const allAddresses = networkService.getAllAddresses()
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
       currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
-      LPAddress: L1orL2Pool === 'L1LP' ? networkService.L1LPAddress : networkService.L2LPAddress,
+      LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
       L1orL2Pool,
       balance,
       decimals: poolInfo.decimals
@@ -93,14 +95,16 @@ class ListFarm extends React.Component {
     this.props.dispatch(openModal('farmDepositModal'))
   }
 
-  handleWithdrawToken() {
+  async handleWithdrawToken() {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
+
+    const allAddresses = networkService.getAllAddresses()
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
       currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
-      LPAddress: L1orL2Pool === 'L1LP' ? networkService.L1LPAddress : networkService.L2LPAddress,
+      LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
       L1orL2Pool,
       balance,
       decimals: poolInfo.decimals

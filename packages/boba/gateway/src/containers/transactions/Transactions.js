@@ -41,7 +41,7 @@ function Transactions({ searchHistory, transactions }) {
   const tokenList = useSelector(selectTokens);
 
   useEffect(() => {
-    setPage(1);
+    setPage(1)
   }, [searchHistory])
 
   const _transactions = transactions.filter(i => {
