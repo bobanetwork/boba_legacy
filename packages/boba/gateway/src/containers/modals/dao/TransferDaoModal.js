@@ -15,22 +15,28 @@ limitations under the License. */
 
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import {Typography} from '@material-ui/core';
 
 import { closeModal, openAlert, openError } from 'actions/uiAction';
 import { transferDao } from 'actions/daoAction';
 
-import * as styles  from './daoModal.module.scss'
-
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@emotion/react'
+import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 function TransferDaoModal({ open = false }) {
 
     const [recipient, setRecipient] = useState('')
     const [amount, setAmount] = useState('')
     const dispatch = useDispatch()
+
+    const loading = false //ToDo useSelector(selectLoading([ 'TRANSFER_DAO/CREATE' ]))
+
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
     function handleClose() {
         setRecipient('')
@@ -58,44 +64,53 @@ function TransferDaoModal({ open = false }) {
             onClose={handleClose}
             maxWidth="md"
         >
-            <Typography variant="h2">Transfer Boba</Typography>
-            <Input
-                label='To Address'
-                placeholder='Hash or ENS name'
-                paste
-                value={recipient}
-                onChange={i => setRecipient(i.target.value)}
-            />
+        <Box>
+            <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
+                Transfer Boba
+            </Typography>
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Input
+                    placeholder='Recipient address on the Boba L2 (0x...)'
+                    value={recipient}
+                    onChange={i => setRecipient(i.target.value)}
+                    fullWidth
+                    paste
+                    sx={{fontSize: '50px', marginBottom: '20px'}}  
+                />
+                <Input
+                    label='Amount to Transfer'
+                    value={amount}
+                    type="number"
+                    onChange={(i) => { setAmount(i.target.value) }}
+                    variant="standard"
+                    newStyle
+                />
+            </Box>
+        </Box>
+        <WrapperActionsModal>
+            <Button
+                onClick={handleClose}
+                color='neutral'
+                size="large"
+            >
+                Cancel
+            </Button>
 
-            <Input
-                label='Amount'
-                placeholder={`Amount to transfer`}
-                value={amount}
-                type="number"
-                onChange={(i) => { setAmount(i.target.value) }}
-            />
-
-            <div className={styles.buttons}>
-                <Button
-                    onClick={handleClose}
-                    color='neutral'
-                    className={styles.button}
-                >
-                    Cancel
-                </Button>
-
-                <Button
-                    className={styles.button}
-                    onClick={() => { submit() }}
-                    color='primary'
-                    variant="outlined"
-                    // loading={loading} // TODO: Implement loading base on the action trigger
-                    disabled={disabledTransfer}
-                >
-                    Transfer
-                </Button>
-            </div>
-        </Modal>
+            <Button
+                onClick={()=>{submit()}}
+                color='primary'
+                variant="contained"
+                tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer Boba from one L2 address to another L2 address"}
+                loading={loading}
+                disabled={disabledTransfer}
+                triggerTime={new Date()}
+                fullWidth={isMobile}
+                size="large"
+            >
+                Transfer
+            </Button>
+        </WrapperActionsModal>
+    </Modal>
     )
 }
 
