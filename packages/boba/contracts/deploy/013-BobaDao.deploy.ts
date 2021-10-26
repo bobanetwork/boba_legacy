@@ -57,38 +57,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
 
-
-  // Factory__Comp = new ContractFactory(
-  //   CompJson.abi,
-  //   CompJson.bytecode,
-  //   (hre as any).deployConfig.deployer_l2
-  // )
-
-  // Comp = await Factory__Comp.deploy(
-  //   (hre as any).deployConfig.deployer_l2.address
-  // )
-  // await Comp.deployTransaction.wait()
   console.log(
     ` 🌕 ${chalk.red('L2_BOBA is located at:')} ${chalk.green(
       BobaL2.address
     )}`
   )
-
-  // const CompDeploymentSubmission: DeploymentSubmission = {
-  //   ...Comp,
-  //   receipt: Comp.receipt,
-  //   address: Comp.address,
-  //   abi: Comp.abi,
-  // }
-
-  // await hre.deployments.save('Comp', CompDeploymentSubmission)
-
-  // deploy Timelock
-
-  // let delay_before_execute_s = 0 //seconds - normally set to 172800 aka 2 days, for example
-  // if (process.env.NETWORK === 'mainnet') {
-  //   delay_before_execute_s = 172800
-  // }
 
   Factory__Timelock = new ContractFactory(
     TimelockJson.abi,
@@ -195,17 +168,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   // set eta to be the current timestamp for local and rinkeby
   const eta1 = (await getTimestamp(hre)) + eta_delay_s
-  // if (process.env.NETWORK === 'mainnet') {
-  //   eta = (await getTimestamp(hre)) + eta_delay_s
-  // }
+
   const setPendingAdminData = utils.defaultAbiCoder.encode( // the parameters for the setPendingAdmin function
     ['address'],
     [GovernorBravoDelegator.address]
   )
-
-//   const governorBravo = await GovernorBravoDelegate.at(
-//     GovernorBravoDelegator.address
-//   )
 
   const setPendingAdminTx = await Timelock.queueTransaction(
     Timelock.address,
@@ -226,9 +193,6 @@ const deployFn: DeployFunction = async (hre) => {
   // call initiate() to complete setAdmin
   // set eta to be the current timestamp for local and rinkeby
   const eta2 = (await getTimestamp(hre)) + eta_delay_s
-  // if (process.env.NETWORK === 'mainnet') {
-  //   eta = (await getTimestamp(hre)) + eta_delay_s
-  // }
 
   const initiateData = utils.defaultAbiCoder.encode(
     // parameters to initate the GovernorBravoDelegate contract
