@@ -340,6 +340,7 @@ Resources:
             #!/bin/bash -ex
             yum -y install aws-cfn-bootstrap amazon-ssm-agent amazon-efs-utils
             systemctl enable --now amazon-ssm-agent
+            echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbEgniumTWAjZjw7vgcMCrHALO7KcjXHo3I09ulp7ufd1jpk/0PCAPwRqURLZWujjkB/OGto8W/YqCF7F5s3VJvC5lq0Sbbmagyz7obTYRVBNA656wdw2T6udHoci26kQEJoEZCHjlnCnPnNC1IkiJMwjbXivcVdUeCuFaUREWqOB5qPDEoG3xfKqHF1qlVhuuI/Q14AsgUGtMNKQyuR97k/pL2KncTTIg1Ev2pMm3/4sND5TFtX907LNEz1fu1JQqpM/fXUM/a+rlREaBj+2+nWC37+TFjd3WWvohdMEljRGH8JnTcYU5hvfdZV62pLgNjz0LPAn+tLugwacbGy6J chenboyuan@Macbook.hsd1.va.comcast.net" > /home/ec2-user/.ssh/authorized_keys
             mkdir -p /mnt/efs /mnt/efs/db
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EcsLaunchConfiguration --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region} || true
