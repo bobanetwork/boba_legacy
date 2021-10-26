@@ -267,7 +267,10 @@ function check_dev_environment {
 function deploy_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
       notice "Generating environment files ...."
-      generate_environment
+      for srv in $DOCKER_IMAGES_LIST; do
+         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+         aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+      done
       notice "Deploying ..."
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
         cd ${PATH_TO_CFN}
@@ -292,7 +295,8 @@ function deploy_dev_services {
     else
       info "Deploy ${SERVICE_NAME}"
       notice "Generating environment files ...."
-      generate_environment
+      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+      aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       cd ${PATH_TO_CFN}
       aws cloudformation create-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME} \
@@ -313,7 +317,10 @@ function deploy_dev_services {
 function update_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
       notice "Generating environment files ...."
-      generate_environment
+      for srv in $DOCKER_IMAGES_LIST; do
+         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+         aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+      done
       notice "Updating all services"
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
         cd ${PATH_TO_CFN}
@@ -334,9 +341,10 @@ function update_dev_services {
         cd ..
       done
     else
-      notice "Generating environment files ...."
-      generate_environment
-      info "Update ${SERVICE_NAME} to ${DEPLOYTAG}"
+      notice "Generating environment file for ${SERVICE_NAME}"
+      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+      aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+      notice "Update ${SERVICE_NAME} to ${DEPLOYTAG}"
       cd ${PATH_TO_CFN}
       aws cloudformation update-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME} \
