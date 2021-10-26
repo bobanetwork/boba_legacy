@@ -34,7 +34,7 @@ interface MessageRelayerOptions {
   // Max gas to relay messages with.
   relayGasLimit: number
 
-  //batch system
+  // Batch system configuration
   minBatchSize: number
   maxWaitTimeS: number
 
@@ -54,7 +54,7 @@ interface MessageRelayerOptions {
   // Number of blocks within each getLogs query - max is 2000
   getLogsInterval?: number
 
-  // filter
+  // Filter configuration - makes sure that the fast message relayer only deals with the messages it needs to
   filterEndpoint?: string
 
   filterPollingInterval?: number
@@ -73,7 +73,6 @@ interface MessageRelayerOptions {
 
 const optionSettings = {
   relayGasLimit: { default: 4_000_000 },
-  //batch system
   minBatchSize: { default: 2 },
   maxWaitTimeS: { default: 60 },
   fromL2TransactionIndex: { default: 0 },
@@ -280,8 +279,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               console.log('Buffer timeout: flushing')
             }
 
-            /* parse this to make sure that the mesaage was actually relayed */
-            // clear out buffer only if the messages are relayed to L1 successfully
+            // Confirm that the the message was actually relayed to L1
+            // If so, clear buffer
             if (
               await this._wereMessagesRelayed(
                 this.state.messageBuffer.reduce((acc, cur) => {
@@ -290,7 +289,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 }, [])
               )
             ) {
-              //clear out the buffer so we do not double relay, which will just
+              // Clear the buffer so we do not double relay, which will just
               // waste gas
               this.state.messageBuffer = []
               this.state.timeOfLastPendingRelay = false
@@ -303,12 +302,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               )
 
               console.log('Receipt:', receipt)
-              // add the time interval between two tx
+              // add a delay between two tx
               this.state.timeOfLastPendingRelay = Date.now()
             }
           } else {
             console.log('Current gas price is unacceptable')
-            // add the time interval between two tx
+            // add a delay between two tx
             this.state.timeOfLastPendingRelay = Date.now()
           }
 
@@ -322,7 +321,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           console.log('***********************************\n')
         }
 
-        // scanning the new messages only if the pending messages are relayed
+        // scanning for new messages only if pending messages are relayed
         // to l1
         if (this.state.timeOfLastPendingRelay === false) {
           this.logger.info('Checking for newly finalized transactions...')
@@ -410,7 +409,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               'Successfully generated a proof. Attempting to relay to Layer 1...'
             )
 
-            // await this._relayMessageToL1(message, proof)
             const messageToSend = {
               payload: {
                 target: message.target,
@@ -454,7 +452,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             }
           )
         } else {
-          this.logger.info('Waiting for the pending tx to be finailized')
+          this.logger.info('Waiting for the pending tx to be finalized')
         }
       } catch (err) {
         this.logger.error('Caught an unhandled error', {
@@ -566,6 +564,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
 
     // decode to get timestamp and check for time elapsed for non-zero dispute period messenger
+    // This is major difference WRT to the normal message-relayer
+    // the message-relayer-fast does not check the SCC for .insideFraudProofWindow
 
     // return !(await this.state.StateCommitmentChain.insideFraudProofWindow(
     //   header.batch
@@ -843,6 +843,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       10
     )
   }
+  
+  /* The filter makes sure that the message-relayer-fast only handles message traffic 
+     intended for it
+  */
 
   private async _getFilter(): Promise<void> {
     try {
@@ -856,9 +860,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           const response = await fetch(this.options.filterEndpoint)
           const filter = await response.json()
 
-          // export L1LIQPOOL=$(echo $ADDRESSES | jq -r '.L1LiquidityPool')
-          // export L1M=$(echo $ADDRESSES | jq -r '.L1Message')
-          // echo '["'$L1LIQPOOL'", "'$L1M'"]' > dist/dumps/whitelist.json
           const filterSelect = [filter.Proxy__L1LiquidityPool, filter.L1Message]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()
