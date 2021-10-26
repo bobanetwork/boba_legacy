@@ -207,7 +207,7 @@ function check_dev_environment {
                        ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                 aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
           cd ..
-      elif [ ! -z "$CFN_APP_STACK" ]; then
+      elif [ -z "$CFN_APP_STACK" ]; then
           warn "ECS Cluster does not exist ... creating one"
           cd ${PATH_TO_CFN}
           aws cloudformation create-stack \
@@ -228,6 +228,7 @@ function check_dev_environment {
                --parameters \
                    ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
             aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog
+            cd ..
       elif [ -z "$CFN_APP_REPLICA_STACK" ]; then
               info "Adding Replica ECS Cluster"
               cd ${PATH_TO_CFN}
@@ -385,7 +386,7 @@ function destroy_dev_services {
       SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|tr '\n' ' '|sed 's#"##g'`
       CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
       ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
-      EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'`
+      EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
       if [ -z ${SERVICE_NAME} ]; then
         info "Restarting ${ECS_CLUSTER}"
         if [[ "${force}" == "yes" ]] ; then
@@ -545,7 +546,6 @@ fi
 
 case "${SUBCMD}" in
     create)
-        [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         check_dev_environment
         ;;
