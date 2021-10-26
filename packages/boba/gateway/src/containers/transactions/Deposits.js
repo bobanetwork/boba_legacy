@@ -35,10 +35,12 @@ const PER_PAGE = 10;
 
 function Deposits({ searchHistory, transactions }) {
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1)
 
-  const loading = useSelector(selectLoading(['TRANSACTION/GETALL']));
-  const tokenList = useSelector(selectTokens);
+  const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
+  const tokenList = useSelector(selectTokens)
+
+  const allAddresses = networkService.getAllAddresses()
 
   useEffect(() => {
     setPage(1);
@@ -47,9 +49,9 @@ function Deposits({ searchHistory, transactions }) {
   const _deposits = transactions.filter(i => {
     return i.hash.includes(searchHistory) && (
       i.to !== null && (
-        i.to.toLowerCase() === networkService.L1LPAddress.toLowerCase() ||
-        i.to.toLowerCase() === networkService.L1_ETH_Address.toLowerCase() ||
-        i.to.toLowerCase() === networkService.L1StandardBridgeAddress.toLowerCase()
+        i.to.toLowerCase() === allAddresses.L1LPAddress.toLowerCase() ||
+        i.to.toLowerCase() === allAddresses.L1_ETH_Address.toLowerCase() ||
+        i.to.toLowerCase() === allAddresses.L1StandardBridgeAddress.toLowerCase()
       )
     )
   })

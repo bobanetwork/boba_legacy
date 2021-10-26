@@ -23,7 +23,6 @@ import { selectTokens } from 'selectors/tokenSelector'
 
 import { logAmount } from 'util/amountConvert'
 
-
 import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
 
@@ -37,18 +36,16 @@ const PER_PAGE = 8
 
 function Exits({ searchHistory, transactions, chainLink }) {
 
-  const [page, setPage] = useState(1);
-
-
+  const [page, setPage] = useState(1)
   const loading = useSelector(selectLoading(['EXIT/GETALL']))
-
   const tokenList = useSelector(selectTokens)
-
+  const allAddresses = networkService.getAllAddresses()
+  
   const _exits = transactions.filter(i => {
     return i.hash.includes(searchHistory) && (
       i.to !== null && (
-        i.to.toLowerCase() === networkService.L2LPAddress.toLowerCase() ||
-        i.to.toLowerCase() === networkService.L2StandardBridgeAddress.toLowerCase()
+        i.to.toLowerCase() === allAddresses.L2LPAddress.toLowerCase() ||
+        i.to.toLowerCase() === allAddresses.L2StandardBridgeAddress.toLowerCase()
       )
     )
   })
