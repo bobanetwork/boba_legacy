@@ -266,6 +266,8 @@ function check_dev_environment {
 
 function deploy_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
+      notice "Generating environment files ...."
+      generate_environment
       notice "Deploying ..."
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
         cd ${PATH_TO_CFN}
@@ -289,6 +291,8 @@ function deploy_dev_services {
       done
     else
       info "Deploy ${SERVICE_NAME}"
+      notice "Generating environment files ...."
+      generate_environment
       cd ${PATH_TO_CFN}
       aws cloudformation create-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME} \
@@ -308,6 +312,8 @@ function deploy_dev_services {
 
 function update_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
+      notice "Generating environment files ...."
+      generate_environment
       notice "Updating all services"
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
         cd ${PATH_TO_CFN}
@@ -328,6 +334,8 @@ function update_dev_services {
         cd ..
       done
     else
+      notice "Generating environment files ...."
+      generate_environment
       info "Update ${SERVICE_NAME} to ${DEPLOYTAG}"
       cd ${PATH_TO_CFN}
       aws cloudformation update-stack \
