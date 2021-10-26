@@ -106,6 +106,7 @@ export function getRewardL2(currencyL2Address, value_Wei_String) {
   )
 }
 export function withdrawLiquidity(currency, value_Wei_String, L1orL2Pool) {
+  console.log("Withdrawing ERC20 Liquidity")
   return createAction('FARM/WITHDRAW', () =>
     networkService.withdrawLiquidity(currency, value_Wei_String, L1orL2Pool)
   )

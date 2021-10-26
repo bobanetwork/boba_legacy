@@ -56,7 +56,7 @@ Get the token info from networkService.web3.eth.Contract
 */
 export async function addToken ( tokenContractAddressL1 ) {
 
-  if( tokenContractAddressL1 === null) return
+  if( tokenContractAddressL1 === null ) return
 
   const state = store.getState()
 
@@ -101,7 +101,7 @@ export async function addToken ( tokenContractAddressL1 ) {
     
     /********* DO WE HAVE L2 DATA?? *************/
     // Let's go see
-    //console.log("Addresses for lookup:", networkService.tokenAddresses)
+    // console.log("Addresses for lookup:", networkService.tokenAddresses)
 
     let tA = networkService.tokenAddresses
 

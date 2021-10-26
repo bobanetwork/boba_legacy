@@ -9,9 +9,6 @@ import hre from 'hardhat'
 const main = async () => {
   console.log('Starting BOBA core contracts deployment...')
 
-  //const config = parseEnv()
-  //not clear if the output is used anywhere?
-
   const network = process.env.NETWORK || 'local'
 
   const l1Provider = new providers.JsonRpcProvider(process.env.L1_NODE_WEB3_URL)
@@ -72,7 +69,6 @@ const main = async () => {
     network,
     relayerAddress,
     fastRelayerAddress,
-    //noCompile: process.env.NO_COMPILE ? true : false, //not clear how/where this is connected
   })
 }
 

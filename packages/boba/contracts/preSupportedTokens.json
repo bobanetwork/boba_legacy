@@ -113,7 +113,7 @@
          "symbol": "FRAX",
          "decimals": 18,
          "address": {
-             "rinkeby":"0x54717398c107ab24ec82bca3f3c2d4dda34c5f1a",
+             "rinkeby":"0xa23A5D188C8E2f4b3E029815a793972C58D89890",
              "mainnet": "0x853d955acef822db058eb8505911ed77f175b99e"
           }
       },
@@ -122,7 +122,7 @@
          "symbol": "FXS",
          "decimals": 18,
          "address": {
-             "rinkeby":"0x8ca351669fcb3434fb7a174309db3ae252e96c8c",
+             "rinkeby":"0xb1efaEC30db0da6CD2ADbDE71D82A73DcA6aF182",
              "mainnet": "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0"
           }
       },
