@@ -79,9 +79,6 @@ function History() {
     });
   }, POLL_INTERVAL);
 
-  console.log(startDate)
-  console.log(endDate)
-
   return (
     <>
       <PageHeader title="Transaction History" />
