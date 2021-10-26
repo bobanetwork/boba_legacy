@@ -177,39 +177,57 @@ describe('Dao Action Test', async () => {
     })
 
     it('should create a new proposal to configure fee', async () => {
-      await moveTimeForward()
+      try {
+        const priorProposalID = (await Governor.proposalCount())._hex
+        console.log(priorProposalID.toString())
+        if (priorProposalID !== '0x01') {
+          const priorState = await Governor.state(priorProposalID)
 
-      // TODO - cancel proposal if one's already there
-      const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
-      const values = [0] // the eth necessary to send to the contract above
-      const signatures = ['configureFee(uint256,uint256)'] // the function that will carry out the proposal
-      const updatedUserRewardFeeRate = initialL2LPUserRewardFeeRate.toNumber() + 1
-      const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
+          console.log(priorState.toString())
+          // clear any pending or active proposal
+          if (priorState === 0 || priorState === 1) {
+            const cancelTx = await Governor.cancel(priorProposalID)
+            await cancelTx.wait()
+          }
+        }
+        await moveTimeForward()
 
-      const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-          ['uint256', 'uint256'],
-          [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
-      )]
+        const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = ['configureFee(uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardFeeRate = initialL2LPUserRewardFeeRate.toNumber() + 1
+        const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
 
-      const description = '# Update Fee for swap-ons' // the description of the proposal
+        const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+            ['uint256', 'uint256'],
+            [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
+        )]
 
-      // submit the proposal
-      const proposeTx = await Governor.propose(
-        addresses,
-        values,
-        signatures,
-        calldatas,
-        description
-      )
-      await proposeTx.wait()
+        const description = '# Update Fee for swap-ons' // the description of the proposal
 
-      const proposalID = (await Governor.proposalCount())._hex
+        // submit the proposal
+        const proposeTx = await Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          description
+        )
+        await proposeTx.wait()
 
-      // const proposal = await Governor.proposals(proposalID)
-      // console.log(`Proposal:`, proposal)
+        const proposalID = (await Governor.proposalCount())._hex
 
-      const state = await Governor.state(proposalID)
-      expect(proposalStates[state]).to.deep.eq('Pending')
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal:`, proposal)
+
+        const state = await Governor.state(proposalID)
+        expect(proposalStates[state]).to.deep.eq('Pending')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
     })
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
@@ -237,8 +255,9 @@ describe('Dao Action Test', async () => {
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
       } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
         const proposalID = (await Governor.proposalCount())._hex
-        const cancelTx = Governor.cancel(proposalID)
+        const cancelTx = await Governor.cancel(proposalID)
         await cancelTx.wait()
       }
     }).timeout(100000)
@@ -276,38 +295,54 @@ describe('Dao Action Test', async () => {
     })
 
     it('should create a new proposal to configure fee', async () => {
-      await moveTimeForward()
+      try {
+        const priorProposalID = (await Governor.proposalCount())._hex
+        if (priorProposalID !== '0x01') {
+          const priorState = await Governor.state(priorProposalID)
+          // clear any pending or active proposal
+          if (priorState === 0 || priorState === 1) {
+            const cancelTx = await Governor.cancel(priorProposalID)
+            await cancelTx.wait()
+          }
+        }
+        await moveTimeForward()
 
-      const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
-      const values = [0] // the eth necessary to send to the contract above
-      const signatures = ['configureFeeExits(uint256,uint256)'] // the function that will carry out the proposal
-      const updatedUserRewardFeeRate = initialL1LPUserRewardFeeRate.toNumber() + 1
-      const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
+        const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = ['configureFeeExits(uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardFeeRate = initialL1LPUserRewardFeeRate.toNumber() + 1
+        const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
 
-      const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-          ['uint256', 'uint256'],
-          [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
-      )]
+        const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+            ['uint256', 'uint256'],
+            [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
+        )]
 
-      const description = '# Update Fee for swap-offs' // the description of the proposal
+        const description = '# Update Fee for swap-offs' // the description of the proposal
 
-      // submitting the proposal
-      const proposeTx = await Governor.propose(
-        addresses,
-        values,
-        signatures,
-        calldatas,
-        description
-      )
-      await proposeTx.wait()
+        // submitting the proposal
+        const proposeTx = await Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          description
+        )
+        await proposeTx.wait()
 
-      const proposalID = (await Governor.proposalCount())._hex
+        const proposalID = (await Governor.proposalCount())._hex
 
-      // const proposal = await Governor.proposals(proposalID)
-      // console.log(`Proposal:`, proposal)
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal:`, proposal)
 
-      const state = await Governor.state(proposalID)
-      expect(proposalStates[state]).to.deep.eq('Pending')
+        const state = await Governor.state(proposalID)
+        expect(proposalStates[state]).to.deep.eq('Pending')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
     })
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
@@ -334,8 +369,9 @@ describe('Dao Action Test', async () => {
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
       } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
         const proposalID = (await Governor.proposalCount())._hex
-        const cancelTx = Governor.cancel(proposalID)
+        const cancelTx = await Governor.cancel(proposalID)
         await cancelTx.wait()
       }
     }).timeout(100000)
