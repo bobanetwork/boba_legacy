@@ -414,10 +414,10 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      const supportedTokens = [ 'TEST', 'USDT', 'DAI', 'USDC', 
-                                'WBTC', 'REP',  'BAT', 'ZRX',
+      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 
+                                'WBTC',  'REP',  'BAT', 'ZRX',
                                 'SUSHI', 'LINK', 'UNI', 'BOBA',
-                                'OMG' ]
+                                'OMG',   /*'FRAX', 'FXS'*/ ]
 
       await Promise.all(supportedTokens.map(async (key) => {
           
@@ -550,35 +550,42 @@ class NetworkService {
         },
       })
 
+      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      
+      this.BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
+
       //DAO related
-      // if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
+      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
-      //   this.boba = new ethers.Contract(
-      //     addresses.TOKENS.BOBA.L2,
-      //     Boba.abi,
-      //     this.provider.getSigner()
-      //   )
+        if (!(await this.getAddress('Timelock', 'Timelock'))) return
+        if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+        
+        console.log("addresses:",allAddresses)
 
-      //   this.delegate = new ethers.Contract(
-      //     addresses.DAO_GovernorBravoDelegate,
-      //     GovernorBravoDelegate.abi,
-      //     this.provider.getSigner()
-      //   )
+        this.delegateContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegate,
+          GovernorBravoDelegate.abi,
+          this.provider.getSigner()
+        )
 
-      //   this.delegator = new ethers.Contract(
-      //     addresses.DAO_GovernorBravoDelegator,
-      //     GovernorBravoDelegator.abi,
-      //     this.provider.getSigner()
-      //   )
+        this.delegatorContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegator,
+          GovernorBravoDelegator.abi,
+          this.provider.getSigner()
+        )
 
-      //   this.timelock = new ethers.Contract(
-      //     addresses.DAO_Timelock,
-      //     Timelock.abi,
-      //     this.provider.getSigner()
-      //   )
-
-      //}
-
+        // this.timelock = new ethers.Contract(
+        //   allAddresses.Timelock,
+        //   Timelock.abi,
+        //   this.provider.getSigner()
+        // )
+      }
+      
       this.bindProviderListeners()
 
       return 'enabled'
@@ -1628,9 +1635,9 @@ class NetworkService {
   /*****************************************************/
   async getL1LPInfo() {
 
-    const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push(allTokens[cur].L1.toLowerCase());
-      return acc;
+    let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
+      acc.push(allTokens[cur].L1.toLowerCase())
+      return acc
     }, [allAddresses.L1_ETH_Address])
 
     const L1LPContract = new ethers.Contract(
@@ -1652,11 +1659,15 @@ class NetworkService {
       let decimals
       
       if (tokenAddress === allAddresses.L1_ETH_Address) {
+        console.log("Getting eth balance:", tokenAddress)
+        //getting eth balance
         tokenBalance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
       } else {
+        //getting eth balance
+        console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
@@ -1665,6 +1676,7 @@ class NetworkService {
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      console.log(tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
