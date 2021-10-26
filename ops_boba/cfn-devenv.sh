@@ -474,11 +474,12 @@ function destroy_dev_services {
       function list_clusters {
           ECS_CLUSTERS=$(aws ecs list-clusters --region ${REGION}|grep infrastructure-application|cut -d/ -f2|sed 's#"##g'|sed 's#,##g')
           for ecs in $ECS_CLUSTERS; do
-          URL=$(echo $ecs|sed 's#-infrastructure-application.*#\.boba.network#')
+          ecs_short=$(echo $ecs|sed 's#-infrastructure-application.*##')
+          URL=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:DomainName\`].Value" --no-paginate --output text)
           STACK_NAME=$(echo $ecs|sed 's#-infrastructure-application.*##')
-          ECS_CLUSTERS_REPLICA=$(aws ecs list-clusters --region ${REGION}|grep infrastructure-replica|cut -d/ -f2|sed 's#"##g'|sed 's#,##g'|sed 's#-infrastructure##g')
-          REPLICA_NAME=$(echo $ECS_CLUSTERS_REPLICA|sed 's#-EcsCluster.*##')
-          echo -e " --------------- \n CLUSTER: $ecs \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n--------------- \n"
+          ELB_INT=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerInt:DNSName\`].Value" --no-paginate --output text)
+          REPLICA_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterReplica\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
+          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n--------------- \n"
           done
         }
 
