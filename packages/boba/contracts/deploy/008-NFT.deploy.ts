@@ -18,6 +18,7 @@ const nftName = 'TestNFT'
 const nftSymbol = 'TST'
 
 const deployFn: DeployFunction = async (hre) => {
+  
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any

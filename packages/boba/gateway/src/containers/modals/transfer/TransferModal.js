@@ -23,15 +23,16 @@ import { selectLoading } from 'selectors/loadingSelector';
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
+import Input from 'components/input/Input'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'
 
-import Input from 'components/input/Input';
-import { selectLookupPrice } from 'selectors/lookupSelector';
-import { Box, Typography, useMediaQuery } from '@material-ui/core';
-import { useTheme } from '@emotion/react';
-import { WrapperActionsModal } from 'components/modal/Modal.styles';
+import { selectLookupPrice } from 'selectors/lookupSelector'
+
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@emotion/react'
+import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 
@@ -84,10 +85,8 @@ function TransferModal ({ open, token, minHeight }) {
         )
         if (transferResponseGood) {
           dispatch(openAlert('Transaction submitted'))
-          handleClose()
-        } else {
-          handleClose()
         }
+        handleClose()
       } catch (err) {
         //guess not really?
       }
@@ -140,7 +139,7 @@ function TransferModal ({ open, token, minHeight }) {
 
           <Input
             label="Amount to Transfer"
-            placeholder="0.0"
+            placeholder=""
             value={value}
             type="number"
             onChange={(i)=>{

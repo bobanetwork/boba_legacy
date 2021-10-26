@@ -83,6 +83,30 @@ function DAO() {
         </div>
     }
 
+/*
+<Button
+          onClick={handleClose}
+          color="neutral"
+          size="large"
+        >
+          {buttonLabel_1}
+        </Button>
+        <Button
+          onClick={doDeposit}
+          color='primary'
+          variant="contained"
+          loading={depositLoading || approvalLoading}
+          tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
+          disabled={!validValue}
+          triggerTime={new Date()}
+          size="large"
+          fullWidth={isMobile}
+          newStyle
+        >
+          {buttonLabel_2}
+        </Button>
+        */
+
     return (
         <>
             <PageHeader title="DAO" />
@@ -104,16 +128,8 @@ function DAO() {
                             </div>
                             <Button
                                 color="primary"
-                                variant="outlined"
-                                style={{
-                                    width: '60%',
-                                    padding: '15px 10px',
-                                    borderRadius: '8px',
-                                    alignSelf: 'center'
-                                }}
-                                onClick={() => {
-                                    dispatch(openModal('transferDaoModal'))
-                                }}
+                                variant="contained"
+                                onClick={()=>{dispatch(openModal('transferDaoModal'))}}
                             >Transfer</Button>
                         </div>
                         <div className={styles.delegateContainer}
@@ -128,17 +144,8 @@ function DAO() {
                             </div>
                             <Button
                                 color="primary"
-                                variant="outlined"
-                                onClick={() => {
-                                    dispatch(openModal('delegateDaoModal'))
-                                }}
-                                style={{
-                                    width: '60%',
-                                    padding: '15px 10px',
-                                    borderRadius: '8px',
-                                    alignSelf: 'center'
-                                }}
-
+                                variant="contained"
+                                onClick={() => {dispatch(openModal('delegateDaoModal'))}}
                             >Delegate Votes</Button>
                         </div>
                     </div>

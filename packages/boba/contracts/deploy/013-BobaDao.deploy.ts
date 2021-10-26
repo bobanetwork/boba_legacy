@@ -1,7 +1,8 @@
 /* Imports: External */
+import { getContractFactory } from '@eth-optimism/contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
-import chalk from 'chalk'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 // import CompJson from '../artifacts/contracts/DAO/Comp.sol/Comp.json'
 import GovernorBravoDelegateJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json'
@@ -24,12 +25,16 @@ let Timelock: Contract
 let Proxy__L2LiquidityPool: Contract
 
 const getTimestamp = async (hre) => {
-    const blockNumber = await (hre as any).deployConfig.l2Provider.getBlockNumber()
-    const block = await (hre as any).deployConfig.l2Provider.getBlock(blockNumber);
-    return block.timestamp
+  const blockNumber = await (hre as any).deployConfig.l2Provider.getBlockNumber()
+  const block = await (hre as any).deployConfig.l2Provider.getBlock(blockNumber)
+  return block.timestamp
 }
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
   let delay_before_execute_s
   let eta_delay_s
@@ -53,15 +58,10 @@ const deployFn: DeployFunction = async (hre) => {
     governor_proposal_threshold = utils.parseEther('50000')
   }
 
-// get deployed BOBA L2
+  // get deployed BOBA L2
 
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
-
-  console.log(
-    ` 🌕 ${chalk.red('L2_BOBA is located at:')} ${chalk.green(
-      BobaL2.address
-    )}`
-  )
+  console.log(`L2_BOBA is located at: ${BobaL2.address}`)
 
   Factory__Timelock = new ContractFactory(
     TimelockJson.abi,
@@ -74,11 +74,7 @@ const deployFn: DeployFunction = async (hre) => {
     delay_before_execute_s
   )
   await Timelock.deployTransaction.wait()
-  console.log(
-    ` 🌕 ${chalk.red('Timelock deployed to:')} ${chalk.green(
-        Timelock.address
-    )}`
-  )
+  console.log(`Timelock deployed to: ${Timelock.address}`)
 
   const TimelockDeploymentSubmission: DeploymentSubmission = {
     ...Timelock,
@@ -88,9 +84,9 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('Timelock', TimelockDeploymentSubmission)
-
+  await registerBobaAddress( addressManager, 'Timelock', Timelock.address )
+  
   // deploy governorDelegate
-
   Factory__GovernorBravoDelegate = new ContractFactory(
     GovernorBravoDelegateJson.abi,
     GovernorBravoDelegateJson.bytecode,
@@ -99,11 +95,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   GovernorBravoDelegate = await Factory__GovernorBravoDelegate.deploy()
   await GovernorBravoDelegate.deployTransaction.wait()
-  console.log(
-    ` 🌕 ${chalk.red('GovernorBravoDelegate deployed to:')} ${chalk.green(
-      GovernorBravoDelegate.address
-    )}`
-  )
+  console.log(`GovernorBravoDelegate deployed to: ${GovernorBravoDelegate.address}`)
 
   const GovernorBravoDelegateDeploymentSubmission: DeploymentSubmission = {
     ...GovernorBravoDelegate,
@@ -113,9 +105,9 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('GovernorBravoDelegate', GovernorBravoDelegateDeploymentSubmission)
-
+  await registerBobaAddress( addressManager, 'GovernorBravoDelegate', GovernorBravoDelegate.address )
+  
   // deploy GovernorBravoDelegator
-
   Factory__GovernorBravoDelegator = new ContractFactory(
     GovernorBravoDelegatorJson.abi,
     GovernorBravoDelegatorJson.bytecode,
@@ -132,11 +124,7 @@ const deployFn: DeployFunction = async (hre) => {
     governor_proposal_threshold // the votes necessary to propose
   )
   await GovernorBravoDelegator.deployTransaction.wait()
-  console.log(
-    ` 🌕 ${chalk.red('GovernorBravoDelegator deployed to:')} ${chalk.green(
-      GovernorBravoDelegator.address
-    )}`
-  )
+  console.log(`GovernorBravoDelegator deployed to: ${ GovernorBravoDelegator.address}`)
 
   const GovernorBravoDelegatorDeploymentSubmission: DeploymentSubmission = {
     ...GovernorBravoDelegator,
@@ -146,9 +134,9 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('GovernorBravoDelegator', GovernorBravoDelegatorDeploymentSubmission)
+  await registerBobaAddress( addressManager, 'GovernorBravoDelegator', GovernorBravoDelegator.address )
 
   // set Dao in L2LP
-
   const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
     'Proxy__L2LiquidityPool'
   )
@@ -160,10 +148,9 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
-  console.log(` ⭐️ ${chalk.blue('LP Dao role transferred to Timelock')}`)
+  console.log(`LP Dao role transferred to Timelock`)
 
   // set admin Timelock
-
   console.log('Queue setPendingAdmin...')
 
   // set eta to be the current timestamp for local and rinkeby
