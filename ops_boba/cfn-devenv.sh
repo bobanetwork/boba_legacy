@@ -435,9 +435,9 @@ function destroy_dev_services {
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
         sleep 30
         if [[ "${SERVICE_NAME}" == "l2geth" ]]; then
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
         elif [[ "${SERVICE_NAME}" == "data-transport-layer" ]]; then
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text > /dev/null
         fi
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 1 >> /dev/null
         info "Restarted ${SERVICE_NAME} on ${ECS_CLUSTER}"
@@ -452,16 +452,38 @@ function destroy_dev_services {
         else
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
-        SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
-        DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
+        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
+        if [[ ${ENV_PREFIX} == *"-replica"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        else
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        fi
         CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
         ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
-        info "STOP ${ECS_CLUSTER}"
+        EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
+        SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
+        DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
+        if [ -z ${SERVICE_NAME} ]; then
+          info "STOP ${ECS_CLUSTER}"
           for num in $SERVICE4RESTART; do
             aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
           done
           aws ecs list-tasks --cluster $ECS_CLUSTER |egrep -vi $DATADOGTASK | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
           info "Stopped ${ECS_CLUSTER}"
+        elif [[ "${SERVICE_NAME}" == "data-transport-layer" ]]; then
+          TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
+          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+          aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text >> /dev/null
+        elif [[ "${SERVICE_NAME}" == "l2geth" ]]; then
+          TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
+          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+          aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+        else
+          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+        fi
+        info "STOPPED ${SERVICE_NAME} on ${ECS_CLUSTER}"
       }
 
 
