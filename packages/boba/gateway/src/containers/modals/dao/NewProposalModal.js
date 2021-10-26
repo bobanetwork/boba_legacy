@@ -12,22 +12,22 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
+
 import React, { useState } from 'react'
-import { Typography } from '@material-ui/core'
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
 
 import { useDispatch } from 'react-redux'
 
 import { closeModal, openAlert, openError } from 'actions/uiAction'
 
-import * as styles from './daoModal.module.scss'
-
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-
 import Select from 'react-select'
 
+import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+
 import { createDaoProposal } from 'actions/daoAction'
 
 function NewProposalModal({ open }) {
@@ -39,6 +39,11 @@ function NewProposalModal({ open }) {
 
     const [proposeText, setProposeText] = useState('')
     const [proposalUri, setProposalUri] = useState('')
+
+    const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
+
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
     const onActionChange = (e) => {
         setVotingThreshold('')
@@ -100,7 +105,7 @@ function NewProposalModal({ open }) {
         handleClose()
     }
 
-    const disabledProposal = () => {
+    const disabled = () => {
         if (action === 'change-threshold') {
             return !votingThreshold
         } else if (action === 'text-proposal') {
@@ -120,75 +125,85 @@ function NewProposalModal({ open }) {
             onClose={handleClose}
             maxWidth="md"
         >
-            <Typography variant="h2">New Proposal</Typography>
-            <div className={styles.modalContent}>
-                <div className={styles.proposalAction}>
+        <Box>
+            <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
+                New Proposal
+            </Typography>
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
                     <Select
                         options={options}
                         onChange={onActionChange}
                         styles={customStyles}
                     >
                     </Select>
+                    {action === '' && 
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
+                        >Right now, the DAO can do three things - change the voting threshold, propose free-form text proposals, and 
+                        propose changes to the bridghe 
+                        </Typography>
+                    }
                     {action === 'change-threshold' && 
                         <Input
-                            label="Voting Threshold"
+                            placeholder='Enter new voting threshold...'
                             value={votingThreshold}
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
-                            variant="standard"
-                            newStyle
+                            fullWidth
+                            sx={{marginTop: '20px'}} 
                         />
                     }
                     {action === 'change-lp-fee' && <> 
                         <Input
-                            label="LP fee in integer tenths"
+                            placeholder="Enter new LP fee in integer tenths"
                             value={LPfee}
                             type="number"
                             onChange={(i)=>setLPfee(i.target.value)}
-                            variant="standard"
-                            newStyle
+                            fullWidth
+                            sx={{marginTop: '20px'}} 
                         />
-                        <Typography variant="body2" style={{lineHeight: '1', paddingTop: 10, fontSize: '0.7em'}}>The fee units are integer tenths. For example, proposing a fee of '3' corresponds to 
-                        an LB bridge fee of 0.3%, whereas a fee of '25' denotes an LP bridge fee of 2.5%. Possible settings range from 
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
+                        >The fee units are integer tenths. 
+                        For example, proposing a fee of '3' corresponds to 
+                        a bridge fee of 0.3%, whereas a fee of '25' denotes a bridge fee of 2.5%. Possible settings range from 
                         0 to 50, i.e., 0.0% to 5.0%.</Typography>
                     </>
                     }
                     {action === 'text-proposal' && <>
                         <Input
-                            label="Enter proposal text"
+                            placeholder="Enter proposal text"
                             value={proposeText}
                             onChange={(i)=>setProposeText(i.target.value)}
-                            variant="standard"
-                            newStyle
+                            sx={{marginTop: '20px'}} 
                         />
                         <Input
-                            label="Enter proposal URI (Optional)"
+                            placeholder="Enter proposal URI (Optional)"
                             value={proposalUri}
                             onChange={(i)=>setProposalUri(i.target.value)}
-                            variant="standard"
-                            newStyle
+                            sx={{marginTop: '20px'}} 
                         />
                     </>
                     }
-                </div>
-            </div>
-
+            </Box>
+        </Box>
             <WrapperActionsModal>
                 <Button
                     onClick={handleClose}
                     color='neutral'
-                    size="large"
+                    size='large'
                 >
                     Cancel
                 </Button>
-
                 <Button
-                    onClick={() => { submit({ useLedgerSign: false }) }}
+                    onClick={()=>{submit()}}
                     color='primary'
+                    variant='contained'
+                    tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}
+                    loading={loading}
+                    disabled={disabled()}
+                    fullWidth={isMobile}
                     size="large"
-                    variant="contained"
-                    // loading={loading} // TODO: Implement loading base on the action trigger
-                    disabled={disabledProposal()}
                 >
                     Propose
                 </Button>

@@ -2265,13 +2265,6 @@ await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
     }
   }
 
-/*
-console.log("NS: transfer error:", error)
-      return error
-      */
-
-
-
   // get DAO Votes
   async getDaoVotes() {
 
