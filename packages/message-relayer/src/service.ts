@@ -460,7 +460,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             }
           )
         } else {
-          this.logger.info('Waiting for the pending tx to be finailized')
+          this.logger.info('Waiting for the pending tx to be finalized')
         }
       } catch (err) {
         this.logger.error('Caught an unhandled error', {

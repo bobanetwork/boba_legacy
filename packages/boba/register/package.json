@@ -1,19 +1,14 @@
 {
-  "name": "@boba/contracts",
+  "name": "@boba/register",
   "version": "0.0.1",
-  "description": "BOBA Smart Contracts",
+  "description": "BOBA Smart Contracts Registration",
   "private": true,
   "author": "OMG",
   "license": "MIT",
   "scripts": {
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
-    "deploy": "ts-node \"./bin/deploy.ts\"",
-    "clean": "rm -rf ./artifacts ./cache",
-    "lint": "yarn lint:check",
-    "lint:check": "eslint . --ext js,jsx,ts,tsx",
-    "lint:fix": "yarn lint:check --fix",
-    "lint:contracts": "yarn solhint -f table contracts/**/*.sol"
+    "deploy": "ts-node \"./bin/deploy.ts\""
   },
   "dependencies": {
     "@eth-optimism/contracts": "^0.4.13",

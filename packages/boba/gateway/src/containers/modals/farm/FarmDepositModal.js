@@ -243,7 +243,7 @@ class FarmDepositModal extends React.Component {
           <>
             {stakeToken.symbol !== 'ETH' &&
               <Typography variant="body2" sx={{mt: 2}}>
-                Your allowance has been approved. You can now stake your funds into the pool.
+                Your allowance has been approved. You can now stake your funds.
               </Typography>
             }
             <WrapperActionsModal>

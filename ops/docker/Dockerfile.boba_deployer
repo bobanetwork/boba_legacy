@@ -43,7 +43,6 @@ COPY packages/boba/contracts/hardhat.config.ts ./
 COPY packages/boba/contracts/deploy ./deploy
 COPY packages/boba/contracts/tasks ./tasks
 COPY packages/boba/contracts/scripts ./scripts
-COPY packages/boba/contracts/deployment ./deployment
 COPY packages/boba/contracts/preSupportedTokens.json ./
 COPY packages/boba/contracts/preSupportedNFTs.json ./
 
