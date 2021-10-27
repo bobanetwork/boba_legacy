@@ -53,7 +53,7 @@ function ProposalList({balance}) {
             <p className={styles.listTitle}>Proposal List</p>
             <Button
                 type="primary"
-                variant="outlined"
+                variant="contained"
                 onClick={() => {
                     if(balance < proposalThreshold) {
                         dispatch(openError(`Insufficient governance token to create a new proposal. You need at least ${proposalThreshold} governance to create a new proposal.`))
@@ -61,13 +61,6 @@ function ProposalList({balance}) {
                         dispatch(openModal('newProposalModal'))
                     }
                 }}
-                style={{
-                    maxWidth: '180px',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    alignSelf: 'center'
-                }}
-
             > Create Proposal </Button>
         </div>
         <div className={styles.listContainer}

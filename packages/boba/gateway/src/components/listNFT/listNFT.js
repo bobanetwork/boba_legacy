@@ -33,7 +33,6 @@ class listNFT extends React.Component {
       symbol,
       address,
       UUID,
-      time,
       URL,
       attributes
     } = this.props;
@@ -44,7 +43,6 @@ class listNFT extends React.Component {
       symbol,
       address,
       UUID,
-      time,
       URL,
       attributes
     }
@@ -54,7 +52,7 @@ class listNFT extends React.Component {
 
     const {
       name, symbol, address,
-      UUID, time, URL, attributes
+      UUID, URL, attributes
     } = this.props;
 
     if (!isEqual(prevState.name, name)) {
@@ -71,10 +69,6 @@ class listNFT extends React.Component {
 
     if (!isEqual(prevState.UUID, UUID)) {
       this.setState({ UUID })
-    }
-
-    if (!isEqual(prevState.time, time)) {
-      this.setState({ time })
     }
 
     if (!isEqual(prevState.URL, URL)) {
@@ -94,7 +88,6 @@ class listNFT extends React.Component {
       symbol,
       address,
       UUID,
-      time,
       URL,
       attributes
     } = this.state;
@@ -133,11 +126,6 @@ class listNFT extends React.Component {
             <Typography variant="body2">URI:
               <Typography variant="body2" component="span" className={styles.muted}>
                 {truncate(URL, 8, 6, '...')} <Copy value={URL} light={true} />
-              </Typography>
-            </Typography>
-            <Typography variant="body2">Time minted:
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {time}
               </Typography>
             </Typography>
           </div>
