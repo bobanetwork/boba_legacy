@@ -83,10 +83,8 @@ Resources:
             - Name: DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE
               Value: "true"
             - Name: DD_CONTAINER_EXCLUDE
-              Value: "name:datadog-agent"
-            - Name: DD_CONTAINER_EXCLUDE
-              Value: "name:amazon-ecs-agent"
-          MountPoints:
+              Value: "name: ecs-agent image:datadog/agent:latest"
+            MountPoints:
             - ContainerPath: "/var/run/docker.sock"
               SourceVolume: docker_sock
             - ContainerPath: "/host/sys/fs/cgroup"
