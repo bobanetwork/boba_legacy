@@ -526,7 +526,7 @@ function destroy_dev_services {
         else
             info "Generating environment file for ${SERVICE_NAME}"
             aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
-            aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+            aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
         fi
       }
 
