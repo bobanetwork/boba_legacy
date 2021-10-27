@@ -1,9 +1,14 @@
 name: Release
-
+# boba doesnt want to run this flow
 on:
   push:
-    branches:
-      - master
+    branches-ignore:
+      - '*'
+      - '*/**'
+  pull_request:
+    branches-ignore:
+      - '*'
+      - '*/**'
 
 jobs:
   release:
