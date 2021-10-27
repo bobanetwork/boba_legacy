@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const web3 = require('web3')
 const { WebSocketProvider } = require('@ethersproject/providers')
-const logger = require('./utilities/logger')
+const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
 
 let l1PoolBalance

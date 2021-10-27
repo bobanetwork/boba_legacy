@@ -16,7 +16,7 @@ limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
 import { Watcher } from '@eth-optimism/core-utils'
-import { ethers, BigNumber, utils, ContractFactory } from 'ethers'
+import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
 import { orderBy } from 'lodash'
@@ -64,7 +64,6 @@ import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Regist
 import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json" 
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
-import Timelock from "../deployment/contracts/Timelock.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -94,10 +93,6 @@ class NetworkService {
     this.provider = null
     this.environment = null
 
-    this.ERC721Contract = null
-    this.L2TokenPoolContract = null
-    this.AtomicSwapContract = null
-
     // L1 or L2
     this.L1orL2 = null
     this.masterSystemConfig = null
@@ -110,13 +105,19 @@ class NetworkService {
     this.AddressManagerAddress = null
     this.AddressManager = null
 
-    this.ERC721Address = null
-    this.ERC721RegAddress = null
+    //this.ERC721Address = null
+    //this.ERC721RegAddress = null
 
     this.L1_TEST_Contract = null
     this.L2_TEST_Contract = null
     this.L1_OMG_Contract = null
     this.L2_ETH_Contract = null
+    
+    this.ERC721Contract = null
+    this.ERC721RegContract = null
+    
+    this.L2TokenPoolContract = null
+    this.AtomicSwapContract = null
 
     this.tokenAddresses = null
     this.addresses = null
@@ -130,10 +131,10 @@ class NetworkService {
     this.L2GasLimit = 10000000
 
     // Dao
-    this.boba = null
-    this.delegate = null
-    this.delegator = null
-    this.timelock = null
+    this.BobaContract = null
+    this.delegateContract = null
+    this.delegatorContract = null
+
   }
 
   async enableBrowserWallet() {
@@ -160,117 +161,117 @@ class NetworkService {
     })
   }
 
-  async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
+  // async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
 
-    try {
+  //   try {
 
-      let meta = Date.now().toString() + '#' + tokenURI + '#'
+  //     let meta = Date.now().toString() + '#' + tokenURI + '#'
 
-      const contract = new ethers.Contract(
-        contractAddress,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
+  //     const contract = new ethers.Contract(
+  //       contractAddress,
+  //       L2ERC721Json.abi,
+  //       this.L2Provider
+  //     )
 
-      let nft = await contract.connect(
-        this.provider.getSigner()
-      ).mintNFT(
-        receiverAddress,
-        meta
-      )
+  //     let nft = await contract.connect(
+  //       this.provider.getSigner()
+  //     ).mintNFT(
+  //       receiverAddress,
+  //       meta
+  //     )
 
-      await nft.wait()
+  //     await nft.wait()
 
-      const registry = new ethers.Contract(
-        this.ERC721RegAddress,
-        L2ERC721RegJson.abi,
-        this.L2Provider
-      )
+  //     const registry = new ethers.Contract(
+  //       this.ERC721RegAddress,
+  //       L2ERC721RegJson.abi,
+  //       this.L2Provider
+  //     )
 
-      //what types of NFTs does this address already own?
-      const addresses = await registry.lookupAddress(
-        receiverAddress
-      )
+  //     //what types of NFTs does this address already own?
+  //     const addresses = await registry.lookupAddress(
+  //       receiverAddress
+  //     )
 
-      //console.log("the receiver's NFT contract addresses:", addresses)
+  //     //console.log("the receiver's NFT contract addresses:", addresses)
 
-      //the receiverAddress already knows about this contract
-      const alreadyHaveAddresss = addresses.find((str) => str.toLowerCase() === contractAddress.toLowerCase())
+  //     //the receiverAddress already knows about this contract
+  //     const alreadyHaveAddresss = addresses.find((str) => str.toLowerCase() === contractAddress.toLowerCase())
 
-      if (alreadyHaveAddresss) {
-        //we are done - no need to double register addresss
-        console.log('Done - no need to double register address')
-      } else {
-        //register address for the recipiant
-        await registry.connect(
-          this.provider.getSigner()
-        ).registerAddress(
-          receiverAddress,
-          contractAddress
-        )
-        //console.log("Reg:",reg)
-        console.log(`Contract registered in recipient's wallet`)
-      }
+  //     if (alreadyHaveAddresss) {
+  //       //we are done - no need to double register addresss
+  //       console.log('Done - no need to double register address')
+  //     } else {
+  //       //register address for the recipiant
+  //       await registry.connect(
+  //         this.provider.getSigner()
+  //       ).registerAddress(
+  //         receiverAddress,
+  //         contractAddress
+  //       )
+  //       //console.log("Reg:",reg)
+  //       console.log(`Contract registered in recipient's wallet`)
+  //     }
 
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
+  //     return true
+  //   } catch (error) {
+  //     console.log(error)
+  //     return false
+  //   }
+  // }
 
-  async deployNFTContract(
-      nftSymbol,
-      nftName)
-  {
+  // async deployNFTContract(
+  //     nftSymbol,
+  //     nftName)
+  // {
 
-    try {
+  //   try {
 
-      console.log("Deploying NFT Contract")
+  //     console.log("Deploying NFT Contract")
 
-      let Factory__L2ERC721 = new ContractFactory(
-        L2ERC721Json.abi,
-        L2ERC721Json.bytecode,
-        this.provider.getSigner()
-      )
+  //     let Factory__L2ERC721 = new ContractFactory(
+  //       L2ERC721Json.abi,
+  //       L2ERC721Json.bytecode,
+  //       this.provider.getSigner()
+  //     )
 
-      let contract = await Factory__L2ERC721.deploy(
-        nftSymbol,
-        nftName,
-        BigNumber.from(String(0)), //starting index for the tokenIDs
-        '0x0000000000000000000000000000000000000042',
-        'simple',
-        'boba_L2'
-      )
+  //     let contract = await Factory__L2ERC721.deploy(
+  //       nftSymbol,
+  //       nftName,
+  //       BigNumber.from(String(0)), //starting index for the tokenIDs
+  //       '0x0000000000000000000000000000000000000042',
+  //       'simple',
+  //       'boba_L2'
+  //     )
 
-      await contract.deployTransaction.wait()
-      console.log('New NFT ERC721 contract deployed to:', contract.address)
+  //     await contract.deployTransaction.wait()
+  //     console.log('New NFT ERC721 contract deployed to:', contract.address)
 
-      const registry = new ethers.Contract(
-        this.ERC721RegAddress,
-        L2ERC721RegJson.abi,
-        this.L2Provider
-      )
+  //     const registry = new ethers.Contract(
+  //       this.ERC721RegAddress,
+  //       L2ERC721RegJson.abi,
+  //       this.L2Provider
+  //     )
 
-      //register address for the contract owner
-      await registry.connect(
-        this.provider.getSigner()
-      ).registerAddress(
-        this.account,
-        contract.address
-      )
-      console.log(`New NFT ERC721 contract registered in Boba NFT registry`)
+  //     //register address for the contract owner
+  //     await registry.connect(
+  //       this.provider.getSigner()
+  //     ).registerAddress(
+  //       this.account,
+  //       contract.address
+  //     )
+  //     console.log(`New NFT ERC721 contract registered in Boba NFT registry`)
 
-      //addNFTContract({address: contract.address})
-      //this will get picked up automatically from the blockchain
+  //     //addNFTContract({address: contract.address})
+  //     //this will get picked up automatically from the blockchain
 
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
+  //     return true
+  //   } catch (error) {
+  //     console.log(error)
+  //     return false
+  //   }
 
-  }
+  // }
 
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
@@ -414,17 +415,16 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      const supportedTokens = [ 'TEST', 'USDT', 'DAI', 'USDC', 
-                                'WBTC', 'REP',  'BAT', 'ZRX',
+      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 
+                                'WBTC',  'REP',  'BAT', 'ZRX',
                                 'SUSHI', 'LINK', 'UNI', 'BOBA',
-                                'OMG' ]
+                                'OMG',   /*'FRAX', 'FXS'*/ ]
+
 
       await Promise.all(supportedTokens.map(async (key) => {
           
         const L1a = await this.AddressManager.getAddress('TK_L1'+key)
         const L2a = await this.AddressManager.getAddress('TK_L2'+key)
-
-
 
         if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
           console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
@@ -510,11 +510,20 @@ class NetworkService {
         this.provider.getSigner()
       )
       
-      // this.ERC721Contract = new ethers.Contract(
-      //   this.ERC721Address,
-      //   L2ERC721Json.abi,
-      //   this.L2Provider
-      // )
+      if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
+      if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
+
+      this.ERC721Contract = new ethers.Contract(
+        allAddresses.L2ERC721Address,
+        L2ERC721Json.abi,
+        this.L2Provider
+      )
+
+      this.ERC721Contract = new ethers.Contract(
+        allAddresses.L2ERC721RegAddress,
+        L2ERC721RegJson.abi,
+        this.L2Provider
+      )
 
       // this.L2TokenPoolContract = new ethers.Contract(
       //   this.L2TokenPoolAddress,
@@ -550,35 +559,33 @@ class NetworkService {
         },
       })
 
+      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      
+      this.BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
+
       //DAO related
-      // if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
+      if( masterSystemConfig === 'local' ) {
 
-      //   this.boba = new ethers.Contract(
-      //     addresses.TOKENS.BOBA.L2,
-      //     Boba.abi,
-      //     this.provider.getSigner()
-      //   )
+        if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+        
+        this.delegateContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegate,
+          GovernorBravoDelegate.abi,
+          this.provider.getSigner()
+        )
 
-      //   this.delegate = new ethers.Contract(
-      //     addresses.DAO_GovernorBravoDelegate,
-      //     GovernorBravoDelegate.abi,
-      //     this.provider.getSigner()
-      //   )
-
-      //   this.delegator = new ethers.Contract(
-      //     addresses.DAO_GovernorBravoDelegator,
-      //     GovernorBravoDelegator.abi,
-      //     this.provider.getSigner()
-      //   )
-
-      //   this.timelock = new ethers.Contract(
-      //     addresses.DAO_Timelock,
-      //     Timelock.abi,
-      //     this.provider.getSigner()
-      //   )
-
-      //}
-
+        this.delegatorContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegator,
+          GovernorBravoDelegator.abi,
+          this.provider.getSigner()
+        )
+      }
+      
       this.bindProviderListeners()
 
       return 'enabled'
@@ -668,7 +675,6 @@ class NetworkService {
     this.correctChain( layer )
 
   }
-
 
   async getTransactions() {
 
@@ -877,7 +883,11 @@ class NetworkService {
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 
-    if(this.ERC721RegAddress === null) return
+    console.log("scanning for NFTs...")
+
+    if(allAddresses.L2ERC721RegAddress === null) return
+
+    console.log("scanning for NFTs...", allAddresses.L2ERC721RegAddress)
 
     //the current list of contracts we know about
     //based in part on the cache and anything we recently generated in this session
@@ -895,7 +905,7 @@ class NetworkService {
 
     //the Boba NFT registry
     const registry = new ethers.Contract(
-      this.ERC721RegAddress,
+      allAddresses.L2ERC721RegAddress,
       L2ERC721RegJson.abi,
       this.L2Provider
     )
@@ -975,9 +985,13 @@ class NetworkService {
           this.L2Provider
         )
 
+        console.log("NFT contracts:",contract)
+
         const balance = await contract.connect(
           this.L2Provider
         ).balanceOf(this.account)
+
+        console.log("balance:",balance)
 
         //always the same, no need to have in the loop
         let nftName = await contract.name()
@@ -985,6 +999,8 @@ class NetworkService {
 
         //can have more than 1 per contract
         for (let i = 0; i < Number(balance.toString()); i++) {
+
+          console.log("looking up first NFT:",i)
 
           //Goal here is to get all the tokenIDs, e.g. 3, 7, and 98,
           //based on knowing the user's balance - e.g. three NFTs
@@ -995,40 +1011,21 @@ class NetworkService {
             tokenIndex
           )
 
-          const nftMeta = await contract.getTokenURI(tokenID)
+          const nftMeta = await contract.tokenURI(tokenID)
 
-          const meta = nftMeta.split('#')
-
-          const time = new Date(parseInt(meta[0]))
-
-          const mintedTime = String(
-              time.toLocaleString('en-US', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-              })
-            )
-
+          console.log("nftMeta:",nftMeta)
+         
           const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
+          const { url , attributes = []} = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
-          const { url , attributes = []} = await getNftImageUrl(meta[1])
-
-          // Uncomment Just to test locally
-          // const { url , attributes = []} = await getNftImageUrl('https://boredapeyachtclub.com/api/mutants/111');
-          // const { url , attributes = []} = await getNftImageUrl('ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6190');
-
-          const NFT = {
+          let NFT = {
             UUID,
-            mintedTime,
-            url,
             tokenID,
             name: nftName,
             symbol: nftSymbol,
             address,
-            attributes,
+            url,
+            attributes
           }
 
           await addNFT( NFT )
@@ -1628,9 +1625,9 @@ class NetworkService {
   /*****************************************************/
   async getL1LPInfo() {
 
-    const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push(allTokens[cur].L1.toLowerCase());
-      return acc;
+    let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
+      acc.push(allTokens[cur].L1.toLowerCase())
+      return acc
     }, [allAddresses.L1_ETH_Address])
 
     const L1LPContract = new ethers.Contract(
@@ -1652,11 +1649,15 @@ class NetworkService {
       let decimals
       
       if (tokenAddress === allAddresses.L1_ETH_Address) {
+        console.log("Getting eth balance:", tokenAddress)
+        //getting eth balance
         tokenBalance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
       } else {
+        //getting eth balance
+        console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
@@ -1665,6 +1666,7 @@ class NetworkService {
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      console.log(tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
@@ -2212,20 +2214,32 @@ class NetworkService {
   /*****         DAO Functions               *****/
   /***********************************************/
 
+/*
+const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
+
+await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
+
+*/
+
   // get DAO Balance
   async getDaoBalance() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
+    
     if( this.L1orL2 !== 'L2' ) return
-    if( this.boba === null ) return
+    if( this.BobaContract === null ) return
 
     try {
-      let balance = await this.boba.balanceOf(this.account)
+      console.log('Checking DAO balance')
+      console.log('this.BobaContract',this.BobaContract)
+      console.log('this.BobaContract',this.account)
+      let balance = await this.BobaContract.balanceOf(this.account)
+      console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: DAO Balance', error)
-      throw new Error(error.message)
+      return error
     }
   }
 
@@ -2234,39 +2248,38 @@ class NetworkService {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
+    
     if( this.L1orL2 !== 'L2' ) return
-    if( this.boba === null ) return
+    if( this.BobaContract === null ) return
     
     try {
-      let votes = await this.boba.getCurrentVotes(this.account)
+      let votes = await this.BobaContract.getCurrentVotes(this.account)
       return { votes: formatEther(votes) }
     } catch (error) {
       console.log('Error: DAO Votes', error)
-      throw new Error(error.message);
+      return error
     }
   }
 
   //Transfer DAO Funds
   async transferDao({ recipient, amount }) {
     try {
-      const tx = await this.boba.transfer(recipient, parseEther(amount.toString()))
+      const tx = await this.BobaContract.transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
       return tx
     } catch (error) {
-      console.log('Error: DAO Transfer', error)
-      throw new Error(error.message);
+      return error
     }
   }
 
   //Delegate DAO Authority
   async delegateVotes({ recipient }) {
     try {
-      const tx = await this.boba.delegate(recipient)
+      const tx = await this.BobaContract.delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
-      console.log('Error: DAO Delegate', error)
-      throw new Error(error.message)
+      return error
     }
   }
 
@@ -2275,13 +2288,14 @@ class NetworkService {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
+    
     if( this.L1orL2 !== 'L2' ) return
-    if( this.delegate === null ) return
+    if( this.delegateContract === null ) return
 
     try {
       // get the threshold proposal only in case of L2
       if(this.L1orL2 === 'L2') {
-        const delegateCheck = await this.delegate.attach(this.delegator.address)
+        const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
         let rawThreshold = await delegateCheck.proposalThreshold()
         return { threshold: formatEther(rawThreshold) }
       }
@@ -2289,52 +2303,70 @@ class NetworkService {
         return { threshold: 0 }
       }
     } catch (error) {
-      console.log(error)
-      throw new Error(error.message)
+      return error
     }
   }
 
   //Create Proposal
-  async createProposal({ votingThreshold = null, text = null }) {
+  async createProposal(payload) {
 
-    if( this.delegate === null ) return
+    let signatures = '' //text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
+    let value = 0
+    let description = ''
+    
+    if( payload.action === 'text-proposal' ) {
+      signatures = ['']
+      value = 0
+      description = payload.text
+    } else if ( payload.action === 'change-lp-fee' ) {
+      signatures = ['_setLPfee(uint256)']
+      value = ethers.utils.parseEther(payload.value)
+      description = `# Changing LP Bridge fee to ${payload.value} integer percent`
+    } else if ( payload.action === 'change-threshold' ) {
+      signatures = ['_setProposalThreshold(uint256)']
+      value = ethers.utils.parseEther(payload.value)
+      description = `# Changing Proposal Threshold to ${payload.value} Boba`
+    }
+
+    if( this.delegateContract === null ) return
 
     try {
-      const delegateCheck = await this.delegate.attach(this.delegator.address)
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
-      let address = [delegateCheck.address];
-      let values = [0];
-      let signatures = !text ? ['_setProposalThreshold(uint256)'] : [''] // the function that will carry out the proposal
-      let voting = !text ? ethers.utils.parseEther(votingThreshold) : 0;
-      let calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+      let address = [delegateCheck.address]
+      let values = [0]
+      //let signatures = text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
+      //let voting = text ? 0 : ethers.utils.parseEther(votingThreshold)
+      let callData = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
         ['uint256'],
-        [voting]
+        [value]
       )]
-      let description = !text ? `# Changing Proposal Threshold to ${votingThreshold} Comp` : text;
+      //let description = text ? text : `# Changing Proposal Threshold to ${votingThreshold} Boba`;
 
       let res = await delegateCheck.propose(
         address,
         values,
         signatures,
-        calldatas,
+        callData,
         description
       )
       return res
     } catch (error) {
-      console.log(error)
-      throw new Error(error.message)
+      console.log("Error:",error)
+      return error
     }
   }
 
-  //Fetch Proposals
+  //Fetch DAO Proposals
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.delegate === null ) return
 
-    const delegateCheck = await this.delegate.attach(this.delegator.address)
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.delegateContract === null ) return
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     try {
       let proposalList = [];
@@ -2406,22 +2438,22 @@ class NetworkService {
       return { proposalList }
     } catch (error) {
       console.log(error)
-      throw new Error(error.message)
+      return error
     }
   }
 
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
 
-    if( this.delegate === null ) return
+    if( this.delegateContract === null ) return
 
     try {
-      const delegateCheck = await this.delegate.attach(this.delegator.address);
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.castVote(id, userVote)
       return res
     } catch(error) {
       console.log('Error: cast vote', error)
-      throw new Error(error.message)
+      return error
     }
   }
 

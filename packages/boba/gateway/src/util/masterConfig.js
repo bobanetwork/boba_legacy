@@ -14,65 +14,61 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 require('dotenv').config()
-const env = process.env.REACT_APP_ENV;
-console.log(process.env)
-console.log(`https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`)
 
-let NETWORKS;
+let NETWORKS
 
-NETWORKS = {
-  rinkeby: {
-    addressUrl:       null,
-    addressOMGXUrl:   null,
-    OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
-    MM_Label:         `Rinkeby`,
-    addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`, 
-    L1: {
-      name: "Rinkeby",
-      chainId: 4,
-      chainIdHex: '0x4',
-      rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
-      blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
-      transaction: `https://rinkeby.etherscan.io/tx/`
-    },
-    L2: {
-      name: "BOBA Rinkeby L2",
-      chainId: 28,
-      chainIdHex: '0x1C',
-      rpcUrl: `https://rinkeby.boba.network`,
-      blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
-      transaction: `https://blockexplorer.rinkeby.boba.network/tx/`
-    }
-  },
-  mainnet: {
-    addressUrl:       `https://mainnet.boba.network:8080/addresses.json`,
-    addressOMGXUrl:   `https://mainnet.boba.network:8080/boba-addr.json`,
-    OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
-    MM_Label:         `Mainnet`,
-    L1: {
-      name: "Mainnet",
-      chainId: 1,
-      chainIdHex: '0x1',
-      rpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
-      blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
-      transaction: ` https://etherscan.io/tx/`,
-    },
-    L2: {
-      name: "BOBA L2",
-      chainId: 288,
-      chainIdHex: '0x120',
-      rpcUrl: `https://mainnet.boba.network`,
-      blockExplorer: `https://blockexplorer.boba.network/`,
-      transaction: `https://blockexplorer.boba.network/tx/`,
+if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+  console.log('Yes, we have rinkeby')
+  NETWORKS = {
+    rinkeby: {
+      OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
+      MM_Label:         `Rinkeby`,
+      addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`, 
+      L1: {
+        name: "Rinkeby",
+        chainId: 4,
+        chainIdHex: '0x4',
+        rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+        blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://rinkeby.etherscan.io/tx/`
+      },
+      L2: {
+        name: "BOBA Rinkeby L2",
+        chainId: 28,
+        chainIdHex: '0x1C',
+        rpcUrl: `https://rinkeby.boba.network`,
+        blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
+        transaction: `https://blockexplorer.rinkeby.boba.network/tx/`
+      }
     }
   }
-}
-
-if (env === 'dev') {
+} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+  NETWORKS = {
+    mainnet: {
+      OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
+      MM_Label:         `Mainnet`,
+      addressManager:   `CHANGE_ME`, 
+      L1: {
+        name: "Mainnet",
+        chainId: 1,
+        chainIdHex: '0x1',
+        rpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+        blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: ` https://etherscan.io/tx/`,
+      },
+      L2: {
+        name: "BOBA L2",
+        chainId: 288,
+        chainIdHex: '0x120',
+        rpcUrl: `https://mainnet.boba.network`,
+        blockExplorer: `https://blockexplorer.boba.network/`,
+        transaction: `https://blockexplorer.boba.network/tx/`,
+      }
+    }
+  }
+} else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORKS = {
     local: {
-      addressUrl:       `http://${window.location.hostname}:8080/addresses.json`,
-      addressOMGXUrl:   `http://${window.location.hostname}:8080/boba-addr.json`,
       OMGX_WATCHER_URL: null, //Does not exist on local
       MM_Label:         `Local`,
       addressManager:   `0x5FbDB2315678afecb367f032d93F642f64180aa3`, 
@@ -90,39 +86,12 @@ if (env === 'dev') {
         rpcUrl: `http://${window.location.hostname}:8545`,
         blockExplorer: null, //does not exist on local
       },
-    },
-    rinkeby_integration: {
-      addressUrl:       `https://rinkeby-integration.boba.network:8080/addresses.json`,
-      addressOMGXUrl:   `https://rinkeby-integration.boba.network:8080/boba-addr.json`,
-      OMGX_WATCHER_URL: `https://api-watcher.rinkeby-integration.boba.network/`,
-      MM_Label:         `Rinkeby Int Test`,
-      L1: {
-        name: "Rinkeby",
-        chainId: 4,
-        chainIdHex: '0x4',
-        rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
-        blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
-        transaction: `https://rinkeby.etherscan.io/tx/`,
-      },
-      L2: {
-        name: "BOBA Rinkeby Int L2",
-        chainId: 29,
-        chainIdHex: '0x1D',
-        rpcUrl: `https://rinkeby-integration.boba.network`,
-        blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
-        transaction: `https://blockexplorer.rinkeby.boba.network/tx/`,
-      }
-    },
-    ...NETWORKS,
+    }
   }
 }
 
 const BaseServices = {
   WALLET_SERVICE:   `https://api-service.boba.network/`,
-  //relevant to local?
-  SELLER_OPTIMISM_API_URL: `https://pm7f0dp9ud.execute-api.us-west-1.amazonaws.com/prod/`,
-  //relevant to local?
-  BUYER_OPTIMISM_API_URL: `https://n245h0ka3i.execute-api.us-west-1.amazonaws.com/prod/`,
   //relevant to local?
   SERVICE_OPTIMISM_API_URL: `https://zlba6djrv6.execute-api.us-west-1.amazonaws.com/prod/`,
   //relevant to local?
@@ -134,9 +103,9 @@ const BaseServices = {
 }
 
 export function getAllNetworks () {
-  return NETWORKS;
+  return NETWORKS
 }
 
 export function getBaseServices () {
-  return BaseServices;
+  return BaseServices
 }

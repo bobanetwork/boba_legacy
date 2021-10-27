@@ -133,7 +133,7 @@ function Home () {
   //get all account balances
   useInterval(() => {
     dispatch(fetchBalances()) //check the balances
-    //dispatch(fetchNFTs())
+    dispatch(fetchNFTs())
 
     // get Dao balance / Votes
     dispatch(fetchDaoBalance())

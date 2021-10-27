@@ -47,17 +47,17 @@ function WalletPicker ({ onEnable, enabled }) {
 
   const dispatch = useDispatch();
 
-  const [ walletEnabled, setWalletEnabled ] = useState(false);
-  const [ accountsEnabled, setAccountsEnabled ] = useState(false);
-  const [ wrongNetwork, setWrongNetwork ] = useState(false);
+  const [ walletEnabled, setWalletEnabled ] = useState(false)
+  const [ accountsEnabled, setAccountsEnabled ] = useState(false)
+  const [ wrongNetwork, setWrongNetwork ] = useState(false)
   
   const walletMethod = useSelector(selectWalletMethod())
   const masterConfig = useSelector(selectNetwork())
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
   
   const dispatchSetWalletMethod = useCallback((methodName) => {
     dispatch(setWalletMethod(methodName));
@@ -70,12 +70,8 @@ function WalletPicker ({ onEnable, enabled }) {
     }
 
     async function enableBrowserWallet () {
-      //console.log("enableBrowserWallet() for",masterConfig)
-      //default to mainnet for normal user, unless set otherwise later 
-      //which is then captured in the localStorage cache
-      const selectedNetwork = masterConfig ? masterConfig : "mainnet"
+      const selectedNetwork = masterConfig
       const walletEnabled = await networkService.enableBrowserWallet(selectedNetwork)
-      //console.log("walletEnabled:",walletEnabled)
       return walletEnabled
         ? setWalletEnabled(true)
         : dispatchSetWalletMethod(null);
