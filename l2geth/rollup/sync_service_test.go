@@ -22,19 +22,27 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rollup/fees"
 	"github.com/ethereum/go-ethereum/rollup/rcfg"
 )
 
 func setupLatestEthContextTest() (*SyncService, *EthContext) {
-	service, _, _, _ := newTestSyncService(false)
+	service, _, _, _ := newTestSyncService(false, nil)
 	resp := &EthContext{
 		BlockNumber: uint64(10),
 		BlockHash:   common.Hash{},
 		Timestamp:   uint64(service.timestampRefreshThreshold.Seconds()) + 1,
 	}
+
+	tx := mockTx()
+	setMockQueueIndex(tx, 0)
+	setMockTxL1BlockNumber(tx, big.NewInt(int64(resp.BlockNumber)))
+	setMockTxL1Timestamp(tx, resp.Timestamp)
+
 	setupMockClient(service, map[string]interface{}{
 		"GetLatestEthContext": resp,
+		"GetEnqueue": []*types.Transaction{
+			tx,
+		},
 	})
 
 	return service, resp
@@ -54,8 +62,16 @@ func TestSyncServiceContextUpdated(t *testing.T) {
 		t.Fatal("context was not instantiated to the expected value")
 	}
 
-	// run the update context call once
+	// Call this (preserved from the old test case) although it should now be a no-op.
 	err := service.updateContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Update the context via syncQueueToTip()
+	// This replaces the earlier method using service.updateContext()
+	service.chainHeadCh <- core.ChainHeadEvent{}
+	err = service.syncQueueToTip()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,6 +85,12 @@ func TestSyncServiceContextUpdated(t *testing.T) {
 	if service.OVMContext != *expectedCtx {
 		t.Fatal("context was not updated to the expected response even though enough time passed")
 	}
+
+	// FIXME - The remainder of this test is preserved from the old service.updateContext() method.
+	// It should succeed, but is not testing the s.timestampRefreshThreshold comparison in its
+	// new syncQueueToTip() location. It's not clear that there's any reason for having that
+	// logic at all now. If/when it is removed from the main code, the rest of this test case
+	// should also be removed (along with the earlier service.updateContext() call).
 
 	// updating the context should be a no-op if time advanced by less than
 	// the refresh period
@@ -98,7 +120,7 @@ func TestSyncServiceContextUpdated(t *testing.T) {
 // after the transaction enqueued event is emitted. Set `false` as
 // the argument to start as a sequencer
 func TestSyncServiceTransactionEnqueued(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(false)
+	service, txCh, _, err := newTestSyncService(false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +182,7 @@ func TestSyncServiceTransactionEnqueued(t *testing.T) {
 }
 
 func TestTransactionToTipNoIndex(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(false)
+	service, txCh, _, err := newTestSyncService(false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +233,7 @@ func TestTransactionToTipNoIndex(t *testing.T) {
 }
 
 func TestTransactionToTipTimestamps(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(false)
+	service, txCh, _, err := newTestSyncService(false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,7 +297,7 @@ func TestTransactionToTipTimestamps(t *testing.T) {
 }
 
 func TestApplyIndexedTransaction(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(true)
+	service, txCh, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -318,7 +340,7 @@ func TestApplyIndexedTransaction(t *testing.T) {
 }
 
 func TestApplyBatchedTransaction(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(true)
+	service, txCh, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -355,7 +377,7 @@ func TestApplyBatchedTransaction(t *testing.T) {
 }
 
 func TestIsAtTip(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -428,7 +450,7 @@ func TestIsAtTip(t *testing.T) {
 }
 
 func TestSyncQueue(t *testing.T) {
-	service, txCh, _, err := newTestSyncService(true)
+	service, txCh, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -444,7 +466,8 @@ func TestSyncQueue(t *testing.T) {
 
 	var tip *uint64
 	go func() {
-		tip, err = service.syncQueue()
+		// atTip, index, err
+		_, tip, err = service.syncQueue(service.client.GetLatestEnqueueIndex)
 	}()
 
 	for i := 0; i < 4; i++ {
@@ -485,7 +508,7 @@ func TestSyncQueue(t *testing.T) {
 }
 
 func TestSyncServiceL1GasPrice(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	setupMockClient(service, map[string]interface{}{})
 
 	if err != nil {
@@ -523,7 +546,7 @@ func TestSyncServiceL1GasPrice(t *testing.T) {
 }
 
 func TestSyncServiceL2GasPrice(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -557,40 +580,8 @@ func TestSyncServiceL2GasPrice(t *testing.T) {
 	}
 }
 
-func TestSyncServiceMinL2GasPrice(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
-	if err != nil {
-		t.Fatal(err)
-	}
-	service.minL2GasLimit = new(big.Int).SetUint64(10_000_000)
-	signer := types.NewEIP155Signer(big.NewInt(420))
-	// Generate a key
-	key, _ := crypto.GenerateKey()
-	// Create a transaction
-	gasLimit := uint64(100)
-	tx := types.NewTransaction(0, common.Address{}, big.NewInt(0), gasLimit, big.NewInt(15000000), []byte{})
-	// Make sure the gas limit is set correctly
-	if tx.Gas() != gasLimit {
-		t.Fatal("gas limit not set correctly")
-	}
-	// Sign the dummy tx with the owner key
-	signedTx, err := types.SignTx(tx, signer, key)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Sanity check the L2 gas limit
-	if tx.L2Gas() > service.minL2GasLimit.Uint64() {
-		t.Fatal("L2 gas limit expected to be smaller than min accepted by sequencer")
-	}
-	// Verify the fee of the signed tx, ensure it does not error
-	err = service.verifyFee(signedTx)
-	if !errors.Is(err, fees.ErrL2GasLimitTooLow) {
-		t.Fatal(err)
-	}
-}
-
 func TestSyncServiceGasPriceOracleOwnerAddress(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -624,7 +615,7 @@ func TestSyncServiceGasPriceOracleOwnerAddress(t *testing.T) {
 // Only the gas price oracle owner can send 0 gas price txs
 // when fees are enforced
 func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -680,7 +671,7 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 
 // Pass true to set as a verifier
 func TestSyncServiceSync(t *testing.T) {
-	service, txCh, sub, err := newTestSyncService(true)
+	service, txCh, sub, err := newTestSyncService(true, nil)
 	defer sub.Unsubscribe()
 	if err != nil {
 		t.Fatal(err)
@@ -732,7 +723,7 @@ func TestSyncServiceSync(t *testing.T) {
 }
 
 func TestInitializeL1ContextPostGenesis(t *testing.T) {
-	service, _, _, err := newTestSyncService(true)
+	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -798,7 +789,7 @@ func TestInitializeL1ContextPostGenesis(t *testing.T) {
 
 func TestBadFeeThresholds(t *testing.T) {
 	// Create the deps for the sync service
-	cfg, txPool, chain, db, err := newTestSyncServiceDeps(false)
+	cfg, txPool, chain, db, err := newTestSyncServiceDeps(false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -843,14 +834,21 @@ func TestBadFeeThresholds(t *testing.T) {
 	}
 }
 
-func newTestSyncServiceDeps(isVerifier bool) (Config, *core.TxPool, *core.BlockChain, ethdb.Database, error) {
+func newTestSyncServiceDeps(isVerifier bool, alloc *common.Address) (Config, *core.TxPool, *core.BlockChain, ethdb.Database, error) {
 	chainCfg := params.AllEthashProtocolChanges
 	chainID := big.NewInt(420)
 	chainCfg.ChainID = chainID
 
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	_ = new(core.Genesis).MustCommit(db)
+	genesis := new(core.Genesis)
+	if alloc != nil {
+		genesis.Alloc = make(core.GenesisAlloc)
+		genesis.Alloc[*alloc] = core.GenesisAccount{
+			Balance: new(big.Int).SetUint64(100000000000000),
+		}
+	}
+	_ = genesis.MustCommit(db)
 	chain, err := core.NewBlockChain(db, nil, chainCfg, engine, vm.Config{}, nil)
 	if err != nil {
 		return Config{}, nil, nil, nil, fmt.Errorf("Cannot initialize blockchain: %w", err)
@@ -869,8 +867,8 @@ func newTestSyncServiceDeps(isVerifier bool) (Config, *core.TxPool, *core.BlockC
 	return cfg, txPool, chain, db, nil
 }
 
-func newTestSyncService(isVerifier bool) (*SyncService, chan core.NewTxsEvent, event.Subscription, error) {
-	cfg, txPool, chain, db, err := newTestSyncServiceDeps(isVerifier)
+func newTestSyncService(isVerifier bool, alloc *common.Address) (*SyncService, chan core.NewTxsEvent, event.Subscription, error) {
+	cfg, txPool, chain, db, err := newTestSyncServiceDeps(isVerifier, alloc)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("Cannot initialize syncservice: %w", err)
 	}
@@ -896,7 +894,10 @@ type mockClient struct {
 	getLatestEthContext            *EthContext
 	getLatestEnqueueIndex          []func() (*uint64, error)
 	getLatestEnqueueIndexCallCount int
+	getLatestEnqueueInfo           []func() (*EnqueueInfo, error)
 }
+
+//GetLatestEnqueueInfo() (*EnqueueInfo, error)
 
 func setupMockClient(service *SyncService, responses map[string]interface{}) {
 	client := newMockClient(responses)
@@ -1004,11 +1005,6 @@ func (m *mockClient) SyncStatus(backend Backend) (*SyncStatus, error) {
 	}, nil
 }
 
-func (m *mockClient) GetL1GasPrice() (*big.Int, error) {
-	price := big.NewInt(1)
-	return price, nil
-}
-
 func (m *mockClient) GetLatestEnqueueIndex() (*uint64, error) {
 	enqueue, err := m.GetLatestEnqueue()
 	if err != nil {
@@ -1018,6 +1014,23 @@ func (m *mockClient) GetLatestEnqueueIndex() (*uint64, error) {
 		return nil, errElementNotFound
 	}
 	return enqueue.GetMeta().QueueIndex, nil
+}
+
+func (m *mockClient) GetLatestEnqueueInfo() (*EnqueueInfo, error) {
+	var inf EnqueueInfo
+
+	enqueue, err := m.GetLatestEnqueue()
+	if err != nil {
+		return nil, err
+	}
+	if enqueue == nil {
+		return nil, errElementNotFound
+	}
+
+	inf.BaseBlock = newUint64(enqueue.L1BlockNumber().Uint64())
+	inf.BaseTime = newUint64(enqueue.L1Timestamp())
+	inf.QueueIndex = enqueue.GetMeta().QueueIndex
+	return &inf, nil
 }
 
 func (m *mockClient) GetLatestTransactionBatchIndex() (*uint64, error) {
@@ -1063,6 +1076,13 @@ func mockTx() *types.Transaction {
 func setMockTxL1Timestamp(tx *types.Transaction, ts uint64) *types.Transaction {
 	meta := tx.GetMeta()
 	meta.L1Timestamp = ts
+	tx.SetTransactionMeta(meta)
+	return tx
+}
+
+func setMockTxL1BlockNumber(tx *types.Transaction, bn *big.Int) *types.Transaction {
+	meta := tx.GetMeta()
+	meta.L1BlockNumber = bn
 	tx.SetTransactionMeta(meta)
 	return tx
 }

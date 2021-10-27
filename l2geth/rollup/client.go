@@ -94,6 +94,15 @@ type Enqueue struct {
 	QueueIndex  *uint64         `json:"index"`
 }
 
+// EnqueueInfo is used in GetLatestEnqueueInfo()
+type EnqueueInfo struct {
+	QueueIndex  *uint64 `json:"index"`
+	BlockNumber *uint64 `json:"blockNumber"`
+	Timestamp   *uint64 `json:"timestamp"`
+	BaseBlock   *uint64 `json:"baseBlock"`
+	BaseTime    *uint64 `json:"baseTime"`
+}
+
 // signature represents a secp256k1 ECDSA signature
 type signature struct {
 	R hexutil.Bytes `json:"r"`
@@ -120,6 +129,7 @@ type RollupClient interface {
 	GetEnqueue(index uint64) (*types.Transaction, error)
 	GetLatestEnqueue() (*types.Transaction, error)
 	GetLatestEnqueueIndex() (*uint64, error)
+	GetLatestEnqueueInfo() (*EnqueueInfo, error)
 	GetTransaction(uint64, Backend) (*types.Transaction, error)
 	GetLatestTransaction(Backend) (*types.Transaction, error)
 	GetLatestTransactionIndex(Backend) (*uint64, error)
@@ -130,7 +140,6 @@ type RollupClient interface {
 	GetLatestTransactionBatchIndex() (*uint64, error)
 	GetTransactionBatch(uint64) (*Batch, []*types.Transaction, error)
 	SyncStatus(Backend) (*SyncStatus, error)
-	GetL1GasPrice() (*big.Int, error)
 }
 
 // Client is an HTTP based RollupClient
@@ -295,6 +304,31 @@ func (c *Client) GetLatestEnqueueIndex() (*uint64, error) {
 		return nil, errors.New("Latest queue index is nil")
 	}
 	return index, nil
+}
+
+// Variant of GetLatestEnqueueIndex() which retrieves the index
+// along with information about the most recent L1 block/timestamp
+// which is guaranteed to be older than any future queue entries.
+// This can avoid some timestamp monotonicity violations
+func (c *Client) GetLatestEnqueueInfo() (*EnqueueInfo, error) {
+	response, err := c.client.R().
+		SetResult(&EnqueueInfo{}).
+		Get("/enqueue/info")
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot fetch latest enqueue info: %w", err)
+	}
+
+	info, ok := response.Result().(*EnqueueInfo)
+	if !ok {
+		return nil, errors.New("Cannot parse latest enqueue info")
+	}
+
+	if info.QueueIndex == nil {
+		return nil, errElementNotFound
+	}
+
+	return info, nil
 }
 
 // GetLatestTransactionIndex returns the latest CTC index that has been batch
@@ -604,27 +638,4 @@ func parseTransactionBatchResponse(txBatch *TransactionBatchResponse, signer *ty
 		txs[i] = transaction
 	}
 	return batch, txs, nil
-}
-
-// GetL1GasPrice will return the current gas price on L1
-func (c *Client) GetL1GasPrice() (*big.Int, error) {
-	response, err := c.client.R().
-		SetResult(&L1GasPrice{}).
-		Get("/eth/gasprice")
-
-	if err != nil {
-		return nil, fmt.Errorf("Cannot fetch L1 gas price: %w", err)
-	}
-
-	gasPriceResp, ok := response.Result().(*L1GasPrice)
-	if !ok {
-		return nil, fmt.Errorf("Cannot parse L1 gas price response")
-	}
-
-	gasPrice, ok := new(big.Int).SetString(gasPriceResp.GasPrice, 10)
-	if !ok {
-		return nil, fmt.Errorf("Cannot parse response as big number")
-	}
-
-	return gasPrice, nil
 }

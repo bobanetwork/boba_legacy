@@ -31,7 +31,8 @@ describe('L2StandardTokenFactory', () => {
       const tx = await L2StandardTokenFactory.createStandardL2Token(
         L1ERC20.address,
         'L2ERC20',
-        'ERC'
+        'ERC',
+        18
       )
       const receipt = await tx.wait()
       const [tokenCreatedEvent] = receipt.events
@@ -58,7 +59,8 @@ describe('L2StandardTokenFactory', () => {
         L2StandardTokenFactory.createStandardL2Token(
           ethers.constants.AddressZero,
           'L2ERC20',
-          'ERC'
+          'ERC',
+          18
         )
       ).to.be.revertedWith('Must provide L1 token address')
     })

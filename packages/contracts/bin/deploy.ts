@@ -2,13 +2,15 @@ import { Wallet } from 'ethers'
 import path from 'path'
 import dirtree from 'directory-tree'
 import fs from 'fs'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 // Ensures that all relevant environment vars are properly set. These lines *must* come before the
 // hardhat import because importing will load the config (which relies on these vars). Necessary
 // because CI currently uses different var names than the ones we've chosen here.
 // TODO: Update CI so that we don't have to do this anymore.
-process.env.HARDHAT_NETWORK = 'custom' // "custom" here is an arbitrary name. only used for CI.
-process.env.CONTRACTS_TARGET_NETWORK = 'custom'
+process.env.HARDHAT_NETWORK = 'rinkeby' // "custom" here is an arbitrary name. only used for CI.
+process.env.CONTRACTS_TARGET_NETWORK = 'rinkeby'
 process.env.CONTRACTS_DEPLOYER_KEY = process.env.DEPLOYER_PRIVATE_KEY
 process.env.CONTRACTS_RPC_URL =
   process.env.L1_NODE_WEB3_URL || 'http://127.0.0.1:8545'
@@ -17,6 +19,8 @@ import hre from 'hardhat'
 
 const sequencer = new Wallet(process.env.SEQUENCER_PRIVATE_KEY)
 const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
+const proposer = new Wallet(process.env.PROPOSER_PRIVATE_KEY)
+const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY)
 
 const parseEnv = () => {
   const ensure = (env, type) => {
@@ -53,7 +57,8 @@ const main = async () => {
     sccFraudProofWindow: config.sccFraudProofWindow,
     sccSequencerPublishWindow: config.sccFraudProofWindow,
     ovmSequencerAddress: sequencer.address,
-    ovmProposerAddress: sequencer.address,
+    ovmProposerAddress: proposer.address,
+    ovmRelayerAddress: relayer.address,
     ovmAddressManagerOwner: deployer.address,
     noCompile: process.env.NO_COMPILE ? true : false,
   })
@@ -66,7 +71,7 @@ const main = async () => {
   }
 
   const contracts: any = dirtree(
-    path.resolve(__dirname, `../deployments/custom`)
+    path.resolve(__dirname, `../deployments/rinkeby`)
   )
     .children.filter((child) => {
       return child.extension === '.json'
@@ -76,7 +81,7 @@ const main = async () => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const artifact = require(path.resolve(
         __dirname,
-        `../deployments/custom/${child.name}`
+        `../deployments/rinkeby/${child.name}`
       ))
       contractsAccumulator[nicknames[contractName] || contractName] =
         artifact.address

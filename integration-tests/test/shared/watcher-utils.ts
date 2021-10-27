@@ -30,6 +30,29 @@ export const initWatcher = async (
   })
 }
 
+export const initWatcherFast = async (
+  l1Provider: JsonRpcProvider,
+  l2Provider: JsonRpcProvider,
+  AddressManager: Contract
+) => {
+  const l1MessengerAddressFast = await AddressManager.getAddress(
+    'Proxy__L1CrossDomainMessengerFast'
+  )
+  const l2MessengerAddress = await AddressManager.getAddress(
+    'L2CrossDomainMessenger'
+  )
+  return new Watcher({
+    l1: {
+      provider: l1Provider,
+      messengerAddress: l1MessengerAddressFast,
+    },
+    l2: {
+      provider: l2Provider,
+      messengerAddress: l2MessengerAddress,
+    },
+  })
+}
+
 export interface CrossDomainMessagePair {
   tx: Transaction
   receipt: TransactionReceipt
@@ -40,6 +63,14 @@ export interface CrossDomainMessagePair {
 export enum Direction {
   L1ToL2,
   L2ToL1,
+}
+
+export const waitForXDomainTransactionFast = async (
+  watcherFast: Watcher,
+  tx: Promise<TransactionResponse> | TransactionResponse,
+  direction: Direction
+): Promise<CrossDomainMessagePair> => {
+  return waitForXDomainTransaction(watcherFast, tx, direction)
 }
 
 export const waitForXDomainTransaction = async (
@@ -54,12 +85,14 @@ export const waitForXDomainTransaction = async (
 
   // await it if needed
   tx = await tx
+
   // get the receipt and the full transaction
   const receipt = await tx.wait()
   const fullTx = await src.provider.getTransaction(tx.hash)
 
   // get the message hash which was created on the SentMessage
   const [xDomainMsgHash] = await watcher.getMessageHashesFromTx(src, tx.hash)
+
   // Get the transaction and receipt on the remote layer
   const remoteReceipt = await watcher.getTransactionReceipt(
     dest,

@@ -32,6 +32,14 @@ COPY packages/message-relayer/package.json ./packages/message-relayer/package.js
 COPY packages/replica-healthcheck/package.json ./packages/replica-healthcheck/package.json
 COPY integration-tests/package.json ./integration-tests/package.json
 
+COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
+COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
+COPY packages/boba/message-relayer-fast/package.json ./packages/boba/message-relayer-fast/package.json
+
+# copy over the patches, if any...
+# needs to happen before `yarn` otherwise patch-packages does not apply the patches
+COPY ./patches ./patches
+
 RUN yarn install --frozen-lockfile
 
 ### BUILDER: Builds the typescript
