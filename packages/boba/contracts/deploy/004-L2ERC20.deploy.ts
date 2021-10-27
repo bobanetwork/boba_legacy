@@ -6,6 +6,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import L1BobaJson from '../artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
 import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -13,6 +14,7 @@ import preSupportedTokens from '../preSupportedTokens.json'
 
 let Factory__L1ERC20: ContractFactory
 let Factory__L2ERC20: ContractFactory
+let Factory__L1Boba: ContractFactory
 let Factory__L2Boba: ContractFactory
 
 let L1ERC20: Contract
@@ -25,8 +27,6 @@ const initialSupply_6 = utils.parseUnits('10000', 6)
 const initialSupply_8 = utils.parseUnits('10000', 8)
 const initialSupply_18 = utils.parseEther('10000000000')
 
-const initialSupply_BOBA = utils.parseEther('500000000')
-
 const deployFn: DeployFunction = async (hre) => {
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
@@ -35,6 +35,12 @@ const deployFn: DeployFunction = async (hre) => {
   Factory__L1ERC20 = new ContractFactory(
     L1ERC20Json.abi,
     L1ERC20Json.bytecode,
+    (hre as any).deployConfig.deployer_l1
+  )
+
+  Factory__L1Boba = new ContractFactory(
+    L1BobaJson.abi,
+    L1BobaJson.bytecode,
     (hre as any).deployConfig.deployer_l1
   )
 
@@ -66,17 +72,20 @@ const deployFn: DeployFunction = async (hre) => {
         supply = initialSupply_6
       } else if (token.decimals === 8) {
         supply = initialSupply_8
-      } else if (token.symbol === 'BOBA') {
-        supply = initialSupply_BOBA
       }
 
-      L1ERC20 = await Factory__L1ERC20.deploy(
-        supply,
-        token.name,
-        token.symbol,
-        token.decimals
-      )
-      await L1ERC20.deployTransaction.wait()
+      if (token.symbol !== 'BOBA') {
+        L1ERC20 = await Factory__L1ERC20.deploy(
+          supply,
+          token.name,
+          token.symbol,
+          token.decimals
+        )
+        await L1ERC20.deployTransaction.wait()
+      } else {
+        L1ERC20 = await Factory__L1Boba.deploy()
+        await L1ERC20.deployTransaction.wait()
+      }
 
       tokenAddressL1 = L1ERC20.address
 
@@ -181,7 +190,7 @@ const deployFn: DeployFunction = async (hre) => {
         ...L2ERC20,
         receipt: L2ERC20.receipt,
         address: L2ERC20.address,
-        abi: L2ERC20.abi,
+        abi: L2GovernanceERC20Json.abi,
       }
       await hre.deployments.save(
         'TK_L2' + token.symbol,

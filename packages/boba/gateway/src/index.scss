@@ -18,7 +18,7 @@ $bunnyRed: #c83950;
 // redesign color;
 
 $background: linear-gradient(180deg, #061122 0%, #08162C 100%);
-$background400: rgba(255, 255, 255, 0.04);
+$background400: rgba(255, 255, 255, 0.14);
 
 $backgroundLight400: rgba(0, 0, 0, 0.06);
 
@@ -41,12 +41,12 @@ $white500: rgba(255, 255, 255, 0.5);
   gray7: $gray7;
   bunnyRed: $bunnyRed;
   maxWidth: $maxWidth;
-  background:$background;
-  background400:$background400;
+  background: $background;
+  background400: $background400;
   backgroundLight400: $backgroundLight400;
-  white:$white;
-  white700:$white700;
-  white500:$white500;
+  white: $white;
+  white700: $white700;
+  white500: $white500;
 }
 
 // /* small screens */
