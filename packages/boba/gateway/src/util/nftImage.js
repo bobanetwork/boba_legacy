@@ -16,7 +16,7 @@ limitations under the License. */
 import axios from 'axios';
 
 const isIpfsUrl = (url) =>{
-    return !!url.includes('ipfs://');
+    return !!url.includes('ipfs://')
 }
 
 const getIpfsUrl = (url) => {
@@ -24,28 +24,27 @@ const getIpfsUrl = (url) => {
     return `https://ipfs.io/ipfs/${payload}`
 }
 
-
 export const getNftImageUrl = async (url) => {
     try {
 
-        let URL = !!isIpfsUrl(url) ? getIpfsUrl(url) : url;
+        let URL = !!isIpfsUrl(url) ? getIpfsUrl(url) : url
 
-        let res = await axios.get(URL);
+        let res = await axios.get(URL)
 
         if (res.headers && res.headers['content-type'].includes('application/json')) {
-            const { image, attributes = [] } = res.data;
+            const { image, attributes = [] } = res.data
             return { 
                 url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image, 
                 attributes 
             }
         } else {
-            return { url };
+            return { url }
         }
     } catch (error) {
         // In case of error returning same url
         // As seems like some time it can be cors for images.
         console.log('Error while loading NFT image url', error.message);
-        return { url };
+        return { url }
     }
 }
 

@@ -68,23 +68,15 @@ describe('NFT Test\n', async () => {
   })
 
   it('should generate a new ERC721 and transfer it from Bob (a1a) to Alice (a2a)', async () => {
-    const ownerName = 'Henrietta Lacks'
 
-    let meta =
-      ownerName +
-      '#' +
-      Date.now().toString() +
-      '#' +
-      'https://www.atcc.org/products/all/CCL-2.aspx'
+    let meta = 'https://boredapeyachtclub.com/api/mutants/111'
+
     console.log(`meta: ${meta}`)
-
     console.log('Alice (a1a):', a2a)
 
     //mint one NFT
     let nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
-
-    //console.log("ERC721:",nft)
 
     const balanceBob = await ERC721.balanceOf(a1a)
     const balanceAlice = await ERC721.balanceOf(a2a)
@@ -101,21 +93,12 @@ describe('NFT Test\n', async () => {
     console.log(`TID:${TID.toString()}`)
 
     //mint a second NFT for account3 aka recipient2
-    meta =
-      ownerName +
-      '#' +
-      Date.now().toString() +
-      '#' +
-      'https://www.atcc.org/products/all/CCL-185.aspx'
+    meta = 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6190'
     nft = await ERC721.mintNFT(a3a, meta)
     await nft.wait()
+
     //mint a third NFT, this time for account2 aka recipient
-    meta =
-      ownerName +
-      '#' +
-      Date.now().toString() +
-      '#' +
-      'https://www.atcc.org/products/all/CCL-185.aspx'
+    meta = 'https://boredapeyachtclub.com/api/mutants/121'
     nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
 
@@ -138,6 +121,7 @@ describe('NFT Test\n', async () => {
   })
 
   it('should derive an NFT Factory from a genesis NFT', async () => {
+    
     //Alice (a2a) Account #2 wishes to create a derivative NFT factory from a genesis NFT
     const tokenID = await ERC721.tokenOfOwnerByIndex(a2a, 0)
     //determine the UUID
@@ -172,25 +156,20 @@ describe('NFT Test\n', async () => {
     )
     console.log(`Derived NFT deployed to: ${ERC721_D.address}`)
 
-    const meta =
-      'ADA BYRON, COUNTESS OF LOVELACE' +
-      '#' +
-      Date.now().toString() +
-      '#' +
-      'http://blogs.bodleian.ox.ac.uk/wp-content/uploads/sites/163/2015/10/AdaByron-1850-1000x1200-e1444805848856.jpg'
+    const meta = 'http://blogs.bodleian.ox.ac.uk/wp-content/uploads/sites/163/2015/10/AdaByron-1850-1000x1200-e1444805848856.jpg'
 
     const nft = await ERC721_D.mintNFT(a3a, meta)
     await nft.wait()
   })
 
   it('should register the NFTs address in users wallet', async () => {
+    
     await ERC721Reg.registerAddress(a2a, ERC721.address)
     //but, a3a should have two flavors of NFT...
     await ERC721Reg.registerAddress(a3a, ERC721.address)
     await ERC721Reg.registerAddress(a3a, ERC721_D.address)
 
     const addresses_a2a = await ERC721Reg.lookupAddress(a2a)
-
     const addresses_a3a = await ERC721Reg.lookupAddress(a3a)
 
     console.log(`Addresses a2a: ${addresses_a2a}`)

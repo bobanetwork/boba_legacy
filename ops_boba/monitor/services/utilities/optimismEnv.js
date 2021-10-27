@@ -8,14 +8,14 @@ const {
   getContractFactory,
 } = require('@eth-optimism/contracts')
 const fetch = require('node-fetch')
-const { Watcher } = require('@eth-optimism/watcher')
+const { Watcher } = require('../../../../packages/core-utils/dist/watcher')
 
-const addressManagerJSON = require('../../artifacts/contracts/optimistic-ethereum/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
+const addressManagerJSON = require('../../artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
-const L2LiquidityPoolJson = require('../../artifacts-ovm/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const OVM_L1StandardBridgeJson = require('../../artifacts/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L1StandardBridge.sol/OVM_L1StandardBridge.json')
-const OVM_L2StandardBridgeJson = require('../../artifacts-ovm/contracts/optimistic-ethereum/OVM/bridge/tokens/OVM_L2StandardBridge.sol/OVM_L2StandardBridge.json')
-const logger = require('./utilities/logger')
+const L2LiquidityPoolJson = require('../../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
+const L1StandardBridgeJson = require('../../artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
+const L2StandardBridgeJson = require('../../artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
+const StateCommitmentChainJson = require('../../artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 const env = process.env
@@ -83,14 +83,16 @@ const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 class OptimismEnv {
   constructor() {
+    this.logger = new core_utils_1.Logger({ name: this.name })
+
     this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
       L1_NODE_WEB3_URL
     )
-    this.L1Provider.on('debug', (info) => {
-      if (info.action === 'request') {
-        logger.info('ethers', info.request)
-      }
-    })
+    // this.L1Provider.on('debug', (info) => {
+    //   if (info.action === 'request') {
+    //     this.logger.info('ethers', info.request)
+    //   }
+    // })
     this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
       L2_NODE_WEB3_URL
     )
@@ -102,8 +104,8 @@ class OptimismEnv {
     this.MySQLDatabaseName = MYSQL_DATABASE_NAME
 
     this.addressManagerAddress = ADDRESS_MANAGER_ADDRESS
-    this.OVM_L1CrossDomainMessenger = null
-    this.OVM_L1CrossDomainMessengerFast = null
+    this.L1CrossDomainMessenger = null
+    this.L1CrossDomainMessengerFast = null
     this.OVM_L2CrossDomainMessenger = L2_MESSENGER_ADDRESS
     this.OVM_L2StandardBridge = OVM_L2_STANDARD_BRIDGE_ADDRESS
 
@@ -124,8 +126,6 @@ class OptimismEnv {
     this.L2rateLimit = L2_RATE_LIMIT
     this.L2sleepThresh = L2_SLEEP_THRESH
 
-    this.logger = new core_utils_1.Logger({ name: this.name })
-
     this.sqlDisconnected = SQL_DISCONNECTED
 
     this.transactionMonitorSQL = false
@@ -134,8 +134,7 @@ class OptimismEnv {
     this.databaseConnected = false
     this.databaseConnectedMutex = new Mutex()
 
-    this.OVM_L2CrossDomainMessengerContract = null
-    this.OVM_StateCommitmentChainContract = null
+    this.StateCommitmentChainContract = null
     this.L1LiquidityPoolContract = null
     this.L2LiquidityPoolContract = null
     this.OVM_L1StandardBridgeContract = null
@@ -170,41 +169,38 @@ class OptimismEnv {
     )
 
     // Get addresses
-    this.OVM_L1CrossDomainMessenger = await addressManager.getAddress(
-      'Proxy__OVM_L1CrossDomainMessenger'
+    this.L1CrossDomainMessenger = await addressManager.getAddress(
+      'Proxy__L1CrossDomainMessenger'
     )
-    this.OVM_L1CrossDomainMessengerFast = await addressManager.getAddress(
-      'Proxy__OVM_L1CrossDomainMessengerFast'
+    this.L1CrossDomainMessengerFast = await addressManager.getAddress(
+      'Proxy__L1CrossDomainMessengerFast'
     )
-    this.Proxy__OVM_L1StandardBridge = await addressManager.getAddress(
-      'Proxy__OVM_L1StandardBridge'
+    this.Proxy__L1StandardBridge = await addressManager.getAddress(
+      'Proxy__L1StandardBridge'
+    )
+    this.StateCommitmentChain = await addressManager.getAddress(
+      'StateCommitmentChain'
     )
 
     this.logger.info(
-      'Found OVM_L1CrossDomainMessenger, OVM_L1CrossDomainMessengerFast and Proxy__OVM_L1StandardBridge',
+      'Found L1CrossDomainMessenger, L1CrossDomainMessengerFast and Proxy__L1StandardBridge',
       {
-        OVM_L1CrossDomainMessenger: this.OVM_L1CrossDomainMessenger,
-        OVM_L1CrossDomainMessengerFast: this.OVM_L1CrossDomainMessengerFast,
-        Proxy__OVM_L1StandardBridge: this.Proxy__OVM_L1StandardBridge,
+        L1CrossDomainMessenger: this.L1CrossDomainMessenger,
+        L1CrossDomainMessengerFast: this.L1CrossDomainMessengerFast,
+        Proxy__L1StandardBridge: this.Proxy__L1StandardBridge,
       }
     )
 
-    // Load L2 CDM
-    this.OVM_L2CrossDomainMessengerContract = await loadContractFromManager({
-      name: 'OVM_L2CrossDomainMessenger',
-      Lib_AddressManager: addressManager,
-      provider: this.L2Provider,
-    })
     // Load SCC
-    this.OVM_StateCommitmentChainContract = await loadContractFromManager({
-      name: 'OVM_StateCommitmentChain',
-      Lib_AddressManager: addressManager,
-      provider: this.L1Provider,
-    })
+    this.StateCommitmentChainContract = new ethers.Contract(
+      this.StateCommitmentChain,
+      StateCommitmentChainJson.abi,
+      this.L1Provider
+    )
     // Load L1 Standard Bridge
     this.OVM_L1StandardBridgeContract = new ethers.Contract(
-      this.Proxy__OVM_L1StandardBridge,
-      OVM_L1StandardBridgeJson.abi,
+      this.Proxy__L1StandardBridge,
+      L1StandardBridgeJson.abi,
       this.L1Provider
     )
     // Interface
@@ -212,7 +208,7 @@ class OptimismEnv {
       L1LiquidityPoolJson.abi
     )
     this.OVM_L1StandardBridgeInterface = new ethers.utils.Interface(
-      OVM_L1StandardBridgeJson.abi
+      L1StandardBridgeJson.abi
     )
 
     if (BOBA_DEPLOYER_URL) {
@@ -244,7 +240,7 @@ class OptimismEnv {
     // Load L2 Standard Bridge
     this.OVM_L2StandardBridgeContract = new ethers.Contract(
       this.OVM_L2StandardBridge,
-      OVM_L2StandardBridgeJson.abi,
+      L2StandardBridgeJson.abi,
       this.L2Provider
     )
 
@@ -252,7 +248,7 @@ class OptimismEnv {
     this.watcher = new Watcher({
       l1: {
         provider: this.L1Provider,
-        messengerAddress: this.OVM_L1CrossDomainMessenger,
+        messengerAddress: this.L1CrossDomainMessenger,
       },
       l2: {
         provider: this.L2Provider,
