@@ -7,7 +7,7 @@ const l1BridgeMonitorService = require('../services/l1BridgeMonitor');
 const messageMonitorService = require('../services/messageMonitor');
 const { sleep } = require('@eth-optimism/core-utils');
 const { setupProvider, validateMonitoring } = require('../services/monitoring');
-const logger = require('../services/utilities/logger');
+const { logger } = require('../services/utilities/logger');
 const configs = require('../services/utilities/configs');
 
 const loop = async (func) => {

@@ -120,7 +120,6 @@ const main = async () => {
     l1MessengerFast: L1_MESSENGER_FAST,
     l1Wallet: wallet,
     relayGasLimit: RELAY_GAS_LIMIT,
-    //batch system
     minBatchSize: MIN_BATCH_SIZE,
     maxWaitTimeS: MAX_WAIT_TIME_S,
     maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
@@ -131,7 +130,6 @@ const main = async () => {
     getLogsInterval: GET_LOGS_INTERVAL,
     filterEndpoint: FILTER_ENDPOINT,
     filterPollingInterval: FILTER_POLLING_INTERVAL,
-    // gas price
     maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
     gasRetryIncrement: GAS_RETRY_INCREMENT,
     numConfirmations: NUM_CONFIRMATIONS,
