@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import ListNFT from 'components/listNFT/listNFT'
-import { openAlert, openError } from 'actions/uiAction'
 
 import * as styles from './Nft.module.scss'
 
@@ -14,9 +13,6 @@ import networkService from 'services/networkService'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
-
-import Button from 'components/button/Button'
-import Input from 'components/input/Input'
 
 class Nft extends React.Component {
 
@@ -29,7 +25,6 @@ class Nft extends React.Component {
     this.state = {
       list,
       contracts,
-      loading: false,
       ownerName: '',
       tokenURI: '',
     }
@@ -54,7 +49,6 @@ class Nft extends React.Component {
 
     const {
       list,
-      loading,
     } = this.state
 
     const numberOfNFTs = Object.keys(list).length

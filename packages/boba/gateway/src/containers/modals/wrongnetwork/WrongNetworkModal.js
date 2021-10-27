@@ -51,6 +51,7 @@ function WrongNetworkModal ({ open, onClose }) {
     and multiple layers, e.g. L1 and L2 
   */
 
+  console.log("nw:",nw)
   console.log("WNM masterConfig",masterConfig)
   console.log("WNM networkLayer",networkLayer)
 

@@ -18,7 +18,7 @@ import { Box, Typography, useMediaQuery } from '@material-ui/core'
 
 import { useDispatch } from 'react-redux'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'

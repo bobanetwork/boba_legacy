@@ -16,7 +16,7 @@ limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
 import { Watcher } from '@eth-optimism/core-utils'
-import { ethers, BigNumber, utils, ContractFactory } from 'ethers'
+import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
 import { orderBy } from 'lodash'
@@ -64,7 +64,6 @@ import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Regist
 import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json" 
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
-import Timelock from "../deployment/contracts/Timelock.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -113,7 +112,10 @@ class NetworkService {
     this.L2_TEST_Contract = null
     this.L1_OMG_Contract = null
     this.L2_ETH_Contract = null
+    
     this.ERC721Contract = null
+    this.ERC721RegContract = null
+    
     this.L2TokenPoolContract = null
     this.AtomicSwapContract = null
 
@@ -442,8 +444,6 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1LiquidityPool', 'L1LPAddress'))) return
       if (!(await this.getAddress('Proxy__L2LiquidityPool', 'L2LPAddress'))) return
 
-      if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
-      
       //this.L1Message = addresses.L1Message
       //this.L2Message = addresses.L2Message
       //backwards compat
@@ -510,11 +510,20 @@ class NetworkService {
         this.provider.getSigner()
       )
       
-      // this.ERC721Contract = new ethers.Contract(
-      //   this.ERC721Address,
-      //   L2ERC721Json.abi,
-      //   this.L2Provider
-      // )
+      if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
+      if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
+
+      this.ERC721Contract = new ethers.Contract(
+        allAddresses.L2ERC721Address,
+        L2ERC721Json.abi,
+        this.L2Provider
+      )
+
+      this.ERC721Contract = new ethers.Contract(
+        allAddresses.L2ERC721RegAddress,
+        L2ERC721RegJson.abi,
+        this.L2Provider
+      )
 
       // this.L2TokenPoolContract = new ethers.Contract(
       //   this.L2TokenPoolAddress,
@@ -559,14 +568,11 @@ class NetworkService {
       )
 
       //DAO related
-      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
+      if( masterSystemConfig === 'local' ) {
 
-        if (!(await this.getAddress('Timelock', 'Timelock'))) return
         if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
         if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
         
-        console.log("addresses:",allAddresses)
-
         this.delegateContract = new ethers.Contract(
           allAddresses.GovernorBravoDelegate,
           GovernorBravoDelegate.abi,
@@ -877,7 +883,11 @@ class NetworkService {
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 
-    if(allAddresses.ERC721RegAddress === null) return
+    console.log("scanning for NFTs...")
+
+    if(allAddresses.L2ERC721RegAddress === null) return
+
+    console.log("scanning for NFTs...", allAddresses.L2ERC721RegAddress)
 
     //the current list of contracts we know about
     //based in part on the cache and anything we recently generated in this session
@@ -895,7 +905,7 @@ class NetworkService {
 
     //the Boba NFT registry
     const registry = new ethers.Contract(
-      allAddresses.ERC721RegAddress,
+      allAddresses.L2ERC721RegAddress,
       L2ERC721RegJson.abi,
       this.L2Provider
     )
@@ -975,9 +985,13 @@ class NetworkService {
           this.L2Provider
         )
 
+        console.log("NFT contracts:",contract)
+
         const balance = await contract.connect(
           this.L2Provider
         ).balanceOf(this.account)
+
+        console.log("balance:",balance)
 
         //always the same, no need to have in the loop
         let nftName = await contract.name()
@@ -985,6 +999,8 @@ class NetworkService {
 
         //can have more than 1 per contract
         for (let i = 0; i < Number(balance.toString()); i++) {
+
+          console.log("looking up first NFT:",i)
 
           //Goal here is to get all the tokenIDs, e.g. 3, 7, and 98,
           //based on knowing the user's balance - e.g. three NFTs
@@ -995,40 +1011,21 @@ class NetworkService {
             tokenIndex
           )
 
-          const nftMeta = await contract.getTokenURI(tokenID)
+          const nftMeta = await contract.tokenURI(tokenID)
 
-          const meta = nftMeta.split('#')
-
-          const time = new Date(parseInt(meta[0]))
-
-          const mintedTime = String(
-              time.toLocaleString('en-US', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-              })
-            )
-
+          console.log("nftMeta:",nftMeta)
+         
           const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
+          const { url , attributes = []} = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
-          const { url , attributes = []} = await getNftImageUrl(meta[1])
-
-          // Uncomment Just to test locally
-          // const { url , attributes = []} = await getNftImageUrl('https://boredapeyachtclub.com/api/mutants/111');
-          // const { url , attributes = []} = await getNftImageUrl('ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6190');
-
-          const NFT = {
+          let NFT = {
             UUID,
-            mintedTime,
-            url,
             tokenID,
             name: nftName,
             symbol: nftSymbol,
             address,
-            attributes,
+            url,
+            attributes
           }
 
           await addNFT( NFT )
