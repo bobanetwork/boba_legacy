@@ -9,25 +9,25 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
     string public constant name = "Compound Governor Bravo";
 
     /// @notice The minimum setable proposal threshold
-    uint public constant MIN_PROPOSAL_THRESHOLD = 50000e18; // 50,000 BOBA
+    uint public constant MIN_PROPOSAL_THRESHOLD = 50000e18;  //  50,000 BOBA
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 100000e18; //100,000 BOBA
+    uint public constant MAX_PROPOSAL_THRESHOLD = 500000e18; // 500,000 BOBA
 
     /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 1; // blocks
+    uint public constant MIN_VOTING_PERIOD = 1;     // blocks
 
     /// @notice The max setable voting period
-    uint public constant MAX_VOTING_PERIOD = 80640; // 2 weeks
+    uint public constant MAX_VOTING_PERIOD = 80640; // 2 weeks (14 days * 24 hours * 60 mins * 4 blocks per min)
 
     /// @notice The min setable voting delay
     uint public constant MIN_VOTING_DELAY = 1;
 
-    /// @notice The max setable voting delay (block before proposal goes votable)
+    /// @notice The max setable voting delay (blocks before proposal goes votable)
     uint public constant MAX_VOTING_DELAY = 40320; // 1 week;
 
-    /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 400000e18; // 400,000 BOBA
+    /// @notice The number of votes in support of a proposal required for a quorum to be reached and for a vote to succeed
+    uint public constant quorumVotes = 1000000e18; // 1,000,000 BOBA
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint public constant proposalMaxOperations = 10; // 10 actions
