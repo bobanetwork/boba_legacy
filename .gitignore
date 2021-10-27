@@ -33,3 +33,11 @@ boba_examples/init-fund-l2/yarn.lock
 # regenesis
 packages/regenesis-surgery/deployment
 packages/regenesis-surgery/state-dump
+
+# monitor
+ops_boba/api/watcher-api/env-rinkeby.yml
+ops_boba/api/watcher-api/env-mainnet.yml
+ops_boba/monitor/yarn.lock
+
+# gateway
+packages/boba/gateway/build
