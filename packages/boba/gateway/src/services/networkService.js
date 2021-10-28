@@ -415,11 +415,10 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 
-                                'WBTC',  'REP',  'BAT', 'ZRX',
-                                'SUSHI', 'LINK', 'UNI', /*'BOBA',*/
-                                'OMG',   /*'FRAX', 'FXS'*/ ]
-
+      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC', 
+                                'REP',  'BAT', 'ZRX',  'SUSHI', 
+                                'LINK', 'UNI', 'BOBA', 'OMG',   
+                                'FRAX', 'FXS' ]
 
       await Promise.all(supportedTokens.map(async (key) => {
           
@@ -444,17 +443,6 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1LiquidityPool', 'L1LPAddress'))) return
       if (!(await this.getAddress('Proxy__L2LiquidityPool', 'L2LPAddress'))) return
 
-      //this.L1Message = addresses.L1Message
-      //this.L2Message = addresses.L2Message
-      //backwards compat
-      // if (addresses.hasOwnProperty('L2ERC721'))
-      //   this.ERC721Address = addresses.L2ERC721
-      // //backwards compat
-      // if (addresses.hasOwnProperty('L2ERC721Reg'))
-      //   this.ERC721RegAddress = addresses.L2ERC721Reg
-      // this.L2TokenPoolAddress = addresses.L2TokenPool
-      // this.AtomicSwapAddress = addresses.AtomicSwap
-
       if(allAddresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
           allAddresses.L2StandardBridgeAddress,
@@ -473,14 +461,14 @@ class NetworkService {
 
       /*The test token*/
       this.L1_TEST_Contract = new ethers.Contract(
-        allTokens.SUSHI.L1, //normally, boba
+        allTokens.BOBA.L1, //this will get changed anyway when the contract is used
         L1ERC20Json.abi,
         this.provider.getSigner()
       )
       //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
       this.L2_TEST_Contract = new ethers.Contract(
-        allTokens.SUSHI.L2, //normally, boba
+        allTokens.BOBA.L2, //this will get changed anyway when the contract is used
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
@@ -523,18 +511,6 @@ class NetworkService {
       //   allAddresses.L2ERC721RegAddress,
       //   L2ERC721RegJson.abi,
       //   this.L2Provider
-      // )
-
-      // this.L2TokenPoolContract = new ethers.Contract(
-      //   this.L2TokenPoolAddress,
-      //   L2TokenPoolJson.abi,
-      //   this.provider.getSigner()
-      // )
-
-      // this.AtomicSwapContract = new ethers.Contract(
-      //   this.AtomicSwapAddress,
-      //   AtomicSwapJson.abi,
-      //   this.provider.getSigner()
       // )
 
       this.watcher = new Watcher({
@@ -680,7 +656,6 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     console.log("Getting transactions...")
 
@@ -712,23 +687,17 @@ class NetworkService {
 
     const responseL2 = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    )
-    //console.log("responseL2",responseL2)
-
-    if(typeof(responseL2) === 'undefined') return
-
-    responseL2.post('get.l2.transactions', {
+    ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
       toRange: 1000,
     })
 
+    console.log("responseL2",responseL2)
+
     if (responseL2.status === 201) {
       //add the chain: 'L2' field
       txL2 = responseL2.data.map(v => ({...v, chain: 'L2'}))
-      //console.log("txL2",txL2)
-      //const annotated = await this.parseTransaction( [...txL1, ...txL2] )
-      //return annotated
     }
 
     const responseL1pending = await omgxWatcherAxiosInstance(
@@ -738,6 +707,8 @@ class NetworkService {
       fromRange:  0,
       toRange: 1000,
     })
+
+    console.log("responseL1pending",responseL1pending)
 
     if (responseL1pending.status === 201) {
       //add the chain: 'L1pending' field
@@ -788,10 +759,10 @@ class NetworkService {
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
       }
 
-      // if (to === allTokens.BOBA.L1.toLowerCase()) {
-      //   //console.log("L1 ERC20 Amount Approval")
-      //   return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
-      // }
+      if (to === allTokens.BOBA.L1.toLowerCase()) {
+        //console.log("L1 ERC20 Amount Approval")
+        return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
+      }
 
       if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
         //console.log("L2 Standard Bridge")
@@ -808,10 +779,9 @@ class NetworkService {
       //   return Object.assign({}, item, { typeTX: 'L2 Message' })
       // }
 
-      // if (to === allTokens.BOBA.L2.toLowerCase()) {
-      //   //console.log("L2 TEST Message")
-      //   return Object.assign({}, item, { typeTX: 'L2 TEST Token' })
-      // }
+      if (to === allTokens.BOBA.L2.toLowerCase()) {
+        return Object.assign({}, item, { typeTX: 'L2 Standard Token' })
+      }
 
       if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
         //console.log("L2 ETH Message")
@@ -825,12 +795,10 @@ class NetworkService {
 
       if (item.crossDomainMessage) {
         if(to === allAddresses.L2LPAddress.toLowerCase()) {
-          //console.log("Found EXIT: L2LPAddress")
           return Object.assign({}, item, { typeTX: 'FAST EXIT via L2LP' })
         }
-        else if (to === allTokens.TEST.L2.toLowerCase()) {
-          //console.log("Found EXIT: L2_TEST_Address")
-          return Object.assign({}, item, { typeTX: 'EXIT (TEST Token)' })
+        else if (to === allTokens.BOBA.L2.toLowerCase()) {
+          return Object.assign({}, item, { typeTX: 'xDomain (Standard Token)' })
         }
         else if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
           //console.log("Found EXIT: L2_ETH_Address")
@@ -848,22 +816,20 @@ class NetworkService {
 
   async getExits() {
 
+    console.log("getExits")
+
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    )
-    //console.log("response",response)
-
-    if(typeof(response) === 'undefined') return
-
-    response.post('get.l2.transactions', {
+    ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
       toRange: 1000,
     })
+
+    console.log("getExits:",response)
 
     if (response.status === 201) {
       const transactions = response.data
@@ -871,7 +837,7 @@ class NetworkService {
         (i) =>
           [
             allAddresses.L2LPAddress.toLowerCase(),
-            allTokens.TEST.L2.toLowerCase(),
+            allTokens.BOBA.L2.toLowerCase(),
             allAddresses.L2_ETH_Address.toLowerCase(),
           ].includes(i.to ? i.to.toLowerCase() : null) && i.crossDomainMessage
       )
@@ -883,7 +849,7 @@ class NetworkService {
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
     
-    return
+    return //still need to deploy ERC721 contracts on mainnet
 
     console.log("scanning for NFTs...")
 
