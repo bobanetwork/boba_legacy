@@ -107,6 +107,41 @@ Resources:
           TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
       ListenerArn: !Ref ReplicaL2Listener
 
+
+  VerifierL2Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
+      Port: 8546
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup2
+
+  GoEthereumVerifierLBTargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8546
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "instance"
+
+
+  GoEthereumVerifierLBListenerRule2:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup2
+      ListenerArn: !Ref ReplicaL2Listener2
+
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -140,12 +175,12 @@ Resources:
               Value: true
             - Name: DEPLOYER_HTTP
               Value: !Sub
-                - "https://${EndpointAddress}:8081"
+                - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
               Value: !Sub
-                - "https://${EndpointAddress}:8081/addresses.json"
+                - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_CLIENT_HTTP
@@ -155,7 +190,7 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_STATE_DUMP_PATH
               Value: !Sub
-                - "https://${EndpointAddress}:8081/state-dump.latest.json"
+                - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_ENABLE_L2_GAS_POLLING
@@ -170,6 +205,9 @@ Resources:
               Value: true
             - Name: ETH1_CONFIRMATION_DEPTH
               Value: 0
+          EntryPoint:
+            - "sh"
+            - "./geth.sh"
           MountPoints:
             - ContainerPath: "/root/.ethereum"
               SourceVolume: l2-node

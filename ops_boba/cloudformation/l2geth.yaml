@@ -87,7 +87,7 @@ Resources:
           - "${DomainName}."
           - DomainName:
               Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-      Name:
+     Name:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
 
   GoEthereumLBTargetGroup:
@@ -170,7 +170,7 @@ Resources:
           Environment:
             - Name: DEPLOYER_HTTP
               Value: !Sub
-                - "https://${EndpointAddress}:8081"
+                - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
@@ -188,6 +188,11 @@ Resources:
                 - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+            - Name: VERBOSITY
+              Value: "6"
+          EntryPoint:
+            - "sh"
+            - "./geth.sh"
           MountPoints:
             - ContainerPath: "/root/.ethereum"
               SourceVolume: l2-node

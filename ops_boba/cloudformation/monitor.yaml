@@ -90,7 +90,6 @@ Resources:
                 - "http://${EndpointAddress}:8081/boba-addr.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
-
           DockerLabels:
             com.datadoghq.ad.check_names: '["monitor"]'
             com.datadoghq.ad.init_configs: '[{}]'

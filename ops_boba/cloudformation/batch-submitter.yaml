@@ -100,6 +100,7 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "batch_submitter", "service": "batch_submitter"}]'
           Essential: true
           Memory: "300"
+          EntryPoint: "./batches.sh"
           LogConfiguration:
             LogDriver: json-file
             Options:
