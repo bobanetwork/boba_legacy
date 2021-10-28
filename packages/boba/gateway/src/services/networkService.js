@@ -1671,7 +1671,7 @@ class NetworkService {
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
-      console.log(tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals)
+      //console.log(tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
