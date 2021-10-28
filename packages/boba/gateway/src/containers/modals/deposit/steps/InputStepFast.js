@@ -55,6 +55,8 @@ function InputStepFast({ handleClose, token }) {
   const lookupPrice = useSelector(selectLookupPrice)
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
+  const allAddresses = networkService.getAllAddresses()
+
   const maxValue = logAmount(token.balance, token.decimals)
 
   function setAmount(value) {
@@ -105,12 +107,14 @@ function InputStepFast({ handleClose, token }) {
       approveERC20(
         value_Wei_String,
         token.address,
-        networkService.L1LPAddress
+        allAddresses.L1LPAddress
       )
     )
 
-    if(!res) {
-      dispatch(openError('Failed to approve amount'))
+    if(res === false) {
+      dispatch(openError('Failed to approve amount or user rejected signature'))
+      handleClose()
+      return
     }
 
     res = await dispatch(
