@@ -34,6 +34,8 @@ import * as S from './History.styles';
 
 const PER_PAGE = 8
 
+const allAddresses = networkService.getAllAddresses()
+
 function Exits({ searchHistory, transactions, chainLink }) {
 
   const [page, setPage] = useState(1)
@@ -82,7 +84,7 @@ function Exits({ searchHistory, transactions, chainLink }) {
     }
 
     //are we dealing with a traditional exit?
-    if (to === networkService.L2StandardBridgeAddress.toLowerCase()) {
+    if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
 
       isExitable = moment().isAfter(moment.unix(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime))
 

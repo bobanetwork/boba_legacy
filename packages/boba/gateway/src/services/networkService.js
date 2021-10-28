@@ -1402,7 +1402,7 @@ class NetworkService {
         this.account,
         approveContractAddress
       )
-      console.log("Allowance:",allowance_BN)
+      console.log("Initial Allowance is:",allowance_BN)
 
       /* OMG IS A SPECIAL CASE - allowance needs to be
       set to zero, and then set to actual amount */
@@ -1424,10 +1424,13 @@ class NetworkService {
         this.account,
         approveContractAddress
       )
+      console.log("Second Allowance is:",allowance_BN)
 
       const allowed = allowance_BN.gte(BigNumber.from(value_Wei_String))
 
+      console.log("Allowed?:",allowed)
       if(!allowed) {
+        console.log("Not good enough - need to set to:",value_Wei_String)
         //and now, the normal allowance transaction
         const approveStatus = await ERC20Contract.approve(
           approveContractAddress,
@@ -1905,12 +1908,17 @@ class NetworkService {
   async depositL1LP(currency, value_Wei_String) {
 
     updateSignatureStatus_depositLP(false)
+    
+    console.log("depositL1LP:",currency)
+    console.log("value_Wei_String",value_Wei_String)
 
     const depositTX = await this.L1LPContract.clientDepositL1(
       value_Wei_String,
       currency,
       currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
     )
+
+    console.log("depositTX",depositTX)
 
     //at this point the tx has been submitted, and we are waiting...
     await depositTX.wait()

@@ -13,37 +13,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from 'services/networkService';
+import networkService from 'services/networkService'
+
+const allAddresses = networkService.getAllAddresses()
 
 const initialState = {
   totalFeeRate: 0,
   userRewardFeeRate: 0,
   poolInfo: {
     L1LP: {
-      [networkService.L1_ETH_Address]: {},
+      [allAddresses.L1_ETH_Address]: {},
     },
     L2LP: {
-      [networkService.L2_ETH_Address]: {},
+      [allAddresses.L2_ETH_Address]: {},
     }
   },
   userInfo: {
     L1LP: {
-      [networkService.L1_ETH_Address]: {},
+      [allAddresses.L1_ETH_Address]: {},
     },
     L2LP: {
-      [networkService.L2_ETH_Address]: {},
+      [allAddresses.L2_ETH_Address]: {},
     }
   },
   stakeToken: {
     symbol: "ETH",
-    currency: networkService.L1_ETH_Address,
-    LPAddress: networkService.L1LPAddress,
+    currency: allAddresses.L1_ETH_Address,
+    LPAddress: allAddresses.L1LPAddress,
     L1orL2Pool: 'L1LP'
   },
   withdrawToken: {
     symbol: "ETH",
-    currency: networkService.L1_ETH_Address,
-    LPAddress: networkService.L1LPAddress,
+    currency: allAddresses.L1_ETH_Address,
+    LPAddress: allAddresses.L1LPAddress,
     L1orL2Pool: 'L1LP'
   }
 };

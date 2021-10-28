@@ -55,6 +55,8 @@ function InputStepFast({ handleClose, token }) {
   const lookupPrice = useSelector(selectLookupPrice)
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
+  const allAddresses = networkService.getAllAddresses()
+
   const maxValue = logAmount(token.balance, token.decimals)
 
   function setAmount(value) {
@@ -101,11 +103,16 @@ function InputStepFast({ handleClose, token }) {
     //at this point we know it's not ETH
     console.log("ERC20 Fast Bridge")
 
+    console.log(value_Wei_String)
+    console.log(token.address)
+    console.log(allAddresses.L1LPAddress)
+
     res = await dispatch(
       approveERC20(
         value_Wei_String,
         token.address,
-        networkService.L1LPAddress
+        allAddresses.L1LPAddress
+        //networkService.L1LPAddress
       )
     )
 
@@ -113,6 +120,8 @@ function InputStepFast({ handleClose, token }) {
       dispatch(openError('Failed to approve amount'))
     }
 
+    console.log("calling depositL1LP(token.address, value_Wei_String)")
+    
     res = await dispatch(
       depositL1LP(token.address, value_Wei_String)
     )
