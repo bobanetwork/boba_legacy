@@ -16,6 +16,7 @@ export default function omgxWatcherAxiosInstance(masterSystemConfig){
     })
   }
   else if (masterSystemConfig === 'mainnet') {
+
     if(nw.mainnet.OMGX_WATCHER_URL === null) return
     axiosInstance = axios.create({
       baseURL: nw.mainnet.OMGX_WATCHER_URL,

@@ -60,7 +60,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         name: "BOBA L2",
         chainId: 288,
         chainIdHex: '0x120',
-        rpcUrl: `http://34.230.75.39:8545`,
+        rpcUrl: `https://mainnet.boba.network`,
         blockExplorer: `https://blockexplorer.boba.network/`,
         transaction: `https://blockexplorer.boba.network/tx/`,
       }
