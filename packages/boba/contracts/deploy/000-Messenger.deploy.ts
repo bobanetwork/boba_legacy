@@ -83,7 +83,7 @@ const deployFn: DeployFunction = async (hre) => {
     abi: L1_MessengerJson.abi,
   }
 
-  await registerBobaAddress(addressManager, 'OVM_L1CrossDomainMessengerFast', L1_Messenger.address)
+  await registerBobaAddress(addressManager, 'L1CrossDomainMessengerFast', L1_Messenger.address)
   await hre.deployments.save('L1CrossDomainMessengerFast',L1_MessengerDeploymentSubmission)
   console.log(`L1CrossDomainMessengerFast deployed to: ${L1_Messenger.address}`)
 

@@ -31,7 +31,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   Proxy_L1_Messenger = await Factory__Proxy_L1_Messenger.deploy(
     addressManager.address,
-    'OVM_L1CrossDomainMessengerFast'
+    'L1CrossDomainMessengerFast'
   )
 
   await Proxy_L1_Messenger.deployTransaction.wait()
