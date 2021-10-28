@@ -47,7 +47,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
       MM_Label:         `Mainnet`,
-      addressManager:   `CHANGE_ME`, 
+      addressManager:   `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`, 
       L1: {
         name: "Mainnet",
         chainId: 1,
@@ -60,7 +60,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         name: "BOBA L2",
         chainId: 288,
         chainIdHex: '0x120',
-        rpcUrl: `https://mainnet.boba.network`,
+        rpcUrl: `http://34.230.75.39:8545`,
         blockExplorer: `https://blockexplorer.boba.network/`,
         transaction: `https://blockexplorer.boba.network/tx/`,
       }

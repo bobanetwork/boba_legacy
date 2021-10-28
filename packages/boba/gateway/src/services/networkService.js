@@ -417,7 +417,7 @@ class NetworkService {
 
       const supportedTokens = [ 'USDT', 'DAI', 'USDC', 
                                 'WBTC',  'REP',  'BAT', 'ZRX',
-                                'SUSHI', 'LINK', 'UNI', 'BOBA',
+                                'SUSHI', 'LINK', 'UNI', /*'BOBA',*/
                                 'OMG',   /*'FRAX', 'FXS'*/ ]
 
 
@@ -473,14 +473,14 @@ class NetworkService {
 
       /*The test token*/
       this.L1_TEST_Contract = new ethers.Contract(
-        allTokens.BOBA.L1,
+        allTokens.SUSHI.L1, //normally, boba
         L1ERC20Json.abi,
         this.provider.getSigner()
       )
       //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
       this.L2_TEST_Contract = new ethers.Contract(
-        allTokens.BOBA.L2,
+        allTokens.SUSHI.L2, //normally, boba
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
@@ -510,20 +510,20 @@ class NetworkService {
         this.provider.getSigner()
       )
       
-      if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
-      if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
+      // if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
+      // if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
 
-      this.ERC721Contract = new ethers.Contract(
-        allAddresses.L2ERC721Address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
+      // this.ERC721Contract = new ethers.Contract(
+      //   allAddresses.L2ERC721Address,
+      //   L2ERC721Json.abi,
+      //   this.L2Provider
+      // )
 
-      this.ERC721Contract = new ethers.Contract(
-        allAddresses.L2ERC721RegAddress,
-        L2ERC721RegJson.abi,
-        this.L2Provider
-      )
+      // this.ERC721Contract = new ethers.Contract(
+      //   allAddresses.L2ERC721RegAddress,
+      //   L2ERC721RegJson.abi,
+      //   this.L2Provider
+      // )
 
       // this.L2TokenPoolContract = new ethers.Contract(
       //   this.L2TokenPoolAddress,
@@ -559,13 +559,13 @@ class NetworkService {
         },
       })
 
-      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      //console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
       
-      this.BobaContract = new ethers.Contract(
-        allTokens.BOBA.L2,
-        Boba.abi,
-        this.provider.getSigner()
-      )
+      // this.BobaContract = new ethers.Contract(
+      //   allTokens.BOBA.L2,
+      //   Boba.abi,
+      //   this.provider.getSigner()
+      // )
 
       //DAO related
       if( masterSystemConfig === 'local' ) {
@@ -788,10 +788,10 @@ class NetworkService {
         return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
       }
 
-      if (to === allTokens.BOBA.L1.toLowerCase()) {
-        //console.log("L1 ERC20 Amount Approval")
-        return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
-      }
+      // if (to === allTokens.BOBA.L1.toLowerCase()) {
+      //   //console.log("L1 ERC20 Amount Approval")
+      //   return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
+      // }
 
       if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
         //console.log("L2 Standard Bridge")
@@ -808,10 +808,10 @@ class NetworkService {
       //   return Object.assign({}, item, { typeTX: 'L2 Message' })
       // }
 
-      if (to === allTokens.BOBA.L2.toLowerCase()) {
-        //console.log("L2 TEST Message")
-        return Object.assign({}, item, { typeTX: 'L2 TEST Token' })
-      }
+      // if (to === allTokens.BOBA.L2.toLowerCase()) {
+      //   //console.log("L2 TEST Message")
+      //   return Object.assign({}, item, { typeTX: 'L2 TEST Token' })
+      // }
 
       if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
         //console.log("L2 ETH Message")
@@ -882,6 +882,8 @@ class NetworkService {
 
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
+    
+    return
 
     console.log("scanning for NFTs...")
 
