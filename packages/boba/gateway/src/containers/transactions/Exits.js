@@ -34,8 +34,6 @@ import * as S from './History.styles';
 
 const PER_PAGE = 8
 
-const allAddresses = networkService.getAllAddresses()
-
 function Exits({ searchHistory, transactions, chainLink }) {
 
   const [page, setPage] = useState(1)

@@ -1,14 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { openModal } from 'actions/uiAction'
 import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
 import * as S from './NetworkSwitcher.styles.js'
 
 import { selectNetwork } from 'selectors/setupSelector'
-import { setNetwork } from 'actions/setupAction'
-import { getAllNetworks } from 'util/masterConfig'
 import { Typography } from '@material-ui/core'
-import networkService from 'services/networkService'
 import WrongNetworkModal from 'containers/modals/wrongnetwork/WrongNetworkModal'
 import { selectModalState } from 'selectors/uiSelector'
 
@@ -22,24 +19,6 @@ function NetworkSwitcher({ walletEnabled }) {
 
   const [ wrongNetwork, setWrongNetwork ] = useState(false)
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
-
-  // // defines the set of possible networks
-  // const networks = getAllNetworks()
-
-  // let allNetworks = []
-  // for (var prop in networks) allNetworks.push(prop)
-
-  // const dispatchSetNetwork = useCallback((network) => {
-  //   dispatch(setNetwork(network))
-
-  //   async function initializeAccounts () {
-  //     const initialized = await networkService.initializeAccounts(network);
-  //     if (initialized === 'wrongnetwork') {
-  //       return setWrongNetwork(true)
-  //     }
-  //   }
-  //   initializeAccounts()
-  // }, [ dispatch ])
 
   useEffect(() => {
     if (wrongNetwork) {
