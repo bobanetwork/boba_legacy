@@ -1964,14 +1964,14 @@ class NetworkService {
       currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
     )
 
-    const despositGas_BN = await this.L2Provider.estimateGas(tx2)
-    console.log("Fast exit gas", despositGas_BN.toString())
+    const depositGas_BN = await this.L2Provider.estimateGas(tx2)
+    console.log("Fast exit gas", depositGas_BN.toString())
 
-    const despositCost_BN = despositGas_BN.mul(gasPrice)
-    console.log("Fast exit cost (ETH)", utils.formatEther(despositCost_BN))
+    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    console.log("Fast exit cost (ETH)", utils.formatEther(depositCost_BN))
     
     //returns total cost in ETH
-    return utils.formatEther(despositCost_BN.add(approvalCost_BN))
+    return utils.formatEther(depositCost_BN.add(approvalCost_BN))
   }
 
   /**************************************************************/
@@ -2046,15 +2046,15 @@ class NetworkService {
     )
     //console.log("tx2",tx2)
 
-    let despositGas_BN = await this.L2Provider.estimateGas(tx2)
+    let depositGas_BN = await this.L2Provider.estimateGas(tx2)
     
     //returns 94082, which is too low?
     //add 40...
     //BUG BUG BUG - this should not be needed
-    despositGas_BN = despositGas_BN.add('40')
+    depositGas_BN = depositGas_BN.add('40')
 
-    console.log("Deposit gas", despositGas_BN.toString())
-    let depositCost_BN = despositGas_BN.mul(gasPrice)
+    console.log("Deposit gas", depositGas_BN.toString())
+    let depositCost_BN = depositGas_BN.mul(gasPrice)
     console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
 
     if(currencyAddress === allAddresses.L2_ETH_Address) {
