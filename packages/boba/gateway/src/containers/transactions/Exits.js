@@ -82,7 +82,7 @@ function Exits({ searchHistory, transactions, chainLink }) {
     }
 
     //are we dealing with a traditional exit?
-    if (to === networkService.L2StandardBridgeAddress.toLowerCase()) {
+    if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
 
       isExitable = moment().isAfter(moment.unix(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime))
 

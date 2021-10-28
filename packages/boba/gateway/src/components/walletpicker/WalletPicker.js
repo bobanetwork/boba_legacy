@@ -38,6 +38,8 @@ import Typography from '@material-ui/core/Typography'
 import { styled } from '@material-ui/core/styles'
 import { useTheme } from '@emotion/react'
 
+require('dotenv').config()
+
 const Root = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(10),
@@ -58,7 +60,13 @@ function WalletPicker ({ onEnable, enabled }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
-  
+
+  let maintenance = false
+
+  if (process.env.REACT_APP_STATUS === 'maintenance' ) {
+      maintenance = true
+  } 
+
   const dispatchSetWalletMethod = useCallback((methodName) => {
     dispatch(setWalletMethod(methodName));
   }, [ dispatch ])
@@ -141,42 +149,60 @@ function WalletPicker ({ onEnable, enabled }) {
         onClose={resetSelection}
       />
       <Root>
+        {!maintenance && 
+          <Container maxWidth="md">
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h1" component="h1">
+                  Connect a Wallet to access BOBA
+                </Typography>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                    Select a wallet to connect to BOBA
+                </S.Subtitle>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <S.WalletCard
+                  // disabled={!browserEnabled}
+                  pulsate={true} onClick={()=>dispatchSetWalletMethod('browser')} isMobile={isMobile}>
+                  <S.WalletCardHeading>
+                    <S.WalletCardTitle>
+                      <S.PlusIcon>+</S.PlusIcon>
+                      <Typography variant="h2" component="h2" paragraph={true} mb={0}>
+                        Metamask
+                      </Typography>
+                    </S.WalletCardTitle>
+                    <Typography variant="body1" component="p" gutterBottom paragraph={true} mb={0}>
+                      Connect using <strong>browser </strong>wallet
+                    </Typography>
+                  </S.WalletCardHeading>
+
+                  <S.WalletCardDescription>
+                    <Fox width={isMobile ? 100 : 50} />
+                  </S.WalletCardDescription>
+                </S.WalletCard>
+              </Grid>
+            </Grid>
+          </Container>
+       }
+       {!!maintenance && 
         <Container maxWidth="md">
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={12}>
               <Typography variant="h1" component="h1">
-                Connect a Wallet to access BOBA
+                SCHEDULED BOBA DOWNTIME 
               </Typography>
               <S.Subtitle variant="body1" component="p" paragraph={true}>
-                  Select a wallet to connect to BOBA
+                As announced in Twitter and in Telegram, BOBA is being upgraded to v2.
               </S.Subtitle>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <S.WalletCard
-                // disabled={!browserEnabled}
-                pulsate={true} onClick={()=>dispatchSetWalletMethod('browser')} isMobile={isMobile}>
-                <S.WalletCardHeading>
-                  <S.WalletCardTitle>
-                    <S.PlusIcon>+</S.PlusIcon>
-                    <Typography variant="h2" component="h2" paragraph={true} mb={0}>
-                      Metamask
-                    </Typography>
-                  </S.WalletCardTitle>
-                  <Typography variant="body1" component="p" gutterBottom paragraph={true} mb={0}>
-                    Connect using <strong>browser </strong>wallet
-                  </Typography>
-                </S.WalletCardHeading>
-
-                <S.WalletCardDescription>
-                  <Fox width={isMobile ? 100 : 50} />
-                </S.WalletCardDescription>
-
-              </S.WalletCard>
-
+              <S.Subtitle variant="body1" component="p" paragraph={true}>
+                The scheduled upgrade window is from Oct. 28 00:00 UTC to approximately 12:00 UTC. 
+                Upgrade status and progress reports will be provided via Twitter and Telegram.
+              </S.Subtitle>
             </Grid>
           </Grid>
         </Container>
+       }
       </Root>
     </>
   );
