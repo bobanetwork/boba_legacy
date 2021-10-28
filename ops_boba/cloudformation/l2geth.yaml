@@ -87,7 +87,7 @@ Resources:
           - "${DomainName}."
           - DomainName:
               Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-     Name:
+      Name:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
 
   GoEthereumLBTargetGroup:
