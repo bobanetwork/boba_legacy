@@ -68,7 +68,7 @@ function InputStep({ handleClose, token }) {
     }
     if (res) {
       dispatch(setActiveHistoryTab1('Bridge to L2'))
-      handleClose();
+      handleClose()
     }
 
   }
