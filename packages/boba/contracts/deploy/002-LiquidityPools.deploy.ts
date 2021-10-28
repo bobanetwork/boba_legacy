@@ -24,35 +24,35 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l1
   )
 
-  Factory__L2LiquidityPool = new ContractFactory(
-    L2LiquidityPoolJson.abi,
-    L2LiquidityPoolJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
+  // Factory__L2LiquidityPool = new ContractFactory(
+  //   L2LiquidityPoolJson.abi,
+  //   L2LiquidityPoolJson.bytecode,
+  //   (hre as any).deployConfig.deployer_l2
+  // )
 
-  console.log(`Deploying L2LP...`)
+  // console.log(`Deploying L2LP...`)
 
-  L2LiquidityPool = await Factory__L2LiquidityPool.deploy()
+  // L2LiquidityPool = await Factory__L2LiquidityPool.deploy()
 
-  await L2LiquidityPool.deployTransaction.wait()
+  // await L2LiquidityPool.deployTransaction.wait()
 
-  const L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
-    ...L2LiquidityPool,
-    receipt: L2LiquidityPool.receipt,
-    address: L2LiquidityPool.address,
-    abi: L1LiquidityPoolJson.abi,
-  }
+  // const L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
+  //   ...L2LiquidityPool,
+  //   receipt: L2LiquidityPool.receipt,
+  //   address: L2LiquidityPool.address,
+  //   abi: L1LiquidityPoolJson.abi,
+  // }
 
-  await registerBobaAddress(
-    addressManager,
-    'L2LiquidityPool',
-    L2LiquidityPool.address
-  )
-  await hre.deployments.save(
-    'L2LiquidityPool',
-    L2LiquidityPoolDeploymentSubmission
-  )
-  console.log(`L2LiquidityPool deployed to: ${L2LiquidityPool.address}`)
+  // await registerBobaAddress(
+  //   addressManager,
+  //   'L2LiquidityPool',
+  //   L2LiquidityPool.address
+  // )
+  // await hre.deployments.save(
+  //   'L2LiquidityPool',
+  //   L2LiquidityPoolDeploymentSubmission
+  // )
+  // console.log(`L2LiquidityPool deployed to: ${L2LiquidityPool.address}`)
 
   console.log(`Deploying L1LP...`)
   L1LiquidityPool = await Factory__L1LiquidityPool.deploy()
