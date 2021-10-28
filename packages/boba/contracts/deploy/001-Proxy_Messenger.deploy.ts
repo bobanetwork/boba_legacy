@@ -38,13 +38,13 @@ const deployFn: DeployFunction = async (hre) => {
 
   const Proxy_L1_MessengerDeploymentSubmission: DeploymentSubmission = {
     ...Proxy_L1_Messenger,
-    receipt: Proxy_L1_Messenger.receipt, 
+    receipt: Proxy_L1_Messenger.receipt,
     address: Proxy_L1_Messenger.address,
     abi: Proxy_L1_Messenger.abi,
   }
-  
+
   await registerBobaAddress( addressManager, 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_Messenger.address )
-  await hre.deployments.save( 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_MessengerDeploymentSubmission ) 
+  await hre.deployments.save( 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_MessengerDeploymentSubmission )
   console.log(`Proxy__L1CrossDomainMessengerFast deployed to: ${Proxy_L1_Messenger.address}`)
 
   const Proxy_L1_Messenger_Deployed = Factory__L1_Messenger.attach(
