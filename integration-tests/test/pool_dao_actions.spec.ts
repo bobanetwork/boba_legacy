@@ -31,6 +31,7 @@ describe('Dao Action Test', async () => {
   let Governor: Contract
 
   let L2StandardBridgeAddress
+  let quorumVotesPlus
 
   let initialL1LPUserRewardFeeRate
   let initialL1LPOwnerRewardFeeRate
@@ -140,10 +141,12 @@ describe('Dao Action Test', async () => {
 
     const L2Balance = await L2Boba.balanceOf(env.l2Wallet.address)
 
-    if (L2Balance.lt(utils.parseEther('500000'))) {
+    quorumVotesPlus = (await Governor.quorumVotes()).add(utils.parseEther('100000'))
+
+    if (L2Balance.lt(quorumVotesPlus)) {
       const approveL1BobaTX = await L1Boba.approve(
         L1StandardBridge.address,
-        utils.parseEther('500000')
+        quorumVotesPlus
       )
       await approveL1BobaTX.wait()
 
@@ -151,7 +154,7 @@ describe('Dao Action Test', async () => {
         env.l1Bridge.depositERC20(
           L1Boba.address,
           L2Boba.address,
-          utils.parseEther('500000'),
+          quorumVotesPlus,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
         ),
@@ -173,7 +176,7 @@ describe('Dao Action Test', async () => {
       const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
       expect(updatedDelegate).to.eq(env.l2Wallet.address)
       const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(BigNumber.from(utils.parseEther('500000')))
+      expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
     })
 
     it('should create a new proposal to configure fee', async () => {
