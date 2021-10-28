@@ -15,13 +15,15 @@ limitations under the License. */
 
 import networkService from "services/networkService";
 
-//import { WebWalletError } from 'services/errorService';
-
 export function createAction (key, asyncAction) {
   return async function (dispatch) {
     dispatch({ type: `${key}/REQUEST` });
     try {
       const response = await asyncAction();
+
+      if(response === false ) {
+        return false
+      }
 
       //deal with metamask errors
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
@@ -34,6 +36,7 @@ export function createAction (key, asyncAction) {
         dispatch({ type: `${key}/ERROR` })
         return false
       }
+
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
     } catch (error) {
