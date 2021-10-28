@@ -78,11 +78,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L1_MessengerDeploymentSubmission: DeploymentSubmission = {
     ...L1_Messenger,
-    receipt: L1_Messenger.receipt, 
+    receipt: L1_Messenger.receipt,
     address: L1_Messenger.address,
     abi: L1_MessengerJson.abi,
   }
-  
+
   await registerBobaAddress(addressManager, 'L1CrossDomainMessengerFast', L1_Messenger.address)
   await hre.deployments.save('L1CrossDomainMessengerFast',L1_MessengerDeploymentSubmission)
   console.log(`L1CrossDomainMessengerFast deployed to: ${L1_Messenger.address}`)
