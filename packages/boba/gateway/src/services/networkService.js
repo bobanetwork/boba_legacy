@@ -418,7 +418,8 @@ class NetworkService {
       const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC', 
                                 'REP',  'BAT', 'ZRX',  'SUSHI', 
                                 'LINK', 'UNI', 'BOBA', 'OMG',   
-                                'FRAX', 'FXS' ]
+                                'FRAX', 'FXS', 'DODO'
+                              ]
 
       await Promise.all(supportedTokens.map(async (key) => {
           
@@ -714,109 +715,94 @@ class NetworkService {
       //add the chain: 'L1pending' field
       txL1pending = responseL1pending.data.map(v => ({...v, chain: 'L1pending'}))
       //console.log("txL1pending",txL1pending)
-      const annotated = await this.parseTransaction(
+      const annotated = //await this.parseTransaction(
         [
           ...txL1,
           ...txL2,
           ...txL1pending //the new data product
         ]
-      )
+      //)
       //console.log("annotated:",annotated)
       return annotated
     }
 
   }
 
-  /* Where possible, annotate the transactions
-  based on contract addresses */
-  async parseTransaction( transactions ) {
+  // /* Where possible, annotate the transactions
+  // based on contract addresses */
+  // async parseTransaction( transactions ) {
 
-    // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+  //   // NOT SUPPORTED on LOCAL
+  //   if (this.masterSystemConfig === 'local') return
 
-    var annotatedTX = transactions.map(item => {
+  //   var annotatedTX = transactions.map(item => {
 
-      let to = item.to
+  //     let to = item.to
 
-      if ( to === null || to === '') {
-        return item
-      }
+  //     if ( to === null || to === '') {
+  //       return item
+  //     }
 
-      to = to.toLowerCase()
+  //     to = to.toLowerCase()
 
-      if (to === allAddresses.L2LPAddress.toLowerCase()) {
-        //console.log("L2->L1 Swap Off")
-        return Object.assign({}, item, { typeTX: 'Fast Bridge to L1' })
-      }
+  //     if (to === allAddresses.L2LPAddress.toLowerCase()) {
+  //       //console.log("L2->L1 Swap Off")
+  //       return Object.assign({}, item, { typeTX: 'Fast Bridge to L1' })
+  //     }
 
-      if (to === allAddresses.L1LPAddress.toLowerCase()) {
-        //console.log("L1->L2 Swap On")
-        return Object.assign({}, item, { typeTX: 'Fast Bridge to L2' })
-      }
+  //     if (to === allAddresses.L1LPAddress.toLowerCase()) {
+  //       //console.log("L1->L2 Swap On")
+  //       return Object.assign({}, item, { typeTX: 'Fast Bridge to L2' })
+  //     }
 
-      if (to === allAddresses.L1StandardBridgeAddress.toLowerCase()) {
-        //console.log("L1->L2 Traditional Deposit")
-        return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
-      }
+  //     if (to === allAddresses.L1StandardBridgeAddress.toLowerCase()) {
+  //       //console.log("L1->L2 Traditional Deposit")
+  //       return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
+  //     }
 
-      if (to === allTokens.BOBA.L1.toLowerCase()) {
-        //console.log("L1 ERC20 Amount Approval")
-        return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
-      }
+  //     if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
+  //       //console.log("L2 Standard Bridge")
+  //       return Object.assign({}, item, { typeTX: 'Classic Bridge to L1' })
+  //     }
 
-      if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
-        //console.log("L2 Standard Bridge")
-        return Object.assign({}, item, { typeTX: 'Classic Bridge to L1' })
-      }
+  //     if (to === allTokens.BOBA.L1.toLowerCase()) {
+  //       //console.log("L1 ERC20 Amount Approval")
+  //       return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
+  //     }
 
-      // if (to === this.L1Message.toLowerCase()) {
-      //   //console.log("L1 Message")
-      //   return Object.assign({}, item, { typeTX: 'L1 Message' })
-      // }
+  //     if (to === allTokens.BOBA.L2.toLowerCase()) {
+  //       return Object.assign({}, item, { typeTX: 'L2 Standard Token' })
+  //     }
 
-      // if (to === this.L2Message.toLowerCase()) {
-      //   //console.log("L2 Message")
-      //   return Object.assign({}, item, { typeTX: 'L2 Message' })
-      // }
+  //     if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
+  //       //console.log("L2 ETH Message")
+  //       return Object.assign({}, item, { typeTX: 'L2 ETH Ops (such as a L2->L2 Transfer)' })
+  //     }
 
-      if (to === allTokens.BOBA.L2.toLowerCase()) {
-        return Object.assign({}, item, { typeTX: 'L2 Standard Token' })
-      }
+  //     if (item.crossDomainMessage) {
+  //       if(to === allAddresses.L2LPAddress.toLowerCase()) {
+  //         return Object.assign({}, item, { typeTX: 'FAST EXIT via L2LP' })
+  //       }
+  //       else if (to === allTokens.BOBA.L2.toLowerCase()) {
+  //         return Object.assign({}, item, { typeTX: 'xDomain (Standard Token)' })
+  //       }
+  //       else if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
+  //         //console.log("Found EXIT: L2_ETH_Address")
+  //         return Object.assign({}, item, { typeTX: 'EXIT ETH' })
+  //       }
+  //     }
 
-      if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
-        //console.log("L2 ETH Message")
-        return Object.assign({}, item, { typeTX: 'L2 ETH Ops (such as a L2->L2 Transfer)' })
-      }
+  //     return Object.assign({}, item, { typeTX: 'Approval/Other (' + to + ')' })
 
-      // if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
-      //   //console.log("L2 ETH Message")
-      //   return Object.assign({}, item, { typeTX: 'L2 ETH Token' })
-      // }
+  //   }) //map
 
-      if (item.crossDomainMessage) {
-        if(to === allAddresses.L2LPAddress.toLowerCase()) {
-          return Object.assign({}, item, { typeTX: 'FAST EXIT via L2LP' })
-        }
-        else if (to === allTokens.BOBA.L2.toLowerCase()) {
-          return Object.assign({}, item, { typeTX: 'xDomain (Standard Token)' })
-        }
-        else if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
-          //console.log("Found EXIT: L2_ETH_Address")
-          return Object.assign({}, item, { typeTX: 'EXIT ETH' })
-        }
-      }
+  //   return annotatedTX
 
-      return Object.assign({}, item, { typeTX: 'Approval/Other (' + to + ')' })
-
-    }) //map
-
-    return annotatedTX
-
-  }
+  // }
 
   async getExits() {
 
-    console.log("getExits")
+    console.log("getExits()")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -829,17 +815,11 @@ class NetworkService {
       toRange: 1000,
     })
 
-    console.log("getExits:",response)
-
     if (response.status === 201) {
       const transactions = response.data
+      console.log(transactions)
       const filteredTransactions = transactions.filter(
-        (i) =>
-          [
-            allAddresses.L2LPAddress.toLowerCase(),
-            allTokens.BOBA.L2.toLowerCase(),
-            allAddresses.L2_ETH_Address.toLowerCase(),
-          ].includes(i.to ? i.to.toLowerCase() : null) && i.crossDomainMessage
+        (i) => i.exitL2 && i.crossDomainMessage
       )
       return { exited: filteredTransactions }
     }
@@ -2083,6 +2063,7 @@ class NetworkService {
     }
 
     const ccBal = await this.L2Provider.getBalance(this.account)
+
     console.log("Balance:", utils.formatEther(ccBal))
     console.log("Cost to exit:", utils.formatEther(depositCost_BN))
     console.log("Amount to exit:", utils.formatEther(balance_BN))
@@ -2189,13 +2170,6 @@ class NetworkService {
   /***********************************************/
   /*****         DAO Functions               *****/
   /***********************************************/
-
-/*
-const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
-
-await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
-
-*/
 
   // get DAO Balance
   async getDaoBalance() {

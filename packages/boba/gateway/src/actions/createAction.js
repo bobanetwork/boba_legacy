@@ -21,7 +21,7 @@ export function createAction (key, asyncAction) {
     try {
       const response = await asyncAction();
 
-      if(response === false ) {
+      if( response === false ) {
         return false
       }
 
