@@ -60,11 +60,6 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/bath-submitter.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-  BatchSubmitterLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 7
-      LogGroupName: !Sub "/omgx/${EnvironmentName}/batch-submitter/${ImageTag}"
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -81,7 +76,7 @@ Resources:
           Environment:
             - Name: URL
               Value: !Sub
-                - "https://${EndpointAddress}:8081/addresses.json"
+                - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: L2_NODE_WEB3_URL
@@ -91,7 +86,7 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DEPLOYER_HTTP
               Value: !Sub
-                - "https://${EndpointAddress}:8081"
+                - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
           DockerLabels:
@@ -100,7 +95,8 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "batch_submitter", "service": "batch_submitter"}]'
           Essential: true
           Memory: "300"
-          EntryPoint: "./batches.sh"
+          EntryPoint:
+            - "./batches.sh"
           LogConfiguration:
             LogDriver: json-file
             Options:
