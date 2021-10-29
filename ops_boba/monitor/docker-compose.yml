@@ -24,7 +24,6 @@ services:
       PROPOSER_ADDRESS: ${PROPOSER_ADDRESS}
       FAST_RELAYER_ADDRESS: ${FAST_RELAYER_ADDRESS}
       MONITORING_RECONNECT_SECS: ${MONITORING_RECONNECT_SECS}
-      MONITORING_HANG_TIMEOUT_MINS: ${MONITORING_HANG_TIMEOUT_MINS}
     labels:
       - "com.datadoghq.tags.env=production"
       - "com.datadoghq.tags.service=boba-monitor"
