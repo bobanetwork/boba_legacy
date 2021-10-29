@@ -55,3 +55,8 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `DEPLOYER_PRIVATE_KEY` | Yes | N/A | Private key for an account on Layer 1 (Ethereum) to be used to deploy contracts. |
 | `TRANSACTION_MONITOR_INTERVAL` | No | 60,000 | Time (in milliseconds) to wait while scanning for new blocks. |
 | `CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL`   | No        | 300,000                                       | Time (in milliseconds) to wait while updating message receipts. |
+| `L1_LIQUIDITY_POOL_ADDRESS` | Yes | N/A | L1 liquidity pool address |
+| `L2_LIQUIDITY_POOL_ADDRESS` | Yes | N/A | L2 liquidity pool address |
+| `L1_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 1 (Ethereum) node. |
+| `L2_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 2 (Optimism) node. |
+| `MONITORING_RECONNECT_SECS` | No | 15 | Time (in second) to wait for reconnecting after network is disconnected. |

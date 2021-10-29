@@ -6,10 +6,10 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderRadius: props.dropDownBox ? '8px' : '0',
   background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
-    padding: ' 30px 10px',
+    //padding: '30px 10px',
   },
   [theme.breakpoints.up('md')]: {
-    padding: '20px',
+    padding: '10px',
   },
 }));
 
@@ -25,8 +25,8 @@ export const DropdownWrapper = styled(Box)`
   justify-content: space-between;
   gap: 5px;
   width: 100%;
-  padding: 16px;
-  margin-top: 16px;
+  padding: 12px;
+  //margin-top: 10px;
   background-color: ${props => props.theme.palette.background.secondary};
   border-radius: 12px;
   text-align: center;
