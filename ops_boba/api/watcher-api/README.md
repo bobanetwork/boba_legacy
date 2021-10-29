@@ -187,7 +187,7 @@
   key: "PRIVATE_KEY",
   endTime: "END_TIME[INT]", // not required
   cdmHash: "CROSS_DOMAIN_HASH", // not required
-  cdmBlock: "CROSS_DOMAIN_BLOCK", // not required
+  cdmBlock: "CROSS_DOMAIN_BLOCK[INT]", // not required
 }
 ```
 
