@@ -14,7 +14,7 @@ Parameters:
     Type: String
     Default: push2aws
 
-  ReplicaL2Image:
+  VerifierL2Image:
     Type: String
     Default: l2geth
 
@@ -77,7 +77,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
       Port: 8545
       Protocol: TCP
       DefaultActions:
@@ -96,23 +96,13 @@ Resources:
           Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
-
-
-  GoEthereumVerifierLBListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
-      ListenerArn: !Ref ReplicaL2Listener
-
+      TargetType: "ip"
 
   VerifierL2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
       Port: 8546
       Protocol: TCP
       DefaultActions:
@@ -131,16 +121,7 @@ Resources:
           Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
-      TargetType: "instance"
-
-
-  GoEthereumVerifierLBListenerRule2:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup2
-      ListenerArn: !Ref ReplicaL2Listener2
+      TargetType: "ip"
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -148,22 +129,21 @@ Resources:
       Volumes:
         - Name: l2-node
           Host:
-            SourcePath: "/mnt/efs/replica_l2"
+            SourcePath: "/mnt/efs/verifier_l2"
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/${ReplicaL2Image}:${ImageTag}"
+        - Image: !Sub "${DockerPrefix}/${VerifierL2Image}:${ImageTag}"
           Name: geth_l2
-          Hostname: geth-l2
           PortMappings:
             - ContainerPort: 8545
               HostPort: 8545
             - ContainerPort: 8546
-              HostPort: 8545
-          EnvironmentFile:
+              HostPort: 8546
+          EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+              - "arn:aws:s3:::${S3BucketV2}/verifier-l2.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-            - Type: "s3"
+              Type: "s3"
           Environment:
             - Name: RPC_API
               Value: eth,net,rollup,web3,txpool,debug,db,personal
@@ -177,22 +157,22 @@ Resources:
               Value: !Sub
                 - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
             - Name: URL
               Value: !Sub
                 - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
             - Name: ROLLUP_CLIENT_HTTP
               Value: !Sub
                 - "http://${EndpointAddress}:7878"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
             - Name: ROLLUP_STATE_DUMP_PATH
               Value: !Sub
                 - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
             - Name: ROLLUP_ENABLE_L2_GAS_POLLING
               Value: true
             - Name: ROLLUP_ENFORCE_FEES
@@ -214,7 +194,7 @@ Resources:
           DockerLabels:
             com.datadoghq.ad.check_names: '["geth_l2"]'
             com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "replica_l2", "service": "replica_l2"}]'
+            com.datadoghq.ad.logs: '[{"source": "verifier_l2", "service": "verifier_l2"}]'
           Essential: true
           Memory: "4000"
           LogConfiguration:
@@ -222,20 +202,32 @@ Resources:
             Options:
               max-file: "5"
               max-size: "10m"
-      NetworkMode: host
+      NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
-      Family: !Sub "L2Replica-${EnvironmentName}"
+      Family: !Sub "L2Verifier-${EnvironmentName}"
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
 
   ECSService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
       LoadBalancers:
         - ContainerName: geth_l2
           ContainerPort: 8545
           TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
+        - ContainerName: geth_l2
+          ContainerPort: 8546
+          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:SecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

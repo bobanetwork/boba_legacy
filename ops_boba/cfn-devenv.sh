@@ -63,12 +63,6 @@ function print_usage_and_exit {
             --service-name <service-name>   Remove the service from the ECS Cluster
             --stack-name <stack-name>                       Stack Name to create
 
-        push2aws                        push new versions of all service containers from hub.docker.com to AWS ECR
-            --deploy-tag <deploy-tag>           The Git Tag or Branch Name of all of the services
-            --from-tag <hub.docker.com-tag>     The Container Tag from hub.docker.com to be used for generating the containers pushed to AWS
-            --service-name <service-name>       The name of the service which container must be re-build
-            --registry-prefix <hub.docker.com-prefix> The name of the registry you want to pull the image from
-
         ssh                              does ssh to the ECS Cluster and then lets you run commands there, writing sudo su will drop you in a root shell
             --stack-name <stack-name>       the name of the stack, in which you want to login to
 
@@ -88,13 +82,6 @@ function print_usage_and_exit {
             $(basename $0) deploy --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag> --service-name <service-name>
 
             $(basename $0) deploy --stack-name <stack-name> --region <Region>  --deploy-tag <DeployTag>
-
-        Push containers to AWS ECR
-            $(basename $0) push2aws --service-name <service-name> --region <Region> --deploy-tag <DeployTag> --from-tag <FromTag>
-
-            $(basename $0) push2aws --region <Region>  --deploy-tag <DeployTag> --from-tag <FromTag>
-
-            $(basename $0) push2aws --region <Region>  --deploy-tag <DeployTag> --from-tag <FromTag>
 
         Destroy an environment/service
             $(basename $0) destroy --stack-name <stack-name> --service-name <service-name> --region <Region> --deploy-tag <DeployTag> [Note: Remove the service from the ECS Cluster]
@@ -146,6 +133,8 @@ function check_dev_environment {
             grep ${ENV_PREFIX}-infrastructure-application | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
     local CFN_APP_REPLICA_STACK="$(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE | \
             grep ${ENV_PREFIX}-replica | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
+    local CFN_APP_VERIFIER_STACK="$(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE | \
+          grep ${ENV_PREFIX}-verifier | grep StackName | awk -F ":" '{print $2}' | tr -d \",)"
     if [ -z "$CFN_INFRASTRUCTURE_STACK" ]; then
           warn "VPC does not exist ... creating one"
           cd ${PATH_TO_CFN}
@@ -258,6 +247,27 @@ function check_dev_environment {
                      --parameters \
                          ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                   aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
+            cd ..
+          elif [ -z "$CFN_APP_VERIFIER_STACK" ]; then
+                  info "Adding Verifier ECS Cluster"
+                  cd ${PATH_TO_CFN}
+                  aws cloudformation create-stack \
+                       --stack-name ${ENV_PREFIX}-verifier \
+                       --capabilities CAPABILITY_IAM \
+                       --template-body=file://05-infrastructure-verifier.yaml \
+                       --region ${REGION} \
+                       --parameters \
+                           ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                    aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-verifier
+                    info "Adding Datadog to the Verifier ECS Cluster"
+                    aws cloudformation create-stack \
+                         --stack-name ${ENV_PREFIX}-datadog-verifier \
+                         --capabilities CAPABILITY_IAM \
+                         --template-body=file://datadog-verifier.yaml \
+                         --region ${REGION} \
+                         --parameters \
+                             ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                      aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog-verifier
             cd ..
           else
             info "ECS Cluster exists"
@@ -398,8 +408,10 @@ function destroy_dev_services {
       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
       if [[ ${ENV_PREFIX} == *"-replica"* ]];then
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       else
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       fi
       SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|tr '\n' ' '|sed 's#"##g'`
       CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
@@ -451,14 +463,10 @@ function destroy_dev_services {
         CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
         if [[ ${ENV_PREFIX} == *"-replica"* ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        fi
-        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
-        if [[ ${ENV_PREFIX} == *"-replica"* ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        else
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w ${ENV_PREFIX}|egrep -v 'replica|verfier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
         CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
         ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
@@ -494,6 +502,8 @@ function destroy_dev_services {
         CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
         if [[ ${ENV_PREFIX} == *"-replica"* ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep -v replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
@@ -511,7 +521,8 @@ function destroy_dev_services {
           STACK_NAME=$(echo $ecs|sed 's#-infrastructure-application.*##')
           ELB_INT=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerInt:DNSName\`].Value" --no-paginate --output text)
           REPLICA_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterReplica\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
-          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n--------------- \n"
+          VERIFIER_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterVerifier\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
+          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n VERIFIER-NAME: $VERIFIER_NAME \n--------------- \n"
           done
         }
 
@@ -519,7 +530,7 @@ function destroy_dev_services {
      function generate_environment {
         if [ -z ${SERVICE_NAME} ]; then
            info "Missing ${SERVICE_NAME} going to re-generate all environment files"
-           for srv in $DOCKER_IMAGES_LIST; do
+           for srv in $DOCKER_IMAGES_LIST datadog; do
               aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
               aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
             done
@@ -537,7 +548,7 @@ if [[ $# -gt 0 ]]; then
             -h|--help)
                 print_usage_and_exit
                 ;;
-            create|deploy|update|destroy|restoredb|push2aws|restart|ssh|list-clusters|envgenerate|stop)
+            create|deploy|update|destroy|restoredb|restart|ssh|list-clusters|envgenerate|stop)
                 SUBCMD="${1}"
                 shift
                 ;;
@@ -620,10 +631,6 @@ case "${SUBCMD}" in
     envgenerate)
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         generate_environment
-        ;;
-    push2aws)
-        [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
-        verify_images_in_ecr
         ;;
     destroy)
         destroy_dev_services $FORCE

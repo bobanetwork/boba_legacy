@@ -71,19 +71,12 @@ Resources:
       ContainerDefinitions:
         - Image: datadog/agent:latest
           Name: datadog
-          Environment:
-            - Name: DD_SITE
-              Value: "datadoghq.com"
-            - Name: DD_PROCESS_AGENT_ENABLED
-              Value: "true"
-            - Name: DD_LOGS_ENABLED
-              Value: "true"
-            - Name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
-              Value: "true"
-            - Name: DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE
-              Value: "true"
-            - Name: DD_CONTAINER_EXCLUDE
-              Value: "name:ecs-agent image:datadog/agent:latest"
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/datadog.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
           MountPoints:
             - ContainerPath: "/var/run/docker.sock"
               SourceVolume: docker_sock
@@ -97,16 +90,15 @@ Resources:
               SourceVolume: docker_logs
           Essential: true
           LogConfiguration:
-            LogDriver: awslogs
+            LogDriver: json-file
             Options:
-              awslogs-group:
-                Ref: DatadogLogGroup
-              awslogs-region:
-                Ref: AWS::Region
+              max-file: "5"
+              max-size: "10m"
           Memory: "256"
           Cpu: "10"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "Datadog-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
