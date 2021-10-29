@@ -172,3 +172,31 @@
 }
 ```
 
+### Global
+
+#### send.crossdomainmessage
+
+**Request Body**
+
+```js
+{
+  hash: "HASH",
+  block: "BLOCK_NUMBER[INT]",
+  startTime: "START_TIME[INT]",
+  l1Tol2: "BOOL",
+  key: "PRIVATE_KEY",
+  endTime: "END_TIME[INT]", // not required
+  cdmHash: "CROSS_DOMAIN_HASH", // not required
+  cdmBlock: "CROSS_DOMAIN_BLOCK[INT]", // not required
+}
+```
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
+```
+

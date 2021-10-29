@@ -82,3 +82,20 @@ functions:
           cors: true
     layers:
       - ${file(env-mainnet.yml):LAYERS}
+  watcher_sendCrossDomainMessage:
+    handler: watcher_sendCrossDomainMessage.watcher_sendCrossDomainMessage
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-mainnet.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-mainnet.yml):SUBNET_ID_1}
+        - ${file(env-mainnet.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.crossdomainmessage
+          method: post
+          cors: true
+    layers:
+      - ${file(env-mainnet.yml):LAYERS}
