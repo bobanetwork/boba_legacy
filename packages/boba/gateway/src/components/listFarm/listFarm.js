@@ -217,7 +217,7 @@ class ListFarm extends React.Component {
 
             <S.GridItemTag item xs={4} md={2}>
                 <img src={logo} alt="logo" width={30} />
-                <Typography variant="overline">{name}</Typography>
+                <Typography variant="overline">{symbol}</Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item xs={4} md={2}>
