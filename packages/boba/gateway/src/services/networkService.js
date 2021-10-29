@@ -1125,7 +1125,7 @@ class NetworkService {
       //at this point the tx has been submitted, and we are waiting...
       await depositTx.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      const block = await this.L1Provider.getTransaction(depositTx.hash)
       console.log(' block:', block)
 
       //closes the Deposit modal
@@ -1134,7 +1134,7 @@ class NetworkService {
       const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
         depositTx.hash
       )
-      console.log(' got L1->L2 message hash', l1ToL2msgHash)
+      console.log(' got L1->L2 message hash', msgHash)
 
       const receipt = await this.watcher.getL2TransactionReceipt(
         msgHash
@@ -1146,7 +1146,7 @@ class NetworkService {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
+        "hash": depositTx.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
         "endTime": time_stop,
@@ -1484,7 +1484,7 @@ class NetworkService {
       console.log("depositTxStatus:",depositTx)
 
       //at this point the tx has been submitted, and we are waiting...
-      await depositTxStatus.wait()
+      await depositTx.wait()
 
       const block = await this.L1Provider.getTransaction(depositTx.hash)
       console.log(' block:', block)
@@ -1495,7 +1495,7 @@ class NetworkService {
       const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
         depositTx.hash
       )
-      console.log(' got L1->L2 message hash', l1ToL2msgHash)
+      console.log(' got L1->L2 message hash', msgHash)
 
       const receipt = await this.watcher.getL2TransactionReceipt(
         msgHash
