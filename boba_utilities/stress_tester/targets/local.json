@@ -1,0 +1,18 @@
+{
+  "name":"local",
+  "ng_enabled":false,
+  "endpoints":[ "http://localhost:9545", "http://localhost:8545" ],
+  "L1_geth_PoA":true,
+  "confirmations": [ 1, 0 ],
+  "start_chain": 1,
+  "op_pct": [ [ 5, 20, 20, 0, 0 ] , [ 5, 20, 20, 0, 0 ] ],
+  "op_delay": 0.5,
+  "gas_price_gwei": [ 0.1 , 0.02 ],
+  "gas_mult": [ 1.5, 1.0 ],
+  "funder_acct":[ "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" , "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba" ],
+  "l1_agent_acct":[ "0xbcd4042de499d14e55001ccbb24a551f3b954096", "0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897" ],
+  "l2_agent_acct":[ "0x71be63f3384f5fb98995898a86b02fb2426c5788", "0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82" ],
+  "max_fund_eth": 100.0,
+  "address_server":"http://localhost:8080",
+  "address_manager_address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+}
