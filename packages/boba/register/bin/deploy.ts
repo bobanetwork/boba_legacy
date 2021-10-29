@@ -82,7 +82,7 @@ const main = async () => {
     deployer_l1,
     process.env.ADDRESS_MANAGER_ADDRESS
   )
-  
+
   const entries = Object.keys(toRegister)
 
   for (const entry of entries) {
