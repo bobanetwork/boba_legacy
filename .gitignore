@@ -41,3 +41,4 @@ ops_boba/monitor/yarn.lock
 
 # gateway
 packages/boba/gateway/build
+packages/boba/gateway/public/env.js
