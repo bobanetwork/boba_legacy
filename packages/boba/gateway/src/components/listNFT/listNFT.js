@@ -37,7 +37,6 @@ class listNFT extends React.Component {
       attributes
     } = this.props;
 
-
     this.state = {
       name,
       symbol,
@@ -120,13 +119,15 @@ class listNFT extends React.Component {
             </Typography>
             <Typography variant="body2">Address:
               <Typography variant="body2" component="span" className={styles.muted}>
-                {truncate(address, 8, 6, '...')} <Copy value={address} light={true} />
+                {truncate(address, 8, 6, '...')} 
               </Typography>
+              <Copy value={address} />
             </Typography>
             <Typography variant="body2">URI:
               <Typography variant="body2" component="span" className={styles.muted}>
-                {truncate(URL, 8, 6, '...')} <Copy value={URL} light={true} />
+                {truncate(URL, 8, 6, '...')} 
               </Typography>
+              <Copy value={URL} />
             </Typography>
           </div>
         </div>

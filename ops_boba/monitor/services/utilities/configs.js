@@ -8,8 +8,6 @@ module.exports.l2PoolAddress = process.env.L2_LIQUIDITY_POOL_ADDRESS
 
 module.exports.monitoringReconnectSecs =
   parseInt(process.env.MONITORING_RECONNECT_SECS, 10) || 15
-module.exports.monitoringHangTimeoutMins =
-  parseInt(process.env.MONITORING_HANG_TIMEOUT_MINS, 10) || 4
 
 module.exports.OMGXNetwork = {
   L1: 'L1',

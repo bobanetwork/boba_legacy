@@ -10,9 +10,6 @@ let l1GasPrice
 let l2PoolBalance
 let l2BlockNumber
 let l2GasPrice
-let hangTimeout = setTimeout(() => {
-  process.exit(1)
-}, configs.monitoringHangTimeoutMins * 60 * 1000)
 
 const convertWeiToEther = (wei) => {
   return parseFloat(web3.utils.fromWei(wei.toString(), 'ether'))
@@ -186,13 +183,6 @@ const onError = (networkName, provider) => {
   }
 }
 
-const resetHangTimeout = () => {
-  clearTimeout(hangTimeout)
-  hangTimeout = setTimeout(() => {
-    process.exit(1)
-  }, configs.monitoringHangTimeoutMins * 60 * 1000)
-}
-
 module.exports.validateMonitoring = () => {
   return (
     configs.l1WsUrl !== undefined &&
@@ -219,14 +209,10 @@ const setupProvider = (networkName, url) => {
       const blockNumber = parseInt(result.number, 16)
 
       // log transactions and events
-      logData(provider, result.number, networkName).then(() => {
-        resetHangTimeout()
-      })
+      logData(provider, result.number, networkName)
 
       // log balances
-      logBalance(provider, blockNumber, networkName).then(() => {
-        resetHangTimeout()
-      })
+      logBalance(provider, blockNumber, networkName)
     })
     .catch()
 }

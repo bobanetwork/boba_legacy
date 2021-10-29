@@ -1,0 +1,97 @@
+{
+  "name":"rinkeby",
+  "ng_enabled":false,
+  "endpoints":[ "https://rinkeby.infura.io/v3/__INFURA_KEY__", "https://rinkeby.boba.network" ],
+  "L1_geth_PoA":true,
+  "confirmations": [ 2, 0 ],
+  "start_chain": 0,
+  "op_pct": [ [ 5, 80, 80, 0, 0  ] , [ 2, 15, 0, 0, 0 ] ],
+  "op_delay": 0.5,
+  "gas_price_gwei": [ 1.0 , 0.02 ],
+  "gas_mult": [ 1.05 , 1.0 ],
+  "funder_acct":[ "0x4CE45e9911Db21db1A85b0F03659dE68d015C62e", "f705c8b61d1f89041224ad5a428cd37718dcd3cfb2200ee4f80630528bd3b178"],
+  "max_fund_eth": 5.0,
+  "addresses":{
+    "BondManager":"0xf3060641267fa5dba812B03E8384Df70ee23dd4E","CanonicalTransactionChain":"0xe7FB1b3F51F1Eb72A71097a4420226c3b1B828e4","ChainStorageContainer-CTC-batches":"0x422E4fDc2fE1F48eD2D3393B1ea4987045e4A7f6","ChainStorageContainer-CTC-queue":"0x38b0aA4357B2234a54b4570443267E76e12B9f42","ChainStorageContainer-SCC-batches":"0x826353c1DFc55B488Bf71496433D65720D4357ea","L1CrossDomainMessenger":"0x04059a546419f54db4bfafFae9d4af3b081C2a8D","L1MultiMessageRelayer":"0x5C6263BCAa00C7f5988E148dB3CA178e1262E69f","AddressManager":"0x93A96D6A5beb1F661cf052722A1424CDDA3e9418","Proxy__L1CrossDomainMessenger":"0xF10EEfC14eB5b7885Ea9F7A631a21c7a82cf5D76","Proxy__L1StandardBridge":"0xDe085C82536A06b40D20654c2AbA342F2abD7077","StateCommitmentChain":"0x7c16Df59010dee851b22021037b4793245Aa23Ab","OVM_Sequencer":"0xE48E5b731FAAb955d147FA954cba19d93Dc03529","Deployer":"0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA",
+      "TOKENS": {
+        "TEST": {
+          "L1": "0xBA294FdF79d3917f76411df968Bdf5ce3cf45376",
+          "L2": "0x956f085fAA4150b16E4c9C630413E27e7645aE2B"
+        },
+        "USDT": {
+          "L1": "0xc98F8277219a97b51B6C8C25E5Fe157eC894F566",
+          "L2": "0x563970C301845E355685c7a22A56bdb1bc8A5bb0"
+        },
+        "DAI": {
+          "L1": "0x65B0A5aF1562F44863987D78cf13bBa71F45eD65",
+          "L2": "0x8723f5cb17eDe7C20cD25A42DBba0454F8D76D75"
+        },
+        "USDC": {
+          "L1": "0x5267152d01810536Ea7710eCf8A69102C7FA65a8",
+          "L2": "0x996c654967f197F1B911805Ea11D5F25a62412F9"
+        },
+        "WBTC": {
+          "L1": "0x6D40CEF5e7040d357fDc9942A47D22eC85A77754",
+          "L2": "0xCd1228673b1366fc8d226D0b0C0d51c30Fbe6C20"
+        },
+        "REP": {
+          "L1": "0x48d02F8Be18C3FDc00653f10d390B4FDe8C2B3A1",
+          "L2": "0x62b61781d4f563C630c2910f046fF7DF1441c39b"
+        },
+        "BAT": {
+          "L1": "0x5BFC17cF479A91b2b46EF06E5785caDF341838ac",
+          "L2": "0xeA70D703DA5498bC0f6549cdBC99F06801Bb608B"
+        },
+        "ZRX": {
+          "L1": "0x970e787caC90f99aD4a06886F65173cAffa9Ff40",
+          "L2": "0xF6208D6C0bAac8efFd1c88069CccFB13d1F4FA1E"
+        },
+        "SUSHI": {
+          "L1": "0xD0866af86E5C2f0968cFc245C57C45A30bE0C366",
+          "L2": "0xa24cA8D1B033d5E4618C53B1cE1063E33AdD5095"
+        },
+        "LINK": {
+          "L1": "0xdca266B30B2301266938eFb99f0a174c0b844705",
+          "L2": "0x9632EdE6D559E487428ca7A0B5e2E6c627D67B6F"
+        },
+        "UNI": {
+          "L1": "0xB0fd45ff21D17f115dE60EE948C73048807cd88c",
+          "L2": "0x983f7c0f36790Fb3C0894BBd7Ca45b50f48622Ff"
+        },
+        "OMG": {
+          "L1": "0x8276775CAa0046b8291E9006376106a817534f4C",
+          "L2": "0xAA432A3c943dF3361d0865beA5B74133EE17E434"
+        },
+        "FRAX": {
+          "L1": "0x1D69645984097c70e91461EE0727885cA9bcf8B3",
+          "L2": "0xcA07A959F565c6004DBC4A6B9fD921d76Da65C1a"
+        },
+        "FXS": {
+          "L1": "0xDd6D79b1Be90A3D0d7c2e4A61dc9f72040d49A19",
+          "L2": "0x556d56CD41FB504006CE37Cb7B86810DD6782354"
+        },
+        "BOBA": {
+          "L1": "0xAcd0b452F6D2Da1b645EF9B21d5f634482D0c7Ff",
+          "L2": "0xbcfDEf30816430F2518e6CdA416272Ef0d80e53D"
+        }
+      },
+      "NFTs": {},
+      "L1CrossDomainMessengerFast": "0x2f28C228C2d9C8dB957E3A842C34E1c3f03f38CB",
+      "Proxy__L1CrossDomainMessengerFast": "0xe2a82CE9671A283190DD5E3f077027979F2c039E",
+      "L2LiquidityPool": "0x58E48905AbFcBd6eDcb7D7b4fA07C66C5eE5Fe56",
+      "L1LiquidityPool": "0xBce090E95cc724f3A4dC9c770d46AFF10f9E49d6",
+      "Proxy__L1LiquidityPool": "0x12F8d1cD442cf1CF94417cE6309c6D2461Bd91a3",
+      "Proxy__L2LiquidityPool": "0x56851CB42F315D0B90496c86E849167B8Cf7108a",
+      "L2TokenPool": "0x0DC3084Fd6aabb0CA9EFD20BcC791D5e6820564d",
+      "L1Message": "0xDCeDc3dD78F11acDD53F4a56e085E99FF7CD970a",
+      "L2Message": "0x5D349Ca5F9C8E99a2E6d2DddC6b15736ad0A233a",
+      "AtomicSwap": "0x903cABDe08F7765d201B470178e19ED1b4f48006",
+      "L2ERC721": "0xEdf91A2fBB745e4651eb57659929813bC3C01f14",
+      "L2ERC721Reg": "0xf296469f3303760D20197C2a2c9Ab2aDe02bfDEB",
+      "L1NFTBridge": "0x48b66666E38c0C7b4b8F863D8caEf607262183Ac",
+      "L2NFTBridge": "0x9b175c83d6238cB4a48E6f3C025D43E35b04391f",
+      "Proxy__L1NFTBridge": "0x40394f7EAb5aeB995132ba3bd3e46035FB66143a",
+      "Proxy__L2NFTBridge": "0x92a5dfc88F58A01fB4dBfDccE13368f9a0D418c5",
+      "L1MultiMessageRelayerFast": "0xEe4A28080C7785A1F14Bc143A8083b2F02B94f88"
+  }
+}
