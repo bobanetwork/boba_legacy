@@ -23,10 +23,6 @@ Parameters:
     Type: String
     Default: bobanetwork
 
-  LogsRetention:
-    Type: Number
-    Default: 7
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String

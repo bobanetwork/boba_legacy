@@ -77,7 +77,7 @@ Resources:
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
-            MountPoints:
+          MountPoints:
             - ContainerPath: "/var/run/docker.sock"
               SourceVolume: docker_sock
             - ContainerPath: "/host/sys/fs/cgroup"

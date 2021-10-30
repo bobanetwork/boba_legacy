@@ -27,10 +27,6 @@ Parameters:
     Type: String
     Default: infrastructure-coredev
 
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
-
 Resources:
   TaskRole:
     Type: AWS::IAM::Role

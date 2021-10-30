@@ -6,10 +6,6 @@ Parameters:
     Type: String
     Default: dev
 
-  CFHelperELBv2RulePriorityStack:
-    Type: String
-    Default: CF-Helper-ELBv2-Rule-Priority
-
   ServiceCount:
     Type: Number
     Default: 1
@@ -30,10 +26,6 @@ Parameters:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:

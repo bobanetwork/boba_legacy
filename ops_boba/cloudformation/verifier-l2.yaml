@@ -27,10 +27,6 @@ Parameters:
     Type: String
     Default: infrastructure-coredev
 
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
-
 Resources:
   TaskRole:
     Type: AWS::IAM::Role
@@ -98,7 +94,7 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  VerifierL2Listener:
+  VerifierL2Listener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
@@ -107,9 +103,9 @@ Resources:
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup2
+        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup1
 
-  GoEthereumVerifierLBTargetGroup2:
+  GoEthereumVerifierLBTargetGroup1:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8546
@@ -150,19 +146,19 @@ Resources:
             - Name: WS_API
               Value: eth,net,rollup,web3,txpool,debug,db,personal
             - Name: ROLLUP_BACKEND
-              Value: l2
+              Value: l1
             - Name: ROLLUP_VERIFIER_ENABLE
               Value: true
             - Name: DEPLOYER_HTTP
               Value: !Sub
                 - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: URL
               Value: !Sub
                 - "http://${EndpointAddress}:8081/addresses.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_CLIENT_HTTP
               Value: !Sub
                 - "http://${EndpointAddress}:7878"
@@ -172,7 +168,7 @@ Resources:
               Value: !Sub
                 - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: ROLLUP_ENABLE_L2_GAS_POLLING
               Value: true
             - Name: ROLLUP_ENFORCE_FEES

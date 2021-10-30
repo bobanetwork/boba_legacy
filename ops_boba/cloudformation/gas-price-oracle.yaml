@@ -22,18 +22,10 @@ Parameters:
     Type: String
     Default: bobanetwork
 
-  LogsRetention:
-    Type: Number
-    Default: 7
-
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
     Default: infrastructure-coredev
-
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
   TaskRole:
