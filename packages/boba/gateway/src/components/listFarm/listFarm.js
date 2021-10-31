@@ -16,7 +16,7 @@ import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
 
-import { Box, Typography, Fade, Grid, CircularProgress } from '@material-ui/core';
+import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
 import * as S from "./ListFarm.styles"
 import { getRewardL1, getRewardL2 } from 'actions/networkAction';
 
@@ -179,13 +179,13 @@ class ListFarm extends React.Component {
     // networkService.L1OrL2 L1: || L2
     const disabled = !L1orL2Pool.includes(networkService.L1orL2)
     const symbol = poolInfo.symbol
-    let name = poolInfo.name
+    // let name = poolInfo.name
     const decimals = poolInfo.decimals
     let logo = getCoinImage(symbol)
 
     //Deal with Token migration to REPv2
     if( symbol === 'REPv2' ) {
-      name = 'AUGUR (REPv2)'
+      // name = 'AUGUR (REPv2)'
       logo = getCoinImage('REP')
     }
 
@@ -213,9 +213,9 @@ class ListFarm extends React.Component {
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <Grid container spacing={2} direction="row" justifyContent="center" alignItems="center" >
+          <S.GridContainer container spacing={2} direction="row" justifyContent="center" alignItems="center" >
 
-            <S.GridItemTag item xs={4} md={2}>
+            <S.GridItemTag item xs={4} md={2} isMobile>
                 <img src={logo} alt="logo" width={30} />
                 <Typography variant="overline">{symbol}</Typography>
             </S.GridItemTag>
@@ -274,7 +274,7 @@ class ListFarm extends React.Component {
                 <ExpandMoreIcon />
               </Box>
             </S.GridItemTag>
-          </Grid>
+          </S.GridContainer>
         )}
 
         {/*********************************************/

@@ -13,11 +13,22 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   },
 }));
 
-export const GridItemTag = styled(Grid)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+
+export const GridContainer = styled(Grid)(({theme})=>({
+  [theme.breakpoints.down('md')]:{
+    justifyContent: 'flex-start'
+  }
+}))
+
+
+export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
+  display: 'flex',
+  flexDirection: `${!props.isMobile ? 'column' : 'column-reverse'}`,
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]:{
+    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
+  }
+}))
 
 export const DropdownWrapper = styled(Box)`
   display: flex;
@@ -37,7 +48,8 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
-    gap: '0',
+    gap: '5px',
+    padding: '5px'
   },
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
