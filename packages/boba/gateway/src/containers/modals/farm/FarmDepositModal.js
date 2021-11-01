@@ -4,7 +4,7 @@ import { isEqual } from 'lodash';
 import BN from 'bignumber.js';
 
 import { closeModal, openAlert, openError } from 'actions/uiAction';
-import { getFarmInfo } from 'actions/farmAction';
+import { addLiquidity, getFarmInfo } from 'actions/farmAction';
 
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
@@ -50,7 +50,7 @@ class FarmDepositModal extends React.Component {
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
-      // let approvedAllowance = powAmount(10, 50)
+      // let approvedAllowance = powAmount(10, 50) //TODO: approved allowance incase of ETH?
       // Set to some very big number
       // There is no need to query allowance for depositing ETH on the L1 or the L2
       console.log("staketoken",stakeToken)
@@ -149,11 +149,11 @@ class FarmDepositModal extends React.Component {
 
     this.setState({ loading: true })
 
-    const addLiquidityTX = await networkService.addLiquidity(
+    const addLiquidityTX = await this.props.dispatch(addLiquidity(
       stakeToken.currency,
       value_Wei_String,
       stakeToken.L1orL2Pool,
-    )
+    ))
 
     if (addLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was added"))

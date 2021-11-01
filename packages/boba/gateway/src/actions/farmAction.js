@@ -78,3 +78,15 @@ export function fetchAllowance(currency, lpAddress) {
     lpAddress
   ))
 }
+
+export function addLiquidity(
+  currency,
+  weiString,
+  L1orL2Pool
+) {
+  return createAction('ADD/LIQUIDITY', () => networkService.addLiquidity(
+    currency,
+    weiString,
+    L1orL2Pool
+  ))
+}
