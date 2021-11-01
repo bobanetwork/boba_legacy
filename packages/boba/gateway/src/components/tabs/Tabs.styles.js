@@ -1,29 +1,37 @@
 import styled from '@emotion/styled';
+import {Box} from '@material-ui/core';
 
-
-export const Tabs = styled.div`
-display: flex;
-flex-direction: row;
-justify-content: flex-start;
-flex: 1;
-margin-bottom: 20px;
-`;
-
-export const TabItem = styled.div`
-   opacity: 0.7;
-   transition: color 200ms ease-in-out;
-   cursor: pointer;
-   margin-right: 20px;
-   &:hover {
-      opacity: 1;
+export const Tabs = styled(Box)(({theme})=>({
+   display: 'flex',
+   flexDirection: 'row',
+   justifyContent: 'flex-start',
+   flex: 1,
+   marginBottom: '20px',
+   [theme.breakpoints.down('md')]:{
+      width: '100%'
    }
-   &.active {
-      color: ${props => props.theme.palette.mode === 'light' ? props.theme.palette.primary.main : props.theme.palette.neutral.main};
-      opacity: 1;
-      border-bottom: 2px solid ${props => props.theme.palette.neutral.contrastText};
-      margin-bottom: -2px;
-      z-index: 1;
+}));
+
+
+export const TabItem = styled(Box)(({ theme }) => ({
+   opacity: 0.7,
+   transition: 'color 200ms ease-in-out',
+   cursor: 'pointer',
+   marginRight: '20px',
+   '&:hover': {
+      opacity: 1,
+   },
+   '&.active': {
+      color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main}`,
+      opacity: 1,
+      borderBottom: `2px solid ${theme.palette.neutral.contrastText}`,
+      marginBottom: '-2px',
+      zIndex: 1,
+   },
+   [theme.breakpoints.down('md')]: {
+      flex: 1,
+      textAlign: 'center'
    }
-`
+}))
 
 

@@ -28,7 +28,7 @@ import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 
 import * as S from './Farm.styles'
-import { Box, FormControlLabel, Checkbox, Typography, Fade, Grid } from '@material-ui/core'
+import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
 import { tableHeadList } from './tableHeadList'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -56,7 +56,7 @@ class Farm extends React.Component {
     let initialViewLayer = 'L1 Liquidity Pool'
     let initialLayer = 'L1LP'
 
-    if(networkService.L1orL2 === 'L2') {
+    if (networkService.L1orL2 === 'L2') {
       initialViewLayer = 'L2 Liquidity Pool'
       initialLayer = 'L2LP'
     }
@@ -159,25 +159,25 @@ class Farm extends React.Component {
   }
 
   handleChange = (event, t) => {
-    if( t === 'L1 Liquidity Pool' )
-      this.setState({ 
+    if (t === 'L1 Liquidity Pool')
+      this.setState({
         lpChoice: 'L1LP',
-        poolTab: t  
+        poolTab: t
       })
-    else if(t === 'L2 Liquidity Pool')
-      this.setState({ 
+    else if (t === 'L2 Liquidity Pool')
+      this.setState({
         lpChoice: 'L2LP',
-        poolTab: t 
+        poolTab: t
       })
   }
 
-  handleCheckBox = (e) =>{
+  handleCheckBox = (e) => {
     this.setState({
       showMDO: e.target.checked
     })
   }
 
-  handleCheckBoxStakes = (e) =>{
+  handleCheckBoxStakes = (e) => {
     this.setState({
       showMSO: e.target.checked
     })
@@ -200,106 +200,108 @@ class Farm extends React.Component {
     const { isMobile } = this.props
 
     const networkLayer = networkService.L1orL2
-    
+
     return (
       <>
         <PageHeader title="Earn" />
 
         <S.Wrapper dropDownBox={dropDownBox}>
-            
-            <Grid container spacing={2} direction="row" justifyContent="left" alignItems="center" >
-          
-              <S.GridItemTag item xs={10} md={10}>
-                <Typography variant="body2" sx={{mt: 2, fontSize: '0.8em'}}>
-                  The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                  {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the 
-                  {' '}<span style={{fontWeight: '700'}}>BALANCE</span> refers to the amount of funds currently in each pool.
-                </Typography>
-              </S.GridItemTag>
 
-              <S.GridItemTag 
-                item 
-                xs={2} 
-                md={2}
-                onClick={()=>{this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false })}}
-                sx={{color: "#0ebf9a"}}
-              >
-                Learn More
-                <Box sx={{display: 'flex', cursor: 'pointer', transform: dropDownBox ? "rotate(-180deg)" : ""}}>
-                  <ExpandMoreIcon />
-                </Box>
-              </S.GridItemTag>
-            </Grid>
+          <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
+
+            <S.GridItemTag item xs={10} md={10}>
+              <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
+                The supply of tokens in the pools reflects the staking and bridging activities of all users.
+                {' '}<span style={{ fontWeight: '700' }}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
+                {' '}<span style={{ fontWeight: '700' }}>BALANCE</span> refers to the amount of funds currently in each pool.
+              </Typography>
+            </S.GridItemTag>
+
+            <S.GridItemTag
+              item
+              xs={2}
+              md={2}
+              onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+              sx={{ color: "#0ebf9a" }}
+            >
+              Learn More
+              <Box sx={{ display: 'flex', cursor: 'pointer', transform: dropDownBox ? "rotate(-180deg)" : "" }}>
+                <ExpandMoreIcon />
+              </Box>
+            </S.GridItemTag>
+          </S.GridItemTagContainer>
 
           {/*********************************************/
-          /**************  Drop Down Box ****************/
-          /**********************************************/
+            /**************  Drop Down Box ****************/
+            /**********************************************/
           }
           {dropDownBox ? (
             <Fade in={dropDownBox}>
               <S.DropdownContent>
                 <S.DropdownWrapper>
-                  <Typography variant="body2" sx={{mt: 1, fontSize: '0.7em'}}>
-                    <span style={{fontWeight: '700'}}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG. 
-                    <br/><br/>
-                    <span style={{fontWeight: '700'}}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,  
-                    they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge. 
-                    Note that bridge operations do not change the pool's liquidity, but only its current balance. 
-                    The difference between what was deposited into the L1 pool (10 OMG) and what was sent 
-                    to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for later harvesting by liquidity providers. 
-                    <br/><br/>
-                    <span style={{fontWeight: '700'}}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people 
-                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current (v1) system, the pool operator is responsible 
+                  <Typography variant="body2" sx={{ mt: 1, fontSize: '0.7em' }}>
+                    <span style={{ fontWeight: '700' }}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG.
+                    <br /><br />
+                    <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
+                    they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
+                    Note that bridge operations do not change the pool's liquidity, but only its current balance.
+                    The difference between what was deposited into the L1 pool (10 OMG) and what was sent
+                    to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for later harvesting by liquidity providers.
+                    <br /><br />
+                    <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
+                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current (v1) system, the pool operator is responsible
                     for pool rebalancing, when and if needed, using 'classic' deposit and exit operations to move funds from one pool to another.
-                    <br/><br/> 
-                    <span style={{fontWeight: '700'}}>Future work</span>. A more elegant approach to pool balancing is an 'automatic' 
-                    supply-and-demand approach, in which staking rewards scale inversely (and non-linearly) with pool balances. Thus, when pool balances 
+                    <br /><br />
+                    <span style={{ fontWeight: '700' }}>Future work</span>. A more elegant approach to pool balancing is an 'automatic'
+                    supply-and-demand approach, in which staking rewards scale inversely (and non-linearly) with pool balances. Thus, when pool balances
                     are very low, a spike in rewards would attract new liquidity into low-balance pools.
                   </Typography>
                 </S.DropdownWrapper>
               </S.DropdownContent>
             </Fade>
-          ) : null }
+          ) : null}
 
         </S.Wrapper>
 
         <Box sx={{ my: 3, width: '100%' }}>
-          <Box sx={{ mb: 2, display: 'flex' }}>
+          <S.GridItemTagContainer sx={{ mb: 2, display: 'flex' }}>
             <Tabs
               activeTab={poolTab}
-              onClick={(t)=>this.handleChange(null, t)}
+              onClick={(t) => this.handleChange(null, t)}
               aria-label="Liquidity Pool Tab"
               tabs={["L1 Liquidity Pool", "L2 Liquidity Pool"]}
             />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={showMDO}
-                  onChange={this.handleCheckBox}
-                  name="my tokens only"
-                  color="primary"
-                />
-              }
-              label="My Tokens Only"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={showMSO}
-                  onChange={this.handleCheckBoxStakes}
-                  name="my stakes only"
-                  color="primary"
-                />
-              }
-              label="My Stakes Only"
-            />
-          </Box>
+            <S.FarmActionContainer>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showMDO}
+                    onChange={this.handleCheckBox}
+                    name="my tokens only"
+                    color="primary"
+                  />
+                }
+                label="My Tokens Only"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showMSO}
+                    onChange={this.handleCheckBoxStakes}
+                    name="my stakes only"
+                    color="primary"
+                  />
+                }
+                label="My Stakes Only"
+              />
+            </S.FarmActionContainer>
+          </S.GridItemTagContainer>
 
           {networkLayer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>
               <S.AlertInfo>
-                <AlertIcon sx={{flex: 1}} />
+                <AlertIcon sx={{ flex: 1 }} />
                 <S.AlertText
                   variant="body1"
                   component="p"
@@ -307,7 +309,7 @@ class Farm extends React.Component {
                   You are on L2. To transact on L1, SWITCH LAYER to L1
                 </S.AlertText>
               </S.AlertInfo>
-              <LayerSwitcher isButton={true} size={isMobile ? "small" : "medium"}/>
+              <LayerSwitcher isButton={true} size={isMobile ? "small" : "medium"} />
             </S.LayerAlert>
           }
 
@@ -339,10 +341,10 @@ class Farm extends React.Component {
           ) : (null)}
 
           {lpChoice === 'L1LP' &&
-            <Box>
+            <S.FarmListContainer>
               {Object.keys(poolInfo.L1LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L1')
-                if(showMDO && Number(ret[0]) === 0) return
+                if (showMDO && Number(ret[0]) === 0) return null
                 return (
                   <ListFarm
                     key={i}
@@ -356,13 +358,13 @@ class Farm extends React.Component {
                   />
                 )
               })}
-            </Box>}
+            </S.FarmListContainer>}
 
           {lpChoice === 'L2LP' &&
-            <Box>
+            <S.FarmListContainer>
               {Object.keys(poolInfo.L2LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L2')
-                if(showMDO && Number(ret[0]) === 0) return
+                if (showMDO && Number(ret[0]) === 0) return null
                 return (
                   <ListFarm
                     key={i}
@@ -376,7 +378,7 @@ class Farm extends React.Component {
                   />
                 )
               })}
-            </Box>
+            </S.FarmListContainer>
           }
         </Box>
       </>

@@ -63,6 +63,16 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   },
 }));
 
+export const GridItemTagContainer = styled(Grid)(({ theme, ...props }) => ({
+  spacing: 2,
+  flexDirection: 'row',
+  justifyContent: "left",
+  alignItems: "center",
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column'
+  }
+}));
+
 export const GridItemTag = styled(Grid)`
   display: flex;
   flex-direction: row;
@@ -94,3 +104,21 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
     gap: '16px',
   },
 }));
+
+export const FarmActionContainer = styled(Box)(({theme})=>({
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]: {
+    width: '100%'
+  }
+}))
+
+export const FarmListContainer = styled(Box)(({theme})=>({
+  [theme.breakpoints.down('md')]: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px'
+  }
+}))
+
