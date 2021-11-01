@@ -1,0 +1,34 @@
+{
+  "name": "@boba/Truffle-ERC20-Example",
+  "version": "1.0.0",
+  "description": "Example of using Truffle to deploy an ERC20 to Boba Rinkeby",
+  "homepage": "https://github.com/omgnetwork/optimism-v2/develop/boba_examples/truffle-erc20#readme",
+  "license": "MIT",
+  "author": "OMG",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omgnetwork/optimism-v2/develop/boba_examples/truffle-erc20.git"
+  },
+  "scripts": {
+    "clean": "rimraf build",
+    "compile": "truffle compile --config truffle-config.js",
+    "test:integration": "truffle test ./test/erc20.spec.js --network boba_rinkeby --config truffle-config.js",
+    "deploy": "truffle migrate --network boba_rinkeby --config truffle-config"
+  },
+  "keywords": [
+    "optimism",
+    "rollup",
+    "optimistic",
+    "ethereum",
+    "truffle",
+    "boba",
+    "example",
+    "ERC20",
+    "token"
+  ],
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.4.0",
+    "rimraf": "^3.0.2",
+    "truffle": "^5.3.6"
+  }
+}
