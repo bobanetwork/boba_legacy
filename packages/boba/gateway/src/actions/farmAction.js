@@ -90,3 +90,11 @@ export function addLiquidity(
     L1orL2Pool
   ))
 }
+
+export function fetchL1LPBalance(currency) {
+  return createAction('FETCH/L1LPBALANCE', () => networkService.L1LPBalance(currency))
+}
+
+export function fetchL2LPBalance(currency) {
+  return createAction('FETCH/L2LPBALANCE', () => networkService.L2LPBalance(currency))
+}
