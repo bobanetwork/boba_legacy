@@ -47,7 +47,8 @@ const initialState = {
     currency: allAddresses.L1_ETH_Address,
     LPAddress: allAddresses.L1LPAddress,
     L1orL2Pool: 'L1LP'
-  }
+  },
+  approvedAllowance: ''
 };
 
 function farmReducer (state = initialState, action) {
@@ -83,6 +84,16 @@ function farmReducer (state = initialState, action) {
       return {
         ...state,
         withdrawToken: action.payload,
+      }
+    case 'FETCH/ALLOWANCE/SUCCESS':
+      return {
+        ...state,
+        approvedAllowance: action.payload.toString(),
+      }
+    case 'FETCH/ALLOWANCE/ERROR':
+      return {
+        ...state,
+        approvedAllowance: '',
       }
     default:
       return state;

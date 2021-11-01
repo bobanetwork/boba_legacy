@@ -17,6 +17,7 @@ import { Typography } from '@material-ui/core';
 import { WrapperActionsModal } from 'components/modal/Modal.styles';
 import { Box } from '@material-ui/system';
 import { farmL1, farmL2 } from 'actions/networkAction';
+import {fetchAllowance} from 'actions/farmAction';
 
 class FarmDepositModal extends React.Component {
 
@@ -49,19 +50,24 @@ class FarmDepositModal extends React.Component {
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
-      let approvedAllowance = powAmount(10, 50)
+      // let approvedAllowance = powAmount(10, 50)
       // Set to some very big number
       // There is no need to query allowance for depositing ETH on the L1 or the L2
       console.log("staketoken",stakeToken)
       if ( stakeToken.symbol !== 'ETH' ) {
-        approvedAllowance = await networkService.checkAllowance(
+        this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
-        )
-        approvedAllowance = approvedAllowance.toString()
+        ))
+        // approvedAllowance = await networkService.checkAllowance(
+        //   stakeToken.currency,
+        //   stakeToken.LPAddress
+        // )
+        // approvedAllowance = approvedAllowance.toString()
       }
 
-      this.setState({ approvedAllowance, stakeToken })
+      // this.setState({ approvedAllowance, stakeToken })
+      this.setState({ stakeToken })
     }
 
   }
@@ -120,13 +126,18 @@ class FarmDepositModal extends React.Component {
 
     if (approveTX) {
       this.props.dispatch(openAlert("Amount was approved"))
-      let approvedAllowance = await networkService.checkAllowance(
+      this.props.dispatch(fetchAllowance(
         stakeToken.currency,
         stakeToken.LPAddress
-      )
-      approvedAllowance = approvedAllowance.toString()
+      ))
+      // let approvedAllowance = await networkService.checkAllowance(
+      //   stakeToken.currency,
+      //   stakeToken.LPAddress
+      // )
+      // approvedAllowance = approvedAllowance.toString()
 
-      this.setState({ approvedAllowance, loading: false })
+      // this.setState({ approvedAllowance, loading: false })
+      this.setState({ loading: false })
     } else {
       this.setState({ loading: false })
     }
@@ -164,9 +175,11 @@ class FarmDepositModal extends React.Component {
       stakeValue,
       stakeValueValid,
       //stakeValueBadEntry,
-      approvedAllowance,
+      // approvedAllowance,
       loading,
     } = this.state
+
+    const {approvedAllowance} = this.props.farm;
 
     let allowanceGTstake = false
 

@@ -18,6 +18,7 @@
 */
 
 import networkService from 'services/networkService';
+import { createAction } from './createAction';
 
 const getFarmInfoBegin = () => ({
   type: 'GET_FARMINFO',
@@ -70,3 +71,10 @@ export const updateWithdrawToken = (withdrawToken) => ({
   type: 'UPDATE_WITHDRAW_TOKEN',
   payload: withdrawToken,
 })
+
+export function fetchAllowance(currency, lpAddress) {
+  return createAction('FETCH/ALLOWANCE', () => networkService.checkAllowance(
+    currency,
+    lpAddress
+  ))
+}
