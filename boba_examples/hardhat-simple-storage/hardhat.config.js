@@ -10,7 +10,7 @@ module.exports = {
     timeout: 300000,
   },
   networks: {
-    bobaL2: {
+    boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
       accounts: [env.PK1],
     },
