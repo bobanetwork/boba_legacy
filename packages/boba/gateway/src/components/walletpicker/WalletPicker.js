@@ -37,6 +37,7 @@ import { Container, Grid, useMediaQuery } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import { styled } from '@material-ui/core/styles'
 import { useTheme } from '@emotion/react'
+import { enableBrowserWallet } from 'actions/networkAction'
 
 require('dotenv').config()
 
@@ -79,7 +80,7 @@ function WalletPicker ({ onEnable, enabled }) {
 
     async function setupBrowserWallet() {
       const selectedNetwork = masterConfig
-      const walletEnabled = await dispatch(enableBrowserWalle(selectedNetwork))
+      const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
       return walletEnabled
         ? setWalletEnabled(true)
         : dispatchSetWalletMethod(null);
