@@ -134,6 +134,15 @@
              "rinkeby":"0x6A6676813d3D4317442CF84667425C13553F4a76",
              "mainnet": "0x42bbfa2e77757c645eeaad1655e0911a7553efbc"
           }
+      },
+      {
+        "name": "Wrapped UST",
+        "symbol": "UST",
+        "decimals": 18,
+        "address": {
+            "rinkeby":"0x012e4C202b1153183F7B0e7A90348C4cCE15d2c9",
+            "mainnet": "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
+         }
       }
    ]
 }

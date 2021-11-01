@@ -41,7 +41,7 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
-import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json' 
+import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 
@@ -61,7 +61,7 @@ import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesi
 import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
 // DAO
-import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json" 
+import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
 
@@ -114,10 +114,10 @@ class NetworkService {
     this.L2_TEST_Contract = null
     this.L1_OMG_Contract = null
     this.L2_ETH_Contract = null
-    
+
     this.ERC721Contract = null
     this.ERC721RegContract = null
-    
+
     this.L2TokenPoolContract = null
     this.AtomicSwapContract = null
 
@@ -282,7 +282,7 @@ class NetworkService {
       return false
     } else {
       allAddresses = {
-        ...allAddresses, 
+        ...allAddresses,
         [varToSet]: address
       }
       console.log(contractName +' pulled from AddressManager and set to:', address)
@@ -388,28 +388,28 @@ class NetworkService {
 
       //L2StandardBridgeAddress is a predeploy, so add by hand....
       allAddresses = {
-        ...allAddresses, 
+        ...allAddresses,
         'L2StandardBridgeAddress': L2StandardBridgeAddress
       }
 
       //L2MessengerAddress is a predeploy, so add by hand....
       allAddresses = {
-        ...allAddresses, 
+        ...allAddresses,
         'L2MessengerAddress': L2MessengerAddress
       }
 
       //L2_ETH_Address is a predeploy, so add by hand....
       allAddresses = {
-        ...allAddresses, 
+        ...allAddresses,
         'L2_ETH_Address': L2_ETH_Address
       }
 
       //L1_ETH_Address is a predeploy, so add by hand....
       allAddresses = {
-        ...allAddresses, 
+        ...allAddresses,
         'L1_ETH_Address': L1_ETH_Address
       }
-     
+
       this.L1StandardBridgeContract = new ethers.Contract(
         allAddresses.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
@@ -417,14 +417,14 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC', 
-                                'REP',  'BAT', 'ZRX',  'SUSHI', 
-                                'LINK', 'UNI', 'BOBA', 'OMG',   
-                                'FRAX', 'FXS', 'DODO'
+      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
+                                'REP',  'BAT', 'ZRX',  'SUSHI',
+                                'LINK', 'UNI', 'BOBA', 'OMG',
+                                'FRAX', 'FXS', 'DODO', 'UST'
                               ]
 
       await Promise.all(supportedTokens.map(async (key) => {
-          
+
         const L1a = await this.AddressManager.getAddress('TK_L1'+key)
         const L2a = await this.AddressManager.getAddress('TK_L2'+key)
 
@@ -500,7 +500,7 @@ class NetworkService {
         L2LPJson.abi,
         this.provider.getSigner()
       )
-      
+
       // if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
       // if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
 
@@ -539,7 +539,7 @@ class NetworkService {
       })
 
       //console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
-      
+
       // this.BobaContract = new ethers.Contract(
       //   allTokens.BOBA.L2,
       //   Boba.abi,
@@ -551,7 +551,7 @@ class NetworkService {
 
         if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
         if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
-        
+
         this.delegateContract = new ethers.Contract(
           allAddresses.GovernorBravoDelegate,
           GovernorBravoDelegate.abi,
@@ -564,7 +564,7 @@ class NetworkService {
           this.provider.getSigner()
         )
       }
-      
+
       this.bindProviderListeners()
 
       return 'enabled'
@@ -614,7 +614,7 @@ class NetworkService {
     //local does not have a blockexplorer
     if( masterConfig !== 'local') {
       blockExplorerUrls = [nw[masterConfig].L2.blockExplorer.slice(0, -1)]
-    } 
+    }
 
     //the chainParams are only needed for the L2's
     const chainParam = {
@@ -830,7 +830,7 @@ class NetworkService {
 
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
-    
+
     return //still need to deploy ERC721 contracts on mainnet
 
     console.log("scanning for NFTs...")
@@ -964,7 +964,7 @@ class NetworkService {
           const nftMeta = await contract.tokenURI(tokenID)
 
           console.log("nftMeta:",nftMeta)
-         
+
           const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
           const { url , attributes = []} = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
@@ -990,7 +990,7 @@ class NetworkService {
     // if the token is already in the list, then this function does nothing
     // but if a new token shows up, then it will get added
     if(allTokens === null) return
-    
+
     Object.keys(allTokens).forEach((token, i) => {
       //console.log("allTokens[token].L1:",allTokens[token].L1)
       getToken(allTokens[token].L1)
@@ -1051,9 +1051,9 @@ class NetworkService {
       const getERC20Balance = async(token, tokenAddress, layer, provider) => {
         const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
         return {
-          ...token, 
+          ...token,
           balance: new BN(balance.toString()),
-          layer, 
+          layer,
           address: layer === 'L1' ? token.addressL1 : token.addressL2,
           symbol: token.symbolL1
         }
@@ -1108,7 +1108,7 @@ class NetworkService {
     console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
 
     updateSignatureStatus_depositTRAD(false)
-    
+
     try {
 
       const time_start = new Date().getTime()
@@ -1172,19 +1172,19 @@ class NetworkService {
 
   //Transfer funds from one account to another, on the L2
   async transfer(address, value_Wei_String, currency) {
-    
+
     let tx = null
 
     try {
-      
+
       if(currency === allAddresses.L2_ETH_Address) {
         //we are sending ETH
 
         let wei = BigNumber.from(value_Wei_String)
 
-        tx = await this.provider.send('eth_sendTransaction', 
+        tx = await this.provider.send('eth_sendTransaction',
           [
-            { 
+            {
               from: this.account,
               to: address,
               value: ethers.utils.hexlify(wei)
@@ -1200,7 +1200,7 @@ class NetworkService {
         )
         await tx.wait()
       }
-      
+
       return tx
     } catch (error) {
       console.log("NS: transfer error:", error)
@@ -1597,7 +1597,7 @@ class NetworkService {
       L1LPContract.ownerRewardFeeRate()
     ])
     const feeRate = Number(userRewardFeeRate) + Number(ownerRewardFeeRate)
-    
+
     return (feeRate / 10).toFixed(1)
   }
 
@@ -1651,12 +1651,12 @@ class NetworkService {
     const L1LPInfoPromise = []
 
     const getL1LPInfoPromise = async(tokenAddress) => {
-      
+
       let tokenBalance
       let tokenSymbol
       let tokenName
       let decimals
-      
+
       if (tokenAddress === allAddresses.L1_ETH_Address) {
         console.log("Getting eth balance:", tokenAddress)
         //getting eth balance
@@ -1680,7 +1680,7 @@ class NetworkService {
     }
 
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
-    
+
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
 
     sortRawTokens(L1LPInfo).forEach((token) => {
@@ -1912,7 +1912,7 @@ class NetworkService {
   async depositL1LP(currency, value_Wei_String) {
 
     updateSignatureStatus_depositLP(false)
-    
+
     console.log("depositL1LP:",currency)
     console.log("value_Wei_String",value_Wei_String)
 
@@ -2055,7 +2055,7 @@ class NetworkService {
 
     const depositCost_BN = depositGas_BN.mul(gasPrice)
     console.log("Fast exit cost (ETH)", utils.formatEther(depositCost_BN))
-    
+
     //returns total cost in ETH
     return utils.formatEther(depositCost_BN.add(approvalCost_BN))
   }
@@ -2116,7 +2116,7 @@ class NetworkService {
         )
         await approveStatus.wait()
 
-        if (!approveStatus) 
+        if (!approveStatus)
           return false
 
       } else {
@@ -2124,7 +2124,7 @@ class NetworkService {
       }
 
     }
-        
+
     const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
       balance_BN,
       currencyAddress,
@@ -2133,7 +2133,7 @@ class NetworkService {
     //console.log("tx2",tx2)
 
     let depositGas_BN = await this.L2Provider.estimateGas(tx2)
-    
+
     //returns 94082, which is too low?
     //add 40...
     //BUG BUG BUG - this should not be needed
@@ -2225,7 +2225,7 @@ class NetworkService {
         L2ERC20Json.abi,
         this.provider.getSigner()
       )
-      
+
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,
         allAddresses.L2LPAddress
@@ -2318,7 +2318,7 @@ class NetworkService {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
-    
+
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
 
@@ -2340,10 +2340,10 @@ class NetworkService {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
-    
+
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
-    
+
     try {
       let votes = await this.BobaContract.getCurrentVotes(this.account)
       return { votes: formatEther(votes) }
@@ -2380,7 +2380,7 @@ class NetworkService {
 
     if( this.masterSystemConfig === 'mainnet' ) return
     if( this.masterSystemConfig === 'rinkeby' ) return
-    
+
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
@@ -2405,7 +2405,7 @@ class NetworkService {
     let signatures = '' //text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
     let value = 0
     let description = ''
-    
+
     if( payload.action === 'text-proposal' ) {
       signatures = ['']
       value = 0
