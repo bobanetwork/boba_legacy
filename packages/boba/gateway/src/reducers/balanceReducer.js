@@ -16,6 +16,10 @@ limitations under the License. */
 const initialState = {
   layer1: [],
   layer2: [],
+  l1LpBalanceWeiString:'',
+  l1FeeRate: 0,
+  l1GasFee: 0,
+  l2FeeBalance: 0
 }
 
 function balanceReducer(state = initialState, action) {
@@ -23,6 +27,34 @@ function balanceReducer(state = initialState, action) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
       return { ...state, layer1, layer2 }
+    case 'FETCH/L1LP/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l1LpBalanceWeiString: action.payload
+      }
+    case 'FETCH/L1TOTALFEERATE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeRate: action.payload
+      }
+    case 'FETCH/FASTEXIT/COST/SUCCESS':
+      return {
+        ...state, 
+        l1GasFee: action.payload
+      }
+    case 'FETCH/L2FEE/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeBalance: action.payload
+      }
+    case 'BALANCE/RESET':
+      return {
+        ...state, 
+        l1LpBalanceWeiString: '',
+        l1FeeRate: 0,
+        l1GasFee: 0,
+        l2FeeBalance: 0,
+      }
     default:
       return state
   }

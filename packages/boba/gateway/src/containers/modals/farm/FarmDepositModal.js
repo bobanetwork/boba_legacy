@@ -59,14 +59,7 @@ class FarmDepositModal extends React.Component {
           stakeToken.currency,
           stakeToken.LPAddress
         ))
-        // approvedAllowance = await networkService.checkAllowance(
-        //   stakeToken.currency,
-        //   stakeToken.LPAddress
-        // )
-        // approvedAllowance = approvedAllowance.toString()
       }
-
-      // this.setState({ approvedAllowance, stakeToken })
       this.setState({ stakeToken })
     }
 
@@ -130,13 +123,6 @@ class FarmDepositModal extends React.Component {
         stakeToken.currency,
         stakeToken.LPAddress
       ))
-      // let approvedAllowance = await networkService.checkAllowance(
-      //   stakeToken.currency,
-      //   stakeToken.LPAddress
-      // )
-      // approvedAllowance = approvedAllowance.toString()
-
-      // this.setState({ approvedAllowance, loading: false })
       this.setState({ loading: false })
     } else {
       this.setState({ loading: false })

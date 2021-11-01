@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { fetchL1LPBalance, getFarmInfo } from 'actions/farmAction'
+import { fetchL1LPBalance, fetchL2LPBalance, getFarmInfo } from 'actions/farmAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
@@ -81,7 +81,7 @@ class FarmWithdrawModal extends React.Component {
         LPBalance: logAmount(lpBalanceWeiString, withdrawToken.decimals),
         LPBalance_Wei_String: lpBalanceWeiString
       })
-      
+
       this.setMaxTransferValue()
     }
 

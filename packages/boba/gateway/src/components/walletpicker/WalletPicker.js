@@ -49,10 +49,10 @@ function WalletPicker ({ onEnable, enabled }) {
 
   const dispatch = useDispatch();
 
-  const [ walletEnabled, setWalletEnabled ] = useState(false)
-  const [ accountsEnabled, setAccountsEnabled ] = useState(false)
-  const [ wrongNetwork, setWrongNetwork ] = useState(false)
-  
+  const [walletEnabled, setWalletEnabled] = useState(false)
+  const [accountsEnabled, setAccountsEnabled] = useState(false)
+  const [wrongNetwork, setWrongNetwork] = useState(false)
+
   const walletMethod = useSelector(selectWalletMethod())
   const masterConfig = useSelector(selectNetwork())
 
@@ -64,8 +64,8 @@ function WalletPicker ({ onEnable, enabled }) {
   let maintenance = false
 
   if (process.env.REACT_APP_STATUS === 'maintenance' ) {
-      maintenance = true
-  } 
+    maintenance = true
+  }
 
   const dispatchSetWalletMethod = useCallback((methodName) => {
     dispatch(setWalletMethod(methodName));
@@ -74,12 +74,12 @@ function WalletPicker ({ onEnable, enabled }) {
   useEffect(() => {
 
     if (walletMethod === 'browser') {
-      enableBrowserWallet()
+      setupBrowserWallet()
     }
 
-    async function enableBrowserWallet () {
+    async function setupBrowserWallet() {
       const selectedNetwork = masterConfig
-      const walletEnabled = await networkService.enableBrowserWallet(selectedNetwork)
+      const walletEnabled = await dispatch(enableBrowserWalle(selectedNetwork))
       return walletEnabled
         ? setWalletEnabled(true)
         : dispatchSetWalletMethod(null);
@@ -149,7 +149,7 @@ function WalletPicker ({ onEnable, enabled }) {
         onClose={resetSelection}
       />
       <Root>
-        {!maintenance && 
+        {!maintenance &&
           <Container maxWidth="md">
             <Grid container spacing={8}>
               <Grid item xs={12} md={6}>
@@ -185,24 +185,24 @@ function WalletPicker ({ onEnable, enabled }) {
             </Grid>
           </Container>
        }
-       {!!maintenance && 
-        <Container maxWidth="md">
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={12}>
-              <Typography variant="h1" component="h1">
-                SCHEDULED BOBA DOWNTIME 
-              </Typography>
-              <S.Subtitle variant="body1" component="p" paragraph={true}>
-                As announced in Twitter and in Telegram, BOBA is being upgraded to v2.
-              </S.Subtitle>
-              <S.Subtitle variant="body1" component="p" paragraph={true}>
-                The scheduled upgrade window is from Oct. 28 00:00 UTC to approximately 12:00 UTC. 
-                Upgrade status and progress reports will be provided via Twitter and Telegram.
-              </S.Subtitle>
+        {!!maintenance && 
+          <Container maxWidth="md">
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h1" component="h1">
+                  SCHEDULED BOBA DOWNTIME 
+                </Typography>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  As announced in Twitter and in Telegram, BOBA is being upgraded to v2.
+                </S.Subtitle>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  The scheduled upgrade window is from Oct. 28 00:00 UTC to approximately 12:00 UTC. 
+                  Upgrade status and progress reports will be provided via Twitter and Telegram.
+                </S.Subtitle>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
-       }
+          </Container>
+        }
       </Root>
     </>
   );

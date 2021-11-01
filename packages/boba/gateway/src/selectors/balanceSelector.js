@@ -20,3 +20,19 @@ export function selectlayer1Balance (state) {
 export function selectlayer2Balance (state) {
   return state.balance.layer2;
 }
+
+export function selectL1LPBalanceString (state) {
+  return state.balance.l1LpBalanceWeiString;
+}
+
+export function selectL1FeeRate (state) {
+  return state.balance.l1FeeRate;
+}
+
+export function selectL1GasFee (state) {
+  return state.balance.l1GasFee;
+}
+
+export function selectL2FeeBalance (state) {
+  return state.balance.l2FeeBalance;
+}

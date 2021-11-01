@@ -36,6 +36,7 @@ import networkService from 'services/networkService'
 
 import * as styles from './WrongNetworkModal.module.scss'
 import { useTheme } from '@emotion/react'
+import { correctChain } from 'actions/networkAction';
 
 function WrongNetworkModal ({ open, onClose }) {
 
@@ -68,8 +69,8 @@ function WrongNetworkModal ({ open, onClose }) {
     dispatch(closeModal('wrongNetworkModal'))
   }
 
-  async function correctChain() {
-    await networkService.correctChain( networkLayer )
+  async function changeMetamaskNetwork() {
+    dispatch(correctChain(networkLayer))
   }
 
   return (
@@ -88,7 +89,7 @@ function WrongNetworkModal ({ open, onClose }) {
       </Typography>
 
       <Button
-        onClick={correctChain}
+        onClick={changeMetamaskNetwork}
         color='primary'
         size='large'
         variant='contained'

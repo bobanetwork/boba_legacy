@@ -36,6 +36,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
 import BN from 'bignumber.js'
+import { fetchFastExitCost, fetchL1LPBalance, fetchL1TotalFeeRate, fetchL2FeeBalance } from 'actions/balanceAction'
+import { selectL1FeeRate, selectL1GasFee, selectL1LPBalanceString, selectL2FeeBalance } from 'selectors/balanceSelector'
 
 function DoExitStepFast({ handleClose, token }) {
 
@@ -44,10 +46,10 @@ function DoExitStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')
 
-  const [ LPBalance, setLPBalance ] = useState(0)
-  const [ feeRate, setFeeRate ] = useState(0)
-  const [ l1gas, setl1gas ] = useState(0)
-  const [ l2FeeBalance, setL2FeeBalance ] = useState(0)
+  const  feeRate = useSelector(selectL1FeeRate)
+  const  l1gas = useSelector(selectL1GasFee)
+  const  l2FeeBalance = useSelector(selectL2FeeBalance)
+  const  l1LpBalanceString = useSelector(selectL1LPBalanceString)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -70,6 +72,10 @@ function DoExitStepFast({ handleClose, token }) {
     }
 
     setValue(value)
+  }
+
+  function getLPBalance () {
+    return Number(logAmount(l1LpBalanceString, token.decimals)).toFixed(3)
   }
 
   const receivableAmount = (value) => {
@@ -124,25 +130,15 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      networkService.L1LPBalance(token.addressL1).then((res) => {
-        setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.getL1TotalFeeRate().then((feeRate) => {
-       setFeeRate(feeRate)
-      })
-      networkService.getFastExitCost(token.address).then((fee) => {
-       setl1gas(fee)
-      })
-      networkService.getL2FeeBalance().then((ETHbalance) => {
-       setL2FeeBalance(ETHbalance)
-      })
+      dispatch(fetchL1LPBalance(token.addressL1));
+      dispatch(fetchL1TotalFeeRate());
+      dispatch(fetchFastExitCost(token.address));
+      dispatch(fetchL2FeeBalance());
     }
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
-      setLPBalance(0)
-      setFeeRate(0)
-      setl1gas(0)
+      dispatch({type: 'BALANCE/RESET'})
     }
   }, [ token ])
 
@@ -231,9 +227,9 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {Number(LPBalance) < Number(value) && (
+        {Number(getLPBalance()) < Number(value) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The liquidity pool balance (of {LPBalance}) is too low to cover your bridge - please
+            The liquidity pool balance (of {getLPBalance()}) is too low to cover your bridge - please
             use the classic bridge or reduce the amount.
           </Typography>
         )}
