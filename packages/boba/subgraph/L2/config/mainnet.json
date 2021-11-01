@@ -1,0 +1,11 @@
+{
+  "network": "boba",
+  "contracts": {
+    "L2LiquidityPool": {
+      "address": "0x3A92cA39476fF84Dc579C868D4D7dE125513B034"
+    },
+    "OVM_L2StandardBridge": {
+      "address": "0x4200000000000000000000000000000000000010"
+    }
+  }
+}
