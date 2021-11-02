@@ -503,16 +503,20 @@ function destroy_dev_services {
           done
           aws ecs list-tasks --cluster $ECS_CLUSTER |egrep -vi $DATADOGTASK | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
           info "Stopped ${ECS_CLUSTER}"
-        elif [[ "${SERVICE_NAME}" == "data-transport-layer" ]]; then
+        elif [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "verifier-dtl" ]]; then
           TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
           aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
           aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
           aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text >> /dev/null
-        elif [[ "${SERVICE_NAME}" == "l2geth" ]]; then
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
+        elif [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" || "${SERVICE_NAME}" == "verifier-l2" ]]; then
           TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
           aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
           aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
           aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
         else
           aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
         fi
@@ -632,6 +636,7 @@ case "${SUBCMD}" in
     update)
         [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
+        stop_cluster
         update_dev_services
         ;;
     restart)

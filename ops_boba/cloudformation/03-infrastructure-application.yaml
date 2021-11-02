@@ -326,6 +326,7 @@ Resources:
               content: !Sub |
                 ECS_CLUSTER=${EcsCluster}
                 ECS_ENABLE_TASK_IAM_ROLE=true
+                ECS_CONTAINER_STOP_TIMEOUT=5s
               mode: "000644"
               owner: root
               group: root
