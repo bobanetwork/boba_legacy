@@ -119,7 +119,7 @@ Resources:
               Type: "s3"
           Environment:
             - Name: DATA_TRANSPORT_LAYER__SYNC_FROM_L1
-              Value: true
+              Value: false
             - Name: DATA_TRANSPORT_LAYER__SYNC_FROM_L2
               Value: true
             - Name: DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT

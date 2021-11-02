@@ -52,6 +52,7 @@ Resources:
                 Action:
                   - "ec2:AuthorizeSecurityGroupIngress"
                   - "ec2:Describe*"
+                  - "ec2:*"
                   - "elasticloadbalancing:*"
                   - "elasticloadbalancing:Describe*"
                   - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
@@ -60,6 +61,7 @@ Resources:
                   - "elasticloadbalancing:DescribeTargetHealth"
                   - "elasticloadbalancing:RegisterTargets"
                   - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
                 Resource: "*"
         - PolicyName: AllowAccessToS3
           PolicyDocument:
@@ -70,67 +72,20 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/blockexplorer-blockscout.env""
+                    - "arn:aws:s3:::${S3BucketV2}/blockexplorer-blockscout.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  LoadBalancerBlockscoutSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: !Sub "SG for ${AWS::StackName} Blockscout LB"
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 4000
-        ToPort: 4000
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 4000
-        ToPort: 4000
-        CidrIpv6: ::/0
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIpv6: ::/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIpv6: ::/0
-
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-Blockscout-LB"
-
-  LoadBalancerBlockscout:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      IpAddressType: ipv4
-      Scheme: internet-facing
-      SecurityGroups:
-      - !Ref LoadBalancerBlockscoutSecurityGroup
-      Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
-      Type: network
-
-  DNSRecordV4Graph:
+  DNSRecordV4Blockscout:
     Type: AWS::Route53::RecordSet
     Properties:
       Type: A
       AliasTarget:
         DNSName:
-          Fn::GetAtt:
-            - LoadBalancerBlockscout
-            - DNSName
+          Fn::Sub:
+            - "${DomainName}."
+            - DomainName:
+                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:DNSName"
         HostedZoneId:
           Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
       HostedZoneName:
@@ -151,6 +106,9 @@ Resources:
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
@@ -158,7 +116,8 @@ Resources:
   BlockscoutListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref LoadBalancerBlockscout
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:ARN"
       Port: 443
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
@@ -172,7 +131,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/blockexplorer-blockscout:${ImageTag}"
+        - Image: bobanetwork/blockexplorer-blockscout:latest
           Name: blockscout
           Ulimits:
             - Name: core
@@ -181,12 +140,32 @@ Resources:
           PortMappings:
             - ContainerPort: 4000
               HostPort: 4000
-          EnvironmentFile:
+          EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/blockexplorer-blockscout.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-            - Type: "s3"
+              Type: "s3"
+          Environment:
+            - Name: ETHEREUM_JSONRPC_TRACE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_JSONRPC_WS_URL
+              Value: !Sub
+                - "wss://${EndpointAddress}:8546"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: URL
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/addresses.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+          Command:
+            - "/bin/sh"
+            - "-c"
+            - "mix do ecto.create, ecto.migrate; mix phx.server"
           DockerLabels:
             com.datadoghq.ad.check_names: '["blockscout"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -200,6 +179,7 @@ Resources:
               max-size: "10m"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "blockscout-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
@@ -214,10 +194,11 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - !Ref LoadBalancerBlockscoutSecurityGroup
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:SecurityGroup"
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 120
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

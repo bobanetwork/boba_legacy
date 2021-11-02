@@ -104,7 +104,7 @@ function timestamp {
 
 function log_output {
     LOG_LEVEL="${1:-INFO}"
-    echo -e "[$(timestamp)] $(basename ${0}) ${LOG_LEVEL}: ${@:2}" >&2
+    echo -e "[$(timestamp)] $(basename ${0}) ${LOG_LEVEL}: ${@:2}" >&2 >> /tmp/logout1.log
 }
 
 function error {
@@ -276,6 +276,11 @@ function check_dev_environment {
 
 function deploy_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
+      if [[ ${ENV_PREFIX} == *"-replica"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
+      elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
+      fi
       notice "Generating environment files ...."
       for srv in $DOCKER_IMAGES_LIST; do
          aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
@@ -305,6 +310,11 @@ function deploy_dev_services {
     else
       info "Deploy ${SERVICE_NAME}"
       notice "Generating environment files ...."
+      if [[ ${ENV_PREFIX} == *"-replica"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
+      elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
+      fi
       aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
       aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       rm -rf ${SERVICE_NAME}.env
@@ -329,6 +339,11 @@ function update_dev_services {
     if [ -z ${SERVICE_NAME} ]; then
       notice "Generating environment files ...."
       for srv in $DOCKER_IMAGES_LIST; do
+        if [[ ${ENV_PREFIX} == *"-replica"* ]];then
+         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
+       elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
+       fi
          aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
          aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       done
@@ -353,6 +368,12 @@ function update_dev_services {
       done
     else
       notice "Generating environment file for ${SERVICE_NAME}"
+      #set -x
+      if [[ ${ENV_PREFIX} == *"-replica"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
+      elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
+        ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
+      fi
       aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
       aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       rm -rf ${SERVICE_NAME}.env
@@ -448,10 +469,12 @@ function destroy_dev_services {
         SERVICE2RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|sed 's#"##g'|grep -i $SRV|tail -1`
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
         sleep 30
-        if [[ "${SERVICE_NAME}" == "l2geth" ]]; then
+        if [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" ]] ; then
           aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
-        elif [[ "${SERVICE_NAME}" == "data-transport-layer" ]]; then
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
+        elif [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" ]]; then
           aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text > /dev/null
+          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text > /dev/null
         fi
         aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 1 >> /dev/null
         info "Restarted ${SERVICE_NAME} on ${ECS_CLUSTER}"

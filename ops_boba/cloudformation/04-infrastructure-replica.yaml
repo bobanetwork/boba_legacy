@@ -62,6 +62,16 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
+  LoadBalancerBlockscout:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Scheme: internet-facing
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      Type: network
+
   EcsCluster:
     Type: AWS::ECS::Cluster
 
@@ -200,3 +210,11 @@ Outputs:
     Value: !Ref LoadBalancerReplicaDTL
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:ARN"
+  LoadBalancerBlockscoutDNSName:
+    Value: !GetAtt LoadBalancerBlockscout.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:DNSName"
+  LoadBalancerBlockscoutArn:
+    Value: !Ref LoadBalancerBlockscout
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:ARN"

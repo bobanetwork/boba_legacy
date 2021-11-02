@@ -180,7 +180,7 @@ Resources:
             - Name: ETH1_SYNC_SERVICE_ENABLE
               Value: true
             - Name: ETH1_CONFIRMATION_DEPTH
-              Value: 0
+              Value: 8
           EntryPoint:
             - "sh"
             - "./geth.sh"
