@@ -1,14 +1,14 @@
 {
-  "name": "@boba/hardhat-example-simplestorage",
-  "version": "0.0.1",
+  "name": "@boba/hardhat-simple-storage",
+  "version": "1.0.0",
   "author": "OMG",
   "license": "MIT",
   "files": [
     "test/**/*.ts"
   ],
   "scripts": {
-    "deploy": "hardhat deploy --network bobaL2",
-    "test": "hardhat test --network bobaL2"
+    "deploy": "hardhat deploy --network boba_rinkeby",
+    "test": "hardhat test --network boba_rinkeby"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",
