@@ -420,7 +420,8 @@ class NetworkService {
       const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                                 'REP',  'BAT', 'ZRX',  'SUSHI',
                                 'LINK', 'UNI', 'BOBA', 'OMG',
-                                'FRAX', 'FXS', 'DODO', 'UST'
+                                'FRAX', 'FXS', 'DODO', 'UST',
+                                'BUSD', 'BNB'
                               ]
 
       await Promise.all(supportedTokens.map(async (key) => {
@@ -1440,7 +1441,7 @@ class NetworkService {
       /* OMG IS A SPECIAL CASE - allowance needs to be
       set to zero, and then set to actual amount */
       if( allowance_BN.gt(BigNumber.from(0)) &&
-          (currency.toLowerCase() === this["L1_OMG_Address"].toLowerCase())
+          (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
         console.log("OMG Token allowance reset")
