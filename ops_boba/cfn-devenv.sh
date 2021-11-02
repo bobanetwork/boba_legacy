@@ -548,9 +548,12 @@ function destroy_dev_services {
           URL=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:DomainName\`].Value" --no-paginate --output text)
           STACK_NAME=$(echo $ecs|sed 's#-infrastructure-application.*##')
           ELB_INT=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerInt:DNSName\`].Value" --no-paginate --output text)
+          ELB_L2=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancer:DNSName\`].Value" --no-paginate --output text)
+          ELB_REPLICA_L2=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerReplica:DNSName\`].Value" --no-paginate --output text)
+          ELB_REPLICA_DTL=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerReplicaDTL:DNSName\`].Value" --no-paginate --output text)
           REPLICA_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterReplica\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
           VERIFIER_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterVerifier\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
-          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n VERIFIER-NAME: $VERIFIER_NAME \n--------------- \n"
+          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-ELB-INTERNAL: https://$ELB_L2 \n REPLICA-L2-URL: http://$ELB_REPLICA_L2:8545 \n REPLICA-DTL: http://$ELB_REPLICA_DTL:7878 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n VERIFIER-NAME: $VERIFIER_NAME \n--------------- \n"
           done
         }
 

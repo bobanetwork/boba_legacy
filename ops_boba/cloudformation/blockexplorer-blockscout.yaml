@@ -147,7 +147,7 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: ETHEREUM_JSONRPC_TRACE_URL
+            - Name: ETHEREUM_JSONRPC_HTTP_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
                 - EndpointAddress:
