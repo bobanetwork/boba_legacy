@@ -141,14 +141,6 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: RPC_API
-              Value: eth,net,rollup,web3,txpool,debug,db,personal
-            - Name: WS_API
-              Value: eth,net,rollup,web3,txpool,debug,db,personal
-            - Name: ROLLUP_BACKEND
-              Value: l2
-            - Name: ROLLUP_VERIFIER_ENABLE
-              Value: true
             - Name: DEPLOYER_HTTP
               Value: !Sub
                 - "http://${EndpointAddress}:8081"
@@ -169,18 +161,6 @@ Resources:
                 - "http://${EndpointAddress}:8081/state-dump.latest.json"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
-            - Name: ROLLUP_ENABLE_L2_GAS_POLLING
-              Value: true
-            - Name: ROLLUP_ENFORCE_FEES
-              Value: true
-            - Name: GCMODE
-              Value: archive
-            - Name: NO_DISCOVER
-              Value: true
-            - Name: ETH1_SYNC_SERVICE_ENABLE
-              Value: true
-            - Name: ETH1_CONFIRMATION_DEPTH
-              Value: 8
           EntryPoint:
             - "sh"
             - "./geth.sh"
