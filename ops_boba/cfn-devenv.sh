@@ -104,7 +104,7 @@ function timestamp {
 
 function log_output {
     LOG_LEVEL="${1:-INFO}"
-    echo -e "[$(timestamp)] $(basename ${0}) ${LOG_LEVEL}: ${@:2}" >&2 >> /tmp/logout1.log
+    echo -e "[$(timestamp)] $(basename ${0}) ${LOG_LEVEL}: ${@:2}" >&2
 }
 
 function error {
@@ -426,11 +426,11 @@ function destroy_dev_services {
   function restart_service {
     #set -x
       local force="${1:-}"
-      CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
-      if [[ ${ENV_PREFIX} == *"-replica"* ]];then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
+      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       else
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       fi
