@@ -143,6 +143,24 @@
             "rinkeby":"0x012e4C202b1153183F7B0e7A90348C4cCE15d2c9",
             "mainnet": "0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
          }
+      },
+      {
+        "name": "Binance USD",
+        "symbol": "BUSD",
+        "decimals": 18,
+        "address": {
+            "rinkeby":"0x697Eda570FE014832456b4B3d2Dff8591eA3f4fc",
+            "mainnet": "0x4fabb145d64652a948d72533023f6e7a623c7c53"
+         }
+      },
+      {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18,
+        "address": {
+            "rinkeby":"0xeB72FaBBEF4D4F59bCA384123977eD9529c9bd2e",
+            "mainnet": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52"
+         }
       }
    ]
 }

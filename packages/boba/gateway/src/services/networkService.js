@@ -420,7 +420,8 @@ class NetworkService {
       const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                                 'REP',  'BAT', 'ZRX',  'SUSHI',
                                 'LINK', 'UNI', 'BOBA', 'OMG',
-                                'FRAX', 'FXS', 'DODO', 'UST'
+                                'FRAX', 'FXS', 'DODO', 'UST',
+                                'BUSD', 'BNB'
                               ]
 
       await Promise.all(supportedTokens.map(async (key) => {

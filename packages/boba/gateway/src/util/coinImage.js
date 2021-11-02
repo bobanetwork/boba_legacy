@@ -16,6 +16,8 @@ import fraxLogo from 'images/frax.png';
 import fxsLogo from 'images/fxs.svg';
 import bobaLogo from 'images/boba-token-glow.png';
 import terraLogo from 'images/terra.png';
+import busdLogo from 'images/busd.svg';
+import bnbLogo from 'images/bnb.svg';
 
 export const getCoinImage = (symbol) => {
 
@@ -78,6 +80,12 @@ export const getCoinImage = (symbol) => {
       break;
     case "UST":
       logo = terraLogo;
+      break;
+    case "BUSD":
+      logo = busdLogo;
+      break;
+    case "BNB":
+      logo = bnbLogo;
       break;
     default:
       logo = ethLogo;
