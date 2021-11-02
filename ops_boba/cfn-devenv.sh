@@ -16,7 +16,7 @@ SUBCMD=
 FORCE=no
 AWS_ECR="942431445534.dkr.ecr.${REGION}.amazonaws.com"
 SKIPSERVICE=
-ALL_DOCKER_IMAGES_LIST=`ls ${PATH_TO_CFN}|egrep -v '^0|^datadog|^optimism|^graph'|sed 's/.yaml//g'`
+ALL_DOCKER_IMAGES_LIST=`ls ${PATH_TO_CFN}|egrep -v '^0|^datadog|^optimism|^graph|^deployer-rinkeby'|sed 's/.yaml//g'`
 DOCKER_IMAGES_LIST=`ls ${PATH_TO_CFN}|egrep -v '^0|^datadog|^optimism|^graph|^replica'|sed 's/.yaml//g'`
 ENV_PREFIX=
 FORCE=no
@@ -482,20 +482,21 @@ function destroy_dev_services {
     }
 
     function stop_cluster {
+      #set -x
         local force="${1:-}"
-        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
-        if [[ ${ENV_PREFIX} == *"-replica"* ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
+        if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w ${ENV_PREFIX}|egrep -v 'replica|verfier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
         fi
         CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
         ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
         EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
         SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
-        DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
         if [ -z ${SERVICE_NAME} ]; then
           info "STOP ${ECS_CLUSTER}"
           for num in $SERVICE4RESTART; do
@@ -555,9 +556,10 @@ function destroy_dev_services {
 
 
      function generate_environment {
+       #set -x
         if [ -z ${SERVICE_NAME} ]; then
-           info "Missing ${SERVICE_NAME} going to re-generate all environment files"
-           for srv in $DOCKER_IMAGES_LIST datadog; do
+           info "Missing SERVICE_NAME going to re-generate all environment files"
+           for srv in $ALL_DOCKER_IMAGES_LIST datadog; do
               aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
               aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
             done
@@ -642,6 +644,7 @@ case "${SUBCMD}" in
     restart)
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         [[ -z "${FORCE}" ]] && warn 'Missing --force, so not going to delete the /mnt/efs directory contents'
+        generate_environment
         restart_service
         ;;
     stop)
