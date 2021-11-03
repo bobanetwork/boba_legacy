@@ -256,6 +256,17 @@ Resources:
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
+          Environment:
+            - Name: ipfs
+              Value: !Sub
+                - "${EndpointAddress}:5001"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
+            - Name: ethereum
+              Value: !Sub
+                - "omgx:http://${EndpointAddress}:8545"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'
