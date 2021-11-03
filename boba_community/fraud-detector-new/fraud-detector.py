@@ -88,8 +88,18 @@ def doEvent(event):
   (junk, ib) = scc_contract.decode_function_input(t.input)
   for sr in ib['_batch']:
     rCount += 1
+
     l2b = rpc[2].eth.getBlock(rCount)
     l2SR = l2b['stateRoot']
+
+    # Handle a possible lag in keeping the verifier up to date.
+    waitCount = 0
+    while rCount > rpc[3].eth.block_number:
+      logger.debug("Waiting for verifier to catch up, currently at block {}/{}".format(rpc[3].eth.block_number, rCount))
+      time.sleep(15)
+      waitCount += 1
+      if waitCount % 40 == 0:
+        logger.warning("Still waiting for verifier to catch up after {} attempts".format(waitCount))
 
     vfb = rpc[3].eth.getBlock(rCount)
     vfSR = vfb['stateRoot']
@@ -122,7 +132,7 @@ def fpLoop():
   l1_tip = rpc[1].eth.block_number
   assert(l1_tip > l1_base)
   startBlock = l1_base
-  logger.debug("SCC contract at {}, l1_base {}, l1_tip []".format(scc_addr, l1_base, l1_tip))
+  logger.debug("SCC contract at {}, l1_base {}, l1_tip {}".format(scc_addr, l1_base, l1_tip))
 
   logger.info("#SCC-IDX L1-Block SCC-STATEROOT L2-STATEROOT VERIFIER-STATEROOT MISMATCH")
 
@@ -158,12 +168,25 @@ def fpLoop():
   while True:
     # FIXME - if the L1 node restarts, this can fail with "filter not found". May want to
     # put some retry/recovery logic inside this utility rather than relying on an external
-    # service to restart it. 
-    for event in FF.get_new_entries():
-      doEvent(event)
-    do_checkpoint()
-    time.sleep(30)
+    # service to restart it.
+    try:
+      for event in FF.get_new_entries():
+        doEvent(event)
+      do_checkpoint()
+    except Exception as e:
+      logger.error("get_new_entries() failed: " + str(e))
+      if "filter not found" in str(e):
+        logger.warning("Attempting to reinstall filter from checkpoint " + str(checkpoint))
+        rCount = checkpoint[0]
+        startBlock = checkpoint[1]
 
+        FF = rpc[1].eth.filter({
+            "fromBlock":startBlock,
+            "toBlock":'latest',
+            "address":scc_addr,
+            "topics":[topic_sig]
+        })
+    time.sleep(30)
   logger.info("Exiting")
 
 fpLoop()
