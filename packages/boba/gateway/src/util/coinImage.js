@@ -18,6 +18,8 @@ import bobaLogo from 'images/boba-token-glow.png';
 import terraLogo from 'images/terra.png';
 import busdLogo from 'images/busd.svg';
 import bnbLogo from 'images/bnb.svg';
+import ftmLogo from 'images/ftm.svg';
+import maticLogo from 'images/matic.svg';
 
 export const getCoinImage = (symbol) => {
 
@@ -86,6 +88,12 @@ export const getCoinImage = (symbol) => {
       break;
     case "BNB":
       logo = bnbLogo;
+      break;
+    case "FTM":
+      logo = ftmLogo;
+      break;
+    case "MATIC":
+      logo = maticLogo;
       break;
     default:
       logo = ethLogo;

@@ -421,7 +421,7 @@ class NetworkService {
                                 'REP',  'BAT', 'ZRX',  'SUSHI',
                                 'LINK', 'UNI', 'BOBA', 'OMG',
                                 'FRAX', 'FXS', 'DODO', 'UST',
-                                'BUSD', 'BNB'
+                                'BUSD', 'BNB', 'FTM',  'MATIC'
                               ]
 
       await Promise.all(supportedTokens.map(async (key) => {
