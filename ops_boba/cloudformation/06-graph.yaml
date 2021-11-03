@@ -116,7 +116,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 5001
-      Protocol: TCP
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref IPFSLBTargetGroup
@@ -130,7 +133,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/7488423e-1d39-4fd3-9422-bf9a80fa7e28
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup
@@ -155,7 +158,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/7488423e-1d39-4fd3-9422-bf9a80fa7e28
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup1
@@ -180,7 +183,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup3
@@ -188,7 +191,7 @@ Resources:
   GraphLBTargetGroup4:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 8040
+      Port: 8020
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
@@ -204,11 +207,11 @@ Resources:
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
-      Port: 8040
+      Port: 8020
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/11a60189-ef87-47ad-af76-802039495816
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup4
@@ -235,12 +238,12 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
           Memory: "1024"
-        - Image: graphprotocol/graph-node
+        - Image: graphprotocol/graph-node:latest
           Name: graph
-          Ulimits:
-            - Name: core
-              SoftLimit: 0
-              HardLimit: 0
+#          Ulimits:
+#            - Name: core
+#              SoftLimit: 0
+#              HardLimit: 0
           PortMappings:
             - ContainerPort: 8000
               HostPort: 8000
@@ -248,8 +251,8 @@ Resources:
               HostPort: 8001
             - ContainerPort: 8030
               HostPort: 8030
-            - ContainerPort: 8040
-              HostPort: 8040
+            - ContainerPort: 8020
+              HostPort: 8020
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/graph.env"
@@ -264,11 +267,9 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
             - Name: ethereum
               Value: !Sub
-                - "omgx:http://${EndpointAddress}:8545"
+                - "boba:http://${EndpointAddress}:8545"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
-          EntryPoint:
-            - "start"
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -288,7 +289,7 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
       LoadBalancers:
         - ContainerName: graph
           ContainerPort: 8000
@@ -300,7 +301,7 @@ Resources:
           ContainerPort: 8030
           TargetGroupArn: !Ref GraphLBTargetGroup3
         - ContainerName: graph
-          ContainerPort: 8040
+          ContainerPort: 8020
           TargetGroupArn: !Ref GraphLBTargetGroup4
         - ContainerName: ipfs
           ContainerPort: 5001
@@ -313,7 +314,7 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 60
+      HealthCheckGracePeriodSeconds: 30
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
