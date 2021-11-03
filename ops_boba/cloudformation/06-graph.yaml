@@ -234,7 +234,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
-          Memory: "512"
+          Memory: "1024"
         - Image: graphprotocol/graph-node
           Name: graph
           Ulimits:
@@ -267,6 +267,8 @@ Resources:
                 - "omgx:http://${EndpointAddress}:8545"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
+          EntryPoint:
+            - "start"
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -311,6 +313,7 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
