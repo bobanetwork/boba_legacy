@@ -30,6 +30,8 @@ logger.debug (os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
 l1_base = int(os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
 element_start = 1
 
+is_ok = True # Set false once a mismatch is found. This disables checkpointing
+
 try:
   with open("./checkpoint.dat", "r") as f:
     start_at = json.loads(f.read())
@@ -79,6 +81,7 @@ last_saved = l1_base
 
 def doEvent(event):
   global rCount
+  global is_ok
 
   t = rpc[1].eth.get_transaction(event.transactionHash)
 
@@ -98,7 +101,8 @@ def doEvent(event):
       match = "**** L2/VERIFIER MISMATCH ****"
     log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), Web3.toHex(l2SR), Web3.toHex(vfSR), match)
     if match != "":
-      logger.warn(log_str)
+      is_ok = False
+      logger.warning(log_str)
     else:
       logger.info(log_str)
 
@@ -108,7 +112,8 @@ def doEvent(event):
 
 def do_checkpoint():
   global last_saved
-  if last_saved != checkpoint[1]:
+  global is_ok
+  if is_ok and last_saved != checkpoint[1]:
     with open("./checkpoint.dat", "w") as f:
       f.write(json.dumps(checkpoint))
     last_saved = checkpoint[1]
@@ -142,6 +147,7 @@ def fpLoop():
     startBlock = toBlock + 1
     do_checkpoint()
 
+  logger.debug("Caught up to L1 tip. Waiting for new events from startBlock " + str(startBlock))
   FF = rpc[1].eth.filter({
       "fromBlock":startBlock,
       "toBlock":'latest',
