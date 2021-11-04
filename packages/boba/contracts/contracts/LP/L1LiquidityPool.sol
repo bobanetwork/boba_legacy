@@ -553,8 +553,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     }
 
     /*
-     * Rebalance L2 LP
-     * @param _amount reward amount that liquidity providers want to withdraw
+     * Rebalance LPs
+     * @param _amount token amount that we want to move from L1 to L2
      * @param _tokenAddress L1 token address
      */
     function rebalanceLP(
