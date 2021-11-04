@@ -11,6 +11,9 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
+/* External Imports */
+import "@eth-optimism/contracts/contracts/L1/messaging/L1StandardBridge.sol";
+
 /**
  * @dev An L1 LiquidityPool implementation
  */
@@ -86,6 +89,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     uint256 public SAFE_GAS_STIPEND;
     // cdm address
     address public l1CrossDomainMessenger;
+    // L1StandardBridge address
+    address payable public L1StandardBridgeAddress;
 
     /********************
      *       Events     *
@@ -142,6 +147,11 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         address tokenAddress
     );
 
+    event RebalanceLP(
+        uint256 amount,
+        address tokenAddress
+    );
+
     /********************
      *    Constructor   *
      ********************/
@@ -194,11 +204,13 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
      * @param _l1CrossDomainMessenger L1 Messenger address being used for sending the cross-chain message.
      * @param _l1CrossDomainMessengerFast L1 Messenger address being used for relaying cross-chain messages quickly.
      * @param _L2LiquidityPoolAddress Address of the corresponding L2 LP deployed to the L2 chain
+     * @param _L1StandardBridgeAddress Address of L1 StandardBridge
      */
     function initialize(
         address _l1CrossDomainMessenger,
         address _l1CrossDomainMessengerFast,
-        address _L2LiquidityPoolAddress
+        address _L2LiquidityPoolAddress,
+        address payable _L1StandardBridgeAddress
     )
         public
         onlyOwner()
@@ -209,6 +221,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         senderMessenger = _l1CrossDomainMessenger;
         relayerMessenger = _l1CrossDomainMessengerFast;
         L2LiquidityPoolAddress = _L2LiquidityPoolAddress;
+        L1StandardBridgeAddress = _L1StandardBridgeAddress;
         owner = msg.sender;
         _configureFee(35, 15);
         configureGas(1400000, 2300);
@@ -534,6 +547,51 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         emit WithdrawReward(
             msg.sender,
             _to,
+            _amount,
+            _tokenAddress
+        );
+    }
+
+    /*
+     * Rebalance LPs
+     * @param _amount token amount that we want to move from L1 to L2
+     * @param _tokenAddress L1 token address
+     */
+    function rebalanceLP(
+        uint256 _amount,
+        address _tokenAddress
+    )
+        external
+        onlyOwner()
+        whenNotPaused()
+    {
+        require(_amount != 0, "Amount Incorrect");
+
+        PoolInfo storage pool = poolInfo[_tokenAddress];
+
+        require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+
+        if (_tokenAddress == address(0)) {
+            require(_amount <= address(this).balance, "Failed to Rebalance LP");
+            L1StandardBridge(L1StandardBridgeAddress).depositETHTo{value: _amount}(
+                L2LiquidityPoolAddress,
+                SETTLEMENT_L2_GAS,
+                ""
+            );
+        } else {
+            require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Failed to Rebalance LP");
+            IERC20(_tokenAddress).approve(L1StandardBridgeAddress, _amount);
+            L1StandardBridge(L1StandardBridgeAddress).depositERC20To(
+                _tokenAddress,
+                pool.l2TokenAddress,
+                L2LiquidityPoolAddress,
+                _amount,
+                SETTLEMENT_L2_GAS,
+                ""
+            );
+        }
+        emit RebalanceLP(
             _amount,
             _tokenAddress
         );
