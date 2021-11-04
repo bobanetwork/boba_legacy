@@ -90,7 +90,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     // cdm address
     address public l1CrossDomainMessenger;
     // L1StandardBridge address
-    address public payable L1StandardBridgeAddress;
+    address payable public L1StandardBridgeAddress;
 
     /********************
      *       Events     *
@@ -210,7 +210,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         address _l1CrossDomainMessenger,
         address _l1CrossDomainMessengerFast,
         address _L2LiquidityPoolAddress,
-        address _L1StandardBridgeAddress
+        address payable _L1StandardBridgeAddress
     )
         public
         onlyOwner()
@@ -584,7 +584,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
                 L2LiquidityPoolAddress,
                 _amount,
                 SETTLEMENT_L2_GAS,
-                abi.encodePacked(0)
+                ""
             );
         }
         emit RebalanceLP(
