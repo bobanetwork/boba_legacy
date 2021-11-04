@@ -1756,7 +1756,7 @@ class NetworkService {
 
     const L2LPInfoPromise = [];
 
-    const getL2LPInfoPromise = async(tokenAddress, tokenAddressL1 ) => {
+    const getL2LPInfoPromise = async( tokenAddress, tokenAddressL1 ) => {
 
       let tokenBalance
       let tokenSymbol
@@ -1775,6 +1775,8 @@ class NetworkService {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
+      console.log("tokenAddress",tokenAddress)
+      console.log("poolTokenInfo",poolTokenInfo)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
     }
@@ -2024,6 +2026,46 @@ class NetworkService {
     }
 
     return balance.toString()
+  }
+
+  /***************************************/
+  /*********** L1LP Liquidity ************/
+  /***************************************/
+  async L1LPLiquidity(tokenAddress) {
+
+    const L1LPContractNS = new ethers.Contract(
+      allAddresses.L1LPAddress,
+      L1LPJson.abi,
+      this.L1Provider
+    )
+
+    try {
+      const poolTokenInfo = await L1LPContractNS.poolInfo(tokenAddress)
+      return poolTokenInfo.userDepositAmount.toString()
+    } catch (err) {
+      return err
+    }
+
+  }
+
+  /***************************************/
+  /*********** L2LP Liquidity ************/
+  /***************************************/
+  async L2LPLiquidity(tokenAddress) {
+
+    const L2LPContractNS = new ethers.Contract(
+      allAddresses.L2LPAddress,
+      L2LPJson.abi,
+      this.L2Provider
+    )
+
+    try {
+      const poolTokenInfo = await L2LPContractNS.poolInfo(tokenAddress)
+      return poolTokenInfo.userDepositAmount.toString()
+    } catch (err) {
+      return err
+    }
+    
   }
 
   /* Estimate cost of Fast Bridge to L1 */
