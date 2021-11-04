@@ -46,10 +46,13 @@ function DoExitStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')
 
-  const  feeRate = useSelector(selectL1FeeRate)
-  const  l1gas = useSelector(selectL1GasFee)
-  const  l2FeeBalance = useSelector(selectL2FeeBalance)
-  const  l1LpBalanceString = useSelector(selectL1LPBalanceString)
+  const [ LPBalance, setLPBalance ] = useState(0)
+  const [ LPLiquidity, setLPLiquidity ] = useState(0)
+  const [ feeRate, setFeeRate ] = useState(0)
+  const [ LPRatio, setLPRatio ] = useState(0)
+
+  const [ l1gas, setl1gas ] = useState(0)
+  const [ l2FeeBalance, setL2FeeBalance ] = useState(0)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -146,15 +149,29 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      dispatch(fetchL1LPBalance(token.addressL1));
-      dispatch(fetchL1TotalFeeRate());
-      dispatch(fetchFastExitCost(token.address));
-      dispatch(fetchL2FeeBalance());
+      networkService.L1LPBalance(token.addressL1).then((res) => {
+        setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
+      })
+      networkService.L1LPLiquidity(token.addressL1).then((res) => {
+        setLPLiquidity(Number(logAmount(res, token.decimals)).toFixed(3))
+      })
+      networkService.getL1TotalFeeRate().then((feeRate) => {
+       setFeeRate(feeRate)
+      })
+      networkService.getFastExitCost(token.address).then((fee) => {
+       setl1gas(fee)
+      })
+      networkService.getL2FeeBalance().then((ETHbalance) => {
+       setL2FeeBalance(ETHbalance)
+      })
     }
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
-      dispatch({type: 'BALANCE/RESET'})
+      setLPBalance(0)
+      setLPLiquidity(0)
+      setFeeRate(0)
+      setl1gas(0)
     }
   }, [ token ])
 
@@ -276,9 +293,9 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {Number(getLPBalance()) < Number(value) && (
+        {Number(LPRatio) < 0.10 && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The liquidity pool balance (of {getLPBalance()}) is too low to cover your bridge - please
+            The pool's balance/liquidity ratio (of {LPRatio}) is too low to cover your fast bridge right now. Please
             use the classic bridge or reduce the amount.
           </Typography>
         )}
