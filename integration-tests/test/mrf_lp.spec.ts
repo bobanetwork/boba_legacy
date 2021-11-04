@@ -716,6 +716,47 @@ describe('Liquidity Pool Test', async () => {
     expect(postBobL1ERC20Balance).to.deep.eq(preL1ERC20Balance.sub(swapOnFees))
   })
 
+  it('Should rebalance ERC20', async () => {
+    const balanceERC20Amount = utils.parseEther('10')
+
+    const preLPL1ERC20Balance = await L1ERC20.balanceOf(L1LiquidityPool.address)
+    const preLPL2ERC20Balance = await L2ERC20.balanceOf(L2LiquidityPool.address)
+
+    await env.waitForXDomainTransaction(
+      L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address),
+      Direction.L1ToL2
+    )
+
+    const postLPL1ERC20Balance = await L1ERC20.balanceOf(
+      L1LiquidityPool.address
+    )
+    const postLPL2ERC20Balance = await L2ERC20.balanceOf(
+      L2LiquidityPool.address
+    )
+
+    expect(preLPL1ERC20Balance).to.deep.eq(
+      postLPL1ERC20Balance.add(balanceERC20Amount)
+    )
+    expect(preLPL2ERC20Balance).to.deep.eq(
+      postLPL2ERC20Balance.sub(balanceERC20Amount)
+    )
+  })
+
+  it('Should revert to rebalance LP', async() => {
+    const balanceERC20Amount = utils.parseEther('10000')
+
+    await expect(
+      L1LiquidityPool.connect(env.l1Wallet_2).rebalanceLP(
+        balanceERC20Amount,
+        '0x0000000000000000000000000000000000000000'
+      )
+    ).to.be.revertedWith('caller is not the owner')
+
+    await expect(
+      L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
+    ).to.be.reverted
+  })
+
   it('should be able to pause L1LiquidityPool contract', async function () {
     const poolOwner = await L1LiquidityPool.owner()
 
@@ -1068,39 +1109,8 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2LPETH).to.deep.eq(postL2LPETH.sub(balanceETHAmount))
     })
 
-    it('Should rebalance ERC20', async () => {
-      const balanceERC20Amount = utils.parseEther('10')
-
-      const preLPL1ERC20Balance = await L1ERC20.balanceOf(
-        L1LiquidityPool.address
-      )
-      const preLPL2ERC20Balance = await L2ERC20.balanceOf(
-        L2LiquidityPool.address
-      )
-
-      await env.waitForXDomainTransaction(
-        L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address),
-        Direction.L1ToL2
-      )
-
-      const postLPL1ERC20Balance = await L1ERC20.balanceOf(
-        L1LiquidityPool.address
-      )
-      const postLPL2ERC20Balance = await L2ERC20.balanceOf(
-        L2LiquidityPool.address
-      )
-
-      expect(preLPL1ERC20Balance).to.deep.eq(
-        postLPL1ERC20Balance.add(balanceERC20Amount)
-      )
-      expect(preLPL2ERC20Balance).to.deep.eq(
-        postLPL2ERC20Balance.sub(balanceERC20Amount)
-      )
-    })
-
-    it('Should revert to rebalance LP', async() => {
+    it('Should revert to rebalance LP', async () => {
       const balanceETHAmount = utils.parseEther('10000')
-      const balanceERC20Amount = utils.parseEther('10000')
 
       await expect(
         L1LiquidityPool.connect(env.l1Wallet_2).rebalanceLP(
@@ -1114,10 +1124,6 @@ describe('Liquidity Pool Test', async () => {
           balanceETHAmount,
           '0x0000000000000000000000000000000000000000'
         )
-      ).to.be.reverted
-
-      await expect(
-        L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
       ).to.be.reverted
     })
 
