@@ -80,9 +80,9 @@ class FarmWithdrawModal extends React.Component {
       this.setState({
         LPBalance: logAmount(lpBalanceWeiString, withdrawToken.decimals),
         LPBalance_Wei_String: lpBalanceWeiString
+      }, ()=>{
+        this.setMaxTransferValue()
       })
-
-      this.setMaxTransferValue()
     }
 
   }
