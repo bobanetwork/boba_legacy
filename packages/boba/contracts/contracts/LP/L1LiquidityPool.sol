@@ -573,6 +573,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         require(pool.l2TokenAddress != address(0), "Token Address Not Register");
 
         if (_tokenAddress == address(0)) {
+            require(_amount <= address(this).balance, "Failed to Rebalance LP");
             (bool sent,) = L1StandardBridgeAddress.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
             require(sent, "Failed to Rebalance Ether");
         } else {
