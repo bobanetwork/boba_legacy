@@ -742,7 +742,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('Should revert to rebalance LP', async() => {
+  it('Should revert rebalancing LP', async() => {
     const balanceERC20Amount = utils.parseEther('10000')
 
     await expect(
@@ -1109,7 +1109,7 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2LPETH).to.deep.eq(postL2LPETH.sub(balanceETHAmount))
     })
 
-    it('Should revert to rebalance LP', async () => {
+    it('Should revert rebalancing LP', async () => {
       const balanceETHAmount = utils.parseEther('10000')
 
       await expect(
