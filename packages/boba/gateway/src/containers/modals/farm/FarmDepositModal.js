@@ -11,7 +11,6 @@ import Modal from 'components/modal/Modal';
 import Input from 'components/input/Input';
 import { logAmount, powAmount, toWei_String } from 'util/amountConvert';
 
-import networkService from 'services/networkService';
 
 import { Typography } from '@material-ui/core';
 import { WrapperActionsModal } from 'components/modal/Modal.styles';

@@ -25,6 +25,9 @@ export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString;
 }
 
+export function selectL1LPLiquidity (state) {
+  return state.balance.l1lpLiquidity;
+}
 export function selectL1FeeRate (state) {
   return state.balance.l1FeeRate;
 }

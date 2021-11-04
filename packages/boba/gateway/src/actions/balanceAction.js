@@ -23,6 +23,11 @@ import { createAction } from './createAction';
 export function fetchL1LPBalance(address) {
     return createAction('FETCH/L1LP/BALANCE', () => networkService.L1LPBalance(address))
 }
+
+export function fetchL1LPLiquidity(address) {
+    return createAction('FETCH/L1LP/LIQUIDITY', () => networkService.L1LPLiquidity(address))
+}
+
 export function fetchL1TotalFeeRate() {
     return createAction('FETCH/L1TOTALFEERATE', () => networkService.getL1TotalFeeRate())
 }

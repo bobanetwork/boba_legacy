@@ -32,8 +32,6 @@ import { getAllNetworks } from 'util/masterConfig'
 
 import store from 'store'
 
-import networkService from 'services/networkService'
-
 import * as styles from './WrongNetworkModal.module.scss'
 import { useTheme } from '@emotion/react'
 import { correctChain } from 'actions/networkAction';

@@ -28,7 +28,6 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
-import networkService from 'services/networkService'
 
 import { Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
@@ -36,8 +35,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
 import BN from 'bignumber.js'
-import { fetchFastExitCost, fetchL1LPBalance, fetchL1TotalFeeRate, fetchL2FeeBalance } from 'actions/balanceAction'
-import { selectL1FeeRate, selectL1GasFee, selectL1LPBalanceString, selectL2FeeBalance } from 'selectors/balanceSelector'
+import { fetchFastExitCost, fetchL1LPBalance, fetchL1TotalFeeRate, fetchL2FeeBalance,fetchL1LPLiquidity } from 'actions/balanceAction'
+import { selectL1FeeRate, selectL1GasFee, selectL1LPBalanceString, selectL2FeeBalance, selectL1LPLiquidity } from 'selectors/balanceSelector'
 
 function DoExitStepFast({ handleClose, token }) {
 
@@ -46,13 +45,13 @@ function DoExitStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')
 
-  const [ LPBalance, setLPBalance ] = useState(0)
-  const [ LPLiquidity, setLPLiquidity ] = useState(0)
-  const [ feeRate, setFeeRate ] = useState(0)
   const [ LPRatio, setLPRatio ] = useState(0)
 
-  const [ l1gas, setl1gas ] = useState(0)
-  const [ l2FeeBalance, setL2FeeBalance ] = useState(0)
+  const LPBalance = useSelector(selectL1LPBalanceString)
+  const LPLiquidity = useSelector(selectL1LPLiquidity)
+  const feeRate = useSelector(selectL1FeeRate)
+  const l1gas = useSelector(selectL1GasFee)
+  const l2FeeBalance = useSelector(selectL2FeeBalance)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -149,29 +148,16 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      networkService.L1LPBalance(token.addressL1).then((res) => {
-        setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.L1LPLiquidity(token.addressL1).then((res) => {
-        setLPLiquidity(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.getL1TotalFeeRate().then((feeRate) => {
-       setFeeRate(feeRate)
-      })
-      networkService.getFastExitCost(token.address).then((fee) => {
-       setl1gas(fee)
-      })
-      networkService.getL2FeeBalance().then((ETHbalance) => {
-       setL2FeeBalance(ETHbalance)
-      })
+      dispatch(fetchL1LPBalance(token.addressL1));
+      dispatch(fetchL1LPLiquidity(token.addressL1));
+      dispatch(fetchL1TotalFeeRate());
+      dispatch(fetchFastExitCost(token.address));
+      dispatch(fetchL2FeeBalance());      
     }
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
-      setLPBalance(0)
-      setLPLiquidity(0)
-      setFeeRate(0)
-      setl1gas(0)
+      dispatch({type: 'BALANCE/RESET'})
     }
   }, [ token ])
 

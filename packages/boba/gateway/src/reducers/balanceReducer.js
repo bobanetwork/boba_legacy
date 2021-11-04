@@ -19,7 +19,8 @@ const initialState = {
   l1LpBalanceWeiString:'',
   l1FeeRate: 0,
   l1GasFee: 0,
-  l2FeeBalance: 0
+  l2FeeBalance: 0,
+  l1lpLiquidity: 0
 }
 
 function balanceReducer(state = initialState, action) {
@@ -47,6 +48,11 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l2FeeBalance: action.payload
       }
+    case 'FETCH/L1LP/LIQUIDITY/SUCCESS':
+      return {
+        ...state, 
+        l1lpLiquidity: action.payload
+      }
     case 'BALANCE/RESET':
       return {
         ...state, 
@@ -54,6 +60,7 @@ function balanceReducer(state = initialState, action) {
         l1FeeRate: 0,
         l1GasFee: 0,
         l2FeeBalance: 0,
+        l1lpLiquidity: 0,
       }
     default:
       return state

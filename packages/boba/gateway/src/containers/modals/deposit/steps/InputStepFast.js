@@ -47,7 +47,7 @@ function InputStepFast({ handleClose, token }) {
 
   const [ LPBalance, setLPBalance ] = useState(0)
   const [ LPLiquidity, setLPLiquidity ] = useState(0)
-  const [ LPRatio, setLPRatio ] = useState(0)
+  const [LPRatio, setLPRatio ] = useState(0)
 
   const [ feeRate, setFeeRate ] = useState(0)
   const [ validValue, setValidValue ] = useState(false)
