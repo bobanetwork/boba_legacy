@@ -91,6 +91,11 @@ function farmReducer (state = initialState, action) {
         ...state,
         approvedAllowance: action.payload.toString(),
       }
+    case 'FETCH/ALLOWANCE/RESET':
+      return {
+        ...state,
+        approvedAllowance: action.payload,
+      }
     case 'FETCH/ALLOWANCE/ERROR':
       return {
         ...state,

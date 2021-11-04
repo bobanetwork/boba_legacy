@@ -34,8 +34,6 @@ class FarmDepositModal extends React.Component {
       stakeValueValid: false,
       value_Wei_String: '',
       // allowance
-      approvedAllowance: '',
-      // loading
       loading: false,
     }
   }
@@ -50,19 +48,30 @@ class FarmDepositModal extends React.Component {
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
-      // let approvedAllowance = powAmount(10, 50) //TODO: approved allowance incase of ETH?
-      // Set to some very big number
-      // There is no need to query allowance for depositing ETH on the L1 or the L2
-      console.log("staketoken",stakeToken)
+      
       if ( stakeToken.symbol !== 'ETH' ) {
         this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
         ))
+      } else {
+        // Set to some very big number to approved allowance in case of ETH.
+        // There is no need to query allowance for depositing ETH on the L1 or the L2
+        this.props.dispatch({
+          type: 'FETCH/ALLOWANCE/RESET',
+          payload: powAmount(10, 50)
+        })
       }
       this.setState({ stakeToken })
     }
 
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'FETCH/ALLOWANCE/RESET',
+      payload: ''
+    })
   }
 
   getMaxTransferValue () {
@@ -161,7 +170,6 @@ class FarmDepositModal extends React.Component {
       stakeValue,
       stakeValueValid,
       //stakeValueBadEntry,
-      // approvedAllowance,
       loading,
     } = this.state
 

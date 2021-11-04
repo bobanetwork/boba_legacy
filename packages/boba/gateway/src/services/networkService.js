@@ -1775,8 +1775,8 @@ class NetworkService {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
-      console.log("tokenAddress",tokenAddress)
-      console.log("poolTokenInfo",poolTokenInfo)
+      // console.log("tokenAddress",tokenAddress)
+      // console.log("poolTokenInfo",poolTokenInfo)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
     }
