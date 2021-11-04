@@ -92,10 +92,6 @@ function DoExitStepFast({ handleClose, token }) {
 
   }
 
-  // function getLPBalance () {
-  //   return Number(logAmount(l1LpBalanceString, token.decimals)).toFixed(3)
-  // }
-
   const receivableAmount = (value) => {
     return (Number(value) * ((100 - Number(feeRate)) / 100)).toFixed(3)
   }
