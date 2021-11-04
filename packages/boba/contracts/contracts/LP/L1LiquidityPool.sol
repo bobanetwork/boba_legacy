@@ -574,8 +574,11 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         if (_tokenAddress == address(0)) {
             require(_amount <= address(this).balance, "Failed to Rebalance LP");
-            (bool sent,) = L1StandardBridgeAddress.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to Rebalance Ether");
+            L1StandardBridge(L1StandardBridgeAddress).depositETHTo{value: _amount}(
+                L2LiquidityPoolAddress,
+                SETTLEMENT_L2_GAS,
+                ""
+            );
         } else {
             require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Failed to Rebalance LP");
             IERC20(_tokenAddress).approve(L1StandardBridgeAddress, _amount);
