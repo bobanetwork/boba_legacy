@@ -45,8 +45,11 @@ function InputStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 
-  const [LPBalance, setLPBalance] = useState(0)
-  const [feeRate, setFeeRate] = useState(0)
+  const [ LPBalance, setLPBalance ] = useState(0)
+  const [ LPLiquidity, setLPLiquidity ] = useState(0)
+  const [ LPRatio, setLPRatio ] = useState(0)
+
+  const [ feeRate, setFeeRate ] = useState(0)
   const [ validValue, setValidValue ] = useState(false)
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
@@ -66,10 +69,19 @@ function InputStepFast({ handleClose, token }) {
 
     if (tooSmall || tooBig) {
       setValidValue(false)
+    } else if (Number(LPRatio) < 0.1) {
+      //not enough balance/liquidity ratio
+      //we always want some balance for unstaking
+      setValidValue(false)
+    } else if (Number(value) > Number(LPBalance) * 0.9) {
+      //not enough absolute balance
+      //we don't want want one large bridge to wipe out all balance
+      setValidValue(false)
     } else {
+      //Whew, finally!
       setValidValue(true)
     }
-
+    
     setValue(value)
   }
 
@@ -143,11 +155,21 @@ function InputStepFast({ handleClose, token }) {
       networkService.L2LPBalance(token.addressL2).then((res) => {
         setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
       })
+      networkService.L2LPLiquidity(token.addressL2).then((res) => {
+        setLPLiquidity(Number(logAmount(res, token.decimals)).toFixed(3))
+      })
       networkService.getTotalFeeRate().then((feeRate) => {
         setFeeRate(feeRate)
       })
     }
   }, [token])
+
+  useEffect(() => {
+    if(LPLiquidity > 0){
+      const LPR = LPBalance / LPLiquidity
+      setLPRatio(Number(LPR).toFixed(3))
+    }
+  }, [LPLiquidity, LPBalance])
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
@@ -217,10 +239,10 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {Number(value) > Number(LPBalance) && (
-          <Typography variant="body2" sx={{ color: 'red', my: 2}}>
-            The liquidity pool balance (of {LPBalance}) is too low to cover your fast bridge. Please
-            use the traditional bridge or reduce the amount.
+        {Number(LPRatio) < 0.10 && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance/liquidity ratio (of {LPRatio}) is too low to cover your fast bridge right now. Please
+            use the classic bridge or reduce the amount.
           </Typography>
         )}
 

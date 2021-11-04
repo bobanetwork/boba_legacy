@@ -65,13 +65,29 @@ function DoExitStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    if (tooSmall || tooBig || (Number(l1gas) > Number(l2FeeBalance))) {
+    if (tooSmall || tooBig) {
+      setValidValue(false)
+    } else if (token.symbol === 'ETH' && (Number(l1gas) + Number(value)) > Number(l2FeeBalance)) {
+      //insufficient funds to actually exit
+      setValidValue(false)
+    } else if ((Number(l1gas) > Number(l2FeeBalance))) {
+      //insufficient funds to actually exit
+      setValidValue(false)
+    } else if (Number(LPRatio) < 0.1) {
+      //not enough balance/liquidity ratio
+      //we always want some balance for unstaking
+      setValidValue(false)
+    } else if (Number(value) > Number(LPBalance) * 0.9) {
+      //not enough absolute balance
+      //we don't want want one large bridge to wipe out all balance
       setValidValue(false)
     } else {
+      //Whew, finally!
       setValidValue(true)
     }
 
     setValue(value)
+
   }
 
   function getLPBalance () {
@@ -143,6 +159,13 @@ function DoExitStepFast({ handleClose, token }) {
   }, [ token ])
 
   useEffect(() => {
+    if(LPLiquidity > 0){
+      const LPR = LPBalance / LPLiquidity
+      setLPRatio(Number(LPR).toFixed(3))
+    }
+  }, [LPLiquidity, LPBalance])
+
+  useEffect(() => {
     if (signatureStatus && loading) {
       //we are all set - can close the window
       //transaction has been sent and signed
@@ -159,19 +182,45 @@ function DoExitStepFast({ handleClose, token }) {
   if( loading ) buttonLabel = 'Close'
 
   let ETHstring = ''
+  let warning = false
 
   if(l1gas && Number(l1gas) > 0) {
-    if(Number(l1gas) > Number(l2FeeBalance)){
-      ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-      WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is too small to cover this transaction. 
-      THE TRANSACTION WILL FAIL.` 
-    } else if (Number(l1gas) > Number(l2FeeBalance) * 0.9) {
-      ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-      CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated cost. 
-      This transaction might fail. It would be safer to have slightly more ETH in your L2 wallet to cover gas fees.` 
-    } else {
-      ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-      Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+    
+    if (token.symbol !== 'ETH') {
+      if(Number(l1gas) > Number(l2FeeBalance)) {
+        warning = true
+        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
+        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover the estimated cost. 
+        THIS TRANSACTION WILL FAIL.` 
+      } 
+      else if(Number(l1gas) > Number(l2FeeBalance) * 0.96) {
+        warning = true
+        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
+        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated cost. 
+        This transaction might fail. It would be safer to have slightly more ETH in your L2 wallet to cover gas fees.` 
+      } 
+      else {
+        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
+        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+      }
+    }
+
+    if (token.symbol === 'ETH') {
+      if((Number(value) + Number(l1gas)) > Number(l2FeeBalance)) {
+        warning = true
+        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
+        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover this transaction. 
+        THIS TRANSACTION WILL FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+      }
+      else if ((Number(value) + Number(l1gas)) > Number(l2FeeBalance) * 0.96) {
+        warning = true
+        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
+        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated total. 
+        THIS TRANSACTION MIGHT FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+      } else {
+        ETHstring = `The estimated total value of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
+        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+      }
     }
   }
 
@@ -214,15 +263,15 @@ function DoExitStepFast({ handleClose, token }) {
             }
           </Typography>
         )}
-
-        {Number(l1gas) > 0 && Number(l1gas) > Number(l2FeeBalance) && (
-          <Typography variant="body2" sx={{mt: 2, fontSize: '0.8em', fontWeight: '700', color: 'red'}}>
+        
+        {warning && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {ETHstring}
           </Typography>
         )}
 
-        {Number(l1gas) > 0 && Number(l1gas) <= Number(l2FeeBalance) && (
-          <Typography variant="body2" sx={{mt: 2, fontSize: '0.7em'}}>
+        {!warning && (
+          <Typography variant="body2" sx={{mt: 2}}>
             {ETHstring}
           </Typography>
         )}
@@ -235,13 +284,11 @@ function DoExitStepFast({ handleClose, token }) {
         )}
 
         {loading && (
-          <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
+          <Typography variant="body2" sx={{mt: 2}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>
         )}
       </Box>
-
-
 
       <WrapperActionsModal>
         <Button
