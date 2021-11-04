@@ -1311,13 +1311,16 @@ class NetworkService {
         )
         console.log("Initial allowance:",allowance_BN)
 
-        /* OMG IS A SPECIAL CASE - allowance needs to be
-        set to zero, and then set to actual amount */
-        if( allowance_BN.gt(BigNumber.from(0)) &&
+        /* 
+        OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+        set to actual amount, unless current approval amount is equal to, or 
+        bigger than, the current approval value 
+        */
+        if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
-          console.log("OMG Token allowance reset")
+          console.log("Current OMG Token allowance too small - need to reset to 0")
           const approveOMG = await ERC20Contract.approve(
             approveContractAddress,
             ethers.utils.parseEther("0")
@@ -1381,13 +1384,16 @@ class NetworkService {
       )
       console.log("Initial Allowance is:",allowance_BN)
 
-      /* OMG IS A SPECIAL CASE - allowance needs to be
-      set to zero, and then set to actual amount */
-      if( allowance_BN.gt(BigNumber.from(0)) &&
+      /* 
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+      set to actual amount, unless current approval amount is equal to, or 
+      bigger than, the current approval value 
+      */
+      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("OMG Token allowance reset")
+        console.log("Current OMG Token allowance too small - need to reset to 0")
         const approveOMG = await ERC20Contract.approve(
           approveContractAddress,
           ethers.utils.parseEther("0")
@@ -1435,16 +1441,18 @@ class NetworkService {
       this.account,
       allAddresses.L1StandardBridgeAddress
     )
-    //console.log("Allowance:",allowance_BN)
 
     try {
-      /* OMG IS A SPECIAL CASE - allowance needs to be
-      set to zero, and then set to actual amount */
-      if( allowance_BN.gt(BigNumber.from(0)) &&
+      /* 
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+      set to actual amount, unless current approval amount is equal to, or 
+      bigger than, the current approval value 
+      */
+      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("OMG Token allowance reset")
+        console.log("Current OMG Token allowance too small - need to reset to 0")
         const approveOMG = await L1_TEST_Contract.approve(
           allAddresses.L1StandardBridgeAddress,
           ethers.utils.parseEther("0")
