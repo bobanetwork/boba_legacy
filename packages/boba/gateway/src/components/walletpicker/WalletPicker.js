@@ -190,13 +190,14 @@ function WalletPicker ({ onEnable, enabled }) {
           <Grid container spacing={1}>
             <Grid item xs={12} md={12}>
               <Typography variant="h1" component="h1">
-                SCHEDULED BOBA DOWNTIME 
+                SCHEDULED BOBA GATEWAY DOWNTIME 
               </Typography>
               <S.Subtitle variant="body1" component="p" paragraph={true}>
-                As announced in Twitter and in Telegram, BOBA is being upgraded to v2.
+                As announced in Twitter and in Telegram, due to unexpectely high demand for the 
+                Boba L2, BOBA liquidity pools are being rebalanced.
               </S.Subtitle>
               <S.Subtitle variant="body1" component="p" paragraph={true}>
-                The scheduled upgrade window is from Oct. 28 00:00 UTC to approximately 12:00 UTC. 
+                The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC. 
                 Upgrade status and progress reports will be provided via Twitter and Telegram.
               </S.Subtitle>
             </Grid>

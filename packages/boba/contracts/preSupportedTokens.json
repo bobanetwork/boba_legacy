@@ -161,6 +161,24 @@
             "rinkeby":"0xeB72FaBBEF4D4F59bCA384123977eD9529c9bd2e",
             "mainnet": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52"
          }
+      },
+      {
+        "name": "Fantom Token",
+        "symbol": "FTM",
+        "decimals": 18,
+        "address": {
+            "rinkeby":"0x72fe8933fca2c14a8e2b3bf050e3d81e90efeb60",
+            "mainnet": "0x4e15361fd6b4bb609fa63c81a2be19d873717870"
+         }
+      },
+      {
+        "name": "Matic Token",
+        "symbol": "MATIC",
+        "decimals": 18,
+        "address": {
+            "rinkeby":"0x3ac6affed629a16ffccd1c865ad6e10dc0a1076a",
+            "mainnet": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
+         }
       }
    ]
 }
