@@ -15,6 +15,8 @@ import requests,json
 import logging
 from web3.middleware import geth_poa_middleware
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
+import threading
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s', datefmt='%Y%m%dT%H%M%S')
 logger = logging.getLogger('fraud-detector')
@@ -30,7 +32,23 @@ logger.debug (os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
 l1_base = int(os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
 element_start = 1
 
-is_ok = True # Set false once a mismatch is found. This disables checkpointing
+Matched = {
+  'Block':0, # Highest good block, and its corresponding state root
+  'Root':"0x",
+  'Time':time.time(), # Local timestamp
+  'is_ok':True # Set false once a mismatch is found. This disables checkpointing
+}
+
+def status(*args):
+  global Matched
+  status = {
+    'matchedBlock':Matched['Block'],
+    'matchedRoot':Matched['Root'],
+    'timestamp':Matched['Time'],
+    'isOK':Matched['is_ok']
+  }
+
+  return status
 
 try:
   with open("./checkpoint.dat", "r") as f:
@@ -78,10 +96,12 @@ scc_contract = loadContract(rpc[1],scc_addr,'./contracts/StateCommitmentChain.js
 rCount = element_start - 1
 checkpoint = [ element_start, l1_base ]
 last_saved = l1_base
+l3_block = 0
 
 def doEvent(event):
   global rCount
-  global is_ok
+  global Matched
+  global l3_block
 
   t = rpc[1].eth.get_transaction(event.transactionHash)
 
@@ -94,7 +114,10 @@ def doEvent(event):
 
     # Handle a possible lag in keeping the verifier up to date.
     waitCount = 0
-    while rCount > rpc[3].eth.block_number:
+    while rCount > l3_block:
+      l3_block = rpc[3].eth.block_number
+      if rCount <= l3_block:
+        break
       logger.debug("Waiting for verifier to catch up, currently at block {}/{}".format(rpc[3].eth.block_number, rCount))
       time.sleep(15)
       waitCount += 1
@@ -111,9 +134,12 @@ def doEvent(event):
       match = "**** L2/VERIFIER MISMATCH ****"
     log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), Web3.toHex(l2SR), Web3.toHex(vfSR), match)
     if match != "":
-      is_ok = False
+      Matched['is_ok'] = False
       logger.warning(log_str)
     else:
+      Matched['Block'] = rCount
+      Matched['Root'] = Web3.toHex(sr)
+      Matched['Time'] = time.time()
       logger.info(log_str)
 
     if event.blockNumber > checkpoint[1]:
@@ -122,11 +148,14 @@ def doEvent(event):
 
 def do_checkpoint():
   global last_saved
-  global is_ok
-  if is_ok and last_saved != checkpoint[1]:
+  global Matched
+  if Matched['is_ok'] and last_saved != checkpoint[1]:
     with open("./checkpoint.dat", "w") as f:
       f.write(json.dumps(checkpoint))
     last_saved = checkpoint[1]
+
+def server_loop(ws):
+  ws.serve_forever()
 
 def fpLoop():  
   l1_tip = rpc[1].eth.block_number
@@ -188,5 +217,10 @@ def fpLoop():
         })
     time.sleep(30)
   logger.info("Exiting")
+
+ws = SimpleJSONRPCServer(('', 8555))
+ws.register_function(status)
+server_thread = threading.Thread(target=server_loop,args=(ws,))
+server_thread.start()
 
 fpLoop()
