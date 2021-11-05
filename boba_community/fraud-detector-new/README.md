@@ -67,7 +67,7 @@ Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifi
 docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
 ```
 
-The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 2 hours to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
+The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 1/2 hour to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
 
 ```bash
 
@@ -77,10 +77,55 @@ fraud-detector_1  | INFO 20211105T171441 Waiting for verifier...
 
 ```
 
-When your Verifier has caught up with the Boba L2, you will see the `Fraud Detector` verify state roots, one by one: 
+When the `Verifier L2 Geth` has caught up, you will see it follow along with the Boba L2 Geth:
 
 ```bash
 
-
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.226] Reinjecting stale transactions           count=0
+verifier_l2geth_1  | TRACE[11-05|17:36:26.226] Applying batched transaction             index=7828
+verifier_l2geth_1  | TRACE[11-05|17:36:26.226] Applying indexed transaction             index=7828
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.226] Applying transaction to tip              index=7828  hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e origin=sequencer
+verifier_l2geth_1  | TRACE[11-05|17:36:26.227] Waiting for transaction to be added to chain hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.227] Attempting to commit rollup transaction  hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.227] Adding L1 fee                            l1-fee=9693
+verifier_l2geth_1  | INFO [11-05|17:36:26.228] New block                                index=7828  l1-timestamp=1636132977 l1-blocknumber=13557931 tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e queue-orign=sequencer gas=234861  fees=0.00234861      elapsed=1.375ms
+verifier_l2geth_1  | TRACE[11-05|17:36:26.228] Waiting for slot to sign and propagate   delay=0s
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Persisted trie from memory database      nodes=48 size=14.23KiB  time=456.119µs   gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=-1868160.00B
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Reinjecting stale transactions           count=0
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Miner got new head                       height=7829 block-hash=0x2a4ec268eb3816a09365880ad2e5fc8b89a5570e555838c2b93ccae21157af30 tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_dtl_1     | {"level":30,"time":1636133786230,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
+verifier_dtl_1     | {"level":30,"time":1636133786232,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.243] Served eth_blockNumber                   conn=172.18.0.4:44544 reqid=147 t=24.086µs
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.244] Served eth_getBlockByNumber              conn=172.18.0.4:44544 reqid=148 t=177.276µs
+fraud-detector_1   | INFO 20211105T173626 74 13508337 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 
 
 ```
+
+At that point, the `Fraud Detector` can compare the public state roots (deposited into Ethereum miannet by the Boba L2) with the state roots that you have computed:
+
+```bash
+
+fraud-detector_1   | INFO 20211105T173626 79 13508337 
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the SCC-STATEROOT, written into Ethereum Mainnet by Boba Mainnet
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the L2-STATEROOT, as reported by Boba Mainnet
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the VERIFIER-STATEROOT you just calculated
+
+```
+
+If all three of these roots agree, then Boba Mainnet has been operating truthfully up to that block. If the `Fraud-Detector` find a mismatch, it will log that problem for you. Once the `Fraud-Detector` has checked all the historical state roots, it will wait for new blocks to be written by Boba Mainnet and check those:
+
+```bash
+
+...
+fraud-detector_1   | INFO 20211105T175039 7788 13557689 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+fraud-detector_1   | DEBUG 20211105T175040 Caught up to L1 tip. Waiting for new events from startBlock 13557996
+verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":13558055,"targetL1Block":13558056,"msg":"Synchronizing events from Layer 1 (Ethereum)"}
+...
+
+```
+
+
+
