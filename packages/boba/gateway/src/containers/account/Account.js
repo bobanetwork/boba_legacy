@@ -135,10 +135,10 @@ function Account () {
     </Box>
   )
 
-  let label_L1 = 'Ethereum L1'
+  let label_L1 = 'Your Balance on Ethereum Mainnet'
   if(network === 'rinkeby') label_L1 = 'Rinkeby L1'
 
-  let label_L2 = 'Boba L2'
+  let label_L2 = 'Your Balance on Boba Network'
   if(network === 'rinkeby') label_L2 = 'Boba Rinkeby L2'
 
   const L1Column = () => (

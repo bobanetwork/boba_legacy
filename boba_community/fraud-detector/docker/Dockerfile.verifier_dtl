@@ -1,0 +1,6 @@
+FROM bobanetwork/data-transport-layer
+ARG TARGET_NAME
+
+COPY boba_community/fraud-detector/deployments/${TARGET_NAME}/state-dump.latest.json /opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json
+
+ENTRYPOINT ["node", "dist/src/services/run.js"]

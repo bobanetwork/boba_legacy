@@ -121,7 +121,7 @@ describe('NFT Test\n', async () => {
   })
 
   it('should derive an NFT Factory from a genesis NFT', async () => {
-    
+
     //Alice (a2a) Account #2 wishes to create a derivative NFT factory from a genesis NFT
     const tokenID = await ERC721.tokenOfOwnerByIndex(a2a, 0)
     //determine the UUID
@@ -163,7 +163,7 @@ describe('NFT Test\n', async () => {
   })
 
   it('should register the NFTs address in users wallet', async () => {
-    
+
     await ERC721Reg.registerAddress(a2a, ERC721.address)
     //but, a3a should have two flavors of NFT...
     await ERC721Reg.registerAddress(a3a, ERC721.address)

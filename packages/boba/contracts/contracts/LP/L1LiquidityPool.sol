@@ -581,7 +581,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             );
         } else {
             require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Failed to Rebalance LP");
-            IERC20(_tokenAddress).approve(L1StandardBridgeAddress, _amount);
+            IERC20(_tokenAddress).safeIncreaseAllowance(L1StandardBridgeAddress, _amount);
             L1StandardBridge(L1StandardBridgeAddress).depositERC20To(
                 _tokenAddress,
                 pool.l2TokenAddress,
