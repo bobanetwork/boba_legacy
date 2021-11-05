@@ -10,6 +10,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2TokenPoolJson from '@boba/contracts/artifacts/contracts/TokenPool.sol/TokenPool.json'
+import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
 
 import { OptimismEnv } from './shared/env'
 
@@ -24,6 +25,9 @@ describe('Liquidity Pool Test', async () => {
   let L1StandardBridge: Contract
   let L2TokenPool: Contract
 
+  let OMGLIkeToken: Contract
+  let L2OMGLikeToken: Contract
+
   let env: OptimismEnv
 
   const initialSupply = utils.parseEther('10000000000')
@@ -36,6 +40,12 @@ describe('Liquidity Pool Test', async () => {
     Factory__L1ERC20 = new ContractFactory(
       L1ERC20Json.abi,
       L1ERC20Json.bytecode,
+      env.l1Wallet
+    )
+
+    const Factory__OMGLikeToken = new ContractFactory(
+      OMGLikeTokenJson.abi,
+      OMGLikeTokenJson.bytecode,
       env.l1Wallet
     )
 
@@ -59,6 +69,9 @@ describe('Liquidity Pool Test', async () => {
     )
     await L1ERC20.deployTransaction.wait()
 
+    OMGLIkeToken = await Factory__OMGLikeToken.deploy()
+    await OMGLIkeToken.deployTransaction.wait()
+
     Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
 
     L2ERC20 = await Factory__L2ERC20.deploy(
@@ -69,6 +82,15 @@ describe('Liquidity Pool Test', async () => {
       18
     )
     await L2ERC20.deployTransaction.wait()
+
+    L2OMGLikeToken = await Factory__L2ERC20.deploy(
+      L2StandardBridgeAddress,
+      OMGLIkeToken.address,
+      'OMG',
+      'OMG',
+      18
+    )
+    await L2OMGLikeToken.deployTransaction.wait()
 
     L1LiquidityPool = new Contract(
       env.addressesBOBA.Proxy__L1LiquidityPool,
@@ -755,6 +777,101 @@ describe('Liquidity Pool Test', async () => {
     await expect(
       L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
     ).to.be.reverted
+  })
+
+  before(async () => {
+    // mint some token to account
+    await OMGLIkeToken.mint(env.l1Wallet.address, utils.parseEther('200'))
+    // register token to pools
+    const registerPoolOMGTXL1 = await L1LiquidityPool.registerPool(
+      OMGLIkeToken.address,
+      L2OMGLikeToken.address
+    )
+    await registerPoolOMGTXL1.wait()
+    const registerPoolOMGTXL2 = await L2LiquidityPool.registerPool(
+      OMGLIkeToken.address,
+      L2OMGLikeToken.address
+    )
+    await registerPoolOMGTXL2.wait()
+    // add to L1
+    const addLiquidityAmount = utils.parseEther('100')
+
+    const approveBobL1TX = await OMGLIkeToken.approve(
+      L1LiquidityPool.address,
+      addLiquidityAmount
+    )
+    await approveBobL1TX.wait()
+
+    const BobAddLiquidity = await L1LiquidityPool.addLiquidity(
+      addLiquidityAmount,
+      OMGLIkeToken.address
+    )
+    await BobAddLiquidity.wait()
+
+    // add to L2
+    const approveL1ERC20TX = await OMGLIkeToken.approve(
+      L1StandardBridge.address,
+      addLiquidityAmount
+    )
+    await approveL1ERC20TX.wait()
+
+    await env.waitForXDomainTransaction(
+      L1StandardBridge.depositERC20(
+        OMGLIkeToken.address,
+        L2OMGLikeToken.address,
+        addLiquidityAmount,
+        9999999,
+        ethers.utils.formatBytes32String(new Date().getTime().toString())
+      ),
+      Direction.L1ToL2
+    )
+
+    const approveL2TX = await L2OMGLikeToken.approve(
+      L2LiquidityPool.address,
+      addLiquidityAmount,
+      { gasLimit: 7000000 }
+    )
+    await approveL2TX.wait()
+
+    const AddLiquidity = await L2LiquidityPool.addLiquidity(
+      addLiquidityAmount,
+      L2OMGLikeToken.address,
+      { gasLimit: 7000000 }
+    )
+    await AddLiquidity.wait()
+  })
+
+  it('Should rebalance OMGLikeToken', async () => {
+      // now try rebalancing
+
+
+    const balanceERC20Amount = utils.parseEther('10')
+
+    const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(L1LiquidityPool.address)
+    const preLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(L2LiquidityPool.address)
+
+    await env.waitForXDomainTransaction(
+      L1LiquidityPool.rebalanceLP(balanceERC20Amount, OMGLIkeToken.address),
+      Direction.L1ToL2
+    )
+
+    const postLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
+      L1LiquidityPool.address
+    )
+    const postLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(
+      L2LiquidityPool.address
+    )
+
+    expect(preLPL1ERC20Balance).to.deep.eq(
+      postLPL1ERC20Balance.add(balanceERC20Amount)
+    )
+    expect(preLPL2ERC20Balance).to.deep.eq(
+      postLPL2ERC20Balance.sub(balanceERC20Amount)
+    )
+
+    // expect L1Standardbridge allowance to be zero
+    const L1LPOMGLikeTokenAllowance = await OMGLIkeToken.allowance(L1LiquidityPool.address, L1StandardBridge.address)
+    expect(L1LPOMGLikeTokenAllowance).to.deep.eq(BigNumber.from(0))
   })
 
   it('should be able to pause L1LiquidityPool contract', async function () {
