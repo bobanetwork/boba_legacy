@@ -50,11 +50,20 @@ class FarmWithdrawModal extends React.Component {
 
     const { withdrawToken } = this.props.farm
 
+    let LPBalance_Wei_String = ''
+
     if (withdrawToken.L1orL2Pool === 'L1LP') {
       this.props.dispatch(fetchL1LPBalance(withdrawToken.currency));
     } else {
       this.props.dispatch(fetchL2LPBalance(withdrawToken.currency));
     }
+
+    this.setState({
+      LPBalance: logAmount(LPBalance_Wei_String, withdrawToken.decimals),
+      LPBalance_Wei_String
+    })
+
+    this.setMaxTransferValue()
 
   }
 
@@ -62,7 +71,7 @@ class FarmWithdrawModal extends React.Component {
 
     const { open } = this.props
 
-    const { withdrawToken, userInfo,lpBalanceWeiString } = this.props.farm
+    const { withdrawToken, userInfo , lpBalanceWeiString} = this.props.farm
 
     if (prevState.open !== open) {
       this.setState({ open })
