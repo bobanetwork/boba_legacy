@@ -249,7 +249,7 @@ class Farm extends React.Component {
                     to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for later harvesting by liquidity providers.
                     <br /><br />
                     <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current (v1) system, the pool operator is responsible
+                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current system, the pool operator is responsible
                     for pool rebalancing, when and if needed, using 'classic' deposit and exit operations to move funds from one pool to another.
                     <br /><br />
                     <span style={{ fontWeight: '700' }}>Future work</span>. A more elegant approach to pool balancing is an 'automatic'
