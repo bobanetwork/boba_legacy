@@ -16,7 +16,7 @@ services:
     image: bobanetwork/verifier_dtl:${TARGET_NAME}
     build:
       context: ../..
-      dockerfile: ./boba_community/fraud-detector-new/docker/Dockerfile.verifier_dtl
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.verifier_dtl
       args:
         TARGET_NAME: ${TARGET_NAME}
     env_file:
@@ -72,7 +72,7 @@ services:
       replicas: 1
     build:
       context: ../..
-      dockerfile: ./boba_community/fraud-detector-new/docker/Dockerfile.fraud-detector
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
       L1_NODE_WEB3_URL: ${L1_RPC_ENDPOINT}
       L2_NODE_WEB3_URL: ${L2_RPC_ENDPOINT}
