@@ -71,8 +71,8 @@ export function fastExitAll(token) {
 //CLASSICAL DEPOSIT ETH
 export function depositETHL2(value) {
   return createAction('DEPOSIT/CREATE', () => {
-      return networkService.depositETHL2(value)
-    }
+    return networkService.depositETHL2(value)
+  }
   )
 }
 
@@ -164,9 +164,17 @@ export function fetchLookUpPrice(params) {
 }
 
 export function correctChain(layer) {
-  return createAction('CORRECT/NETWORK', ()=> networkService.correctChain(layer))
+  return createAction('CORRECT/NETWORK', () => networkService.correctChain(layer))
 }
 
 export function enableBrowserWallet(network) {
-  return createAction('ENABLE/BROWSER/WALLET', ()=> networkService.enableBrowserWallet(network))
+  return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
+}
+
+export function switchChain(layer) {
+  return createAction('SWITCH/CHAIN', () => networkService.switchChain(layer))
+}
+
+export function getAllAddresses() {
+  return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
 }

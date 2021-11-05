@@ -49,7 +49,8 @@ const initialState = {
     L1orL2Pool: 'L1LP'
   },
   approvedAllowance: '',
-  lpBalanceWeiString: ''
+  lpBalanceWeiString: '',
+  allAddresses: {},
 };
 
 function farmReducer (state = initialState, action) {
@@ -106,6 +107,16 @@ function farmReducer (state = initialState, action) {
       return {
         ...state,
         lpBalanceWeiString: action.payload,
+      }
+    case 'GET/ALL/ADDRESS/SUCCESS':
+      return {
+        ...state,
+        allAddresses: action.payload,
+      }
+    case 'GET/ALL/ADDRESS/ERROR':
+      return {
+        ...state,
+        allAddresses: {},
       }
     case 'FETCH/L1LPBALANCE/ERROR':
     case 'FETCH/L2LPBALANCE/ERROR':

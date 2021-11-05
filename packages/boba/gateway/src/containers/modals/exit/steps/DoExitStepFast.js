@@ -153,7 +153,7 @@ function DoExitStepFast({ handleClose, token }) {
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
-      dispatch({type: 'BALANCE/RESET'})
+      dispatch({type: 'BALANCE/L1/RESET'})
     }
   }, [ token ])
 

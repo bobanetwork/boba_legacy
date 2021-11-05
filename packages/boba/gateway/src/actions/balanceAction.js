@@ -24,13 +24,26 @@ export function fetchL1LPBalance(address) {
     return createAction('FETCH/L1LP/BALANCE', () => networkService.L1LPBalance(address))
 }
 
+export function fetchL2LPBalance(address) {
+    return createAction('FETCH/L2LP/BALANCE', () => networkService.L2LPBalance(address))
+}
+
 export function fetchL1LPLiquidity(address) {
     return createAction('FETCH/L1LP/LIQUIDITY', () => networkService.L1LPLiquidity(address))
+}
+
+export function fetchL2LPLiquidity(address) {
+    return createAction('FETCH/L2LP/LIQUIDITY', () => networkService.L2LPLiquidity(address))
 }
 
 export function fetchL1TotalFeeRate() {
     return createAction('FETCH/L1TOTALFEERATE', () => networkService.getL1TotalFeeRate())
 }
+
+export function fetchL2TotalFeeRate() {
+    return createAction('FETCH/L2TOTALFEERATE', () => networkService.getTotalFeeRate())
+}
+
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))
 }

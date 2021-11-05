@@ -25,11 +25,23 @@ export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString;
 }
 
+export function selectL2LPBalanceString (state) {
+  return state.balance.l2LpBalanceWeiString;
+}
+
 export function selectL1LPLiquidity (state) {
   return state.balance.l1lpLiquidity;
 }
+
+export function selectL2LPLiquidity (state) {
+  return state.balance.l2lpLiquidity;
+}
+
 export function selectL1FeeRate (state) {
   return state.balance.l1FeeRate;
+}
+export function selectL2FeeRate (state) {
+  return state.balance.l2FeeRate;
 }
 
 export function selectL1GasFee (state) {

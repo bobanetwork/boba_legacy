@@ -17,10 +17,13 @@ const initialState = {
   layer1: [],
   layer2: [],
   l1LpBalanceWeiString:'',
+  l2LpBalanceWeiString:'',
   l1FeeRate: 0,
+  l2FeeRate: 0,
   l1GasFee: 0,
   l2FeeBalance: 0,
-  l1lpLiquidity: 0
+  l1lpLiquidity: 0,
+  l2lpLiquidity: 0
 }
 
 function balanceReducer(state = initialState, action) {
@@ -33,10 +36,20 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l1LpBalanceWeiString: action.payload
       }
+    case 'FETCH/L2LP/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l2LpBalanceWeiString: action.payload
+      }
     case 'FETCH/L1TOTALFEERATE/SUCCESS':
       return {
         ...state, 
         l1FeeRate: action.payload
+      }
+    case 'FETCH/L2TOTALFEERATE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeRate: action.payload
       }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
       return {
@@ -53,7 +66,12 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l1lpLiquidity: action.payload
       }
-    case 'BALANCE/RESET':
+    case 'FETCH/L2LP/LIQUIDITY/SUCCESS':
+      return {
+        ...state, 
+        l2lpLiquidity: action.payload
+      }
+    case 'BALANCE/L1/RESET':
       return {
         ...state, 
         l1LpBalanceWeiString: '',
@@ -61,6 +79,13 @@ function balanceReducer(state = initialState, action) {
         l1GasFee: 0,
         l2FeeBalance: 0,
         l1lpLiquidity: 0,
+      }
+    case 'BALANCE/L2/RESET':
+      return {
+        ...state, 
+        l2LpBalanceWeiString: '',
+        l2FeeRate: 0,
+        l2lpLiquidity: 0,
       }
     default:
       return state

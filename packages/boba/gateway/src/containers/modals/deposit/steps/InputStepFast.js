@@ -38,6 +38,9 @@ import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
 
 import BN from 'bignumber.js'
 
+import { fetchL2LPBalance, fetchL2LPLiquidity, fetchL2TotalFeeRate } from 'actions/balanceAction'
+import { selectL2FeeRate, selectL2LPBalanceString, selectL2LPLiquidity } from 'selectors/balanceSelector'
+
 function InputStepFast({ handleClose, token }) {
 
   const dispatch = useDispatch()
@@ -45,11 +48,13 @@ function InputStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 
-  const [ LPBalance, setLPBalance ] = useState(0)
-  const [ LPLiquidity, setLPLiquidity ] = useState(0)
+  const  LPBalance = useSelector(selectL2LPBalanceString)
+  const  LPLiquidity = useSelector(selectL2LPLiquidity)
+  const  feeRate = useSelector(selectL2FeeRate)
+  
   const [ LPRatio, setLPRatio ] = useState(0)
+  
 
-  const [ feeRate, setFeeRate ] = useState(0)
   const [ validValue, setValidValue ] = useState(false)
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
@@ -152,15 +157,13 @@ function InputStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      networkService.L2LPBalance(token.addressL2).then((res) => {
-        setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.L2LPLiquidity(token.addressL2).then((res) => {
-        setLPLiquidity(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.getTotalFeeRate().then((feeRate) => {
-        setFeeRate(feeRate)
-      })
+      dispatch(fetchL2LPBalance(token.addressL2));
+      dispatch(fetchL2LPLiquidity(token.addressL2));
+      dispatch(fetchL2TotalFeeRate());
+
+      return ()=>{
+        dispatch({type: 'BALANCE/L2/RESET'})
+      }
     }
   }, [token])
 

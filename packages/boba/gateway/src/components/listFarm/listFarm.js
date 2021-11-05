@@ -18,7 +18,7 @@ import { getCoinImage } from 'util/coinImage';
 
 import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
 import * as S from "./ListFarm.styles"
-import { getRewardL1, getRewardL2 } from 'actions/networkAction';
+import { getAllAddresses, getRewardL1, getRewardL2 } from 'actions/networkAction';
 
 class ListFarm extends React.Component {
 
@@ -51,6 +51,10 @@ class ListFarm extends React.Component {
     }
   }
 
+  componentDidMount(){
+    this.props.dispatch(getAllAddresses());
+  }
+
   componentDidUpdate(prevState) {
 
     const { poolInfo, userInfo, balance, showAll, showStakesOnly } = this.props
@@ -81,7 +85,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = networkService.getAllAddresses()
+    const {allAddresses} = this.props.farm;
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
@@ -99,7 +103,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = networkService.getAllAddresses()
+    const {allAddresses} = this.props.farm;
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
@@ -342,6 +346,7 @@ class ListFarm extends React.Component {
 }
 
 const mapStateToProps = state => ({
+    farm: state.farm,
 })
 
 export default connect(mapStateToProps)(ListFarm)
