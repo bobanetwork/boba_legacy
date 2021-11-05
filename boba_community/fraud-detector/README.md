@@ -1,3 +1,5 @@
+# Checking Boba Mainnet for Fraud
+
 - [Fraud Detector](#fraud-detector)
   * [0. Concepts](#0-concepts)
   * [1. Errors and State Root Mismatches in the Boba Mainnet](#1-errors-and-state-root-mismatches-in-the-boba-mainnet)
@@ -6,7 +8,7 @@
 
 # Fraud Detector
 
-A docker script for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service.
+Docker scripts and python source code for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service.
 
 ## 0. Concepts
 
@@ -26,71 +28,104 @@ The central idea is that if two (or more) systems look at the same transactions,
 
 ## 2. What do when you discover a state root mismatch
 
-Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.  
+Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.  
 
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
-**Requirements**: you will need a command line and Docker.
+**Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*. 
 
-**Open a terminal window**. Create a `.env` file from the provided example (`env.example`) and paste in your Infura key. You can get a free Infura key at https://infura.io. Your `.env` should then look like this (except that you will be using your Infura key):
-
-```bash
-
-L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
-ADDRESS_MANAGER_ADDRESS=0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089
-L1_MAINNET_DEPLOYMENT_BLOCK=13011896
-
-```
-
-Then, start the Fraud Prover, Verifier, and DTL by:
+**Open a terminal window**. Add your Infura key to `/deployments/mainnet/env`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
 
 ```bash
 
-$ ./up_local.sh
+#/deployments/mainnet/env
+
+TARGET_NAME="mainnet"
+L1_RPC_ENDPOINT="https://mainnet.infura.io/v3/YOUR_INFURA_KEY_HERE"
+L2_RPC_ENDPOINT="https://mainnet.boba.network"
+ETH1_CTC_DEPLOYMENT_HEIGHT=13502893
+ADDRESS_MANAGER="0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+L2_CHAIN_ID=288
 
 ```
 
-The L2 will spin up and begin to sync with the Boba L1. **NOTE: the sync process can take ~2 hours to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
+Then, build the needed Docker images:
+
+```
+docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/local/env build
+```
+
+You may need to create the default docker network:
+
+```
+docker network create ops_default
+```
+
+Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
+
+```
+docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
+```
+
+The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 1/2 hour to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
 
 ```bash
 
-data_transport_layer_1  | {"level":30,"time":1632868364830,"method":"GET","url":"/eth/syncing?backend=l1","elapsed":0,"msg":"Served HTTP Request"}
-geth_l2_1               | INFO [09-28|22:32:44.831] Still syncing                            index=9 tip=2706
-data_transport_layer_1  | {"level":30,"time":1632868374830,"method":"GET","url":"/eth/syncing?backend=l1","elapsed":1,"msg":"Served HTTP Request"}
-geth_l2_1               | INFO [09-28|22:32:54.831] Still syncing                            index=11 tip=2706
+verifier_dtl_1    | {"level":30,"time":...,"highestSyncedL1Block":...,"targetL1Block":...,"msg":"Synchronizing events from Layer 1 (Ethereum)"}
+verifier_l2geth_1 | INFO [11-05|17:12:47.725] Still syncing                            index=69 tip=7806
+fraud-detector_1  | INFO 20211105T171441 Waiting for verifier...
 
 ```
 
-When your Verifier has caught up with the Boba L2, then you will see it fetching transactions and performing other L2 operations: 
+When the `Verifier L2 Geth` has caught up, you will see it follow along with the Boba L2 Geth:
 
 ```bash
 
-data_transport_layer_1  | {"level":30,"time":1632875212812,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
-geth_l2_1               | INFO [09-29|00:26:52.813] Set L2 Gas Price                         gasprice=0
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.226] Reinjecting stale transactions           count=0
+verifier_l2geth_1  | TRACE[11-05|17:36:26.226] Applying batched transaction             index=7828
+verifier_l2geth_1  | TRACE[11-05|17:36:26.226] Applying indexed transaction             index=7828
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.226] Applying transaction to tip              index=7828  hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e origin=sequencer
+verifier_l2geth_1  | TRACE[11-05|17:36:26.227] Waiting for transaction to be added to chain hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.227] Attempting to commit rollup transaction  hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.227] Adding L1 fee                            l1-fee=9693
+verifier_l2geth_1  | INFO [11-05|17:36:26.228] New block                                index=7828  l1-timestamp=1636132977 l1-blocknumber=13557931 tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e queue-orign=sequencer gas=234861  fees=0.00234861      elapsed=1.375ms
+verifier_l2geth_1  | TRACE[11-05|17:36:26.228] Waiting for slot to sign and propagate   delay=0s
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Persisted trie from memory database      nodes=48 size=14.23KiB  time=456.119µs   gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=-1868160.00B
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Reinjecting stale transactions           count=0
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.229] Miner got new head                       height=7829 block-hash=0x2a4ec268eb3816a09365880ad2e5fc8b89a5570e555838c2b93ccae21157af30 tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e tx-hash=0xbfbc45382be5b47ec39398af8db5401a39d0826201d10103e49d0821d425d40e
+verifier_dtl_1     | {"level":30,"time":1636133786230,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
+verifier_dtl_1     | {"level":30,"time":1636133786232,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.243] Served eth_blockNumber                   conn=172.18.0.4:44544 reqid=147 t=24.086µs
+verifier_l2geth_1  | DEBUG[11-05|17:36:26.244] Served eth_getBlockByNumber              conn=172.18.0.4:44544 reqid=148 t=177.276µs
+fraud-detector_1   | INFO 20211105T173626 74 13508337 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 
 
 ```
 
-The Fraud Detector will then fire up and cache relevant events from the chain. After caching older chain data, which should take at most 30 minutes, the Fraud Detector will then verify each state root: 
+At that point, the `Fraud Detector` can compare the public state roots (deposited into Ethereum miannet by the Boba L2) with the state roots that you have computed:
 
 ```bash
 
-data_transport_layer_1  | {"level":30,"time":1632965735657,"method":"GET","url":"/eth/gasprice","elapsed":1310,"msg":"Served HTTP Request"}
-geth_l2_1               | INFO [09-30|01:35:35.658] Set L1 Gas Price                         gasprice=88121008566
-data_transport_layer_1  | {"level":30,"time":1632965735660,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
-geth_l2_1               | INFO [09-30|01:35:35.661] Set L2 Gas Price                         gasprice=3000000000
-fraud_detector_1        | New L1 blocks to inspect: 41
-fraud_detector_1        | Scanning L1 from 13324134 to 13324175
-fraud_detector_1        | Adding 0 new L2blocks: []
-geth_l2_1               | DEBUG[09-30|01:35:36.232] Served eth_getBlockByNumber              conn=172.18.0.4:40504 reqid=858 t=219.754µs
-fraud_detector_1        | {"level":30,"time":1632965736232,
-      "L2_block":825,
-      "operatorSR":"0x26ec701d6375df51b074c8e9efb1f07e7edcd1e8bcd10a2c356442db80a45fe1",
-      "verifierSR":"0x26ec701d6375df51b074c8e9efb1f07e7edcd1e8bcd10a2c356442db80a45fe1",
-      "msg":"State root MATCH - verified ✓"
-    }
-fraud_detector_1        | 
-fraud_detector_1        | ***********************************************************
-fraud_detector_1        | State root MATCH - verified ✓ L2 Block number 825
-fraud_detector_1        | ***********************************************************
+fraud-detector_1   | INFO 20211105T173626 79 13508337 
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the SCC-STATEROOT, written into Ethereum Mainnet by Boba Mainnet
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the L2-STATEROOT, as reported by Boba Mainnet
+  0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the VERIFIER-STATEROOT you just calculated
 
 ```
+
+If all three of these roots agree, then Boba Mainnet has been operating truthfully up to that block. If the `Fraud-Detector` find a mismatch, it will log that problem for you. Once the `Fraud-Detector` has checked all the historical state roots, it will wait for new blocks to be written by Boba Mainnet and check those:
+
+```bash
+
+...
+fraud-detector_1   | INFO 20211105T175039 7788 13557689 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+fraud-detector_1   | DEBUG 20211105T175040 Caught up to L1 tip. Waiting for new events from startBlock 13557996
+verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":13558055,"targetL1Block":13558056,"msg":"Synchronizing events from Layer 1 (Ethereum)"}
+...
+
+```
+
+
+
