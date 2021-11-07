@@ -201,6 +201,14 @@ Resources:
         FromPort: 8040
         ToPort: 8040
         CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 73.241.148.235/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIpv6: ::/0
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-LB"
@@ -213,7 +221,7 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
       Type: network
-
+      
   LoadBalancerInt:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -378,6 +386,10 @@ Outputs:
     Value: !Ref LoadBalancerIntSecurityGroup
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
+  LoadBalancerSecurityGroup:
+    Value: !Ref LoadBalancerIntSecurityGroup
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerSecurityGroup"
   DomainName:
     Value: !Ref DomainName
     Export:
@@ -390,10 +402,7 @@ Outputs:
     Value: !GetAtt LoadBalancer.DNSName
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancer:DNSName"
-  LoadBalancerGraphDNSName:
-    Value: !GetAtt LoadBalancerGraph.DNSName
-    Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
+
   LoadBalancerIntArn:
     Value: !Ref LoadBalancerInt
     Export:
@@ -410,10 +419,6 @@ Outputs:
     Value: !GetAtt LoadBalancerDeployer.DNSName
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerDeployer:DNSName"
-  LoadBalancerGraphArn:
-    Value: !Ref LoadBalancerGraph
-    Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
   LoadBalancerCanonicalHostedZoneID:
     Value: !GetAtt LoadBalancerInt.CanonicalHostedZoneID
     Export:
@@ -426,3 +431,11 @@ Outputs:
     Value: !Ref S3BucketV2
     Export:
       Name: !Sub "${InfrastructureStackName}:S3BucketV2"
+  LoadBalancerGraphDNSName:
+    Value: !GetAtt LoadBalancerGraph.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
+  LoadBalancerGraphArn:
+    Value: !Ref LoadBalancerGraph
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"

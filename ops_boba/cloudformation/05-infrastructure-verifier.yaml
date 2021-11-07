@@ -112,10 +112,9 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       SecurityGroupIngress:
-      - SourceSecurityGroupId: !Ref LoadBalancerVerifierSecurityGroup
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 65535
+      - Description: Allow all traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Verifier-ECS-Cluster"

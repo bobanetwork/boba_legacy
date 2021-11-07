@@ -238,15 +238,6 @@ function check_dev_environment {
                      --parameters \
                          ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                   aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog-replica
-                info "Adding Graph to the ECS Cluster"
-                aws cloudformation create-stack \
-                     --stack-name ${ENV_PREFIX}-graph \
-                     --capabilities CAPABILITY_NAMED_IAM \
-                     --template-body=file://05-graph.yaml \
-                     --region ${REGION} \
-                     --parameters \
-                         ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
-                  aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
             cd ..
           elif [ -z "$CFN_APP_VERIFIER_STACK" ]; then
                   info "Adding Verifier ECS Cluster"
@@ -259,15 +250,24 @@ function check_dev_environment {
                        --parameters \
                            ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                     aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-verifier
-                    info "Adding Datadog to the Verifier ECS Cluster"
+                    info "Adding IPFS to the ECS Cluster"
                     aws cloudformation create-stack \
-                         --stack-name ${ENV_PREFIX}-datadog-verifier \
-                         --capabilities CAPABILITY_IAM \
-                         --template-body=file://datadog-verifier.yaml \
+                         --stack-name ${ENV_PREFIX}-graph \
+                         --capabilities CAPABILITY_NAMED_IAM \
+                         --template-body=file://06-ipfs.yaml \
                          --region ${REGION} \
                          --parameters \
                              ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
-                      aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog-verifier
+                      aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
+                      info "Adding Graph to the ECS Cluster"
+                      aws cloudformation create-stack \
+                           --stack-name ${ENV_PREFIX}-graph \
+                           --capabilities CAPABILITY_NAMED_IAM \
+                           --template-body=file://07-graph.yaml \
+                           --region ${REGION} \
+                           --parameters \
+                               ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                        aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-graph
             cd ..
           else
             info "ECS Cluster exists"

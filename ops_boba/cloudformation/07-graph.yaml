@@ -1,3 +1,4 @@
+
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Enya Graph Application Deployment"
 
@@ -72,7 +73,7 @@ Resources:
       AliasTarget:
         DNSName:
           Fn::Sub:
-            - "dualstack.${DomainName}."
+            - "${DomainName}."
             - DomainName:
                 Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
         HostedZoneId:
@@ -99,10 +100,10 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  IPFSLBTargetGroup:
+  GraphLBTargetGroup5:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 5001
+      Port: 8040
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
@@ -110,19 +111,19 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  IPFSListener:
+  GraphListener5:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
-      Port: 5001
+      Port: 8040
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref IPFSLBTargetGroup
+        TargetGroupArn: !Ref GraphLBTargetGroup5
 
   GraphListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -219,31 +220,13 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Volumes:
-        - Name: ipfs
-          Host:
-            SourcePath: "/mnt/efs/ipfs"
       ContainerDefinitions:
-        - Image: ipfs/go-ipfs:v0.4.23
-          Name: ipfs
-          PortMappings:
-            - ContainerPort: 5001
-              HostPort: 5001
-          MountPoints:
-            - ContainerPath: "/data/ipfs"
-              SourceVolume: ipfs
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["ipfs"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
-          Essential: true
-          Memory: "1024"
         - Image: graphprotocol/graph-node:latest
           Name: graph
-#          Ulimits:
-#            - Name: core
-#              SoftLimit: 0
-#              HardLimit: 0
+          Ulimits:
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 8000
               HostPort: 8000
@@ -253,6 +236,8 @@ Resources:
               HostPort: 8030
             - ContainerPort: 8020
               HostPort: 8020
+            - ContainerPort: 8040
+              HostPort: 8040
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/graph.env"
@@ -264,7 +249,7 @@ Resources:
               Value: !Sub
                 - "${EndpointAddress}:5001"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIPFS:DNSName"
             - Name: ethereum
               Value: !Sub
                 - "boba:http://${EndpointAddress}:8545"
@@ -303,14 +288,14 @@ Resources:
         - ContainerName: graph
           ContainerPort: 8020
           TargetGroupArn: !Ref GraphLBTargetGroup4
-        - ContainerName: ipfs
-          ContainerPort: 5001
-          TargetGroupArn: !Ref IPFSLBTargetGroup
+        - ContainerName: graph
+          ContainerPort: 8040
+          TargetGroupArn: !Ref GraphLBTargetGroup5
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIntSecurityGroup"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerSecurityGroup"
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
