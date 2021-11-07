@@ -61,7 +61,7 @@ jobs:
 
       - name: Bring the stack up
         working-directory: ./ops
-        run: docker-compose up -d
+        run: docker-compose up -d -V
 
       - name: Wait for the Sequencer node
         working-directory: ./ops
