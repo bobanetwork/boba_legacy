@@ -77,7 +77,7 @@ Resources:
       AliasTarget:
         DNSName:
           Fn::Sub:
-            - "dualstack.${DomainName}."
+            - "${DomainName}."
             - DomainName:
                 Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:DNSName"
         HostedZoneId:
@@ -127,7 +127,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GoEthereumLBTargetGroupWS
@@ -141,7 +141,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GoEthereumLBTargetGroup
