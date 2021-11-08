@@ -29,16 +29,24 @@ The central idea is that if two (or more) systems look at the same transactions,
 ## 2. What do when you discover a state root mismatch
 
 Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.  
-
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
 **Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*. 
 
-**Open a terminal window**. Add your Infura key to `/deployments/mainnet/env`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
+**Open a terminal window**. First, clone the project and install needed dependencies:
+
+```bash
+$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ cd optimism-v2
+$ yarn install
+$ yarn build
+```
+
+Then, add your Infura key to `boba_community/fraud-detector/deployments/mainnet/env`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
 
 ```bash
 
-#/deployments/mainnet/env
+#boba_community/fraud-detector/deployments/mainnet/env
 
 TARGET_NAME="mainnet"
 L1_RPC_ENDPOINT="https://mainnet.infura.io/v3/YOUR_INFURA_KEY_HERE"
@@ -49,22 +57,23 @@ L2_CHAIN_ID=288
 
 ```
 
-Then, build the needed Docker images:
+Next, navigate to `boba_community/fraud-detector` and build the needed Docker images:
 
 ```
-docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/local/env build
+$ cd boba_community/fraud-detector
+$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/local/env build
 ```
 
 You may need to create the default docker network:
 
 ```
-docker network create ops_default
+$ docker network create ops_default
 ```
 
 Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
 ```
-docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
+$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 1/2 hour to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
