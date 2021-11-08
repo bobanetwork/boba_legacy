@@ -70,10 +70,10 @@ function DoExitStepFast({ handleClose, token }) {
     if (tooSmall || tooBig) {
       setValidValue(false)
     } else if (token.symbol === 'ETH' && (Number(l1gas) + Number(value)) > Number(l2FeeBalance)) {
-      //insufficient funds to actually exit
+      //insufficient ETH to cover the ETH amount plus exit fees
       setValidValue(false)
     } else if ((Number(l1gas) > Number(l2FeeBalance))) {
-      //insufficient funds to actually exit
+      //insufficient ETH to pay exit fees
       setValidValue(false)
     } else if (Number(LPRatio) < 0.1) {
       //not enough balance/liquidity ratio
@@ -81,7 +81,10 @@ function DoExitStepFast({ handleClose, token }) {
       setValidValue(false)
     } else if (Number(value) > Number(LPBalance) * 0.9) {
       //not enough absolute balance
-      //we don't want want one large bridge to wipe out all balance
+      //we don't want one large bridge to wipe out all the balance
+      //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
+      //this is because the every time someone exits, the limit is recalculated
+      //via Number(LPBalance) * 0.9, and LPBalance changes over time 
       setValidValue(false)
     } else {
       //Whew, finally!

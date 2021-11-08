@@ -226,7 +226,7 @@ export const expectLogs = async (
     .join(',')})`
   const eventTopic = utils.keccak256(utils.toUtf8Bytes(eventSignature))
   const logs = receipt.logs
-  const filterdLogs = logs
+  const filteredLogs = logs
     .filter(
       (log) =>
         log.topics.length > 0 &&
@@ -238,5 +238,5 @@ export const expectLogs = async (
     )
     .map((decoded) => ({ event: eventName, args: decoded }))
 
-  return expectEvent.inLogs(filterdLogs, eventName, eventArgs)
+  return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
 }
