@@ -238,5 +238,5 @@ export const expectLogs = async (
     )
     .map((decoded) => ({ event: eventName, args: decoded }))
 
-  return expectEvent(filteredLogs, eventName, eventArgs)
+  return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
 }
