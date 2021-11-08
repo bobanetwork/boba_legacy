@@ -62,7 +62,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/${TransactionMonitorImage}:0.0.1"
+        - Image: !Sub "${DockerPrefix}/${TransactionMonitorImage}:${ImageTag}"
           Name: monitor
           EnvironmentFiles:
             - Value: !Sub
