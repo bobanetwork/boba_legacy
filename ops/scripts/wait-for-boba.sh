@@ -4,7 +4,7 @@ RETRIES=60
 URL=http://127.0.0.1:8080/addresses.json
 until $(curl --silent --fail --output /dev/null "$URL"); 
 do
-    sleep 20s
+    sleep 20
     echo "Will wait $((RETRIES--)) more times for $URL to be up..."
 
     if [ "$RETRIES" -lt 0 ]; then
@@ -19,7 +19,7 @@ URL2=http://127.0.0.1:8080/boba-addr.json
 
 until $(curl --silent --fail --output /dev/null "$URL2"); 
 do
-    sleep 20s
+    sleep 20
     echo "Will wait $((RETRIES--)) more times for $URL2 to be up..."
 
     if [ "$RETRIES" -lt 0 ]; then
