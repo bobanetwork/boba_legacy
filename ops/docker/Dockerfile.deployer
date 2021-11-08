@@ -2,7 +2,7 @@ FROM bobanetwork/builder AS builder
 
 FROM node:14-alpine
 
-RUN apk add --no-cache git curl python bash jq
+RUN apk add --no-cache git curl bash jq
 
 WORKDIR /opt/optimism/
 
