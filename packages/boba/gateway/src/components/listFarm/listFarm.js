@@ -225,7 +225,7 @@ class ListFarm extends React.Component {
                 <Typography variant="overline" sx={{opacity: 0.7}}>Earned</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userReward ? `${logAmount(userReward, decimals, 3)}` : `0`}
+                {userReward ? `${logAmount(userReward, decimals, 2)}` : `0`}
               </Typography>
             </S.GridItemTag>
 
@@ -257,10 +257,10 @@ class ListFarm extends React.Component {
               ) : (null)}
               <Typography variant="body1">
                 {poolInfo.userDepositAmount ?
-                  `${logAmount(poolInfo.userDepositAmount, decimals, 2)}` : `0`
+                  `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
                 }{' ('}
                 {poolInfo.tokenBalance ?
-                  `${logAmount(poolInfo.tokenBalance, decimals, 2)}` : `0`
+                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
                 })
               </Typography>
             </S.GridItemTag>

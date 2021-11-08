@@ -421,7 +421,7 @@ class NetworkService {
                                 'REP',  'BAT', 'ZRX',  'SUSHI',
                                 'LINK', 'UNI', 'BOBA', 'OMG',
                                 'FRAX', 'FXS', 'DODO', 'UST',
-                                'BUSD', 'BNB'
+                                'BUSD', 'BNB', 'FTM',  'MATIC'
                               ]
 
       await Promise.all(supportedTokens.map(async (key) => {
@@ -1311,13 +1311,16 @@ class NetworkService {
         )
         console.log("Initial allowance:",allowance_BN)
 
-        /* OMG IS A SPECIAL CASE - allowance needs to be
-        set to zero, and then set to actual amount */
-        if( allowance_BN.gt(BigNumber.from(0)) &&
+        /* 
+        OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+        set to actual amount, unless current approval amount is equal to, or 
+        bigger than, the current approval value 
+        */
+        if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
-          console.log("OMG Token allowance reset")
+          console.log("Current OMG Token allowance too small - need to reset to 0")
           const approveOMG = await ERC20Contract.approve(
             approveContractAddress,
             ethers.utils.parseEther("0")
@@ -1381,13 +1384,16 @@ class NetworkService {
       )
       console.log("Initial Allowance is:",allowance_BN)
 
-      /* OMG IS A SPECIAL CASE - allowance needs to be
-      set to zero, and then set to actual amount */
-      if( allowance_BN.gt(BigNumber.from(0)) &&
+      /* 
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+      set to actual amount, unless current approval amount is equal to, or 
+      bigger than, the current approval value 
+      */
+      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("OMG Token allowance reset")
+        console.log("Current OMG Token allowance too small - need to reset to 0")
         const approveOMG = await ERC20Contract.approve(
           approveContractAddress,
           ethers.utils.parseEther("0")
@@ -1435,16 +1441,18 @@ class NetworkService {
       this.account,
       allAddresses.L1StandardBridgeAddress
     )
-    //console.log("Allowance:",allowance_BN)
 
     try {
-      /* OMG IS A SPECIAL CASE - allowance needs to be
-      set to zero, and then set to actual amount */
-      if( allowance_BN.gt(BigNumber.from(0)) &&
+      /* 
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
+      set to actual amount, unless current approval amount is equal to, or 
+      bigger than, the current approval value 
+      */
+      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("OMG Token allowance reset")
+        console.log("Current OMG Token allowance too small - need to reset to 0")
         const approveOMG = await L1_TEST_Contract.approve(
           allAddresses.L1StandardBridgeAddress,
           ethers.utils.parseEther("0")
@@ -1748,7 +1756,7 @@ class NetworkService {
 
     const L2LPInfoPromise = [];
 
-    const getL2LPInfoPromise = async(tokenAddress, tokenAddressL1 ) => {
+    const getL2LPInfoPromise = async( tokenAddress, tokenAddressL1 ) => {
 
       let tokenBalance
       let tokenSymbol
@@ -1767,6 +1775,8 @@ class NetworkService {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
+      console.log("tokenAddress",tokenAddress)
+      console.log("poolTokenInfo",poolTokenInfo)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
     }
@@ -2016,6 +2026,46 @@ class NetworkService {
     }
 
     return balance.toString()
+  }
+
+  /***************************************/
+  /*********** L1LP Liquidity ************/
+  /***************************************/
+  async L1LPLiquidity(tokenAddress) {
+
+    const L1LPContractNS = new ethers.Contract(
+      allAddresses.L1LPAddress,
+      L1LPJson.abi,
+      this.L1Provider
+    )
+
+    try {
+      const poolTokenInfo = await L1LPContractNS.poolInfo(tokenAddress)
+      return poolTokenInfo.userDepositAmount.toString()
+    } catch (err) {
+      return err
+    }
+
+  }
+
+  /***************************************/
+  /*********** L2LP Liquidity ************/
+  /***************************************/
+  async L2LPLiquidity(tokenAddress) {
+
+    const L2LPContractNS = new ethers.Contract(
+      allAddresses.L2LPAddress,
+      L2LPJson.abi,
+      this.L2Provider
+    )
+
+    try {
+      const poolTokenInfo = await L2LPContractNS.poolInfo(tokenAddress)
+      return poolTokenInfo.userDepositAmount.toString()
+    } catch (err) {
+      return err
+    }
+    
   }
 
   /* Estimate cost of Fast Bridge to L1 */
