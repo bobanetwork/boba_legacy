@@ -3,11 +3,11 @@
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
-git clone git@github.com:omgnetwork/optimism-v2.git
-cd optimism-v2
-yarn clean
-yarn install
-yarn build
+$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ cd optimism-v2
+$ yarn clean
+$ yarn install
+$ yarn build
 ```
 
 Build and run the entire stack:
