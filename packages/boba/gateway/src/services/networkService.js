@@ -38,8 +38,6 @@ import {
   updateSignatureStatus_depositTRAD
 } from 'actions/signAction'
 
-import { WebWalletError } from 'services/errorService'
-
 //Base contracts
 import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
