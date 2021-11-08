@@ -91,16 +91,16 @@ describe('System setup', async () => {
     const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
-    console.log(
-      `🌕 ${chalk.red(
-        'L1ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL1ERC20Balance.toString())}`
-    )
-    console.log(
-      `🌕 ${chalk.red(
-        'L2ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL2ERC20Balance.toString())}`
-    )
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L1ERC20 TEST token balance for Deployer PK now:'
+    //   )} ${chalk.green(postL1ERC20Balance.toString())}`
+    // )
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L2ERC20 TEST token balance for Deployer PK now:'
+    //   )} ${chalk.green(postL2ERC20Balance.toString())}`
+    // )
 
     expect(preL1ERC20Balance).to.deep.eq(
       postL1ERC20Balance.add(depositL2ERC20Amount)
