@@ -146,14 +146,6 @@ Resources:
         ToPort: 6001
         CidrIpv6: ::/0
       - IpProtocol: tcp
-        FromPort: 8020
-        ToPort: 8020
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 8020
-        ToPort: 8020
-        CidrIpv6: ::/0
-      - IpProtocol: tcp
         FromPort: 5001
         ToPort: 5001
         CidrIp: 0.0.0.0/0
@@ -211,7 +203,7 @@ Resources:
         CidrIpv6: ::/0
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-LB"
+          Value: !Sub "${AWS::StackName}-External-LB"
 
   LoadBalancerGraph:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -221,7 +213,7 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
       Type: network
-      
+
   LoadBalancerInt:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
