@@ -731,78 +731,6 @@ class NetworkService {
 
   }
 
-  // /* Where possible, annotate the transactions
-  // based on contract addresses */
-  // async parseTransaction( transactions ) {
-
-  //   // NOT SUPPORTED on LOCAL
-  //   if (this.masterSystemConfig === 'local') return
-
-  //   var annotatedTX = transactions.map(item => {
-
-  //     let to = item.to
-
-  //     if ( to === null || to === '') {
-  //       return item
-  //     }
-
-  //     to = to.toLowerCase()
-
-  //     if (to === allAddresses.L2LPAddress.toLowerCase()) {
-  //       //console.log("L2->L1 Swap Off")
-  //       return Object.assign({}, item, { typeTX: 'Fast Bridge to L1' })
-  //     }
-
-  //     if (to === allAddresses.L1LPAddress.toLowerCase()) {
-  //       //console.log("L1->L2 Swap On")
-  //       return Object.assign({}, item, { typeTX: 'Fast Bridge to L2' })
-  //     }
-
-  //     if (to === allAddresses.L1StandardBridgeAddress.toLowerCase()) {
-  //       //console.log("L1->L2 Traditional Deposit")
-  //       return Object.assign({}, item, { typeTX: 'Classic Bridge to L2' })
-  //     }
-
-  //     if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
-  //       //console.log("L2 Standard Bridge")
-  //       return Object.assign({}, item, { typeTX: 'Classic Bridge to L1' })
-  //     }
-
-  //     if (to === allTokens.BOBA.L1.toLowerCase()) {
-  //       //console.log("L1 ERC20 Amount Approval")
-  //       return Object.assign({}, item, { typeTX: 'L1 ERC20 Amount Approval' })
-  //     }
-
-  //     if (to === allTokens.BOBA.L2.toLowerCase()) {
-  //       return Object.assign({}, item, { typeTX: 'L2 Standard Token' })
-  //     }
-
-  //     if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
-  //       //console.log("L2 ETH Message")
-  //       return Object.assign({}, item, { typeTX: 'L2 ETH Ops (such as a L2->L2 Transfer)' })
-  //     }
-
-  //     if (item.crossDomainMessage) {
-  //       if(to === allAddresses.L2LPAddress.toLowerCase()) {
-  //         return Object.assign({}, item, { typeTX: 'FAST EXIT via L2LP' })
-  //       }
-  //       else if (to === allTokens.BOBA.L2.toLowerCase()) {
-  //         return Object.assign({}, item, { typeTX: 'xDomain (Standard Token)' })
-  //       }
-  //       else if (to === allAddresses.L2_ETH_Address.toLowerCase()) {
-  //         //console.log("Found EXIT: L2_ETH_Address")
-  //         return Object.assign({}, item, { typeTX: 'EXIT ETH' })
-  //       }
-  //     }
-
-  //     return Object.assign({}, item, { typeTX: 'Approval/Other (' + to + ')' })
-
-  //   }) //map
-
-  //   return annotatedTX
-
-  // }
-
   async getExits() {
 
     console.log("getExits()")
@@ -1003,11 +931,8 @@ class NetworkService {
       const layer2Balance = await this.L2Provider.getBalance(this.account)
       return utils.formatEther(layer2Balance)
     } catch (error) {
-      throw new WebWalletError({
-        originalError: error,
-        reportToSentry: false,
-        reportToUi: false,
-      })
+      console.log("NS: getL2FeeBalance error:",error)
+      return error
     }
   }
 
@@ -1086,11 +1011,8 @@ class NetworkService {
         layer2: orderBy(layer2Balances, (i) => i.currency),
       }
     } catch (error) {
-      throw new WebWalletError({
-        originalError: error,
-        reportToSentry: false,
-        reportToUi: false,
-      })
+      console.log("NS: getBalances error:",error)
+      return error
     }
   }
 
@@ -1234,15 +1156,10 @@ class NetworkService {
         this.account,
         targetContract
       )
-      return allowance //.toString()
+      return allowance
     } catch (error) {
       console.log("NS: checkAllowance error:", error)
-      throw new WebWalletError({
-        originalError: error,
-        customErrorMessage: 'Could not check ERC20 allowance.',
-        reportToSentry: false,
-        reportToUi: true,
-      })
+      return error
     }
   }
 
@@ -1426,7 +1343,7 @@ class NetworkService {
       return true
     } catch (error) {
       console.log("NS: approveERC20 error:", error)
-      return false
+      return error
     }
   }
 
@@ -1537,13 +1454,8 @@ class NetworkService {
 
       return receipt
     } catch (error) {
-      throw new WebWalletError({
-        originalError: error,
-        customErrorMessage:
-          'Could not deposit ERC20. Please check to make sure you have enough in your wallet to cover both the amount you want to deposit and the associated gas fees.',
-        reportToSentry: false,
-        reportToUi: true,
-      })
+      console.log("NS: depositErc20 error:", error)
+      return error
     }
   }
 
@@ -1854,9 +1766,9 @@ class NetworkService {
       )
       await addLiquidityTX.wait()
       return true
-    } catch (err) {
-      console.log(err)
-      return false
+    } catch (error) {
+      console.log("NS: addLiquidity error:", error)
+      return error
     }
   }
 
@@ -1873,8 +1785,9 @@ class NetworkService {
       )
       await withdrawRewardTX.wait()
       return withdrawRewardTX
-    } catch (err) {
-      return err
+    } catch (error) {
+      console.log("NS: getRewardL1 error:", error)
+      return error
     }
   }
 
@@ -1891,8 +1804,9 @@ class NetworkService {
       )
       await withdrawRewardTX.wait()
       return withdrawRewardTX
-    } catch (err) {
-      return err
+    } catch (error) {
+      console.log("NS: getRewardL2 error:", error)
+      return error
     }
   }
 
@@ -1912,8 +1826,9 @@ class NetworkService {
       )
       await withdrawLiquidityTX.wait()
       return withdrawLiquidityTX
-    } catch (err) {
-      return err
+    } catch (error) {
+      console.log("NS: withdrawLiquidity error:", error)
+      return error
     }
   }
 
@@ -2042,8 +1957,9 @@ class NetworkService {
     try {
       const poolTokenInfo = await L1LPContractNS.poolInfo(tokenAddress)
       return poolTokenInfo.userDepositAmount.toString()
-    } catch (err) {
-      return err
+    } catch (error) {
+      console.log("NS: L1LPLiquidity error:", error)
+      return error
     }
 
   }
@@ -2062,8 +1978,9 @@ class NetworkService {
     try {
       const poolTokenInfo = await L2LPContractNS.poolInfo(tokenAddress)
       return poolTokenInfo.userDepositAmount.toString()
-    } catch (err) {
-      return err
+    } catch (error) {
+      console.log("NS: L2LPLiquidity error:", error)
+      return error
     }
     
   }
@@ -2094,7 +2011,7 @@ class NetworkService {
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
 
-    //in soem cases zero not allowed
+    //in some cases zero not allowed
     const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
       currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
       currencyAddress,
@@ -2354,7 +2271,7 @@ class NetworkService {
        const res = await coinGeckoAxiosInstance.get(
          `simple/price?ids=${params.join()}&vs_currencies=usd`
        )
-       return res.data;
+       return res.data
     } catch(error) {
       return error
     }
@@ -2399,7 +2316,7 @@ class NetworkService {
       let votes = await this.BobaContract.getCurrentVotes(this.account)
       return { votes: formatEther(votes) }
     } catch (error) {
-      console.log('Error: DAO Votes', error)
+      console.log('NS: getDaoVotes error:', error)
       return error
     }
   }
@@ -2411,6 +2328,7 @@ class NetworkService {
       await tx.wait()
       return tx
     } catch (error) {
+      console.log('NS: transferDao error:', error)
       return error
     }
   }
@@ -2422,6 +2340,7 @@ class NetworkService {
       await tx.wait()
       return tx
     } catch (error) {
+      console.log('NS: delegateVotes error:', error)
       return error
     }
   }
@@ -2446,6 +2365,7 @@ class NetworkService {
         return { threshold: 0 }
       }
     } catch (error) {
+      console.log('NS: getProposalThreshold error:', error)
       return error
     }
   }
@@ -2495,7 +2415,7 @@ class NetworkService {
       )
       return res
     } catch (error) {
-      console.log("Error:",error)
+      console.log("NS: getProposalThreshold error:",error)
       return error
     }
   }
@@ -2580,7 +2500,7 @@ class NetworkService {
       }
       return { proposalList }
     } catch (error) {
-      console.log(error)
+      console.log("NS: fetchProposals error:",error)
       return error
     }
   }
@@ -2595,7 +2515,7 @@ class NetworkService {
       let res = delegateCheck.castVote(id, userVote)
       return res
     } catch(error) {
-      console.log('Error: cast vote', error)
+      console.log("NS: castProposalVote error:",error)
       return error
     }
   }
