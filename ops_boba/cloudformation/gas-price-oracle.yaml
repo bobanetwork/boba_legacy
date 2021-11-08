@@ -55,6 +55,10 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Volumes:
+        - Name: gas-oracle
+          Host:
+            SourcePath: "/mnt/efs/gas-oracle"
       ContainerDefinitions:
         - Image: !Sub "${DockerPrefix}/${GASPRICEImage}:${ImageTag}"
           Name: gas-price-oracle
@@ -70,6 +74,9 @@ Resources:
                 - "https://${EndpointAddress}"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+          MountPoints:
+            - ContainerPath: "/opt/optimism/packages/boba/gas-price-oracle/data"
+              SourceVolume: gas-oracle
           DockerLabels:
             com.datadoghq.ad.check_names: '["gas-price-oracle"]'
             com.datadoghq.ad.init_configs: '[{}]'
