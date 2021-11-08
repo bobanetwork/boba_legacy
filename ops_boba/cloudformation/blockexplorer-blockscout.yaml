@@ -122,7 +122,7 @@ Resources:
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d9758ac0-9b4b-453b-b3c1-21f06abdd4ac
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref BlockscoutLBTargetGroup
