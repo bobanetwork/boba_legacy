@@ -1900,6 +1900,8 @@ class NetworkService {
   /***************************************/
   async L1LPBalance(tokenAddress) {
 
+    console.log("L1LPBalance(tokenAddress)")
+
     let balance
     let tokenAddressLC = tokenAddress.toLowerCase()
 
@@ -1914,6 +1916,8 @@ class NetworkService {
       )
     }
 
+    console.log("L1LPBalance(tokenAddress):",balance.toString())
+    
     return balance.toString()
 
   }

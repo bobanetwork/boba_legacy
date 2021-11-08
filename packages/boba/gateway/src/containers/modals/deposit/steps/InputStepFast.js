@@ -165,7 +165,7 @@ function InputStepFast({ handleClose, token }) {
         dispatch({type: 'BALANCE/L2/RESET'})
       }
     }
-  }, [token])
+  }, [token, dispatch])
 
   useEffect(() => {
     if(LPLiquidity > 0){

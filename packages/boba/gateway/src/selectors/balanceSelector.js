@@ -14,40 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 export function selectlayer1Balance (state) {
-  return state.balance.layer1;
+  return state.balance.layer1
 }
 
 export function selectlayer2Balance (state) {
-  return state.balance.layer2;
+  return state.balance.layer2
 }
 
 export function selectL1LPBalanceString (state) {
-  return state.balance.l1LpBalanceWeiString;
+  return state.balance.l1LpBalanceWeiString
 }
 
 export function selectL2LPBalanceString (state) {
-  return state.balance.l2LpBalanceWeiString;
+  return state.balance.l2LpBalanceWeiString
 }
 
 export function selectL1LPLiquidity (state) {
-  return state.balance.l1lpLiquidity;
+  return state.balance.l1lpLiquidity
 }
 
 export function selectL2LPLiquidity (state) {
-  return state.balance.l2lpLiquidity;
+  return state.balance.l2lpLiquidity
 }
 
+//balance.l1GasFee
+
 export function selectL1FeeRate (state) {
-  return state.balance.l1FeeRate;
+  console.log("Getting balance.l1GasFee:",state.balance.l1FeeRate)
+  return state.balance.l1FeeRate
 }
 export function selectL2FeeRate (state) {
-  return state.balance.l2FeeRate;
+  return state.balance.l2FeeRate
 }
 
 export function selectL1GasFee (state) {
-  return state.balance.l1GasFee;
+  return state.balance.l1GasFee
 }
 
 export function selectL2FeeBalance (state) {
-  return state.balance.l2FeeBalance;
+  return state.balance.l2FeeBalance
 }

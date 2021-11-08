@@ -18,13 +18,17 @@ const initialState = {
   layer2: [],
   l1LpBalanceWeiString:'',
   l2LpBalanceWeiString:'',
-  l1FeeRate: 0,
-  l2FeeRate: 0,
-  l1GasFee: 0,
-  l2FeeBalance: 0,
-  l1lpLiquidity: 0,
-  l2lpLiquidity: 0
+  l1FeeRate: '',
+  l2FeeRate: '',
+  l1GasFee: '',
+  l2FeeBalance: '',
+  l1lpLiquidity: '',
+  l2lpLiquidity: ''
 }
+
+/*
+balance.l1GasFee
+*/
 
 function balanceReducer(state = initialState, action) {
   switch (action.type) {
@@ -52,6 +56,7 @@ function balanceReducer(state = initialState, action) {
         l2FeeRate: action.payload
       }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
+      console.log("firing reducer:",action.payload)
       return {
         ...state, 
         l1GasFee: action.payload

@@ -25,6 +25,8 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      console.log("response:",response)
+
       //deal with metamask errors
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
         let errorMessage = networkService.handleMetaMaskError(response.code) ?? response.message;
@@ -37,6 +39,7 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      console.log("dispatching:",`${key}/SUCCESS`)
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
     } catch (error) {

@@ -35,8 +35,22 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
 import BN from 'bignumber.js'
-import { fetchFastExitCost, fetchL1LPBalance, fetchL1TotalFeeRate, fetchL2FeeBalance,fetchL1LPLiquidity } from 'actions/balanceAction'
-import { selectL1FeeRate, selectL1GasFee, selectL1LPBalanceString, selectL2FeeBalance, selectL1LPLiquidity } from 'selectors/balanceSelector'
+
+import { 
+  fetchFastExitCost, 
+  fetchL1LPBalance, 
+  fetchL1TotalFeeRate, 
+  fetchL2FeeBalance,
+  fetchL1LPLiquidity 
+} from 'actions/balanceAction'
+
+import { 
+  selectL1FeeRate, 
+  selectL1GasFee, 
+  selectL1LPBalanceString, 
+  selectL2FeeBalance, 
+  selectL1LPLiquidity 
+} from 'selectors/balanceSelector'
 
 function DoExitStepFast({ handleClose, token }) {
 
@@ -48,10 +62,15 @@ function DoExitStepFast({ handleClose, token }) {
   const [ LPRatio, setLPRatio ] = useState(0)
 
   const LPBalance = useSelector(selectL1LPBalanceString)
+  console.log("LPBalance:",LPBalance)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
+  console.log("LPLiquidity:",LPLiquidity)
   const feeRate = useSelector(selectL1FeeRate)
+  console.log("FeeRate:",feeRate)
   const l1gas = useSelector(selectL1GasFee)
+  console.log("l1gas:",l1gas)
   const l2FeeBalance = useSelector(selectL2FeeBalance)
+  console.log("l2FeeBalance:",l2FeeBalance)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -147,25 +166,32 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      dispatch(fetchL1LPBalance(token.addressL1));
-      dispatch(fetchL1LPLiquidity(token.addressL1));
-      dispatch(fetchL1TotalFeeRate());
-      dispatch(fetchFastExitCost(token.address));
-      dispatch(fetchL2FeeBalance());      
+      dispatch(fetchL1LPBalance(token.addressL1))
+      dispatch(fetchL1LPLiquidity(token.addressL1))
+      dispatch(fetchL1TotalFeeRate())
+      dispatch(fetchFastExitCost(token.address))
+      dispatch(fetchL2FeeBalance())     
     }
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
       dispatch({type: 'BALANCE/L1/RESET'})
     }
-  }, [ token ])
+  }, [ token, dispatch ])
 
   useEffect(() => {
-    if(LPLiquidity > 0){
-      const LPR = LPBalance / LPLiquidity
+    console.log("computing lp ratio")
+    const lbl = Number(logAmount(LPLiquidity, token.decimals))
+    console.log("LPLiquidity:",LPLiquidity)
+    console.log("token.decimals:",token.decimals)
+    console.log("lbl:",lbl)
+    if(lbl > 0){
+      const lbp = Number(logAmount(LPBalance, token.decimals))
+      const LPR = lbp / lbl
+      console.log("lp ratio is:",Number(LPR).toFixed(3))
       setLPRatio(Number(LPR).toFixed(3))
     }
-  }, [LPLiquidity, LPBalance])
+  }, [ LPLiquidity, LPBalance ])
 
   useEffect(() => {
     if (signatureStatus && loading) {

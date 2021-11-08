@@ -20,7 +20,10 @@
 import networkService from 'services/networkService';
 import { createAction } from './createAction';
 
+//fetchL1LPBalance
+
 export function fetchL1LPBalance(address) {
+    console.log("dispatching fetchL1LPBalance")
     return createAction('FETCH/L1LP/BALANCE', () => networkService.L1LPBalance(address))
 }
 
