@@ -493,7 +493,7 @@ class NetworkService {
         OMGJson,
         this.provider.getSigner()
       )
-      console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
+      //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
       console.log('Setting up contract for L1LP at:',allAddresses.L1LPAddress)
@@ -693,6 +693,8 @@ class NetworkService {
       }
     }
 
+    //console.log("responseL1",txL1)
+
     const responseL2 = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
     ).post('get.l2.transactions', {
@@ -700,6 +702,8 @@ class NetworkService {
       fromRange:  0,
       toRange: 1000,
     })
+
+    //console.log("responseL2",responseL2)
 
     if (responseL2.status === 201) {
       //add the chain: 'L2' field
@@ -1039,7 +1043,7 @@ class NetworkService {
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
 
-    console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
+    //console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
 
     updateSignatureStatus_depositTRAD(false)
 
@@ -1248,13 +1252,15 @@ class NetworkService {
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
-          console.log("Current OMG Token allowance too small - need to reset to 0")
-          const approveOMG = await ERC20Contract.approve(
-            approveContractAddress,
-            ethers.utils.parseEther("0")
-          )
-          await approveOMG.wait()
-          console.log("OMG Token allowance set to 0:",approveOMG)
+          console.log("Current OMG Token allowance too small - might need to reset to 0, unless it's already zero")
+          if (allowance_BN.gt(BigNumber.from("0"))) {
+            const approveOMG = await ERC20Contract.approve(
+              approveContractAddress,
+              ethers.utils.parseEther("0")
+            )
+            await approveOMG.wait()
+            console.log("OMG Token allowance has been set to 0")
+          }
         }
 
         //recheck the allowance
@@ -1321,13 +1327,15 @@ class NetworkService {
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("Current OMG Token allowance too small - need to reset to 0")
-        const approveOMG = await ERC20Contract.approve(
-          approveContractAddress,
-          ethers.utils.parseEther("0")
-        )
-        await approveOMG.wait()
-        console.log("OMG Token allowance set to 0:",approveOMG)
+        console.log("Current OMG Token allowance too small - might need to reset to 0, unless it's already zero")
+        if (allowance_BN.gt(BigNumber.from("0"))) {
+          const approveOMG = await ERC20Contract.approve(
+            approveContractAddress,
+            ethers.utils.parseEther("0")
+          )
+          await approveOMG.wait()
+          console.log("OMG Token allowance has been set to 0")
+        }
       }
 
       //recheck the allowance
@@ -1340,6 +1348,7 @@ class NetworkService {
       const allowed = allowance_BN.gte(BigNumber.from(value_Wei_String))
 
       console.log("Allowed?:",allowed)
+
       if(!allowed) {
         console.log("Not good enough - need to set to:",value_Wei_String)
         //and now, the normal allowance transaction
@@ -1380,13 +1389,15 @@ class NetworkService {
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
-        console.log("Current OMG Token allowance too small - need to reset to 0")
-        const approveOMG = await L1_TEST_Contract.approve(
-          allAddresses.L1StandardBridgeAddress,
-          ethers.utils.parseEther("0")
-        )
-        await approveOMG.wait()
-        console.log("OMG Token allowance set to 0:",approveOMG)
+        console.log("Current OMG Token allowance too small - might need to reset to 0, unless it's already zero")
+        if (allowance_BN.gt(BigNumber.from("0"))) {
+          const approveOMG = await L1_TEST_Contract.approve(
+            allAddresses.L1StandardBridgeAddress,
+            ethers.utils.parseEther("0")
+          )
+          await approveOMG.wait()
+          console.log("OMG Token allowance has been set to 0")
+        }
       }
 
       //recheck the allowance
