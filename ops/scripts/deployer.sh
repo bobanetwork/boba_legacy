@@ -64,8 +64,3 @@ if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
   echo
   echo "Upload done."
 fi
-
-# service the addresses and dumps
-cd ./dist/dumps
-exec python -c \
-            'import BaseHTTPServer as bhs, SimpleHTTPServer as shs; bhs.HTTPServer(("0.0.0.0", 8081), shs.SimpleHTTPRequestHandler).serve_forever()'
