@@ -18,8 +18,10 @@ import networkService from 'services/networkService'
 const allAddresses = networkService.getAllAddresses()
 
 const initialState = {
-  totalFeeRate: 0,
-  userRewardFeeRate: 0,
+  // totalL1FeeRate: 0,
+  // totalL2FeeRate: 0,
+  // userL1RewardFeeRate: 0,
+  // userL2RewardFeeRate: 0,
   poolInfo: {
     L1LP: {
       [allAddresses.L1_ETH_Address]: {},
@@ -69,14 +71,22 @@ function farmReducer (state = initialState, action) {
           L2LP: action.payload.L2UserInfo,
         }
       }
-    case 'GET_FEE':
-      return state;
-    case 'GET_FEE_SUCCESS':
-      return { 
-        ...state, 
-        userRewardFeeRate: action.payload.userRewardFeeRate,
-        totalFeeRate: action.payload.totalFeeRate,
-      }
+    // case 'GET_L1FEE':
+    //   return state;
+    // case 'GET_L2FEE':
+    //   return state;
+    // case 'GET_L1FEE_SUCCESS':
+    //   return { 
+    //     ...state, 
+    //     userL1RewardFeeRate: action.payload.userRewardFeeRate,
+    //     totalL1FeeRate: action.payload.totalFeeRate,
+    //   }
+    // case 'GET_L2FEE_SUCCESS':
+    //   return { 
+    //     ...state, 
+    //     userL2RewardFeeRate: action.payload.userRewardFeeRate,
+    //     totalL2FeeRate: action.payload.totalFeeRate,
+    //   }
     case 'UPDATE_STAKE_TOKEN':
       return {
         ...state,

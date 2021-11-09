@@ -212,7 +212,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'There is a ' + feeRate + '% fee.'
+  const label = 'There is a ' + feeRate + '% fee'
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -244,11 +244,10 @@ function InputStepFast({ handleClose, token }) {
         warning = true
         ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
         <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
-        <br/>This transaction might fail. It would be safer to have slightly more ETH in your L1 wallet to cover gas.` 
+        <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.` 
       } 
       else {
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
-        <br/>Your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
       }
     }
 
@@ -268,8 +267,7 @@ function InputStepFast({ handleClose, token }) {
         <br/>THIS TRANSACTION MIGHT FAIL.` 
       } else {
         ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH  
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
-        <br/>Your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
       }
     }
   }

@@ -193,7 +193,7 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
-  const feeLabel = 'There is a ' + feeRate + '% fee.'
+  const feeLabel = 'There is a ' + feeRate + '% fee'
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -220,8 +220,7 @@ function DoExitStepFast({ handleClose, token }) {
         <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.` 
       } 
       else {
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
-        Your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
       }
     }
 
@@ -238,8 +237,7 @@ function DoExitStepFast({ handleClose, token }) {
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
         <br/>TRANSACTION MIGHT FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
       } else {
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
-        Your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH` 
       }
     }
   }

@@ -1524,11 +1524,15 @@ class NetworkService {
       L1LPJson.abi,
       this.L1Provider
     )
-    const [userRewardFeeRate, ownerRewardFeeRate] = await Promise.all([
+    const [userFeeRate, operatorFeeRate] = await Promise.all([
       L1LPContract.userRewardFeeRate(),
       L1LPContract.ownerRewardFeeRate()
     ])
-    const feeRate = Number(userRewardFeeRate) + Number(ownerRewardFeeRate)
+
+    console.log("L1 operatorFeeRate",Number(operatorFeeRate))
+    console.log("L1 userFeeRate",Number(userFeeRate))
+
+    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
@@ -1539,24 +1543,38 @@ class NetworkService {
       L2LPJson.abi,
       this.L2Provider
     )
-    const [userRewardFeeRate, ownerRewardFeeRate] = await Promise.all([
+    const [userFeeRate, operatorFeeRate] = await Promise.all([
       L2LPContract.userRewardFeeRate(),
       L2LPContract.ownerRewardFeeRate()
     ])
-    const feeRate = Number(userRewardFeeRate) + Number(ownerRewardFeeRate)
+
+    console.log("L2 operatorFeeRate",Number(operatorFeeRate))
+    console.log("L2 userRewardFeeRate",Number(userFeeRate))
+
+    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
 
-  async getUserRewardFeeRate() {
-    const L2LPContract = new ethers.Contract(
-      allAddresses.L2LPAddress,
-      L2LPJson.abi,
-      this.L2Provider
-    )
-    const feeRate = await L2LPContract.userRewardFeeRate()
-    return (feeRate / 10).toFixed(1)
-  }
+  // async getL1UserRewardFeeRate() {
+  //   const L1LPContract = new ethers.Contract(
+  //     allAddresses.L1LPAddress,
+  //     L1LPJson.abi,
+  //     this.L1Provider
+  //   )
+  //   const feeRate = await L1LPContract.userRewardFeeRate()
+  //   return (feeRate / 10).toFixed(1)
+  // }
+
+  // async getL2UserRewardFeeRate() {
+  //   const L2LPContract = new ethers.Contract(
+  //     allAddresses.L2LPAddress,
+  //     L2LPJson.abi,
+  //     this.L2Provider
+  //   )
+  //   const feeRate = await L2LPContract.userRewardFeeRate()
+  //   return (feeRate / 10).toFixed(1)
+  // }
 
   /*****************************************************/
   /***** Pool, User Info, to populate the Farm tab *****/
