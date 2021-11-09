@@ -714,7 +714,7 @@ class NetworkService {
       toRange: 1000,
     })
 
-    console.log("responseL1pending",responseL1pending)
+    //console.log("responseL1pending",responseL1pending)
 
     if (responseL1pending.status === 201) {
       //add the chain: 'L1pending' field
@@ -2191,7 +2191,7 @@ class NetworkService {
     console.log("Balance:", utils.formatEther(ccBal))
     console.log("Cost to exit:", utils.formatEther(depositCost_BN))
     console.log("Amount to exit:", utils.formatEther(balance_BN))
-    console.log("Should be zero:", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
+    console.log("Should be zero (if exiting ETH):", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
