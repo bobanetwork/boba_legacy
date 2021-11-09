@@ -16,6 +16,16 @@ limitations under the License. */
 const initialState = {
   layer1: [],
   layer2: [],
+  l1LpBalanceWeiString:'',
+  l2LpBalanceWeiString:'',
+  l1FeeRate: '',
+  l2FeeRate: '',
+  fastExitCost: '',
+  fastDepositCost: '',
+  l1FeeBalance: '',
+  l2FeeBalance: '',
+  l1lpLiquidity: '',
+  l2lpLiquidity: ''
 }
 
 function balanceReducer(state = initialState, action) {
@@ -23,6 +33,74 @@ function balanceReducer(state = initialState, action) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
       return { ...state, layer1, layer2 }
+    case 'FETCH/L1LP/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l1LpBalanceWeiString: action.payload
+      }
+    case 'FETCH/L2LP/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l2LpBalanceWeiString: action.payload
+      }
+    case 'FETCH/L1TOTALFEERATE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeRate: action.payload
+      }
+    case 'FETCH/L2TOTALFEERATE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeRate: action.payload
+      }
+    case 'FETCH/FASTEXIT/COST/SUCCESS':
+      return {
+        ...state, 
+        fastExitCost: action.payload
+      }
+    case 'FETCH/FASTDEPOSIT/COST/SUCCESS':
+      return {
+        ...state, 
+        fastDepositCost: action.payload
+      }
+    case 'FETCH/L1FEE/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeBalance: action.payload
+      }
+    case 'FETCH/L2FEE/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeBalance: action.payload
+      }
+    case 'FETCH/L1LP/LIQUIDITY/SUCCESS':
+      return {
+        ...state, 
+        l1lpLiquidity: action.payload
+      }
+    case 'FETCH/L2LP/LIQUIDITY/SUCCESS':
+      return {
+        ...state, 
+        l2lpLiquidity: action.payload
+      }
+    case 'BALANCE/L1/RESET':
+      return {
+        ...state, 
+        l1LpBalanceWeiString: '',
+        l1FeeRate: '',
+        fastExitCost: '',
+        l2FeeBalance: '',
+        l1lpLiquidity: '',
+      }
+    case 'BALANCE/L2/RESET':
+      return {
+        ...state, 
+        l2LpBalanceWeiString: '',
+        l2FeeRate: '',
+        fastDepositCost: '',
+        l1FeeBalance: '',
+        l2lpLiquidity: '',
+      }
     default:
       return state
   }

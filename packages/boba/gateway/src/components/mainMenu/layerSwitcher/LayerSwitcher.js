@@ -26,6 +26,7 @@ import networkService from 'services/networkService'
 import Button from 'components/button/Button'
 
 import LayerIcon from 'components/icons/LayerIcon'
+import { switchChain } from 'actions/networkAction.js'
 
 function LayerSwitcher({ walletEnabled, isButton = false, size }) {
 
@@ -48,7 +49,7 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
 
   const dispatchSetLayer = useCallback((layer) => {
     dispatch(setLayer(layer))
-    networkService.switchChain(layer)
+    dispatch(switchChain(layer))
   }, [ dispatch ])
 
   if (!!isButton) {

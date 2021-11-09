@@ -25,6 +25,8 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      //console.log("response:",response)
+
       //deal with metamask errors
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
         let errorMessage = networkService.handleMetaMaskError(response.code) ?? response.message;
@@ -37,10 +39,11 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      //console.log("dispatching:",`${key}/SUCCESS`)
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
     } catch (error) {
-      console.log("Error RAW:", {error})
+      //console.log("Error RAW:", {error})
       if(error.message.includes('NETWORK_ERROR')) {
         console.log("Internet down")
         return false
@@ -53,7 +56,7 @@ export function createAction (key, asyncAction) {
       dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage })
       // cancel request loading state
       dispatch({ type: `${key}/ERROR` })
-      console.log("createAction error:", error)
+      //console.log("createAction error:", error)
       return false
     }
   }

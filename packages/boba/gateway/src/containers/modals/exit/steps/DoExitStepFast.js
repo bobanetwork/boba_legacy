@@ -28,14 +28,31 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
-import networkService from 'services/networkService'
 
 import { Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
+import parse from 'html-react-parser'
+
 import BN from 'bignumber.js'
+
+import { 
+  fetchFastExitCost, 
+  fetchL1LPBalance, 
+  fetchL1TotalFeeRate, 
+  fetchL2FeeBalance,
+  fetchL1LPLiquidity 
+} from 'actions/balanceAction'
+
+import { 
+  selectL1FeeRate, 
+  selectFastExitCost, //estimated total cost of this exit
+  selectL1LPBalanceString, 
+  selectL2FeeBalance, 
+  selectL1LPLiquidity 
+} from 'selectors/balanceSelector'
 
 function DoExitStepFast({ handleClose, token }) {
 
@@ -44,13 +61,13 @@ function DoExitStepFast({ handleClose, token }) {
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')
 
-  const [ LPBalance, setLPBalance ] = useState(0)
-  const [ LPLiquidity, setLPLiquidity ] = useState(0)
-  const [ feeRate, setFeeRate ] = useState(0)
   const [ LPRatio, setLPRatio ] = useState(0)
 
-  const [ l1gas, setl1gas ] = useState(0)
-  const [ l2FeeBalance, setL2FeeBalance ] = useState(0)
+  const LPBalance = useSelector(selectL1LPBalanceString)
+  const LPLiquidity = useSelector(selectL1LPLiquidity)
+  const feeRate = useSelector(selectL1FeeRate)
+  const cost = useSelector(selectFastExitCost)
+  const feeBalance = useSelector(selectL2FeeBalance)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -68,10 +85,10 @@ function DoExitStepFast({ handleClose, token }) {
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } else if (token.symbol === 'ETH' && (Number(l1gas) + Number(value)) > Number(l2FeeBalance)) {
-      //insufficient ETH to cover the ETH amount plus exit fees
+    } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
+      //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
-    } else if ((Number(l1gas) > Number(l2FeeBalance))) {
+    } else if ((Number(cost) > Number(feeBalance))) {
       //insufficient ETH to pay exit fees
       setValidValue(false)
     } else if (Number(LPRatio) < 0.1) {
@@ -146,38 +163,27 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      networkService.L1LPBalance(token.addressL1).then((res) => {
-        setLPBalance(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.L1LPLiquidity(token.addressL1).then((res) => {
-        setLPLiquidity(Number(logAmount(res, token.decimals)).toFixed(3))
-      })
-      networkService.getL1TotalFeeRate().then((feeRate) => {
-       setFeeRate(feeRate)
-      })
-      networkService.getFastExitCost(token.address).then((fee) => {
-       setl1gas(fee)
-      })
-      networkService.getL2FeeBalance().then((ETHbalance) => {
-       setL2FeeBalance(ETHbalance)
-      })
+      dispatch(fetchL1LPBalance(token.addressL1))
+      dispatch(fetchL1LPLiquidity(token.addressL1))
+      dispatch(fetchL1TotalFeeRate())
+      dispatch(fetchFastExitCost(token.address))
+      dispatch(fetchL2FeeBalance())
     }
     // to clean up state and fix the
     // error in console for max state update.
     return ()=>{
-      setLPBalance(0)
-      setLPLiquidity(0)
-      setFeeRate(0)
-      setl1gas(0)
+      dispatch({type: 'BALANCE/L1/RESET'})
     }
-  }, [ token ])
+  }, [ token, dispatch ])
 
   useEffect(() => {
-    if(LPLiquidity > 0){
-      const LPR = LPBalance / LPLiquidity
+    const lbl = Number(logAmount(LPLiquidity, token.decimals))
+    if(lbl > 0){
+      const lbp = Number(logAmount(LPBalance, token.decimals))
+      const LPR = lbp / lbl
       setLPRatio(Number(LPR).toFixed(3))
     }
-  }, [LPLiquidity, LPBalance])
+  }, [ LPLiquidity, LPBalance, token.decimals ])
 
   useEffect(() => {
     if (signatureStatus && loading) {
@@ -187,7 +193,7 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
-  const feeLabel = 'There is a ' + feeRate + '% fee.'
+  const feeLabel = 'There is a ' + feeRate + '% fee'
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -198,42 +204,40 @@ function DoExitStepFast({ handleClose, token }) {
   let ETHstring = ''
   let warning = false
 
-  if(l1gas && Number(l1gas) > 0) {
+  if(cost && Number(cost) > 0) {
     
     if (token.symbol !== 'ETH') {
-      if(Number(l1gas) > Number(l2FeeBalance)) {
+      if(Number(cost) > Number(feeBalance)) {
         warning = true
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover the estimated cost. 
-        THIS TRANSACTION WILL FAIL.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas. 
+        <br/>TRANSACTION WILL FAIL.` 
       } 
-      else if(Number(l1gas) > Number(l2FeeBalance) * 0.96) {
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated cost. 
-        This transaction might fail. It would be safer to have slightly more ETH in your L2 wallet to cover gas fees.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.` 
       } 
       else {
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
       }
     }
 
     if (token.symbol === 'ETH') {
-      if((Number(value) + Number(l1gas)) > Number(l2FeeBalance)) {
+      if((Number(value) + Number(cost)) > Number(feeBalance)) {
         warning = true
-        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover this transaction. 
-        THIS TRANSACTION WILL FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
+        <br/>TRANSACTION WILL FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
       }
-      else if ((Number(value) + Number(l1gas)) > Number(l2FeeBalance) * 0.96) {
+      else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated total. 
-        THIS TRANSACTION MIGHT FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
+        <br/>TRANSACTION MIGHT FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
       } else {
-        ETHstring = `The estimated total value of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH` 
       }
     }
   }
@@ -250,7 +254,7 @@ function DoExitStepFast({ handleClose, token }) {
 
         <Input
           label={`Amount to bridge to L1`}
-          placeholder="0.0"
+          placeholder="0"
           value={value}
           type="number"
           onChange={(i)=>{
@@ -280,13 +284,13 @@ function DoExitStepFast({ handleClose, token }) {
         
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            {ETHstring}
+            {parse(ETHstring)}
           </Typography>
         )}
 
         {!warning && (
           <Typography variant="body2" sx={{mt: 2}}>
-            {ETHstring}
+            {parse(ETHstring)}
           </Typography>
         )}
 

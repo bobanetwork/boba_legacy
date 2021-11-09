@@ -20,7 +20,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash';
 
-import { getFarmInfo, getFee } from 'actions/farmAction'
+import { getFarmInfo /*, getL1Fee, getL2Fee */} from 'actions/farmAction'
 
 import ListFarm from 'components/listFarm/listFarm'
 import Tabs from 'components/tabs/Tabs'
@@ -41,8 +41,10 @@ class Farm extends React.Component {
     super(props)
 
     const {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate,
+      // userL1RewardFeeRate,
+      // totalL2FeeRate,
+      // userL2RewardFeeRate,
       poolInfo,
       userInfo,
     } = this.props.farm
@@ -62,8 +64,10 @@ class Farm extends React.Component {
     }
 
     this.state = {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate,
+      // userL1RewardFeeRate,
+      // totalL2FeeRate,
+      // userL2RewardFeeRate,
       poolInfo,
       userInfo,
       layer1,
@@ -80,12 +84,21 @@ class Farm extends React.Component {
 
   componentDidMount() {
 
-    const { totalFeeRate, userRewardFeeRate } = this.props.farm
+    // const { 
+    //   totalL1FeeRate, userL1RewardFeeRate,
+    //   totalL2FeeRate, userL2RewardFeeRate  
+    // } = this.props.farm
 
-    if (!totalFeeRate || !userRewardFeeRate) {
-      this.props.dispatch(getFee())
-    }
+    // if (!totalL1FeeRate || !userL1RewardFeeRate) {
+    //   this.props.dispatch(getL1Fee())
+    // }
 
+    // if (!totalL2FeeRate || !userL2RewardFeeRate) {
+    //   this.props.dispatch(getL2Fee())
+    // }
+
+    //this.props.dispatch(getL1Fee())
+    //this.props.dispatch(getL2Fee())
     this.props.dispatch(getFarmInfo())
 
   }
@@ -93,8 +106,8 @@ class Farm extends React.Component {
   componentDidUpdate(prevState) {
 
     const {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate, userL1RewardFeeRate,
+      // totalL2FeeRate, userL2RewardFeeRate 
       poolInfo,
       userInfo,
     } = this.props.farm
@@ -104,13 +117,21 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    if (prevState.farm.totalFeeRate !== totalFeeRate) {
-      this.setState({ totalFeeRate })
-    }
+    // if (prevState.farm.totalL1FeeRate !== totalL1FeeRate) {
+    //   this.setState({ totalL1FeeRate })
+    // }
 
-    if (prevState.farm.userRewardFeeRate !== userRewardFeeRate) {
-      this.setState({ userRewardFeeRate })
-    }
+    // if (prevState.farm.userL1RewardFeeRate !== userL1RewardFeeRate) {
+    //   this.setState({ userL1RewardFeeRate })
+    // }
+
+    // if (prevState.farm.totalL2FeeRate !== totalL2FeeRate) {
+    //   this.setState({ totalL2FeeRate })
+    // }
+
+    // if (prevState.farm.userL2RewardFeeRate !== userL2RewardFeeRate) {
+    //   this.setState({ userL2RewardFeeRate })
+    // }
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -186,9 +207,7 @@ class Farm extends React.Component {
   render() {
 
     const {
-      // Pool
       poolInfo,
-      // user
       userInfo,
       lpChoice,
       poolTab,
