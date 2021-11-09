@@ -34,6 +34,8 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
+import parse from 'html-react-parser'
+
 import BN from 'bignumber.js'
 
 import { 
@@ -46,7 +48,7 @@ import {
 
 import { 
   selectL1FeeRate, 
-  selectL1GasFee, 
+  selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString, 
   selectL2FeeBalance, 
   selectL1LPLiquidity 
@@ -62,15 +64,10 @@ function DoExitStepFast({ handleClose, token }) {
   const [ LPRatio, setLPRatio ] = useState(0)
 
   const LPBalance = useSelector(selectL1LPBalanceString)
-  console.log("LPBalance:",LPBalance)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
-  console.log("LPLiquidity:",LPLiquidity)
   const feeRate = useSelector(selectL1FeeRate)
-  console.log("FeeRate:",feeRate)
-  const l1gas = useSelector(selectL1GasFee)
-  console.log("l1gas:",l1gas)
-  const l2FeeBalance = useSelector(selectL2FeeBalance)
-  console.log("l2FeeBalance:",l2FeeBalance)
+  const cost = useSelector(selectFastExitCost)
+  const feeBalance = useSelector(selectL2FeeBalance)
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -88,10 +85,10 @@ function DoExitStepFast({ handleClose, token }) {
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } else if (token.symbol === 'ETH' && (Number(l1gas) + Number(value)) > Number(l2FeeBalance)) {
-      //insufficient ETH to cover the ETH amount plus exit fees
+    } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
+      //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
-    } else if ((Number(l1gas) > Number(l2FeeBalance))) {
+    } else if ((Number(cost) > Number(feeBalance))) {
       //insufficient ETH to pay exit fees
       setValidValue(false)
     } else if (Number(LPRatio) < 0.1) {
@@ -170,7 +167,7 @@ function DoExitStepFast({ handleClose, token }) {
       dispatch(fetchL1LPLiquidity(token.addressL1))
       dispatch(fetchL1TotalFeeRate())
       dispatch(fetchFastExitCost(token.address))
-      dispatch(fetchL2FeeBalance())     
+      dispatch(fetchL2FeeBalance())
     }
     // to clean up state and fix the
     // error in console for max state update.
@@ -180,18 +177,13 @@ function DoExitStepFast({ handleClose, token }) {
   }, [ token, dispatch ])
 
   useEffect(() => {
-    console.log("computing lp ratio")
     const lbl = Number(logAmount(LPLiquidity, token.decimals))
-    console.log("LPLiquidity:",LPLiquidity)
-    console.log("token.decimals:",token.decimals)
-    console.log("lbl:",lbl)
     if(lbl > 0){
       const lbp = Number(logAmount(LPBalance, token.decimals))
       const LPR = lbp / lbl
-      console.log("lp ratio is:",Number(LPR).toFixed(3))
       setLPRatio(Number(LPR).toFixed(3))
     }
-  }, [ LPLiquidity, LPBalance ])
+  }, [ LPLiquidity, LPBalance, token.decimals ])
 
   useEffect(() => {
     if (signatureStatus && loading) {
@@ -212,42 +204,42 @@ function DoExitStepFast({ handleClose, token }) {
   let ETHstring = ''
   let warning = false
 
-  if(l1gas && Number(l1gas) > 0) {
+  if(cost && Number(cost) > 0) {
     
     if (token.symbol !== 'ETH') {
-      if(Number(l1gas) > Number(l2FeeBalance)) {
+      if(Number(cost) > Number(feeBalance)) {
         warning = true
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover the estimated cost. 
-        THIS TRANSACTION WILL FAIL.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas. 
+        <br/>TRANSACTION WILL FAIL.` 
       } 
-      else if(Number(l1gas) > Number(l2FeeBalance) * 0.96) {
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated cost. 
-        This transaction might fail. It would be safer to have slightly more ETH in your L2 wallet to cover gas fees.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.` 
       } 
       else {
-        ETHstring = `The estimated gas fee for this transaction (approval + bridge) is ${Number(l1gas).toFixed(4)} ETH. 
-        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
+        Your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
       }
     }
 
     if (token.symbol === 'ETH') {
-      if((Number(value) + Number(l1gas)) > Number(l2FeeBalance)) {
+      if((Number(value) + Number(cost)) > Number(feeBalance)) {
         warning = true
-        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        WARNING: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is not sufficient to cover this transaction. 
-        THIS TRANSACTION WILL FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
+        <br/>TRANSACTION WILL FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
       }
-      else if ((Number(value) + Number(l1gas)) > Number(l2FeeBalance) * 0.96) {
+      else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `The estimated total of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        CAUTION: your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is very close to the estimated total. 
-        THIS TRANSACTION MIGHT FAIL. If you would like to bridge all of your ETH, please use the "BRIDGE ALL" button.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
+        <br/>TRANSACTION MIGHT FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
       } else {
-        ETHstring = `The estimated total value of this transaction (amount + approval + bridge) is ${(Number(value) + Number(l1gas)).toFixed(4)} ETH. 
-        Your L2 ETH balance of ${Number(l2FeeBalance).toFixed(4)} is sufficent to cover this transaction.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        Your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is sufficent to cover this transaction.` 
       }
     }
   }
@@ -264,7 +256,7 @@ function DoExitStepFast({ handleClose, token }) {
 
         <Input
           label={`Amount to bridge to L1`}
-          placeholder="0.0"
+          placeholder="0"
           value={value}
           type="number"
           onChange={(i)=>{
@@ -294,13 +286,13 @@ function DoExitStepFast({ handleClose, token }) {
         
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            {ETHstring}
+            {parse(ETHstring)}
           </Typography>
         )}
 
         {!warning && (
           <Typography variant="body2" sx={{mt: 2}}>
-            {ETHstring}
+            {parse(ETHstring)}
           </Typography>
         )}
 

@@ -37,18 +37,23 @@ export function selectL2LPLiquidity (state) {
   return state.balance.l2lpLiquidity
 }
 
-//balance.l1GasFee
-
 export function selectL1FeeRate (state) {
-  console.log("Getting balance.l1GasFee:",state.balance.l1FeeRate)
   return state.balance.l1FeeRate
 }
 export function selectL2FeeRate (state) {
   return state.balance.l2FeeRate
 }
 
-export function selectL1GasFee (state) {
-  return state.balance.l1GasFee
+export function selectFastExitCost (state) {
+  return state.balance.fastExitCost
+}
+
+export function selectFastDepositCost (state) {
+  return state.balance.fastDepositCost
+}
+
+export function selectL1FeeBalance (state) {
+  return state.balance.l1FeeBalance
 }
 
 export function selectL2FeeBalance (state) {

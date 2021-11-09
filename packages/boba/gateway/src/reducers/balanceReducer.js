@@ -20,15 +20,13 @@ const initialState = {
   l2LpBalanceWeiString:'',
   l1FeeRate: '',
   l2FeeRate: '',
-  l1GasFee: '',
+  fastExitCost: '',
+  fastDepositCost: '',
+  l1FeeBalance: '',
   l2FeeBalance: '',
   l1lpLiquidity: '',
   l2lpLiquidity: ''
 }
-
-/*
-balance.l1GasFee
-*/
 
 function balanceReducer(state = initialState, action) {
   switch (action.type) {
@@ -56,10 +54,19 @@ function balanceReducer(state = initialState, action) {
         l2FeeRate: action.payload
       }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
-      console.log("firing reducer:",action.payload)
       return {
         ...state, 
-        l1GasFee: action.payload
+        fastExitCost: action.payload
+      }
+    case 'FETCH/FASTDEPOSIT/COST/SUCCESS':
+      return {
+        ...state, 
+        fastDepositCost: action.payload
+      }
+    case 'FETCH/L1FEE/BALANCE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeBalance: action.payload
       }
     case 'FETCH/L2FEE/BALANCE/SUCCESS':
       return {
@@ -80,17 +87,19 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l1LpBalanceWeiString: '',
-        l1FeeRate: 0,
-        l1GasFee: 0,
-        l2FeeBalance: 0,
-        l1lpLiquidity: 0,
+        l1FeeRate: '',
+        fastExitCost: '',
+        l2FeeBalance: '',
+        l1lpLiquidity: '',
       }
     case 'BALANCE/L2/RESET':
       return {
         ...state, 
         l2LpBalanceWeiString: '',
-        l2FeeRate: 0,
-        l2lpLiquidity: 0,
+        l2FeeRate: '',
+        fastDepositCost: '',
+        l1FeeBalance: '',
+        l2lpLiquidity: '',
       }
     default:
       return state

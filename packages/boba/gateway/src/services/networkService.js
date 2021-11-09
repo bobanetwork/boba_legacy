@@ -415,12 +415,22 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      const supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
+      let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                                 'REP',  'BAT', 'ZRX',  'SUSHI',
                                 'LINK', 'UNI', 'BOBA', 'OMG',
                                 'FRAX', 'FXS', 'DODO', 'UST',
                                 'BUSD', 'BNB', 'FTM',  'MATIC'
                               ]
+
+      //not all tokens are on Rinkeby
+      if ( masterSystemConfig === 'rinkeby') {
+        supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
+                          'REP',  'BAT', 'ZRX',  'SUSHI',
+                          'LINK', 'UNI', 'BOBA', 'OMG',
+                          //'FRAX', 'FXS', 'UST',
+                          //'BUSD', 'BNB', 'FTM',  'MATIC'
+                        ]
+      }     
 
       await Promise.all(supportedTokens.map(async (key) => {
 
@@ -601,7 +611,7 @@ class NetworkService {
 
   }
 
-  /* Yes, this almost complete duplicates async switchChain( layer )
+  /* Yes, this almost completely duplicates async switchChain( layer )
   but that's safest for now */
   async correctChain( targetLayer ) {
 
@@ -665,8 +675,6 @@ class NetworkService {
     let txL1pending = []
     let txL2 = []
 
-    //console.log("trying")
-
     const responseL1 = await etherScanInstance(
       this.masterSystemConfig,
       'L1'
@@ -682,8 +690,6 @@ class NetworkService {
           timeStamp: parseInt(v.timeStamp),     //fix bug - sometimes this is string, sometimes an integer
           chain: 'L1'
         }))
-        //console.log("txL1",txL1)
-        //return transactions.result
       }
     }
 
@@ -694,8 +700,6 @@ class NetworkService {
       fromRange:  0,
       toRange: 1000,
     })
-
-    console.log("responseL2",responseL2)
 
     if (responseL2.status === 201) {
       //add the chain: 'L2' field
@@ -746,7 +750,6 @@ class NetworkService {
 
     if (response.status === 201) {
       const transactions = response.data
-      console.log(transactions)
       const filteredTransactions = transactions.filter(
         (i) => i.exitL2 && i.crossDomainMessage
       )
@@ -924,10 +927,20 @@ class NetworkService {
     })
   }
 
+  async getL1FeeBalance() {
+    try {
+      const balance = await this.L1Provider.getBalance(this.account)
+      return utils.formatEther(balance)
+    } catch (error) {
+      console.log("NS: getL1FeeBalance error:",error)
+      return error
+    }
+  }
+
   async getL2FeeBalance() {
     try {
-      const layer2Balance = await this.L2Provider.getBalance(this.account)
-      return utils.formatEther(layer2Balance)
+      const balance = await this.L2Provider.getBalance(this.account)
+      return utils.formatEther(balance)
     } catch (error) {
       console.log("NS: getL2FeeBalance error:",error)
       return error
@@ -1520,8 +1533,7 @@ class NetworkService {
     return (feeRate / 10).toFixed(1)
   }
 
-  // Total exit fee
-  async getTotalFeeRate() {
+  async getL2TotalFeeRate() {
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
       L2LPJson.abi,
@@ -1531,10 +1543,8 @@ class NetworkService {
       L2LPContract.userRewardFeeRate(),
       L2LPContract.ownerRewardFeeRate()
     ])
-    //console.log("Fee URFR:",userRewardFeeRate.toString())
-    //console.log("Fee ORFR:",ownerRewardFeeRate.toString())
     const feeRate = Number(userRewardFeeRate) + Number(ownerRewardFeeRate)
-    //console.log("FeeRate:",feeRate)
+
     return (feeRate / 10).toFixed(1)
   }
 
@@ -1553,6 +1563,9 @@ class NetworkService {
   /*****************************************************/
   async getL1LPInfo() {
 
+    const poolInfo = {}
+    const userInfo = {}
+
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       acc.push(allTokens[cur].L1.toLowerCase())
       return acc
@@ -1563,9 +1576,6 @@ class NetworkService {
       L1LPJson.abi,
       this.L1Provider
     )
-
-    const poolInfo = {}
-    const userInfo = {}
 
     const L1LPInfoPromise = []
 
@@ -1594,7 +1604,6 @@ class NetworkService {
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
-      //console.log(tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
@@ -1685,8 +1694,6 @@ class NetworkService {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
-      // console.log("tokenAddress",tokenAddress)
-      // console.log("poolTokenInfo",poolTokenInfo)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
     }
@@ -1987,7 +1994,7 @@ class NetworkService {
     
   }
 
-  /* Estimate cost of Fast Bridge to L1 */
+  /* Estimate cost of Fast Exit to L1 */
   async getFastExitCost(currencyAddress) {
 
     let approvalCost_BN = BigNumber.from('0')
@@ -1997,13 +2004,13 @@ class NetworkService {
 
     if( currencyAddress !== allAddresses.L2_ETH_Address ) {
 
-      const L2ERC20Contract = new ethers.Contract(
+      const ERC20Contract = new ethers.Contract(
         currencyAddress,
-        L2ERC20Json.abi,
+        L2ERC20Json.abi, //any old abi will do...
         this.provider.getSigner()
       )
 
-      const tx = await L2ERC20Contract.populateTransaction.approve(
+      const tx = await ERC20Contract.populateTransaction.approve(
         allAddresses.L2LPAddress,
         utils.parseEther('1.0')
       )
@@ -2024,7 +2031,50 @@ class NetworkService {
     console.log("Fast exit gas", depositGas_BN.toString())
 
     const depositCost_BN = depositGas_BN.mul(gasPrice)
-    console.log("Fast exit cost (ETH)", utils.formatEther(depositCost_BN))
+    console.log("Fast exit cost (ETH):", utils.formatEther(depositCost_BN))
+
+    //returns total cost in ETH
+    return utils.formatEther(depositCost_BN.add(approvalCost_BN))
+  }
+
+  /* Estimate cost of Fast Deposit to L2 */
+  async getFastDepositCost(currencyAddress) {
+
+    let approvalCost_BN = BigNumber.from('0')
+
+    const gasPrice = await this.L1Provider.getGasPrice()
+    console.log("Fast deposit gas price", gasPrice.toString())
+
+    if( currencyAddress !== allAddresses.L1_ETH_Address ) {
+
+      const ERC20Contract = new ethers.Contract(
+        currencyAddress,
+        L2ERC20Json.abi, //any old abi will do...
+        this.provider.getSigner()
+      )
+
+      const tx = await ERC20Contract.populateTransaction.approve(
+        allAddresses.L1LPAddress,
+        utils.parseEther('1.0')
+      )
+
+      const approvalGas_BN = await this.L1Provider.estimateGas(tx)
+      approvalCost_BN = approvalGas_BN.mul(gasPrice)
+      console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+    }
+
+    //in some cases zero not allowed
+    const tx2 = await this.L1LPContract.populateTransaction.clientDepositL1(
+      currencyAddress === allAddresses.L1_ETH_Address ? '1' : '0', //ETH does not allow zero
+      currencyAddress,
+      currencyAddress === allAddresses.L1_ETH_Address ? { value : '1'} : {}
+    )
+
+    const depositGas_BN = await this.L1Provider.estimateGas(tx2)
+    console.log("Fast deposit gas", depositGas_BN.toString())
+
+    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    console.log("Fast deposit cost (ETH):", utils.formatEther(depositCost_BN))
 
     //returns total cost in ETH
     return utils.formatEther(depositCost_BN.add(approvalCost_BN))

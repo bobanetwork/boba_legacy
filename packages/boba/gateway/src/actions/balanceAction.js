@@ -20,10 +20,7 @@
 import networkService from 'services/networkService';
 import { createAction } from './createAction';
 
-//fetchL1LPBalance
-
 export function fetchL1LPBalance(address) {
-    console.log("dispatching fetchL1LPBalance")
     return createAction('FETCH/L1LP/BALANCE', () => networkService.L1LPBalance(address))
 }
 
@@ -44,12 +41,21 @@ export function fetchL1TotalFeeRate() {
 }
 
 export function fetchL2TotalFeeRate() {
-    return createAction('FETCH/L2TOTALFEERATE', () => networkService.getTotalFeeRate())
+    return createAction('FETCH/L2TOTALFEERATE', () => networkService.getL2TotalFeeRate())
 }
 
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))
 }
+
+export function fetchFastDepositCost(address) {
+    return createAction('FETCH/FASTDEPOSIT/COST', () => networkService.getFastDepositCost(address))
+}
+
+export function fetchL1FeeBalance() {
+    return createAction('FETCH/L1FEE/BALANCE', () => networkService.getL1FeeBalance())
+}
+
 export function fetchL2FeeBalance() {
     return createAction('FETCH/L2FEE/BALANCE', () => networkService.getL2FeeBalance())
 }

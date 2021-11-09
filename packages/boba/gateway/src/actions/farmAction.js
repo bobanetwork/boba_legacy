@@ -39,11 +39,12 @@ const getFeeSuccess = (totalFeeRate, userRewardFeeRate) => ({
 })
 
 export const getFarmInfo = () => async (dispatch) => {
-  dispatch(getFarmInfoBegin());
-  const [L1LPInfo, L2LPInfo] = await Promise.all([
+  console.log("getFarmInfo()")
+  dispatch(getFarmInfoBegin())
+   const [L1LPInfo, L2LPInfo] = await Promise.all([
     networkService.getL1LPInfo(),
     networkService.getL2LPInfo(),
-  ])
+   ])
   dispatch(getFarmInfoSuccess(
     L1LPInfo.poolInfo,
     L1LPInfo.userInfo,
@@ -52,14 +53,13 @@ export const getFarmInfo = () => async (dispatch) => {
   ))
 }
 
-
 export const getFee = () => async (dispatch) => {
-  dispatch(getFeeBegin());
+  dispatch(getFeeBegin())
   const [totalFeeRate, userRewardFeeRate] = await Promise.all([
     networkService.getTotalFeeRate(),
     networkService.getUserRewardFeeRate(),
   ])
-  dispatch(getFeeSuccess(totalFeeRate, userRewardFeeRate));
+  dispatch(getFeeSuccess(totalFeeRate, userRewardFeeRate))
 }
 
 export const updateStakeToken = (stakeToken) => ({
