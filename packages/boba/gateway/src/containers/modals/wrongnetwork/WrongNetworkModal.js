@@ -91,7 +91,7 @@ function WrongNetworkModal ({ open, onClose }) {
         color='primary'
         size='large'
         variant='contained'
-        fullWidth={isMobile}
+        fullWidth={true}
         newStyle
       >
         Change MetaMask Network

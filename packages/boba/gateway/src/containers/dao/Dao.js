@@ -129,6 +129,7 @@ function DAO() {
                             <Button
                                 color="primary"
                                 variant="contained"
+                                fullWidth={true}
                                 onClick={()=>{dispatch(openModal('transferDaoModal'))}}
                             >Transfer</Button>
                         </div>
@@ -145,6 +146,7 @@ function DAO() {
                             <Button
                                 color="primary"
                                 variant="contained"
+                                fullWidth={true}
                                 onClick={() => {dispatch(openModal('delegateDaoModal'))}}
                             >Delegate Votes</Button>
                         </div>
