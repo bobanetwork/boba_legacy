@@ -429,12 +429,15 @@ function destroy_dev_services {
     #set -x
       local force="${1:-}"
       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
-      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
+      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" || "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       else
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      fi
+      if [[ "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
+        SERVICE_NAME="blockscout"
       fi
       SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|tr '\n' ' '|sed 's#"##g'`
       CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
@@ -562,17 +565,18 @@ function destroy_dev_services {
 
      function generate_environment {
        #set -x
+       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
         if [ -z ${SERVICE_NAME} ]; then
            info "Missing SERVICE_NAME going to re-generate all environment files"
            for srv in $ALL_DOCKER_IMAGES_LIST datadog; do
-              aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
-              aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+              aws secretsmanager get-secret-value --secret-id ${srv}-${CLUSTER_NAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+              aws s3 cp ${srv}.env s3://${CLUSTER_NAME}-infrastructure-application-s3/ > /dev/null
               rm -f ${srv}.env > /dev/null
             done
         else
             info "Generating environment file for ${SERVICE_NAME}"
-            aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
-            aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+            aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${CLUSTER_NAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+            aws s3 cp ${SERVICE_NAME}.env s3://${CLUSTER_NAME}-infrastructure-application-s3/ > /dev/null
             rm -f ${SERVICE_NAME}.env > /dev/null
         fi
       }
