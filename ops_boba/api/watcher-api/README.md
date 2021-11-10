@@ -200,3 +200,54 @@
 { status: "failed" }
 ```
 
+### Airdrop
+
+get.airdrop
+
+**Request Body**
+
+```js
+{
+  address: "ADDRESS"
+}
+```
+
+**Response Body**
+
+```js
+{
+  "address": "ADDRESS",
+  "amount": "AMOUNT", // IN WEI
+  "claim": "TRUE / FALSE",
+  "claimTimestamp": "TIMESTAMP",
+  "claimAmount": "CLAIM AMOUNT",
+  "merkleProof": {
+    "index": "INDEX",
+    "amount": "AMOUNT", //hex,
+    "proof": "PROOF"
+  }
+}
+```
+
+send.airdrop
+
+**Request Body**
+
+```js
+{
+  "address":"ADDRESS",
+  "claimTimestamp": "TIMESTAMP",
+  "claimAmount": "AMOUNT",
+  "key":"ACCESS_KEY"
+}
+```
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
+```
+

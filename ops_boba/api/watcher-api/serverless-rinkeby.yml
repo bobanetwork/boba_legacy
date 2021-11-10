@@ -99,3 +99,37 @@ functions:
           cors: true
     layers:
       - ${file(env-rinkeby.yml):LAYERS}
+  watcher_getAirdrop:
+    handler: watcher_getAirdrop.watcher_getAirdrop
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.airdrop
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}
+  watcher_sendAirdrop:
+    handler: watcher_sendAirdrop.watcher_sendAirdrop
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.airdrop
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}
