@@ -285,6 +285,7 @@ function deploy_dev_services {
       for srv in $DOCKER_IMAGES_LIST; do
          aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
          aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+         rm -f  ${srv}.env > /dev/null
       done
       notice "Deploying ..."
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
@@ -346,6 +347,7 @@ function update_dev_services {
        fi
          aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
          aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+         rm -f ${srv}.env > /dev/null
       done
       notice "Updating all services"
       for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
@@ -565,11 +567,13 @@ function destroy_dev_services {
            for srv in $ALL_DOCKER_IMAGES_LIST datadog; do
               aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
               aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+              rm -f ${srv}.env > /dev/null
             done
         else
             info "Generating environment file for ${SERVICE_NAME}"
             aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
             aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
+            rm -f ${SERVICE_NAME}.env > /dev/null
         fi
       }
 

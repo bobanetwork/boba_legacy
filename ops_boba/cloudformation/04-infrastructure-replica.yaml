@@ -56,11 +56,11 @@ Resources:
   LoadBalancerReplica:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Scheme: internal
+      Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerBlockscout:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer

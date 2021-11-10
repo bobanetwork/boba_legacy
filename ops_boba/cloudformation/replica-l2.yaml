@@ -68,14 +68,39 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+  DNSRecordV4:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName:
+          Fn::Sub:
+            - "${DomainName}."
+            - DomainName:
+                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
+        HostedZoneId:
+          Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
+      HostedZoneName:
+        Fn::Sub:
+          - "${DomainName}."
+          - DomainName:
+              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+      Name:
+        Fn::Sub:
+          - "replica.${DomainName}."
+          - DomainName:
+              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
 
   ReplicaL2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
-      Port: 8545
-      Protocol: TCP
+      Port: 443
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
