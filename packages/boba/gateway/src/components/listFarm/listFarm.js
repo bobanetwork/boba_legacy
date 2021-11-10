@@ -18,7 +18,7 @@ import { getCoinImage } from 'util/coinImage';
 
 import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
 import * as S from "./ListFarm.styles"
-import { getAllAddresses, getRewardL1, getRewardL2 } from 'actions/networkAction';
+import { getAllAddresses, getReward } from 'actions/networkAction';
 
 class ListFarm extends React.Component {
 
@@ -103,7 +103,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const {allAddresses} = this.props.farm;
+    const { allAddresses } = this.props.farm
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
@@ -119,7 +119,7 @@ class ListFarm extends React.Component {
 
   async handleHarvest() {
 
-    const { poolInfo, userInfo } = this.state;
+    const { poolInfo, L1orL2Pool, userInfo } = this.state;
 
     this.setState({ loading: true })
 
@@ -130,22 +130,12 @@ class ListFarm extends React.Component {
       .sub(BigNumber.from(userInfo.rewardDebt))
     ).toString()
 
-    let getRewardTX = null;
-
-    if(networkService.L1orL2 === 'L1') {
-      getRewardTX = await this.props.dispatch(getRewardL1(
-        poolInfo.l1TokenAddress,
-        userReward
-      ))
-    } else if (networkService.L1orL2 === 'L2') {
-      getRewardTX = await this.props.dispatch(getRewardL2(
-        poolInfo.l2TokenAddress,
-        userReward
-      ))
-    } else {
-      console.log("handleHarvest(): Chain not set")
-    }
-
+    let getRewardTX = await this.props.dispatch(getReward(
+      L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
+      userReward,
+      L1orL2Pool
+    ))
+    
     if (getRewardTX) {
       this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
       this.props.dispatch(getFarmInfo())

@@ -1178,7 +1178,8 @@ class NetworkService {
     }
   }
 
-  /*Used when people want to fast exit - they have to deposit funds into the L2LP*/
+  // Used when people want to fast exit - they have to deposit funds into the L2LP
+  // to start the fast exit
   async approveERC20_L2LP(
     value_Wei_String,
     currencyAddress
@@ -1216,6 +1217,7 @@ class NetworkService {
     }
   }
 
+  //used to stake funds in the L1LP
   async approveERC20_L1LP(
     value_Wei_String,
     currency
@@ -1283,7 +1285,7 @@ class NetworkService {
           value_Wei_String
         )
         await approveStatus.wait()
-        console.log("ERC 20 L1 BRIDGE ops approved:",approveStatus)
+        console.log("ERC 20 L1 Staking approved:",approveStatus)
         return approveStatus
       }
 
@@ -1367,7 +1369,7 @@ class NetworkService {
     }
   }
 
-  //Used to move ERC20 Tokens from L1 to L2
+  //Used to move ERC20 Tokens from L1 to L2 using the classic deposit
   async depositErc20(value_Wei_String, currency, currencyL2) {
 
     updateSignatureStatus_depositTRAD(false)
@@ -1807,39 +1809,23 @@ class NetworkService {
   }
 
   /***********************************************/
-  /*****           Get Reward L1             *****/
+  /*****           Get Reward                *****/
   /***********************************************/
-  async getRewardL1(currencyL1Address, value_Wei_String) {
+  async getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
 
     try {
-      const withdrawRewardTX = await this.L1LPContract.withdrawReward(
+      const TX = await (L1orL2Pool === 'L1LP'
+        ? this.L1LPContract
+        : this.L2LPContract
+      ).withdrawReward(
         value_Wei_String,
-        currencyL1Address,
+        currencyAddress,
         this.account
       )
-      await withdrawRewardTX.wait()
-      return withdrawRewardTX
+      await TX.wait()
+      return TX
     } catch (error) {
-      console.log("NS: getRewardL1 error:", error)
-      return error
-    }
-  }
-
-  /***********************************************/
-  /*****           Get Reward L2             *****/
-  /***********************************************/
-  async getRewardL2(currencyL2Address, value_Wei_String) {
-
-    try {
-      const withdrawRewardTX = await this.L2LPContract.withdrawReward(
-        value_Wei_String,
-        currencyL2Address,
-        this.account
-      )
-      await withdrawRewardTX.wait()
-      return withdrawRewardTX
-    } catch (error) {
-      console.log("NS: getRewardL2 error:", error)
+      console.log("NS: getReward error:", error)
       return error
     }
   }
@@ -1850,7 +1836,7 @@ class NetworkService {
   async withdrawLiquidity(currency, value_Wei_String, L1orL2Pool) {
 
     try {
-      const withdrawLiquidityTX = await (L1orL2Pool === 'L1LP'
+      const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
       ).withdrawLiquidity(
@@ -1858,8 +1844,8 @@ class NetworkService {
         currency,
         this.account
       )
-      await withdrawLiquidityTX.wait()
-      return withdrawLiquidityTX
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: withdrawLiquidity error:", error)
       return error

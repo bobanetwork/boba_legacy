@@ -95,16 +95,12 @@ export function farmL2(value_Wei_String, currencyAddress) {
     networkService.approveERC20_L2LP(value_Wei_String, currencyAddress)
   )
 }
-export function getRewardL1(currencyL1Address, value_Wei_String) {
+export function getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
   return createAction('FARM/HARVEST', () =>
-    networkService.getRewardL1(currencyL1Address, value_Wei_String)
+    networkService.getReward(currencyAddress, value_Wei_String, L1orL2Pool)
   )
 }
-export function getRewardL2(currencyL2Address, value_Wei_String) {
-  return createAction('FARM/HARVEST', () =>
-    networkService.getRewardL2(currencyL2Address, value_Wei_String)
-  )
-}
+
 export function withdrawLiquidity(currency, value_Wei_String, L1orL2Pool) {
   console.log("Withdrawing ERC20 Liquidity")
   return createAction('FARM/WITHDRAW', () =>
