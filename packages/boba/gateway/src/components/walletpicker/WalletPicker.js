@@ -37,6 +37,7 @@ import { Container, Grid, useMediaQuery } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import { styled } from '@material-ui/core/styles'
 import { useTheme } from '@emotion/react'
+import { enableBrowserWallet } from 'actions/networkAction'
 
 require('dotenv').config()
 
@@ -49,10 +50,10 @@ function WalletPicker ({ onEnable, enabled }) {
 
   const dispatch = useDispatch();
 
-  const [ walletEnabled, setWalletEnabled ] = useState(false)
-  const [ accountsEnabled, setAccountsEnabled ] = useState(false)
-  const [ wrongNetwork, setWrongNetwork ] = useState(false)
-  
+  const [walletEnabled, setWalletEnabled] = useState(false)
+  const [accountsEnabled, setAccountsEnabled] = useState(false)
+  const [wrongNetwork, setWrongNetwork] = useState(false)
+
   const walletMethod = useSelector(selectWalletMethod())
   const masterConfig = useSelector(selectNetwork())
 
@@ -64,8 +65,8 @@ function WalletPicker ({ onEnable, enabled }) {
   let maintenance = false
 
   if (process.env.REACT_APP_STATUS === 'maintenance' ) {
-      maintenance = true
-  } 
+    maintenance = true
+  }
 
   const dispatchSetWalletMethod = useCallback((methodName) => {
     dispatch(setWalletMethod(methodName));
@@ -74,18 +75,18 @@ function WalletPicker ({ onEnable, enabled }) {
   useEffect(() => {
 
     if (walletMethod === 'browser') {
-      enableBrowserWallet()
+      setupBrowserWallet()
     }
 
-    async function enableBrowserWallet () {
+    async function setupBrowserWallet() {
       const selectedNetwork = masterConfig
-      const walletEnabled = await networkService.enableBrowserWallet(selectedNetwork)
+      const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
       return walletEnabled
         ? setWalletEnabled(true)
         : dispatchSetWalletMethod(null);
     }
 
-  }, [ dispatchSetWalletMethod, walletMethod, masterConfig ]);
+  }, [ dispatchSetWalletMethod, walletMethod, masterConfig , dispatch]);
 
   useEffect(() => {
 
@@ -120,6 +121,7 @@ function WalletPicker ({ onEnable, enabled }) {
   }, [ onEnable, accountsEnabled ]);
 
   useEffect(() => {
+    console.log([walletEnabled , wrongNetwork])
     if (walletEnabled && wrongNetwork) {
       dispatch(openModal('wrongNetworkModal'));
       localStorage.setItem('changeChain', false);
@@ -149,7 +151,7 @@ function WalletPicker ({ onEnable, enabled }) {
         onClose={resetSelection}
       />
       <Root>
-        {!maintenance && 
+        {!maintenance &&
           <Container maxWidth="md">
             <Grid container spacing={8}>
               <Grid item xs={12} md={6}>
@@ -185,25 +187,25 @@ function WalletPicker ({ onEnable, enabled }) {
             </Grid>
           </Container>
        }
-       {!!maintenance && 
-        <Container maxWidth="md">
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={12}>
-              <Typography variant="h1" component="h1">
-                SCHEDULED BOBA GATEWAY DOWNTIME 
-              </Typography>
-              <S.Subtitle variant="body1" component="p" paragraph={true}>
-                As announced in Twitter and in Telegram, due to unexpectely high demand for the 
-                Boba L2, BOBA liquidity pools are being rebalanced.
-              </S.Subtitle>
-              <S.Subtitle variant="body1" component="p" paragraph={true}>
-                The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC. 
-                Upgrade status and progress reports will be provided via Twitter and Telegram.
-              </S.Subtitle>
+        {!!maintenance &&
+          <Container maxWidth="md">
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h1" component="h1">
+                  SCHEDULED BOBA GATEWAY DOWNTIME
+                </Typography>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  As announced in Twitter and in Telegram, due to unexpectely high demand for the
+                  Boba L2, BOBA liquidity pools are being rebalanced.
+                </S.Subtitle>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC.
+                  Upgrade status and progress reports will be provided via Twitter and Telegram.
+                </S.Subtitle>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
-       }
+          </Container>
+        }
       </Root>
     </>
   );

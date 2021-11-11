@@ -3,14 +3,12 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { getFarmInfo } from 'actions/farmAction'
+import { fetchL1LPBalance, fetchL2LPBalance, getFarmInfo } from 'actions/farmAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 import { logAmount, toWei_String } from 'util/amountConvert'
-
-import networkService from 'services/networkService'
 
 import { Typography } from '@material-ui/core'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
@@ -55,9 +53,9 @@ class FarmWithdrawModal extends React.Component {
     let LPBalance_Wei_String = ''
 
     if (withdrawToken.L1orL2Pool === 'L1LP') {
-      LPBalance_Wei_String = await networkService.L1LPBalance(withdrawToken.currency)
+      this.props.dispatch(fetchL1LPBalance(withdrawToken.currency));
     } else {
-      LPBalance_Wei_String = await networkService.L2LPBalance(withdrawToken.currency)
+      this.props.dispatch(fetchL2LPBalance(withdrawToken.currency));
     }
 
     this.setState({
@@ -73,7 +71,7 @@ class FarmWithdrawModal extends React.Component {
 
     const { open } = this.props
 
-    const { withdrawToken, userInfo } = this.props.farm
+    const { withdrawToken, userInfo , lpBalanceWeiString} = this.props.farm
 
     if (prevState.open !== open) {
       this.setState({ open })
@@ -85,6 +83,15 @@ class FarmWithdrawModal extends React.Component {
 
     if (!isEqual(prevState.farm.userInfo, userInfo)) {
       this.setState({ userInfo })
+    }
+
+    if (!isEqual(prevState.farm.lpBalanceWeiString, lpBalanceWeiString)) {
+      this.setState({
+        LPBalance: logAmount(lpBalanceWeiString, withdrawToken.decimals),
+        LPBalance_Wei_String: lpBalanceWeiString
+      }, ()=>{
+        this.setMaxTransferValue()
+      })
     }
 
   }

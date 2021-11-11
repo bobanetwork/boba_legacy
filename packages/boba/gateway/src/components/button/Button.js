@@ -69,19 +69,21 @@ function Button ({
 
   return (
   <Tooltip title={tooltip}>
-    <ButtonMUI {...muiProps} style={{minWidth: loading ? '200px' : 'none'}}>
-      {children}
-      {(disabled || loading) && timeDefined && (waitTime > 3) &&
-        <div style={{marginLeft: '10px'}}>
-          {waitTime}s ago
-        </div>
-      }
-      {loading &&
-        <div style={{paddingTop: '4px', marginLeft: '10px'}}>
-          <CircularProgress size={14} color='inherit' />
-        </div>
-      }
-    </ButtonMUI>
+      <span>
+        <ButtonMUI {...muiProps} style={{ minWidth: loading ? '200px' : 'none' }}>
+          {children}
+          {(disabled || loading) && timeDefined && (waitTime > 3) &&
+            <div style={{ marginLeft: '10px' }}>
+              {waitTime}s ago
+            </div>
+          }
+          {loading &&
+            <div style={{ paddingTop: '4px', marginLeft: '10px' }}>
+              <CircularProgress size={14} color='inherit' />
+            </div>
+          }
+        </ButtonMUI>
+      </span>
   </Tooltip>
   )
 }

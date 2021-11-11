@@ -26,8 +26,6 @@ import { logAmount } from 'util/amountConvert'
 import Pager from 'components/pager/Pager'
 import Transaction from 'components/transaction/Transaction'
 
-import networkService from 'services/networkService'
-
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles';
 
@@ -39,8 +37,6 @@ function Deposits({ searchHistory, transactions }) {
 
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
-
-  const allAddresses = networkService.getAllAddresses()
 
   useEffect(() => {
     setPage(1)
