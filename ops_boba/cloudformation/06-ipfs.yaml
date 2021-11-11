@@ -22,7 +22,7 @@ Parameters:
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
     Type: String
-    Default: infrastructure-coredev
+    Default: rinkeby-infrastructure-core
 
 Resources:
   TaskRole:
@@ -144,7 +144,7 @@ Resources:
       - "IPFSListenerRule"
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
       LoadBalancers:
         - ContainerName: ipfs
           ContainerPort: 5001

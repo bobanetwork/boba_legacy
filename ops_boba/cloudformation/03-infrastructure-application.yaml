@@ -209,10 +209,11 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
-      Type: network
 
   LoadBalancerInt:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
