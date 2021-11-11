@@ -170,16 +170,14 @@ class ListFarm extends React.Component {
     }
 
     // L1orL2Pool: L1LP || L2LP
-    // networkService.L1OrL2 L1: || L2
+    // networkService.L1OrL2 L1 || L2
     const disabled = !L1orL2Pool.includes(networkService.L1orL2)
     const symbol = poolInfo.symbol
-    // let name = poolInfo.name
     const decimals = poolInfo.decimals
     let logo = getCoinImage(symbol)
 
     //Deal with Token migration to REPv2
     if( symbol === 'REPv2' ) {
-      // name = 'AUGUR (REPv2)'
       logo = getCoinImage('REP')
     }
 
