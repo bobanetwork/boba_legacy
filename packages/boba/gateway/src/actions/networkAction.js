@@ -71,8 +71,8 @@ export function fastExitAll(token) {
 //CLASSICAL DEPOSIT ETH
 export function depositETHL2(value) {
   return createAction('DEPOSIT/CREATE', () => {
-      return networkService.depositETHL2(value)
-    }
+    return networkService.depositETHL2(value)
+  }
   )
 }
 
@@ -95,20 +95,16 @@ export function farmL2(value_Wei_String, currencyAddress) {
     networkService.approveERC20_L2LP(value_Wei_String, currencyAddress)
   )
 }
-export function getRewardL1(currencyL1Address, value_Wei_String) {
+export function getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
   return createAction('FARM/HARVEST', () =>
-    networkService.getRewardL1(currencyL1Address, value_Wei_String)
+    networkService.getReward(currencyAddress, value_Wei_String, L1orL2Pool)
   )
 }
-export function getRewardL2(currencyL2Address, value_Wei_String) {
-  return createAction('FARM/HARVEST', () =>
-    networkService.getRewardL2(currencyL2Address, value_Wei_String)
-  )
-}
-export function withdrawLiquidity(currency, value_Wei_String, L1orL2Pool) {
+
+export function withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool) {
   console.log("Withdrawing ERC20 Liquidity")
   return createAction('FARM/WITHDRAW', () =>
-    networkService.withdrawLiquidity(currency, value_Wei_String, L1orL2Pool)
+    networkService.withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool)
   )
 }
 
@@ -161,4 +157,20 @@ export function transfer(recipient, value, currency) {
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))
+}
+
+export function correctChain(layer) {
+  return createAction('CORRECT/NETWORK', () => networkService.correctChain(layer))
+}
+
+export function enableBrowserWallet(network) {
+  return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
+}
+
+export function switchChain(layer) {
+  return createAction('SWITCH/CHAIN', () => networkService.switchChain(layer))
+}
+
+export function getAllAddresses() {
+  return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
 }

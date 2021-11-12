@@ -18,7 +18,7 @@ import { getCoinImage } from 'util/coinImage';
 
 import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
 import * as S from "./ListFarm.styles"
-import { getRewardL1, getRewardL2 } from 'actions/networkAction';
+import { getAllAddresses, getReward } from 'actions/networkAction';
 
 class ListFarm extends React.Component {
 
@@ -51,6 +51,10 @@ class ListFarm extends React.Component {
     }
   }
 
+  componentDidMount(){
+    this.props.dispatch(getAllAddresses());
+  }
+
   componentDidUpdate(prevState) {
 
     const { poolInfo, userInfo, balance, showAll, showStakesOnly } = this.props
@@ -81,7 +85,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = networkService.getAllAddresses()
+    const {allAddresses} = this.props.farm;
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
@@ -99,7 +103,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const allAddresses = networkService.getAllAddresses()
+    const { allAddresses } = this.props.farm
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
@@ -115,7 +119,7 @@ class ListFarm extends React.Component {
 
   async handleHarvest() {
 
-    const { poolInfo, userInfo } = this.state;
+    const { poolInfo, L1orL2Pool, userInfo } = this.state;
 
     this.setState({ loading: true })
 
@@ -126,22 +130,12 @@ class ListFarm extends React.Component {
       .sub(BigNumber.from(userInfo.rewardDebt))
     ).toString()
 
-    let getRewardTX = null;
-
-    if(networkService.L1orL2 === 'L1') {
-      getRewardTX = await this.props.dispatch(getRewardL1(
-        poolInfo.l1TokenAddress,
-        userReward
-      ))
-    } else if (networkService.L1orL2 === 'L2') {
-      getRewardTX = await this.props.dispatch(getRewardL2(
-        poolInfo.l2TokenAddress,
-        userReward
-      ))
-    } else {
-      console.log("handleHarvest(): Chain not set")
-    }
-
+    let getRewardTX = await this.props.dispatch(getReward(
+      L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
+      userReward,
+      L1orL2Pool
+    ))
+    
     if (getRewardTX) {
       this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
       this.props.dispatch(getFarmInfo())
@@ -176,16 +170,14 @@ class ListFarm extends React.Component {
     }
 
     // L1orL2Pool: L1LP || L2LP
-    // networkService.L1OrL2 L1: || L2
+    // networkService.L1OrL2 L1 || L2
     const disabled = !L1orL2Pool.includes(networkService.L1orL2)
     const symbol = poolInfo.symbol
-    // let name = poolInfo.name
     const decimals = poolInfo.decimals
     let logo = getCoinImage(symbol)
 
     //Deal with Token migration to REPv2
     if( symbol === 'REPv2' ) {
-      // name = 'AUGUR (REPv2)'
       logo = getCoinImage('REP')
     }
 
@@ -215,7 +207,7 @@ class ListFarm extends React.Component {
         ) : (
           <S.GridContainer container spacing={2} direction="row" justifyContent="center" alignItems="center" >
 
-            <S.GridItemTag item xs={4} md={2} isMobile>
+            <S.GridItemTag item xs={4} md={2}>
                 <img src={logo} alt="logo" width={30} />
                 <Typography variant="overline">{symbol}</Typography>
             </S.GridItemTag>
@@ -342,6 +334,7 @@ class ListFarm extends React.Component {
 }
 
 const mapStateToProps = state => ({
+    farm: state.farm,
 })
 
 export default connect(mapStateToProps)(ListFarm)

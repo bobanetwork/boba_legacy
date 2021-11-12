@@ -506,25 +506,30 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       return SCCEvent[0]
     }
 
-    let startingBlock = this.state.lastQueriedL1Block
+    let startingBlock = this.state.lastQueriedL1Block + 1
     const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
-    while (startingBlock < maxBlock) {
+    while (startingBlock <= maxBlock) {
+      const endBlock = Math.min(
+        startingBlock + this.options.getLogsInterval,
+        maxBlock
+      )
+
       this.logger.info('Querying events', {
         startingBlock,
-        endBlock: startingBlock + this.options.getLogsInterval,
+        endBlock,
         maxBlock,
       })
-
       const events: ethers.Event[] =
         await this.state.StateCommitmentChain.queryFilter(
           this.state.StateCommitmentChain.filters.StateBatchAppended(),
           startingBlock,
-          startingBlock + this.options.getLogsInterval
+          endBlock
         )
-      this.state.lastQueriedL1Block = Math.min(
-        startingBlock + this.options.getLogsInterval,
-        maxBlock
-      )
+      const ebn = []
+      events.forEach(e => {
+        ebn.push(e.blockNumber)
+      })
+      this.logger.info('Queried Events', { startingBlock, endBlock, ebn })
 
       this.state.eventCache = this.state.eventCache.concat(events)
       this.logger.info('Added events to eventCache', {
@@ -532,7 +537,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         newSize: this.state.eventCache.length,
       })
 
-      startingBlock += this.options.getLogsInterval
+      this.state.lastQueriedL1Block = endBlock
+      startingBlock = endBlock + 1
 
       // We need to stop syncing early once we find the event we're looking for to avoid putting
       // *all* events into memory at the same time. Otherwise we'll get OOM killed.

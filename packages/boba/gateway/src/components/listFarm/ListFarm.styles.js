@@ -23,9 +23,11 @@ export const GridContainer = styled(Grid)(({theme})=>({
 
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
   display: 'flex',
-  flexDirection: `${!props.isMobile ? 'column' : 'column-reverse'}`,
+  // flexDirection: `${!props.ismobile ? 'column' : 'column-reverse'}`,
+  flexDirection:  'column-reverse',
   alignItems: 'center',
   [theme.breakpoints.down('md')]:{
+    flexDirection:  'column',
     padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
   }
 }))
