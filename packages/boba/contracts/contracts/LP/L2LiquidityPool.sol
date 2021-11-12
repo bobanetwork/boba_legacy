@@ -91,6 +91,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     address public DAO;
 
+    uint256 public extraGasRelay;
+
     /********************
      *       Event      *
      ********************/
@@ -256,6 +258,16 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         userRewardFeeRate = _userRewardFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
+    }
+
+    function configureExtraGasRelay(
+        uint256 _extraGas
+    )
+        public
+        onlyOwner()
+        onlyInitialized()
+    {
+        extraGasRelay = _extraGas;
     }
 
     /**
@@ -442,6 +454,15 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         payable
         whenNotPaused
     {
+        uint256 startingGas = gasleft();
+        require(startingGas > extraGasRelay, "Insufficient Gas For a Relay Transaction");
+
+        uint256 desiredGasLeft = startingGas.sub(extraGasRelay);
+        uint256 i;
+        while (gasleft() > desiredGasLeft) {
+            i++;
+        }
+
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
