@@ -199,5 +199,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "blockexplorer-blockscout"
+      ServiceName: "blockscout"
       TaskDefinition: !Ref TaskDefinition

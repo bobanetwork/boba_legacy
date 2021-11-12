@@ -337,6 +337,7 @@ function deploy_dev_services {
 }
 
 function update_dev_services {
+  #set +x
     if [ -z ${SERVICE_NAME} ]; then
       notice "Generating environment files ...."
       for srv in $DOCKER_IMAGES_LIST; do
@@ -370,7 +371,7 @@ function update_dev_services {
       done
     else
       notice "Generating environment file for ${SERVICE_NAME}"
-      #set -x
+      set -x
       if [[ ${ENV_PREFIX} == *"-replica"* ]];then
         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
       elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
