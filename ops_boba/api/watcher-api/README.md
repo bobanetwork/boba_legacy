@@ -202,13 +202,14 @@
 
 ### Airdrop
 
-get.airdrop
+#### get.airdrop
 
 **Request Body**
 
 ```js
 {
-  address: "ADDRESS"
+  "address": "ADDRESS",
+  "key":"ACCESS_KEY"
 }
 ```
 
@@ -217,10 +218,12 @@ get.airdrop
 ```js
 {
   "address": "ADDRESS",
-  "amount": "AMOUNT", // IN WEI
-  "claim": "TRUE / FALSE",
+  "amount": "AMOUNT_WEI_STRING",
+  "claimed": "TRUE / FALSE",
   "claimTimestamp": "TIMESTAMP",
-  "claimAmount": "CLAIM AMOUNT",
+  "claimAmount": "AMOUNT_WEI_STRING",
+  "claimImmediate": "TRUE / FALSE", //if staked on L2 during snapshot, claimImmediate === True
+  "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
   "merkleProof": {
     "index": "INDEX",
     "amount": "AMOUNT", //hex,
@@ -229,7 +232,7 @@ get.airdrop
 }
 ```
 
-send.airdrop
+#### send.airdrop
 
 **Request Body**
 
@@ -237,7 +240,8 @@ send.airdrop
 {
   "address":"ADDRESS",
   "claimTimestamp": "TIMESTAMP",
-  "claimAmount": "AMOUNT",
+  "claimAmount": "AMOUNT_WEI_STRING",
+  "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
   "key":"ACCESS_KEY"
 }
 ```
