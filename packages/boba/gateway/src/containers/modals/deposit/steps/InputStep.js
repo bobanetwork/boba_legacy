@@ -127,7 +127,7 @@ function InputStep({ handleClose, token }) {
         />
 
         {!!convertToUSD && (
-          <Typography variant="body1" sx={{mt: 2, fontWeight: 700}}>
+          <Typography variant="body2" sx={{mt: 2}}>
             {`Amount in USD ${amountToUsd(value, lookupPrice, token).toFixed(2)}`}
           </Typography>
         )}

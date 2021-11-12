@@ -17,7 +17,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import networkService from 'services/networkService';
+import networkService from 'services/networkService'
+import { createAction } from './createAction'
 
 const getFarmInfoBegin = () => ({
   type: 'GET_FARMINFO',
@@ -28,21 +29,31 @@ const getFarmInfoSuccess = (L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo) => (
   payload: { L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo }
 })
 
-const getFeeBegin = () => ({
-  type: 'GET_USERINFO',
-})
+// const getL1FeeBegin = () => ({
+//   type: 'GET_USERINFO',
+// })
 
-const getFeeSuccess = (totalFeeRate, userRewardFeeRate) => ({
-  type: 'GET_FEE_SUCCESS',
-  payload: { totalFeeRate, userRewardFeeRate },
-})
+// const getL2FeeBegin = () => ({
+//   type: 'GET_USERINFO',
+// })
+
+// const getL1FeeSuccess = (totalFeeRate, userRewardFeeRate) => ({
+//   type: 'GET_L1FEE_SUCCESS',
+//   payload: { totalFeeRate, userRewardFeeRate },
+// })
+
+// const getL2FeeSuccess = (totalFeeRate, userRewardFeeRate) => ({
+//   type: 'GET_L2FEE_SUCCESS',
+//   payload: { totalFeeRate, userRewardFeeRate },
+// })
 
 export const getFarmInfo = () => async (dispatch) => {
-  dispatch(getFarmInfoBegin());
-  const [L1LPInfo, L2LPInfo] = await Promise.all([
+  console.log("getFarmInfo()")
+  dispatch(getFarmInfoBegin())
+   const [L1LPInfo, L2LPInfo] = await Promise.all([
     networkService.getL1LPInfo(),
     networkService.getL2LPInfo(),
-  ])
+   ])
   dispatch(getFarmInfoSuccess(
     L1LPInfo.poolInfo,
     L1LPInfo.userInfo,
@@ -51,15 +62,27 @@ export const getFarmInfo = () => async (dispatch) => {
   ))
 }
 
+// export const getL1Fee = () => async (dispatch) => {
+//   dispatch(getL1FeeBegin())
+//   const [totalFeeRate, userFeeRate] = await Promise.all([
+//     networkService.getL1TotalFeeRate(),
+//     networkService.getL1UserRewardFeeRate(),
+//   ])
+//   console.log("L1 totalFeeRate",totalFeeRate)
+//   console.log("L1 userRewardFeeRate",userFeeRate)
+//   dispatch(getL1FeeSuccess(totalFeeRate, userFeeRate))
+// }
 
-export const getFee = () => async (dispatch) => {
-  dispatch(getFeeBegin());
-  const [totalFeeRate, userRewardFeeRate] = await Promise.all([
-    networkService.getTotalFeeRate(),
-    networkService.getUserRewardFeeRate(),
-  ])
-  dispatch(getFeeSuccess(totalFeeRate, userRewardFeeRate));
-}
+// export const getL2Fee = () => async (dispatch) => {
+//   dispatch(getL2FeeBegin())
+//   const [totalFeeRate, userFeeRate] = await Promise.all([
+//     networkService.getL2TotalFeeRate(),
+//     networkService.getL2UserRewardFeeRate(),
+//   ])
+//   console.log("L2 totalFeeRate",totalFeeRate)
+//   console.log("L2 userRewardFeeRate",userFeeRate)
+//   dispatch(getL2FeeSuccess(totalFeeRate, userFeeRate))
+// }
 
 export const updateStakeToken = (stakeToken) => ({
   type: 'UPDATE_STAKE_TOKEN',
@@ -70,3 +93,30 @@ export const updateWithdrawToken = (withdrawToken) => ({
   type: 'UPDATE_WITHDRAW_TOKEN',
   payload: withdrawToken,
 })
+
+export function fetchAllowance(currency, lpAddress) {
+  return createAction('FETCH/ALLOWANCE', () => networkService.checkAllowance(
+    currency,
+    lpAddress
+  ))
+}
+
+export function addLiquidity(
+  currency,
+  weiString,
+  L1orL2Pool
+) {
+  return createAction('ADD/LIQUIDITY', () => networkService.addLiquidity(
+    currency,
+    weiString,
+    L1orL2Pool
+  ))
+}
+
+export function fetchL1LPBalance(currency) {
+  return createAction('FETCH/L1LPBALANCE', () => networkService.L1LPBalance(currency))
+}
+
+export function fetchL2LPBalance(currency) {
+  return createAction('FETCH/L2LPBALANCE', () => networkService.L2LPBalance(currency))
+}

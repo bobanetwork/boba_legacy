@@ -49,6 +49,7 @@ export const CardTag = styled(Card)(({ theme }) => ({
   border: '2px solid rgba(255, 255, 255, 0.2)',
   overflow: 'initial',
   minHeight: '225px',
+  marginBottom: '20px',
   backgroundColor: theme.palette.background.secondary,
   [theme.breakpoints.up('lg')]: {
     margin: '60px 0 30px 0',
