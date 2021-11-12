@@ -34,7 +34,7 @@ def watcher_getAirdrop(event, context):
   airdropPayload = {}
 
   if key != securityKey:
-    return returnReponse(400)
+    return returnReponse(404, airdropPayload)
 
   statusCode = 201
   with con:
@@ -51,7 +51,7 @@ def watcher_getAirdrop(event, context):
       if len(payload) == 1:
         [address, amount, claim, claimTimestamp, claimAmount, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
         airdropPayload = {
-          "address" : address, "amount": amount, "claim": claim,
+          "address" : address, "amount": amount, "claimed": claim,
           "claimTimestamp": claimTimestamp, "claimAmount": claimAmount,
           "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
@@ -66,7 +66,10 @@ def watcher_getAirdrop(event, context):
 
   con.close()
 
-  response = {
+  return returnReponse(statusCode, airdropPayload)
+
+def returnReponse(statusCode, body):
+    return {
     "statusCode": statusCode,
     "headers": {
       "Access-Control-Allow-Origin": "*",
@@ -78,6 +81,5 @@ def watcher_getAirdrop(event, context):
       "Referrer-Policy": "same-origin",
       "Permissions-Policy": "*",
     },
-    "body": json.dumps(airdropPayload),
+    "body": json.dumps(body),
   }
-  return response
