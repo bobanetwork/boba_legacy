@@ -1403,4 +1403,83 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2EthBalance).to.deep.eq(postBobL2EthBalance)
     })
   })
+
+  describe('Relay gas burn tests', async () => {
+    it('should not allow updating extraGasRelay for non-owner', async () => {
+      const newExtraGasRelay = 500000
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet_2).configureExtraGasRelay(
+          newExtraGasRelay
+        )
+      ).to.be.revertedWith('caller is not the owner')
+    })
+
+    it('should allow updating extraGasRelay for owner', async () => {
+      // approximate and set new extra gas to over it for tests
+      const approveBobL2TX = await L2ERC20.approve(
+        L2LiquidityPool.address,
+        utils.parseEther('10')
+      )
+      await approveBobL2TX.wait()
+      const estimatedGas = await L2LiquidityPool.estimateGas.clientDepositL2(
+        utils.parseEther('10'),
+        L2ERC20.address
+      )
+
+      const newExtraGasRelay = estimatedGas.mul(2)
+      const configureTx = await L2LiquidityPool.configureExtraGasRelay(
+        newExtraGasRelay
+      )
+      await configureTx.wait()
+
+      const updatedExtraGasRelay = await L2LiquidityPool.extraGasRelay()
+      expect(updatedExtraGasRelay).to.eq(newExtraGasRelay)
+    })
+
+    it('should be able to fast exit with correct added gas', async () => {
+      const fastExitAmount = utils.parseEther('10')
+
+      const preBobL1ERC20Balance = await L1ERC20.balanceOf(
+        env.l1Wallet.address
+      )
+
+      const approveBobL2TX = await L2ERC20.approve(
+        L2LiquidityPool.address,
+        utils.parseEther('10')
+      )
+      await approveBobL2TX.wait()
+
+      const depositTx = await env.waitForXDomainTransactionFast(
+        L2LiquidityPool.clientDepositL2(
+          fastExitAmount,
+          L2ERC20.address
+        ),
+        Direction.L2ToL1
+      )
+
+      const userRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
+      const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+      const totalFeeRate = userRewardFeeRate.add(ownerRewardFeeRate)
+      const remainingPercent = BigNumber.from(1000).sub(totalFeeRate)
+
+      const postBobL1ERC20Balance = await L1ERC20.balanceOf(
+        env.l1Wallet.address
+      )
+
+      expect(postBobL1ERC20Balance).to.deep.eq(
+        preBobL1ERC20Balance.add(fastExitAmount.mul(remainingPercent).div(1000))
+      )
+
+      const extraGasRelay = await L2LiquidityPool.extraGasRelay()
+      expect(depositTx.receipt.gasUsed).to.be.gt(extraGasRelay)
+
+      // update it back to zero for tests
+      const configureTx = await L2LiquidityPool.configureExtraGasRelay(
+        0
+      )
+      await configureTx.wait()
+      const finalExtraGasRelay = await L2LiquidityPool.extraGasRelay()
+      expect(finalExtraGasRelay).to.eq(0)
+    })
+  })
 })
