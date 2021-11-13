@@ -7,7 +7,7 @@
 
 ### Layer 1
 
-#### get.l1.transactions
+#### get.l1.transactions (POST)
 
 **Request Body**
 
@@ -61,7 +61,7 @@
 
 ### Layer 2
 
-#### get.l2.transactions
+#### get.l2.transactions (POST)
 
 **Request Body**
 
@@ -116,7 +116,7 @@
 ]
 ```
 
-#### get.l2.deployments
+#### get.l2.deployments (POST)
 
 **Request Body**
 
@@ -140,7 +140,7 @@
 ]
 ```
 
-#### get.l2.crossdomainmessage
+#### get.l2.crossdomainmessage (POST)
 
 **Request Body**
 
@@ -172,9 +172,28 @@
 }
 ```
 
+#### get.l2.pendingexits (GET)
+
+**Response Body**
+
+```
+{
+  hash: "TRANSACTION_HASH",
+  blockHash: "BLOCK_HASH",
+  blockNumber: "BLOCK_NUMBER",
+  exitSender: "EXIT_SENDER",
+  exitTo: "EXIT_TO", // L1 LP address
+  exitTOKEN: "EXIT_TOKEN_L2_ADDRESS",
+  exitAmount: "EXIT_AMOUNT",
+  exitReceive: "EXIT_RECEIVE",
+  fastRelay: "FAST_RELAY" // 1 or 0,
+  status: "pending"
+}
+```
+
 ### Global
 
-#### send.crossdomainmessage
+#### send.crossdomainmessage (POST)
 
 **Request Body**
 
@@ -202,7 +221,7 @@
 
 ### Airdrop
 
-#### get.airdrop
+#### get.airdrop (POST)
 
 **Request Body**
 
@@ -232,7 +251,7 @@
 }
 ```
 
-#### send.airdrop
+#### send.airdrop (POST)
 
 **Request Body**
 
