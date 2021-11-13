@@ -16,6 +16,7 @@ def watcher_sendAirdrop(event, context):
   address = body.get("address")
   claimTimestamp = body.get("claimTimestamp")
   claimAmount = body.get("claimAmount")
+  claimUnlockTime = body.get("claimUnlockTime")
   key = body.get("key")
 
   # Read YML
@@ -41,8 +42,8 @@ def watcher_sendAirdrop(event, context):
     try:
       cur = con.cursor()
       cur.execute("""UPDATE airdrop
-        SET claim=%s, claimTimestamp=%s, claimAmount=%s WHERE address=%s
-      """, (True, claimTimestamp, claimAmount, address))
+        SET claim=%s, claimTimestamp=%s, claimAmount=%s, claimUnlockTime=%s WHERE address=%s
+      """, (True, claimTimestamp, claimAmount, claimUnlockTime, address))
     except Exception as e:
       statusCode = 500
       print("error: ", e)
