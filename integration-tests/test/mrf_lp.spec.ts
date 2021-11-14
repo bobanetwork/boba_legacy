@@ -1411,7 +1411,7 @@ describe('Liquidity Pool Test', async () => {
         L2LiquidityPool.connect(env.l2Wallet_2).configureExtraGasRelay(
           newExtraGasRelay
         )
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('caller is not the gasPriceOracle owner')
     })
 
     it('should allow updating extraGasRelay for owner', async () => {

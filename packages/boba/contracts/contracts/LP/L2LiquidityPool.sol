@@ -12,6 +12,7 @@ import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 
 /**
  * @dev An L2 LiquidityPool implementation
@@ -170,6 +171,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         _;
     }
 
+    modifier onlyGasPriceOracleOwner() {
+        require(msg.sender == OVM_GasPriceOracle(Lib_PredeployAddresses.OVM_GAS_PRICE_ORACLE).owner(), 'caller is not the gasPriceOracle owner');
+        _;
+    }
+
     modifier onlyNotInitialized() {
         require(address(L1LiquidityPoolAddress) == address(0), "Contract has been initialized");
         _;
@@ -264,7 +270,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         uint256 _extraGas
     )
         public
-        onlyOwner()
+        onlyGasPriceOracleOwner()
         onlyInitialized()
     {
         extraGasRelay = _extraGas;
