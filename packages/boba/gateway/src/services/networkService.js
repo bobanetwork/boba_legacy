@@ -1915,6 +1915,61 @@ class NetworkService {
     return receipt
   }
 
+
+  /***************************************/
+  /************ L1LP Pool size ***********/
+  /***************************************/
+  async L1LPPending(tokenAddress) {
+
+    // console.log("L1LPBalance(tokenAddress)")
+
+    // let balance
+    // let tokenAddressLC = tokenAddress.toLowerCase()
+
+    // if (
+    //   tokenAddressLC === allAddresses.L2_ETH_Address ||
+    //   tokenAddressLC === allAddresses.L1_ETH_Address
+    // ) {
+    //   balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
+    // } else {
+    //   balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
+    //     allAddresses.L1LPAddress
+    //   )
+    // }
+
+    // console.log("L1LPBalance(tokenAddress):",balance.toString())
+    
+    // return balance.toString()
+
+  }
+
+  /***************************************/
+  /************ L1LP Pool size ***********/
+  /***************************************/
+  async L2LPPending(tokenAddress) {
+
+    // console.log("L1LPBalance(tokenAddress)")
+
+    // let balance
+    // let tokenAddressLC = tokenAddress.toLowerCase()
+
+    // if (
+    //   tokenAddressLC === allAddresses.L2_ETH_Address ||
+    //   tokenAddressLC === allAddresses.L1_ETH_Address
+    // ) {
+    //   balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
+    // } else {
+    //   balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
+    //     allAddresses.L1LPAddress
+    //   )
+    // }
+
+    // console.log("L1LPBalance(tokenAddress):",balance.toString())
+    
+    // return balance.toString()
+
+  }
+
   /***************************************/
   /************ L1LP Pool size ***********/
   /***************************************/
