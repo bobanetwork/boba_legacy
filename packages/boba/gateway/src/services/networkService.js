@@ -127,8 +127,9 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999
-    this.L2GasLimit = 10000000
+    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts 
+    // "param _l1Gas Unused, but included for potential forward compatibility considerations"
+    this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
     // Dao
     this.BobaContract = null
@@ -1913,6 +1914,46 @@ class NetworkService {
     console.log("Speed checker:", speed)
 
     return receipt
+  }
+
+
+  /***************************************/
+  /************ L1LP Pool size ***********/
+  /***************************************/
+  async L1LPPending(tokenAddress) {
+
+    const L1pending = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits', {})
+
+    console.log("tokenAddress",tokenAddress)
+    console.log("L1pending",L1pending)
+
+    const pendingFast = L1pending.data.filter(i => {
+       return (i.fastRelay === 1) && //fast exit 
+        i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
+    })
+
+    console.log("L1pendingFast",pendingFast)
+
+    let sum = pendingFast.reduce(function(prev, current) {
+      let weiString = BigNumber.from(current.exitAmount)
+      return prev.add(weiString)
+    }, BigNumber.from('0'))
+
+    console.log("L1pendingFastSum:",sum.toString())
+
+    return sum.toString()
+
+  }
+
+  /***************************************/
+  /************ L1LP Pool size ***********/
+  /***************************************/
+  async L2LPPending(tokenAddress) {
+    //Placeholder return
+    const sum = BigNumber.from('0')
+    return sum.toString()
   }
 
   /***************************************/
