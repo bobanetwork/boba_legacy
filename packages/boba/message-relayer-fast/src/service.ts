@@ -214,9 +214,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       await this._getFilter()
 
       try {
-        // The message is relayed directly, no need to keep cache
-        this.state.eventCache = []
-
         // Check that the correct address is set in the address manager
         const relayer = await this.state.Lib_AddressManager.getAddress(
           'OVM_L2MessageRelayer'
