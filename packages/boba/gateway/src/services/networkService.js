@@ -127,8 +127,9 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999
-    this.L2GasLimit = 10000000
+    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts 
+    // "param _l1Gas Unused, but included for potential forward compatibility considerations"
+    this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
     // Dao
     this.BobaContract = null
@@ -1921,25 +1922,28 @@ class NetworkService {
   /***************************************/
   async L1LPPending(tokenAddress) {
 
-    // console.log("L1LPBalance(tokenAddress)")
+    const L1pending = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits', {})
 
-    // let balance
-    // let tokenAddressLC = tokenAddress.toLowerCase()
+    console.log("tokenAddress",tokenAddress)
+    console.log("L1pending",L1pending)
 
-    // if (
-    //   tokenAddressLC === allAddresses.L2_ETH_Address ||
-    //   tokenAddressLC === allAddresses.L1_ETH_Address
-    // ) {
-    //   balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
-    // } else {
-    //   balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
-    //     allAddresses.L1LPAddress
-    //   )
-    // }
+    const pendingFast = L1pending.data.filter(i => {
+       return (i.fastRelay === 1) && //fast exit 
+        i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
+    })
 
-    // console.log("L1LPBalance(tokenAddress):",balance.toString())
-    
-    // return balance.toString()
+    console.log("L1pendingFast",pendingFast)
+
+    let sum = pendingFast.reduce(function(prev, current) {
+      let weiString = BigNumber.from(current.exitAmount)
+      return prev.add(weiString)
+    }, BigNumber.from('0'))
+
+    console.log("L1pendingFastSum:",sum.toString())
+
+    return sum.toString()
 
   }
 
@@ -1947,27 +1951,9 @@ class NetworkService {
   /************ L1LP Pool size ***********/
   /***************************************/
   async L2LPPending(tokenAddress) {
-
-    // console.log("L1LPBalance(tokenAddress)")
-
-    // let balance
-    // let tokenAddressLC = tokenAddress.toLowerCase()
-
-    // if (
-    //   tokenAddressLC === allAddresses.L2_ETH_Address ||
-    //   tokenAddressLC === allAddresses.L1_ETH_Address
-    // ) {
-    //   balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
-    // } else {
-    //   balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
-    //     allAddresses.L1LPAddress
-    //   )
-    // }
-
-    // console.log("L1LPBalance(tokenAddress):",balance.toString())
-    
-    // return balance.toString()
-
+    //Placeholder return
+    const sum = BigNumber.from('0')
+    return sum.toString()
   }
 
   /***************************************/

@@ -175,7 +175,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (typeof(token) !== 'undefined') {
       dispatch(fetchL1LPBalance(token.addressL1))
       dispatch(fetchL1LPLiquidity(token.addressL1))
-      dispatch(fetchL1LPPending(token.addressL1))
+      dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
       dispatch(fetchL1TotalFeeRate())
       dispatch(fetchFastExitCost(token.address))
       dispatch(fetchL2FeeBalance())

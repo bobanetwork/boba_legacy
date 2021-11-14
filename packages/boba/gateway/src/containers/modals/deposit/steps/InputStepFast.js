@@ -86,12 +86,19 @@ function InputStepFast({ handleClose, token }) {
 
   const maxValue = logAmount(token.balance, token.decimals)
   const lpUnits = logAmount(LPBalance, token.decimals)
+  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
+    console.log("cost:",Number(cost))
+    console.log("value:",Number(value))
+    console.log("feeBalance:",Number(feeBalance))
+    console.log("LPRatio:",Number(LPRatio))
+    console.log("LPBalance:",Number(balanceSubPending))
+    
     if (tooSmall || tooBig) {
       setValidValue(false)
     } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
@@ -104,7 +111,7 @@ function InputStepFast({ handleClose, token }) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
-    } else if (Number(value) > Number(lpUnits) * 0.9) {
+    } else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out the entire balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
@@ -190,7 +197,7 @@ function InputStepFast({ handleClose, token }) {
     if (typeof(token) !== 'undefined') {
       dispatch(fetchL2LPBalance(token.addressL2))
       dispatch(fetchL2LPLiquidity(token.addressL2))
-      dispatch(fetchL2LPPending(token.addressL2))
+      dispatch(fetchL2LPPending(token.addressL1)) //lookup is, confusingly, via L1 token address
       dispatch(fetchL2TotalFeeRate())
       dispatch(fetchFastDepositCost(token.address))
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
@@ -331,9 +338,9 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 || Number(value) > Number(lpUnits) * 0.90) && (
+        {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {lpUnits}) and/or balance/liquidity ratio (of {LPRatio}) is low. 
+            The pool's balance (of {balanceSubPending} including inflight bridges) and/or balance/liquidity ratio (of {LPRatio}) is low. 
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}
