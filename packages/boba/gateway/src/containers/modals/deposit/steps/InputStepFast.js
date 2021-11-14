@@ -340,7 +340,7 @@ function InputStepFast({ handleClose, token }) {
 
         {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {balanceSubPending} including inflight bridges) and/or balance/liquidity ratio (of {LPRatio}) is low. 
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) and/or balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}

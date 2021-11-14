@@ -81,6 +81,7 @@ function DoExitStepFast({ handleClose, token }) {
 
   const maxValue = logAmount(token.balance, token.decimals)
   const lpUnits = logAmount(LPBalance, token.decimals)
+  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   function setAmount(value) {
 
@@ -91,7 +92,7 @@ function DoExitStepFast({ handleClose, token }) {
     console.log("value:",Number(value))
     console.log("feeBalance:",Number(feeBalance))
     console.log("LPRatio:",Number(LPRatio))
-    console.log("LPBalance:",Number(lpUnits))
+    console.log("LPBalance:",Number(balanceSubPending))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -105,7 +106,7 @@ function DoExitStepFast({ handleClose, token }) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
-    } else if (Number(value) > Number(lpUnits) * 0.9) {
+    } else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out all the balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
@@ -305,9 +306,9 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 || Number(value) > Number(lpUnits) * 0.90) && (
+        {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {lpUnits}) and/or balance/liquidity ratio (of {LPRatio}) is low. 
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) and/or balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low. 
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}
