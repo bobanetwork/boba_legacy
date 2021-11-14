@@ -81,6 +81,10 @@ const main = async () => {
     'burned-gas-fee-ration-100x',
     parseInt(env.BURNED_GAS_FEE_RATIO_100X, 10) || 30
   )
+  const MAX_BURNED_GAS = config.str(
+    'max-burned-gas',
+    env.MAX_BURNED_GAS || '10000000'
+  )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
@@ -150,6 +154,7 @@ const main = async () => {
     gasPriceMinPercentChange: GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE,
     pollingInterval: POLLING_INTERVAL,
     burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
+    maxBurnedGas: MAX_BURNED_GAS,
   })
 
   await service.start()

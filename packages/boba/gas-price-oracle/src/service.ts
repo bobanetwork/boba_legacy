@@ -54,6 +54,9 @@ interface GasPriceOracleOptions {
 
   // Burned gas fee ratio
   burnedGasFeeRatio100X: number
+
+  // max burned gas
+  maxBurnedGas: string
 }
 
 const optionSettings = {}
@@ -516,7 +519,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           .mul(BigNumber.from(this.options.burnedGasFeeRatio100X))
           .div(BigNumber.from(100))
         const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
-        const targetExtraGasRelay = extraChargeFee.div(L2GasPrice)
+        const targetExtraGasRelay = extraChargeFee
+          .div(L2GasPrice)
+          .gt(BigNumber.from(this.options.maxBurnedGas))
+          ? BigNumber.from(this.options.maxBurnedGas)
+          : extraChargeFee.div(L2GasPrice)
+
         const extraGasRelay =
           await this.state.Proxy__L2LiquidityPool.extraGasRelay()
 
