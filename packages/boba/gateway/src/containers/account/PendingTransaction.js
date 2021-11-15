@@ -112,7 +112,7 @@ function PendingTransaction() {
         return false
     })
     pendingDepositsTrad = pendingDepositsTrad.map(v => ({
-        ...v, label: 'Classic 7-day Bridge to L2', labelStatus: 'Pending',
+        ...v, label: 'Classic Bridge to L2', labelStatus: 'Pending',
         completion: v.crossDomainMessage.crossDomainMessageEstimateFinalizedTime,
       })
     )
