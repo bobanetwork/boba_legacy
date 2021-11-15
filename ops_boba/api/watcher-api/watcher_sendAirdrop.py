@@ -14,8 +14,9 @@ def watcher_sendAirdrop(event, context):
   # Parse incoming event
   body = json.loads(event["body"])
   address = body.get("address")
-  claimTimestamp = body.get("claimTimestamp")
-  claimAmount = body.get("claimAmount")
+  claimed = body.get("claimed")
+  claimedTimestamp = body.get("claimedTimestamp")
+  claimedAmount = body.get("claimedAmount")
   claimUnlockTime = body.get("claimUnlockTime")
   key = body.get("key")
 
@@ -42,8 +43,8 @@ def watcher_sendAirdrop(event, context):
     try:
       cur = con.cursor()
       cur.execute("""UPDATE airdrop
-        SET claim=%s, claimTimestamp=%s, claimAmount=%s, claimUnlockTime=%s WHERE address=%s
-      """, (True, claimTimestamp, claimAmount, claimUnlockTime, address))
+        SET claimed=%s, claimedTimestamp=%s, claimedAmount=%s, claimUnlockTime=%s WHERE address=%s
+      """, (claimed, claimedTimestamp, claimedAmount, claimUnlockTime, address))
     except Exception as e:
       statusCode = 500
       print("error: ", e)

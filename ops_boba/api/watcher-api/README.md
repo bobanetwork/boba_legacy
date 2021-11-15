@@ -239,8 +239,8 @@
   "address": "ADDRESS",
   "amount": "AMOUNT_WEI_STRING",
   "claimed": "TRUE / FALSE",
-  "claimTimestamp": "TIMESTAMP",
-  "claimAmount": "AMOUNT_WEI_STRING",
+  "claimedTimestamp": "TIMESTAMP",
+  "claimedAmount": "AMOUNT_WEI_STRING",
   "claimImmediate": "TRUE / FALSE", //if staked on L2 during snapshot, claimImmediate === True
   "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
   "merkleProof": {
@@ -258,8 +258,9 @@
 ```js
 {
   "address":"ADDRESS",
-  "claimTimestamp": "TIMESTAMP",
-  "claimAmount": "AMOUNT_WEI_STRING",
+  "claimed": "TRUE / FALSE",
+  "claimedTimestamp": "TIMESTAMP",
+  "claimedAmount": "AMOUNT_WEI_STRING",
   "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
   "key":"ACCESS_KEY"
 }

@@ -40,7 +40,7 @@ def watcher_getAirdrop(event, context):
   with con:
     try:
       cur = con.cursor()
-      cur.execute("""SELECT airdrop.address, airdrop.amount, airdrop.claim, airdrop.claimTimestamp, airdrop.claimAmount, airdrop.claimImmediate, airdrop.claimUnlockTime,
+      cur.execute("""SELECT airdrop.address, airdrop.amount, airdrop.claimed, airdrop.claimedTimestamp, airdrop.claimedAmount, airdrop.claimImmediate, airdrop.claimUnlockTime,
         merkleProofs.`index`, merkleProofs.amount, merkleProofs.proof
         FROM airdrop
         LEFT JOIN merkleProofs
@@ -49,10 +49,10 @@ def watcher_getAirdrop(event, context):
       """, (address))
       payload = cur.fetchall()
       if len(payload) == 1:
-        [address, amount, claim, claimTimestamp, claimAmount, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
+        [address, amount, claimed, claimedTimestamp, claimedAmount, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
         airdropPayload = {
-          "address" : address, "amount": amount, "claimed": claim,
-          "claimTimestamp": claimTimestamp, "claimAmount": claimAmount,
+          "address" : address, "amount": amount, "claimed": claimed,
+          "claimedTimestamp": claimedTimestamp, "claimedAmount": claimedAmount,
           "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
             "index": index, "amount": hexAmount, "proof": json.loads(proof)
