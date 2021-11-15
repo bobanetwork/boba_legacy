@@ -28,6 +28,14 @@ export function fetchL2LPBalance(address) {
     return createAction('FETCH/L2LP/BALANCE', () => networkService.L2LPBalance(address))
 }
 
+export function fetchL1LPPending(address) {
+    return createAction('FETCH/L1LP/PENDING', () => networkService.L1LPPending(address))
+}
+
+export function fetchL2LPPending(address) {
+    return createAction('FETCH/L2LP/PENDING', () => networkService.L2LPPending(address))
+}
+
 export function fetchL1LPLiquidity(address) {
     return createAction('FETCH/L1LP/LIQUIDITY', () => networkService.L1LPLiquidity(address))
 }

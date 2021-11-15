@@ -40,7 +40,8 @@ import BN from 'bignumber.js'
 
 import { 
   fetchFastExitCost, 
-  fetchL1LPBalance, 
+  fetchL1LPBalance,
+  fetchL1LPPending,  
   fetchL1TotalFeeRate, 
   fetchL2FeeBalance,
   fetchL1LPLiquidity 
@@ -50,6 +51,7 @@ import {
   selectL1FeeRate, 
   selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString, 
+  selectL1LPPendingString,
   selectL2FeeBalance, 
   selectL1LPLiquidity 
 } from 'selectors/balanceSelector'
@@ -64,6 +66,7 @@ function DoExitStepFast({ handleClose, token }) {
   const [ LPRatio, setLPRatio ] = useState(0)
 
   const LPBalance = useSelector(selectL1LPBalanceString)
+  const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
   const feeRate = useSelector(selectL1FeeRate)
   const cost = useSelector(selectFastExitCost)
@@ -77,11 +80,19 @@ function DoExitStepFast({ handleClose, token }) {
   const signatureStatus = useSelector(selectSignatureStatus_exitLP)
 
   const maxValue = logAmount(token.balance, token.decimals)
+  const lpUnits = logAmount(LPBalance, token.decimals)
+  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
+
+    console.log("cost:",Number(cost))
+    console.log("value:",Number(value))
+    console.log("feeBalance:",Number(feeBalance))
+    console.log("LPRatio:",Number(LPRatio))
+    console.log("LPBalance:",Number(balanceSubPending))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -95,7 +106,7 @@ function DoExitStepFast({ handleClose, token }) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
-    } else if (Number(value) > Number(LPBalance) * 0.9) {
+    } else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out all the balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
@@ -165,6 +176,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (typeof(token) !== 'undefined') {
       dispatch(fetchL1LPBalance(token.addressL1))
       dispatch(fetchL1LPLiquidity(token.addressL1))
+      dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
       dispatch(fetchL1TotalFeeRate())
       dispatch(fetchFastExitCost(token.address))
       dispatch(fetchL2FeeBalance())
@@ -294,10 +306,10 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {Number(LPRatio) < 0.10 && (
+        {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance/liquidity ratio (of {LPRatio}) is too low to cover your fast bridge right now. Please
-            use the classic bridge or reduce the amount.
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) and/or balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low. 
+            Please use the classic bridge or reduce the amount.
           </Typography>
         )}
 

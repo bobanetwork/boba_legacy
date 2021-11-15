@@ -68,7 +68,7 @@ export function fastExitAll(token) {
   )
 }
 
-//CLASSICAL DEPOSIT ETH
+//CLASSIC DEPOSIT ETH
 export function depositETHL2(value) {
   return createAction('DEPOSIT/CREATE', () => {
     return networkService.depositETHL2(value)
