@@ -375,14 +375,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     )
     // The oETH in OVM_SequencerFeeVault is zero after withdrawing it
     let L2ETHCollectFeeIncreased = BigNumber.from('0')
-    if (L2ETHCollectFee.lt(this.state.L2ETHCollectFee)) {
-      this.state.L2ETHVaultBalance = L2ETHCollectFee
-    } else {
-      L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(
-        this.state.L2ETHVaultBalance
-      )
+
+    if (L2ETHCollectFee.lt(this.state.L2ETHVaultBalance)) {
       this.state.L2ETHVaultBalance = L2ETHCollectFee
     }
+    L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(this.state.L2ETHVaultBalance)
+    this.state.L2ETHVaultBalance = L2ETHCollectFee
+
     this.state.L2ETHCollectFee = this.state.L2ETHCollectFee.add(
       L2ETHCollectFeeIncreased
     )
