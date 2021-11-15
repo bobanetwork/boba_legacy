@@ -59,7 +59,14 @@ def watcher_getAirdrop(event, context):
           }
         }
       else:
-        statusCode = 400
+        airdropPayload = {
+          "address" : address, "amount": 0, "claimed": False,
+          "claimedTimestamp": None, "claimedAmount": None,
+          "claimImmediate": None, "claimUnlockTime": None,
+          "merkleProof": {
+            "index": None, "amount": None, "proof": None
+          }
+        }
     except Exception as e:
       statusCode = 500
       print("error: ", e)
