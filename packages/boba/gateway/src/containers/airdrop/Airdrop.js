@@ -198,8 +198,10 @@ class Airdrop extends React.Component {
             </Typography>
             <Button
               onClick={this.initiateDrop}
-              color="neutral"
+              color="primary"
               size="large"
+              newStyle
+              variant="contained"
             >
               Initiate Airdrop
             </Button>
@@ -242,8 +244,10 @@ class Airdrop extends React.Component {
             </Typography>
             <Button
               onClick={this.airdrop}
-              color="neutral"
+              color="primary"
               size="large"
+              newStyle
+              variant="contained"
             >
               Airdrop my Boba!
             </Button>
@@ -283,11 +287,13 @@ class Airdrop extends React.Component {
               Yes, there is an OMG balance of {balanceL2} on Boba in the snapshot block.
             </Typography>
             <Button
-                onClick={this.airdrop}
-                color="neutral"
-                size="large"
-              >
-                Airdrop my Boba!
+              onClick={this.airdrop}
+              color="primary"
+              size="large"
+              newStyle
+              variant="contained"
+            >
+              Airdrop my Boba!
             </Button>
             </>
           }
