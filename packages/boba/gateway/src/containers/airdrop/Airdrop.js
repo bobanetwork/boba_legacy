@@ -249,7 +249,7 @@ class Airdrop extends React.Component {
               component="p" 
               sx={{color: 'green', fontWeight: '700'}}
             >
-              Airdrop initiated.
+              Airdrop initiated
             </Typography>
             <Typography 
               variant="body2" 
@@ -290,7 +290,7 @@ class Airdrop extends React.Component {
               component="p" 
               sx={{color: 'green', fontWeight: '700'}}
             >
-              Airdrop completed.
+              Airdrop completed
             </Typography>
             <Typography 
               variant="body2" 
@@ -345,7 +345,7 @@ class Airdrop extends React.Component {
                 component="p" 
                 sx={{color: 'green', fontWeight: '700'}}
               >
-                Airdrop completed.
+                Airdrop completed
               </Typography>
               <Typography 
                 variant="body2" 
