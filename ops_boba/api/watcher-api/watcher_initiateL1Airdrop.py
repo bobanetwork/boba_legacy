@@ -3,7 +3,7 @@ import yaml
 import pymysql
 import time
 
-def watcher_sendL2Airdrop(event, context):
+def watcher_initiateL1Airdrop(event, context):
 
   # Parse incoming event
   body = json.loads(event["body"])
@@ -31,11 +31,11 @@ def watcher_sendL2Airdrop(event, context):
   statusCode = 201
   with con:
     try:
-      unixTime = int(time.time())
+      unixTime = int(time.time()) + 30 * 60 * 60
       cur = con.cursor()
-      cur.execute("""UPDATE airdropL2
-        SET claimed=%s, claimedTimestamp=%s, claimUnlockTime=%s WHERE address=%s AND claimed=%s
-      """, (True, unixTime, unixTime, address, False))
+      cur.execute("""UPDATE airdropL1
+        SET claimUnlockTime=%s WHERE address=%s AND claimUnlockTime is NULL AND claimed=%s
+      """, (unixTime, address, False))
     except Exception as e:
       statusCode = 500
       print("error: ", e)

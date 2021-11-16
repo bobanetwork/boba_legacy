@@ -1,12 +1,6 @@
 import json
 import yaml
 import pymysql
-import boto3
-import string
-import random
-import time
-import requests
-import redis
 
 def watcher_getL1Airdrop(event, context):
 
@@ -40,7 +34,7 @@ def watcher_getL1Airdrop(event, context):
   with con:
     try:
       cur = con.cursor()
-      cur.execute("""SELECT airdrop.address, airdrop.amount, airdrop.claimed, airdrop.claimedTimestamp, airdrop.claimedAmount, airdrop.claimImmediate, airdrop.claimUnlockTime,
+      cur.execute("""SELECT airdrop.address, airdrop.amount, airdrop.claimed, airdrop.claimedTimestamp, airdrop.claimImmediate, airdrop.claimUnlockTime,
         merkleProofs.`index`, merkleProofs.amount, merkleProofs.proof
         FROM airdropL1 as airdrop
         LEFT JOIN merkleProofsL1 as merkleProofs
@@ -49,11 +43,10 @@ def watcher_getL1Airdrop(event, context):
       """, (address))
       payload = cur.fetchall()
       if len(payload) == 1:
-        [address, amount, claimed, claimedTimestamp, claimedAmount, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
+        [address, amount, claimed, claimedTimestamp, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
         airdropPayload = {
           "address" : address, "amount": amount, "claimed": claimed,
-          "claimedTimestamp": claimedTimestamp, "claimedAmount": claimedAmount,
-          "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
+          "claimedTimestamp": claimedTimestamp, "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
             "index": index, "amount": hexAmount, "proof": json.loads(proof)
           },
@@ -62,8 +55,7 @@ def watcher_getL1Airdrop(event, context):
       else:
         airdropPayload = {
           "address" : address, "amount": 0, "claimed": False,
-          "claimedTimestamp": None, "claimedAmount": None,
-          "claimImmediate": None, "claimUnlockTime": None,
+          "claimedTimestamp": None, "claimImmediate": None, "claimUnlockTime": None,
           "merkleProof": {
             "index": None, "amount": None, "proof": None
           },

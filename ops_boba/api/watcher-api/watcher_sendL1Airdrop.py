@@ -1,23 +1,13 @@
 import json
 import yaml
 import pymysql
-import boto3
-import string
-import random
 import time
-import requests
-import redis
-
 
 def watcher_sendL1Airdrop(event, context):
 
   # Parse incoming event
   body = json.loads(event["body"])
   address = body.get("address")
-  claimed = body.get("claimed")
-  claimedTimestamp = body.get("claimedTimestamp")
-  claimedAmount = body.get("claimedAmount")
-  claimUnlockTime = body.get("claimUnlockTime")
   key = body.get("key")
 
   # Read YML
@@ -43,8 +33,8 @@ def watcher_sendL1Airdrop(event, context):
     try:
       cur = con.cursor()
       cur.execute("""UPDATE airdropL1
-        SET claimed=%s, claimedTimestamp=%s, claimedAmount=%s, claimUnlockTime=%s WHERE address=%s
-      """, (claimed, claimedTimestamp, claimedAmount, claimUnlockTime, address))
+        SET claimed=%s, claimedTimestamp=%s WHERE address=%s AND claimed=%s
+      """, (True, int(time.time()), address, False))
     except Exception as e:
       statusCode = 500
       print("error: ", e)
