@@ -20,7 +20,11 @@ class Airdrop extends React.Component {
 
     super(props)
 
-    const { claimDetailsL1, claimDetailsL2 } = this.props.airdrop
+    const { 
+      claimDetailsL1, 
+      claimDetailsL2 
+    } = this.props.airdrop
+    
     const { layer2 } = this.props.balance
 
     this.state = {

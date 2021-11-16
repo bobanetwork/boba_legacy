@@ -240,6 +240,22 @@ class NetworkService {
 
   }
 
+  async getAirdropL1(callData) {
+
+   //Interact with contract
+
+   //Interact with API if the contract interaction was success
+
+  }
+
+  async getAirdropL2(callData) {
+
+   //Interact with contract
+
+   //Interact with API if the contract interaction was success
+
+  }
+
   // async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
 
   //   try {
