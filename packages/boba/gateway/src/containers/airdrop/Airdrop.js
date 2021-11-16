@@ -60,7 +60,7 @@ class Airdrop extends React.Component {
 
   async initiateDrop() {
 
-    console.log('initiateDrop')
+    console.log('initiateAirdrop')
 
     let res = await this.props.dispatch(initiateAirdrop())
 
@@ -104,28 +104,24 @@ class Airdrop extends React.Component {
       layer2
     } = this.state
 
-    console.log("claimDetails:",claimDetailsL1)
-    console.log("claimDetails:",claimDetailsL2)
-    console.log("layer2:",layer2)
-
-    //just for testing use ETH balance 
+    //console.log("claimDetails:",claimDetailsL1)
+    //console.log("claimDetails:",claimDetailsL2)
+    //console.log("layer2:",layer2)
+ 
     let omgBalance = layer2.filter((i) => {
       if (i.symbol === 'OMG') return true
       return false
     })
 
     let omgWeiString = '0'
-
     if (typeof(omgBalance[0]) !== 'undefined') {
       console.log("omgBalance:",omgBalance[0])
       omgWeiString = omgBalance[0].balance.toString()
     }
 
-    console.log("omgWeiString:",omgWeiString)
+    //console.log("omgWeiString:",omgWeiString)
 
     let l2BalanceOMG = Number(logAmount(omgWeiString, 18))
-
-    l2BalanceOMG = 10
 
     let recordFoundL1 = false
     let snapValueL1 = 0

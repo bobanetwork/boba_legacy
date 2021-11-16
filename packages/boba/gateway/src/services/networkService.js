@@ -213,23 +213,17 @@ class NetworkService {
 
   }
 
-  async initiateAirdropL1() {
+  async initiateAirdrop() {
 
     console.log("Initiating airdrop")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
 
-    let time_seconds = Math.round((new Date()).getTime() / 1000) + (30 * 24 * 60 * 60)
-
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    ).post('send.l1.airdrop', {
+    ).post('initiate.l1.airdrop', {
       address: this.account,
-      claimed: 0,
-      claimedTimestamp: null,
-      claimedAmount: null,
-      claimUnlockTime: time_seconds,
       key: process.env.REACT_APP_AIRDROP
     })
 
@@ -254,28 +248,51 @@ class NetworkService {
   async getAirdropL2(callData) {
 
     console.log("getAirdropL2(callData)",callData)
+    console.log("this.account:",this.account)
     
     //Interact with contract
     const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdrop,
+      allAddresses.BobaAirdropL2,
       BobaAirdropJson.abi,
       this.provider.getSigner()
     )
 
     console.log("airdropContract.address:", airdropContract.address)
-    console.log("this.account:",this.account)
 
-    //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-    let claim = await airdropContract.claim(
-      callData.merkleProof.index,  //Spec - 1 - Type Number,
-      this.account,                //wallet address 
-      callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-      callData.merkleProof.proof   //proof1
-    )
+    try {
+      
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.claim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        this.account,                //wallet address 
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
 
-    await claim.wait()
+      await claim.wait()
 
-    //Interact with API if the contract interaction was success
+      //Interact with API if the contract interaction was success
+      //success of this this call has no bearing on the airdrop itself, since the api is just 
+      //used for user status updates etc.
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('send.l2.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("Airdrop gateway response:",response.data)
+      } else {
+        console.log("Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return false
+    }
 
   }
 
@@ -502,14 +519,14 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
 
-      await this.getAddress('airdropL2', 'BobaAirdrop')
-      console.log("BobaAirdrop:",allAddresses.BobaAirdrop)
+      await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
+      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
 
       //L2StandardBridgeAddress is a predeploy, so add by hand....
       allAddresses = {
         ...allAddresses,
         'L2StandardBridgeAddress': L2StandardBridgeAddress,
-        'BobaAirdrop': '0x4cA698d5c23bE5A79813687a99BB2269bDdA5B2e' //manual for now
+        //'BobaAirdrop': '0x4cA698d5c23bE5A79813687a99BB2269bDdA5B2e' //manual for now
       }
 
       //L2MessengerAddress is a predeploy, so add by hand....
@@ -1154,9 +1171,12 @@ class NetworkService {
   }
 
   handleMetaMaskError = (errorCode) => {
+    console.log("MetaMask Errorcode:",errorCode)
     switch (errorCode) {
       case 4001:
         return 'Transaction was rejected by user: signature denied'
+      case -32603:
+        return 'Execution reverted: ERC20: transfer amount exceeds balance'
       default:
         return null
     }
