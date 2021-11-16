@@ -271,9 +271,10 @@ class NetworkService {
 
       await claim.wait()
 
-      //Interact with API if the contract interaction was success
+      //Interact with API if the contract interaction was successful
       //success of this this call has no bearing on the airdrop itself, since the api is just 
       //used for user status updates etc.
+      //send.l2.airdrop
       const response = await omgxWatcherAxiosInstance(
         this.masterSystemConfig
       ).post('send.l2.airdrop', {

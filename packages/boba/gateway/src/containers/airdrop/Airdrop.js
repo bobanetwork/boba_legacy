@@ -91,7 +91,7 @@ class Airdrop extends React.Component {
     let res = await this.props.dispatch(getAirdropL2(this.state.claimDetailsL2))
 
     if (res) {
-      this.props.dispatch(openAlert(`L2 airdrop claim successfull.`))
+      this.props.dispatch(openAlert(`L2 airdrop claim successful.`))
     }
 
   }
@@ -104,8 +104,8 @@ class Airdrop extends React.Component {
       layer2
     } = this.state
 
-    //console.log("claimDetails:",claimDetailsL1)
-    //console.log("claimDetails:",claimDetailsL2)
+    console.log("claimDetails:",claimDetailsL1)
+    console.log("claimDetails:",claimDetailsL2)
     //console.log("layer2:",layer2)
  
     let omgBalance = layer2.filter((i) => {
