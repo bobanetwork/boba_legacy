@@ -59,7 +59,7 @@ import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesi
 import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
 //DAO
-//import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
+import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
 
@@ -292,7 +292,7 @@ class NetworkService {
 
     } catch (error) {
       console.log(error)
-      return false
+      return error
     }
 
   }
@@ -687,13 +687,13 @@ class NetworkService {
         },
       })
 
-      //console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
 
-      // this.BobaContract = new ethers.Contract(
-      //   allTokens.BOBA.L2,
-      //   Boba.abi,
-      //   this.provider.getSigner()
-      // )
+      this.BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
 
       //DAO related
       if( masterSystemConfig === 'local' ) {
@@ -1176,8 +1176,8 @@ class NetworkService {
     switch (errorCode) {
       case 4001:
         return 'Transaction was rejected by user: signature denied'
-      case -32603:
-        return 'Execution reverted: ERC20: transfer amount exceeds balance'
+      //case -32603:
+      //  return 'Execution reverted: ERC20: transfer amount exceeds balance'
       default:
         return null
     }
@@ -2534,18 +2534,18 @@ class NetworkService {
   // get DAO Balance
   async getDaoBalance() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
 
     try {
-      console.log('Checking DAO balance')
-      console.log('this.BobaContract',this.BobaContract)
-      console.log('this.BobaContract',this.account)
+      //console.log('Checking DAO balance')
+      //console.log('this.BobaContract',this.BobaContract)
+      //console.log('this.BobaContract',this.account)
       let balance = await this.BobaContract.balanceOf(this.account)
-      console.log('balance',balance)
+      //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: DAO Balance', error)
@@ -2556,8 +2556,8 @@ class NetworkService {
   // get DAO Votes
   async getDaoVotes() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return

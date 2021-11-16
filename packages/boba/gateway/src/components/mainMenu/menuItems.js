@@ -31,7 +31,7 @@ export const menuItems = [
   },
   {
     key: 'Airdrop',
-    icon: "DAOIcon",
+    icon: "SwapIcon",
     title: "Airdrop",
     url: "/airdrop"
   },

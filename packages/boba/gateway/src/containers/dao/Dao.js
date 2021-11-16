@@ -128,11 +128,11 @@ function DAO() {
                         </div>
                     </div>
                 </div>
+            {/*
                 <div className={styles.proposal}>
-                    <ProposalList
-                        balance={balance}
-                    />
+                    <ProposalList balance={balance} />
                 </div>
+            */}
             </div>
         </>
     

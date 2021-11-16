@@ -12,7 +12,7 @@ import moment from 'moment'
 
 import { openAlert } from 'actions/uiAction'
 import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropAction'
-import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
+import { logAmount } from 'util/amountConvert'
 
 class Airdrop extends React.Component {
 
@@ -33,10 +33,6 @@ class Airdrop extends React.Component {
       layer2
     }
 
-  }
-
-  componentDidMount() {
-    //ToDo
   }
 
   componentDidUpdate(prevState) {
@@ -65,7 +61,7 @@ class Airdrop extends React.Component {
     let res = await this.props.dispatch(initiateAirdrop())
 
     if (res) {
-      this.props.dispatch(openAlert(`Your airdrop for L1 snapshot balances has been initiated. You will receive your Boba in 30 days.`))
+      this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your Boba in 30 days.`))
     }
 
   }
@@ -74,13 +70,11 @@ class Airdrop extends React.Component {
 
     console.log('airdropL1')
 
-    let res = await this.props.dispatch(getAirdropL1({
-      test: 'test'
-    }))
+    let res = await this.props.dispatch(getAirdropL1(this.state.claimDetailsL1))
 
     if (res) {
-      this.props.dispatch(openAlert(`L1 airdrop claim successfull.`))
-    }
+      this.props.dispatch(openAlert(`L1 claim successful.`))
+    } 
 
   }
 
@@ -91,7 +85,7 @@ class Airdrop extends React.Component {
     let res = await this.props.dispatch(getAirdropL2(this.state.claimDetailsL2))
 
     if (res) {
-      this.props.dispatch(openAlert(`L2 airdrop claim successful.`))
+      this.props.dispatch(openAlert(`L2 claim successful.`))
     }
 
   }
@@ -104,10 +98,9 @@ class Airdrop extends React.Component {
       layer2
     } = this.state
 
-    console.log("claimDetails:",claimDetailsL1)
-    console.log("claimDetails:",claimDetailsL2)
-    //console.log("layer2:",layer2)
- 
+    //console.log("claimDetails:",claimDetailsL1)
+    //console.log("claimDetails:",claimDetailsL2)
+
     let omgBalance = layer2.filter((i) => {
       if (i.symbol === 'OMG') return true
       return false
@@ -135,7 +128,7 @@ class Airdrop extends React.Component {
     }
     if(claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
       claimedL1 = true
-      claimedL1time = moment.unix(claimDetailsL1.claimTimestamp).format('MM/DD/YYYY hh:mm a') 
+      claimedL1time = moment.unix(claimDetailsL1.claimedTimestamp).format('MM/DD/YYYY hh:mm a') 
     }
     /*not yet claimed, but initiated*/
     if(claimDetailsL1.hasOwnProperty('claimUnlockTime') && claimDetailsL1.claimUnlockTime !== null && claimDetailsL1.claimed === 0) {
@@ -153,7 +146,7 @@ class Airdrop extends React.Component {
     }
     if(claimDetailsL2.hasOwnProperty('claimed') && claimDetailsL2.claimed === 1) {
       claimedL2 = true
-      claimedL2time = moment.unix(claimDetailsL2.claimTimestamp).format('MM/DD/YYYY hh:mm a') 
+      claimedL2time = moment.unix(claimDetailsL2.claimedTimestamp).format('MM/DD/YYYY hh:mm a')
     }
 
     const layer = networkService.L1orL2
@@ -164,7 +157,6 @@ class Airdrop extends React.Component {
             <div className={styles.content}>
                 <Box
                   sx={{
-                    //background: theme.palette.background.secondary,
                     borderRadius: '12px',
                     margin: '20px 5px',
                     padding: '10px 20px',
@@ -193,20 +185,21 @@ class Airdrop extends React.Component {
         </div>
     }
 
+
     return (
-      <>
-        <PageHeader title="Airdrop" />
+  <>
+    <PageHeader title="Airdrop" />
 
-        <Grid item xs={12}>
+      <Grid item xs={12}>
 
-          <Typography variant="h3" component="h3" sx={{fontWeight: "700"}}>L1 Airdrop</Typography>
-
+        <Box sx={{background: 'rgba(255, 255, 255, 0.07)', padding: '10px', borderRadius: '10px'}}>
+          <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>L1 Airdrop</Typography>
+          <Box sx={{background: 'rgba(255, 255, 255, 0.11)', padding: '10px', borderRadius: '3px'}}>
           {/* STATE 1 - NO OMG ON L1 DURING SNAPSHOT */}
           {!recordFoundL1 &&
               <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2}}
             >
               There is no record of OMG in this wallet on Ethereum during the snapshot.
             </Typography>
@@ -218,10 +211,10 @@ class Airdrop extends React.Component {
             <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2, color: 'green'}}
+              sx={{color: 'green'}}
             >
               Yes, there was an OMG balance of {snapValueL1} on Ethereum during the snapshot. 
-              <br/>Also, you have enough OMG on Boba to initiate your airdrop. 
+              <br/>Also, you have enough OMG on Boba to claim your airdrop. 
             </Typography>
             <Button
               onClick={(i)=>{this.initiateDrop()}}
@@ -240,25 +233,32 @@ class Airdrop extends React.Component {
             <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2, color: 'yellow'}}
+              sx={{color: 'yellow'}}
             >
-              Yes, there was an OMG balance of {snapValueL1} on Ethereum during the snapshot.
+              Yes, there was a balance of {snapValueL1} OMG on Ethereum during the snapshot.
               <br/>However, your current OMG balance on Boba is only {l2BalanceOMG}. 
-              <br/>Please bridge {(snapValueL1 - l2BalanceOMG)*0.99} or more OMG to Boba to initiate your airdrop.
+              <br/>Please bridge {(snapValueL1 - l2BalanceOMG)*0.99} or more OMG to Boba to claim your airdrop.
             </Typography>
           }
 
           {/* STATE 4 - INITIATED BUT TOO EARLY */}
           {recordFoundL1 && (unlockL1time !== 0) && (isUnlocked === false) && 
+            <>
+            <Typography 
+              variant="body1" 
+              component="p" 
+              sx={{color: 'green', fontWeight: '700'}}
+            >
+              Airdrop initiated.
+            </Typography>
             <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2, color: 'green'}}
             >
-              Airdrop initiated.
-              <br/>The unlock time is {unlockL1time}. 
-              <br/>After that, you will be able to airdrop your Boba based on your L1 OMG snapshot balance.
+              The unlock time is {unlockL1time}. 
+              <br/>After that, you will be able to claim your L1 snapshot Boba.
             </Typography>
+            </>
           }
 
           {/* STATE 5 - INITIATED AND READY TO AIRDROP */}
@@ -267,9 +267,8 @@ class Airdrop extends React.Component {
               <Typography 
                 variant="body2" 
                 component="p" 
-                sx={{mt: 1, mb: 2, color: 'green'}}
               >
-                The unlock time of {unlockL1time} has passed. You can now airdrop your L1 snapshot Boba.
+                The unlock time of {unlockL1time} has passed. You can now claim your L1 snapshot Boba.
               </Typography>
               <Button
                 onClick={(i)=>{this.airdropL1()}}
@@ -278,29 +277,41 @@ class Airdrop extends React.Component {
                 newStyle
                 variant="contained"
               >
-                Airdrop my L1 snapshot Boba!
+                Claim my L1 snapshot Boba!
               </Button>
             </>
           }
            
           {/* STATE 6 - CLAIMED */}
           {!!claimedL1 &&
+            <>
+            <Typography 
+              variant="body1" 
+              component="p" 
+              sx={{color: 'green', fontWeight: '700'}}
+            >
+              Airdrop completed.
+            </Typography>
             <Typography 
               variant="body2" 
               component="p" 
               sx={{mt: 1, mb: 2}}
             >
-              You airdropped your L1 snapshot Boba at {claimedL1time}.
+              You claimed your L1 snapshot Boba at {claimedL1time}.
             </Typography>
+            </>
           }
+          </Box>
+        </Box>
 
-          <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginTop: '30px'}}>L2 Airdrop</Typography>
+        <Box sx={{background: 'rgba(255, 255, 255, 0.07)', marginTop: '20px', padding: '10px', borderRadius: '10px'}}>
+          <Typography variant="h3" component="h3" sx={{fontWeight: "700",marginBottom: '20px'}}>L2 Airdrop</Typography>
+          <Box sx={{background: 'rgba(255, 255, 255, 0.11)', padding: '10px', borderRadius: '3px'}}>
 
           {!recordFoundL2 &&
               <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2}}
             >
               There is no record of OMG in this wallet on Boba during the snapshot.
             </Typography>
@@ -308,34 +319,44 @@ class Airdrop extends React.Component {
 
           {recordFoundL2 && snapValueL2 > 0 && claimedL2 === false &&
             <>
-            <Typography 
-              variant="body2" 
-              component="p" 
-              sx={{mt: 1, mb: 2}}
-            >
-              Yes, there was an OMG balance of {snapValueL2} on Boba during the snapshot.
-            </Typography>
-            <Button
-              onClick={(i)=>{this.airdropL2()}}
-              color="primary"
-              size="large"
-              newStyle
-              variant="contained"
-            >
-              Airdrop my L2 snapshot Boba!
-            </Button>
+              <Typography 
+                variant="body2" 
+                component="p" 
+              >
+                There was a balance of {snapValueL2*0.95} OMG on Boba during the snapshot.
+                You will receive {snapValueL2} Boba (OMG balance + 5%).
+              </Typography>
+              <Button
+                onClick={(i)=>{this.airdropL2()}}
+                color="primary"
+                size="large"
+                newStyle
+                variant="contained"
+              >
+                Claim my L2 snapshot Boba!
+              </Button>
             </>
           }
 
           {!!claimedL2 &&
-            <Typography 
-              variant="body2" 
-              component="p" 
-              sx={{mt: 1, mb: 2}}
-            >
-              You airdropped your L2 snapshot Boba at {claimedL2time}.
-            </Typography>
+            <>
+              <Typography 
+                variant="body1" 
+                component="p" 
+                sx={{color: 'green', fontWeight: '700'}}
+              >
+                Airdrop completed.
+              </Typography>
+              <Typography 
+                variant="body2" 
+                component="p" 
+              >
+                You claimed your L2 snapshot Boba at {claimedL2time}.
+              </Typography>
+            </>
           }
+        </Box>
+      </Box>
 
         </Grid>
 
