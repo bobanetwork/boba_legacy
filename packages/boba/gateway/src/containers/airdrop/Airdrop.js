@@ -61,7 +61,7 @@ class Airdrop extends React.Component {
     let res = await this.props.dispatch(initiateAirdrop())
 
     if (res) {
-      this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your Boba in 30 days.`))
+      this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your BOBA in 30 days.`))
     }
 
   }
@@ -256,7 +256,7 @@ class Airdrop extends React.Component {
               component="p" 
             >
               The unlock time is {unlockL1time}. 
-              <br/>After that, you will be able to claim your L1 snapshot Boba.
+              <br/>After that, you will be able to claim your L1 snapshot BOBA.
             </Typography>
             </>
           }
@@ -268,7 +268,7 @@ class Airdrop extends React.Component {
                 variant="body2" 
                 component="p" 
               >
-                The unlock time of {unlockL1time} has passed. You can now claim your L1 snapshot Boba.
+                The unlock time of {unlockL1time} has passed. You can now claim your L1 snapshot BOBA.
               </Typography>
               <Button
                 onClick={(i)=>{this.airdropL1()}}
@@ -277,7 +277,7 @@ class Airdrop extends React.Component {
                 newStyle
                 variant="contained"
               >
-                Claim my L1 snapshot Boba!
+                Claim my L1 snapshot BOBA!
               </Button>
             </>
           }
@@ -297,7 +297,7 @@ class Airdrop extends React.Component {
               component="p" 
               sx={{mt: 1, mb: 2}}
             >
-              You claimed your L1 snapshot Boba at {claimedL1time}.
+              You claimed your L1 snapshot BOBA at {claimedL1time}.
             </Typography>
             </>
           }
@@ -324,7 +324,7 @@ class Airdrop extends React.Component {
                 component="p" 
               >
                 There was a balance of {snapValueL2*0.95} OMG on Boba during the snapshot.
-                You will receive {snapValueL2} Boba (OMG balance + 5%).
+                You will receive {snapValueL2} BOBA (OMG balance + 5%).
               </Typography>
               <Button
                 onClick={(i)=>{this.airdropL2()}}
@@ -333,7 +333,7 @@ class Airdrop extends React.Component {
                 newStyle
                 variant="contained"
               >
-                Claim my L2 snapshot Boba!
+                Claim my L2 snapshot BOBA!
               </Button>
             </>
           }
@@ -351,7 +351,7 @@ class Airdrop extends React.Component {
                 variant="body2" 
                 component="p" 
               >
-                You claimed your L2 snapshot Boba at {claimedL2time}.
+                You claimed your L2 snapshot BOBA at {claimedL2time}.
               </Typography>
             </>
           }
