@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import * as styles from './Airdrop.module.scss'
 import { Box, Grid, Typography } from '@material-ui/core'
+import Button from 'components/button/Button'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
@@ -53,6 +54,14 @@ class Airdrop extends React.Component {
 
   }
 
+  initiateDrop() {
+    console.log('initiateDrop')
+  }
+
+  airdrop() {
+    console.log('airdrop')
+  }
+
   render() {
 
     const {
@@ -83,14 +92,14 @@ class Airdrop extends React.Component {
 
     let recordFoundL1 = false
     let balanceL1 = 0
-    if(claimDetailsL1.merkleProof.amount !== null) {
+    if(claimDetailsL1.hasOwnProperty('merkleProof') && claimDetailsL1.merkleProof.amount !== null) {
       recordFoundL1 = true
       balanceL1 = Number(logAmount(claimDetailsL1.merkleProof.amount.toString(), 18))
     }
 
     let recordFoundL2 = false
     let balanceL2 = 0
-    if(claimDetailsL2.merkleProof.amount !== null) {
+    if(claimDetailsL2.hasOwnProperty('merkleProof') && claimDetailsL2.merkleProof.amount !== null) {
       recordFoundL2 = true
       balanceL2 = Number(logAmount(claimDetailsL2.merkleProof.amount.toString(), 18))
     }
@@ -138,7 +147,7 @@ class Airdrop extends React.Component {
 
         <Grid item xs={12}>
 
-          <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Status L1 Airdrop</Typography>
+          <Typography variant="h3" component="h3" sx={{fontWeight: "700"}}>L1 Airdrop</Typography>
 
           <Typography 
             variant="body2" 
@@ -158,17 +167,39 @@ class Airdrop extends React.Component {
             </Typography>
           }
 
-          {recordFoundL1 && balanceL1 > 0 &&
+          {recordFoundL1 && balanceL1 > 0 && OMG_float > balanceL1 * 0.97 &&
+            <>
               <Typography 
               variant="body2" 
               component="p" 
-              sx={{mt: 1, mb: 2}}
+              sx={{mt: 1, mb: 2, color: 'green'}}
+            >
+              Yes, there is an OMG balance of {balanceL1} on Ethereum in the snapshot block. 
+              <br/>Also, you have enough OMG on Boba to initiate your airdrop. 
+            </Typography>
+            <Button
+              onClick={this.initiateDrop}
+              color="neutral"
+              size="large"
+            >
+              Initiate Airdrop
+            </Button>
+            </>
+          }
+
+          {recordFoundL1 && balanceL1 > 0 && OMG_float <= balanceL1 * 0.97 &&
+              <Typography 
+              variant="body2" 
+              component="p" 
+              sx={{mt: 1, mb: 2, color: 'yellow'}}
             >
               Yes, there is an OMG balance of {balanceL1} on Ethereum in the snapshot block.
+              <br/>However, your current OMG balance on Boba is only {OMG_float}. 
+              <br/>Please bridge {(balanceL1 - OMG_float)*0.99} or more OMG to Boba to initiate your airdrop.
             </Typography>
           }
 
-          <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Status L2 Airdrop</Typography>
+          <Typography variant="h3" component="h3" sx={{fontWeight: "700"}}>L2 Airdrop</Typography>
 
           {!recordFoundL2 &&
               <Typography 
@@ -181,26 +212,24 @@ class Airdrop extends React.Component {
           }
 
           {recordFoundL2 && balanceL2 > 0 &&
-              <Typography 
+            <>
+            <Typography 
               variant="body2" 
               component="p" 
               sx={{mt: 1, mb: 2}}
             >
               Yes, there is an OMG balance of {balanceL2} on Boba in the snapshot block.
             </Typography>
+            <Button
+                onClick={this.airdrop}
+                color="neutral"
+                size="large"
+              >
+                Airdrop my Boba!
+            </Button>
+            </>
           }
 
-{/*
-          {numberOfNFTs === 1 &&
-            <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>You have one NFT and it should be shown below.</Typography>
-          }
-          {numberOfNFTs > 1 &&
-            <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>You have {numberOfNFTs} NFTs and they should be shown below.</Typography>
-          }
-          {numberOfNFTs < 1 &&
-            <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>Scanning the blockchain for your NFTs...</Typography>
-          }
-*/}
         </Grid>
 
       </>

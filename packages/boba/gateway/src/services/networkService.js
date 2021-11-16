@@ -171,7 +171,7 @@ class NetworkService {
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    ).post('get.airdrop', {
+    ).post('get.airdropL1', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
     })
@@ -195,7 +195,7 @@ class NetworkService {
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
-    ).post('get.airdrop', {
+    ).post('get.airdropL2', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
     })
