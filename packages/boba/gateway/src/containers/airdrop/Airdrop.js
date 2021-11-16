@@ -8,6 +8,7 @@ import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
+import moment from 'moment'
 
 import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
 
@@ -24,9 +25,6 @@ class Airdrop extends React.Component {
       claimDetailsL1,
       claimDetailsL2,
       layer2
-      //contracts,
-      //ownerName: '',
-      //tokenURI: '',
     }
 
   }
@@ -92,16 +90,35 @@ class Airdrop extends React.Component {
 
     let recordFoundL1 = false
     let balanceL1 = 0
+    let claimedL1 = false
+    let claimedL1time = 0
+    let unlockL1time = 0
+    let isUnlocked = false
     if(claimDetailsL1.hasOwnProperty('merkleProof') && claimDetailsL1.merkleProof.amount !== null) {
       recordFoundL1 = true
       balanceL1 = Number(logAmount(claimDetailsL1.merkleProof.amount.toString(), 18))
     }
+    if(claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed) {
+      claimedL1 = true
+      claimedL1time = moment.unix(claimDetailsL1.claimTimestamp).format('MM/DD/YYYY hh:mm a') 
+    }
+    /*not yet claimed, but initiated*/
+    if(claimDetailsL1.hasOwnProperty('claimUnlockTime') && claimDetailsL1.claimed === false) {
+      unlockL1time = moment.unix(claimDetailsL1.claimUnlockTime).format('MM/DD/YYYY hh:mm a')
+      isUnlocked = moment().isAfter(moment.unix(claimDetailsL1.claimUnlockTime)) 
+    }
 
     let recordFoundL2 = false
     let balanceL2 = 0
+    let claimedL2 = false
+    let claimedL2time = 0
     if(claimDetailsL2.hasOwnProperty('merkleProof') && claimDetailsL2.merkleProof.amount !== null) {
       recordFoundL2 = true
       balanceL2 = Number(logAmount(claimDetailsL2.merkleProof.amount.toString(), 18))
+    }
+    if(claimDetailsL2.hasOwnProperty('claimed') && claimDetailsL2.claimed) {
+      claimedL2 = true
+      claimedL2time = moment.unix(claimDetailsL2.claimTimestamp).format('MM/DD/YYYY hh:mm a') 
     }
 
     const layer = networkService.L1orL2
@@ -157,6 +174,7 @@ class Airdrop extends React.Component {
             You have {OMG_float} OMG on Boba
           </Typography>
 
+          {/* STATE 1 - NO OMG ON L1 DURING SNAPSHOT */}
           {!recordFoundL1 &&
               <Typography 
               variant="body2" 
@@ -167,15 +185,16 @@ class Airdrop extends React.Component {
             </Typography>
           }
 
-          {recordFoundL1 && balanceL1 > 0 && OMG_float > balanceL1 * 0.97 &&
+          {/* STATE 2 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED AND ENOUGH OMG ON L2 RIGHT NOW */}
+          {recordFoundL1 && (balanceL1 > 0) && (OMG_float > balanceL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
             <>
-              <Typography 
+            <Typography 
               variant="body2" 
               component="p" 
               sx={{mt: 1, mb: 2, color: 'green'}}
             >
               Yes, there is an OMG balance of {balanceL1} on Ethereum in the snapshot block. 
-              <br/>Also, you have enough OMG on Boba to initiate your airdrop. 
+              <br/>Yes, you have enough OMG on Boba to initiate your airdrop. 
             </Typography>
             <Button
               onClick={this.initiateDrop}
@@ -187,8 +206,9 @@ class Airdrop extends React.Component {
             </>
           }
 
-          {recordFoundL1 && balanceL1 > 0 && OMG_float <= balanceL1 * 0.97 &&
-              <Typography 
+          {/* STATE 3 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED BUT NOT ENOUGH OMG ON L2 */}
+          {recordFoundL1 && (balanceL1 > 0) && (OMG_float <= balanceL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
+            <Typography 
               variant="body2" 
               component="p" 
               sx={{mt: 1, mb: 2, color: 'yellow'}}
@@ -196,6 +216,48 @@ class Airdrop extends React.Component {
               Yes, there is an OMG balance of {balanceL1} on Ethereum in the snapshot block.
               <br/>However, your current OMG balance on Boba is only {OMG_float}. 
               <br/>Please bridge {(balanceL1 - OMG_float)*0.99} or more OMG to Boba to initiate your airdrop.
+            </Typography>
+          }
+
+          {/* STATE 4 - INITIATED BUT TOO EARLY */}
+          {recordFoundL1 && (unlockL1time !== 0) && (isUnlocked === false) && 
+            <Typography 
+              variant="body2" 
+              component="p" 
+              sx={{mt: 1, mb: 2}}
+            >
+              Airdrop initiated. The unlock time is {unlockL1time}. After that, you will be able to airdrop your Boba based on your L1 OMG snapshot balance.
+            </Typography>
+          }
+
+          {/* STATE 5 - INITIATED AND READY TO AIRDROP */}
+          {recordFoundL1 && (unlockL1time !== 0) && (isUnlocked === true) && 
+            <>
+            <Typography 
+              variant="body2" 
+              component="p" 
+              sx={{mt: 1, mb: 2, color: 'green'}}
+            >
+              The unlock time of {unlockL1time} has passed. You can now airdrop your Boba based on your L1 OMG snapshot balance.
+            </Typography>
+            <Button
+              onClick={this.airdrop}
+              color="neutral"
+              size="large"
+            >
+              Airdrop my Boba!
+            </Button>
+            </>
+          }
+           
+          {/* STATE 6 - CLAIMED */}
+          {recordFoundL1 && claimedL1 === true &&
+              <Typography 
+              variant="body2" 
+              component="p" 
+              sx={{mt: 1, mb: 2}}
+            >
+              You airdropped your Boba at {claimedL1time}.
             </Typography>
           }
 
@@ -211,7 +273,7 @@ class Airdrop extends React.Component {
             </Typography>
           }
 
-          {recordFoundL2 && balanceL2 > 0 &&
+          {recordFoundL2 && balanceL2 > 0 && claimedL2 === false &&
             <>
             <Typography 
               variant="body2" 
@@ -228,6 +290,16 @@ class Airdrop extends React.Component {
                 Airdrop my Boba!
             </Button>
             </>
+          }
+
+          {recordFoundL2 && claimedL2 === true &&
+              <Typography 
+              variant="body2" 
+              component="p" 
+              sx={{mt: 1, mb: 2}}
+            >
+              You airdropped your Boba at {claimedL2time}.
+            </Typography>
           }
 
         </Grid>
