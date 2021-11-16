@@ -56,7 +56,8 @@ def watcher_getL2Airdrop(event, context):
           "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
             "index": index, "amount": hexAmount, "proof": json.loads(proof)
-          }
+          },
+          "network": "bobanetwork"
         }
       else:
         airdropPayload = {
@@ -65,7 +66,8 @@ def watcher_getL2Airdrop(event, context):
           "claimImmediate": None, "claimUnlockTime": None,
           "merkleProof": {
             "index": None, "amount": None, "proof": None
-          }
+          },
+          "network": "bobanetwork"
         }
     except Exception as e:
       statusCode = 500

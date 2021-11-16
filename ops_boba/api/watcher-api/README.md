@@ -221,7 +221,7 @@
 
 ### Airdrop
 
-#### get.airdrop (POST)
+#### get.l1.airdrop (POST) / get.l2.airdrop (POST) 
 
 **Request Body**
 
@@ -247,11 +247,12 @@
     "index": "INDEX",
     "amount": "AMOUNT", //hex,
     "proof": "PROOF"
-  }
+  },
+  "network": "NETWORK" // bobanetwork or mainnet
 }
 ```
 
-#### send.airdrop (POST)
+#### send.l1.airdrop (POST) / send.l2.airdrop (POST) 
 
 **Request Body**
 
