@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { useDispatch,useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { openModal } from 'actions/uiAction'
 
@@ -83,30 +83,6 @@ function DAO() {
         </div>
     }
 
-/*
-<Button
-          onClick={handleClose}
-          color="neutral"
-          size="large"
-        >
-          {buttonLabel_1}
-        </Button>
-        <Button
-          onClick={doDeposit}
-          color='primary'
-          variant="contained"
-          loading={depositLoading || approvalLoading}
-          tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
-          disabled={!validValue}
-          triggerTime={new Date()}
-          size="large"
-          fullWidth={isMobile}
-          newStyle
-        >
-          {buttonLabel_2}
-        </Button>
-        */
-
     return (
         <>
             <PageHeader title="DAO" />
@@ -162,7 +138,6 @@ function DAO() {
     
     )
 }
-
 
 export default React.memo(DAO);
 

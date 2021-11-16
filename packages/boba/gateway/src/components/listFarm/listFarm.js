@@ -85,7 +85,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const {allAddresses} = this.props.farm;
+    const { allAddresses } = this.props.farm
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,

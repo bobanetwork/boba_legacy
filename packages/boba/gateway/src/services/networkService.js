@@ -210,6 +210,36 @@ class NetworkService {
 
   }
 
+  async initiateAirdropL1() {
+
+    console.log("Initiating airdrop")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    let time_seconds = Math.round((new Date()).getTime() / 1000) + (30 * 24 * 60 * 60)
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('send.l1.airdrop', {
+      address: this.account,
+      claimed: 0,
+      claimedTimestamp: null,
+      claimedAmount: null,
+      claimUnlockTime: time_seconds,
+      key: process.env.REACT_APP_AIRDROP
+    })
+
+    if (response.status === 201) {
+      const status = response.data
+      return status
+    } else {
+      console.log("Bad gateway response")
+      return false
+    }
+
+  }
+
   // async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
 
   //   try {
