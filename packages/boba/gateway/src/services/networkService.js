@@ -58,10 +58,13 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
-// DAO
-// import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
+//DAO
+//import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
+
+//Airdrop
+import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -250,9 +253,29 @@ class NetworkService {
 
   async getAirdropL2(callData) {
 
-   //Interact with contract
+    console.log("getAirdropL2(callData)",callData)
+    
+    //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdrop,
+      BobaAirdropJson.abi,
+      this.provider.getSigner()
+    )
 
-   //Interact with API if the contract interaction was success
+    console.log("airdropContract.address:", airdropContract.address)
+    console.log("this.account:",this.account)
+
+    //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+    let claim = await airdropContract.claim(
+      callData.merkleProof.index,  //Spec - 1 - Type Number,
+      this.account,                //wallet address 
+      callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+      callData.merkleProof.proof   //proof1
+    )
+
+    await claim.wait()
+
+    //Interact with API if the contract interaction was success
 
   }
 
@@ -479,10 +502,14 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
 
+      await this.getAddress('airdropL2', 'BobaAirdrop')
+      console.log("BobaAirdrop:",allAddresses.BobaAirdrop)
+
       //L2StandardBridgeAddress is a predeploy, so add by hand....
       allAddresses = {
         ...allAddresses,
-        'L2StandardBridgeAddress': L2StandardBridgeAddress
+        'L2StandardBridgeAddress': L2StandardBridgeAddress,
+        'BobaAirdrop': '0x4cA698d5c23bE5A79813687a99BB2269bDdA5B2e' //manual for now
       }
 
       //L2MessengerAddress is a predeploy, so add by hand....

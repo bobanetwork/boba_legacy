@@ -9,9 +9,9 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 import moment from 'moment'
-import { openAlert } from 'actions/uiAction'
-import { initiateAirdropL1 } from 'actions/airdropAction'
 
+import { openAlert } from 'actions/uiAction'
+import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropAction'
 import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
 
 class Airdrop extends React.Component {
@@ -62,7 +62,7 @@ class Airdrop extends React.Component {
 
     console.log('initiateDrop')
 
-    let res = await this.props.dispatch(initiateAirdropL1())
+    let res = await this.props.dispatch(initiateAirdrop())
 
     if (res) {
       this.props.dispatch(openAlert(`Your airdrop for L1 snapshot balances has been initiated. You will receive your Boba in 30 days.`))
@@ -70,8 +70,30 @@ class Airdrop extends React.Component {
 
   }
 
-  airdrop() {
-    console.log('airdrop')
+  async airdropL1() {
+
+    console.log('airdropL1')
+
+    let res = await this.props.dispatch(getAirdropL1({
+      test: 'test'
+    }))
+
+    if (res) {
+      this.props.dispatch(openAlert(`L1 airdrop claim successfull.`))
+    }
+
+  }
+
+  async airdropL2() {
+
+    console.log('airdropL2')
+
+    let res = await this.props.dispatch(getAirdropL2(this.state.claimDetailsL2))
+
+    if (res) {
+      this.props.dispatch(openAlert(`L2 airdrop claim successfull.`))
+    }
+
   }
 
   render() {
@@ -206,7 +228,7 @@ class Airdrop extends React.Component {
               <br/>Also, you have enough OMG on Boba to initiate your airdrop. 
             </Typography>
             <Button
-              onClick={this.initiateDrop}
+              onClick={(i)=>{this.initiateDrop()}}
               color="primary"
               size="large"
               newStyle
@@ -254,7 +276,7 @@ class Airdrop extends React.Component {
                 The unlock time of {unlockL1time} has passed. You can now airdrop your L1 snapshot Boba.
               </Typography>
               <Button
-                onClick={this.airdrop}
+                onClick={(i)=>{this.airdropL1()}}
                 color="primary"
                 size="large"
                 newStyle
@@ -298,7 +320,7 @@ class Airdrop extends React.Component {
               Yes, there was an OMG balance of {snapValueL2} on Boba during the snapshot.
             </Typography>
             <Button
-              onClick={this.airdrop}
+              onClick={(i)=>{this.airdropL2()}}
               color="primary"
               size="large"
               newStyle
