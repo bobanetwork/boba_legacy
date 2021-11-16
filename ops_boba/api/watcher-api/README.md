@@ -259,13 +259,39 @@
 ```js
 {
   "address":"ADDRESS",
-  "claimed": "TRUE / FALSE",
-  "claimedTimestamp": "TIMESTAMP",
-  "claimedAmount": "AMOUNT_WEI_STRING",
-  "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
   "key":"ACCESS_KEY"
 }
 ```
+
+**Effect on DB entries**
+
+When `send.l_.airdrop` is called, the `claimed` flag should change to `true` and the `claimedTimestamp` should change to the `now` unix seconds timestamp, for example, `1636964190`.
+If `claimed` already === `true` then calling `send.l_.airdrop` should have no effect.   
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
+```
+
+#### initiate.l1.airdrop (POST)
+
+**Request Body**
+
+```js
+{
+  "address":"ADDRESS",
+  "key":"ACCESS_KEY"
+}
+```
+
+**Effect on DB entries**
+
+When `initiate.l1.airdrop` is called, the `claimUnlockTime` should change from `null` to a unix seconds timestamp = now + 30 days, for example, `1636964190`. 
+If `claimUnlockTime` already !== `null` then calling `initiate.l1.airdrop` should have no effect.  
 
 **Response Body**
 
