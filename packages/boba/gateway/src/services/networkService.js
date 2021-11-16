@@ -162,9 +162,33 @@ class NetworkService {
     })
   }
 
-  async fetchAirdropStatus() {
+  async fetchAirdropStatusL1() {
 
-    console.log("fetching airdrop status")
+    console.log("fetching airdrop L1 status")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('get.airdrop', {
+      address: this.account,
+      key: process.env.REACT_APP_AIRDROP
+    })
+
+    if (response.status === 201) {
+      const status = response.data
+      return status
+    } else {
+      console.log("Bad gateway response")
+      return false
+    }
+
+  }
+
+  async fetchAirdropStatusL2() {
+
+    console.log("fetching airdrop L2 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return

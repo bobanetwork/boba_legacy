@@ -59,7 +59,8 @@ import {
 import Airdrop from 'containers/airdrop/Airdrop'
 
 import { 
-  fetchAirdropStatus
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2,
 } from 'actions/airdropAction'
 
 //Wallet Functions
@@ -140,7 +141,8 @@ function Home () {
   useInterval(() => {
     dispatch(fetchBalances())
     dispatch(fetchNFTs())
-    dispatch(fetchAirdropStatus())
+    dispatch(fetchAirdropStatusL1())
+    dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
     dispatch(fetchDaoVotes())
     dispatch(fetchDaoProposals())

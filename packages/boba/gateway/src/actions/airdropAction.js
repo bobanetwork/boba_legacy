@@ -20,13 +20,7 @@
 import networkService from 'services/networkService'
 import { createAction } from './createAction'
 
-export function fetchAirdropStatus() {
-    return createAction('FETCH/AIRDROP/STATUS', () => networkService.fetchAirdropStatus())
-}
-
-export function getAirdrop(callData) {
-  return createAction('AIRDROP/CREATE', () => {
-        return networkService.getAirdrop(callData)
-      }
-  )
-}
+export function fetchAirdropStatusL1() {return createAction('FETCH/AIRDROPL1/STATUS', () => networkService.fetchAirdropStatusL1())}
+export function fetchAirdropStatusL2() {return createAction('FETCH/AIRDROPL2/STATUS', () => networkService.fetchAirdropStatusL2())}
+export function getAirdropL1(callData) {return createAction('AIRDROPL1/CREATE',()=>{return networkService.getAirdropL1(callData)})}
+export function getAirdropL2(callData) {return createAction('AIRDROPL2/CREATE',()=>{return networkService.getAirdropL2(callData)})}

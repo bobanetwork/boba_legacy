@@ -31,15 +31,21 @@ limitations under the License. */
  */
 
 const initialState = {
-  claimDetails: {},
+  claimDetailsL1: {},
+  claimDetailsL2: {}
 }
 
 function airdropReducer(state = initialState, action) {
   switch (action.type) {
-    case 'FETCH/AIRDROP/STATUS':
+    case 'FETCH/AIRDROPL1/STATUS/SUCCESS':
       return {
         ...state, 
-        claimDetails: action.payload
+        claimDetailsL1: action.payload
+      }
+    case 'FETCH/AIRDROPL2/STATUS/SUCCESS':
+      return {
+        ...state, 
+        claimDetailsL2: action.payload
       }
     default:
       return state
