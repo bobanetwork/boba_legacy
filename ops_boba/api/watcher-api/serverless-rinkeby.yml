@@ -99,8 +99,8 @@ functions:
           cors: true
     layers:
       - ${file(env-rinkeby.yml):LAYERS}
-  watcher_getAirdrop:
-    handler: watcher_getAirdrop.watcher_getAirdrop
+  watcher_getL1Airdrop:
+    handler: watcher_getL1Airdrop.watcher_getL1Airdrop
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
@@ -111,13 +111,13 @@ functions:
         - ${file(env-rinkeby.yml):SUBNET_ID_2}
     events:
       - http:
-          path: get.airdrop
+          path: get.l1.airdrop
           method: post
           cors: true
     layers:
       - ${file(env-rinkeby.yml):LAYERS}
-  watcher_sendAirdrop:
-    handler: watcher_sendAirdrop.watcher_sendAirdrop
+  watcher_getL2Airdrop:
+    handler: watcher_getL2Airdrop.watcher_getL2Airdrop
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
@@ -128,7 +128,41 @@ functions:
         - ${file(env-rinkeby.yml):SUBNET_ID_2}
     events:
       - http:
-          path: send.airdrop
+          path: get.l2.airdrop
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}
+  watcher_sendL1Airdrop:
+    handler: watcher_sendL1Airdrop.watcher_sendL1Airdrop
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.l1.airdrop
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}
+  watcher_sendL2Airdrop:
+    handler: watcher_sendL2Airdrop.watcher_sendL2Airdrop
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.l2.airdrop
           method: post
           cors: true
     layers:

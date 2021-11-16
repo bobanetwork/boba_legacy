@@ -8,7 +8,7 @@ import time
 import requests
 import redis
 
-def watcher_getAirdrop(event, context):
+def watcher_getL2Airdrop(event, context):
 
   # Parse incoming event
   body = json.loads(event["body"])
@@ -42,8 +42,8 @@ def watcher_getAirdrop(event, context):
       cur = con.cursor()
       cur.execute("""SELECT airdrop.address, airdrop.amount, airdrop.claimed, airdrop.claimedTimestamp, airdrop.claimedAmount, airdrop.claimImmediate, airdrop.claimUnlockTime,
         merkleProofs.`index`, merkleProofs.amount, merkleProofs.proof
-        FROM airdrop
-        LEFT JOIN merkleProofs
+        FROM airdropL2 as airdrop
+        LEFT JOIN merkleProofsL2 as merkleProofs
         ON airdrop.address = merkleProofs.address
         WHERE airdrop.address=%s
       """, (address))

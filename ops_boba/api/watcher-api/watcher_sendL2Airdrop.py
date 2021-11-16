@@ -9,7 +9,7 @@ import requests
 import redis
 
 
-def watcher_sendAirdrop(event, context):
+def watcher_sendL2Airdrop(event, context):
 
   # Parse incoming event
   body = json.loads(event["body"])
@@ -42,7 +42,7 @@ def watcher_sendAirdrop(event, context):
   with con:
     try:
       cur = con.cursor()
-      cur.execute("""UPDATE airdrop
+      cur.execute("""UPDATE airdropL2
         SET claimed=%s, claimedTimestamp=%s, claimedAmount=%s, claimUnlockTime=%s WHERE address=%s
       """, (claimed, claimedTimestamp, claimedAmount, claimUnlockTime, address))
     except Exception as e:
