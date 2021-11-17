@@ -10,14 +10,14 @@ type RPCReq struct {
 	JSONRPC string          `json:"jsonrpc"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params"`
-	ID      *int            `json:"id"`
+	ID      *json.Number    `json:"id"`
 }
 
 type RPCRes struct {
-	JSONRPC string      `json:"jsonrpc"`
-	Result  interface{} `json:"result,omitempty"`
-	Error   *RPCErr     `json:"error,omitempty"`
-	ID      *int        `json:"id"`
+	JSONRPC string       `json:"jsonrpc"`
+	Result  interface{}  `json:"result,omitempty"`
+	Error   *RPCErr      `json:"error,omitempty"`
+	ID      *json.Number `json:"id"`
 }
 
 func (r *RPCRes) IsError() bool {
@@ -33,26 +33,39 @@ func (r *RPCErr) Error() string {
 	return r.Message
 }
 
+func isBatch(msg []byte) bool {
+	return string(msg)[0] == '['
+}
+
 func ParseRPCReq(r io.Reader) (*RPCReq, error) {
 	body, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, wrapErr(err, "error reading request body")
 	}
 
-	req := new(RPCReq)
-	if err := json.Unmarshal(body, req); err != nil {
-		return nil, ErrParseErr
-	}
+	if isBatch(body) {
+		var arr []*RPCReq
+		err := json.Unmarshal(body, &arr)
+		if err != nil {
+			return nil, ErrParseErr
+		}
+		return arr[0], nil
+	} else {
+		req := new(RPCReq)
+		if err := json.Unmarshal(body, req); err != nil {
+			return nil, ErrParseErr
+		}
 
-	if req.JSONRPC != JSONRPCVersion {
-		return nil, ErrInvalidRequest
-	}
+		if req.JSONRPC != JSONRPCVersion {
+			return nil, ErrInvalidRequest
+		}
 
-	if req.Method == "" {
-		return nil, ErrInvalidRequest
-	}
+		if req.Method == "" {
+			return nil, ErrInvalidRequest
+		}
 
-	return req, nil
+		return req, nil
+	}
 }
 
 func ParseRPCRes(r io.Reader) (*RPCRes, error) {
@@ -69,7 +82,7 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	return res, nil
 }
 
-func NewRPCErrorRes(id *int, err error) *RPCRes {
+func NewRPCErrorRes(id *json.Number, err error) *RPCRes {
 	var rpcErr *RPCErr
 	if rr, ok := err.(*RPCErr); ok {
 		rpcErr = rr

@@ -225,7 +225,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 	)
 }
 
-func writeRPCError(w http.ResponseWriter, id *int, err error) {
+func writeRPCError(w http.ResponseWriter, id *json.Number, err error) {
 	enc := json.NewEncoder(w)
 	w.WriteHeader(200)
 
