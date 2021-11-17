@@ -210,7 +210,6 @@ func init() {
 		utils.RPCListenAddrFlag,
 		utils.RPCVirtualHostsFlag,
 		utils.IPCDisabledFlag,
-		utils.LogsRangeLimit,
 		utils.IPCPathFlag,
 		utils.RPCEnabledFlag,
 		rpcPortFlag,

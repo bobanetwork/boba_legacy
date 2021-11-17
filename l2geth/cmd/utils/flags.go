@@ -566,13 +566,6 @@ var (
 
 		EnvVar: "RPC_PORT",
 	}
-	LogsRangeLimit = cli.IntFlag{
-		Name:  "logsrangelimit",
-		Usage: "Get logs range limit",
-		Value: 5000,
-
-		EnvVar: "GET_LOGS_RANGE_LIMIT",
-	}
 	RPCCORSDomainFlag = cli.StringFlag{
 		Name:  "rpccorsdomain",
 		Usage: "Comma separated list of domains from which to accept cross origin requests (browser enforced)",
