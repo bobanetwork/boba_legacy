@@ -49,7 +49,10 @@ func ParseRPCReq(r io.Reader) (*RPCReq, error) {
 		if err != nil {
 			return nil, ErrParseErr
 		}
-		return arr[0], nil
+		if len(arr) == 1 {
+			return arr[0], nil
+		}
+		return nil, ErrInvalidBatch
 	} else {
 		req := new(RPCReq)
 		if err := json.Unmarshal(body, req); err != nil {

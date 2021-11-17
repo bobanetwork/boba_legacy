@@ -56,6 +56,10 @@ var (
 		Code:    JSONRPCErrorInternal - 13,
 		Message: "backend returned an invalid response",
 	}
+	ErrInvalidBatch = &RPCErr{
+		Code:    JSONRPCErrorInternal - 14,
+		Message: "invalid bacth",
+	}
 )
 
 type Backend struct {
