@@ -56,6 +56,13 @@ import {
   getProposalThreshold 
 } from 'actions/daoAction'
 
+import Airdrop from 'containers/airdrop/Airdrop'
+
+import { 
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2,
+} from 'actions/airdropAction'
+
 //Wallet Functions
 import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
@@ -132,10 +139,10 @@ function Home () {
 
   //get all account balances
   useInterval(() => {
-    dispatch(fetchBalances()) //check the balances
+    dispatch(fetchBalances())
     dispatch(fetchNFTs())
-
-    // get Dao balance / Votes
+    dispatch(fetchAirdropStatusL1())
+    dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
     dispatch(fetchDaoVotes())
     dispatch(fetchDaoProposals())
@@ -150,7 +157,7 @@ function Home () {
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
       {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />} 
-      {!!exitModalState && <ExitModal open={exitModalState}  token={token} fast={fast} />}
+      {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
       {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
       {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
@@ -189,8 +196,6 @@ function Home () {
 
       <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
         <MainMenu />
-        {/* The Top SubMenu Bar, non-mobile */}
-
         <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
           {pageDisplay === "AccountNow" &&
           <>
@@ -210,6 +215,9 @@ function Home () {
           }
           {pageDisplay === "DAO" &&
             <DAO/>
+          }
+          {pageDisplay === "Airdrop" &&
+            <Airdrop/>
           }
           {pageDisplay === "Help" &&
             <Help/>

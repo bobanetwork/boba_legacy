@@ -15,10 +15,6 @@ limitations under the License. */
 
 import { lazy } from "react"
 
-
-// TODO: move me to the proper folder.
-
-// FIXME: MOVE ALL THE COMPONENTS FROM components to pages folder.
 const WalletPage = lazy(()=> import('../pages/wallet/index'))
 const FarmPage = lazy(()=> import('../pages/farm/index'))
 const LearnPage = lazy(()=> import('../pages/learn/index'))

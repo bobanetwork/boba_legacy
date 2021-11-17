@@ -18,7 +18,6 @@ require('dotenv').config()
 let NETWORKS
 
 if (process.env.REACT_APP_CHAIN === 'rinkeby') {
-  console.log('Yes, we have rinkeby')
   NETWORKS = {
     rinkeby: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
