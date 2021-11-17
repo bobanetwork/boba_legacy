@@ -465,7 +465,7 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		// just handle them here.
 		req, err := w.prepareClientMsg(msg)
 		if err != nil {
-			var id *json.Number
+			var id *json.RawMessage
 			method := MethodUnknown
 			if req != nil {
 				id = req.ID
@@ -522,7 +522,7 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 
 		res, err := w.parseBackendMsg(msg)
 		if err != nil {
-			var id *json.Number
+			var id *json.RawMessage
 			if res != nil {
 				id = res.ID
 			}

@@ -109,6 +109,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	log.Info("received RPC request", "req_id", GetReqID(ctx), "auth", GetAuthCtx(ctx))
 
 	req, err := ParseRPCReq(io.LimitReader(r.Body, s.maxBodySize))
+
 	if err != nil {
 		log.Info("rejected request with bad rpc request", "source", "rpc", "err", err, "r", r)
 		RecordRPCError(ctx, BackendProxyd, MethodUnknown, err)
@@ -225,7 +226,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 	)
 }
 
-func writeRPCError(w http.ResponseWriter, id *json.Number, err error) {
+func writeRPCError(w http.ResponseWriter, id *json.RawMessage, err error) {
 	enc := json.NewEncoder(w)
 	w.WriteHeader(200)
 
