@@ -7,17 +7,17 @@ import (
 )
 
 type RPCReq struct {
-	JSONRPC string          `json:"jsonrpc"`
-	Method  string          `json:"method"`
-	Params  json.RawMessage `json:"params"`
-	ID      *json.Number    `json:"id"`
+	JSONRPC string           `json:"jsonrpc"`
+	Method  string           `json:"method"`
+	Params  json.RawMessage  `json:"params"`
+	ID      *json.RawMessage `json:"id"`
 }
 
 type RPCRes struct {
-	JSONRPC string       `json:"jsonrpc"`
-	Result  interface{}  `json:"result,omitempty"`
-	Error   *RPCErr      `json:"error,omitempty"`
-	ID      *json.Number `json:"id"`
+	JSONRPC string           `json:"jsonrpc"`
+	Result  interface{}      `json:"result,omitempty"`
+	Error   *RPCErr          `json:"error,omitempty"`
+	ID      *json.RawMessage `json:"id"`
 }
 
 func (r *RPCRes) IsError() bool {
@@ -82,7 +82,7 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	return res, nil
 }
 
-func NewRPCErrorRes(id *json.Number, err error) *RPCRes {
+func NewRPCErrorRes(id *json.RawMessage, err error) *RPCRes {
 	var rpcErr *RPCErr
 	if rr, ok := err.(*RPCErr); ok {
 		rpcErr = rr
