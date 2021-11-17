@@ -172,6 +172,10 @@ var (
 
 		EnvVar: "NETWORK_ID",
 	}
+	RangeLimitFlag = cli.BoolFlag{
+		Name:  "rangelimit",
+		Usage: "Enable 5000 blocks limit for range query",
+	}
 	TestnetFlag = cli.BoolFlag{
 		Name:  "testnet",
 		Usage: "Ropsten network: pre-configured proof-of-work test network",
@@ -561,6 +565,13 @@ var (
 		Value: node.DefaultHTTPPort,
 
 		EnvVar: "RPC_PORT",
+	}
+	LogsRangeLimit = cli.IntFlag{
+		Name:  "logsrangelimit",
+		Usage: "Get logs range limit",
+		Value: 5000,
+
+		EnvVar: "GET_LOGS_RANGE_LIMIT",
 	}
 	RPCCORSDomainFlag = cli.StringFlag{
 		Name:  "rpccorsdomain",
@@ -1357,6 +1368,9 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 	if ctx.GlobalIsSet(InsecureUnlockAllowedFlag.Name) {
 		cfg.InsecureUnlockAllowed = ctx.GlobalBool(InsecureUnlockAllowedFlag.Name)
+	}
+	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
+		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
 	}
 }
 
