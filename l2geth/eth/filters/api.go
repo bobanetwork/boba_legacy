@@ -343,10 +343,10 @@ func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([
 			end = crit.ToBlock.Int64()
 		}
 
-		// Construct the range filter
 		if end-begin > n {
 			return nil, fmt.Errorf("exceed maximum block range: %d", n)
 		}
+		// Construct the range filter
 		filter = NewRangeFilter(api.backend, begin, end, crit.Addresses, crit.Topics)
 	}
 	// Run the filter and return all the logs
