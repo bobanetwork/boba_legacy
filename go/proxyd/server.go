@@ -110,7 +110,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 
 	req, err := ParseRPCReq(io.LimitReader(r.Body, s.maxBodySize))
 	if err != nil {
-		log.Info("rejected request with bad rpc request", "source", "rpc", "err", err)
+		log.Info("rejected request with bad rpc request", "source", "rpc", "err", err, "r", r)
 		RecordRPCError(ctx, BackendProxyd, MethodUnknown, err)
 		writeRPCError(w, nil, err)
 		return
