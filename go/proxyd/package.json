@@ -1,0 +1,6 @@
+{
+  "name": "@eth-optimism/proxyd",
+  "version": "3.0.0",
+  "private": true,
+  "dependencies": {}
+}
