@@ -57,6 +57,7 @@
     "ganache-core": "^2.13.2",
     "glob": "^7.1.6",
     "google-spreadsheet": "^3.1.15",
+    "lodash": "^4.17.21",
     "merkletreejs": "^0.2.18",
     "patch-package": "^6.4.7",
     "rlp": "^2.2.6"

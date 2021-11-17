@@ -140,7 +140,7 @@ function NewProposalModal({ open }) {
                         <Typography variant="body2" 
                             style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
                         >Right now, the DAO can do three things - change the voting threshold, propose free-form text proposals, and 
-                        propose changes to the bridghe 
+                        propose changes to the bridge 
                         </Typography>
                     }
                     {action === 'change-threshold' && 

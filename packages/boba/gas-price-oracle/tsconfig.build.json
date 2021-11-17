@@ -3,10 +3,11 @@
 
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "resolveJsonModule": true
   },
 
   "include": [
-    "src/**/*", "contracts/**/*"
+    "src/**/*", "contracts/**/*", "src/abi/*.json"
   ]
 }
