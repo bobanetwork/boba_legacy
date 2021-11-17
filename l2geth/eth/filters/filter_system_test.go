@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math/big"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -345,13 +346,15 @@ func TestInvalidGetLogsRequest(t *testing.T) {
 		0: {BlockHash: &blockHash, FromBlock: big.NewInt(100)},
 		1: {BlockHash: &blockHash, ToBlock: big.NewInt(500)},
 		2: {BlockHash: &blockHash, FromBlock: big.NewInt(rpc.LatestBlockNumber.Int64())},
+		3: {BlockHash: &blockHash, FromBlock: big.NewInt(1), ToBlock: big.NewInt(5000)},
 	}
-
+	os.Setenv("GET_LOGS_RANGE_LIMIT", "4000")
 	for i, test := range testCases {
 		if _, err := api.GetLogs(context.Background(), test); err == nil {
 			t.Errorf("Expected Logs for case #%d to fail", i)
 		}
 	}
+	os.Unsetenv("GET_LOGS_RANGE_LIMIT")
 }
 
 // TestLogFilter tests whether log filters match the correct logs that are posted to the event feed.

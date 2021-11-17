@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -328,14 +330,21 @@ func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([
 		// Block filter requested, construct a single-shot filter
 		filter = NewBlockFilter(api.backend, *crit.BlockHash, crit.Addresses, crit.Topics)
 	} else {
+		limit := os.Getenv("GET_LOGS_RANGE_LIMIT")
+		n, _ := strconv.ParseInt(limit, 10, 64)
 		// Convert the RPC block numbers into internal representations
 		begin := rpc.LatestBlockNumber.Int64()
 		if crit.FromBlock != nil {
 			begin = crit.FromBlock.Int64()
 		}
 		end := rpc.LatestBlockNumber.Int64()
+
 		if crit.ToBlock != nil {
 			end = crit.ToBlock.Int64()
+		}
+
+		if end-begin > n {
+			return nil, fmt.Errorf("exceed maximum block range: %d", n)
 		}
 		// Construct the range filter
 		filter = NewRangeFilter(api.backend, begin, end, crit.Addresses, crit.Topics)
