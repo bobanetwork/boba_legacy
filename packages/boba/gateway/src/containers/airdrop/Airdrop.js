@@ -323,7 +323,7 @@ class Airdrop extends React.Component {
                 variant="body2" 
                 component="p" 
               >
-                There was a balance of {snapValueL2*0.95} OMG on Boba during the snapshot.
+                There was a balance of {snapValueL2*(100/105)} OMG on Boba during the snapshot.
                 You will receive {snapValueL2} BOBA (OMG balance + 5%).
               </Typography>
               <Button
