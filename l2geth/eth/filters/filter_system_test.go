@@ -354,6 +354,7 @@ func TestInvalidGetLogsRequest(t *testing.T) {
 			t.Errorf("Expected Logs for case #%d to fail", i)
 		}
 	}
+	os.Unsetenv("GET_LOGS_RANGE_LIMIT")
 }
 
 // TestLogFilter tests whether log filters match the correct logs that are posted to the event feed.
