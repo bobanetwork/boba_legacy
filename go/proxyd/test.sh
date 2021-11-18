@@ -81,7 +81,7 @@ RESULT_5=$(curl -s \
   | jq -r '.id'
 )
 
-if [ $RESULT_5 == "1sdsasd-32783-dsjfhsujd" ]; then
+if [ "$RESULT_5" != "null" ]; then
   echo 'PASSED TEST CASE 5'
 else
   echo "FAILED TEST CASE 5: id - $RESULT_5"
