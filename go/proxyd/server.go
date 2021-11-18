@@ -108,51 +108,52 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("received RPC request", "req_id", GetReqID(ctx), "auth", GetAuthCtx(ctx))
 
-	req, err := ParseRPCReq(io.LimitReader(r.Body, s.maxBodySize))
+	reqs, err := ParseRPCReq(io.LimitReader(r.Body, s.maxBodySize))
 	if err != nil {
 		log.Info("rejected request with bad rpc request", "source", "rpc", "err", err, "r", r)
 		RecordRPCError(ctx, BackendProxyd, MethodUnknown, err)
 		writeRPCError(w, nil, err)
 		return
 	}
+	for _, req := range reqs {
+		group := s.rpcMethodMappings[req.Method]
+		if group == "" {
+			// use unknown below to prevent DOS vector that fills up memory
+			// with arbitrary method names.
+			log.Info(
+				"blocked request for non-whitelisted method",
+				"source", "rpc",
+				"req_id", GetReqID(ctx),
+				"method", req.Method,
+			)
+			RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
+			writeRPCError(w, req.ID, ErrMethodNotWhitelisted)
+			return
+		}
 
-	group := s.rpcMethodMappings[req.Method]
-	if group == "" {
-		// use unknown below to prevent DOS vector that fills up memory
-		// with arbitrary method names.
-		log.Info(
-			"blocked request for non-whitelisted method",
-			"source", "rpc",
-			"req_id", GetReqID(ctx),
-			"method", req.Method,
-		)
-		RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
-		writeRPCError(w, req.ID, ErrMethodNotWhitelisted)
+		backendRes, err := s.backendGroups[group].Forward(ctx, &req)
+		if err != nil {
+			log.Error(
+				"error forwarding RPC request",
+				"method", req.Method,
+				"req_id", GetReqID(ctx),
+				"err", err,
+			)
+			writeRPCError(w, req.ID, err)
+		}
 		return
-	}
 
-	backendRes, err := s.backendGroups[group].Forward(ctx, req)
-	if err != nil {
-		log.Error(
-			"error forwarding RPC request",
-			"method", req.Method,
-			"req_id", GetReqID(ctx),
-			"err", err,
-		)
-		writeRPCError(w, req.ID, err)
-		return
-	}
-
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(backendRes); err != nil {
-		log.Error(
-			"error encoding response",
-			"req_id", GetReqID(ctx),
-			"err", err,
-		)
-		RecordRPCError(ctx, BackendProxyd, req.Method, err)
-		writeRPCError(w, req.ID, err)
-		return
+		enc := json.NewEncoder(w)
+		if err := enc.Encode(backendRes); err != nil {
+			log.Error(
+				"error encoding response",
+				"req_id", GetReqID(ctx),
+				"err", err,
+			)
+			RecordRPCError(ctx, BackendProxyd, req.Method, err)
+			writeRPCError(w, req.ID, err)
+			return
+		}
 	}
 }
 

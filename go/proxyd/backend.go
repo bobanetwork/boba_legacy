@@ -463,31 +463,33 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
-		req, err := w.prepareClientMsg(msg)
-		if err != nil {
-			var id *int
-			method := MethodUnknown
-			if req != nil {
+		reqs, err := w.prepareClientMsg(msg)
+		for _, req := range reqs {
+			if err != nil {
+				var id *int
+				method := MethodUnknown
+
 				id = req.ID
 				method = req.Method
+
+				log.Info(
+					"error preparing client message",
+					"auth", GetAuthCtx(ctx),
+					"req_id", GetReqID(ctx),
+					"err", err,
+				)
+				outConn = w.clientConn
+				msg = mustMarshalJSON(NewRPCErrorRes(id, err))
+				RecordRPCError(ctx, BackendProxyd, method, err)
+			} else {
+				RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
+				log.Info(
+					"forwarded WS message to backend",
+					"method", req.Method,
+					"auth", GetAuthCtx(ctx),
+					"req_id", GetReqID(ctx),
+				)
 			}
-			log.Info(
-				"error preparing client message",
-				"auth", GetAuthCtx(ctx),
-				"req_id", GetReqID(ctx),
-				"err", err,
-			)
-			outConn = w.clientConn
-			msg = mustMarshalJSON(NewRPCErrorRes(id, err))
-			RecordRPCError(ctx, BackendProxyd, method, err)
-		} else {
-			RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
-			log.Info(
-				"forwarded WS message to backend",
-				"method", req.Method,
-				"auth", GetAuthCtx(ctx),
-				"req_id", GetReqID(ctx),
-			)
 		}
 
 		err = outConn.WriteMessage(msgType, msg)
@@ -563,21 +565,22 @@ func (w *WSProxier) close() {
 	activeBackendWsConnsGauge.WithLabelValues(w.backend.Name).Dec()
 }
 
-func (w *WSProxier) prepareClientMsg(msg []byte) (*RPCReq, error) {
-	req, err := ParseRPCReq(bytes.NewReader(msg))
-	if err != nil {
-		return nil, err
-	}
+func (w *WSProxier) prepareClientMsg(msg []byte) ([]RPCReq, error) {
+	reqs, err := ParseRPCReq(bytes.NewReader(msg))
+	for _, req := range reqs {
+		if err != nil {
+			return nil, err
+		}
 
-	if !w.methodWhitelist.Has(req.Method) {
-		return req, ErrMethodNotWhitelisted
-	}
+		if !w.methodWhitelist.Has(req.Method) {
+			return reqs, ErrMethodNotWhitelisted
+		}
 
-	if w.backend.IsRateLimited() {
-		return req, ErrBackendOverCapacity
+		if w.backend.IsRateLimited() {
+			return reqs, ErrBackendOverCapacity
+		}
 	}
-
-	return req, nil
+	return reqs, nil
 }
 
 func (w *WSProxier) parseBackendMsg(msg []byte) (*RPCRes, error) {

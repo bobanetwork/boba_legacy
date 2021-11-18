@@ -33,26 +33,60 @@ func (r *RPCErr) Error() string {
 	return r.Message
 }
 
-func ParseRPCReq(r io.Reader) (*RPCReq, error) {
+func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
 	body, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, wrapErr(err, "error reading request body")
 	}
+	var arr []RPCReq
+	if isBatch(body) {
+		err := json.Unmarshal(body, &arr)
+		if err != nil {
+			return nil, wrapErr(err, "failed to parse JSON batch request: ")
+		}
+		for _, t := range arr {
+			if t.JSONRPC != JSONRPCVersion {
+				return nil, ErrInvalidRequest
+			}
 
-	req := new(RPCReq)
-	if err := json.Unmarshal(body, req); err != nil {
-		return nil, ErrParseErr
+			if t.Method == "" {
+				return nil, ErrInvalidRequest
+			}
+			// methods = append(methods, t.Method)
+			// res = append(res, ModifiedRequest{
+			// 	ID:         t.ID,
+			// 	Path:       t.Method,
+			// 	RemoteAddr: ip,
+			// 	Params:     t.Params,
+			// })
+		}
+		return arr, nil
+	} else {
+		req := new(RPCReq)
+		if err := json.Unmarshal(body, req); err != nil {
+			return nil, ErrParseErr
+		}
+
+		if req.JSONRPC != JSONRPCVersion {
+			return nil, ErrInvalidRequest
+		}
+
+		if req.Method == "" {
+			return nil, ErrInvalidRequest
+		}
+		arr[0] = *req
+		return arr, nil
 	}
+}
 
-	if req.JSONRPC != JSONRPCVersion {
-		return nil, ErrInvalidRequest
+func isBatch(msg []byte) bool {
+	for _, c := range msg {
+		if c == 0x20 || c == 0x09 || c == 0x0a || c == 0x0d {
+			continue
+		}
+		return c == '['
 	}
-
-	if req.Method == "" {
-		return nil, ErrInvalidRequest
-	}
-
-	return req, nil
+	return false
 }
 
 func ParseRPCRes(r io.Reader) (*RPCRes, error) {
