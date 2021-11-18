@@ -4,20 +4,42 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"strconv"
 )
 
 type RPCReq struct {
 	JSONRPC string          `json:"jsonrpc"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params"`
-	ID      *int            `json:"id"`
+	ID      json.RawMessage `json:"id"`
 }
 
 type RPCRes struct {
 	JSONRPC string      `json:"jsonrpc"`
 	Result  interface{} `json:"result,omitempty"`
 	Error   *RPCErr     `json:"error,omitempty"`
-	ID      *int        `json:"id"`
+	ID      string      `json:"id"`
+}
+
+func (s *RPCRes) UnmarshalJSON(data []byte) error {
+	type Alias RPCRes
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(s),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		auxAlt := &struct {
+			ID int `json:"id"`
+			*Alias
+		}{
+			Alias: (*Alias)(s),
+		}
+		if err := json.Unmarshal(data, &auxAlt); err == nil {
+			s.ID = strconv.Itoa(auxAlt.ID)
+		}
+	}
+	return nil
 }
 
 func (r *RPCRes) IsError() bool {
@@ -38,8 +60,8 @@ func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
 	if err != nil {
 		return nil, wrapErr(err, "error reading request body")
 	}
-	var arr []RPCReq
 	if isBatch(body) {
+		var arr []RPCReq
 		err := json.Unmarshal(body, &arr)
 		if err != nil {
 			return nil, wrapErr(err, "failed to parse JSON batch request: ")
@@ -52,13 +74,6 @@ func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
 			if t.Method == "" {
 				return nil, ErrInvalidRequest
 			}
-			// methods = append(methods, t.Method)
-			// res = append(res, ModifiedRequest{
-			// 	ID:         t.ID,
-			// 	Path:       t.Method,
-			// 	RemoteAddr: ip,
-			// 	Params:     t.Params,
-			// })
 		}
 		return arr, nil
 	} else {
@@ -74,6 +89,7 @@ func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
 		if req.Method == "" {
 			return nil, ErrInvalidRequest
 		}
+		arr := make([]RPCReq, 1)
 		arr[0] = *req
 		return arr, nil
 	}
@@ -103,7 +119,7 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	return res, nil
 }
 
-func NewRPCErrorRes(id *int, err error) *RPCRes {
+func NewRPCErrorRes(id *string, err error) *RPCRes {
 	var rpcErr *RPCErr
 	if rr, ok := err.(*RPCErr); ok {
 		rpcErr = rr
@@ -117,6 +133,6 @@ func NewRPCErrorRes(id *int, err error) *RPCRes {
 	return &RPCRes{
 		JSONRPC: JSONRPCVersion,
 		Error:   rpcErr,
-		ID:      id,
+		ID:      *id,
 	}
 }

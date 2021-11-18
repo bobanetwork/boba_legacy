@@ -466,10 +466,11 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		reqs, err := w.prepareClientMsg(msg)
 		for _, req := range reqs {
 			if err != nil {
-				var id *int
+				var id *string
 				method := MethodUnknown
 
-				id = req.ID
+				*id = string(req.ID)
+
 				method = req.Method
 
 				log.Info(
@@ -524,9 +525,9 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 
 		res, err := w.parseBackendMsg(msg)
 		if err != nil {
-			var id *int
+			var id *string
 			if res != nil {
-				id = res.ID
+				*id = string(res.ID)
 			}
 			msg = mustMarshalJSON(NewRPCErrorRes(id, err))
 		}

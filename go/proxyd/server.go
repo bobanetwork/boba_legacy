@@ -115,7 +115,47 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 		writeRPCError(w, nil, err)
 		return
 	}
-	for _, req := range reqs {
+	if len(reqs) > 1 {
+		arrbackendRes := make([]RPCRes, len(reqs))
+		for index, req := range reqs {
+			group := s.rpcMethodMappings[req.Method]
+			if group == "" {
+				// use unknown below to prevent DOS vector that fills up memory
+				// with arbitrary method names.
+				log.Info(
+					"blocked request for non-whitelisted method",
+					"source", "rpc",
+					"req_id", GetReqID(ctx),
+					"method", req.Method,
+				)
+				RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
+				var id *string
+				idtmp := string(req.ID)
+				*id = idtmp
+				writeRPCError(w, id, ErrMethodNotWhitelisted)
+				return
+			}
+
+			backendRes, err := s.backendGroups[group].Forward(ctx, &req)
+			if err != nil {
+				log.Error(
+					"error forwarding RPC request",
+					"method", req.Method,
+					"req_id", GetReqID(ctx),
+					"err", err,
+				)
+				var id *string
+				idtmp := string(req.ID)
+				*id = idtmp
+				writeRPCError(w, id, err)
+			}
+			arrbackendRes[index] = *backendRes
+		}
+		enc := json.NewEncoder(w)
+		// ommiting RecordRPCError logging :(
+		enc.Encode(arrbackendRes)
+	} else {
+		req := reqs[0]
 		group := s.rpcMethodMappings[req.Method]
 		if group == "" {
 			// use unknown below to prevent DOS vector that fills up memory
@@ -127,7 +167,10 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"method", req.Method,
 			)
 			RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
-			writeRPCError(w, req.ID, ErrMethodNotWhitelisted)
+			var id *string
+			idtmp := string(req.ID)
+			*id = idtmp
+			writeRPCError(w, id, ErrMethodNotWhitelisted)
 			return
 		}
 
@@ -139,9 +182,12 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"req_id", GetReqID(ctx),
 				"err", err,
 			)
-			writeRPCError(w, req.ID, err)
+			var id *string
+			log.Warn("req.IDreq.IDreq.ID", "req.ID", req.ID)
+			idtmp := string(req.ID)
+			*id = idtmp
+			writeRPCError(w, id, err)
 		}
-		return
 
 		enc := json.NewEncoder(w)
 		if err := enc.Encode(backendRes); err != nil {
@@ -151,10 +197,14 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"err", err,
 			)
 			RecordRPCError(ctx, BackendProxyd, req.Method, err)
-			writeRPCError(w, req.ID, err)
+			var id *string
+			idtmp := string(req.ID)
+			*id = idtmp
+			writeRPCError(w, id, err)
 			return
 		}
 	}
+
 }
 
 func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
@@ -226,7 +276,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 	)
 }
 
-func writeRPCError(w http.ResponseWriter, id *int, err error) {
+func writeRPCError(w http.ResponseWriter, id *string, err error) {
 	enc := json.NewEncoder(w)
 	w.WriteHeader(200)
 
