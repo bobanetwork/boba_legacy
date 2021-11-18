@@ -33,6 +33,7 @@ import farmReduer from './farmReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
+import airdropReducer from './airdropReducer'
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -53,6 +54,7 @@ const rootReducer = combineReducers({
   farm: farmReduer,
   lookup: lookupReducer,
   dao: daoReducer,
-});
+  airdrop: airdropReducer,
+})
 
-export default rootReducer;
+export default rootReducer
