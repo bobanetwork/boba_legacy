@@ -1629,6 +1629,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	if ctx.GlobalIsSet(CacheNoPrefetchFlag.Name) {
 		cfg.NoPrefetch = ctx.GlobalBool(CacheNoPrefetchFlag.Name)
 	}
+	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
+		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
+	}
 	if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheTrieFlag.Name) {
 		cfg.TrieCleanCache = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheTrieFlag.Name) / 100
 	}

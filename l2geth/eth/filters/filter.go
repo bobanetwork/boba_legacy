@@ -148,6 +148,7 @@ func (f *Filter) Logs(ctx context.Context) ([]*types.Log, error) {
 	if f.end == -1 {
 		end = head
 	}
+	log.Warn("range limit ", "rangeLimit", f.rangeLimit, "maxFilterBlockRange", maxFilterBlockRange)
 	if f.rangeLimit && (int64(end)-f.begin) > maxFilterBlockRange {
 		return nil, fmt.Errorf("exceed maximum block range: %d", maxFilterBlockRange)
 	}
