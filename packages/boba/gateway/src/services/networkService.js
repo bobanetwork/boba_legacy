@@ -171,6 +171,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if (this.masterSystemConfig === 'mainnet') return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -219,6 +220,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if (this.masterSystemConfig === 'mainnet') return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
