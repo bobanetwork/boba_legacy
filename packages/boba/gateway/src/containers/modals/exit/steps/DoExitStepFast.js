@@ -286,7 +286,7 @@ function DoExitStepFast({ handleClose, token }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          {feeLabel}. In most cases, a fast exit takes one hour or less. However, if Ethereum is conjested, it can take as long as 3 hours.
+          {feeLabel}. In most cases, a fast exit takes one hour or less. However, if Ethereum is congested, it can take as long as 3 hours.
         </Typography>
 
         <Input
