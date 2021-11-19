@@ -1,0 +1,151 @@
+# List of WS methods to whitelist.
+ws_method_whitelist = [
+  "web3_clientVersion",
+  "eth_getProof",
+  "rollup_getInfo",
+  "web3_sha3",
+  "net_version",
+  "net_peerCount",
+  "net_listening",
+  "eth_protocolVersion",
+  "eth_syncing",
+  "eth_coinbase",
+  "eth_mining",
+  "eth_hashrate",
+  "eth_gasPrice",
+  "eth_accounts",
+  "eth_blockNumber",
+  "eth_getBalance",
+  "eth_getStorageAt",
+  "eth_getTransactionCount",
+  "eth_getBlockTransactionCountByHash",
+  "eth_getBlockTransactionCountByNumber",
+  "eth_getUncleCountByBlockHash",
+  "eth_getUncleCountByBlockNumber",
+  "eth_getCode",
+  "eth_sign",
+  "eth_signTransaction",
+  "eth_sendTransaction",
+  "eth_sendRawTransaction",
+  "eth_call",
+  "eth_estimateGas",
+  "eth_getBlockByHash",
+  "eth_getBlockByNumber",
+  "eth_getTransactionByHash",
+  "eth_getTransactionByBlockHashAndIndex",
+  "eth_getTransactionByBlockNumberAndIndex",
+  "eth_getTransactionReceipt",
+  "eth_getUncleByBlockHashAndIndex",
+  "eth_getUncleByBlockNumberAndIndex",
+  "eth_getCompilers",
+  "eth_compile",
+  "eth_compileSolidity",
+  "eth_compileSerpent",
+  "eth_newFilter",
+  "eth_newBlockFilter",
+  "eth_newPendingTransactionFilter",
+  "eth_uninstallFilter",
+  "eth_getFilterChanges",
+  "eth_getFilterLogs",
+  "eth_getLogs",
+  "eth_getWork",
+  "eth_submitWork",
+  "eth_submitHashrate",
+  "db_putString",
+  "db_getString",
+  "db_putHex",
+  "db_getHex",
+  "shh_post",
+  "shh_version",
+  "shh_newIdentity",
+  "shh_hasIdentity",
+  "shh_newGroup",
+  "shh_addToGroup",
+  "shh_newFilter",
+  "shh_uninstallFilter",
+  "shh_getFilterChanges",
+  "shh_getMessages",
+  "eth_getBlockRange",
+  "eth_subscribe",
+  "eth_call",
+  "eth_chainId"
+]
+# Enable WS on this backend group. There can only be one WS-enabled backend group.
+ws_backend_group = "main"
+
+[server]
+# Host for the proxyd RPC server to listen on.
+rpc_host = "0.0.0.0"
+# Port for the above.
+rpc_port = 8545
+# Host for the proxyd WS server to listen on.
+ws_host = "0.0.0.0"
+# Port for the above
+ws_port = 8546
+# Maximum client body size, in bytes, that the server will accept.
+max_body_size_bytes = 10485760
+
+[redis]
+# URL to a Redis instance.
+url = "redis://ELASTICACHE:6379"
+
+[metrics]
+# Whether or not to enable Prometheus metrics.
+enabled = false
+# Host for the Prometheus metrics endpoint to listen on.
+host = "0.0.0.0"
+# Port for the above.
+port = 9761
+
+[backend]
+# How long proxyd should wait for a backend response before timing out.
+response_timeout_seconds = 10
+# Maximum response size, in bytes, that proxyd will accept from a backend.
+max_response_size_bytes = 5242880
+# Maximum number of times proxyd will try a backend before giving up.
+max_retries = 30
+# Number of seconds to wait before trying an unhealthy backend again.
+out_of_service_seconds = 300
+
+[backends]
+# A map of backends by name.
+[backends.rinkeby]
+# The URL to contact the backend at.
+rpc_url = "http://MAIN_L2GETH:8545"
+# The WS URL to contact the backend at.
+ws_url = "http://MAIN_L2GETH:8546"
+username = ""
+password = ""
+# default max_rps = 3
+max_rps = 300
+# default max_ws_conns = 1
+max_ws_conns = 100
+
+[backends.replica]
+# The URL to contact the backend at.
+rpc_url = "http://REPLICA_L2GETH:8545"
+ws_url = "http://REPLICA_L2GETH:8546"
+username = ""
+password = ""
+max_rps = 300
+max_ws_conns = 100
+
+[backend_groups]
+[backend_groups.main]
+backends = ["rinkeby"]
+
+[backend_groups.replica]
+backends = ["replica"]
+
+# If the authentication group below is in the config,
+# proxyd will only accept authenticated requests.
+[authentication]
+# Mapping of auth key to alias. The alias is used to provide a human-
+# readable name for the auth key in monitoring.
+secret = "test"
+
+# Mapping of methods to backend groups.
+[rpc_method_mappings]
+eth_call = "replica"
+eth_chainId = "replica"
+eth_blockNumber = "replica"

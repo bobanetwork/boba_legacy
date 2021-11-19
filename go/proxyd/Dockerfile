@@ -16,6 +16,7 @@ FROM alpine:3.14.2
 EXPOSE 8080
 
 VOLUME /etc/proxyd
-
-COPY --from=builder /app/bin/proxyd /bin/proxyd
-CMD ["/bin/proxyd", "/etc/proxyd/proxyd.toml"]
+COPY proxyd.toml /etc/proxyd/proxyd.toml
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
