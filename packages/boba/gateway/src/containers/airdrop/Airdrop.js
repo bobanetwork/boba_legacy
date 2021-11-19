@@ -122,16 +122,16 @@ class Airdrop extends React.Component {
     let claimedL1time = 0
     let unlockL1time = 0
     let isUnlocked = false
-    if(claimDetailsL1.hasOwnProperty('amount') && claimDetailsL1.amount !== 0) {
+    if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('amount') && claimDetailsL1.amount !== 0) {
       recordFoundL1 = true
       snapValueL1 = Number(logAmount(claimDetailsL1.amount, 18))
     }
-    if(claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
+    if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
       claimedL1 = true
       claimedL1time = moment.unix(claimDetailsL1.claimedTimestamp).format('MM/DD/YYYY hh:mm a') 
     }
     /*not yet claimed, but initiated*/
-    if(claimDetailsL1.hasOwnProperty('claimUnlockTime') && claimDetailsL1.claimUnlockTime !== null && claimDetailsL1.claimed === 0) {
+    if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('claimUnlockTime') && claimDetailsL1.claimUnlockTime !== null && claimDetailsL1.claimed === 0) {
       unlockL1time = moment.unix(claimDetailsL1.claimUnlockTime).format('MM/DD/YYYY hh:mm a')
       isUnlocked = moment().isAfter(moment.unix(claimDetailsL1.claimUnlockTime)) 
     }
@@ -140,11 +140,11 @@ class Airdrop extends React.Component {
     let snapValueL2 = 0
     let claimedL2 = false
     let claimedL2time = 0
-    if(claimDetailsL2.hasOwnProperty('amount') && claimDetailsL2.amount !== 0) {
+    if(claimDetailsL2 && claimDetailsL2.hasOwnProperty('amount') && claimDetailsL2.amount !== 0) {
       recordFoundL2 = true
       snapValueL2 = Number(logAmount(claimDetailsL2.amount, 18))
     }
-    if(claimDetailsL2.hasOwnProperty('claimed') && claimDetailsL2.claimed === 1) {
+    if(claimDetailsL2 && claimDetailsL2.hasOwnProperty('claimed') && claimDetailsL2.claimed === 1) {
       claimedL2 = true
       claimedL2time = moment.unix(claimDetailsL2.claimedTimestamp).format('MM/DD/YYYY hh:mm a')
     }
@@ -195,112 +195,13 @@ class Airdrop extends React.Component {
         <Box sx={{background: 'rgba(255, 255, 255, 0.07)', padding: '10px', borderRadius: '10px'}}>
           <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>L1 Airdrop</Typography>
           <Box sx={{background: 'rgba(255, 255, 255, 0.11)', padding: '10px', borderRadius: '3px'}}>
-          {/* STATE 1 - NO OMG ON L1 DURING SNAPSHOT */}
-          {!recordFoundL1 &&
-              <Typography 
-              variant="body2" 
-              component="p" 
-            >
-              There is no record of OMG in this wallet on Ethereum during the snapshot.
-            </Typography>
-          }
 
-          {/* STATE 2 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED AND ENOUGH OMG ON L2 RIGHT NOW */}
-          {recordFoundL1 && (snapValueL1 > 0) && (l2BalanceOMG > snapValueL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
-            <>
-            <Typography 
-              variant="body2" 
-              component="p" 
-              sx={{color: 'green'}}
-            >
-              Yes, there was an OMG balance of {snapValueL1} on Ethereum during the snapshot. 
-              <br/>Also, you have enough OMG on Boba to claim your airdrop. 
-            </Typography>
-            <Button
-              onClick={(i)=>{this.initiateDrop()}}
-              color="primary"
-              size="large"
-              newStyle
-              variant="contained"
-            >
-              Initiate Airdrop
-            </Button>
-            </>
-          }
-
-          {/* STATE 3 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED BUT NOT ENOUGH OMG ON L2 */}
-          {recordFoundL1 && (snapValueL1 > 0) && (l2BalanceOMG <= snapValueL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
-            <Typography 
-              variant="body2" 
-              component="p" 
-              sx={{color: 'yellow'}}
-            >
-              Yes, there was a balance of {snapValueL1} OMG on Ethereum during the snapshot.
-              <br/>However, your current OMG balance on Boba is only {l2BalanceOMG}. 
-              <br/>Please bridge {(snapValueL1 - l2BalanceOMG)*0.99} or more OMG to Boba to claim your airdrop.
-            </Typography>
-          }
-
-          {/* STATE 4 - INITIATED BUT TOO EARLY */}
-          {recordFoundL1 && (unlockL1time !== 0) && (isUnlocked === false) && 
-            <>
-            <Typography 
-              variant="body1" 
-              component="p" 
-              sx={{color: 'green', fontWeight: '700'}}
-            >
-              Airdrop initiated
-            </Typography>
-            <Typography 
-              variant="body2" 
-              component="p" 
-            >
-              The unlock time is {unlockL1time}. 
-              <br/>After that, you will be able to claim your L1 snapshot BOBA.
-            </Typography>
-            </>
-          }
-
-          {/* STATE 5 - INITIATED AND READY TO AIRDROP */}
-          {isUnlocked && 
-            <>
               <Typography 
                 variant="body2" 
                 component="p" 
               >
-                The unlock time of {unlockL1time} has passed. You can now claim your L1 snapshot BOBA.
+                The L1 airdrop claim system will go live at 22:00 UTC on Nov. 19, 2021.
               </Typography>
-              <Button
-                onClick={(i)=>{this.airdropL1()}}
-                color="primary"
-                size="large"
-                newStyle
-                variant="contained"
-              >
-                Claim my L1 snapshot BOBA!
-              </Button>
-            </>
-          }
-           
-          {/* STATE 6 - CLAIMED */}
-          {!!claimedL1 &&
-            <>
-            <Typography 
-              variant="body1" 
-              component="p" 
-              sx={{color: 'green', fontWeight: '700'}}
-            >
-              Airdrop completed
-            </Typography>
-            <Typography 
-              variant="body2" 
-              component="p" 
-              sx={{mt: 1, mb: 2}}
-            >
-              You claimed your L1 snapshot BOBA at {claimedL1time}.
-            </Typography>
-            </>
-          }
           </Box>
         </Box>
 
