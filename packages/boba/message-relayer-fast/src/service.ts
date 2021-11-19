@@ -109,6 +109,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     timeOfLastRelayS: number
     messageBuffer: Array<BatchMessage>
     timeOfLastPendingRelay: any
+    didWork: boolean
   }
 
   protected async _init(): Promise<void> {
@@ -212,7 +213,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
+      if (! this.state.didWork) {
+        await sleep(this.options.pollingInterval)
+      }
+      this.state.didWork = false
+
       await this._getFilter()
 
       try {
@@ -271,6 +276,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           pendingTXTimeOut
         ) {
           if (gasPriceAcceptable) {
+            this.state.didWork = true
             if (bufferFull) {
               console.log('Buffer full: flushing')
             }
@@ -365,6 +371,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             continue
           }
 
+          this.state.didWork = true
           this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
           while (
             await this._isTransactionFinalized(
