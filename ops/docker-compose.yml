@@ -99,6 +99,22 @@ x-integration_3_pk: &integration_3_pk
 version: "3"
 
 services:
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
+  #   command:
+  #     - --save ""
+  #     - --appendonly no
+  #make sure you setup proxyd.toml
+  # proxyd:
+  #   ports:
+  #     - 8081:8080
+  #   depends_on:
+  #     - redis
+  #   image: proxyd:latest
+  #   volumes:
+  #     - ../go/proxyd:/etc/proxyd/
   # base service builder
   builder:
     image: bobanetwork/builder:latest

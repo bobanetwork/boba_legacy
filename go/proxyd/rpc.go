@@ -11,7 +11,7 @@ type RPCReq struct {
 	JSONRPC string          `json:"jsonrpc"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params"`
-	ID      json.RawMessage `json:"id"`
+	ID      string          `json:"id"`
 }
 
 type RPCRes struct {
@@ -19,6 +19,27 @@ type RPCRes struct {
 	Result  interface{} `json:"result,omitempty"`
 	Error   *RPCErr     `json:"error,omitempty"`
 	ID      string      `json:"id"`
+}
+
+func (s *RPCReq) UnmarshalJSON(data []byte) error {
+	type Alias RPCReq
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(s),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		auxAlt := &struct {
+			ID int `json:"id"`
+			*Alias
+		}{
+			Alias: (*Alias)(s),
+		}
+		if err := json.Unmarshal(data, &auxAlt); err == nil {
+			s.ID = strconv.Itoa(auxAlt.ID)
+		}
+	}
+	return nil
 }
 
 func (s *RPCRes) UnmarshalJSON(data []byte) error {
@@ -119,7 +140,7 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	return res, nil
 }
 
-func NewRPCErrorRes(id *string, err error) *RPCRes {
+func NewRPCErrorRes(id string, err error) *RPCRes {
 	var rpcErr *RPCErr
 	if rr, ok := err.(*RPCErr); ok {
 		rpcErr = rr
@@ -133,6 +154,6 @@ func NewRPCErrorRes(id *string, err error) *RPCRes {
 	return &RPCRes{
 		JSONRPC: JSONRPCVersion,
 		Error:   rpcErr,
-		ID:      *id,
+		ID:      id,
 	}
 }

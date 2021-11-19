@@ -112,7 +112,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Info("rejected request with bad rpc request", "source", "rpc", "err", err, "r", r)
 		RecordRPCError(ctx, BackendProxyd, MethodUnknown, err)
-		writeRPCError(w, nil, err)
+		writeRPCError(w, "nil", err)
 		return
 	}
 	if len(reqs) > 1 {
@@ -129,10 +129,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 					"method", req.Method,
 				)
 				RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
-				var id *string
-				idtmp := string(req.ID)
-				*id = idtmp
-				writeRPCError(w, id, ErrMethodNotWhitelisted)
+				writeRPCError(w, req.ID, ErrMethodNotWhitelisted)
 				return
 			}
 
@@ -144,12 +141,10 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 					"req_id", GetReqID(ctx),
 					"err", err,
 				)
-				var id *string
-				idtmp := string(req.ID)
-				*id = idtmp
-				writeRPCError(w, id, err)
+				writeRPCError(w, req.ID, err)
+			} else {
+				arrbackendRes[index] = *backendRes
 			}
-			arrbackendRes[index] = *backendRes
 		}
 		enc := json.NewEncoder(w)
 		// ommiting RecordRPCError logging :(
@@ -167,10 +162,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"method", req.Method,
 			)
 			RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrMethodNotWhitelisted)
-			var id *string
-			idtmp := string(req.ID)
-			*id = idtmp
-			writeRPCError(w, id, ErrMethodNotWhitelisted)
+			writeRPCError(w, req.ID, ErrMethodNotWhitelisted)
 			return
 		}
 
@@ -182,11 +174,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"req_id", GetReqID(ctx),
 				"err", err,
 			)
-			var id *string
-			log.Warn("req.IDreq.IDreq.ID", "req.ID", req.ID)
-			idtmp := string(req.ID)
-			*id = idtmp
-			writeRPCError(w, id, err)
+			writeRPCError(w, req.ID, err)
 		}
 
 		enc := json.NewEncoder(w)
@@ -197,10 +185,7 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 				"err", err,
 			)
 			RecordRPCError(ctx, BackendProxyd, req.Method, err)
-			var id *string
-			idtmp := string(req.ID)
-			*id = idtmp
-			writeRPCError(w, id, err)
+			writeRPCError(w, req.ID, err)
 			return
 		}
 	}
@@ -276,7 +261,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 	)
 }
 
-func writeRPCError(w http.ResponseWriter, id *string, err error) {
+func writeRPCError(w http.ResponseWriter, id string, err error) {
 	enc := json.NewEncoder(w)
 	w.WriteHeader(200)
 

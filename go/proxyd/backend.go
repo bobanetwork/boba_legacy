@@ -466,10 +466,7 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		reqs, err := w.prepareClientMsg(msg)
 		for _, req := range reqs {
 			if err != nil {
-				var id *string
 				method := MethodUnknown
-
-				*id = string(req.ID)
 
 				method = req.Method
 
@@ -480,7 +477,7 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 					"err", err,
 				)
 				outConn = w.clientConn
-				msg = mustMarshalJSON(NewRPCErrorRes(id, err))
+				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
 				RecordRPCError(ctx, BackendProxyd, method, err)
 			} else {
 				RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
@@ -525,11 +522,7 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 
 		res, err := w.parseBackendMsg(msg)
 		if err != nil {
-			var id *string
-			if res != nil {
-				*id = string(res.ID)
-			}
-			msg = mustMarshalJSON(NewRPCErrorRes(id, err))
+			msg = mustMarshalJSON(NewRPCErrorRes(res.ID, err))
 		}
 		if res.IsError() {
 			log.Info(
