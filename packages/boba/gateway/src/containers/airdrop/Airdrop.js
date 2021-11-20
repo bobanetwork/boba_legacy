@@ -9,10 +9,11 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 import moment from 'moment'
-
 import { openAlert } from 'actions/uiAction'
 import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropAction'
 import { logAmount } from 'util/amountConvert'
+import truncate from 'truncate-middle';
+
 
 class Airdrop extends React.Component {
 
@@ -30,7 +31,8 @@ class Airdrop extends React.Component {
     this.state = {
       claimDetailsL1,
       claimDetailsL2,
-      layer2
+      layer2,
+      walletAddress: networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
     }
 
   }
@@ -95,7 +97,8 @@ class Airdrop extends React.Component {
     const {
       claimDetailsL1,
       claimDetailsL2,
-      layer2
+      layer2,
+      walletAddress
     } = this.state
 
     //console.log("claimDetails:",claimDetailsL1)
@@ -195,18 +198,126 @@ class Airdrop extends React.Component {
         <Box sx={{background: 'rgba(255, 255, 255, 0.07)', padding: '10px', borderRadius: '10px'}}>
           <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>L1 Airdrop</Typography>
           <Box sx={{background: 'rgba(255, 255, 255, 0.11)', padding: '10px', borderRadius: '3px'}}>
+           
+           {/* STATE 1 - NO OMG ON L1 DURING SNAPSHOT */}
+           {!recordFoundL1 &&
+               <Typography 
+               variant="body2" 
+               component="p" 
+             >
+              There is no record of OMG in this specific non-custodial address ({walletAddress}) on Ethereum during the snapshot. 
+              <br/><br/><span style={{color: 'yellow', fontWeight: '700'}}>If you had OMG on Ethereum during the snapshot, 
+              but are getting this message, please double check to make sure that you are accessing the gateway with 
+              the correct account/address.</span>
+              <br/><br/>Be advised that this claim tab has nothing to do with the exchanges. 
+              If you held OMG at an exchange during the L1 snapshot, the exchange, if it supported the airdrop, will 
+              drop your BOBA to you.
+             </Typography>
+           }
 
-              <Typography 
-                variant="body2" 
-                component="p" 
-              >
-                The L1 airdrop claim system will go live at 22:00 UTC on Nov. 19, 2021.
-              </Typography>
+           {/* STATE 2 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED AND ENOUGH OMG ON L2 RIGHT NOW */}
+           {recordFoundL1 && (snapValueL1 > 0) && (l2BalanceOMG > snapValueL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
+             <>
+             <Typography 
+               variant="body2" 
+               component="p" 
+               sx={{color: 'green'}}
+             >
+               Yes, there was an OMG balance of {snapValueL1} on Ethereum during the snapshot. 
+               <br/>Also, you have enough OMG on Boba to claim your airdrop. 
+             </Typography>
+             <Button
+               onClick={(i)=>{this.initiateDrop()}}
+               color="primary"
+               size="large"
+               newStyle
+               variant="contained"
+             >
+               Initiate Airdrop
+             </Button>
+             </>
+           }
+
+           {/* STATE 3 - OMG ON L1 DURING SNAPSHOT AND NOT CLAIMED AND NOT INITIATED BUT NOT ENOUGH OMG ON L2 */}
+           {recordFoundL1 && (snapValueL1 > 0) && (l2BalanceOMG <= snapValueL1 * 0.97) && (claimedL1 === false) && (unlockL1time === 0) &&
+             <Typography 
+               variant="body2" 
+               component="p" 
+               sx={{color: 'yellow'}}
+             >
+               Yes, there was a balance of {snapValueL1} OMG on Ethereum during the snapshot.
+               <br/>However, your current OMG balance on Boba is only {l2BalanceOMG}. 
+               <br/>Please bridge {(snapValueL1 - l2BalanceOMG)*0.99} or more OMG to Boba to claim your airdrop.
+             </Typography>
+           }
+
+           {/* STATE 4 - INITIATED BUT TOO EARLY */}
+           {recordFoundL1 && (unlockL1time !== 0) && (isUnlocked === false) && 
+             <>
+             <Typography 
+               variant="body1" 
+               component="p" 
+               sx={{color: 'green', fontWeight: '700'}}
+             >
+               Airdrop initiated
+             </Typography>
+             <Typography 
+               variant="body2" 
+               component="p" 
+             >
+               The unlock time is {unlockL1time}. 
+               <br/>After that, you will be able to claim your L1 snapshot BOBA.
+             </Typography>
+             </>
+           }
+
+           {/* STATE 5 - INITIATED AND READY TO AIRDROP */}
+           {isUnlocked && 
+             <>
+               <Typography 
+                 variant="body2" 
+                 component="p" 
+               >
+                 The unlock time of {unlockL1time} has passed. You can now claim your L1 snapshot BOBA.
+               </Typography>
+               <Button
+                 onClick={(i)=>{this.airdropL1()}}
+                 color="primary"
+                 size="large"
+                 newStyle
+                 variant="contained"
+               >
+                 Claim my L1 snapshot BOBA!
+               </Button>
+             </>
+           }
+
+           {/* STATE 6 - CLAIMED */}
+           {!!claimedL1 &&
+             <>
+             <Typography 
+               variant="body1" 
+               component="p" 
+               sx={{color: 'green', fontWeight: '700'}}
+             >
+               Airdrop completed
+             </Typography>
+             <Typography 
+               variant="body2" 
+               component="p" 
+               sx={{mt: 1, mb: 2}}
+             >
+               You claimed your L1 snapshot BOBA at {claimedL1time}.
+             </Typography>
+             </>
+           }
           </Box>
         </Box>
 
         <Box sx={{background: 'rgba(255, 255, 255, 0.07)', marginTop: '20px', padding: '10px', borderRadius: '10px'}}>
+          
           <Typography variant="h3" component="h3" sx={{fontWeight: "700",marginBottom: '20px'}}>L2 Airdrop</Typography>
+          
           <Box sx={{background: 'rgba(255, 255, 255, 0.11)', padding: '10px', borderRadius: '3px'}}>
 
           {!recordFoundL2 &&
@@ -214,7 +325,13 @@ class Airdrop extends React.Component {
               variant="body2" 
               component="p" 
             >
-              There is no record of OMG in this wallet on Boba during the snapshot.
+              There is no record of OMG in this specific non-custodial address ({walletAddress}) on Boba during the snapshot. 
+              <br/><br/><span style={{color: 'yellow', fontWeight: '700'}}>If you had OMG on Boba during the snapshot, 
+              but are getting this message, please double check to make sure that you are accessing the gateway with 
+              the correct account/address.</span>
+              <br/><br/>Be advised that this claim tab has nothing to do with the exchanges. 
+              If you held OMG at an exchange during the L1 snapshot, the exchange, if it supported the airdrop, will 
+              drop your BOBA to you.
             </Typography>
           }
 
