@@ -17,10 +17,8 @@ import React, { useState } from 'react'
 import { batch, useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'
 import { useSelector } from 'react-redux'
-import DatePicker from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
 
-import { useMediaQuery, useTheme } from '@material-ui/core'
+import "react-datepicker/dist/react-datepicker.css"
 
 import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens } from 'actions/networkAction'
@@ -43,16 +41,7 @@ import { POLL_INTERVAL } from 'util/constant'
 
 function BobaScope() {
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
   const dispatch = useDispatch()
-
-  const now = new Date()
-  const last_week = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
-
-  const [startDate, setStartDate] = useState(last_week)
-  const [endDate, setEndDate] = useState(now)
 
   const [searchData, setSearchData] = useState('')
 
