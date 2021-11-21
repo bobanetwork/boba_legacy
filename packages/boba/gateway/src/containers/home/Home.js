@@ -66,6 +66,7 @@ import {
 //Wallet Functions
 import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
+import BobaScope from 'containers/bobaScope/BobaScope'
 
 //Help page
 import Help from 'containers/help/Help'
@@ -198,14 +199,13 @@ function Home () {
         <MainMenu />
         <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
           {pageDisplay === "AccountNow" &&
-          <>
             <Account/>
-          </>
           }
           {pageDisplay === "History" &&
-          <>
             <Transactions/>
-          </>
+          }
+          {pageDisplay === "BobaScope" &&
+            <BobaScope/>
           }
           {pageDisplay === "NFT" &&
             <NFT/>

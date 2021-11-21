@@ -19,7 +19,7 @@ import { Typography, useMediaQuery } from '@material-ui/core'
 import { Box } from '@material-ui/system'
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
-import { openAlert, openError, setActiveHistoryTab1 } from 'actions/uiAction'
+import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -154,7 +154,7 @@ function InputStepFast({ handleClose, token }) {
       res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
       if (res) {
-        dispatch(setActiveHistoryTab1('Bridge to L2'))
+        dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
             `ETH was bridged. You will receive
@@ -190,7 +190,7 @@ function InputStepFast({ handleClose, token }) {
     )
 
     if (res) {
-      dispatch(setActiveHistoryTab1('Bridge to L2'))
+      dispatch(setActiveHistoryTab('Bridge to L2'))
       dispatch(
         openAlert(
           `${token.symbol} was bridged to the L1LP. You will receive

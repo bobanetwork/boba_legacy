@@ -904,6 +904,30 @@ class NetworkService {
 
   }
 
+  async getSevens() {
+
+    console.log("getSevens()")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits')
+
+    //console.log("response:",response)
+
+    if (response.status === 201) {
+      const sevens = response.data
+      const filteredSevens = sevens.filter(
+        (i) => (i.fastRelay === 0) && (i.status === 'pending')
+      )
+      //console.log("response:",filteredSevens)
+      return filteredSevens
+    }
+
+  }
+
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 

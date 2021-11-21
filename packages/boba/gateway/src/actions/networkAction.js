@@ -36,6 +36,12 @@ export function fetchTransactions() {
   )
 }
 
+export function fetchSevens() {
+  return createAction('SEVENS/GETALL', () =>
+    networkService.getSevens()
+  )
+}
+
 export function fetchExits() {
   return createAction('EXIT/GETALL', () => networkService.getExits())
 }
