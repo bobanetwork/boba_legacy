@@ -22,6 +22,8 @@ import store from 'store'
 import { orderBy } from 'lodash'
 import BN from 'bn.js'
 
+import { logAmount } from 'util/amountConvert'
+
 import { getToken } from 'actions/tokenAction'
 
 import {
@@ -58,10 +60,13 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
-// DAO
-// import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
+//DAO
+import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
 import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
+
+//Airdrop
+import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -160,6 +165,140 @@ class NetworkService {
       localStorage.setItem('changeChain', true)
       window.location.reload()
     })
+  }
+
+  async fetchAirdropStatusL1() {
+
+    console.log("fetching airdrop L1 status")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+    //if (this.masterSystemConfig === 'mainnet') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('get.l1.airdrop', {
+      address: this.account,
+      key: process.env.REACT_APP_AIRDROP
+    })
+
+    if (response.status === 201) {
+      const status = response.data
+      return status
+    } else {
+      console.log("Bad gateway response")
+      return false
+    }
+
+  }
+
+  async fetchAirdropStatusL2() {
+
+    console.log("fetching airdrop L2 status")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('get.l2.airdrop', {
+      address: this.account,
+      key: process.env.REACT_APP_AIRDROP
+    })
+
+    if (response.status === 201) {
+      const status = response.data
+      return status
+    } else {
+      console.log("Bad gateway response")
+      return false
+    }
+
+  }
+
+  async initiateAirdrop() {
+
+    console.log("Initiating airdrop")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+    //if (this.masterSystemConfig === 'mainnet') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('initiate.l1.airdrop', {
+      address: this.account,
+      key: process.env.REACT_APP_AIRDROP
+    })
+
+    if (response.status === 201) {
+      const status = response.data
+      return status
+    } else {
+      console.log("Bad gateway response")
+      return false
+    }
+
+  }
+
+  async getAirdropL1(callData) {
+
+   //Interact with contract
+
+   //Interact with API if the contract interaction was success
+
+  }
+
+  async getAirdropL2(callData) {
+
+    console.log("getAirdropL2(callData)",callData)
+    console.log("this.account:",this.account)
+    
+    //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdropL2,
+      BobaAirdropJson.abi,
+      this.provider.getSigner()
+    )
+
+    console.log("airdropContract.address:", airdropContract.address)
+
+    try {
+      
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.claim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        this.account,                //wallet address 
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
+
+      await claim.wait()
+
+      //Interact with API if the contract interaction was successful
+      //success of this this call has no bearing on the airdrop itself, since the api is just 
+      //used for user status updates etc.
+      //send.l2.airdrop
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('send.l2.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("Airdrop gateway response:",response.data)
+      } else {
+        console.log("Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+
   }
 
   // async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
@@ -385,10 +524,14 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
 
+      await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
+      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
+
       //L2StandardBridgeAddress is a predeploy, so add by hand....
       allAddresses = {
         ...allAddresses,
-        'L2StandardBridgeAddress': L2StandardBridgeAddress
+        'L2StandardBridgeAddress': L2StandardBridgeAddress,
+        //'BobaAirdrop': '0x4cA698d5c23bE5A79813687a99BB2269bDdA5B2e' //manual for now
       }
 
       //L2MessengerAddress is a predeploy, so add by hand....
@@ -548,13 +691,13 @@ class NetworkService {
         },
       })
 
-      //console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
 
-      // this.BobaContract = new ethers.Contract(
-      //   allTokens.BOBA.L2,
-      //   Boba.abi,
-      //   this.provider.getSigner()
-      // )
+      this.BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
 
       //DAO related
       if( masterSystemConfig === 'local' ) {
@@ -763,6 +906,30 @@ class NetworkService {
 
   }
 
+  async getSevens() {
+
+    console.log("getSevens()")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits')
+
+    //console.log("response:",response)
+
+    if (response.status === 201) {
+      const sevens = response.data
+      const filteredSevens = sevens.filter(
+        (i) => (i.fastRelay === 0) && (i.status === 'pending')
+      )
+      //console.log("response:",filteredSevens)
+      return filteredSevens
+    }
+
+  }
+
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 
@@ -952,6 +1119,31 @@ class NetworkService {
     }
   }
 
+  async getGas() {
+
+    try {
+      const gasPrice2 = await this.L2Provider.getGasPrice()
+      console.log("L2 gas", gasPrice2.toString())
+
+      const gasPrice1 = await this.L1Provider.getGasPrice()
+      console.log("L1 gas", gasPrice1.toString())
+
+      const gasData = {
+        gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
+        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0)
+      }
+
+      console.log(gasData)
+
+      return gasData
+    } catch (error) {
+      console.log("NS: getGas error:",error)
+      return error
+    }
+
+
+  }
+
   async getBalances() {
 
     try {
@@ -1033,9 +1225,12 @@ class NetworkService {
   }
 
   handleMetaMaskError = (errorCode) => {
+    console.log("MetaMask Errorcode:",errorCode)
     switch (errorCode) {
       case 4001:
         return 'Transaction was rejected by user: signature denied'
+      //case -32603:
+      //  return 'Execution reverted: ERC20: transfer amount exceeds balance'
       default:
         return null
     }
@@ -2392,18 +2587,18 @@ class NetworkService {
   // get DAO Balance
   async getDaoBalance() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
 
     try {
-      console.log('Checking DAO balance')
-      console.log('this.BobaContract',this.BobaContract)
-      console.log('this.BobaContract',this.account)
+      //console.log('Checking DAO balance')
+      //console.log('this.BobaContract',this.BobaContract)
+      //console.log('this.BobaContract',this.account)
       let balance = await this.BobaContract.balanceOf(this.account)
-      console.log('balance',balance)
+      //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: DAO Balance', error)
@@ -2414,8 +2609,8 @@ class NetworkService {
   // get DAO Votes
   async getDaoVotes() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return

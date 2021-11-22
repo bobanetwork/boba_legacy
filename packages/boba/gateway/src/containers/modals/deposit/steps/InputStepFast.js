@@ -19,7 +19,7 @@ import { Typography, useMediaQuery } from '@material-ui/core'
 import { Box } from '@material-ui/system'
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
-import { openAlert, openError, setActiveHistoryTab1 } from 'actions/uiAction'
+import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -93,24 +93,32 @@ function InputStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    console.log("cost:",Number(cost))
-    console.log("value:",Number(value))
-    console.log("feeBalance:",Number(feeBalance))
+    console.log("ETH fees:",Number(cost))
+    console.log("Transaction token value:",Number(value))
+    console.log("ETH available for paying fees:",Number(feeBalance))
     console.log("LPRatio:",Number(LPRatio))
     console.log("LPBalance:",Number(balanceSubPending))
     
     if (tooSmall || tooBig) {
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
       //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
+      setValue(value)
+      return false
     } else if ((Number(cost) > Number(feeBalance))) {
       //insufficient ETH to pay gas
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (Number(LPRatio) < 0.1) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out the entire balance
@@ -118,12 +126,15 @@ function InputStepFast({ handleClose, token }) {
       //this is because the every time someone exits, the limit is recalculated
       //via Number(LPBalance) * 0.9, and LPBalance changes over time 
       setValidValue(false)
+      setValue(value)
+      return false
     } else {
       //Whew, finally!
       setValidValue(true)
+      setValue(value)
+      return true
     }
     
-    setValue(value)
   }
 
   const receivableAmount = (value) => {
@@ -132,10 +143,10 @@ function InputStepFast({ handleClose, token }) {
 
   async function doDeposit() {
 
-    let res
-
     console.log("Amount to bridge to L2:", value_Wei_String)
-
+    
+    let res
+    
     if(token.symbol === 'ETH') {
 
       console.log("ETH Fast Bridge")
@@ -143,7 +154,7 @@ function InputStepFast({ handleClose, token }) {
       res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
       if (res) {
-        dispatch(setActiveHistoryTab1('Bridge to L2'))
+        dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
             `ETH was bridged. You will receive
@@ -179,7 +190,7 @@ function InputStepFast({ handleClose, token }) {
     )
 
     if (res) {
-      dispatch(setActiveHistoryTab1('Bridge to L2'))
+      dispatch(setActiveHistoryTab('Bridge to L2'))
       dispatch(
         openAlert(
           `${token.symbol} was bridged to the L1LP. You will receive

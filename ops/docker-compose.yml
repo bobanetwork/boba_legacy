@@ -208,6 +208,7 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
+        GET_LOGS_RANGE_LIMIT: 5000
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
         ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json

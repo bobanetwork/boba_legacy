@@ -18,6 +18,7 @@ import { combineReducers } from 'redux';
 import loadingReducer from './loadingReducer'
 import depositReducer from './depositReducer'
 import transactionReducer from './transactionReducer'
+import dataReducer from './dataReducer'
 import statusReducer from './statusReducer'
 import balanceReducer from './balanceReducer'
 import exitReducer from './exitReducer'
@@ -33,11 +34,13 @@ import farmReduer from './farmReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
+import airdropReducer from './airdropReducer'
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
   deposit: depositReducer,
   transaction: transactionReducer,
+  data: dataReducer,
   signature: signatureReducer,
   status: statusReducer,
   balance: balanceReducer,
@@ -53,6 +56,7 @@ const rootReducer = combineReducers({
   farm: farmReduer,
   lookup: lookupReducer,
   dao: daoReducer,
-});
+  airdrop: airdropReducer,
+})
 
-export default rootReducer;
+export default rootReducer

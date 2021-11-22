@@ -9,6 +9,8 @@ import HistoryIcon from 'components/icons/HistoryIcon'
 import NFTIcon from 'components/icons/NFTIcon'
 import DAOIcon from 'components/icons/DAOIcon'
 import HelpIcon from 'components/icons/LearnIcon'
+import SwapIcon from 'components/icons/SwapIcon'
+import SearchIcon from 'components/icons/SearchIcon'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { selectModalState } from 'selectors/uiSelector'
@@ -29,7 +31,9 @@ function MenuItems ({setOpen }) {
     HistoryIcon,
     NFTIcon,
     DAOIcon,
-    HelpIcon
+    HelpIcon,
+    SwapIcon,
+    SearchIcon
   }
 
   return (

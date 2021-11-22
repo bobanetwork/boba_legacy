@@ -18,7 +18,7 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositL2LP, fastExitAll } from 'actions/networkAction'
-import { openAlert } from 'actions/uiAction'
+import { openAlert, openError } from 'actions/uiAction'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector'
@@ -88,24 +88,32 @@ function DoExitStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    console.log("cost:",Number(cost))
-    console.log("value:",Number(value))
-    console.log("feeBalance:",Number(feeBalance))
+    console.log("ETH fees:",Number(cost))
+    console.log("Transaction token value:",Number(value))
+    console.log("ETH available for fees:",Number(feeBalance))
     console.log("LPRatio:",Number(LPRatio))
     console.log("LPBalance:",Number(balanceSubPending))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
       //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
+      setValue(value)
+      return false
     } else if ((Number(cost) > Number(feeBalance))) {
       //insufficient ETH to pay exit fees
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (Number(LPRatio) < 0.1) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
+      setValue(value)
+      return false
     } else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out all the balance
@@ -113,12 +121,14 @@ function DoExitStepFast({ handleClose, token }) {
       //this is because the every time someone exits, the limit is recalculated
       //via Number(LPBalance) * 0.9, and LPBalance changes over time 
       setValidValue(false)
+      setValue(value)
+      return false
     } else {
       //Whew, finally!
       setValidValue(true)
+      setValue(value)
+      return true
     }
-
-    setValue(value)
 
   }
 
@@ -153,27 +163,40 @@ function DoExitStepFast({ handleClose, token }) {
 
     console.log("Amount to exit:", token.balance.toString())
 
-    let res = await dispatch(
-      fastExitAll(
-        token.address
-      )
-    )
+    const value = logAmount(token.balance, token.decimals)
+    const valid = setAmount(value)
 
-    if (res) {
-      dispatch(
-          openAlert(
-            `${token.symbol} was bridged. You will receive
-            ${receivableAmount(value)} ${token.symbol} 
-            minus gas fees (if bridging ETH) on L1.`
-          )
+    if(valid) {
+      let res = await dispatch(
+        fastExitAll(
+          token.address
         )
-      handleClose()
+      )
+      if (res) {
+        dispatch(
+            openAlert(
+              `${token.symbol} was bridged. You will receive
+              ${receivableAmount(value)} ${token.symbol} 
+              minus gas fees (if bridging ETH) on L1.`
+            )
+          )
+        handleClose()
+      }
+    } else {
+      dispatch(
+        openError(
+          `You cannot currently fast bridge all of your ${token.symbol} due to insufficient liquidity ratio (of ${Number(LPRatio).toFixed(2)})
+          and/or insufficient pool balance (of ${Number(balanceSubPending).toFixed(2)}). Please reduce the amount you wish to exit 
+          to below ${Number(balanceSubPending).toFixed(2)*0.9} or use the classic bridge instead.`
+        )
+      )
     }
 
   }
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
+      console.log("Token:",token)
       dispatch(fetchL1LPBalance(token.addressL1))
       dispatch(fetchL1LPLiquidity(token.addressL1))
       dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
@@ -262,7 +285,9 @@ function DoExitStepFast({ handleClose, token }) {
           Fast Bridge to L1
         </Typography>
 
-        <Typography variant="body2" sx={{mb: 3}}>{feeLabel}</Typography>
+        <Typography variant="body2" sx={{mb: 3}}>
+          {feeLabel}. In most cases, a fast exit takes one hour or less. However, if Ethereum is congested, it can take as long as 3 hours.
+        </Typography>
 
         <Input
           label={`Amount to bridge to L1`}
