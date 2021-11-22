@@ -29,16 +29,22 @@ def watcher_getL2PendingExits(event, context):
   with con:
     try:
       cur = con.cursor()
-      cur.execute("""SELECT hash, blockHash, blockNumber, exitSender, exitTo, exitToken, exitAmount,
-        exitReceive, fastRelay, status FROM exitL2 WHERE status=%s""", ('pending'))
+      cur.execute("""SELECT exitL2.hash, exitL2.blockHash, exitL2.blockNumber,
+        exitSender, exitTo, exitToken, exitAmount, exitReceive, fastRelay, status,
+        block.timestamp
+        FROM exitL2
+        LEFT JOIN block
+        on exitL2.blockNumber = block.blockNumber
+        WHERE status=%s""", ('pending')
+      )
       payload = cur.fetchall()
       for eachPayload in payload:
-        [txHash, blockHash, blockNumber, exitSender, exitTo, exitToken, exitAmount, exitReceive, fastRelay, status] = eachPayload
+        [txHash, blockHash, blockNumber, exitSender, exitTo, exitToken, exitAmount, exitReceive, fastRelay, status, timestamp] = eachPayload
         exitPayload.append({
           "hash": txHash, "blockHash": blockHash, "blockNumber": blockNumber,
           "exitSender": exitSender, "exitTo": exitTo, "exitToken": exitToken,
           "exitAmount": exitAmount, "exitReceive": exitReceive, "fastRelay": fastRelay,
-          "status": status
+          "status": status, "timestamp": timestamp
         })
     except Exception as e:
       statusCode = 500
