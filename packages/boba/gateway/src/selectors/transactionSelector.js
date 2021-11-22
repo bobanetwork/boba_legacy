@@ -11,13 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 export function selectTransactions (state) {
-  return Object.values(state.transaction);
+  return Object.values(state.transaction)
 }
 
 export function selectErc20Deposits (state) {
-  return Object.values(state.deposit.erc20);
+  return Object.values(state.deposit.erc20)
 }
 
 export function selectEthDeposits (state) {
-  return Object.values(state.deposit.eth);
+  return Object.values(state.deposit.eth)
 }

@@ -13,28 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export function selectModalState (modal) {
-  return function (state) {
-    return state.ui[modal]
+import { keyBy } from 'lodash'
+
+const initialState = {
+  sevens: {}
+}
+
+function dataReducer (state = initialState, action) {
+  switch (action.type) {
+    case 'SEVENS/GETALL/SUCCESS':
+      return { 
+        sevens: {
+          ...state.sevens, 
+          ...keyBy(action.payload, 'blockNumber', 'hash') 
+        }
+      }
+    default:
+      return state
   }
 }
 
-export function selectAlert (state) {
-  return state.ui.alert
-}
-
-export function selectError (state) {
-  return state.ui.error
-}
-
-export function selectLedger (state) {
-  return state.ui.ledger
-}
-
-export function selectActiveHistoryTab (state) {
-  return state.ui.activeHistoryTab
-}
-
-export function selectActiveDataTab (state) {
-  return state.ui.activeDataTab
-}
+export default dataReducer
