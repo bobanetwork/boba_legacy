@@ -60,3 +60,11 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `L1_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 1 (Ethereum) node. |
 | `L2_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 2 (Optimism) node. |
 | `MONITORING_RECONNECT_SECS` | No | 15 | Time (in second) to wait for reconnecting after network is disconnected. |
+| `RDS_ENDPOINT`              | Yes | N/A | HTTP endpoint of MySQL for TX Log. |
+| `RDS_MYSQL_NAME`            | Yes | N/A | MySQL username for TX Log. |
+| `RDS_MYSQL_PASSWORD`        | Yes | N/A | MySQL password for TX Log. |
+| `RDS_DBNAME_TX`             | Yes | N/A | MySQL database name for TX Log. |
+| `RDS_DBNAME_RECEIPT`        | Yes | N/A | MySQL database name for Receipt Log. |
+| `LOG_START_TIME`            | Yes | N/A | Starting block number for TX log |
+| `RECEIPT_START_TIME`        | Yes | N/A | Starting block number for Receipt log |
+| `IS_LOG_TX`                 | Yes | N/A | set to `true` if you want to log tx and receipt |
