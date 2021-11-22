@@ -57,11 +57,11 @@ function Seven({
 
   if( overdue > 0) {
     if(hoursAgo <= 1)
-      timeLabel = `Funds will exit soon. The 7 day window just passed. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window just passed. Now waiting for Ethereum gas to dip below 120 Gwei.`
     else if(hoursAgo <= 2)
-      timeLabel = `Funds will exit soon. The 7 day window recently passed. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window recently passed. Now waiting for Ethereum gas to dip below 120 Gwei.`
     else if(hoursAgo > 2)
-      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago. Now waiting for Ethereum gas to dip below 120 Gwei.`
   }
 
   return (
