@@ -22,6 +22,8 @@ import store from 'store'
 import { orderBy } from 'lodash'
 import BN from 'bn.js'
 
+import { logAmount } from 'util/amountConvert'
+
 import { getToken } from 'actions/tokenAction'
 
 import {
@@ -1115,6 +1117,31 @@ class NetworkService {
       console.log("NS: getL2FeeBalance error:",error)
       return error
     }
+  }
+
+  async getGas() {
+
+    try {
+      const gasPrice2 = await this.L2Provider.getGasPrice()
+      console.log("L2 gas", gasPrice2.toString())
+
+      const gasPrice1 = await this.L1Provider.getGasPrice()
+      console.log("L1 gas", gasPrice1.toString())
+
+      const gasData = {
+        gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
+        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0)
+      }
+
+      console.log(gasData)
+
+      return gasData
+    } catch (error) {
+      console.log("NS: getGas error:",error)
+      return error
+    }
+
+
   }
 
   async getBalances() {

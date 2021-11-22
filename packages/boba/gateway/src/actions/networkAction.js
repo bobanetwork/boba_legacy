@@ -20,6 +20,10 @@ export function fetchBalances() {
   return createAction('BALANCE/GET', () => networkService.getBalances())
 }
 
+export function fetchGas() {
+  return createAction('GAS/GET', () => networkService.getGas())
+}
+
 export function addTokenList() {
   console.log("addTokenList")
   return createAction('TOKENLIST/GET', () => networkService.addTokenList())
