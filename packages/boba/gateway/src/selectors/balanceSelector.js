@@ -60,6 +60,10 @@ export function selectFastExitCost (state) {
   return state.balance.fastExitCost
 }
 
+export function selectClassicExitCost (state) {
+  return state.balance.classicExitCost
+}
+
 export function selectFastDepositCost (state) {
   return state.balance.fastDepositCost
 }

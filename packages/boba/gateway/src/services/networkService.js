@@ -44,6 +44,7 @@ import {
 import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
+import DiscretionaryExitBurnJson from '../deployment/contracts/DiscretionaryExitBurn.json'
 
 //OMGX LP contracts
 import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
@@ -523,6 +524,7 @@ class NetworkService {
       if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
+      if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
@@ -1123,24 +1125,23 @@ class NetworkService {
 
     try {
       const gasPrice2 = await this.L2Provider.getGasPrice()
-      console.log("L2 gas", gasPrice2.toString())
+      //console.log("L2 gas", gasPrice2.toString())
 
       const gasPrice1 = await this.L1Provider.getGasPrice()
-      console.log("L1 gas", gasPrice1.toString())
+      //console.log("L1 gas", gasPrice1.toString())
 
       const gasData = {
         gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
         gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0)
       }
 
-      console.log(gasData)
+      //console.log(gasData)
 
       return gasData
     } catch (error) {
       console.log("NS: getGas error:",error)
       return error
     }
-
 
   }
 
@@ -1684,41 +1685,113 @@ class NetworkService {
 
     updateSignatureStatus_exitTRAD(false)
 
-    //now coming in as a value_Wei_String
-    const value = BigNumber.from(value_Wei_String)
+    try {
+      //now coming in as a value_Wei_String
+      const value = BigNumber.from(value_Wei_String)
 
-    const allowance = await this.checkAllowance(
-      currencyAddress,
-      allAddresses.L2StandardBridgeAddress
-    )
-
-    //no need to approve L2 ETH
-    if( currencyAddress !== allAddresses.L2_ETH_Address && allowance.lt(value) ) {
-      const res = await this.approveERC20(
-        value_Wei_String,
+      const allowance = await this.checkAllowance(
         currencyAddress,
-        this.L2StandardBridgeAddress
+        allAddresses.DiscretionaryExitBurn
       )
-      if (!res) return false
+
+      //no need to approve L2 ETH
+      if( currencyAddress !== allAddresses.L2_ETH_Address && allowance.lt(value) ) {
+        const res = await this.approveERC20(
+          value_Wei_String,
+          currencyAddress,
+          allAddresses.DiscretionaryExitBurn
+        )
+        if (!res) return false
+      }
+
+      /*
+      const estimatedGas = await ExitBurn.estimateGas.burnAndWithdraw(
+        L2ERC20.address,
+        utils.parseEther('10'),
+        9999999,
+        ethers.utils.formatBytes32String(new Date().getTime().toString())
+      )
+      */
+
+      const DiscretionaryExitBurnContract = new ethers.Contract(
+        allAddresses.DiscretionaryExitBurn,
+        DiscretionaryExitBurnJson.abi,
+        this.provider.getSigner()
+      )
+      console.log("DiscretionaryExitBurnContract",DiscretionaryExitBurnContract)
+
+      const tx = await DiscretionaryExitBurnContract.burnAndWithdraw(
+        currencyAddress,
+        value_Wei_String,
+        this.L1GasLimit,
+        utils.formatBytes32String(new Date().getTime().toString())
+      )
+
+      //everything submitted... waiting
+      await tx.wait()
+
+      //can close window now
+      updateSignatureStatus_exitTRAD(true)
+
+      const [L2ToL1msgHash] = await this.watcher.getMessageHashesFromL2Tx(tx.hash)
+      console.log(' got L2->L1 message hash', L2ToL1msgHash)
+
+      return tx
+    } catch (error) {
+      console.log("NS: exitBOBA error:", error)
+      return error
     }
 
-    const tx = await this.L2StandardBridgeContract.withdraw(
-      currencyAddress,
-      value_Wei_String,
-      this.L1GasLimit,
-      utils.formatBytes32String(new Date().getTime().toString())
+  }
+
+  /* Estimate cost of Classical Exit to L1 */
+  async getExitCost(currencyAddress) {
+
+    let approvalCost_BN = BigNumber.from('0')
+
+    const gasPrice = await this.L2Provider.getGasPrice()
+    console.log("Classical exit gas price", gasPrice.toString())
+
+    if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+
+      const ERC20Contract = new ethers.Contract(
+        currencyAddress,
+        L2ERC20Json.abi, //any old abi will do...
+        this.provider.getSigner()
+      )
+
+      const tx = await ERC20Contract.populateTransaction.approve(
+        allAddresses.DiscretionaryExitBurn,
+        utils.parseEther('1.0')
+      )
+
+      const approvalGas_BN = await this.L2Provider.estimateGas(tx)
+      approvalCost_BN = approvalGas_BN.mul(gasPrice)
+      console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+    }
+
+    const DiscretionaryExitBurnContract = new ethers.Contract(
+      allAddresses.DiscretionaryExitBurn,
+      DiscretionaryExitBurnJson.abi,
+      this.provider.getSigner()
     )
+    
+    const tx2 = await DiscretionaryExitBurnContract.populateTransaction.burnAndWithdraw(
+      allAddresses.L2_ETH_Address,
+      utils.parseEther('1.0'),
+      this.L1GasLimit,
+      ethers.utils.formatBytes32String(new Date().getTime().toString()),
+      { value: utils.parseEther('1.0') }
+    )
+    
+    const gas_BN = await this.L2Provider.estimateGas(tx2)
+    console.log("Classical exit gas", gas_BN.toString())
 
-    //everything submitted... waiting
-    await tx.wait()
+    const cost_BN = gas_BN.mul(gasPrice)
+    console.log("Classical exit cost (ETH):", utils.formatEther(cost_BN))
 
-    //can close window now
-    updateSignatureStatus_exitTRAD(true)
-
-    const [L2ToL1msgHash] = await this.watcher.getMessageHashesFromL2Tx(tx.hash)
-    console.log(' got L2->L1 message hash', L2ToL1msgHash)
-
-    return tx
+    //returns total cost in ETH
+    return utils.formatEther(cost_BN.add(approvalCost_BN))
   }
 
   /***********************************************/
