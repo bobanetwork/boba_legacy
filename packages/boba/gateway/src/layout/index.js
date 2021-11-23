@@ -34,13 +34,13 @@ import { isChangingChain } from 'util/changeChain';
 import * as styles from './layout.module.scss';
 import * as S from './layout.style';
 
-
 function App () {
-  const dispatch = useDispatch();
-  const theme = useSelector(selectModalState('theme'));
-  const light = theme === 'light';
 
-  const [ enabled, setEnabled ] = useState(false);
+  const dispatch = useDispatch()
+  const theme = useSelector(selectModalState('theme'))
+  const light = theme === 'light'
+
+  const [ enabled, setEnabled ] = useState(false)
 
   let MUItheme = createTheme({
     palette: {
