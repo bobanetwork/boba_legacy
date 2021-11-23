@@ -1,4 +1,8 @@
-# Overall Setup
+# Running the Boba stack locally
+
+## Basics
+
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
@@ -6,16 +10,34 @@ Clone the repository, open it, and install nodejs packages with `yarn`:
 $ git clone git@github.com:omgnetwork/optimism-v2.git
 $ cd optimism-v2
 $ yarn clean
-$ yarn install
+$ yarn
 $ yarn build
 ```
 
-Build and run the entire stack:
+Then, make sure you have Docker installed _and make sure Docker is running_. Finally, build and run the entire stack:
 
 ```bash
 $ cd ops
 $ BUILD=1 DAEMON=0 ./up_local.sh
 ```
+
+## Spinning up the stack
+
+Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. 
+
+You can either inspect the Docker Dashboard>Containers/All>Ops _or_ you can run this script to wait for the sequencer to be fully up:
+
+```bash
+./scripts/wait-for-sequencer.sh
+```
+
+If the command returns with no log output, the sequencer is up. Once the sequencer is up, you can inspect the Docker `Dashboard>Containers/All>Ops` for the `ops_boba_deployer` _or_ you can run the following script to wait for all the boba contracts (e.g. the fast message relay system) to be fully up and deployed:
+
+```bash
+./scripts/wait-for-boba.sh
+```
+
+When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
 Helpful commands:
 
@@ -34,8 +56,10 @@ yarn test
 
 ### Running integration tests
 
+Make sure you are in the `ops` folder and then run
+
 ```bash
-cd integration-tests
-yarn build:integration
-yarn test:integration
+docker-compose run integration_tests
 ```
+
+Expect the full test suite to complete in between *30 minutes* to *two hours* depending on your computer hardware. 
