@@ -44,11 +44,13 @@ def watcher_getL1Airdrop(event, context):
       payload = cur.fetchall()
       if len(payload) == 1:
         [address, amount, claimed, claimedTimestamp, claimImmediate, claimUnlockTime, index, hexAmount, proof ] = payload[0]
+        if proof == None: proofBody = None
+        else: proofBody = json.loads(proof)
         airdropPayload = {
           "address" : address, "amount": amount, "claimed": claimed,
           "claimedTimestamp": claimedTimestamp, "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
-            "index": index, "amount": hexAmount, "proof": json.loads(proof)
+            "index": index, "amount": hexAmount, "proof": proofBody
           },
           "network": "mainnet"
         }

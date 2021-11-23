@@ -22,6 +22,7 @@ import useInterval from 'util/useInterval';
 
 import {
   fetchBalances,
+  fetchGas,
   addTokenList,
   fetchNFTs,
   fetchExits
@@ -148,6 +149,7 @@ function Home () {
     dispatch(fetchDaoVotes())
     dispatch(fetchDaoProposals())
     dispatch(getProposalThreshold())
+    dispatch(fetchGas())
   }, POLL_INTERVAL)
 
   useEffect(() => {

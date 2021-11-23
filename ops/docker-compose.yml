@@ -99,6 +99,22 @@ x-integration_3_pk: &integration_3_pk
 version: "3"
 
 services:
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
+  #   command:
+  #     - --save ""
+  #     - --appendonly no
+  #make sure you setup proxyd.toml
+  # proxyd:
+  #   ports:
+  #     - 8081:8080
+  #   depends_on:
+  #     - redis
+  #   image: proxyd:latest
+  #   volumes:
+  #     - ../go/proxyd:/etc/proxyd/
   # base service builder
   builder:
     image: bobanetwork/builder:latest
@@ -208,7 +224,6 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
-        GET_LOGS_RANGE_LIMIT: 5000
         ETH1_HTTP: http://l1_chain:8545
         ROLLUP_TIMESTAMP_REFRESH: 5s
         ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json

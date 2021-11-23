@@ -31,7 +31,7 @@ def watcher_initiateL1Airdrop(event, context):
   statusCode = 201
   with con:
     try:
-      unixTime = int(time.time()) + 30 * 60 * 60
+      unixTime = int(time.time()) + 30 * 24 * 60 * 60
       cur = con.cursor()
       cur.execute("""UPDATE airdropL1
         SET claimUnlockTime=%s WHERE address=%s AND claimUnlockTime is NULL AND claimed=%s

@@ -51,17 +51,17 @@ function Seven({
   const secondsAgo = Math.round(Date.now() / 1000) - unixTime
   const daysAgo = Math.floor(secondsAgo / (3600 * 24))
   const hoursAgo = Math.round((secondsAgo % (3600 * 24)) / 3600)
-  let timeLabel = `Exit was started ${daysAgo} days and ${daysAgo} hours ago.`
+  let timeLabel = `Exit was started ${daysAgo} days and ${hoursAgo} hours ago.`
 
   const overdue = secondsAgo - (7*24*60*60)
 
   if( overdue > 0) {
     if(hoursAgo <= 1)
-      timeLabel = `Funds will exit soon. The 7 day window just passed. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window just passed. Waiting for Ethereum gas to dip below 120 Gwei.`
     else if(hoursAgo <= 2)
-      timeLabel = `Funds will exit soon. The 7 day window recently passed. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window recently passed. Waiting for Ethereum gas to dip below 120 Gwei.`
     else if(hoursAgo > 2)
-      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago. Now waiting for Ethereum gas to dip below 90 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago. Waiting for Ethereum gas to dip below 120 Gwei.`
   }
 
   return (
