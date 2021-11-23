@@ -798,6 +798,8 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	// Note that Ethereum Layer one consensus rules dictate that the timestamp
 	// must be strictly increasing between blocks, so no need to check both the
 	// timestamp and the blocknumber.
+	ts := s.GetLatestL1Timestamp()
+ 	bn := s.GetLatestL1BlockNumber()
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
