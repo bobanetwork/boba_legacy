@@ -30,7 +30,6 @@ import networkService from 'services/networkService'
 import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
-import { tableHeadList } from './tableHeadList'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
@@ -188,8 +187,8 @@ class Farm extends React.Component {
             <S.GridItemTag item xs={10} md={10}>
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
                 The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                {' '}<span style={{ fontWeight: '700' }}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
-                {' '}<span style={{ fontWeight: '700' }}>BALANCE</span> refers to the amount of funds currently in each pool.
+                {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
+                {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
               </Typography>
             </S.GridItemTag>
 
@@ -306,13 +305,15 @@ class Farm extends React.Component {
 
           {!isMobile ? (
             <S.TableHeading>
-              {tableHeadList.map((item) => {
-                return (
-                  <S.TableHeadingItem key={item.label} variant="body2" component="div">
-                    {item.label}
-                  </S.TableHeadingItem>
-                )
-              })}
+              <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">APR %</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>
+              </S.GridItemTagContainer>
             </S.TableHeading>
           ) : (null)}
 
