@@ -1,5 +1,12 @@
 # Running the Boba stack locally
 
+- [Running the Boba stack locally](#running-the-boba-stack-locally)
+  * [Basics](#basics)
+  * [Spinning up the stack](#spinning-up-the-stack)
+    + [Helpful commands](#helpful-commands)
+    + [Running unit tests](#running-unit-tests)
+    + [Running integration tests](#running-integration-tests)
+    
 ## Basics
 
 **Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
@@ -23,15 +30,13 @@ $ BUILD=1 DAEMON=0 ./up_local.sh
 
 ## Spinning up the stack
 
-Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. 
-
-You can either inspect the Docker Dashboard>Containers/All>Ops _or_ you can run this script to wait for the sequencer to be fully up:
+Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. Recommended settings - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
 ```bash
 ./scripts/wait-for-sequencer.sh
 ```
 
-If the command returns with no log output, the sequencer is up. Once the sequencer is up, you can inspect the Docker `Dashboard>Containers/All>Ops` for the `ops_boba_deployer` _or_ you can run the following script to wait for all the boba contracts (e.g. the fast message relay system) to be fully up and deployed:
+If the command returns with no log output, the sequencer is up. Once the sequencer is up, you can inspect the Docker `Dashboard>Containers/All>Ops` for the progress of `ops_boba_deployer` _or_ you can run the following script to wait for all the Boba contracts (e.g. the fast message relay system) to be deployed and up:
 
 ```bash
 ./scripts/wait-for-boba.sh
@@ -39,7 +44,7 @@ If the command returns with no log output, the sequencer is up. Once the sequenc
 
 When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
-Helpful commands:
+### Helpful commands
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
