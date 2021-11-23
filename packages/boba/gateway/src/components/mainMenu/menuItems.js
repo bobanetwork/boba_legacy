@@ -12,6 +12,12 @@ export const menuItems = [
     url: "/history"
   },
   {
+    key: 'BobaScope',
+    icon: "SearchIcon",
+    title: "System Analytics",
+    url: "/bobascope"
+  },
+  {
     key: 'Farm',
     icon: "EarnIcon",
     title: "Earn",
