@@ -173,6 +173,7 @@ class ListFarm extends React.Component {
     // networkService.L1OrL2 L1 || L2
     const disabled = !L1orL2Pool.includes(networkService.L1orL2)
     const symbol = poolInfo.symbol
+    const name = poolInfo.name
     const decimals = poolInfo.decimals
     let logo = getCoinImage(symbol)
 
@@ -205,36 +206,63 @@ class ListFarm extends React.Component {
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <S.GridContainer container spacing={2} direction="row" justifyContent="center" alignItems="center" >
+          <S.GridContainer container 
+            spacing={2} 
+            direction="row" 
+            justifyContent="flex-start" 
+            alignItems="center"
+          >
 
-            <S.GridItemTag item xs={4} md={2}>
-                <img src={logo} alt="logo" width={30} />
-                <Typography variant="overline">{symbol}</Typography>
+            <S.GridItemTag item 
+            xs={4} 
+            md={2} 
+            style={{
+              justifyContent: 'flex-start', 
+              alignItems:'center', 
+            }}>
+              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                <img src={logo} alt="logo" width={35} height={35} />
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
+                  <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
+                  <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
+                </div>
+              </div>
             </S.GridItemTag>
 
-            <S.GridItemTag item xs={4} md={2}>
+            <S.GridItemTag item 
+              xs={4} 
+              md={2}
+              >
               {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7}}>Earned</Typography>
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Balance</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userReward ? `${logAmount(userReward, decimals, 2)}` : `0`}
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item xs={4} md={2}>
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7}}>Your Stake</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-                {userInfo.amount ?
-                  `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                {poolInfo.tokenBalance ?
+                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
                 }
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item xs={4} md={2}>
+            <S.GridItemTag item 
+              xs={4} 
+              md={2}
+              >
               {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7}}>APR %</Typography>
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Liquidity</Typography>
+              ) : (null)}
+              <Typography variant="body1" style={{opacity: '0.4'}}>
+                {poolInfo.userDepositAmount ?
+                  `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
+                }
+              </Typography>
+            </S.GridItemTag>
+
+            <S.GridItemTag item 
+              xs={3} 
+              md={1}
+            >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>APR %</Typography>
               ) : (null)}
               <Typography variant="body1">
                 {userInfo.amount ?
@@ -243,21 +271,36 @@ class ListFarm extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item xs={4} md={2}>
+            <S.GridItemTag item 
+              xs={3} 
+              md={1}
+            >
               {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7}}>Liquidity (Balance)</Typography>
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Your Stake</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {poolInfo.userDepositAmount ?
-                  `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
-                }{' ('}
-                {poolInfo.tokenBalance ?
-                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
-                })
+                {userInfo.amount ?
+                  `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                }
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item xs={12} md={2}>
+            <S.GridItemTag item 
+              xs={3} 
+              md={1}
+              >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
+              ) : (null)}
+              <Typography variant="body1">
+                {userReward ? `${logAmount(userReward, decimals, 2)}` : `0`}
+              </Typography>
+            </S.GridItemTag>
+
+            <S.GridItemTag item 
+              xs={3} 
+              md={1}
+            >
               <Box
                 disabled={disabled}
                 onClick={()=>{this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false })}}
