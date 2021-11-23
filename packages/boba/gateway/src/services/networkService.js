@@ -133,7 +133,7 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts 
+    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts
     // "param _l1Gas Unused, but included for potential forward compatibility considerations"
     this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
@@ -254,7 +254,7 @@ class NetworkService {
 
     console.log("getAirdropL2(callData)",callData)
     console.log("this.account:",this.account)
-    
+
     //Interact with contract
     const airdropContract = new ethers.Contract(
       allAddresses.BobaAirdropL2,
@@ -265,11 +265,11 @@ class NetworkService {
     console.log("airdropContract.address:", airdropContract.address)
 
     try {
-      
+
       //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
       let claim = await airdropContract.claim(
         callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address 
+        this.account,                //wallet address
         callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
         callData.merkleProof.proof   //proof1
       )
@@ -277,7 +277,7 @@ class NetworkService {
       await claim.wait()
 
       //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just 
+      //success of this this call has no bearing on the airdrop itself, since the api is just
       //used for user status updates etc.
       //send.l2.airdrop
       const response = await omgxWatcherAxiosInstance(
@@ -576,7 +576,7 @@ class NetworkService {
                           //'FRAX', 'FXS', 'UST',
                           //'BUSD', 'BNB', 'FTM',  'MATIC'
                         ]
-      }     
+      }
 
       await Promise.all(supportedTokens.map(async (key) => {
 
@@ -1167,6 +1167,7 @@ class NetworkService {
         {
           address: allAddresses.L2_ETH_Address,
           addressL1: allAddresses.L1_ETH_Address,
+          addressL2: allAddresses.L2_ETH_Address,
           currency: allAddresses.L1_ETH_Address,
           symbol: 'ETH',
           decimals: 18,
@@ -1442,10 +1443,10 @@ class NetworkService {
         )
         console.log("Initial allowance:",allowance_BN)
 
-        /* 
-        OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
-        set to actual amount, unless current approval amount is equal to, or 
-        bigger than, the current approval value 
+        /*
+        OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then
+        set to actual amount, unless current approval amount is equal to, or
+        bigger than, the current approval value
         */
         if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
@@ -1517,10 +1518,10 @@ class NetworkService {
       )
       console.log("Initial Allowance is:",allowance_BN)
 
-      /* 
-      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
-      set to actual amount, unless current approval amount is equal to, or 
-      bigger than, the current approval value 
+      /*
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then
+      set to actual amount, unless current approval amount is equal to, or
+      bigger than, the current approval value
       */
       if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
@@ -1579,10 +1580,10 @@ class NetworkService {
     )
 
     try {
-      /* 
-      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then 
-      set to actual amount, unless current approval amount is equal to, or 
-      bigger than, the current approval value 
+      /*
+      OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then
+      set to actual amount, unless current approval amount is equal to, or
+      bigger than, the current approval value
       */
       if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
@@ -1724,7 +1725,9 @@ class NetworkService {
         currencyAddress,
         value_Wei_String,
         this.L1GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString())
+        utils.formatBytes32String(new Date().getTime().toString()),
+        currencyAddress === allAddresses.L2_ETH_Address ?
+          { value: value_Wei_String } : {}
       )
 
       //everything submitted... waiting
@@ -1775,15 +1778,15 @@ class NetworkService {
       DiscretionaryExitBurnJson.abi,
       this.provider.getSigner()
     )
-    
+
     const tx2 = await DiscretionaryExitBurnContract.populateTransaction.burnAndWithdraw(
       allAddresses.L2_ETH_Address,
-      utils.parseEther('1.0'),
+      utils.parseEther('0.00001'),
       this.L1GasLimit,
       ethers.utils.formatBytes32String(new Date().getTime().toString()),
-      { value: utils.parseEther('1.0') }
+      { value: utils.parseEther('0.00001') }
     )
-    
+
     const gas_BN = await this.L2Provider.estimateGas(tx2)
     console.log("Classical exit gas", gas_BN.toString())
 
@@ -2198,7 +2201,7 @@ class NetworkService {
     console.log("L1pending",L1pending)
 
     const pendingFast = L1pending.data.filter(i => {
-       return (i.fastRelay === 1) && //fast exit 
+       return (i.fastRelay === 1) && //fast exit
         i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
     })
 
@@ -2246,7 +2249,7 @@ class NetworkService {
     }
 
     console.log("L1LPBalance(tokenAddress):",balance.toString())
-    
+
     return balance.toString()
 
   }
@@ -2315,7 +2318,7 @@ class NetworkService {
       console.log("NS: L2LPLiquidity error:", error)
       return error
     }
-    
+
   }
 
   /* Estimate cost of Fast Exit to L1 */
