@@ -113,7 +113,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     this.logger.info('Connecting to Proxy__L1StandardBridge...')
     const Proxy__L1StandardBridgeAddress =
       await this.state.Lib_AddressManager.getAddress('Proxy__L1StandardBridge')
-    this.state.Proxy__L1LiquidityPool = new Contract(
+    this.state.Proxy__L1StandardBridge = new Contract(
       Proxy__L1StandardBridgeAddress,
       L1StandardBridgeJson.abi,
       this.options.l1RpcProvider
