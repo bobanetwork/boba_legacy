@@ -258,7 +258,9 @@ describe('Standard Exit burn', async () => {
 
       const postBalanceExitorL1 = await env.l1Wallet.getBalance()
       const postBalanceExitorL2 = await env.l2Wallet.getBalance()
-      const ExitBurnContractBalance = await L2ERC20.balanceOf(ExitBurn.address)
+      const ExitBurnContractBalance = await env.l2Provider.getBalance(
+        ExitBurn.address
+      )
 
       expect(postBalanceExitorL2).to.be.lt(preBalanceExitorL2.sub(exitAmount))
       const expectedGas = preBalanceExitorL2
