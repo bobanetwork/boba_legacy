@@ -66,6 +66,8 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
+  multiRelayLimit?: number
+
   resubmissionTimeout?: number
 
   maxWaitTxTimeS: number
@@ -107,6 +109,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     timeOfLastRelayS: number
     messageBuffer: Array<BatchMessage>
     timeOfLastPendingRelay: any
+    didWork: boolean
   }
 
   protected async _init(): Promise<void> {
@@ -210,13 +213,14 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
+      if (! this.state.didWork) {
+        await sleep(this.options.pollingInterval)
+      }
+      this.state.didWork = false
+
       await this._getFilter()
 
       try {
-        // The message is relayed directly, no need to keep cache
-        this.state.eventCache = []
-
         // Check that the correct address is set in the address manager
         const relayer = await this.state.Lib_AddressManager.getAddress(
           'OVM_L2MessageRelayer'
@@ -272,6 +276,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           pendingTXTimeOut
         ) {
           if (gasPriceAcceptable) {
+            this.state.didWork = true
             if (bufferFull) {
               console.log('Buffer full: flushing')
             }
@@ -279,29 +284,58 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               console.log('Buffer timeout: flushing')
             }
 
-            // Confirm that the the message was actually relayed to L1
-            // If so, clear buffer
-            if (
-              await this._wereMessagesRelayed(
-                this.state.messageBuffer.reduce((acc, cur) => {
-                  acc.push(cur.message)
-                  return acc
-                }, [])
-              )
-            ) {
-              // Clear the buffer so we do not double relay, which will just
-              // waste gas
-              this.state.messageBuffer = []
+            // Filter out messages which have been processed
+            let newMB = []
+            for (const cur of this.state.messageBuffer) {
+              if (
+                !(await this._wasMessageRelayed(cur.message)) &&
+                !(await this._wasMessageFailed(cur.message))
+              ) {
+                newMB.push(cur)
+              }
+            }
+            this.state.messageBuffer = newMB
+
+            if (this.state.messageBuffer.length === 0) {
               this.state.timeOfLastPendingRelay = false
             } else {
+              // Limit the number of messages to be submitted per batch.
+              const subBuffer = this.state.messageBuffer.slice(
+                0,
+                this.options.multiRelayLimit
+              )
+
               const receipt = await this._relayMultiMessageToL1(
-                this.state.messageBuffer.reduce((acc, cur) => {
+                subBuffer.reduce((acc, cur) => {
                   acc.push(cur.payload)
                   return acc
                 }, [])
               )
 
-              console.log('Receipt:', receipt)
+              if (!receipt) {
+                this.logger.error(
+                  'No receipt for relayMultiMessage transaction'
+                )
+              } else if (receipt.status == 1) {
+                this.logger.info('Successful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              } else {
+                this.logger.warning('Unsuccessful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              }
+
               // add a delay between two tx
               this.state.timeOfLastPendingRelay = Date.now()
             }
@@ -337,6 +371,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             continue
           }
 
+          this.state.didWork = true
           this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
           while (
             await this._isTransactionFinalized(
@@ -508,7 +543,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
       this.logger.info('Querying events', {
         startingBlock,
-        endBlock: startingBlock + this.options.getLogsInterval,
+        endBlock,
       })
 
       const events: ethers.Event[] =
@@ -519,7 +554,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         )
 
       const ebn = []
-      events.forEach(e => {
+      events.forEach((e) => {
         ebn.push(e.blockNumber)
       })
       this.logger.info('Queried Events', { startingBlock, endBlock, ebn })
@@ -854,7 +889,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       10
     )
   }
-  
+
   /* The filter makes sure that the message-relayer-fast only handles message traffic 
      intended for it
   */
