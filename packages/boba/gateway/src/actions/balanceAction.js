@@ -17,8 +17,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import networkService from 'services/networkService';
-import { createAction } from './createAction';
+import networkService from 'services/networkService'
+import { createAction } from './createAction'
 
 export function fetchL1LPBalance(address) {
     return createAction('FETCH/L1LP/BALANCE', () => networkService.L1LPBalance(address))
@@ -54,6 +54,10 @@ export function fetchL2TotalFeeRate() {
 
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))
+}
+
+export function fetchClassicExitCost(address) {
+    return createAction('FETCH/CLASSICEXIT/COST', () => networkService.getExitCost(address))
 }
 
 export function fetchFastDepositCost(address) {
