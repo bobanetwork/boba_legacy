@@ -248,7 +248,7 @@ class ListFarm extends React.Component {
               md={2}
               >
               {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Total Staked</Typography>
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Liquidity</Typography>
               ) : (null)}
               <Typography variant="body1" style={{opacity: '0.4'}}>
                 {poolInfo.userDepositAmount ?
