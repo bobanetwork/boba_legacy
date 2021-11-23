@@ -843,6 +843,7 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
  	})
 	// Block until the transaction has been added to the chain
 	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
+	
 	select {
  	case err := <-errCh:
  		log.Error("Got error waiting for transaction to be added to chain", "msg", err)
