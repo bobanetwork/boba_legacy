@@ -76,6 +76,7 @@ services:
       dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
       L1_NODE_WEB3_URL: ${L1_RPC_ENDPOINT}
+      L1_CONFIRMATIONS: 8
       L2_NODE_WEB3_URL: ${L2_RPC_ENDPOINT}
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier_l2geth:8545

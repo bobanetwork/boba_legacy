@@ -24,6 +24,7 @@ logger.setLevel(logging.DEBUG)
 #logger.addHandler(logging.StreamHandler())
 
 logger.debug (os.environ['L1_NODE_WEB3_URL'])
+logger.debug (os.environ['L1_CONFIRMATIONS'])
 logger.debug (os.environ['L2_NODE_WEB3_URL'])
 logger.debug (os.environ['VERIFIER_WEB3_URL'])
 logger.debug (os.environ['ADDRESS_MANAGER_ADDRESS'])
@@ -31,6 +32,7 @@ logger.debug (os.environ['L1_DEPLOYMENT_BLOCK'])
 logger.debug (os.environ['L2_START_BLOCK'])
 logger.debug (os.environ['L2_CHECK_INTERVAL'])
 
+l1_confirmations = int(os.environ['L1_CONFIRMATIONS'])
 # These can be changed from the defaults to start at a previously verified
 # position in the chain, avoiding the need to replay many old blocks.
 # Element_start must be set to the L2 block number corresponding to the
@@ -182,7 +184,8 @@ def server_loop(ws):
   ws.serve_forever()
 
 def fpLoop():
-  l1_tip = rpc[1].eth.block_number
+  l1_tip = rpc[1].eth.block_number - l1_confirmations
+
   assert(l1_tip > l1_base)
   startBlock = l1_base
   logger.debug("SCC contract at {}, l1_base {}, l1_tip {}".format(scc_addr, l1_base, l1_tip))
@@ -195,54 +198,40 @@ def fpLoop():
     toBlock = min(startBlock+batch_size, l1_tip) - 1
     #print("Scanning from",startBlock,"to",toBlock)
 
-    FF = rpc[1].eth.filter({
+    batch = rpc[1].eth.getLogs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
       "topics":[topic_sig]
     })
 
-    for event in FF.get_all_entries():
+    for event in batch:
       doEvent(event, False)
-
-    rpc[1].eth.uninstall_filter(FF.filter_id)
 
     startBlock = toBlock + 1
     do_checkpoint()
 
   logger.debug("Caught up to L1 tip. Waiting for new events from startBlock " + str(startBlock))
-  FF = rpc[1].eth.filter({
-      "fromBlock":startBlock,
-      "toBlock":'latest',
-      "address":scc_addr,
-      "topics":[topic_sig]
-  })
 
   while True:
-    event_batch = []
-    try:
-      for event in FF.get_new_entries():
-        event_batch.append(event)
+    toBlock = rpc[1].eth.block_number - l1_confirmations
+    if startBlock > toBlock:
+      time.sleep(30)
+      continue
 
-      while len(event_batch) > 0:
-        event = event_batch.pop(0)
-        doEvent(event, (len(event_batch) == 0))
+    batch = rpc[1].eth.getLogs({
+      "fromBlock":startBlock,
+      "toBlock":toBlock,
+      "address":scc_addr,
+      "topics":[topic_sig]
+    })
 
-      do_checkpoint()
-    except Exception as e:
-      logger.error("get_new_entries() failed: " + str(e))
-      if "filter not found" in str(e):
-        logger.warning("Attempting to reinstall filter from checkpoint " + str(checkpoint))
-        rCount = checkpoint[0]
-        startBlock = checkpoint[1]
+    for event in batch:
+      doEvent(event, True)
 
-        FF = rpc[1].eth.filter({
-            "fromBlock":startBlock,
-            "toBlock":'latest',
-            "address":scc_addr,
-            "topics":[topic_sig]
-        })
-    time.sleep(30)
+    startBlock = toBlock + 1
+    do_checkpoint()
+
   logger.info("Exiting")
 
 ws = SimpleJSONRPCServer(('', 8555))
