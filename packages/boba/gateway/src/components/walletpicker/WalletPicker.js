@@ -112,21 +112,20 @@ function WalletPicker ({ onEnable, enabled }) {
     if (walletEnabled) {
       initializeAccounts()
     }
-  }, [ walletEnabled, masterConfig ]);
+  }, [ walletEnabled, masterConfig ])
 
   useEffect(() => {
     if (accountsEnabled) {
-      onEnable(true);
+      onEnable(true)
     }
-  }, [ onEnable, accountsEnabled ]);
+  }, [ onEnable, accountsEnabled ])
 
   useEffect(() => {
-    console.log([walletEnabled , wrongNetwork])
     if (walletEnabled && wrongNetwork) {
       dispatch(openModal('wrongNetworkModal'));
-      localStorage.setItem('changeChain', false);
+      localStorage.setItem('changeChain', false)
     }
-  }, [ dispatch, walletEnabled, wrongNetwork ]);
+  }, [ dispatch, walletEnabled, wrongNetwork ])
 
   function resetSelection () {
     dispatchSetWalletMethod(null)

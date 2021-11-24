@@ -20,7 +20,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash';
 
-import { getFarmInfo /*, getL1Fee, getL2Fee */} from 'actions/farmAction'
+import { getFarmInfo } from 'actions/farmAction'
 
 import ListFarm from 'components/listFarm/listFarm'
 import Tabs from 'components/tabs/Tabs'
@@ -30,7 +30,6 @@ import networkService from 'services/networkService'
 import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
-import { tableHeadList } from './tableHeadList'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
@@ -41,12 +40,8 @@ class Farm extends React.Component {
     super(props)
 
     const {
-      // totalL1FeeRate,
-      // userL1RewardFeeRate,
-      // totalL2FeeRate,
-      // userL2RewardFeeRate,
       poolInfo,
-      userInfo,
+      userInfo
     } = this.props.farm
 
     const {
@@ -64,10 +59,6 @@ class Farm extends React.Component {
     }
 
     this.state = {
-      // totalL1FeeRate,
-      // userL1RewardFeeRate,
-      // totalL2FeeRate,
-      // userL2RewardFeeRate,
       poolInfo,
       userInfo,
       layer1,
@@ -83,31 +74,12 @@ class Farm extends React.Component {
   }
 
   componentDidMount() {
-
-    // const { 
-    //   totalL1FeeRate, userL1RewardFeeRate,
-    //   totalL2FeeRate, userL2RewardFeeRate  
-    // } = this.props.farm
-
-    // if (!totalL1FeeRate || !userL1RewardFeeRate) {
-    //   this.props.dispatch(getL1Fee())
-    // }
-
-    // if (!totalL2FeeRate || !userL2RewardFeeRate) {
-    //   this.props.dispatch(getL2Fee())
-    // }
-
-    //this.props.dispatch(getL1Fee())
-    //this.props.dispatch(getL2Fee())
     this.props.dispatch(getFarmInfo())
-
   }
 
   componentDidUpdate(prevState) {
 
     const {
-      // totalL1FeeRate, userL1RewardFeeRate,
-      // totalL2FeeRate, userL2RewardFeeRate 
       poolInfo,
       userInfo,
     } = this.props.farm
@@ -116,22 +88,6 @@ class Farm extends React.Component {
       layer1,
       layer2
     } = this.props.balance
-
-    // if (prevState.farm.totalL1FeeRate !== totalL1FeeRate) {
-    //   this.setState({ totalL1FeeRate })
-    // }
-
-    // if (prevState.farm.userL1RewardFeeRate !== userL1RewardFeeRate) {
-    //   this.setState({ userL1RewardFeeRate })
-    // }
-
-    // if (prevState.farm.totalL2FeeRate !== totalL2FeeRate) {
-    //   this.setState({ totalL2FeeRate })
-    // }
-
-    // if (prevState.farm.userL2RewardFeeRate !== userL2RewardFeeRate) {
-    //   this.setState({ userL2RewardFeeRate })
-    // }
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -231,8 +187,8 @@ class Farm extends React.Component {
             <S.GridItemTag item xs={10} md={10}>
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
                 The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                {' '}<span style={{ fontWeight: '700' }}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
-                {' '}<span style={{ fontWeight: '700' }}>BALANCE</span> refers to the amount of funds currently in each pool.
+                {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
+                {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
               </Typography>
             </S.GridItemTag>
 
@@ -349,13 +305,15 @@ class Farm extends React.Component {
 
           {!isMobile ? (
             <S.TableHeading>
-              {tableHeadList.map((item) => {
-                return (
-                  <S.TableHeadingItem key={item.label} variant="body2" component="div">
-                    {item.label}
-                  </S.TableHeadingItem>
-                )
-              })}
+              <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">APR %</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>
+              </S.GridItemTagContainer>
             </S.TableHeading>
           ) : (null)}
 

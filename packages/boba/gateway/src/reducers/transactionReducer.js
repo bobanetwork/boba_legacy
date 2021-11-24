@@ -32,4 +32,4 @@ function transactionReducer (state = initialState, action) {
   }
 }
 
-export default transactionReducer;
+export default transactionReducer

@@ -1,5 +1,5 @@
 import { styled } from '@material-ui/core/styles'
-import { Box, Grid } from '@material-ui/core';
+import { Box, Grid } from '@material-ui/core'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
@@ -13,21 +13,19 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   },
 }));
 
-
 export const GridContainer = styled(Grid)(({theme})=>({
   [theme.breakpoints.down('md')]:{
     justifyContent: 'flex-start'
   }
 }))
 
-
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
   display: 'flex',
   // flexDirection: `${!props.ismobile ? 'column' : 'column-reverse'}`,
-  flexDirection:  'column-reverse',
+  //flexDirection:  'column-reverse',
   alignItems: 'center',
   [theme.breakpoints.down('md')]:{
-    flexDirection:  'column',
+    //flexDirection:  'column',
     padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
   }
 }))
