@@ -32,8 +32,9 @@ services:
       RDS_DBNAME_RECEIPT: ${RDS_DBNAME_RECEIPT}
       LOG_START_TIME: ${LOG_START_TIME}
       RECEIPT_START_TIME: ${RECEIPT_START_TIME}
-      IS_LOG_TX: ${IS_LOG_TX}
+      ENABLE_TX_RESPONSE_TIME: ${ENABLE_TX_RESPONSE_TIME}
     labels:
       - "com.datadoghq.tags.env=production"
+      - "com.datadoghq.tags.env=mainnet"
       - "com.datadoghq.tags.service=boba-monitor"
       - "com.datadoghq.tags.version=production-v1"
