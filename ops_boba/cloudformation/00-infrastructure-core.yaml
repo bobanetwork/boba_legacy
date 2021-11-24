@@ -12,7 +12,7 @@ Parameters:
   Route53HostedZoneName:
     Description: The Route 53 zone to create
     Type: String
-    Default: dev-integration.omgx.network
+    Default: rinkeby.boba.network
 
 Metadata:
   AWS::CloudFormation::Interface:

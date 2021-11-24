@@ -40,7 +40,7 @@ Parameters:
   DomainName:
     Description: The domain for the Common Name of the wildcard certificate on the Load Balancer listener
     Type: String
-    Default: dev-integration.omgx.network
+    Default: rinkeby.boba.network
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -201,6 +201,10 @@ Resources:
         FromPort: 8020
         ToPort: 8020
         CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 10.0.0.0/8
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-External-LB"
@@ -208,7 +212,12 @@ Resources:
   LoadBalancerGraph:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      IpAddressType: dualstack
       Scheme: internet-facing
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '3600'
+      Type: application
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
       Subnets:

@@ -44,6 +44,7 @@ Resources:
                 Action:
                   - "ec2:AuthorizeSecurityGroupIngress"
                   - "ec2:Describe*"
+                  - "ec2:*"
                   - "elasticloadbalancing:*"
                   - "elasticloadbalancing:Describe*"
                   - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
@@ -52,7 +53,7 @@ Resources:
                   - "elasticloadbalancing:DescribeTargetHealth"
                   - "elasticloadbalancing:RegisterTargets"
                   - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
-                  - "ecs:PutAccountSetting"
+                  - "s3:*"
                 Resource: "*"
         - PolicyName: AllowAccessToS3
           PolicyDocument:
@@ -264,10 +265,8 @@ Resources:
       Conditions:
         - Field: host-header
           HostHeaderConfig:
-            Values: !Sub
-              - "graph.${EndpointAddress}"
-              - EndpointAddress:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            Values:
+              - !Ref DNSRecordV4Graph
       ListenerArn: !Ref GraphListener
       Priority: 1
 
@@ -280,10 +279,8 @@ Resources:
       Conditions:
         - Field: host-header
           HostHeaderConfig:
-            Values: !Sub
-              - "graph.${EndpointAddress}"
-              - EndpointAddress:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            Values:
+              - !Ref DNSRecordV4Graph
       ListenerArn: !Ref GraphListener1
       Priority: 1
 
@@ -296,10 +293,8 @@ Resources:
       Conditions:
         - Field: host-header
           HostHeaderConfig:
-            Values: !Sub
-              - "graph.${EndpointAddress}"
-              - EndpointAddress:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            Values:
+              - !Ref DNSRecordV4Graph
       ListenerArn: !Ref GraphListener3
       Priority: 1
 
@@ -312,10 +307,8 @@ Resources:
       Conditions:
         - Field: host-header
           HostHeaderConfig:
-            Values: !Sub
-              - "graph.${EndpointAddress}"
-              - EndpointAddress:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            Values:
+              - !Ref DNSRecordV4Graph
       ListenerArn: !Ref GraphListener4
       Priority: 1
 
@@ -328,17 +321,38 @@ Resources:
       Conditions:
         - Field: host-header
           HostHeaderConfig:
-            Values: !Sub
-              - "graph.${EndpointAddress}"
-              - EndpointAddress:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            Values:
+              - !Ref DNSRecordV4Graph
       ListenerArn: !Ref GraphListener5
       Priority: 1
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Volumes:
+        - Name: ipfs
+          Host:
+            SourcePath: "/mnt/efs/ipfs"
       ContainerDefinitions:
+        - Image: ipfs/go-ipfs:v0.4.23
+          Name: ipfs
+          PortMappings:
+           - ContainerPort: 5001
+             HostPort: 0
+          MountPoints:
+           - ContainerPath: "/data/ipfs"
+             SourceVolume: ipfs
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["ipfs"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
+          Essential: true
+          Memory: "1024"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
         - Image: graphprotocol/graph-node:latest
           Name: graph
           Ulimits:
@@ -347,15 +361,15 @@ Resources:
               HardLimit: 0
           PortMappings:
             - ContainerPort: 8000
-              HostPort: 8000
+              HostPort: 0
             - ContainerPort: 8001
-              HostPort: 8001
+              HostPort: 0
             - ContainerPort: 8030
-              HostPort: 8030
+              HostPort: 0
             - ContainerPort: 8020
-              HostPort: 8020
+              HostPort: 0
             - ContainerPort: 8040
-              HostPort: 8040
+              HostPort: 0
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/graph.env"
@@ -364,10 +378,7 @@ Resources:
               Type: "s3"
           Environment:
             - Name: ipfs
-              Value: !Sub
-                - "${EndpointAddress}:5001"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIPFS:DNSName"
+              Value: ipfs:5001
             - Name: ethereum
               Value: !Sub
                 - "boba:https://replica.${EndpointAddress}"
@@ -384,6 +395,8 @@ Resources:
             Options:
               max-file: "5"
               max-size: "10m"
+          Links:
+           - ipfs
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
