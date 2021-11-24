@@ -706,17 +706,17 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const CanonicalTransactionChainLog =
         await this.state.CanonicalTransactionChain.queryFilter(
           this.state.CanonicalTransactionChain.filters.SequencerBatchAppended(),
-          Number(latestL1Block) - 5000,
+          Number(latestL1Block) - 1000,
           Number(latestL1Block)
         )
       const StateCommitmentChainLog =
         await this.state.StateCommitmentChain.queryFilter(
           this.state.StateCommitmentChain.filters.StateBatchAppended(),
-          Number(latestL1Block) - 5000,
+          Number(latestL1Block) - 1000,
           Number(latestL1Block)
         )
 
-      const orderedOverheadLog = orderBy(
+    const orderedOverheadLog = orderBy(
         [...CanonicalTransactionChainLog, ...StateCommitmentChainLog],
         'blockNumber',
         'desc'
@@ -726,11 +726,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       let L1BatchSubmissionCost = BigNumber.from(0)
       const transactionHashList = orderedOverheadLog.reduce(
         (acc, cur, index) => {
-          if (
-            index < 50 &&
-            acc.length < 10 &&
-            !acc.includes(cur.transactionHash)
-          ) {
+          if (!acc.includes(cur.transactionHash)) {
             acc.push(cur.transactionHash)
           }
           return acc
@@ -769,12 +765,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         this.logger.debug('Updating overhead gas...')
         const tx =
           await this.state.OVM_GasPriceOracle.setOverhead(
-            overheadGas,
+            targetOverheadGas,
             { gasPrice: 0 }
           )
         await tx.wait()
         this.logger.info('Updated overhead gas', {
-          overheadGas: Number(overheadGas.toString()),
+          overheadGas: Number(targetOverheadGas.toString()),
         })
       }
     } catch (error) {
