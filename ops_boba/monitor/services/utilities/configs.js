@@ -14,7 +14,7 @@ module.exports.OMGXNetwork = {
   L2: 'L2',
 }
 
-module.exports.isLogTx = process.env.IS_LOG_TX === 'true'
+module.exports.enableTxResponseTime = process.env.ENABLE_TX_RESPONSE_TIME === 'true'
 module.exports.rdsEndpoint = process.env.RDS_ENDPOINT
 module.exports.rdsPort = 3306
 module.exports.rdsDbNameTx = process.env.RDS_DBNAME_TX

@@ -114,7 +114,7 @@ const getLatestReceipt = async () => {
 }
 
 const main = async () => {
-  if (configs.isLogTx) {
+  if (configs.enableTxResponseTime) {
     loopLogTx()
   }
 

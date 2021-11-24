@@ -67,4 +67,4 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `RDS_DBNAME_RECEIPT`        | Yes | N/A | MySQL database name for Receipt Log. |
 | `LOG_START_TIME`            | Yes | N/A | Starting block number for TX log |
 | `RECEIPT_START_TIME`        | Yes | N/A | Starting block number for Receipt log |
-| `IS_LOG_TX`                 | Yes | N/A | set to `true` if you want to log tx and receipt |
+| `ENABLE_TX_RESPONSE_TIME`   | Yes | N/A | set to `true` if you want to log tx and receipt |
