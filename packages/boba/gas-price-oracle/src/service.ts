@@ -214,12 +214,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      // await sleep(this.options.pollingInterval)
-      // await this._getL1Balance()
-      // await this._getL2GasCost()
-      // await this._updateGasPrice()
-      // await this._updateFastExitGasBurnFee()
-      // await this._updateClassicalExitGasBurnFee()
+      await sleep(this.options.pollingInterval)
+      await this._getL1Balance()
+      await this._getL2GasCost()
+      await this._updateGasPrice()
+      await this._updateFastExitGasBurnFee()
+      await this._updateClassicalExitGasBurnFee()
       await this._updateOverheadFee()
     }
   }
