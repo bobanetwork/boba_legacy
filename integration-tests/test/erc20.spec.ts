@@ -60,7 +60,7 @@ describe('System setup', async () => {
   it('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-    
+
     // console.log(
     //   `🌕 ${chalk.red(
     //     'L1ERC20 TEST token balance for Deployer PK:'

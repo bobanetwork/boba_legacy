@@ -29,7 +29,6 @@ import Pager from 'components/pager/Pager'
 import networkService from 'services/networkService'
 
 import * as styles from './Transactions.module.scss'
-
 import * as S from './History.styles';
 
 const PER_PAGE = 8
@@ -45,15 +44,21 @@ function Exits({ searchHistory, transactions, chainLink }) {
     return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
   })
 
+  //console.log("_exits:",_exits)
+  //console.log("transactions:",transactions)
+
   const renderExits = _exits.map((i, index) => {
     
     const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
     
     let metaData = ''
 
+    //i.crossDomainMessage.fast can be either 1 or null,
+    //where null denotes the classic 7 day exit 
+
     if(i.crossDomainMessage.fast === 1) {
       metaData = 'Fast Bridge'
-    } else if (i.crossDomainMessage.fast === 0) {
+    } else if (i.crossDomainMessage.fast === null) {
       metaData = 'Classic 7-day Bridge'
     }
 

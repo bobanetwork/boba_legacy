@@ -23,10 +23,10 @@ import "react-datepicker/dist/react-datepicker.css"
 import {useMediaQuery, useTheme} from '@material-ui/core'
 import moment from 'moment';
 
-import { setActiveHistoryTab1 } from 'actions/uiAction'
-import { fetchTransactions } from 'actions/networkAction'
+import { setActiveHistoryTab } from 'actions/uiAction'
+import { selectActiveHistoryTab } from 'selectors/uiSelector'
 
-import { selectActiveHistoryTab1 } from 'selectors/uiSelector'
+import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import Tabs from 'components/tabs/Tabs'
@@ -59,7 +59,7 @@ function History() {
 
   const [searchHistory, setSearchHistory] = useState('')
 
-  const activeTab1 = useSelector(selectActiveHistoryTab1, isEqual)
+  const activeTab = useSelector(selectActiveHistoryTab, isEqual)
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
@@ -129,26 +129,26 @@ function History() {
       <div className={styles.data}>
         <div className={styles.section}>
           <Tabs
-            onClick={tab => {dispatch(setActiveHistoryTab1(tab))}}
-            activeTab={activeTab1}
+            onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
+            activeTab={activeTab}
             tabs={['All', 'Bridge to L2', 'Bridge to L1']}
           />
 
-          {activeTab1 === 'All' && (
+          {activeTab === 'All' && (
             <Transactions
               searchHistory={searchHistory}
               transactions={transactions}
             />
           )}
 
-          {activeTab1 === 'Bridge to L2' &&
+          {activeTab === 'Bridge to L2' &&
             <Deposits
               searchHistory={searchHistory}
               transactions={transactions}
             />
           }
 
-          {activeTab1 === 'Bridge to L1' &&
+          {activeTab === 'Bridge to L1' &&
             <Exits
               searchHistory={searchHistory}
               transactions={transactions}
