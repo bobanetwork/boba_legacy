@@ -24,7 +24,7 @@ import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
 import { getAllNetworks } from 'util/masterConfig'
 
-function Seven({
+function FastExit({
   link,
   status,
   chain,
@@ -93,4 +93,4 @@ function Seven({
 
 }
 
-export default Seven
+export default FastExit
