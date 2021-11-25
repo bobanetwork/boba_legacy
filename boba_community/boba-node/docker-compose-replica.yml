@@ -13,6 +13,12 @@ networks:
     name: ops_default
 
 services:
+  builder:
+    image: bobanetwork/builder:latest
+    build:
+      context: ../..
+      dockerfile: ./ops/docker/Dockerfile.monorepo
+      
   dtl:
     image: bobanetwork/data-transport-layer:latest
     build:
