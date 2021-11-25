@@ -5,6 +5,7 @@ const util = require('util')
 const configs = require('../services/utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const { logger } = require('../services/utilities/logger')
+const ResponseTimeService = require("../services/responseTime.service");
 
 const loop = async (func) => {
   while (true) {
@@ -22,95 +23,13 @@ const loop = async (func) => {
 }
 
 const loopLogTx = async () => {
+  const ResponseTimeService = require('../services/responseTime.service')
+  const responseTimeService = new ResponseTimeService()
+
   while (true) {
-    try {
-      await getLatestTx()
-    } catch (error) {
-      logger.error('Unhandled exception during logging tx', {
-        message: error.toString(),
-        stack: error.stack,
-        code: error.code,
-      })
-    }
-    try {
-      await getLatestReceipt()
-    } catch (error) {
-      logger.error('Unhandled exception during logging receipt', {
-        message: error.toString(),
-        stack: error.stack,
-        code: error.code,
-      })
-    }
+    await responseTimeService.logResponseTime()
     await sleep(5000)
   }
-}
-
-const getLatestTx = async () => {
-  const con = mysql.createConnection({
-    host: configs.rdsEndpoint,
-    port: configs.rdsPort,
-    user: configs.rdsMysqlName,
-    password: configs.rdsMysqlPassword,
-  })
-
-  const query = util.promisify(con.query).bind(con)
-  await query(`USE ${configs.rdsDbNameTx}`)
-  const txs = await query(
-    `SELECT * FROM tx WHERE startTime>${configs.startTimeLog} ORDER BY startTime LIMIT 10`
-  )
-
-  if (txs.length > 0) {
-    txs.forEach((tx, index) => {
-      if (index === txs.length - 1) {
-        configs.startTimeLog = `${tx.startTime}`
-      }
-      tx.startTime = parseInt(`${tx.startTime}`, 10)
-      tx.endTime = parseInt(`${tx.endTime}`, 10)
-      tx.duration = tx.endTime - tx.startTime
-      tx.endISOTime = new Date(parseInt(`${tx.endTime}`, 10)).toISOString()
-      tx.startISOTime = new Date(parseInt(`${tx.startTime}`, 10)).toISOString()
-      logger.info('tx', tx)
-    })
-  }
-  con.end()
-}
-
-const getLatestReceipt = async () => {
-  const con = mysql.createConnection({
-    host: configs.rdsEndpoint,
-    port: configs.rdsPort,
-    user: configs.rdsMysqlName,
-    password: configs.rdsMysqlPassword,
-  })
-
-  const query = util.promisify(con.query).bind(con)
-  await query(`USE ${configs.rdsDbNameReceipt}`)
-  const receipts = await query(
-    `SELECT * FROM receipt WHERE crossDomainMessageSendTime>${configs.startTimeReceipt}
-        AND crossDomainMessageFinalize=1
-        ORDER BY crossDomainMessageSendTime LIMIT 10`
-  )
-
-  if (receipts.length > 0) {
-    receipts.forEach((tx, index) => {
-      if (index === receipts.length - 1) {
-        configs.startTimeReceipt = tx.crossDomainMessageSendTime
-      }
-
-      tx.duration =
-        tx.crossDomainMessageFinalizedTime - tx.crossDomainMessageSendTime
-
-      tx.crossDomainMessageSendISOTime = new Date(
-        tx.crossDomainMessageSendTime
-      ).toISOString()
-
-      tx.crossDomainMessageFinalizedISOTime = new Date(
-        tx.crossDomainMessageFinalizedTime
-      ).toISOString()
-      logger.info('receipt', tx)
-    })
-  }
-  con.end()
 }
 
 const main = async () => {

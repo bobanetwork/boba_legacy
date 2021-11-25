@@ -586,6 +586,73 @@ class DatabaseService extends OptimismEnv {
     con.end()
     return pendingMessages
   }
+
+  async getLatestTx(logger) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseNameTx}`)
+    const txs = await query(
+      `SELECT * FROM tx WHERE startTime>${this.MySQLStartTimeLog} ORDER BY startTime LIMIT 10`
+    )
+
+    if (txs.length > 0) {
+      txs.forEach((tx, index) => {
+        if (index === txs.length - 1) {
+          this.MySQLStartTimeLog = Number(tx.startTime)
+        }
+        tx.startTime = Number(tx.startTime)
+        tx.endTime = Number(tx.endTime)
+        tx.duration = tx.endTime - tx.startTime
+        tx.endISOTime = new Date(tx.endTime).toISOString()
+        tx.startISOTime = new Date(tx.startTime).toISOString()
+        logger.info('tx', tx)
+      })
+    }
+    con.end()
+  }
+
+  async getLatestReceipt(logger) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseNameReceipt}`)
+    const receipts = await query(
+      `SELECT * FROM receipt WHERE crossDomainMessageSendTime>${this.MySQLStartTimeReceipt}
+          AND crossDomainMessageFinalize=1
+          ORDER BY crossDomainMessageSendTime LIMIT 10`
+    )
+
+    if (receipts.length > 0) {
+      receipts.forEach((tx, index) => {
+        if (index === receipts.length - 1) {
+          this.MySQLStartTimeReceipt = tx.crossDomainMessageSendTime
+        }
+
+        tx.duration =
+          tx.crossDomainMessageFinalizedTime - tx.crossDomainMessageSendTime
+
+        tx.crossDomainMessageSendISOTime = new Date(
+          tx.crossDomainMessageSendTime
+        ).toISOString()
+
+        tx.crossDomainMessageFinalizedISOTime = new Date(
+          tx.crossDomainMessageFinalizedTime
+        ).toISOString()
+        logger.info('receipt', tx)
+      })
+    }
+    con.end()
+  }
 }
 
 module.exports = DatabaseService

@@ -14,12 +14,5 @@ module.exports.OMGXNetwork = {
   L2: 'L2',
 }
 
-module.exports.enableTxResponseTime = process.env.ENABLE_TX_RESPONSE_TIME === 'true'
-module.exports.rdsEndpoint = process.env.RDS_ENDPOINT
-module.exports.rdsPort = 3306
-module.exports.rdsDbNameTx = process.env.RDS_DBNAME_TX
-module.exports.rdsDbNameReceipt = process.env.RDS_DBNAME_RECEIPT
-module.exports.rdsMysqlName = process.env.RDS_MYSQL_NAME
-module.exports.rdsMysqlPassword = process.env.RDS_MYSQL_PASSWORD
-module.exports.startTimeLog = process.env.LOG_START_TIME
-module.exports.startTimeReceipt = process.env.RECEIPT_START_TIME
+module.exports.enableTxResponseTime =
+  process.env.ENABLE_TX_RESPONSE_TIME === 'true'
