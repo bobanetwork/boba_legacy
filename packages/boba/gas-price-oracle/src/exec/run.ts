@@ -72,6 +72,20 @@ const main = async () => {
     parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60 * 5
   )
 
+  const ADDRESS_MANAGER_ADDRESS = config.str(
+    'address-manager-address',
+    env.ADDRESS_MANAGER_ADDRESS
+  )
+  // BURNED_GAS_FEE_RATIO_100X / 100 = ratio
+  const BURNED_GAS_FEE_RATIO_100X = config.uint(
+    'burned-gas-fee-ration-100x',
+    parseInt(env.BURNED_GAS_FEE_RATIO_100X, 10) || 30
+  )
+  const MAX_BURNED_GAS = config.str(
+    'max-burned-gas',
+    env.MAX_BURNED_GAS || '10000000'
+  )
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -127,6 +141,7 @@ const main = async () => {
   const service = new GasPriceOracleService({
     l1RpcProvider: l1Provider,
     l2RpcProvider: l2Provider,
+    addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
     gasPriceOracleAddress: GAS_PRICE_ORACLE_ADDRESS,
     OVM_SequencerFeeVault,
     gasPriceOracleOwnerWallet,
@@ -138,6 +153,8 @@ const main = async () => {
     gasRoofPrice: GAS_PRICE_ORACLE_ROOF_PRICE,
     gasPriceMinPercentChange: GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE,
     pollingInterval: POLLING_INTERVAL,
+    burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
+    maxBurnedGas: MAX_BURNED_GAS,
   })
 
   await service.start()

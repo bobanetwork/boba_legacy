@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositETHL2, depositErc20 } from 'actions/networkAction'
-import { setActiveHistoryTab1 } from 'actions/uiAction'
+import { setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -67,7 +67,7 @@ function InputStep({ handleClose, token }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab1('Bridge to L2'))
+      dispatch(setActiveHistoryTab('Bridge to L2'))
       handleClose()
     }
 

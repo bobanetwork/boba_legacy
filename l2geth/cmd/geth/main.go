@@ -68,6 +68,7 @@ var (
 		utils.KeyStoreDirFlag,
 		utils.ExternalSignerFlag,
 		utils.NoUSBFlag,
+		utils.RangeLimitFlag,
 		utils.SmartCardDaemonPathFlag,
 		utils.OverrideIstanbulFlag,
 		utils.OverrideMuirGlacierFlag,

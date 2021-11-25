@@ -12,6 +12,12 @@ export const menuItems = [
     url: "/history"
   },
   {
+    key: 'BobaScope',
+    icon: "SearchIcon",
+    title: "System Analytics",
+    url: "/bobascope"
+  },
+  {
     key: 'Farm',
     icon: "EarnIcon",
     title: "Earn",
@@ -28,6 +34,12 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: "/dao"
+  },
+  {
+    key: 'Airdrop',
+    icon: "SwapIcon",
+    title: "Airdrop",
+    url: "/airdrop"
   },
   {
     key: 'Help',

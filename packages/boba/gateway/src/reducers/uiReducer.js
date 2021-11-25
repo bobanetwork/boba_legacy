@@ -40,8 +40,8 @@ const initialState = {
   ledger: false,
   alert: null,
   error: null,
-  activeHistoryTab1: 'All',
-  activeHistoryTab2: 'Bridge to L1',
+  activeHistoryTab: 'All',
+  activeDataTab: 'Seven Day Queue',
 };
 
 function uiReducer (state = initialState, action) {
@@ -69,10 +69,10 @@ function uiReducer (state = initialState, action) {
       return { ...state, error: action.payload }
     case 'UI/LEDGER/UPDATE':
       return { ...state, ledger: action.payload }
-    case 'UI/HISTORYTAB/UPDATE1':
-      return { ...state, activeHistoryTab1: action.payload }
-    case 'UI/HISTORYTAB/UPDATE2':
-      return { ...state, activeHistoryTab2: action.payload }
+    case 'UI/HISTORYTAB/UPDATE':
+      return { ...state, activeHistoryTab: action.payload }
+    case 'UI/DATATAB/UPDATE':
+      return { ...state, activeDataTab: action.payload }
     case 'UI/MODAL/DATA':
       let dataType = 'generic';
       if(action.payload.modal === 'confirmationModal') {
@@ -86,4 +86,4 @@ function uiReducer (state = initialState, action) {
   }
 }
 
-export default uiReducer;
+export default uiReducer

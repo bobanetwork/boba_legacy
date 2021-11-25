@@ -1,9 +1,14 @@
 import React, {useState} from 'react'
 import { ReactComponent as Logo } from './../../images/logo-boba.svg'
 import * as S from "./MainMenu.styles"
+
 import { Link } from 'react-router-dom'
+
 import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
+import ThemeSwitcher from './themeSwitcher/ThemeSwitcher'
+import GasSwitcher from './gasSwitcher/GasSwitcher'
+
 import MenuItems from './menuItems/MenuItems'
 import { useTheme } from '@emotion/react'
 import { Container, Drawer, IconButton, useMediaQuery } from '@material-ui/core'
@@ -11,7 +16,6 @@ import WalletAddress from 'components/walletAddress/WalletAddress'
 import { makeStyles } from '@material-ui/styles'
 import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg'
 import NavIcon from '../icons/NavIcon'
-import ThemeSwitcher from './themeSwitcher/ThemeSwitcher'
 import { Box } from '@material-ui/system'
 import { useDispatch } from 'react-redux'
 import { setPage } from 'actions/uiAction'
@@ -72,6 +76,7 @@ function MainMenu ({ pageDisplay, handleSetPage }) {
           </Link>
           <NetworkSwitcher />
           <LayerSwitcher />
+          <GasSwitcher />
           <MenuItems setOpen={setOpen}/>
           <ThemeSwitcher />
         </S.Menu>

@@ -89,7 +89,7 @@ function PendingTransaction() {
         return false
     })
     pendingExitsTrad = pendingExitsTrad.map(v => ({
-        ...v,label: 'Classical Bridge to L1',labelStatus: 'In 7 day window',
+        ...v,label: 'Classic 7-day Bridge to L1',labelStatus: 'In 7 day window',
         completion: v.crossDomainMessage.crossDomainMessageEstimateFinalizedTime,
       })
     )
@@ -112,7 +112,7 @@ function PendingTransaction() {
         return false
     })
     pendingDepositsTrad = pendingDepositsTrad.map(v => ({
-        ...v, label: 'Classical Bridge to L2', labelStatus: 'Pending',
+        ...v, label: 'Classic Bridge to L2', labelStatus: 'Pending',
         completion: v.crossDomainMessage.crossDomainMessageEstimateFinalizedTime,
       })
     )

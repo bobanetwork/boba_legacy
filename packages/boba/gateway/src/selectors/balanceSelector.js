@@ -21,12 +21,24 @@ export function selectlayer2Balance (state) {
   return state.balance.layer2
 }
 
+export function selectGas (state) {
+  return state.balance.gas
+}
+
 export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString
 }
 
 export function selectL2LPBalanceString (state) {
   return state.balance.l2LpBalanceWeiString
+}
+
+export function selectL1LPPendingString (state) {
+  return state.balance.l1LpPendingWeiString
+}
+
+export function selectL2LPPendingString (state) {
+  return state.balance.l2LpPendingWeiString
 }
 
 export function selectL1LPLiquidity (state) {
@@ -46,6 +58,10 @@ export function selectL2FeeRate (state) {
 
 export function selectFastExitCost (state) {
   return state.balance.fastExitCost
+}
+
+export function selectClassicExitCost (state) {
+  return state.balance.classicExitCost
 }
 
 export function selectFastDepositCost (state) {

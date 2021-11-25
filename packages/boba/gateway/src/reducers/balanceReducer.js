@@ -18,21 +18,34 @@ const initialState = {
   layer2: [],
   l1LpBalanceWeiString:'',
   l2LpBalanceWeiString:'',
+  l1LpPendingWeiString:'',
+  l2LpPendingWeiString:'',
   l1FeeRate: '',
   l2FeeRate: '',
   fastExitCost: '',
+  classicExitCost: '',
   fastDepositCost: '',
   l1FeeBalance: '',
   l2FeeBalance: '',
   l1lpLiquidity: '',
-  l2lpLiquidity: ''
+  l2lpLiquidity: '',
+  gas: {}
 }
 
 function balanceReducer(state = initialState, action) {
   switch (action.type) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
-      return { ...state, layer1, layer2 }
+      return { 
+        ...state, 
+        layer1, 
+        layer2 
+      }
+    case 'GAS/GET/SUCCESS':
+      return {
+        ...state, 
+        gas: action.payload
+      }
     case 'FETCH/L1LP/BALANCE/SUCCESS':
       return {
         ...state, 
@@ -42,6 +55,16 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l2LpBalanceWeiString: action.payload
+      }
+    case 'FETCH/L1LP/PENDING/SUCCESS':
+      return {
+        ...state, 
+        l1LpPendingWeiString: action.payload
+      }
+    case 'FETCH/L2LP/PENDING/SUCCESS':
+      return {
+        ...state, 
+        l2LpPendingWeiString: action.payload
       }
     case 'FETCH/L1TOTALFEERATE/SUCCESS':
       return {
@@ -57,6 +80,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         fastExitCost: action.payload
+      }
+    case 'FETCH/CLASSICEXIT/COST/SUCCESS':
+      return {
+        ...state, 
+        classicExitCost: action.payload
       }
     case 'FETCH/FASTDEPOSIT/COST/SUCCESS':
       return {
@@ -87,6 +115,7 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l1LpBalanceWeiString: '',
+        l1LpPendingWeiString: '',
         l1FeeRate: '',
         fastExitCost: '',
         l2FeeBalance: '',
@@ -96,6 +125,7 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l2LpBalanceWeiString: '',
+        l2LpPendingWeiString: '',
         l2FeeRate: '',
         fastDepositCost: '',
         l1FeeBalance: '',

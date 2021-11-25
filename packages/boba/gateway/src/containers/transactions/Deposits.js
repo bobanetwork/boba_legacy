@@ -76,11 +76,7 @@ function Deposits({ searchHistory, transactions }) {
                 <div className={styles.disclaimer}>Loading deposits...</div>
               )}
               {paginatedDeposits.map((i, index) => {
-                
-                //const typeTX = typeof(i.typeTX) === 'undefined' ? '' : i.typeTX
-                //const activity = typeof(i.activity) === 'undefined' ? '' : ' (' + i.activity + ')'
-                //let metaData = typeTX + ' ' + activity
-                
+                                
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
                 let details = null

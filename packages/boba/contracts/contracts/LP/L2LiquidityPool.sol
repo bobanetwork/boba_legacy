@@ -12,6 +12,7 @@ import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 
 /**
  * @dev An L2 LiquidityPool implementation
@@ -91,6 +92,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     address public DAO;
 
+    uint256 public extraGasRelay;
+
     /********************
      *       Event      *
      ********************/
@@ -165,6 +168,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     modifier onlyDAO() {
         require(msg.sender == DAO, 'caller is not the DAO');
+        _;
+    }
+
+    modifier onlyGasPriceOracleOwner() {
+        require(msg.sender == OVM_GasPriceOracle(Lib_PredeployAddresses.OVM_GAS_PRICE_ORACLE).owner(), 'caller is not the gasPriceOracle owner');
         _;
     }
 
@@ -256,6 +264,16 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         userRewardFeeRate = _userRewardFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
+    }
+
+    function configureExtraGasRelay(
+        uint256 _extraGas
+    )
+        public
+        onlyGasPriceOracleOwner()
+        onlyInitialized()
+    {
+        extraGasRelay = _extraGas;
     }
 
     /**
@@ -442,6 +460,15 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         payable
         whenNotPaused
     {
+        uint256 startingGas = gasleft();
+        require(startingGas > extraGasRelay, "Insufficient Gas For a Relay Transaction");
+
+        uint256 desiredGasLeft = startingGas.sub(extraGasRelay);
+        uint256 i;
+        while (gasleft() > desiredGasLeft) {
+            i++;
+        }
+
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
