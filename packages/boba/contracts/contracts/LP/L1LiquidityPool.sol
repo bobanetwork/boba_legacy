@@ -287,7 +287,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         if (poolBalance == 0) {
             return userRewardMaxFeeRate;
         } else {
-            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / (poolBalance * 1000);
+            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / poolBalance;
             if (userRewardMinFeeRate > poolRewardRate) {
                 return userRewardMinFeeRate;
             } else if (userRewardMaxFeeRate < poolRewardRate) {
@@ -792,6 +792,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
         onlyInitialized()
     {
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");
         _configureFee(_userRewardMinFeeRate, _userRewardMaxFeeRate,_ownerRewardFeeRate);
     }
 }

@@ -265,7 +265,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyDAO()
         onlyInitialized()
     {
-        require(_userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         userRewardMinFeeRate = _userRewardMinFeeRate;
         userRewardMaxFeeRate = _userRewardMaxFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
@@ -297,7 +297,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyDAO()
         onlyInitialized()
     {
-        require(_userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         bytes memory data = abi.encodeWithSelector(
             iL1LiquidityPool.configureFee.selector,
             _userRewardMinFeeRate,
@@ -352,7 +352,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         if (poolBalance == 0) {
             return userRewardMaxFeeRate;
         } else {
-            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / (poolBalance * 1000);
+            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / poolBalance;
             if (userRewardMinFeeRate > poolRewardRate) {
                 return userRewardMinFeeRate;
             } else if (userRewardMaxFeeRate < poolRewardRate) {
