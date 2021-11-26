@@ -49,6 +49,7 @@ class ListFarm extends React.Component {
       // loading
       loading: false,
     }
+
   }
 
   componentDidMount(){
@@ -213,21 +214,33 @@ class ListFarm extends React.Component {
             alignItems="center"
           >
 
-            <S.GridItemTag item 
-            xs={4} 
-            md={2} 
-            style={{
-              justifyContent: 'flex-start', 
-              alignItems:'center', 
-            }}>
-              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                <img src={logo} alt="logo" width={35} height={35} />
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
-                  <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
-                  <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
+            {isMobile && 
+              <S.GridItemTag item 
+                xs={12} 
+                md={2} 
+              >
+                <Typography variant="overline" style={{lineHeight: '1em', fontSize: '1.2em'}}>{symbol}</Typography>
+              </S.GridItemTag>
+            }
+
+            {!isMobile && 
+              <S.GridItemTag item 
+                xs={4} 
+                md={2} 
+                style={{
+                  justifyContent: 'flex-start', 
+                  alignItems:'center', 
+                }}
+              >
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                  <img src={logo} alt="logo" width={35} height={35} />
+                  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
+                    <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
+                    <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
+                  </div>
                 </div>
-              </div>
-            </S.GridItemTag>
+              </S.GridItemTag>
+            }
 
             <S.GridItemTag item 
               xs={4} 
@@ -258,7 +271,7 @@ class ListFarm extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item 
-              xs={3} 
+              xs={4} 
               md={1}
             >
               {isMobile ? (
@@ -272,7 +285,7 @@ class ListFarm extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item 
-              xs={3} 
+              xs={4} 
               md={1}
             >
               {isMobile ? (
@@ -286,7 +299,7 @@ class ListFarm extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item 
-              xs={3} 
+              xs={4} 
               md={1}
               >
               {isMobile ? (
@@ -321,7 +334,7 @@ class ListFarm extends React.Component {
             <S.DropdownContent>
               <S.DropdownWrapper>
                 <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Earned</Typography>
-                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 3)}</Typography>
+                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 2)}</Typography>
                 <Button
                   variant="contained"
                   fullWidth
@@ -351,7 +364,7 @@ class ListFarm extends React.Component {
                   </> :
                   <>
                     <Typography variant="body2" component="div">{`${symbol}`} Staked</Typography>
-                    <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals)}</Typography>
+                    <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
                     <Box sx={{display: "flex", alignItems: "center", gap: "5px"}}>
                       <Button
                         variant="outlined"
