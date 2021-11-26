@@ -200,7 +200,7 @@ describe('Dao Action Test', async () => {
 
         const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
         const values = [0] // the eth necessary to send to the contract above
-        const signatures = ['configureFee(uint256,uint256, uint256)'] // the function that will carry out the proposal
+        const signatures = ['configureFee(uint256,uint256,uint256)'] // the function that will carry out the proposal
         const updatedUserRewardMinFeeRate = initialL2LPUserRewardMinFeeRate.toNumber() + 1
         const updatedUserRewardMaxFeeRate = initialL2LPUserRewardMaxFeeRate.toNumber() + 1
         const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
@@ -321,7 +321,7 @@ describe('Dao Action Test', async () => {
         const values = [0] // the eth necessary to send to the contract above
         const signatures = ['configureFeeExits(uint256,uint256,uint256)'] // the function that will carry out the proposal
         const updatedUserRewardMinFeeRate = initialL1LPUserRewardMinFeeRate.toNumber() + 1
-        const updatedUserRewardMaxFeeRate = initialL1LPUserRewardMaxFeeRate.toNumber() + 1
+        const updatedUserRewardMaxFeeRate = initialL1LPUserRewardMaxFeeRate.toNumber()
         const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
 
         const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
@@ -410,7 +410,7 @@ describe('Dao Action Test', async () => {
       const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
       const userRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
       expect(userRewardMinFeeRate).to.deep.eq(initialL1LPUserRewardMinFeeRate.add(1))
-      expect(userRewardMaxFeeRate).to.deep.eq(initialL1LPUserRewardMaxFeeRate.add(1))
+      expect(userRewardMaxFeeRate).to.deep.eq(initialL1LPUserRewardMaxFeeRate)
       const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
       expect(ownerRewardFeeRate).to.deep.eq(initialL1LPOwnerRewardFeeRate.add(1))
     }).timeout(100000)
