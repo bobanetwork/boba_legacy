@@ -93,8 +93,8 @@ function App () {
         fontWeight: 400,
       },
       body3: {
-        lineHeight: '1.0em',
-        fontSize: '0.7em'
+        lineHeight: '1.2em',
+        fontSize: '0.8em'
       },
     },
     components: {

@@ -20,30 +20,30 @@ import moment from 'moment'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import Pager from 'components/pager/Pager'
-import Seven from 'components/seven/Seven'
+import FastExit from 'components/seven/FastExit'
 
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 const PER_PAGE = 10
 
-function Sevens({ searchData, sevens }) {
+function FastExits({ searchData, data }) {
 
   const [page, setPage] = useState(1)
 
-  const loading = useSelector(selectLoading(['SEVENS/GETALL']))
+  const loading = useSelector(selectLoading(['FASTEXITS/GETALL']))
 
   useEffect(() => {setPage(1)}, [searchData])
 
-  const _sevens = sevens.filter(i => {
+  const _data = data.filter(i => {
     return i.hash.includes(searchData) && i.to !== null
   })
 
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
   const endingIndex = page * PER_PAGE
-  const paginatedSevens = _sevens.slice(startingIndex, endingIndex)
+  const paginatedData = _data.slice(startingIndex, endingIndex)
 
-  let totalNumberOfPages = Math.ceil(_sevens.length / PER_PAGE);
+  let totalNumberOfPages = Math.ceil(_data.length / PER_PAGE)
 
   //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
@@ -53,7 +53,7 @@ function Sevens({ searchData, sevens }) {
       <S.HistoryContainer>
         <Pager
           currentPage={page}
-          isLastPage={paginatedSevens.length < PER_PAGE}
+          isLastPage={paginatedData.length < PER_PAGE}
           totalPages={totalNumberOfPages}
           onClickNext={()=>setPage(page + 1)}
           onClickBack={()=>setPage(page - 1)}
@@ -62,15 +62,15 @@ function Sevens({ searchData, sevens }) {
         <Grid item xs={12}>
           <Box>
             <S.Content>
-              {!paginatedSevens.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for pending 7 day exits...</div>
+              {!paginatedData.length && !loading && (
+                <div className={styles.disclaimer}>Scanning for pending fast exits...</div>
               )}
-              {!paginatedSevens.length && loading && (
-                <div className={styles.disclaimer}>Loading pending 7 day exits...</div>
+              {!paginatedData.length && loading && (
+                <div className={styles.disclaimer}>Loading pending fast exits...</div>
               )}
-              {paginatedSevens.map((i, index) => {
+              {paginatedData.map((i, index) => {
                 return (
-                  <Seven
+                  <FastExit
                     key={index}
                     title={`Hash: ${i.hash}`}
                     blockNumber={`Block ${i.blockNumber}`}
@@ -88,4 +88,4 @@ function Sevens({ searchData, sevens }) {
   );
 }
 
-export default React.memo(Sevens)
+export default React.memo(FastExits)
