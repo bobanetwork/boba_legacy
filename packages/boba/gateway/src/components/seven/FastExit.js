@@ -24,7 +24,7 @@ import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
 import { getAllNetworks } from 'util/masterConfig'
 
-function Seven({
+function FastExit({
   link,
   status,
   chain,
@@ -49,20 +49,7 @@ function Seven({
   }
 
   const secondsAgo = Math.round(Date.now() / 1000) - unixTime
-  const daysAgo = Math.floor(secondsAgo / (3600 * 24))
-  const hoursAgo = Math.round((secondsAgo % (3600 * 24)) / 3600)
-  let timeLabel = `Exit was started ${daysAgo} days and ${hoursAgo} hours ago`
-
-  const overdue = secondsAgo - (7*24*60*60)
-
-  if( overdue > 0) {
-    if(hoursAgo <= 1)
-      timeLabel = `Funds will exit soon. The 7 day window just passed`
-    else if(hoursAgo <= 2)
-      timeLabel = `Funds will exit soon. The 7 day window recently passed`
-    else if(hoursAgo > 2)
-      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago`
-  }
+  let timeLabel = `Fast Exit was started ${secondsAgo} seconds ago`
 
   return (
     <
@@ -82,17 +69,9 @@ function Seven({
             {blockNumber}
           </Typography>
 
-          {overdue < 0 &&
-            <Typography variant="body3" className={styles.muted} style={{color: 'yellow'}}>
-              {timeLabel}
-            </Typography>
-          }
-
-          {overdue > 0 &&
-            <Typography variant="body3" className={styles.muted} style={{color: 'green'}}>
-              {timeLabel}
-            </Typography>
-          }
+          <Typography variant="body3" className={styles.muted} style={{color: 'green'}}>
+            {timeLabel}
+          </Typography>
 
           <Typography variant="body3" className={styles.muted}>
             Hash:&nbsp;
@@ -114,4 +93,4 @@ function Seven({
 
 }
 
-export default Seven
+export default FastExit
