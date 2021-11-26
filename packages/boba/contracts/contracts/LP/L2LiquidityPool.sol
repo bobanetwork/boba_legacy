@@ -337,6 +337,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         address _l2TokenAddress
     )
         public
+        view
         onlyInitialized()
         returns (uint256 userRewardFeeRate)
     {

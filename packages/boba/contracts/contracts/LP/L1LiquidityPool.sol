@@ -272,6 +272,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         address _l1TokenAddress
     )
         public
+        view
         onlyInitialized()
         returns (uint256 userRewardFeeRate)
     {
