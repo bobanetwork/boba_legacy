@@ -136,6 +136,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "replica_dtl", "service": "replica_dtl"}]'
           Essential: true
+          Memory: "256"
           LogConfiguration:
             LogDriver: json-file
             Options:
