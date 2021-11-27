@@ -57,6 +57,11 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL`   | No        | 300,000                                       | Time (in milliseconds) to wait while updating message receipts. |
 | `L1_LIQUIDITY_POOL_ADDRESS` | Yes | N/A | L1 liquidity pool address |
 | `L2_LIQUIDITY_POOL_ADDRESS` | Yes | N/A | L2 liquidity pool address |
-| `L1_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 1 (Ethereum) node. |
-| `L2_NODE_WEB3_WS` | Yes | N/A | Websocket endpoint for a Layer 2 (Optimism) node. |
+| `L1_NODE_WEB3_WS`           | Yes | N/A | Websocket endpoint for a Layer 1 (Ethereum) node. |
+| `L2_NODE_WEB3_WS`           | Yes | N/A | Websocket endpoint for a Layer 2 (Optimism) node. |
 | `MONITORING_RECONNECT_SECS` | No | 15 | Time (in second) to wait for reconnecting after network is disconnected. |
+| `MYSQL_DBNAME_TX`           | Yes | N/A | MySQL database name for TX Log. |
+| `MYSQL_DBNAME_RECEIPT`      | Yes | N/A | MySQL database name for Receipt Log. |
+| `MYSQL_LOG_START_TIME`      | Yes | N/A | Starting block number for TX log |
+| `MYSQL_RECEIPT_START_TIME`  | Yes | N/A | Starting block number for Receipt log |
+| `ENABLE_TX_RESPONSE_TIME`   | Yes | N/A | set to `true` if you want to log tx and receipt |

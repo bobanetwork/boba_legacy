@@ -92,11 +92,11 @@ const logTransaction = (socket, trans, networkName, metadata) => {
     networkName === configs.OMGXNetwork.L1
       ? configs.l1PoolAddress
       : configs.l2PoolAddress
-  logger.debug({
-    from: trans.from,
-    to: trans.to,
-    poolAddress,
-  })
+  // logger.debug({
+  //   from: trans.from,
+  //   to: trans.to,
+  //   poolAddress,
+  // })
   if (trans.from !== poolAddress && trans.to !== poolAddress) {
     return
   }
@@ -147,7 +147,7 @@ const logData = (socket, blockNumber, networkName) => {
   return socket
     .getBlockWithTransactions(blockNumber)
     .then((block) => {
-      block.transactions.forEach((trans) => {
+      block?.transactions.forEach((trans) => {
         logTransaction(socket, trans, networkName, metadata)
       })
     })
