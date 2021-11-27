@@ -30,6 +30,35 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}"
 
+  LoadBalancerIntSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} Internal LB"
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      SecurityGroupIngress:
+      - Description: Allow all outbound traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-IntLB"
+
+  LoadBalancerGraph:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '3600'
+      Type: application
+      SecurityGroups:
+        - !Ref LoadBalancerIntSecurityGroup
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
   LoadBalancerReplicaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -63,6 +92,16 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerBlockscout:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Scheme: internet-facing
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      Type: network
+
+  LoadBalancerProxyd:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       IpAddressType: ipv4
@@ -219,3 +258,11 @@ Outputs:
     Value: !Ref LoadBalancerBlockscout
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:ARN"
+  LoadBalancerGraphDNSName:
+    Value: !GetAtt LoadBalancerGraph.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:DNSName"
+  LoadBalancerGraphArn:
+    Value: !Ref LoadBalancerGraph
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"

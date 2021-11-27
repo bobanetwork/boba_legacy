@@ -76,29 +76,6 @@ Resources:
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  DNSRecordV4Blockscout:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      Type: A
-      AliasTarget:
-        DNSName:
-          Fn::Sub:
-            - "${DomainName}."
-            - DomainName:
-                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:DNSName"
-        HostedZoneId:
-          Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
-      HostedZoneName:
-        Fn::Sub:
-          - "${DomainName}."
-          - DomainName:
-              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-      Name:
-        Fn::Sub:
-          - "blockexplorer.${DomainName}."
-          - DomainName:
-              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-
   BlockscoutLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -147,16 +124,6 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: ETHEREUM_JSONRPC_HTTP_URL
-              Value: !Sub
-                - "https://replica.${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-            - Name: URL
-              Value: !Sub
-                - "http://${EndpointAddress}:8081/addresses.json"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
             - Name: SUPPORTED_CHAINS
               Value: '[{"title":"Boba Mainnet","url":"https://blockexplorer.boba.network","hide_in_dropdown?": false},{"title":"Boba Rinkeby","url":"https://blockexplorer.rinkeby.boba.network","test_net?":true},{"title":"Boba Rinkeby Integration","url":"https://blockexplorer.rinkeby-integration.boba.network","test_net?":true,"hide_in_dropdown?": true}]'
           Command:
@@ -168,7 +135,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "blockscout", "service": "blockscout"}]'
           Essential: true
-          Memory: "512"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -199,5 +165,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "blockscout"
+      ServiceName: "blockexplorer-blockscout"
       TaskDefinition: !Ref TaskDefinition
