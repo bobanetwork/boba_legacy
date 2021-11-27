@@ -347,3 +347,7 @@ Outputs:
     Value: !Ref LoadBalancerReplicaDTL3
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL3:ARN"
+  S3BucketV2:
+    Value: mainnet-infrastructure-application-s3
+    Export:
+      Name: !Sub "${InfrastructureStackName}:S3BucketV2"

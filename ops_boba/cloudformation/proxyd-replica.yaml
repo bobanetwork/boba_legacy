@@ -166,7 +166,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: bobanetwork/proxyd:latest
+        - Image: bobanetwork/proxyd:ecs
           Name: proxyd
           PortMappings:
            - ContainerPort: 8545
@@ -218,5 +218,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "proxyd"
+      ServiceName: "proxyd-replica"
       TaskDefinition: !Ref TaskDefinition
