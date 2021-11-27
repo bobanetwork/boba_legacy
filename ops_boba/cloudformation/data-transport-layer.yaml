@@ -169,7 +169,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "data_transport_layer", "service": "data_transport_layer"}]'
           Essential: true
-          Memory: "200"
           LogConfiguration:
             LogDriver: json-file
             Options:

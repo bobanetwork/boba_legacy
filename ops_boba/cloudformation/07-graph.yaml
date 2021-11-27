@@ -347,7 +347,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
-          Memory: "1024"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -389,7 +388,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "graph", "service": "graph"}]'
           Essential: true
-          Memory: "1200"
           LogConfiguration:
             LogDriver: json-file
             Options:

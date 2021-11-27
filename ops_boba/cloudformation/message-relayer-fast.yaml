@@ -84,7 +84,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "message_relayer_fast", "service": "message_relayer_fast"}]'
           Essential: true
-          Memory: "4096"
           LogConfiguration:
             LogDriver: json-file
             Options:

@@ -127,7 +127,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
-          Memory: "1024"
           LogConfiguration:
             LogDriver: json-file
             Options:
