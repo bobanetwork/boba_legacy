@@ -20,8 +20,10 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import {useMediaQuery, useTheme, Input} from '@material-ui/core'
+import {useMediaQuery, useTheme} from '@material-ui/core'
 import moment from 'moment';
+
+import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import { selectActiveHistoryTab } from 'selectors/uiSelector'
@@ -75,6 +77,20 @@ function History() {
     })
   }, POLL_INTERVAL);
 
+/*
+<S.Header>
+        <div className={styles.searchInput}>
+          <Input
+            size='small'
+            placeholder='Search by hash'
+            value={searchData}
+            onChange={i=>{setSearchData(i.target.value)}}
+            className={styles.searchBar}
+          />
+        </div>
+      </S.Header>
+      */
+
   return (
     <>
       <PageHeader title="Transaction History" />
@@ -86,6 +102,7 @@ function History() {
             placeholder='Search by hash'
             value={searchHistory}
             onChange={i=>{setSearchHistory(i.target.value)}}
+            className={styles.searchBar}
           />
         </div>
         <div className={styles.actions}>
