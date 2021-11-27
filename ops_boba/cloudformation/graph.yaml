@@ -324,7 +324,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
           Essential: true
-          Memory: "8000"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -371,7 +370,7 @@ Resources:
           Links:
            - ipfs
       NetworkMode: bridge
-      Memory: "4000"
+      Memory: "12000"
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "Graph-${EnvironmentName}"
