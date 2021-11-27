@@ -68,28 +68,6 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-  DNSRecordV4:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      Type: A
-      AliasTarget:
-        DNSName:
-          Fn::Sub:
-            - "${DomainName}."
-            - DomainName:
-                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
-        HostedZoneId:
-          Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancer:CanonicalHostedZoneID"
-      HostedZoneName:
-        Fn::Sub:
-          - "${DomainName}."
-          - DomainName:
-              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-      Name:
-        Fn::Sub:
-          - "replica.${DomainName}."
-          - DomainName:
-              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
 
   ReplicaL2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
