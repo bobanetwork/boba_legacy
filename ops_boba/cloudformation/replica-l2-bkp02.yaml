@@ -156,9 +156,9 @@ Resources:
           Name: geth_l2
           PortMappings:
             - ContainerPort: 8545
-              HostPort: 0
+              HostPort: 8545
             - ContainerPort: 8546
-              HostPort: 0
+              HostPort: 8546
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
@@ -197,7 +197,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "replica_l2", "service": "replica_l2"}]'
           Essential: true
-          Memory: "8000"
+          Memory: "6000"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -212,7 +212,7 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplicaBackup02"
       LoadBalancers:
         - ContainerName: geth_l2
           ContainerPort: 8545

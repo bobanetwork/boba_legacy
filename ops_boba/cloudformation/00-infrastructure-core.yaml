@@ -237,10 +237,10 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-  Route53HostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref Route53HostedZoneName
+#  Route53HostedZone:
+#    Type: AWS::Route53::HostedZone
+#    Properties:
+#      Name: !Ref Route53HostedZoneName
 
 Outputs:
   VpcId:
@@ -263,11 +263,11 @@ Outputs:
     Value: !Ref PrivateSubnet2
     Export:
       Name: !Sub "${AWS::StackName}:PrivateSubnet2"
-  Route53HostedZoneName:
-    Value: !Ref Route53HostedZoneName
-    Export:
-      Name: !Sub "${AWS::StackName}:Route53HostedZoneName"
-  Route53HostedZoneID:
-    Value: !Ref Route53HostedZone
-    Export:
-      Name: !Sub "${AWS::StackName}:Route53HostedZoneID"
+#  Route53HostedZoneName:
+#    Value: !Ref Route53HostedZoneName
+#    Export:
+#      Name: !Sub "${AWS::StackName}:Route53HostedZoneName"
+#  Route53HostedZoneID:
+#    Value: !Ref Route53HostedZone
+#    Export:
+#      Name: !Sub "${AWS::StackName}:Route53HostedZoneID"

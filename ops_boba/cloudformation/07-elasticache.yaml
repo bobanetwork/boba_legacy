@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS ElatiCache for Redis
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-coredev
+
+  ElasticacheInstanceClass:
+    Type: String
+    Default: cache.m4.large
+
+Resources:
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-elasticache-replicationgroup.html
+  RedisCluster:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      AutoMinorVersionUpgrade: true
+      # enable Cluster Mode
+      CacheParameterGroupName: default.redis6.x
+      CacheNodeType: !Ref ElasticacheInstanceClass
+      CacheSubnetGroupName:  !Ref RedisSubnetGroup
+      Engine: redis
+      EngineVersion: 6.0
+      NumNodeGroups: 1
+      Port: 6379
+      ReplicasPerNodeGroup: 1
+      ReplicationGroupDescription: Sample Redis group for scaling
+      SecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-RedisCluster"
+
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Redis subnet group
+      SubnetIds:
+        - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+        - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-RedisSubnetGroup"
+
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: vpc-03cc2bb8f0fed88b8
+      GroupDescription: Enable Redis access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsSecurityGroupReplica"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-RedisSecurityGroup"
+
+Outputs:
+
+  RedisPrimaryEndpoint:
+    Value: !GetAtt RedisCluster.PrimaryEndPoint.Address
+    Export:
+      Name: !Sub "${InfrastructureStackName}:RedisCluster:DNS"

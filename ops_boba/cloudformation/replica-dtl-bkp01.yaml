@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enya Data Transport Layer Application Deployment"
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  ServiceCount:
+    Type: Number
+    Default: 1
+
+  ImageTag:
+    Type: String
+    Default: push2aws
+
+  DataTransportLayerImage:
+    Type: String
+    Default: data-transport-layer
+
+  DockerPrefix:
+    Type: String
+    Default: bobanetwork
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-coredev
+
+Resources:
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ecs-tasks.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/replica-dtl.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
+  DataTransportLayerReplicaLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 7878
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  DataTransportLayerReplicaListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:ARN"
+      Port: 7878
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup
+
+  DataTransportLayerReplicaLBTargetGroup1:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8081
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  DataTransportLayerReplicaListener1:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:ARN"
+      Port: 8081
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup1
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Volumes:
+        - Name: db
+          Host:
+            SourcePath: "/mnt/efs/replica_dtl/db"
+      ContainerDefinitions:
+        - Image: !Sub "${DockerPrefix}/${DataTransportLayerImage}:${ImageTag}"
+          Name: data_transport_layer
+          PortMappings:
+            - ContainerPort: 7878
+              HostPort: 7878
+            - ContainerPort: 8081
+              HostPort: 8081
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/replica-dtl.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: DEPLOYER_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}:8081"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+            - Name: URL
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/addresses.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+          MountPoints:
+            - ContainerPath: "/db"
+              SourceVolume: db
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["replica_dtl"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "replica_dtl", "service": "replica_dtl"}]'
+          Essential: true
+          Memory: "256"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
+      NetworkMode: awsvpc
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      Family: !Sub "Replica-DTL-${EnvironmentName}"
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+      LoadBalancers:
+        - ContainerName: data_transport_layer
+          ContainerPort: 7878
+          TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup
+        - ContainerName: data_transport_layer
+          ContainerPort: 8081
+          TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:SecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 60
+      DesiredCount: !Ref ServiceCount
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
+      ServiceName: "replica-dtl"
+      TaskDefinition: !Ref TaskDefinition

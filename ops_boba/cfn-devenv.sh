@@ -177,6 +177,31 @@ function check_dev_environment {
                  --parameters \
                      ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
               aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-replica
+              aws cloudformation create-stack \
+                   --stack-name ${ENV_PREFIX}-replica-bkp01 \
+                   --capabilities CAPABILITY_IAM \
+                   --template-body=file://05-infrastructure-replica-backup01.yaml \
+                   --region ${REGION} \
+                   --parameters \
+                       ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-replica-bkp01
+                aws cloudformation create-stack \
+                     --stack-name ${ENV_PREFIX}-replica-bkp02 \
+                     --capabilities CAPABILITY_IAM \
+                     --template-body=file://06-infrastructure-replica-backup02.yaml \
+                     --region ${REGION} \
+                     --parameters \
+                         ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                  aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-replica-bkp02
+               info "Provioning Redis Cache"
+               aws cloudformation create-stack \
+                    --stack-name ${ENV_PREFIX}-redis \
+                    --capabilities CAPABILITY_IAM \
+                    --template-body=file://07-elasticache.yaml \
+                    --region ${REGION} \
+                    --parameters \
+                        ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                 aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-redis
               info "Adding Datadog to the Replica ECS Cluster"
               aws cloudformation create-stack \
                    --stack-name ${ENV_PREFIX}-datadog-replica \
@@ -218,7 +243,7 @@ function check_dev_environment {
                    ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
             aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-datadog
             cd ..
-      elif [ -z "$CFN_APP_REPLICA_STACK" ]; then
+     elif [ -z "$CFN_APP_REPLICA_STACK" ]; then
               info "Adding Replica ECS Cluster"
               cd ${PATH_TO_CFN}
               aws cloudformation create-stack \
@@ -533,11 +558,16 @@ function destroy_dev_services {
 
     function ssh_to_ecs_cluster {
 #set -x
-        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##')
+        #CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica*##')
+        CLUSTER_NAME=$(echo ${ENV_PREFIX})
         if [[ ${ENV_PREFIX} == *"-replica"* ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ ${ENV_PREFIX} == *"-replica-bkp01"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ ${ENV_PREFIX} == *"-replica-bkp02"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
