@@ -21,15 +21,16 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 
 import { setActiveDataTab } from 'actions/uiAction'
-import { fetchSevens } from 'actions/networkAction'
+import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
 import { selectActiveDataTab } from 'selectors/uiSelector'
-import { selectSevens } from 'selectors/dataSelector'
+import { selectSevens, selectFastExits } from 'selectors/dataSelector'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
 
 import Sevens from './Sevens'
+import FastExits from './FastExits'
 
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
@@ -48,14 +49,18 @@ function BobaScope() {
   const activeTab = useSelector(selectActiveDataTab, isEqual)
 
   const unorderedSevens = useSelector(selectSevens, isEqual)
-
-  //sort transactions by timeStamp
   const orderedSevens = orderBy(unorderedSevens, i => i.timeStamp, 'desc')
-
   const sevens = orderedSevens
 
+  const unorderedFastExits = useSelector(selectFastExits, isEqual)
+  const orderedFastExits = orderBy(unorderedFastExits, i => i.timeStamp, 'desc')
+  const fastExits = orderedFastExits
+
   useInterval(() => {
-    batch(()=>{dispatch(fetchSevens())})
+    batch(()=>{
+      dispatch(fetchSevens())
+      dispatch(fetchFastExits())
+    })
   }, POLL_INTERVAL)
 
   return (
@@ -78,7 +83,7 @@ function BobaScope() {
           <Tabs
             onClick={tab => {dispatch(setActiveDataTab(tab))}}
             activeTab={activeTab}
-            tabs={['Seven Day Queue']}
+            tabs={['Seven Day Queue', 'Fast Exits']}
           />
 
           {activeTab === 'Seven Day Queue' && (
@@ -87,7 +92,12 @@ function BobaScope() {
               sevens={sevens}
             />
           )}
-
+          {activeTab === 'Fast Exits' && (
+            <FastExits
+              searchData={searchData}
+              data={fastExits}
+            />
+          )}
         </div>
       </div>
     </>

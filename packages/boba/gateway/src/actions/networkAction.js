@@ -46,6 +46,12 @@ export function fetchSevens() {
   )
 }
 
+export function fetchFastExits() {
+  return createAction('FASTEXITS/GETALL', () =>
+    networkService.getFastExits()
+  )
+}
+
 export function fetchExits() {
   return createAction('EXIT/GETALL', () => networkService.getExits())
 }
