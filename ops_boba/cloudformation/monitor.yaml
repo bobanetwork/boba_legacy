@@ -91,6 +91,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "monitor", "service": "monitor"}]'
           Essential: true
+          Memory: "256"
           LogConfiguration:
             LogDriver: json-file
             Options:

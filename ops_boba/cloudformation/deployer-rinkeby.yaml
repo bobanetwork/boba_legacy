@@ -141,6 +141,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "deployer", "service": "deployer"}]'
           Essential: true
+          Memory: "64"
   ECSService:
     Type: AWS::ECS::Service
     DependsOn: DeployerListener
