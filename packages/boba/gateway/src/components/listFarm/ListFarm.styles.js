@@ -3,8 +3,8 @@ import { Box, Grid } from '@material-ui/core'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
-  borderRadius: props.dropDownBox ? '8px' : '0',
-  background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
+  borderRadius: '0',
+  background: theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
     //padding: '30px 10px',
   },
