@@ -32,7 +32,6 @@ export const Content = styled(Box)`
   border-radius: 6px;
 `;
 
-
 export const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',

@@ -13,3 +13,6 @@ module.exports.OMGXNetwork = {
   L1: 'L1',
   L2: 'L2',
 }
+
+module.exports.enableTxResponseTime =
+  process.env.ENABLE_TX_RESPONSE_TIME === 'true'
