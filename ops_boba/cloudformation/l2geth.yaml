@@ -201,7 +201,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "geth_l2", "service": "geth_l2"}]'
           Essential: true
-          Memory: "6000"
           LogConfiguration:
             LogDriver: json-file
             Options:

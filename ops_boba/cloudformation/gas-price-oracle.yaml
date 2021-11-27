@@ -82,7 +82,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "gas-price-oracle", "service": "gas-price-oracle"}]'
           Essential: true
-          Memory: "128"
           LogConfiguration:
             LogDriver: json-file
             Options:

@@ -114,7 +114,6 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "verifier_dtl", "service": "verifier_dtl"}]'
           Essential: true
-          Memory: "256"
           LogConfiguration:
             LogDriver: json-file
             Options:

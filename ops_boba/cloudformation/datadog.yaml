@@ -96,7 +96,6 @@ Resources:
                 Ref: DatadogLogGroup
               awslogs-region:
                 Ref: AWS::Region
-          Memory: "256"
           Cpu: "10"
       NetworkMode: bridge
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
