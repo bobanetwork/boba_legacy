@@ -22,7 +22,6 @@ export const TableHeadingItem = styled(Typography)`
   opacity: 0.7;
 `;
 
-
 export const Content = styled(Box)`
   display: flex;
   flex-direction: column;

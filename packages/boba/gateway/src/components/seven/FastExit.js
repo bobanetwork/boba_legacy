@@ -52,44 +52,42 @@ function FastExit({
   let timeLabel = `Fast Exit was started ${secondsAgo} seconds ago`
 
   return (
-    <
-      div style={{
-        padding: '5px',
-        borderRadius: '8px',
-        background: theme.palette.background.secondaryLight,
-      }}
-    >
-      <S.TableBody>
-
-        <S.TableCell
-          style={{ width: '100%' }}
-        >
-
-          <Typography variant="body3">
-            {blockNumber}
-          </Typography>
-
-          <Typography variant="body3" className={styles.muted} style={{color: 'green'}}>
-            {timeLabel}
-          </Typography>
-
-          <Typography variant="body3" className={styles.muted}>
-            Hash:&nbsp;
-            <a
-              href={chainLink({hash:oriHash})}
-              target={'_blank'}
-              rel='noopener noreferrer'
-              style={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }}
+        <S.Wrapper>
+          <S.GridContainer container 
+            spacing={2} 
+            direction="row" 
+            justifyContent="flex-start" 
+            alignItems="center"
+          >
+            <S.GridItemTag item 
+              xs={12} 
+              md={12} 
+              style={{
+                justifyContent: 'flex-start', 
+                alignItems:'center', 
+              }}
             >
-              {oriHash}
-            </a>
-          </Typography>
-
-        </S.TableCell>
-
-      </S.TableBody>
-
-    </div>)
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                  <Typography variant="overline" style={{fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
+                  <Typography variant="overline" style={{lineHeight: '1.0em', color: 'green'}}>
+                    {timeLabel}
+                  </Typography>
+                  <Typography variant="body3" style={{fontSize: '0.7em', lineHeight: '1.0em'}}>
+                    Hash:&nbsp;
+                    <a
+                      href={chainLink({hash:oriHash})}
+                      target={'_blank'}
+                      rel='noopener noreferrer'
+                      style={{ color: 'rgba(255, 255, 255, 0.3)', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
+                    >
+                      {oriHash}
+                    </a>
+                  </Typography>
+                </div>
+            </S.GridItemTag>
+          </S.GridContainer>
+        </S.Wrapper>
+      )
 
 }
 

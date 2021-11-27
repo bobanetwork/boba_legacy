@@ -33,15 +33,13 @@ export const DropdownWrapper = styled(Box)`
   justify-content: space-between;
   gap: 5px;
   width: 100%;
-  padding: 6px;
   margin-top: 10px;
+  padding: 12px;
   background-color: ${props => props.theme.palette.background.secondary};
-  border-radius: 4px;
   text-align: center;
 `;
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '70%',
   display: 'flex',
   justifyContent: 'space-between',
   [theme.breakpoints.down('md')]: {

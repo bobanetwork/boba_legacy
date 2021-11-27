@@ -44,9 +44,6 @@ function Exits({ searchHistory, transactions, chainLink }) {
     return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
   })
 
-  //console.log("_exits:",_exits)
-  //console.log("transactions:",transactions)
-
   const renderExits = _exits.map((i, index) => {
     
     const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
@@ -134,35 +131,29 @@ function Exits({ searchHistory, transactions, chainLink }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1;
 
   return (
-    <>
-      <div className={styles.section}>
-        <div className={styles.transactionSection}>
-          <S.HistoryContainer>
-            <Pager
-              currentPage={page}
-              isLastPage={paginatedExits.length < PER_PAGE}
-              totalPages={totalNumberOfPages}
-              onClickNext={() => setPage(page + 1)}
-              onClickBack={() => setPage(page - 1)}
-            />
+    <S.HistoryContainer>
+      <Pager
+        currentPage={page}
+        isLastPage={paginatedExits.length < PER_PAGE}
+        totalPages={totalNumberOfPages}
+        onClickNext={() => setPage(page + 1)}
+        onClickBack={() => setPage(page - 1)}
+      />
 
-            <Grid item xs={12}>
-              <Box>
-                <S.Content>
-                  {!renderExits.length && !loading && (
-                    <div className={styles.disclaimer}>Scanning for exits...</div>
-                  )}
-                  {!renderExits.length && loading && (
-                    <div className={styles.disclaimer}>Loading...</div>
-                  )}
-                  {React.Children.toArray(paginatedExits)}
-                </S.Content>
-              </Box>
-            </Grid>
-          </S.HistoryContainer>
-        </div>
-      </div>
-    </>
+      <Grid item xs={12}>
+        <Box>
+          <S.Content>
+            {!renderExits.length && !loading && (
+              <S.Disclaimer>Scanning for exits...</S.Disclaimer>
+            )}
+            {!renderExits.length && loading && (
+              <S.Disclaimer>Loading...</S.Disclaimer>
+            )}
+            {React.Children.toArray(paginatedExits)}
+          </S.Content>
+        </Box>
+      </Grid>
+    </S.HistoryContainer>
   );
 }
 
