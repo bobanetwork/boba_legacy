@@ -135,6 +135,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "blockscout", "service": "blockscout"}]'
           Essential: true
+          Memory: "16000"
           LogConfiguration:
             LogDriver: json-file
             Options:
