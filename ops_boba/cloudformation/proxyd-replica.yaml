@@ -1,0 +1,222 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enya Graph Application Deployment"
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  ServiceCount:
+    Type: Number
+    Default: 1
+
+  ImageTag:
+    Type: String
+    Default: push2aws
+
+  DockerPrefix:
+    Type: String
+    Default: bobanetwork
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-coredev
+
+Resources:
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ecs-tasks.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAccessToELB
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:Describe*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
+                Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/graph.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
+  ProxydLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8545
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckIntervalSeconds: 20
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 10
+      Matcher:
+        HttpCode: "200-499"
+
+  ProxydListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref ProxydLBTargetGroup
+
+  ProxydListener2:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
+      Port: 8546
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref ProxydLBTargetGroup2
+
+  ProxydLBTargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8546
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckIntervalSeconds: 20
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 10
+      Matcher:
+        HttpCode: "200-499"
+
+  ProxydListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ProxydLBTargetGroup
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - replica.boba.network
+      ListenerArn: !Ref ProxydListener
+      Priority: 1
+
+  ProxydListenerRule2:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ProxydLBTargetGroup2
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - replica.boba.network
+      ListenerArn: !Ref ProxydListener2
+      Priority: 1
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Image: bobanetwork/proxyd:latest
+          Name: proxyd
+          PortMappings:
+           - ContainerPort: 8545
+             HostPort: 0
+           - ContainerPort: 8546
+             HostPort: 0
+          Environment:
+            - Name: MAIN_L2GETH
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
+            - Name: REPLICA_L2GETH
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:DNSName"
+            - Name: ELASTICACHE
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisCluster:DNS"
+          Essential: true
+          Memory: "2048"
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
+      NetworkMode: bridge
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+      Family: !Sub "proxyd-${EnvironmentName}"
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - "ProxydListenerRule"
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+      LoadBalancers:
+        - ContainerName: proxyd
+          ContainerPort: 8545
+          TargetGroupArn: !Ref ProxydLBTargetGroup
+        - ContainerName: proxyd
+          ContainerPort: 8546
+          TargetGroupArn: !Ref ProxydLBTargetGroup2
+      HealthCheckGracePeriodSeconds: 30
+      DesiredCount: !Ref ServiceCount
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
+      ServiceName: "proxyd"
+      TaskDefinition: !Ref TaskDefinition

@@ -82,7 +82,43 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
+  LoadBalancerReplicaDTL2:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  LoadBalancerReplicaDTL3:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
   LoadBalancerReplica:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
+  LoadBalancerReplica2:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
+  LoadBalancerReplica3:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internet-facing
@@ -279,3 +315,35 @@ Outputs:
     Value: !Ref LoadBalancerProxyd
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
+  LoadBalancerReplicaDNSName2:
+    Value: !GetAtt LoadBalancerReplica2.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:DNSName"
+  LoadBalancerReplicaArn2:
+    Value: !Ref LoadBalancerReplica2
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:ARN"
+  LoadBalancerReplicaDTLDNSName2:
+    Value: !GetAtt LoadBalancerReplicaDTL2.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:DNSName"
+  LoadBalancerReplicaDTLArn2:
+    Value: !Ref LoadBalancerReplicaDTL2
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:ARN"
+  LoadBalancerReplicaDNSName3:
+    Value: !GetAtt LoadBalancerReplica3.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica3:DNSName"
+  LoadBalancerReplicaArn3:
+    Value: !Ref LoadBalancerReplica2
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica3:ARN"
+  LoadBalancerReplicaDTLDNSName3:
+    Value: !GetAtt LoadBalancerReplicaDTL3.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL3:DNSName"
+  LoadBalancerReplicaDTLArn3:
+    Value: !Ref LoadBalancerReplicaDTL3
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL3:ARN"
