@@ -266,3 +266,11 @@ Outputs:
     Value: !Ref LoadBalancerGraph
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
+  LoadBalancerProxydDNSName:
+    Value: !GetAtt LoadBalancerProxyd.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:DNSName"
+  LoadBalancerProxydArn:
+    Value: !Ref LoadBalancerProxyd
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
