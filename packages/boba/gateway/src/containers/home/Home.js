@@ -133,12 +133,6 @@ function Home () {
     dispatch(addTokenList()) //only need to do this boot
   }, [ dispatch ])
 
-  useInterval(() => {
-    batch(() => {
-      dispatch(fetchExits())
-    })
-  }, POLL_INTERVAL)
-
   //get all account balances
   useInterval(() => {
     dispatch(fetchBalances())
@@ -150,6 +144,7 @@ function Home () {
     dispatch(fetchDaoProposals())
     dispatch(getProposalThreshold())
     dispatch(fetchGas())
+    dispatch(fetchExits())
   }, POLL_INTERVAL)
 
   useEffect(() => {

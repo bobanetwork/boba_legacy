@@ -919,17 +919,38 @@ class NetworkService {
       this.masterSystemConfig
     ).get('get.l2.pendingexits')
 
-    //console.log("response:",response)
-
     if (response.status === 201) {
-      const sevens = response.data
-      const filteredSevens = sevens.filter(
+      const data = response.data
+      const filtered = data.filter(
         (i) => (i.fastRelay === 0) && (i.status === 'pending')
       )
-      //console.log("response:",filteredSevens)
-      return filteredSevens
+      return filtered
+    } else {
+      return []
     }
 
+  }
+
+  async getFastExits() {
+
+    console.log("getFastExits()")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits')
+
+    if (response.status === 201) {
+      const data = response.data
+      const filtered = data.filter(
+        (i) => (i.fastRelay === 1) && (i.status === 'pending')
+      )
+      return filtered
+    } else {
+      return []
+    }
   }
 
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
