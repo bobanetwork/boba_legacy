@@ -6,8 +6,6 @@ import ListNFT from 'components/listNFT/listNFT'
 
 import * as styles from './Nft.module.scss'
 
-import { addNFTContract } from 'actions/nftAction'
-
 import { Box, Grid, Typography } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
 
@@ -26,34 +24,23 @@ class Nft extends React.Component {
     super(props)
 
     const { 
-      list, 
-      contracts 
+      list
     } = this.props.nft
 
     this.state = {
       list,
-      contracts,
       contractAddress: '',
-      //ownerName: '',
       tokenURI: '',
     }
 
   }
 
-  componentDidMount() {
-    //ToDo
-  }
-
   componentDidUpdate(prevState) {
 
-    const { list, contracts } = this.props.nft
+    const { list } = this.props.nft
 
     if (!isEqual(prevState.nft.list, list)) {
      this.setState({ list })
-    }
-
-    if (!isEqual(prevState.nft.contracts, contracts)) {
-     this.setState({ contracts })
     }
 
   }
@@ -70,7 +57,6 @@ class Nft extends React.Component {
 
     const {
       list,
-      contracts,
       contractAddress
     } = this.state
 

@@ -59,7 +59,6 @@ import OMGJson from '../deployment/contracts/OMG.json'
 
 //BOBA L2 Contracts
 import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
-import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
 
 //DAO
 import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
@@ -301,118 +300,6 @@ class NetworkService {
     }
 
   }
-
-  // async mintAndSendNFT(receiverAddress, contractAddress, tokenURI) {
-
-  //   try {
-
-  //     let meta = Date.now().toString() + '#' + tokenURI + '#'
-
-  //     const contract = new ethers.Contract(
-  //       contractAddress,
-  //       L2ERC721Json.abi,
-  //       this.L2Provider
-  //     )
-
-  //     let nft = await contract.connect(
-  //       this.provider.getSigner()
-  //     ).mintNFT(
-  //       receiverAddress,
-  //       meta
-  //     )
-
-  //     await nft.wait()
-
-  //     const registry = new ethers.Contract(
-  //       this.ERC721RegAddress,
-  //       L2ERC721RegJson.abi,
-  //       this.L2Provider
-  //     )
-
-  //     //what types of NFTs does this address already own?
-  //     const addresses = await registry.lookupAddress(
-  //       receiverAddress
-  //     )
-
-  //     //console.log("the receiver's NFT contract addresses:", addresses)
-
-  //     //the receiverAddress already knows about this contract
-  //     const alreadyHaveAddresss = addresses.find((str) => str.toLowerCase() === contractAddress.toLowerCase())
-
-  //     if (alreadyHaveAddresss) {
-  //       //we are done - no need to double register addresss
-  //       console.log('Done - no need to double register address')
-  //     } else {
-  //       //register address for the recipiant
-  //       await registry.connect(
-  //         this.provider.getSigner()
-  //       ).registerAddress(
-  //         receiverAddress,
-  //         contractAddress
-  //       )
-  //       //console.log("Reg:",reg)
-  //       console.log(`Contract registered in recipient's wallet`)
-  //     }
-
-  //     return true
-  //   } catch (error) {
-  //     console.log(error)
-  //     return false
-  //   }
-  // }
-
-  // async deployNFTContract(
-  //     nftSymbol,
-  //     nftName)
-  // {
-
-  //   try {
-
-  //     console.log("Deploying NFT Contract")
-
-  //     let Factory__L2ERC721 = new ContractFactory(
-  //       L2ERC721Json.abi,
-  //       L2ERC721Json.bytecode,
-  //       this.provider.getSigner()
-  //     )
-
-  //     let contract = await Factory__L2ERC721.deploy(
-  //       nftSymbol,
-  //       nftName,
-  //       BigNumber.from(String(0)), //starting index for the tokenIDs
-  //       '0x0000000000000000000000000000000000000042',
-  //       'simple',
-  //       'boba_L2'
-  //     )
-
-  //     await contract.deployTransaction.wait()
-  //     console.log('New NFT ERC721 contract deployed to:', contract.address)
-
-  //     const registry = new ethers.Contract(
-  //       this.ERC721RegAddress,
-  //       L2ERC721RegJson.abi,
-  //       this.L2Provider
-  //     )
-
-  //     //register address for the contract owner
-  //     await registry.connect(
-  //       this.provider.getSigner()
-  //     ).registerAddress(
-  //       this.account,
-  //       contract.address
-  //     )
-  //     console.log(`New NFT ERC721 contract registered in Boba NFT registry`)
-
-  //     //addNFTContract({address: contract.address})
-  //     //this will get picked up automatically from the blockchain
-
-  //     return true
-  //   } catch (error) {
-  //     console.log(error)
-  //     return false
-  //   }
-
-  // }
 
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
@@ -978,38 +865,8 @@ class NetworkService {
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 
-    // return //still need to deploy ERC721 contracts on mainnet
-
-    // console.log("scanning for NFTs...")
-
-    // if(allAddresses.L2ERC721RegAddress === null) return
-
-    // console.log("scanning for NFTs...", allAddresses.L2ERC721RegAddress)
-
-    //the current list of contracts we know about
-    //based in part on the cache and anything we recently generated in this session
-    //console.log("NFTContracts 1:",await getNFTContracts())
-
     let NFTContracts = Object.entries(await getNFTContracts())
     console.log("Step 1 - NFTContracts:",NFTContracts)
-
-    //list of NFT contract addresses we know about, locally
-    const localCache = NFTContracts.map(item => {
-      return item[0].toLowerCase()
-    })
-
-    //console.log("Step 2 - localCache addresses:",localCache)
-
-    //the Boba NFT registry
-    // const registry = new ethers.Contract(
-    //   allAddresses.L2ERC721RegAddress,
-    //   L2ERC721RegJson.abi,
-    //   this.L2Provider
-    // )
-
-    //This account's NFT contract addresses in that registry
-    // const addresses = await registry.lookupAddress(this.account)
-    // //console.log("Step 3 - Blockchain NFT wallet addresses:", addresses)
 
     //How many NFTs do you have right now?
     let numberOfNFTS = 0

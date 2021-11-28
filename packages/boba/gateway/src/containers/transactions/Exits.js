@@ -28,8 +28,7 @@ import Pager from 'components/pager/Pager'
 
 import networkService from 'services/networkService'
 
-import * as styles from './Transactions.module.scss'
-import * as S from './History.styles';
+import * as S from './History.styles'
 
 const PER_PAGE = 8
 

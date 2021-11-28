@@ -17,11 +17,9 @@ limitations under the License. */
 import React from 'react'
 import { Typography } from '@material-ui/core'
 
-import truncate from 'truncate-middle'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import * as styles from './listNFT.module.scss'
-import Copy from 'components/copy/Copy'
 
 class listNFT extends React.Component {
 
@@ -86,8 +84,6 @@ class listNFT extends React.Component {
     const {
       name,
       symbol,
-      address,
-      UUID,
       URL,
       meta
     } = this.state;
