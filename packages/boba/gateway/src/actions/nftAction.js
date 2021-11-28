@@ -27,8 +27,8 @@ export function getNFTContracts () {
 
 export async function addNFT ( NFT ) {
   
-  const state = store.getState();
-  const UUID = NFT.UUID;
+  const state = store.getState()
+  const UUID = NFT.UUID
 
   //if we already have added it, no need to add again
   if (state.nft.list[UUID]) {
@@ -36,13 +36,13 @@ export async function addNFT ( NFT ) {
   }
   
   const info = {
-    UUID: NFT.UUID, 
-    url: NFT.url, 
-    name:  NFT.name, 
+    UUID: NFT.UUID,
     address: NFT.address,
-    mintedTime: NFT.mintedTime,
-    symbol:  NFT.symbol,  
-    attributes: NFT.attributes
+    name:  NFT.name, 
+    tokenID: NFT.tokenID,
+    symbol:  NFT.symbol,
+    url: NFT.url,
+    meta: NFT.meta
   }
 
   store.dispatch({
@@ -65,7 +65,6 @@ export async function addNFTContract ( Contract ) {
   }
   
   const contract = {
-    owner: Contract.owner, 
     address: Contract.address,
     name:  Contract.name, 
     symbol: Contract.symbol,   

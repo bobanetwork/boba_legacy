@@ -953,23 +953,45 @@ class NetworkService {
     }
   }
 
+  async addNFTContract( address ) {
+
+    const contract = new ethers.Contract(
+      address,
+      L2ERC721Json.abi,
+      this.L2Provider
+    )
+
+    //always the same, no need to have in the loop
+    let nftName = await contract.name()
+    let nftSymbol = await contract.symbol()
+
+    const newContract = {
+      name: nftName,
+      symbol: nftSymbol,
+      address,
+    }
+
+    await addNFTContract( newContract )
+
+  }
+
   //goal is to find your NFTs and NFT contracts based on local cache and registry data
   async fetchNFTs() {
 
-    return //still need to deploy ERC721 contracts on mainnet
+    // return //still need to deploy ERC721 contracts on mainnet
 
-    console.log("scanning for NFTs...")
+    // console.log("scanning for NFTs...")
 
-    if(allAddresses.L2ERC721RegAddress === null) return
+    // if(allAddresses.L2ERC721RegAddress === null) return
 
-    console.log("scanning for NFTs...", allAddresses.L2ERC721RegAddress)
+    // console.log("scanning for NFTs...", allAddresses.L2ERC721RegAddress)
 
     //the current list of contracts we know about
     //based in part on the cache and anything we recently generated in this session
     //console.log("NFTContracts 1:",await getNFTContracts())
 
     let NFTContracts = Object.entries(await getNFTContracts())
-    //console.log("Step 1 - NFTContracts:",NFTContracts)
+    console.log("Step 1 - NFTContracts:",NFTContracts)
 
     //list of NFT contract addresses we know about, locally
     const localCache = NFTContracts.map(item => {
@@ -979,46 +1001,15 @@ class NetworkService {
     //console.log("Step 2 - localCache addresses:",localCache)
 
     //the Boba NFT registry
-    const registry = new ethers.Contract(
-      allAddresses.L2ERC721RegAddress,
-      L2ERC721RegJson.abi,
-      this.L2Provider
-    )
+    // const registry = new ethers.Contract(
+    //   allAddresses.L2ERC721RegAddress,
+    //   L2ERC721RegJson.abi,
+    //   this.L2Provider
+    // )
 
     //This account's NFT contract addresses in that registry
-    const addresses = await registry.lookupAddress(this.account)
-    //console.log("Step 3 - Blockchain NFT wallet addresses:", addresses)
-
-    //make sure we have all the contracts relevant to this user
-    for(let i = 0; i < addresses.length; i++) {
-      const address = addresses[i]
-      var inCache = (localCache.indexOf(address.toLowerCase()) > -1)
-      if(!inCache) {
-        console.log("Found a new NFT contract - adding:",address)
-        //Add to local NFT contracts structure
-        const contract = new ethers.Contract(
-          address,
-          L2ERC721Json.abi,
-          this.L2Provider
-        )
-
-        //always the same, no need to have in the loop
-        let nftName = await contract.name()
-        let nftSymbol = await contract.symbol()
-        let owner = await contract.owner()
-
-        const newContract = {
-          name: nftName,
-          symbol: nftSymbol,
-          owner: owner.toLowerCase(),
-          address,
-        }
-
-        console.log("newContract just added:",newContract)
-
-        await addNFTContract( newContract )
-      }
-    }
+    // const addresses = await registry.lookupAddress(this.account)
+    // //console.log("Step 3 - Blockchain NFT wallet addresses:", addresses)
 
     //How many NFTs do you have right now?
     let numberOfNFTS = 0
@@ -1026,9 +1017,13 @@ class NetworkService {
     NFTContracts = Object.entries(await getNFTContracts())
 
     for(let i = 0; i < NFTContracts.length; i++) {
+      
+      const address = NFTContracts[i][1].address
 
+      console.log("address:",address)
+      
       let contract = new ethers.Contract(
-        NFTContracts[i][1].address,
+        address,
         L2ERC721Json.abi,
         this.L2Provider
       )
@@ -1062,10 +1057,12 @@ class NetworkService {
 
         console.log("NFT contracts:",contract)
 
-        const balance = await contract.connect(
-          this.L2Provider
-        ).balanceOf(this.account)
+        const ownerTokenIDs = await contract.getOwnerNFTs(
+          this.account
+        )
+        console.log("ownerTokenIDs:",ownerTokenIDs)
 
+        const balance = ownerTokenIDs.length
         console.log("balance:",balance)
 
         //always the same, no need to have in the loop
@@ -1073,35 +1070,25 @@ class NetworkService {
         let nftSymbol = await contract.symbol()
 
         //can have more than 1 per contract
-        for (let i = 0; i < Number(balance.toString()); i++) {
+        for (let i = 0; i < balance; i++) {
 
-          console.log("looking up first NFT:",i)
-
-          //Goal here is to get all the tokenIDs, e.g. 3, 7, and 98,
-          //based on knowing the user's balance - e.g. three NFTs
-          const tokenIndex = BigNumber.from(i)
-
-          const tokenID = await contract.tokenOfOwnerByIndex(
-            this.account,
-            tokenIndex
-          )
-
+          const tokenID = ownerTokenIDs[i]
+          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
           const nftMeta = await contract.tokenURI(tokenID)
 
-          console.log("nftMeta:",nftMeta)
-
-          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
-          const { url , attributes = []} = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+          const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
           let NFT = {
-            UUID,
-            tokenID,
-            name: nftName,
-            symbol: nftSymbol,
+            UUID, 
             address,
+            name: nftName,
+            tokenID,
+            symbol: nftSymbol,
             url,
-            attributes
+            meta
           }
+
+          console.log("NFT:",NFT)
 
           await addNFT( NFT )
 

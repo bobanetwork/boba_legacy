@@ -31,11 +31,65 @@ export const getNftImageUrl = async (url) => {
 
         let res = await axios.get(URL)
 
+/*
+{
+   "collection":"BobaPunks",
+   "rank":"8970",
+   "id":3491,
+   "image":"https://ipfs.io/ipfs/QmTqPtJ893q9mTHzvjB1nYs2FNyYzXJr2sg4CHrndF5EJC/3491.png",
+   "traits":[
+      {
+         "trait_type":"Gender",
+         "trait_value":"Male"
+      },
+      {
+         "trait_type":"background",
+         "trait_value":"Data Stream"
+      },
+      {
+         "trait_type":"eyes",
+         "trait_value":"regular shades"
+      },
+      {
+         "trait_type":"head",
+         "trait_value":"messy hair"
+      },
+      {
+         "trait_type":"type",
+         "trait_value":"human dark"
+      }
+   ],
+   "rarity_score":28.57,
+   "name":"Bobapunk #3491"
+}
+*/
         if (res.headers && res.headers['content-type'].includes('application/json')) {
-            const { image, attributes = [] } = res.data
+
+            const { 
+                image, 
+                attributes = [], 
+                traits = [], 
+                collection = '', 
+                rank = '', 
+                id = '',
+                rarity_score = '',
+                name = '' 
+            } = res.data
+
+            //console.log("image:",image)
+            //console.log("attributes:",attributes)
+            //console.log("traits:",traits)
             return { 
-                url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image, 
-                attributes 
+                url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image,
+                meta: { 
+                    attributes,
+                    traits,
+                    collection,
+                    rank,
+                    id,
+                    rarity_score,
+                    name 
+                }
             }
         } else {
             return { url }
