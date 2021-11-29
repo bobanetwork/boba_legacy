@@ -579,7 +579,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(pool.accOwnerReward >= _amount, "Owner Reward Withdraw Error");
 
         pool.accOwnerReward = pool.accOwnerReward.sub(_amount);
