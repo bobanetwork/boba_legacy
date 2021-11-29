@@ -16,19 +16,27 @@ limitations under the License. */
 import { keyBy } from 'lodash'
 
 const initialState = {
-  sevens: {}
+  sevens: {},
+  fastExits: {}
 }
 
 function dataReducer (state = initialState, action) {
   switch (action.type) {
     case 'SEVENS/GETALL/SUCCESS':
-      return { 
+      return {
+        ...state, 
         sevens: {
-          ...state.sevens, 
           ...keyBy(action.payload, 'blockNumber', 'hash') 
         }
       }
-    default:
+  case 'FASTEXITS/GETALL/SUCCESS':
+    return { 
+      ...state, 
+      fastExits: { 
+        ...keyBy(action.payload, 'blockNumber', 'hash') 
+      }
+    }
+  default:
       return state
   }
 }

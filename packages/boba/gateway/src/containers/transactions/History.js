@@ -23,6 +23,8 @@ import "react-datepicker/dist/react-datepicker.css"
 import {useMediaQuery, useTheme} from '@material-ui/core'
 import moment from 'moment';
 
+import Input from 'components/input/Input'
+
 import { setActiveHistoryTab } from 'actions/uiAction'
 import { selectActiveHistoryTab } from 'selectors/uiSelector'
 
@@ -30,17 +32,16 @@ import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import Tabs from 'components/tabs/Tabs'
-import Input from 'components/input/Input'
 
 import Exits from './Exits'
 import Deposits from './Deposits'
+import Transactions from './Transactions'
 
-import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
+import * as styles from './Transactions.module.scss'
 
 import useInterval from 'util/useInterval'
 import PageHeader from 'components/pageHeader/PageHeader'
-import Transactions from './Transactions'
 
 import { POLL_INTERVAL } from 'util/constant'
 
@@ -58,12 +59,9 @@ function History() {
   const [endDate, setEndDate] = useState(now)
 
   const [searchHistory, setSearchHistory] = useState('')
-
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
-
-  //sort transactions by timeStamp
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
   const transactions = orderedTransactions.filter((i) => {
@@ -74,10 +72,24 @@ function History() {
   })
 
   useInterval(() => {
-    batch(() => {
-      dispatch(fetchTransactions());
-    });
+    batch(()=>{
+      dispatch(fetchTransactions())
+    })
   }, POLL_INTERVAL);
+
+/*
+<S.Header>
+        <div className={styles.searchInput}>
+          <Input
+            size='small'
+            placeholder='Search by hash'
+            value={searchData}
+            onChange={i=>{setSearchData(i.target.value)}}
+            className={styles.searchBar}
+          />
+        </div>
+      </S.Header>
+      */
 
   return (
     <>
@@ -89,9 +101,7 @@ function History() {
             size='small'
             placeholder='Search by hash'
             value={searchHistory}
-            onChange={i => {
-              setSearchHistory(i.target.value);
-            }}
+            onChange={i=>{setSearchHistory(i.target.value)}}
             className={styles.searchBar}
           />
         </div>
@@ -101,28 +111,28 @@ function History() {
           ) : null}
           <DatePicker
             wrapperClassName={styles.datePickerInput}
+            popperClassName={styles.popperStyle}
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={(date)=>setStartDate(date)}
             selectsStart
             endDate={new Date(endDate)}
             maxDate={new Date(endDate)}
             calendarClassName={theme.palette.mode}
             placeholderText={isMobile ? "From" : ""}
-            popperClassName={styles.popperStyle}
           />
           {!isMobile ? (
             <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
           ) : null}
           <DatePicker
             wrapperClassName={styles.datePickerInput}
+            popperClassName={styles.popperStyle}
             selected={endDate}
-            onChange={(date) => setEndDate(date)}
+            onChange={(date)=>setEndDate(date)}
             selectsEnd
             startDate={new Date(startDate)}
             minDate={new Date(startDate)}
             calendarClassName={theme.palette.mode}
             placeholderText={isMobile ? "To" : ""}
-            popperClassName={styles.popperStyle}
           />
         </div>
       </S.Header>
@@ -160,4 +170,4 @@ function History() {
   );
 }
 
-export default React.memo(History);
+export default React.memo(History)

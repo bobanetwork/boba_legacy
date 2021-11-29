@@ -75,6 +75,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     DiscretionaryExitBurn: Contract
     Proxy__L1LiquidityPool: Contract
     Proxy__L2LiquidityPool: Contract
+    CanonicalTransactionChain: Contract
+    StateCommitmentChain: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
     L2ETHVaultBalance: BigNumber
@@ -158,6 +160,30 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.Proxy__L2LiquidityPool.address,
     })
 
+   this.logger.info('Connecting to CanonicalTransactionChain...')
+    const CanonicalTransactionChainAddress =
+      await this.state.Lib_AddressManager.getAddress('CanonicalTransactionChain')
+    this.state.CanonicalTransactionChain = loadContract(
+      'CanonicalTransactionChain',
+      CanonicalTransactionChainAddress,
+      this.options.l1RpcProvider
+    )
+    this.logger.info('Connected to CanonicalTransactionChain', {
+      address: this.state.CanonicalTransactionChain.address,
+    })
+
+   this.logger.info('Connecting to StateCommitmentChain...')
+    const StateCommitmentChainAddress =
+      await this.state.Lib_AddressManager.getAddress('StateCommitmentChain')
+    this.state.StateCommitmentChain = loadContract(
+      'StateCommitmentChain',
+      StateCommitmentChainAddress,
+      this.options.l1RpcProvider
+    )
+    this.logger.info('Connected to StateCommitmentChain', {
+      address: this.state.StateCommitmentChain.address,
+    })
+
     this.logger.info('Connecting to OVM_GasPriceOracle...')
     this.state.OVM_GasPriceOracle = loadContract(
       'OVM_GasPriceOracle',
@@ -194,6 +220,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this._updateGasPrice()
       await this._updateFastExitGasBurnFee()
       await this._updateClassicalExitGasBurnFee()
+      await this._updateOverheadFee()
     }
   }
 
@@ -670,6 +697,84 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE CLASSICAL EXIT BURNED RATIO ${error}`)
+    }
+  }
+
+   private async _updateOverheadFee(): Promise<void> {
+    try {
+      const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
+      const CanonicalTransactionChainLog =
+        await this.state.CanonicalTransactionChain.queryFilter(
+          this.state.CanonicalTransactionChain.filters.SequencerBatchAppended(),
+          Number(latestL1Block) - 1000,
+          Number(latestL1Block)
+        )
+      const StateCommitmentChainLog =
+        await this.state.StateCommitmentChain.queryFilter(
+          this.state.StateCommitmentChain.filters.StateBatchAppended(),
+          Number(latestL1Block) - 1000,
+          Number(latestL1Block)
+        )
+
+    const orderedOverheadLog = orderBy(
+        [...CanonicalTransactionChainLog, ...StateCommitmentChainLog],
+        'blockNumber',
+        'desc'
+      )
+
+      // Calculate the batch size
+      let L1BatchSubmissionCost = BigNumber.from(0)
+      const transactionHashList = orderedOverheadLog.reduce(
+        (acc, cur, index) => {
+          if (!acc.includes(cur.transactionHash)) {
+            acc.push(cur.transactionHash)
+          }
+          return acc
+        },
+        []
+      )
+
+      const batchSize = StateCommitmentChainLog.reduce((acc, cur) => {
+        acc += cur.args._batchSize.toNumber()
+        return acc
+      }, 0)
+
+      for (const hash of transactionHashList) {
+        const txReceipt =
+          await this.options.l1RpcProvider.getTransactionReceipt(hash)
+        L1BatchSubmissionCost = L1BatchSubmissionCost.add(
+          txReceipt.effectiveGasPrice.mul(txReceipt.gasUsed)
+        )
+      }
+
+      const batchFee = L1BatchSubmissionCost.div(
+        BigNumber.from(batchSize)
+      )
+      const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
+      const targetOverheadGas = batchFee.div(L2GasPrice)
+
+      const overheadGas =
+        await this.state.OVM_GasPriceOracle.overhead()
+
+      if (targetOverheadGas.toString() === overheadGas.toString()) {
+        this.logger.info('No need to overhead gas', {
+          targetOverheadGas: Number(targetOverheadGas.toString()),
+          overheadGas: Number(overheadGas.toString()),
+        })
+      } else {
+        this.logger.debug('Updating overhead gas...')
+        const tx =
+          await this.state.OVM_GasPriceOracle.setOverhead(
+            targetOverheadGas,
+            { gasPrice: 0 }
+          )
+        await tx.wait()
+        this.logger.info('Updated overhead gas', {
+          overheadGas: Number(targetOverheadGas.toString()),
+        })
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE OVER HEAD RATIO ${error}`)
     }
   }
 }
