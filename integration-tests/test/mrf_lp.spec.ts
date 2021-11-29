@@ -798,7 +798,7 @@ describe('Liquidity Pool Test', async () => {
         balanceERC20Amount,
         '0x0000000000000000000000000000000000000000'
       )
-    ).to.be.revertedWith('caller is not the owner')
+    ).to.be.revertedWith('Caller is not the owner')
 
     await expect(
       L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
@@ -809,7 +809,7 @@ describe('Liquidity Pool Test', async () => {
         balanceERC20Amount,
         '0x4200000000000000000000000000000000000006'
       )
-    ).to.be.revertedWith('caller is not the owner')
+    ).to.be.revertedWith('Caller is not the owner')
 
     await expect(
       L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2ERC20.address)
@@ -922,7 +922,7 @@ describe('Liquidity Pool Test', async () => {
 
       await expect(
         L1LiquidityPool.connect(env.l1Wallet_2).pause()
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       // only owner can pause
       await L1LiquidityPool.connect(env.l1Wallet).pause()
@@ -969,7 +969,7 @@ describe('Liquidity Pool Test', async () => {
 
       await expect(
         L2LiquidityPool.connect(env.l2Wallet_2).pause()
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       // only owner can pause
       await L2LiquidityPool.connect(env.l2Wallet).pause()
@@ -1045,7 +1045,7 @@ describe('Liquidity Pool Test', async () => {
   it('should fail configuring L2LP fee for non DAO', async () => {
     await expect(
       L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35, 15)
-    ).to.be.revertedWith('caller is not the DAO')
+    ).to.be.revertedWith('Caller is not the DAO')
   })
 
   it('the DAO should be able to configure fee for L1LP', async function () {
@@ -1094,7 +1094,7 @@ describe('Liquidity Pool Test', async () => {
   it('should fail configuring L1LP fee for non DAO', async () => {
     await expect(
       L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35, 15)
-    ).to.be.revertedWith('caller is not the DAO')
+    ).to.be.revertedWith('Caller is not the DAO')
 
     await expect(L1LiquidityPool.configureFee(35, 15)).to.be.revertedWith(
       'XCHAIN: messenger contract unauthenticated'
@@ -1300,7 +1300,7 @@ describe('Liquidity Pool Test', async () => {
           balanceETHAmount,
           '0x0000000000000000000000000000000000000000'
         )
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       await expect(
         L1LiquidityPool.rebalanceLP(
@@ -1314,7 +1314,7 @@ describe('Liquidity Pool Test', async () => {
           balanceETHAmount,
           '0x4200000000000000000000000000000000000006'
         )
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       await expect(
         L2LiquidityPool.rebalanceLP(
@@ -1491,7 +1491,7 @@ describe('Liquidity Pool Test', async () => {
         L2LiquidityPool.connect(env.l2Wallet_2).configureExtraGasRelay(
           newExtraGasRelay
         )
-      ).to.be.revertedWith('caller is not the gasPriceOracle owner')
+      ).to.be.revertedWith('Caller is not the gasPriceOracle owner')
     })
 
     it('should allow updating extraGasRelay for owner', async () => {
