@@ -13,6 +13,7 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
+import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridge.sol";
 
 /**
  * @dev An L2 LiquidityPool implementation
@@ -145,6 +146,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     event WithdrawReward(
         address sender,
         address receiver,
+        uint256 amount,
+        address tokenAddress
+    );
+
+    event RebalanceLP(
         uint256 amount,
         address tokenAddress
     );
@@ -631,6 +637,53 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         emit WithdrawReward(
             msg.sender,
             _to,
+            _amount,
+            _tokenAddress
+        );
+    }
+
+    /*
+     * Rebalance LPs
+     * @param _amount token amount that we want to move from L2 to L1
+     * @param _tokenAddress L2 token address
+     */
+    function rebalanceLP(
+        uint256 _amount,
+        address _tokenAddress
+    )
+        external
+        payable
+        onlyOwner()
+        whenNotPaused()
+    {
+        require(_amount != 0, "Amount Incorrect");
+
+        PoolInfo storage pool = poolInfo[_tokenAddress];
+
+        require(L1LiquidityPoolAddress != address(0), "L1 Liquidity Pool Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+
+        if (_tokenAddress == Lib_PredeployAddresses.OVM_ETH) {
+            require(_amount <= address(this).balance, "Failed to Rebalance LP");
+            L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
+                _tokenAddress,
+                L1LiquidityPoolAddress,
+                _amount,
+                DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS,
+                ""
+            );
+        } else {
+            require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Failed to Rebalance LP");
+            IERC20(_tokenAddress).safeIncreaseAllowance(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, _amount);
+            L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
+                _tokenAddress,
+                L1LiquidityPoolAddress,
+                _amount,
+                DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS,
+                ""
+            );
+        }
+        emit RebalanceLP(
             _amount,
             _tokenAddress
         );

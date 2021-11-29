@@ -179,6 +179,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         _;
     }
 
+    modifier onlyL1StandardBridge() {
+        require(address(L1StandardBridgeAddress) == msg.sender, "Can't receive ETH");
+        _;
+    }
+
+    /********************
+     * Fall back Functions *
+     ********************/
+    receive()
+        external
+        payable
+        onlyL1StandardBridge()
+    {}
 
     /********************
      * Public Functions *
