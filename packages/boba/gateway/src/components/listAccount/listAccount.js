@@ -88,6 +88,10 @@ class ListAccount extends React.Component {
     const enabled = (networkLayer === chain) ? true : false
     const logo = getCoinImage(token.symbol)
 
+    const amount = token.symbol === 'ETH' ? 
+      Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, {minimumFractionDigits: 3,maximumFractionDigits:3}) :
+      Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits:2})
+
     return (
       <>
         <S.Content>
@@ -101,9 +105,14 @@ class ListAccount extends React.Component {
                 </S.TextTableCell>
               </S.TableCell>
 
-              <S.TableCell>
-                <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div" sx={{fontWeight:"700"}}>
-                  {`${logAmount(token.balance, token.decimals, 2)}`}
+              <S.TableCell sx={{justifyContent: "flex-start"}}>
+                <S.TextTableCell 
+                  enabled={`${enabled}`} 
+                  variant="body2" 
+                  component="div" 
+                  sx={{fontWeight:'700'}}
+                >
+                  {amount}
                 </S.TextTableCell>
               </S.TableCell>
 
@@ -192,7 +201,7 @@ class ListAccount extends React.Component {
                   color='primary'
                   disabled={disabled}
                   variant="contained"
-                  tooltip="A swap-based bridge to Boba L2. This option is only available if there is enough liquidity in the pools."
+                  tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
                   fullWidth
                 >
                   Fast Bridge to L2
@@ -216,7 +225,7 @@ class ListAccount extends React.Component {
                     onClick={()=>{this.handleModalClick('exitModal', token, true)}}
                     variant="contained"
                     disabled={disabled}
-                    tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a small fee, however, and this option is only available if there is enough liquidity in the pools."
+                    tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
                     fullWidth
                   >
                     Fast Bridge to L1

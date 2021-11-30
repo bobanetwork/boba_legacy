@@ -76,6 +76,16 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l2FeeRate: action.payload
       }
+    case 'FETCH/L1FEERATE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeRateN: action.payload
+      }
+    case 'FETCH/L2FEERATE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeRateN: action.payload
+      }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
       return {
         ...state, 
