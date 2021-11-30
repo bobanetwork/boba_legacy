@@ -1078,7 +1078,7 @@ describe('Liquidity Pool Test', async () => {
 
   it('should fail configuring L2LP fee for non DAO', async () => {
     await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35, 15)
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(5, 35, 15)
     ).to.be.revertedWith('Caller is not the DAO')
   })
 
@@ -1134,7 +1134,7 @@ describe('Liquidity Pool Test', async () => {
 
   it('should fail configuring L1LP fee for non DAO', async () => {
     await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35, 15)
+      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(5, 35, 15)
     ).to.be.revertedWith('Caller is not the DAO')
 
     await expect(L1LiquidityPool.configureFee(5, 35, 15)).to.be.revertedWith(
