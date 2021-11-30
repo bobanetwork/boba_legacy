@@ -235,7 +235,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'There is a maximum possible fee of' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
+  const label = 'There is a maximum possible fee of ' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -302,7 +302,13 @@ function InputStepFast({ handleClose, token }) {
           Fast Bridge to L2
         </Typography>
 
-        <Typography variant="body2" sx={{mb: 3}}>{label}</Typography>
+        <Typography variant="body2" sx={{mb: 3}}>
+          {label}
+        </Typography>
+
+        <Typography variant="body2" sx={{mb: 3}}>
+          In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
+        </Typography>
 
         <Input
           label={`Amount to bridge`}

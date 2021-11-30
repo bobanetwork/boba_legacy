@@ -228,7 +228,7 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
-  const feeLabel = 'There is a maximum possible fee of' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
+  const feeLabel = 'There is a maximum possible fee of ' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -286,7 +286,11 @@ function DoExitStepFast({ handleClose, token }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          {feeLabel}. In most cases, a fast exit takes one hour or less. However, if Ethereum is congested, it can take as long as 3 hours.
+          {feeLabel}
+        </Typography>
+
+        <Typography variant="body2" sx={{mb: 3}}>
+          In most cases, a fast exit takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
         </Typography>
 
         <Input
