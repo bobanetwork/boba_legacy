@@ -1688,15 +1688,15 @@ class NetworkService {
       L1LPJson.abi,
       this.L1Provider
     )
-    const [userFeeRate, operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      L1LPContract.userRewardFeeRate(),
+    const [/*userFeeRate, */operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+      //L1LPContract.userRewardFeeRate(),
       L1LPContract.ownerRewardFeeRate(),
       L1LPContract.userRewardMinFeeRate(),
       L1LPContract.userRewardMaxFeeRate()
     ])
 
     console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-    console.log("L1 userFeeRate",Number(userFeeRate))
+    //console.log("L1 userFeeRate",Number(userFeeRate))
     console.log("L1 userMinFeeRate",Number(userMinFeeRate))
     console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
 
@@ -1711,15 +1711,15 @@ class NetworkService {
       L2LPJson.abi,
       this.L2Provider
     )
-    const [userFeeRate, operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      L2LPContract.userRewardFeeRate(),
+    const [/*userFeeRate, */operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+      //L2LPContract.userRewardFeeRate(),
       L2LPContract.ownerRewardFeeRate(),
       L2LPContract.userRewardMinFeeRate(),
       L2LPContract.userRewardMaxFeeRate()
     ])
 
     console.log("L2 operatorFeeRate",Number(operatorFeeRate))
-    console.log("L2 userRewardFeeRate",Number(userFeeRate))
+    //console.log("L2 userRewardFeeRate",Number(userFeeRate))
     console.log("L2 userMinFeeRate",Number(userMinFeeRate))
     console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
