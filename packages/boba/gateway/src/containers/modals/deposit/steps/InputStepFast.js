@@ -142,7 +142,7 @@ function InputStepFast({ handleClose, token }) {
   }
 
   const receivableAmount = (value) => {
-    return (Number(value) * ((100 - Number(feeRate)) / 100)).toFixed(3)
+    return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
 
   async function doDeposit() {
@@ -161,8 +161,8 @@ function InputStepFast({ handleClose, token }) {
         dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
-            `ETH was bridged. You will receive at least
-            ${((Number(value) * (100 - Number(feeRate)))/100).toFixed(3)}
+            `ETH was bridged. You will receive approximately
+            ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
             ETH on L2`
           )
         )
@@ -197,7 +197,7 @@ function InputStepFast({ handleClose, token }) {
       dispatch(setActiveHistoryTab('Bridge to L2'))
       dispatch(
         openAlert(
-          `${token.symbol} was bridged to the L1LP. You will receive at least
+          `${token.symbol} was bridged to the L1LP. You will receive approximately
            ${receivableAmount(value)} ${token.symbol} on L2`
         )
       )
@@ -240,7 +240,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'The current fee is ' + feeRateN + '% but it can vary depending on pool utilization. The maximum possible fee is ' + feeRate + '%.'
+  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -337,7 +337,7 @@ function InputStepFast({ handleClose, token }) {
 
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive at least ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
+            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
           </Typography>
         )}
 
@@ -360,9 +360,23 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
+        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) and/or balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+            The pool's balance and balance/liquidity ratio are low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+
+        {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+        
+        {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}

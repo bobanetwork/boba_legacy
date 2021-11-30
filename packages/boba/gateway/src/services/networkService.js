@@ -1684,46 +1684,65 @@ class NetworkService {
 
   async getL1TotalFeeRate() {
 
-    const L1LPContract = new ethers.Contract(
-      allAddresses.L1LPAddress,
-      L1LPJson.abi,
-      this.L1Provider
-    )
-    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      L1LPContract.ownerRewardFeeRate(),
-      L1LPContract.userRewardMinFeeRate(),
-      L1LPContract.userRewardMaxFeeRate()
-    ])
+    try{
+      const L1LPContract = new ethers.Contract(
+        allAddresses.L1LPAddress,
+        L1LPJson.abi,
+        this.L1Provider
+      )
+      const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+        L1LPContract.ownerRewardFeeRate(),
+        L1LPContract.userRewardMinFeeRate(),
+        L1LPContract.userRewardMaxFeeRate()
+      ])
 
-    // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-    // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
-    // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
+      // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
+      // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
+      // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
+      const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
+      const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
-    return (feeRate / 10).toFixed(1)
+      return {
+        feeMin: (feeRateL / 10).toFixed(1),
+        feeMax: (feeRateH / 10).toFixed(1)
+      }
+    } catch (error) {
+      console.log("NS: getL1TotalFeeRate error:", error)
+      return error
+    }
   }
 
   async getL2TotalFeeRate() {
 
-    const L2LPContract = new ethers.Contract(
-      allAddresses.L2LPAddress,
-      L2LPJson.abi,
-      this.L2Provider
-    )
-    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      L2LPContract.ownerRewardFeeRate(),
-      L2LPContract.userRewardMinFeeRate(),
-      L2LPContract.userRewardMaxFeeRate()
-    ])
+    try{
+    
+      const L2LPContract = new ethers.Contract(
+        allAddresses.L2LPAddress,
+        L2LPJson.abi,
+        this.L2Provider
+      )
+      const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+        L2LPContract.ownerRewardFeeRate(),
+        L2LPContract.userRewardMinFeeRate(),
+        L2LPContract.userRewardMaxFeeRate()
+      ])
 
     // console.log("L2 operatorFeeRate",Number(operatorFeeRate))
     // console.log("L2 userMinFeeRate",Number(userMinFeeRate))
     // console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
+      const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
+      const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
-    return (feeRate / 10).toFixed(1)
+      return {
+        feeMin: (feeRateL / 10).toFixed(1),
+        feeMax: (feeRateH / 10).toFixed(1)
+      }
+    } catch (error) {
+      console.log("NS: getL2TotalFeeRate error:", error)
+      return error
+    }
   }
 
   async getL1UserRewardFeeRate(tokenAddress) {
