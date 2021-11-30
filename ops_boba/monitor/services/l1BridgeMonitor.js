@@ -262,10 +262,10 @@ class l1BridgeMonitorService extends OptimismEnv {
           )
         }
       }
-    } else {
-      this.logger.info(
-        `No L1 standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+    //   this.logger.info(
+    //     `No L1 standard bridge logs found from block ${this.startBlock} to ${endBlock}`
+    //   )
     }
 
     this.startBlock = endBlock

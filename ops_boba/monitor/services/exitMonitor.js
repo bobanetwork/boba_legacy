@@ -169,10 +169,10 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    } else {
-      this.logger.info(
-        `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+      // this.logger.info(
+      //   `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
+      // )
     }
 
     this.startBlock = endBlock
