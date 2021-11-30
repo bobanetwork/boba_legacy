@@ -79,12 +79,12 @@ class l1BridgeMonitorService extends OptimismEnv {
     const endBlock = Math.min(latestL1Block, this.endBlock)
     if (this.startBlock > endBlock) this.startBlock = endBlock
 
-    const [userRewardFeeRate, ownerRewardFeeRate] = await Promise.all([
-      this.L2LiquidityPoolContract.userRewardFeeRate(),
+    const [userRewardMaxFeeRate, ownerRewardFeeRate] = await Promise.all([
+      this.L2LiquidityPoolContract.userRewardMaxFeeRate(),
       this.L2LiquidityPoolContract.ownerRewardFeeRate(),
     ])
 
-    const totalFeeRate = userRewardFeeRate.add(ownerRewardFeeRate)
+    const totalFeeRate = userRewardMaxFeeRate.add(ownerRewardFeeRate)
 
     const L1LPLog = await this.L1Provider.getLogs({
       address: this.L1LiquidityPoolAddress,
