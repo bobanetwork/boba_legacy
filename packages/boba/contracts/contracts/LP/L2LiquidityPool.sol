@@ -84,7 +84,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     address public owner;
     address public L1LiquidityPoolAddress;
-    uint256 public userRewardFeeRate;
+    uint256 public userRewardMinFeeRate;
     uint256 public ownerRewardFeeRate;
     // Default gas value which can be overridden if more complex logic runs on L1.
     uint32 public DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS;
@@ -94,6 +94,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     address public DAO;
 
     uint256 public extraGasRelay;
+
+    uint256 public userRewardMaxFeeRate;
 
     /********************
      *       Event      *
@@ -245,7 +247,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
         DAO = msg.sender;
-        configureFee(35, 15);
+        configureFee(1, 10, 15);
         configureGas(100000);
 
         __Context_init_unchained();
@@ -256,19 +258,22 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     /**
      * @dev Configure fee of this contract.
      *
-     * @param _userRewardFeeRate fee rate that users get
+     * @param _userRewardMinFeeRate minimum fee rate that users get
+     * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
      */
     function configureFee(
-        uint256 _userRewardFeeRate,
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
         uint256 _ownerRewardFeeRate
     )
         public
         onlyDAO()
         onlyInitialized()
     {
-        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'One or both fee rates too large');
-        userRewardFeeRate = _userRewardFeeRate;
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
+        userRewardMinFeeRate = _userRewardMinFeeRate;
+        userRewardMaxFeeRate = _userRewardMaxFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
     }
 
@@ -285,21 +290,24 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     /**
      * @dev Configure fee of the L1LP contract
      *
-     * @param _userRewardFeeRate fee rate that users get
+     * @param _userRewardMinFeeRate minimum fee rate that users get
+     * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
      */
     function configureFeeExits(
-        uint256 _userRewardFeeRate,
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
         uint256 _ownerRewardFeeRate
     )
         external
         onlyDAO()
         onlyInitialized()
     {
-        require(_userRewardFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'One or both fee rates too large');
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         bytes memory data = abi.encodeWithSelector(
             iL1LiquidityPool.configureFee.selector,
-            _userRewardFeeRate,
+            _userRewardMinFeeRate,
+            _userRewardMaxFeeRate,
             _ownerRewardFeeRate
         );
 
@@ -324,6 +332,40 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyInitialized()
     {
         DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS = _l1GasFee;
+    }
+
+    /**
+     * @dev Return user reward fee rate.
+     *
+     * @param _l2TokenAddress L2 token address
+     */
+    function getUserRewardFeeRate(
+        address _l2TokenAddress
+    )
+        public
+        view
+        onlyInitialized()
+        returns (uint256 userRewardFeeRate)
+    {
+        PoolInfo storage pool = poolInfo[_l2TokenAddress];
+        uint256 poolLiquidity = pool.userDepositAmount;
+        uint256 poolBalance;
+        if (_l2TokenAddress == Lib_PredeployAddresses.OVM_ETH) {
+            poolBalance = address(this).balance;
+        } else {
+            poolBalance = IERC20(_l2TokenAddress).balanceOf(address(this));
+        }
+        if (poolBalance == 0) {
+            return userRewardMaxFeeRate;
+        } else {
+            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / poolBalance;
+            if (userRewardMinFeeRate > poolRewardRate) {
+                return userRewardMinFeeRate;
+            } else if (userRewardMaxFeeRate < poolRewardRate) {
+                return userRewardMaxFeeRate;
+            }
+            return poolRewardRate;
+        }
     }
 
     /***
@@ -723,7 +765,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         bool replyNeeded = false;
         PoolInfo storage pool = poolInfo[_tokenAddress];
-
+        uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
@@ -793,7 +835,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         whenNotPaused
     {
         PoolInfo storage pool = poolInfo[_tokenAddress];
-
+        uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
