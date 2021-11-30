@@ -30,6 +30,101 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}"
 
+  LoadBalancerGraphSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} Graph LB"
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8000
+        ToPort: 8000
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8000
+        ToPort: 8000
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8001
+        ToPort: 8001
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8001
+        ToPort: 8001
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8030
+        ToPort: 8030
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8030
+        ToPort: 8030
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8040
+        ToPort: 8040
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8040
+        ToPort: 8040
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 73.241.148.235/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 10.0.0.0/8
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 223.197.37.165/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 45.76.251.252/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 212.185.199.57/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 103.6.151.183/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 47.118.60.217/32
+      - IpProtocol: tcp
+        FromPort: 8020
+        ToPort: 8020
+        CidrIp: 47.75.71.52/32
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Graph-LB"
+
   LoadBalancerIntSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -47,17 +142,20 @@ Resources:
   LoadBalancerGraph:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      IpAddressType: dualstack
       Scheme: internet-facing
-      LoadBalancerAttributes:
-      - Key: idle_timeout.timeout_seconds
-        Value: '3600'
-      Type: application
-      SecurityGroups:
-        - !Ref LoadBalancerIntSecurityGroup
+      Type: network
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
+  LoadBalancerIpfs:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
   LoadBalancerReplicaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -283,6 +381,10 @@ Outputs:
     Value: !Ref LoadBalancerReplicaSecurityGroup
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica:SecurityGroup"
+  LoadBalancerGraphSecurityGroup:
+    Value: !Ref LoadBalancerGraphSecurityGroup
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGraph:SecurityGroup"
   LoadBalancerReplicaDTLDNSName:
     Value: !GetAtt LoadBalancerReplicaDTL.DNSName
     Export:
@@ -347,6 +449,14 @@ Outputs:
     Value: !Ref LoadBalancerReplicaDTL3
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL3:ARN"
+  LoadBalancerIpfsDNSName:
+    Value: !GetAtt LoadBalancerIpfs.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerIpfs:DNSName"
+  LoadBalancerIpfsArn:
+    Value: !Ref LoadBalancerIpfs
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerIpfs:ARN"
   S3BucketV2:
     Value: mainnet-infrastructure-application-s3
     Export:

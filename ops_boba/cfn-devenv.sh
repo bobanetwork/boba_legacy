@@ -396,7 +396,7 @@ function update_dev_services {
       done
     else
       notice "Generating environment file for ${SERVICE_NAME}"
-      set -x
+      #set -x
       if [[ ${ENV_PREFIX} == *"-replica"* ]];then
         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-replica##g'`
       elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
@@ -455,8 +455,12 @@ function destroy_dev_services {
     #set -x
       local force="${1:-}"
       CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
-      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" || "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
+      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp01" || "${SERVICE_NAME}" == "replica-l2-bkp01" || "${SERVICE_NAME}" == "ipfs" ]]; then
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+      elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp02" || "${SERVICE_NAME}" == "replica-l2b-kp02" || "${SERVICE_NAME}" == "graph" ]]; then
+        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
         ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
       else
@@ -518,6 +522,10 @@ function destroy_dev_services {
         CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
         if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp01" || "${SERVICE_NAME}" == "replica-l2-bkp01" || "${SERVICE_NAME}" == "ipfs" ]]; then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp02" || "${SERVICE_NAME}" == "replica-l2b-kp02" || "${SERVICE_NAME}" == "graph" ]]; then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         else
@@ -560,8 +568,8 @@ function destroy_dev_services {
 #set -x
         #CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica*##')
         CLUSTER_NAME=$(echo ${ENV_PREFIX})
-        if [[ ${ENV_PREFIX} == *"-replica"* ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        if [[ ${ENV_PREFIX} == *"-replica"* ]] || [[ ${ENV_PREFIX} != *"-replica-bkp01"* ]] || [[ ${ENV_PREFIX} != *"-replica-bkp02"* ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep replica|head -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == *"-replica-bkp01"* ]];then

@@ -135,7 +135,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "blockscout", "service": "blockscout"}]'
           Essential: true
-          Memory: "16000"
+          Memory: "9000"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -162,7 +162,7 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 60
+      HealthCheckGracePeriodSeconds: 10
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

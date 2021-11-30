@@ -14,7 +14,7 @@ Parameters:
     # The types of instances is limited to avoid mistakes generating huge costs by putting the wrong instance type.
     Description: Type of instances to be added to the ECS cluster
     Type: String
-    Default: c6i.2xlarge
+    Default: t3a.xlarge
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -30,10 +30,10 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}"
 
-  LoadBalancerReplicaBackup02SecurityGroup:
+  LoadBalancerVerifierSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: !Sub "SG for ${AWS::StackName} ReplicaBackup02 LB"
+      GroupDescription: !Sub "SG for ${AWS::StackName} Verifier LB"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       SecurityGroupIngress:
@@ -42,9 +42,9 @@ Resources:
         CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-ReplicaBackup02-LB"
+          Value: !Sub "${AWS::StackName}-Verifier-LB"
 
-  LoadBalancerReplicaBackup02DTL:
+  LoadBalancerVerifier:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internal
@@ -53,14 +53,14 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
-  LoadBalancerReplicaBackup02:
+  LoadBalancerVerifierDTL:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Scheme: internet-facing
+      Scheme: internal
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
   EcsCluster:
     Type: AWS::ECS::Cluster
@@ -105,22 +105,21 @@ Resources:
     Properties:
       Roles: [!Ref EcsInstanceRole]
 
-  EcsSecurityGroupReplicaBackup02:
+  EcsSecurityGroupVerifier:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: !Sub "SG for ${AWS::StackName} Landscape ECS Cluster ReplicaBackup02"
+      GroupDescription: !Sub "SG for ${AWS::StackName} Landscape ECS Cluster Verifier"
       VpcId:
         Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       SecurityGroupIngress:
-      - SourceSecurityGroupId: !Ref LoadBalancerReplicaBackup02SecurityGroup
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 65535
+      - Description: Allow all traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-ReplicaBackup02-ECS-Cluster"
+          Value: !Sub "${AWS::StackName}-Verifier-ECS-Cluster"
 
-  EcsLaunchConfigurationReplicaBackup02:
+  EcsLaunchConfigurationVerifier:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
       AWS::CloudFormation::Init:
@@ -137,7 +136,7 @@ Resources:
     Properties:
       InstanceType: !Ref EcsInstanceType
       SecurityGroups:
-      - !Ref EcsSecurityGroupReplicaBackup02
+      - !Ref EcsSecurityGroupVerifier
       IamInstanceProfile: !Ref EcsInstanceProfile
       ImageId: !Ref EcsImageId
       UserData:
@@ -147,13 +146,13 @@ Resources:
             systemctl enable --now amazon-ssm-agent
             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbEgniumTWAjZjw7vgcMCrHALO7KcjXHo3I09ulp7ufd1jpk/0PCAPwRqURLZWujjkB/OGto8W/YqCF7F5s3VJvC5lq0Sbbmagyz7obTYRVBNA656wdw2T6udHoci26kQEJoEZCHjlnCnPnNC1IkiJMwjbXivcVdUeCuFaUREWqOB5qPDEoG3xfKqHF1qlVhuuI/Q14AsgUGtMNKQyuR97k/pL2KncTTIg1Ev2pMm3/4sND5TFtX907LNEz1fu1JQqpM/fXUM/a+rlREaBj+2+nWC37+TFjd3WWvohdMEljRGH8JnTcYU5hvfdZV62pLgNjz0LPAn+tLugwacbGy6J chenboyuan@Macbook.hsd1.va.comcast.net" > /home/ec2-user/.ssh/authorized_keys
             mkdir -p /mnt/efs /mnt/efs/db
-            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EcsLaunchConfigurationReplicaBackup02 --region ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroupReplicaBackup02 --region ${AWS::Region} || true
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EcsLaunchConfigurationVerifier --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroupVerifier --region ${AWS::Region} || true
 
-  AutoScalingGroupReplicaBackup02:
+  AutoScalingGroupVerifier:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      LaunchConfigurationName: !Ref EcsLaunchConfigurationReplicaBackup02
+      LaunchConfigurationName: !Ref EcsLaunchConfigurationVerifier
       MetricsCollection:
       - Granularity: 1Minute
         Metrics:
@@ -166,38 +165,38 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-ReplicaBackup02-ECS"
+          Value: !Sub "${AWS::StackName}-Verifier-ECS"
           PropagateAtLaunch: true
 Outputs:
   EcsCluster:
     Value: !Ref EcsCluster
     Export:
-      Name: !Sub "${InfrastructureStackName}:EcsClusterReplicaBackup02"
+      Name: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
   EcsSecurityGroup:
-    Value: !Ref EcsSecurityGroupReplicaBackup02
+    Value: !Ref EcsSecurityGroupVerifier
     Export:
-      Name: !Sub "${InfrastructureStackName}:EcsSecurityGroupReplicaBackup02"
-  LoadBalancerReplicaBackup02DNSName:
-    Value: !GetAtt LoadBalancerReplicaBackup02.DNSName
+      Name: !Sub "${InfrastructureStackName}:EcsSecurityGroupVerifier"
+  LoadBalancerVerifierDNSName:
+    Value: !GetAtt LoadBalancerVerifier.DNSName
     Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaBackup02:DNSName"
-  LoadBalancerReplicaBackup02Arn:
-    Value: !Ref LoadBalancerReplicaBackup02
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:DNSName"
+  LoadBalancerVerifierArn:
+    Value: !Ref LoadBalancerVerifier
     Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaBackup02:ARN"
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
   EFSFilesystem:
     Value: !Ref FileSystem
     Export:
-      Name: !Sub "${InfrastructureStackName}:EFSFilesystemReplicaBackup02"
-  LoadBalancerReplicaBackup02SecurityGroup:
-    Value: !Ref LoadBalancerReplicaBackup02SecurityGroup
+      Name: !Sub "${InfrastructureStackName}:EFSFilesystemVerifier"
+  LoadBalancerVerifierSecurityGroup:
+    Value: !Ref LoadBalancerVerifierSecurityGroup
     Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaBackup02:SecurityGroup"
-  LoadBalancerReplicaBackup02DTLDNSName:
-    Value: !GetAtt LoadBalancerReplicaBackup02DTL.DNSName
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:SecurityGroup"
+  LoadBalancerVerifierDTLDNSName:
+    Value: !GetAtt LoadBalancerVerifier.DNSName
     Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaBackup02DTL:DNSName"
-  LoadBalancerReplicaBackup02DTLArn:
-    Value: !Ref LoadBalancerReplicaBackup02DTL
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:DNSName"
+  LoadBalancerVerifierDTLArn:
+    Value: !Ref LoadBalancerVerifier
     Export:
-      Name: !Sub "${InfrastructureStackName}:LoadBalancerReplicaBackup02DTL:ARN"
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:ARN"

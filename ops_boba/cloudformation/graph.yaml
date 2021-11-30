@@ -72,39 +72,29 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8000
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GraphLBTargetGroup5:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8040
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GraphListener5:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -112,10 +102,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8040
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup5
@@ -126,10 +116,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 443
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup
@@ -138,20 +128,15 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8001
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GraphListener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -159,10 +144,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8001
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup1
@@ -171,20 +156,15 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8030
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GraphListener3:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -192,10 +172,10 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8030
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup3
@@ -204,20 +184,15 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8020
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GraphListener4:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -225,110 +200,18 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:ARN"
       Port: 8020
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GraphLBTargetGroup4
 
-  GraphListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GraphLBTargetGroup
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - graph.mainnet.boba.network
-      ListenerArn: !Ref GraphListener
-      Priority: 1
-
-  GraphListenerRule1:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GraphLBTargetGroup1
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - graph.mainnet.boba.network
-      ListenerArn: !Ref GraphListener1
-      Priority: 1
-
-  GraphListenerRule3:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GraphLBTargetGroup3
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - graph.mainnet.boba.network
-      ListenerArn: !Ref GraphListener3
-      Priority: 1
-
-  GraphListenerRule4:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GraphLBTargetGroup4
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - graph.mainnet.boba.network
-      ListenerArn: !Ref GraphListener4
-      Priority: 1
-
-  GraphListenerRule5:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GraphLBTargetGroup5
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - graph.mainnet.boba.network
-      ListenerArn: !Ref GraphListener5
-      Priority: 1
-
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Volumes:
-        - Name: ipfs
-          Host:
-            SourcePath: "/mnt/efs/ipfs"
       ContainerDefinitions:
-        - Image: ipfs/go-ipfs:v0.4.23
-          Name: ipfs
-          PortMappings:
-           - ContainerPort: 5001
-             HostPort: 0
-          MountPoints:
-           - ContainerPath: "/data/ipfs"
-             SourceVolume: ipfs
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["ipfs"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "ipfs", "service": "ipfs"}]'
-          Essential: true
-          LogConfiguration:
-            LogDriver: json-file
-            Options:
-              max-file: "5"
-              max-size: "10m"
         - Image: graphprotocol/graph-node:latest
           Name: graph
           Ulimits:
@@ -337,15 +220,15 @@ Resources:
               HardLimit: 0
           PortMappings:
             - ContainerPort: 8000
-              HostPort: 0
+              HostPort: 8000
             - ContainerPort: 8001
-              HostPort: 0
+              HostPort: 8001
             - ContainerPort: 8030
-              HostPort: 0
+              HostPort: 8030
             - ContainerPort: 8020
-              HostPort: 0
+              HostPort: 8020
             - ContainerPort: 8040
-              HostPort: 0
+              HostPort: 8040
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/graph.env"
@@ -354,7 +237,10 @@ Resources:
               Type: "s3"
           Environment:
             - Name: ipfs
-              Value: ipfs:5001
+              Value: !Sub
+                - "${EndpointAddress}:5001"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIpfs:DNSName"
             - Name: ethereum
               Value: boba:https://replica.boba.network
           DockerLabels:
@@ -367,20 +253,16 @@ Resources:
             Options:
               max-file: "5"
               max-size: "10m"
-          Links:
-           - ipfs
-      NetworkMode: bridge
-      Memory: "12000"
+      NetworkMode: awsvpc
+      Memory: "5000"
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "Graph-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn:
-      - "GraphListenerRule"
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplicaBackup02"
       LoadBalancers:
         - ContainerName: graph
           ContainerPort: 8000
@@ -397,7 +279,15 @@ Resources:
         - ContainerName: graph
           ContainerPort: 8040
           TargetGroupArn: !Ref GraphLBTargetGroup5
-      HealthCheckGracePeriodSeconds: 30
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGraph:SecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 10
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA

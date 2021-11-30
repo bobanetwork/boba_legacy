@@ -189,5 +189,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "replica-l2"
+      ServiceName: "replica-l2bkp02"
       TaskDefinition: !Ref TaskDefinition
