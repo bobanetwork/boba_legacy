@@ -157,7 +157,7 @@ function InputStepFast({ handleClose, token }) {
         dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
-            `ETH was bridged. You will receive
+            `ETH was bridged. You will receive at least
             ${((Number(value) * (100 - Number(feeRate)))/100).toFixed(3)}
             ETH on L2`
           )
@@ -193,7 +193,7 @@ function InputStepFast({ handleClose, token }) {
       dispatch(setActiveHistoryTab('Bridge to L2'))
       dispatch(
         openAlert(
-          `${token.symbol} was bridged to the L1LP. You will receive
+          `${token.symbol} was bridged to the L1LP. You will receive at least
            ${receivableAmount(value)} ${token.symbol} on L2`
         )
       )
@@ -235,7 +235,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'There is a ' + feeRate + '% fee'
+  const label = 'There is a maximum possible fee of' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -326,7 +326,7 @@ function InputStepFast({ handleClose, token }) {
 
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
+            {`You will receive at least ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
           </Typography>
         )}
 

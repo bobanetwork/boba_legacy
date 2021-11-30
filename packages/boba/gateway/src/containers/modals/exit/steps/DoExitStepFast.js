@@ -150,7 +150,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (res) {
       dispatch(
           openAlert(
-            `${token.symbol} was bridged. You will receive
+            `${token.symbol} was bridged. You will receive at least
             ${receivableAmount(value)} ${token.symbol} on L1.`
           )
         )
@@ -175,7 +175,7 @@ function DoExitStepFast({ handleClose, token }) {
       if (res) {
         dispatch(
             openAlert(
-              `${token.symbol} was bridged. You will receive
+              `${token.symbol} was bridged. You will receive at least
               ${receivableAmount(value)} ${token.symbol} 
               minus gas fees (if bridging ETH) on L1.`
             )
@@ -228,7 +228,7 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
-  const feeLabel = 'There is a ' + feeRate + '% fee'
+  const feeLabel = 'There is a maximum possible fee of' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -310,7 +310,7 @@ function DoExitStepFast({ handleClose, token }) {
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
             {value &&
-              `You will receive
+              `You will receive at least
               ${receivableAmount(value)}
               ${token.symbol}
               ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}

@@ -1688,15 +1688,17 @@ class NetworkService {
       L1LPJson.abi,
       this.L1Provider
     )
-    const [userFeeRate, operatorFeeRate] = await Promise.all([
+    const [userFeeRate, operatorFeeRate, userMaxFeeRate] = await Promise.all([
       L1LPContract.userRewardFeeRate(),
-      L1LPContract.ownerRewardFeeRate()
+      L1LPContract.ownerRewardFeeRate(),
+      L1LPContract.userRewardMaxFeeRate()
     ])
 
     console.log("L1 operatorFeeRate",Number(operatorFeeRate))
     console.log("L1 userFeeRate",Number(userFeeRate))
+    console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
+    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
@@ -1707,15 +1709,17 @@ class NetworkService {
       L2LPJson.abi,
       this.L2Provider
     )
-    const [userFeeRate, operatorFeeRate] = await Promise.all([
+    const [userFeeRate, operatorFeeRate, userMaxFeeRate] = await Promise.all([
       L2LPContract.userRewardFeeRate(),
-      L2LPContract.ownerRewardFeeRate()
+      L2LPContract.ownerRewardFeeRate(),
+      L2LPContract.userRewardMaxFeeRate()
     ])
 
     console.log("L2 operatorFeeRate",Number(operatorFeeRate))
     console.log("L2 userRewardFeeRate",Number(userFeeRate))
+    console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
+    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
@@ -1814,8 +1818,10 @@ class NetworkService {
                     token.poolTokenInfo.userDepositAmount
                   ),
                   accDiv(
-                    new Date().getTime() -
-                      Number(token.poolTokenInfo.startTime) * 1000,
+                    //compute a more accurate current APR by considering the last week only,
+                    //rather than the full lifetime of the pools
+                      7 * 24 * 60 * 60 * 1000,
+                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
                     365 * 24 * 60 * 60 * 1000
                   )
                 ),
@@ -1877,7 +1883,7 @@ class NetworkService {
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
-      return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
+      return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
     tokenAddressList.forEach(({L1, L2}) => L2LPInfoPromise.push(getL2LPInfoPromise(L2, L1)))
@@ -1905,8 +1911,10 @@ class NetworkService {
                     token.poolTokenInfo.userDepositAmount
                   ),
                   accDiv(
-                    new Date().getTime() -
-                      Number(token.poolTokenInfo.startTime) * 1000,
+                    //compute a more accurate current APR by considering the last week only,
+                    //rather than the full lifetime of the pools
+                      7 * 24 * 60 * 60 * 1000,
+                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
                     365 * 24 * 60 * 60 * 1000
                   )
                 ),
