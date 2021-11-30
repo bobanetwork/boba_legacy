@@ -738,7 +738,7 @@ describe('Liquidity Pool Test', async () => {
     expect(postBobL1ERC20Balance).to.deep.eq(preL1ERC20Balance.sub(swapOnFees))
   })
 
-  it('Should rebalance ERC20', async () => {
+  it('Should rebalance ERC20 from L1 to L2', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await L1ERC20.balanceOf(L1LiquidityPool.address)
@@ -764,18 +764,55 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
+  it('Should rebalance ERC20 from L2 to L1', async () => {
+    const balanceERC20Amount = utils.parseEther('10')
+
+    const preLPL1ERC20Balance = await L1ERC20.balanceOf(L1LiquidityPool.address)
+    const preLPL2ERC20Balance = await L2ERC20.balanceOf(L2LiquidityPool.address)
+
+    await env.waitForXDomainTransaction(
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2ERC20.address),
+      Direction.L2ToL1
+    )
+
+    const postLPL1ERC20Balance = await L1ERC20.balanceOf(
+      L1LiquidityPool.address
+    )
+    const postLPL2ERC20Balance = await L2ERC20.balanceOf(
+      L2LiquidityPool.address
+    )
+
+    expect(preLPL1ERC20Balance).to.deep.eq(
+      postLPL1ERC20Balance.sub(balanceERC20Amount)
+    )
+    expect(preLPL2ERC20Balance).to.deep.eq(
+      postLPL2ERC20Balance.add(balanceERC20Amount)
+    )
+  })
+
   it('Should revert rebalancing LP', async() => {
     const balanceERC20Amount = utils.parseEther('10000')
 
     await expect(
       L1LiquidityPool.connect(env.l1Wallet_2).rebalanceLP(
         balanceERC20Amount,
-        '0x0000000000000000000000000000000000000000'
+        L1ERC20.address
       )
-    ).to.be.revertedWith('caller is not the owner')
+    ).to.be.revertedWith('Caller is not the owner')
 
     await expect(
       L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
+    ).to.be.reverted
+
+    await expect(
+      L2LiquidityPool.connect(env.l2Wallet_2).rebalanceLP(
+        balanceERC20Amount,
+        L2ERC20.address
+      )
+    ).to.be.revertedWith('Caller is not the owner')
+
+    await expect(
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2ERC20.address)
     ).to.be.reverted
   })
 
@@ -841,10 +878,7 @@ describe('Liquidity Pool Test', async () => {
     await AddLiquidity.wait()
   })
 
-  it('Should rebalance OMGLikeToken', async () => {
-      // now try rebalancing
-
-
+  it('Should rebalance OMGLikeToken from L1 to L2', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(L1LiquidityPool.address)
@@ -874,6 +908,32 @@ describe('Liquidity Pool Test', async () => {
     expect(L1LPOMGLikeTokenAllowance).to.deep.eq(BigNumber.from(0))
   })
 
+  it('Should rebalance OMGLikeToken from L2 to L1', async () => {
+    const balanceERC20Amount = utils.parseEther('10')
+
+    const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(L1LiquidityPool.address)
+    const preLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(L2LiquidityPool.address)
+
+    await env.waitForXDomainTransaction(
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2OMGLikeToken.address),
+      Direction.L2ToL1
+    )
+
+    const postLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
+      L1LiquidityPool.address
+    )
+    const postLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(
+      L2LiquidityPool.address
+    )
+
+    expect(preLPL1ERC20Balance).to.deep.eq(
+      postLPL1ERC20Balance.sub(balanceERC20Amount)
+    )
+    expect(preLPL2ERC20Balance).to.deep.eq(
+      postLPL2ERC20Balance.add(balanceERC20Amount)
+    )
+})
+
   it('should be able to pause L1LiquidityPool contract', async function () {
     const poolOwner = await L1LiquidityPool.owner()
 
@@ -885,7 +945,7 @@ describe('Liquidity Pool Test', async () => {
 
       await expect(
         L1LiquidityPool.connect(env.l1Wallet_2).pause()
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       // only owner can pause
       await L1LiquidityPool.connect(env.l1Wallet).pause()
@@ -932,7 +992,7 @@ describe('Liquidity Pool Test', async () => {
 
       await expect(
         L2LiquidityPool.connect(env.l2Wallet_2).pause()
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       // only owner can pause
       await L2LiquidityPool.connect(env.l2Wallet).pause()
@@ -1008,7 +1068,7 @@ describe('Liquidity Pool Test', async () => {
   it('should fail configuring L2LP fee for non DAO', async () => {
     await expect(
       L2LiquidityPool.connect(env.l2Wallet_2).configureFee(35, 15)
-    ).to.be.revertedWith('caller is not the DAO')
+    ).to.be.revertedWith('Caller is not the DAO')
   })
 
   it('the DAO should be able to configure fee for L1LP', async function () {
@@ -1057,7 +1117,7 @@ describe('Liquidity Pool Test', async () => {
   it('should fail configuring L1LP fee for non DAO', async () => {
     await expect(
       L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(35, 15)
-    ).to.be.revertedWith('caller is not the DAO')
+    ).to.be.revertedWith('Caller is not the DAO')
 
     await expect(L1LiquidityPool.configureFee(35, 15)).to.be.revertedWith(
       'XCHAIN: messenger contract unauthenticated'
@@ -1197,7 +1257,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('Should rebalance ETH', async () => {
+    it('Should rebalance ETH from L1 to L2', async () => {
       const balanceETHAmount = utils.parseEther('10')
 
       const preL1LPETH = await env.l1Provider.getBalance(
@@ -1226,6 +1286,35 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2LPETH).to.deep.eq(postL2LPETH.sub(balanceETHAmount))
     })
 
+    it('Should rebalance ETH from L2 to L1', async () => {
+      const balanceETHAmount = utils.parseEther('1')
+
+      const preL1LPETH = await env.l1Provider.getBalance(
+        L1LiquidityPool.address
+      )
+      const preL2LPETH = await env.l2Provider.getBalance(
+        L2LiquidityPool.address
+      )
+
+      await env.waitForXDomainTransaction(
+        L2LiquidityPool.rebalanceLP(
+          balanceETHAmount,
+          '0x4200000000000000000000000000000000000006'
+        ),
+        Direction.L2ToL1
+      )
+
+      const postL1LPETH = await env.l1Provider.getBalance(
+        L1LiquidityPool.address
+      )
+      const postL2LPETH = await env.l2Provider.getBalance(
+        L2LiquidityPool.address
+      )
+
+      expect(preL1LPETH).to.deep.eq(postL1LPETH.sub(balanceETHAmount))
+      expect(preL2LPETH).to.deep.eq(postL2LPETH.add(balanceETHAmount))
+    })
+
     it('Should revert rebalancing LP', async () => {
       const balanceETHAmount = utils.parseEther('10000')
 
@@ -1234,12 +1323,26 @@ describe('Liquidity Pool Test', async () => {
           balanceETHAmount,
           '0x0000000000000000000000000000000000000000'
         )
-      ).to.be.revertedWith('caller is not the owner')
+      ).to.be.revertedWith('Caller is not the owner')
 
       await expect(
         L1LiquidityPool.rebalanceLP(
           balanceETHAmount,
           '0x0000000000000000000000000000000000000000'
+        )
+      ).to.be.reverted
+
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet_2).rebalanceLP(
+          balanceETHAmount,
+          '0x4200000000000000000000000000000000000006'
+        )
+      ).to.be.revertedWith('Caller is not the owner')
+
+      await expect(
+        L2LiquidityPool.rebalanceLP(
+          balanceETHAmount,
+          '0x4200000000000000000000000000000000000006'
         )
       ).to.be.reverted
     })
@@ -1411,7 +1514,7 @@ describe('Liquidity Pool Test', async () => {
         L2LiquidityPool.connect(env.l2Wallet_2).configureExtraGasRelay(
           newExtraGasRelay
         )
-      ).to.be.revertedWith('caller is not the gasPriceOracle owner')
+      ).to.be.revertedWith('Caller is not the gasPriceOracle owner')
     })
 
     it('should allow updating extraGasRelay for owner', async () => {
