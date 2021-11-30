@@ -1787,7 +1787,7 @@ class NetworkService {
       let decimals
 
       if (tokenAddress === allAddresses.L1_ETH_Address) {
-        console.log("Getting eth balance:", tokenAddress)
+        //console.log("Getting eth balance:", tokenAddress)
         //getting eth balance
         tokenBalance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
         tokenSymbol = 'ETH'
@@ -1795,7 +1795,7 @@ class NetworkService {
         decimals = 18
       } else {
         //getting eth balance
-        console.log("Getting balance for:", tokenAddress)
+        //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
