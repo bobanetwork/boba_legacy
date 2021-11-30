@@ -166,7 +166,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
      **********************/
 
     modifier onlyOwner() {
-        require(msg.sender == owner || owner == address(0), 'caller is not the owner');
+        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
         _;
     }
 
@@ -180,6 +180,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         _;
     }
 
+    modifier onlyL1StandardBridge() {
+        require(address(L1StandardBridgeAddress) == msg.sender, "Can't receive ETH");
+        _;
+    }
+
+    /********************
+     * Fall back Functions *
+     ********************/
+    receive()
+        external
+        payable
+        onlyL1StandardBridge()
+    {}
 
     /********************
      * Public Functions *
@@ -376,7 +389,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         // Update accUserRewardPerShare
         updateUserRewardPerShare(_tokenAddress);
@@ -431,7 +444,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         // transfer funds if users deposit ERC20
         if (_tokenAddress != address(0)) {
@@ -478,7 +491,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(user.amount >= _amount, "Withdraw Error");
 
         // Update accUserRewardPerShare
@@ -499,7 +512,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send Ether");
+            require(sent, "Failed to send ETH");
         }
 
         emit WithdrawLiquidity(
@@ -526,7 +539,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     {
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(pool.accOwnerReward >= _amount, "Owner Reward Withdraw Error");
 
         pool.accOwnerReward = pool.accOwnerReward.sub(_amount);
@@ -563,7 +576,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         uint256 pendingReward = user.pendingReward.add(
             user.amount.mul(pool.accUserRewardPerShare).div(1e12).sub(user.rewardDebt)
@@ -606,8 +619,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Register");
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Registered");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         if (_tokenAddress == address(0)) {
             require(_amount <= address(this).balance, "Failed to Rebalance LP");
@@ -700,7 +713,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
                  // balances[address(0)] = balances[address(0)].sub(_amount);
                  //_to.transfer(_amount); UNSAFE
                  (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
-                 require(sent, "Failed to send Ether");
+                 require(sent, "Failed to send ETH");
              }
          }
 
