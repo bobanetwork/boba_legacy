@@ -29,7 +29,7 @@ import { getToken } from 'actions/tokenAction'
 import {
   addNFT,
   getNFTs,
-  addNFTContract,
+  //addNFTContract,
   getNFTContracts,
 } from 'actions/nftAction'
 
@@ -842,23 +842,31 @@ class NetworkService {
 
   async addNFTContract( address ) {
 
-    const contract = new ethers.Contract(
-      address,
-      L2ERC721Json.abi,
-      this.L2Provider
-    )
+    try {
 
-    //always the same, no need to have in the loop
-    let nftName = await contract.name()
-    let nftSymbol = await contract.symbol()
+      const contract = new ethers.Contract(
+        address,
+        L2ERC721Json.abi,
+        this.L2Provider
+      )
 
-    const newContract = {
-      name: nftName,
-      symbol: nftSymbol,
-      address,
+      let nftName = await contract.name()
+      let nftSymbol = await contract.symbol()
+
+      const newContract = {
+        name: nftName,
+        symbol: nftSymbol,
+        address,
+      }
+
+
+      //console.log("newContract:",newContract)
+      return newContract
+
+    } catch (error) {
+      console.log("NS: addNFTContract error:",error)
+      return error
     }
-
-    await addNFTContract( newContract )
 
   }
 
