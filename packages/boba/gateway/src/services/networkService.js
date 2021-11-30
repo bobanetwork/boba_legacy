@@ -29,7 +29,7 @@ import { getToken } from 'actions/tokenAction'
 import {
   addNFT,
   getNFTs,
-  addNFTContract,
+  //addNFTContract,
   getNFTContracts,
 } from 'actions/nftAction'
 
@@ -405,7 +405,7 @@ class NetworkService {
         AddressManagerJson.abi,
         this.L1Provider
       )
-      console.log("AddressManager Contract:",this.AddressManager)
+      //console.log("AddressManager Contract:",this.AddressManager)
 
       if (!(await this.getAddress('Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
@@ -842,23 +842,31 @@ class NetworkService {
 
   async addNFTContract( address ) {
 
-    const contract = new ethers.Contract(
-      address,
-      L2ERC721Json.abi,
-      this.L2Provider
-    )
+    try {
 
-    //always the same, no need to have in the loop
-    let nftName = await contract.name()
-    let nftSymbol = await contract.symbol()
+      const contract = new ethers.Contract(
+        address,
+        L2ERC721Json.abi,
+        this.L2Provider
+      )
 
-    const newContract = {
-      name: nftName,
-      symbol: nftSymbol,
-      address,
+      let nftName = await contract.name()
+      let nftSymbol = await contract.symbol()
+
+      const newContract = {
+        name: nftName,
+        symbol: nftSymbol,
+        address,
+      }
+
+
+      //console.log("newContract:",newContract)
+      return newContract
+
+    } catch (error) {
+      console.log("NS: addNFTContract error:",error)
+      return error
     }
-
-    await addNFTContract( newContract )
 
   }
 
@@ -866,7 +874,7 @@ class NetworkService {
   async fetchNFTs() {
 
     let NFTContracts = Object.entries(await getNFTContracts())
-    console.log("Step 1 - NFTContracts:",NFTContracts)
+    //console.log("Step 1 - NFTContracts:",NFTContracts)
 
     //How many NFTs do you have right now?
     let numberOfNFTS = 0
@@ -877,7 +885,7 @@ class NetworkService {
       
       const address = NFTContracts[i][1].address
 
-      console.log("address:",address)
+      //console.log("address:",address)
       
       let contract = new ethers.Contract(
         address,
@@ -992,12 +1000,18 @@ class NetworkService {
       const gasPrice2 = await this.L2Provider.getGasPrice()
       //console.log("L2 gas", gasPrice2.toString())
 
+      const block2 = await this.L2Provider.getBlockNumber()
+
       const gasPrice1 = await this.L1Provider.getGasPrice()
       //console.log("L1 gas", gasPrice1.toString())
 
+      const block1 = await this.L1Provider.getBlockNumber()
+
       const gasData = {
         gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
-        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0)
+        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0),
+        blockL1: Number(block1),
+        blockL2: Number(block2),
       }
 
       //console.log(gasData)
@@ -1669,62 +1683,80 @@ class NetworkService {
   /***********************************************/
 
   async getL1TotalFeeRate() {
+
     const L1LPContract = new ethers.Contract(
       allAddresses.L1LPAddress,
       L1LPJson.abi,
       this.L1Provider
     )
-    const [userFeeRate, operatorFeeRate] = await Promise.all([
-      L1LPContract.userRewardFeeRate(),
-      L1LPContract.ownerRewardFeeRate()
+    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+      L1LPContract.ownerRewardFeeRate(),
+      L1LPContract.userRewardMinFeeRate(),
+      L1LPContract.userRewardMaxFeeRate()
     ])
 
-    console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-    console.log("L1 userFeeRate",Number(userFeeRate))
+    // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
+    // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
+    // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
+    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
 
   async getL2TotalFeeRate() {
+
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
-    const [userFeeRate, operatorFeeRate] = await Promise.all([
-      L2LPContract.userRewardFeeRate(),
-      L2LPContract.ownerRewardFeeRate()
+    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
+      L2LPContract.ownerRewardFeeRate(),
+      L2LPContract.userRewardMinFeeRate(),
+      L2LPContract.userRewardMaxFeeRate()
     ])
 
-    console.log("L2 operatorFeeRate",Number(operatorFeeRate))
-    console.log("L2 userRewardFeeRate",Number(userFeeRate))
+    // console.log("L2 operatorFeeRate",Number(operatorFeeRate))
+    // console.log("L2 userMinFeeRate",Number(userMinFeeRate))
+    // console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
-    const feeRate = Number(userFeeRate) + Number(operatorFeeRate)
+    const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
 
-  // async getL1UserRewardFeeRate() {
-  //   const L1LPContract = new ethers.Contract(
-  //     allAddresses.L1LPAddress,
-  //     L1LPJson.abi,
-  //     this.L1Provider
-  //   )
-  //   const feeRate = await L1LPContract.userRewardFeeRate()
-  //   return (feeRate / 10).toFixed(1)
-  // }
+  async getL1UserRewardFeeRate(tokenAddress) {
+    try{
+        const L1LPContract = new ethers.Contract(
+        allAddresses.L1LPAddress,
+        L1LPJson.abi,
+        this.L1Provider
+      )
+      const feeRate = await L1LPContract.getUserRewardFeeRate(tokenAddress)
+      //console.log("NS: getL1UserRewardFeeRate:", feeRate)
+      return (feeRate / 10).toFixed(1)
+    } catch (error) {
+      console.log("NS: getL1UserRewardFeeRate error:", error)
+      return error
+    }
+  }
 
-  // async getL2UserRewardFeeRate() {
-  //   const L2LPContract = new ethers.Contract(
-  //     allAddresses.L2LPAddress,
-  //     L2LPJson.abi,
-  //     this.L2Provider
-  //   )
-  //   const feeRate = await L2LPContract.userRewardFeeRate()
-  //   return (feeRate / 10).toFixed(1)
-  // }
+  async getL2UserRewardFeeRate(tokenAddress) {
+    try {
+        const L2LPContract = new ethers.Contract(
+        allAddresses.L2LPAddress,
+        L2LPJson.abi,
+        this.L2Provider
+      )
+      const feeRate = await L2LPContract.getUserRewardFeeRate(tokenAddress)
+      //console.log("NS: getL2UserRewardFeeRate:", feeRate)
+      return (feeRate / 10).toFixed(1)
+    } catch (error) {
+      console.log("NS: getL2UserRewardFeeRate error:", error)
+      return error
+    }
+  }
 
   /*****************************************************/
   /***** Pool, User Info, to populate the Farm tab *****/
@@ -1755,7 +1787,7 @@ class NetworkService {
       let decimals
 
       if (tokenAddress === allAddresses.L1_ETH_Address) {
-        console.log("Getting eth balance:", tokenAddress)
+        //console.log("Getting eth balance:", tokenAddress)
         //getting eth balance
         tokenBalance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
         tokenSymbol = 'ETH'
@@ -1763,7 +1795,7 @@ class NetworkService {
         decimals = 18
       } else {
         //getting eth balance
-        console.log("Getting balance for:", tokenAddress)
+        //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
@@ -1800,8 +1832,10 @@ class NetworkService {
                     token.poolTokenInfo.userDepositAmount
                   ),
                   accDiv(
-                    new Date().getTime() -
-                      Number(token.poolTokenInfo.startTime) * 1000,
+                    //compute a more accurate current APR by considering the last week only,
+                    //rather than the full lifetime of the pools
+                      7 * 24 * 60 * 60 * 1000,
+                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
                     365 * 24 * 60 * 60 * 1000
                   )
                 ),
@@ -1863,7 +1897,7 @@ class NetworkService {
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
       const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
-      return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals}
+      return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
     tokenAddressList.forEach(({L1, L2}) => L2LPInfoPromise.push(getL2LPInfoPromise(L2, L1)))
@@ -1891,8 +1925,10 @@ class NetworkService {
                     token.poolTokenInfo.userDepositAmount
                   ),
                   accDiv(
-                    new Date().getTime() -
-                      Number(token.poolTokenInfo.startTime) * 1000,
+                    //compute a more accurate current APR by considering the last week only,
+                    //rather than the full lifetime of the pools
+                      7 * 24 * 60 * 60 * 1000,
+                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
                     365 * 24 * 60 * 60 * 1000
                   )
                 ),
@@ -2062,22 +2098,22 @@ class NetworkService {
       this.masterSystemConfig
     ).get('get.l2.pendingexits', {})
 
-    console.log("tokenAddress",tokenAddress)
-    console.log("L1pending",L1pending)
+    //console.log("tokenAddress",tokenAddress)
+    //console.log("L1pending",L1pending)
 
     const pendingFast = L1pending.data.filter(i => {
        return (i.fastRelay === 1) && //fast exit
         i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
     })
 
-    console.log("L1pendingFast",pendingFast)
+    //console.log("L1pendingFast",pendingFast)
 
     let sum = pendingFast.reduce(function(prev, current) {
       let weiString = BigNumber.from(current.exitAmount)
       return prev.add(weiString)
     }, BigNumber.from('0'))
 
-    console.log("L1pendingFastSum:",sum.toString())
+    //console.log("L1pendingFastSum:",sum.toString())
 
     return sum.toString()
 
@@ -2097,7 +2133,7 @@ class NetworkService {
   /***************************************/
   async L1LPBalance(tokenAddress) {
 
-    console.log("L1LPBalance(tokenAddress)")
+    //console.log("L1LPBalance(tokenAddress)")
 
     let balance
     let tokenAddressLC = tokenAddress.toLowerCase()
@@ -2113,7 +2149,7 @@ class NetworkService {
       )
     }
 
-    console.log("L1LPBalance(tokenAddress):",balance.toString())
+    //console.log("L1LPBalance(tokenAddress):",balance.toString())
 
     return balance.toString()
 

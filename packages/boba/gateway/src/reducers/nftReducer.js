@@ -58,12 +58,20 @@ function nftReducer (state = initialState, action) {
       }
 
     case 'NFT/ADDCONTRACT/SUCCESS':
-
-      //console.log("added to state:", action.payload)
-
+      
+      //const state = store.getState()
+      const address = action.payload.address
+        
+      // //if we already have already added it, no need to add again
+      // if (state.contracts[address]) {
+      //   //do nothing
+      //   console.log("Contract already added:",address)
+      //   return //state.nft.contracts[address]
+      // }
+      
       localStorage.setItem("nftContracts", JSON.stringify({
           ...state.contracts,
-          [action.payload.address]: action.payload
+          [address]: action.payload
         })
       )
 
@@ -71,7 +79,7 @@ function nftReducer (state = initialState, action) {
         ...state,
         contracts: {
           ...state.contracts,
-          [action.payload.address]: action.payload
+          [address]: action.payload
         }
       }
       
@@ -80,4 +88,4 @@ function nftReducer (state = initialState, action) {
   }
 }
 
-export default nftReducer;
+export default nftReducer

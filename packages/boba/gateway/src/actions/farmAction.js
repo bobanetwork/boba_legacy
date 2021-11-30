@@ -84,6 +84,9 @@ export const getFarmInfo = () => async (dispatch) => {
 //   dispatch(getL2FeeSuccess(totalFeeRate, userFeeRate))
 // }
 
+export function fetchL1UserFee(currency) {return createAction('FETCH/L1USERFEE', () => networkService.getL1UserRewardFeeRate(currency))}
+export function fetchL2UserFee(currency) {return createAction('FETCH/L2USERFEE', () => networkService.getL2UserRewardFeeRate(currency))}
+
 export const updateStakeToken = (stakeToken) => ({
   type: 'UPDATE_STAKE_TOKEN',
   payload: stakeToken,

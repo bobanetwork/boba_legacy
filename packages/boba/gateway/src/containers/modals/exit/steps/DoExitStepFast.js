@@ -43,12 +43,14 @@ import {
   fetchL1LPBalance,
   fetchL1LPPending,  
   fetchL1TotalFeeRate, 
+  fetchL1FeeRateN, 
   fetchL2FeeBalance,
   fetchL1LPLiquidity 
 } from 'actions/balanceAction'
 
 import { 
-  selectL1FeeRate, 
+  selectL1FeeRate,
+  selectL1FeeRateN,  
   selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString, 
   selectL1LPPendingString,
@@ -69,6 +71,8 @@ function DoExitStepFast({ handleClose, token }) {
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
   const feeRate = useSelector(selectL1FeeRate)
+  const feeRateN = useSelector(selectL1FeeRateN)
+
   const cost = useSelector(selectFastExitCost)
   const feeBalance = useSelector(selectL2FeeBalance)
 
@@ -88,11 +92,11 @@ function DoExitStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    console.log("ETH fees:",Number(cost))
-    console.log("Transaction token value:",Number(value))
-    console.log("ETH available for fees:",Number(feeBalance))
-    console.log("LPRatio:",Number(LPRatio))
-    console.log("LPBalance:",Number(balanceSubPending))
+    // console.log("ETH fees:",Number(cost))
+    // console.log("Transaction token value:",Number(value))
+    // console.log("ETH available for fees:",Number(feeBalance))
+    // console.log("LPRatio:",Number(LPRatio))
+    // console.log("LPBalance:",Number(balanceSubPending))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -150,7 +154,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (res) {
       dispatch(
           openAlert(
-            `${token.symbol} was bridged. You will receive
+            `${token.symbol} was bridged. You will receive at least
             ${receivableAmount(value)} ${token.symbol} on L1.`
           )
         )
@@ -175,7 +179,7 @@ function DoExitStepFast({ handleClose, token }) {
       if (res) {
         dispatch(
             openAlert(
-              `${token.symbol} was bridged. You will receive
+              `${token.symbol} was bridged. You will receive at least
               ${receivableAmount(value)} ${token.symbol} 
               minus gas fees (if bridging ETH) on L1.`
             )
@@ -196,11 +200,12 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      console.log("Token:",token)
+      //console.log("Token:",token)
       dispatch(fetchL1LPBalance(token.addressL1))
       dispatch(fetchL1LPLiquidity(token.addressL1))
       dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
       dispatch(fetchL1TotalFeeRate())
+      dispatch(fetchL1FeeRateN(token.addressL1))
       dispatch(fetchFastExitCost(token.address))
       dispatch(fetchL2FeeBalance())
     }
@@ -228,7 +233,9 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
-  const feeLabel = 'There is a ' + feeRate + '% fee'
+  const feeLabel = 'The current fee is ' + feeRateN + '% but it can vary depending on pool utilization. The maximum possible fee is ' + feeRate + '%.'
+
+  //const feeLabel = 'There is a maximum possible fee of ' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -286,7 +293,11 @@ function DoExitStepFast({ handleClose, token }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          {feeLabel}. In most cases, a fast exit takes one hour or less. However, if Ethereum is congested, it can take as long as 3 hours.
+          {feeLabel}
+        </Typography>
+
+        <Typography variant="body2" sx={{mb: 3}}>
+          In most cases, a fast exit takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
         </Typography>
 
         <Input
@@ -310,7 +321,7 @@ function DoExitStepFast({ handleClose, token }) {
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
             {value &&
-              `You will receive
+              `You will receive at least
               ${receivableAmount(value)}
               ${token.symbol}
               ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}

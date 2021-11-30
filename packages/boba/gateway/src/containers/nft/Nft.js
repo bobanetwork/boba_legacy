@@ -14,6 +14,8 @@ import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
 
+import { addNFTContract } from 'actions/nftAction'
+
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 
@@ -24,23 +26,37 @@ class Nft extends React.Component {
     super(props)
 
     const { 
-      list
+      list,
+      contracts
     } = this.props.nft
 
     this.state = {
       list,
+      contracts,
       contractAddress: '',
       tokenURI: '',
+      loading: this.props.loading['NFT/ADDCONTRACT']
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { list } = this.props.nft
+    const { list, contracts } = this.props.nft
 
     if (!isEqual(prevState.nft.list, list)) {
      this.setState({ list })
+    }
+
+    if (!isEqual(prevState.nft.contracts, contracts)) {
+     this.setState({ contracts })
+    }
+
+    if (!isEqual(prevState.loading['NFT/ADDCONTRACT'], this.props.loading['NFT/ADDCONTRACT'])) {
+     this.setState({ loading: this.props.loading['NFT/ADDCONTRACT'] })
+     if(this.props.loading['NFT/ADDCONTRACT']) {
+       this.setState({ contractAddress: '' })
+     }
     }
 
   }
@@ -50,17 +66,18 @@ class Nft extends React.Component {
   }
 
   addContract = event => {
-    networkService.addNFTContract( this.state.contractAddress )
+    //console.log("adding contract:",this.state.contractAddress)
+    this.props.dispatch(addNFTContract( this.state.contractAddress ))
   }
   
   render() {
 
     const {
       list,
-      contractAddress
+      contracts,
+      contractAddress,
+      loading
     } = this.state
-
-    console.log("contractAddress:",contractAddress)
 
     const numberOfNFTs = Object.keys(list).length
     const layer = networkService.L1orL2
@@ -159,14 +176,28 @@ class Nft extends React.Component {
             value={contractAddress}
             onChange={this.handleInput}
           />
+
           <Button
             variant="contained"
             onClick={this.addContract}
+            disabled={loading}
             //fullWidth
-            sx={{flex: 1, marginTop: '20px'}}
+            sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
           >
-            Add NFT contract
+            {loading ? 'Adding contract...' : 'Add NFT contract'}
           </Button>
+
+          <Typography variant="body2" sx={{fontWeight: "700"}} component="p">Your NFT Contracts</Typography>
+
+          {Object.keys(contracts).map((contract, index) => {
+            return (
+            <Typography variant="body2" key={index}>
+              {contracts[contract].name}:&nbsp; 
+              <Typography variant="body2" component="span" className={styles.muted}>
+                {contracts[contract].address}
+              </Typography>
+            </Typography>)
+          })}
 
         </Grid>
 
@@ -177,7 +208,7 @@ class Nft extends React.Component {
 
 const mapStateToProps = state => ({
   nft: state.nft,
-  setup: state.setup
+  loading: state.loading
 })
 
 export default connect(mapStateToProps)(Nft)

@@ -213,7 +213,7 @@ function PendingTransaction() {
                     }
                 }
 
-                return <S.Wrapper>
+                return <S.Wrapper key={i.hash}>
                 <S.GridContainer 
                     container
                     key={i.hash} 
