@@ -405,7 +405,7 @@ class NetworkService {
         AddressManagerJson.abi,
         this.L1Provider
       )
-      console.log("AddressManager Contract:",this.AddressManager)
+      //console.log("AddressManager Contract:",this.AddressManager)
 
       if (!(await this.getAddress('Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
@@ -866,7 +866,7 @@ class NetworkService {
   async fetchNFTs() {
 
     let NFTContracts = Object.entries(await getNFTContracts())
-    console.log("Step 1 - NFTContracts:",NFTContracts)
+    //console.log("Step 1 - NFTContracts:",NFTContracts)
 
     //How many NFTs do you have right now?
     let numberOfNFTS = 0
@@ -992,12 +992,18 @@ class NetworkService {
       const gasPrice2 = await this.L2Provider.getGasPrice()
       //console.log("L2 gas", gasPrice2.toString())
 
+      const block2 = await this.L2Provider.getBlockNumber()
+
       const gasPrice1 = await this.L1Provider.getGasPrice()
       //console.log("L1 gas", gasPrice1.toString())
 
+      const block1 = await this.L1Provider.getBlockNumber()
+
       const gasData = {
         gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
-        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0)
+        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0),
+        blockL1: Number(block1),
+        blockL2: Number(block2),
       }
 
       //console.log(gasData)
