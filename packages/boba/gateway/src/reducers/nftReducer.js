@@ -17,8 +17,8 @@ limitations under the License. */
 //with cache - ToDo
 //need to keep track of wgich account the cache is for, otherwise incorrect NFTs will be shown
 
-localStorage.removeItem("nftContracts")
-localStorage.removeItem("nftList")
+//localStorage.removeItem("nftContracts")
+//localStorage.removeItem("nftList")
 
 let nftContracts = localStorage.getItem("nftContracts")
 let nftList = localStorage.getItem("nftList")
