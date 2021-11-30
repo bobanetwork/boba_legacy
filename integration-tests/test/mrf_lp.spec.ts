@@ -796,7 +796,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(
       L1LiquidityPool.connect(env.l1Wallet_2).rebalanceLP(
         balanceERC20Amount,
-        '0x0000000000000000000000000000000000000000'
+        L1ERC20.address
       )
     ).to.be.revertedWith('Caller is not the owner')
 
@@ -807,7 +807,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(
       L2LiquidityPool.connect(env.l2Wallet_2).rebalanceLP(
         balanceERC20Amount,
-        '0x4200000000000000000000000000000000000006'
+        L2ERC20.address
       )
     ).to.be.revertedWith('Caller is not the owner')
 
@@ -878,10 +878,7 @@ describe('Liquidity Pool Test', async () => {
     await AddLiquidity.wait()
   })
 
-  it('Should rebalance OMGLikeToken', async () => {
-      // now try rebalancing
-
-
+  it('Should rebalance OMGLikeToken from L1 to L2', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(L1LiquidityPool.address)
@@ -910,6 +907,32 @@ describe('Liquidity Pool Test', async () => {
     const L1LPOMGLikeTokenAllowance = await OMGLIkeToken.allowance(L1LiquidityPool.address, L1StandardBridge.address)
     expect(L1LPOMGLikeTokenAllowance).to.deep.eq(BigNumber.from(0))
   })
+
+  it('Should rebalance OMGLikeToken from L2 to L1', async () => {
+    const balanceERC20Amount = utils.parseEther('10')
+
+    const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(L1LiquidityPool.address)
+    const preLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(L2LiquidityPool.address)
+
+    await env.waitForXDomainTransaction(
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2OMGLikeToken.address),
+      Direction.L2ToL1
+    )
+
+    const postLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
+      L1LiquidityPool.address
+    )
+    const postLPL2ERC20Balance = await L2OMGLikeToken.balanceOf(
+      L2LiquidityPool.address
+    )
+
+    expect(preLPL1ERC20Balance).to.deep.eq(
+      postLPL1ERC20Balance.sub(balanceERC20Amount)
+    )
+    expect(preLPL2ERC20Balance).to.deep.eq(
+      postLPL2ERC20Balance.add(balanceERC20Amount)
+    )
+})
 
   it('should be able to pause L1LiquidityPool contract', async function () {
     const poolOwner = await L1LiquidityPool.owner()

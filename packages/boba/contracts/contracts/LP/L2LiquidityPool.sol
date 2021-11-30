@@ -652,7 +652,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         address _tokenAddress
     )
         external
-        payable
         onlyOwner()
         whenNotPaused()
     {
