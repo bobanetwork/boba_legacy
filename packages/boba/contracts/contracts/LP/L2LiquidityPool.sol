@@ -673,7 +673,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             );
         } else {
             require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Requested ERC20 exceeds pool balance");
-            IERC20(_tokenAddress).safeIncreaseAllowance(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, _amount);
             L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
                 L1LiquidityPoolAddress,
