@@ -1683,22 +1683,21 @@ class NetworkService {
   /***********************************************/
 
   async getL1TotalFeeRate() {
+
     const L1LPContract = new ethers.Contract(
       allAddresses.L1LPAddress,
       L1LPJson.abi,
       this.L1Provider
     )
-    const [/*userFeeRate, */operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      //L1LPContract.userRewardFeeRate(),
+    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
       L1LPContract.ownerRewardFeeRate(),
       L1LPContract.userRewardMinFeeRate(),
       L1LPContract.userRewardMaxFeeRate()
     ])
 
-    console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-    //console.log("L1 userFeeRate",Number(userFeeRate))
-    console.log("L1 userMinFeeRate",Number(userMinFeeRate))
-    console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
+    // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
+    // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
+    // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
 
     const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
@@ -1706,47 +1705,58 @@ class NetworkService {
   }
 
   async getL2TotalFeeRate() {
+
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
-    const [/*userFeeRate, */operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
-      //L2LPContract.userRewardFeeRate(),
+    const [operatorFeeRate, userMinFeeRate, userMaxFeeRate] = await Promise.all([
       L2LPContract.ownerRewardFeeRate(),
       L2LPContract.userRewardMinFeeRate(),
       L2LPContract.userRewardMaxFeeRate()
     ])
 
-    console.log("L2 operatorFeeRate",Number(operatorFeeRate))
-    //console.log("L2 userRewardFeeRate",Number(userFeeRate))
-    console.log("L2 userMinFeeRate",Number(userMinFeeRate))
-    console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
+    // console.log("L2 operatorFeeRate",Number(operatorFeeRate))
+    // console.log("L2 userMinFeeRate",Number(userMinFeeRate))
+    // console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
     const feeRate = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
     return (feeRate / 10).toFixed(1)
   }
 
-  // async getL1UserRewardFeeRate() {
-  //   const L1LPContract = new ethers.Contract(
-  //     allAddresses.L1LPAddress,
-  //     L1LPJson.abi,
-  //     this.L1Provider
-  //   )
-  //   const feeRate = await L1LPContract.userRewardFeeRate()
-  //   return (feeRate / 10).toFixed(1)
-  // }
+  async getL1UserRewardFeeRate(tokenAddress) {
+    try{
+        const L1LPContract = new ethers.Contract(
+        allAddresses.L1LPAddress,
+        L1LPJson.abi,
+        this.L1Provider
+      )
+      const feeRate = await L1LPContract.getUserRewardFeeRate(tokenAddress)
+      //console.log("NS: getL1UserRewardFeeRate:", feeRate)
+      return (feeRate / 10).toFixed(1)
+    } catch (error) {
+      console.log("NS: getL1UserRewardFeeRate error:", error)
+      return error
+    }
+  }
 
-  // async getL2UserRewardFeeRate() {
-  //   const L2LPContract = new ethers.Contract(
-  //     allAddresses.L2LPAddress,
-  //     L2LPJson.abi,
-  //     this.L2Provider
-  //   )
-  //   const feeRate = await L2LPContract.userRewardFeeRate()
-  //   return (feeRate / 10).toFixed(1)
-  // }
+  async getL2UserRewardFeeRate(tokenAddress) {
+    try {
+        const L2LPContract = new ethers.Contract(
+        allAddresses.L2LPAddress,
+        L2LPJson.abi,
+        this.L2Provider
+      )
+      const feeRate = await L2LPContract.getUserRewardFeeRate(tokenAddress)
+      //console.log("NS: getL2UserRewardFeeRate:", feeRate)
+      return (feeRate / 10).toFixed(1)
+    } catch (error) {
+      console.log("NS: getL2UserRewardFeeRate error:", error)
+      return error
+    }
+  }
 
   /*****************************************************/
   /***** Pool, User Info, to populate the Farm tab *****/
@@ -2088,22 +2098,22 @@ class NetworkService {
       this.masterSystemConfig
     ).get('get.l2.pendingexits', {})
 
-    console.log("tokenAddress",tokenAddress)
-    console.log("L1pending",L1pending)
+    //console.log("tokenAddress",tokenAddress)
+    //console.log("L1pending",L1pending)
 
     const pendingFast = L1pending.data.filter(i => {
        return (i.fastRelay === 1) && //fast exit
         i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
     })
 
-    console.log("L1pendingFast",pendingFast)
+    //console.log("L1pendingFast",pendingFast)
 
     let sum = pendingFast.reduce(function(prev, current) {
       let weiString = BigNumber.from(current.exitAmount)
       return prev.add(weiString)
     }, BigNumber.from('0'))
 
-    console.log("L1pendingFastSum:",sum.toString())
+    //console.log("L1pendingFastSum:",sum.toString())
 
     return sum.toString()
 
@@ -2123,7 +2133,7 @@ class NetworkService {
   /***************************************/
   async L1LPBalance(tokenAddress) {
 
-    console.log("L1LPBalance(tokenAddress)")
+    //console.log("L1LPBalance(tokenAddress)")
 
     let balance
     let tokenAddressLC = tokenAddress.toLowerCase()
@@ -2139,7 +2149,7 @@ class NetworkService {
       )
     }
 
-    console.log("L1LPBalance(tokenAddress):",balance.toString())
+    //console.log("L1LPBalance(tokenAddress):",balance.toString())
 
     return balance.toString()
 

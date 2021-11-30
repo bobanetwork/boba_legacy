@@ -52,6 +52,12 @@ export function fetchL2TotalFeeRate() {
     return createAction('FETCH/L2TOTALFEERATE', () => networkService.getL2TotalFeeRate())
 }
 
+// ()=>{return networkService.addNFTContract( contactAddress )}
+// async getL1UserRewardFeeRate(tokenAddress) {
+
+export function fetchL1FeeRateN(tokenAddress) { return createAction('FETCH/L1FEERATE', ()=>{return networkService.getL1UserRewardFeeRate(tokenAddress)}) }
+export function fetchL2FeeRateN(tokenAddress) { return createAction('FETCH/L2FEERATE', ()=>{return networkService.getL2UserRewardFeeRate(tokenAddress)}) }
+
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))
 }

@@ -45,12 +45,14 @@ import {
   fetchL2LPBalance,
   fetchL2LPPending, 
   fetchL2TotalFeeRate,
+  fetchL2FeeRateN,
   fetchL1FeeBalance,
   fetchL2LPLiquidity, 
  } from 'actions/balanceAction'
 
 import { 
   selectL2FeeRate,
+  selectL2FeeRateN,
   selectFastDepositCost, 
   selectL2LPBalanceString,
   selectL2LPPendingString,
@@ -71,6 +73,8 @@ function InputStepFast({ handleClose, token }) {
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
   const feeRate = useSelector(selectL2FeeRate)
+  const feeRateN = useSelector(selectL2FeeRateN)
+
   const cost = useSelector(selectFastDepositCost)
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
   
@@ -93,11 +97,11 @@ function InputStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    console.log("ETH fees:",Number(cost))
-    console.log("Transaction token value:",Number(value))
-    console.log("ETH available for paying fees:",Number(feeBalance))
-    console.log("LPRatio:",Number(LPRatio))
-    console.log("LPBalance:",Number(balanceSubPending))
+    // console.log("ETH fees:",Number(cost))
+    // console.log("Transaction token value:",Number(value))
+    // console.log("ETH available for paying fees:",Number(feeBalance))
+    // console.log("LPRatio:",Number(LPRatio))
+    // console.log("LPBalance:",Number(balanceSubPending))
     
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -201,7 +205,7 @@ function InputStepFast({ handleClose, token }) {
     }
 
   }
-
+  
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
   useEffect(() => {
@@ -210,6 +214,7 @@ function InputStepFast({ handleClose, token }) {
       dispatch(fetchL2LPLiquidity(token.addressL2))
       dispatch(fetchL2LPPending(token.addressL1)) //lookup is, confusingly, via L1 token address
       dispatch(fetchL2TotalFeeRate())
+      dispatch(fetchL2FeeRateN(token.addressL2))
       dispatch(fetchFastDepositCost(token.address))
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
       return ()=>{
@@ -235,7 +240,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'There is a maximum possible fee of ' + feeRate + '%. The actual fee may be lower depending on pool utilization.'
+  const label = 'The current fee is ' + feeRateN + '% but it can vary depending on pool utilization. The maximum possible fee is ' + feeRate + '%.'
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
