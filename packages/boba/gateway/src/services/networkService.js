@@ -885,7 +885,7 @@ class NetworkService {
       
       const address = NFTContracts[i][1].address
 
-      console.log("address:",address)
+      //console.log("address:",address)
       
       let contract = new ethers.Contract(
         address,
