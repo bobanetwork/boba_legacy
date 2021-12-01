@@ -334,7 +334,7 @@ class ListFarm extends React.Component {
             <S.DropdownContent>
               <S.DropdownWrapper>
                 <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Earned</Typography>
-                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 2)}</Typography>
+                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
                   variant="contained"
                   fullWidth
