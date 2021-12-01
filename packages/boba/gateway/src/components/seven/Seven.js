@@ -17,9 +17,7 @@ import React from 'react'
 
 import { Typography } from '@material-ui/core'
 
-import * as styles from './Transaction.module.scss'
 import * as S from './Transaction.styles'
-import { useTheme } from '@emotion/react'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
 import { getAllNetworks } from 'util/masterConfig'
@@ -34,8 +32,6 @@ function Seven({
   age,
   unixTime
 }) {
-
-  const theme = useTheme()
 
   const currentNetwork = useSelector(selectNetwork())
   const nw = getAllNetworks()

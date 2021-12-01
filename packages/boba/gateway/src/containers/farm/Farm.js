@@ -255,6 +255,7 @@ class Farm extends React.Component {
                     onChange={this.handleCheckBox}
                     name="my tokens only"
                     color="primary"
+                    icon={<S.BpIcon />}
                   />
                 }
                 label="My Tokens Only"
@@ -266,6 +267,7 @@ class Farm extends React.Component {
                     onChange={this.handleCheckBoxStakes}
                     name="my stakes only"
                     color="primary"
+                    icon={<S.BpIcon />}
                   />
                 }
                 label="My Stakes Only"

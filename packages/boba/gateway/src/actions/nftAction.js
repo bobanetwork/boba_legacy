@@ -13,6 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+// import networkService from 'services/networkService';
+// import { createAction } from './createAction'
+
+// /***********************************************/
+// ****           DAO Action                ****
+// /***********************************************/
+
+// export function fetchDaoBalance() {
+//     return createAction('BALANCE/DAO/GET', () => networkService.getDaoBalance())
+// }
+
+
+
+import networkService from 'services/networkService'
+import { createAction } from './createAction'
 import store from 'store'
 
 export function getNFTs () {
@@ -27,8 +42,8 @@ export function getNFTContracts () {
 
 export async function addNFT ( NFT ) {
   
-  const state = store.getState();
-  const UUID = NFT.UUID;
+  const state = store.getState()
+  const UUID = NFT.UUID
 
   //if we already have added it, no need to add again
   if (state.nft.list[UUID]) {
@@ -36,13 +51,13 @@ export async function addNFT ( NFT ) {
   }
   
   const info = {
-    UUID: NFT.UUID, 
-    url: NFT.url, 
-    name:  NFT.name, 
+    UUID: NFT.UUID,
     address: NFT.address,
-    mintedTime: NFT.mintedTime,
-    symbol:  NFT.symbol,  
-    attributes: NFT.attributes
+    name:  NFT.name, 
+    tokenID: NFT.tokenID,
+    symbol:  NFT.symbol,
+    url: NFT.url,
+    meta: NFT.meta
   }
 
   store.dispatch({
@@ -54,30 +69,36 @@ export async function addNFT ( NFT ) {
 
 }
 
-export async function addNFTContract ( Contract ) {
-
-  const state = store.getState()
-  const address = Contract.address
-    
-  //if we already have already added it, no need to add again
-  if (state.nft.contracts[address]) {
-    return state.nft.contracts[address]
-  }
-  
-  const contract = {
-    owner: Contract.owner, 
-    address: Contract.address,
-    name:  Contract.name, 
-    symbol: Contract.symbol,   
-  }
-
-  store.dispatch({
-    type: 'NFT/ADDCONTRACT/SUCCESS',
-    payload: contract
-  })
-
-  console.log("added new contract:",contract)
-
-  return contract
-
+export function addNFTContract( contactAddress ) {
+  //console.log("addNFTContract:",contactAddress)
+  return createAction('NFT/ADDCONTRACT', ()=>{return networkService.addNFTContract( contactAddress )})
 }
+
+//export function getAirdropL1(callData) {return createAction('AIRDROPL1/CREATE',()=>{return networkService.getAirdropL1(callData)})}
+
+// export async function addNFTContract ( Contract ) {
+
+//   const state = store.getState()
+//   const address = Contract.address
+    
+//   //if we already have already added it, no need to add again
+//   if (state.nft.contracts[address]) {
+//     return state.nft.contracts[address]
+//   }
+  
+//   const contract = {
+//     address: Contract.address,
+//     name:  Contract.name, 
+//     symbol: Contract.symbol,
+//   }
+
+//   store.dispatch({
+//     type: 'NFT/ADDCONTRACT/SUCCESS',
+//     payload: contract
+//   })
+
+//   console.log("added new contract:",contract)
+
+//   return contract
+
+// }

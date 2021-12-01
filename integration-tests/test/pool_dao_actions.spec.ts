@@ -33,9 +33,11 @@ describe('Dao Action Test', async () => {
   let L2StandardBridgeAddress
   let quorumVotesPlus
 
-  let initialL1LPUserRewardFeeRate
+  let initialL1LPUserRewardMinFeeRate
+  let initialL1LPUserRewardMaxFeeRate
   let initialL1LPOwnerRewardFeeRate
-  let initialL2LPUserRewardFeeRate
+  let initialL2LPUserRewardMinFeeRate
+  let initialL2LPUserRewardMaxFeeRate
   let initialL2LPOwnerRewardFeeRate
 
   let env: OptimismEnv
@@ -166,7 +168,8 @@ describe('Dao Action Test', async () => {
   describe('Config fee L2 LP', async () => {
     before(async () => {
       // get the initial fee config
-      initialL2LPUserRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
+      initialL2LPUserRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
+      initialL2LPUserRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
       initialL2LPOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
     })
 
@@ -197,13 +200,14 @@ describe('Dao Action Test', async () => {
 
         const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
         const values = [0] // the eth necessary to send to the contract above
-        const signatures = ['configureFee(uint256,uint256)'] // the function that will carry out the proposal
-        const updatedUserRewardFeeRate = initialL2LPUserRewardFeeRate.toNumber() + 1
+        const signatures = ['configureFee(uint256,uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardMinFeeRate = initialL2LPUserRewardMinFeeRate.toNumber() + 1
+        const updatedUserRewardMaxFeeRate = initialL2LPUserRewardMaxFeeRate.toNumber() + 1
         const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
 
         const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-            ['uint256', 'uint256'],
-            [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
+            ['uint256', 'uint256', 'uint256'],
+            [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
         )]
 
         const description = '# Update Fee for swap-ons' // the description of the proposal
@@ -282,8 +286,10 @@ describe('Dao Action Test', async () => {
       const state = await Governor.state(proposalID)
       expect(proposalStates[state]).to.deep.eq('Executed')
 
-      const userRewardFeeRate = await L2LiquidityPool.userRewardFeeRate()
-      expect(userRewardFeeRate).to.deep.eq(initialL2LPUserRewardFeeRate.add(1))
+      const userRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
+      const userRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
+      expect(userRewardMinFeeRate).to.deep.eq(initialL2LPUserRewardMinFeeRate.add(1))
+      expect(userRewardMaxFeeRate).to.deep.eq(initialL2LPUserRewardMaxFeeRate.add(1))
       const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
       expect(ownerRewardFeeRate).to.deep.eq(initialL2LPOwnerRewardFeeRate.add(1))
     })
@@ -293,7 +299,8 @@ describe('Dao Action Test', async () => {
   describe('Config fee L1 LP', async () => {
     before(async () => {
       // get the initial fee config
-      initialL1LPUserRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
+      initialL1LPUserRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
+      initialL1LPUserRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
       initialL1LPOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
     })
 
@@ -312,13 +319,14 @@ describe('Dao Action Test', async () => {
 
         const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
         const values = [0] // the eth necessary to send to the contract above
-        const signatures = ['configureFeeExits(uint256,uint256)'] // the function that will carry out the proposal
-        const updatedUserRewardFeeRate = initialL1LPUserRewardFeeRate.toNumber() + 1
+        const signatures = ['configureFeeExits(uint256,uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardMinFeeRate = initialL1LPUserRewardMinFeeRate.toNumber() + 1
+        const updatedUserRewardMaxFeeRate = initialL1LPUserRewardMaxFeeRate.toNumber()
         const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
 
         const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-            ['uint256', 'uint256'],
-            [updatedUserRewardFeeRate, updatedOwnerRewardFeeRate]
+            ['uint256', 'uint256', 'uint256'],
+            [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
         )]
 
         const description = '# Update Fee for swap-offs' // the description of the proposal
@@ -399,8 +407,10 @@ describe('Dao Action Test', async () => {
       // involves xDomain message, wait for xdomain relay
       await env.waitForXDomainTransactionFast(executeTx, Direction.L2ToL1)
 
-      const userRewardFeeRate = await L1LiquidityPool.userRewardFeeRate()
-      expect(userRewardFeeRate).to.deep.eq(initialL1LPUserRewardFeeRate.add(1))
+      const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
+      const userRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
+      expect(userRewardMinFeeRate).to.deep.eq(initialL1LPUserRewardMinFeeRate.add(1))
+      expect(userRewardMaxFeeRate).to.deep.eq(initialL1LPUserRewardMaxFeeRate)
       const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
       expect(ownerRewardFeeRate).to.deep.eq(initialL1LPOwnerRewardFeeRate.add(1))
     }).timeout(100000)
