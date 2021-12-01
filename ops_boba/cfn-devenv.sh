@@ -425,22 +425,7 @@ function update_dev_services {
 }
 
 function destroy_dev_services {
-    if [ -z ${SERVICE_NAME} ]; then
-      notice "Destroying all services"
-      for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
-        cd ${PATH_TO_CFN}
-        info "Removing $SERVICE"
-        aws cloudformation delete-stack \
-            --stack-name ${ENV_PREFIX}-$SERVICE
-        cd ..
-      done
-      for SERVICE in ${ALL_DOCKER_IMAGES_LIST}; do
-          aws cloudformation wait stack-delete-complete --stack-name=${ENV_PREFIX}-$SERVICE
-          info "$SERVICE delete completed"
-      done
-      exit
-    else
-      info "Remove ${SERVICE_NAME}"
+      info "Removing ${SERVICE_NAME} from ${ENV_PREFIX}"
       cd ${PATH_TO_CFN}
       aws cloudformation delete-stack \
           --stack-name ${ENV_PREFIX}-${SERVICE_NAME}
@@ -448,119 +433,77 @@ function destroy_dev_services {
       info "Delete completed"
       cd ..
       exit
-    fi
   }
 
   function restart_service {
     #set -x
       local force="${1:-}"
-      CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica##; s#-verifier##')
-      if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp01" || "${SERVICE_NAME}" == "replica-l2-bkp01" || "${SERVICE_NAME}" == "ipfs" ]]; then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp02" || "${SERVICE_NAME}" == "replica-l2b-kp02" || "${SERVICE_NAME}" == "graph" ]]; then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      else
-        ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-      fi
+      CLUSTERS_LIST=( `aws ecs list-clusters --region ${REGION}|grep ${ENV_PREFIX}|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'` )
       if [[ "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
         SERVICE_NAME="blockscout"
       fi
-      SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|tr '\n' ' '|sed 's#"##g'`
-      CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
-      ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
-      EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
-      if [ -z ${SERVICE_NAME} ]; then
-        info "Restarting ${ECS_CLUSTER}"
-        if [[ "${force}" == "yes" ]] ; then
-          for num in $SERVICE4RESTART; do
-            aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
-          done
-          aws ecs list-tasks --cluster $ECS_CLUSTER | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
-          sleep 30
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text
-          for num in $SERVICE4RESTART; do
-            aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 1 >> /dev/null
-          done
-          info "Removed contents in /mnt/efs/ and restarted, please allow 1-2 minutes for the new tasks to actually start"
+      for ecs in "${!CLUSTERS_LIST[@]}"; do
+        ECS_CLUSTER=`echo ${CLUSTERS_LIST[ecs]}`
+        SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|sed 's#"##g'|grep -i ${SERVICE_NAME}|tail -1`
+        if [[ -z $SERVICE4RESTART && ${CLUSTERS_LIST[ecs]} = $ECS_CLUSTER ]]; then
+          unset 'CLUSTERS_LIST[ecs]'
         else
-          for num in $SERVICE4RESTART; do
-            aws ecs update-service  --region ${REGION} --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
-          done
-          aws ecs list-tasks --cluster $ECS_CLUSTER | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
+          CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
+          ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
+          EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
+          info "Restarting ${SERVICE_NAME} on ${ECS_CLUSTER}"
+          aws ecs update-service  --region ${REGION} --service $SERVICE4RESTART --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
           sleep 30
-          for num in $SERVICE4RESTART; do
-            aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 1 >> /dev/null
-          done
-          info "Restarted, please allow 1-2 minutes for the new tasks to actually start"
+          if [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" ]] ; then
+            aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
+            aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
+          elif [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" ]]; then
+            aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text > /dev/null
+            aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text > /dev/null
+          fi
+          aws ecs update-service  --region ${REGION} --service $SERVICE4RESTART --cluster $ECS_CLUSTER --desired-count 1 >> /dev/null
+          info "Restarted ${SERVICE_NAME} on ${ECS_CLUSTER}"
         fi
-      else
-        info "Restarting ${SERVICE_NAME} on ${ECS_CLUSTER}"
-        SRV=`echo ${SERVICE_NAME}`
-        SERVICE2RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|sed 's#"##g'|grep -i $SRV|tail -1`
-        aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
-        sleep 30
-        if [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" ]] ; then
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica_l2/geth/LOCK" --region ${REGION} --output text > /dev/null
-        elif [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" ]]; then
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text > /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text > /dev/null
-        fi
-        aws ecs update-service  --region ${REGION} --service $SERVICE2RESTART --cluster $ECS_CLUSTER --desired-count 1 >> /dev/null
-        info "Restarted ${SERVICE_NAME} on ${ECS_CLUSTER}"
-      fi
+      done
     }
 
     function stop_cluster {
       #set -x
         local force="${1:-}"
-        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica.*##; s#-verifier.*##')
-        if [[ "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "replica-l2" ]]; then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp01" || "${SERVICE_NAME}" == "replica-l2-bkp01" || "${SERVICE_NAME}" == "ipfs" ]]; then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        elif [[ "${SERVICE_NAME}" == "replica-dtl-bkp02" || "${SERVICE_NAME}" == "replica-l2b-kp02" || "${SERVICE_NAME}" == "graph" ]]; then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        elif [[ "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "verifier-l2" ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-        else
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep ${ENV_PREFIX}|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
-          DATADOGTASK=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION} --service-name Datadog-prod|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|tr '\n' ' '`
+        CLUSTERS_LIST=( `aws ecs list-clusters --region ${REGION}|grep ${ENV_PREFIX}|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'` )
+        if [[ "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
+          SERVICE_NAME="blockscout"
         fi
-        CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
-        ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep $CLUSTER_NAME|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
-        EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
-        SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i $CLUSTER_NAME|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
-        if [ -z ${SERVICE_NAME} ]; then
-          info "STOP ${ECS_CLUSTER}"
-          for num in $SERVICE4RESTART; do
-            aws ecs update-service  --region ${REGION} --service $num --cluster $ECS_CLUSTER --service $num --desired-count 0 >> /dev/null
-          done
-          aws ecs list-tasks --cluster $ECS_CLUSTER |egrep -vi $DATADOGTASK | jq -r ' .taskArns[] | [.] | @tsv' |  while IFS=$'\t' read -r taskArn; do  aws ecs stop-task --cluster $ECS_CLUSTER --task $taskArn >> /dev/null; done
-          info "Stopped ${ECS_CLUSTER}"
-        elif [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "verifier-dtl" ]]; then
-          TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
-          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
-          aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
-        elif [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" || "${SERVICE_NAME}" == "verifier-l2" ]]; then
-          TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
-          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
-          aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
-          aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
-        else
-          aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
-        fi
-        info "STOPPED ${SERVICE_NAME} on ${ECS_CLUSTER}"
+        for ecs in "${!CLUSTERS_LIST[@]}"; do
+          ECS_CLUSTER=`echo ${CLUSTERS_LIST[ecs]}`
+          SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|sed 's#"##g'|grep -i ${SERVICE_NAME}|tail -1`
+          if [[ -z $SERVICE4RESTART && ${CLUSTERS_LIST[ecs]} = $ECS_CLUSTER ]]; then
+            unset 'CLUSTERS_LIST[ecs]'
+          else
+            CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep ${ENV_PREFIX}|tail -1|cut -d/ -f3|sed 's#"##g'`
+            ECS_TASKS=`aws ecs list-tasks --cluster $ECS_CLUSTER --region ${REGION}|grep ${ENV_PREFIX}|cut -d/ -f3|sed 's#"##g'|egrep -vi ^datadog|tr '\n' ' '`
+            EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`
+            SERVICE4RESTART=`aws ecs list-services --region ${REGION} --cluster $ECS_CLUSTER|grep -i ${ENV_PREFIX}|cut -d/ -f3|sed 's#,##g'|egrep -vi ^datadog|tr '\n' ' '|sed 's#"##g'`
+              if [[ "${SERVICE_NAME}" == "data-transport-layer" || "${SERVICE_NAME}" == "replica-dtl" || "${SERVICE_NAME}" == "verifier-dtl" || "${SERVICE_NAME}" == "replica-dtl-bkp01" || "${SERVICE_NAME}" == "replica-dtl-bkp02"  ]]; then
+                TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
+                aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+                aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/db/LOCK" --region ${REGION} --output text >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-dtl/db/LOCK" --region ${REGION} --output text >> /dev/null
+              elif [[ "${SERVICE_NAME}" == "l2geth" || "${SERVICE_NAME}" == "replica-l2" || "${SERVICE_NAME}" == "verifier-l2" || "${SERVICE_NAME}" == "replica-l2-bkp01" || "${SERVICE_NAME}" == "replica-l2-bkp02" ]]; then
+                TASK_ARN=`aws ecs list-tasks --cluster $ECS_CLUSTER --service ${SERVICE_NAME} --output text --query taskArns[0]`
+                aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+                aws ecs stop-task --cluster $ECS_CLUSTER --task $TASK_ARN >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/geth_l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/replica-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+                aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids $EC2_INSTANCE --parameters commands="rm -rf /mnt/efs/verifier-l2/geth/LOCK" --region ${REGION} --output text >> /dev/null
+              else
+                aws ecs update-service  --region ${REGION} --service ${SERVICE_NAME} --cluster $ECS_CLUSTER --desired-count 0 >> /dev/null
+              fi
+          info "STOPPED ${SERVICE_NAME} on ${ECS_CLUSTER}"
+          fi
+        done
       }
 
 
@@ -571,7 +514,7 @@ function destroy_dev_services {
         if [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica" && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp01"  && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp02" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME-replica|head -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-verifier" ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME|grep verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME-verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica-bkp01" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME-replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica-bkp02" ]];then
@@ -688,11 +631,13 @@ case "${SUBCMD}" in
     update)
         [[ -z "${DEPLOYTAG}" ]] && error 'Missing required option --deploy-tag'
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
+        [[ -z "${SERVICE_NAME}" ]] && error 'Missing required option --service-name'
         stop_cluster
         update_dev_services
         ;;
     restart)
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
+        [[ -z "${SERVICE_NAME}" ]] && error 'Missing required option --service-name'
         [[ -z "${FORCE}" ]] && warn 'Missing --force, so not going to delete the /mnt/efs directory contents'
         generate_environment
         restart_service
@@ -700,6 +645,7 @@ case "${SUBCMD}" in
     stop)
         [[ -z "${ENV_PREFIX}" ]] && error 'Missing required option --stack-name'
         [[ -z "${FORCE}" ]] && warn 'Missing --force, so not going to delete the /mnt/efs directory contents'
+        [[ -z "${SERVICE_NAME}" ]] && error 'Missing required option --service-name'
         stop_cluster
         ;;
     ssh)
