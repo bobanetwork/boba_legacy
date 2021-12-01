@@ -204,7 +204,7 @@ class BlockMonitorService extends OptimismEnv {
     let checkNonWhitelist = this.checkTime(this.nonWhitelistString)
 
     if (crossDomainData.length) {
-      this.logger.info('Found cross domain message.')
+      // this.logger.info('Found cross domain message.')
 
       for (let receiptData of crossDomainData) {
         if (promiseCount % this.L2sleepThresh === 0) {
@@ -432,10 +432,10 @@ class BlockMonitorService extends OptimismEnv {
     receiptData.crossDomainMessageFinalizedTime =
       crossDomainMessageFinalizedTime
 
-    this.logger.info('Found the cross domain message status', {
-      crossDomainMessageFinalize,
-      crossDomainMessageFinalizedTime,
-    })
+    // this.logger.info('Found the cross domain message status', {
+    //   crossDomainMessageFinalize,
+    //   crossDomainMessageFinalizedTime,
+    // })
 
     return receiptData
   }

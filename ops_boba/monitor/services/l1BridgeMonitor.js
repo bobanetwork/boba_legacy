@@ -257,9 +257,9 @@ class l1BridgeMonitorService extends OptimismEnv {
           }
 
           await this.databaseService.insertL1BridgeData(payload)
-          this.logger.info(
-            `Found standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-          )
+          // this.logger.info(
+          //   `Found standard bridge logs found from block ${this.startBlock} to ${endBlock}`
+          // )
         }
       }
     // } else {
