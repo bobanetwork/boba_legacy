@@ -77,11 +77,11 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice The total number of proposals
     uint public proposalCount;
 
-    /// @notice The address of the Compound Protocol Timelock
+    /// @notice The address of the Boba Timelock
     TimelockInterface public timelock;
 
-    /// @notice The address of the Compound governance token
-    CompInterface public comp;
+    /// @notice The address of the L2 BOBA governance token
+    BobaInterface public boba;
 
     /// @notice The official record of all proposals ever proposed
     mapping (uint => Proposal) public proposals;
@@ -178,6 +178,6 @@ interface TimelockInterface {
     function executeTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external payable returns (bytes memory);
 }
 
-interface CompInterface {
+interface BobaInterface {
     function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
 }
