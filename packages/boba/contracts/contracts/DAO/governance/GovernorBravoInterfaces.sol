@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 contract GovernorBravoEvents {
     /// @notice An event emitted when a new proposal is created
-    event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startBlock, uint endBlock, string description);
+    event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
     /// @notice An event emitted when a vote has been cast on a proposal
     /// @param voter The address which casted a vote
@@ -115,11 +115,14 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
         /// @notice Proposal metadata such as description and URI
         string description;
 
-        /// @notice The block at which voting begins: holders must delegate their votes prior to this block
+        /// @notice The block at which voting power is measured: holders must delegate their votes prior to this block
         uint startBlock;
 
-        /// @notice The block at which voting ends: votes must be cast prior to this block
-        uint endBlock;
+        /// @notice The time at which voting begins
+        uint startTimestamp;
+
+        /// @notice The time at which voting ends: votes must be cast prior to this timestamp
+        uint endTimestamp;
 
         /// @notice Current number of votes in favor of this proposal
         uint forVotes;
