@@ -74,11 +74,8 @@ Resources:
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
-      Port: 443
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      Port: 8545
+      Protocol: TCP
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
@@ -134,9 +131,20 @@ Resources:
           Name: geth_l2
           PortMappings:
             - ContainerPort: 8545
-              HostPort: 0
+              HostPort: 8545
             - ContainerPort: 8546
-              HostPort: 0
+              HostPort: 8546
+          Environment:
+            - Name: ROLLUP_CLIENT_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}:7878"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:DNSName"
+            - Name: ROLLUP_STATE_DUMP_PATH
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/state-dump.latest.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:DNSName"
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"

@@ -85,7 +85,7 @@ Resources:
       HealthyThresholdCount: 3
       UnhealthyThresholdCount: 10
       Matcher:
-        HttpCode: "200-499"
+        HttpCode: "200-399"
 
   ProxydListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -96,7 +96,7 @@ Resources:
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref ProxydLBTargetGroup
@@ -110,7 +110,7 @@ Resources:
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref ProxydLBTargetGroup2
@@ -132,7 +132,7 @@ Resources:
       HealthyThresholdCount: 3
       UnhealthyThresholdCount: 10
       Matcher:
-        HttpCode: "200-499"
+        HttpCode: "200-399"
 
   ProxydListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
@@ -190,12 +190,12 @@ Resources:
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisCluster:DNS"
           Essential: true
-          Memory: "2048"
           LogConfiguration:
             LogDriver: json-file
             Options:
               max-file: "5"
               max-size: "10m"
+      Memory: "2048"
       NetworkMode: bridge
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"

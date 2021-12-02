@@ -48,11 +48,11 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/replica-dtl.env"
+                    - "arn:aws:s3:::${S3BucketV2}/replica-dtl-bkp01.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  DataTransportLayerReplicaLBTargetGroup:
+  DataTransportLayerReplica2LBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 7878
@@ -63,18 +63,18 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  DataTransportLayerReplicaListener:
+  DataTransportLayerReplica2Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:ARN"
       Port: 7878
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup
+        TargetGroupArn: !Ref DataTransportLayerReplica2LBTargetGroup
 
-  DataTransportLayerReplicaLBTargetGroup1:
+  DataTransportLayerReplica2LBTargetGroup1:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8081
@@ -85,16 +85,16 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  DataTransportLayerReplicaListener1:
+  DataTransportLayerReplica2Listener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:ARN"
       Port: 8081
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup1
+        TargetGroupArn: !Ref DataTransportLayerReplica2LBTargetGroup1
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -113,7 +113,7 @@ Resources:
               HostPort: 8081
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/replica-dtl.env"
+              - "arn:aws:s3:::${S3BucketV2}/replica-dtl-bkp01.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
@@ -143,10 +143,10 @@ Resources:
       LoadBalancers:
         - ContainerName: data_transport_layer
           ContainerPort: 7878
-          TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup
+          TargetGroupArn: !Ref DataTransportLayerReplica2LBTargetGroup
         - ContainerName: data_transport_layer
           ContainerPort: 8081
-          TargetGroupArn: !Ref DataTransportLayerReplicaLBTargetGroup1
+          TargetGroupArn: !Ref DataTransportLayerReplica2LBTargetGroup1
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -159,5 +159,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "replica-dtlbkp01"
+      ServiceName: "replica-dtl-bkp01"
       TaskDefinition: !Ref TaskDefinition

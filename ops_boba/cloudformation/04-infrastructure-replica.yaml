@@ -92,10 +92,6 @@ Resources:
       - IpProtocol: tcp
         FromPort: 8020
         ToPort: 8020
-        CidrIpv6: ::/0
-      - IpProtocol: tcp
-        FromPort: 8020
-        ToPort: 8020
         CidrIp: 10.0.0.0/8
       - IpProtocol: tcp
         FromPort: 8020
@@ -438,7 +434,7 @@ Outputs:
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica3:DNSName"
   LoadBalancerReplicaArn3:
-    Value: !Ref LoadBalancerReplica2
+    Value: !Ref LoadBalancerReplica3
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerReplica3:ARN"
   LoadBalancerReplicaDTLDNSName3:

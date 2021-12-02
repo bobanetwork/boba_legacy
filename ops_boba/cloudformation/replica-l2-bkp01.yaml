@@ -65,25 +65,22 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+                    - "arn:aws:s3:::${S3BucketV2}/replica-l2-bkp01.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  ReplicaL2Listener:
+  ReplicaL2BK1Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
-      Port: 443
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/abcacbeb-a855-4234-95e3-0344677c849f
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:ARN"
+      Port: 8545
+      Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
+        TargetGroupArn: !Ref GoEthereumReplica2LBTargetGroup2
 
-  GoEthereumReplicaLBTargetGroup:
+  GoEthereumReplica2LBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8545
@@ -97,7 +94,7 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  GoEthereumReplicaLBTargetGroup2:
+  GoEthereumReplica2LBTargetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8546
@@ -111,16 +108,16 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  ReplicaL2Listener2:
+  ReplicaL2BK1Listener2:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:ARN"
       Port: 8546
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup2
+        TargetGroupArn: !Ref GoEthereumReplica2LBTargetGroup2
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -137,9 +134,20 @@ Resources:
               HostPort: 8545
             - ContainerPort: 8546
               HostPort: 8546
+          Environment:
+            - Name: ROLLUP_CLIENT_HTTP
+              Value: !Sub
+                - "http://${EndpointAddress}:7878"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:DNSName"
+            - Name: ROLLUP_STATE_DUMP_PATH
+              Value: !Sub
+                - "http://${EndpointAddress}:8081/state-dump.latest.json"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplicaDTL2:DNSName"
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/replica-l2.env"
+              - "arn:aws:s3:::${S3BucketV2}/replica-l2-bkp01.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
@@ -173,10 +181,10 @@ Resources:
       LoadBalancers:
         - ContainerName: geth_l2
           ContainerPort: 8545
-          TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup
+          TargetGroupArn: !Ref GoEthereumReplica2LBTargetGroup
         - ContainerName: geth_l2
           ContainerPort: 8546
-          TargetGroupArn: !Ref GoEthereumReplicaLBTargetGroup2
+          TargetGroupArn: !Ref GoEthereumReplica2LBTargetGroup2
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -189,5 +197,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "replica-l2bkp01"
+      ServiceName: "replica-l2-bkp01"
       TaskDefinition: !Ref TaskDefinition
