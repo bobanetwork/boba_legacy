@@ -15,11 +15,16 @@ import omgLogo from 'images/omg.png';
 import fraxLogo from 'images/frax.png';
 import fxsLogo from 'images/fxs.svg';
 import bobaLogo from 'images/boba-token-glow.png';
+import terraLogo from 'images/terra.png';
+import busdLogo from 'images/busd.svg';
+import bnbLogo from 'images/bnb.svg';
+import ftmLogo from 'images/ftm.svg';
+import maticLogo from 'images/matic.svg';
 
 export const getCoinImage = (symbol) => {
-  
+
   let logo = null
-  
+
   switch (symbol) {
     case "TEST":
       logo = TESTLogo;
@@ -74,6 +79,21 @@ export const getCoinImage = (symbol) => {
       break;
     case "BOBA":
       logo = bobaLogo;
+      break;
+    case "UST":
+      logo = terraLogo;
+      break;
+    case "BUSD":
+      logo = busdLogo;
+      break;
+    case "BNB":
+      logo = bnbLogo;
+      break;
+    case "FTM":
+      logo = ftmLogo;
+      break;
+    case "MATIC":
+      logo = maticLogo;
       break;
     default:
       logo = ethLogo;

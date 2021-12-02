@@ -1,23 +1,31 @@
 import { styled } from '@material-ui/core/styles'
-import { Box, Grid } from '@material-ui/core';
+import { Box, Grid } from '@material-ui/core'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
-  borderRadius: props.dropDownBox ? '8px' : '0',
-  background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
+  borderRadius: '0',
+  background: theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
-    padding: ' 30px 10px',
+    //padding: '30px 10px',
   },
   [theme.breakpoints.up('md')]: {
-    padding: '20px',
+    padding: '10px',
   },
 }));
 
-export const GridItemTag = styled(Grid)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+export const GridContainer = styled(Grid)(({theme})=>({
+  [theme.breakpoints.down('md')]:{
+    justifyContent: 'flex-start'
+  }
+}))
+
+export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]:{
+    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
+  }
+}))
 
 export const DropdownWrapper = styled(Box)`
   display: flex;
@@ -25,19 +33,21 @@ export const DropdownWrapper = styled(Box)`
   justify-content: space-between;
   gap: 5px;
   width: 100%;
-  padding: 16px;
-  margin-top: 16px;
+  padding: 6px;
+  margin-top: 10px;
   background-color: ${props => props.theme.palette.background.secondary};
-  border-radius: 12px;
+  border-radius: 4px;
   text-align: center;
 `;
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
+  width: '70%',
   display: 'flex',
   justifyContent: 'space-between',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
-    gap: '0',
+    gap: '5px',
+    padding: '5px'
   },
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',

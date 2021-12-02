@@ -34,13 +34,13 @@ import { isChangingChain } from 'util/changeChain';
 import * as styles from './layout.module.scss';
 import * as S from './layout.style';
 
-
 function App () {
-  const dispatch = useDispatch();
-  const theme = useSelector(selectModalState('theme'));
-  const light = theme === 'light';
 
-  const [ enabled, setEnabled ] = useState(false);
+  const dispatch = useDispatch()
+  const theme = useSelector(selectModalState('theme'))
+  const light = theme === 'light'
+
+  const [ enabled, setEnabled ] = useState(false)
 
   let MUItheme = createTheme({
     palette: {
@@ -56,6 +56,7 @@ function App () {
       background: {
         default: light ? "#fff" : "#061122",
         secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
+        secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : 'rgba(32, 29, 49, 0.8)',
         modalTransparent: light ? "#fff" : 'transparent',
@@ -92,7 +93,8 @@ function App () {
         fontWeight: 400,
       },
       body3: {
-        fontSize: '0.7em'
+        lineHeight: '1.2em',
+        fontSize: '0.8em'
       },
     },
     components: {
@@ -209,7 +211,6 @@ function App () {
   const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));
 
   useEffect(() => {
-    //dispatch(oracleService.initialize());
     if (isChangingChain) {
       dispatch(setWalletMethod('browser'));
     }
@@ -234,13 +235,6 @@ function App () {
               <Notification/>
               <Suspense fallback={<>Loading...</>}>
                 <Switch>
-                  {/* {
-                    routeConfig.map((routeProps)=> {
-                      return <Layout enabled={enabled} onEnable={setEnabled} {...routeProps}/>;
-
-                      // <Route {...routeProps} enabled={enabled} onEnable={setEnabled} key={routeProps.path} />
-                    })
-                  } */}
                   <Route exact path="/" component={enabled ? () => <Home /> : ()=> <WalletPicker enabled={enabled} onEnable={setEnabled} />} />
                 </Switch>
               </Suspense>

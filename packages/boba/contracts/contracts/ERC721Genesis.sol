@@ -71,7 +71,7 @@ contract ERC721Genesis is Ownable, ERC721Enumerable, ERC721URIStorage {
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721URIStorage,ERC721) returns (string memory) {
-        super.tokenURI(tokenId);
+        return super.tokenURI(tokenId);
     }
 
     function _burn(uint256 tokenId) internal override(ERC721URIStorage,ERC721) {

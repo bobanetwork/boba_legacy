@@ -4,19 +4,19 @@ import { isEqual } from 'lodash';
 import BN from 'bignumber.js';
 
 import { closeModal, openAlert, openError } from 'actions/uiAction';
-import { getFarmInfo } from 'actions/farmAction';
+import { addLiquidity, getFarmInfo } from 'actions/farmAction';
 
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 import Input from 'components/input/Input';
 import { logAmount, powAmount, toWei_String } from 'util/amountConvert';
 
-import networkService from 'services/networkService';
 
 import { Typography } from '@material-ui/core';
 import { WrapperActionsModal } from 'components/modal/Modal.styles';
 import { Box } from '@material-ui/system';
 import { farmL1, farmL2 } from 'actions/networkAction';
+import {fetchAllowance} from 'actions/farmAction';
 
 class FarmDepositModal extends React.Component {
 
@@ -33,8 +33,6 @@ class FarmDepositModal extends React.Component {
       stakeValueValid: false,
       value_Wei_String: '',
       // allowance
-      approvedAllowance: '',
-      // loading
       loading: false,
     }
   }
@@ -49,21 +47,30 @@ class FarmDepositModal extends React.Component {
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
-      let approvedAllowance = powAmount(10, 50)
-      // Set to some very big number
-      // There is no need to query allowance for depositing ETH on the L1 or the L2
-      console.log("staketoken",stakeToken)
+      
       if ( stakeToken.symbol !== 'ETH' ) {
-        approvedAllowance = await networkService.checkAllowance(
+        this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
-        )
-        approvedAllowance = approvedAllowance.toString()
+        ))
+      } else {
+        // Set to some very big number to approved allowance in case of ETH.
+        // There is no need to query allowance for depositing ETH on the L1 or the L2
+        this.props.dispatch({
+          type: 'FETCH/ALLOWANCE/RESET',
+          payload: powAmount(10, 50)
+        })
       }
-
-      this.setState({ approvedAllowance, stakeToken })
+      this.setState({ stakeToken })
     }
 
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'FETCH/ALLOWANCE/RESET',
+      payload: ''
+    })
   }
 
   getMaxTransferValue () {
@@ -120,13 +127,11 @@ class FarmDepositModal extends React.Component {
 
     if (approveTX) {
       this.props.dispatch(openAlert("Amount was approved"))
-      let approvedAllowance = await networkService.checkAllowance(
+      this.props.dispatch(fetchAllowance(
         stakeToken.currency,
         stakeToken.LPAddress
-      )
-      approvedAllowance = approvedAllowance.toString()
-
-      this.setState({ approvedAllowance, loading: false })
+      ))
+      this.setState({ loading: false })
     } else {
       this.setState({ loading: false })
     }
@@ -138,11 +143,11 @@ class FarmDepositModal extends React.Component {
 
     this.setState({ loading: true })
 
-    const addLiquidityTX = await networkService.addLiquidity(
+    const addLiquidityTX = await this.props.dispatch(addLiquidity(
       stakeToken.currency,
       value_Wei_String,
       stakeToken.L1orL2Pool,
-    )
+    ))
 
     if (addLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was added"))
@@ -164,9 +169,10 @@ class FarmDepositModal extends React.Component {
       stakeValue,
       stakeValueValid,
       //stakeValueBadEntry,
-      approvedAllowance,
       loading,
     } = this.state
+
+    const {approvedAllowance} = this.props.farm;
 
     let allowanceGTstake = false
 

@@ -13,15 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from "services/networkService";
-
-//import { WebWalletError } from 'services/errorService';
+import networkService from "services/networkService"
 
 export function createAction (key, asyncAction) {
+
   return async function (dispatch) {
-    dispatch({ type: `${key}/REQUEST` });
+
+    dispatch({ type: `${key}/REQUEST` })
+    
     try {
-      const response = await asyncAction();
+      const response = await asyncAction()
+
+      if( response === false ) {
+        return false
+      }
 
       //deal with metamask errors
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
@@ -30,14 +35,16 @@ export function createAction (key, asyncAction) {
           errorMessage = response.data.message
         }
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage })
-        // cancel request loading state
         dispatch({ type: `${key}/ERROR` })
         return false
       }
+
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
+
     } catch (error) {
       console.log("Error RAW:", {error})
+      
       if(error.message.includes('NETWORK_ERROR')) {
         console.log("Internet down")
         return false
@@ -46,11 +53,13 @@ export function createAction (key, asyncAction) {
         console.log("Internet down")
         return false
       }
+      if(error.message.includes('503')) {
+        console.log("503 Service Unavailable")
+        return false
+      }
       const errorMessage = networkService.handleMetaMaskError(error.code) ?? error.message;
       dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage })
-      // cancel request loading state
       dispatch({ type: `${key}/ERROR` })
-      console.log("createAction error:", error)
       return false
     }
   }

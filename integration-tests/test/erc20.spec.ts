@@ -60,16 +60,17 @@ describe('System setup', async () => {
   it('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-    console.log(
-      `🌕 ${chalk.red(
-        'L1ERC20 TEST token balance for Deployer PK:'
-      )} ${chalk.green(preL1ERC20Balance.toString())}`
-    )
-    console.log(
-      `🌕 ${chalk.red(
-        'L2ERC20 TEST token balance for Deployer PK:'
-      )} ${chalk.green(preL2ERC20Balance.toString())}`
-    )
+
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L1ERC20 TEST token balance for Deployer PK:'
+    //   )} ${chalk.green(preL1ERC20Balance.toString())}`
+    // )
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L2ERC20 TEST token balance for Deployer PK:'
+    //   )} ${chalk.green(preL2ERC20Balance.toString())}`
+    // )
 
     const depositL2ERC20Amount = utils.parseEther('12345')
 
@@ -90,16 +91,16 @@ describe('System setup', async () => {
     const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
-    console.log(
-      `🌕 ${chalk.red(
-        'L1ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL1ERC20Balance.toString())}`
-    )
-    console.log(
-      `🌕 ${chalk.red(
-        'L2ERC20 TEST token balance for Deployer PK now:'
-      )} ${chalk.green(postL2ERC20Balance.toString())}`
-    )
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L1ERC20 TEST token balance for Deployer PK now:'
+    //   )} ${chalk.green(postL1ERC20Balance.toString())}`
+    // )
+    // console.log(
+    //   `🌕 ${chalk.red(
+    //     'L2ERC20 TEST token balance for Deployer PK now:'
+    //   )} ${chalk.green(postL2ERC20Balance.toString())}`
+    // )
 
     expect(preL1ERC20Balance).to.deep.eq(
       postL1ERC20Balance.add(depositL2ERC20Amount)

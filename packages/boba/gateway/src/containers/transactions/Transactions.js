@@ -28,7 +28,6 @@ import { logAmount } from 'util/amountConvert'
 import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
 
-import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 const PER_PAGE = 8;
@@ -70,22 +69,42 @@ function Transactions({ searchHistory, transactions }) {
         <Box>
           <S.Content>
             {!paginatedTransactions.length && !loading && (
-              <div className={styles.disclaimer}>Scanning for transactions...</div>
+              <S.Disclaimer>Scanning for transactions...</S.Disclaimer>
             )}
             {!paginatedTransactions.length && loading && (
-              <div className={styles.disclaimer}>Loading...</div>
+              <S.Disclaimer>Loading...</S.Disclaimer>
             )}
             {paginatedTransactions.map((i, index) => {
+                
+              let metaData = ''
+
+              if(i.crossDomainMessage && i.crossDomainMessage.fast === 1) {
+                metaData = 'Fast Bridge'
+              } else if (i.crossDomainMessage && i.crossDomainMessage.fast === 0) {
+                metaData = 'Classic Bridge'
+              }
               
-              const typeTX = typeof(i.typeTX) === 'undefined' ? '' : i.typeTX
-              const activity = typeof(i.activity) === 'undefined' ? '' : ' (' + i.activity + ')'
-              let metaData = typeTX + ' ' + activity
+              let annotation = ''
+
+              if(metaData === '' && typeof(i.activity) === 'undefined') {
+                //annotation = 'No Idea'
+              } else if (typeof(i.activity) === 'undefined') {
+                //we only have metaData
+                annotation = metaData
+              } else if (metaData === '') {
+                //we only have activity
+                annotation = i.activity
+              } else {
+                //we have both
+                annotation = `${metaData} (${i.activity})`
+              }
 
               const time = moment.unix(i.timeStamp).format('lll')
-              let details = null
               const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
               
+              let details = null
               let amountTx = null
+
               if (i.action && i.action.token) {
                 let token = tokenList[i.action.token.toLowerCase()];
                 if (chain === 'L2') {
@@ -125,7 +144,7 @@ function Transactions({ searchHistory, transactions }) {
                   time={time}
                   blockNumber={`Block ${i.blockNumber}`}
                   chain={`${chain} Chain`}
-                  typeTX={`TX Type: ${metaData}`}
+                  typeTX={annotation === '' ? `` : `TX Type: ${annotation}`}
                   detail={details}
                   oriChain={chain}
                   oriHash={i.hash}
@@ -136,7 +155,6 @@ function Transactions({ searchHistory, transactions }) {
           </S.Content>
         </Box>
       </Grid>
-
     </S.HistoryContainer>
   )
 }

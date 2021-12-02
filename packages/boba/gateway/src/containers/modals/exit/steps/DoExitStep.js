@@ -35,7 +35,19 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { Box } from '@material-ui/system'
 
+import parse from 'html-react-parser'
+
 import BN from 'bignumber.js'
+
+import { 
+  fetchClassicExitCost,
+  fetchL2FeeBalance, 
+} from 'actions/balanceAction'
+
+import { 
+  selectClassicExitCost, //estimated total cost of this exit
+  selectL2FeeBalance,
+} from 'selectors/balanceSelector'
 
 function DoExitStep({ handleClose, token }) {
 
@@ -50,23 +62,60 @@ function DoExitStep({ handleClose, token }) {
   const signatureStatus = useSelector(selectSignatureStatus_exitTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
 
+  const cost = useSelector(selectClassicExitCost)
+  const feeBalance = useSelector(selectL2FeeBalance)
+
   const maxValue = logAmount(token.balance, token.decimals)
   console.log("maxValue",maxValue) //this is now a float represented as a string
 
+  // function setAmount(value) {
+  //   //this function can accommodate strings, numbers, 
+  //   //and BigNumbers since it's based on "bignumber.js"
+
+  //   console.log("ETH fees:",Number(cost))
+
+  //   const tooSmall = new BN(value).lte(new BN(0.0))
+  //   const tooBig   = new BN(value).gt(new BN(maxValue))
+
+  //   if (tooSmall || tooBig) {
+  //     setValidValue(false)
+  //   } else {
+  //     setValidValue(true)
+  //   }
+
+  //   setValue(value)
+  // }
+
   function setAmount(value) {
-    //this function can accommadate strings, numbers, 
-    //and BigNumbers since it's based on "bignumber.js"
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
+    console.log("ETH fees:",Number(cost))
+    console.log("Transaction token value:",Number(value))
+    console.log("ETH available for fees:",Number(feeBalance))
+
     if (tooSmall || tooBig) {
       setValidValue(false)
+      setValue(value)
+      return false
+    } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
+      //insufficient ETH to cover the ETH amount plus gas
+      setValidValue(false)
+      setValue(value)
+      return false
+    } else if ((Number(cost) > Number(feeBalance))) {
+      //insufficient ETH to pay exit fees
+      setValidValue(false)
+      setValue(value)
+      return false
     } else {
+      //Whew, finally!
       setValidValue(true)
+      setValue(value)
+      return true
     }
 
-    setValue(value)
   }
 
   async function doExit() {
@@ -101,6 +150,55 @@ function DoExitStep({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
+  useEffect(() => {
+    if (typeof(token) !== 'undefined') {
+      console.log("Token:",token)
+      dispatch(fetchClassicExitCost(token.address))
+      dispatch(fetchL2FeeBalance())
+    }
+  }, [ token, dispatch ])
+
+  let ETHstring = ''
+  let warning = false
+
+  if(cost && Number(cost) > 0) {
+    
+    if (token.symbol !== 'ETH') {
+      if(Number(cost) > Number(feeBalance)) {
+        warning = true
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas. 
+        <br/>TRANSACTION WILL FAIL.` 
+      } 
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
+        warning = true
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.` 
+      } 
+      else {
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH` 
+      }
+    }
+
+    if (token.symbol === 'ETH') {
+      if((Number(value) + Number(cost)) > Number(feeBalance)) {
+        warning = true
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
+        <br/>TRANSACTION WILL FAIL.` 
+      }
+      else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
+        warning = true
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
+        <br/>TRANSACTION MIGHT FAIL.` 
+      } else {
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(value) + Number(cost)).toFixed(4)} ETH` 
+      }
+    }
+  }
+
   return (
     <>
       <Box>
@@ -110,7 +208,7 @@ function DoExitStep({ handleClose, token }) {
 
         <Input
           label={'Amount to bridge to L1'}
-          placeholder="0.0"
+          placeholder="0"
           value={value}
           type="number"
           onChange={(i)=>{
@@ -134,6 +232,18 @@ function DoExitStep({ handleClose, token }) {
               `You will receive ${Number(value).toFixed(3)} ${token.symbol}
               ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
               on L1. Your funds will be available on L1 in 7 days.`}
+          </Typography>
+        )}
+
+        {warning && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            {parse(ETHstring)}
+          </Typography>
+        )}
+
+        {!warning && (
+          <Typography variant="body2" sx={{mt: 2}}>
+            {parse(ETHstring)}
           </Typography>
         )}
 

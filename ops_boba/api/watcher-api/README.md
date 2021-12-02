@@ -7,7 +7,7 @@
 
 ### Layer 1
 
-#### get.l1.transactions
+#### get.l1.transactions (POST)
 
 **Request Body**
 
@@ -61,7 +61,7 @@
 
 ### Layer 2
 
-#### get.l2.transactions
+#### get.l2.transactions (POST)
 
 **Request Body**
 
@@ -116,7 +116,7 @@
 ]
 ```
 
-#### get.l2.deployments
+#### get.l2.deployments (POST)
 
 **Request Body**
 
@@ -140,7 +140,7 @@
 ]
 ```
 
-#### get.l2.crossdomainmessage
+#### get.l2.crossdomainmessage (POST)
 
 **Request Body**
 
@@ -170,5 +170,135 @@
   l1From: "L1_FROM",
   l1To: "L1_TO"
 }
+```
+
+#### get.l2.pendingexits (GET)
+
+**Response Body**
+
+```
+{
+  hash: "TRANSACTION_HASH",
+  blockHash: "BLOCK_HASH",
+  blockNumber: "BLOCK_NUMBER",
+  exitSender: "EXIT_SENDER",
+  exitTo: "EXIT_TO", // L1 LP address
+  exitTOKEN: "EXIT_TOKEN_L2_ADDRESS",
+  exitAmount: "EXIT_AMOUNT",
+  exitReceive: "EXIT_RECEIVE",
+  fastRelay: "FAST_RELAY" // 1 or 0,
+  status: "pending"
+}
+```
+
+### Global
+
+#### send.crossdomainmessage (POST)
+
+**Request Body**
+
+```js
+{
+  hash: "HASH",
+  block: "BLOCK_NUMBER[INT]",
+  startTime: "START_TIME[INT]",
+  l1Tol2: "BOOL",
+  key: "PRIVATE_KEY",
+  endTime: "END_TIME[INT]", // not required
+  cdmHash: "CROSS_DOMAIN_HASH", // not required
+  cdmBlock: "CROSS_DOMAIN_BLOCK[INT]", // not required
+}
+```
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
+```
+
+### Airdrop
+
+#### get.l1.airdrop (POST) / get.l2.airdrop (POST) 
+
+**Request Body**
+
+```js
+{
+  "address": "ADDRESS",
+  "key":"ACCESS_KEY"
+}
+```
+
+**Response Body**
+
+```js
+{
+  "address": "ADDRESS",
+  "amount": "AMOUNT_WEI_STRING",
+  "claimed": "TRUE / FALSE",
+  "claimedTimestamp": "TIMESTAMP",
+  "claimedAmount": "AMOUNT_WEI_STRING",
+  "claimImmediate": "TRUE / FALSE", //if staked on L2 during snapshot, claimImmediate === True
+  "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
+  "merkleProof": {
+    "index": "INDEX",
+    "amount": "AMOUNT", //hex,
+    "proof": "PROOF"
+  },
+  "network": "NETWORK" // bobanetwork or mainnet
+}
+```
+
+#### send.l1.airdrop (POST) / send.l2.airdrop (POST) 
+
+**Request Body**
+
+```js
+{
+  "address":"ADDRESS",
+  "key":"ACCESS_KEY"
+}
+```
+
+**Effect on DB entries**
+
+When `send.l_.airdrop` is called, the `claimed` flag should change to `true` and the `claimedTimestamp` should change to the `now` unix seconds timestamp, for example, `1636964190`.
+If `claimed` already === `true` then calling `send.l_.airdrop` should have no effect.   
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
+```
+
+#### initiate.l1.airdrop (POST)
+
+**Request Body**
+
+```js
+{
+  "address":"ADDRESS",
+  "key":"ACCESS_KEY"
+}
+```
+
+**Effect on DB entries**
+
+When `initiate.l1.airdrop` is called, the `claimUnlockTime` should change from `null` to a unix seconds timestamp = now + 30 days, for example, `1636964190`. 
+If `claimUnlockTime` already !== `null` then calling `initiate.l1.airdrop` should have no effect.  
+
+**Response Body**
+
+```js
+// Success
+{ status: "succeeded" }
+// failure
+{ status: "failed" }
 ```
 

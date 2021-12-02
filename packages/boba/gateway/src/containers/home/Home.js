@@ -13,15 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector, batch } from 'react-redux';
-import { selectWalletMethod } from 'selectors/setupSelector';
-import { selectModalState } from 'selectors/uiSelector';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectWalletMethod } from 'selectors/setupSelector'
+import { selectModalState } from 'selectors/uiSelector'
 
-import useInterval from 'util/useInterval';
+import useInterval from 'util/useInterval'
 
 import {
   fetchBalances,
+  fetchGas,
   addTokenList,
   fetchNFTs,
   fetchExits
@@ -56,9 +57,17 @@ import {
   getProposalThreshold 
 } from 'actions/daoAction'
 
+import Airdrop from 'containers/airdrop/Airdrop'
+
+import { 
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2,
+} from 'actions/airdropAction'
+
 //Wallet Functions
 import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
+import BobaScope from 'containers/bobaScope/BobaScope'
 
 //Help page
 import Help from 'containers/help/Help'
@@ -124,22 +133,18 @@ function Home () {
     dispatch(addTokenList()) //only need to do this boot
   }, [ dispatch ])
 
-  useInterval(() => {
-    batch(() => {
-      dispatch(fetchExits())
-    })
-  }, POLL_INTERVAL)
-
   //get all account balances
   useInterval(() => {
-    dispatch(fetchBalances()) //check the balances
+    dispatch(fetchBalances())
     dispatch(fetchNFTs())
-
-    // get Dao balance / Votes
+    dispatch(fetchAirdropStatusL1())
+    dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
     dispatch(fetchDaoVotes())
     dispatch(fetchDaoProposals())
     dispatch(getProposalThreshold())
+    dispatch(fetchGas())
+    dispatch(fetchExits())
   }, POLL_INTERVAL)
 
   useEffect(() => {
@@ -150,7 +155,7 @@ function Home () {
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
       {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />} 
-      {!!exitModalState && <ExitModal open={exitModalState}  token={token} fast={fast} />}
+      {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
       {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
       {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
@@ -189,18 +194,15 @@ function Home () {
 
       <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
         <MainMenu />
-        {/* The Top SubMenu Bar, non-mobile */}
-
         <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
           {pageDisplay === "AccountNow" &&
-          <>
             <Account/>
-          </>
           }
           {pageDisplay === "History" &&
-          <>
             <Transactions/>
-          </>
+          }
+          {pageDisplay === "BobaScope" &&
+            <BobaScope/>
           }
           {pageDisplay === "NFT" &&
             <NFT/>
@@ -210,6 +212,9 @@ function Home () {
           }
           {pageDisplay === "DAO" &&
             <DAO/>
+          }
+          {pageDisplay === "Airdrop" &&
+            <Airdrop/>
           }
           {pageDisplay === "Help" &&
             <Help/>

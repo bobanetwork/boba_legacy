@@ -14,9 +14,73 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 export function selectlayer1Balance (state) {
-  return state.balance.layer1;
+  return state.balance.layer1
 }
 
 export function selectlayer2Balance (state) {
-  return state.balance.layer2;
+  return state.balance.layer2
+}
+
+export function selectGas (state) {
+  return state.balance.gas
+}
+
+export function selectL1LPBalanceString (state) {
+  return state.balance.l1LpBalanceWeiString
+}
+
+export function selectL2LPBalanceString (state) {
+  return state.balance.l2LpBalanceWeiString
+}
+
+export function selectL1LPPendingString (state) {
+  return state.balance.l1LpPendingWeiString
+}
+
+export function selectL2LPPendingString (state) {
+  return state.balance.l2LpPendingWeiString
+}
+
+export function selectL1LPLiquidity (state) {
+  return state.balance.l1lpLiquidity
+}
+
+export function selectL2LPLiquidity (state) {
+  return state.balance.l2lpLiquidity
+}
+
+export function selectL1FeeRate (state) {
+  return state.balance.l1FeeRate
+}
+
+export function selectL2FeeRate (state) {
+  return state.balance.l2FeeRate
+}
+
+export function selectL1FeeRateN (state) {
+  return state.balance.l1FeeRateN
+}
+
+export function selectL2FeeRateN (state) {
+  return state.balance.l2FeeRateN
+}
+
+export function selectFastExitCost (state) {
+  return state.balance.fastExitCost
+}
+
+export function selectClassicExitCost (state) {
+  return state.balance.classicExitCost
+}
+
+export function selectFastDepositCost (state) {
+  return state.balance.fastDepositCost
+}
+
+export function selectL1FeeBalance (state) {
+  return state.balance.l1FeeBalance
+}
+
+export function selectL2FeeBalance (state) {
+  return state.balance.l2FeeBalance
 }

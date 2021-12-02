@@ -37,6 +37,9 @@ import { Container, Grid, useMediaQuery } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import { styled } from '@material-ui/core/styles'
 import { useTheme } from '@emotion/react'
+import { enableBrowserWallet } from 'actions/networkAction'
+
+require('dotenv').config()
 
 const Root = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(10),
@@ -47,10 +50,10 @@ function WalletPicker ({ onEnable, enabled }) {
 
   const dispatch = useDispatch();
 
-  const [ walletEnabled, setWalletEnabled ] = useState(false)
-  const [ accountsEnabled, setAccountsEnabled ] = useState(false)
-  const [ wrongNetwork, setWrongNetwork ] = useState(false)
-  
+  const [walletEnabled, setWalletEnabled] = useState(false)
+  const [accountsEnabled, setAccountsEnabled] = useState(false)
+  const [wrongNetwork, setWrongNetwork] = useState(false)
+
   const walletMethod = useSelector(selectWalletMethod())
   const masterConfig = useSelector(selectNetwork())
 
@@ -58,7 +61,13 @@ function WalletPicker ({ onEnable, enabled }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
-  
+
+  let maintenance = false
+
+  if (process.env.REACT_APP_STATUS === 'maintenance' ) {
+    maintenance = true
+  }
+
   const dispatchSetWalletMethod = useCallback((methodName) => {
     dispatch(setWalletMethod(methodName));
   }, [ dispatch ])
@@ -66,18 +75,18 @@ function WalletPicker ({ onEnable, enabled }) {
   useEffect(() => {
 
     if (walletMethod === 'browser') {
-      enableBrowserWallet()
+      setupBrowserWallet()
     }
 
-    async function enableBrowserWallet () {
+    async function setupBrowserWallet() {
       const selectedNetwork = masterConfig
-      const walletEnabled = await networkService.enableBrowserWallet(selectedNetwork)
+      const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
       return walletEnabled
         ? setWalletEnabled(true)
         : dispatchSetWalletMethod(null);
     }
 
-  }, [ dispatchSetWalletMethod, walletMethod, masterConfig ]);
+  }, [ dispatchSetWalletMethod, walletMethod, masterConfig , dispatch]);
 
   useEffect(() => {
 
@@ -103,20 +112,20 @@ function WalletPicker ({ onEnable, enabled }) {
     if (walletEnabled) {
       initializeAccounts()
     }
-  }, [ walletEnabled, masterConfig ]);
+  }, [ walletEnabled, masterConfig ])
 
   useEffect(() => {
     if (accountsEnabled) {
-      onEnable(true);
+      onEnable(true)
     }
-  }, [ onEnable, accountsEnabled ]);
+  }, [ onEnable, accountsEnabled ])
 
   useEffect(() => {
     if (walletEnabled && wrongNetwork) {
       dispatch(openModal('wrongNetworkModal'));
-      localStorage.setItem('changeChain', false);
+      localStorage.setItem('changeChain', false)
     }
-  }, [ dispatch, walletEnabled, wrongNetwork ]);
+  }, [ dispatch, walletEnabled, wrongNetwork ])
 
   function resetSelection () {
     dispatchSetWalletMethod(null)
@@ -141,42 +150,61 @@ function WalletPicker ({ onEnable, enabled }) {
         onClose={resetSelection}
       />
       <Root>
-        <Container maxWidth="md">
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={6}>
-              <Typography variant="h1" component="h1">
-                Connect a Wallet to access BOBA
-              </Typography>
-              <S.Subtitle variant="body1" component="p" paragraph={true}>
-                  Select a wallet to connect to BOBA
-              </S.Subtitle>
-            </Grid>
+        {!maintenance &&
+          <Container maxWidth="md">
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h1" component="h1">
+                  Connect a Wallet to access BOBA
+                </Typography>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                    Select a wallet to connect to BOBA
+                </S.Subtitle>
+              </Grid>
 
-            <Grid item xs={12} md={6}>
-              <S.WalletCard
-                // disabled={!browserEnabled}
-                pulsate={true} onClick={()=>dispatchSetWalletMethod('browser')} isMobile={isMobile}>
-                <S.WalletCardHeading>
-                  <S.WalletCardTitle>
-                    <S.PlusIcon>+</S.PlusIcon>
-                    <Typography variant="h2" component="h2" paragraph={true} mb={0}>
-                      Metamask
+              <Grid item xs={12} md={6}>
+                <S.WalletCard
+                  // disabled={!browserEnabled}
+                  pulsate={true} onClick={()=>dispatchSetWalletMethod('browser')} isMobile={isMobile}>
+                  <S.WalletCardHeading>
+                    <S.WalletCardTitle>
+                      <S.PlusIcon>+</S.PlusIcon>
+                      <Typography variant="h2" component="h2" paragraph={true} mb={0}>
+                        Metamask
+                      </Typography>
+                    </S.WalletCardTitle>
+                    <Typography variant="body1" component="p" gutterBottom paragraph={true} mb={0}>
+                      Connect using <strong>browser </strong>wallet
                     </Typography>
-                  </S.WalletCardTitle>
-                  <Typography variant="body1" component="p" gutterBottom paragraph={true} mb={0}>
-                    Connect using <strong>browser </strong>wallet
-                  </Typography>
-                </S.WalletCardHeading>
+                  </S.WalletCardHeading>
 
-                <S.WalletCardDescription>
-                  <Fox width={isMobile ? 100 : 50} />
-                </S.WalletCardDescription>
-
-              </S.WalletCard>
-
+                  <S.WalletCardDescription>
+                    <Fox width={isMobile ? 100 : 50} />
+                  </S.WalletCardDescription>
+                </S.WalletCard>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
+          </Container>
+       }
+        {!!maintenance &&
+          <Container maxWidth="md">
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h1" component="h1">
+                  SCHEDULED BOBA GATEWAY DOWNTIME
+                </Typography>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  As announced in Twitter and in Telegram, due to unexpectely high demand for the
+                  Boba L2, BOBA liquidity pools are being rebalanced.
+                </S.Subtitle>
+                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                  The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC.
+                  Upgrade status and progress reports will be provided via Twitter and Telegram.
+                </S.Subtitle>
+              </Grid>
+            </Grid>
+          </Container>
+        }
       </Root>
     </>
   );

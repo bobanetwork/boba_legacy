@@ -37,7 +37,21 @@ packages/regenesis-surgery/state-dump
 # monitor
 ops_boba/api/watcher-api/env-rinkeby.yml
 ops_boba/api/watcher-api/env-mainnet.yml
+ops_boba/api/watcher-api/env.yml
 ops_boba/monitor/yarn.lock
+ops_boba/api/watcher-api/.serverless
 
 # gateway
 packages/boba/gateway/build
+packages/boba/gateway/public/env.js
+
+# subgraph
+/packages/boba/subgraph/L1/yarn.lock
+/packages/boba/subgraph/L2/yarn.lock
+/packages/boba/subgraph/L1/build
+/packages/boba/subgraph/L2/build
+/packages/boba/subgraph/L1/generated
+/packages/boba/subgraph/L2/generated
+
+# api
+env-mainnet.yml

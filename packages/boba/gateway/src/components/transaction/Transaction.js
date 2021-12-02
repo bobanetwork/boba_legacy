@@ -15,23 +15,22 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 
-import { Grid, Typography,Fade } from '@material-ui/core'
+import { Typography, Fade, useMediaQuery } from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
-import * as styles from './Transaction.module.scss'
-import * as S from './Transaction.styles'
+import * as S from "./ListFarm.styles"
+
 import { useTheme } from '@emotion/react'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
 import { getAllNetworks } from 'util/masterConfig'
-import Button from 'components/button/Button'
+import truncate from 'truncate-middle'
 
 function Transaction({
   link,
   status,
   statusPercentage,
   subStatus,
-  button,
   title,
   time,
   subTitle,
@@ -46,7 +45,9 @@ function Transaction({
 }) {
 
   const [dropDownBox, setDropDownBox] = useState(false)
+
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const currentNetwork = useSelector(selectNetwork())
   const nw = getAllNetworks()
@@ -54,15 +55,9 @@ function Transaction({
   const chainLink = ({chain,hash}) => {
     let network = nw[currentNetwork]
     if (!!network && !!network[chain]) {
-      // network object should have L1 & L2
-      // endpoint name is now network specific - `?network` no longer needed
-      //if (chain === 'L1') {
-          return `${network[chain].transaction}${hash}`;
-      //} else {  
-      //    return `${network[chain].transaction}${item.hash}?network=${currentNetwork[0].toUpperCase() + currentNetwork.slice(1)}`;
-      //}
+      return `${network[chain].transaction}${hash}`;
     }
-    return '';
+    return ''
   }
 
   function renderDetailRedesign() {
@@ -75,130 +70,120 @@ function Transaction({
     if (oriChain === 'L2') prefix = 'L1'
 
     return (
+      <Fade in={dropDownBox}>
+        <S.DropdownContent>
+          <S.DropdownWrapper style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start'}}>
 
-      <S.TableBody
-        style={{ justifyContent: 'center' }}
-      >
-        <S.TableCell sx={{
-          gap: '5px',
-          width: '98% !important',
-          padding: '10px',
-          alignItems: 'flex-start !important',
-        }}>
-          {!!dropDownBox ? <Fade in={dropDownBox}>
-            <div>
-              <Grid className={styles.dropDownContent} container spacing={1}>
-                <Typography variant="body3" className={styles.muted}>
-                  {prefix} Hash:&nbsp;
-                  <a className={styles.href} href={chainLink({ chain: prefix, hash:detail.hash})} target="_blank" rel="noopener noreferrer">
-                    {detail.hash}
-                  </a>
-                </Typography>
-              </Grid>
-              <Grid className={styles.dropDownContent} container spacing={1}>
-                <Typography variant="body3" className={styles.muted}>{prefix} Block:&nbsp;{detail.blockNumber}</Typography>
-              </Grid>
-              <Grid className={styles.dropDownContent} container spacing={1}>
-                <Typography variant="body3" className={styles.muted}>{prefix} Block Hash:&nbsp;{detail.blockHash}</Typography>
-              </Grid>
-              <Grid className={styles.dropDownContent} container spacing={1}>
-                <Typography variant="body3" className={styles.muted}>{prefix} From:&nbsp;{detail.from}</Typography>
-              </Grid>
-              <Grid className={styles.dropDownContent} container spacing={1}>
-                <Typography variant="body3" className={styles.muted}>{prefix} To:&nbsp;{detail.to}</Typography>
-              </Grid>
-            </div>
-          </Fade> : null}
-        </S.TableCell>
-      </S.TableBody>)
-  }
-
-  return (
-    <
-      div style={{
-        padding: '10px',
-        borderRadius: '8px',
-        background: theme.palette.background.secondary,
-      }}
-    >
-      <S.TableBody>
-
-        <S.TableCell
-          sx={{ gap: '5px' }}
-          style={{ width: '60%' }}
-        >
-          <Typography variant="h3">{chain}</Typography>
-
-          <Typography variant="body3" className={styles.muted}>
-            {time}
-          </Typography>
-
-          <Typography variant="body3" className={styles.muted}>
-            {oriChain}&nbsp;Hash:&nbsp;
-            <a
-              href={chainLink({hash:oriHash, chain: oriChain})}
-              target={'_blank'}
-              rel='noopener noreferrer'
-              style={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }}
+           <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
+            {prefix} Hash:&nbsp;
+            <a 
+              href={chainLink({ chain: prefix, hash:detail.hash})} 
+              target={'_blank'} 
+              rel="noopener noreferrer"
+              style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
             >
-              {oriHash}
+              {isMobile ? truncate(detail.hash, 6, 6, '...') : detail.hash}
             </a>
           </Typography>
 
-          <Typography variant="body3" className={styles.muted}>
-            {typeTX}
-          </Typography>
+          <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>{prefix} Block:&nbsp;{detail.blockNumber}</Typography>
+          <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>{prefix} Block Hash:&nbsp;
+          <span style={{fontFamily: 'MessinaSB',fontSize: '0.8em'}}>
+            {detail.blockHash}
+          </span></Typography>
+          <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>{prefix} From:&nbsp;
+          <span style={{fontFamily: 'MessinaSB',fontSize: '0.8em'}}>
+            {detail.from}
+           </span></Typography>
+          <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>{prefix} To:&nbsp;
+          <span style={{fontFamily: 'MessinaSB',fontSize: '0.8em'}}>
+            {detail.to}
+          </span></Typography>
+          </S.DropdownWrapper>
+        </S.DropdownContent>
+      </Fade>
+    )
 
-          {!!detail &&
-            <Typography
-              variant="body2"
-              sx={{
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              onClick={() => {
-                setDropDownBox(!dropDownBox)
-              }}
-            >
-              More Information <ExpandMoreIcon />
-            </Typography>
-          }
-        </S.TableCell>
+  }
 
-        <S.TableCell
-          sx={{ gap: '5px' }}
-          style={{ width: '20%' }}
+  return (
+    <S.Wrapper dropDownBox={dropDownBox}>
+
+      <S.GridContainer 
+        container 
+        spacing={2} 
+        direction="row" 
+        justifyContent="flex-start" 
+        alignItems="flex-start"
+        minHeight={20}
+      >
+
+      <S.GridItemTag 
+        item 
+        xs={6} 
+        md={6} 
         >
-          <div className={styles.muted}>
-            <Typography variant="body3">
-              {blockNumber}
+          <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start', paddingLeft: '3px' }}>
+            <Typography variant="overline" style={{lineHeight: '1.1em'}}>{chain}</Typography>
+            <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{time}</Typography>
+            <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
+              {oriChain}&nbsp;Hash:&nbsp;
+              <a
+                href={chainLink({hash:oriHash, chain: oriChain})}
+                target={'_blank'}
+                rel='noopener noreferrer'
+                style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
+              >
+                {isMobile ? truncate(oriHash, 6, 6, '...') : oriHash}
+              </a>
             </Typography>
           </div>
-          {amountTx ? <Typography variant="h4">{amountTx}</Typography> : null}
-        </S.TableCell>
+      </S.GridItemTag>
 
-        <S.TableCell sx={{ gap: "5px" }}>
-          {button &&
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                boder: '1.4px solid #506DFA',
-                borderRadius: '8px',
-                width: '180px'
-              }}
-              onClick={button.onClick}
-            >
-              {button.text}
-            </Button>
-          }
+      <S.GridItemTag 
+        item 
+        xs={3} 
+        md={3}
+      >
+        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start'}}>
+          <Typography variant="overline" style={{lineHeight: '1.1em'}}>
+            {blockNumber}
+          </Typography>
+          <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
+            {typeTX}
+          </Typography>
+          {amountTx ? 
+            <Typography 
+              variant="overline"
+              style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}
+             > 
+               {amountTx}
+             </Typography> : null
+           }
+        </div>
+      </S.GridItemTag>
 
-        </S.TableCell>
-      </S.TableBody>
-      {renderDetailRedesign()}
-    </div>)
+      <S.GridItemTag 
+        item 
+        xs={3} 
+        md={3}
+      >
+        {!!detail &&
+          <Typography
+            variant="overline"
+            sx={{cursor: 'pointer',display: 'flex', alignItems: 'center',lineHeight: '1.1em'}}
+            onClick={()=>{setDropDownBox(!dropDownBox)}}
+          >
+            More Information <ExpandMoreIcon style={{paddingBottom: '3px'}}/>
+          </Typography>
+        }
+      </S.GridItemTag>
+    </S.GridContainer>
 
+    {dropDownBox ? renderDetailRedesign() : null }
+    
+    </S.Wrapper>
+  )
 }
 
 export default Transaction

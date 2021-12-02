@@ -1,11 +1,11 @@
 import { styled } from '@material-ui/core/styles'
-import { Box, Card, CardContent, Typography } from "@material-ui/core";
+import { Box, Card, CardContent, Typography, Grid } from "@material-ui/core";
 
 export const WrapperHeading = styled(Box)`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 30px;
+  //margin-bottom: 10px;
   justify-content: space-between;
 `;
 
@@ -24,6 +24,27 @@ export const TableHeading = styled(Box)(({ theme }) => ({
     marginBottom: "20px",
   },
 }));
+
+export const Wrapper = styled(Box)(({ theme, ...props }) => ({
+  borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
+  [theme.breakpoints.down('md')]: {
+    //padding: '30px 10px',
+  },
+  [theme.breakpoints.up('md')]: {
+    padding: '10px',
+  },
+}));
+
+export const GridContainer = styled(Grid)(({theme})=>({
+  //background: '#192333',
+  //borderRadius: '8px',
+  //height: '40px',
+  //paddingTop: '5px',
+  //paddingLeft: '20px',
+  // [theme.breakpoints.down('md')]:{
+  //   justifyContent: 'flex-start'
+  // }
+}))
 
 export const TableHeadingItem = styled(Typography)`
   width: 20%;
@@ -49,6 +70,7 @@ export const CardTag = styled(Card)(({ theme }) => ({
   border: '2px solid rgba(255, 255, 255, 0.2)',
   overflow: 'initial',
   minHeight: '225px',
+  marginBottom: '20px',
   backgroundColor: theme.palette.background.secondary,
   [theme.breakpoints.up('lg')]: {
     margin: '60px 0 30px 0',

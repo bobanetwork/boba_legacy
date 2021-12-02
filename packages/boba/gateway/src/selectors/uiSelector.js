@@ -31,10 +31,10 @@ export function selectLedger (state) {
   return state.ui.ledger
 }
 
-export function selectActiveHistoryTab1 (state) {
-  return state.ui.activeHistoryTab1
+export function selectActiveHistoryTab (state) {
+  return state.ui.activeHistoryTab
 }
 
-export function selectActiveHistoryTab2 (state) {
-  return state.ui.activeHistoryTab2
+export function selectActiveDataTab (state) {
+  return state.ui.activeDataTab
 }
