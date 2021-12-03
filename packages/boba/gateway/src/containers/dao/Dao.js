@@ -137,7 +137,7 @@ function DAO() {
                     </div>
                 </div>
                 <div className={styles.proposal}>
-                    <ProposalList balance={balance} />
+                    <ProposalList/>
                 </div>
             </div>
         </>

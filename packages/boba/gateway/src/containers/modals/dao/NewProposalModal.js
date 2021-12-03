@@ -29,8 +29,7 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import { createDaoProposal } from 'actions/daoAction'
-
-import { selectProposals, selectProposalThreshold, selectDaoBalance } from 'selectors/daoSelector'
+import { selectProposalThreshold } from 'selectors/daoSelector'
 
 function NewProposalModal({ open }) {
 
