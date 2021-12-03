@@ -45,7 +45,8 @@ class ListContract extends React.Component {
     return (
       <S.Wrapper>
 
-          <S.GridContainer container
+          <S.GridContainer 
+            container
             spacing={2}
             direction="row"
             justifyContent="flex-start"

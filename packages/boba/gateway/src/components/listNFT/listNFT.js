@@ -105,40 +105,40 @@ class listNFT extends React.Component {
             </Typography>
 
             {meta.collection !== '' &&
-              <Typography variant="body2">
+              <Typography variant="body3">
                 Collection: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {meta.collection}
                 </Typography>
               </Typography>
             }
             {meta.rank !== '' &&
-              <Typography variant="body2">
+              <Typography variant="body3">
                 Rank: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {meta.rank}
                 </Typography>
               </Typography>
             }
             {meta.rarity_score !== '' &&
-              <Typography variant="body2">
+              <Typography variant="body3">
                 Rarity: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {meta.rarity_score}
                 </Typography>
               </Typography>
             }
             {(meta.attributes || []).map((attr, index) => {
-              return (<Typography variant="body2" key={index}>{attr.trait_type}: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+              return (<Typography variant="body3" key={index}>{attr.trait_type}: 
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {attr.value}
                 </Typography>
               </Typography>)
             })}
             {(meta.traits || []).map((attr, index) => {
-              return (<Typography variant="body2" key={index}>
+              return (<Typography variant="body3" key={index}>
                 {attr.trait_type}: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {attr.trait_value}
                 </Typography>
               </Typography>)
