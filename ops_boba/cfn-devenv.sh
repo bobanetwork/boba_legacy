@@ -308,7 +308,7 @@ function deploy_dev_services {
       fi
       notice "Generating environment files ...."
       for srv in $DOCKER_IMAGES_LIST; do
-         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${srv}.env
          aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
          rm -f  ${srv}.env > /dev/null
       done
@@ -341,7 +341,7 @@ function deploy_dev_services {
       elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
       fi
-      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${SERVICE_NAME}.env
       aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       rm -rf ${SERVICE_NAME}.env
       cd ${PATH_TO_CFN}
@@ -371,7 +371,7 @@ function update_dev_services {
        elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
          ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
        fi
-         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+         aws secretsmanager get-secret-value --secret-id ${srv}-${ENV_PREFIX}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${srv}.env
          aws s3 cp ${srv}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
          rm -f ${srv}.env > /dev/null
       done
@@ -402,7 +402,7 @@ function update_dev_services {
       elif [[ ${ENV_PREFIX} == *"-verifier"* ]];then
         ENV_PREFIX=`echo $ENV_PREFIX|sed 's#-verifier##g'`
       fi
-      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+      aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${ENV_PREFIX}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${SERVICE_NAME}.env
       aws s3 cp ${SERVICE_NAME}.env s3://${ENV_PREFIX}-infrastructure-application-s3/ > /dev/null
       rm -rf ${SERVICE_NAME}.env
       notice "Update ${SERVICE_NAME} to ${DEPLOYTAG}"
@@ -551,13 +551,13 @@ function destroy_dev_services {
         if [ -z ${SERVICE_NAME} ]; then
            info "Missing SERVICE_NAME going to re-generate all environment files"
            for srv in $ALL_DOCKER_IMAGES_LIST datadog; do
-              aws secretsmanager get-secret-value --secret-id ${srv}-${CLUSTER_NAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${srv}.env
+              aws secretsmanager get-secret-value --secret-id ${srv}-${CLUSTER_NAME}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${srv}.env
               aws s3 cp ${srv}.env s3://${CLUSTER_NAME}-infrastructure-application-s3/ > /dev/null
               rm -f ${srv}.env > /dev/null
             done
         else
             info "Generating environment file for ${SERVICE_NAME}"
-            aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${CLUSTER_NAME}|jq -r .SecretString|sed 's#",#\n#g; s#":"#=#g; s#"##g; s#{##g; s#}##g' > ${SERVICE_NAME}.env
+            aws secretsmanager get-secret-value --secret-id ${SERVICE_NAME}-${CLUSTER_NAME}|jq -r .SecretString|jq -r 'to_entries | .[] | .key + "=" + .value + ""' > ${SERVICE_NAME}.env
             aws s3 cp ${SERVICE_NAME}.env s3://${CLUSTER_NAME}-infrastructure-application-s3/ > /dev/null
             rm -f ${SERVICE_NAME}.env > /dev/null
         fi
