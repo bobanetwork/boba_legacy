@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import {Typography, useTheme, Link} from '@material-ui/core'
+import { Typography, useTheme, Link, Fade } from '@material-ui/core'
 
 import { useDispatch } from 'react-redux';
 import { openAlert, openError } from 'actions/uiAction'
@@ -22,18 +22,13 @@ import { castProposalVote, queueProposal, executeProposal } from 'actions/daoAct
 
 import moment from 'moment'
 import Button from 'components/button/Button'
-
-import * as styles from './Proposal.module.scss'
 import * as S from "./Proposal.styles"
-
-import { backgroundLight400 } from 'index.scss'
 
 function Proposal({
     proposal,
 }) {
 
     const dispatch = useDispatch()
-    const theme = useTheme()
 
     const [dropDownBox, setDropDownBox] = useState(false)
     const [dropDownBoxInit, setDropDownBoxInit] = useState(true)
@@ -47,7 +42,7 @@ function Proposal({
                 setVotePercent(50);
             }
         };
-        init();
+        init()
     }, [proposal])
 
 
@@ -60,7 +55,7 @@ function Proposal({
         }
     }
 
-    const queueProposal = async () => {
+    const doQueueProposal = async () => {
         let res = await dispatch(queueProposal(proposal.id))
         if(res) {
             dispatch(openAlert(`Proposal is queuing`));
@@ -69,7 +64,7 @@ function Proposal({
         }
     }
 
-    const executeProposal = async () => {
+    const doExecuteProposal = async () => {
         let res = await dispatch(executeProposal(proposal.id))
         if(res) {
             dispatch(openAlert(`Proposal is executing`));
@@ -83,7 +78,7 @@ function Proposal({
             let descList = description.split('@@')
             if(descList[1] !== '') {
                 //should validate http link
-                return  <>{descList[0]}&nbsp;&nbsp;<Link color="inherit" variant="body2" className={styles.href} target="_blank" rel="noopener noreferrer" href={descList[1]}>MORE DETAILS</Link>  </>
+                return  <>{descList[0]}&nbsp;&nbsp;<Link color="inherit" variant="body2" target="_blank" rel="noopener noreferrer" href={descList[1]}>MORE DETAILS</Link>  </>
             } else {
                 return  <>{descList[0]}</>
             }
@@ -94,166 +89,110 @@ function Proposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
-/*
-        const proposalStates = [
-          'Pending',
-          'Active',
-          'Canceled',
-          'Defeated',
-          'Succeeded',
-          'Queued',
-          'Expired',
-          'Executed',
-        ]
-*/
-
-
-    return (<div
-        className={styles.proposalCard}
-        style={{
-            background: `${theme.palette.mode === 'light' ? backgroundLight400 : 'linear-gradient(132.17deg, rgba(255, 255, 255, 0.1) 0.24%, rgba(255, 255, 255, 0.03) 94.26%)'}`,
-        }}>
-
-        <div>
-            <div className={styles.proposalHeader}>
-                <div className={styles.title} style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+    return (
+        <S.Wrapper dropDownBox={dropDownBox}>
+            <S.GridContainer container
+              spacing={1}
+              direction="row"
+              justifyContent="flex-start"
+              alignItems="center"
+            >
+                <S.GridItemTag item
+                  xs={12}
+                  md={8}
+                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
+                >
                     <Typography variant="body2" style={{fontWeight: '700'}}>Proposal {proposal.id}</Typography>
                     <Typography variant="body3">Title: <FormatDescription description={proposal.description} /></Typography>
                     {proposal.state === 'Defeated' && 
-                        <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
-                        >
-                          Status: &nbsp;
-                            <span style={{color: 'red'}}>
-                              {proposal.state}
-                            </span>
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                          Status: &nbsp;<span style={{color: 'red'}}>{proposal.state}</span>
                         </Typography>
                     }
                     {proposal.state === 'Succeeded' && 
-                    <>
-                        <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
-                        >
-                          Status: &nbsp;
-                            <span style={{color: 'green'}}>
-                              {proposal.state}
-                            </span>
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                            Status: &nbsp;<span style={{color: 'green'}}>{proposal.state}</span>
                         </Typography>
-                    </>
                     }
                     {proposal.state === 'Queued' && 
-                    <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
-                        >
-                          Status: &nbsp;
-                            <span style={{color: 'green'}}>
-                              {proposal.state}
-                            </span>
-                    </Typography>
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                            Status: &nbsp;<span style={{color: 'green'}}>{proposal.state}</span>
+                        </Typography>
                     }
                     {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
-                        <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
-                        >
-                          Status: &nbsp;
-                            <span style={{color: 'yellow'}}>
-                              {proposal.state}
-                            </span>
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                          Status: &nbsp;<span style={{color: 'yellow'}}>{proposal.state}</span>
                         </Typography>
                     }
                     <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
-                        Voting Start Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{startTime}</span>&nbsp; 
-                        Voting Stop Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{endTime}</span> 
+                        Voting Start: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{startTime}</span>
+                    </Typography>
+                    <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                        Voting Stop: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{endTime}</span> 
                     </Typography>
                     {proposal.state === 'Active' && !proposal.hasVoted &&
-                        <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700'}}
-                        >
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700'}}>
                           Proposal active 
                         </Typography>
                     }
                     {proposal.state === 'Active' && proposal.hasVoted &&
-                        <Typography 
-                            variant="overline" 
-                            style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'green', fontWeight: '700'}}
-                        >
+                        <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'green', fontWeight: '700'}}>
                           Vote recorded: thank you
                         </Typography>
                     }
-                </div>
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                </S.GridItemTag>
+                <S.GridItemTag item
+                    xs={12}
+                    md={2}
+                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
+                >
                     {proposal.state === 'Active' && !proposal.hasVoted &&
                         <Button type="primary" variant="contained" onClick={()=>{setDropDownBox(!dropDownBox); setDropDownBoxInit(false)}}>VOTE</Button>
                     }
                     {proposal.state === 'Queued' && 
-                        <Button type="primary" variant="contained" onClick={(e)=>{executeProposal()}}>EXECUTE PROPOSAL</Button>
+                        <Button type="primary" variant="contained" onClick={(e)=>{doExecuteProposal()}}>EXECUTE</Button>
                     }
                     {proposal.state === 'Succeeded' && 
-                        <Button type="primary" variant="contained" onClick={(e)=>{queueProposal()}}>QUEUE PROPOSAL</Button>
+                        <Button type="primary" variant="contained" onClick={(e)=>{doQueueProposal()}}>QUEUE</Button>
                     }
-                </div>
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
-                    <Typography variant="overline" className={styles.vote}>For: {proposal.forVotes}</Typography>
-                    <Typography variant="overline" className={styles.vote}>Against: {proposal.againstVotes}</Typography>
-                    <Typography variant="overline" className={styles.vote}>Abstain: {proposal.abstainVotes}</Typography>
-                    <Typography variant="overline" className={styles.vote} style={{minWidth: '150px'}}>Percentage For: {votePercent}% </Typography>
-                    <Typography variant="overline" className={styles.vote}>Total Votes: {proposal.totalVotes}</Typography>
-                </div>
-            </div>
-        </div>
-
-        <div className={dropDownBox ? styles.dropDownContainer : dropDownBoxInit ? styles.dropDownInit : styles.closeDropDown}>
-            <div className={styles.proposalDetail}>
-                <Typography variant="body2">Note: only your first vote counts.</Typography>
+                </S.GridItemTag>
+                <S.GridItemTag item
+                    xs={12}
+                    md={2}
+                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
+                >
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>For: {proposal.forVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Against: {proposal.againstVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Abstain: {proposal.abstainVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>For (%): {votePercent}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Total Votes: {proposal.totalVotes}</Typography>
+                </S.GridItemTag>
+        </S.GridContainer>
+        {dropDownBox ? (
+          <Fade in={dropDownBox}>
+            <S.DropdownContent>
+              <S.DropdownWrapper>
                 <Button
                     type="primary"
-                    variant="outlined"
-                    style={{
-                        maxWidth: '180px',
-                        padding: '15px 10px',
-                        borderRadius: '8px',
-                        alignSelf: 'center'
-                    }}
-                    onClick={(e) => {
-                        updateVote(proposal.id, 1, 'Cast Vote For')
-                    }}
-
-                > Cast Vote For</Button>
+                    variant="contained"
+                    onClick={(e) => {updateVote(proposal.id, 1, 'Cast Vote For')}}
+                >Vote For</Button>
                 <Button
                     type="primary"
-                    variant="outlined"
-                    style={{
-                        maxWidth: '180px',
-                        padding: '15px 10px',
-                        borderRadius: '8px',
-                        alignSelf: 'center'
-                    }}
-                    onClick={(e) => {
-                        updateVote(proposal.id, 0, 'Cast Vote Against')
-                    }}
-
-                > Cast Vote Against</Button>
+                    variant="contained"
+                    onClick={(e) => {updateVote(proposal.id, 0, 'Cast Vote Against')}}
+                >Vote Against</Button>
                 <Button
                     type="outline"
-                    variant="outlined"
-                    style={{
-                        maxWidth: '180px',
-                        padding: '15px 10px',
-                        borderRadius: '8px',
-                        alignSelf: 'center'
-                    }}
-                    onClick={(e) => {
-                        updateVote(proposal.id, 2, 'Cast Vote Abstain')
-                    }}
-                > Cast Vote Abstain</Button>
-            </div>
-        </div>
-    </div>)
+                    variant="contained"
+                    onClick={(e) => {updateVote(proposal.id, 2, 'Cast Vote Abstain')}}
+                >Vote Abstain</Button>
+              </S.DropdownWrapper>
+            </S.DropdownContent>
+          </Fade>
+        ) : null }
+    </S.Wrapper>
+    )
 }
 
 

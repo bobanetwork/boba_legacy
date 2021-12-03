@@ -2867,9 +2867,11 @@ class NetworkService {
 
     if( this.delegateContract === null ) return
 
+    console.log("ProposalID:",Number(proposalID))
+
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
-      let res = delegateCheck.queue(proposalID)
+      let res = delegateCheck.queue(Number(proposalID))
       return res
     } catch(error) {
       console.log("NS: queueProposal error:",error)
@@ -2882,9 +2884,11 @@ class NetworkService {
 
     if( this.delegateContract === null ) return
 
+    console.log("ProposalID:",Number(proposalID))
+
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
-      let res = delegateCheck.execute(proposalID)
+      let res = delegateCheck.execute(Number(proposalID))
       return res
     } catch(error) {
       console.log("NS: executeProposal error:",error)

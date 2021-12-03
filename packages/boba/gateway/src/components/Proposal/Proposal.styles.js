@@ -6,7 +6,7 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderRadius: '0',
   background: theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
-    //padding: '30px 10px',
+    padding: '30px 10px',
   },
   [theme.breakpoints.up('md')]: {
     padding: '10px',
@@ -30,7 +30,7 @@ export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
 export const DropdownWrapper = styled(Box)`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 5px;
   width: 100%;
   padding: 6px;
@@ -41,7 +41,7 @@ export const DropdownWrapper = styled(Box)`
 `;
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '70%',
+  width: '100%',
   display: 'flex',
   justifyContent: 'space-between',
   [theme.breakpoints.down('md')]: {

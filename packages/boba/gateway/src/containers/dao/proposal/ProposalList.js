@@ -57,7 +57,7 @@ function ProposalList() {
 
     return <>
         <div className={styles.containerAction}>
-            <p className={styles.listTitle}>Proposal List</p>
+            <p className={styles.listTitle}>Proposals</p>
             <Typography variant="body2" className={styles.helpTextLight}>
                 At least {proposalThreshold} BOBA are needed to create a new proposal
             </Typography>
@@ -71,7 +71,7 @@ function ProposalList() {
                         dispatch(openModal('newProposalModal'))
                     }
                 }}
-            >Create Proposal</Button>
+            >Create</Button>
         </div>
         <div className={styles.listContainer}
             style={{
