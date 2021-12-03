@@ -15,13 +15,13 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
     uint public constant MAX_PROPOSAL_THRESHOLD = 500000e18; // 500,000 BOBA
 
     /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 1;     // seconds
+    uint public constant MIN_VOTING_PERIOD = 3 days;     // seconds
 
     /// @notice The max setable voting period
     uint public constant MAX_VOTING_PERIOD = 14 days; // 2 weeks
 
     /// @notice The min setable voting delay
-    uint public constant MIN_VOTING_DELAY = 1;  // seconds
+    uint public constant MIN_VOTING_DELAY = 2 days;  // seconds
 
     /// @notice The max setable voting delay (seconds before proposal goes votable)
     uint public constant MAX_VOTING_DELAY = 7 days; // 1 week

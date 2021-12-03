@@ -53,7 +53,7 @@ describe('Dao Action Test', async () => {
     'Executed',
   ]
 
-  const moveTimeForward = async () => {
+  const moveTimeForward = async (time = 0) => {
     Factory__L1ERC20 = new ContractFactory(
       L1ERC20Json.abi,
       L1ERC20Json.bytecode,
@@ -78,6 +78,9 @@ describe('Dao Action Test', async () => {
       18
     )
     await L2ERC20.deployTransaction.wait()
+
+    // increase l1 time and in turn change the l2 timestamp
+    await env.l1Provider.send("evm_increaseTime", [time])
 
     const approveL1ERC20TX = await L1ERC20.approve(
       L1StandardBridge.address,
@@ -239,7 +242,11 @@ describe('Dao Action Test', async () => {
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
       try {
-        await moveTimeForward()
+        // get current voting delay from contract
+        const votingDelay = (await Governor.votingDelay()).toNumber()
+        // mock timestmap
+        await moveTimeForward(votingDelay)
+
         const proposalID = (await Governor.proposalCount())._hex
 
         await Governor.castVote(proposalID, 1)
@@ -253,11 +260,9 @@ describe('Dao Action Test', async () => {
         // wait till voting period ends
         console.log("\twaiting for voting period to end...")
 
-        let i = 0
-        while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
-          await moveTimeForward()
-          i++
-        }
+        const votingPeriod = (await Governor.votingPeriod()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingPeriod)
 
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
@@ -358,7 +363,11 @@ describe('Dao Action Test', async () => {
 
     it('should cast vote to the proposal and wait for voting period to end', async () => {
       try {
-        await moveTimeForward()
+        // get current voting delay from contract
+        const votingDelay = (await Governor.votingDelay()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingDelay)
+
         const proposalID = (await Governor.proposalCount())._hex
 
         await Governor.castVote(proposalID, 1)
@@ -371,11 +380,10 @@ describe('Dao Action Test', async () => {
 
         // wait till voting period ends
         console.log("\twaiting for voting period to end...")
-        let i = 0
-        while ((await Governor.state(proposalID)) !== 4 && i !== 19) {
-          await moveTimeForward()
-          i++
-        }
+
+        const votingPeriod = (await Governor.votingPeriod()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingPeriod)
 
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
