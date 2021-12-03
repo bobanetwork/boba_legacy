@@ -32,7 +32,6 @@ function daoReducer(state = initialState, action) {
       return { ...state, ...action.payload }
 
     case 'PROPOSALTHRESHOLD/GET/SUCCESS':
-      console.log("TH:",action.payload)
       return { ...state, ...action.payload }
 
     default:

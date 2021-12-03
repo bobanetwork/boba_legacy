@@ -16,7 +16,7 @@ limitations under the License. */
 import React, {useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Box, Typography,useMediaQuery } from '@material-ui/core'
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 
 import { openError, openModal } from 'actions/uiAction'
@@ -27,14 +27,14 @@ import Pager from 'components/pager/Pager'
 
 import * as styles from './proposalList.module.scss'
 
-import { selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
+import { selectProposals, selectProposalThreshold, selectDaoBalance } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import { orderBy } from 'lodash'
 
 const PER_PAGE = 8
 
-function ProposalList({balance}) {
+function ProposalList() {
 
     const theme = useTheme()
 
@@ -44,10 +44,9 @@ function ProposalList({balance}) {
     const loading = useSelector(selectLoading(['PROPOSALS/GET']))
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
+    const balance = useSelector(selectDaoBalance)
 
-    console.log("TH2:",proposalThreshold)
-
-    const orderedProposals = orderBy(proposals, i => i.startTime, 'asc')
+    const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
     const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
     const endingIndex = page * PER_PAGE
@@ -66,13 +65,13 @@ function ProposalList({balance}) {
                 type="primary"
                 variant="contained"
                 onClick={() => {
-                    if(balance < proposalThreshold) {
+                    if(Number(balance) < Number(proposalThreshold)) {
                         dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA to create a new proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
                     }
                 }}
-            > Create Proposal </Button>
+            >Create Proposal</Button>
         </div>
         <div className={styles.listContainer}
             style={{

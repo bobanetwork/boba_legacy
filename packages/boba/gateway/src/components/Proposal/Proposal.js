@@ -18,7 +18,7 @@ import {Typography, useTheme, Link} from '@material-ui/core'
 
 import { useDispatch } from 'react-redux';
 import { openAlert, openError } from 'actions/uiAction'
-import { castProposalVote } from 'actions/daoAction'
+import { castProposalVote, queueProposal, executeProposal } from 'actions/daoAction'
 
 import moment from 'moment'
 import Button from 'components/button/Button'
@@ -60,6 +60,24 @@ function Proposal({
         }
     }
 
+    const queueProposal = async () => {
+        let res = await dispatch(queueProposal(proposal.id))
+        if(res) {
+            dispatch(openAlert(`Proposal is queuing`));
+        } else {
+            dispatch(openError(`Failed to queue proposal`));
+        }
+    }
+
+    const executeProposal = async () => {
+        let res = await dispatch(executeProposal(proposal.id))
+        if(res) {
+            dispatch(openAlert(`Proposal is executing`));
+        } else {
+            dispatch(openError(`Failed to execute proposal`));
+        }
+    }
+
     const FormatDescription = ({description}) =>{
         if(!!description.includes('@@')) {
             let descList = description.split('@@')
@@ -76,24 +94,27 @@ function Proposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
+/*
+        const proposalStates = [
+          'Pending',
+          'Active',
+          'Canceled',
+          'Defeated',
+          'Succeeded',
+          'Queued',
+          'Expired',
+          'Executed',
+        ]
+*/
+
+
     return (<div
         className={styles.proposalCard}
         style={{
             background: `${theme.palette.mode === 'light' ? backgroundLight400 : 'linear-gradient(132.17deg, rgba(255, 255, 255, 0.1) 0.24%, rgba(255, 255, 255, 0.03) 94.26%)'}`,
         }}>
 
-        <div
-            onClick={() => {
-                if(proposal.state !== 'Active') {
-                    return;
-                }
-                if(proposal.hasVoted) {
-                    return;
-                }
-                setDropDownBox(!dropDownBox)
-                setDropDownBoxInit(false)
-            }}
-        >
+        <div>
             <div className={styles.proposalHeader}>
                 <div className={styles.title} style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
                     <Typography variant="body2" style={{fontWeight: '700'}}>Proposal {proposal.id}</Typography>
@@ -110,6 +131,7 @@ function Proposal({
                         </Typography>
                     }
                     {proposal.state === 'Succeeded' && 
+                    <>
                         <Typography 
                             variant="overline" 
                             style={{fontSize: '0.8em', lineHeight: '1.2em'}}
@@ -119,6 +141,22 @@ function Proposal({
                               {proposal.state}
                             </span>
                         </Typography>
+                        <Button type="primary" variant="contained" onClick={(e)=>{queueProposal()}}>QUEUE PROPOSAL</Button>
+                    </>
+                    }
+                    {proposal.state === 'Queued' && 
+                    <>
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
+                        >
+                          Status: &nbsp;
+                            <span style={{color: 'green'}}>
+                              {proposal.state}
+                            </span>
+                        </Typography>
+                        <Button type="primary" variant="contained" onClick={(e)=>{executeProposal()}}>EXECUTE PROPOSAL</Button>
+                    </>
                     }
                     {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
                         <Typography 
@@ -137,26 +175,23 @@ function Proposal({
                         Voting Stop Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{endTime}</span> 
                     </Typography>
                     {proposal.state === 'Active' && !proposal.hasVoted &&
-                         <div style={{
-                            background: 'blue', 
-                            borderRadius: '4px',
-                            height: '25px',
-                            fontSize: '0.9em',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center'
-                        }}>Proposal active: please VOTE</div>
+                    <>
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700'}}
+                        >
+                          Proposal active 
+                        </Typography>
+                        <Button type="primary" variant="contained" onClick={()=>{ setDropDownBox(!dropDownBox); setDropDownBoxInit(false) }}>VOTE</Button>
+                    </>
                     }
                     {proposal.state === 'Active' && proposal.hasVoted &&
-                         <div style={{
-                            background: 'green', 
-                            borderRadius: '4px',
-                            height: '25px',
-                            fontSize: '0.9em',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center'
-                        }}>Vote recorded: thank you</div>
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'green', fontWeight: '700'}}
+                        >
+                          Vote recorded: thank you
+                        </Typography>
                     }
                 </div>
                 <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>

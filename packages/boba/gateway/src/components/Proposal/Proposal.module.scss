@@ -48,7 +48,7 @@ $boxDropDownHeight: 50px;
   height: $dropDownHeight;
   overflow: hidden;
   animation: openDropDown 1s;
-  padding: 10px;
+  //padding: 10px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -58,7 +58,7 @@ $boxDropDownHeight: 50px;
   height: 0px;
   overflow: hidden;
   animation: closeDropDown 1s;
-  padding: 10px;
+  //padding: 10px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -100,5 +100,6 @@ $boxDropDownHeight: 50px;
 }
 
 .href {
+  color: blue;
   text-decoration: underline;
 }

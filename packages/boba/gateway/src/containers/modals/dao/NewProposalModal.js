@@ -16,7 +16,7 @@ limitations under the License. */
 import React, { useState } from 'react'
 import { Box, Typography, useMediaQuery } from '@material-ui/core'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { closeModal, openAlert } from 'actions/uiAction'
 
@@ -30,7 +30,10 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import { createDaoProposal } from 'actions/daoAction'
 
+import { selectProposals, selectProposalThreshold, selectDaoBalance } from 'selectors/daoSelector'
+
 function NewProposalModal({ open }) {
+
     const dispatch = useDispatch()
 
     const [action, setAction] = useState('')
@@ -47,6 +50,8 @@ function NewProposalModal({ open }) {
 
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+    const proposalThreshold = useSelector(selectProposalThreshold)
 
     const onActionChange = (e) => {
         setVotingThreshold('')
@@ -177,6 +182,11 @@ function NewProposalModal({ open }) {
                     }
                     {action === 'change-threshold' && 
                     <>
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                        >
+                            The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
+                        </Typography>
                         <Input
                             label="DAO voting threshold"
                             placeholder='New voting threshold (e.g. 65000)'
@@ -186,11 +196,6 @@ function NewProposalModal({ open }) {
                             fullWidth
                             sx={{marginBottom: '20px'}} 
                         />
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
-                        >
-                            The minimum number of votes required for an account to create a proposal.
-                        </Typography>
                     </>
                     }
                     {(action === 'change-lp1-fee' || action === 'change-lp2-fee') && 

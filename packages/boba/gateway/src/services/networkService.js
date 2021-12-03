@@ -2591,8 +2591,6 @@ class NetworkService {
 
     try {
       //console.log('Checking DAO balance')
-      //console.log('this.BobaContract',this.BobaContract)
-      //console.log('this.BobaContract',this.account)
       let balance = await this.BobaContract.balanceOf(this.account)
       //console.log('balance',balance)
       return { balance: formatEther(balance) }
@@ -2684,23 +2682,6 @@ class NetworkService {
 
     console.log("payload",payload)
 
-/*
-targets: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
-values: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
-signatures: The ordered list of function signatures to be passed during execution. This array must be the same length as all other array parameters in this function.
-calldatas: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
-description: A human readable description of the proposal and the changes it will enact.
-RETURN: The ID of the newly created proposal.
-*/
-
-/*
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-*/
-
     let signatures = [''] // the function that will carry out the proposal
     let value1 = 0
     let value2 = 0
@@ -2723,7 +2704,7 @@ RETURN: The ID of the newly created proposal.
       value1 = Number(payload.value[0])
       value2 = Number(payload.value[1])
       value3 = Number(payload.value[2])
-      description = `Changing L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      description = `Change L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
       address = [allAddresses.L2LPAddress]
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256','uint256','uint256'],
@@ -2735,7 +2716,7 @@ RETURN: The ID of the newly created proposal.
       value1 = Number(payload.value[0])
       value2 = Number(payload.value[1])
       value3 = Number(payload.value[2])
-      description = `Changing L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      description = `Change L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
       address = [allAddresses.L2LPAddress]
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256','uint256','uint256'],
@@ -2745,7 +2726,7 @@ RETURN: The ID of the newly created proposal.
       address = [delegateCheck.address]
       signatures = ['_setProposalThreshold(uint256)']
       value1 = Number(payload.value[0])
-      description = `Changing Proposal Threshold to ${value1} BOBA`
+      description = `Change Proposal Threshold to ${value1} BOBA`
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256'],
         [value1]
@@ -2880,6 +2861,36 @@ RETURN: The ID of the newly created proposal.
       console.log("NS: castProposalVote error:",error)
       return error
     }
+  }
+
+  async queueProposal(proposalID) {
+
+    if( this.delegateContract === null ) return
+
+    try {
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      let res = delegateCheck.queue(proposalID)
+      return res
+    } catch(error) {
+      console.log("NS: queueProposal error:",error)
+      return error
+    }
+
+  }
+
+  async executeProposal(proposalID) {
+
+    if( this.delegateContract === null ) return
+
+    try {
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      let res = delegateCheck.execute(proposalID)
+      return res
+    } catch(error) {
+      console.log("NS: executeProposal error:",error)
+      return error
+    }
+
   }
 
 }
