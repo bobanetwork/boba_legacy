@@ -141,12 +141,10 @@ function Proposal({
                               {proposal.state}
                             </span>
                         </Typography>
-                        <Button type="primary" variant="contained" onClick={(e)=>{queueProposal()}}>QUEUE PROPOSAL</Button>
                     </>
                     }
                     {proposal.state === 'Queued' && 
-                    <>
-                        <Typography 
+                    <Typography 
                             variant="overline" 
                             style={{fontSize: '0.8em', lineHeight: '1.2em'}}
                         >
@@ -154,9 +152,7 @@ function Proposal({
                             <span style={{color: 'green'}}>
                               {proposal.state}
                             </span>
-                        </Typography>
-                        <Button type="primary" variant="contained" onClick={(e)=>{executeProposal()}}>EXECUTE PROPOSAL</Button>
-                    </>
+                    </Typography>
                     }
                     {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
                         <Typography 
@@ -170,20 +166,16 @@ function Proposal({
                         </Typography>
                     }
                     <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
-                        Start L2 Block: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{proposal.startBlock}</span>&nbsp;
                         Voting Start Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{startTime}</span>&nbsp; 
                         Voting Stop Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{endTime}</span> 
                     </Typography>
                     {proposal.state === 'Active' && !proposal.hasVoted &&
-                    <>
                         <Typography 
                             variant="overline" 
                             style={{fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700'}}
                         >
                           Proposal active 
                         </Typography>
-                        <Button type="primary" variant="contained" onClick={()=>{ setDropDownBox(!dropDownBox); setDropDownBoxInit(false) }}>VOTE</Button>
-                    </>
                     }
                     {proposal.state === 'Active' && proposal.hasVoted &&
                         <Typography 
@@ -192,6 +184,17 @@ function Proposal({
                         >
                           Vote recorded: thank you
                         </Typography>
+                    }
+                </div>
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                    {proposal.state === 'Active' && !proposal.hasVoted &&
+                        <Button type="primary" variant="contained" onClick={()=>{setDropDownBox(!dropDownBox); setDropDownBoxInit(false)}}>VOTE</Button>
+                    }
+                    {proposal.state === 'Queued' && 
+                        <Button type="primary" variant="contained" onClick={(e)=>{executeProposal()}}>EXECUTE PROPOSAL</Button>
+                    }
+                    {proposal.state === 'Succeeded' && 
+                        <Button type="primary" variant="contained" onClick={(e)=>{queueProposal()}}>QUEUE PROPOSAL</Button>
                     }
                 </div>
                 <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
