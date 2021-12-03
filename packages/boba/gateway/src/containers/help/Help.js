@@ -47,10 +47,17 @@ class Help extends React.Component {
           </Typography>
 
           <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
+            Ledger Hardware Wallet Random Errors
+          </Typography>
+          <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
+            UNKNOWN_ERROR (0x650f) when trying to connect to MetaMask. Solution: on the Ledger, select 'ethereum' and make sure the display says 'Application is ready'.
+          </Typography>
+
+          <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
             Ledger Hardware Wallet L1 to L2 Deposits not working
           </Typography>
           <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
-            Please make sure that you are using a current firmware version for Ledger, for example, v2.0.0.
+            Please make sure that you are using a current firmware version for Ledger, for example, v2.1.0.
           </Typography>
 
           <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
