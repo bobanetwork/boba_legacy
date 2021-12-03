@@ -269,13 +269,13 @@ function DoExitStepFast({ handleClose, token }) {
         warning = true
         ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
-        <br/>TRANSACTION WILL FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
+        <br/>TRANSACTION WILL FAIL.`
       }
       else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
         ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
-        <br/>TRANSACTION MIGHT FAIL. To bridge all your ETH, select "BRIDGE ALL".` 
+        <br/>TRANSACTION MIGHT FAIL.` 
       } else {
         ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH` 
       }

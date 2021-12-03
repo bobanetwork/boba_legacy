@@ -16,6 +16,8 @@ import networkService from 'services/networkService'
 
 import { addNFTContract } from 'actions/nftAction'
 
+import ListContract from 'components/listContract/listContract'
+
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 
@@ -66,7 +68,6 @@ class Nft extends React.Component {
   }
 
   addContract = event => {
-    //console.log("adding contract:",this.state.contractAddress)
     this.props.dispatch(addNFTContract( this.state.contractAddress ))
   }
   
@@ -125,12 +126,6 @@ class Nft extends React.Component {
 
           <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Your NFTs</Typography>
 
-          <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}
-          >
-            To add an NFT, please add its contract address and click 'Add NFT contract' below. You only have to do this once per NFT family. 
-            Once you have added the contract, it will take about 15 seconds to find your NFT(s). 
-          </Typography>
-
           {numberOfNFTs === 1 &&
             <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>You have one NFT and it should be shown below.</Typography>
           }
@@ -166,38 +161,38 @@ class Nft extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} sx={{marginTop: '20px'}}>
+        <Grid item xs={12} sx={{marginTop: '20px', borderRadius: '4px', border: 'solid 1px rgba(255,255,255,0.2)', padding: '10px'}}>
 
-          <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Add NFTs</Typography>
+          <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>Add NFT contracts</Typography>
+          
+          {Object.keys(contracts).map((contract, index) => {
+            return (
+              <ListContract
+                key={index}
+                contract={contracts[contract]}
+              />)
+          })}
+
+          <Typography variant="body3" component="p" sx={{mt: 1, mb: 2, fontSize: '0.7em', marginTop: '20px', marginRight: '40px'}}>
+            To add an NFT contract, please add its address and click 'Add NFT contract'. You only have to do this once per NFT family. 
+            Once you have added the contract, it will take about 15 seconds to find your NFT(s). 
+          </Typography>
 
           <Input
             placeholder='Address 0x...'
-            paste
             value={contractAddress}
             onChange={this.handleInput}
+            paste
           />
 
           <Button
             variant="contained"
             onClick={this.addContract}
-            disabled={loading}
-            //fullWidth
+            disabled={loading || contractAddress === ''}
             sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
           >
             {loading ? 'Adding contract...' : 'Add NFT contract'}
           </Button>
-
-          <Typography variant="body2" sx={{fontWeight: "700"}} component="p">Your NFT Contracts</Typography>
-
-          {Object.keys(contracts).map((contract, index) => {
-            return (
-            <Typography variant="body2" key={index}>
-              {contracts[contract].name}:&nbsp; 
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {contracts[contract].address}
-              </Typography>
-            </Typography>)
-          })}
 
         </Grid>
 

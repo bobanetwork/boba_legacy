@@ -184,8 +184,17 @@ class Farm extends React.Component {
 
           <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
 
-            <S.GridItemTag item xs={10} md={10}>
+            <S.GridItemTag 
+              item xs={10} 
+              md={10}
+            > 
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
+                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute 
+                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the 
+                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which 
+                reflects the fees people paid to bridge and the previous usage patterns for each pool.
+                <br/>
+                <br/>
                 The supply of tokens in the pools reflects the staking and bridging activities of all users.
                 {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
                 {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
@@ -221,15 +230,14 @@ class Farm extends React.Component {
                     they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
                     Note that bridge operations do not change the pool's liquidity, but only its current balance.
                     The difference between what was deposited into the L1 pool (10 OMG) and what was sent
-                    to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for later harvesting by liquidity providers.
+                    to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by liquidity providers.
                     <br /><br />
                     <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current system, the pool operator is responsible
-                    for pool rebalancing, when and if needed, using 'classic' deposit and exit operations to move funds from one pool to another.
+                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
+                    rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another.
                     <br /><br />
-                    <span style={{ fontWeight: '700' }}>Future work</span>. A more elegant approach to pool balancing is an 'automatic'
-                    supply-and-demand approach, in which staking rewards scale inversely (and non-linearly) with pool balances. Thus, when pool balances
-                    are very low, a spike in rewards would attract new liquidity into low-balance pools.
+                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees. 
+                    When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool, and vice-versa.
                   </Typography>
                 </S.DropdownWrapper>
               </S.DropdownContent>
@@ -311,7 +319,7 @@ class Farm extends React.Component {
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">APR %</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Past APR %</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>

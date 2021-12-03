@@ -58,17 +58,9 @@ function nftReducer (state = initialState, action) {
       }
 
     case 'NFT/ADDCONTRACT/SUCCESS':
-      
-      //const state = store.getState()
+
       const address = action.payload.address
-        
-      // //if we already have already added it, no need to add again
-      // if (state.contracts[address]) {
-      //   //do nothing
-      //   console.log("Contract already added:",address)
-      //   return //state.nft.contracts[address]
-      // }
-      
+              
       localStorage.setItem("nftContracts", JSON.stringify({
           ...state.contracts,
           [address]: action.payload
@@ -82,9 +74,23 @@ function nftReducer (state = initialState, action) {
           [address]: action.payload
         }
       }
+
+    case 'NFT/REMOVECONTRACT/SUCCESS':
+      
+      let listC = state.contracts
+      delete listC[action.payload]
+      
+      localStorage.setItem("nftContracts", JSON.stringify(listC))
+      localStorage.removeItem("nftList")
+
+      return { 
+        ...state,
+        contracts: listC,
+        list: {}
+      }
       
     default:
-      return state;
+      return state
   }
 }
 

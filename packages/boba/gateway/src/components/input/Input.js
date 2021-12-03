@@ -72,35 +72,61 @@ function Input({
   return (
     <>
       <S.Wrapper newstyle={newStyle ? 1 : 0}>
-        {unit && (
-          <S.UnitContent>
-            <div>
-              <Typography variant="body2" component="div">{unit}</Typography>
-              <img src={getCoinImage(unit)} alt="logo" width={50} height={50} />
-            </div>
-          </S.UnitContent>
-        )}
 
-        <S.InputWrapper>
-          {label && (
-            <Typography variant="body2" component="div" sx={{opacity: 0.7, mb: 1}}>
-              {label}
-            </Typography>
-          )}
-          <S.TextFieldTag
-            placeholder={placeholder}
-            type={type}
-            value={value}
-            onChange={onChange}
-            disabled={disabled}
-            fullWidth={fullWidth}
-            size={size}
-            variant={variant}
-            error={underZero || overMax}
-            sx={sx}
-            newstyle={newStyle ? 1 : 0}
-          />
-        </S.InputWrapper>
+        {!unit &&
+          <S.InputWrapperFull>
+            {label && (
+              <Typography variant="body2" component="div" sx={{opacity: 0.7, mb: 1}}>
+                {label}
+              </Typography>
+            )}
+            <S.TextFieldTag
+              placeholder={placeholder}
+              type={type}
+              value={value}
+              onChange={onChange}
+              disabled={disabled}
+              fullWidth={fullWidth}
+              size={size}
+              variant={variant}
+              error={underZero || overMax}
+              sx={sx}
+              newstyle={newStyle ? 1 : 0}
+            />
+          </S.InputWrapperFull>
+        }
+
+        {unit && (
+          <>
+            <S.UnitContent>
+              <div>
+                <Typography variant="body2" component="div">{unit}</Typography>
+                <img src={getCoinImage(unit)} alt="logo" width={50} height={50} />
+              </div>
+            </S.UnitContent>
+            <S.InputWrapper>
+              {label && (
+                <Typography variant="body2" component="div" sx={{opacity: 0.7, mb: 1}}>
+                  {label}
+                </Typography>
+              )}
+              <S.TextFieldTag
+                placeholder={placeholder}
+                type={type}
+                value={value}
+                onChange={onChange}
+                disabled={disabled}
+                fullWidth={fullWidth}
+                size={size}
+                variant={variant}
+                error={underZero || overMax}
+                sx={sx}
+                newstyle={newStyle ? 1 : 0}
+              />
+            </S.InputWrapper>
+          </>
+          )
+        }
 
         {unit && (
           <S.ActionsWrapper>
@@ -131,8 +157,12 @@ function Input({
             )}
           </S.ActionsWrapper>
         )}
+
         {paste && (
-          <Box onClick={handlePaste} sx={{color: theme.palette.secondary.main, opacity: 0.9, cursor: 'pointer', position: 'absolute', right: '70px', fontSize: '14px'}}>
+          <Box 
+            onClick={handlePaste} 
+            sx={{color: theme.palette.secondary.main, opacity: 0.9, cursor: 'pointer', position: 'relative', right: '70px', fontSize: '14px', zIndex: '100'}}
+          >
             PASTE
           </Box>
         )}
