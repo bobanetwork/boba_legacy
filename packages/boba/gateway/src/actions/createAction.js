@@ -13,11 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from "services/networkService";
+import networkService from "services/networkService"
 
 export function createAction (key, asyncAction) {
+
   return async function (dispatch) {
+
     dispatch({ type: `${key}/REQUEST` })
+    
     try {
       const response = await asyncAction()
 

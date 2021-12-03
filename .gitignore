@@ -53,3 +53,6 @@ packages/boba/gateway/public/env.js
 /packages/boba/subgraph/L2/build
 /packages/boba/subgraph/L1/generated
 /packages/boba/subgraph/L2/generated
+
+# api
+env-mainnet.yml

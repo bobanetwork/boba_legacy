@@ -82,7 +82,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
     address public owner;
     address public L2LiquidityPoolAddress;
-    uint256 public userRewardFeeRate;
+    uint256 public userRewardMinFeeRate;
     uint256 public ownerRewardFeeRate;
     // Default gas value which can be overridden if more complex logic runs on L2.
     uint32 public SETTLEMENT_L2_GAS;
@@ -91,6 +91,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     address public l1CrossDomainMessenger;
     // L1StandardBridge address
     address payable public L1StandardBridgeAddress;
+    uint256 public userRewardMaxFeeRate;
 
     /********************
      *       Events     *
@@ -165,7 +166,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
      **********************/
 
     modifier onlyOwner() {
-        require(msg.sender == owner || owner == address(0), 'caller is not the owner');
+        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
         _;
     }
 
@@ -179,6 +180,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         _;
     }
 
+    modifier onlyL1StandardBridge() {
+        require(address(L1StandardBridgeAddress) == msg.sender, "Can't receive ETH");
+        _;
+    }
+
+    /********************
+     * Fall back Functions *
+     ********************/
+    receive()
+        external
+        payable
+        onlyL1StandardBridge()
+    {}
 
     /********************
      * Public Functions *
@@ -223,7 +237,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         L2LiquidityPoolAddress = _L2LiquidityPoolAddress;
         L1StandardBridgeAddress = _L1StandardBridgeAddress;
         owner = msg.sender;
-        _configureFee(35, 15);
+        _configureFee(5, 50, 0);
         configureGas(1400000, 2300);
 
         __Context_init_unchained();
@@ -233,12 +247,14 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     }
 
     function _configureFee(
-        uint256 _userRewardFeeRate,
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
         uint256 _ownerRewardFeeRate
     )
         internal
     {
-        userRewardFeeRate = _userRewardFeeRate;
+        userRewardMinFeeRate = _userRewardMinFeeRate;
+        userRewardMaxFeeRate = _userRewardMaxFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
     }
 
@@ -258,6 +274,40 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     {
         SETTLEMENT_L2_GAS = _l2GasFee;
         SAFE_GAS_STIPEND = _safeGas;
+    }
+
+    /**
+     * @dev Return user reward fee rate.
+     *
+     * @param _l1TokenAddress L1 token address
+     */
+    function getUserRewardFeeRate(
+        address _l1TokenAddress
+    )
+        public
+        view
+        onlyInitialized()
+        returns (uint256 userRewardFeeRate)
+    {
+        PoolInfo storage pool = poolInfo[_l1TokenAddress];
+        uint256 poolLiquidity = pool.userDepositAmount;
+        uint256 poolBalance;
+        if (_l1TokenAddress == address(0)) {
+            poolBalance = address(this).balance;
+        } else {
+            poolBalance = IERC20(_l1TokenAddress).balanceOf(address(this));
+        }
+        if (poolBalance == 0) {
+            return userRewardMaxFeeRate;
+        } else {
+            uint256 poolRewardRate = userRewardMinFeeRate * poolLiquidity / poolBalance;
+            if (userRewardMinFeeRate > poolRewardRate) {
+                return userRewardMinFeeRate;
+            } else if (userRewardMaxFeeRate < poolRewardRate) {
+                return userRewardMaxFeeRate;
+            }
+            return poolRewardRate;
+        }
     }
 
     /***
@@ -339,7 +389,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         // Update accUserRewardPerShare
         updateUserRewardPerShare(_tokenAddress);
@@ -394,7 +444,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         // transfer funds if users deposit ERC20
         if (_tokenAddress != address(0)) {
@@ -441,7 +491,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(user.amount >= _amount, "Withdraw Error");
 
         // Update accUserRewardPerShare
@@ -462,7 +512,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send Ether");
+            require(sent, "Failed to send ETH");
         }
 
         emit WithdrawLiquidity(
@@ -489,7 +539,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     {
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(pool.accOwnerReward >= _amount, "Owner Reward Withdraw Error");
 
         pool.accOwnerReward = pool.accOwnerReward.sub(_amount);
@@ -526,7 +576,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         PoolInfo storage pool = poolInfo[_tokenAddress];
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         uint256 pendingReward = user.pendingReward.add(
             user.amount.mul(pool.accUserRewardPerShare).div(1e12).sub(user.rewardDebt)
@@ -569,8 +619,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
-        require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Register");
-        require(pool.l2TokenAddress != address(0), "Token Address Not Register");
+        require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Registered");
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         if (_tokenAddress == address(0)) {
             require(_amount <= address(this).balance, "Failed to Rebalance LP");
@@ -632,8 +682,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         whenNotPaused
     {
         bool replyNeeded = false;
-
         PoolInfo storage pool = poolInfo[_tokenAddress];
+        uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
@@ -663,7 +713,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
                  // balances[address(0)] = balances[address(0)].sub(_amount);
                  //_to.transfer(_amount); UNSAFE
                  (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
-                 require(sent, "Failed to send Ether");
+                 require(sent, "Failed to send ETH");
              }
          }
 
@@ -710,6 +760,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         whenNotPaused
     {
         PoolInfo storage pool = poolInfo[_tokenAddress];
+        uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
@@ -741,17 +792,20 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     /**
      * @dev Configure fee of this contract. called from L2
      *
-     * @param _userRewardFeeRate fee rate that users get
+     * @param _userRewardMinFeeRate minimum fee rate that users get
+     * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
      */
     function configureFee(
-        uint256 _userRewardFeeRate,
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
         uint256 _ownerRewardFeeRate
     )
         external
         onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
         onlyInitialized()
     {
-        _configureFee(_userRewardFeeRate,_ownerRewardFeeRate);
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");
+        _configureFee(_userRewardMinFeeRate, _userRewardMaxFeeRate,_ownerRewardFeeRate);
     }
 }

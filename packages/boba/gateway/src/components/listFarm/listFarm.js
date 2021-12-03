@@ -49,6 +49,7 @@ class ListFarm extends React.Component {
       // loading
       loading: false,
     }
+
   }
 
   componentDidMount(){
@@ -135,7 +136,7 @@ class ListFarm extends React.Component {
       userReward,
       L1orL2Pool
     ))
-    
+
     if (getRewardTX) {
       this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
       this.props.dispatch(getFarmInfo())
@@ -206,31 +207,43 @@ class ListFarm extends React.Component {
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <S.GridContainer container 
-            spacing={2} 
-            direction="row" 
-            justifyContent="flex-start" 
+          <S.GridContainer container
+            spacing={2}
+            direction="row"
+            justifyContent="flex-start"
             alignItems="center"
           >
 
-            <S.GridItemTag item 
-            xs={4} 
-            md={2} 
-            style={{
-              justifyContent: 'flex-start', 
-              alignItems:'center', 
-            }}>
-              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                <img src={logo} alt="logo" width={35} height={35} />
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
-                  <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
-                  <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
-                </div>
-              </div>
-            </S.GridItemTag>
+            {isMobile &&
+              <S.GridItemTag item
+                xs={12}
+                md={2}
+              >
+                <Typography variant="overline" style={{lineHeight: '1em', fontSize: '1.2em'}}>{symbol}</Typography>
+              </S.GridItemTag>
+            }
 
-            <S.GridItemTag item 
-              xs={4} 
+            {!isMobile &&
+              <S.GridItemTag item
+                xs={4}
+                md={2}
+                style={{
+                  justifyContent: 'flex-start',
+                  alignItems:'center',
+                }}
+              >
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                  <img src={logo} alt="logo" width={35} height={35} />
+                  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
+                    <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
+                    <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
+                  </div>
+                </div>
+              </S.GridItemTag>
+            }
+
+            <S.GridItemTag item
+              xs={4}
               md={2}
               >
               {isMobile ? (
@@ -243,8 +256,8 @@ class ListFarm extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item 
-              xs={4} 
+            <S.GridItemTag item
+              xs={4}
               md={2}
               >
               {isMobile ? (
@@ -257,8 +270,8 @@ class ListFarm extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item 
-              xs={3} 
+            <S.GridItemTag item
+              xs={4}
               md={1}
             >
               {isMobile ? (
@@ -271,8 +284,8 @@ class ListFarm extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item 
-              xs={3} 
+            <S.GridItemTag item
+              xs={4}
               md={1}
             >
               {isMobile ? (
@@ -285,20 +298,20 @@ class ListFarm extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item 
-              xs={3} 
+            <S.GridItemTag item
+              xs={4}
               md={1}
               >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userReward ? `${logAmount(userReward, decimals, 2)}` : `0`}
+                {userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item 
-              xs={3} 
+            <S.GridItemTag item
+              xs={3}
               md={1}
             >
               <Box
@@ -321,7 +334,7 @@ class ListFarm extends React.Component {
             <S.DropdownContent>
               <S.DropdownWrapper>
                 <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Earned</Typography>
-                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 3)}</Typography>
+                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
                   variant="contained"
                   fullWidth
@@ -351,7 +364,7 @@ class ListFarm extends React.Component {
                   </> :
                   <>
                     <Typography variant="body2" component="div">{`${symbol}`} Staked</Typography>
-                    <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals)}</Typography>
+                    <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
                     <Box sx={{display: "flex", alignItems: "center", gap: "5px"}}>
                       <Button
                         variant="outlined"

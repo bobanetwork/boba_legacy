@@ -139,6 +139,4 @@ function DAO() {
     )
 }
 
-export default React.memo(DAO);
-
-
+export default React.memo(DAO)

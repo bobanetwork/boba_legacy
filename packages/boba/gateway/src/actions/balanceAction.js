@@ -44,13 +44,11 @@ export function fetchL2LPLiquidity(address) {
     return createAction('FETCH/L2LP/LIQUIDITY', () => networkService.L2LPLiquidity(address))
 }
 
-export function fetchL1TotalFeeRate() {
-    return createAction('FETCH/L1TOTALFEERATE', () => networkService.getL1TotalFeeRate())
-}
+export function fetchL1TotalFeeRate() { return createAction('FETCH/L1TOTALFEERATE', ()=>{return networkService.getL1TotalFeeRate()}) }
+export function fetchL2TotalFeeRate() { return createAction('FETCH/L2TOTALFEERATE', ()=>{return networkService.getL2TotalFeeRate()}) }
 
-export function fetchL2TotalFeeRate() {
-    return createAction('FETCH/L2TOTALFEERATE', () => networkService.getL2TotalFeeRate())
-}
+export function fetchL1FeeRateN(tokenAddress) { return createAction('FETCH/L1FEERATE', ()=>{return networkService.getL1UserRewardFeeRate(tokenAddress)}) }
+export function fetchL2FeeRateN(tokenAddress) { return createAction('FETCH/L2FEERATE', ()=>{return networkService.getL2UserRewardFeeRate(tokenAddress)}) }
 
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))

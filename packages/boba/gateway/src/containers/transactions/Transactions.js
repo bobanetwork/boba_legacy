@@ -28,7 +28,6 @@ import { logAmount } from 'util/amountConvert'
 import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
 
-import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 const PER_PAGE = 8;
@@ -70,10 +69,10 @@ function Transactions({ searchHistory, transactions }) {
         <Box>
           <S.Content>
             {!paginatedTransactions.length && !loading && (
-              <div className={styles.disclaimer}>Scanning for transactions...</div>
+              <S.Disclaimer>Scanning for transactions...</S.Disclaimer>
             )}
             {!paginatedTransactions.length && loading && (
-              <div className={styles.disclaimer}>Loading...</div>
+              <S.Disclaimer>Loading...</S.Disclaimer>
             )}
             {paginatedTransactions.map((i, index) => {
                 
@@ -156,7 +155,6 @@ function Transactions({ searchHistory, transactions }) {
           </S.Content>
         </Box>
       </Grid>
-
     </S.HistoryContainer>
   )
 }

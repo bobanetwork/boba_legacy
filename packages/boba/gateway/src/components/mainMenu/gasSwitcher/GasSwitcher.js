@@ -19,7 +19,9 @@ function GasSwitcher() {
             <S.Label variant="body2">
               Ethereum Gas<br/>
               Boba Gas<br/>
-              Savings
+              Savings<br/>
+              L1 Block<br/>
+              L2 Block
             </S.Label>
             <Box sx={{
               display: 'flex',
@@ -35,7 +37,9 @@ function GasSwitcher() {
               >
                 {gas.gasL1} Gwei<br/>
                 {gas.gasL2} Gwei<br/>
-                {savings.toFixed(0)}x
+                {savings.toFixed(0)}x<br/>
+                {gas.blockL1}<br/>
+                {gas.blockL2}
               </Typography>
             </Box>
           </S.NetWorkStyle>
