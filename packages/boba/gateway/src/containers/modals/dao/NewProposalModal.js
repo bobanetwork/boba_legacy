@@ -108,7 +108,7 @@ function NewProposalModal({ open }) {
         } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
             res = await dispatch(createDaoProposal({
               action,
-              value: [LPfeeMin, LPfeeMax, LPfeeOwn],
+              value: [Math.round(Number(LPfeeMin)*10), Math.round(Number(LPfeeMax)*10), Math.round(Number(LPfeeOwn)*10)],
               text: ''  //extra text if any
             }))
         }
@@ -125,14 +125,17 @@ function NewProposalModal({ open }) {
         } else if (action === 'text-proposal') {
             return !proposeText
         } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
-            if (Number(LPfeeMin) < 0 || Number(LPfeeMin) > 50) {
+            if (Number(LPfeeMin) < 0.0 || Number(LPfeeMin) > 5.0) {
 
                 return true //aka disabled
             }
-            if (Number(LPfeeMax) < 0 || Number(LPfeeMax) > 50) {
+            if (Number(LPfeeMax) < 0.0 || Number(LPfeeMax) > 5.0) {
                 return true //aka disabled
             }
-            if (Number(LPfeeOwn) < 0 || Number(LPfeeOwn) > 50) {
+            if (Number(LPfeeMax) <= Number(LPfeeMin)) {
+                return true //aka disabled
+            }
+            if (Number(LPfeeOwn) < 0.0 || Number(LPfeeOwn) > 5.0) {
                 return true
             }
             if (LPfeeMin === '') {
@@ -168,7 +171,7 @@ function NewProposalModal({ open }) {
                     </Select>
                     {action === '' && 
                         <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
-                        Currently, the DAO can: change the voting threshold, propose free-form text proposals, and 
+                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and 
                         change to the bridge fee limits for the L1 and L2 bridge pools. 
                         </Typography>
                     }
@@ -176,7 +179,7 @@ function NewProposalModal({ open }) {
                     <>
                         <Input
                             label="DAO voting threshold"
-                            placeholder='New voting threshold (e.g. 65,000)'
+                            placeholder='New voting threshold (e.g. 65000)'
                             value={votingThreshold}
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
@@ -195,14 +198,12 @@ function NewProposalModal({ open }) {
                         <Typography variant="body2" 
                             style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
                         >
-                            The fee units are integer tenths. 
-                            For example, proposing a fee of '3' corresponds to a bridge fee of 0.3%, whereas a fee of '25' denotes a bridge fee of 2.5%. 
-                            Possible settings range from 0 to 50, i.e., 0.0% to 5.0%.
-                            All three values must be specified.
+                            Possible settings range from 0.0% to 5.0%.
+                            All three values must be specified and the maximum fee must be larger than the minimum fee.
                         </Typography>
                         <Input
-                            label="New LP minimium fees"
-                            placeholder="Minimium fees in integer tenths (e.g. 3)"
+                            label="New LP minimium fee (%)"
+                            placeholder="Minimium fee (e.g. 1.0)"
                             value={LPfeeMin}
                             type="number"
                             onChange={(i)=>setLPfeeMin(i.target.value)}
@@ -210,8 +211,8 @@ function NewProposalModal({ open }) {
                             sx={{marginBottom: '20px'}} 
                         />
                         <Input
-                            label="New LP maximum fees"
-                            placeholder="Maximum fees in integer tenths (e.g. 30)"
+                            label="New LP maximum fee (%)"
+                            placeholder="Maximum fee (e.g. 3.0)"
                             value={LPfeeMax}
                             type="number"
                             onChange={(i)=>setLPfeeMax(i.target.value)}
@@ -219,8 +220,8 @@ function NewProposalModal({ open }) {
                             sx={{marginBottom: '20px'}} 
                         />
                         <Input
-                            label="New LP operator fees"
-                            placeholder="Operator fees in integer tenths (e.g. 1)"
+                            label="New LP operator fee (%)"
+                            placeholder="Operator fee (e.g. 1.0)"
                             value={LPfeeOwn}
                             type="number"
                             onChange={(i)=>setLPfeeOwn(i.target.value)}

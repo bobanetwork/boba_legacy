@@ -2663,8 +2663,10 @@ class NetworkService {
 
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
-      let rawThreshold = await delegateCheck.proposalThreshold()
-      return { threshold: formatEther(rawThreshold) }
+      const rawThreshold = await delegateCheck.proposalThreshold()
+      const res = { proposalThreshold: formatEther(rawThreshold) }
+      console.log("res:",res)
+      return res
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
       return error
@@ -2710,16 +2712,18 @@ RETURN: The ID of the newly created proposal.
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
-
+      address = [delegateCheck.address] // anything will do, as long at it's not blank
       description = payload.text
-      console.log("payload",payload)
-      console.log("description",description)
+      callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
+        ['uint256'],
+        [value1]
+      )]
     } else if ( payload.action === 'change-lp1-fee' ) {
       signatures = ['configureFeeExits(uint256,uint256,uint256)']
       value1 = Number(payload.value[0])
       value2 = Number(payload.value[1])
       value3 = Number(payload.value[2])
-      description = `# Changing L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      description = `Changing L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
       address = [allAddresses.L2LPAddress]
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256','uint256','uint256'],
@@ -2731,7 +2735,7 @@ RETURN: The ID of the newly created proposal.
       value1 = Number(payload.value[0])
       value2 = Number(payload.value[1])
       value3 = Number(payload.value[2])
-      description = `# Changing L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      description = `Changing L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
       address = [allAddresses.L2LPAddress]
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256','uint256','uint256'],
@@ -2741,7 +2745,7 @@ RETURN: The ID of the newly created proposal.
       address = [delegateCheck.address]
       signatures = ['_setProposalThreshold(uint256)']
       value1 = Number(payload.value[0])
-      description = `# Changing Proposal Threshold to ${value1} BOBA`
+      description = `Changing Proposal Threshold to ${value1} BOBA`
       callData = [ethers.utils.defaultAbiCoder.encode(
         ['uint256'],
         [value1]
