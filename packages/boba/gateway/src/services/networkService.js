@@ -908,7 +908,7 @@ class NetworkService {
 
     if (numberOfNFTS !== numberOfStoredNFTS) {
 
-      console.log('NFT change - need to add one or more NFTs')
+      //console.log('NFT change - need to add one or more NFTs')
 
       for(let i = 0; i < NFTContracts.length; i++) {
 
@@ -920,15 +920,15 @@ class NetworkService {
           this.L2Provider
         )
 
-        console.log("NFT contracts:",contract)
+        //console.log("NFT contracts:",contract)
 
         const ownerTokenIDs = await contract.getOwnerNFTs(
           this.account
         )
-        console.log("ownerTokenIDs:",ownerTokenIDs)
+        //console.log("ownerTokenIDs:",ownerTokenIDs)
 
         const balance = ownerTokenIDs.length
-        console.log("balance:",balance)
+        //console.log("balance:",balance)
 
         //always the same, no need to have in the loop
         let nftName = await contract.name()

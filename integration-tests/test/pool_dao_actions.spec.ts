@@ -186,7 +186,7 @@ describe('Dao Action Test', async () => {
       try {
         const priorProposalID = (await Governor.proposalCount())._hex
         console.log(priorProposalID.toString())
-        if (priorProposalID !== '0x01') {
+        if (priorProposalID !== '0x00') {
           const priorState = await Governor.state(priorProposalID)
 
           console.log(priorState.toString())
@@ -307,7 +307,7 @@ describe('Dao Action Test', async () => {
     it('should create a new proposal to configure fee', async () => {
       try {
         const priorProposalID = (await Governor.proposalCount())._hex
-        if (priorProposalID !== '0x01') {
+        if (priorProposalID !== '0x00') {
           const priorState = await Governor.state(priorProposalID)
           // clear any pending or active proposal
           if (priorState === 0 || priorState === 1) {
