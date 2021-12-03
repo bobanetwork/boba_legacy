@@ -16,6 +16,8 @@ import networkService from 'services/networkService'
 
 import { addNFTContract } from 'actions/nftAction'
 
+import ListContract from 'components/listContract/listContract'
+
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 
@@ -66,7 +68,6 @@ class Nft extends React.Component {
   }
 
   addContract = event => {
-    //console.log("adding contract:",this.state.contractAddress)
     this.props.dispatch(addNFTContract( this.state.contractAddress ))
   }
   
@@ -125,12 +126,6 @@ class Nft extends React.Component {
 
           <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Your NFTs</Typography>
 
-          <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}
-          >
-            To add an NFT, please add its contract address and click 'Add NFT contract' below. You only have to do this once per NFT family. 
-            Once you have added the contract, it will take about 15 seconds to find your NFT(s). 
-          </Typography>
-
           {numberOfNFTs === 1 &&
             <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>You have one NFT and it should be shown below.</Typography>
           }
@@ -169,10 +164,14 @@ class Nft extends React.Component {
         <Grid item xs={12} sx={{marginTop: '20px'}}>
 
           <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Add NFTs</Typography>
+          
+          <Typography variant="body3" component="p" sx={{mt: 1, mb: 2, fontSize: '0.7em'}}>
+            To add an NFT, please add its contract address and click 'Add NFT contract'. You only have to do this once per NFT family. 
+            Once you have added the contract, it will take about 15 seconds to find your NFT(s). 
+          </Typography>
 
           <Input
             placeholder='Address 0x...'
-            paste
             value={contractAddress}
             onChange={this.handleInput}
           />
@@ -181,7 +180,6 @@ class Nft extends React.Component {
             variant="contained"
             onClick={this.addContract}
             disabled={loading}
-            //fullWidth
             sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
           >
             {loading ? 'Adding contract...' : 'Add NFT contract'}
@@ -191,12 +189,10 @@ class Nft extends React.Component {
 
           {Object.keys(contracts).map((contract, index) => {
             return (
-            <Typography variant="body2" key={index}>
-              {contracts[contract].name}:&nbsp; 
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {contracts[contract].address}
-              </Typography>
-            </Typography>)
+              <ListContract
+                key={index}
+                contract={contracts[contract]}
+              />)
           })}
 
         </Grid>
