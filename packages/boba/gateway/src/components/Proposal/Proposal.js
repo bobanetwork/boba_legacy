@@ -13,19 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState, useEffect } from 'react';
-import {Typography, useTheme, Link} from '@material-ui/core';
+import React, { useState, useEffect } from 'react'
+import {Typography, useTheme, Link} from '@material-ui/core'
 
 import { useDispatch } from 'react-redux';
+import { openAlert, openError } from 'actions/uiAction'
+import { castProposalVote } from 'actions/daoAction'
 
-import { openAlert, openError } from 'actions/uiAction';
-import { castProposalVote } from 'actions/daoAction';
+import moment from 'moment'
+import Button from 'components/button/Button'
 
-import Button from 'components/button/Button';
+import * as styles from './Proposal.module.scss'
+import * as S from "./Proposal.styles"
 
-import * as styles from './Proposal.module.scss';
-
-import { backgroundLight400 } from 'index.scss';
+import { backgroundLight400 } from 'index.scss'
 
 function Proposal({
     proposal,
@@ -36,7 +37,6 @@ function Proposal({
 
     const [dropDownBox, setDropDownBox] = useState(false)
     const [dropDownBoxInit, setDropDownBoxInit] = useState(true)
-
     const [votePercent, setVotePercent] = useState(undefined)
     
     useEffect(() => {
@@ -73,12 +73,13 @@ function Proposal({
         return <>{description}</>;
     }
 
+    const startTime = moment.unix(proposal.startTimestamp).format('lll')
+    const endTime = moment.unix(proposal.endTimestamp).format('lll')
+
     return (<div
         className={styles.proposalCard}
-
         style={{
             background: `${theme.palette.mode === 'light' ? backgroundLight400 : 'linear-gradient(132.17deg, rgba(255, 255, 255, 0.1) 0.24%, rgba(255, 255, 255, 0.03) 94.26%)'}`,
-            borderRadius: '12px'
         }}>
 
         <div
@@ -94,15 +95,51 @@ function Proposal({
             }}
         >
             <div className={styles.proposalHeader}>
-                <div className={styles.title}>
-                    <p>Proposal #{proposal.id}</p>
-                    <Typography variant="body3" component="p" className={styles.muted}>Title: <FormatDescription description={proposal.description} /></Typography>
-                    <Typography variant="body3" component="p" className={styles.muted}>Status: {proposal.state}</Typography>
-                    <Typography variant="body3" component="p" className={styles.muted}>Start L1 Block: {proposal.startBlock} &nbsp; &nbsp; End L1 Block: {proposal.endBlock}</Typography>
+                <div className={styles.title} style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                    <Typography variant="body2" style={{fontWeight: '700'}}>Proposal {proposal.id}</Typography>
+                    <Typography variant="body3">Title: <FormatDescription description={proposal.description} /></Typography>
+                    {proposal.state === 'Defeated' && 
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
+                        >
+                          Status: &nbsp;
+                            <span style={{color: 'red'}}>
+                              {proposal.state}
+                            </span>
+                        </Typography>
+                    }
+                    {proposal.state === 'Succeeded' && 
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
+                        >
+                          Status: &nbsp;
+                            <span style={{color: 'green'}}>
+                              {proposal.state}
+                            </span>
+                        </Typography>
+                    }
+                    {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
+                        <Typography 
+                            variant="overline" 
+                            style={{fontSize: '0.8em', lineHeight: '1.2em'}}
+                        >
+                          Status: &nbsp;
+                            <span style={{color: 'yellow'}}>
+                              {proposal.state}
+                            </span>
+                        </Typography>
+                    }
+                    <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
+                        Start L2 Block: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{proposal.startBlock}</span>&nbsp;
+                        Voting Start Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{startTime}</span>&nbsp; 
+                        Voting Stop Time: <span style={{color: 'rgba(255, 255, 255, 0.3)'}}>{endTime}</span> 
+                    </Typography>
                     {proposal.state === 'Active' && !proposal.hasVoted &&
                          <div style={{
                             background: 'blue', 
-                            borderRadius: '8px',
+                            borderRadius: '4px',
                             height: '25px',
                             fontSize: '0.9em',
                             display: 'flex',
@@ -113,7 +150,7 @@ function Proposal({
                     {proposal.state === 'Active' && proposal.hasVoted &&
                          <div style={{
                             background: 'green', 
-                            borderRadius: '8px',
+                            borderRadius: '4px',
                             height: '25px',
                             fontSize: '0.9em',
                             display: 'flex',
@@ -122,12 +159,12 @@ function Proposal({
                         }}>Vote recorded: thank you</div>
                     }
                 </div>
-                <div>
-                    <Typography variant="body3" component="p" className={styles.vote}>For: {proposal.forVotes}</Typography>
-                    <Typography variant="body3" component="p" className={styles.vote}>Against: {proposal.againstVotes}</Typography>
-                    <Typography variant="body3" component="p" className={styles.vote}>Abstain: {proposal.abstainVotes}</Typography>
-                    <Typography variant="body3" component="p" className={styles.vote} style={{minWidth: '150px'}}>Percentage For: {votePercent}% </Typography>
-                    <Typography variant="body3" component="p" className={styles.vote}>Total Votes: {proposal.totalVotes}</Typography>
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                    <Typography variant="overline" className={styles.vote}>For: {proposal.forVotes}</Typography>
+                    <Typography variant="overline" className={styles.vote}>Against: {proposal.againstVotes}</Typography>
+                    <Typography variant="overline" className={styles.vote}>Abstain: {proposal.abstainVotes}</Typography>
+                    <Typography variant="overline" className={styles.vote} style={{minWidth: '150px'}}>Percentage For: {votePercent}% </Typography>
+                    <Typography variant="overline" className={styles.vote}>Total Votes: {proposal.totalVotes}</Typography>
                 </div>
             </div>
         </div>

@@ -97,7 +97,7 @@ function DAO() {
                                 <Typography variant="h3">{balance} Boba</Typography>
                                 <Typography variant="h4">Wallet Balance</Typography>
                                 <Typography variant="body2" className={styles.helpText} style={{textAlign: 'left'}}>
-                                    To transfer Boba governance tokens to another wallet, select "Transfer".
+                                    To transfer Boba to another wallet, select "Transfer".
                                 </Typography>
                             </div>
                             <Button

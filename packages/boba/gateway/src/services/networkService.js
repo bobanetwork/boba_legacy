@@ -2831,7 +2831,8 @@ RETURN: The ID of the newly created proposal.
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
         let startBlock = proposalData.startBlock.toString()
-        let endBlock = proposalData.endBlock.toString()
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
 
         let proposal = await delegateCheck.getActions(i+2)
 
@@ -2849,7 +2850,8 @@ RETURN: The ID of the newly created proposal.
            abstainVotes,
            state: proposalStates[state],
            startBlock,
-           endBlock,
+           startTimestamp,
+           endTimestamp,
            hasVoted
         })
 
