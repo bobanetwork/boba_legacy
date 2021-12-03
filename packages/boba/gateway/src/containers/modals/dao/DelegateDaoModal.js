@@ -64,13 +64,12 @@ function DelegateDaoModal({ open }) {
         >
         <Box>
             <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-                Delegate Boba
+                Delegate my BOBA votes to...
             </Typography>
             <Box sx={{display: 'flex', flexDirection: 'column'}}>
                 <Input
-                    label='Delegate Address'
+                    label='Delegate my BOBA to 0x...'
                     placeholder='Hash'
-                    paste
                     value={recipient}
                     onChange={i => setRecipient(i.target.value)}
                 />
@@ -89,14 +88,14 @@ function DelegateDaoModal({ open }) {
                 onClick={()=>{submit()}}
                 color='primary'
                 variant="contained"
-                tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate Boba voting power from one L2 address to another L2 address"}
+                tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
                 loading={loading}
                 disabled={disabled}
                 triggerTime={new Date()}
                 fullWidth={isMobile}
                 size="large"
             >
-                Transfer
+                Delegate
             </Button>
         </WrapperActionsModal>
         </Modal>

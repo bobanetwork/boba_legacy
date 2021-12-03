@@ -90,17 +90,15 @@ function DAO() {
             <div className={styles.container}>
 
                 <div className={styles.content}>
-                    <div className={`${styles.action} ${isMobile ? styles.isMobile : ''}`}>
                         <div className={styles.transferContainer}
-                        
-                            style={{
-                                background: theme.palette.background.secondary,
-                            }}
+                            style={{background: theme.palette.background.secondary }}
                         >
                             <div className={styles.info}>
                                 <Typography variant="h3">{balance} Boba</Typography>
                                 <Typography variant="h4">Wallet Balance</Typography>
-                                <Typography variant="body2" className={styles.helpText}>To transfer Boba governance tokens to another wallet, select "Transfer".</Typography>
+                                <Typography variant="body2" className={styles.helpText} style={{textAlign: 'left'}}>
+                                    To transfer Boba governance tokens to another wallet, select "Transfer".
+                                </Typography>
                             </div>
                             <Button
                                 color="primary"
@@ -109,30 +107,38 @@ function DAO() {
                                 onClick={()=>{dispatch(openModal('transferDaoModal'))}}
                             >Transfer</Button>
                         </div>
-                        <div className={styles.delegateContainer}
-                            style={{
-                                background: theme.palette.background.secondary,
-                            }}
+                        <div className={styles.delegateContainer} 
+                            style={{background: theme.palette.background.secondary}}
                         >
                             <div className={styles.info}>
                                 <Typography variant="h3">{votes} Votes</Typography>
                                 <Typography variant="h4">Voting Power</Typography>
-                                <Typography variant="body2" className={styles.helpText}>To delegate voting authority, select "Delegate Votes".</Typography>
-                            </div>
+                                <Typography variant="body2" className={styles.helpText}>
+                                    To delegate voting authority, select "Delegate Votes". 
+                                </Typography>
+                            </div> 
                             <Button
                                 color="primary"
                                 variant="contained"
                                 fullWidth={true}
                                 onClick={() => {dispatch(openModal('delegateDaoModal'))}}
-                            >Delegate Votes</Button>
-                        </div>
+                            >
+                                Delegate Votes
+                            </Button>
+                            <div className={styles.info}>
+                            <Typography variant="body2" className={styles.helpTextLight} style={{textAlign: 'left'}}>
+                                You can delegate to one address at a time.
+                                If you would like to vote from this account, then you will need to delegate your votes to yourself.
+                                The number of votes added to the delegatee’s vote count is equivalent to your balance of BOBA.
+                                Votes are delegated from the current time onward until you delegate again (to someone else) or transfer your BOBA.
+
+                            </Typography>
+                            </div>
                     </div>
                 </div>
-            {/*
                 <div className={styles.proposal}>
                     <ProposalList balance={balance} />
                 </div>
-            */}
             </div>
         </>
     

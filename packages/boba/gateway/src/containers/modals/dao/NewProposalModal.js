@@ -35,7 +35,10 @@ function NewProposalModal({ open }) {
 
     const [action, setAction] = useState('')
     const [votingThreshold, setVotingThreshold] = useState('')
-    const [LPfee, setLPfee] = useState('')
+
+    const [LPfeeMin, setLPfeeMin] = useState('')
+    const [LPfeeMax, setLPfeeMax] = useState('')
+    const [LPfeeOwn, setLPfeeOwn] = useState('')
 
     const [proposeText, setProposeText] = useState('')
     const [proposalUri, setProposalUri] = useState('')
@@ -47,7 +50,9 @@ function NewProposalModal({ open }) {
 
     const onActionChange = (e) => {
         setVotingThreshold('')
-        setLPfee('')
+        setLPfeeMin('')
+        setLPfeeMax('')
+        setLPfeeOwn('')
         setProposeText('')
         setProposalUri('')
         setAction(e.value)
@@ -55,7 +60,9 @@ function NewProposalModal({ open }) {
 
     function handleClose() {
         setVotingThreshold('')
-        setLPfee('')
+        setLPfeeMin('')
+        setLPfeeMax('')
+        setLPfeeOwn('')
         setAction('')
         setProposeText('')
         setProposalUri('')
@@ -64,8 +71,9 @@ function NewProposalModal({ open }) {
 
     const options = [
       { value: 'change-threshold', label: 'Change Voting Threshold' },
-      { value: 'text-proposal', label: 'Freeform Text Proposal' },
-      { value: 'change-lp-fee', label: 'Change LP fees' }
+      { value: 'text-proposal',    label: 'Freeform Text Proposal' },
+      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' },
+      { value: 'change-lp2-fee',   label: 'Change L2 LP fees' }
     ]
 
     const customStyles = {
@@ -75,27 +83,33 @@ function NewProposalModal({ open }) {
       }),
     }
 
+/*
+    function configureFeeExits(
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+*/
     const submit = async () => {
         
         let res = null
 
         if (action === 'change-threshold') {
             res = await dispatch(createDaoProposal({
-              action, //e.g. === 'change-threshold'
-              value: votingThreshold, //parameter
-              text: '' //text if any
+              action,
+              value: [votingThreshold],
+              text: '' //extra text if any
             }))
         } else if (action === 'text-proposal') {
             res = await dispatch(createDaoProposal({
               action,
-              value: 0,
               text: `${proposeText}@@${proposalUri}`
             }))
-        } else if (action === 'change-lp-fee') {
+        } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
             res = await dispatch(createDaoProposal({
               action,
-              value: LPfee,
-              text: ''
+              value: [LPfeeMin, LPfeeMax, LPfeeOwn],
+              text: ''  //extra text if any
             }))
         }
         
@@ -110,12 +124,27 @@ function NewProposalModal({ open }) {
             return !votingThreshold
         } else if (action === 'text-proposal') {
             return !proposeText
-        } else if (action === 'change-lp-fee') {
-            if (LPfee < 0 || LPfee > 50) {
-                setLPfee(0)
+        } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
+            if (Number(LPfeeMin) < 0 || Number(LPfeeMin) > 50) {
+
                 return true //aka disabled
             }
-            return !LPfee
+            if (Number(LPfeeMax) < 0 || Number(LPfeeMax) > 50) {
+                return true //aka disabled
+            }
+            if (Number(LPfeeOwn) < 0 || Number(LPfeeOwn) > 50) {
+                return true
+            }
+            if (LPfeeMin === '') {
+                return true
+            }
+            if (LPfeeMax === '') {
+                return true
+            }
+            if (LPfeeOwn === '') {
+                return true
+            }
+            return false
         }
     }
 
@@ -134,51 +163,93 @@ function NewProposalModal({ open }) {
                         options={options}
                         onChange={onActionChange}
                         styles={customStyles}
+                        sx={{marginBottom: '20px'}} 
                     >
                     </Select>
                     {action === '' && 
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
-                        >Right now, the DAO can do three things - change the voting threshold, propose free-form text proposals, and 
-                        propose changes to the bridge 
+                        <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
+                        Currently, the DAO can: change the voting threshold, propose free-form text proposals, and 
+                        change to the bridge fee limits for the L1 and L2 bridge pools. 
                         </Typography>
                     }
                     {action === 'change-threshold' && 
+                    <>
                         <Input
-                            placeholder='Enter new voting threshold...'
+                            label="DAO voting threshold"
+                            placeholder='New voting threshold (e.g. 65,000)'
                             value={votingThreshold}
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
                             fullWidth
-                            sx={{marginTop: '20px'}} 
-                        />
-                    }
-                    {action === 'change-lp-fee' && <> 
-                        <Input
-                            placeholder="Enter new LP fee in integer tenths"
-                            value={LPfee}
-                            type="number"
-                            onChange={(i)=>setLPfee(i.target.value)}
-                            fullWidth
-                            sx={{marginTop: '20px'}} 
+                            sx={{marginBottom: '20px'}} 
                         />
                         <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
-                        >The fee units are integer tenths. 
-                        For example, proposing a fee of '3' corresponds to 
-                        a bridge fee of 0.3%, whereas a fee of '25' denotes a bridge fee of 2.5%. Possible settings range from 
-                        0 to 50, i.e., 0.0% to 5.0%.</Typography>
+                            style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
+                        >
+                            The minimum number of votes required for an account to create a proposal.
+                        </Typography>
                     </>
                     }
-                    {action === 'text-proposal' && <>
+                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') && 
+                    <> 
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                        >
+                            The fee units are integer tenths. 
+                            For example, proposing a fee of '3' corresponds to a bridge fee of 0.3%, whereas a fee of '25' denotes a bridge fee of 2.5%. 
+                            Possible settings range from 0 to 50, i.e., 0.0% to 5.0%.
+                            All three values must be specified.
+                        </Typography>
                         <Input
-                            placeholder="Enter proposal text"
-                            value={proposeText}
-                            onChange={(i)=>setProposeText(i.target.value)}
-                            sx={{marginTop: '20px'}} 
+                            label="New LP minimium fees"
+                            placeholder="Minimium fees in integer tenths (e.g. 3)"
+                            value={LPfeeMin}
+                            type="number"
+                            onChange={(i)=>setLPfeeMin(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
                         />
                         <Input
-                            placeholder="Enter proposal URI (Optional)"
+                            label="New LP maximum fees"
+                            placeholder="Maximum fees in integer tenths (e.g. 30)"
+                            value={LPfeeMax}
+                            type="number"
+                            onChange={(i)=>setLPfeeMax(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
+                        />
+                        <Input
+                            label="New LP operator fees"
+                            placeholder="Operator fees in integer tenths (e.g. 1)"
+                            value={LPfeeOwn}
+                            type="number"
+                            onChange={(i)=>setLPfeeOwn(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
+                        />
+                    </>
+                    }
+                    {action === 'text-proposal' && 
+                    <>
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        >
+                            Your proposal text should be about a paragraph in length, describing the major aspects of your proposal. 
+                        </Typography>
+                        <Input
+                            placeholder="Proposal text"
+                            value={proposeText}
+                            onChange={(i)=>setProposeText(i.target.value)}
+                            sx={{marginTop: '20px'}}  
+                        />
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        >
+                            You can provide additional information (technical specifications, diagrams, and other material) on a seperate 
+                            website below, if you wish. 
+                        </Typography>
+                        <Input
+                            placeholder="Optional: Proposal URI, https://..."
                             value={proposalUri}
                             onChange={(i)=>setProposalUri(i.target.value)}
                             sx={{marginTop: '20px'}} 

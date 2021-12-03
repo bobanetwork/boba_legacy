@@ -411,7 +411,7 @@ class NetworkService {
       if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      //if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
@@ -589,7 +589,7 @@ class NetworkService {
       )
 
       //DAO related
-      if( masterSystemConfig === 'local' ) {
+      if( (masterSystemConfig === 'local' || masterSystemConfig === 'rinkeby') && this.L1orL2 === 'L2' ) {
 
         if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
         if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
@@ -2622,6 +2622,10 @@ class NetworkService {
 
   //Transfer DAO Funds
   async transferDao({ recipient, amount }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.BobaContract === null ) return
+
     try {
       const tx = await this.BobaContract.transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
@@ -2634,6 +2638,10 @@ class NetworkService {
 
   //Delegate DAO Authority
   async delegateVotes({ recipient }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.BobaContract === null ) return
+
     try {
       const tx = await this.BobaContract.delegate(recipient)
       await tx.wait()
@@ -2648,21 +2656,15 @@ class NetworkService {
   async getProposalThreshold() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
     try {
-      // get the threshold proposal only in case of L2
-      if(this.L1orL2 === 'L2') {
-        const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
-        let rawThreshold = await delegateCheck.proposalThreshold()
-        return { threshold: formatEther(rawThreshold) }
-      }
-      else {
-        return { threshold: 0 }
-      }
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      let rawThreshold = await delegateCheck.proposalThreshold()
+      return { threshold: formatEther(rawThreshold) }
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
       return error
@@ -2672,38 +2674,91 @@ class NetworkService {
   //Create Proposal
   async createProposal(payload) {
 
-    let signatures = '' //text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
-    let value = 0
-    let description = ''
+    if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
-    if( payload.action === 'text-proposal' ) {
-      signatures = ['']
-      value = 0
-      description = payload.text
-    } else if ( payload.action === 'change-lp-fee' ) {
-      signatures = ['_setLPfee(uint256)']
-      value = ethers.utils.parseEther(payload.value)
-      description = `# Changing LP Bridge fee to ${payload.value} integer percent`
-    } else if ( payload.action === 'change-threshold' ) {
-      signatures = ['_setProposalThreshold(uint256)']
-      value = ethers.utils.parseEther(payload.value)
-      description = `# Changing Proposal Threshold to ${payload.value} Boba`
-    }
-
+    if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
-    try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+    console.log("payload",payload)
 
-      let address = [delegateCheck.address]
-      let values = [0]
-      //let signatures = text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
-      //let voting = text ? 0 : ethers.utils.parseEther(votingThreshold)
-      let callData = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-        ['uint256'],
-        [value]
+/*
+targets: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+values: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+signatures: The ordered list of function signatures to be passed during execution. This array must be the same length as all other array parameters in this function.
+calldatas: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+description: A human readable description of the proposal and the changes it will enact.
+RETURN: The ID of the newly created proposal.
+*/
+
+/*
+    function configureFeeExits(
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+*/
+
+    let signatures = [''] // the function that will carry out the proposal
+    let value1 = 0
+    let value2 = 0
+    let value3 = 0
+    let description = ''
+    let address = ['']
+    let callData = ['']
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    if( payload.action === 'text-proposal' ) {
+
+      description = payload.text
+      console.log("payload",payload)
+      console.log("description",description)
+    } else if ( payload.action === 'change-lp1-fee' ) {
+      signatures = ['configureFeeExits(uint256,uint256,uint256)']
+      value1 = Number(payload.value[0])
+      value2 = Number(payload.value[1])
+      value3 = Number(payload.value[2])
+      description = `# Changing L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      address = [allAddresses.L2LPAddress]
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256','uint256','uint256'],
+        [value1, value2, value3]
       )]
-      //let description = text ? text : `# Changing Proposal Threshold to ${votingThreshold} Boba`;
+    } else if ( payload.action === 'change-lp2-fee' ) {
+      address = [delegateCheck.address]
+      signatures = ['configureFee(uint256,uint256,uint256)']
+      value1 = Number(payload.value[0])
+      value2 = Number(payload.value[1])
+      value3 = Number(payload.value[2])
+      description = `# Changing L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      address = [allAddresses.L2LPAddress]
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256','uint256','uint256'],
+        [value1, value2, value3]
+      )]
+    } else if ( payload.action === 'change-threshold' ) {
+      address = [delegateCheck.address]
+      signatures = ['_setProposalThreshold(uint256)']
+      value1 = Number(payload.value[0])
+      description = `# Changing Proposal Threshold to ${value1} BOBA`
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256'],
+        [value1]
+      )]
+    }
+
+    try {
+
+      let values = [0] //amount of ETH to send, generally, zero
+
+      console.log("Submitting proposal:", {
+        address, 
+        values, 
+        signatures, 
+        callData, 
+        description
+      })
 
       let res = await delegateCheck.propose(
         address,
@@ -2713,6 +2768,7 @@ class NetworkService {
         description
       )
       return res
+
     } catch (error) {
       console.log("NS: getProposalThreshold error:",error)
       return error
@@ -2723,7 +2779,7 @@ class NetworkService {
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
@@ -2731,9 +2787,10 @@ class NetworkService {
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     try {
-      let proposalList = [];
+
+      let proposalList = []
       const proposalCounts = await delegateCheck.proposalCount()
-      const totalProposals = await proposalCounts.toNumber() - 1 //it's always off by one??
+      const totalProposals = await proposalCounts.toNumber()
 
       const filter = delegateCheck.filters.ProposalCreated(
         null,

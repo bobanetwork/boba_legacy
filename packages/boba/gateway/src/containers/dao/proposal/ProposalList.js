@@ -56,7 +56,7 @@ function ProposalList({balance}) {
                 variant="contained"
                 onClick={() => {
                     if(balance < proposalThreshold) {
-                        dispatch(openError(`Insufficient governance token to create a new proposal. You need at least ${proposalThreshold} governance to create a new proposal.`))
+                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA to create a new proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
                     }
