@@ -53,8 +53,8 @@ const deployFn: DeployFunction = async (hre) => {
     // set config for local/rinkeby
     delay_before_execute_s = 0
     eta_delay_s = 0
-    governor_voting_period = 60 // seconds
-    governor_voting_delay = 10 // seconds
+    governor_voting_period = 259200 // 3 days in seconds
+    governor_voting_delay = 172800 // 2 days in seconds
     governor_proposal_threshold = utils.parseEther('50000')
   }
 
