@@ -61,6 +61,14 @@ class Help extends React.Component {
           </Typography>
 
           <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
+            MetaMask / Ledger Blind Signing
+          </Typography>
+          <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
+            Please follow the MetaMask instructions above the 'Confirm' button in MetaMask - 'blind signing' must be enabled in 
+            the Ethereum app in Ledger (ethereum>settings>blind signing)
+          </Typography>
+
+          <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
             L1 to L2 Deposits not working
           </Typography>
           <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>

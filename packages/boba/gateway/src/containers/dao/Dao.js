@@ -31,6 +31,7 @@ import PageHeader from 'components/pageHeader/PageHeader'
 
 import networkService from 'services/networkService'
 
+import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
 
 function DAO() {
@@ -52,35 +53,18 @@ function DAO() {
     if(layer === 'L1') {
         return <div className={styles.container}>
             <PageHeader title="DAO" />
-            <div className={styles.content}>
-                <Box
-                    sx={{
-                        background: theme.palette.background.secondary,
-                        borderRadius: '12px',
-                        margin: '20px 5px',
-                        padding: '10px 20px',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                    }}
+            <S.LayerAlert>
+              <S.AlertInfo>
+                <AlertIcon />
+                <S.AlertText
+                  variant="body2"
+                  component="p"
                 >
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <AlertIcon />
-                        <Typography
-                            sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                            variant="body1"
-                            component="p"
-                        >
-                            You are on L1. To use the Boba DAO, SWITCH LAYER to L2
-                        </Typography>
-                    </div>
-                    <LayerSwitcher isButton={true} />
-                </Box>
-            </div>
+                  You are on Ethereum Mainnet. To use the Boba DAO, SWITCH to Boba
+                </S.AlertText>
+              </S.AlertInfo>
+              <LayerSwitcher isButton={true} />
+            </S.LayerAlert>
         </div>
     }
 
