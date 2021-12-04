@@ -81,7 +81,8 @@ interface iL1LiquidityPool {
         external;
 
     function configureFee(
-        uint256 _userRewardFeeRate,
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
         uint256 _ownerRewardFeeRate
     )
         external;

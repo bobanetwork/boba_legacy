@@ -2,16 +2,13 @@ FROM node:14-buster as base
 
 FROM base as build
 
-RUN apt-get update && apt-get install -y bash git python build-essential
+#RUN apt-get update && apt-get install -y bash git python build-essential
 
-WORKDIR /
+WORKDIR /app
 
-COPY ops_boba ./ops_boba
-COPY packages/core-utils ./packages/core-utils
+COPY "package.json" ./
+RUN yarn install --production
 
-RUN cd packages/core-utils && yarn install
-RUN cd ops_boba/monitor/ && yarn install
-
-WORKDIR /ops_boba/monitor
+COPY . .
 
 ENTRYPOINT yarn start

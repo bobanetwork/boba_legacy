@@ -17,9 +17,7 @@ import React from 'react'
 
 import { Typography } from '@material-ui/core'
 
-import * as styles from './Transaction.module.scss'
 import * as S from './Transaction.styles'
-import { useTheme } from '@emotion/react'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
 import { getAllNetworks } from 'util/masterConfig'
@@ -35,8 +33,6 @@ function Seven({
   unixTime
 }) {
 
-  const theme = useTheme()
-
   const currentNetwork = useSelector(selectNetwork())
   const nw = getAllNetworks()
 
@@ -51,66 +47,112 @@ function Seven({
   const secondsAgo = Math.round(Date.now() / 1000) - unixTime
   const daysAgo = Math.floor(secondsAgo / (3600 * 24))
   const hoursAgo = Math.round((secondsAgo % (3600 * 24)) / 3600)
-  let timeLabel = `Exit was started ${daysAgo} days and ${hoursAgo} hours ago.`
+  let timeLabel = `Exit was started ${daysAgo} days and ${hoursAgo} hours ago`
 
   const overdue = secondsAgo - (7*24*60*60)
 
   if( overdue > 0) {
     if(hoursAgo <= 1)
-      timeLabel = `Funds will exit soon. The 7 day window just passed. Waiting for Ethereum gas to dip below 120 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window just passed`
     else if(hoursAgo <= 2)
-      timeLabel = `Funds will exit soon. The 7 day window recently passed. Waiting for Ethereum gas to dip below 120 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window recently passed`
     else if(hoursAgo > 2)
-      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago. Waiting for Ethereum gas to dip below 120 Gwei.`
+      timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago`
   }
 
-  return (
-    <
-      div style={{
-        padding: '5px',
-        borderRadius: '8px',
-        background: theme.palette.background.secondaryLight,
-      }}
-    >
-      <S.TableBody>
-
-        <S.TableCell
-          style={{ width: '100%' }}
-        >
-
-          <Typography variant="body3">
-            {blockNumber}
-          </Typography>
-
-          {overdue < 0 &&
-            <Typography variant="body3" className={styles.muted} style={{fontWeight: '700', color: 'yellow'}}>
-              {timeLabel}
-            </Typography>
-          }
-
-          {overdue > 0 &&
-            <Typography variant="body3" className={styles.muted} style={{fontWeight: '700', color: 'green'}}>
-              {timeLabel}
-            </Typography>
-          }
-
-          <Typography variant="body3" className={styles.muted}>
-            Hash:&nbsp;
-            <a
-              href={chainLink({hash:oriHash})}
-              target={'_blank'}
-              rel='noopener noreferrer'
-              style={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }}
+    return (
+      <S.Wrapper>
+          <S.GridContainer container 
+            spacing={2} 
+            direction="row" 
+            justifyContent="flex-start" 
+            alignItems="center"
+          >
+            <S.GridItemTag item 
+              xs={12} 
+              md={12} 
+              style={{
+                justifyContent: 'flex-start', 
+                alignItems:'center', 
+              }}
             >
-              {oriHash}
-            </a>
-          </Typography>
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                  <Typography variant="overline" style={{fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
+                  {overdue < 0 &&
+                    <Typography variant="overline" style={{lineHeight: '1.0em', color: 'yellow'}}>
+                      {timeLabel}
+                    </Typography>
+                  }
+                  {overdue > 0 &&
+                    <Typography variant="overline" style={{lineHeight: '1.0em', color: 'green'}}>
+                      {timeLabel}
+                    </Typography>
+                  }
+                  <Typography variant="body3" style={{fontSize: '0.7em', lineHeight: '1.0em'}}>
+                    Hash:&nbsp;
+                    <a
+                      href={chainLink({hash:oriHash})}
+                      target={'_blank'}
+                      rel='noopener noreferrer'
+                      style={{ color: 'rgba(255, 255, 255, 0.3)', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
+                    >
+                      {oriHash}
+                    </a>
+                  </Typography>
+                </div>
+            </S.GridItemTag>
+          </S.GridContainer>
+        </S.Wrapper>
+      )
 
-        </S.TableCell>
 
-      </S.TableBody>
+  // return (
+  //   <
+  //     div style={{
+  //       padding: '5px',
+  //       borderRadius: '8px',
+  //       background: theme.palette.background.secondaryLight,
+  //     }}
+  //   >
+  //     <S.TableBody>
 
-    </div>)
+  //       <S.TableCell
+  //         style={{ width: '100%' }}
+  //       >
+
+  //         <Typography variant="body3">
+  //           {blockNumber}
+  //         </Typography>
+
+  //         {overdue < 0 &&
+  //           <Typography variant="body3" className={styles.muted} style={{color: 'yellow'}}>
+  //             {timeLabel}
+  //           </Typography>
+  //         }
+
+  //         {overdue > 0 &&
+  //           <Typography variant="body3" className={styles.muted} style={{color: 'green'}}>
+  //             {timeLabel}
+  //           </Typography>
+  //         }
+
+  //         <Typography variant="body3" className={styles.muted}>
+  //           Hash:&nbsp;
+  //           <a
+  //             href={chainLink({hash:oriHash})}
+  //             target={'_blank'}
+  //             rel='noopener noreferrer'
+  //             style={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }}
+  //           >
+  //             {oriHash}
+  //           </a>
+  //         </Typography>
+
+  //       </S.TableCell>
+
+  //     </S.TableBody>
+
+  //   </div>)
 
 }
 

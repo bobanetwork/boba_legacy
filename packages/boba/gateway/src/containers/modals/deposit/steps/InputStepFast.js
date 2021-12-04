@@ -45,12 +45,14 @@ import {
   fetchL2LPBalance,
   fetchL2LPPending, 
   fetchL2TotalFeeRate,
+  fetchL2FeeRateN,
   fetchL1FeeBalance,
   fetchL2LPLiquidity, 
  } from 'actions/balanceAction'
 
 import { 
   selectL2FeeRate,
+  selectL2FeeRateN,
   selectFastDepositCost, 
   selectL2LPBalanceString,
   selectL2LPPendingString,
@@ -71,6 +73,8 @@ function InputStepFast({ handleClose, token }) {
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
   const feeRate = useSelector(selectL2FeeRate)
+  const feeRateN = useSelector(selectL2FeeRateN)
+
   const cost = useSelector(selectFastDepositCost)
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
   
@@ -93,11 +97,11 @@ function InputStepFast({ handleClose, token }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(maxValue))
 
-    console.log("ETH fees:",Number(cost))
-    console.log("Transaction token value:",Number(value))
-    console.log("ETH available for paying fees:",Number(feeBalance))
-    console.log("LPRatio:",Number(LPRatio))
-    console.log("LPBalance:",Number(balanceSubPending))
+    // console.log("ETH fees:",Number(cost))
+    // console.log("Transaction token value:",Number(value))
+    // console.log("ETH available for paying fees:",Number(feeBalance))
+    // console.log("LPRatio:",Number(LPRatio))
+    // console.log("LPBalance:",Number(balanceSubPending))
     
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -138,7 +142,7 @@ function InputStepFast({ handleClose, token }) {
   }
 
   const receivableAmount = (value) => {
-    return (Number(value) * ((100 - Number(feeRate)) / 100)).toFixed(3)
+    return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
 
   async function doDeposit() {
@@ -157,8 +161,8 @@ function InputStepFast({ handleClose, token }) {
         dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
-            `ETH was bridged. You will receive
-            ${((Number(value) * (100 - Number(feeRate)))/100).toFixed(3)}
+            `ETH was bridged. You will receive approximately
+            ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
             ETH on L2`
           )
         )
@@ -193,7 +197,7 @@ function InputStepFast({ handleClose, token }) {
       dispatch(setActiveHistoryTab('Bridge to L2'))
       dispatch(
         openAlert(
-          `${token.symbol} was bridged to the L1LP. You will receive
+          `${token.symbol} was bridged to the L1LP. You will receive approximately
            ${receivableAmount(value)} ${token.symbol} on L2`
         )
       )
@@ -201,7 +205,7 @@ function InputStepFast({ handleClose, token }) {
     }
 
   }
-
+  
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
   useEffect(() => {
@@ -210,6 +214,7 @@ function InputStepFast({ handleClose, token }) {
       dispatch(fetchL2LPLiquidity(token.addressL2))
       dispatch(fetchL2LPPending(token.addressL1)) //lookup is, confusingly, via L1 token address
       dispatch(fetchL2TotalFeeRate())
+      dispatch(fetchL2FeeRateN(token.addressL2))
       dispatch(fetchFastDepositCost(token.address))
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
       return ()=>{
@@ -235,7 +240,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = 'There is a ' + feeRate + '% fee'
+  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -302,7 +307,13 @@ function InputStepFast({ handleClose, token }) {
           Fast Bridge to L2
         </Typography>
 
-        <Typography variant="body2" sx={{mb: 3}}>{label}</Typography>
+        <Typography variant="body2" sx={{mb: 3}}>
+          {label}
+        </Typography>
+
+        <Typography variant="body2" sx={{mb: 3}}>
+          In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
+        </Typography>
 
         <Input
           label={`Amount to bridge`}
@@ -326,7 +337,7 @@ function InputStepFast({ handleClose, token }) {
 
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
+            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
           </Typography>
         )}
 
@@ -349,9 +360,23 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 || Number(value) > Number(balanceSubPending) * 0.90) && (
+        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) and/or balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+            The pool's balance and balance/liquidity ratio are low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+
+        {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+        
+        {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}

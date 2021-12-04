@@ -1,0 +1,51 @@
+service: sls-boba-mainnet-token # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: python3.7
+  stackName: sls-boba-mainnet-token
+  stage: prod
+  region: us-east-1
+  role: ${file(env-mainnet.yml):ROLE}
+
+package:
+  exclude:
+    - .gitignore
+  individually: true
+
+functions:
+  token_getSupply:
+    handler: token_getSupply.token_getSupply
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-mainnet.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-mainnet.yml):SUBNET_ID_1}
+        - ${file(env-mainnet.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.supply
+          method: get
+          cors: true
+    layers:
+      - ${file(env-mainnet.yml):LAYERS}
+
+  token_getCirculatingSupply:
+    handler: token_getCirculatingSupply.token_getCirculatingSupply
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-mainnet.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-mainnet.yml):SUBNET_ID_1}
+        - ${file(env-mainnet.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.circulatingSupply
+          method: get
+          cors: true
+    layers:
+      - ${file(env-mainnet.yml):LAYERS}
