@@ -410,7 +410,7 @@ class NetworkService {
       if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      //if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
