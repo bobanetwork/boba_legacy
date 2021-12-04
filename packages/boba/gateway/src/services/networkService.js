@@ -244,7 +244,6 @@ class NetworkService {
   async getAirdropL1(callData) {
 
    //Interact with contract
-
    //Interact with API if the contract interaction was success
 
   }
@@ -2663,7 +2662,6 @@ class NetworkService {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
       const res = { proposalThreshold: formatEther(rawThreshold) }
-      console.log("res:",res)
       return res
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
@@ -2680,7 +2678,7 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
-    console.log("payload",payload)
+    //console.log("payload",payload)
 
     let signatures = [''] // the function that will carry out the proposal
     let value1 = 0
@@ -2694,7 +2692,7 @@ class NetworkService {
 
     if( payload.action === 'text-proposal' ) {
       address = [delegateCheck.address] // anything will do, as long at it's not blank
-      description = payload.text
+      description = payload.text.slice(0, 252) //100+150+2
       callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
         ['uint256'],
         [value1]
@@ -2737,13 +2735,13 @@ class NetworkService {
 
       let values = [0] //amount of ETH to send, generally, zero
 
-      console.log("Submitting proposal:", {
-        address, 
-        values, 
-        signatures, 
-        callData, 
-        description
-      })
+      // console.log("Submitting proposal:", {
+      //   address, 
+      //   values, 
+      //   signatures, 
+      //   callData, 
+      //   description
+      // })
 
       let res = await delegateCheck.propose(
         address,
@@ -2774,22 +2772,22 @@ class NetworkService {
     try {
 
       let proposalList = []
-      const proposalCounts = await delegateCheck.proposalCount()
-      const totalProposals = await proposalCounts.toNumber()
 
+      const proposalCounts = await delegateCheck.proposalCount()
+      console.log('proposalCounts:',proposalCounts)
+
+      const totalProposals = await proposalCounts.toNumber()
+      console.log('totalProposals:',totalProposals)
+      
       const filter = delegateCheck.filters.ProposalCreated(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        null, null, null, null, null,
+        null, null, null, null
       )
 
+      console.log('filter:',filter)
+
       const descriptionList = await delegateCheck.queryFilter(filter)
+      console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
@@ -2821,7 +2819,7 @@ class NetworkService {
 
         let proposal = await delegateCheck.getActions(i+2)
 
-        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)//delegateCheck.address)
+        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)
 
         let description = descriptionList[i].args[8].toString()
 

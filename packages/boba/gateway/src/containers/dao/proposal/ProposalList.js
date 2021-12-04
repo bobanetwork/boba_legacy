@@ -22,7 +22,7 @@ import { useTheme } from '@emotion/react'
 import { openError, openModal } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
-import Proposal from 'components/Proposal/Proposal'
+import Proposal from 'components/listProposal/listProposal'
 import Pager from 'components/pager/Pager'
 
 import * as styles from './proposalList.module.scss'
@@ -45,6 +45,9 @@ function ProposalList() {
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
     const balance = useSelector(selectDaoBalance)
+
+    console.log("proposalThreshold:",proposalThreshold)
+    console.log("balance:",balance)
 
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
@@ -96,4 +99,3 @@ function ProposalList() {
 }
 
 export default React.memo(ProposalList)
-

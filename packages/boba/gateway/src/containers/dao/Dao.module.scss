@@ -34,7 +34,7 @@
 
     .transferContainer,
     .delegateContainer {
-      border-radius: 12px;
+      border-radius: 4px;
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -42,7 +42,6 @@
       width: 48%;
       margin: 5px;
       @media only screen and (max-width: 900px) {
-        max-width: unset;
         width: 100%;
         min-width: unset;
         min-height: unset;

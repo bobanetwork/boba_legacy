@@ -21,9 +21,26 @@ export const GridContainer = styled(Grid)(({theme})=>({
 
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: 'column', 
+  justifyContent: 'center', 
+  alignItems:'flex-start', 
+  paddingLeft: '8px',
   [theme.breakpoints.down('md')]:{
     padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
+  }
+}))
+
+export const GridItemTagR = styled(Grid)(({ theme, ...props }) => ({
+  display: 'flex',
+  flexDirection: 'column', 
+  justifyContent: 'space-between', 
+  alignItems: 'flex-start', 
+  //paddingLeft: '8px',
+  [theme.breakpoints.down('md')]:{
+    //padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',  
   }
 }))
 

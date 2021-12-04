@@ -13,31 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { openModal } from 'actions/uiAction'
-
-import * as styles from './Dao.module.scss'
-
-import { Box, Typography,useMediaQuery } from '@material-ui/core'
+import { Box, Typography } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 
 import Button from 'components/button/Button'
 import ProposalList from './proposal/ProposalList'
+
 import { selectDaoBalance, selectDaoVotes } from 'selectors/daoSelector'
 import { selectLayer } from 'selectors/setupSelector'
+
 import AlertIcon from 'components/icons/AlertIcon'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import PageHeader from 'components/pageHeader/PageHeader'
+
 import networkService from 'services/networkService'
 
-import PageHeader from 'components/pageHeader/PageHeader'
+import * as styles from './Dao.module.scss'
 
 function DAO() {
 
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch()
+
+    const theme = useTheme()
+    
     const balance = useSelector(selectDaoBalance)
     const votes = useSelector(selectDaoVotes)
     
@@ -126,12 +127,11 @@ function DAO() {
                                 Delegate Votes
                             </Button>
                             <div className={styles.info}>
-                            <Typography variant="body2" className={styles.helpTextLight} style={{textAlign: 'left'}}>
+                            <Typography variant="body2" className={styles.helpTextLight} style={{textAlign: 'left', fontSize: '0.7em', lineHeight: '1.0em'}}>
                                 You can delegate to one address at a time.
-                                If you would like to vote from this account, then you will need to delegate your votes to yourself.
-                                The number of votes added to the delegatee’s vote count is equivalent to your balance of BOBA.
-                                Votes are delegated from the current time onward until you delegate again (to someone else) or transfer your BOBA.
-
+                                To vote from this account, please delegate your votes to yourself.
+                                The number of votes delegated is equal to your balance of BOBA.
+                                Votes are delegated until you delegate again (to someone else) or transfer your BOBA.
                             </Typography>
                             </div>
                     </div>

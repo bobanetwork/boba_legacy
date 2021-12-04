@@ -130,7 +130,6 @@ function NewProposalModal({ open }) {
             return !proposeText
         } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
             if (Number(LPfeeMin) < 0.0 || Number(LPfeeMin) > 5.0) {
-
                 return true //aka disabled
             }
             if (Number(LPfeeMax) < 0.0 || Number(LPfeeMax) > 5.0) {
@@ -239,24 +238,24 @@ function NewProposalModal({ open }) {
                         <Typography variant="body2" 
                             style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
                         >
-                            Your proposal text should be about a paragraph in length, describing the major aspects of your proposal. 
+                            Your proposal title is limited to 100 characters. Use the link field below to provide more information.
                         </Typography>
                         <Input
-                            placeholder="Proposal text"
+                            placeholder="Title (<100 characters)"
                             value={proposeText}
-                            onChange={(i)=>setProposeText(i.target.value)}
+                            onChange={(i)=>setProposeText(i.target.value.slice(0, 100))}
                             sx={{marginTop: '20px'}}  
                         />
                         <Typography variant="body2" 
                             style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
                         >
-                            You can provide additional information (technical specifications, diagrams, and other material) on a seperate 
-                            website below, if you wish. 
+                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate 
+                            website. The link length is limited to 150 characters. You may need to use a link shortener. 
                         </Typography>
                         <Input
-                            placeholder="Optional: Proposal URI, https://..."
+                            placeholder="URI, https://..."
                             value={proposalUri}
-                            onChange={(i)=>setProposalUri(i.target.value)}
+                            onChange={(i)=>setProposalUri(i.target.value.slice(0, 150))}
                             sx={{marginTop: '20px'}} 
                         />
                     </>

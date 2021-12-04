@@ -22,7 +22,7 @@ import { castProposalVote, queueProposal, executeProposal } from 'actions/daoAct
 
 import moment from 'moment'
 import Button from 'components/button/Button'
-import * as S from "./Proposal.styles"
+import * as S from "./listProposal.styles"
 
 function Proposal({
     proposal,
@@ -31,13 +31,12 @@ function Proposal({
     const dispatch = useDispatch()
 
     const [dropDownBox, setDropDownBox] = useState(false)
-    const [dropDownBoxInit, setDropDownBoxInit] = useState(true)
     const [votePercent, setVotePercent] = useState(undefined)
     
     useEffect(() => {
         const init = async () => {
             if (proposal.totalVotes > 0) {
-                setVotePercent(Math.round((100 * proposal.forVotes) / proposal.totalVotes));
+                setVotePercent(Math.round((100 * proposal.forVotes) / proposal.totalVotes))
             } else {
                 setVotePercent(50);
             }
@@ -100,10 +99,8 @@ function Proposal({
                 <S.GridItemTag item
                   xs={12}
                   md={8}
-                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
                 >
-                    <Typography variant="body2" style={{fontWeight: '700'}}>Proposal {proposal.id}</Typography>
-                    <Typography variant="body3">Title: <FormatDescription description={proposal.description} /></Typography>
+                    <Typography variant="body2" style={{fontWeight: '700'}}>Proposal {proposal.id}: <FormatDescription description={proposal.description} /></Typography>
                     {proposal.state === 'Defeated' && 
                         <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '1.2em'}}>
                           Status: &nbsp;<span style={{color: 'red'}}>{proposal.state}</span>
@@ -144,10 +141,9 @@ function Proposal({
                 <S.GridItemTag item
                     xs={12}
                     md={2}
-                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
                 >
                     {proposal.state === 'Active' && !proposal.hasVoted &&
-                        <Button type="primary" variant="contained" onClick={()=>{setDropDownBox(!dropDownBox); setDropDownBoxInit(false)}}>VOTE</Button>
+                        <Button type="primary" variant="contained" onClick={()=>{setDropDownBox(!dropDownBox)}}>VOTE</Button>
                     }
                     {proposal.state === 'Queued' && 
                         <Button type="primary" variant="contained" onClick={(e)=>{doExecuteProposal()}}>EXECUTE</Button>
@@ -156,17 +152,17 @@ function Proposal({
                         <Button type="primary" variant="contained" onClick={(e)=>{doQueueProposal()}}>QUEUE</Button>
                     }
                 </S.GridItemTag>
-                <S.GridItemTag item
+                <S.GridItemTagR 
+                    item
                     xs={12}
                     md={2}
-                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}
                 >
-                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>For: {proposal.forVotes}</Typography>
-                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Against: {proposal.againstVotes}</Typography>
-                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Abstain: {proposal.abstainVotes}</Typography>
-                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>For (%): {votePercent}</Typography>
-                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em'}}>Total Votes: {proposal.totalVotes}</Typography>
-                </S.GridItemTag>
+                    <Typography variant="overline" style={{fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700'}}>For: {votePercent}%</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)'}}>For: {proposal.forVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)'}}>Against: {proposal.againstVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)'}}>Abstain: {proposal.abstainVotes}</Typography>
+                    <Typography variant="overline" style={{fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)'}}>Total Votes: {proposal.totalVotes}</Typography>
+                </S.GridItemTagR>
         </S.GridContainer>
         {dropDownBox ? (
           <Fade in={dropDownBox}>
