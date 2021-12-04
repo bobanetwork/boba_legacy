@@ -1,6 +1,5 @@
-
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Enya Graph Application Deployment"
+Description: "Enya forwarder Application Deployment"
 
 Parameters:
   EnvironmentName:
@@ -14,6 +13,10 @@ Parameters:
   ImageTag:
     Type: String
     Default: push2aws
+
+  GoEthereumImage:
+    Type: String
+    Default: l2geth
 
   DockerPrefix:
     Type: String
@@ -64,14 +67,14 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/graph.env"
+                    - "arn:aws:s3:::${S3BucketV2}/l2geth.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  ProxydLBTargetGroup:
+  ForwarderLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 8545
+      Port: 80
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
@@ -82,96 +85,50 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  ProxydListener:
+  ForwarderListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
-      Port: 443
-      Protocol: TLS
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref ProxydLBTargetGroup
-
-  ProxydListener2:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
-      Port: 8546
-      Protocol: TLS
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref ProxydLBTargetGroup2
-
-  ProxydLBTargetGroup2:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Port: 8546
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerBlockscout:ARN"
+      Port: 80
       Protocol: TCP
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: 30
-      HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref ForwarderLBTargetGroup
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: bobanetwork/proxyd:ecs
-          Name: proxyd
+        - Image: 942431445534.dkr.ecr.us-east-1.amazonaws.com/omgx/nginx-eth-proxy:forwarder
+          Name: forwarder
           PortMappings:
-           - ContainerPort: 8545
-             HostPort: 8545
-           - ContainerPort: 8546
-             HostPort: 8546
-          Environment:
-            - Name: MAIN_L2GETH
-              Value: !Sub
-                - "${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:DNSName"
-            - Name: REPLICA_L2GETH
-              Value: !Sub
-                - "${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:DNSName"
-            - Name: ELASTICACHE
-              Value: !Sub
-                - "${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisCluster:DNS"
+            - ContainerPort: 80
+              HostPort: 80
+          Command:
+            - "nginx-debug"
+            - "-g"
+            - "daemon off;"
           Essential: true
+          Memory: "128"
           LogConfiguration:
             LogDriver: json-file
             Options:
               max-file: "5"
               max-size: "10m"
-      Memory: "2048"
       NetworkMode: awsvpc
-      TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
-      Family: !Sub "proxyd-${EnvironmentName}"
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      Family: !Sub "Forwarder-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplica"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplicaBackup01"
       LoadBalancers:
-        - ContainerName: proxyd
-          ContainerPort: 8545
-          TargetGroupArn: !Ref ProxydLBTargetGroup
-        - ContainerName: proxyd
-          ContainerPort: 8546
-          TargetGroupArn: !Ref ProxydLBTargetGroup2
+        - ContainerName: forwarder
+          ContainerPort: 80
+          TargetGroupArn: !Ref ForwarderLBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -180,9 +137,9 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 10
+      HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "proxyd-replica"
+      ServiceName: "forwarder"
       TaskDefinition: !Ref TaskDefinition
