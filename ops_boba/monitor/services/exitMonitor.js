@@ -133,10 +133,10 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    } else {
-      this.logger.info(
-        `No LP fast exit found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+      // this.logger.info(
+      //   `No LP fast exit found from block ${this.startBlock} to ${endBlock}`
+      // )
     }
 
     if (OVM_L2StandardBridgeLog.length) {
@@ -169,10 +169,10 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    } else {
-      this.logger.info(
-        `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+      // this.logger.info(
+      //   `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
+      // )
     }
 
     this.startBlock = endBlock

@@ -48,7 +48,7 @@ const MESSAGE_MONITOR_INTERVAL = env.MESSAGE_MONITOR_INTERVAL || 10 * 60 * 1000
 const SQL_DISCONNECTED = 'disconnected'
 
 const WHITELIST_SLEEP = 60 // in seconds
-const NON_WHITELIST_SLEEP = 3 * 60 * 60 // in seconds
+const NON_WHITELIST_SLEEP = Number(env.NON_WHITELIST_SLEEP) || 10 * 60 // in seconds
 const WHITELIST = 'whitelist'
 const NON_WHITELIST = 'non_whitelist'
 

@@ -213,7 +213,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      if (! this.state.didWork) {
+      if (!this.state.didWork) {
         await sleep(this.options.pollingInterval)
       }
       this.state.didWork = false
@@ -304,6 +304,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 0,
                 this.options.multiRelayLimit
               )
+              this.logger.info('Prepared message subBuffer', {
+                subLen: subBuffer.length,
+                bufLen: this.state.messageBuffer.length,
+                limit: this.options.multiRelayLimit,
+              })
 
               const receipt = await this._relayMultiMessageToL1(
                 subBuffer.reduce((acc, cur) => {
@@ -316,7 +321,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 this.logger.error(
                   'No receipt for relayMultiMessage transaction'
                 )
-              } else if (receipt.status == 1) {
+              } else if (receipt.status === 1) {
                 this.logger.info('Successful relayMultiMessage', {
                   blockNumber: receipt.blockNumber,
                   transactionIndex: receipt.transactionIndex,
@@ -471,12 +476,39 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             const lastProcessedBatch = await this._getStateBatchHeader(
               lastMessage.parentTransactionIndex
             )
+            this.logger.info('Pending messages', {
+              numMessages: messages.length,
+              firstTxnIdx: messages[0].parentTransactionIndex,
+              lastTxnIdx: lastMessage.parentTransactionIndex,
+              lastBatch: lastProcessedBatch.batch.batchIndex,
+            })
 
             // Remove any events from the cache for batches that should've been processed by now.
+            const oldLen = this.state.eventCache.length
+            this.logger.info('eventCache before filter', {
+              size: oldLen,
+              firstIdx: oldLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: oldLen
+                ? this.state.eventCache[oldLen - 1].args._batchIndex
+                : 'n/a',
+            })
             this.state.eventCache = this.state.eventCache.filter((event) => {
               return (
-                event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+                Number(event.args._batchIndex) >
+                Number(lastProcessedBatch.batch.batchIndex)
               )
+            })
+            const newLen = this.state.eventCache.length
+            this.logger.info('eventCache after filter', {
+              size: newLen,
+              firstIdx: newLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: newLen
+                ? this.state.eventCache[newLen - 1].args._batchIndex
+                : 'n/a',
             })
           }
 
@@ -603,7 +635,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     const header = await this._getStateBatchHeader(height)
 
     if (header === undefined) {
-      this.logger.info('No state batch header found.')
+      this.logger.info('No state batch header found.', {
+        height,
+        lastF: this.state.lastFinalizedTxHeight,
+        nextU: this.state.nextUnfinalizedTxHeight,
+      })
       return false
     } else {
       this.logger.info('Got state batch header', { header })
