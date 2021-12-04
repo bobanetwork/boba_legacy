@@ -190,8 +190,6 @@ function PendingTransaction() {
             paginatedTransactions.length > 0 &&
             paginatedTransactions.map((i) => {
 
-                //console.log(i)
-
                 let completionTime = 'Not available'
 
                 if(i.completion)
@@ -200,7 +198,8 @@ function PendingTransaction() {
                 let link = chainLink(i)
 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
-                let amountTx = null;
+                
+                let amountTx = null
                 
                 if (i.action) {
                     let token = tokenList[i.action.token.toLowerCase()];
@@ -214,63 +213,62 @@ function PendingTransaction() {
                     }
                 }
 
-                return <Grid
-                    key={i.hash}
+                return <S.Wrapper key={i.hash}>
+                <S.GridContainer 
                     container
-                    sx={{
-                        background: '#192333',
-                        borderRadius: '8px',
-                        margin: '5px',
-                        padding: '5px 20px',
-                    }}
+                    key={i.hash} 
+                    spacing={2} 
+                    direction="row" 
+                    justifyContent="flex-start" 
+                    alignItems="center"
                 >
-                    <Grid item xs={2}>
-                        <span style={{fontSize: '0.9em'}}>{i.label}</span>
+                    <Grid item xs={4}>
+                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                            <Typography variant="overline" style={{fontSize: '1.0em', lineHeight: '1.0em'}}>{i.label}</Typography>
+                            <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '0.8em', color: 'rgba(255, 255, 255, 0.3)'}}>{amountTx}</Typography>
+                        </div>
                     </Grid>
                     <Grid item xs={4}>
-                        <Typography
-                            sx={{ wordBreak: 'break-all',fontSize: '0.7em'}}
-                            variant="body2"
-                            component="p"
-                        >
-                        {'Started: '}{moment.unix(i.timeStamp).format('lll')}<br/>
-                        {'Completion after: '}{completionTime}
-                        </Typography>
+                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                            <Typography
+                                variant="overline" 
+                                sx={{fontSize: '0.8em', lineHeight: '1.0em', color: 'rgba(255, 255, 255, 0.3)'}}
+                            >
+                                {'Started: '}{moment.unix(i.timeStamp).format('lll')}
+                            </Typography>
+                            <Typography
+                                variant="overline" 
+                                sx={{fontSize: '0.8em', lineHeight: '0.8em', color: 'rgba(255, 255, 255, 0.3)'}}
+                            >
+                                {'Completion after: '}{completionTime}
+                            </Typography>
+                        </div>
                     </Grid>
-                    <Grid item xs={3}>
-                    <Typography
-                            sx={{ wordBreak: 'break-all' }}
-                            variant="body2"
-                            component="p"
-                        >
-                        {i.labelStatus}
-                    </Typography>
+                    <Grid item xs={4}>
+                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                            <Typography
+                                variant="overline" 
+                                sx={{fontSize: '0.8em', lineHeight: '1.0em'}}
+                            >
+                                {i.labelStatus}
+                            </Typography>
+                            <Typography
+                                sx={{ wordBreak: 'break-all', fontSize: '0.8em', lineHeight: '0.8em' }}
+                                variant="body2"
+                                component="p"
+                            >
+                                <a style={{color: 'white'}}
+                                    href={link}
+                                    target={'_blank'}
+                                    rel='noopener noreferrer'
+                                >
+                                    Details
+                                </a>
+                            </Typography>
+                        </div>
                     </Grid>
-                    <Grid item xs={1}>
-                    <Typography
-                            sx={{ wordBreak: 'break-all' }}
-                            variant="body2"
-                            component="p"
-                    >
-                        <a style={{color: 'white'}}
-                            href={link}
-                            target={'_blank'}
-                            rel='noopener noreferrer'
-                        >
-                            Details
-                        </a>
-                    </Typography>
-                    </Grid>
-                    <Grid item xs={1}>
-                        <Typography
-                            sx={{ wordBreak: 'break-all', whiteSpace: 'nowrap' }}
-                            variant="body2"
-                            component="p"
-                        >
-                            {amountTx}
-                        </Typography>
-                    </Grid>
-                </Grid>
+                </S.GridContainer>
+            </S.Wrapper>
             })
         }
 

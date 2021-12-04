@@ -17,11 +17,10 @@ limitations under the License. */
 import React from 'react'
 import { Typography } from '@material-ui/core'
 
-import truncate from 'truncate-middle'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import * as styles from './listNFT.module.scss'
-import Copy from 'components/copy/Copy'
+
 class listNFT extends React.Component {
 
   constructor(props) {
@@ -34,8 +33,8 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      attributes
-    } = this.props;
+      meta
+    } = this.props
 
     this.state = {
       name,
@@ -43,7 +42,7 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      attributes
+      meta
     }
   }
 
@@ -51,7 +50,7 @@ class listNFT extends React.Component {
 
     const {
       name, symbol, address,
-      UUID, URL, attributes
+      UUID, URL, meta
     } = this.props;
 
     if (!isEqual(prevState.name, name)) {
@@ -74,8 +73,8 @@ class listNFT extends React.Component {
       this.setState({ URL })
     }
 
-    if (!isEqual(prevState.attributes, attributes)) {
-      this.setState({ attributes })
+    if (!isEqual(prevState.meta, meta)) {
+      this.setState({ meta })
     }
 
   }
@@ -85,10 +84,8 @@ class listNFT extends React.Component {
     const {
       name,
       symbol,
-      address,
-      UUID,
       URL,
-      attributes
+      meta
     } = this.state;
 
     return (
@@ -102,36 +99,52 @@ class listNFT extends React.Component {
 
         <div className={styles.topContainer}>
           <div className={styles.Table2}>
+          
             <Typography variant="h4">
               {name} ({symbol})
             </Typography>
-            {(attributes || []).map((attr, index) => {
-              return (<Typography variant="body2" key={index}>{attr.trait_type}: 
-                <Typography variant="body2" component="span" className={styles.muted}>
+
+            {meta.collection !== '' &&
+              <Typography variant="body3">
+                Collection: 
+                <Typography variant="body3" component="span" className={styles.muted}>
+                  {meta.collection}
+                </Typography>
+              </Typography>
+            }
+            {meta.rank !== '' &&
+              <Typography variant="body3">
+                Rank: 
+                <Typography variant="body3" component="span" className={styles.muted}>
+                  {meta.rank}
+                </Typography>
+              </Typography>
+            }
+            {meta.rarity_score !== '' &&
+              <Typography variant="body3">
+                Rarity: 
+                <Typography variant="body3" component="span" className={styles.muted}>
+                  {meta.rarity_score}
+                </Typography>
+              </Typography>
+            }
+            {(meta.attributes || []).map((attr, index) => {
+              return (<Typography variant="body3" key={index}>{attr.trait_type}: 
+                <Typography variant="body3" component="span" className={styles.muted}>
                   {attr.value}
                 </Typography>
               </Typography>)
             })}
-            <Typography variant="body2">UUID:
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {UUID}
-              </Typography>
-            </Typography>
-            <Typography variant="body2">Address:
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {truncate(address, 8, 6, '...')} 
-              </Typography>
-              <Copy value={address} />
-            </Typography>
-            <Typography variant="body2">URI:
-              <Typography variant="body2" component="span" className={styles.muted}>
-                {truncate(URL, 8, 6, '...')} 
-              </Typography>
-              <Copy value={URL} />
-            </Typography>
+            {(meta.traits || []).map((attr, index) => {
+              return (<Typography variant="body3" key={index}>
+                {attr.trait_type}: 
+                <Typography variant="body3" component="span" className={styles.muted}>
+                  {attr.trait_value}
+                </Typography>
+              </Typography>)
+            })}
           </div>
         </div>
-
       </div>
     )
   }

@@ -26,7 +26,6 @@ import { logAmount } from 'util/amountConvert'
 import Pager from 'components/pager/Pager'
 import Transaction from 'components/transaction/Transaction'
 
-import * as styles from './Transactions.module.scss'
 import * as S from './History.styles';
 
 const PER_PAGE = 10;
@@ -56,7 +55,6 @@ function Deposits({ searchHistory, transactions }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <div className={styles.transactionSection}>
       <S.HistoryContainer>
         <Pager
           currentPage={page}
@@ -70,10 +68,10 @@ function Deposits({ searchHistory, transactions }) {
           <Box>
             <S.Content>
               {!paginatedDeposits.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for deposits...</div>
+                <S.Disclaimer>Scanning for deposits...</S.Disclaimer>
               )}
               {!paginatedDeposits.length && loading && (
-                <div className={styles.disclaimer}>Loading deposits...</div>
+                <S.Disclaimer>Loading...</S.Disclaimer>
               )}
               {paginatedDeposits.map((i, index) => {
                                 
@@ -128,7 +126,6 @@ function Deposits({ searchHistory, transactions }) {
           </Box>
         </Grid>
       </S.HistoryContainer>
-    </div>
   );
 }
 

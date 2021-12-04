@@ -15,8 +15,6 @@ $gray7: #f8f8f8;
 
 $bunnyRed: #c83950;
 
-// redesign color;
-
 $background: linear-gradient(180deg, #061122 0%, #08162C 100%);
 $background400: rgba(255, 255, 255, 0.14);
 
@@ -66,6 +64,11 @@ $white500: rgba(255, 255, 255, 0.5);
   @media screen and (max-width: 450px) {
     @content;
   }
+}
+
+@font-face {
+  font-family: 'MessinaSB';
+  src: url(./fonts/MessinaSansMono-SemiBold.ttf) format('opentype');
 }
 
 @font-face {

@@ -77,12 +77,12 @@ class exitMonitorService extends OptimismEnv {
 
     const endBlock = Math.min(latestL2Block, this.endBlock)
 
-    const [userRewardFeeRate, ownerRewardFeeRate] = await Promise.all([
-      this.L1LiquidityPoolContract.userRewardFeeRate(),
+    const [userRewardMaxFeeRate, ownerRewardFeeRate] = await Promise.all([
+      this.L1LiquidityPoolContract.userRewardMaxFeeRate(),
       this.L1LiquidityPoolContract.ownerRewardFeeRate(),
     ])
 
-    const totalFeeRate = userRewardFeeRate.add(ownerRewardFeeRate)
+    const totalFeeRate = userRewardMaxFeeRate.add(ownerRewardFeeRate)
 
     const L2LPLog = await this.L2LiquidityPoolContract.queryFilter(
       this.L2LiquidityPoolContract.filters.ClientDepositL2(),
@@ -133,10 +133,10 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    } else {
-      this.logger.info(
-        `No LP fast exit found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+      // this.logger.info(
+      //   `No LP fast exit found from block ${this.startBlock} to ${endBlock}`
+      // )
     }
 
     if (OVM_L2StandardBridgeLog.length) {
@@ -169,10 +169,10 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    } else {
-      this.logger.info(
-        `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+      // this.logger.info(
+      //   `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
+      // )
     }
 
     this.startBlock = endBlock

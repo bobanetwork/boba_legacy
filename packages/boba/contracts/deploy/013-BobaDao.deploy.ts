@@ -46,15 +46,15 @@ const deployFn: DeployFunction = async (hre) => {
     // set config for mainnet
     delay_before_execute_s = 172800 // 2 days
     eta_delay_s = 182800
-    governor_voting_period = 17280 // 3 days
-    governor_voting_delay = 11520 // 2 days
-    governor_proposal_threshold = utils.parseEther('50000')
+    governor_voting_period = 259200 // 3 days
+    governor_voting_delay = 172800 // 2 days
+    governor_proposal_threshold = utils.parseEther('100000')
   } else {
     // set config for local/rinkeby
     delay_before_execute_s = 0
     eta_delay_s = 0
-    governor_voting_period = 6
-    governor_voting_delay = 1
+    governor_voting_period = 259200 // 3 days in seconds
+    governor_voting_delay = 172800 // 2 days in seconds
     governor_proposal_threshold = utils.parseEther('50000')
   }
 
@@ -85,7 +85,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   await hre.deployments.save('Timelock', TimelockDeploymentSubmission)
   await registerBobaAddress( addressManager, 'Timelock', Timelock.address )
-  
+
   // deploy governorDelegate
   Factory__GovernorBravoDelegate = new ContractFactory(
     GovernorBravoDelegateJson.abi,
@@ -106,7 +106,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   await hre.deployments.save('GovernorBravoDelegate', GovernorBravoDelegateDeploymentSubmission)
   await registerBobaAddress( addressManager, 'GovernorBravoDelegate', GovernorBravoDelegate.address )
-  
+
   // deploy GovernorBravoDelegator
   Factory__GovernorBravoDelegator = new ContractFactory(
     GovernorBravoDelegatorJson.abi,
@@ -119,8 +119,8 @@ const deployFn: DeployFunction = async (hre) => {
     BobaL2.address,
     Timelock.address,
     GovernorBravoDelegate.address,
-    governor_voting_period, // VOTING PERIOD - duration of the voting period in blocks
-    governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in blocks
+    governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
+    governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
     governor_proposal_threshold // the votes necessary to propose
   )
   await GovernorBravoDelegator.deployTransaction.wait()

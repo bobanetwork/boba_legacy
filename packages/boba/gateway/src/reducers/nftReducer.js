@@ -17,8 +17,8 @@ limitations under the License. */
 //with cache - ToDo
 //need to keep track of wgich account the cache is for, otherwise incorrect NFTs will be shown
 
-localStorage.removeItem("nftContracts")
-localStorage.removeItem("nftList")
+//localStorage.removeItem("nftContracts")
+//localStorage.removeItem("nftList")
 
 let nftContracts = localStorage.getItem("nftContracts")
 let nftList = localStorage.getItem("nftList")
@@ -59,11 +59,11 @@ function nftReducer (state = initialState, action) {
 
     case 'NFT/ADDCONTRACT/SUCCESS':
 
-      //console.log("added to state:", action.payload)
-
+      const address = action.payload.address
+              
       localStorage.setItem("nftContracts", JSON.stringify({
           ...state.contracts,
-          [action.payload.address]: action.payload
+          [address]: action.payload
         })
       )
 
@@ -71,13 +71,27 @@ function nftReducer (state = initialState, action) {
         ...state,
         contracts: {
           ...state.contracts,
-          [action.payload.address]: action.payload
+          [address]: action.payload
         }
+      }
+
+    case 'NFT/REMOVECONTRACT/SUCCESS':
+      
+      let listC = state.contracts
+      delete listC[action.payload]
+      
+      localStorage.setItem("nftContracts", JSON.stringify(listC))
+      localStorage.removeItem("nftList")
+
+      return { 
+        ...state,
+        contracts: listC,
+        list: {}
       }
       
     default:
-      return state;
+      return state
   }
 }
 
-export default nftReducer;
+export default nftReducer

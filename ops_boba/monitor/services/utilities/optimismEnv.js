@@ -27,6 +27,10 @@ const MYSQL_PORT = env.MYSQL_PORT || 3306
 const MYSQL_USERNAME = env.MYSQL_USERNAME
 const MYSQL_PASSWORD = env.MYSQL_PASSWORD
 const MYSQL_DATABASE_NAME = env.MYSQL_DATABASE_NAME || 'OMGXV1'
+const MYSQL_DBNAME_TX = env.MYSQL_DBNAME_TX
+const MYSQL_DBNAME_RECEIPT = env.MYSQL_DBNAME_RECEIPT
+const MYSQL_LOG_START_TIME = Number(env.MYSQL_LOG_START_TIME) || 0
+const MYSQL_RECEIPT_START_TIME = Number(env.MYSQL_RECEIPT_START_TIME) || 0
 
 const ADDRESS_MANAGER_ADDRESS = env.ADDRESS_MANAGER_ADDRESS
 const L2_MESSENGER_ADDRESS =
@@ -44,7 +48,7 @@ const MESSAGE_MONITOR_INTERVAL = env.MESSAGE_MONITOR_INTERVAL || 10 * 60 * 1000
 const SQL_DISCONNECTED = 'disconnected'
 
 const WHITELIST_SLEEP = 60 // in seconds
-const NON_WHITELIST_SLEEP = 3 * 60 * 60 // in seconds
+const NON_WHITELIST_SLEEP = Number(env.NON_WHITELIST_SLEEP) || 10 * 60 // in seconds
 const WHITELIST = 'whitelist'
 const NON_WHITELIST = 'non_whitelist'
 
@@ -102,6 +106,10 @@ class OptimismEnv {
     this.MySQLUsername = MYSQL_USERNAME
     this.MySQLPassword = MYSQL_PASSWORD
     this.MySQLDatabaseName = MYSQL_DATABASE_NAME
+    this.MySQLDatabaseNameTx = MYSQL_DBNAME_TX
+    this.MySQLDatabaseNameReceipt = MYSQL_DBNAME_RECEIPT
+    this.MySQLStartTimeLog = MYSQL_LOG_START_TIME
+    this.MySQLStartTimeReceipt = MYSQL_RECEIPT_START_TIME
 
     this.addressManagerAddress = ADDRESS_MANAGER_ADDRESS
     this.L1CrossDomainMessenger = null

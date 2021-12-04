@@ -87,7 +87,11 @@ const main = async () => {
   )
   const NUM_CONFIRMATIONS = config.uint(
     'num-confirmations',
-    parseInt(env.NUM_CONFIRMATIONS, 10) || 0
+    parseInt(env.NUM_CONFIRMATIONS, 10) || 1
+  )
+  const MULTI_RELAY_LIMIT = config.uint(
+    'multi-relay-limit',
+    parseInt(env.MULTI_RELAY_LIMIT, 10) || 10
   )
 
   if (!ADDRESS_MANAGER_ADDRESS) {
@@ -133,6 +137,7 @@ const main = async () => {
     maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
     gasRetryIncrement: GAS_RETRY_INCREMENT,
     numConfirmations: NUM_CONFIRMATIONS,
+    multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
   })
 

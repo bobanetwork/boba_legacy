@@ -1,5 +1,11 @@
 @import 'index.scss';
 
+.muted {
+  color: $white500;
+  margin-left: 5px !important;
+  font-weight: 600 !important;
+}
+
 .container {
   display: flex;
   flex-direction: column;

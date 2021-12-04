@@ -52,12 +52,25 @@ export function selectL2LPLiquidity (state) {
 export function selectL1FeeRate (state) {
   return state.balance.l1FeeRate
 }
+
 export function selectL2FeeRate (state) {
   return state.balance.l2FeeRate
 }
 
+export function selectL1FeeRateN (state) {
+  return state.balance.l1FeeRateN
+}
+
+export function selectL2FeeRateN (state) {
+  return state.balance.l2FeeRateN
+}
+
 export function selectFastExitCost (state) {
   return state.balance.fastExitCost
+}
+
+export function selectClassicExitCost (state) {
+  return state.balance.classicExitCost
 }
 
 export function selectFastDepositCost (state) {

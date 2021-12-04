@@ -23,9 +23,9 @@ import Pager from 'components/pager/Pager'
 import Seven from 'components/seven/Seven'
 
 import * as styles from './Transactions.module.scss'
-import * as S from './History.styles';
+import * as S from './History.styles'
 
-const PER_PAGE = 10;
+const PER_PAGE = 10
 
 function Sevens({ searchData, sevens }) {
 
