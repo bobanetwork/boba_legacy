@@ -170,6 +170,9 @@ Resources:
   LoadBalancerReplicaDTL:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
       Scheme: internal
       Type: network
       Subnets:
@@ -179,6 +182,9 @@ Resources:
   LoadBalancerReplicaDTL2:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
       Scheme: internal
       Type: network
       Subnets:
@@ -188,6 +194,9 @@ Resources:
   LoadBalancerReplicaDTL3:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
       Scheme: internal
       Type: network
       Subnets:
@@ -197,6 +206,9 @@ Resources:
   LoadBalancerReplica:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
       Scheme: internet-facing
       Type: network
       Subnets:
@@ -206,6 +218,9 @@ Resources:
   LoadBalancerReplica2:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+         - Key: load_balancing.cross_zone.enabled
+           Value: true
       Scheme: internet-facing
       Type: network
       Subnets:
@@ -215,6 +230,9 @@ Resources:
   LoadBalancerReplica3:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+         - Key: load_balancing.cross_zone.enabled
+           Value: true
       Scheme: internet-facing
       Type: network
       Subnets:
@@ -224,6 +242,9 @@ Resources:
   LoadBalancerBlockscout:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+         - Key: load_balancing.cross_zone.enabled
+           Value: true
       IpAddressType: ipv4
       Scheme: internet-facing
       Subnets:
@@ -234,14 +255,11 @@ Resources:
   LoadBalancerProxyd:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      IpAddressType: dualstack
-      Scheme: internet-facing
       LoadBalancerAttributes:
-      - Key: idle_timeout.timeout_seconds
-        Value: '3600'
-      Type: application
-      SecurityGroups:
-        - !Ref LoadBalancerIntSecurityGroup
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      Scheme: internet-facing
+      Type: network
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
