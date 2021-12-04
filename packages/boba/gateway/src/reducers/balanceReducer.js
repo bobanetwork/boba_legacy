@@ -20,8 +20,8 @@ const initialState = {
   l2LpBalanceWeiString:'',
   l1LpPendingWeiString:'',
   l2LpPendingWeiString:'',
-  l1FeeRate: '',
-  l2FeeRate: '',
+  l1FeeRate: {},
+  l2FeeRate: {},
   fastExitCost: '',
   classicExitCost: '',
   fastDepositCost: '',
@@ -75,6 +75,16 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l2FeeRate: action.payload
+      }
+    case 'FETCH/L1FEERATE/SUCCESS':
+      return {
+        ...state, 
+        l1FeeRateN: action.payload
+      }
+    case 'FETCH/L2FEERATE/SUCCESS':
+      return {
+        ...state, 
+        l2FeeRateN: action.payload
       }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
       return {

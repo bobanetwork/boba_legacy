@@ -143,16 +143,13 @@ function Account () {
 
   const L1Column = () => (
     <S.AccountWrapper >
-
       {!isMobile ? (
         <S.WrapperHeading>
           <Typography variant="h3" sx={{opacity: networkLayer === 'L1' ? "1.0" : "0.2", fontWeight: "700"}}>{label_L1}</Typography>
-          {/* <SearchIcon color={theme.palette.secondary.main}/> */}
           {networkLayer === 'L1' ? <ActiveItem active={true} /> : null}
         </S.WrapperHeading>
         ) : (null)
       }
-
       <S.TableHeading>
         {tableHeadList.map((item) => {
           return (
@@ -162,7 +159,6 @@ function Account () {
           )
         })}
       </S.TableHeading>
-
       <Box>
         {rootBalance.map((i, index) => {
           return (
@@ -184,12 +180,10 @@ function Account () {
       {!isMobile ? (
         <S.WrapperHeading>
           <Typography variant="h3" sx={{opacity: networkLayer === 'L2' ? "1.0" : "0.4", fontWeight: "700"}}>{label_L2}</Typography>
-          {/* <SearchIcon color={theme.palette.secondary.main}/> */}
           {networkLayer === 'L2' ? <ActiveItem active={true} /> : null}
         </S.WrapperHeading>
         ) : (null)
       }
-
       <S.TableHeading sx={{opacity: networkLayer === 'L2' ? "1.0" : "0.4"}}>
         {tableHeadList.map((item) => {
           return (
@@ -197,7 +191,6 @@ function Account () {
           )
         })}
       </S.TableHeading>
-
       <Box>
         {childBalance.map((i, index) => {
           return (

@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import networkService from 'services/networkService'
+import { createAction } from './createAction'
 import store from 'store'
 
 export function getNFTs () {
@@ -54,29 +56,10 @@ export async function addNFT ( NFT ) {
 
 }
 
-export async function addNFTContract ( Contract ) {
+export function addNFTContract( contactAddress ) {
+  return createAction('NFT/ADDCONTRACT', ()=>{return networkService.addNFTContract( contactAddress )})
+}
 
-  const state = store.getState()
-  const address = Contract.address
-    
-  //if we already have already added it, no need to add again
-  if (state.nft.contracts[address]) {
-    return state.nft.contracts[address]
-  }
-  
-  const contract = {
-    address: Contract.address,
-    name:  Contract.name, 
-    symbol: Contract.symbol,   
-  }
-
-  store.dispatch({
-    type: 'NFT/ADDCONTRACT/SUCCESS',
-    payload: contract
-  })
-
-  console.log("added new contract:",contract)
-
-  return contract
-
+export function removeNFTContract( contactAddress ) {
+  return createAction('NFT/REMOVECONTRACT', ()=>{return contactAddress})
 }

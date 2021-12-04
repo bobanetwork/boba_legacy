@@ -6,10 +6,10 @@ export const Wrapper = styled(Box)`
   align-items: center;
   justify-content: space-between;
   background-color: ${(props) => props.newstyle ? props.theme.palette.background.input : 'transparent' };
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: ${(props) => props.newstyle ? '-13px 15px 19px rgba(0, 0, 0, 0.15), inset 53px 36px 120px rgba(255, 255, 255, 0.06)' : 'none' };
   padding: ${(props) => props.newstyle ? '10px 20px' : '0' };
-  border: ${(props) => props.newstyle ? '2px solid #5E6170' : 'none' };
+  border: ${(props) => props.newstyle ? '1px solid #5E6170' : 'none' };
 `;
 
 export const TextFieldTag = styled(TextField)(({ ...props }) => ({
@@ -21,24 +21,20 @@ export const TextFieldTag = styled(TextField)(({ ...props }) => ({
     "MozAppearance": "textfield"
   },
   '& .MuiInputBase-input': {
-    fontSize: props.newstyle ? '24px' : '16px',
-    fontWeight: 700,
-    opacity: 0.7,
-    paddingLeft: '15px',
-    paddingRight: '15px',
+    fontSize: '1.0em',
   },
   '&:hover': {
-    borderRadius: 8,
+    borderRadius: 4,
     backgroundColor: props.theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255,255,255,0.05)',
   }
 }));
 
 export const UnitContent = styled(Box)`
-display: flex;
-justify-content: flex-start;
-border-right: ${(props) => props.theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(255,255,255,0.2)'};
-margin-right: 30px;
-flex: 2;
+  display: flex;
+  justify-content: flex-start;
+  border-right: ${(props) => props.theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(255,255,255,0.2)'};
+  margin-right: 30px;
+  flex: 2;
   div {
     display: flex;
     flex-direction: column;
@@ -54,6 +50,12 @@ export const InputWrapper = styled(Box)(({ theme }) => ({
     flex: 4,
   },
 }));
+
+export const InputWrapperFull = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+}))
 
 export const ActionsWrapper = styled(Box)`
   display: flex;

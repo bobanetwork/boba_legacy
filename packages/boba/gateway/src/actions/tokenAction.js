@@ -45,7 +45,7 @@ export async function getToken ( tokenContractAddressL1 ) {
   if (state.tokenList[_tokenContractAddressL1]) {
     return state.tokenList[_tokenContractAddressL1]
   } else {
-    console.log("Adding new token:",_tokenContractAddressL1)
+    //console.log("Adding new token:",_tokenContractAddressL1)
     const tokenInfo = await addToken(_tokenContractAddressL1)
     return tokenInfo
   }
