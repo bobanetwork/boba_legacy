@@ -146,10 +146,10 @@ class stateRootMonitorService extends OptimismEnv {
           stateRootStartBlock++
         }
       }
-    } else {
-      this.logger.info(
-        `No state root found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+    //   this.logger.info(
+    //     `No state root found from block ${this.startBlock} to ${endBlock}`
+    //   )
     }
 
     this.startBlock = endBlock

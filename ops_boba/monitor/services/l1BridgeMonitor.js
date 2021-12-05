@@ -175,10 +175,10 @@ class l1BridgeMonitorService extends OptimismEnv {
           )
         }
       }
-    } else {
-      this.logger.info(
-        `No L1 LP logs found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+    //   this.logger.info(
+    //     `No L1 LP logs found from block ${this.startBlock} to ${endBlock}`
+    //   )
     }
 
     const L1StandardBridgeLog = await this.L1Provider.getLogs({
@@ -257,15 +257,15 @@ class l1BridgeMonitorService extends OptimismEnv {
           }
 
           await this.databaseService.insertL1BridgeData(payload)
-          this.logger.info(
-            `Found standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-          )
+          // this.logger.info(
+          //   `Found standard bridge logs found from block ${this.startBlock} to ${endBlock}`
+          // )
         }
       }
-    } else {
-      this.logger.info(
-        `No L1 standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-      )
+    // } else {
+    //   this.logger.info(
+    //     `No L1 standard bridge logs found from block ${this.startBlock} to ${endBlock}`
+    //   )
     }
 
     this.startBlock = endBlock
