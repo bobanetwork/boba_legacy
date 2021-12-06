@@ -264,6 +264,18 @@ Resources:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
+  LoadBalancerProxydBackup:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
   EcsCluster:
     Type: AWS::ECS::Cluster
 
@@ -431,6 +443,14 @@ Outputs:
     Value: !Ref LoadBalancerProxyd
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerProxyd:ARN"
+  LoadBalancerProxydBackupDNSName:
+    Value: !GetAtt LoadBalancerProxydBackup.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerProxydBackup:DNSName"
+  LoadBalancerProxydBackupArn:
+    Value: !Ref LoadBalancerProxydBackup
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerProxydBackup:ARN"
   LoadBalancerReplicaDNSName2:
     Value: !GetAtt LoadBalancerReplica2.DNSName
     Export:

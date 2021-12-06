@@ -1,0 +1,188 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enya Graph Application Deployment"
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  ServiceCount:
+    Type: Number
+    Default: 1
+
+  ImageTag:
+    Type: String
+    Default: push2aws
+
+  DockerPrefix:
+    Type: String
+    Default: bobanetwork
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-coredev
+
+Resources:
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ecs-tasks.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAccessToELB
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:Describe*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
+                Resource: "*"
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/graph.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
+  ProxydBackupLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8545
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  ProxydBackupListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxydBackup:ARN"
+      Port: 443
+      Protocol: TLS
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref ProxydBackupLBTargetGroup
+
+  ProxydListener2Backup:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerProxydBackup:ARN"
+      Port: 8546
+      Protocol: TLS
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref ProxydBackupLBTargetGroup2
+
+  ProxydBackupLBTargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8546
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Image: bobanetwork/proxyd:ecs
+          Name: proxyd
+          PortMappings:
+           - ContainerPort: 8545
+             HostPort: 8545
+           - ContainerPort: 8546
+             HostPort: 8546
+          Environment:
+            - Name: MAIN_L2GETH
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica3:DNSName"
+            - Name: REPLICA_L2GETH
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica2:DNSName"
+            - Name: ELASTICACHE
+              Value: !Sub
+                - "${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterBackup:DNS"
+          Essential: true
+          LogConfiguration:
+            LogDriver: json-file
+            Options:
+              max-file: "5"
+              max-size: "10m"
+      Memory: "2048"
+      NetworkMode: awsvpc
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+      Family: !Sub "proxyd-${EnvironmentName}"
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterReplicaBackup02"
+      LoadBalancers:
+        - ContainerName: proxyd
+          ContainerPort: 8545
+          TargetGroupArn: !Ref ProxydBackupLBTargetGroup
+        - ContainerName: proxyd
+          ContainerPort: 8546
+          TargetGroupArn: !Ref ProxydBackupLBTargetGroup2
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:SecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+      HealthCheckGracePeriodSeconds: 10
+      DesiredCount: !Ref ServiceCount
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
+      ServiceName: "proxyd-replica-backup"
+      TaskDefinition: !Ref TaskDefinition

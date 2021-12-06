@@ -202,6 +202,14 @@ function check_dev_environment {
                     --parameters \
                         ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
                  aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-redis
+                 aws cloudformation create-stack \
+                      --stack-name ${ENV_PREFIX}-redis-backup \
+                      --capabilities CAPABILITY_IAM \
+                      --template-body=file://08-elasticache-backup.yaml \
+                      --region ${REGION} \
+                      --parameters \
+                          ParameterKey=InfrastructureStackName,ParameterValue=${ENV_PREFIX}-infrastructure-core | jq '.StackId'
+                   aws cloudformation wait stack-create-complete --stack-name=${ENV_PREFIX}-redis-backup
               info "Adding Datadog to the Replica ECS Cluster"
               aws cloudformation create-stack \
                    --stack-name ${ENV_PREFIX}-datadog-replica \
