@@ -13,55 +13,68 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, {useState} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {useTheme} from '@material-ui/core';
+import React, {useState} from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { openError, openModal } from 'actions/uiAction';
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@emotion/react'
 
-import Button from 'components/button/Button';
-import Proposal from 'components/Proposal/Proposal';
+import { openError, openModal } from 'actions/uiAction'
+
+import Button from 'components/button/Button'
+import Proposal from 'components/listProposal/listProposal'
+import Pager from 'components/pager/Pager'
 
 import * as styles from './proposalList.module.scss'
-import { selectProposals, selectProposalThreshold } from 'selectors/daoSelector';
-import { selectLoading } from 'selectors/loadingSelector';
-import Pager from 'components/pager/Pager'
-import { orderBy } from 'lodash';
 
-const PER_PAGE = 3;
+import { selectProposals, selectProposalThreshold, selectDaoBalance } from 'selectors/daoSelector'
+import { selectLoading } from 'selectors/loadingSelector'
 
-function ProposalList({balance}) {
-    const theme = useTheme();
+import { orderBy } from 'lodash'
 
-    const [page, setPage] = useState(1);
+const PER_PAGE = 8
+
+function ProposalList() {
+
+    const theme = useTheme()
+
+    const [page, setPage] = useState(1)
     const dispatch = useDispatch()
+
     const loading = useSelector(selectLoading(['PROPOSALS/GET']))
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
+    const balance = useSelector(selectDaoBalance)
 
-    const orderedProposals = orderBy(proposals, i => i.startBlock, 'desc')
+    console.log("proposalThreshold:",proposalThreshold)
+    console.log("balance:",balance)
 
-    const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
-    const endingIndex = page * PER_PAGE;
-    const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex);
+    const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
-    let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE);
+    const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
+    const endingIndex = page * PER_PAGE
+    const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex)
+
+    let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE)
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
     return <>
         <div className={styles.containerAction}>
-            <p className={styles.listTitle}>Proposal List</p>
+            <p className={styles.listTitle}>Proposals</p>
+            <Typography variant="body2" className={styles.helpTextLight}>
+                At least {proposalThreshold} BOBA are needed to create a new proposal
+            </Typography>
             <Button
                 type="primary"
                 variant="contained"
                 onClick={() => {
-                    if(balance < proposalThreshold) {
-                        dispatch(openError(`Insufficient governance token to create a new proposal. You need at least ${proposalThreshold} governance to create a new proposal.`))
+                    if(Number(balance) < Number(proposalThreshold)) {
+                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA to create a new proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
                     }
                 }}
-            > Create Proposal </Button>
+            >Create</Button>
         </div>
         <div className={styles.listContainer}
             style={{
@@ -86,4 +99,3 @@ function ProposalList({balance}) {
 }
 
 export default React.memo(ProposalList)
-

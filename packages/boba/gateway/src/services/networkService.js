@@ -244,7 +244,6 @@ class NetworkService {
   async getAirdropL1(callData) {
 
    //Interact with contract
-
    //Interact with API if the contract interaction was success
 
   }
@@ -589,7 +588,7 @@ class NetworkService {
       )
 
       //DAO related
-      if( masterSystemConfig === 'local' ) {
+      if( (masterSystemConfig === 'local' || masterSystemConfig === 'rinkeby') && this.L1orL2 === 'L2' ) {
 
         if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
         if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
@@ -2591,8 +2590,6 @@ class NetworkService {
 
     try {
       //console.log('Checking DAO balance')
-      //console.log('this.BobaContract',this.BobaContract)
-      //console.log('this.BobaContract',this.account)
       let balance = await this.BobaContract.balanceOf(this.account)
       //console.log('balance',balance)
       return { balance: formatEther(balance) }
@@ -2622,6 +2619,10 @@ class NetworkService {
 
   //Transfer DAO Funds
   async transferDao({ recipient, amount }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.BobaContract === null ) return
+
     try {
       const tx = await this.BobaContract.transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
@@ -2634,6 +2635,10 @@ class NetworkService {
 
   //Delegate DAO Authority
   async delegateVotes({ recipient }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.BobaContract === null ) return
+
     try {
       const tx = await this.BobaContract.delegate(recipient)
       await tx.wait()
@@ -2648,21 +2653,16 @@ class NetworkService {
   async getProposalThreshold() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
     try {
-      // get the threshold proposal only in case of L2
-      if(this.L1orL2 === 'L2') {
-        const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
-        let rawThreshold = await delegateCheck.proposalThreshold()
-        return { threshold: formatEther(rawThreshold) }
-      }
-      else {
-        return { threshold: 0 }
-      }
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const rawThreshold = await delegateCheck.proposalThreshold()
+      const res = { proposalThreshold: formatEther(rawThreshold) }
+      return res
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
       return error
@@ -2672,38 +2672,76 @@ class NetworkService {
   //Create Proposal
   async createProposal(payload) {
 
-    let signatures = '' //text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
-    let value = 0
-    let description = ''
+    if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
-    if( payload.action === 'text-proposal' ) {
-      signatures = ['']
-      value = 0
-      description = payload.text
-    } else if ( payload.action === 'change-lp-fee' ) {
-      signatures = ['_setLPfee(uint256)']
-      value = ethers.utils.parseEther(payload.value)
-      description = `# Changing LP Bridge fee to ${payload.value} integer percent`
-    } else if ( payload.action === 'change-threshold' ) {
-      signatures = ['_setProposalThreshold(uint256)']
-      value = ethers.utils.parseEther(payload.value)
-      description = `# Changing Proposal Threshold to ${payload.value} Boba`
-    }
-
+    if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
-    try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+    //console.log("payload",payload)
 
-      let address = [delegateCheck.address]
-      let values = [0]
-      //let signatures = text ? [''] : ['_setProposalThreshold(uint256)'] // the function that will carry out the proposal
-      //let voting = text ? 0 : ethers.utils.parseEther(votingThreshold)
-      let callData = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+    let signatures = [''] // the function that will carry out the proposal
+    let value1 = 0
+    let value2 = 0
+    let value3 = 0
+    let description = ''
+    let address = ['']
+    let callData = ['']
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    if( payload.action === 'text-proposal' ) {
+      address = [delegateCheck.address] // anything will do, as long at it's not blank
+      description = payload.text.slice(0, 252) //100+150+2
+      callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
         ['uint256'],
-        [value]
+        [value1]
       )]
-      //let description = text ? text : `# Changing Proposal Threshold to ${votingThreshold} Boba`;
+    } else if ( payload.action === 'change-lp1-fee' ) {
+      signatures = ['configureFeeExits(uint256,uint256,uint256)']
+      value1 = Number(payload.value[0])
+      value2 = Number(payload.value[1])
+      value3 = Number(payload.value[2])
+      description = `Change L1 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      address = [allAddresses.L2LPAddress]
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256','uint256','uint256'],
+        [value1, value2, value3]
+      )]
+    } else if ( payload.action === 'change-lp2-fee' ) {
+      address = [delegateCheck.address]
+      signatures = ['configureFee(uint256,uint256,uint256)']
+      value1 = Number(payload.value[0])
+      value2 = Number(payload.value[1])
+      value3 = Number(payload.value[2])
+      description = `Change L2 LP Bridge fee to ${value1}, ${value2}, and ${value3} integer percent`
+      address = [allAddresses.L2LPAddress]
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256','uint256','uint256'],
+        [value1, value2, value3]
+      )]
+    } else if ( payload.action === 'change-threshold' ) {
+      address = [delegateCheck.address]
+      signatures = ['_setProposalThreshold(uint256)']
+      value1 = Number(payload.value[0])
+      description = `Change Proposal Threshold to ${value1} BOBA`
+      callData = [ethers.utils.defaultAbiCoder.encode(
+        ['uint256'],
+        [value1]
+      )]
+    }
+
+    try {
+
+      let values = [0] //amount of ETH to send, generally, zero
+
+      // console.log("Submitting proposal:", {
+      //   address, 
+      //   values, 
+      //   signatures, 
+      //   callData, 
+      //   description
+      // })
 
       let res = await delegateCheck.propose(
         address,
@@ -2713,6 +2751,7 @@ class NetworkService {
         description
       )
       return res
+
     } catch (error) {
       console.log("NS: getProposalThreshold error:",error)
       return error
@@ -2723,7 +2762,7 @@ class NetworkService {
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
-    if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
@@ -2731,23 +2770,24 @@ class NetworkService {
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     try {
-      let proposalList = [];
-      const proposalCounts = await delegateCheck.proposalCount()
-      const totalProposals = await proposalCounts.toNumber() - 1 //it's always off by one??
 
+      let proposalList = []
+
+      const proposalCounts = await delegateCheck.proposalCount()
+      console.log('proposalCounts:',proposalCounts)
+
+      const totalProposals = await proposalCounts.toNumber()
+      console.log('totalProposals:',totalProposals)
+      
       const filter = delegateCheck.filters.ProposalCreated(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        null, null, null, null, null,
+        null, null, null, null
       )
 
+      console.log('filter:',filter)
+
       const descriptionList = await delegateCheck.queryFilter(filter)
+      console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
@@ -2774,11 +2814,12 @@ class NetworkService {
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
         let startBlock = proposalData.startBlock.toString()
-        let endBlock = proposalData.endBlock.toString()
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
 
         let proposal = await delegateCheck.getActions(i+2)
 
-        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)//delegateCheck.address)
+        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)
 
         let description = descriptionList[i].args[8].toString()
 
@@ -2792,7 +2833,8 @@ class NetworkService {
            abstainVotes,
            state: proposalStates[state],
            startBlock,
-           endBlock,
+           startTimestamp,
+           endTimestamp,
            hasVoted
         })
 
@@ -2817,6 +2859,40 @@ class NetworkService {
       console.log("NS: castProposalVote error:",error)
       return error
     }
+  }
+
+  async queueProposal(proposalID) {
+
+    if( this.delegateContract === null ) return
+
+    console.log("ProposalID:",Number(proposalID))
+
+    try {
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      let res = delegateCheck.queue(Number(proposalID))
+      return res
+    } catch(error) {
+      console.log("NS: queueProposal error:",error)
+      return error
+    }
+
+  }
+
+  async executeProposal(proposalID) {
+
+    if( this.delegateContract === null ) return
+
+    console.log("ProposalID:",Number(proposalID))
+
+    try {
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      let res = delegateCheck.execute(Number(proposalID))
+      return res
+    } catch(error) {
+      console.log("NS: executeProposal error:",error)
+      return error
+    }
+
   }
 
 }

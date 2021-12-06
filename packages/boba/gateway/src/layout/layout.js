@@ -2,7 +2,6 @@ import WalletPicker from 'components/walletpicker/WalletPicker';
 import React from 'react';
 import {Route} from 'react-router-dom'
 
-
 function Layout({
     enabled, 
     onEnable,
