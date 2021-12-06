@@ -28,6 +28,8 @@ import Button from 'components/button/Button'
 
 import { delegateVotes } from 'actions/daoAction'
 
+import networkService from 'services/networkService'
+
 function DelegateDaoModal({ open }) {
 
     const [recipient, setRecipient] = useState('');
@@ -39,6 +41,8 @@ function DelegateDaoModal({ open }) {
 
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+    const wAddress = networkService.account ? networkService.account : ''
 
     function handleClose() {
         setRecipient('')
@@ -56,48 +60,90 @@ function DelegateDaoModal({ open }) {
         }
     }
 
+    const submitMe = async () => {
+        let res = await dispatch(delegateVotes({ recipient: wAddress }))
+        if (res) {
+            dispatch(openAlert(`Votes self-delegation successfull!`))
+            handleClose();
+        } else {
+            dispatch(openError(`Failed to delegate`))
+            handleClose();
+        }
+    }
+
     return (
         <Modal
             open={open}
             onClose={handleClose}
             maxWidth="md"
         >
-        <Box>
             <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-                Delegate my BOBA votes to...
+                Delegate my BOBA votes
             </Typography>
-            <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                <Input
-                    label='Delegate my BOBA to 0x...'
-                    placeholder='Hash'
-                    value={recipient}
-                    onChange={i => setRecipient(i.target.value)}
-                />
+            <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
+                <Typography variant="h3" sx={{mb: 1}}>
+                    Delegate my BOBA votes to myself
+                </Typography>
+                <Typography variant="body3" style={{fontSize: '0.8em', lineHeight: '1.0em'}}>
+                    My address:&nbsp;
+                    <span
+                      style={{ color: 'rgba(255, 255, 255, 0.3)', fontFamily: 'MessinaSB', fontSize: '0.9em'}}
+                    >
+                      {wAddress}
+                    </span>
+                  </Typography>
+                <WrapperActionsModal>
+                    <Button
+                        onClick={()=>{submitMe()}}
+                        color='primary'
+                        variant="contained"
+                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                        loading={loading}
+                        triggerTime={new Date()}
+                        fullWidth={isMobile}
+                        size="large"
+                    >
+                        Delegate to me
+                    </Button>
+                </WrapperActionsModal>
             </Box>
-        </Box>
-        <WrapperActionsModal>
-            <Button
-                onClick={handleClose}
-                color='neutral'
-                size="large"
-            >
-                Cancel
-            </Button>
-
-            <Button
-                onClick={()=>{submit()}}
-                color='primary'
-                variant="contained"
-                tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
-                loading={loading}
-                disabled={disabled}
-                triggerTime={new Date()}
-                fullWidth={isMobile}
-                size="large"
-            >
-                Delegate
-            </Button>
-        </WrapperActionsModal>
+            <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
+                <Typography variant="h3" sx={{mb: 1}}>
+                    Or, delegate my BOBA votes to someone else
+                </Typography>
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                    <Input
+                        label='Delegate to:'
+                        placeholder='Address (0x...)'
+                        value={recipient}
+                        onChange={i => setRecipient(i.target.value)}
+                    />
+                </Box>
+                <WrapperActionsModal>
+                    <Button
+                        onClick={()=>{submit()}}
+                        color='primary'
+                        variant="contained"
+                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                        loading={loading}
+                        disabled={disabled}
+                        triggerTime={new Date()}
+                        fullWidth={isMobile}
+                        size="large"
+                    >
+                        Delegate to other
+                    </Button>
+                </WrapperActionsModal>
+            </Box>
+            <WrapperActionsModal>
+                <Button
+                    onClick={handleClose}
+                    color='neutral'
+                    size="large"
+                >
+                    Cancel
+                </Button>
+                </WrapperActionsModal>
         </Modal>
     )
 }
