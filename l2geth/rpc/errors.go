@@ -63,3 +63,30 @@ type invalidParamsError struct{ message string }
 func (e *invalidParamsError) ErrorCode() int { return -32602 }
 
 func (e *invalidParamsError) Error() string { return e.message }
+
+// Custom codes for TURING off-chain interface. Numeric codes are
+// arbitrary and can be changed if they conflict with anything.
+
+// Uode is used when the contract triggers an off-chain request
+type turingNeedDataError struct{ requestCode string }
+
+func (e *turingNeedDataError) ErrorCode() int { return -23401 }
+
+// FIXME could pretty-print this one and provide a separate method to get the raw code
+//func (e *turingNeedDataError) Error() string { return "Turing off-chain request:" + e.requestCode }
+func (e *turingNeedDataError) Error() string { return e.requestCode }
+
+// Used when the off-chain response is not acceptable
+type turingBadDataError struct{ message string }
+
+func (e *turingBadDataError) ErrorCode() int { return -23402 }
+
+func (e *turingBadDataError) Error() string { return e.message }
+
+// Used when L2geth did not get an off-chain response
+// or any other generic failure in the mechanism
+type turingServerError struct{ message string }
+
+func (e *turingServerError) ErrorCode() int { return -23403 }
+
+func (e *turingServerError) Error() string { return e.message }

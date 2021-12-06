@@ -91,6 +91,9 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	if err != nil {
 		return nil, err
 	}
+
+	log.Debug("TURING state_processor.go entering ApplyTransaction")
+
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
 	// Create a new environment which holds all relevant information
@@ -107,7 +110,16 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	}
 
 	// Apply the transaction to the current state (included in the env)
-	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+	result, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+
+	log.Debug("TURING state_processor.go ApplyMessage result", 
+		"failed", failed, 
+		"err", err, 
+		"gas", gas, 
+		"result", hexutil.Bytes(result), 
+		"turing", bytes.Contains(result, []byte("_TURING_"))
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -140,6 +152,8 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockHash = statedb.BlockHash()
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
+
+	log.Debug("TURING state_processor.go leaving ApplyTransaction", "receipt", receipt)
 
 	return receipt, err
 }
