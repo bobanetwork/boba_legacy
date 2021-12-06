@@ -46,8 +46,8 @@ function ProposalList() {
     const proposalThreshold = useSelector(selectProposalThreshold)
     const balance = useSelector(selectDaoBalance)
 
-    console.log("proposalThreshold:",proposalThreshold)
-    console.log("balance:",balance)
+    //console.log("proposalThreshold:",proposalThreshold)
+    //console.log("balance:",balance)
 
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 

@@ -588,7 +588,7 @@ class NetworkService {
       )
 
       //DAO related
-      if( (masterSystemConfig === 'local' || masterSystemConfig === 'rinkeby') && this.L1orL2 === 'L2' ) {
+      if( /*(masterSystemConfig === 'local' || masterSystemConfig === 'rinkeby') && */ this.L1orL2 === 'L2' ) {
 
         if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
         if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
@@ -2652,7 +2652,7 @@ class NetworkService {
   // Proposal Create Threshold
   async getProposalThreshold() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
     //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
@@ -2661,6 +2661,7 @@ class NetworkService {
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
+      //console.log("rawThreshold:",rawThreshold)
       const res = { proposalThreshold: formatEther(rawThreshold) }
       return res
     } catch (error) {
@@ -2672,7 +2673,7 @@ class NetworkService {
   //Create Proposal
   async createProposal(payload) {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
     //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
@@ -2761,7 +2762,7 @@ class NetworkService {
   //Fetch DAO Proposals
   async fetchProposals() {
 
-    if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'mainnet' ) return
     //if( this.masterSystemConfig === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
@@ -2774,20 +2775,21 @@ class NetworkService {
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()
-      console.log('proposalCounts:',proposalCounts)
+      //console.log('proposalCounts:',proposalCounts)
 
       const totalProposals = await proposalCounts.toNumber()
-      console.log('totalProposals:',totalProposals)
+      //console.log('totalProposals:',totalProposals)
       
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
         null, null, null, null
       )
 
-      console.log('filter:',filter)
+      //console.log('filter:',filter)
 
       const descriptionList = await delegateCheck.queryFilter(filter)
-      console.log('descriptionList:',descriptionList)
+      
+      //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
