@@ -17,6 +17,7 @@
 package vm
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"sync/atomic"
@@ -30,6 +31,9 @@ import (
 	"github.com/ethereum/go-ethereum/rollup/rcfg"
 	"github.com/ethereum/go-ethereum/rollup/util"
 	"golang.org/x/crypto/sha3"
+
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/log"
 
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -347,8 +351,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			"depth", evm.depth, 
 			"addr", addr, 
 			"input", hexutil.Bytes(input), 
-			"gas", gas
-		);
+			"gas", gas)
 	}
 
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
@@ -420,10 +423,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				"ret", hexutil.Bytes(ret), 
 				"input", hexutil.Bytes(input), 
 				"contract", contract.CodeAddr, 
-				"turing", isTuring
-			)
+				"turing", isTuring)
 
-			if isTuring /*&& UsingOVM */ {
+			if isTuring /*&& UsingOVM - rcfg.UsingOVM */ {
 
 				ii := bytes.Index(ret, []byte("_TURING_"))
 				

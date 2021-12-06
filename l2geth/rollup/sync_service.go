@@ -846,7 +846,7 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	log.Debug("TURING sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
 	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
 	<-s.chainHeadCh
-	/log.Debug("TURING sync_service leaving applyTransactionToTip")
+	log.Debug("TURING sync_service leaving applyTransactionToTip")
 
 	// Update the cache when the transaction is from the owner
 	// of the gas price oracle

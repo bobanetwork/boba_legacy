@@ -26,6 +26,10 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/fees"
+
+	"bytes"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning
@@ -117,8 +121,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		"err", err, 
 		"gas", gas, 
 		"result", hexutil.Bytes(result), 
-		"turing", bytes.Contains(result, []byte("_TURING_"))
-	)
+		"turing", bytes.Contains(result, []byte("_TURING_")))
 
 	if err != nil {
 		return nil, err

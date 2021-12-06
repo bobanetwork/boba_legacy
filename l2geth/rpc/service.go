@@ -212,8 +212,7 @@ func (c *callback) call(ctx context.Context, method string, args []reflect.Value
 		err := results[c.errPos].Interface().(error)
 		log.Debug("TURING non-Turing error result in service.go", 
 			"results", results[0].Interface(), 
-			"err", err
-		)
+			"err", err)
 		return reflect.Value{}, err
 	}
 	return results[0].Interface(), nil
