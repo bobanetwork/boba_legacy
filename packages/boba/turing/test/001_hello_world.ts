@@ -23,14 +23,6 @@ let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-
-// const http = new XMLHttpRequest()
-
-// http.open("GET", "https://api.lyrics.ovh/v1/toto/africa")
-// http.send()
-
-// http.onload = () => console.log(http.responseText)
-
 // Key for Hardhat test account #13 (0x1cbd3b2770909d4e10f157cabc84c7264073c9ec)
 const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
 const testWallet = new Wallet(testPrivateKey, local_provider)
@@ -187,13 +179,11 @@ describe("Hello World", function () {
 
   it("should return the helper address", async () => {
     let helperAddress = await hello.helperAddr();
-    //console.log("url:",url)
     expect(helperAddress).to.equal(helper.address)
   })
 
   it("should return the URL", async () => {
     let url = await helper.data_URL();
-    //console.log("url:",url)
     expect(url.slice(0,32)).to.equal(ethers.utils.formatBytes32String(urlStr).slice(0,32))
   })
 
