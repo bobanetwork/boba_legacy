@@ -1,5 +1,5 @@
 {
-  "name": "turing-hybrid-compute",
+  "name": "@boba/turing-hybrid-compute",
   "version": "0.2.0",
   "description": "Hybrid Compute for Ethereum prototype",
   "main": "index.js",
@@ -11,11 +11,16 @@
     "clean": "rm -rf ./artifacts ./cache",
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
-    "test:boba": "hardhat --network boba test"
+    "test:boba": "hardhat --network boba_local test"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",
+    "@ethersproject/address": "^5.0.11",
+    "@ethersproject/contracts": "^5.0.11",
+    "@ethersproject/networks": "^5.0.11",
+    "@ethersproject/solidity": "^5.0.11",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "4.3.2",
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.3",
     "ethers": "^5.0.32",

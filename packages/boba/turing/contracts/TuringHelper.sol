@@ -5,14 +5,15 @@ pragma solidity 0.6.12;
 import "hardhat/console.sol";
 
 contract TuringHelper {
-  bytes data_URL;
+
+  bytes public data_URL;
   TuringHelper Self;
   bytes[] methods;
 
   event OffchainResponse(uint version, bytes responseData);
 
   constructor (string memory _url) public {
-    console.log("Deploying a helper contract with data source:", _url);
+    console.log("TuringHelper.sol: Deploying a helper contract with data source:", _url);
     data_URL = bytes(_url);
     Self = TuringHelper(address(this));
   }
@@ -54,14 +55,14 @@ contract TuringHelper {
     // For now this is the only valid value and all others are reserved.
     byte request_version = 0x01;
 
-    bytes memory prefix = bytes("_OMGXTURING_");
-    assert (prefix.length == 12);
+    bytes memory prefix = bytes("_TURING_");
+    assert (prefix.length == 8);
     uint i;
     uint j;
 
     // Constrain these to simplify the RLP encoding logic.
-    require (data_URL.length < 65536, "data_URL is too long");
-    require (payload.length < 65536, "payload is too long");
+    require (data_URL.length < 65536, "data_URL too long");
+    require (payload.length < 65536, "payload too long");
 
     uint32 l1 = uint32(data_URL.length);
     uint32 l2 = uint32(method.length);
@@ -149,7 +150,7 @@ contract TuringHelper {
      The _slot parameters is overloaded to represent either the
      request parameters or the off-chain response, with the rType
      parameter indicating which is which. When called as a request,
-     it reverts with an encoded OMGX_TURING string. The modified
+     it reverts with an encoded TURING string. The modified
      l2geth intercepts this, performs the off-chain interaction,
      then rewrites the parameters and calls the method again in
      "response" mode. This response is then passed back to the

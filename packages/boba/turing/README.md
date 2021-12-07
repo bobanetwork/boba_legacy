@@ -1,7 +1,19 @@
 
 ## Introduction to Turing
 
+## Preparation
+
+Spin up a local test stack. Duplicate `env.example`, make changes if needed, and then save as `.env`. Finally, build and test the contracts.
+
+```bash
+
+$ yarn build
+
+```
+
 ## Basic Usage
+
+
 
 ## Example of AWS Lambda code for DeFi
 

@@ -10,14 +10,14 @@ interface Helper {
 }
 
 contract HelloTuring {
-  address helperAddr;
+  address public helperAddr;
   Helper myHelper;
 
   mapping (address => string) locales;
   mapping (address => string) cachedGreetings;
 
   constructor(address _helper) public {
-    console.log("Deploying a contract with helper address:", _helper);
+    console.log("HelloTuring.sol: Deploying a contract with helper address:", _helper);
     helperAddr = _helper;
     myHelper = Helper(helperAddr);
   }

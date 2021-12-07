@@ -1,4 +1,5 @@
 exports.handler = async (event) => {
+    
     //caller provides for example, two floats to add or multiply
     const input = JSON.parse(event.body)
     
@@ -17,6 +18,7 @@ exports.handler = async (event) => {
             sum: sum,
             mul: mul
         }),
-    };
-    return response;
-};
+    }
+    
+    return response
+}

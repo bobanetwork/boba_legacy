@@ -11,34 +11,19 @@ const hPort = 9009 // Port for local HTTP server
 var urlStr
 const gasOverride = {} // Can specify e.g. {gasPrice:0, gasLimit:999999} if needed
 
-// import HelloTuringJson_1 from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-// import HelloTuringJson_2 from "../artifacts-ovm/contracts/HelloTuring.sol/HelloTuring.json"
-// import TuringHelper_1 from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
-// import TuringHelper_2 from "../artifacts-ovm/contracts/TuringHelper.sol/TuringHelper.json"
-import StableSwapJSON from "../artifacts-ovm/contracts/StableSwap.sol/StableSwap.json"
-import TuringHelper_2 from "../artifacts-ovm/contracts/TuringHelper.sol/TuringHelper.json"
+import StableSwapJSON from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
+import TuringHelper_2 from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
 let Factory__Stable: ContractFactory
 let Stable: Contract
 let Factory__Helper: ContractFactory
 let helper: Contract
 
-
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 // Key for Hardhat test account #13 (0x1cbd3b2770909d4e10f157cabc84c7264073c9ec)
 const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
 const testWallet = new Wallet(testPrivateKey, local_provider)
-const L1 = !cfg['ovm']
-
-describe("L2_Only", function() {
-  // It is no longer feasible to mock out enough of the l2geth functionality to support
-  // an L1 version of these tests.
-
-  it("should not be run on an L1 chain", async() => {
-    expect(L1).to.be.false
-  })
-})
 
 describe("StableTest", function() {
 
