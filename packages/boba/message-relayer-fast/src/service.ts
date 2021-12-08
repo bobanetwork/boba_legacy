@@ -383,16 +383,26 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               this.state.nextUnfinalizedTxHeight
             )
           ) {
-            const size = (
+            const batch = (
               await this._getStateBatchHeader(
                 this.state.nextUnfinalizedTxHeight
               )
-            ).batch.batchSize.toNumber()
+            ).batch
+            const size = batch.batchSize.toNumber()
+            const batchStart = batch.prevTotalElements.toNumber()
+
             this.logger.info(
               'Found a batch of finalized transaction(s), checking for more...',
-              { batchSize: size }
+              {
+                batchSize: size,
+                atHeight: this.state.nextUnfinalizedTxHeight,
+                batchStart,
+              }
             )
-            this.state.nextUnfinalizedTxHeight += size
+            // This must point to the first txHeight within the next batch. If the service starts
+            // with a misaligned fromL2TransactionIndex then this should realign it to avoid
+            // missed messages.
+            this.state.nextUnfinalizedTxHeight = batchStart + size
 
             // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
             // need to keep in memory. We operate on full batches at a time so the actual amount
