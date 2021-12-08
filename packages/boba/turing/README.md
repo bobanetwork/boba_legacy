@@ -57,7 +57,7 @@ When you run `test`, a helper contract (`TuringHelper.sol`) will be deployed.
       testWallet)
 ```
 
-Among other information, the help contract contains the compute URL endpoint that will be called when pre-defined methods are called. Those methofds must first be registered:
+Among other information, the helper contract contains the compute URL endpoint that will be called when pre-defined methods are called. Those methods must first be registered:
 
 ```javascript
     //defines the URL that will be called by HelloTuring.sol
@@ -66,7 +66,7 @@ Among other information, the help contract contains the compute URL endpoint tha
     await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello")));
 ```
 
-Next, a contract that uses Turing will be deployed. It is initialized with the address of the helper contract:
+Next, a contract that uses Turing is deployed. It is initialized with the address of the Turing helper contract:
 
 ```javascript    
     Factory__Hello = new ContractFactory(
@@ -89,7 +89,7 @@ bytes memory response =  myHelper.TuringTx(0, abi.encode(locale));
 
 ## Key code snippets
 
-A central code snippet is in the `TuringHelper.sol`:
+A central code snippet is in `TuringHelper.sol`. 
 
 ```javascript
   
@@ -125,6 +125,12 @@ A central code snippet is in the `TuringHelper.sol`:
     return _slot;
   }
 ```
+
+Note how calling `GetResponse()` with `rType=1` triggers the revert, and note how the paratmers and other data needed by Geth are packed into the revert string via `genRequestRLP(methods[method_idx], _slot)`:
+```
+if (rType == 1)
+    require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
+``` 
 
 ## Preconfigured AWS Lambda code for Testing
 
