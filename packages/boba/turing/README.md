@@ -18,7 +18,7 @@ Boba's **Turing** is a system for _hybrid compute_, defined as enabling Solidity
 
 ## Technical Backdrop
 
-The recent growth of L2 scaling solutions is typically explained in terms of improved speed and reduced cost; however there is an additional benefit which has received less attention but may be even more important. Specifically, many of the L2s involve **unitary sequencers** and this opens the door to advanced computation on (or at least coordinated by) Ethereum. 
+The recent growth of L2 scaling solutions is typically explained in terms of improved speed and reduced cost; however there is an additional benefit which has received less attention but may be even more important. Specifically, many of the L2s involve **unitary sequencers**, opening the door to advanced computation on (or at least coordinated by) Ethereum. 
 
 The key problem has been the difficulty of achieving distributed consensus when nodes/miners are performing computations lacking a single correct answer. Certainly, there is no difficulty for miners to confirm the validity of a hash, but there is no obvious mechanism for the same miners to agree on the 'right' answer of a stochastic gradient decent. Due to the stochastic nature of the algorithm, every miner will arrive at a slightly different answers and all of those will be mathematically correct. Related areas encompass 'verifiable computation' and 'distributed computation'. For the L2s such as Boba, there is no mining and there is only one sequencer, which bypasses the classical barriers to advanced computation in the Ethereum ecosystem. 
 
@@ -80,7 +80,7 @@ Next, a contract that uses Turing is deployed. It is initialized with the addres
 Finally, call Turing:
 
 ```javascript
-//This tests the eth_call pathway by returning a customized greeting for the specified locale. This only requires a passthrough call to the helper contract.
+//This tests the eth_call pathway by returning a customized greeting for the specified locale. This only requires a pass through call to the helper contract.
 bytes memory response = myHelper.TuringCall(0, abi.encode(locale));
 
 //This tests the eth_sendRawTransaction pathway by fetching a personalized greeting string for the user's chosen locale and storing it for later reference.
@@ -126,13 +126,14 @@ A central code snippet is in `TuringHelper.sol`.
   }
 ```
 
-Note how calling `GetResponse()` with `rType=1` triggers the revert, and note how the paratmers and other data needed by Geth are packed into the revert string via `genRequestRLP(methods[method_idx], _slot)`:
+Note how calling `GetResponse()` with `rType=1` triggers the revert, and note how the parameters and other data needed by Geth are packed into the revert string via `genRequestRLP(methods[method_idx], _slot)`:
+
 ```
 if (rType == 1)
     require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
 ``` 
 
-## Preconfigured AWS Lambda code for Testing
+## Pre-configured AWS Lambda code for Testing
 
 ### Trivial Add and Multiply
 
@@ -183,7 +184,7 @@ exports.handler = async (event) => {
 
 ```
 
-### Stableswap re-parametrisation 
+### Stableswap re-parametrization 
 
 Calling 
 
@@ -231,8 +232,3 @@ def lambda_handler(event, context):
     }
 
 ```
-
-
-
-
-
