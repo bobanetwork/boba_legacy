@@ -576,7 +576,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1
-    const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
+    const maxBlock = (await this.options.l1RpcProvider.getBlockNumber()) - 5
     while (startingBlock <= maxBlock) {
       const endBlock = Math.min(
         startingBlock + this.options.getLogsInterval,
