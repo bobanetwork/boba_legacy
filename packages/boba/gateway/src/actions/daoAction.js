@@ -41,7 +41,7 @@ export function delegateVotes({ recipient }) {
 }
 
 export function getProposalThreshold() {
-    return createAction('PROPOSAL/THRESHOLD/GET', () => networkService.getProposalThreshold())
+    return createAction('PROPOSALTHRESHOLD/GET', () => networkService.getProposalThreshold())
 }
 
 export function fetchDaoProposals() {
@@ -52,6 +52,16 @@ export function createDaoProposal(payload) {
     return createAction('PROPOSAL/CREATE', () => networkService.createProposal(payload))
 }
 
+export function queueProposal(proposalID) {
+    return createAction('PROPOSAL/QUEUE', () => networkService.queueProposal(proposalID))
+}
+
+export function executeProposal(proposalID) {
+    return createAction('PROPOSAL/EXECUTE', () => networkService.executeProposal(proposalID))
+}
+
 export function castProposalVote(payload) {
     return createAction('PROPOSAL/CAST/VOTE', () => networkService.castProposalVote(payload))
 }
+
+
