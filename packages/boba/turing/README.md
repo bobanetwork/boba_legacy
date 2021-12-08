@@ -6,7 +6,7 @@
   * [Basic System Architecture](#basic-system-architecture)
   * [Current Limitations: Prototyping use only](#current-limitations--prototyping-use-only)
   * [Hello World](#hello-world)
-  * [Under to hood](#under-to-hood)
+  * [Under the hood](#under-to-hood)
   * [Key code snippets](#key-code-snippets)
   * [Preconfigured AWS Lambda code for Testing](#preconfigured-aws-lambda-code-for-testing)
     + [Trivial Add and Multiply](#trivial-add-and-multiply)
@@ -44,7 +44,7 @@ $ yarn test
 
 ```
 
-## Under to hood
+## Under the hood
 
 When you run `test`, a helper contract (`TuringHelper.sol`) will be deployed.
 
