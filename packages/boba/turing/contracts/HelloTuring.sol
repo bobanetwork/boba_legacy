@@ -10,11 +10,15 @@ interface Helper {
 }
 
 contract HelloTuring {
+
   address public helperAddr;
   Helper myHelper;
 
   mapping (address => string) locales;
   mapping (address => string) cachedGreetings;
+
+  event RegisteringLocale(address sender, string locale);
+  event LocaleBytes(bytes localeBytes);
 
   constructor(address _helper) public {
     console.log("HelloTuring.sol: Deploying a contract with helper address:", _helper);
@@ -42,13 +46,19 @@ contract HelloTuring {
      query for it later.
   */
   function SetMyLocale(string memory locale) public {
+    
     console.log("Registering locale for user:", msg.sender, locale);
+    emit RegisteringLocale(msg.sender, locale);
+    
     bytes memory localebytes = bytes(locale);
-    require(localebytes.length <= 5 && localebytes.length > 0,
-       "Invalid Locale"); // Example uses "EN_US" etc
-
+    emit LocaleBytes(localebytes);
+    
+    require(localebytes.length <= 5 && localebytes.length > 0,"Invalid Locale"); // Example uses "EN_US" etc
+    require(abi.encode(locale).length > 0, "abi.encode broken");
+    
     locales[msg.sender] = locale;
-    bytes memory response =  myHelper.TuringTx(0, abi.encode(locale));
+    
+    bytes memory response = myHelper.TuringTx(0, abi.encode(locale));
     cachedGreetings[msg.sender] = abi.decode(response,(string));
   }
 
@@ -57,7 +67,6 @@ contract HelloTuring {
     public view returns (string memory) {
     string memory greeting = cachedGreetings[msg.sender];
     require (bytes(greeting).length > 0, "No cached greeting string for this user");
-
     return greeting;
   }
 

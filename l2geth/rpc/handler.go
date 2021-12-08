@@ -137,22 +137,27 @@ func (h *handler) handleMsg(msg *jsonrpcMessage) {
 	}
 	h.startCallProc(func(cp *callProc) {
 		// MMDBG 3
-		if msg.Method != "eth_chainId" && 
-			msg.Method != "eth_blockNumber" && 
-			msg.Method != "eth_getBlockByNumber" && 
-			msg.Method != "rollup_getInfo" {
-			log.Debug("TURING handler.go incoming RPC", "msg", msg)
+		if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
+			log.Debug("TURING handler.go potentially relevant incoming RPC", "msg", msg)
 		}
-
+		// if msg.Method != "eth_chainId" && 
+		// 	msg.Method != "eth_blockNumber" && 
+		// 	msg.Method != "eth_getBlockByNumber" && 
+		// 	msg.Method != "rollup_getInfo" {
+		// 	log.Debug("TURING handler.go incoming RPC", "msg", msg)
+		// }
 		answer := h.handleCallMsg(cp, msg)
 		h.addSubscriptions(cp.notifiers)
 		if answer != nil {
 			h.conn.writeJSON(cp.ctx, answer)
-			if msg.Method != "eth_chainId" && 
-				msg.Method != "eth_blockNumber" && 
-				msg.Method != "rollup_getInfo" {
-				log.Debug("TURING writeJSON", "ans", answer)
+			if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
+				log.Debug("TURING handler.go writeJSON", "ans", answer)
 			}
+			// if msg.Method != "eth_chainId" && 
+			// 	msg.Method != "eth_blockNumber" && 
+			// 	msg.Method != "rollup_getInfo" {
+			// 	log.Debug("TURING writeJSON", "ans", answer)
+			// }
 		}
 		for _, n := range cp.notifiers {
 			n.activate()
@@ -350,7 +355,7 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	}
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
 
-	if msg.Method == "eth_call" || msg.Method == "eth_estimateGas" {
+	if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
 	  log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // , "CallArgs", args[0].Interface())
 	}
 

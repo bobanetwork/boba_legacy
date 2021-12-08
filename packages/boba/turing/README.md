@@ -129,5 +129,61 @@ $ python app.py
 in the `classifer` directory.
 
 
+## Sequence of events
+
+0/ Basic setup
+
+Deploy the helper contract
+
+```javascript
+Factory__Helper = new ContractFactory(
+      (TuringHelper.abi),
+      (TuringHelper.bytecode),
+      testWallet)
+```
+
+Set the compute URL endpoint that will be called and register the method (e.g. `hello`) 
+
+```javascript
+    //defines the URL that will be called by HelloTuring.sol
+    helper = await Factory__Helper.deploy(urlStr, gasOverride)
+    
+    console.log("    Helper contract deployed as", helper.address, "on", "L2")
+
+    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello")));
+```
+
+and finally deploy your contract that uses Turing
+
+```javascript    
+    Factory__Hello = new ContractFactory(
+      (HelloTuringJson.abi),
+      (HelloTuringJson.bytecode),
+      testWallet)
+    
+    hello = await Factory__Hello.deploy(helper.address, gasOverride)
+```
+
+1/ Call a function that uses Turing
+
+```javascript
+//This tests the eth_call pathway by returning a customized greeting for the specified locale. This only requires a passthrough call to the helper contract.
+bytes memory response = myHelper.TuringCall(0, abi.encode(locale));
+
+//This tests the eth_sendRawTransaction pathway by fetching a personalized greeting string for the user's chosen locale and storing it for later reference.
+bytes memory response =  myHelper.TuringTx(0, abi.encode(locale));
+```
+
+1/ Incoming RPC request
+
+l2geth/rpc/handler.go
+
+TURING handler.go incoming RPC - looks at msg.Method - we only care about either `eth_call` or `eth_sendRawTransaction`. 
+
+
+
+
+
+
 
 

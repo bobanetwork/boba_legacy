@@ -19,7 +19,15 @@ contract TuringHelper {
   }
 
   function RegisterMethod(bytes memory methodName) public {
+    //require (bytes1(methodName[0]) == bytes1("h"), "Method != start with h");
     methods.push(methodName);
+  }
+
+  function GetMethod(uint32 method_idx) 
+    public view returns (bytes memory) 
+  {
+    require (method_idx < methods.length, "IDX not in methods[]");
+    return methods[method_idx];
   }
 
   function _lenCalc1(bytes memory item, uint32 len) internal pure
@@ -42,8 +50,8 @@ contract TuringHelper {
     return (prefix, len);
   }
 
-  function genRequestRLP(bytes memory method, bytes memory payload) internal view
-  returns (bytes memory)
+  function genRequestRLP(bytes memory method, bytes memory payload) 
+    internal view returns (bytes memory)
   {
     // This function generates a Turing request consisting of a
     // fixed prefix string followed by parameters in RLP encoding.
@@ -55,8 +63,8 @@ contract TuringHelper {
     // For now this is the only valid value and all others are reserved.
     byte request_version = 0x01;
 
-    bytes memory prefix = bytes("_TURING_");
-    assert (prefix.length == 8);
+    bytes memory prefix = bytes("TURING_");
+    assert (prefix.length == 7);
     uint i;
     uint j;
 
@@ -146,27 +154,33 @@ contract TuringHelper {
   }
 
   /* This is the interface to the off-chain mechanism. Although
-     marked as "public", it is only to be called by TuringCall().
-     The _slot parameters is overloaded to represent either the
+     marked as "public", it is only to be called by TuringCall() 
+     or TuringTX().
+     The _slot parameter is overloaded to represent either the
      request parameters or the off-chain response, with the rType
-     parameter indicating which is which. When called as a request,
-     it reverts with an encoded TURING string. The modified
-     l2geth intercepts this, performs the off-chain interaction,
-     then rewrites the parameters and calls the method again in
-     "response" mode. This response is then passed back to the
-     caller.
+     parameter indicating which is which. 
+     When called as a request (rType == 1), it reverts with 
+     an encoded TURING string. 
+     The modified l2geth intercepts this special revert, 
+     performs the off-chain interaction, then rewrites the parameters 
+     and calls the method again in "response" mode (rType == 2). 
+     This response is then passed back to the caller.
   */
   function GetResponse(uint32 method_idx, uint32 rType, bytes memory _slot)
     public view returns (bytes memory) {
 
-    require (msg.sender == address(this));
-    require (rType == 1 || rType == 2); // l2geth can pass 0 here to indicate an error
-    require (_slot.length > 0);
+    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+    require (method_idx < methods.length, "Turing:GetResponse:method not registered");
+    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
+    require (_slot.length > 0, "Turing:GetResponse:_slot.length == 0");
 
-    if (rType != 2) {
-    	// The if() avoids calling genRequestRLP unnecessarily
-    	require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
+    if (rType == 1) {
+      // knock knock - wake up the l2geth
+      // force a revert
+      // the if() avoids calling genRequestRLP unnecessarily
+      require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
     }
+    //if (rType == 2) -> the l2geth has obtained fresh data for us
     return _slot;
   }
 
@@ -181,8 +195,8 @@ contract TuringHelper {
   */
   function TuringCall(uint32 method_idx, bytes memory _payload)
     public view returns (bytes memory) {
-      require (method_idx < methods.length, "Method not registered");
-      require (_payload.length > 0, "Payload length was 0");
+      require (method_idx < methods.length, "Turing:TuringCall:method not registered");
+      require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
 
       /* Initiate the request. This can't be a local function call
          because that would stay inside the EVM and not give l2geth
@@ -200,8 +214,11 @@ contract TuringHelper {
   */
   function TuringTx(uint32 method_idx, bytes memory _payload)
     public returns (bytes memory) {
-      require (method_idx < methods.length, "Method not registered");
-      require (_payload.length > 0, "Payload length was 0");
+
+      bytes memory pl = abi.encode("FR");
+
+      require (method_idx < methods.length, "Turing:TuringTx:method not registered");
+      require (_payload.length > 0, "Turing:TuringTx:payload length == 0");
 
       /* Initiate the request. This can't be a local function call
          because that would stay inside the EVM and not give l2geth

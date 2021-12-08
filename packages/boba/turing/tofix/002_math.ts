@@ -11,9 +11,13 @@ const cfg = hre.network.config
 const hPort = 1234 // Port for local HTTP server
 var urlStr
 
+//const gasOverride = {} // Can specify e.g. {gasPrice:0, gasLimit:999999} if needed
+
 const gasOverride =  {
   //gasLimit:999999,
   //gasPrice:0,
+  //gas: 4698712, 
+  //gasLimit:999999
 } // if needed
 
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
@@ -82,6 +86,60 @@ describe("Hello World", function () {
             res.end(JSON.stringify(jResp))
             server.emit('success', body);
           } 
+          // else if (jBody.method === "add2") {
+
+          //   let v1 = jBody.params[0]
+
+          //   const args = abiDecoder.decodeParameters(['uint256', 'uint256'], v1)
+
+          //   let sum = Number(args['0']) + Number(args['1'])
+
+          //   res.writeHead(200, { 'Content-Type': 'application/json' });
+          //   console.log("      (HTTP) Returning off-chain response:", args, "->", sum)
+          //   var jResp2 = {
+          //     "jsonrpc": "2.0",
+          //     "id": jBody.id,
+          //     "result": abiDecoder.encodeParameter('uint256', sum)
+          //   }
+          //   res.end(JSON.stringify(jResp2))
+          //   server.emit('success', body);
+          // } else if (jBody.method === "mult2") {
+          //   let v1 = jBody.params[0]
+
+          //   const args = abiDecoder.decodeParameters(['uint256', 'uint256'], v1)
+
+          //   let product = Number(args['0']) * Number(args['1'])
+
+          //   res.writeHead(200, { 'Content-Type': 'application/json' });
+          //   console.log("      (HTTP) Returning off-chain response:", args, "->", product);
+          //   var jResp2 = {
+          //     "jsonrpc": "2.0",
+          //     "id": jBody.id,
+          //     "result": abiDecoder.encodeParameter('uint256', product)
+          //   }
+          //   res.end(JSON.stringify(jResp2));
+          //   server.emit('success', body);
+          // } else if (jBody.method == "catOrDog") {
+          //   let v1 = jBody.params[0]
+
+          //   const args = abiDecoder.decodeParameters(['string'], v1);
+
+          //   let classification = await (async () => {
+          //     let response = await fetch('http://127.0.0.1:8123/api', {method:'POST', body:JSON.stringify({"url":args['0']})})
+          //     response = await response.json();
+          //     return response.class
+          //   })();
+
+          //   res.writeHead(200, { 'Content-Type': 'application/json' });
+          //   console.log("      (HTTP) Returning off-chain response:", args['0'], "->", classification);
+          //   var jResp2 = {
+          //     "jsonrpc": "2.0",
+          //     "id": jBody.id,
+          //     "result": abiDecoder.encodeParameter('string', classification)
+          //   }
+          //   res.end(JSON.stringify(jResp2));
+          //   server.emit('success', body);
+          // }
           else {
             res.writeHead(400, { 'Content-Type': 'text/plain' })
             res.end('Unknown method')
@@ -111,6 +169,9 @@ describe("Hello World", function () {
     console.log("    Helper contract deployed as", helper.address, "on", "L2")
     
     await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello")))
+    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("add2")));
+    // await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("mult2")));
+    // await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("catOrDog")));
     
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
@@ -124,12 +185,18 @@ describe("Hello World", function () {
 
 
   it("should correctly register one or more methods", async () => {
+    //let reg = await helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello"))
     let method = await helper.GetMethod(0)
     expect(method).to.equal(ethers.utils.formatBytes32String("hello").slice(0,12))
+
+    //reg = await helper.RegisterMethod(ethers.utils.toUtf8Bytes("add2"))
+    method = await helper.GetMethod(1)
+    expect(method).to.equal(ethers.utils.formatBytes32String("add2").slice(0,10))
   })
 
   it("should return the URL from the helper", async () => {
     let url = await helper.data_URL()
+    //console.log("URL:",url)
     expect(url.slice(0,32)).to.equal(ethers.utils.formatBytes32String(urlStr).slice(0,32))
   })
 
@@ -177,20 +244,35 @@ describe("Hello World", function () {
     //expect(rawData.toString()).to.contain("426f6e6a6f7572206c65206d6f6e6465") // "Bonjour le monde" as hex
   })
   
-  it("should return the expected personal greeting", async () => {
-    let msg1 = hello.PersonalGreeting(gasOverride)
-    expect(await msg1).to.equal("Bonjour le monde")
-  })
+  // it("should return the expected personal greeting", async () => {
+  //   let msg1 = hello.PersonalGreeting(gasOverride)
+  //   expect(await msg1).to.equal("Bonjour le monde")
+  // })
   
-  it("should allow the user to change their locale", async () => {
-    let loc2 = await hello.SetMyLocale("EN_GB", gasOverride)
-    expect(await loc2.wait()).to.be.ok
-  })
+  // it("should allow the user to change their locale", async () => {
+  //   let loc2 = await hello.SetMyLocale("EN_GB", gasOverride)
+  //   expect(await loc2.wait()).to.be.ok
+  // })
   
-  it("should now return a different personal greeting", async () => {
-    let msg2 = hello.PersonalGreeting(gasOverride)
-    expect(await msg2).to.equal("Top of the Morning")
-  })
-  
+  // it("should now return a different personal greeting", async () => {
+  //   let msg2 = hello.PersonalGreeting(gasOverride)
+  //   expect(await msg2).to.equal("Top of the Morning")
+  // })
+  // it("should support numerical datatypes", async () => {
+  //   let sum = hello.AddNumbers(20, 22)
+  //   expect(await sum).to.equal(42)
+  // })
+  // it("should support numerical multiplication", async () => {
+  //   let product = hello.MultNumbers(5, 5);
+  //   expect(await product).to.equal(25);
+  // })
+  // // The "classifier" test is broken, relying on a local service which is not launched by the test harness.
+  // it.skip("should correctly classfify the image of dog or cat", async () => {
+  //   let dogClassification = hello.isCatOrDog("https://i.insider.com/5484d9d1eab8ea3017b17e29?width=1300&format=jpeg&auto=webp");
+  //   expect(await dogClassification).to.equal('dog');
+
+  //   let catClassification = hello.isCatOrDog("https://c.files.bbci.co.uk/12A9B/production/_111434467_gettyimages-1143489763.jpg");
+  //   expect(await catClassification).to.equal('cat');
+  // })
 })
 

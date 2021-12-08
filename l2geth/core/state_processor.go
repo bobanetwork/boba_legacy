@@ -121,7 +121,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		"err", err, 
 		"gas", gas, 
 		"result", hexutil.Bytes(result), 
-		"turing", bytes.Contains(result, []byte("_TURING_")))
+		"turing", bytes.Contains(result, []byte("TURING_")))
 
 	if err != nil {
 		return nil, err

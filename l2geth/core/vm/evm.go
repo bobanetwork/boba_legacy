@@ -230,6 +230,11 @@ func (evm *EVM) Interpreter() Interpreter {
 
 func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 
+	// log.Debug ("TURING bobaTuringCall", 
+	// 	"prefix", prefix, 
+	// 	"rest", rest, 
+	// 	"rlen", rlen)
+
 	var responseStringEnc string
 	var responseString []byte
 	var reqFields [4]string
@@ -238,7 +243,7 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	copy(prefix,oldValue[0:4])
 
 	// If decoding fails, we'll return a "0" parameter which should fail a
-	// "require" in the contract without generating another OMGX_TURING marker.
+	// "require" in the contract without generating another TURING marker.
 	// FIXME - would be cleaner to return nil here and put better error handling
 	// into l2geth to avoid that second call into the contract.
 
@@ -249,31 +254,31 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	bad := append(prefix, method_idx...)
 	bad = append(bad, hexutil.MustDecode(fmt.Sprintf("0x%064x", 0))...)
 
-	log.Debug ("TURING decode oldValue", "prefix", prefix, "rest", rest, "rlen", rlen)
+	log.Debug ("TURING-1 bobaTuringCall:Decode oldValue", "prefix", prefix, "rest", rest, "rlen", rlen)
 
 	if (rlen < 128) {
-		log.Warn("TURING Unexpected oldValue in bobaTuringCall", "len < 128", rlen)
+		log.Warn("TURING-2 bobaTuringCall:Unexpected oldValue in bobaTuringCall", "len < 128", rlen)
 		return bad
 	}
 
 	rType_big := new(big.Int).SetBytes(rest[32:64]) // 1 for Request, 2 for Response
 	rType := int(rType_big.Uint64())
 	if (rType != 1) {
-		log.Warn("TURING unexpected oldValue in bobaTuringCall", "rType", rType)
+		log.Warn("TURING-3 bobaTuringCall:Unexpected oldValue in bobaTuringCall", "rType", rType)
 		return bad
 	}
 
 	if err := rlp.Decode(bytes.NewReader(reqString), &reqFields); err != nil {
-		log.Warn("TURING RLP decoding failed", "err", err)
+		log.Warn("TURING-4 bobaTuringCall:RLP decoding failed", "err", err)
 		return bad
 	} else {
-		log.Debug("TURING RLP decoded OK", "reqFields", reqFields)
+		log.Debug("TURING-5 bobaTuringCall:RLP decoded OK", "reqFields", reqFields)
 	}
 
 	reqVer := reqFields[0]
 
 	if reqVer != "\x01" {
-		log.Warn("TURING Unexpected request version", "ver", hexutil.Bytes(reqVer))
+		log.Warn("TURING-6 bobaTuringCall:Unexpected request version", "ver", hexutil.Bytes(reqVer))
 		return bad
 	}
 	reqUrl := reqFields[1]
@@ -289,32 +294,34 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	turingCache.lock.Unlock()
 
 	if ret != nil {
-		log.Debug("TURING turingCache hit for", "key", reqValue)
+		log.Debug("TURING-7 bobaTuringCall:TuringCache hit for", "key", reqValue)
 		return ret
 	}
 
 	client,err := rpc.Dial(reqUrl)
 	if client != nil {
-		log.Debug("TURING Calling off-chain client at", "url", reqFields[1])
+		log.Debug("TURING-8 bobaTuringCall:Calling off-chain client at", "url", reqFields[1])
 		if err := client.Call(&responseStringEnc, reqMethod, hexutil.Bytes(reqValue)); err != nil {
-			log.Warn("TURING client error", "err", err)
+			log.Warn("TURING-9 bobaTuringCall:Client error", "err", err)
 			return bad
 		}
 		responseString, err = hexutil.Decode(responseStringEnc)
 		if err != nil {
-			log.Warn("TURING error decoding responseString", "err", err)
+			log.Warn("TURING-10 bobaTuringCall:Error decoding responseString", "err", err)
 			return bad
 		}
 	} else {
-		log.Warn("TURING Failed to create client for off-chain request", "err", err)
+		log.Warn("TURING-11 bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		return bad
 	}
 
-	log.Debug("TURING Generating Turing response", "Request", reqValue, "Response", responseString)
+	log.Debug("TURING-12 bobaTuringCall:Generating Turing response", 
+		"Request", reqValue, 
+		"Response", responseString)
 
 	rsLen := len(responseString)
 
-	new_val := hexutil.MustDecode(fmt.Sprintf("0x%064x", rsLen))
+	new_val := hexutil.MustDecode(fmt.Sprintf("0x%064x", rsLen)) 
 	rsBytes := []byte(responseString)
 	new_val = append(new_val, rsBytes...)
 
@@ -328,7 +335,7 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", 96))...)
 	ret = append(ret, new_val...)
 
-	log.Debug("TURING Modified parameters", "newValue", ret)
+	log.Debug("TURING-13 bobaTuringCall:Modified parameters", "newValue", ret)
 
 	turingCache.lock.Lock()
 	turingCache.key = reqValue
@@ -336,7 +343,7 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	turingCache.value = ret
 	turingCache.lock.Unlock()
 
-	log.Debug("TURING turingCache entry stored for", "key", reqValue)
+	log.Debug("TURING-14 bobaTuringCall:TuringCache entry stored for", "key", reqValue)
 	return ret
 }
 
@@ -417,7 +424,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	if err != nil {
 		if ! bytes.HasPrefix(contract.CodeAddr.Bytes(), deadPrefix) {
-			isTuring := bytes.Contains(ret, []byte("_TURING_"))
+			isTuring := bytes.Contains(ret, []byte("TURING_"))
 			log.Debug("TURING evm.go run result", 
 				"err", err, 
 				"ret", hexutil.Bytes(ret), 
@@ -427,7 +434,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 			if isTuring /*&& UsingOVM - rcfg.UsingOVM */ {
 
-				ii := bytes.Index(ret, []byte("_TURING_"))
+				ii := bytes.Index(ret, []byte("TURING_"))
 				
 				rest := ret[ii+12:]
 
@@ -441,7 +448,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 					"ret", hexutil.Bytes(ret), 
 					"new_in", hexutil.Bytes(new_in), 
 					"contract", contract.CodeAddr, 
-					"turing", bytes.Contains(ret, []byte("_TURING_")))
+					"turing", bytes.Contains(ret, []byte("TURING_")))
 			}
 		}
 	}
