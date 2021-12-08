@@ -123,12 +123,18 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _l2NFTBridge
     )
         public
+        onlyOwner()
+        initializer()
     {
         require(messenger == address(0), "Contract has already been initialized.");
         messenger = _l1messenger;
         l2NFTBridge = _l2NFTBridge;
         owner = msg.sender;
         configureGas(1400000);
+
+        __Context_init_unchained();
+        __Pausable_init_unchained();
+        __ReentrancyGuard_init_unchained();
     }
 
     /***
@@ -366,5 +372,23 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 emit NFTWithdrawalFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
             }
         }
+    }
+
+    /******************
+     *      Pause     *
+     ******************/
+
+    /**
+     * Pause contract
+     */
+    function pause() external onlyOwner() {
+        _pause();
+    }
+
+    /**
+     * UnPause contract
+     */
+    function unpause() external onlyOwner() {
+        _unpause();
     }
 }

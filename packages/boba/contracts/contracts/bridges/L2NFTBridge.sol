@@ -46,6 +46,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     address public owner;
     address public l1NFTBridge;
     uint256 public extraGasRelay;
+    uint32 public DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS;
 
     enum Network { L1, L2 }
 
@@ -110,11 +111,33 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _l1NFTBridge
     )
         public
+        onlyOwner()
+        initializer()
     {
         require(messenger == address(0), "Contract has already been initialized.");
         messenger = _l2CrossDomainMessenger;
         l1NFTBridge = _l1NFTBridge;
         owner = msg.sender;
+        configureGas(100000);
+
+        __Context_init_unchained();
+        __Pausable_init_unchained();
+        __ReentrancyGuard_init_unchained();
+    }
+
+    /**
+     * Configure gas.
+     *
+     * @param _l1GasFee default finalized withdraw L1 Gas
+     */
+    function configureGas(
+        uint32 _l1GasFee
+    )
+        public
+        onlyOwner()
+        onlyInitialized()
+    {
+        DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS = _l1GasFee;
     }
 
     /**
@@ -385,15 +408,15 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 // Send message up to L1 bridge
                 sendCrossDomainMessage(
                     l1NFTBridge,
-                    0,
+                    DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS,
                     message
                 );
                 emit DepositFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
             }
         } else {
-            // needs to verify comes from correct l2Contract
+            // needs to verify comes from correct l1Contract
             require(exits[_l2Contract][_tokenId] == _l1Contract, "Incorrect Deposit");
-            // When a deposit is finalized on L2, the L2 Bridge transfers the funds to the depositer
+            // When a deposit is finalized on L2, the L2 Bridge transfers the NFT to the depositer
             IERC721(_l2Contract).safeTransferFrom(
                 address(this),
                 _to,
@@ -401,5 +424,23 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             );
             emit DepositFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
         }
+    }
+
+    /******************
+     *      Pause     *
+     ******************/
+
+    /**
+     * Pause contract
+     */
+    function pause() external onlyOwner() {
+        _pause();
+    }
+
+    /**
+     * UnPause contract
+     */
+    function unpause() external onlyOwner() {
+        _unpause();
     }
 }
