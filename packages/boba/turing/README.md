@@ -14,7 +14,7 @@
     
 ## What is Turing?
 
-Boba's **Turing** is a system for _hybrid compute_, defined as enabling Solidity smart contracts to interact with conventional compute endpoints via a modified L2 Geth.  Unlike Bitcoin, Ethereum is both a blockchain and a general-purpose computer. Sustained (and increasing) demand for Ethereum is congesting the network and, indirectly, makes it extremely expensive to use Ethereum for anything but trivial computation. Beyond limited speed and memory, and extreme cost, the architecture of the Ethereum EVM was never designed for, and is therefore not well suited for, contemporary algorithms from finance, algorithmic trading, artificial intelligence, creative content, audio and film, games, and computer science.
+Boba's **Turing** is a system for _hybrid compute_, defined as enabling Solidity smart contracts to interact with conventional compute endpoints via a modified L2 Geth.  Unlike Bitcoin, Ethereum is both a blockchain and a general-purpose computer. Sustained (and increasing) demand for Ethereum is congesting the network and, indirectly, makes it extremely expensive to use Ethereum for anything but trivial computation. Beyond limited speed and memory, and extreme cost, the architecture of the Ethereum EVM was never designed for, and is therefore not well suited for, contemporary algorithms from finance, algorithmic trading, artificial intelligence, creative content, audio and film, games, and computer science. Turing is designed to address these limitations. 
 
 ## Technical Backdrop
 
