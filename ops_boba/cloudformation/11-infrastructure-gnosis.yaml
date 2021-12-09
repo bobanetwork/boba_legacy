@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Gnosis-safe Application Infrastructure"
+
+Parameters:
+
+  EcsImageId:
+    # TODO: Implement automatic update or notifications: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS-AMI-SubscribeTopic.html
+    Description: Image ID for running the ECS Cluster instances
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
+
+  EcsInstanceType:
+    # https://aws.amazon.com/ec2/instance-types/
+    # The types of instances is limited to avoid mistakes generating huge costs by putting the wrong instance type.
+    Description: Type of instances to be added to the ECS cluster
+    Type: String
+    Default: t3a.xlarge
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-core
+
+Resources:
+
+  LoadBalancerGnosisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} External LB"
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8000
+        ToPort: 8000
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIpv6: ::/0
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Gnosis-LB"
+
+  LoadBalancerGnosis:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '3600'
+      Type: application
+      SecurityGroups:
+        - !Ref LoadBalancerGnosisSecurityGroup
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+
+  EcsInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [!Sub "ec2.${AWS::URLSuffix}"]
+          Action: ["sts:AssumeRole"]
+      Policies:
+        - PolicyName: AllowAccessToELB
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:*"
+                  - "ec2:Describe*"
+                  - "s3:*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticfilesystem:ClientMount"
+                  - "elasticfilesystem:ClientRootAccess"
+                  - "elasticfilesystem:ClientWrite"
+                  - "elasticfilesystem:DescribeMountTargets"
+                Resource: "*"
+
+  EcsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref EcsInstanceRole]
+
+  EcsSecurityGroupGnosis:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "SG for ${AWS::StackName} Landscape ECS Cluster Gnosis"
+      VpcId:
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
+      SecurityGroupIngress:
+      - Description: Allow all traffic
+        IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Gnosis-ECS-Cluster"
+
+  EcsLaunchConfigurationGnosis:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            '/etc/ecs/ecs.config':
+              content: !Sub |
+                ECS_CLUSTER=${EcsCluster}
+                ECS_ENABLE_TASK_IAM_ROLE=true
+                ECS_CONTAINER_STOP_TIMEOUT=5s
+              mode: "000644"
+              owner: root
+              group: root
+    Properties:
+      InstanceType: !Ref EcsInstanceType
+      SecurityGroups:
+      - !Ref EcsSecurityGroupGnosis
+      IamInstanceProfile: !Ref EcsInstanceProfile
+      ImageId: !Ref EcsImageId
+      UserData:
+        Fn::Base64: !Sub |
+            #!/bin/bash -ex
+            yum -y install aws-cfn-bootstrap amazon-ssm-agent amazon-efs-utils
+            systemctl enable --now amazon-ssm-agent
+            echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbEgniumTWAjZjw7vgcMCrHALO7KcjXHo3I09ulp7ufd1jpk/0PCAPwRqURLZWujjkB/OGto8W/YqCF7F5s3VJvC5lq0Sbbmagyz7obTYRVBNA656wdw2T6udHoci26kQEJoEZCHjlnCnPnNC1IkiJMwjbXivcVdUeCuFaUREWqOB5qPDEoG3xfKqHF1qlVhuuI/Q14AsgUGtMNKQyuR97k/pL2KncTTIg1Ev2pMm3/4sND5TFtX907LNEz1fu1JQqpM/fXUM/a+rlREaBj+2+nWC37+TFjd3WWvohdMEljRGH8JnTcYU5hvfdZV62pLgNjz0LPAn+tLugwacbGy6J chenboyuan@Macbook.hsd1.va.comcast.net" > /home/ec2-user/.ssh/authorized_keys
+            mkdir -p /mnt/efs /mnt/efs/db
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EcsLaunchConfigurationGnosis --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroupGnosis --region ${AWS::Region} || true
+  AutoScalingGroupGnosis:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref EcsLaunchConfigurationGnosis
+      MetricsCollection:
+      - Granularity: 1Minute
+        Metrics:
+        - GroupTotalInstances
+      MinSize: 1
+      MaxSize: 1
+      DesiredCapacity: 1
+      VPCZoneIdentifier:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Gnosis-ECS"
+          PropagateAtLaunch: true
+Outputs:
+  EcsCluster:
+    Value: !Ref EcsCluster
+    Export:
+      Name: !Sub "${InfrastructureStackName}:EcsClusterGnosis"
+  EcsSecurityGroupGnosis:
+    Value: !Ref EcsSecurityGroupGnosis
+    Export:
+      Name: !Sub "${InfrastructureStackName}:EcsSecurityGroupGnosis"
+  LoadBalancerGnosisDNSName:
+    Value: !GetAtt LoadBalancerGnosis.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+  LoadBalancerGnosisArn:
+    Value: !Ref LoadBalancerGnosis
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+  LoadBalancerGnosisSecurityGroup:
+    Value: !Ref LoadBalancerGnosisSecurityGroup
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"

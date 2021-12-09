@@ -1,0 +1,564 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Enya Gnosis-Safe Application Deployment"
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  ServiceCount:
+    Type: Number
+    Default: 1
+
+  ImageTag:
+    Type: String
+    Default: push2aws
+
+  DockerPrefix:
+    Type: String
+    Default: bobanetwork
+
+  InfrastructureStackName:
+    Description: Infrastructure stack to associate this stack with
+    Type: String
+    Default: infrastructure-coredev
+
+Conditions:
+  IsProduction:
+    !Equals [!Ref EnvironmentName, "production"]
+
+Resources:
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ecs-tasks.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowAccessToS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetBucketLocation"
+                Resource: !Sub
+                    - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+                    - S3BucketV2:
+                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
+  DNSRecordV4Gnosis:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      AliasTarget:
+        DNSName:
+          Fn::Sub:
+            - "dualstack.${DomainName}."
+            - DomainName:
+                Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+        HostedZoneId:
+          Fn::ImportValue: !Sub "${InfrastructureStackName}:Route53HostedZoneID"
+      HostedZoneName:
+        Fn::Sub:
+          - "${DomainName}."
+          - DomainName:
+              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+      Name:
+        Fn::Sub:
+          - "safe.${DomainName}."
+          - DomainName:
+              Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+
+  GnosisLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckIntervalSeconds: 20
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 10
+      Matcher:
+        HttpCode: 200
+
+  GnosisLBTargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8000
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckIntervalSeconds: 20
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 10
+      Matcher:
+        HttpCode: 200
+
+  GnosisListener1:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup
+
+  GnosisListener2:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 8000
+      Protocol: HTTP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup2
+
+  GnosisListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup
+
+  GnosisListener2:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 8000
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup2
+
+  GnosisLBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GnosisLBTargetGroup
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+             Values:
+               - !Ref DNSRecordV4Gnosis
+      ListenerArn: !Ref GnosisListener
+      Priority: 1
+
+  GnosisLBListenerRule2:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GnosisLBTargetGroup2
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+             Values:
+               - !Ref DNSRecordV4Gnosis
+      ListenerArn: !Ref GnosisListener2
+      Priority: 1
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Volumes:
+        - Name: nginx
+          Host:
+            SourcePath: "/mnt/nginx"
+      ContainerDefinitions:
+        - Image: !Sub "${DockerPrefix}/nginx-safe-transaction-service:latest"
+          Name: nginx-safe-transaction-service
+          PortMappings:
+            - ContainerPort: 8000
+              HostPort: 0
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["nginx-safe-transaction-service"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "nginx-safe-transaction-service", "service": "nginx-safe-transaction-service"}]'
+          Essential: true
+          Memory: "1024"
+        - Image: !Sub "${DockerPrefix}/nginx-safe-config-service:latest"
+          Name: nginx-safe-config-service
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 0
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONDONTWRITEBYTECODE
+              Value: true
+            - Name: DEBUG
+              Value: true
+            - Name: ROOT_LOG_LEVEL
+              Value: DEBUG
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: GUNICORN_BIND_PORT
+              Value: 8000
+            - Name: DOCKER_NGINX_VOLUME_ROOT
+              Value: /nginx
+            - Name: GUNICORN_BIND_SOCKET
+              Value: unix:/nginx/gunicorn.socket
+            - Name: NGINX_HOST_PORT
+              Value: 8080
+            - Name: NGINX_ENVSUBST_OUTPUT_DIR
+              Value: /etc/nginx/
+            - Name: GUNICORN_WEB_RELOAD
+              Value: false
+            - Name: CGW_URL
+              Value: http://127.0.0.1
+            - Name: DEFAULT_FILE_STORAGE
+              Value: django.core.files.storage.FileSystemStorage
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["nginx-safe-config-service"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "nginx-safe-config-service", "service": "nginx-safe-config-service"}]'
+          Essential: true
+          Memory: "1024"
+        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+          Name: safe-transaction-service
+          PortMappings:
+            - ContainerPort: 8888
+              HostPort: 0
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONPATH
+              Value: /app/
+            - Name: DJANGO_SETTINGS_MODULE
+              Value: config.settings.local
+            - Name: C_FORCE_ROOT
+              Value: true
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: ETHEREUM_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_TRACING_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: REDIS_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/0"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: CELERY_BROKER_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/1"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+          Command:
+            - "./docker/web/run_web.sh"
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-transaction-service"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
+          Essential: true
+          Memory: "2500"
+          Links:
+            - worker
+            - scheduler
+        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+          Name: worker
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONPATH
+              Value: /app/
+            - Name: DJANGO_SETTINGS_MODULE
+              Value: config.settings.local
+            - Name: C_FORCE_ROOT
+              Value: true
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: ETHEREUM_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_TRACING_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: REDIS_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/0"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: CELERY_BROKER_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/1"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+          Command:
+            - "./docker/web/celery/worker/run.sh"
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["worker"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
+          Essential: true
+          Memory: "2500"
+        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+          Name: scheduler
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONPATH
+              Value: /app/
+            - Name: DJANGO_SETTINGS_MODULE
+              Value: config.settings.local
+            - Name: C_FORCE_ROOT
+              Value: true
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: ETHEREUM_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_TRACING_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: REDIS_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/0"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: CELERY_BROKER_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/1"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+          Command:
+            - "./docker/web/celery/scheduler/run.sh"
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["worker"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
+          Essential: true
+          Memory: "2500"
+        - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
+          Name: safe-client-gateway
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: CONFIG_SERVICE_URI
+              Value: !Sub
+                - "http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: FEATURE_FLAG_NESTED_DECODING
+              Value: true
+            - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
+              Value: false
+            - Name: SCHEME
+              Value: http
+            - Name: ROCKET_LOG_LEVEL
+              Value: debug
+            - Name: RUST_LOG
+              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
+            - Name: LOG_ALL_ERROR_RESPONSES
+              Value: true
+            - Name: VPC_TRANSACTION_SERVICE_URI
+              Value: true
+            - Name: CONCURRENT_BALANCE_TOKEN_REQUESTS
+              Value: 5
+            - Name: INTERNAL_CLIENT_CONNECT_TIMEOUT
+              Value: 10000
+            - Name: SAFE_APP_INFO_REQUEST_TIMEOUT
+              Value: 10000
+            - Name: CHAIN_INFO_REQUEST_TIMEOUT
+              Value: 15000
+            - Name: EXCHANGE_API_BASE_URI
+              Value: http://api.exchangeratesapi.io/latest
+            - Name: REDIS_URI
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: ROCKET_PORT
+              Value: 3666
+            - Name: ROCKET_ADDRESS
+              Value: 0.0.0.0
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-client-gateway"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
+          Essential: true
+          Memory: "2000"
+        - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
+          Name: safe-config-service
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONDONTWRITEBYTECODE
+              Value: true
+            - Name: DEBUG
+              Value: true
+            - Name: ROOT_LOG_LEVEL
+              Value: DEBUG
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: GUNICORN_BIND_PORT
+              Value: 8000
+            - Name: DOCKER_NGINX_VOLUME_ROOT
+              Value: /nginx
+            - Name: GUNICORN_BIND_SOCKET
+              Value: unix:/nginx/gunicorn.socket
+            - Name: NGINX_HOST_PORT
+              Value: 8080
+            - Name: NGINX_ENVSUBST_OUTPUT_DIR
+              Value: /etc/nginx/
+            - Name: GUNICORN_WEB_RELOAD
+              Value: false
+            - Name: CGW_URL
+              Value: http://127.0.0.1
+            - Name: DEFAULT_FILE_STORAGE
+              Value: django.core.files.storage.FileSystemStorage
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-config-service"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
+          Essential: true
+          Memory: "2000"
+        - Image: !Sub "${DockerPrefix}/safe-react:${ImageTag}"
+          Name: safe-react
+          PortMappings:
+            - ContainerPort: 3000
+              HostPort: 0
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: REACT_APP_NETWORK
+              Value: BOBA_RINKEBY
+            - Name: NODE_ENV
+              Value: test
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-react"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
+          Essential: true
+          Memory: "1500"
+      NetworkMode: bridge
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
+      Family: !Sub "Gnosis-${EnvironmentName}"
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: GnosisLBListenerRule
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterGnosis"
+      LoadBalancers:
+        - ContainerName: nginx-safe-config-service
+          ContainerPort: 80
+          TargetGroupArn: !Ref GnosisLBTargetGroup
+        - ContainerName: nginx-safe-transaction-service
+          ContainerPort: 8000
+          TargetGroupArn: !Ref GnosisLBTargetGroup2
+      DesiredCount: !Ref ServiceCount
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
+      ServiceName: "gnosis-safe"
+      TaskDefinition: !Ref TaskDefinition

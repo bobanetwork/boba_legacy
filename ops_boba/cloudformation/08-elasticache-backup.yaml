@@ -51,7 +51,8 @@ Resources:
   RedisSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: vpc-03cc2bb8f0fed88b8
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId
       GroupDescription: Enable Redis access
       SecurityGroupIngress:
         - IpProtocol: tcp

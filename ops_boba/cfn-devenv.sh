@@ -545,18 +545,30 @@ function destroy_dev_services {
       }
 
       function list_clusters {
-          ECS_CLUSTERS=$(aws ecs list-clusters --region ${REGION}|grep infrastructure-application|cut -d/ -f2|sed 's#"##g'|sed 's#,##g')
-          for ecs in $ECS_CLUSTERS; do
-          ecs_short=$(echo $ecs|sed 's#-infrastructure-application.*##')
-          URL=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:DomainName\`].Value" --no-paginate --output text)
-          STACK_NAME=$(echo $ecs|sed 's#-infrastructure-application.*##')
-          ELB_INT=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerInt:DNSName\`].Value" --no-paginate --output text)
-          ELB_L2=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancer:DNSName\`].Value" --no-paginate --output text)
-          ELB_REPLICA_L2=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerReplica:DNSName\`].Value" --no-paginate --output text)
-          ELB_REPLICA_DTL=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:LoadBalancerReplicaDTL:DNSName\`].Value" --no-paginate --output text)
-          REPLICA_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterReplica\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
-          VERIFIER_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`${ecs_short}-infrastructure-core:EcsClusterVerifier\`].ExportingStackId" --no-paginate --output text|cut -d/ -f2)
-          echo -e " --------------- \n CLUSTER: $ecs \n DTL-URL: http://$ELB_INT:8081 \n L2-ELB-INTERNAL: https://$ELB_L2 \n REPLICA-L2-URL: http://$ELB_REPLICA_L2:8545 \n REPLICA-DTL: http://$ELB_REPLICA_DTL:7878 \n L2-URL: https://$URL \n STACK-NAME: $STACK_NAME \n REPLICA-NAME: $REPLICA_NAME \n VERIFIER-NAME: $VERIFIER_NAME \n--------------- \n"
+          #set -x
+          CLUSTERS_LIST_PREFIX=( `aws ecs list-clusters --region us-east-1|grep us-east-1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'|egrep -v default|cut -d'-' -f1|sort -u` )
+          for ecs in "${!CLUSTERS_LIST_PREFIX[@]}"; do
+            ECS_CLUSTER_SHORT=`echo ${CLUSTERS_LIST_PREFIX[ecs]}`
+            ECS_CLUSTER="CLUSTER: `echo ${CLUSTERS_LIST_PREFIX[ecs]}` \n"
+              URL="L2-URL: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:DomainName\\\`].Value\"  --output text` \n"
+            ELB_INT="DTL-URL: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerInt:DNSName\\\`].Value\"  --output text`:8081 \n"
+            ELB_L2="L2-ELB-INTERNAL: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancer:DNSName\\\`].Value\"  --output text` \n"
+            ELB_BLOCKSCOUT="BLOCKSCOUT: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerBlockscout:DNSName\\\`].Value\"  --output text` \n"
+            ELB_GRAPH="GRAPH: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerGraph:DNSName\\\`].Value\"  --output text` \n"
+            ELB_IPFS="IPFS: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerIPFS:DNSName\\\`].Value\"  --output text` \n"
+            ELB_PROXYD01="PROXYD-01: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerProxyd:DNSName\\\`].Value\"  --output text` \n"
+            ELB_PROXYD02="PROXYD-02: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerProxydBackup:DNSName\\\`].Value\"  --output text` \n"
+            ELB_REPLICA_L2="REPLICA-L2-URL: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplica:DNSName\\\`].Value\"  --output text`:8545 \n"
+            ELB_REPLICA2_L2="REPLICA-BKP01-L2-URL: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplica2:DNSName\\\`].Value\"  --output text` \n"
+            ELB_REPLICA3_L2="REPLICA-BKP02-L2-URL: https://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplica3:DNSName\\\`].Value\"  --output text` \n"
+            ELB_REPLICA_DTL="REPLICA-DTL: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplicaDTL:DNSName\\\`].Value\"  --output text`:7878 \n"
+            ELB_REPLICA_DTL2="REPLICA-BKP01-DTL: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplicaDTL2:DNSName\\\`].Value\"  --output text`:7878 \n"
+            ELB_REPLICA_DTL3="REPLICA-BKP02-DTL: http://`aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:LoadBalancerReplicaDTL3:DNSName\\\`].Value\"  --output text`:7878 \n"
+            REPLICA_NAME="REPLICA-NAME: `aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:EcsClusterReplica\\\`].ExportingStackId\"  --output text|cut -d/ -f2` \n"
+            REPLICA_BKP01_NAME="REPLICA-BKP01-NAME: `aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:EcsClusterReplicaBackup01\\\`].ExportingStackId\"  --output text|cut -d/ -f2` \n"
+            REPLICA_BKP02_NAME="REPLICA-BKP02-NAME: `aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:EcsClusterReplicaBackup02\\\`].ExportingStackId\"  --output text|cut -d/ -f2` \n"
+            VERIFIER_NAME="VERIFIER-NAME: `aws cloudformation list-exports --query \"Exports[?Name==\\\`${ECS_CLUSTER_SHORT}-infrastructure-core:EcsClusterVerifier\\\`].ExportingStackId\"  --output text|cut -d/ -f2` \n"
+            echo -e " --------------- \n $ECS_CLUSTER $ELB_INT $ELB_L2 $ELB_REPLICA_L2 $ELB_REPLICA_DTL $URL $ELB_PROXYD01 $ELB_PROXYD02 $ECS_CLUSTER $REPLICA_NAME $REPLICA_BKP01_NAME $REPLICA_BKP02_NAME $VERIFIER_NAME $ELB_BLOCKSCOUT $ELB_IPFS $ELB_REPLICA2_L2"
           done
         }
 

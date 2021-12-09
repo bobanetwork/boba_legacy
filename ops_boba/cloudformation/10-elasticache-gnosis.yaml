@@ -52,14 +52,14 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       GroupDescription: Enable Redis access
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
           ToPort: 6379
           SourceSecurityGroupId:
-            Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerReplica:SecurityGroup"
+            Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-RedisSecurityGroup"
@@ -69,4 +69,4 @@ Outputs:
   RedisPrimaryEndpoint:
     Value: !GetAtt RedisCluster.PrimaryEndPoint.Address
     Export:
-      Name: !Sub "${InfrastructureStackName}:RedisCluster:DNS"
+      Name: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
