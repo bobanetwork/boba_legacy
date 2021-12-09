@@ -66,6 +66,8 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
+  numEventConfirmations?: number
+
   multiRelayLimit?: number
 
   resubmissionTimeout?: number
@@ -203,6 +205,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.nextUnfinalizedTxHeight =
       this.options.fromL2TransactionIndex || 0
     this.state.lastFilterPollingTimestamp = 0
+
+    this.logger.info('Starting at', {
+      lastFinalizedTxHeight: this.state.lastFinalizedTxHeight,
+      nextUnfinalizedTxHeight: this.state.nextUnfinalizedTxHeight,
+      lastQueriedL1Block: this.state.lastQueriedL1Block,
+      numEventConfirmations: this.options.numEventConfirmations,
+    })
 
     //batch system
     this.state.timeOfLastRelayS = Date.now()
@@ -576,7 +585,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1
-    const maxBlock = (await this.options.l1RpcProvider.getBlockNumber()) - 5
+    const maxBlock =
+      (await this.options.l1RpcProvider.getBlockNumber()) -
+      this.options.numEventConfirmations
     while (startingBlock <= maxBlock) {
       const endBlock = Math.min(
         startingBlock + this.options.getLogsInterval,
