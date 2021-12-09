@@ -434,7 +434,7 @@ Resources:
             - Name: ROCKET_LOG_LEVEL
               Value: info
             - Name: RUST_LOG
-              Value: safe_client_gateway=info,safe_client_gateway::monitoring=info
+              Value: safe_client_gateway=normal,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
               Value: true
             - Name: VPC_TRANSACTION_SERVICE_URI
