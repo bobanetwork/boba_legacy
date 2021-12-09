@@ -310,6 +310,114 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 
 
 
+## old material to merge
+
+# Project Turing
+
+- [Project Turing](#project-turing)
+  * [1. Context](#1-context)
+  * [2. What we are not trying to do](#2-what-we-are-not-trying-to-do)
+  * [3. Some simple use cases](#3-some-simple-use-cases)
+  * [4. What's special about an L2?](#4-what-s-special-about-an-l2-)
+  * [5. A hierarchy of problems and approaches](#5-a-hierarchy-of-problems-and-approaches)
+    + [5.1. Baseline - focus on injecting real world data into L2 (and thereby into L1).](#1-baseline---focus-on-injecting-real-world-data-into-l2--and-thereby-into-l1-)
+    + [5.2. Better - Add ability to EASILY trigger off-chain compute](#2-better---add-ability-to-easily-trigger-off-chain-compute)
+    + [5.3. Long Term - the Horizon.](#3-long-term---the-horizon)
+
+## 1. Context
+
+Although Ethereum is Turing-complete, the congestion of the network and the exorbitant gas prices preclude all but the most essential computations from taking place on mainchain. 
+
+Smart contracts live in a local world defined by their chain. By design, smart contracts cannot readily trigger off-chain events. This is because in a system with distributed consensus, all miners must:
+
+1. Be trying to solve the _same_ problem and be operating on the the same inputs, and,
+2. Once a solution has been found, it must be trivial (and fast) for all the other miners to check that solution's validity.
+
+If smart contracts could directly call off-chain APIs, different instances of the chain would struggle to agree on its next state, due to:
+
+1. **System latencies**. Each node would have to accomodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
+2. **Non-deterministic external operations**. Random number generators, stochastic gradient decent, or even different compute platforms with different numerical precision/truncation would greatly complicate distributed consensus. Specifically, there could be numerous mathematically correct answers to _what is the next state of the chain given some set of contract interactions_. By contrast, in a typical blockchain, all miners, when given the same inputs, know precisely what the correct outputs are. 
+
+## 2. What we are not trying to do
+
+There has been a general tendency in the literature to conflate 'off-chain compute' with 'distributed, verifiable computation'. It's certainly possible to do both at the same time, such as in `TrueBit`, but the example of ChainLink illustrates that solving even a tiny part of the problem can be extremely useful and valuable. For the purposes of this exercise, we are **not** trying to solve the more general problem of distributed, verifiable computation, at least not as a first step.
+
+## 3. Some simple use cases
+
+* An exchange runs an AMM with periodic rebalancing. Today, the exchange might do this by deploying an entirely new set of smart contracts, or, manually updating weight matrices and constants. For example, they could monitor the chain, detect events, compute, and push new weights/constants into an AMM. This loop may involve bespoke scripts, multiple architectures, people, and other steps to close the 'detect->compute->update' contract update loop. Imagine a system that makes this easy.
+
+* An insurance company wishes to offer policies to people via smart contracts. The insurance company has spent 30 years building a prequalification stack, but it is not obvious how to translate that into a set of smart contracts. Don't laugh - a drone company offering automated hail damage detection was almost bankrupted because insurance companies did not want to know the _actual_ extent of hail damage, but rather they wanted to know the _estimated_ hail damage as sampled through a 10x10 grid by a human on a ladder - because that's what all their risk models were built around. Note that what was important here was not the precision of the estimate, but the compatibility of the new tech with existing workflows, programming languages, endpoints, company inertia etc. 
+
+* A complex DeFi project wishes to save gas and is hitting bytecode length issues. Moreover, they have special timing needs, and wish to prevent manipulation and frontrunning. So, offload the bulky, complex code and the timing-critical code to Turing.
+
+* As above, except focusing on SMC and FHE - completely impossible to do that on chain.  
+
+## 4. What's special about an L2?
+
+Most obviously, if there is only one sequencer, then in principle, many of the traditional issues (see Section 1) do not apply, since in an L2, there is no such thing as distributed consensus - transaction ordering is whatever the L2 says it is. For example, the L2 could put transactions/interactions into a 'pending' ring-buffer until an external API returns, and then, the transactions/interactions would be flushed into the transaction queue and batch submitted to L1.  
+
+## 5. A hierarchy of problems and approaches 
+
+### 1. Baseline - focus on injecting real world data into L2 (and thereby into L1).
+
+Allow e.g. ChainLink to push larger amounts of data at lower cost by making it possible to submit an array of transactions into the OMGX sequencer. The main goal here is not to solve the grand unified distributed compute problem, it would be to allow ChainLink to push more data more quickly at lower cost into a system that is trust-rooted in Ethereum.
+
+### 2. Better - Add ability to EASILY trigger off-chain compute
+
+Extend the L2 daemon (message relayer) to detect smart contract interactions that set a `refresh` flag: 
+
+```javascript
+
+//in AMM.sol
+string public endpoint = 'https://api-id.execute-api.us-east-2.amazonaws.com'
+bool public TCR_refresh; //TCR is a Turing Compute Request
+uint256 public last_updated;
+uint _AMM_weights[3] = [1, 2, 3];
+
+//core logic
+if(blocktime - last_updated > 20) {
+  TCR_refresh = true;
+}
+
+//called by external API to refresh AMM weights
+//also resets counter and TCR flag
+function updateAMMWeights( uint AMM_weights[3] ) { 
+    _AMM_weights = AMM_weights; 
+    last_updated = blocktime;
+    TCR_refresh = false; 
+}
+
+```
+
+```javascript
+
+//in Daemon
+string contract_to_monitor = '0x123456789';
+string trigger_flag = 'TCR_refresh';
+string API_to_call = null;
+
+API_to_call = await ComplicatedAMMContract.API_URI()
+//console.log(API_to_call)
+//'https://api-id.execute-api.us-east-2.amazonaws.com'
+
+//core logic
+if(await ComplicatedAMMContract.TCR_refresh()) {
+  newWeights = await curl API_to_call
+}
+
+if(newWeights) {
+ let updated = await ComplicatedAMMContract.updateAMMWeights(newWeights)
+ await updated.wait()
+}
+
+```
+
+The smart contract could store the correct endpoint to call, similar to the `string metadata` field that is now used to store NFT URIs. Contract developers could point the smart contracts at different endpoints, or could update the code running at those endpoints, knowing that the smart contracts will then start to use the new logic. This would also allow code to be offloaded from the chain, with only basic logic being contained in the smart contract itself. This could also be a way to save gas and/or to deal with the L2 18kb size limit on bytecode. 
+
+### 3. Long Term - the Horizon.
+
+In this approach, the compute operations coordinated by the daemon would not end up at typically only one place, e.g. an AWS Lambda endpoint, but would flow into a distributed compute system similar in spirit to TruBit. That system could build on Approach 2 (immediately above) but would have additional logic to farm out the TCRs, verify the results, and reward the verifiers and the people providing the compute power. 
+
 
 
 
