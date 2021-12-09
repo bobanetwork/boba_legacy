@@ -62,14 +62,14 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
+      HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 1
       UnhealthyThresholdCount: 10
       Matcher:
-        HttpCode: 200
+        HttpCode: "200-499"
 
   GnosisLBTargetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -81,14 +81,14 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
+      HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 1
       UnhealthyThresholdCount: 10
       Matcher:
-        HttpCode: 200
+        HttpCode: "200-499"
 
   GnosisLBTargetGroup3:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -100,14 +100,14 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 20
+      HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 15
-      HealthyThresholdCount: 3
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 1
       UnhealthyThresholdCount: 10
       Matcher:
-        HttpCode: 200
+        HttpCode: "200-499"
 
   GnosisListener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -345,7 +345,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
           Essential: true
-          Memory: "2500"
+          Memory: "2000"
           Links:
             - worker
             - scheduler
@@ -442,7 +442,7 @@ Resources:
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
           Essential: true
-          Memory: "2500"
+          Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
           Name: safe-client-gateway
           PortMappings:
@@ -589,7 +589,7 @@ Resources:
         - ContainerName: safe-client-gateway
           ContainerPort: 3666
           TargetGroupArn: !Ref GnosisLBTargetGroup3
-      HealthCheckGracePeriodSeconds: 20
+      HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
