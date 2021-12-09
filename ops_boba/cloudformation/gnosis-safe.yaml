@@ -235,10 +235,7 @@ Resources:
             - Name: ROOT_LOG_LEVEL
               Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: "*"
             - Name: GUNICORN_BIND_PORT
               Value: 8000
             - Name: DOCKER_NGINX_VOLUME_ROOT
@@ -276,17 +273,16 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: ETH_L2_NETWORK
+              Value: 1
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: "*"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -327,17 +323,16 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: ETH_L2_NETWORK
+              Value: 1
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: "*"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -375,17 +370,16 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: ETH_L2_NETWORK
+              Value: 1
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: "*"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -438,9 +432,9 @@ Resources:
             - Name: SCHEME
               Value: http
             - Name: ROCKET_LOG_LEVEL
-              Value: debug
+              Value: info
             - Name: RUST_LOG
-              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
+              Value: safe_client_gateway=info,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
               Value: true
             - Name: VPC_TRANSACTION_SERVICE_URI
@@ -485,14 +479,11 @@ Resources:
             - Name: PYTHONDONTWRITEBYTECODE
               Value: true
             - Name: DEBUG
-              Value: true
-            - Name: ROOT_LOG_LEVEL
-              Value: DEBUG
+              Value: false
+            # - Name: ROOT_LOG_LEVEL
+            #   Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: "*"
             - Name: GUNICORN_BIND_PORT
               Value: 8000
             - Name: DOCKER_NGINX_VOLUME_ROOT
