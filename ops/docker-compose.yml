@@ -255,7 +255,7 @@ services:
       # a funded hardhat account
       << : *relayer_pk
       RETRIES: 100
-      POLLING_INTERVAL: 500
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
       FILTER_POLLING_INTERVAL: 30000
@@ -281,7 +281,7 @@ services:
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
       RETRIES: 100
-      POLLING_INTERVAL: 1500
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
