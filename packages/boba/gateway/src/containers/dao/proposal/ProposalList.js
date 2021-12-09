@@ -27,7 +27,7 @@ import Pager from 'components/pager/Pager'
 
 import * as styles from './proposalList.module.scss'
 
-import { selectProposals, selectProposalThreshold, selectDaoBalance } from 'selectors/daoSelector'
+import { selectProposals, selectProposalThreshold, selectDaoBalance, selectDaoVotes} from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import { orderBy } from 'lodash'
@@ -45,9 +45,11 @@ function ProposalList() {
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
     const balance = useSelector(selectDaoBalance)
+    const votes = useSelector(selectDaoVotes)
 
-    console.log("proposalThreshold:",proposalThreshold)
-    console.log("balance:",balance)
+    //console.log("proposalThreshold:",proposalThreshold)
+    //console.log("balance:",balance)
+    //console.log("votes:",votes)
 
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
@@ -68,7 +70,7 @@ function ProposalList() {
                 type="primary"
                 variant="contained"
                 onClick={() => {
-                    if(Number(balance) < Number(proposalThreshold)) {
+                    if(Number(votes) < Number(proposalThreshold)) {
                         dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA to create a new proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
