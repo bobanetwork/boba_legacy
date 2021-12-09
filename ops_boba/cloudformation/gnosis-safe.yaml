@@ -445,6 +445,9 @@ Resources:
           Memory: "2500"
         - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
           Name: safe-client-gateway
+          PortMappings:
+            - ContainerPort: 3666
+              HostPort: 0
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
