@@ -65,7 +65,7 @@ Resources:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 30
+      HealthCheckTimeoutSeconds: 20
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 10
       Matcher:
@@ -84,7 +84,7 @@ Resources:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 30
+      HealthCheckTimeoutSeconds: 20
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 10
       Matcher:
@@ -103,7 +103,7 @@ Resources:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /
       HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 30
+      HealthCheckTimeoutSeconds: 20
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 10
       Matcher:
@@ -276,7 +276,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: unix://nginx/gunicorn.socket
+              Value: "unix://nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
@@ -313,7 +313,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.production
+              Value: config.settings.local
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
@@ -363,7 +363,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.production
+              Value: config.settings.local
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
@@ -410,7 +410,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.production
+              Value: config.settings.local
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
@@ -459,10 +459,7 @@ Resources:
               Type: "s3"
           Environment:
             - Name: CONFIG_SERVICE_URI
-              Value: !Sub
-                - "http://${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+              Value: http://nginx-safe-config-service/
             - Name: FEATURE_FLAG_NESTED_DECODING
               Value: true
             - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
@@ -470,7 +467,9 @@ Resources:
             - Name: SCHEME
               Value: http
             - Name: ROCKET_LOG_LEVEL
-              Value: info
+              Value: debug
+            - Name: RUST_BACKTRACE
+              Value: 1
             - Name: RUST_LOG
               Value: safe_client_gateway=normal,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
@@ -502,6 +501,8 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
           Essential: true
           Memory: "2000"
+          Links:
+            - nginx-safe-config-service
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
           MountPoints:
@@ -518,8 +519,8 @@ Resources:
               Value: true
             - Name: DEBUG
               Value: false
-            # - Name: ROOT_LOG_LEVEL
-            #   Value: DEBUG
+            - Name: ROOT_LOG_LEVEL
+              Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
               Value: "*"
             - Name: GUNICORN_BIND_PORT
@@ -527,7 +528,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: unix://nginx/gunicorn.socket
+              Value: "unix://nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
