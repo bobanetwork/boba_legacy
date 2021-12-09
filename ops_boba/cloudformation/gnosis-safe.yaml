@@ -586,6 +586,7 @@ Resources:
         - ContainerName: safe-client-gateway
           ContainerPort: 3666
           TargetGroupArn: !Ref GnosisLBTargetGroup3
+      HealthCheckGracePeriodSeconds: 20
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
