@@ -46,7 +46,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     address public owner;
     address public l1NFTBridge;
     uint256 public extraGasRelay;
-    uint32 public DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS;
+    uint32 public exitL1Gas;
 
     enum Network { L1, L2 }
 
@@ -128,16 +128,16 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     /**
      * Configure gas.
      *
-     * @param _l1GasFee default finalized withdraw L1 Gas
+     * @param _exitL1Gas default finalized withdraw L1 Gas
      */
     function configureGas(
-        uint32 _l1GasFee
+        uint32 _exitL1Gas
     )
         public
         onlyOwner()
         onlyInitialized()
     {
-        DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS = _l1GasFee;
+        exitL1Gas = _exitL1Gas;
     }
 
     /**
@@ -408,7 +408,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 // Send message up to L1 bridge
                 sendCrossDomainMessage(
                     l1NFTBridge,
-                    DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS,
+                    exitL1Gas,
                     message
                 );
                 emit DepositFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);

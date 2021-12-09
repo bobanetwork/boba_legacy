@@ -42,7 +42,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     address public owner;
     address public l2NFTBridge;
     // Default gas value which can be overridden if more complex logic runs on L2.
-    uint32 public SETTLEMENT_L2_GAS;
+    uint32 public depositL2Gas;
 
     enum Network { L1, L2 }
 
@@ -102,16 +102,16 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     /**
      * @dev Configure gas.
      *
-     * @param _l2GasFee default finalized deposit L2 Gas
+     * @param _depositL2Gas default finalized deposit L2 Gas
      */
     function configureGas(
-        uint32 _l2GasFee
+        uint32 _depositL2Gas
     )
         public
         onlyOwner()
         onlyInitialized()
     {
-        SETTLEMENT_L2_GAS = _l2GasFee;
+        depositL2Gas = _depositL2Gas;
     }
 
     /**
@@ -366,7 +366,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 // Send message up to L1 bridge
                 sendCrossDomainMessage(
                     l2NFTBridge,
-                    SETTLEMENT_L2_GAS,
+                    depositL2Gas,
                     message
                 );
                 emit NFTWithdrawalFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
