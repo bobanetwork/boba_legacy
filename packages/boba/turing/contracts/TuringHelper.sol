@@ -18,6 +18,8 @@ contract TuringHelper {
     Self = TuringHelper(address(this));
   }
 
+  //RegisterMethod(bytes)
+  //a8847e88
   function RegisterMethod(bytes memory methodName) public {
     //require (bytes1(methodName[0]) == bytes1("h"), "Method != start with h");
     methods.push(methodName);
@@ -36,20 +38,22 @@ contract TuringHelper {
     uint32 L = uint32(item.length);
     uint8 prefix;
 
-    if (L > 255) {
+    if (L > 255) {       //256 to ...
       len += 3;
       prefix = 0xb9;
-    } else if (L > 55) {
+    } else if (L > 55) { //56 to 255
       len += 2;
-      prefix = 0xb8;
-    } else {
+      prefix = 0xb8; 
+    } else {             //0 to 55 case
       len += 1;
-      prefix = 0x80 + uint8(L);
+      prefix = 0x80 + uint8(L); //range [0x80, 0xb7]
     }
 
     return (prefix, len);
   }
 
+  //genRequestRLP(bytes,bytes)
+  //0d9bb200
   function genRequestRLP(bytes memory method, bytes memory payload) 
     internal view returns (bytes memory)
   {
@@ -63,8 +67,8 @@ contract TuringHelper {
     // For now this is the only valid value and all others are reserved.
     byte request_version = 0x01;
 
-    bytes memory prefix = bytes("TURING_");
-    assert (prefix.length == 7);
+    bytes memory prefix = bytes("_OMGXTURING_");
+    require (prefix.length == 12, "Incorrect prefix length");
     uint i;
     uint j;
 
@@ -85,28 +89,32 @@ contract TuringHelper {
     (pre[2], pLen) = _lenCalc1(method, pLen);
     (pre[3], pLen) = _lenCalc1(payload, pLen);
 
+    //the goal here is to augment pLen in just the right way to accomodate 
+    //all the possible lengths for all possible payloads
+
     // We now have the total length of the three items which will be in the list.
     // This determines the encoding required for the list header
 
-    if (pLen > 65535) {
+    if (pLen > 65535) {      //total list payload: > 65535 case
       hLen += 3;
       pre[0] = 0xfa;
-    } else if (pLen > 255) {
+    } else if (pLen > 255) { //total list payload: 256 to 65535 case
       hLen += 2;
       pre[0] = 0xf9;
-    } else if (pLen > 55) {
+    } else if (pLen > 55) { //total list payload: 56 to 255 case
       hLen += 1;
       pre[0] = 0xf8;
-    } else {
+    } else {                //total list payload: 0 to 55 case
       pre[0] = 0xc0 + uint8(pLen);
     }
 
     bytes memory result = new bytes(hLen + pLen + prefix.length);
-
+    
+    //add the prefix, not encoded 
     for (i=0; i < prefix.length; i++) result[j++] = prefix[i];
-
+    
+    //create the header for the list
     result[j++] = bytes1(pre[0]);
-
     if (pre[0] > 0xf9) {
       result[j++] = bytes1(uint8(pLen / 65536));
       pLen = pLen % 65536;
@@ -118,9 +126,10 @@ contract TuringHelper {
     if (pre[0] > 0xf7) {
       result[j++] = bytes1(uint8(pLen));
     }
-
+    //first list entry
     result[j++] = request_version;
 
+    //second list entry - data_URL
     result[j++] = bytes1(pre[1]);
     if (pre[1] > 0xb8) {
       result[j++] = bytes1(uint8(l1 / 256));
@@ -131,6 +140,7 @@ contract TuringHelper {
     }
     for (i=0; i<data_URL.length; i++) result[j++] = data_URL[i];
 
+    //third list entry - method
     result[j++] = bytes1(pre[2]);
     if (pre[2] > 0xb8) {
       result[j++] = bytes1(uint8(l2 / 256));
@@ -141,6 +151,7 @@ contract TuringHelper {
     }
     for (i=0; i<method.length; i++) result[j++] = method[i];
 
+    //third list entry - parameters
     result[j++] = bytes1(pre[3]);
     if (pre[3] > 0xb8) {
       result[j++] = bytes1(uint8(l3 / 256));
@@ -150,6 +161,7 @@ contract TuringHelper {
       result[j++] = bytes1(uint8(l3));
     }
     for (i=0; i<payload.length; i++) result[j++] = payload[i];
+
     return result;
   }
 
@@ -166,6 +178,9 @@ contract TuringHelper {
      and calls the method again in "response" mode (rType == 2). 
      This response is then passed back to the caller.
   */
+  //GetResponse(uint32,uint32,bytes,uint32)
+  //a6c40354
+
   function GetResponse(uint32 method_idx, uint32 rType, bytes memory _slot)
     public view returns (bytes memory) {
 
@@ -178,10 +193,33 @@ contract TuringHelper {
       // knock knock - wake up the l2geth
       // force a revert
       // the if() avoids calling genRequestRLP unnecessarily
+      //require (rType == 2, "Trigger first revert");
       require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
     }
     //if (rType == 2) -> the l2geth has obtained fresh data for us
     return _slot;
+  }
+
+  /* Checks the Turing payload generated for Geth
+  */
+  function GetResponseDryRun(uint32 method_idx, uint32 rType, bytes memory _slot)
+    public view returns (bytes memory) {
+
+    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+    require (method_idx < methods.length, "Turing:GetResponse:method not registered");
+    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
+    require (_slot.length > 0, "Turing:GetResponse:_slot.length == 0");
+
+    // if (rType == 1) {
+    //   // knock knock - wake up the l2geth
+    //   // force a revert
+    //   // the if() avoids calling genRequestRLP unnecessarily
+    //   require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
+    // }
+    //if (rType == 2) -> the l2geth has obtained fresh data for us
+    //note the change from string() here
+    bytes memory example = genRequestRLP(methods[method_idx], _slot);
+    return example;//genRequestRLP(methods[method_idx], _slot);
   }
 
   /* This is called from the external contract. It takes a method
@@ -202,7 +240,22 @@ contract TuringHelper {
          because that would stay inside the EVM and not give l2geth
          a place to intercept and re-write the call.
       */
-      bytes memory response = Self.GetResponse(method_idx, 1, _payload);
+      bytes memory response = Self.GetResponse(method_idx, 0, _payload);
+      return response;
+  }
+
+  /* Confirms correct payload packing and structure.
+  */
+  function TuringCallDryRun(uint32 method_idx, bytes memory _payload)
+    public view returns (bytes memory) {
+      require (method_idx < methods.length, "Turing:TuringCall:method not registered");
+      require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
+
+      /* Initiate the request. This can't be a local function call
+         because that would stay inside the EVM and not give l2geth
+         a place to intercept and re-write the call.
+      */
+      bytes memory response = Self.GetResponseDryRun(method_idx, 1, _payload);
       return response;
   }
 
@@ -215,7 +268,7 @@ contract TuringHelper {
   function TuringTx(uint32 method_idx, bytes memory _payload)
     public returns (bytes memory) {
 
-      bytes memory pl = abi.encode("FR");
+      //bytes memory pl = abi.encode("FR");
 
       require (method_idx < methods.length, "Turing:TuringTx:method not registered");
       require (_payload.length > 0, "Turing:TuringTx:payload length == 0");

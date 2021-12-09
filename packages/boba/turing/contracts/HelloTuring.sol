@@ -5,6 +5,7 @@ pragma solidity 0.6.12;
 import "hardhat/console.sol";
 
 interface Helper {
+  function TuringCallDryRun(uint32 method_idx, bytes memory) view external returns (bytes memory);
   function TuringCall(uint32 method_idx, bytes memory) view external returns (bytes memory);
   function TuringTx(uint32 method_idx, bytes memory) external returns (bytes memory);
 }
@@ -30,12 +31,78 @@ contract HelloTuring {
      greeting for the specified locale. This only requires a
      passthrough call to the helper contract.
   */
+
+  //CustomGreetingFor(string)
+  //530f8fcf
+  //CustomGreetingFor(string,uint32)
+  //bf62d557
+  
+  /*
+  0x
+  530f8fcf
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 //32?
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05 //string length
+  45 4e 5f 55 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 //EN_US string
+
+  0x
+  bf62d557
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 //64?
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2a //42
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05 //string length
+  45 4e 5f 55 53 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+  0x
+  4f9d6d19
+  0000000000000000000000000000000000000000000000000000000000000060 //96 - length of inputs
+  000000000000000000000000000000000000000000000000000000000000002a //value 1 = 42
+  00000000000000000000000000000000000000000000000000000000000004d2 //value 2 = 1234
+  0000000000000000000000000000000000000000000000000000000000000003 //string length
+  454e5f0000000000000000000000000000000000000000000000000000000000 //the string
+  uint32
+  unit32
+  string
+  */
+
+  //CustomGreetingFor(string)
+  //530f8fcf
   function CustomGreetingFor(string memory locale)
     public view returns (string memory) {
 
-    bytes memory response = myHelper.TuringCall(0, abi.encode(locale));
-    return abi.decode(response,(string));
+    bytes memory encode = abi.encode(locale);
+    bytes memory response = myHelper.TuringCall(0, encode);
+    string memory decoded = abi.decode(response,(string));
+    //return abi.decode(myHelper.TuringCall(0, abi.encode(locale)),(string));
+    return response;
   }
+
+  /* This tests the eth_call payload by returning it directly
+  */
+  function CustomGreetingForDryRun(string memory locale)
+    public view returns (bytes memory) {
+
+    bytes memory encode = abi.encode(locale);
+    bytes memory response = myHelper.TuringCallDryRun(0, encode);
+    //string memory decoded = abi.decode(response,(string));
+    return response;
+  }
+
+  function CustomGreetingMinimal(string memory locale)
+    public view returns (string memory) {
+
+    //bytes memory response = myHelper.TuringCallDryRun(0, abi.encode(locale));
+    string memory response = "TURING_";
+    return response;
+  }
+
+  function CustomGreetingABIcycle(string memory locale)
+    public view returns (string memory) {
+
+    //bytes memory response = myHelper.TuringCallDryRun(0, abi.encode(locale));
+    bytes memory response = abi.encode(locale);
+    string memory decoded = abi.decode(response,(string));
+    return decoded;
+  }
+
 
   /* This tests the eth_sendRawTransaction pathway by fetching
      a personalized greeting string for the user's chosen locale

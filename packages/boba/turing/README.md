@@ -232,3 +232,92 @@ def lambda_handler(event, context):
     }
 
 ```
+
+
+
+## Execution flow
+
+1. Message arrives via RPC
+
+TURING handler.go potentially relevant incoming RPC msg="{\"jsonrpc\":\"2.0\",\"id\":51,\"method\":\"eth_sendRawTransaction
+
+l2geth_1           | DEBUG[12-09|00:37:10.956] TURING handler.go handleCall starting    Method=eth_sendRawTransaction
+
+l2geth_1           | DEBUG[12-09|00:37:10.956] TURING api.go entering SendRawTransaction
+
+l2geth_1           | DEBUG[12-09|00:37:10.958] TURING api_backend.go SendTx             signedTx
+
+l2geth_1           | DEBUG[12-09|00:37:10.960] TURING sync_service.go acquired txLock in ValidateAndApply 
+l2geth_1           | TRACE[12-09|00:37:10.960] Sequencer transaction validation         hash=0x5ad7d8269f350f8c199ae16b54e136326dceb329d167af74b170a9401da701db
+l2geth_1           | DEBUG[12-09|00:37:10.960] TURING sync_service.go entering applyTransactionToTip 
+l2geth_1           | DEBUG[12-09|00:37:10.961] Applying transaction to tip              index=29    hash=0x5ad7d8269f350f8c199ae16b54e136326dceb329d167af74b170a9401da701db origin=sequencer
+l2geth_1           | DEBUG[12-09|00:37:10.961] TURING sync_service.go Waiting to apply  index=29    hash=0x5ad7d8269f350f8c199ae16b54e136326dceb329d167af74b170a9401da701db
+l2geth_1           | TRACE[12-09|00:37:10.961] Waiting for transaction to be added to chain hash=0x5ad7d8269f350f8c199ae16b54e136326dceb329d167af74b170a9401da701db
+l2geth_1           | DEBUG[12-09|00:37:10.961] Attempting to commit rollup transaction  hash=0x5ad7d8269f350f8c199ae16b54e136326dceb329d167af74b170a9401da701db
+l2geth_1           | DEBUG[12-09|00:37:10.961] TURING worker.go entering commitNewTx 
+l2geth_1           | DEBUG[12-09|00:37:10.961] TURING state_processor.go entering ApplyTransaction 
+l2geth_1           | DEBUG[12-09|00:37:10.962] Adding L1 fee                            l1-fee=12731100026887800832
+
+*Potential Error to look for*
+
+If you see this, this is a true `out-of-gas` and you are using the wrong `gasLimit`. Consider `gasLimit: 3000000` 
+```
+l2geth_1           | DEBUG[12-09|00:37:10.962] TURING processing contract               Address=0xe675d25Eb3cdA9BF81055c962e0DA794Add2662C
+l2geth_1           | DEBUG[12-09|00:37:10.962] TURING processing contract               Address=0x000000000000000000636F6e736F6c652e6c6f67
+l2geth_1           | DEBUG[12-09|00:37:10.962] VM returned with error                   err="contract creation code storage out of gas"
+```
+
+*All is well*
+If everything is working, you should see:
+
+```
+l2geth_1           | DEBUG[12-09|00:42:08.887] TURING processing contract               Address=0x488516e15E671491BdaB7f0b9c5045E670a80431
+l2geth_1           | DEBUG[12-09|00:42:08.887] TURING processing contract               Address=0x000000000000000000636F6e736F6c652e6c6f67
+l2geth_1           | DEBUG[12-09|00:42:08.887] TURING state_processor.go ApplyMessage result failed=false err=nil                                    gas=2450561             
+```
+
+
+3. `l2geth/core/vm/evm.go func (evm *EVM) Call(caller ContractRef...`
+
+In `Call`, we check the reverting transactions for the magic string
+
+```javascript
+    // Call executes the contract associated with the addr with the given input as
+    // parameters. It also handles any necessary value transfer required and takes
+    // the necessary steps to create accounts and reverses the state in case of an
+    // execution error or failed value transfer.
+    
+    func (evm *EVM) Call
+    ...
+    ...
+    ...
+        //Was this a TURING request - let's check the ret for the _OMGXTURING_ string
+        if err != nil {
+            if ! bytes.HasPrefix(contract.CodeAddr.Bytes(), deadPrefix) {
+                isTuring := bytes.Contains(ret, []byte("_OMGXTURING_"))
+
+```
+
+At this point, the Call has reverted AND there is the magic prefix.
+
+Next, prepare the various datastructures we need: the `revert` string and also the `input` string - which we are going to manipulate.
+
+This information is then sent to `bobaTuringCall`
+
+func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
