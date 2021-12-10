@@ -37,11 +37,11 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        CidrIpv6: ::/0
+        CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
-        CidrIpv6: ::/0
+        CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Gnosis-LB"
@@ -51,12 +51,7 @@ Resources:
     Properties:
       IpAddressType: dualstack
       Scheme: internet-facing
-      LoadBalancerAttributes:
-      - Key: idle_timeout.timeout_seconds
-        Value: '3600'
-      Type: application
-      SecurityGroups:
-        - !Ref LoadBalancerGnosisSecurityGroup
+      Type: network
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2

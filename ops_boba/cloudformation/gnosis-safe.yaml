@@ -56,91 +56,43 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 80
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 20
-      HealthyThresholdCount: 2
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GnosisLBTargetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 8000
-      Protocol: HTTP
+      Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
-      HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 20
-      HealthyThresholdCount: 2
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
-  GnosisLBTargetGroup3:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Port: 3666
-      Protocol: HTTP
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: 30
-      HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /
-      HealthCheckProtocol: HTTP # TODO Implement proper healthcheck
-      HealthCheckTimeoutSeconds: 20
-      HealthyThresholdCount: 2
-      UnhealthyThresholdCount: 10
-      Matcher:
-        HttpCode: "200-499"
-
-  GnosisListener1:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 80
-      Protocol: HTTP
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GnosisLBTargetGroup
-
-  GnosisListener2:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 8000
-      Protocol: HTTP
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GnosisLBTargetGroup2
-
-  GnosisListener3:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 3666
-      Protocol: HTTP
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GnosisLBTargetGroup2
+#  GnosisLBTargetGroup3:
+#    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+#    Properties:
+#      Port: 3666
+#      Protocol: TCP
+#      VpcId:
+#        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+#      TargetGroupAttributes:
+#        - Key: deregistration_delay.timeout_seconds
+#          Value: 30
+#      HealthCheckProtocol: TCP
+#      HealthCheckPort: "traffic-port"
+#      TargetType: "ip"
 
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -148,8 +100,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
       Port: 443
-      Protocol: HTTPS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Protocol: TLS
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
@@ -162,7 +113,7 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
       Port: 8000
-      Protocol: HTTPS
+      Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
       Certificates:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
@@ -170,61 +121,20 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup2
 
-  GnosisListener3:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 3666
-      Protocol: HTTPS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GnosisLBTargetGroup3
+#  GnosisListener3:
+#    Type: AWS::ElasticLoadBalancingV2::Listener
+#    Properties:
+#      LoadBalancerArn:
+#        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+#      Port: 3666
+#      Protocol: TLS
+#      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+#      DefaultActions:
+#      - Type: forward
+#        TargetGroupArn: !Ref GnosisLBTargetGroup3
 
-  GnosisLBListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GnosisLBTargetGroup
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
-      ListenerArn: !Ref GnosisListener
-      Priority: 1
-
-  GnosisLBListenerRule2:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GnosisLBTargetGroup2
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
-      ListenerArn: !Ref GnosisListener2
-      Priority: 1
-
-  GnosisLBListenerRule3:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref GnosisLBTargetGroup2
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
-      ListenerArn: !Ref GnosisListener3
-      Priority: 1
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -238,7 +148,7 @@ Resources:
           Name: nginx-safe-transaction-service
           PortMappings:
             - ContainerPort: 8000
-              HostPort: 0
+              HostPort: 8000
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -252,7 +162,7 @@ Resources:
           Name: nginx-safe-config-service
           PortMappings:
             - ContainerPort: 80
-              HostPort: 0
+              HostPort: 80
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -276,7 +186,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix://nginx/gunicorn.socket"
+              Value: "unix:///nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
@@ -297,7 +207,7 @@ Resources:
           Name: safe-transaction-service
           PortMappings:
             - ContainerPort: 8888
-              HostPort: 0
+              HostPort: 8888
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -346,9 +256,6 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
           Essential: true
           Memory: "2000"
-          Links:
-            - worker
-            - scheduler
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: worker
           EnvironmentFiles:
@@ -447,7 +354,7 @@ Resources:
           Name: safe-client-gateway
           PortMappings:
             - ContainerPort: 3666
-              HostPort: 0
+              HostPort: 3666
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -501,8 +408,6 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
           Essential: true
           Memory: "2000"
-          Links:
-            - nginx-safe-config-service
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
           MountPoints:
@@ -518,7 +423,7 @@ Resources:
             - Name: PYTHONDONTWRITEBYTECODE
               Value: true
             - Name: DEBUG
-              Value: false
+              Value: true
             - Name: ROOT_LOG_LEVEL
               Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
@@ -528,7 +433,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix://nginx/gunicorn.socket"
+              Value: "unix:///nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
@@ -549,7 +454,7 @@ Resources:
           Name: safe-react
           PortMappings:
             - ContainerPort: 3000
-              HostPort: 0
+              HostPort: 3000
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -570,13 +475,12 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
           Essential: true
           Memory: "1500"
-      NetworkMode: bridge
+      NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       Family: !Sub "Gnosis-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: GnosisLBListenerRule
     Properties:
       Cluster:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterGnosis"
@@ -587,9 +491,17 @@ Resources:
         - ContainerName: nginx-safe-transaction-service
           ContainerPort: 8000
           TargetGroupArn: !Ref GnosisLBTargetGroup2
-        - ContainerName: safe-client-gateway
-          ContainerPort: 3666
-          TargetGroupArn: !Ref GnosisLBTargetGroup3
+        #- ContainerName: safe-client-gateway
+        #  ContainerPort: 3666
+        #  TargetGroupArn: !Ref GnosisLBTargetGroup3
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"
+          Subnets:
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
       HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
