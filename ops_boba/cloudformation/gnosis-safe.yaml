@@ -394,19 +394,22 @@ Resources:
               Type: "s3"
           Environment:
             - Name: CONFIG_SERVICE_URI
-              Value: http://nginx-safe-config-service/
+              Value: !Sub
+                - "https://${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: FEATURE_FLAG_NESTED_DECODING
               Value: true
             - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
               Value: false
             - Name: SCHEME
-              Value: http
+              Value: https
             - Name: ROCKET_LOG_LEVEL
               Value: debug
             - Name: RUST_BACKTRACE
               Value: 1
             - Name: RUST_LOG
-              Value: safe_client_gateway=normal,safe_client_gateway::monitoring=info
+              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
               Value: true
             - Name: VPC_TRANSACTION_SERVICE_URI
