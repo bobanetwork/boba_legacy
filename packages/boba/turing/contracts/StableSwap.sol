@@ -4,18 +4,10 @@ pragma solidity >= 0.6.12;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/SignedSafeMath.sol";
-import "hardhat/console.sol";
-
 
 interface Helper {
   function TuringCall(uint32 method_idx, bytes memory) view external returns (bytes memory);
 }
-
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
- */
-
 
  contract StableSwap {
 
@@ -43,7 +35,6 @@ interface Helper {
     )
         public
     {
-        console.log("Deploying a contract with helper address:", _helper);
         helperAddr = _helper;
         myHelper = Helper(helperAddr);
 

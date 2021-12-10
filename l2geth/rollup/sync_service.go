@@ -966,10 +966,8 @@ func (s *SyncService) ValidateAndApplySequencerTransaction(tx *types.Transaction
 		return errors.New("nil transaction passed to ValidateAndApplySequencerTransaction")
 	}
 	s.txLock.Lock()
-	//defer s.txLock.Unlock()
-	
 	log.Debug("TURING sync_service.go acquired txLock in ValidateAndApply")
-	
+
 	defer func() {
 	  log.Debug("TURING sync_service.go deferred txLock release")
 	  s.txLock.Unlock()

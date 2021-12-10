@@ -760,7 +760,7 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	snap := w.current.state.Snapshot()
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
-	
+
 	if err != nil || receipt.Status != 1 {
 		log.Warn("TURING worker.go ApplyTransaction result", "err", err, "receipt", receipt)
 	}

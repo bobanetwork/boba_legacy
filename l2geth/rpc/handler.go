@@ -140,12 +140,6 @@ func (h *handler) handleMsg(msg *jsonrpcMessage) {
 		if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
 			log.Debug("TURING handler.go potentially relevant incoming RPC", "msg", msg)
 		}
-		// if msg.Method != "eth_chainId" && 
-		// 	msg.Method != "eth_blockNumber" && 
-		// 	msg.Method != "eth_getBlockByNumber" && 
-		// 	msg.Method != "rollup_getInfo" {
-		// 	log.Debug("TURING handler.go incoming RPC", "msg", msg)
-		// }
 		answer := h.handleCallMsg(cp, msg)
 		h.addSubscriptions(cp.notifiers)
 		if answer != nil {
@@ -153,11 +147,6 @@ func (h *handler) handleMsg(msg *jsonrpcMessage) {
 			if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
 				log.Debug("TURING handler.go writeJSON", "ans", answer)
 			}
-			// if msg.Method != "eth_chainId" && 
-			// 	msg.Method != "eth_blockNumber" && 
-			// 	msg.Method != "rollup_getInfo" {
-			// 	log.Debug("TURING writeJSON", "ans", answer)
-			// }
 		}
 		for _, n := range cp.notifiers {
 			n.activate()
@@ -313,18 +302,16 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 		h.log.Debug("Served "+msg.Method, "t", time.Since(start))
 		return nil
 	case msg.isCall():
-		//resp := h.handleCall(ctx, msg)
-		// MMDBG 4
-        var resp *jsonrpcMessage
+		var resp *jsonrpcMessage
 
-        if msg.Method == "eth_call" {
+		if msg.Method == "eth_call" {
 			log.Debug("MMDBG4", "msg", msg, "PT", reflect.TypeOf(msg.Params))
 			resp = h.handleCall(ctx, msg)
-	    	log.Debug("MMDBG4 wJ", "resp", resp)
-        } else {
-		  	resp = h.handleCall(ctx, msg)
+			log.Debug("MMDBG4 wJ", "resp", resp)
+		} else {
+			resp = h.handleCall(ctx, msg)
 		}
-		
+
 		if resp.Error != nil {
 			h.log.Warn("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start), "err", resp.Error.Message)
 		} else {
@@ -356,7 +343,7 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
 
 	if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
-	  log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // , "CallArgs", args[0].Interface())
+		log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
 	}
 
 	if err != nil {
@@ -367,7 +354,7 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	rMsg := h.runMethod(cp.ctx, msg, callb, args)
 	return rMsg
 
-	//return h.runMethod(cp.ctx, msg, callb, args)
+	// return h.runMethod(cp.ctx, msg, callb, args)
 }
 
 // handleSubscribe processes *_subscribe method calls.
@@ -408,7 +395,7 @@ func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *cal
 	// MMDBG 6
 	result, err := callb.call(ctx, msg.Method, args)
 	if msg.Method == "eth_call" && err != nil {
-	 log.Debug("TURING handler.go check for Turing request:", "err", err, "result", result, "args", args)
+		log.Debug("TURING handler.go check for Turing request:", "err", err, "result", result, "args", args)
 	}
 	if err != nil {
 		return msg.errorResponse(err)
