@@ -8,7 +8,7 @@ const abiDecoder = require('web3-eth-abi')
 const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
-const hPort = 1234 // Port for local HTTP server
+const hPort = 1235 // Port for local HTTP server
 var urlStr
 
 const gasOverride =  {
@@ -25,13 +25,13 @@ let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-// Key for Hardhat test account #13 (0x1cbd3b2770909d4e10f157cabc84c7264073c9ec)
-const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
+// Key for autofunded L2 Hardhat test account
+const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
-describe("Hello World", function () {
+describe("Basic Math", function () {
 
-  before(async () => {
+    before(async () => {
 
     var http = require('http')
     var ip = require("ip")
@@ -99,7 +99,6 @@ describe("Hello World", function () {
 
     // Get a non-localhost IP address of the local machine, as the target for the off-chain request
     urlStr = "http://" + ip.address() + ":" + hPort
-    //urlStr = "http://localhost:" + hPort
     
     console.log("    Created local HTTP server at", urlStr)
     
@@ -125,17 +124,6 @@ describe("Hello World", function () {
     console.log("    Test contract deployed as", hello.address)
   })
 
-
-  it("should correctly register one or more methods", async () => {
-    //let reg = await helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello"))
-    let method = await helper.GetMethod(1)
-    expect(method).to.equal(ethers.utils.formatBytes32String("mult2").slice(0,12))
-
-    //reg = await helper.RegisterMethod(ethers.utils.toUtf8Bytes("add2"))
-    method = await helper.GetMethod(1)
-    expect(method).to.equal(ethers.utils.formatBytes32String("add2").slice(0,10))
-  })
-
   it("should return the URL from the helper", async () => {
     let url = await helper.data_URL()
     expect(url.slice(0,32)).to.equal(ethers.utils.formatBytes32String(urlStr).slice(0,32))
@@ -146,11 +134,11 @@ describe("Hello World", function () {
     expect(helperAddress).to.equal(helper.address)
   })
 
-  it("test of local compute endpoint: should return the EN_US greeting via direct server query", async () => {
+  it("test of local compute endpoint: should do basic math via direct server query", async () => {
 
     let body = {
       method: 'mult2',
-      params: [abiDecoder.encodeParameters(['uint256', 'uint256'], 5, 5)],
+      params: [abiDecoder.encodeParameters(['uint256','uint256'],['6', '6'])],
     }
 
     fetch(urlStr, {
@@ -160,60 +148,27 @@ describe("Hello World", function () {
     }).then(
       res => res.json()
     ).then(json => {
-        const us_greeting = abiDecoder.decodeParameters(['uint256', 'uint256'], json.result) //abiDecoder.decodeParameter('string', json.result)
-        expect(us_greeting).to.equal("Hello World")
+        const result = abiDecoder.decodeParameter('uint256', json.result)
+        expect(result).to.equal('36')
       }
     )
 
   })
 
-  it("should return the EN_US greeting via eth_call", async () => {
-    let us_greeting = await hello.CustomGreetingFor("EN_US", gasOverride)
-    console.log("us_greeting:",us_greeting)
-    expect(us_greeting).to.equal("Hello World")
+  it("should support numerical datatypes", async () => {
+    let tr = await hello.AddNumbers(20, 22, gasOverride)
+    const sum = await tr.wait()
+    expect(sum).to.be.ok
+    const rawData = sum.events[0].data
+    expect(rawData.toString()).to.contain(Number(42).toString(16))
+  })
+  it("should support numerical multiplication", async () => {
+    let tr = await hello.MultNumbers(5, 5, gasOverride)
+    const prod = await tr.wait()
+    expect(prod).to.be.ok
+    const rawData = prod.events[0].data
+    expect(rawData.toString()).to.contain(Number(25).toString(16))
   })
 
-  it("should allow the user to set a locale via eth_sendRawTransaction", async () => {    
-    let loc1 = await hello.SetMyLocale("FR", gasOverride)
-    const tr = await loc1.wait()
-    console.log("events",tr.events)
-    console.log("events[0].args",tr.events[0].args)
-    console.log("events[1].args",tr.events[1].args)
-    // expect(tr).to.be.ok
-    //console.log("FIXME - use proper API to check that receipt contains the expected OffchainResponse event")
-    //const rawData = tr.events[0].data
-    //expect(rawData.toString()).to.contain("426f6e6a6f7572206c65206d6f6e6465") // "Bonjour le monde" as hex
-  })
-  
-  // it("should return the expected personal greeting", async () => {
-  //   let msg1 = hello.PersonalGreeting(gasOverride)
-  //   expect(await msg1).to.equal("Bonjour le monde")
-  // })
-  
-  // it("should allow the user to change their locale", async () => {
-  //   let loc2 = await hello.SetMyLocale("EN_GB", gasOverride)
-  //   expect(await loc2.wait()).to.be.ok
-  // })
-  
-  // it("should now return a different personal greeting", async () => {
-  //   let msg2 = hello.PersonalGreeting(gasOverride)
-  //   expect(await msg2).to.equal("Top of the Morning")
-  // })
-  // it("should support numerical datatypes", async () => {
-  //   let sum = hello.AddNumbers(20, 22)
-  //   expect(await sum).to.equal(42)
-  // })
-  // it("should support numerical multiplication", async () => {
-  //   let product = hello.MultNumbers(5, 5);
-  //   expect(await product).to.equal(25);
-  // })
-  // // The "classifier" test is broken, relying on a local service which is not launched by the test harness.
-  // it.skip("should correctly classfify the image of dog or cat", async () => {
-  //   let dogClassification = hello.isCatOrDog("https://i.insider.com/5484d9d1eab8ea3017b17e29?width=1300&format=jpeg&auto=webp");
-  //   expect(await dogClassification).to.equal('dog');
-
-  //   let catClassification = hello.isCatOrDog("https://c.files.bbci.co.uk/12A9B/production/_111434467_gettyimages-1143489763.jpg");
-  //   expect(await catClassification).to.equal('cat');
-  // })
 })
 
