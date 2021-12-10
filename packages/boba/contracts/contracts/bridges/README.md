@@ -1,6 +1,7 @@
 # Boba NFT Bridges
 
-<img width="1142" alt="Boba NFT Bridge" src="https://user-images.githubusercontent.com/46272347/145501469-83466252-e8e4-49dc-bd20-3258199036c5.png">
+
+<img width="1097" alt="Boba NFT Bridge" src="https://user-images.githubusercontent.com/46272347/145503571-0b5e34c9-c55e-4ff8-8749-19a130d32958.png">
 
 Boba NFT bridges support the **native L1 NFT** and the **native L2 NFT**. Users can transfer their NFTs between L1 and L2. 
 
