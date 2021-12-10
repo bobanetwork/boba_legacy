@@ -44,7 +44,7 @@ contract HelloTuring {
      query for it later.
   */
   function SetMyLocale(string memory locale) public {
-        
+      
     locales[msg.sender] = locale;
     bytes memory encoded = abi.encode(locale);
     bytes memory response = myHelper.TuringTx(0, encoded);
@@ -60,21 +60,29 @@ contract HelloTuring {
     return greeting;
   }
 
-  /* Example of performing off-chain calculations on numeric data types */
-  function AddNumbers(uint112 a, uint112 b) public returns (uint256) {
-    uint256 c;
+  /* Example of performing off-chain calculations on numeric data */
+  function AddNumbers(uint112 a, uint112 b) 
+    public returns (uint256) {
+    
     bytes memory encRequest = abi.encode(a, b);
     bytes memory encResponse = myHelper.TuringTx(0, encRequest);
-    c = abi.decode(encResponse,(uint256));
-    return c;
+    return abi.decode(encResponse,(uint256));
   }
 
-  function MultNumbers(uint112 a, uint112 b) public returns (uint256) {
-    uint256 c;
+  function MultNumbers(uint112 a, uint112 b) 
+    public returns (uint256) {
+    
     bytes memory encRequest = abi.encode(a, b);
     bytes memory encResponse = myHelper.TuringTx(1, encRequest);
-    c = abi.decode(encResponse,(uint256));
-    return c;
+    return abi.decode(encResponse,(uint256));
+  }
+
+  function MultFloatNumbers(string memory a, string memory b, uint8 methodID) 
+    public returns (string memory) {
+    
+    bytes memory encRequest = abi.encode(a, b);
+    bytes memory encResponse = myHelper.TuringTx(methodID, encRequest);
+    return abi.decode(encResponse,(string));
   }
 
   // function isCatOrDog(string memory url) public view returns (string memory) {

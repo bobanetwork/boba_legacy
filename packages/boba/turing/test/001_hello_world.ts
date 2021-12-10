@@ -30,6 +30,7 @@ const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a84
 //this gets automatically funded on L2 by the deployer
 //deployer_1         | ✓ Funded 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec on L2 with 5000.0 ETH
 const testWallet = new Wallet(testPrivateKey, local_provider)
+console.log("Remaining balance:",testWallet.getBalance())
 
 describe("Hello World", function () {
 
@@ -113,7 +114,7 @@ describe("Hello World", function () {
     console.log("    Helper contract deployed as", helper.address, "on", "L2")
 
     let remainingBalance = await testWallet.getBalance()
-    console.log("    Remaining funds:", remainingBalance.toString(), "wei")
+    console.log("    Remaining funds:", ethers.utils.formatEther(remainingBalance), "ETH")
     
     let register = await helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello"))
     TX = await register.wait()
@@ -121,7 +122,7 @@ describe("Hello World", function () {
     console.log("    RegisterMethod TX cumulativeGasUsed:", TX.cumulativeGasUsed.toString())
     
     remainingBalance = await testWallet.getBalance()
-    console.log("    Remaining funds:", remainingBalance.toString(), "wei")
+    console.log("    Remaining funds:", ethers.utils.formatEther(remainingBalance), "ETH")
 
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
@@ -135,7 +136,7 @@ describe("Hello World", function () {
     console.log("    Test contract deployed as", hello.address)
 
     remainingBalance = await testWallet.getBalance()
-    console.log("    Remaining funds:", remainingBalance.toString(), "wei")
+    console.log("    Remaining funds:", ethers.utils.formatEther(remainingBalance), "ETH")
   })
 
   it("test of local compute endpoint: should return the EN_US greeting via direct server query", async () => {

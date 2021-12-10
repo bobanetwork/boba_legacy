@@ -84,6 +84,40 @@ describe("Basic Math", function () {
             res.end(JSON.stringify(jResp2));
             server.emit('success', body);
           } 
+          else if (jBody.method === "float") {
+            let v1 = jBody.params[0]
+
+            const args = abiDecoder.decodeParameters(['string', 'string'], v1)
+
+            let product = parseFloat(args['0']) / parseFloat(args['1'])
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            console.log("      (HTTP) Returning off-chain response:", args, "->", product.toString())
+            var jResp2 = {
+              "jsonrpc": "2.0",
+              "id": jBody.id,
+              "result": abiDecoder.encodeParameter('string', product.toString())
+            }
+            res.end(JSON.stringify(jResp2));
+            server.emit('success', body);
+          } 
+          else if (jBody.method === "sphere") {
+            let v1 = jBody.params[0]
+
+            const args = abiDecoder.decodeParameters(['string', 'string'], v1)
+
+            let volume = (4/3) * parseFloat(args['0']) * Math.pow(parseFloat(args['1']),3)
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            console.log("      (HTTP) Returning off-chain response:", args, "->", volume.toString())
+            var jResp2 = {
+              "jsonrpc": "2.0",
+              "id": jBody.id,
+              "result": abiDecoder.encodeParameter('string', volume.toString())
+            }
+            res.end(JSON.stringify(jResp2));
+            server.emit('success', body);
+          } 
           else {
             res.writeHead(400, { 'Content-Type': 'text/plain' })
             res.end('Unknown method')
@@ -112,7 +146,9 @@ describe("Basic Math", function () {
     console.log("    Helper contract deployed as", helper.address, "on", "L2")
     
     await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("add2")))
-    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("mult2")));
+    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("mult2")))
+    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("float")))
+    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("sphere")))
     
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
@@ -155,19 +191,47 @@ describe("Basic Math", function () {
 
   })
 
-  it("should support numerical datatypes", async () => {
+  it("should support numerical datatypes and addition", async () => {
     let tr = await hello.AddNumbers(20, 22, gasOverride)
-    const sum = await tr.wait()
-    expect(sum).to.be.ok
-    const rawData = sum.events[0].data
-    expect(rawData.toString()).to.contain(Number(42).toString(16))
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data 
+    const numberHexString = rawData.slice(-64)
+    const result = parseInt(numberHexString, 16)
+    console.log("      result of 20 + 22 =",result)
+    expect(result).to.equal(20+22)
   })
-  it("should support numerical multiplication", async () => {
+  it("should support integer multiplication", async () => {
     let tr = await hello.MultNumbers(5, 5, gasOverride)
-    const prod = await tr.wait()
-    expect(prod).to.be.ok
-    const rawData = prod.events[0].data
-    expect(rawData.toString()).to.contain(Number(25).toString(16))
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data 
+    const numberHexString = rawData.slice(-64)
+    const result = parseInt(numberHexString, 16)
+    console.log("      result of 5*5 =",result)
+    expect(result).to.equal(5*5)
+  })
+  it("should support floating point division", async () => {
+    let tr = await hello.MultFloatNumbers("42.165", "3.14159", 2/*method*/, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = rawData.slice(-64)
+    const numberString = Buffer.from(numberHexString, 'hex').toString()
+    const result = parseFloat(numberString)
+    console.log("      result of 42.165 / 3.14159 =",result)
+    expect(result.toFixed(3)).to.equal('13.422')
+  })
+  it("should support floating point volume of sphere", async () => {
+    let tr = await hello.MultFloatNumbers("3.14159", "2.00", 3/*method*/, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = rawData.slice(-64)
+    const numberString = Buffer.from(numberHexString, 'hex').toString()
+    const result = parseFloat(numberString)
+    console.log("      result of 4/3 * Pi * r^3 =",result)
+    expect(result.toFixed(5)).to.equal('33.51029')
   })
 
 })
