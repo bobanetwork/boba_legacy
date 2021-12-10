@@ -242,7 +242,7 @@ Resources:
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerIpfs:DNSName"
             - Name: ethereum
-              Value: boba:https://replica.boba.network
+              Value: boba:http://mainn-LoadB-148FZN36N6IWC-a71e1f94a625b68d.elb.us-east-1.amazonaws.com
           DockerLabels:
             com.datadoghq.ad.check_names: '["graph"]'
             com.datadoghq.ad.init_configs: '[{}]'

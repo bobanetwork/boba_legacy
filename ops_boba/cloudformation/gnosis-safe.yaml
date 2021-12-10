@@ -114,10 +114,10 @@ Resources:
     Properties:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 443
-      Protocol: TLS
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      Port: 80
+      Protocol: TCP
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup
@@ -128,10 +128,9 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
       Port: 8000
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      Protocol: TCP
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup2
@@ -142,10 +141,9 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
       Port: 3666
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      Protocol: TCP
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup3
@@ -156,10 +154,9 @@ Resources:
       LoadBalancerArn:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
       Port: 3000
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      Protocol: TCP
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup4
@@ -171,6 +168,9 @@ Resources:
         - Name: nginx
           Host:
             SourcePath: "/mnt/nginx"
+        - Name: nginx2
+          Host:
+            SourcePath: "/mnt/nginx2"
       ContainerDefinitions:
         - Image: !Sub "${DockerPrefix}/nginx-safe-transaction-service:latest"
           Name: nginx-safe-transaction-service
@@ -193,7 +193,7 @@ Resources:
               HostPort: 80
           MountPoints:
             - ContainerPath: "/nginx"
-              SourceVolume: nginx
+              SourceVolume: nginx2
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
@@ -395,7 +395,7 @@ Resources:
           Environment:
             - Name: CONFIG_SERVICE_URI
               Value: !Sub
-                - "https://${EndpointAddress}/"
+                - "http://${EndpointAddress}/"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: FEATURE_FLAG_NESTED_DECODING
@@ -403,7 +403,7 @@ Resources:
             - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
               Value: false
             - Name: SCHEME
-              Value: https
+              Value: http
             - Name: ROCKET_LOG_LEVEL
               Value: debug
             - Name: RUST_BACKTRACE
@@ -443,7 +443,7 @@ Resources:
           Name: safe-config-service
           MountPoints:
             - ContainerPath: "/nginx"
-              SourceVolume: nginx
+              SourceVolume: nginx2
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
@@ -472,7 +472,10 @@ Resources:
             - Name: GUNICORN_WEB_RELOAD
               Value: false
             - Name: CGW_URL
-              Value: http://127.0.0.1
+              Value: !Sub
+                - "http://${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           DockerLabels:
