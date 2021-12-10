@@ -25,12 +25,12 @@ contract TuringHelper {
     methods.push(methodName);
   }
 
-  function GetMethod(uint32 method_idx) 
-    public view returns (bytes memory) 
-  {
-    require (method_idx < methods.length, "IDX not in methods[]");
-    return methods[method_idx];
-  }
+  // function GetMethod(uint32 method_idx) 
+  //   public view returns (bytes memory) 
+  // {
+  //   require (method_idx < methods.length, "IDX not in methods[]");
+  //   return methods[method_idx];
+  // }
 
   function _lenCalc1(bytes memory item, uint32 len) internal pure
     returns (uint8, uint32)
@@ -200,27 +200,27 @@ contract TuringHelper {
     return _slot;
   }
 
-  /* Checks the Turing payload generated for Geth
-  */
-  function GetResponseDryRun(uint32 method_idx, uint32 rType, bytes memory _slot)
-    public view returns (bytes memory) {
+  // /* Checks the Turing payload generated for Geth
+  // */
+  // function GetResponseDryRun(uint32 method_idx, uint32 rType, bytes memory _slot)
+  //   public view returns (bytes memory) {
 
-    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
-    require (method_idx < methods.length, "Turing:GetResponse:method not registered");
-    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
-    require (_slot.length > 0, "Turing:GetResponse:_slot.length == 0");
+  //   require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+  //   require (method_idx < methods.length, "Turing:GetResponse:method not registered");
+  //   require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
+  //   require (_slot.length > 0, "Turing:GetResponse:_slot.length == 0");
 
-    // if (rType == 1) {
-    //   // knock knock - wake up the l2geth
-    //   // force a revert
-    //   // the if() avoids calling genRequestRLP unnecessarily
-    //   require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
-    // }
-    //if (rType == 2) -> the l2geth has obtained fresh data for us
-    //note the change from string() here
-    bytes memory example = genRequestRLP(methods[method_idx], _slot);
-    return example;//genRequestRLP(methods[method_idx], _slot);
-  }
+  //   // if (rType == 1) {
+  //   //   // knock knock - wake up the l2geth
+  //   //   // force a revert
+  //   //   // the if() avoids calling genRequestRLP unnecessarily
+  //   //   require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
+  //   // }
+  //   //if (rType == 2) -> the l2geth has obtained fresh data for us
+  //   //note the change from string() here
+  //   bytes memory example = genRequestRLP(methods[method_idx], _slot);
+  //   return example;//genRequestRLP(methods[method_idx], _slot);
+  // }
 
   /* This is called from the external contract. It takes a method
      selector and an abi-encoded request payload. The URL and the
@@ -244,20 +244,20 @@ contract TuringHelper {
       return response;
   }
 
-  /* Confirms correct payload packing and structure.
-  */
-  function TuringCallDryRun(uint32 method_idx, bytes memory _payload)
-    public view returns (bytes memory) {
-      require (method_idx < methods.length, "Turing:TuringCall:method not registered");
-      require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
+  // /* Confirms correct payload packing and structure.
+  // */
+  // function TuringCallDryRun(uint32 method_idx, bytes memory _payload)
+  //   public view returns (bytes memory) {
+  //     require (method_idx < methods.length, "Turing:TuringCall:method not registered");
+  //     require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
 
-      /* Initiate the request. This can't be a local function call
-         because that would stay inside the EVM and not give l2geth
-         a place to intercept and re-write the call.
-      */
-      bytes memory response = Self.GetResponseDryRun(method_idx, 1, _payload);
-      return response;
-  }
+  //     /* Initiate the request. This can't be a local function call
+  //        because that would stay inside the EVM and not give l2geth
+  //        a place to intercept and re-write the call.
+  //     */
+  //     bytes memory response = Self.GetResponseDryRun(method_idx, 1, _payload);
+  //     return response;
+  // }
 
   /* Same as TuringCall() but logs the offchain response so that a future
      verifier or fraud prover can replay the transaction and ensure that it
@@ -267,9 +267,6 @@ contract TuringHelper {
   */
   function TuringTx(uint32 method_idx, bytes memory _payload)
     public returns (bytes memory) {
-
-      //bytes memory pl = abi.encode("FR");
-
       require (method_idx < methods.length, "Turing:TuringTx:method not registered");
       require (_payload.length > 0, "Turing:TuringTx:payload length == 0");
 
