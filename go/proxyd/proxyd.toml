@@ -27,6 +27,7 @@ ws_method_whitelist = [
   "eth_signTransaction",
   "eth_sendTransaction",
   "eth_sendRawTransaction",
+  "eth_call",
   "eth_estimateGas",
   "eth_getBlockByHash",
   "eth_getBlockByNumber",
@@ -70,23 +71,23 @@ ws_method_whitelist = [
   "eth_chainId"
 ]
 # Enable WS on this backend group. There can only be one WS-enabled backend group.
-ws_backend_group = "mainnet"
+ws_backend_group = "main"
 
 [server]
 # Host for the proxyd RPC server to listen on.
 rpc_host = "0.0.0.0"
 # Port for the above.
-rpc_port = 8547
+rpc_port = 8545
 # Host for the proxyd WS server to listen on.
 ws_host = "0.0.0.0"
 # Port for the above
-ws_port = 8548
+ws_port = 8546
 # Maximum client body size, in bytes, that the server will accept.
 max_body_size_bytes = 10485760
 
 [redis]
 # URL to a Redis instance.
-url = "redis://REDIS:6379"
+url = "redis://ELASTICACHE:6379"
 
 [metrics]
 # Whether or not to enable Prometheus metrics.
@@ -98,118 +99,53 @@ port = 9761
 
 [backend]
 # How long proxyd should wait for a backend response before timing out.
-response_timeout_seconds = 120
+response_timeout_seconds = 10
 # Maximum response size, in bytes, that proxyd will accept from a backend.
 max_response_size_bytes = 5242880
 # Maximum number of times proxyd will try a backend before giving up.
-max_retries = 100
+max_retries = 30
 # Number of seconds to wait before trying an unhealthy backend again.
-out_of_service_seconds = 5
+out_of_service_seconds = 300
 
 [backends]
 # A map of backends by name.
-[backends.mainnet]
+[backends.rinkeby]
 # The URL to contact the backend at.
-rpc_url = "MAINNET_RPC"
+rpc_url = "http://MAIN_L2GETH:8545"
 # The WS URL to contact the backend at.
-ws_url = "MAINNET_RPC_WS"
+ws_url = "http://MAIN_L2GETH:8546"
 username = ""
 password = ""
 # default max_rps = 3
-max_rps = 100000
+max_rps = 300
 # default max_ws_conns = 1
-max_ws_conns = 10000
+max_ws_conns = 100
 
-[backends.alchemy]
+[backends.replica]
 # The URL to contact the backend at.
-rpc_url = "ALCHEMY_RPC"
-ws_url = "ALCHEMY_RPC_WS"
+rpc_url = "http://REPLICA_L2GETH:8545"
+ws_url = "http://REPLICA_L2GETH:8546"
 username = ""
 password = ""
-max_rps = 30000000000
-max_ws_conns = 30000000000
+max_rps = 300
+max_ws_conns = 100
 
 [backend_groups]
-[backend_groups.mainnet]
-backends = ["mainnet"]
+[backend_groups.main]
+backends = ["rinkeby"]
 
-[backend_groups.alchemy]
-backends = ["alchemy"]
+[backend_groups.replica]
+backends = ["replica"]
 
 # If the authentication group below is in the config,
 # proxyd will only accept authenticated requests.
 [authentication]
 # Mapping of auth key to alias. The alias is used to provide a human-
 # readable name for the auth key in monitoring.
-secret = "7BJAqKqiK6T43wKJZAKa"
+secret = "test"
 
 # Mapping of methods to backend groups.
 [rpc_method_mappings]
-eth_call = "mainnet"
-eth_blockNumber = "mainnet"
-web3_clientVersion="mainnet"
-eth_getProof="mainnet"
-rollup_getInfo="mainnet"
-web3_sha3="mainnet"
-net_version="mainnet"
-net_peerCount="mainnet"
-net_listening="mainnet"
-eth_protocolVersion="mainnet"
-eth_syncing="mainnet"
-eth_coinbase="mainnet"
-eth_mining="mainnet"
-eth_hashrate="mainnet"
-eth_gasPrice="mainnet"
-eth_accounts="mainnet"
-eth_getBalance="mainnet"
-eth_getStorageAt="mainnet"
-eth_getTransactionCount="mainnet"
-eth_getBlockTransactionCountByHash="mainnet"
-eth_getBlockTransactionCountByNumber="mainnet"
-eth_getUncleCountByBlockHash="mainnet"
-eth_getUncleCountByBlockNumber="mainnet"
-eth_getCode="mainnet"
-eth_sign="mainnet"
-eth_signTransaction="mainnet"
-eth_sendTransaction="mainnet"
-eth_sendRawTransaction="mainnet"
-eth_estimateGas="mainnet"
-eth_getBlockByHash="mainnet"
-eth_getBlockByNumber="mainnet"
-eth_getTransactionByHash="mainnet"
-eth_getTransactionByBlockHashAndIndex="mainnet"
-eth_getTransactionByBlockNumberAndIndex="mainnet"
-eth_getTransactionReceipt="mainnet"
-eth_getUncleByBlockHashAndIndex="mainnet"
-eth_getUncleByBlockNumberAndIndex="mainnet"
-eth_getCompilers="mainnet"
-eth_compile="mainnet"
-eth_compileSolidity="mainnet"
-eth_compileSerpent="mainnet"
-eth_newFilter="mainnet"
-eth_newBlockFilter="mainnet"
-eth_newPendingTransactionFilter="mainnet"
-eth_uninstallFilter="mainnet"
-eth_getFilterChanges="mainnet"
-eth_getWork="mainnet"
-eth_submitWork="mainnet"
-eth_submitHashrate="mainnet"
-db_putString="mainnet"
-db_getString="mainnet"
-db_putHex="mainnet"
-db_getHex="mainnet"
-shh_post="mainnet"
-shh_version="mainnet"
-shh_newIdentity="mainnet"
-shh_hasIdentity="mainnet"
-shh_newGroup="mainnet"
-shh_addToGroup="mainnet"
-shh_newFilter="mainnet"
-shh_uninstallFilter="mainnet"
-shh_getFilterChanges="mainnet"
-shh_getMessages="mainnet"
-eth_getBlockRange="mainnet"
-eth_subscribe="mainnet"
-eth_chainId = "alchemy"
-eth_getFilterLogs="alchemy"
-eth_getLogs="alchemy"
+eth_call = "replica"
+eth_chainId = "replica"
+eth_blockNumber = "replica"

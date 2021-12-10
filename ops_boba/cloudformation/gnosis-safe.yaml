@@ -80,19 +80,34 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-#  GnosisLBTargetGroup3:
-#    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-#    Properties:
-#      Port: 3666
-#      Protocol: TCP
-#      VpcId:
-#        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-#      TargetGroupAttributes:
-#        - Key: deregistration_delay.timeout_seconds
-#          Value: 30
-#      HealthCheckProtocol: TCP
-#      HealthCheckPort: "traffic-port"
-#      TargetType: "ip"
+  GnosisLBTargetGroup3:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 3666
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  GnosisLBTargetGroup4:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 3000
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
 
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -121,20 +136,33 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup2
 
-#  GnosisListener3:
-#    Type: AWS::ElasticLoadBalancingV2::Listener
-#    Properties:
-#      LoadBalancerArn:
-#        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-#      Port: 3666
-#      Protocol: TLS
-#      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-#      Certificates:
-#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-#      DefaultActions:
-#      - Type: forward
-#        TargetGroupArn: !Ref GnosisLBTargetGroup3
+  GnosisListener3:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 3666
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup3
 
+  GnosisListener4:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 3000
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup4
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -186,7 +214,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix:///nginx/gunicorn.socket"
+              Value: "unix:/nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
@@ -433,7 +461,7 @@ Resources:
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix:///nginx/gunicorn.socket"
+              Value: "unix:/nginx/gunicorn.socket"
             - Name: NGINX_HOST_PORT
               Value: 8080
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
@@ -491,9 +519,12 @@ Resources:
         - ContainerName: nginx-safe-transaction-service
           ContainerPort: 8000
           TargetGroupArn: !Ref GnosisLBTargetGroup2
-        #- ContainerName: safe-client-gateway
-        #  ContainerPort: 3666
-        #  TargetGroupArn: !Ref GnosisLBTargetGroup3
+        - ContainerName: safe-client-gateway
+          ContainerPort: 3666
+          TargetGroupArn: !Ref GnosisLBTargetGroup3
+        - ContainerName: safe-react
+          ContainerPort: 3000
+          TargetGroupArn: !Ref GnosisLBTargetGroup4
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
