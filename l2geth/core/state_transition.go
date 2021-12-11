@@ -253,7 +253,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
 		log.Debug("TURING state_transition.go before evm.Call", "st.data", hexutil.Bytes(st.data))
 		ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
-		log.Debug("TURING state_transition.go evm.Call result","ret", hexutil.Bytes(ret), "st.gas", st.gas, "vmerr", vmerr)
+		log.Debug("TURING state_transition.go evm.Call result", "ret", hexutil.Bytes(ret), "st.gas", st.gas, "vmerr", vmerr)
 	}
 
 	if vmerr != nil {

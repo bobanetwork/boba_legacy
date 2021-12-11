@@ -378,7 +378,7 @@ func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs
 	}
 	log.Debug("TURING api.go entering SendTransaction")
 	ret, err := SubmitTransaction(ctx, s.b, signed)
-    log.Debug("TURING api.go SendTransaction returning", "RET", ret, "ERR", err)
+	log.Debug("TURING api.go SendTransaction returning", "RET", ret, "ERR", err)
 	return ret, err
 	//return SubmitTransaction(ctx, s.b, signed)
 }
@@ -1672,11 +1672,11 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	tx.SetTransactionMeta(txMeta)
 
 	log.Debug("TURING api.go entering SendRawTransaction", "TX", tx)
-	
+
 	ret, err := SubmitTransaction(ctx, s.b, tx)
-    
-    log.Debug("TURING api.go SendRawTransaction returning", "RET", ret, "ERR", err)  // ret is (type common.Hash)
-	
+
+	log.Debug("TURING api.go SendRawTransaction returning", "RET", ret, "ERR", err)
+
 	return ret, err
 
 	//return SubmitTransaction(ctx, s.b, tx)

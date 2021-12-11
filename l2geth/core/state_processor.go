@@ -17,19 +17,19 @@
 package core
 
 import (
+	"bytes"
+
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/fees"
-
-	"bytes"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning
@@ -116,11 +116,11 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	// Apply the transaction to the current state (included in the env)
 	result, gas, failed, err := ApplyMessage(vmenv, msg, gp)
 
-	log.Debug("TURING state_processor.go ApplyMessage result", 
-		"failed", failed, 
-		"err", err, 
-		"gas", gas, 
-		"result", hexutil.Bytes(result), 
+	log.Debug("TURING state_processor.go ApplyMessage result",
+		"failed", failed,
+		"err", err,
+		"gas", gas,
+		"result", hexutil.Bytes(result),
 		"turing", bytes.Contains(result, []byte("_OMGXTURING_")))
 
 	if err != nil {

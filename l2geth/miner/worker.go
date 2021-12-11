@@ -894,7 +894,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 // on reading from a channel that is written to when a new block is added to the
 // chain.
 func (w *worker) commitNewTx(tx *types.Transaction) error {
-	
+
 	log.Debug("TURING worker.go entering commitNewTx")
 
 	w.mu.RLock()

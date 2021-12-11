@@ -20,9 +20,9 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"sync"
 	"sync/atomic"
 	"time"
-	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -126,10 +126,10 @@ type Context struct {
 // some of the earlier concepts for a "Turing" mechanism.
 
 var turingCache struct {
-	lock		sync.RWMutex
-	expires		time.Time
-	key			string
-	value		[]byte
+	lock    sync.RWMutex
+	expires time.Time
+	key     string
+	value   []byte
 }
 
 // EVM is the Ethereum Virtual Machine base object and provides
@@ -228,79 +228,79 @@ func (evm *EVM) Interpreter() Interpreter {
 
 func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 
-    // reqString []byte -> everything after the _OMGXTURING_ - this is the RLP encoded data from the revert string
-    // oldvalue -> the original input to the call
-    // new_in := bobaTuringCall(rest, input)
-	
+	// reqString []byte -> everything after the _OMGXTURING_ - this is the RLP encoded data from the revert string
+	// oldvalue -> the original input to the call
+	// new_in := bobaTuringCall(rest, input)
+
 	var responseStringEnc string
 	var responseString []byte
 	var reqFields [4]string
 
-    reqVer := reqFields[0]
-
-	if reqVer != "\x01" {
-		log.Warn("TURING-0 bobaTuringCall:Unexpected request version", "ver", hexutil.Bytes(reqVer))
-		//return bad
-	}
+	reqVer := reqFields[0]
 	reqUrl := reqFields[1]
 	reqMethod := reqFields[2]
 	reqValue := reqFields[3]
-	
+
 	prefix := make([]byte, 4)
-	copy(prefix,oldValue[0:4]) // we preserve the 4 byte methodSelector = calldata[0:4]
+	copy(prefix, oldValue[0:4])
 
 	// If decoding fails, we'll return a "0" parameter which should fail a
 	// "require" in the contract without generating another TURING marker.
 	// FIXME - would be cleaner to return nil here and put better error handling
 	// into l2geth to avoid that second call into the contract.
 
-    //oldValue aka input
-    //first 4 bytes = prefix
-    //next 32 bytes = method_idx
-    //next 32 bytes = 1 for Request, 2 for Response
+	//oldValue aka input
+	//first 4 bytes = prefix
+	//next 32 bytes = method_idx
+	//next 32 bytes = 1 for Request, 2 for Response
 
 	// Some other consistency checks. Probably OK to remove these at some point.
-	rest := oldValue[4:]	
+	rest := oldValue[4:]
 	rlen := len(rest)
 	method_idx := rest[0:32] // This value is preserved and passed back on the 2nd call
 	rtypeRaw := rest[32:64]  // can be 0, 1, or 2
-	
-    log.Debug ("TURING bobaTuringCall prep", 
-		"prefix", prefix, 
+
+	log.Debug("TURING bobaTuringCall prep",
+		"prefix", prefix,
 		"rest", rest,
 		"oldvalue", oldValue,
 		"rlen", rlen,
-	    "method_idx", method_idx,
-	    "rtypeRaw", rtypeRaw)
+		"method_idx", method_idx,
+		"rtypeRaw", rtypeRaw)
 
 	bad := append(prefix, method_idx...)
 	bad = append(bad, hexutil.MustDecode(fmt.Sprintf("0x%064x", 0))...) //0 denotes failure
 
-	log.Debug ("TURING-1 bobaTuringCall:Decode oldValue", 
-		"prefix", prefix, 
-		"rest", rest, 
+	if reqVer != "\x01" {
+		log.Warn("TURING-0 bobaTuringCall:Unexpected request version", "ver", hexutil.Bytes(reqVer))
+		return bad
+	}
+
+	log.Debug("TURING-1 bobaTuringCall:Decode oldValue",
+		"prefix", prefix,
+		"rest", rest,
 		"rlen", rlen,
 		"bad", bad,
 		"mustdecode", fmt.Sprintf("0x%064x", 0),
 		"hu", hexutil.MustDecode(fmt.Sprintf("0x%064x", 0)))
 
-	if (rlen < 128) {
+	if rlen < 128 {
 		log.Warn("TURING-2 bobaTuringCall:Unexpected oldValue in bobaTuringCall", "len < 128", rlen)
 		return bad
 	}
 
 	rType_big := new(big.Int).SetBytes(rest[32:64]) // 1 for Request, 2 for Response
 	rType := int(rType_big.Uint64())
-	if (rType != 1) {
+	if rType != 1 {
 		log.Warn("TURING-3 bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
 		return bad
 	}
 
 	var ret hexutil.Bytes
 
-    // don't recalculate unless actually needed... 
-    // if we have data, and if the time is right,
-    // replace the calldata with the cached value and return 
+	// don't recalculate unless actually needed...
+	// if we have data, and if the time is right,
+	// replace the calldata with the cached value and return
 	turingCache.lock.Lock()
 	if reqValue == turingCache.key && time.Now().Before(turingCache.expires) {
 		ret = turingCache.value
@@ -312,27 +312,27 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 		return ret
 	}
 
-    // if we have not yet returned by now, we (1) have a Turing compute request, and
-    // (2) we DO NOT have a valid response from off-chain, so let's get one now and 
-    // save it for later 
+	// if we have not yet returned by now, we (1) have a Turing compute request, and
+	// (2) we DO NOT have a valid response from off-chain, so let's get one now and
+	// save it for later
 
 	// Step  1 - let's decode the RLP - the 'rest' we generated earlier
 	if err := rlp.Decode(bytes.NewReader(reqString), &reqFields); err != nil {
 		log.Warn("TURING-5 bobaTuringCall:RLP decoding failed", "err", err)
-		//return bad
+		return bad
 	} else {
 		log.Debug("TURING-5 bobaTuringCall:RLP decoded OK", "reqFields", reqFields)
 	}
 
 	// at this point we have all the info we need to call off-chain
-	log.Debug ("TURING bobaTuringCall information", 
+	log.Debug("TURING bobaTuringCall information",
 		"version", hexutil.Bytes(reqVer),
-		"url", reqUrl, 
-		"method", reqMethod, 
+		"url", reqUrl,
+		"method", reqMethod,
 		"value", reqValue,
 		"reqString", reqString)
 
-	client,err := rpc.Dial(reqUrl)
+	client, err := rpc.Dial(reqUrl)
 
 	if client != nil {
 		log.Debug("TURING-8 bobaTuringCall:Calling off-chain client at", "url", reqFields[1])
@@ -350,24 +350,24 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 		return bad
 	}
 
-	log.Debug("TURING-12 bobaTuringCall:Have valid response from offchain API", 
-		"Request", reqValue, 
+	log.Debug("TURING-12 bobaTuringCall:Have valid response from offchain API",
+		"Request", reqValue,
 		"Response", responseString)
 
 	rsLen := len(responseString)
-	new_val := hexutil.MustDecode(fmt.Sprintf("0x%064x", rsLen)) // length of the response 
+	new_val := hexutil.MustDecode(fmt.Sprintf("0x%064x", rsLen)) // length of the response
 	rsBytes := responseString                                    // the response itself
-	new_val = append(new_val, rsBytes...) 
+	new_val = append(new_val, rsBytes...)
 
-    // pad the response if needed
+	// pad the response if needed
 	tmpLen := len(new_val) % 32
 	if tmpLen > 0 {
-		pad := bytes.Repeat([]byte{0}, 32 - tmpLen)
+		pad := bytes.Repeat([]byte{0}, 32-tmpLen)
 		new_val = append(new_val, pad...)
 	}
-    
-    // build the calldata: 
-    //	 MethodID,
+
+	// build the calldata:
+	//   MethodID,
 	//   methodIndex,
 	//   rType = 2,
 	//   96 = 3*32
@@ -375,14 +375,14 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	ret = append(prefix, method_idx...)                                  // the usual prefix and the method_idx, unchanged
 	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...)  // this is a response, hence change 1 -> 2
 	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", 96))...) // length of response slots? - this number might change in some cases
-	ret = append(ret, new_val...)                                        // and the data themselves                
+	ret = append(ret, new_val...)                                        // and the data themselves
 
 	log.Debug("TURING-13 bobaTuringCall:Modified parameters", "newValue", ret)
 
-    // saving the "updated" calldata in the cache
+	// saving the "updated" calldata in the cache
 	turingCache.lock.Lock()
 	turingCache.key = reqValue
-	turingCache.expires = time.Now().Add(2*time.Second)
+	turingCache.expires = time.Now().Add(2 * time.Second)
 	turingCache.value = ret
 	turingCache.lock.Unlock()
 
@@ -396,11 +396,11 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
-	
-	log.Debug("TURING entering Call", 
-		"depth", evm.depth, 
-		"addr", addr, 
-		"input", hexutil.Bytes(input), 
+
+	log.Debug("TURING entering Call",
+		"depth", evm.depth,
+		"addr", addr,
+		"input", hexutil.Bytes(input),
 		"gas", gas)
 
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
@@ -457,61 +457,61 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 	ret, err = run(evm, contract, input, false)
 
-	log.Debug("TURING evm.go run", 
-		"contract", contract.CodeAddr, 
-		"ret", hexutil.Bytes(ret), 
+	log.Debug("TURING evm.go run",
+		"contract", contract.CodeAddr,
+		"ret", hexutil.Bytes(ret),
 		"err", err)
 
 	if err != nil {
 
 		isTuring := bytes.Contains(ret, []byte("_OMGXTURING_"))
-		
+
 		if isTuring {
-			log.Debug("YES TURING", 
-			"err", err, 
-			"retRaw", ret, 
-			"ret", hexutil.Bytes(ret), 
-			"input", hexutil.Bytes(input), 
-			"contract", contract.CodeAddr, 
-			"turing", isTuring)
+			log.Debug("YES TURING",
+				"err", err,
+				"retRaw", ret,
+				"ret", hexutil.Bytes(ret),
+				"input", hexutil.Bytes(input),
+				"contract", contract.CodeAddr,
+				"turing", isTuring)
 		}
 
-		if isTuring /*&& rcfg.UsingOVM*/ {
+		if isTuring {
 
-            //at this point we have a call that has reverted AND the ret includes _OMGXTURING_ somewhere in it
-            //let's chop off _OMGXTURING_ and then focus on the remainder with the parameters, the URL, etc.
-			//find the "_OMGXTURING_" string - everything after that is the 
-			//RLP encoded instructions
-			header := "_OMGXTURING_";
+			// at this point we have a call that has reverted AND the ret includes _OMGXTURING_ somewhere in it
+			// let's chop off _OMGXTURING_ and then focus on the remainder with the parameters, the URL, etc.
+			// find the "_OMGXTURING_" string - everything after that is the
+			// RLP encoded instructions
+			header := "_OMGXTURING_"
 			ii := bytes.Index(ret, []byte(header))
 
 			headerLen := len(header)
-		    rest := ret[ii+headerLen/*12*/ /*==the length of _OMGXTURING_*/:]
-			
-			//Now the 'rest' contains the important stuff, namely: 
-			//the version number, the function name, the URL, and input(s)
-			//to the compute endpoint 
-			log.Debug("TURING-M1 calling bobaTuringCall(rest, input)", 
+			rest := ret[ii+headerLen:]
+
+			// Now the 'rest' contains the important stuff, namely:
+			// the version number, the function name, the URL, and input(s)
+			// to the compute endpoint
+			log.Debug("TURING-M1 calling bobaTuringCall(rest, input)",
 				"rest", rest,
 				"input", input)
 
-            //bobaTuringCall takes the original 'input' (aka calldata), figures out what needs 
-            //to be done (via inspection of the instuctions in 'rest'), and then synthesizes a 
-            //'new_in' calldata that does not lead to the revert (by changing rType from 1 to 2)
+			// bobaTuringCall takes the original 'input' (aka calldata), figures out what needs
+			// to be done (via inspection of the instuctions in 'rest'), and then synthesizes a
+			// 'new_in' calldata that does not lead to the revert (by changing rType from 1 to 2)
 			new_in := bobaTuringCall(rest, input)
 
 			//evm.StateDB.RevertToSnapshot(snapshot) // thoughts?
-            
-            log.Debug("TURING-M2 replay with modified calldata", 
+
+			log.Debug("TURING-M2 replay with modified calldata",
 				"modifiedCalldata", new_in)
 
-            //and then rerun the call with the modified calldata
+			//and then rerun the call with the modified calldata
 			ret, err = run(evm, contract, new_in, false)
 			//the only point of the function is now to return the modified calldata
 			//as the response to the caller
 
-			log.Debug("TURING-M3 received replay response", 
-				"err", err, 
+			log.Debug("TURING-M3 received replay response",
+				"err", err,
 				"ret", hexutil.Bytes(ret))
 		}
 	}
@@ -527,11 +527,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}
 	}
 
-	log.Debug("TURING exiting Call", 
-		"depth", evm.depth, 
-		"addr", addr, 
-		"ret", hexutil.Bytes(ret), 
-		"err", err);
+	log.Debug("TURING exiting Call",
+		"depth", evm.depth,
+		"addr", addr,
+		"ret", hexutil.Bytes(ret),
+		"err", err)
 
 	return ret, contract.Gas, err
 }
