@@ -6,23 +6,38 @@ import { Contract, ContractFactory, utils, BigNumber, constants } from 'ethers'
 import { Direction } from './shared/watcher-utils'
 
 import xL2GovernanceERC20 from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
+import xL2GovernanceERC20Helper from '@boba/contracts/artifacts/contracts/test-helpers/xL2GovernanceERC20Helper.sol/xL2GovernanceERC20Helper.json'
 
 import { OptimismEnv } from './shared/env'
 
 describe('xBOBA Test', async () => {
   let Factory__xBoba: ContractFactory
+  let Factory_xBobaHelper: ContractFactory
   let xBoba: Contract
+  let xBobaHelper: Contract
 
   let env: OptimismEnv
 
   before(async () => {
     env = await OptimismEnv.new()
 
-    xBoba = new Contract(
-      env.addressesBOBA.TOKENS.xBOBA.L2,
+    Factory__xBoba = new ContractFactory(
       xL2GovernanceERC20.abi,
+      xL2GovernanceERC20.bytecode,
       env.l2Wallet
     )
+
+    Factory_xBobaHelper = new ContractFactory(
+      xL2GovernanceERC20Helper.abi,
+      xL2GovernanceERC20Helper.bytecode,
+      env.l2Wallet
+    )
+
+    xBoba = await Factory__xBoba.deploy('xBOBA Token', 'xBOBA', 18)
+    await xBoba.deployTransaction.wait()
+
+    xBobaHelper = await Factory_xBobaHelper.deploy(xBoba.address)
+    await xBobaHelper.deployTransaction.wait()
   })
 
   it('should not be able to transfer ownership for non-owner', async () => {
@@ -31,7 +46,7 @@ describe('xBOBA Test', async () => {
     )
   })
 
-  it('should not be able to unpause xBoba for non-owner', async () => {
+  it('should not be able to unpause xBoba for non-DAO', async () => {
     await expect(
       xBoba.connect(env.l2Wallet_2).transferOwnership(env.l2Wallet_2.address)
     ).to.be.rejectedWith('Caller is not the owner')
@@ -55,18 +70,24 @@ describe('xBOBA Test', async () => {
     ).to.be.rejectedWith('Caller is not the owner')
   })
 
+  it('Should not be able to add EOA accounts as the controller', async () => {
+    await expect(xBoba.addController(env.l2Wallet.address)).to.be.rejectedWith(
+      'Account not contract'
+    )
+  })
+
   it('Should add controller', async () => {
-    const addTx = await xBoba.addController(env.l2Wallet.address)
+    const addTx = await xBoba.addController(xBobaHelper.address)
     await addTx.wait()
 
-    const controllerStatus = await xBoba.controllers(env.l2Wallet.address)
+    const controllerStatus = await xBoba.controllers(xBobaHelper.address)
     expect(controllerStatus).to.be.equal(true)
   })
 
   it('Should not be able to add controller twice', async () => {
-    await expect(xBoba.addController(env.l2Wallet.address)).to.be.eventually.rejected
+    await expect(xBoba.addController(xBobaHelper.address)).to.be.eventually.rejected
 
-    const controllerStatus = await xBoba.controllers(env.l2Wallet.address)
+    const controllerStatus = await xBoba.controllers(xBobaHelper.address)
     expect(controllerStatus).to.be.equal(true)
   })
 
@@ -75,7 +96,7 @@ describe('xBOBA Test', async () => {
 
     const preBalance = await xBoba.balanceOf(env.l2Wallet_2.address)
 
-    const mintTx = await xBoba.mint(env.l2Wallet_2.address, mintAmount)
+    const mintTx = await xBobaHelper.mint(env.l2Wallet_2.address, mintAmount)
     await mintTx.wait()
 
     const postBalance = await xBoba.balanceOf(env.l2Wallet_2.address)
@@ -94,8 +115,19 @@ describe('xBOBA Test', async () => {
     ).to.be.rejectedWith('Pausable: paused')
   })
 
+  it('Should transfer DAO', async () => {
+    const transferTx = await xBoba
+      .connect(env.l2Wallet)
+      .transferDAO(xBobaHelper.address)
+    await transferTx.wait()
+
+    const DAO = await xBoba.DAO()
+    expect(DAO).to.equal(xBobaHelper.address)
+  })
+
   it('Should unpause the xBoba', async () => {
-    const unpauseTx = await xBoba.connect(env.l2Wallet).unpause()
+    const payload = await xBoba.populateTransaction.unpause()
+    const unpauseTx = await xBobaHelper.connect(env.l2Wallet).call(payload.data)
     await unpauseTx.wait()
 
     const pauseStatus = await xBoba.paused()
@@ -143,7 +175,8 @@ describe('xBOBA Test', async () => {
   })
 
   it('Should pause the xBoba', async () => {
-    const pauseTx = await xBoba.connect(env.l2Wallet).pause()
+    const payload = await xBoba.populateTransaction.pause()
+    const pauseTx = await xBobaHelper.connect(env.l2Wallet).call(payload.data)
     await pauseTx.wait()
 
     const pauseStatus = await xBoba.paused()
@@ -151,10 +184,10 @@ describe('xBOBA Test', async () => {
   })
 
   it('Should delete the controller', async () => {
-    const deleteTx = await xBoba.deleteController(env.l2Wallet.address)
+    const deleteTx = await xBoba.deleteController(xBobaHelper.address)
     await deleteTx.wait()
 
-    const controllerStatus = await xBoba.controllers(env.l2Wallet.address)
+    const controllerStatus = await xBoba.controllers(xBobaHelper.address)
     expect(controllerStatus).to.be.equal(false)
   })
 })

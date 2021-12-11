@@ -7,6 +7,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import { ERC20Votes } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20VotesComp.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 /* External Imports */
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -16,6 +17,7 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
     uint8 private immutable _decimals;
     address public owner;
+    address public DAO;
 
     mapping(address => bool) public controllers;
 
@@ -31,19 +33,31 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
         ERC20(_name, _symbol) ERC20Permit(_name) initializer() {
         _decimals = decimals_;
         owner = msg.sender;
+        DAO = msg.sender;
 
         __Context_init_unchained();
         __Pausable_init_unchained();
         __ReentrancyGuard_init_unchained();
+        _pause();
     }
 
-    modifier onlyOwner() {
+    modifier onlyOwner {
         require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
+        _;
+    }
+
+    modifier onlyDAO {
+        require(msg.sender == DAO, 'Caller is not the owner');
         _;
     }
 
     modifier onlyController {
         require(controllers[msg.sender], "Only controller can mint and burn");
+        _;
+    }
+
+    modifier onlyContract (address _address) {
+        require(Address.isContract(_address), "Account not contract");
         _;
     }
 
@@ -62,6 +76,20 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
     }
 
     /**
+     * transfer DAO
+     *
+     * @param _newDAO new owner of this contract
+     */
+    function transferDAO(
+        address _newDAO
+    )
+        public
+        onlyDAO()
+    {
+        DAO = _newDAO;
+    }
+
+    /**
      * add controller
      *
      * @param _controller new controller of this contract
@@ -71,6 +99,7 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
     )
         public
         onlyOwner()
+        onlyContract(_controller)
     {
         require(!controllers[_controller]);
         controllers[_controller] = true;
@@ -86,6 +115,7 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
     )
         public
         onlyOwner()
+        onlyContract(_controller)
     {
         require(controllers[_controller]);
        controllers[_controller] = false;
@@ -94,14 +124,14 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
     /**
      * Pause contract
      */
-    function pause() external onlyOwner() {
+    function pause() external onlyDAO() {
         _pause();
     }
 
     /**
      * UnPause contract
      */
-    function unpause() external onlyOwner() {
+    function unpause() external onlyDAO() {
         _unpause();
     }
 

@@ -249,9 +249,6 @@ const deployFn: DeployFunction = async (hre) => {
   L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', tokenDecimals)
   await L2ERC20.deployTransaction.wait()
 
-  const pauseTx = await L2ERC20.pause()
-  await pauseTx.wait()
-
   const L2ERC20DeploymentSubmission: DeploymentSubmission = {
     ...L2ERC20,
     receipt: L2ERC20.receipt,
