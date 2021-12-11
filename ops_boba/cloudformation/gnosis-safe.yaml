@@ -282,8 +282,8 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-transaction-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
-          Essential: true
-          Memory: "2000"
+          Essential: false
+          Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: worker
           EnvironmentFiles:
@@ -329,8 +329,8 @@ Resources:
             com.datadoghq.ad.check_names: '["worker"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
-          Essential: true
-          Memory: "2500"
+          Essential: false
+          Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: scheduler
           EnvironmentFiles:
@@ -349,7 +349,10 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: "*"
+              Value: !Sub
+                - "*,127.0.0.1,${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -376,8 +379,8 @@ Resources:
             com.datadoghq.ad.check_names: '["worker"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
-          Essential: true
-          Memory: "2000"
+          Essential: false
+          Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
           Name: safe-client-gateway
           PortMappings:
@@ -437,8 +440,8 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-client-gateway"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
-          Essential: true
-          Memory: "2000"
+          Essential: false
+          Memory: "4000"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
           MountPoints:
@@ -482,7 +485,7 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
-          Essential: true
+          Essential: false
           Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-react:${ImageTag}"
           Name: safe-react
@@ -507,8 +510,8 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-react"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
-          Essential: true
-          Memory: "1500"
+          Essential: false
+          Memory: "3000"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
