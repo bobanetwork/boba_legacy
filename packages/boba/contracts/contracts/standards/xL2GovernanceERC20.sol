@@ -3,38 +3,32 @@ pragma solidity >0.7.5;
 
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import { ERC20Votes } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20VotesComp.sol";
-import { IL2StandardERC20 } from "@eth-optimism/contracts/contracts/standards/IL2StandardERC20.sol";
 
 /* External Imports */
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-contract xL2GovernanceERC20 is Context, IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, ReentrancyGuardUpgradeable, PausableUpgradeable {
-    address public l1Token;
-    address public l2Bridge;
+contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, ReentrancyGuardUpgradeable, PausableUpgradeable {
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
     uint8 private immutable _decimals;
     address public owner;
 
+    mapping(address => bool) public controllers;
+
     /**
-     * @param _l2Bridge Address of the L2 standard bridge.
-     * @param _l1Token Address of the corresponding L1 token.
      * @param _name ERC20 name.
      * @param _symbol ERC20 symbol.
      */
     constructor(
-        address _l2Bridge,
-        address _l1Token,
         string memory _name,
         string memory _symbol,
          uint8 decimals_
     )
         ERC20(_name, _symbol) ERC20Permit(_name) initializer() {
-        l1Token = _l1Token;
-        l2Bridge = _l2Bridge;
         _decimals = decimals_;
         owner = msg.sender;
 
@@ -48,13 +42,13 @@ contract xL2GovernanceERC20 is Context, IL2StandardERC20, ERC20, ERC20Permit, ER
         _;
     }
 
-    modifier onlyL2Bridge {
-        require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
+    modifier onlyController {
+        require(controllers[msg.sender], "Only controller can mint and burn");
         _;
     }
 
     /**
-     * @dev transfer ownership
+     * transfer ownership
      *
      * @param _newOwner new owner of this contract
      */
@@ -65,6 +59,36 @@ contract xL2GovernanceERC20 is Context, IL2StandardERC20, ERC20, ERC20Permit, ER
         onlyOwner()
     {
         owner = _newOwner;
+    }
+
+    /**
+     * add controller
+     *
+     * @param _controller new controller of this contract
+     */
+    function addController(
+        address _controller
+    )
+        public
+        onlyOwner()
+    {
+        require(!controllers[_controller]);
+        controllers[_controller] = true;
+    }
+
+    /**
+     * delete controller
+     *
+     * @param _controller controller of this contract
+     */
+    function deleteController(
+        address _controller
+    )
+        public
+        onlyOwner()
+    {
+        require(controllers[_controller]);
+       controllers[_controller] = false;
     }
 
     /**
@@ -87,22 +111,15 @@ contract xL2GovernanceERC20 is Context, IL2StandardERC20, ERC20, ERC20Permit, ER
 
     function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
-        bytes4 secondSupportedInterface = IL2StandardERC20.l1Token.selector
-            ^ IL2StandardERC20.mint.selector
-            ^ IL2StandardERC20.burn.selector;
-        return _interfaceId == firstSupportedInterface || _interfaceId == secondSupportedInterface;
+        return _interfaceId == firstSupportedInterface;
     }
 
-    function mint(address _to, uint256 _amount) public virtual onlyL2Bridge {
+    function mint(address _to, uint256 _amount) public virtual onlyController {
         _mint(_to, _amount);
-
-        emit Mint(_to, _amount);
     }
 
-    function burn(address _from, uint256 _amount) public virtual onlyL2Bridge {
+    function burn(address _from, uint256 _amount) public virtual onlyController {
         _burn(_from, _amount);
-
-        emit Burn(_from, _amount);
     }
 
     // Overrides required by Solidity
@@ -112,6 +129,30 @@ contract xL2GovernanceERC20 is Context, IL2StandardERC20, ERC20, ERC20Permit, ER
 
     function _burn(address _account, uint256 _amount) internal override (ERC20, ERC20Votes) {
         super._burn(_account, _amount);
+    }
+
+    function transfer(address recipient, uint256 amount) public virtual whenNotPaused override (ERC20) returns (bool) {
+        return super.transfer(recipient, amount);
+    }
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public virtual whenNotPaused override (ERC20) returns (bool) {
+        return super.transferFrom(sender, recipient, amount);
+    }
+
+    function approve(address spender, uint256 amount) public virtual whenNotPaused override (ERC20) returns (bool) {
+        return super.approve(spender, amount);
+    }
+
+    function increaseAllowance(address spender, uint256 addedValue) public virtual whenNotPaused override (ERC20) returns (bool) {
+        return super.increaseAllowance(spender, addedValue);
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual whenNotPaused override (ERC20) returns (bool) {
+        return super.decreaseAllowance(spender, subtractedValue);
     }
 
     function _afterTokenTransfer(
