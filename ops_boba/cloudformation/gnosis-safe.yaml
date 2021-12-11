@@ -481,6 +481,7 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
+          PseudoTerminal: true
           DockerLabels:
             com.datadoghq.ad.check_names: '["safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
