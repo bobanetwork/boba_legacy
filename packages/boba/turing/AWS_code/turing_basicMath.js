@@ -1,6 +1,6 @@
 exports.handler = async (event) => {
     
-    //caller provides for example, two floats to add or multiply
+    //caller provides, for example, two floats to add or multiply
     const input = JSON.parse(event.body)
     
     const float1 = parseFloat(input["key1"])
