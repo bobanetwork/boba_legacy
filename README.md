@@ -67,10 +67,10 @@ as well as a docker-compose file for bringing up local testnets easily
 * [`boba_utilities`](./boba_utilities): A stress-tester fro discovering bugs under load
 * [`ops_boba`](./ops_boba): Parts of the Boba backend, including the `api-watcher` service
 * [`packages/boba`](./packages/boba): Contains all the boba typescript packages and contracts
-  * [`contracts`](./packages/boba/contracts): Solidity smart contracts implementing Boba features including the fast bridges and the DAO
+  * [`contracts`](./packages/boba/contracts): Solidity smart contracts implementing features including the fast bridges and the DAO
   * [`gateway`](./packages/boba/gateway): The Boba Web gateway
   * [`gas-price-oracle`](./packages/boba/gas-price-oracle): A custom gas price oracle
-  * [`message-realyer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
+  * [`message-relayer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
   * [`turing`](./packages/boba/turing): Experimental branch only - system for hybrid compute
 
 ## Contributing
