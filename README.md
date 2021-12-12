@@ -26,7 +26,7 @@
 
 ## TL;DR
 
-This is the primary place where [Boba](https://boba.network) works on the Boba L2. The Boba L2 is based on [Optimism](https://optimism.io) and uses the same base contracts, but differs from Optimism by:
+This is the primary place where [Boba](https://boba.network) works on the Boba L2. Boba is based on the amazing work done by [Optimism](https://optimism.io) and uses the same base contracts, but differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -35,7 +35,7 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
   * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
   * being organized as a [DAO](./packages/boba/contracts/contracts/DAO)
   * (coming on Dec. 20) native [NFT bridging](./packages/boba/contracts/contracts/bridges)
-  * Boba automatically relays classical 7-day exits messages to L1 for you, rather than this being a separate step
+  * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
 ## Documentation
 
@@ -47,7 +47,7 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
 
 ## Directory Structure
 
-**Base layer (generally similar or identical to Optimistic Ethereum)**
+**Base Layer (generally similar or identical to Optimistic Ethereum)**
 
 * [`packages`](./packages): Contains all the typescript packages and contracts
   * [`contracts`](./packages/contracts): Solidity smart contracts implementing the OVM
@@ -62,7 +62,7 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
 * [`ops`](./ops): Contains Dockerfiles for containerizing each service involved in the protocol,
 as well as a docker-compose file for bringing up local testnets easily
 
-**Boba layer**
+**Boba Layer**
 
 * [`boba_community`](./boba_community): Code for running your own Boba node/replica and the fraud detector
 * [`boba_documentation`](./boba_documentation): Boba-specific documentation
