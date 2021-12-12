@@ -5,9 +5,9 @@
 </div>
 
 <p align="center">
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/typescript%20/%20contracts/badge.svg" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration/badge.svg" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth%20unit%20tests/badge.svg" /></a>
+  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
 </p>
 
 - [TL;DR](#tl-dr)
