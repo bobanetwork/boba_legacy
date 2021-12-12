@@ -2,15 +2,19 @@
 
 - [Introduction to Turing](#introduction-to-turing)
   * [What is Turing?](#what-is-turing-)
-  * [Technical Backdrop](#technical-backdrop)
+  * [Motivation](#motivation)
+  * [What we are **not** trying to do](#what-we-are---not---trying-to-do)
   * [Basic System Architecture](#basic-system-architecture)
   * [Current Limitations: Prototyping use only](#current-limitations--prototyping-use-only)
   * [Hello World](#hello-world)
-  * [Under the hood](#under-to-hood)
+  * [Under the hood](#under-the-hood)
   * [Key code snippets](#key-code-snippets)
-  * [Preconfigured AWS Lambda code for Testing](#preconfigured-aws-lambda-code-for-testing)
-    + [Trivial Add and Multiply](#trivial-add-and-multiply)
-    + [Stableswap re-parametrisation](#stableswap-re-parametrisation)
+  * [Some simple use cases](#some-simple-use-cases)
+  * [Pre-configured AWS Lambda code for Testing](#pre-configured-aws-lambda-code-for-testing)
+    + [Turing Simple Math](#turing-simple-math)
+    + [Turing StableSwap example](#turing-stableswap-example)
+  * [Turing Debugging](#turing-debugging)
+  * [Long Term - the Horizon](#long-term---the-horizon)
     
 ## What is Turing?
 
@@ -21,7 +25,7 @@ Turing is a system for _hybrid compute_, defined as enabling Solidity smart cont
     * reuse existing API endpoints (for algorithmic trading, big data, and AI)
     * run calculations for 1 cent that would be cost millions on Ethereum
     * run calculations in milliseconds that would be take decades on Ethereum
-    * not to worry about nearest-integer division, or other EVM specialities such as SQRT(3) = 1
+    * not to worry about nearest-integer division, or other EVM specialties such as SQRT(3) = 1
     * write complex `hybrid` contracts without worrying about the 24k bytecode limit 
 
 ## Motivation
@@ -33,7 +37,7 @@ Smart contracts live in a local world defined by their chain. By design, smart c
 
 If smart contracts could directly call off-chain APIs, different instances of the chain would struggle to agree on its next state, due to:
 
-    1. **System latencies**. Each node would have to accomodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
+    1. **System latencies**. Each node would have to accommodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
 
     2. **Non-deterministic external operations**. Random number generators, stochastic gradient decent, or even different compute platforms with different numerical precision/truncation would greatly complicate distributed consensus. Specifically, there could be numerous mathematically correct answers to _what is the next state of the chain given some set of contract interactions_. By contrast, in a typical blockchain, all miners, when given the same inputs, know precisely what the correct outputs are. 
 
