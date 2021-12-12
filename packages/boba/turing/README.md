@@ -21,25 +21,25 @@
 Unlike Bitcoin, Ethereum is both a blockchain and a general-purpose computer. Although Ethereum is Turing-complete, the congestion of the network and the exorbitant gas prices preclude all but the most essential computations from taking place on Ethereum. Beyond limited speed and memory, and extreme cost, the architecture of the Ethereum EVM was not designed for, and is therefore not well suited for, contemporary algorithms from finance, algorithmic trading, artificial intelligence, creative content, audio and film, games, and computer science. Boba's **Turing** is designed to address these limitations. 
 
 Turing is a system for _hybrid compute_, defined as enabling Solidity smart contracts to interact with conventional compute endpoints via a modified L2 Geth. This makes it very easy for developers to:
-    * reuse existing Python, R, C++, Kera, Tensorflow, and other code
-    * reuse existing API endpoints (for algorithmic trading, big data, and AI)
-    * run calculations for 1 cent that would be cost millions on Ethereum
-    * run calculations in milliseconds that would be take decades on Ethereum
-    * not to worry about nearest-integer division, or other EVM specialties such as SQRT(3) = 1
-    * write complex `hybrid` contracts without worrying about the 24k bytecode limit 
+  * reuse existing Python, R, C++, Kera, Tensorflow, and other code  
+  * reuse existing API endpoints (for algorithmic trading, big data, and AI)  
+  * run calculations for 1 cent that would be cost millions on Ethereum  
+  * run calculations in milliseconds that would be take decades on Ethereum  
+  * not to worry about nearest-integer division, or other EVM specialties such as SQRT(3) = 1  
+  * write complex `hybrid` contracts without worrying about the 24k bytecode limit   
 
 ## Motivation
 
 Smart contracts live in a local world defined by their chain. By design, smart contracts cannot readily trigger off-chain events. This is because in a system with distributed consensus, all miners must:
 
-    1. Be trying to solve the _same_ problem and be operating on the the same inputs, and,
-    2. Once a solution has been found, it must be trivial (and fast) for all the other miners to check that solution's validity.
+1. Be trying to solve the _same_ problem and be operating on the the same inputs, and,  
+2. Once a solution has been found, it must be trivial (and fast) for all the other miners to check that solution's validity.  
 
-If smart contracts could directly call off-chain APIs, different instances of the chain would struggle to agree on its next state, due to:
+If smart contracts could directly call off-chain APIs, different nodes would struggle to agree on its next state, due to:
 
-    1. **System latencies**. Each node would have to accommodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
+1. **System latencies**. Each node would have to accommodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
 
-    2. **Non-deterministic external operations**. Random number generators, stochastic gradient decent, or even different compute platforms with different numerical precision/truncation would greatly complicate distributed consensus. Specifically, there could be numerous mathematically correct answers to _what is the next state of the chain given some set of contract interactions_. By contrast, in a typical blockchain, all miners, when given the same inputs, know precisely what the correct outputs are. 
+2. **Non-deterministic external operations**. Random number generators, stochastic gradient decent, or even different compute platforms with different numerical precision/truncation complicate distributed consensus. Specifically, there could be numerous mathematically correct answers to _what is the next state of the chain given some set of contract interactions_. By contrast, in a typical blockchain, all miners, when given the same inputs, know precisely what the correct outputs are. 
 
 The recent growth of L2 scaling solutions is typically explained in terms of improved speed and reduced cost; however there is an additional benefit which has received less attention but may be even more important. Specifically, there is no mining on the L2s and they involve **unitary sequencers**, which indirectly solves the above issues, opening the door to advanced computation coordinated by Ethereum. 
 
@@ -49,7 +49,7 @@ There has been a general tendency in the literature to conflate 'off-chain compu
 
 ## Basic System Architecture
 
-Turing involves a small number of simple helper contracts, a modified Geth, and traditional compute endpoints including AWS Lambda. The system is based on (1) sending information to Geth via data hidden in revert strings and (2) receiving information from Geth via overloaded calldata. Specifically, a calling contract packs information into a revert string and _deliberately_ causes a call to a target contract to revert. The modified Geth intercepts those reverts, unpacks the data (such as input parameters and URIs such as `https://kkfpq0g9y0.execute-api.us-west-1.amazonaws.com/default/turing_add`), and calls the endpoint with those parameters. After receiving a response, Geth caches it, packs it into the calldata, and re-runs the call, which now succeeds, returning the calldata to the original calling contract. In this way, a contract is able to trigger arbitrary compute endpoints and send and receive data from the outside world.
+Turing involves a small number of simple helper contracts, a modified Geth, and traditional compute endpoints including AWS Lambda. The system is based on (1) sending information to Geth via data hidden in revert strings and (2) receiving information from Geth via overloaded calldata. Specifically, a calling contract packs information into a revert string and _deliberately_ causes a call to a target contract to revert. The modified Geth intercepts those reverts, unpacks the data (such as input parameters and URIs such as `https://kkfpq0g9y0.execute-api.us-west-1.amazonaws.com/default/turing_add`), and calls the endpoint with those parameters. After receiving a response, Geth caches it, packs it into the calldata, and re-runs the call, which now succeeds, returning the modified calldata to the original calling contract. In this way, a contract is able to trigger arbitrary compute endpoints and send and receive data from the outside world.
 
 ## Current Limitations: Prototyping use only
 
@@ -57,7 +57,7 @@ Turing is *NOT* ready for production use, but is a technical prototype designed 
 
 1. Effectively no error handling
 2. Absence of unit and integration tests
-3. The current system is incompatible with fraud detection and fraud proving. This is because we are not currently storing all the data that would be needed for an outside observer to re-compute the state of chain, thereby verifying the consistency of the input transactions and the state roots, for example. However, Turing in already emiting event which contain the needed information, and thus this issue can be addressed by adding additional functionality to fraud detectors and fraud provers.
+3. The current system is incompatible with fraud detection and fraud proving. This is because we are not currently storing all the data that would be needed for an outside observer to re-compute the state of chain, thereby verifying the consistency of the input transactions and the state roots, for example. However, Turing can already emit events which contain the needed information, and thus this issue can be addressed by adding additional functionality to fraud detectors and fraud provers.
 4. Due to points 1 to 3, Turing can only be used on local test systems and is not (yet) available on `rinkeby.boba.network` or `mainnet.boba.network`. 
 
 ## Hello World
