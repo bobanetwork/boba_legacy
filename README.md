@@ -26,13 +26,16 @@
 
 ## TL;DR
 
-This is the primary place where [Boba](https://boba.network) works on the Boba L2. The Boba L2 is based on [Optimistic Ethereum](https://research.paradigm.xyz/optimism) and uses the same base contracts, but differs from Optimism by:
+This is the primary place where [Boba](https://boba.network) works on the Boba L2. The Boba L2 is based on [Optimism](https://optimism.io) and uses the same base contracts, but differs from Optimism by:
 
-  * providing additional cross-chain services such as a `message-relayer-fast`
+  * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
-  * providing a system for rapid L2->L1 exits (without the 7 day window)
+  * providing a swap-based system for rapid L2->L1 exits (without the 7 day delay)
   * providing a community fraud-detector that allows transactions to be independently verified by anyone
-  * using ERC20 ETH as the fee token rather than WETH
+  * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
+  * being organized as a [DAO](./packages/boba/contracts/contracts/DAO)
+  * (coming on Dec. 20) native [NFT bridging](./packages/boba/contracts/contracts/bridges)
+  * Boba automatically relays classical 7-day exits messages to L1 for you, rather than this being a separate step
 
 ## Documentation
 
@@ -44,7 +47,7 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
 
 ## Directory Structure
 
-**Base layer (similar or identical to Optimistic Ethereum)**
+**Base layer (generally similar or identical to Optimistic Ethereum)**
 
 * [`packages`](./packages): Contains all the typescript packages and contracts
   * [`contracts`](./packages/contracts): Solidity smart contracts implementing the OVM
@@ -61,21 +64,22 @@ as well as a docker-compose file for bringing up local testnets easily
 
 **Boba layer**
 
-* [`boba_community`](./boba_community): Code for running your own boba node/replica and the fraud detector
+* [`boba_community`](./boba_community): Code for running your own Boba node/replica and the fraud detector
 * [`boba_documentation`](./boba_documentation): Boba-specific documentation
-* [`boba_examples`](./boba_examples): Basic examples for deploying contracts on Boba
-* [`boba_utilities`](./boba_utilities): A stress-tester fro discovering bugs under load
-* [`ops_boba`](./ops_boba): Parts of the Boba backend, including the `api-watcher` service
-* [`packages/boba`](./packages/boba): Contains all the boba typescript packages and contracts
-  * [`contracts`](./packages/boba/contracts): Solidity smart contracts implementing features including the fast bridges and the DAO
-  * [`gateway`](./packages/boba/gateway): The Boba Web gateway
+* [`boba_examples`](./boba_examples): Basic examples of deploying contracts on Boba
+* [`boba_utilities`](./boba_utilities): A stress-tester for discovering bugs under load
+* [`ops_boba`](./ops_boba): Parts of the Boba back-end, including the `api-watcher` service
+* [`packages/boba`](./packages/boba): Contains all the Boba typescript packages and contracts
+  * [`contracts`](./packages/boba/contracts): Solidity smart contracts implementing the fast bridges, the DAO, etc.
   * [`gas-price-oracle`](./packages/boba/gas-price-oracle): A custom gas price oracle
+  * [`gateway`](./packages/boba/gateway): The Boba Web gateway
   * [`message-relayer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
+  * [`register`](./packages/boba/register): Code for registering addresses in the AddressManager
+  * [`subgraph`](./packages/boba/subgraph): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
   * [`turing`](./packages/boba/turing): Experimental branch only - system for hybrid compute
 
 ## Contributing
 
-Read through [CONTRIBUTING.md](./CONTRIBUTING.md) for a general overview of our contribution process.
 Follow the [Development Quick Start](#development-quick-start) to set up your local development environment.
 
 ## Development Quick Start
@@ -90,14 +94,14 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**. 
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
 $ git clone git@github.com:omgnetwork/optimism-v2.git
 $ cd optimism-v2
-$ yarn clean
+$ yarn clean # only needed / will only work if you had it installed previously
 $ yarn
 $ yarn build
 ```
@@ -111,7 +115,7 @@ $ BUILD=1 DAEMON=0 ./up_local.sh
 
 ## Spinning up the stack
 
-Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
+Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings in docker - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
 ```bash
 ./scripts/wait-for-sequencer.sh
@@ -129,7 +133,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
-* _To (re)build individual Boba services_: `docker-compose -f "docker-compose.yml" build -- boba_message-relayer-fast` Note: First you will have to comment out various dependencies in `docker-compose.yml`.
+* _To (re)build individual Boba services_: `docker-compose -f "docker-compose.yml" build -- boba_message-relayer-fast` Note: You may have to first comment out various dependencies in `docker-compose.yml`.
 
 ### Running unit tests
 
@@ -148,7 +152,7 @@ Make sure you are in the `ops` folder and then run
 docker-compose run integration_tests
 ```
 
-Expect the full test suite to complete in between *30 minutes* to *two hours* depending on your computer hardware. 
+Expect the full test suite with more than 110 tests including load tests to complete in between *30 minutes* to *two hours* depending on your computer hardware. 
 
 ### Viewing docker container logs
 
