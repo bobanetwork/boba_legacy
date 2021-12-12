@@ -180,10 +180,10 @@ class BlockMonitorService extends OptimismEnv {
       // update scannedLastBlock
       this.scannedLastBlock = this.latestBlock
 
-      this.logger.info(
-        `Found block, receipt and transaction data. Sleeping ${this.transactionMonitorInterval} ms...`
-      )
-    } else {
+      // this.logger.info(
+      //   `Found block, receipt and transaction data. Sleeping ${this.transactionMonitorInterval} ms...`
+      // )
+    // } else {
       // this.logger.info('No new block found.');
     }
 
@@ -191,7 +191,7 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async startCrossDomainMessageMonitor() {
-    this.logger.info('Searching cross domain messages...')
+    // this.logger.info('Searching cross domain messages...')
     const crossDomainData = await this.databaseService.getL2CrossDomainData()
 
     // counts the number of server request
@@ -204,7 +204,7 @@ class BlockMonitorService extends OptimismEnv {
     let checkNonWhitelist = this.checkTime(this.nonWhitelistString)
 
     if (crossDomainData.length) {
-      this.logger.info('Found cross domain message.')
+      // this.logger.info('Found cross domain message.')
 
       for (let receiptData of crossDomainData) {
         if (promiseCount % this.L2sleepThresh === 0) {
@@ -223,8 +223,8 @@ class BlockMonitorService extends OptimismEnv {
         }
       }
       promiseCount = 0
-    } else {
-      this.logger.info('No waiting cross domain message found.')
+    // } else {
+      // this.logger.info('No waiting cross domain message found.')
     }
 
     if (checkWhitelist) {
@@ -234,9 +234,9 @@ class BlockMonitorService extends OptimismEnv {
       checkNonWhitelist = false
     }
 
-    this.logger.info(
-      `End searching cross domain messages. Sleeping ${this.crossDomainMessageMonitorInterval} ms...`
-    )
+    // this.logger.info(
+    //   `End searching cross domain messages. Sleeping ${this.crossDomainMessageMonitorInterval} ms...`
+    // )
 
     await sleep(this.crossDomainMessageMonitorInterval)
   }
@@ -324,7 +324,7 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async getCrossDomainMessageStatusL1(receiptData) {
-    this.logger.info('Checking if message has been finalized...')
+    // this.logger.info('Checking if message has been finalized...')
     const receiptDataRaw = await this.L2Provider.getTransactionReceipt(
       receiptData.transactionHash
         ? receiptData.transactionHash
@@ -432,10 +432,10 @@ class BlockMonitorService extends OptimismEnv {
     receiptData.crossDomainMessageFinalizedTime =
       crossDomainMessageFinalizedTime
 
-    this.logger.info('Found the cross domain message status', {
-      crossDomainMessageFinalize,
-      crossDomainMessageFinalizedTime,
-    })
+    // this.logger.info('Found the cross domain message status', {
+    //   crossDomainMessageFinalize,
+    //   crossDomainMessageFinalizedTime,
+    // })
 
     return receiptData
   }

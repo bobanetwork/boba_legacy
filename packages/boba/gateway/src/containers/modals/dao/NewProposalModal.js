@@ -16,7 +16,7 @@ limitations under the License. */
 import React, { useState } from 'react'
 import { Box, Typography, useMediaQuery } from '@material-ui/core'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { closeModal, openAlert } from 'actions/uiAction'
 
@@ -29,13 +29,18 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import { createDaoProposal } from 'actions/daoAction'
+import { selectProposalThreshold } from 'selectors/daoSelector'
 
 function NewProposalModal({ open }) {
+
     const dispatch = useDispatch()
 
     const [action, setAction] = useState('')
     const [votingThreshold, setVotingThreshold] = useState('')
-    const [LPfee, setLPfee] = useState('')
+
+    const [LPfeeMin, setLPfeeMin] = useState('')
+    const [LPfeeMax, setLPfeeMax] = useState('')
+    const [LPfeeOwn, setLPfeeOwn] = useState('')
 
     const [proposeText, setProposeText] = useState('')
     const [proposalUri, setProposalUri] = useState('')
@@ -45,9 +50,13 @@ function NewProposalModal({ open }) {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+    const proposalThreshold = useSelector(selectProposalThreshold)
+
     const onActionChange = (e) => {
         setVotingThreshold('')
-        setLPfee('')
+        setLPfeeMin('')
+        setLPfeeMax('')
+        setLPfeeOwn('')
         setProposeText('')
         setProposalUri('')
         setAction(e.value)
@@ -55,7 +64,9 @@ function NewProposalModal({ open }) {
 
     function handleClose() {
         setVotingThreshold('')
-        setLPfee('')
+        setLPfeeMin('')
+        setLPfeeMax('')
+        setLPfeeOwn('')
         setAction('')
         setProposeText('')
         setProposalUri('')
@@ -64,8 +75,9 @@ function NewProposalModal({ open }) {
 
     const options = [
       { value: 'change-threshold', label: 'Change Voting Threshold' },
-      { value: 'text-proposal', label: 'Freeform Text Proposal' },
-      { value: 'change-lp-fee', label: 'Change LP fees' }
+      { value: 'text-proposal',    label: 'Freeform Text Proposal' },
+      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' },
+      { value: 'change-lp2-fee',   label: 'Change L2 LP fees' }
     ]
 
     const customStyles = {
@@ -75,27 +87,33 @@ function NewProposalModal({ open }) {
       }),
     }
 
+/*
+    function configureFeeExits(
+        uint256 _userRewardMinFeeRate,
+        uint256 _userRewardMaxFeeRate,
+        uint256 _ownerRewardFeeRate
+    )
+*/
     const submit = async () => {
         
         let res = null
 
         if (action === 'change-threshold') {
             res = await dispatch(createDaoProposal({
-              action, //e.g. === 'change-threshold'
-              value: votingThreshold, //parameter
-              text: '' //text if any
+              action,
+              value: [votingThreshold],
+              text: '' //extra text if any
             }))
         } else if (action === 'text-proposal') {
             res = await dispatch(createDaoProposal({
               action,
-              value: 0,
               text: `${proposeText}@@${proposalUri}`
             }))
-        } else if (action === 'change-lp-fee') {
+        } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
             res = await dispatch(createDaoProposal({
               action,
-              value: LPfee,
-              text: ''
+              value: [Math.round(Number(LPfeeMin)*10), Math.round(Number(LPfeeMax)*10), Math.round(Number(LPfeeOwn)*10)],
+              text: ''  //extra text if any
             }))
         }
         
@@ -110,12 +128,29 @@ function NewProposalModal({ open }) {
             return !votingThreshold
         } else if (action === 'text-proposal') {
             return !proposeText
-        } else if (action === 'change-lp-fee') {
-            if (LPfee < 0 || LPfee > 50) {
-                setLPfee(0)
+        } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
+            if (Number(LPfeeMin) < 0.0 || Number(LPfeeMin) > 5.0) {
                 return true //aka disabled
             }
-            return !LPfee
+            if (Number(LPfeeMax) < 0.0 || Number(LPfeeMax) > 5.0) {
+                return true //aka disabled
+            }
+            if (Number(LPfeeMax) <= Number(LPfeeMin)) {
+                return true //aka disabled
+            }
+            if (Number(LPfeeOwn) < 0.0 || Number(LPfeeOwn) > 5.0) {
+                return true
+            }
+            if (LPfeeMin === '') {
+                return true
+            }
+            if (LPfeeMax === '') {
+                return true
+            }
+            if (LPfeeOwn === '') {
+                return true
+            }
+            return false
         }
     }
 
@@ -134,53 +169,93 @@ function NewProposalModal({ open }) {
                         options={options}
                         onChange={onActionChange}
                         styles={customStyles}
+                        sx={{marginBottom: '20px'}} 
                     >
                     </Select>
                     {action === '' && 
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
-                        >Right now, the DAO can do three things - change the voting threshold, propose free-form text proposals, and 
-                        propose changes to the bridge 
+                        <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
+                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and 
+                        change to the bridge fee limits for the L1 and L2 bridge pools. 
                         </Typography>
                     }
                     {action === 'change-threshold' && 
+                    <>
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                        >
+                            The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
+                        </Typography>
                         <Input
-                            placeholder='Enter new voting threshold...'
+                            label="DAO voting threshold"
+                            placeholder='New voting threshold (e.g. 65000)'
                             value={votingThreshold}
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
                             fullWidth
-                            sx={{marginTop: '20px'}} 
+                            sx={{marginBottom: '20px'}} 
                         />
-                    }
-                    {action === 'change-lp-fee' && <> 
-                        <Input
-                            placeholder="Enter new LP fee in integer tenths"
-                            value={LPfee}
-                            type="number"
-                            onChange={(i)=>setLPfee(i.target.value)}
-                            fullWidth
-                            sx={{marginTop: '20px'}} 
-                        />
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', padding: 10, paddingTop: 20, color: '#f8e5e5'}}
-                        >The fee units are integer tenths. 
-                        For example, proposing a fee of '3' corresponds to 
-                        a bridge fee of 0.3%, whereas a fee of '25' denotes a bridge fee of 2.5%. Possible settings range from 
-                        0 to 50, i.e., 0.0% to 5.0%.</Typography>
                     </>
                     }
-                    {action === 'text-proposal' && <>
+                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') && 
+                    <> 
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                        >
+                            Possible settings range from 0.0% to 5.0%.
+                            All three values must be specified and the maximum fee must be larger than the minimum fee.
+                        </Typography>
                         <Input
-                            placeholder="Enter proposal text"
-                            value={proposeText}
-                            onChange={(i)=>setProposeText(i.target.value)}
-                            sx={{marginTop: '20px'}} 
+                            label="New LP minimium fee (%)"
+                            placeholder="Minimium fee (e.g. 1.0)"
+                            value={LPfeeMin}
+                            type="number"
+                            onChange={(i)=>setLPfeeMin(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
                         />
                         <Input
-                            placeholder="Enter proposal URI (Optional)"
+                            label="New LP maximum fee (%)"
+                            placeholder="Maximum fee (e.g. 3.0)"
+                            value={LPfeeMax}
+                            type="number"
+                            onChange={(i)=>setLPfeeMax(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
+                        />
+                        <Input
+                            label="New LP operator fee (%)"
+                            placeholder="Operator fee (e.g. 1.0)"
+                            value={LPfeeOwn}
+                            type="number"
+                            onChange={(i)=>setLPfeeOwn(i.target.value)}
+                            fullWidth
+                            sx={{marginBottom: '20px'}} 
+                        />
+                    </>
+                    }
+                    {action === 'text-proposal' && 
+                    <>
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        >
+                            Your proposal title is limited to 100 characters. Use the link field below to provide more information.
+                        </Typography>
+                        <Input
+                            placeholder="Title (<100 characters)"
+                            value={proposeText}
+                            onChange={(i)=>setProposeText(i.target.value.slice(0, 100))}
+                            sx={{marginTop: '20px'}}  
+                        />
+                        <Typography variant="body2" 
+                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        >
+                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate 
+                            website. The link length is limited to 150 characters. You may need to use a link shortener. 
+                        </Typography>
+                        <Input
+                            placeholder="URI, https://..."
                             value={proposalUri}
-                            onChange={(i)=>setProposalUri(i.target.value)}
+                            onChange={(i)=>setProposalUri(i.target.value.slice(0, 150))}
                             sx={{marginTop: '20px'}} 
                         />
                     </>

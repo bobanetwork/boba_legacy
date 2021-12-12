@@ -13,7 +13,7 @@
     "audit-check": "audit-ci --moderate",
     "postinstall": "patch-package",
     "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:rinkeby": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=rinkeby react-scripts build && aws s3 rm s3://boba-gateway-test --recursive && aws s3 sync build s3://boba-gateway-test && aws s3 cp s3://boba-gateway-test/index.html s3://boba-gateway-test/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
+    "deploy:rinkeby": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=rinkeby react-scripts build && aws s3 rm s3://boba-gateway-rinkeby --recursive && aws s3 sync build s3://boba-gateway-rinkeby && aws s3 cp s3://boba-gateway-rinkeby/index.html s3://boba-gateway-rinkeby/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
   },
   "dependencies": {
     "@emotion/react": "^11.4.0",
