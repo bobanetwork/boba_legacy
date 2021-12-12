@@ -49,7 +49,7 @@ describe("Basic Math", function () {
         req.on('end', async function () {
 
           var jBody = JSON.parse(body)
- 
+
           if (jBody.method === "add2") {
 
             let v1 = jBody.params[0]
@@ -66,7 +66,7 @@ describe("Basic Math", function () {
               "result": abiDecoder.encodeParameter('uint256', sum)
             }
             res.end(JSON.stringify(jResp2))
-            server.emit('success', body);
+            server.emit('success', body)
           } else if (jBody.method === "mult2") {
             let v1 = jBody.params[0]
 
@@ -81,44 +81,53 @@ describe("Basic Math", function () {
               "id": jBody.id,
               "result": abiDecoder.encodeParameter('uint256', product)
             }
-            res.end(JSON.stringify(jResp2));
-            server.emit('success', body);
+            res.end(JSON.stringify(jResp2))
+            server.emit('success', body)
           } 
           else if (jBody.method === "float") {
             let v1 = jBody.params[0]
+            //console.log("      params:", v1)
 
             const args = abiDecoder.decodeParameters(['string', 'string'], v1)
-
+            //console.log("      args:", args)
             let product = parseFloat(args['0']) / parseFloat(args['1'])
+            //console.log("      product:", product)
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             console.log("      (HTTP) Returning off-chain response:", args, "->", product.toString())
+            const result = abiDecoder.encodeParameter('string', product.toString())
             var jResp2 = {
               "jsonrpc": "2.0",
               "id": jBody.id,
-              "result": abiDecoder.encodeParameter('string', product.toString())
+              "result": result
             }
-            res.end(JSON.stringify(jResp2));
-            server.emit('success', body);
+            //console.log("      jResp2:", jResp2)
+            var jResp2JSON = JSON.stringify(jResp2)
+            //console.log("      jResp2JSON:", jResp2JSON)
+            res.end(jResp2JSON)
+            server.emit('success', body)
           } 
           else if (jBody.method === "sphere") {
             let v1 = jBody.params[0]
+            //console.log("      params:", v1)
 
             const args = abiDecoder.decodeParameters(['string', 'string'], v1)
+            //console.log("      args:", args)
 
             let volume = (4/3) * parseFloat(args['0']) * Math.pow(parseFloat(args['1']),3)
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            console.log("      (HTTP) Returning off-chain response:", args, "->", volume.toString())
+            console.log("      (HTTP) SPHERE Returning off-chain response:", args, "->", volume.toString())
             var jResp2 = {
               "jsonrpc": "2.0",
               "id": jBody.id,
               "result": abiDecoder.encodeParameter('string', volume.toString())
             }
-            res.end(JSON.stringify(jResp2));
-            server.emit('success', body);
+            res.end(JSON.stringify(jResp2))
+            server.emit('success', body)
           } 
           else {
+            console.log("Unknown method:", jBody.method)
             res.writeHead(400, { 'Content-Type': 'text/plain' })
             res.end('Unknown method')
           }
@@ -126,6 +135,7 @@ describe("Basic Math", function () {
         });
 
       } else {
+        console.log("Other request:", req)
         res.writeHead(400, { 'Content-Type': 'text/plain' })
         res.end('Expected content-type: application/json')
       }
@@ -197,9 +207,11 @@ describe("Basic Math", function () {
     expect(res).to.be.ok
     const rawData = res.events[0].data 
     const numberHexString = rawData.slice(-64)
-    const result = parseInt(numberHexString, 16)
+    let result = parseInt(numberHexString, 16)
     console.log("      result of 20 + 22 =",result)
     expect(result).to.equal(20+22)
+    result = await hello.addResult(gasOverride)
+    expect(result).to.equal("42")
   })
   it("should support integer multiplication", async () => {
     let tr = await hello.MultNumbers(5, 5, gasOverride)
@@ -212,7 +224,7 @@ describe("Basic Math", function () {
     expect(result).to.equal(5*5)
   })
   it("should support floating point division", async () => {
-    let tr = await hello.MultFloatNumbers("42.165", "3.14159", 2/*method*/, gasOverride)
+    let tr = await hello.MultFloatNumbers("42.165", "3.14159", 2/*method=float*/, gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
@@ -223,7 +235,7 @@ describe("Basic Math", function () {
     expect(result.toFixed(3)).to.equal('13.422')
   })
   it("should support floating point volume of sphere", async () => {
-    let tr = await hello.MultFloatNumbers("3.14159", "2.00", 3/*method*/, gasOverride)
+    let tr = await hello.MultFloatNumbers("3.14159", "2.00", 3/*method = sphere*/, gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data

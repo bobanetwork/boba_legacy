@@ -30,7 +30,6 @@ const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a84
 //this gets automatically funded on L2 by the deployer
 //deployer_1         | ✓ Funded 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec on L2 with 5000.0 ETH
 const testWallet = new Wallet(testPrivateKey, local_provider)
-console.log("Remaining balance:",testWallet.getBalance())
 
 describe("Hello World", function () {
 
@@ -105,6 +104,9 @@ describe("Hello World", function () {
       (TuringHelper.abi),
       (TuringHelper.bytecode),
       testWallet)
+
+    console.log("Remaining balance:",await testWallet.getBalance())
+    console.log("GasPrice:",await local_provider.getFeeData())
 
     // defines the URL that will be called by HelloTuring.sol
     helper = await Factory__Helper.deploy(urlStr, gasOverride)

@@ -170,7 +170,7 @@ contract TuringHelper {
   */
   //GetResponse(uint32,uint32,bytes) = 638740c4f
   function GetResponse(uint32 method_idx, uint32 rType, bytes memory _slot)
-    public returns (bytes memory) {
+    public /*view*/ returns (bytes memory) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (method_idx < methods.length, "Turing:GetResponse:method not registered");
@@ -213,5 +213,20 @@ contract TuringHelper {
       emit OffchainResponse(0x01, response);
       return response;
   }
+
+  /* Similar to TuringTx, but a "view" function and may be used from eth_call.
+  */
+  // function TuringCall(uint32 method_idx, bytes memory _payload)
+  //   public view returns (bytes memory) {
+  //     require (method_idx < methods.length, "Turing:TuringCall:method not registered");
+  //     require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
+
+  //      Initiate the request. This can't be a local function call
+  //        because that would stay inside the EVM and not give l2geth
+  //        a place to intercept and re-write the call.
+      
+  //     bytes memory response = Self.GetResponse(method_idx, 1, _payload);
+  //     return response;
+  // }
 }
 

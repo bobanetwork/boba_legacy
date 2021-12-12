@@ -167,27 +167,27 @@ services:
         DTL_REGISTRY_URL: http://dtl:8081/addresses.json
         DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
 
-  # # deploys boba contracts and serves contract addresses
-  # boba_deployer:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #     - l2geth
-  #   image: bobanetwork/boba_deployer:latest
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.boba_deployer
-  #   environment:
-  #     L1_NODE_WEB3_URL: http://l1_chain:8545
-  #     L2_NODE_WEB3_URL: http://l2geth:8545
-  #     ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-  #     URL: http://dtl:8081/addresses.json
-  #     # DO NOT use in production
-  #     << : *deployer_pk
-  #     << : *relayer_pk
-  #     << : *fast-relayer_pk
-  #     RETRIES: 100
-  #     DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+  # deploys boba contracts and serves contract addresses
+  boba_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_deployer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.boba_deployer
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      URL: http://dtl:8081/addresses.json
+      # DO NOT use in production
+      << : *deployer_pk
+      << : *relayer_pk
+      << : *fast-relayer_pk
+      RETRIES: 100
+      DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
 
   dtl:
     depends_on:
@@ -262,31 +262,31 @@ services:
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
 
-  # # a second relay system for messages that need to get to L1 quickly
-  # # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
-  # boba_message-relayer-fast:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #     - l2geth
-  #   image: bobanetwork/boba_message-relayer-fast
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
-  #   environment:
-  #     L1_NODE_WEB3_URL: http://l1_chain:8545
-  #     L2_NODE_WEB3_URL: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     BOBA_URL: http://dtl:8081/boba-addr.json
-  #     # This is who pays for the fast message relayer
-  #     << : *fast-relayer_pk
-  #     RETRIES: 100
-  #     POLLING_INTERVAL: 1500
-  #     GET_LOGS_INTERVAL: 500
-  #     FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
-  #     FILTER_POLLING_INTERVAL: 30000
-  #     MAX_WAIT_TIME_S: 5
-  #     MAX_WAIT_TX_TIME_S: 5
+  # a second relay system for messages that need to get to L1 quickly
+  # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
+  boba_message-relayer-fast:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_message-relayer-fast
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      # This is who pays for the fast message relayer
+      << : *fast-relayer_pk
+      RETRIES: 100
+      POLLING_INTERVAL: 1500
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
 
   batch_submitter:
     depends_on:
@@ -307,78 +307,78 @@ services:
         << : *sequencer_pk
         << : *proposer_pk
 
-  # verifier:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #   image: bobanetwork/l2geth:latest
-  #   deploy:
-  #     replicas: 0
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.geth
-  #   entrypoint: sh ./geth.sh
-  #   env_file:
-  #     - ./envs/geth.env
-  #   environment:
-  #       ETH1_HTTP: http://l1_chain:8545
-  #       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-  #       ROLLUP_CLIENT_HTTP: http://dtl:7878
-  #       ROLLUP_BACKEND: 'l1'
-  #       ROLLUP_VERIFIER_ENABLE: 'true'
-  #       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-  #       RETRIES: 100
-  #   ports:
-  #     - ${VERIFIER_HTTP_PORT:-8547}:8545
-  #     - ${VERIFIER_WS_PORT:-8548}:8546
+  verifier:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+        ETH1_HTTP: http://l1_chain:8545
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_CLIENT_HTTP: http://dtl:7878
+        ROLLUP_BACKEND: 'l1'
+        ROLLUP_VERIFIER_ENABLE: 'true'
+        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+        RETRIES: 100
+    ports:
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
 
-  # replica:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #   image: bobanetwork/l2geth:latest
-  #   deploy:
-  #     replicas: 1
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.geth
-  #   entrypoint: sh ./geth.sh
-  #   env_file:
-  #     - ./envs/geth.env
-  #   environment:
-  #       ETH1_HTTP: http://l1_chain:8545
-  #       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-  #       ROLLUP_CLIENT_HTTP: http://dtl:7878
-  #       ROLLUP_BACKEND: 'l2'
-  #       ROLLUP_VERIFIER_ENABLE: 'true'
-  #       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-  #       RETRIES: 100
-  #       # no need to keep this secret, only used internally to sign blocks
-  #       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-  #       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-  #   ports:
-  #     - ${L2GETH_HTTP_PORT:-8549}:8545
-  #     - ${L2GETH_WS_PORT:-8550}:8546
+  replica:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+        ETH1_HTTP: http://l1_chain:8545
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_CLIENT_HTTP: http://dtl:7878
+        ROLLUP_BACKEND: 'l2'
+        ROLLUP_VERIFIER_ENABLE: 'true'
+        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+        RETRIES: 100
+        # no need to keep this secret, only used internally to sign blocks
+        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
 
-  # integration_tests:
-  #   image: bobanetwork/integration-tests:latest
-  #   deploy:
-  #      replicas: 0
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.integration-tests
-  #   entrypoint: ./integration-tests.sh
-  #   environment:
-  #     L1_URL: http://l1_chain:8545
-  #     L2_URL: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     BOBA_URL: http://dtl:8081/boba-addr.json
-  #     ENABLE_GAS_REPORT: 1
-  #     NO_NETWORK: 1
-  #     L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
-  #     << : *integration_pk
-  #     << : *integration_2_pk
-  #     << : *integration_3_pk
+  integration_tests:
+    image: bobanetwork/integration-tests:latest
+    deploy:
+       replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.integration-tests
+    entrypoint: ./integration-tests.sh
+    environment:
+      L1_URL: http://l1_chain:8545
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      << : *integration_pk
+      << : *integration_2_pk
+      << : *integration_3_pk
 
   gas_oracle:
     depends_on:

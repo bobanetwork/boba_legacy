@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 
 interface Helper {
   function TuringTx(uint32 method_idx, bytes memory) external returns (bytes memory);
+  //function TuringCall(uint32 method_idx, bytes memory) view external returns (bytes memory);
 }
 
 contract HelloTuring {
@@ -16,10 +17,13 @@ contract HelloTuring {
   mapping (address => string) locales;
   mapping (address => string) cachedGreetings;
 
+  uint256 public addResult;
+
   constructor(address _helper) public {
     console.log("HelloTuring.sol: Deploying a contract with helper address:", _helper);
     helperAddr = _helper;
     myHelper = Helper(helperAddr);
+    addResult = 0;
   }
 
   /* Tests the eth_call pathway by returning a customized
@@ -60,13 +64,14 @@ contract HelloTuring {
     return greeting;
   }
 
-  /* Example of performing off-chain calculations on numeric data */
+  /* Examples of performing off-chain calculations on numeric data */
   function AddNumbers(uint112 a, uint112 b) 
     public returns (uint256) {
     
     bytes memory encRequest = abi.encode(a, b);
-    bytes memory encResponse = myHelper.TuringTx(0, encRequest);
-    return abi.decode(encResponse,(uint256));
+    bytes memory encResponse = myHelper.TuringTx(0, abi.encode(a, b));
+    addResult = abi.decode(encResponse,(uint256));
+    return addResult;
   }
 
   function MultNumbers(uint112 a, uint112 b) 
@@ -77,7 +82,7 @@ contract HelloTuring {
     return abi.decode(encResponse,(uint256));
   }
 
-  function MultFloatNumbers(string memory a, string memory b, uint8 methodID) 
+  function MultFloatNumbers(string memory a, string memory b, uint32 methodID) 
     public returns (string memory) {
     
     bytes memory encRequest = abi.encode(a, b);

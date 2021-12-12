@@ -236,11 +236,6 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	var responseString []byte
 	var reqFields [4]string
 
-	reqVer := reqFields[0]
-	reqUrl := reqFields[1]
-	reqMethod := reqFields[2]
-	reqValue := reqFields[3]
-
 	prefix := make([]byte, 4)
 	copy(prefix, oldValue[0:4])
 
@@ -271,11 +266,6 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	bad := append(prefix, method_idx...)
 	bad = append(bad, hexutil.MustDecode(fmt.Sprintf("0x%064x", 0))...) //0 denotes failure
 
-	if reqVer != "\x01" {
-		log.Warn("TURING-0 bobaTuringCall:Unexpected request version", "ver", hexutil.Bytes(reqVer))
-		return bad
-	}
-
 	log.Debug("TURING-1 bobaTuringCall:Decode oldValue",
 		"prefix", prefix,
 		"rest", rest,
@@ -296,6 +286,23 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 		return bad
 	}
 
+	// if we have not yet returned by now, we (1) have a Turing compute request, and
+	// (2) we DO NOT have a valid response from off-chain, so let's get one now and
+	// save it for later
+
+	// Step  1 - let's decode the RLP - the 'rest' we generated earlier
+	if err := rlp.Decode(bytes.NewReader(reqString), &reqFields); err != nil {
+		log.Warn("TURING-4 bobaTuringCall:RLP decoding failed", "err", err)
+		return bad
+	} else {
+		log.Debug("TURING-4 bobaTuringCall:RLP decoded OK", "reqFields", reqFields)
+	}
+
+	reqVer := reqFields[0]
+	reqUrl := reqFields[1]
+	reqMethod := reqFields[2]
+	reqValue := reqFields[3]
+
 	var ret hexutil.Bytes
 
 	// don't recalculate unless actually needed...
@@ -308,20 +315,10 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 	turingCache.lock.Unlock()
 
 	if ret != nil {
-		log.Debug("TURING-4 bobaTuringCall:TuringCache hit for", "key", reqValue)
+		log.Debug("TURING-5 bobaTuringCall:Found cached result; returning that",
+			"key", reqValue,
+			"cached", ret)
 		return ret
-	}
-
-	// if we have not yet returned by now, we (1) have a Turing compute request, and
-	// (2) we DO NOT have a valid response from off-chain, so let's get one now and
-	// save it for later
-
-	// Step  1 - let's decode the RLP - the 'rest' we generated earlier
-	if err := rlp.Decode(bytes.NewReader(reqString), &reqFields); err != nil {
-		log.Warn("TURING-5 bobaTuringCall:RLP decoding failed", "err", err)
-		return bad
-	} else {
-		log.Debug("TURING-5 bobaTuringCall:RLP decoded OK", "reqFields", reqFields)
 	}
 
 	// at this point we have all the info we need to call off-chain
@@ -331,6 +328,11 @@ func bobaTuringCall(reqString []byte, oldValue hexutil.Bytes) hexutil.Bytes {
 		"method", reqMethod,
 		"value", reqValue,
 		"reqString", reqString)
+
+	if reqVer != "\x01" {
+		log.Warn("TURING-6 bobaTuringCall:Unexpected request version", "ver", hexutil.Bytes(reqVer))
+		return bad
+	}
 
 	client, err := rpc.Dial(reqUrl)
 
