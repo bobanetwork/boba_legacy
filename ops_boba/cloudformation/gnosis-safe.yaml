@@ -208,21 +208,27 @@ Resources:
             - Name: ROOT_LOG_LEVEL
               Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: "*"
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: GUNICORN_BIND_PORT
-              Value: 8000
+              Value: 8080
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix:/nginx/gunicorn.socket"
+              Value: unix:////nginx/gunicorn.socket
             - Name: NGINX_HOST_PORT
-              Value: 8080
+              Value: 80
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
               Value: /etc/nginx/
             - Name: GUNICORN_WEB_RELOAD
               Value: false
             - Name: CGW_URL
-              Value: http://127.0.0.1
+              Value: !Sub
+                - "http://${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           DockerLabels:
@@ -255,7 +261,10 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: "*"
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -302,7 +311,10 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: "*"
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -350,9 +362,9 @@ Resources:
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
-                - "*,127.0.0.1,${EndpointAddress}"
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -440,10 +452,13 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-client-gateway"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
-          Essential: false
+          Essential: true
           Memory: "4000"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx2
@@ -461,15 +476,18 @@ Resources:
             - Name: ROOT_LOG_LEVEL
               Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
-              Value: "*"
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: GUNICORN_BIND_PORT
-              Value: 8000
+              Value: 8080
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
-              Value: "unix:/nginx/gunicorn.socket"
+              Value: unix:/nginx/gunicorn.socket
             - Name: NGINX_HOST_PORT
-              Value: 8080
+              Value: 80
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
               Value: /etc/nginx/
             - Name: GUNICORN_WEB_RELOAD
@@ -482,6 +500,10 @@ Resources:
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           PseudoTerminal: true
+          Interactive: true
+          DependsOn:
+            - Condition: START
+              ContainerName: nginx-safe-config-service
           DockerLabels:
             com.datadoghq.ad.check_names: '["safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -511,7 +533,7 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-react"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
-          Essential: false
+          Essential: true
           Memory: "3000"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
