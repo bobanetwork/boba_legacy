@@ -10,10 +10,9 @@ import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/E
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 /* External Imports */
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, Pausable {
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
     uint8 private immutable _decimals;
     address public owner;
@@ -30,14 +29,11 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
         string memory _symbol,
          uint8 decimals_
     )
-        ERC20(_name, _symbol) ERC20Permit(_name) initializer() {
+        ERC20(_name, _symbol) ERC20Permit(_name) {
         _decimals = decimals_;
         owner = msg.sender;
         DAO = msg.sender;
 
-        __Context_init_unchained();
-        __Pausable_init_unchained();
-        __ReentrancyGuard_init_unchained();
         _pause();
     }
 
@@ -197,11 +193,11 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
         return maxSupply;
     }
 
-    function _msgSender() internal view virtual override (Context, ContextUpgradeable) returns (address) {
+    function _msgSender() internal view virtual override (Context) returns (address) {
         return msg.sender;
     }
 
-    function _msgData() internal view virtual override (Context, ContextUpgradeable) returns (bytes calldata) {
+    function _msgData() internal view virtual override (Context) returns (bytes calldata) {
         return msg.data;
     }
 }

@@ -246,16 +246,16 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   // Deploy xBoba
-  L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', tokenDecimals)
+  L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)
   await L2ERC20.deployTransaction.wait()
 
-  const L2ERC20DeploymentSubmission: DeploymentSubmission = {
+  const xL2BobaDeploymentSubmission: DeploymentSubmission = {
     ...L2ERC20,
     receipt: L2ERC20.receipt,
     address: L2ERC20.address,
     abi: xL2GovernanceERC20Json.abi,
   }
-  await hre.deployments.save('TK_L2' + 'xBOBA', L2ERC20DeploymentSubmission)
+  await hre.deployments.save('TK_L2' + 'xBOBA', xL2BobaDeploymentSubmission)
   await registerBobaAddress(addressManager, 'TK_L2' + 'xBOBA', L2ERC20.address)
   console.log(`TK_L2xBOBA was deployed to ${L2ERC20.address}`)
 }
