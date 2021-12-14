@@ -7,6 +7,7 @@ contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoE
 	constructor(
 			address timelock_,
 			address bobaToken_,
+            address xbobaToken_,
 			address admin_,
 	        address implementation_,
 	        uint votingPeriod_,
@@ -19,6 +20,7 @@ contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoE
         delegateTo(implementation_, abi.encodeWithSignature("initialize(address,address,uint256,uint256,uint256)",
                                                             timelock_,
                                                             bobaToken_,
+                                                            xbobaToken_,
                                                             votingPeriod_,
                                                             votingDelay_,
                                                             proposalThreshold_));
