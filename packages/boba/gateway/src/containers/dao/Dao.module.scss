@@ -20,51 +20,52 @@
   }
 
   .content {
+
     margin: 10px auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
     width: 100%;
 
-    .action {
+    @media only screen and (max-width: 900px) {
+      flex-direction: column;
+    }
+
+    .transferContainer,
+    .delegateContainer {
+      border-radius: 4px;
+      padding: 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-direction: row;
-
-      &.isMobile {
-        flex-direction: column;
+      flex-direction: column;
+      justify-content: flex-start;
+      width: 48%;
+      margin: 5px;
+      @media only screen and (max-width: 900px) {
+        width: 100%;
+        min-width: unset;
+        min-height: unset;
       }
-
-      .transferContainer,
-      .delegateContainer {
-        /*margin: auto;*/
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        max-width: 48%;
-        width: 48%;
-        min-width: 350px;
-        margin: 5px;
-        min-height: 200px;
-        .info {
-          text-align: center;
-          .title {
-            font-size: 1.4em;
-            color: $white;
-          }
-          .subTitle {
-            font-size: 1.2em;
-            color: $white700;
-            margin: 10px;
-          }
-          .helpText {
-            font-size: 0.8em;
-            margin: 10px;
-            opacity: 0.7;
-            margin: 10px;
-          }
+      .info {
+        text-align: center;
+        .title {
+          font-size: 1.4em;
+          color: $white;
+        }
+        .subTitle {
+          font-size: 1.2em;
+          color: $white700;
+          margin: 10px;
+        }
+        .helpText {
+          font-size: 0.8em;
+          margin: 10px;
+          opacity: 0.8;
+        }
+        .helpTextLight {
+          font-size: 0.8em;
+          margin: 10px;
+          opacity: 0.6;
         }
       }
     }

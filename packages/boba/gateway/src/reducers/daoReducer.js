@@ -31,7 +31,7 @@ function daoReducer(state = initialState, action) {
     case 'PROPOSALS/GET/SUCCESS':
       return { ...state, ...action.payload }
 
-    case 'PROPOSAL/THRESHOLD/GET/SUCCESS':
+    case 'PROPOSALTHRESHOLD/GET/SUCCESS':
       return { ...state, ...action.payload }
 
     default:
