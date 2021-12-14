@@ -108,6 +108,19 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
+  GnosisLBTargetGroup5:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8080
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -161,6 +174,19 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup4
 
+  GnosisListener5:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+      Port: 8080
+      Protocol: TCP
+#      Certificates:
+#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup5
+
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -213,7 +239,7 @@ Resources:
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
             - Name: GUNICORN_BIND_PORT
-              Value: 8080
+              Value: 80
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
@@ -557,6 +583,9 @@ Resources:
         - ContainerName: safe-react
           ContainerPort: 3000
           TargetGroupArn: !Ref GnosisLBTargetGroup4
+        - ContainerName: safe-config-service
+          ContainerPort: 8080
+          TargetGroupArn: !Ref GnosisLBTargetGroup5
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
