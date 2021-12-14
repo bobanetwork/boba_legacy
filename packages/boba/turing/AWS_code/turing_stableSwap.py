@@ -1,12 +1,9 @@
 # AWS Lambda Stableswap Toy Code
 
-# AWS Lambda Test Input
-# {
-#   "body": "{\"L_x\":\"10.0\",\"L_y\":\"10.0\",\"A\":\"1.00\",\"x_in\":\"5.0\", \"sol\":\"true\"}"
-# }
-
 import json
 import math
+import textwrap
+import struct
 
 x = int(0)
 y = int(0)
@@ -16,10 +13,9 @@ k = int(0)
 A = int(0)
 sol = bool(False)
 
-def initializeLiquidity(_x,_y,_sol):
-  global x, y, k, A, x_prev, y_prev, sol
+def initializeLiquidity(_x,_y):
+  global x, y, k, A, x_prev, y_prev
   assert (_x > 0 and _y > 0)
-  sol = _sol
   y = _y
   x = _x
   x_prev = x
@@ -53,49 +49,11 @@ def changeA(_A):
   print("A changed to: " + str(A) + "\n")
 
 def sqrt_B(a):
-  global sol
   assert (a >= 0)
-  
-  print("Solidity mode: " + str(sol) + "\n")
-  
-  # solidity
-  if sol:
-    print("SQRT: Solidity mode\n")
-    if (a == 0):
-      return 0
-    elif (a <= 3):
-      print("Solidity SQRT error: " + str(math.sqrt(a)-1.0) + "\n")
-      return 1
-    c = (a+1)//2
-    b = a
-    while(c < b):
-      b = c
-      c = ((a//c) + c)//2
-    print("Solidity SQRT error: " + str(math.sqrt(a)-int(b)) + "\n")
-    return int(b)
-  else:
-    print("SQRT: Precison mode\n")
-    return math.sqrt(a)
+  return math.sqrt(a)
 
 def pow_B(base, exponent):
-    global sol
-
-    if sol:
-      print("POW: Solidity mode\n")
-      if(exponent == 0):
-        return 1
-      elif (exponent == 1):
-        return base
-      elif (base == 0 and not(exponent == 0)):
-        return 0
-      else:
-        z = base
-        for i in range(1, exponent):
-          z = z*base
-        return z
-    else:
-      print("POW: Precison mode\n")
-      return pow(base, exponent)
+  return pow(base, exponent)
 
 def invariant():
   global x, y, k, A
@@ -179,35 +137,44 @@ def swap_y(y_in):
     
 def lambda_handler(event, context):
 
-    global x, y, k, A, x_prev, y_prev, sol
+    global x, y, A, y_prev
     input = json.loads(event["body"])
     
-    print("DEBUG: Inputs:", input)
+    print("DEBUG: from Geth:", input['params'][0])
+    
+    param4HexString = input['params'][0]
+    param4HexString = param4HexString.removeprefix("0x")
 
-    # Prepare the inputs
-    L_x = float(input["L_x"])
-    L_y = float(input["L_y"])
-    a = float(input["A"])
-    x_in = float(input["x_in"])
-    sol = bool(input["sol"] == 'true')
+    #break the string into length 64 chunks
+    params = textwrap.wrap(param4HexString, 64)
 
-    if sol:
-      print("Emulating solidity\n")
-    else: 
-      print("Precison mode\n")
+    #decode each parameter
+    L_x  = float(int(params[0], 16))
+    L_y  = float(int(params[1], 16))
+    a    = float(int(params[2], 16))
+    x_in = float(int(params[3], 16))
 
-    print('DEBUG: Inputs: L_x:', L_x, 
+    print('DEBUG: Inputs:'
+      ' L_x:', L_x, 
       ' L_y:', L_y, 
       ' A:', a,
-      ' x_in:', x_in,
-      ' sol:', sol)
+      ' x_in:', x_in)
     
     # Do the math
-    initializeLiquidity(L_x, L_y, sol)
+    initializeLiquidity(L_x, L_y)
     changeA(a)
     swap_x(x_in)
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({"x_in":x_in, "y_out":y_prev-y,"x_new":x,"y_prev":y_prev, "y_new":y, "sol": sol})
+    
+    result = '0x{0:0{1}x}'.format(int(y),64)
+    #translates 42 -> 0x0000000000000000000000000000000000000000002a
+    
+    returnPayload = {
+      'statusCode': 200,
+      'body': json.dumps({
+        "result": result
+      })
     }
+
+    print('return payload:', returnPayload)
+    
+    return returnPayload

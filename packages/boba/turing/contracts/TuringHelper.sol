@@ -79,8 +79,8 @@ contract TuringHelper {
     (pre[2], pLen) = _lenCalc1(method, pLen);
     (pre[3], pLen) = _lenCalc1(payload, pLen);
 
-    //the goal here is to augment pLen in just the right way to accomodate 
-    //all the possible lengths for all possible payloads
+    // the goal here is to augment pLen in just the right way to accomodate 
+    // all the possible lengths for all possible payloads
 
     // We now have the total length of the three items which will be in the list.
     // This determines the encoding required for the list header
