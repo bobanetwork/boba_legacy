@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
@@ -12,7 +11,7 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 /* External Imports */
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, Pausable {
+contract xL2GovernanceERC20 is ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp, Pausable {
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
     uint8 private immutable _decimals;
     address public owner;
@@ -191,13 +190,5 @@ contract xL2GovernanceERC20 is Context, ERC20, ERC20Permit, ERC20Votes, ERC20Vot
 
     function _maxSupply() internal pure override (ERC20Votes, ERC20VotesComp) returns (uint224) {
         return maxSupply;
-    }
-
-    function _msgSender() internal view virtual override (Context) returns (address) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view virtual override (Context) returns (bytes calldata) {
-        return msg.data;
     }
 }
