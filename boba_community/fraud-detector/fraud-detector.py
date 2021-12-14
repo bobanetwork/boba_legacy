@@ -24,13 +24,28 @@ logger.setLevel(logging.DEBUG)
 #logger.addHandler(logging.StreamHandler())
 
 logger.debug (os.environ['L1_NODE_WEB3_URL'])
+logger.debug (os.environ['L1_CONFIRMATIONS'])
 logger.debug (os.environ['L2_NODE_WEB3_URL'])
 logger.debug (os.environ['VERIFIER_WEB3_URL'])
 logger.debug (os.environ['ADDRESS_MANAGER_ADDRESS'])
-logger.debug (os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
+logger.debug (os.environ['L1_DEPLOYMENT_BLOCK'])
+logger.debug (os.environ['L2_START_BLOCK'])
+logger.debug (os.environ['L2_CHECK_INTERVAL'])
 
-l1_base = int(os.environ['L1_MAINNET_DEPLOYMENT_BLOCK'])
-element_start = 1
+l1_confirmations = int(os.environ['L1_CONFIRMATIONS'])
+# These can be changed from the defaults to start at a previously verified
+# position in the chain, avoiding the need to replay many old blocks.
+# Element_start must be set to the L2 block number corresponding to the
+# first stateroot in the L1 block.
+l1_base = int(os.environ['L1_DEPLOYMENT_BLOCK'])
+element_start = int(os.environ['L2_START_BLOCK'])
+
+# To reduce load on the mainnet L2 when many users are running fraud detectors, the L2
+# state root is only queried once per <interval> seconds. The primary concern with respect
+# to fraud is whether or not the transactions in the CTC lead to the state roots recorded
+# in the SCC, and this can be determined using the L1 RPC only.
+l2_check_interval = int(os.environ['L2_CHECK_INTERVAL'])
+last_l2check = 0
 
 Matched = {
   'Block':0, # Highest good block, and its corresponding state root
@@ -98,10 +113,11 @@ checkpoint = [ element_start, l1_base ]
 last_saved = l1_base
 l3_block = 0
 
-def doEvent(event):
+def doEvent(event, force_L2):
   global rCount
   global Matched
   global l3_block
+  global l2_check_interval,last_l2check
 
   t = rpc[1].eth.get_transaction(event.transactionHash)
 
@@ -109,8 +125,11 @@ def doEvent(event):
   for sr in ib['_batch']:
     rCount += 1
 
-    l2b = rpc[2].eth.getBlock(rCount)
-    l2SR = l2b['stateRoot']
+    l2SR = None
+    now = time.time()
+    if (force_L2 and sr == ib['_batch'][-1]) or (now > last_l2check + l2_check_interval):
+      l2SR = rpc[2].eth.getBlock(rCount)['stateRoot']
+      last_l2check = now
 
     # Handle a possible lag in keeping the verifier up to date.
     waitCount = 0
@@ -128,11 +147,18 @@ def doEvent(event):
     vfSR = vfb['stateRoot']
 
     match = ""
-    if sr != l2SR:
+    if l2SR is not None and sr != l2SR:
       match = "**** SCC/L2 MISMATCH ****"
-    elif l2SR != vfSR:
+    if l2SR is not None and l2SR != vfSR:
       match = "**** L2/VERIFIER MISMATCH ****"
-    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), Web3.toHex(l2SR), Web3.toHex(vfSR), match)
+    if sr != vfSR:
+      match = "**** SCC/VERIFIER MISMATCH ****"
+
+    if l2SR:
+      l2SR_str = Web3.toHex(l2SR)
+    else:
+      l2SR_str = "                                --                                "
+    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), l2SR_str, Web3.toHex(vfSR), match)
     if match != "":
       Matched['is_ok'] = False
       logger.warning(log_str)
@@ -157,8 +183,9 @@ def do_checkpoint():
 def server_loop(ws):
   ws.serve_forever()
 
-def fpLoop():  
-  l1_tip = rpc[1].eth.block_number
+def fpLoop():
+  l1_tip = rpc[1].eth.block_number - l1_confirmations
+
   assert(l1_tip > l1_base)
   startBlock = l1_base
   logger.debug("SCC contract at {}, l1_base {}, l1_tip {}".format(scc_addr, l1_base, l1_tip))
@@ -171,51 +198,40 @@ def fpLoop():
     toBlock = min(startBlock+batch_size, l1_tip) - 1
     #print("Scanning from",startBlock,"to",toBlock)
 
-    FF = rpc[1].eth.filter({
+    batch = rpc[1].eth.getLogs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
       "topics":[topic_sig]
     })
 
-    for event in FF.get_all_entries():
-      doEvent(event)
-
-    rpc[1].eth.uninstall_filter(FF.filter_id)
+    for event in batch:
+      doEvent(event, False)
 
     startBlock = toBlock + 1
     do_checkpoint()
 
   logger.debug("Caught up to L1 tip. Waiting for new events from startBlock " + str(startBlock))
-  FF = rpc[1].eth.filter({
-      "fromBlock":startBlock,
-      "toBlock":'latest',
-      "address":scc_addr,
-      "topics":[topic_sig]
-  })
 
   while True:
-    # FIXME - if the L1 node restarts, this can fail with "filter not found". May want to
-    # put some retry/recovery logic inside this utility rather than relying on an external
-    # service to restart it.
-    try:
-      for event in FF.get_new_entries():
-        doEvent(event)
-      do_checkpoint()
-    except Exception as e:
-      logger.error("get_new_entries() failed: " + str(e))
-      if "filter not found" in str(e):
-        logger.warning("Attempting to reinstall filter from checkpoint " + str(checkpoint))
-        rCount = checkpoint[0]
-        startBlock = checkpoint[1]
+    toBlock = rpc[1].eth.block_number - l1_confirmations
+    if startBlock > toBlock:
+      time.sleep(30)
+      continue
 
-        FF = rpc[1].eth.filter({
-            "fromBlock":startBlock,
-            "toBlock":'latest',
-            "address":scc_addr,
-            "topics":[topic_sig]
-        })
-    time.sleep(30)
+    batch = rpc[1].eth.getLogs({
+      "fromBlock":startBlock,
+      "toBlock":toBlock,
+      "address":scc_addr,
+      "topics":[topic_sig]
+    })
+
+    for event in batch:
+      doEvent(event, True)
+
+    startBlock = toBlock + 1
+    do_checkpoint()
+
   logger.info("Exiting")
 
 ws = SimpleJSONRPCServer(('', 8555))

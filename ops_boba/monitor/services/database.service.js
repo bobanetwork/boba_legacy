@@ -642,11 +642,11 @@ class DatabaseService extends OptimismEnv {
           tx.crossDomainMessageFinalizedTime - tx.crossDomainMessageSendTime
 
         tx.crossDomainMessageSendISOTime = new Date(
-          tx.crossDomainMessageSendTime
+          tx.crossDomainMessageSendTime * 1000
         ).toISOString()
 
         tx.crossDomainMessageFinalizedISOTime = new Date(
-          tx.crossDomainMessageFinalizedTime
+          tx.crossDomainMessageFinalizedTime * 1000
         ).toISOString()
         logger.info('receipt', tx)
       })

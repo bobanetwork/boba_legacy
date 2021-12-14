@@ -100,7 +100,7 @@ function TransferDaoModal({ open = false }) {
                 onClick={()=>{submit()}}
                 color='primary'
                 variant="contained"
-                tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer Boba from one L2 address to another L2 address"}
+                tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer BOBA from one L2 address to another L2 address"}
                 loading={loading}
                 disabled={disabledTransfer}
                 triggerTime={new Date()}
