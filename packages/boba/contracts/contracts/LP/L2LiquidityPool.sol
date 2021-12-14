@@ -501,7 +501,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         address BOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2BOBA");
         if (BOBAAddress == _tokenAddress) {
-            // burn xBoba
+            // burn xBOBA
             address xBOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2xBOBA");
             xL2GovernanceERC20(xBOBAAddress).burn(msg.sender, _amount);
         }
@@ -675,7 +675,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             require(sent, "Failed to send ovm_Eth");
         }
 
-        // burn xBoba
+        // burn xBOBA
         burnXBOBA(_amount, _tokenAddress);
 
         emit WithdrawLiquidity(
