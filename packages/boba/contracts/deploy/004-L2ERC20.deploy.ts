@@ -267,6 +267,13 @@ const deployFn: DeployFunction = async (hre) => {
   )
   await registerBOBA.wait()
   console.log(`BOBA and xBOBA were registered in L2 LP`)
+
+  // Add controller
+  const addController = await L2ERC20.addController(
+    Proxy__L2LiquidityPool.address
+  )
+  await addController.wait()
+  console.log(`L2 LP has the power to mint and burn xBOBA`)
 }
 
 deployFn.tags = ['L1ERC20', 'test']
