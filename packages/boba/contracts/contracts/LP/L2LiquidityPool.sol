@@ -101,10 +101,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     uint256 public userRewardMaxFeeRate;
 
-    address public addressManager;
+    address public xBOBAAddress;
+    address public BOBAAddress;
 
     // mapping use address to the status of xBOBA
-    mapping(address => bool) public xBOBAInfo;
+    mapping(address => bool) public xBOBAStatus;
 
     /********************
      *       Event      *
@@ -239,13 +240,10 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Initialize this contract.
-     *
-     * @param _addressManager L1 Lib_AddressManager.
      * @param _l2CrossDomainMessenger L2 Messenger address being used for sending the cross-chain message.
      * @param _L1LiquidityPoolAddress Address of the corresponding L1 LP deployed to the main chain
      */
     function initialize(
-        address _addressManager,
         address _l2CrossDomainMessenger,
         address _L1LiquidityPoolAddress
     )
@@ -254,7 +252,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyNotInitialized()
         initializer()
     {
-        addressManager = _addressManager;
         messenger = _l2CrossDomainMessenger;
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
@@ -459,13 +456,13 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        address BOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2BOBA");
-        if (!xBOBAInfo[msg.sender] && BOBAAddress == _tokenAddress) {
+        if (!xBOBAStatus[msg.sender] && BOBAAddress == _tokenAddress) {
             // mint xBoba
             UserInfo storage user = userInfo[_tokenAddress][msg.sender];
-            address xBOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2xBOBA");
-            xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, user.amount);
-            xBOBAInfo[msg.sender] = true;
+            if (user.amount != 0) {
+                xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, user.amount);
+            }
+            xBOBAStatus[msg.sender] = true;
         }
     }
 
@@ -480,10 +477,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        address BOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2BOBA");
         if (BOBAAddress == _tokenAddress) {
             // mint xBoba
-            address xBOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2xBOBA");
             xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, _amount);
         }
     }
@@ -499,10 +494,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        address BOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2BOBA");
         if (BOBAAddress == _tokenAddress) {
             // burn xBOBA
-            address xBOBAAddress = Lib_AddressManager(addressManager).getAddress("TK_L2xBOBA");
             xL2GovernanceERC20(xBOBAAddress).burn(msg.sender, _amount);
         }
     }
