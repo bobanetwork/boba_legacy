@@ -377,6 +377,26 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /***
+     * @dev Register BOBA tokens
+     *
+     * @param _BOBAAddress L2 BOBA address
+     * @param _xBOBAAddress L2 xBOBA address
+     *
+     */
+    function registerBOBA (
+        address _BOBAAddress,
+        address _xBOBAAddress
+    )
+        public
+        onlyOwner()
+    {
+        require(BOBAAddress == address(0) && _BOBAAddress != address(0) && _xBOBAAddress != address(0), "Invalid BOBA address");
+        BOBAAddress = _BOBAAddress;
+        xBOBAAddress = _xBOBAAddress;
+    }
+
+
+    /***
      * @dev Add the new token pair to the pool
      * DO NOT add the same LP token more than once. Rewards will be messed up if you do.
      *
