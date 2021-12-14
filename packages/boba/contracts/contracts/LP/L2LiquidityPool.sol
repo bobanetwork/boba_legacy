@@ -14,7 +14,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridge.sol";
-import "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
 
 /* External Imports */
 import "../standards/xL2GovernanceERC20.sol";
