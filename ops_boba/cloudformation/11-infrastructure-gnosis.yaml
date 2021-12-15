@@ -53,8 +53,49 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  LoadBalancerGnosisTransaction:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  LoadBalancerGnosisGateway:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  LoadBalancerGnosisReact:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
+  LoadBalancerGnosisConfig:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+
 
   EcsCluster:
     Type: AWS::ECS::Cluster
@@ -169,6 +210,38 @@ Outputs:
     Value: !Ref EcsSecurityGroupGnosis
     Export:
       Name: !Sub "${InfrastructureStackName}:EcsSecurityGroupGnosis"
+  LoadBalancerGnosisTransactionDNSName:
+    Value: !GetAtt LoadBalancerGnosisTransaction.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisTransaction:DNSName"
+  LoadBalancerGnosisTransactionArn:
+    Value: !Ref LoadBalancerGnosisTransaction
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisTransaction:ARN"
+  LoadBalancerGnosisConfigDNSName:
+    Value: !GetAtt LoadBalancerGnosisConfig.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisConfig:DNSName"
+  LoadBalancerGnosisConfigArn:
+    Value: !Ref LoadBalancerGnosisConfig
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisConfig:ARN"
+  LoadBalancerGnosisReactDNSName:
+    Value: !GetAtt LoadBalancerGnosisReact.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:DNSName"
+  LoadBalancerGnosisReactArn:
+    Value: !Ref LoadBalancerGnosisReact
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:ARN"
+  LoadBalancerGnosisGatewayDNSName:
+    Value: !GetAtt LoadBalancerGnosisGateway.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisGateway:DNSName"
+  LoadBalancerGnosisGatewayArn:
+    Value: !Ref LoadBalancerGnosisGateway
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisGateway:ARN"
   LoadBalancerGnosisDNSName:
     Value: !GetAtt LoadBalancerGnosis.DNSName
     Export:
