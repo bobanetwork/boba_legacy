@@ -206,267 +206,265 @@ describe('Dao Action Test', async () => {
       const delegateTx = await xBoba.delegate(env.l2Wallet.address)
       await delegateTx.wait()
       const updatedDelegate = await xBoba.delegates(env.l2Wallet.address)
-      await updatedDelegate.wait()
       expect(updatedDelegate).to.eq(env.l2Wallet.address)
       const currentVotes = await xBoba.getCurrentVotes(env.l2Wallet.address)
       expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
     })
   })
 
-  // describe('Config fee L2 LP', async () => {
-  //   before(async () => {
-  //     // get the initial fee config
-  //     initialL2LPUserRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
-  //     initialL2LPUserRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
-  //     initialL2LPOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
-  //   })
+  describe('Config fee L2 LP', async () => {
+    before(async () => {
+      // get the initial fee config
+      initialL2LPUserRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
+      initialL2LPUserRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
+      initialL2LPOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+    })
 
-  //   it('should delegate voting rights', async () => {
-  //     const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
-  //     await delegateTx.wait()
-  //     const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
-  //     await updatedDelegate.wait()
-  //     expect(updatedDelegate).to.eq(env.l2Wallet.address)
-  //     const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-  //     expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
-  //   })
+    it('should delegate voting rights', async () => {
+      const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
+      await delegateTx.wait()
+      const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
+      expect(updatedDelegate).to.eq(env.l2Wallet.address)
+      const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
+      expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
+    })
 
-  //   it('should create a new proposal to configure fee', async () => {
-  //     try {
-  //       const priorProposalID = (await Governor.proposalCount())._hex
-  //       console.log(priorProposalID.toString())
-  //       if (priorProposalID !== '0x00') {
-  //         const priorState = await Governor.state(priorProposalID)
+    it('should create a new proposal to configure fee', async () => {
+      try {
+        const priorProposalID = (await Governor.proposalCount())._hex
+        console.log(priorProposalID.toString())
+        if (priorProposalID !== '0x00') {
+          const priorState = await Governor.state(priorProposalID)
 
-  //         console.log(priorState.toString())
-  //         // clear any pending or active proposal
-  //         if (priorState === 0 || priorState === 1) {
-  //           const cancelTx = await Governor.cancel(priorProposalID)
-  //           await cancelTx.wait()
-  //         }
-  //       }
-  //       await moveTimeForward()
+          console.log(priorState.toString())
+          // clear any pending or active proposal
+          if (priorState === 0 || priorState === 1) {
+            const cancelTx = await Governor.cancel(priorProposalID)
+            await cancelTx.wait()
+          }
+        }
+        await moveTimeForward()
 
-  //       const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
-  //       const values = [0] // the eth necessary to send to the contract above
-  //       const signatures = ['configureFee(uint256,uint256,uint256)'] // the function that will carry out the proposal
-  //       const updatedUserRewardMinFeeRate = initialL2LPUserRewardMinFeeRate.toNumber() + 1
-  //       const updatedUserRewardMaxFeeRate = initialL2LPUserRewardMaxFeeRate.toNumber() + 1
-  //       const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
+        const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = ['configureFee(uint256,uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardMinFeeRate = initialL2LPUserRewardMinFeeRate.toNumber() + 1
+        const updatedUserRewardMaxFeeRate = initialL2LPUserRewardMaxFeeRate.toNumber() + 1
+        const updatedOwnerRewardFeeRate = initialL2LPOwnerRewardFeeRate.toNumber() + 1
 
-  //       const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-  //           ['uint256', 'uint256', 'uint256'],
-  //           [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
-  //       )]
+        const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+            ['uint256', 'uint256', 'uint256'],
+            [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
+        )]
 
-  //       const description = '# Update Fee for swap-ons' // the description of the proposal
+        const description = '# Update Fee for swap-ons' // the description of the proposal
 
-  //       // submit the proposal
-  //       const proposeTx = await Governor.propose(
-  //         addresses,
-  //         values,
-  //         signatures,
-  //         calldatas,
-  //         description
-  //       )
-  //       await proposeTx.wait()
+        // submit the proposal
+        const proposeTx = await Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          description
+        )
+        await proposeTx.wait()
 
-  //       const proposalID = (await Governor.proposalCount())._hex
+        const proposalID = (await Governor.proposalCount())._hex
 
-  //       // const proposal = await Governor.proposals(proposalID)
-  //       // console.log(`Proposal:`, proposal)
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal:`, proposal)
 
-  //       const state = await Governor.state(proposalID)
-  //       expect(proposalStates[state]).to.deep.eq('Pending')
-  //     } catch (error) {
-  //       // cancel the current proposal if there's a problem to avoid errors on rerun
-  //       const proposalID = (await Governor.proposalCount())._hex
-  //       const cancelTx = await Governor.cancel(proposalID)
-  //       await cancelTx.wait()
-  //     }
-  //   })
+        const state = await Governor.state(proposalID)
+        expect(proposalStates[state]).to.deep.eq('Pending')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
+    })
 
-  //   it('should cast vote to the proposal and wait for voting period to end', async () => {
-  //     try {
-  //       // get current voting delay from contract
-  //       const votingDelay = (await Governor.votingDelay()).toNumber()
-  //       // mock timestmap
-  //       await moveTimeForward(votingDelay)
+    it('should cast vote to the proposal and wait for voting period to end', async () => {
+      try {
+        // get current voting delay from contract
+        const votingDelay = (await Governor.votingDelay()).toNumber()
+        // mock timestmap
+        await moveTimeForward(votingDelay)
 
-  //       const proposalID = (await Governor.proposalCount())._hex
+        const proposalID = (await Governor.proposalCount())._hex
 
-  //       await Governor.castVote(proposalID, 1)
+        await Governor.castVote(proposalID, 1)
 
-  //       // const proposal = await Governor.proposals(proposalID)
-  //       // console.log(`Proposal End Block:`, proposal.endBlock.toString())
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal End Block:`, proposal.endBlock.toString())
 
-  //       const stateAfterVote = await Governor.state(proposalID)
-  //       expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
+        const stateAfterVote = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
 
-  //       // wait till voting period ends
-  //       console.log("\twaiting for voting period to end...")
+        // wait till voting period ends
+        console.log("\twaiting for voting period to end...")
 
-  //       const votingPeriod = (await Governor.votingPeriod()).toNumber()
-  //       // mock timestamp
-  //       await moveTimeForward(votingPeriod)
+        const votingPeriod = (await Governor.votingPeriod()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingPeriod)
 
-  //       const stateAfterVotingPeriod = await Governor.state(proposalID)
-  //       expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
-  //     } catch (error) {
-  //       // cancel the current proposal if there's a problem to avoid errors on rerun
-  //       const proposalID = (await Governor.proposalCount())._hex
-  //       const cancelTx = await Governor.cancel(proposalID)
-  //       await cancelTx.wait()
-  //     }
-  //   }).timeout(100000)
+        const stateAfterVotingPeriod = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
+    }).timeout(100000)
 
-  //   it('should queue the proposal successfully', async () => {
-  //     const proposalID = (await Governor.proposalCount())._hex
-  //     const queueTx = await Governor.queue(proposalID)
-  //     await queueTx.wait()
+    it('should queue the proposal successfully', async () => {
+      const proposalID = (await Governor.proposalCount())._hex
+      const queueTx = await Governor.queue(proposalID)
+      await queueTx.wait()
 
-  //     const state = await Governor.state(proposalID)
-  //     expect(proposalStates[state]).to.deep.eq('Queued')
-  //   })
+      const state = await Governor.state(proposalID)
+      expect(proposalStates[state]).to.deep.eq('Queued')
+    })
 
-  //   it('should execute the proposal successfully', async () => {
-  //     const proposalID = (await Governor.proposalCount())._hex
-  //     const executeTx = await Governor.execute(proposalID)
-  //     await executeTx.wait()
+    it('should execute the proposal successfully', async () => {
+      const proposalID = (await Governor.proposalCount())._hex
+      const executeTx = await Governor.execute(proposalID)
+      await executeTx.wait()
 
-  //     const state = await Governor.state(proposalID)
-  //     expect(proposalStates[state]).to.deep.eq('Executed')
+      const state = await Governor.state(proposalID)
+      expect(proposalStates[state]).to.deep.eq('Executed')
 
-  //     const userRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
-  //     const userRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
-  //     expect(userRewardMinFeeRate).to.deep.eq(initialL2LPUserRewardMinFeeRate.add(1))
-  //     expect(userRewardMaxFeeRate).to.deep.eq(initialL2LPUserRewardMaxFeeRate.add(1))
-  //     const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
-  //     expect(ownerRewardFeeRate).to.deep.eq(initialL2LPOwnerRewardFeeRate.add(1))
-  //   })
-  // })
+      const userRewardMinFeeRate = await L2LiquidityPool.userRewardMinFeeRate()
+      const userRewardMaxFeeRate = await L2LiquidityPool.userRewardMaxFeeRate()
+      expect(userRewardMinFeeRate).to.deep.eq(initialL2LPUserRewardMinFeeRate.add(1))
+      expect(userRewardMaxFeeRate).to.deep.eq(initialL2LPUserRewardMaxFeeRate.add(1))
+      const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+      expect(ownerRewardFeeRate).to.deep.eq(initialL2LPOwnerRewardFeeRate.add(1))
+    })
+  })
 
-  // // test configFee for fast-exits
-  // describe('Config fee L1 LP', async () => {
-  //   before(async () => {
-  //     // get the initial fee config
-  //     initialL1LPUserRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
-  //     initialL1LPUserRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
-  //     initialL1LPOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
-  //   })
+  // test configFee for fast-exits
+  describe('Config fee L1 LP', async () => {
+    before(async () => {
+      // get the initial fee config
+      initialL1LPUserRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
+      initialL1LPUserRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
+      initialL1LPOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+    })
 
-  //   it('should create a new proposal to configure fee', async () => {
-  //     try {
-  //       const priorProposalID = (await Governor.proposalCount())._hex
-  //       if (priorProposalID !== '0x00') {
-  //         const priorState = await Governor.state(priorProposalID)
-  //         // clear any pending or active proposal
-  //         if (priorState === 0 || priorState === 1) {
-  //           const cancelTx = await Governor.cancel(priorProposalID)
-  //           await cancelTx.wait()
-  //         }
-  //       }
-  //       await moveTimeForward()
+    it('should create a new proposal to configure fee', async () => {
+      try {
+        const priorProposalID = (await Governor.proposalCount())._hex
+        if (priorProposalID !== '0x00') {
+          const priorState = await Governor.state(priorProposalID)
+          // clear any pending or active proposal
+          if (priorState === 0 || priorState === 1) {
+            const cancelTx = await Governor.cancel(priorProposalID)
+            await cancelTx.wait()
+          }
+        }
+        await moveTimeForward()
 
-  //       const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
-  //       const values = [0] // the eth necessary to send to the contract above
-  //       const signatures = ['configureFeeExits(uint256,uint256,uint256)'] // the function that will carry out the proposal
-  //       const updatedUserRewardMinFeeRate = initialL1LPUserRewardMinFeeRate.toNumber() + 1
-  //       const updatedUserRewardMaxFeeRate = initialL1LPUserRewardMaxFeeRate.toNumber()
-  //       const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
+        const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = ['configureFeeExits(uint256,uint256,uint256)'] // the function that will carry out the proposal
+        const updatedUserRewardMinFeeRate = initialL1LPUserRewardMinFeeRate.toNumber() + 1
+        const updatedUserRewardMaxFeeRate = initialL1LPUserRewardMaxFeeRate.toNumber()
+        const updatedOwnerRewardFeeRate = initialL1LPOwnerRewardFeeRate.toNumber() + 1
 
-  //       const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
-  //           ['uint256', 'uint256', 'uint256'],
-  //           [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
-  //       )]
+        const calldatas = [ethers.utils.defaultAbiCoder.encode( // the parameter for the above function
+            ['uint256', 'uint256', 'uint256'],
+            [updatedUserRewardMinFeeRate, updatedUserRewardMaxFeeRate, updatedOwnerRewardFeeRate]
+        )]
 
-  //       const description = '# Update Fee for swap-offs' // the description of the proposal
+        const description = '# Update Fee for swap-offs' // the description of the proposal
 
-  //       // submitting the proposal
-  //       const proposeTx = await Governor.propose(
-  //         addresses,
-  //         values,
-  //         signatures,
-  //         calldatas,
-  //         description
-  //       )
-  //       await proposeTx.wait()
+        // submitting the proposal
+        const proposeTx = await Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          description
+        )
+        await proposeTx.wait()
 
-  //       const proposalID = (await Governor.proposalCount())._hex
+        const proposalID = (await Governor.proposalCount())._hex
 
-  //       // const proposal = await Governor.proposals(proposalID)
-  //       // console.log(`Proposal:`, proposal)
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal:`, proposal)
 
-  //       const state = await Governor.state(proposalID)
-  //       expect(proposalStates[state]).to.deep.eq('Pending')
-  //     } catch (error) {
-  //       // cancel the current proposal if there's a problem to avoid errors on rerun
-  //       const proposalID = (await Governor.proposalCount())._hex
-  //       const cancelTx = await Governor.cancel(proposalID)
-  //       await cancelTx.wait()
-  //     }
-  //   })
+        const state = await Governor.state(proposalID)
+        expect(proposalStates[state]).to.deep.eq('Pending')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
+    })
 
-  //   it('should cast vote to the proposal and wait for voting period to end', async () => {
-  //     try {
-  //       // get current voting delay from contract
-  //       const votingDelay = (await Governor.votingDelay()).toNumber()
-  //       // mock timestamp
-  //       await moveTimeForward(votingDelay)
+    it('should cast vote to the proposal and wait for voting period to end', async () => {
+      try {
+        // get current voting delay from contract
+        const votingDelay = (await Governor.votingDelay()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingDelay)
 
-  //       const proposalID = (await Governor.proposalCount())._hex
+        const proposalID = (await Governor.proposalCount())._hex
 
-  //       await Governor.castVote(proposalID, 1)
+        await Governor.castVote(proposalID, 1)
 
-  //       // const proposal = await Governor.proposals(proposalID)
-  //       // console.log(`Proposal End Block:`, proposal.endBlock.toString())
+        // const proposal = await Governor.proposals(proposalID)
+        // console.log(`Proposal End Block:`, proposal.endBlock.toString())
 
-  //       const stateAfterVote = await Governor.state(proposalID)
-  //       expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
+        const stateAfterVote = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVote]).to.deep.eq('Active')
 
-  //       // wait till voting period ends
-  //       console.log("\twaiting for voting period to end...")
+        // wait till voting period ends
+        console.log("\twaiting for voting period to end...")
 
-  //       const votingPeriod = (await Governor.votingPeriod()).toNumber()
-  //       // mock timestamp
-  //       await moveTimeForward(votingPeriod)
+        const votingPeriod = (await Governor.votingPeriod()).toNumber()
+        // mock timestamp
+        await moveTimeForward(votingPeriod)
 
-  //       const stateAfterVotingPeriod = await Governor.state(proposalID)
-  //       expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
-  //     } catch (error) {
-  //       // cancel the current proposal if there's a problem to avoid errors on rerun
-  //       const proposalID = (await Governor.proposalCount())._hex
-  //       const cancelTx = await Governor.cancel(proposalID)
-  //       await cancelTx.wait()
-  //     }
-  //   }).timeout(100000)
+        const stateAfterVotingPeriod = await Governor.state(proposalID)
+        expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
+      } catch (error) {
+        // cancel the current proposal if there's a problem to avoid errors on rerun
+        const proposalID = (await Governor.proposalCount())._hex
+        const cancelTx = await Governor.cancel(proposalID)
+        await cancelTx.wait()
+      }
+    }).timeout(100000)
 
-  //   it('should queue the proposal successfully', async () => {
-  //     const proposalID = (await Governor.proposalCount())._hex
-  //     const queueTx = await Governor.queue(proposalID)
-  //     await queueTx.wait()
+    it('should queue the proposal successfully', async () => {
+      const proposalID = (await Governor.proposalCount())._hex
+      const queueTx = await Governor.queue(proposalID)
+      await queueTx.wait()
 
-  //     const state = await Governor.state(proposalID)
-  //     expect(proposalStates[state]).to.deep.eq('Queued')
-  //   })
+      const state = await Governor.state(proposalID)
+      expect(proposalStates[state]).to.deep.eq('Queued')
+    })
 
-  //   it('should execute the proposal successfully', async () => {
-  //     const proposalID = (await Governor.proposalCount())._hex
-  //     const executeTx = await Governor.execute(proposalID)
-  //     await executeTx.wait()
+    it('should execute the proposal successfully', async () => {
+      const proposalID = (await Governor.proposalCount())._hex
+      const executeTx = await Governor.execute(proposalID)
+      await executeTx.wait()
 
-  //     const state = await Governor.state(proposalID)
-  //     expect(proposalStates[state]).to.deep.eq('Executed')
+      const state = await Governor.state(proposalID)
+      expect(proposalStates[state]).to.deep.eq('Executed')
 
-  //     // involves xDomain message, wait for xdomain relay
-  //     await env.waitForXDomainTransactionFast(executeTx, Direction.L2ToL1)
+      // involves xDomain message, wait for xdomain relay
+      await env.waitForXDomainTransactionFast(executeTx, Direction.L2ToL1)
 
-  //     const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
-  //     const userRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
-  //     expect(userRewardMinFeeRate).to.deep.eq(initialL1LPUserRewardMinFeeRate.add(1))
-  //     expect(userRewardMaxFeeRate).to.deep.eq(initialL1LPUserRewardMaxFeeRate)
-  //     const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
-  //     expect(ownerRewardFeeRate).to.deep.eq(initialL1LPOwnerRewardFeeRate.add(1))
-  //   }).timeout(100000)
-  // })
+      const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
+      const userRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()
+      expect(userRewardMinFeeRate).to.deep.eq(initialL1LPUserRewardMinFeeRate.add(1))
+      expect(userRewardMaxFeeRate).to.deep.eq(initialL1LPUserRewardMaxFeeRate)
+      const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
+      expect(ownerRewardFeeRate).to.deep.eq(initialL1LPOwnerRewardFeeRate.add(1))
+    }).timeout(100000)
+  })
 })
