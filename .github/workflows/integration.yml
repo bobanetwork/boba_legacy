@@ -61,7 +61,7 @@ jobs:
 
       - name: Bring the stack up
         working-directory: ./ops
-        run: docker-compose up -d -V
+        run: NO_PULL=1 BUILD=0 DAEMON=1 ./up_local.sh
 
       - name: Wait for the Sequencer node
         working-directory: ./ops
@@ -70,10 +70,6 @@ jobs:
       - name: Start background logging
         working-directory: ./ops
         run: docker-compose -f docker-compose.yml logs --follow &
-
-      - name: Test serving BOBA contracts
-        working-directory: ./ops
-        run: ./scripts/wait-for-boba.sh
 
       - name: Run the integration tests
         working-directory: ./ops
