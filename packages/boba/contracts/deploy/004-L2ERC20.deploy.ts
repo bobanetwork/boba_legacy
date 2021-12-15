@@ -258,6 +258,22 @@ const deployFn: DeployFunction = async (hre) => {
   await hre.deployments.save('TK_L2' + 'xBOBA', xL2BobaDeploymentSubmission)
   await registerBobaAddress(addressManager, 'TK_L2' + 'xBOBA', L2ERC20.address)
   console.log(`TK_L2xBOBA was deployed to ${L2ERC20.address}`)
+
+  // Register BOBA and xBOBA
+  const deployments = await hre.deployments.all()
+  const registerBOBA = await Proxy__L2LiquidityPool.registerBOBA(
+    deployments['TK_L2BOBA'].address,
+    deployments['TK_L2xBOBA'].address
+  )
+  await registerBOBA.wait()
+  console.log(`BOBA and xBOBA were registered in L2 LP`)
+
+  // Add controller
+  const addController = await L2ERC20.addController(
+    Proxy__L2LiquidityPool.address
+  )
+  await addController.wait()
+  console.log(`L2 LP has the power to mint and burn xBOBA`)
 }
 
 deployFn.tags = ['L1ERC20', 'test']
