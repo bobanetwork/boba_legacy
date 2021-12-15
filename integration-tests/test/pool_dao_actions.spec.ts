@@ -178,7 +178,7 @@ describe('Dao Action Test', async () => {
 
   describe('Get xBOBA', async () => {
     before(async () => {
-      const depositAmount = utils.parseEther('1000')
+      const depositAmount = utils.parseEther('110000')
 
       const prexBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
 
@@ -195,10 +195,6 @@ describe('Dao Action Test', async () => {
       await addLiquidityTX.wait()
 
       const postBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
-      console.log({
-        prexBobaAmount: prexBobaAmount.toString(),
-        postBobaAmount: postBobaAmount.toString()
-      })
       expect(prexBobaAmount).to.deep.equal(postBobaAmount.sub(depositAmount))
     })
 
@@ -207,8 +203,9 @@ describe('Dao Action Test', async () => {
       await delegateTx.wait()
       const updatedDelegate = await xBoba.delegates(env.l2Wallet.address)
       expect(updatedDelegate).to.eq(env.l2Wallet.address)
+      const xBobaBalance = await xBoba.balanceOf(env.l2Wallet.address)
       const currentVotes = await xBoba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
+      expect(currentVotes).to.eq(xBobaBalance)
     })
   })
 
@@ -225,8 +222,9 @@ describe('Dao Action Test', async () => {
       await delegateTx.wait()
       const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
       expect(updatedDelegate).to.eq(env.l2Wallet.address)
+      const L2BobaBalance = await L2Boba.balanceOf(env.l2Wallet.address)
       const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
+      expect(currentVotes).to.eq(L2BobaBalance)
     })
 
     it('should create a new proposal to configure fee', async () => {
