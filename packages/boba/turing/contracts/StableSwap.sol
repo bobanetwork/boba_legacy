@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/SignedSafeMath.sol";
 
 interface Helper {
-    function TuringTx(uint32 method_idx, bytes memory) external returns (bytes memory);
+    function TuringTx(string memory, bytes memory) external returns (bytes memory);
 }
 
  contract StableSwap {
@@ -16,6 +16,7 @@ interface Helper {
 
     event SwapY(uint256 y_in, uint256 x_out);
     event SwapX(uint256 x_in, uint256 y_out);
+    event Debug(bytes response);
 
     uint256 public x;
     uint256 public y;
@@ -179,7 +180,7 @@ interface Helper {
      * @dev Swap x for y according to stable swap invariant
      * @param x_in to return y_out
      */
-    function swap_x(uint256 x_in) 
+    function swap_x(string memory _url, uint256 x_in) 
         public returns (uint256 y_out){
 
         //call offchain
@@ -189,8 +190,10 @@ interface Helper {
     
         //call offchain
         bytes memory encRequest = abi.encode(x, y, A, x_in);
-        bytes memory encResponse = myHelper.TuringTx(0 /*methodID*/, encRequest);
+        bytes memory encResponse = myHelper.TuringTx(_url, encRequest);
         
+        emit Debug(encResponse);
+
         //the new X and Y values
         uint256 newX = x.add(x_in);
         
@@ -203,11 +206,11 @@ interface Helper {
         //amount to pay out
         y_out = y.sub(newY);
 
+        emit SwapX(x, y_out);
+
         //update the token amounts
         x = newX;
         y = newY;
-        
-        emit SwapX(x_in, y_out);
     }
 
     /**

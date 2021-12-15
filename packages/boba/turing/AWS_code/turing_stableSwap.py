@@ -1,5 +1,10 @@
 # AWS Lambda Stableswap Toy Code
 
+# AWS Lambda Test Input
+# {
+#   "body": "{\"L_x\":\"10.0\",\"L_y\":\"10.0\",\"A\":\"1.00\",\"x_in\":\"5.0\", \"sol\":\"true\"}"
+# }
+
 import json
 import math
 import textwrap
@@ -53,7 +58,8 @@ def sqrt_B(a):
   return math.sqrt(a)
 
 def pow_B(base, exponent):
-  return pow(base, exponent)
+    print("POW: Precison mode\n")
+    return pow(base, exponent)
 
 def invariant():
   global x, y, k, A
@@ -140,6 +146,7 @@ def lambda_handler(event, context):
     global x, y, A, y_prev
     input = json.loads(event["body"])
     
+    print("DEBUG: from Geth:", input)
     print("DEBUG: from Geth:", input['params'][0])
     
     param4HexString = input['params'][0]
@@ -148,11 +155,10 @@ def lambda_handler(event, context):
     #break the string into length 64 chunks
     params = textwrap.wrap(param4HexString, 64)
 
-    #decode each parameter
-    L_x  = float(int(params[0], 16))
-    L_y  = float(int(params[1], 16))
-    a    = float(int(params[2], 16))
-    x_in = float(int(params[3], 16))
+    L_x  = float(int(params[1], 16))
+    L_y  = float(int(params[2], 16))
+    a    = float(int(params[3], 16))
+    x_in = float(int(params[4], 16))
 
     print('DEBUG: Inputs:'
       ' L_x:', L_x, 
@@ -165,9 +171,11 @@ def lambda_handler(event, context):
     changeA(a)
     swap_x(x_in)
     
-    result = '0x{0:0{1}x}'.format(int(y),64)
-    #translates 42 -> 0x0000000000000000000000000000000000000000002a
+    res = '0x{0:0{1}x}'.format(int(32),64)
+    result = res + '{0:0{1}x}'.format(int(y),64) #the actual result
     
+    print("RESULT:", result)
+
     returnPayload = {
       'statusCode': 200,
       'body': json.dumps({
