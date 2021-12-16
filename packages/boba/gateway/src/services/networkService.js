@@ -138,6 +138,7 @@ class NetworkService {
 
     // Dao
     this.BobaContract = null
+    this.xBobaContract = null
     this.delegateContract = null
     this.delegatorContract = null
 
@@ -458,7 +459,7 @@ class NetworkService {
       if ( masterSystemConfig === 'rinkeby') {
         supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                           'REP',  'BAT', 'ZRX',  'SUSHI',
-                          'LINK', 'UNI', 'BOBA', 'OMG',
+                          'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                           //'FRAX', 'FXS', 'UST',
                           //'BUSD', 'BNB', 'FTM',  'MATIC'
                         ]
@@ -466,16 +467,28 @@ class NetworkService {
 
       await Promise.all(supportedTokens.map(async (key) => {
 
-        const L1a = await this.AddressManager.getAddress('TK_L1'+key)
         const L2a = await this.AddressManager.getAddress('TK_L2'+key)
 
-        if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
-          console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-          return false
+        if(key === 'xBOBA') {
+          if (L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': 'xBOBA',
+              'L2': L2a
+            }
+          }
         } else {
-          allTokens[key] = {
-            'L1': L1a,
-            'L2': L2a
+          const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+          if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': L1a,
+              'L2': L2a
+            }
           }
         }
 
@@ -583,6 +596,12 @@ class NetworkService {
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
+
+      this.xBobaContract = new ethers.Contract(
+        allTokens.xBOBA.L2,
         Boba.abi,
         this.provider.getSigner()
       )
@@ -1026,6 +1045,7 @@ class NetworkService {
   async getBalances() {
 
     try {
+
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
       const layer2Balance = await this.L2Provider.getBalance(this.account)
@@ -1080,16 +1100,21 @@ class NetworkService {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
-        getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        if(token.symbolL1 === 'xBOBA') {
+          //there is no L1 xBOBA
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        } else {
+          getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
       })
 
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' && token.balance.gt(new BN(0))) {
+        if (token.layer === 'L1' && token.symbol !== 'xBOBA' && token.balance.gt(new BN(0)) ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))){
+        } else if (token.layer === 'L2' && (token.balance.gt(new BN(0)) || token.symbol === 'xBOBA')) {
           layer2Balances.push(token)
         }
       })
@@ -1785,7 +1810,9 @@ class NetworkService {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push(allTokens[cur].L1.toLowerCase())
+      if(cur !== 'xBOBA') {
+        acc.push(allTokens[cur].L1.toLowerCase())
+      }
       return acc
     }, [allAddresses.L1_ETH_Address])
 
@@ -1874,15 +1901,19 @@ class NetworkService {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push({
-        L1: allTokens[cur].L1.toLowerCase(),
-        L2: allTokens[cur].L2.toLowerCase()
-      });
-      return acc;
+      if(cur !== 'xBOBA') {
+        acc.push({
+          L1: allTokens[cur].L1.toLowerCase(),
+          L2: allTokens[cur].L2.toLowerCase()
+        })
+      }
+      return acc
     }, [{
       L1: allAddresses.L1_ETH_Address,
       L2: allAddresses.L2_ETH_Address
     }])
+
+    console.log("tokenAddressList:",tokenAddressList)
 
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
@@ -2594,7 +2625,26 @@ class NetworkService {
       //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
-      console.log('Error: DAO Balance', error)
+      console.log('Error: getDaoBalance', error)
+      return error
+    }
+  }
+
+  async getDaoBalanceX() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      //console.log('Checking DAO balance')
+      let balance = await this.xBobaContract.balanceOf(this.account)
+      //console.log('balance',balance)
+      return { balanceX: formatEther(balance) }
+    } catch (error) {
+      console.log('Error: getDaoBalanceX', error)
       return error
     }
   }
@@ -2613,6 +2663,24 @@ class NetworkService {
       return { votes: formatEther(votes) }
     } catch (error) {
       console.log('NS: getDaoVotes error:', error)
+      return error
+    }
+  }
+
+    // get DAO Votes
+  async getDaoVotesX() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      let votes = await this.xBobaContract.getCurrentVotes(this.account)
+      return { votesX: formatEther(votes) }
+    } catch (error) {
+      console.log('NS: getDaoVotesX error:', error)
       return error
     }
   }
@@ -2645,6 +2713,22 @@ class NetworkService {
       return tx
     } catch (error) {
       console.log('NS: delegateVotes error:', error)
+      return error
+    }
+  }
+
+  //Delegate DAO Authority
+  async delegateVotesX({ recipient }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      const tx = await this.xBobaContract.delegate(recipient)
+      await tx.wait()
+      return tx
+    } catch (error) {
+      console.log('NS: delegateVotesX error:', error)
       return error
     }
   }
@@ -2775,23 +2859,25 @@ class NetworkService {
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()
-      //console.log('proposalCounts:',proposalCounts)
+      console.log('proposalCounts:',proposalCounts)
 
       const totalProposals = await proposalCounts.toNumber()
-      //console.log('totalProposals:',totalProposals)
+      console.log('totalProposals:',totalProposals)
       
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
         null, null, null, null
       )
 
-      //console.log('filter:',filter)
+      console.log('filter:',filter)
 
       const descriptionList = await delegateCheck.queryFilter(filter)
       
-      //console.log('descriptionList:',descriptionList)
+      console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
+
+        if(typeof(descriptionList[i]) === 'undefined') continue
 
         let proposalID = descriptionList[i].args[0]
 

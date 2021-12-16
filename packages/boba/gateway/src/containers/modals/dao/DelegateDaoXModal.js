@@ -26,11 +26,11 @@ import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 
-import { delegateVotes } from 'actions/daoAction'
+import { delegateVotesX } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
 
-function DelegateDaoModal({ open }) {
+function DelegateDaoXModal({ open }) {
 
     const [recipient, setRecipient] = useState('');
     const dispatch = useDispatch()
@@ -46,11 +46,11 @@ function DelegateDaoModal({ open }) {
 
     function handleClose() {
         setRecipient('')
-        dispatch(closeModal('delegateDaoModal'))
+        dispatch(closeModal('delegateDaoXModal'))
     }
 
     const submit = async () => {
-        let res = await dispatch(delegateVotes({ recipient }));
+        let res = await dispatch(delegateVotesX({ recipient }));
         if (res) {
             dispatch(openAlert(`Votes delegated successfully!`));
             handleClose();
@@ -61,7 +61,7 @@ function DelegateDaoModal({ open }) {
     }
 
     const submitMe = async () => {
-        let res = await dispatch(delegateVotes({ recipient: wAddress }))
+        let res = await dispatch(delegateVotesX({ recipient: wAddress }))
         if (res) {
             dispatch(openAlert(`Vote self-delegation successfull!`))
             handleClose();
@@ -78,11 +78,11 @@ function DelegateDaoModal({ open }) {
             maxWidth="md"
         >
             <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-                Delegate my BOBA votes
+                Delegate my xBOBA
             </Typography>
             <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
                 <Typography variant="h3" sx={{mb: 1}}>
-                    Delegate my BOBA votes to myself
+                    Delegate my xBOBA votes to myself
                 </Typography>
                 <Typography variant="body3" style={{fontSize: '0.8em', lineHeight: '1.0em'}}>
                     My address:&nbsp;
@@ -97,7 +97,7 @@ function DelegateDaoModal({ open }) {
                         onClick={()=>{submitMe()}}
                         color='primary'
                         variant="contained"
-                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
                         loading={loading}
                         triggerTime={new Date()}
                         fullWidth={isMobile}
@@ -109,7 +109,7 @@ function DelegateDaoModal({ open }) {
             </Box>
             <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
                 <Typography variant="h3" sx={{mb: 1}}>
-                    Or, delegate my BOBA votes to someone else
+                    Or, delegate my xBOBA votes to someone else
                 </Typography>
                 <Box sx={{display: 'flex', flexDirection: 'column'}}>
                     <Input
@@ -124,7 +124,7 @@ function DelegateDaoModal({ open }) {
                         onClick={()=>{submit()}}
                         color='primary'
                         variant="contained"
-                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
                         loading={loading}
                         disabled={disabled}
                         triggerTime={new Date()}
@@ -148,4 +148,4 @@ function DelegateDaoModal({ open }) {
     )
 }
 
-export default React.memo(DelegateDaoModal)
+export default React.memo(DelegateDaoXModal)

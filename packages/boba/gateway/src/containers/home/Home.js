@@ -48,11 +48,14 @@ import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
 import DAO from 'containers/dao/Dao';
 import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
+import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 
 import { 
   fetchDaoBalance, 
   fetchDaoVotes, 
+  fetchDaoBalanceX, 
+  fetchDaoVotesX, 
   fetchDaoProposals, 
   getProposalThreshold 
 } from 'actions/daoAction'
@@ -112,6 +115,7 @@ function Home () {
   // DAO modal
   const tranferBobaDaoModalState = useSelector(selectModalState('transferDaoModal'))
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
+  const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const walletMethod = useSelector(selectWalletMethod())
@@ -141,6 +145,8 @@ function Home () {
     dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
     dispatch(fetchDaoVotes())
+    dispatch(fetchDaoBalanceX())
+    dispatch(fetchDaoVotesX())
     dispatch(fetchDaoProposals())
     dispatch(getProposalThreshold())
     dispatch(fetchGas())
@@ -163,6 +169,7 @@ function Home () {
 
       {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
+      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
 
       <Alert
