@@ -3,8 +3,8 @@ pragma solidity >0.7.5;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import { ERC20Votes } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20VotesComp.sol";
+import { ERC20Votes } from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesRegenesis.sol";
+import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesCompRegenesis.sol";
 import { IL2StandardERC20 } from "@eth-optimism/contracts/contracts/standards/IL2StandardERC20.sol";
 
 contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp {
@@ -40,7 +40,7 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
     function decimals() public view virtual override returns (uint8) {
         return _decimals;
     }
-    
+
     function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
         bytes4 secondSupportedInterface = IL2StandardERC20.l1Token.selector
