@@ -46,7 +46,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.geth
     entrypoint: sh ./geth.sh
     env_file:
-      - ../../ops//envs/geth.env
+      - ../../ops/envs/geth.env
     environment:
         ROLLUP_TIMESTAMP_REFRESH: 5s
         ROLLUP_STATE_DUMP_PATH: http://verifier_dtl:8081/state-dump.latest.json
