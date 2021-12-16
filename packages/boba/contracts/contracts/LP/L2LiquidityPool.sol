@@ -475,7 +475,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        if (!xBOBAStatus[msg.sender] && BOBAAddress == _tokenAddress) {
+        if (!xBOBAStatus[msg.sender] && BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
             // mint xBoba
             UserInfo storage user = userInfo[_tokenAddress][msg.sender];
             if (user.amount != 0) {
@@ -496,7 +496,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        if (BOBAAddress == _tokenAddress) {
+        if (BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
             // mint xBoba
             xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, _amount);
         }
@@ -513,7 +513,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     )
         internal
     {
-        if (BOBAAddress == _tokenAddress) {
+        if (BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
             // burn xBOBA
             xL2GovernanceERC20(xBOBAAddress).burn(msg.sender, _amount);
         }
