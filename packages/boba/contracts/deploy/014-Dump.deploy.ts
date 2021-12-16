@@ -31,6 +31,10 @@ const deployFn: DeployFunction = async (hre) => {
           L1: deployments[key].address,
           L2: deployments['NFT_L2' + nftMatch[2]].address,
         }
+      } else if (tokenMatch[2] === 'xBOBA') {
+        contracts['TOKENS'][tokenMatch[2]] = {
+          L2: deployments['TK_L2' + tokenMatch[2]].address,
+        }
       }
     }
   }
