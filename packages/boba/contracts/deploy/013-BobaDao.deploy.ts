@@ -61,7 +61,9 @@ const deployFn: DeployFunction = async (hre) => {
   // get deployed BOBA L2
 
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
+  const xBobaL2 = await hre.deployments.getOrNull('TK_L2xBOBA')
   console.log(`L2_BOBA is located at: ${BobaL2.address}`)
+  console.log(`L2_xBOBA is located at: ${xBobaL2.address}`)
 
   Factory__Timelock = new ContractFactory(
     TimelockJson.abi,
@@ -117,6 +119,7 @@ const deployFn: DeployFunction = async (hre) => {
   GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
     Timelock.address,
     BobaL2.address,
+    xBobaL2.address,
     Timelock.address,
     GovernorBravoDelegate.address,
     governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds

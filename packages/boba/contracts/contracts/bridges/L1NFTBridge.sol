@@ -14,6 +14,14 @@ import { Lib_PredeployAddresses } from "@eth-optimism/contracts/contracts/librar
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+
+/* Contract Imports */
+import { IL1StandardERC721 } from "../standards/IL1StandardERC721.sol";
+
+/* External Imports */
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
  * @title L1NFTBridge
@@ -24,17 +32,31 @@ import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721H
  * Compiler used: solc
  * Runtime target: EVM
  */
-contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
+contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
     using SafeMath for uint;
 
     /********************************
      * External Contract References *
      ********************************/
 
+    address public owner;
     address public l2NFTBridge;
+    // Default gas value which can be overridden if more complex logic runs on L2.
+    uint32 public depositL2Gas;
 
-    // Maps L1 token to tokenId to L2 token contract deposited
+    enum Network { L1, L2 }
+
+    // Info of each NFT
+    struct PairNFTInfo {
+        address l1Contract;
+        address l2Contract;
+        Network baseNetwork; // L1 or L2
+    }
+
+    // Maps L1 token to tokenId to L2 token contract deposited for the native L1 NFT
     mapping(address => mapping (uint256 => address)) public deposits;
+    // Maps L1 NFT address to NFTInfo
+    mapping(address => PairNFTInfo) public pairNFTInfo;
 
     /***************
      * Constructor *
@@ -45,9 +67,52 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
         CrossDomainEnabled(address(0))
     {}
 
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    modifier onlyOwner() {
+        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
+        _;
+    }
+
+    modifier onlyInitialized() {
+        require(address(messenger) != address(0), "Contract has not yet been initialized");
+        _;
+    }
+
     /******************
      * Initialization *
      ******************/
+
+    /**
+     * @dev transfer ownership
+     *
+     * @param _newOwner new owner of this contract
+     */
+    function transferOwnership(
+        address _newOwner
+    )
+        public
+        onlyOwner()
+    {
+        owner = _newOwner;
+    }
+
+    /**
+     * @dev Configure gas.
+     *
+     * @param _depositL2Gas default finalized deposit L2 Gas
+     */
+    function configureGas(
+        uint32 _depositL2Gas
+    )
+        public
+        onlyOwner()
+        onlyInitialized()
+    {
+        depositL2Gas = _depositL2Gas;
+    }
 
     /**
      * @param _l1messenger L1 Messenger address being used for cross-chain communications.
@@ -58,31 +123,70 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
         address _l2NFTBridge
     )
         public
+        onlyOwner()
+        initializer()
     {
         require(messenger == address(0), "Contract has already been initialized.");
         messenger = _l1messenger;
         l2NFTBridge = _l2NFTBridge;
+        owner = msg.sender;
+        configureGas(1400000);
+
+        __Context_init_unchained();
+        __Pausable_init_unchained();
+        __ReentrancyGuard_init_unchained();
+    }
+
+    /***
+     * @dev Add the new NFT pair to the pool
+     * DO NOT add the same NFT token more than once.
+     *
+     * @param _l1Contract L1 NFT contract address
+     * @param _l2Contract L2 NFT contract address
+     * @param _baseNetwork Network where the NFT contract was created
+     *
+     */
+    function registerNFTPair(
+        address _l1Contract,
+        address _l2Contract,
+        string memory _baseNetwork
+    )
+        public
+        onlyOwner()
+    {
+        // use with caution, can register only once
+        PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
+        // l2 NFT address equal to zero, then pair is not registered.
+        require(pairNFT.l2Contract == address(0), "L2 NFT Address Already Registered");
+        // _baseNetwork can only be L1 or L2
+        require(
+            keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L1"))) ||
+            keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L2"))),
+            "Invalid Network"
+        );
+        Network baseNetwork;
+        if (keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L1")))) {
+            baseNetwork = Network.L1;
+        } else {
+            baseNetwork = Network.L2;
+        }
+        pairNFTInfo[_l1Contract] =
+            PairNFTInfo({
+                l1Contract: _l1Contract,
+                l2Contract: _l2Contract,
+                baseNetwork: baseNetwork
+            });
     }
 
     /**************
      * Depositing *
      **************/
 
-    /** @dev Modifier requiring sender to be EOA.  This check could be bypassed by a malicious
-     *  contract via initcode, but it takes care of the user error we want to avoid.
-     */
-    modifier onlyEOA() {
-        // Used to stop deposits from contracts (avoid accidentally lost tokens)
-        require(!Address.isContract(msg.sender), "Account not EOA");
-        _;
-    }
-
     // /**
     //  * @inheritdoc iL1NFTBridge
     //  */
     function depositNFT(
         address _l1Contract,
-        address _l2Contract,
         uint256 _tokenId,
         uint32 _l2Gas,
         bytes calldata _data
@@ -90,9 +194,10 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
         external
         virtual
         override
-        onlyEOA()
+        nonReentrant()
+        whenNotPaused()
     {
-        _initiateNFTDeposit(_l1Contract, _l2Contract, msg.sender, msg.sender, _tokenId, _l2Gas, _data);
+        _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, _data);
     }
 
     //  /**
@@ -100,17 +205,18 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
     //  */
     function depositNFTTo(
         address _l1Contract,
-        address _l2Contract,
         address _to,
         uint256 _tokenId,
         uint32 _l2Gas,
         bytes calldata _data
     )
         external
-        override
         virtual
+        override
+        nonReentrant()
+        whenNotPaused()
     {
-        _initiateNFTDeposit(_l1Contract, _l2Contract, msg.sender, _to, _tokenId, _l2Gas, _data);
+        _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, _data);
     }
 
     /**
@@ -118,7 +224,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
      * contract of the deposit and calling a handler to lock the L1 token. (e.g. transferFrom)
      *
      * @param _l1Contract Address of the L1 NFT contract we are depositing
-     * @param _l2Contract Address of the respective L2 NFT contract
      * @param _from Account to pull the deposit from on L1
      * @param _to Account to give the deposit to on L2
      * @param _tokenId NFT token Id to deposit.
@@ -129,7 +234,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
      */
     function _initiateNFTDeposit(
         address _l1Contract,
-        address _l2Contract,
         address _from,
         address _to,
         uint256 _tokenId,
@@ -138,36 +242,77 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
     )
         internal
     {
-        // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-        // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-        // _from is an EOA or address(0).
-        IERC721(_l1Contract).safeTransferFrom(
-            _from,
-            address(this),
-            _tokenId
-        );
+        PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
+        require(pairNFT.l2Contract != address(0), "Can't Find L2 NFT Contract");
 
-        // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
-        bytes memory message = abi.encodeWithSelector(
-            iL2NFTBridge.finalizeDeposit.selector,
-            _l1Contract,
-            _l2Contract,
-            _from,
-            _to,
-            _tokenId,
-            _data
-        );
+        if (pairNFT.baseNetwork == Network.L1) {
+            //  This check could be bypassed by a malicious contract via initcode,
+            // but it takes care of the user error we want to avoid.
+            require(!Address.isContract(msg.sender), "Account not EOA");
+            // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
+            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
+            // _from is an EOA or address(0).
+            IERC721(_l1Contract).safeTransferFrom(
+                _from,
+                address(this),
+                _tokenId
+            );
 
-        // Send calldata into L2
-        sendCrossDomainMessage(
-            l2NFTBridge,
-            _l2Gas,
-            message
-        );
+            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            bytes memory message = abi.encodeWithSelector(
+                iL2NFTBridge.finalizeDeposit.selector,
+                _l1Contract,
+                pairNFT.l2Contract,
+                _from,
+                _to,
+                _tokenId,
+                _data
+            );
 
-        deposits[_l1Contract][_tokenId] = _l2Contract;
+            // Send calldata into L2
+            sendCrossDomainMessage(
+                l2NFTBridge,
+                _l2Gas,
+                message
+            );
 
-        emit NFTDepositInitiated(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+            deposits[_l1Contract][_tokenId] = pairNFT.l2Contract;
+        } else {
+            address l2Contract = IL1StandardERC721(_l1Contract).l2Contract();
+            require(pairNFT.l2Contract == l2Contract, "L2 NFT Contract Address Error");
+
+            // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
+            // usage
+            address NFTOwner = IL1StandardERC721(_l1Contract).ownerOf(_tokenId);
+            require(
+                msg.sender == NFTOwner || IL1StandardERC721(_l1Contract).getApproved(_tokenId) == msg.sender ||
+                IL1StandardERC721(pairNFT.l2Contract).isApprovedForAll(NFTOwner, msg.sender)
+            );
+
+            IL1StandardERC721(_l1Contract).burn(_tokenId);
+
+            // Construct calldata for l2NFTBridge.finalizeDeposit(_to, _amount)
+            bytes memory message;
+
+            message = abi.encodeWithSelector(
+                iL2NFTBridge.finalizeDeposit.selector,
+                _l1Contract,
+                l2Contract,
+                _from,
+                _to,
+                _tokenId,
+                _data
+            );
+
+            // Send calldata into L2
+            sendCrossDomainMessage(
+                l2NFTBridge,
+                _l2Gas,
+                message
+            );
+        }
+
+        emit NFTDepositInitiated(_l1Contract, pairNFT.l2Contract, _from, _to, _tokenId, _data);
     }
 
     // /**
@@ -185,12 +330,65 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder {
         override
         onlyFromCrossDomainAccount(l2NFTBridge)
     {
-        // needs to verify comes from correct l2Contract
-        require(deposits[_l1Contract][_tokenId] == _l2Contract, "Incorrect Burn");
+        PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
 
-        // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
-        IERC721(_l1Contract).safeTransferFrom(address(this), _to, _tokenId);
+        if (pairNFT.baseNetwork == Network.L1) {
+            // needs to verify comes from correct l2Contract
+            require(deposits[_l1Contract][_tokenId] == _l2Contract, "Incorrect Burn");
 
-        emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+            // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
+            IERC721(_l1Contract).safeTransferFrom(address(this), _to, _tokenId);
+
+            emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+        } else {
+            // Check the target token is compliant and
+            // verify the deposited token on L2 matches the L1 deposited token representation here
+            if (
+                // check with interface of IL1StandardERC721
+                ERC165Checker.supportsInterface(_l1Contract, 0x3899b238) &&
+                _l2Contract == IL1StandardERC721(_l1Contract).l2Contract()
+            ) {
+                // When a deposit is finalized, we credit the account on L2 with the same amount of
+                // tokens.
+                IL1StandardERC721(_l1Contract).mint(_to, _tokenId);
+                emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+            } else {
+                bytes memory message = abi.encodeWithSelector(
+                    iL2NFTBridge.finalizeDeposit.selector,
+                    _l1Contract,
+                    _l2Contract,
+                    _to,   // switched the _to and _from here to bounce back the deposit to the sender
+                    _from,
+                    _tokenId,
+                    _data
+                );
+
+                // Send message up to L1 bridge
+                sendCrossDomainMessage(
+                    l2NFTBridge,
+                    depositL2Gas,
+                    message
+                );
+                emit NFTWithdrawalFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+            }
+        }
+    }
+
+    /******************
+     *      Pause     *
+     ******************/
+
+    /**
+     * Pause contract
+     */
+    function pause() external onlyOwner() {
+        _pause();
+    }
+
+    /**
+     * UnPause contract
+     */
+    function unpause() external onlyOwner() {
+        _unpause();
     }
 }

@@ -448,11 +448,11 @@ class NetworkService {
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
-                                'REP',  'BAT', 'ZRX',  'SUSHI',
-                                'LINK', 'UNI', 'BOBA', 'OMG',
-                                'FRAX', 'FXS', 'DODO', 'UST',
-                                'BUSD', 'BNB', 'FTM',  'MATIC'
-                              ]
+                              'REP',  'BAT', 'ZRX',  'SUSHI',
+                              'LINK', 'UNI', 'BOBA', 'OMG',
+                              'FRAX', 'FXS', 'DODO', 'UST',
+                              'BUSD', 'BNB', 'FTM',  'MATIC'
+                            ]
 
       //not all tokens are on Rinkeby
       if ( masterSystemConfig === 'rinkeby') {

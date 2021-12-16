@@ -171,12 +171,31 @@ export const encodeSolidityRevertMessage = (_reason: string): string => {
   return '0x08c379a0' + remove0x(abiCoder.encode(['string'], [_reason]))
 }
 
-export const DEFAULT_TRANSACTION = {
-  to: '0x' + '1234'.repeat(10),
-  gasLimit: 8_000_000,
-  gasPrice: 0,
-  data: '0x',
-  value: 0,
+export const defaultTransactionFactory = () => {
+  return {
+    to: '0x' + '1234'.repeat(10),
+    gasLimit: 8_000_000,
+    gasPrice: BigNumber.from(0),
+    data: '0x',
+    value: 0,
+  }
+}
+
+export const isLiveNetwork = () => {
+  return process.env.IS_LIVE_NETWORK === 'true'
+}
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export const gasPriceForL2 = async () => {
+  if (await isMainnet()) {
+    return l2Wallet.getGasPrice()
+  }
+
+  if (isLiveNetwork()) {
+    return Promise.resolve(BigNumber.from(10000))
+  }
+
+  return Promise.resolve(BigNumber.from(0))
 }
 
 export const waitForL2Geth = async (
@@ -239,4 +258,10 @@ export const expectLogs = async (
     .map((decoded) => ({ event: eventName, args: decoded }))
 
   return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export const isMainnet = async () => {
+  const chainId = await l1Wallet.getChainId()
+  return chainId === 1
 }
