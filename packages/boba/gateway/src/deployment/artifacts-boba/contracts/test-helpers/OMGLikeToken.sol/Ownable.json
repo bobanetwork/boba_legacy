@@ -1,0 +1,42 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Ownable",
+  "sourceName": "contracts/test-helpers/OMGLikeToken.sol",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    }
+  ],
+  "bytecode": "0x6060604052341561000c57fe5b5b60008054600160a060020a03191633600160a060020a03161790555b5b61017c806100396000396000f300606060405263ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416638da5cb5b8114610045578063f2fde38b1461007e575bfe5b341561004d57fe5b6100556100a9565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b341561008657fe5b6100a773ffffffffffffffffffffffffffffffffffffffff600435166100c5565b005b60005473ffffffffffffffffffffffffffffffffffffffff1681565b6000543373ffffffffffffffffffffffffffffffffffffffff9081169116146100ee5760006000fd5b73ffffffffffffffffffffffffffffffffffffffff81161561014b57600080547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff83161790555b5b5b505600a165627a7a7230582060263b0de5bc2f437a7cccfa1316e36a2950af3448bd1abbe38781a3c8442fd80029",
+  "deployedBytecode": "0x606060405263ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416638da5cb5b8114610045578063f2fde38b1461007e575bfe5b341561004d57fe5b6100556100a9565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b341561008657fe5b6100a773ffffffffffffffffffffffffffffffffffffffff600435166100c5565b005b60005473ffffffffffffffffffffffffffffffffffffffff1681565b6000543373ffffffffffffffffffffffffffffffffffffffff9081169116146100ee5760006000fd5b73ffffffffffffffffffffffffffffffffffffffff81161561014b57600080547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff83161790555b5b5b505600a165627a7a7230582060263b0de5bc2f437a7cccfa1316e36a2950af3448bd1abbe38781a3c8442fd80029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
