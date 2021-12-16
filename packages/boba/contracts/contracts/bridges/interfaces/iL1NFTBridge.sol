@@ -25,9 +25,17 @@ interface iL1NFTBridge {
         bytes _data
     );
 
+    event NFTWithdrawalFailed (
+        address indexed _l1Contract,
+        address indexed _l2Contract,
+        address indexed _from,
+        address _to,
+        uint256 _tokenId,
+        bytes _data
+    );
+
     function depositNFT(
         address _l1Contract,
-        address _l2Contract,
         uint256 _tokenId,
         uint32 _l2Gas,
         bytes calldata _data
@@ -36,7 +44,6 @@ interface iL1NFTBridge {
 
     function depositNFTTo(
         address _l1Contract,
-        address _l2Contract,
         address _to,
         uint256 _tokenId,
         uint32 _l2Gas,

@@ -8,6 +8,7 @@ import { registerBobaAddress } from './000-Messenger.deploy'
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L1BobaJson from '../artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
 import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import xL2GovernanceERC20Json from '../artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import preSupportedTokens from '../preSupportedTokens.json'
@@ -16,6 +17,7 @@ let Factory__L1ERC20: ContractFactory
 let Factory__L2ERC20: ContractFactory
 let Factory__L1Boba: ContractFactory
 let Factory__L2Boba: ContractFactory
+let Factory__xL2Boba: ContractFactory
 
 let L1ERC20: Contract
 let L2ERC20: Contract
@@ -52,6 +54,12 @@ const deployFn: DeployFunction = async (hre) => {
   Factory__L2Boba = new ContractFactory(
     L2GovernanceERC20Json.abi,
     L2GovernanceERC20Json.bytecode,
+    (hre as any).deployConfig.deployer_l2
+  )
+
+  Factory__xL2Boba = new ContractFactory(
+    xL2GovernanceERC20Json.abi,
+    xL2GovernanceERC20Json.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
 
@@ -236,6 +244,36 @@ const deployFn: DeployFunction = async (hre) => {
     await registerL2LP.wait()
     console.log(`${token.name} was registered in LPs`)
   }
+
+  // Deploy xBoba
+  L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)
+  await L2ERC20.deployTransaction.wait()
+
+  const xL2BobaDeploymentSubmission: DeploymentSubmission = {
+    ...L2ERC20,
+    receipt: L2ERC20.receipt,
+    address: L2ERC20.address,
+    abi: xL2GovernanceERC20Json.abi,
+  }
+  await hre.deployments.save('TK_L2' + 'xBOBA', xL2BobaDeploymentSubmission)
+  await registerBobaAddress(addressManager, 'TK_L2' + 'xBOBA', L2ERC20.address)
+  console.log(`TK_L2xBOBA was deployed to ${L2ERC20.address}`)
+
+  // Register BOBA and xBOBA
+  const deployments = await hre.deployments.all()
+  const registerBOBA = await Proxy__L2LiquidityPool.registerBOBA(
+    deployments['TK_L2BOBA'].address,
+    deployments['TK_L2xBOBA'].address
+  )
+  await registerBOBA.wait()
+  console.log(`BOBA and xBOBA were registered in L2 LP`)
+
+  // Add controller
+  const addController = await L2ERC20.addController(
+    Proxy__L2LiquidityPool.address
+  )
+  await addController.wait()
+  console.log(`L2 LP has the power to mint and burn xBOBA`)
 }
 
 deployFn.tags = ['L1ERC20', 'test']

@@ -15,6 +15,9 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridge.sol";
 
+/* External Imports */
+import "../standards/xL2GovernanceERC20.sol";
+
 /**
  * @dev An L2 LiquidityPool implementation
  */
@@ -96,6 +99,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     uint256 public extraGasRelay;
 
     uint256 public userRewardMaxFeeRate;
+
+    address public xBOBAAddress;
+    address public BOBAAddress;
+
+    // mapping use address to the status of xBOBA
+    mapping(address => bool) public xBOBAStatus;
 
     /********************
      *       Event      *
@@ -230,7 +239,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Initialize this contract.
-     *
      * @param _l2CrossDomainMessenger L2 Messenger address being used for sending the cross-chain message.
      * @param _L1LiquidityPoolAddress Address of the corresponding L1 LP deployed to the main chain
      */
@@ -369,6 +377,26 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /***
+     * @dev Register BOBA tokens
+     *
+     * @param _BOBAAddress L2 BOBA address
+     * @param _xBOBAAddress L2 xBOBA address
+     *
+     */
+    function registerBOBA (
+        address _BOBAAddress,
+        address _xBOBAAddress
+    )
+        public
+        onlyOwner()
+    {
+        require(BOBAAddress == address(0) && _BOBAAddress != address(0) && _xBOBAAddress != address(0), "Invalid BOBA address");
+        BOBAAddress = _BOBAAddress;
+        xBOBAAddress = _xBOBAAddress;
+    }
+
+
+    /***
      * @dev Add the new token pair to the pool
      * DO NOT add the same LP token more than once. Rewards will be messed up if you do.
      *
@@ -439,6 +467,59 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /**
+     * Give xBOBA to users who has already deposited liquidity
+     * @param _tokenAddress address of the liquidity token.
+     */
+    function mintXBOBAForPreOwner(
+        address _tokenAddress
+    )
+        internal
+    {
+        if (!xBOBAStatus[msg.sender] && BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
+            // mint xBoba
+            UserInfo storage user = userInfo[_tokenAddress][msg.sender];
+            if (user.amount != 0) {
+                xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, user.amount);
+            }
+            xBOBAStatus[msg.sender] = true;
+        }
+    }
+
+    /**
+     * Give xBOBA to users who deposit liquidity
+     * @param _amount boba amount that users want to deposit.
+     * @param _tokenAddress address of the liquidity token.
+     */
+    function mintXBOBA(
+        uint256 _amount,
+        address _tokenAddress
+    )
+        internal
+    {
+        if (BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
+            // mint xBoba
+            xL2GovernanceERC20(xBOBAAddress).mint(msg.sender, _amount);
+        }
+    }
+
+   /**
+     * Burn xBOBA for users who withdraw liquidity
+     * @param _amount boba amount that users want to withdraw.
+     * @param _tokenAddress address of the liquidity token.
+     */
+    function burnXBOBA(
+        uint256 _amount,
+        address _tokenAddress
+    )
+        internal
+    {
+        if (BOBAAddress == _tokenAddress && BOBAAddress != address(0)) {
+            // burn xBOBA
+            xL2GovernanceERC20(xBOBAAddress).burn(msg.sender, _amount);
+        }
+    }
+
+    /**
      * Liquididity providers add liquidity
      * @param _amount liquidity amount that users want to deposit.
      * @param _tokenAddress address of the liquidity token.
@@ -465,6 +546,9 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        // Send initial xBOBA
+        mintXBOBAForPreOwner(_tokenAddress);
+
         // Update accUserRewardPerShare
         updateUserRewardPerShare(_tokenAddress);
 
@@ -487,6 +571,9 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         // update amounts
         user.amount = user.amount.add(_amount);
         pool.userDepositAmount = pool.userDepositAmount.add(_amount);
+
+        //  xBOBA
+        mintXBOBA(_amount, _tokenAddress);
 
         emit AddLiquidity(
             msg.sender,
@@ -576,6 +663,9 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         require(user.amount >= _amount, "Requested amount exceeds amount staked");
 
+        // Send initial xBOBA
+        mintXBOBAForPreOwner(_tokenAddress);
+
         // Update accUserRewardPerShare
         updateUserRewardPerShare(_tokenAddress);
 
@@ -596,6 +686,9 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
             require(sent, "Failed to send ovm_Eth");
         }
+
+        // burn xBOBA
+        burnXBOBA(_amount, _tokenAddress);
 
         emit WithdrawLiquidity(
             msg.sender,
