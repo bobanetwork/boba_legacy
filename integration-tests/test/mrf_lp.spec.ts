@@ -11,6 +11,8 @@ import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1Liquid
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2TokenPoolJson from '@boba/contracts/artifacts/contracts/TokenPool.sol/TokenPool.json'
 import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
+import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import xL2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 
@@ -27,6 +29,10 @@ describe('Liquidity Pool Test', async () => {
 
   let OMGLIkeToken: Contract
   let L2OMGLikeToken: Contract
+
+  let L1BOBAToken: Contract
+  let L2BOBAToken: Contract
+  let xBOBAToken: Contract
 
   let env: OptimismEnv
 
@@ -107,6 +113,24 @@ describe('Liquidity Pool Test', async () => {
     L2TokenPool = new Contract(
       env.addressesBOBA.L2TokenPool,
       L2TokenPoolJson.abi,
+      env.l2Wallet
+    )
+
+    L1BOBAToken = new Contract(
+      env.addressesBOBA.TOKENS.BOBA.L1,
+      L1ERC20Json.abi,
+      env.l1Wallet
+    )
+
+    L2BOBAToken = new Contract(
+      env.addressesBOBA.TOKENS.BOBA.L2,
+      L2GovernanceERC20Json.abi,
+      env.l2Wallet
+    )
+
+    xBOBAToken = new Contract(
+      env.addressesBOBA.TOKENS.xBOBA.L2,
+      xL2GovernanceERC20Json.abi,
       env.l2Wallet
     )
   })
@@ -1605,6 +1629,87 @@ describe('Liquidity Pool Test', async () => {
       await configureTx.wait()
       const finalExtraGasRelay = await L2LiquidityPool.extraGasRelay()
       expect(finalExtraGasRelay).to.eq(0)
+    })
+  })
+
+  describe('BOBA and xBOBA tests', async () => {
+    before('Transfer BOBA to L2', async () => {
+      const depositBOBAAmount = utils.parseEther('10000')
+
+      const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
+      const preL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+
+      const approveL1BOBATX = await L1BOBAToken.approve(
+        L1StandardBridge.address,
+        depositBOBAAmount
+      )
+      await approveL1BOBATX.wait()
+
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20(
+          L1BOBAToken.address,
+          L2BOBAToken.address,
+          depositBOBAAmount,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L1ToL2
+      )
+
+      const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
+      const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+
+      expect(preL1BOBABalance).to.deep.eq(
+        postL1BOBABalance.add(depositBOBAAmount)
+      )
+
+      expect(preL2BOBABalance).to.deep.eq(
+        postL2BOBABalance.sub(depositBOBAAmount)
+      )
+    })
+
+    it('Should mint xBOBA', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const prexBOBAAmount = await xBOBAToken.balanceOf(env.l2Wallet.address)
+
+      const approveL2BOBATX = await L2BOBAToken.approve(
+        L2LiquidityPool.address,
+        depositAmount
+      )
+      await approveL2BOBATX.wait()
+
+      const addLiquidityTX = await L2LiquidityPool.addLiquidity(
+        depositAmount,
+        L2BOBAToken.address
+      )
+      await addLiquidityTX.wait()
+
+      const postxBOBAAmount = await xBOBAToken.balanceOf(env.l2Wallet.address)
+
+      expect(prexBOBAAmount).to.deep.eq(
+        postxBOBAAmount.sub(depositAmount)
+      )
+    })
+
+    it('Should burn xBOBA', async () => {
+      const exitAmount = utils.parseEther('5')
+
+      const prexBOBAAmount = await xBOBAToken.balanceOf(env.l2Wallet.address)
+
+      const withdrawLiquidityTX = await L2LiquidityPool.withdrawLiquidity(
+        exitAmount,
+        L2BOBAToken.address,
+        env.l2Wallet.address,
+        { gasLimit: 7000000 }
+      )
+      await withdrawLiquidityTX.wait()
+
+      const postxBOBAAmount = await xBOBAToken.balanceOf(env.l2Wallet.address)
+
+      expect(prexBOBAAmount).to.deep.eq(
+        postxBOBAAmount.add(exitAmount)
+      )
     })
   })
 })

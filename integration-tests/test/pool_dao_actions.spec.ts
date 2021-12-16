@@ -7,6 +7,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L1BobaJson from '@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
 import L2BobaJson from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import xBobaJson from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -26,6 +27,7 @@ describe('Dao Action Test', async () => {
   let L2ERC20: Contract
   let L1Boba: Contract
   let L2Boba: Contract
+  let xBoba: Contract
   let L1StandardBridge: Contract
 
   let Governor: Contract
@@ -126,6 +128,12 @@ describe('Dao Action Test', async () => {
       env.l2Wallet
     )
 
+    xBoba = new Contract(
+      env.addressesBOBA.TOKENS.xBOBA.L2,
+      xBobaJson.abi,
+      env.l2Wallet
+    )
+
     L1LiquidityPool = new Contract(
       env.addressesBOBA.Proxy__L1LiquidityPool,
       L1LiquidityPoolJson.abi,
@@ -168,6 +176,39 @@ describe('Dao Action Test', async () => {
     }
   })
 
+  describe('Get xBOBA', async () => {
+    before(async () => {
+      const depositAmount = utils.parseEther('110000')
+
+      const prexBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
+
+      const approveL2BobaTX = await L2Boba.approve(
+        L2LiquidityPool.address,
+        depositAmount
+      )
+      await approveL2BobaTX.wait()
+
+      const addLiquidityTX = await L2LiquidityPool.addLiquidity(
+        depositAmount,
+        L2Boba.address
+      )
+      await addLiquidityTX.wait()
+
+      const postBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
+      expect(prexBobaAmount).to.deep.equal(postBobaAmount.sub(depositAmount))
+    })
+
+    it('should delegate voting rights', async () => {
+      const delegateTx = await xBoba.delegate(env.l2Wallet.address)
+      await delegateTx.wait()
+      const updatedDelegate = await xBoba.delegates(env.l2Wallet.address)
+      expect(updatedDelegate).to.eq(env.l2Wallet.address)
+      const xBobaBalance = await xBoba.balanceOf(env.l2Wallet.address)
+      const currentVotes = await xBoba.getCurrentVotes(env.l2Wallet.address)
+      expect(currentVotes).to.eq(xBobaBalance)
+    })
+  })
+
   describe('Config fee L2 LP', async () => {
     before(async () => {
       // get the initial fee config
@@ -181,8 +222,9 @@ describe('Dao Action Test', async () => {
       await delegateTx.wait()
       const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
       expect(updatedDelegate).to.eq(env.l2Wallet.address)
+      const L2BobaBalance = await L2Boba.balanceOf(env.l2Wallet.address)
       const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(BigNumber.from(quorumVotesPlus))
+      expect(currentVotes).to.eq(L2BobaBalance)
     })
 
     it('should create a new proposal to configure fee', async () => {
