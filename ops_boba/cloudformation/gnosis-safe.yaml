@@ -1,3 +1,11 @@
+# TODO
+# - update DJANGO_SECRET_KEY
+# - update WEBHOOK_TOKEN
+# - after Rinkeby validation set DEBUG flags to false
+# - potentially limit DJANGO_ALLOWED_HOSTS
+# - safe_client_gateway=debug,safe_client_gateway::monitoring=info set to safe_client_gateway=normal,safe_client_gateway::monitoring=info
+# - safe config service can use DEFAULT_FILE_STORAGE S3Boto3Storage - # django-storages – Amazon S3 configuration See https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+#
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Enya Gnosis-Safe Application Deployment"
 
@@ -313,7 +321,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
@@ -373,7 +381,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
@@ -433,7 +441,7 @@ Resources:
             - Name: PYTHONPATH
               Value: /app/
             - Name: DJANGO_SETTINGS_MODULE
-              Value: config.settings.local
+              Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
