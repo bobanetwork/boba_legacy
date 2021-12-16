@@ -525,18 +525,20 @@ function destroy_dev_services {
 
     function ssh_to_ecs_cluster {
 #set -x
-        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica.*##; s#-verifier.*##')
+        CLUSTER_NAME=$(echo ${ENV_PREFIX}|sed 's#-replica.*##; s#-verifier.*##; s#-gnosis.*##')
         #CLUSTER_NAME=$(echo ${ENV_PREFIX})
         if [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica" && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp01"  && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp02" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME-replica|head -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-verifier" ]];then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME-verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME-verifier|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+        elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-gnosis" ]];then
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep -w $CLUSTER_NAME-gnosis|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica-bkp01" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME-replica-bkp01|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} == "$CLUSTER_NAME-replica-bkp02" ]];then
           ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $CLUSTER_NAME-replica-bkp02|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         elif [[ ${ENV_PREFIX} != "$CLUSTER_NAME-replica" && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp01" && ${ENV_PREFIX} != "$CLUSTER_NAME-replica-bkp02" ]]; then
-          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $ENV_PREFIX|egrep -v 'replica|verifier'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
+          ECS_CLUSTER=`aws ecs list-clusters  --region ${REGION}|grep $ENV_PREFIX|egrep -v 'replica|verifier|gnosis'|tail -1|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'`
         fi
         CONTAINER_INSTANCE=`aws ecs list-container-instances --region ${REGION} --cluster $ECS_CLUSTER|grep $CLUSTER_NAME|tail -1|cut -d/ -f3|sed 's#"##g'`
         EC2_INSTANCE=`aws ecs describe-container-instances --region ${REGION} --cluster $ECS_CLUSTER --container-instance $CONTAINER_INSTANCE|jq '.containerInstances[0] .ec2InstanceId'|sed 's#"##g'`

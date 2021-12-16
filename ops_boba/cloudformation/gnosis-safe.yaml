@@ -116,6 +116,19 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
+  GnosisLBTargetGroup5:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8080
+      Protocol: TCP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      HealthCheckProtocol: TCP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
 
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -147,11 +160,11 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 3666
-      Protocol: TCP
-#      Certificates:
-#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisGateway:ARN"
+      Port: 443
+      Protocol: TLS
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup3
@@ -160,14 +173,27 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
-      Port: 3000
-      Protocol: TCP
-#      Certificates:
-#      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:ARN"
+      Port: 443
+      Protocol: TLS
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup4
+
+  GnosisListener5:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisConfig:ARN"
+      Port: 443
+      Protocol: TLS
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBTargetGroup5
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -182,6 +208,16 @@ Resources:
       ContainerDefinitions:
         - Image: !Sub "${DockerPrefix}/nginx-safe-transaction-service:latest"
           Name: nginx-safe-transaction-service
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 8000
               HostPort: 8000
@@ -196,6 +232,16 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/nginx-safe-config-service:latest"
           Name: nginx-safe-config-service
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 80
               HostPort: 80
@@ -209,8 +255,19 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: PYTHONDONTWRITEBYTECODE
+              Value: true
+            - Name: DEBUG
+              Value: true
+            - Name: ROOT_LOG_LEVEL
+              Value: DEBUG
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: GUNICORN_BIND_PORT
-              Value: 8080
+              Value: 80
             - Name: DOCKER_NGINX_VOLUME_ROOT
               Value: /nginx
             - Name: GUNICORN_BIND_SOCKET
@@ -219,6 +276,15 @@ Resources:
               Value: 80
             - Name: NGINX_ENVSUBST_OUTPUT_DIR
               Value: /etc/nginx/
+            - Name: GUNICORN_WEB_RELOAD
+              Value: false
+            - Name: CGW_URL
+              Value: !Sub
+                - "https://safe-client.${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+            - Name: DEFAULT_FILE_STORAGE
+              Value: django.core.files.storage.FileSystemStorage
           DockerLabels:
             com.datadoghq.ad.check_names: '["nginx-safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
@@ -227,6 +293,16 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: safe-transaction-service
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 8888
               HostPort: 8888
@@ -250,9 +326,9 @@ Resources:
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -283,6 +359,16 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: worker
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
@@ -300,9 +386,9 @@ Resources:
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -333,6 +419,16 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: scheduler
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
@@ -350,9 +446,9 @@ Resources:
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
                 - "https://${EndpointAddress}"
@@ -383,6 +479,16 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
           Name: safe-client-gateway
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 3666
               HostPort: 3666
@@ -398,9 +504,9 @@ Resources:
           Environment:
             - Name: CONFIG_SERVICE_URI
               Value: !Sub
-                - "http://${EndpointAddress}/"
+                - "https://safe-config.${EndpointAddress}/"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: FEATURE_FLAG_NESTED_DECODING
               Value: true
             - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
@@ -444,6 +550,16 @@ Resources:
           Memory: "4000"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 8080
               HostPort: 8080
@@ -465,9 +581,9 @@ Resources:
               Value: DEBUG
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
-                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,${EndpointAddress}"
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: GUNICORN_BIND_PORT
               Value: 8080
             - Name: DOCKER_NGINX_VOLUME_ROOT
@@ -482,9 +598,9 @@ Resources:
               Value: false
             - Name: CGW_URL
               Value: !Sub
-                - "http://${EndpointAddress}/"
+                - "https://safe-client.${EndpointAddress}/"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           PseudoTerminal: true
@@ -500,6 +616,16 @@ Resources:
           Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-react:${ImageTag}"
           Name: safe-react
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
           PortMappings:
             - ContainerPort: 3000
               HostPort: 3000
@@ -545,14 +671,17 @@ Resources:
         - ContainerName: safe-react
           ContainerPort: 3000
           TargetGroupArn: !Ref GnosisLBTargetGroup4
+        - ContainerName: safe-config-service
+          ContainerPort: 8080
+          TargetGroupArn: !Ref GnosisLBTargetGroup5
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"
           Subnets:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PublicSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PublicSubnet2"
       HealthCheckGracePeriodSeconds: 60
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2

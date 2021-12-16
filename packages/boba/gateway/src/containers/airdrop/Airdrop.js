@@ -1,7 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
+
+import * as S from './Airdrop.styles'
 import * as styles from './Airdrop.module.scss'
+
 import { Box, Grid, Typography } from '@material-ui/core'
 import Button from 'components/button/Button'
 import PageHeader from 'components/pageHeader/PageHeader'
@@ -157,37 +160,20 @@ class Airdrop extends React.Component {
     if(layer === 'L1') {
         return <div className={styles.container}>
             <PageHeader title="Airdrop" />
-            <div className={styles.content}>
-                <Box
-                  sx={{
-                    borderRadius: '12px',
-                    margin: '20px 5px',
-                    padding: '10px 20px',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}
+            <S.LayerAlert>
+              <S.AlertInfo>
+                <AlertIcon />
+                <S.AlertText
+                  variant="body2"
+                  component="p"
                 >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <AlertIcon />
-                    <Typography
-                      sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                      variant="body1"
-                      component="p"
-                    >
-                      You are on L1. To claim Boba, SWITCH LAYER to L2
-                    </Typography>
-                  </div>
-                    <LayerSwitcher isButton={true} />
-                </Box>
-            </div>
+                  You are on Ethereum Mainnet. To claim your BOBA, SWITCH to Boba
+                </S.AlertText>
+              </S.AlertInfo>
+              <LayerSwitcher isButton={true} />
+            </S.LayerAlert>
         </div>
     }
-
 
     return (
   <>
