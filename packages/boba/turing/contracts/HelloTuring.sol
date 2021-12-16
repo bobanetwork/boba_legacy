@@ -5,7 +5,8 @@ pragma solidity 0.6.12;
 import "hardhat/console.sol";
 
 interface Helper {
-  function TuringTx(uint32 method_idx, bytes memory) external returns (bytes memory);
+  function TuringTx(uint32, bytes memory) external returns (bytes memory);
+  function TuringRandom() external returns (uint256);
   //function TuringCall(uint32 method_idx, bytes memory) view external returns (bytes memory);
 }
 
@@ -88,6 +89,12 @@ contract HelloTuring {
     bytes memory encRequest = abi.encode(a, b);
     bytes memory encResponse = myHelper.TuringTx(methodID, encRequest);
     return abi.decode(encResponse,(string));
+  }
+
+  function GetRandom() 
+    public returns (uint256) {
+
+    return myHelper.TuringRandom();
   }
 
   // function isCatOrDog(string memory url) public view returns (string memory) {

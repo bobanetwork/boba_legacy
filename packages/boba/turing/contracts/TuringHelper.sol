@@ -9,6 +9,7 @@ contract TuringHelper {
   TuringHelper Self;
 
   event OffchainResponse(uint version, bytes responseData);
+  event OffchainRandom(uint version, uint256 random);
 
   constructor () public {
     Self = TuringHelper(address(this));
@@ -45,6 +46,22 @@ contract TuringHelper {
     return _payload;
   }
 
+  function GetRandom(uint32 rType, uint256 _random)
+    public returns (uint256) {
+
+    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
+    
+    if (rType == 1) {
+      // knock knock - wake up the L2Geth
+      // force a revert via 1 == 2
+      // the if() avoids calling genRequestRLP unnecessarily
+      require (1 == 2, "RANDOM_");
+    }
+    //if (rType == 2) -> the L2Geth has obtained fresh data for us
+    return _random;
+  }
+
   /* This is called from the external contract. It takes a method
      selector and an abi-encoded request payload. The URL and the
      list of allowed methods are supplied when the contract is
@@ -60,7 +77,6 @@ contract TuringHelper {
   */
   function TuringTx(string memory _url, bytes memory _payload)
     public returns (bytes memory) {
-      //require (method_idx < methods.length, "Turing:TuringTx:method not registered");
       require (_payload.length > 0, "Turing:TuringTx:no payload");
 
       /* Initiate the request. This can't be a local function call
@@ -69,6 +85,18 @@ contract TuringHelper {
       */
       bytes memory response = Self.GetResponse(1, _url, _payload);
       emit OffchainResponse(0x01, response);
+      return response;
+  }
+
+  function TuringRandom()
+    public returns (uint256) {
+
+      /* Initiate the request. This can't be a local function call
+         because that would stay inside the EVM and not give l2geth
+         a place to intercept and re-write the call.
+      */
+      uint256 response = Self.GetRandom(1, 0);
+      emit OffchainRandom(0x01, response);
       return response;
   }
 
