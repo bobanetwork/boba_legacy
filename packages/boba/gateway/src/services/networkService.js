@@ -44,11 +44,15 @@ import {
 import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
-import DiscretionaryExitBurnJson from '../deployment/contracts/DiscretionaryExitBurn.json'
+
+import DiscretionaryExitBurnJson from '../deployment/artifacts-boba/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
 
 //OMGX LP contracts
 import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LPJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+
+//L2 Staking
+import L2SaveJson from '../deployment/artifacts-boba/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
 
 //Standard ERC20 jsons
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
@@ -58,12 +62,12 @@ import L2ERC20Json from '../deployment/artifacts-base/contracts/standards/L2Stan
 import OMGJson from '../deployment/contracts/OMG.json'
 
 //BOBA L2 Contracts
-import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
+import L2ERC721Json from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 
 //DAO
-import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
-import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
-import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
+import Boba from                   "../deployment/artifacts-boba/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
+import GovernorBravoDelegate from  "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
+import GovernorBravoDelegator from "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
 
 //Airdrop
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
@@ -412,6 +416,7 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      if (!(await this.getAddress('BobaFixedSavings', 'BobaFixedSavings'))) return
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
@@ -2978,6 +2983,124 @@ class NetworkService {
       return res
     } catch(error) {
       console.log("NS: executeProposal error:",error)
+      return error
+    }
+
+  }
+
+
+  /***********************************************/
+  /*****       Fixed savings account         *****/
+  /***********************************************/
+  async addFS_Savings(value_Wei_String) {
+    
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider.getSigner()
+      )
+
+      // const account = await this.provider.getSigner().getAddress()
+      // console.log('this.account', account)
+
+      // console.log(this.L2Provider)
+
+      let allowance_BN = await this.BobaContract.allowance(
+        this.account,
+        allAddresses.BobaFixedSavings
+      )
+      console.log("Allowance",allowance_BN.toString())
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+      console.log("Deposit:",depositAmount_BN)
+
+      if (depositAmount_BN.gt(allowance_BN)) {
+        console.log("Need to approve YES:",depositAmount_BN)
+        const approveStatus = await this.BobaContract.approve(
+          allAddresses.BobaFixedSavings,
+          value_Wei_String
+        )
+        await approveStatus.wait()
+        if (!approveStatus) return false
+      } else {
+        console.log("Allowance is sufficient:",allowance_BN.toString(), depositAmount_BN.toString())
+      }
+
+      const addSavingsTX = await FixedSavings.stake(value_Wei_String)
+      await addSavingsTX.wait()
+      return true
+    } catch (error) {
+      console.log("NS: addFS_Savings error:", error)
+      return error
+    }
+  }
+
+  async getFS_Saves() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+
+    try {
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.L2Provider
+      )
+
+      const l2ba = await FixedSavings.l2Boba()
+      console.log('l2 boba:', l2ba)
+      console.log('l2 boba:', allTokens['BOBA'])
+
+      let stakecount = await FixedSavings.personalStakeCount(this.account)
+      return { stakecount: Number(stakecount) }
+    } catch (error) {
+      console.log('NS: getSaves error:', error)
+      return error
+    }
+  }
+
+  async getFS_Info() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.L2Provider
+      )
+
+      let stakeInfo = []
+
+      const stakeCounts = await FixedSavings.personalStakeCount(this.account)
+      //console.log('stakeCounts:',stakeCounts)
+
+      for (let i = 0; i < stakeCounts; i++) {
+
+        const stakeId = await FixedSavings.personalStakePos(this.account, i)
+        const stakeData = await FixedSavings.stakeDataMap(stakeId)
+
+        stakeInfo.push({
+          stakeId: Number(stakeId.toString()),
+          depositTimestamp: Number(stakeData.depositTimestamp.toString()),
+          depositAmount: logAmount(stakeData.depositAmount.toString(), 18),
+          isActive: stakeData.isActive
+        })
+
+      }
+      //console.log("stakeInfo:",stakeInfo)
+      return { stakeInfo }
+    } catch (error) {
+      console.log("NS: getFS_Info error:",error)
       return error
     }
 

@@ -41,11 +41,16 @@ import LedgerConnect from 'containers/modals/ledger/LedgerConnect';
 import AddTokenModal from 'containers/modals/addtoken/AddTokenModal';
 
 //Farm
+import FarmWrapper from 'containers/farm/FarmWrapper'
 import FarmDepositModal from 'containers/modals/farm/FarmDepositModal';
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
 
+//Save
+import Save from 'containers/save/Save'
+import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
+
 //DAO
-import DAO from 'containers/dao/Dao';
+import DAO from 'containers/dao/Dao'
 import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
@@ -67,6 +72,11 @@ import {
   fetchAirdropStatusL2,
 } from 'actions/airdropAction'
 
+import { 
+  getFS_Saves,
+  getFS_Info,
+} from 'actions/fixedAction'
+
 //Wallet Functions
 import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
@@ -81,7 +91,7 @@ import NFT from 'containers/nft/Nft'
 import { useTheme } from '@material-ui/core/styles'
 import { Box, Container, useMediaQuery } from '@material-ui/core'
 import MainMenu from 'components/mainMenu/MainMenu'
-import FarmWrapper from 'containers/farm/FarmWrapper'
+
 
 import Alert from 'components/alert/Alert'
 
@@ -108,6 +118,8 @@ function Home () {
 
   const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
   const ledgerConnectModalState = useSelector(selectModalState('ledgerConnectModal'))
+
+  const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -151,6 +163,8 @@ function Home () {
     dispatch(getProposalThreshold())
     dispatch(fetchGas())
     dispatch(fetchExits())
+    dispatch(getFS_Saves())
+    dispatch(getFS_Info())
   }, POLL_INTERVAL)
 
   useEffect(() => {
@@ -164,6 +178,9 @@ function Home () {
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
       {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
+
+      {!!saveDepositModalState && <SaveDepositModal  open={saveDepositModalState} />}
+
       {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
@@ -216,6 +233,9 @@ function Home () {
           }
           {pageDisplay === "Farm" &&
             <FarmWrapper/>
+          }
+          {pageDisplay === "Save" &&
+            <Save/>
           }
           {pageDisplay === "DAO" &&
             <DAO/>
