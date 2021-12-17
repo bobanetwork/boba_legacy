@@ -83,6 +83,9 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice The address of the L2 BOBA governance token
     BobaInterface public boba;
 
+    /// @notice The address of the L2 xBOBA governance token
+    BobaInterface public xboba;
+
     /// @notice The official record of all proposals ever proposed
     mapping (uint => Proposal) public proposals;
 

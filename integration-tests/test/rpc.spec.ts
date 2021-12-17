@@ -6,10 +6,11 @@ import chai, { expect } from 'chai'
 import {
   sleep,
   l2Provider,
-  DEFAULT_TRANSACTION,
+  defaultTransactionFactory,
   fundUser,
   L2_CHAINID,
-  IS_LIVE_NETWORK,
+  isLiveNetwork,
+  gasPriceForL2,
 } from './shared/utils'
 import chaiAsPromised from 'chai-as-promised'
 import { OptimismEnv } from './shared/env'
@@ -18,6 +19,8 @@ import {
   TransactionRequest,
 } from '@ethersproject/providers'
 import { solidity } from 'ethereum-waffle'
+import simpleStorageJson from '../artifacts/contracts/SimpleStorage.sol/SimpleStorage.json'
+
 chai.use(chaiAsPromised)
 chai.use(solidity)
 
@@ -57,7 +60,8 @@ describe('Basic RPC tests', () => {
 
   describe('eth_sendRawTransaction', () => {
     it('should correctly process a valid transaction', async () => {
-      const tx = DEFAULT_TRANSACTION
+      const tx = defaultTransactionFactory()
+      tx.gasPrice = await gasPriceForL2()
       const nonce = await wallet.getTransactionCount()
       const result = await wallet.sendTransaction(tx)
 
@@ -70,7 +74,8 @@ describe('Basic RPC tests', () => {
 
     it('should not accept a transaction with the wrong chain ID', async () => {
       const tx = {
-        ...DEFAULT_TRANSACTION,
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
         chainId: (await wallet.getChainId()) + 1,
       }
 
@@ -79,20 +84,25 @@ describe('Basic RPC tests', () => {
       ).to.be.rejectedWith('invalid transaction: invalid sender')
     })
 
-    it('should not accept a transaction without a chain ID', async () => {
+    it('should accept a transaction without a chain ID', async () => {
       const tx = {
-        ...DEFAULT_TRANSACTION,
+        ...defaultTransactionFactory(),
+        nonce: await wallet.getTransactionCount(),
+        gasPrice: await gasPriceForL2(),
         chainId: null, // Disables EIP155 transaction signing.
       }
+      const signed = await wallet.signTransaction(tx)
+      const response = await provider.sendTransaction(signed)
 
-      await expect(
-        provider.sendTransaction(await wallet.signTransaction(tx))
-      ).to.be.rejectedWith('Cannot submit unprotected transaction')
+      expect(response.chainId).to.equal(0)
+      const v = response.v
+      expect(v === 27 || v === 28).to.be.true
     })
 
     it('should accept a transaction with a value', async () => {
       const tx = {
-        ...DEFAULT_TRANSACTION,
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
         chainId: await env.l2Wallet.getChainId(),
         data: '0x',
         value: ethers.utils.parseEther('0.1'),
@@ -103,15 +113,16 @@ describe('Basic RPC tests', () => {
       const receipt = await result.wait()
       expect(receipt.status).to.deep.equal(1)
 
-      expect(await provider.getBalance(env.l2Wallet.address)).to.deep.equal(
-        balanceBefore.sub(ethers.utils.parseEther('0.1'))
-      )
+      const balAfter = await provider.getBalance(env.l2Wallet.address)
+      expect(balAfter.lte(balanceBefore.sub(ethers.utils.parseEther('0.1')))).to
+        .be.true
     })
 
     it('should reject a transaction with higher value than user balance', async () => {
       const balance = await env.l2Wallet.getBalance()
       const tx = {
-        ...DEFAULT_TRANSACTION,
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
         chainId: await env.l2Wallet.getChainId(),
         data: '0x',
         value: balance.add(ethers.utils.parseEther('1')),
@@ -240,7 +251,7 @@ describe('Basic RPC tests', () => {
     it('includes L1 gas price and L1 gas used', async () => {
       const tx = await env.l2Wallet.populateTransaction({
         to: env.l2Wallet.address,
-        gasPrice: 20000000,
+        gasPrice: isLiveNetwork() ? 10000 : 1,
       })
 
       const raw = serialize({
@@ -274,7 +285,8 @@ describe('Basic RPC tests', () => {
 
   describe('eth_getTransactionByHash', () => {
     it('should be able to get all relevant l1/l2 transaction data', async () => {
-      const tx = DEFAULT_TRANSACTION
+      const tx = defaultTransactionFactory()
+      tx.gasPrice = await gasPriceForL2()
       const result = await wallet.sendTransaction(tx)
       await result.wait()
 
@@ -288,7 +300,8 @@ describe('Basic RPC tests', () => {
   describe('eth_getBlockByHash', () => {
     it('should return the block and all included transactions', async () => {
       // Send a transaction and wait for it to be mined.
-      const tx = DEFAULT_TRANSACTION
+      const tx = defaultTransactionFactory()
+      tx.gasPrice = await gasPriceForL2()
       const result = await wallet.sendTransaction(tx)
       const receipt = await result.wait()
 
@@ -315,7 +328,7 @@ describe('Basic RPC tests', () => {
     // other people are sending transactions to the Sequencer at the same time
     // as this test is running.
     it('should return the same result when new transactions are not applied', async function () {
-      if (IS_LIVE_NETWORK) {
+      if (isLiveNetwork()) {
         this.skip()
       }
 
@@ -362,7 +375,7 @@ describe('Basic RPC tests', () => {
       let lastEstimate: BigNumber
       for (let i = 0; i < 10; i++) {
         const estimate = await l2Provider.estimateGas({
-          to: DEFAULT_TRANSACTION.to,
+          to: defaultTransactionFactory().to,
           value: 0,
         })
 
@@ -376,7 +389,7 @@ describe('Basic RPC tests', () => {
 
     it('should return a gas estimate for txs with empty data', async () => {
       const estimate = await l2Provider.estimateGas({
-        to: DEFAULT_TRANSACTION.to,
+        to: defaultTransactionFactory().to,
         value: 0,
       })
       // Expect gas to be less than or equal to the target plus 1%
@@ -394,11 +407,30 @@ describe('Basic RPC tests', () => {
     })
   })
 
-  // SKIP: ?
-  describe.skip('rollup_gasPrices', () => {
+  describe('debug_traceTransaction', () => {
+    it('should match debug_traceBlock', async () => {
+      const storage = new ContractFactory(
+        simpleStorageJson.abi,
+        simpleStorageJson.bytecode,
+        env.l2Wallet
+      )
+      const tx = (await storage.deploy()).deployTransaction
+      const receipt = await tx.wait()
+
+      const txTrace = await provider.send('debug_traceTransaction', [
+        receipt.transactionHash,
+      ])
+      const blockTrace = await provider.send('debug_traceBlockByHash', [
+        receipt.blockHash,
+      ])
+      expect(txTrace).to.deep.equal(blockTrace[0].result)
+    })
+  })
+
+  describe('rollup_gasPrices', () => {
     it('should return the L1 and L2 gas prices', async () => {
       const result = await provider.send('rollup_gasPrices', [])
-      const l1GasPrice = await env.l1Wallet.provider.getGasPrice()
+      const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
       const l2GasPrice = await env.gasPriceOracle.gasPrice()
 
       expect(BigNumber.from(result.l1GasPrice)).to.deep.eq(l1GasPrice)

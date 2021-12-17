@@ -1194,7 +1194,6 @@ type RPCTransaction struct {
 	R                *hexutil.Big    `json:"r"`
 	S                *hexutil.Big    `json:"s"`
 	QueueOrigin      string          `json:"queueOrigin"`
-	TxType           string          `json:"txType"`
 	L1TxOrigin       *common.Address `json:"l1TxOrigin"`
 	L1BlockNumber    *hexutil.Big    `json:"l1BlockNumber"`
 	L1Timestamp      hexutil.Uint64  `json:"l1Timestamp"`
@@ -1574,9 +1573,6 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 
 // SubmitTransaction is a helper function that submits tx to txPool and logs a message.
 func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (common.Hash, error) {
-	if !tx.Protected() {
-		return common.Hash{}, errors.New("Cannot submit unprotected transaction")
-	}
 	if err := b.SendTx(ctx, tx); err != nil {
 		return common.Hash{}, err
 	}
@@ -2027,51 +2023,6 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 // SetHead rewinds the head of the blockchain to a previous block.
 func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
 	api.b.SetHead(uint64(number))
-}
-
-func (api *PrivateDebugAPI) IngestTransactions(txs []*RPCTransaction) error {
-	transactions := make([]*types.Transaction, len(txs))
-
-	for i, tx := range txs {
-		nonce := uint64(tx.Nonce)
-		value := tx.Value.ToInt()
-		gasLimit := uint64(tx.Gas)
-		gasPrice := tx.GasPrice.ToInt()
-		data := tx.Input
-		l1BlockNumber := tx.L1BlockNumber.ToInt()
-		l1Timestamp := uint64(tx.L1Timestamp)
-		rawTransaction := tx.RawTransaction
-
-		var queueOrigin types.QueueOrigin
-		switch tx.QueueOrigin {
-		case "sequencer":
-			queueOrigin = types.QueueOriginSequencer
-		case "l1":
-			queueOrigin = types.QueueOriginL1ToL2
-		default:
-			return fmt.Errorf("Transaction with unknown queue origin: %s", tx.TxType)
-		}
-
-		var transaction *types.Transaction
-		if tx.To == nil {
-			transaction = types.NewContractCreation(nonce, value, gasLimit, gasPrice, data)
-		} else {
-			transaction = types.NewTransaction(nonce, *tx.To, value, gasLimit, gasPrice, data)
-		}
-
-		meta := types.TransactionMeta{
-			L1BlockNumber:   l1BlockNumber,
-			L1Timestamp:     l1Timestamp,
-			L1MessageSender: tx.L1TxOrigin,
-			QueueOrigin:     queueOrigin,
-			Index:           (*uint64)(tx.Index),
-			QueueIndex:      (*uint64)(tx.QueueIndex),
-			RawTransaction:  rawTransaction,
-		}
-		transaction.SetTransactionMeta(&meta)
-		transactions[i] = transaction
-	}
-	return api.b.IngestTransactions(transactions)
 }
 
 // PublicNetAPI offers network related RPC methods
