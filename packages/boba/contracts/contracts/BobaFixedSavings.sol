@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0;
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -29,6 +29,9 @@ contract BobaFixedSavings is PausableUpgradeable {
         bool isActive;
     }
 
+    event FundsStaked(uint256 stakeId, address account, uint256 amount);
+    event FundsUnstaked(uint256 stakeId, address account, uint256 amount, uint256 rewards);
+
     // stakeId to stakeData
     mapping (uint256 => StakeData) public stakeDataMap;
     // address to no of stakes
@@ -40,7 +43,7 @@ contract BobaFixedSavings is PausableUpgradeable {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
+        require(msg.sender == owner, "Caller is not the owner");
         _;
     }
 
@@ -55,11 +58,13 @@ contract BobaFixedSavings is PausableUpgradeable {
         public
         onlyOwner
     {
-        require(_newOwner != address(0), 'New owner cannot be the zero address');
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
     }
 
-    function initialize(address l2BobaAddress, address xBobaAddress) public onlyOwner onlyNotInitialized initializer {
+    function initialize(address l2BobaAddress, address xBobaAddress) public onlyNotInitialized initializer {
+        require(l2BobaAddress != address(0), "l2 Boba cannot be zero address");
+        require(xBobaAddress != address(0), "xBoba cannot be zero address");
         l2Boba = l2BobaAddress;
         xBoba = xBobaAddress;
         owner = msg.sender;
@@ -71,6 +76,7 @@ contract BobaFixedSavings is PausableUpgradeable {
     function stake(uint256 _amount) external whenNotPaused {
         // change if want amounts to be in lot sizes
         require(_amount > 0, "Amount to stake cannot be zero");
+        require(stakingCloseTimestamp == 0, "Staking contract is closed");
         IERC20(l2Boba).safeTransferFrom(msg.sender, address(this), _amount);
 
         totalStakeCount++;
@@ -90,6 +96,8 @@ contract BobaFixedSavings is PausableUpgradeable {
 
         // mint xBOBA for the user
         _mintXBOBA(msg.sender, _amount);
+
+        emit FundsStaked(totalStakeCount, msg.sender, _amount);
     }
 
     function unstake(uint256 stakeId) public {
@@ -113,6 +121,8 @@ contract BobaFixedSavings is PausableUpgradeable {
         uint256 noOfPeriods = ((finalTimestamp - stakeData.depositTimestamp)/(LOCK_TIME + UNSTAKE_TIME)) + 1;
         uint256 totalReward = (stakeData.depositAmount * FLAT_INTEREST_PER_PERIOD * noOfPeriods) / 10000;
         IERC20(l2Boba).safeTransfer(msg.sender, totalReward);
+
+        emit FundsUnstaked(stakeData.stakeId, stakeData.account, stakeData.depositAmount, totalReward);
     }
 
     function _mintXBOBA(address account, uint256 amount) internal {
@@ -132,6 +142,7 @@ contract BobaFixedSavings is PausableUpgradeable {
     }
 
     function stopStakingContract() external onlyOwner {
+        require(stakingCloseTimestamp == 0, "Already closed");
         stakingCloseTimestamp = block.timestamp;
     }
 }

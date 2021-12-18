@@ -198,14 +198,14 @@ describe('Boba Fixed Savings', async () => {
     })
 
     it('should fail staking with incorrect staking amount', async () => {
-      const bobaBalance = await L2Boba.balanceOf(env.l2Wallet.address)
+      const bobaBalance = await L2Boba.balanceOf(env.l2Wallet_2.address)
       await expect(
         FixedSavings.connect(env.l2Wallet_2.address).stake(bobaBalance.add(1))
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     })
 
     it('should fail staking with incorrect amount approved', async () => {
-      await L2Boba.approve(FixedSavings.address, 100)
+      await L2Boba.connect(env.l2Wallet_2).approve(FixedSavings.address, 100)
       await expect(
         FixedSavings.connect(env.l2Wallet_2.address).stake(101)
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
@@ -571,6 +571,19 @@ describe('Boba Fixed Savings', async () => {
         expect(stopTime).to.not.eq(0)
         expect(stopTime).to.be.eq(timeNowAfterStop)
       }).timeout(100000)
+
+      it('should not allow to restop interest bearing contract', async () => {
+        await expect(
+          FixedSavings.connect(env.l2Wallet).stopStakingContract()
+        ).to.be.revertedWith('Already closed')
+      })
+
+      it('should not allow new stakes after stopping contract', async () => {
+        await L2Boba.connect(env.l2Wallet).approve(FixedSavings.address, 100)
+        await expect(
+          FixedSavings.connect(env.l2Wallet).stake(100)
+        ).to.be.revertedWith('Staking contract is closed')
+      })
 
       it('should give out rewards until the contract was stopped', async () => {
         const personalStakeCount = await FixedSavings.personalStakeCount(
