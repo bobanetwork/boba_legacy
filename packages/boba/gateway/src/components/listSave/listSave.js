@@ -93,7 +93,7 @@ class ListSave extends React.Component {
       locked = false
     }
 
-    const earned = stakeInfo.depositAmount * (0.05 / 365) * (duration_S / (24 * 60 * 60))
+    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
 
     const unlocktime_S = timeNow_S + twoWeeks - secondsOverWindow
     const unlocktimeNextBegin = moment.unix(unlocktime_S).format('MM/DD/YYYY hh:mm a')
@@ -114,7 +114,7 @@ class ListSave extends React.Component {
           >
 
             <S.GridItemTag item
-              xs={4}
+              xs={2}
               md={1}
             >
               {isMobile ? (
@@ -128,19 +128,19 @@ class ListSave extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
-              md={2}
+              xs={6}
+              md={3}
             >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
               ) : (null)}
-              <Typography variant="overline" style={{opacity: '0.4', fontSize: '0.9em'}}>
+              <Typography variant="overline" style={{opacity: '0.4', fontSize: '1.0em'}}>
                 {timeDeposit}
               </Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
+              xs={2}
               md={1}
             >
               {isMobile ? (
@@ -152,43 +152,35 @@ class ListSave extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
+              xs={2}
               md={1}
               >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Status</Typography>
-              ) : (null)}
               <Typography variant="body1">
                 {stakeInfo.isActive ? 'Active' : 'Not Active'}
               </Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
-              md={2}
-              >
+              xs={8}
+              md={4}
+            >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Next Unstake Window</Typography>
               ) : (null)}
-              <Typography variant="overline" style={{opacity: '0.4'}}>
-                Begin: {unlocktimeNextBegin}<br/>
-                End: {unlocktimeNextEnd}
-              </Typography>
+              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
+                <Typography variant="overline" style={{lineHeight: '1em'}}>Begin: {unlocktimeNextBegin}</Typography>
+                <Typography variant="overline" style={{lineHeight: '1em'}}>End: {unlocktimeNextEnd}</Typography>
+              </div>
             </S.GridItemTag>
 
             <S.GridItemTag item
               xs={4}
               md={2}
-              >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Actions</Typography>
-              ) : (null)}
+            >
               <Button
                 variant="contained"
                 onClick={()=>{this.handleUnstake()}}
                 disabled={locked}
-                fullWidth
-                sx={{flex: 1}}
               >
                 Unstake
               </Button>

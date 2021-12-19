@@ -16,9 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import React from 'react';
-import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import React from 'react'
+import { connect } from 'react-redux'
+import { isEqual } from 'lodash'
 
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
@@ -33,6 +33,7 @@ import * as S from './Save.styles'
 import * as styles from './Save.module.scss'
 
 import { Box, FormControlLabel, Checkbox, Typography, Fade, Button } from '@material-ui/core'
+
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -45,7 +46,7 @@ class Save extends React.Component {
 
     const {
       stakeCount,
-      stakeInfo
+      stakeInfo,
     } = this.props.fixed
 
     this.state = {
@@ -93,7 +94,7 @@ class Save extends React.Component {
     const { isMobile } = this.props
     const networkLayer = networkService.L1orL2
 
-    console.log("stakeInfo:",stakeInfo)
+    //console.log("stakeInfo:",stakeInfo)
 
     if(networkLayer === 'L1') {
         return <div className={styles.container}>
@@ -124,13 +125,16 @@ class Save extends React.Component {
             <S.GridItemTag 
               item xs={10} 
               md={10}
-            > 
+            >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
                 <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> You will earn an APR of 5%. 
                 <br/>
-                <span style={{fontWeight: '700'}}>UNSTAKING:</span> Each staking period lasts 2 weeks. 
-                If you do not unstake after a staking period, your stake will be renewed in two week increments until you unstake. 
-                The unstaking window lasts 2 days. You can only unstake in the unstaking window.
+                <span style={{fontWeight: '700'}}>STAKING PERIOD:</span> Each staking period lasts 2 weeks. 
+                If you do not unstake after a staking period, your stake will be automatically renewed.
+                <br/>
+                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW:</span> The first two days of every 
+                staking period, except for the first staking period, are the unstaking window. You can 
+                only unstake during the unstaking window.
               </Typography>
             </S.GridItemTag>
 
@@ -152,12 +156,12 @@ class Save extends React.Component {
           {!isMobile ? (
             <S.TableHeading>
               <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
-                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Amount</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Deposited On</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Status</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Next Unstake Window</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Actions</Typography></S.GridItemTag>
+                <S.GridItemTag item md={1}><Typography variant="body2">Amount</Typography></S.GridItemTag>
+                <S.GridItemTag item md={3}><Typography variant="body2">Deposited On</Typography></S.GridItemTag>
+                <S.GridItemTag item md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
+                <S.GridItemTag item md={1}><Typography variant="body2">Status</Typography></S.GridItemTag>
+                <S.GridItemTag item md={4}><Typography variant="body2">Next Unstake Window</Typography></S.GridItemTag>
+                <S.GridItemTag item md={2}><Typography variant="body2">Actions</Typography></S.GridItemTag>
               </S.GridItemTagContainer>
             </S.TableHeading>
           ) : (null)}
@@ -168,6 +172,7 @@ class Save extends React.Component {
                   <ListSave
                     key={i}
                     stakeInfo={stakeInfo[i]}
+                    isMobile={isMobile}
                   />
                 )
               })}

@@ -46,7 +46,7 @@ import FarmDepositModal from 'containers/modals/farm/FarmDepositModal';
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
 
 //Save
-import Save from 'containers/save/Save'
+import SaveWrapper from 'containers/save/SaveWrapper'
 import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
 
 //DAO
@@ -235,7 +235,7 @@ function Home () {
             <FarmWrapper/>
           }
           {pageDisplay === "Save" &&
-            <Save/>
+            <SaveWrapper/>
           }
           {pageDisplay === "DAO" &&
             <DAO/>
