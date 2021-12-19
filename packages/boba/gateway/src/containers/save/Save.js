@@ -78,60 +78,6 @@ class Save extends React.Component {
 
   }
 
-  // getBalance(address, chain) {
-
-  //   const { layer1, layer2 } = this.state
-
-  //   if (typeof (layer1) === 'undefined') return [0, 0]
-  //   if (typeof (layer2) === 'undefined') return [0, 0]
-
-  //   if (chain === 'L1') {
-  //     let tokens = Object.entries(layer1)
-  //     for (let i = 0; i < tokens.length; i++) {
-  //       if (tokens[i][1].address.toLowerCase() === address.toLowerCase()) {
-  //         return [tokens[i][1].balance, tokens[i][1].decimals]
-  //       }
-  //     }
-  //   }
-  //   else if (chain === 'L2') {
-  //     let tokens = Object.entries(layer2)
-  //     for (let i = 0; i < tokens.length; i++) {
-  //       if (tokens[i][1].address.toLowerCase() === address.toLowerCase()) {
-  //         return [tokens[i][1].balance, tokens[i][1].decimals]
-  //       }
-  //     }
-  //   }
-
-  //   return [0, 0]
-
-  // }
-
-  // handleChange = (event, t) => {
-  //   if (t === 'L1 Liquidity Pool')
-  //     this.setState({
-  //       lpChoice: 'L1LP',
-  //       poolTab: t
-  //     })
-  //   else if (t === 'L2 Liquidity Pool')
-  //     this.setState({
-  //       lpChoice: 'L2LP',
-  //       poolTab: t
-  //     })
-  // }
-
-  // handleCheckBox = (e) => {
-  //   this.setState({
-  //     showMDO: e.target.checked
-  //   })
-  // }
-
-  // handleCheckBoxStakes = (e) => {
-  //   this.setState({
-  //     showMSO: e.target.checked
-  //   })
-  // }
-
-
   async handleAddSave() {
     this.props.dispatch(openModal('saveDepositModal'))
   }
@@ -142,12 +88,6 @@ class Save extends React.Component {
       stakecount,
       stakeInfo,
       loading,
-      // userInfo,
-      // lpChoice,
-      // poolTab,
-      // showMDO,
-      // showMSO,
-      //dropDownBox,
     } = this.state
 
     const { isMobile } = this.props
@@ -186,15 +126,11 @@ class Save extends React.Component {
               md={10}
             > 
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute 
-                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the 
-                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which 
-                reflects the fees people paid to bridge and the previous usage patterns for each pool.
+                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> You will earn an APR of 5%. 
                 <br/>
-                <br/>
-                The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
-                {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
+                <span style={{fontWeight: '700'}}>UNSTAKING:</span> Each staking period lasts 2 weeks. 
+                If you do not unstake after a staking period, your stake will be renewed in two week increments until you unstake. 
+                The unstaking window lasts 2 days. You can only unstake in the unstaking window.
               </Typography>
             </S.GridItemTag>
 
@@ -216,10 +152,12 @@ class Save extends React.Component {
           {!isMobile ? (
             <S.TableHeading>
               <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
-                <S.GridItemTag item xs={4} md={3}><Typography variant="body2">Amount</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={3}><Typography variant="body2">Staked</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={3}><Typography variant="body2">Status</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={12} md={3}><Typography variant="body2">Actions</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Amount</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Deposited On</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={1}><Typography variant="body2">Status</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Next Unstake Window</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Actions</Typography></S.GridItemTag>
               </S.GridItemTagContainer>
             </S.TableHeading>
           ) : (null)}

@@ -3029,11 +3029,33 @@ class NetworkService {
         console.log("Allowance is sufficient:",allowance_BN.toString(), depositAmount_BN.toString())
       }
 
-      const addSavingsTX = await FixedSavings.stake(value_Wei_String)
-      await addSavingsTX.wait()
+      const TX = await FixedSavings.stake(value_Wei_String)
+      await TX.wait()
       return true
     } catch (error) {
       console.log("NS: addFS_Savings error:", error)
+      return error
+    }
+  }
+
+  /***********************************************/
+  /*****       Fixed savings account         *****/
+  /***********************************************/
+  async withdrawFS_Savings(stakeID) {
+
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await FixedSavings.unstake(stakeID)
+      await TX.wait()
+      return true
+    } catch (error) {
+      console.log("NS: withdrawFS_Savings error:", error)
       return error
     }
   }

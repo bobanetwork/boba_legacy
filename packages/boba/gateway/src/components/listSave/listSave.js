@@ -4,7 +4,7 @@ import { isEqual } from 'lodash'
 import { logAmount, powAmount } from 'util/amountConvert'
 import { BigNumber } from 'ethers'
 
-import { openAlert, openModal } from 'actions/uiAction'
+import { openAlert, openModal, openError } from 'actions/uiAction'
 import moment from 'moment'
 
 import Button from 'components/button/Button'
@@ -12,6 +12,8 @@ import networkService from 'services/networkService'
 
 import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core'
 import * as S from "./ListSave.styles"
+
+import { withdrawFS_Savings } from 'actions/fixedAction'
 
 class ListSave extends React.Component {
 
@@ -36,92 +38,29 @@ class ListSave extends React.Component {
 
   componentDidUpdate(prevState) {
 
-    // const { poolInfo, userInfo, balance, showAll, showStakesOnly } = this.props
+    const { stakeInfo } = this.props
 
-    // if (!isEqual(prevState.poolInfo, poolInfo)) {
-    //   this.setState({ poolInfo });
-    // }
-
-    // if (!isEqual(prevState.userInfo, userInfo)) {
-    //   this.setState({ userInfo });
-    // }
-
-    // if (!isEqual(prevState.balance, balance)) {
-    //   this.setState({ balance });
-    // }
-
-    // if (!isEqual(prevState.showAll, showAll)) {
-    //   this.setState({ showAll });
-    // }
-
-    // if (!isEqual(prevState.showStakesOnly, showStakesOnly)) {
-    //   this.setState({ showStakesOnly });
-    // }
+    if (!isEqual(prevState.stakeInfo, stakeInfo)) {
+      this.setState({ stakeInfo })
+    }
 
   }
 
-  async handleStakeToken() {
+  async handleUnstake() {
 
-    // const { poolInfo, L1orL2Pool, balance } = this.state
+    const { stakeInfo } = this.state
 
-    // const { allAddresses } = this.props.farm
+    this.setState({ loading: true })
 
-    // this.props.dispatch(updateStakeToken({
-    //   symbol: poolInfo.symbol,
-    //   currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
-    //   LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
-    //   L1orL2Pool,
-    //   balance,
-    //   decimals: poolInfo.decimals
-    // }))
+    const withdrawTX = await this.props.dispatch(withdrawFS_Savings(stakeInfo.stakeId))
 
-    // this.props.dispatch(openModal('farmDepositModal'))
-  }
-
-  async handleWithdrawToken() {
-
-    // const { poolInfo, L1orL2Pool, balance } = this.state
-
-    // const { allAddresses } = this.props.farm
-
-    // this.props.dispatch(updateWithdrawToken({
-    //   symbol: poolInfo.symbol,
-    //   currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
-    //   LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
-    //   L1orL2Pool,
-    //   balance,
-    //   decimals: poolInfo.decimals
-    // }))
-
-    // this.props.dispatch(openModal('farmWithdrawModal'))
-  }
-
-  async handleHarvest() {
-
-    // const { poolInfo, L1orL2Pool, userInfo } = this.state;
-
-    // this.setState({ loading: true })
-
-    // const userReward = BigNumber.from(userInfo.pendingReward).add(
-    //   BigNumber.from(userInfo.amount)
-    //   .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
-    //   .div(BigNumber.from(powAmount(1, 12)))
-    //   .sub(BigNumber.from(userInfo.rewardDebt))
-    // ).toString()
-
-    // let getRewardTX = await this.props.dispatch(getReward(
-    //   L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
-    //   userReward,
-    //   L1orL2Pool
-    // ))
-
-    // if (getRewardTX) {
-    //   this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
-    //   this.props.dispatch(getFarmInfo())
-    //   this.setState({ loading: false })
-    // } else {
-    //   this.setState({ loading: false })
-    // }
+    if (withdrawTX) {
+      this.props.dispatch(openAlert("Your BOBA were unstaked"))
+      this.setState({ loading: false })
+    } else {
+      this.props.dispatch(openError("Failed to unstake BOBA"))
+      this.setState({ loading: false })
+    }
 
   }
 
@@ -129,7 +68,6 @@ class ListSave extends React.Component {
 
     const {
       stakeInfo,
-      dropDownBox, 
       loading
     } = this.state
 
@@ -137,17 +75,32 @@ class ListSave extends React.Component {
 
     const { isMobile } = this.props
 
-/*
-depositAmount: "100"
-depositTimestamp: 1639707811
-isActive: true
-stakeId: 3
-*/
+    const timeDeposit_S = stakeInfo.depositTimestamp
+    const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
 
-    const time = moment.unix(stakeInfo.depositTimestamp).format('MM/DD/YYYY hh:mm a')
+    const timeNow_S = Math.round(Date.now() / 1000)
+
+    const twoWeeks = 14 * 24 * 60 * 60
+    const twoDays  =  2 * 24 * 60 * 60
+
+    const duration_S = timeNow_S - timeDeposit_S
+
+    const secondsOverWindow = duration_S % twoWeeks
+
+    let locked = true
+
+    if( duration_S >= twoWeeks && secondsOverWindow > 0 && secondsOverWindow <= twoDays ) {
+      locked = false
+    }
+
+    const earned = stakeInfo.depositAmount * (0.05 / 365) * (duration_S / (24 * 60 * 60))
+
+    const unlocktime_S = timeNow_S + twoWeeks - secondsOverWindow
+    const unlocktimeNextBegin = moment.unix(unlocktime_S).format('MM/DD/YYYY hh:mm a')
+    const unlocktimeNextEnd = moment.unix(unlocktime_S+twoDays).format('MM/DD/YYYY hh:mm a')
 
     return (
-      <S.Wrapper dropDownBox={dropDownBox}>
+      <S.Wrapper>
         {pageLoading ? (
           <Box sx={{textAlign: 'center'}}>
             <CircularProgress color="secondary" />
@@ -162,7 +115,7 @@ stakeId: 3
 
             <S.GridItemTag item
               xs={4}
-              md={3}
+              md={1}
             >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Amount</Typography>
@@ -176,39 +129,64 @@ stakeId: 3
 
             <S.GridItemTag item
               xs={4}
-              md={3}
+              md={2}
             >
               {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Staked</Typography>
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
               ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
-                {time}
+              <Typography variant="overline" style={{opacity: '0.4', fontSize: '0.9em'}}>
+                {timeDeposit}
               </Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item
               xs={4}
-              md={3}
+              md={1}
+            >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
+              ) : (null)}
+              <Typography variant="body1">
+                {earned.toFixed(3)}
+              </Typography>
+            </S.GridItemTag>
+
+            <S.GridItemTag item
+              xs={4}
+              md={1}
               >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Status</Typography>
               ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
+              <Typography variant="body1">
                 {stakeInfo.isActive ? 'Active' : 'Not Active'}
               </Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={12}
-              md={3}
+              xs={4}
+              md={2}
+              >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Next Unstake Window</Typography>
+              ) : (null)}
+              <Typography variant="overline" style={{opacity: '0.4'}}>
+                Begin: {unlocktimeNextBegin}<br/>
+                End: {unlocktimeNextEnd}
+              </Typography>
+            </S.GridItemTag>
+
+            <S.GridItemTag item
+              xs={4}
+              md={2}
               >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Actions</Typography>
               ) : (null)}
               <Button
                 variant="contained"
-                onClick={()=>{}}
-                disabled={false}
+                onClick={()=>{this.handleUnstake()}}
+                disabled={locked}
                 fullWidth
                 sx={{flex: 1}}
               >
