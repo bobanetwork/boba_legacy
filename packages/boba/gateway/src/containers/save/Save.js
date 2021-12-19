@@ -23,20 +23,20 @@ import { isEqual } from 'lodash'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
 import ListSave from 'components/listSave/listSave'
-import Tabs from 'components/tabs/Tabs'
+
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 
-import { openAlert, openModal } from 'actions/uiAction'
+import { openModal } from 'actions/uiAction'
+import Button from 'components/button/Button'
 
 import * as S from './Save.styles'
 import * as styles from './Save.module.scss'
 
-import { Box, FormControlLabel, Checkbox, Typography, Fade, Button } from '@material-ui/core'
+import { Box, Typography, Grid } from '@material-ui/core'
 
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 class Save extends React.Component {
 
@@ -45,12 +45,10 @@ class Save extends React.Component {
     super(props)
 
     const {
-      stakeCount,
       stakeInfo,
     } = this.props.fixed
 
     this.state = {
-      stakeCount,
       stakeInfo,
       loading: false,
     }
@@ -65,13 +63,8 @@ class Save extends React.Component {
   componentDidUpdate(prevState) {
 
     const {
-      stakeCount,
       stakeInfo
     } = this.props.fixed
-
-    if (!isEqual(prevState.fixed.stakeCount, stakeCount)) {
-      this.setState({ stakeCount })
-    }
 
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
       this.setState({ stakeInfo })
@@ -86,7 +79,6 @@ class Save extends React.Component {
   render() {
 
     const {
-      stakecount,
       stakeInfo,
       loading,
     } = this.state
@@ -120,10 +112,14 @@ class Save extends React.Component {
 
         <S.Wrapper>
 
-          <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
+          <Grid 
+            container 
+            spacing={2} 
+          >
 
             <S.GridItemTag 
-              item xs={10} 
+              item 
+              xs={10} 
               md={10}
             >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
@@ -138,7 +134,7 @@ class Save extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-          </S.GridItemTagContainer>
+          </Grid>
 
         </S.Wrapper>
 
@@ -155,18 +151,21 @@ class Save extends React.Component {
 
           {!isMobile ? (
             <S.TableHeading>
-              <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
+              <Grid 
+                container 
+                spacing={1}
+              >
                 <S.GridItemTag item md={1}><Typography variant="body2">Amount</Typography></S.GridItemTag>
                 <S.GridItemTag item md={3}><Typography variant="body2">Deposited On</Typography></S.GridItemTag>
                 <S.GridItemTag item md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
                 <S.GridItemTag item md={1}><Typography variant="body2">Status</Typography></S.GridItemTag>
                 <S.GridItemTag item md={4}><Typography variant="body2">Next Unstake Window</Typography></S.GridItemTag>
                 <S.GridItemTag item md={2}><Typography variant="body2">Actions</Typography></S.GridItemTag>
-              </S.GridItemTagContainer>
+              </Grid>
             </S.TableHeading>
           ) : (null)}
 
-            <S.FarmListContainer>
+            <S.ListContainer>
               {Object.keys(stakeInfo).map((v, i) => {
                 return (
                   <ListSave
@@ -176,7 +175,7 @@ class Save extends React.Component {
                   />
                 )
               })}
-            </S.FarmListContainer>
+            </S.ListContainer>
 
         </Box>
       </>

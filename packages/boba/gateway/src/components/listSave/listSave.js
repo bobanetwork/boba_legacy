@@ -1,16 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { logAmount, powAmount } from 'util/amountConvert'
-import { BigNumber } from 'ethers'
 
-import { openAlert, openModal, openError } from 'actions/uiAction'
+import { openAlert, openError } from 'actions/uiAction'
 import moment from 'moment'
 
 import Button from 'components/button/Button'
-import networkService from 'services/networkService'
-
-import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core'
+import { Box, Typography, CircularProgress, Grid } from '@material-ui/core'
 import * as S from "./ListSave.styles"
 
 import { withdrawFS_Savings } from 'actions/fixedAction'
@@ -27,13 +23,8 @@ class ListSave extends React.Component {
 
     this.state = {
       stakeInfo,
-      loading: false,
     }
 
-  }
-
-  componentDidMount(){
-    //this.props.dispatch(getAllAddresses());
   }
 
   componentDidUpdate(prevState) {
@@ -50,16 +41,12 @@ class ListSave extends React.Component {
 
     const { stakeInfo } = this.state
 
-    this.setState({ loading: true })
-
     const withdrawTX = await this.props.dispatch(withdrawFS_Savings(stakeInfo.stakeId))
 
     if (withdrawTX) {
       this.props.dispatch(openAlert("Your BOBA were unstaked"))
-      this.setState({ loading: false })
     } else {
       this.props.dispatch(openError("Failed to unstake BOBA"))
-      this.setState({ loading: false })
     }
 
   }
@@ -68,7 +55,6 @@ class ListSave extends React.Component {
 
     const {
       stakeInfo,
-      loading
     } = this.state
 
     const pageLoading = Object.keys(stakeInfo).length === 0
@@ -106,14 +92,14 @@ class ListSave extends React.Component {
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <S.GridContainer container
+        <S.Entry>
+          <Grid 
+            container
             spacing={2}
-            direction="row"
-            justifyContent="flex-start"
-            alignItems="center"
           >
 
-            <S.GridItemTag item
+            <S.GridItemTag 
+              item
               xs={2}
               md={1}
             >
@@ -127,14 +113,15 @@ class ListSave extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag item
+            <S.GridItemTag 
+              item
               xs={6}
               md={3}
             >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
               ) : (null)}
-              <Typography variant="overline" style={{opacity: '0.4', fontSize: '1.0em'}}>
+              <Typography variant="body1" style={{opacity: '0.4'}}>
                 {timeDeposit}
               </Typography>
             </S.GridItemTag>
@@ -167,7 +154,7 @@ class ListSave extends React.Component {
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Next Unstake Window</Typography>
               ) : (null)}
-              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
+              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
                 <Typography variant="overline" style={{lineHeight: '1em'}}>Begin: {unlocktimeNextBegin}</Typography>
                 <Typography variant="overline" style={{lineHeight: '1em'}}>End: {unlocktimeNextEnd}</Typography>
               </div>
@@ -186,7 +173,8 @@ class ListSave extends React.Component {
               </Button>
             </S.GridItemTag>
 
-          </S.GridContainer>
+          </Grid>
+        </S.Entry>
         )}
       </S.Wrapper>
     )

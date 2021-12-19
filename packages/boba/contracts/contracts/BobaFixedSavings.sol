@@ -7,6 +7,7 @@ import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import './standards/xL2GovernanceERC20.sol';
 
 contract BobaFixedSavings is PausableUpgradeable {
+
     using SafeERC20 for IERC20;
 
     address public owner;
@@ -14,7 +15,7 @@ contract BobaFixedSavings is PausableUpgradeable {
     address public l2Boba;
     address public xBoba;
     uint256 public totalStakeCount;
-    // set closing time if you want to stop giving out interest anymore
+    // set closing time to stop giving out interest
     uint256 public stakingCloseTimestamp;
     uint256 public constant FLAT_INTEREST_PER_PERIOD = 22; // 0.22% scaled by ten thousand
     // a period is equal to LOCK_TIME + UNSTAKE_TIME
@@ -105,7 +106,7 @@ contract BobaFixedSavings is PausableUpgradeable {
         require(stakeData.isActive, "Stake is not active or already claimed");
         require(stakeData.account == msg.sender, "Sender not owner of the funds");
         // unstake logic
-        require((block.timestamp - stakeData.depositTimestamp)%(LOCK_TIME + UNSTAKE_TIME) > LOCK_TIME, "Not on unstaking period");
+        require((block.timestamp - stakeData.depositTimestamp)%(LOCK_TIME + UNSTAKE_TIME) > LOCK_TIME, "Not in unstaking period");
 
         stakeData.isActive = false;
 

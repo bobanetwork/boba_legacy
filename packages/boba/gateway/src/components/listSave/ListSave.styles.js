@@ -13,45 +13,25 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   },
 }));
 
+export const Entry = styled(Box)(({ theme }) => ({
+  padding: "20px",
+  display: "flex",
+  justifyContent: 'center',
+  alignItems: 'center',
+  background: theme.palette.background.secondary,
+}))
+
 export const GridContainer = styled(Grid)(({theme})=>({
-  [theme.breakpoints.down('md')]:{
-    justifyContent: 'flex-start'
-  }
+  // [theme.breakpoints.down('md')]:{
+  //   justifyContent: 'flex-start'
+  // }
 }))
 
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
+  textAlign: 'left',
   display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  [theme.breakpoints.down('md')]:{
-    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
-  }
 }))
-
-export const DropdownWrapper = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 5px;
-  width: 100%;
-  padding: 6px;
-  margin-top: 10px;
-  background-color: ${props => props.theme.palette.background.secondary};
-  border-radius: 4px;
-  text-align: center;
-`;
-
-export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '70%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    gap: '5px',
-    padding: '5px'
-  },
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
-    gap: '16px',
-  },
-}));
 

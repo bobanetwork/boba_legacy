@@ -1,7 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
-import BN from 'bignumber.js';
 
 import { closeModal, openAlert, openError } from 'actions/uiAction'
 import { addFS_Savings } from 'actions/fixedAction'
@@ -9,7 +7,7 @@ import { addFS_Savings } from 'actions/fixedAction'
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
-import { logAmount, powAmount, toWei_String } from 'util/amountConvert'
+import { logAmount, toWei_String } from 'util/amountConvert'
 
 import { Typography } from '@material-ui/core'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
@@ -65,7 +63,10 @@ class SaveDepositModal extends React.Component {
 
   handleStakeValue(value) {
 
-    if( value && (Number(value) > 0.0) && (Number(value) <= Number(this.getMaxTransferValue()) )) {
+    if( value && 
+      (Number(value) > 0.0) && 
+      (Number(value) <= Number(this.getMaxTransferValue()))
+      ) {
         this.setState({
           stakeValue: value,
           stakeValueValid: true,
@@ -79,39 +80,6 @@ class SaveDepositModal extends React.Component {
       })
     }
   }
-
-  // async handleApprove() {
-
-  //   const { stakeToken, value_Wei_String } = this.state
-
-  //   this.setState({ loading: true })
-
-  //   let approveTX
-
-  //   if (stakeToken.L1orL2Pool === 'L2LP') {
-  //     approveTX = await this.props.dispatch(farmL2(
-  //       value_Wei_String,
-  //       stakeToken.currency,
-  //     ))
-  //   }
-  //   else if (stakeToken.L1orL2Pool === 'L1LP') {
-  //     approveTX = await this.props.dispatch(farmL1(
-  //       value_Wei_String,
-  //       stakeToken.currency,
-  //     ))
-  //   }
-
-  //   if (approveTX) {
-  //     this.props.dispatch(openAlert("Amount was approved"))
-  //     this.props.dispatch(fetchAllowance(
-  //       stakeToken.currency,
-  //       stakeToken.LPAddress
-  //     ))
-  //     this.setState({ loading: false })
-  //   } else {
-  //     this.setState({ loading: false })
-  //   }
-  // }
 
   async handleConfirm() {
 
@@ -140,10 +108,8 @@ class SaveDepositModal extends React.Component {
 
     const {
       open,
-      stakeToken,
       stakeValue,
       stakeValueValid,
-      //stakeValueBadEntry,
       loading,
     } = this.state
 

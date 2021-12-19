@@ -13,9 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from 'services/networkService'
-const allAddresses = networkService.getAllAddresses()
-
 const initialState = {
   stakeCount: 0,
   stakeInfo: {},
