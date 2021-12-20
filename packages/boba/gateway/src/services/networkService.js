@@ -71,6 +71,7 @@ import GovernorBravoDelegator from "../deployment/artifacts-boba/contracts/DAO/g
 
 //Airdrop
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
+import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -187,6 +188,8 @@ class NetworkService {
       key: process.env.REACT_APP_AIRDROP
     })
 
+    console.log("L1 response:", response)
+
     if (response.status === 201) {
       const status = response.data
       return status
@@ -221,40 +224,71 @@ class NetworkService {
 
   }
 
-  async initiateAirdrop() {
+  async initiateAirdrop(callData) {
 
     console.log("Initiating airdrop")
+    console.log("getAirdropL1(callData)",callData.merkleProof)
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
     //if (this.masterSystemConfig === 'mainnet') return
 
-    const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
-    ).post('initiate.l1.airdrop', {
-      address: this.account,
-      key: process.env.REACT_APP_AIRDROP
-    })
+  //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdropL1,
+      BobaAirdropL1Json.abi,
+      this.provider.getSigner()
+    )
 
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
+    console.log("airdropL1Contract.address:", airdropContract.address)
+
+    try {
+
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.initiateClaim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
+
+      await claim.wait()
+
+      //Interact with API if the contract interaction was successful
+      //success of this this call has no bearing on the airdrop itself, since the api is just
+      //used for user status updates etc.
+      //send.l1.airdrop
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('initiate.l1.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("L1 Airdrop gateway response:",response.data)
+      } else {
+        console.log("L1 Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return error
     }
 
   }
 
   async getAirdropL1(callData) {
 
-    console.log("getAirdropL1(callData)",callData)
+    console.log("getAirdropL1")
+    console.log("getAirdropL1(callData)",callData.merkleProof)
     console.log("this.account:",this.account)
 
     //Interact with contract
     const airdropContract = new ethers.Contract(
       allAddresses.BobaAirdropL1,
-      BobaAirdropJson.abi,
+      BobaAirdropL1Json.abi,
       this.provider.getSigner()
     )
 
@@ -275,7 +309,7 @@ class NetworkService {
       //Interact with API if the contract interaction was successful
       //success of this this call has no bearing on the airdrop itself, since the api is just
       //used for user status updates etc.
-      //send.l2.airdrop
+      //send.l1.airdrop
       const response = await omgxWatcherAxiosInstance(
         this.masterSystemConfig
       ).post('send.l1.airdrop', {
