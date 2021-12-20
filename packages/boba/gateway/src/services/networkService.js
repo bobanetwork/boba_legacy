@@ -174,7 +174,7 @@ class NetworkService {
 
   async fetchAirdropStatusL1() {
 
-    console.log("fetching airdrop L1 status")
+    //console.log("fetching airdrop L1 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -199,7 +199,7 @@ class NetworkService {
 
   async fetchAirdropStatusL2() {
 
-    console.log("fetching airdrop L2 status")
+    //console.log("fetching airdrop L2 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -248,8 +248,53 @@ class NetworkService {
 
   async getAirdropL1(callData) {
 
-   //Interact with contract
-   //Interact with API if the contract interaction was success
+    console.log("getAirdropL1(callData)",callData)
+    console.log("this.account:",this.account)
+
+    //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdropL1,
+      BobaAirdropJson.abi,
+      this.provider.getSigner()
+    )
+
+    console.log("airdropL1Contract.address:", airdropContract.address)
+
+    try {
+
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.claim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        this.account,                //wallet address
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
+
+      await claim.wait()
+
+      //Interact with API if the contract interaction was successful
+      //success of this this call has no bearing on the airdrop itself, since the api is just
+      //used for user status updates etc.
+      //send.l2.airdrop
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('send.l1.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("L1 Airdrop gateway response:",response.data)
+      } else {
+        console.log("L1 Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return error
+    }
 
   }
 
@@ -265,7 +310,7 @@ class NetworkService {
       this.provider.getSigner()
     )
 
-    console.log("airdropContract.address:", airdropContract.address)
+    console.log("airdropL2Contract.address:", airdropContract.address)
 
     try {
 
@@ -291,9 +336,9 @@ class NetworkService {
       })
 
       if (response.status === 201) {
-        console.log("Airdrop gateway response:",response.data)
+        console.log("L2 Airdrop gateway response:",response.data)
       } else {
-        console.log("Airdrop gateway response:",response)
+        console.log("L2 Airdrop gateway response:",response)
       }
 
       return claim
@@ -416,7 +461,10 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
-      if (!(await this.getAddress('BobaFixedSavings', 'BobaFixedSavings'))) return
+      if (!(await this.getAddress('Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+
+      await this.getAddress('BobaAirdropL1', 'BobaAirdropL1')
+      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
@@ -455,7 +503,7 @@ class NetworkService {
 
       let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                               'REP',  'BAT', 'ZRX',  'SUSHI',
-                              'LINK', 'UNI', 'BOBA', 'OMG',
+                              'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
                               'BUSD', 'BNB', 'FTM',  'MATIC'
                             ]
@@ -1918,7 +1966,7 @@ class NetworkService {
       L2: allAddresses.L2_ETH_Address
     }])
 
-    console.log("tokenAddressList:",tokenAddressList)
+    //console.log("tokenAddressList:",tokenAddressList)
 
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
@@ -2864,7 +2912,7 @@ class NetworkService {
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()
-      console.log('proposalCounts:',proposalCounts)
+      //console.log('proposalCounts:',proposalCounts)
 
       const totalProposals = await proposalCounts.toNumber()
       console.log('totalProposals:',totalProposals)
@@ -2874,11 +2922,11 @@ class NetworkService {
         null, null, null, null
       )
 
-      console.log('filter:',filter)
+      //console.log('filter:',filter)
 
       const descriptionList = await delegateCheck.queryFilter(filter)
       
-      console.log('descriptionList:',descriptionList)
+      //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
@@ -3074,9 +3122,10 @@ class NetworkService {
         this.L2Provider
       )
 
-      const l2ba = await FixedSavings.l2Boba()
-      console.log('l2 boba:', l2ba)
-      console.log('l2 boba:', allTokens['BOBA'])
+      //const l2ba = 
+      await FixedSavings.l2Boba()
+      //console.log('l2 boba:', l2ba)
+      //console.log('l2 boba:', allTokens['BOBA'])
 
       let stakecount = await FixedSavings.personalStakeCount(this.account)
       return { stakecount: Number(stakecount) }

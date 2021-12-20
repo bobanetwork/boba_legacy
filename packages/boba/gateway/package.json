@@ -1,6 +1,6 @@
 {
-  "name": "@omgx/wallet_react",
-  "version": "0.0.2",
+  "name": "@boba/wallet_react",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "buildenv-dev": "react-env",

@@ -146,7 +146,7 @@ class Save extends React.Component {
             disabled={loading}
             sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
           >
-            {loading ? 'Depositing...' : 'Add Stake'}
+            {loading ? 'Depositing...' : 'Deposit BOBA'}
           </Button>
 
           {!isMobile ? (

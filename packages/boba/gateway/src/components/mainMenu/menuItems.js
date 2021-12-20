@@ -26,7 +26,7 @@ export const menuItems = [
   {
     key: 'Save',
     icon: "SaveIcon",
-    title: "Save",
+    title: "Save @ 5%",
     url: "/save",
   },
   {
