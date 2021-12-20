@@ -86,8 +86,6 @@ class Save extends React.Component {
     const { isMobile } = this.props
     const networkLayer = networkService.L1orL2
 
-    //console.log("stakeInfo:",stakeInfo)
-
     if(networkLayer === 'L1') {
         return <div className={styles.container}>
             <PageHeader title="Fixed Rate Staking" />
@@ -98,7 +96,7 @@ class Save extends React.Component {
                   variant="body2"
                   component="p"
                 >
-                  You are on Ethereum Mainnet. To use stake your BOBA, SWITCH to Boba
+                  You are on Ethereum Mainnet. This function is only available on Boba. SWITCH to Boba
                 </S.AlertText>
               </S.AlertInfo>
               <LayerSwitcher isButton={true} />
