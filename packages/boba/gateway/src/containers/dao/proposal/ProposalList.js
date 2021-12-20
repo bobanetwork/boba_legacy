@@ -16,7 +16,7 @@ limitations under the License. */
 import React, {useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 
 import { openError, openModal } from 'actions/uiAction'
@@ -27,7 +27,7 @@ import Pager from 'components/pager/Pager'
 
 import * as styles from './proposalList.module.scss'
 
-import { selectProposals, selectProposalThreshold, selectDaoBalance, selectDaoVotes} from 'selectors/daoSelector'
+import { selectProposals, selectProposalThreshold, selectDaoVotes, selectDaoVotesX} from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import { orderBy } from 'lodash'
@@ -44,12 +44,9 @@ function ProposalList() {
     const loading = useSelector(selectLoading(['PROPOSALS/GET']))
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
-    const balance = useSelector(selectDaoBalance)
-    const votes = useSelector(selectDaoVotes)
 
-    //console.log("proposalThreshold:",proposalThreshold)
-    //console.log("balance:",balance)
-    //console.log("votes:",votes)
+    const votes = useSelector(selectDaoVotes)
+    const votesX = useSelector(selectDaoVotesX)
 
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
@@ -64,14 +61,14 @@ function ProposalList() {
         <div className={styles.containerAction}>
             <p className={styles.listTitle}>Proposals</p>
             <Typography variant="body2" className={styles.helpTextLight}>
-                At least {proposalThreshold} BOBA are needed to create a new proposal
+                At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal
             </Typography>
             <Button
                 type="primary"
                 variant="contained"
                 onClick={() => {
-                    if(Number(votes) < Number(proposalThreshold)) {
-                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA to create a new proposal.`))
+                    if(Number(votes + votesX) < Number(proposalThreshold)) {
+                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a new proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
                     }

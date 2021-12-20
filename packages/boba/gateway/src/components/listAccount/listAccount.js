@@ -130,14 +130,16 @@ class ListAccount extends React.Component {
                     Bridge
                   </S.TextTableCell>
                 }
-                {chain === 'L2' &&
+                {chain === 'L2' && token.symbol !== 'xBOBA' &&
                   <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
                     Bridge/Transfer
                   </S.TextTableCell>
                 }
-                <Box sx={{display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
-                  <ExpandMoreIcon sx={{width: "12px"}}/>
-                </Box>
+                {token.symbol !== 'xBOBA' &&
+                  <Box sx={{display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
+                    <ExpandMoreIcon sx={{width: "12px"}}/>
+                  </Box>
+                }
               </S.TableCell>
             </S.TableBody>
 

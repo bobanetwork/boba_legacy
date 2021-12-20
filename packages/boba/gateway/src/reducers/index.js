@@ -35,6 +35,7 @@ import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
 import airdropReducer from './airdropReducer'
+import fixedReducer from './fixedReducer'
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -57,6 +58,7 @@ const rootReducer = combineReducers({
   lookup: lookupReducer,
   dao: daoReducer,
   airdrop: airdropReducer,
+  fixed: fixedReducer,
 })
 
 export default rootReducer
