@@ -11,6 +11,11 @@ import './tasks/deploy'
 // Load environment variables from .env
 dotenv.config()
 
+// Fix lint
+if (!process.env.L1_NODE_WEB3_URL) {
+  process.env.L1_NODE_WEB3_URL = 'http://localhost:9545'
+}
+
 const config: HardhatUserConfig = {
   mocha: {
     timeout: 300000,
