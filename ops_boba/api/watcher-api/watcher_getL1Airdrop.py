@@ -47,7 +47,7 @@ def watcher_getL1Airdrop(event, context):
         if proof == None: proofBody = None
         else: proofBody = json.loads(proof)
         airdropPayload = {
-          "address" : address, "amount": amount, "claimed": claimed,
+          "address" : address, "amount": amount.replace('\r',''), "claimed": claimed,
           "claimedTimestamp": claimedTimestamp, "claimImmediate": claimImmediate, "claimUnlockTime": claimUnlockTime,
           "merkleProof": {
             "index": index, "amount": hexAmount, "proof": proofBody

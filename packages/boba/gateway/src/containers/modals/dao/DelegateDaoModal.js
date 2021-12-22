@@ -63,7 +63,7 @@ function DelegateDaoModal({ open }) {
     const submitMe = async () => {
         let res = await dispatch(delegateVotes({ recipient: wAddress }))
         if (res) {
-            dispatch(openAlert(`Votes self-delegation successfull!`))
+            dispatch(openAlert(`Vote self-delegation successfull!`))
             handleClose();
         } else {
             dispatch(openError(`Failed to delegate`))
