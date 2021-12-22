@@ -86,6 +86,8 @@ const main = async () => {
     env.MAX_BURNED_GAS || '10000000'
   )
 
+  const NETWORK = config.str('network', env.NETWORL || 'mainnet')
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -155,6 +157,7 @@ const main = async () => {
     pollingInterval: POLLING_INTERVAL,
     burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
     maxBurnedGas: MAX_BURNED_GAS,
+    network: NETWORK,
   })
 
   await service.start()

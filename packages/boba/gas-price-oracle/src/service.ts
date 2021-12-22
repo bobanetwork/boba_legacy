@@ -59,6 +59,9 @@ interface GasPriceOracleOptions {
 
   // max burned gas
   maxBurnedGas: string
+
+  // network
+  network: string
 }
 
 const optionSettings = {}
@@ -218,9 +221,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this._getL1Balance()
       await this._getL2GasCost()
       await this._updateGasPrice()
-      await this._updateFastExitGasBurnFee()
-      await this._updateClassicalExitGasBurnFee()
-      await this._updateOverheadFee()
+      if (this.options.network !== 'local') {
+        await this._updateFastExitGasBurnFee()
+        await this._updateClassicalExitGasBurnFee()
+        await this._updateOverheadFee()
+      }
     }
   }
 
