@@ -86,7 +86,7 @@ const main = async () => {
     env.MAX_BURNED_GAS || '10000000'
   )
 
-  const NETWORK = config.str('network', env.NETWORL || 'mainnet')
+  const NETWORK = config.str('network', env.NETWORK || 'mainnet')
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')

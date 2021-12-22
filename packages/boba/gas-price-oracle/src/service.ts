@@ -101,6 +101,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       fastRelayerWallet: this.options.fastRelayerAddress,
       gasFloorPrice: this.options.gasFloorPrice,
       pollingInterval: this.options.pollingInterval,
+      network: this.options.network,
     })
 
     this.state = {} as any
