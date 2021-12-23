@@ -287,6 +287,8 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      # Integration tests require 0 confirmations. Suggested to use 5 for production.
+      NUM_EVENT_CONFIRMATIONS: 0
 
   batch_submitter:
     depends_on:
