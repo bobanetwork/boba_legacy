@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+
+	"github.com/ethereum/go-ethereum/log"
 )
 
 type RPCReq struct {
@@ -75,43 +77,46 @@ func (r *RPCErr) Error() string {
 	return r.Message
 }
 
-func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
+func ParseRPCReq(r io.Reader) ([]RPCReq, bool, error) {
 	body, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, wrapErr(err, "error reading request body")
+		return nil, true, wrapErr(err, "error reading request body")
 	}
 	if isBatch(body) {
+		log.Info("THIS WAS A BATCH REQUEST")
 		var arr []RPCReq
 		err := json.Unmarshal(body, &arr)
 		if err != nil {
-			return nil, wrapErr(err, "failed to parse JSON batch request: ")
+			return nil, true, wrapErr(err, "failed to parse JSON batch request: ")
 		}
 		for _, t := range arr {
 			if t.JSONRPC != JSONRPCVersion {
-				return nil, ErrInvalidRequest
+				return nil, true, ErrInvalidRequest
 			}
 
 			if t.Method == "" {
-				return nil, ErrInvalidRequest
+				return nil, true, ErrInvalidRequest
 			}
 		}
-		return arr, nil
+		return arr, true, nil
 	} else {
+
+		log.Info("THIS WAS NOT A BATCH REQUEST")
 		req := new(RPCReq)
 		if err := json.Unmarshal(body, req); err != nil {
-			return nil, ErrParseErr
+			return nil, false, ErrParseErr
 		}
 
 		if req.JSONRPC != JSONRPCVersion {
-			return nil, ErrInvalidRequest
+			return nil, false, ErrInvalidRequest
 		}
 
 		if req.Method == "" {
-			return nil, ErrInvalidRequest
+			return nil, false, ErrInvalidRequest
 		}
 		arr := make([]RPCReq, 1)
 		arr[0] = *req
-		return arr, nil
+		return arr, false, nil
 	}
 }
 

@@ -81,7 +81,7 @@ const axios = require('axios').default
     axios
       .post(to, obj4)
       .then(function (response) {
-        if (response.data.id === id4) {
+        if (response.data[0].id === id4) {
           console.log(test4 + ' PASSED')
         } else {
           throw new Error(test4)

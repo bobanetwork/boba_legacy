@@ -560,7 +560,7 @@ func (w *WSProxier) close() {
 }
 
 func (w *WSProxier) prepareClientMsg(msg []byte) ([]RPCReq, error) {
-	reqs, err := ParseRPCReq(bytes.NewReader(msg))
+	reqs, _, err := ParseRPCReq(bytes.NewReader(msg))
 	for _, req := range reqs {
 		if err != nil {
 			return nil, err
