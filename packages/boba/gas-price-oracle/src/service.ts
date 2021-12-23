@@ -59,9 +59,6 @@ interface GasPriceOracleOptions {
 
   // max burned gas
   maxBurnedGas: string
-
-  // network
-  network: string
 }
 
 const optionSettings = {}
@@ -101,7 +98,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       fastRelayerWallet: this.options.fastRelayerAddress,
       gasFloorPrice: this.options.gasFloorPrice,
       pollingInterval: this.options.pollingInterval,
-      network: this.options.network,
     })
 
     this.state = {} as any
@@ -222,11 +218,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this._getL1Balance()
       await this._getL2GasCost()
       await this._updateGasPrice()
-      if (this.options.network !== 'local') {
-        await this._updateFastExitGasBurnFee()
-        await this._updateClassicalExitGasBurnFee()
-        await this._updateOverheadFee()
-      }
+      await this._updateFastExitGasBurnFee()
+      await this._updateClassicalExitGasBurnFee()
+      // disabled
+      // await this._updateOverheadFee()
     }
   }
 
