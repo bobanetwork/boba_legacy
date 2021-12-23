@@ -16,10 +16,12 @@ import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
-import L1StandardBridgeJson from './abi/L1StandardBridge.json'
-import DiscretionaryExitBurnJson from './abi/DiscretionaryExitBurn.json'
-import L1LiquidityPoolJson from './abi/L1LiquidityPool.json'
-import L2LiquidityPoolJson from './abi/L2LiquidityPool.json'
+import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
+import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -77,6 +79,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Proxy__L2LiquidityPool: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
+    Proxy__L1NFTBridge: Contract
+    Proxy__L2NFTBridge: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
     L2ETHVaultBalance: BigNumber
@@ -160,7 +164,30 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.Proxy__L2LiquidityPool.address,
     })
 
-   this.logger.info('Connecting to CanonicalTransactionChain...')
+    this.logger.info('Connecting to Proxy__L1NFTBridge...')
+    const Proxy__L1NFTBridgeAddress =
+      await this.state.Lib_AddressManager.getAddress('Proxy__L1NFTBridge')
+    this.state.Proxy__L1NFTBridge = new Contract(
+      Proxy__L1NFTBridgeAddress,
+      L1NFTBridgeJson.abi,
+      this.options.gasPriceOracleOwnerWallet
+    )
+    this.logger.info('Connected to Proxy__L1NFTBridge', {
+      address: this.state.Proxy__L1NFTBridge.address,
+    })
+
+    const Proxy__L2NFTBridgeAddress =
+      await this.state.Lib_AddressManager.getAddress('Proxy__L2NFTBridge')
+    this.state.Proxy__L2NFTBridge = new Contract(
+      Proxy__L2NFTBridgeAddress,
+      L2NFTBridgeJson.abi,
+      this.options.gasPriceOracleOwnerWallet
+    )
+    this.logger.info('Connected to Proxy__L2NFTBridge', {
+      address: this.state.Proxy__L2NFTBridge.address,
+    })
+
+    this.logger.info('Connecting to CanonicalTransactionChain...')
     const CanonicalTransactionChainAddress =
       await this.state.Lib_AddressManager.getAddress('CanonicalTransactionChain')
     this.state.CanonicalTransactionChain = loadContract(
@@ -220,7 +247,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this._updateGasPrice()
       await this._updateFastExitGasBurnFee()
       await this._updateClassicalExitGasBurnFee()
-      await this._updateOverheadFee()
+      // disabled
+      // await this._updateOverheadFee()
+      await this._updateNFTBridgeGasBurnFee()
     }
   }
 
@@ -775,6 +804,97 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE OVER HEAD RATIO ${error}`)
+    }
+  }
+
+  private async _updateNFTBridgeGasBurnFee(): Promise<void> {
+    try {
+      const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
+      const L1NFTBridgeSuccessLog =
+        await this.state.Proxy__L1NFTBridge.queryFilter(
+          this.state.Proxy__L1NFTBridge.filters.NFTWithdrawalFinalized(),
+          Number(latestL1Block) - 10000,
+          Number(latestL1Block)
+        )
+      const L1NFTBridgeFailureLog =
+        await this.state.Proxy__L1NFTBridge.queryFilter(
+          this.state.Proxy__L1NFTBridge.filters.NFTWithdrawalFailed(),
+          Number(latestL1Block) - 10000,
+          Number(latestL1Block)
+        )
+
+      const orderedL1NFTBridgeLog = orderBy(
+        [...L1NFTBridgeSuccessLog, ...L1NFTBridgeFailureLog],
+        'blockNumber',
+        'desc'
+      )
+
+      // Calculate the average fee of last 50 relayed messages
+      let L1NFTRelayerCost = BigNumber.from(0)
+      const transactionHashList = orderedL1NFTBridgeLog.reduce(
+        (acc, cur, index) => {
+          if (
+            index < 50 &&
+            acc.length < 10 &&
+            !acc.includes(cur.transactionHash)
+          ) {
+            acc.push(cur.transactionHash)
+          }
+          return acc
+        },
+        []
+      )
+      const numberOfMessages = [
+        ...L1NFTBridgeSuccessLog,
+        ...L1NFTBridgeFailureLog,
+      ].filter((i) => transactionHashList.includes(i.transactionHash)).length
+
+      if (numberOfMessages) {
+        for (const hash of transactionHashList) {
+          const txReceipt =
+            await this.options.l1RpcProvider.getTransactionReceipt(hash)
+          L1NFTRelayerCost = L1NFTRelayerCost.add(
+            txReceipt.effectiveGasPrice.mul(txReceipt.gasUsed)
+          )
+        }
+
+        const messageFee = L1NFTRelayerCost.div(
+          BigNumber.from(numberOfMessages)
+        )
+        const extraChargeFee = messageFee
+          .mul(BigNumber.from(this.options.burnedGasFeeRatio100X))
+          .div(BigNumber.from(100))
+        const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
+        const targetExtraGasRelay = extraChargeFee
+          .div(L2GasPrice)
+          .gt(BigNumber.from(this.options.maxBurnedGas))
+          ? BigNumber.from(this.options.maxBurnedGas)
+          : extraChargeFee.div(L2GasPrice)
+
+        const extraGasRelay =
+          await this.state.Proxy__L2NFTBridge.extraGasRelay()
+
+        if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
+          this.logger.info('No need to update extra gas', {
+            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: Number(extraGasRelay.toString()),
+          })
+        } else {
+          this.logger.debug('Updating extra gas for Proxy__L2NFTBridge...')
+          const tx = await this.state.Proxy__L2NFTBridge.configureExtraGasRelay(
+            targetExtraGasRelay,
+            { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated Proxy__L2NFTBridge extra gas', {
+            extraGasRelay: Number(targetExtraGasRelay.toString()),
+          })
+        }
+      } else {
+        this.logger.info('No need to update extra gas for NFT')
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE NFT EXIT BURNED RATIO ${error}`)
     }
   }
 }
