@@ -44,11 +44,15 @@ import {
 import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
-import DiscretionaryExitBurnJson from '../deployment/contracts/DiscretionaryExitBurn.json'
+
+import DiscretionaryExitBurnJson from '../deployment/artifacts-boba/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
 
 //OMGX LP contracts
 import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LPJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+
+//L2 Staking
+import L2SaveJson from '../deployment/artifacts-boba/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
 
 //Standard ERC20 jsons
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
@@ -58,15 +62,16 @@ import L2ERC20Json from '../deployment/artifacts-base/contracts/standards/L2Stan
 import OMGJson from '../deployment/contracts/OMG.json'
 
 //BOBA L2 Contracts
-import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
+import L2ERC721Json from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 
 //DAO
-import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json"
-import GovernorBravoDelegate from "../deployment/contracts/GovernorBravoDelegate.json"
-import GovernorBravoDelegator from "../deployment/contracts/GovernorBravoDelegator.json"
+import Boba from                   "../deployment/artifacts-boba/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
+import GovernorBravoDelegate from  "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
+import GovernorBravoDelegator from "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
 
 //Airdrop
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
+import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
@@ -138,6 +143,7 @@ class NetworkService {
 
     // Dao
     this.BobaContract = null
+    this.xBobaContract = null
     this.delegateContract = null
     this.delegatorContract = null
 
@@ -169,7 +175,7 @@ class NetworkService {
 
   async fetchAirdropStatusL1() {
 
-    console.log("fetching airdrop L1 status")
+    //console.log("fetching airdrop L1 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -181,6 +187,8 @@ class NetworkService {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
     })
+
+    console.log("L1 response:", response)
 
     if (response.status === 201) {
       const status = response.data
@@ -194,7 +202,7 @@ class NetworkService {
 
   async fetchAirdropStatusL2() {
 
-    console.log("fetching airdrop L2 status")
+    //console.log("fetching airdrop L2 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -216,35 +224,111 @@ class NetworkService {
 
   }
 
-  async initiateAirdrop() {
+  async initiateAirdrop(callData) {
 
     console.log("Initiating airdrop")
+    console.log("getAirdropL1(callData)",callData.merkleProof)
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
     //if (this.masterSystemConfig === 'mainnet') return
 
-    const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
-    ).post('initiate.l1.airdrop', {
-      address: this.account,
-      key: process.env.REACT_APP_AIRDROP
-    })
+  //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdropL1,
+      BobaAirdropL1Json.abi,
+      this.provider.getSigner()
+    )
 
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
+    console.log("airdropL1Contract.address:", airdropContract.address)
+
+    try {
+
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.initiateClaim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
+
+      await claim.wait()
+
+      //Interact with API if the contract interaction was successful
+      //success of this this call has no bearing on the airdrop itself, since the api is just
+      //used for user status updates etc.
+      //send.l1.airdrop
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('initiate.l1.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("L1 Airdrop gateway response:",response.data)
+      } else {
+        console.log("L1 Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return error
     }
 
   }
 
   async getAirdropL1(callData) {
 
-   //Interact with contract
-   //Interact with API if the contract interaction was success
+    console.log("getAirdropL1")
+    console.log("getAirdropL1(callData)",callData.merkleProof)
+    console.log("this.account:",this.account)
+
+    //Interact with contract
+    const airdropContract = new ethers.Contract(
+      allAddresses.BobaAirdropL1,
+      BobaAirdropL1Json.abi,
+      this.provider.getSigner()
+    )
+
+    console.log("airdropL1Contract.address:", airdropContract.address)
+
+    try {
+
+      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
+      let claim = await airdropContract.claim(
+        callData.merkleProof.index,  //Spec - 1 - Type Number,
+        this.account,                //wallet address
+        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
+        callData.merkleProof.proof   //proof1
+      )
+
+      await claim.wait()
+
+      //Interact with API if the contract interaction was successful
+      //success of this this call has no bearing on the airdrop itself, since the api is just
+      //used for user status updates etc.
+      //send.l1.airdrop
+      const response = await omgxWatcherAxiosInstance(
+        this.masterSystemConfig
+      ).post('send.l1.airdrop', {
+          address: this.account,
+          key: process.env.REACT_APP_AIRDROP
+      })
+
+      if (response.status === 201) {
+        console.log("L1 Airdrop gateway response:",response.data)
+      } else {
+        console.log("L1 Airdrop gateway response:",response)
+      }
+
+      return claim
+
+    } catch (error) {
+      console.log(error)
+      return error
+    }
 
   }
 
@@ -260,7 +344,7 @@ class NetworkService {
       this.provider.getSigner()
     )
 
-    console.log("airdropContract.address:", airdropContract.address)
+    console.log("airdropL2Contract.address:", airdropContract.address)
 
     try {
 
@@ -286,9 +370,9 @@ class NetworkService {
       })
 
       if (response.status === 201) {
-        console.log("Airdrop gateway response:",response.data)
+        console.log("L2 Airdrop gateway response:",response.data)
       } else {
-        console.log("Airdrop gateway response:",response)
+        console.log("L2 Airdrop gateway response:",response)
       }
 
       return claim
@@ -411,6 +495,10 @@ class NetworkService {
       if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      if (!(await this.getAddress('Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+
+      await this.getAddress('BobaAirdropL1', 'BobaAirdropL1')
+      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
 
       await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
@@ -449,7 +537,7 @@ class NetworkService {
 
       let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                               'REP',  'BAT', 'ZRX',  'SUSHI',
-                              'LINK', 'UNI', 'BOBA', 'OMG',
+                              'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
                               'BUSD', 'BNB', 'FTM',  'MATIC'
                             ]
@@ -458,7 +546,7 @@ class NetworkService {
       if ( masterSystemConfig === 'rinkeby') {
         supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                           'REP',  'BAT', 'ZRX',  'SUSHI',
-                          'LINK', 'UNI', 'BOBA', 'OMG',
+                          'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                           //'FRAX', 'FXS', 'UST',
                           //'BUSD', 'BNB', 'FTM',  'MATIC'
                         ]
@@ -466,16 +554,28 @@ class NetworkService {
 
       await Promise.all(supportedTokens.map(async (key) => {
 
-        const L1a = await this.AddressManager.getAddress('TK_L1'+key)
         const L2a = await this.AddressManager.getAddress('TK_L2'+key)
 
-        if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
-          console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-          return false
+        if(key === 'xBOBA') {
+          if (L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': 'xBOBA',
+              'L2': L2a
+            }
+          }
         } else {
-          allTokens[key] = {
-            'L1': L1a,
-            'L2': L2a
+          const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+          if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': L1a,
+              'L2': L2a
+            }
           }
         }
 
@@ -583,6 +683,12 @@ class NetworkService {
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
+
+      this.xBobaContract = new ethers.Contract(
+        allTokens.xBOBA.L2,
         Boba.abi,
         this.provider.getSigner()
       )
@@ -1026,6 +1132,7 @@ class NetworkService {
   async getBalances() {
 
     try {
+
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
       const layer2Balance = await this.L2Provider.getBalance(this.account)
@@ -1080,16 +1187,21 @@ class NetworkService {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
-        getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        if(token.symbolL1 === 'xBOBA') {
+          //there is no L1 xBOBA
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        } else {
+          getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
       })
 
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' && token.balance.gt(new BN(0))) {
+        if (token.layer === 'L1' && token.symbol !== 'xBOBA' && token.balance.gt(new BN(0)) ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))){
+        } else if (token.layer === 'L2' && (token.balance.gt(new BN(0)) || token.symbol === 'xBOBA')) {
           layer2Balances.push(token)
         }
       })
@@ -1785,7 +1897,9 @@ class NetworkService {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push(allTokens[cur].L1.toLowerCase())
+      if(cur !== 'xBOBA') {
+        acc.push(allTokens[cur].L1.toLowerCase())
+      }
       return acc
     }, [allAddresses.L1_ETH_Address])
 
@@ -1874,15 +1988,19 @@ class NetworkService {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      acc.push({
-        L1: allTokens[cur].L1.toLowerCase(),
-        L2: allTokens[cur].L2.toLowerCase()
-      });
-      return acc;
+      if(cur !== 'xBOBA') {
+        acc.push({
+          L1: allTokens[cur].L1.toLowerCase(),
+          L2: allTokens[cur].L2.toLowerCase()
+        })
+      }
+      return acc
     }, [{
       L1: allAddresses.L1_ETH_Address,
       L2: allAddresses.L2_ETH_Address
     }])
+
+    //console.log("tokenAddressList:",tokenAddressList)
 
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
@@ -2594,7 +2712,26 @@ class NetworkService {
       //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
-      console.log('Error: DAO Balance', error)
+      console.log('Error: getDaoBalance', error)
+      return error
+    }
+  }
+
+  async getDaoBalanceX() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      //console.log('Checking DAO balance')
+      let balance = await this.xBobaContract.balanceOf(this.account)
+      //console.log('balance',balance)
+      return { balanceX: formatEther(balance) }
+    } catch (error) {
+      console.log('Error: getDaoBalanceX', error)
       return error
     }
   }
@@ -2613,6 +2750,24 @@ class NetworkService {
       return { votes: formatEther(votes) }
     } catch (error) {
       console.log('NS: getDaoVotes error:', error)
+      return error
+    }
+  }
+
+    // get DAO Votes
+  async getDaoVotesX() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      let votes = await this.xBobaContract.getCurrentVotes(this.account)
+      return { votesX: formatEther(votes) }
+    } catch (error) {
+      console.log('NS: getDaoVotesX error:', error)
       return error
     }
   }
@@ -2645,6 +2800,22 @@ class NetworkService {
       return tx
     } catch (error) {
       console.log('NS: delegateVotes error:', error)
+      return error
+    }
+  }
+
+  //Delegate DAO Authority
+  async delegateVotesX({ recipient }) {
+
+    if( this.L1orL2 !== 'L2' ) return
+    if( this.xBobaContract === null ) return
+
+    try {
+      const tx = await this.xBobaContract.delegate(recipient)
+      await tx.wait()
+      return tx
+    } catch (error) {
+      console.log('NS: delegateVotesX error:', error)
       return error
     }
   }
@@ -2778,7 +2949,7 @@ class NetworkService {
       //console.log('proposalCounts:',proposalCounts)
 
       const totalProposals = await proposalCounts.toNumber()
-      //console.log('totalProposals:',totalProposals)
+      console.log('totalProposals:',totalProposals)
       
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
@@ -2792,6 +2963,8 @@ class NetworkService {
       //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
+
+        if(typeof(descriptionList[i]) === 'undefined') continue
 
         let proposalID = descriptionList[i].args[0]
 
@@ -2892,6 +3065,147 @@ class NetworkService {
       return res
     } catch(error) {
       console.log("NS: executeProposal error:",error)
+      return error
+    }
+
+  }
+
+
+  /***********************************************/
+  /*****       Fixed savings account         *****/
+  /***********************************************/
+  async addFS_Savings(value_Wei_String) {
+    
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider.getSigner()
+      )
+
+      // const account = await this.provider.getSigner().getAddress()
+      // console.log('this.account', account)
+
+      // console.log(this.L2Provider)
+
+      let allowance_BN = await this.BobaContract.allowance(
+        this.account,
+        allAddresses.BobaFixedSavings
+      )
+      console.log("Allowance",allowance_BN.toString())
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+      console.log("Deposit:",depositAmount_BN)
+
+      if (depositAmount_BN.gt(allowance_BN)) {
+        console.log("Need to approve YES:",depositAmount_BN)
+        const approveStatus = await this.BobaContract.approve(
+          allAddresses.BobaFixedSavings,
+          value_Wei_String
+        )
+        await approveStatus.wait()
+        if (!approveStatus) return false
+      } else {
+        console.log("Allowance is sufficient:",allowance_BN.toString(), depositAmount_BN.toString())
+      }
+
+      const TX = await FixedSavings.stake(value_Wei_String)
+      await TX.wait()
+      return true
+    } catch (error) {
+      console.log("NS: addFS_Savings error:", error)
+      return error
+    }
+  }
+
+  /***********************************************/
+  /*****       Fixed savings account         *****/
+  /***********************************************/
+  async withdrawFS_Savings(stakeID) {
+
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await FixedSavings.unstake(stakeID)
+      await TX.wait()
+      return true
+    } catch (error) {
+      console.log("NS: withdrawFS_Savings error:", error)
+      return error
+    }
+  }
+
+  async getFS_Saves() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+
+    try {
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.L2Provider
+      )
+
+      //const l2ba = 
+      await FixedSavings.l2Boba()
+      //console.log('l2 boba:', l2ba)
+      //console.log('l2 boba:', allTokens['BOBA'])
+
+      let stakecount = await FixedSavings.personalStakeCount(this.account)
+      return { stakecount: Number(stakecount) }
+    } catch (error) {
+      console.log('NS: getSaves error:', error)
+      return error
+    }
+  }
+
+  async getFS_Info() {
+
+    //if( this.masterSystemConfig === 'mainnet' ) return
+    //if( this.masterSystemConfig === 'rinkeby' ) return
+
+    if( this.L1orL2 !== 'L2' ) return
+
+    try {
+
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.L2Provider
+      )
+
+      let stakeInfo = []
+
+      const stakeCounts = await FixedSavings.personalStakeCount(this.account)
+      //console.log('stakeCounts:',stakeCounts)
+
+      for (let i = 0; i < stakeCounts; i++) {
+
+        const stakeId = await FixedSavings.personalStakePos(this.account, i)
+        const stakeData = await FixedSavings.stakeDataMap(stakeId)
+
+        stakeInfo.push({
+          stakeId: Number(stakeId.toString()),
+          depositTimestamp: Number(stakeData.depositTimestamp.toString()),
+          depositAmount: logAmount(stakeData.depositAmount.toString(), 18),
+          isActive: stakeData.isActive
+        })
+
+      }
+      //console.log("stakeInfo:",stakeInfo)
+      return { stakeInfo }
+    } catch (error) {
+      console.log("NS: getFS_Info error:",error)
       return error
     }
 

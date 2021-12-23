@@ -86,13 +86,6 @@ class Help extends React.Component {
           </Typography>
 
           <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
-            DAO not active yet
-          </Typography>
-          <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
-            The DAO is pending and is not yet live.
-          </Typography>
-
-          <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
             It would be really nice if...
           </Typography>
           <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>

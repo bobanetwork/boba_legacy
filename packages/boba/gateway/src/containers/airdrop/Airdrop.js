@@ -61,9 +61,9 @@ class Airdrop extends React.Component {
 
   async initiateDrop() {
 
-    console.log('initiateAirdrop')
+    console.log('initiateAirdrop:',this.state.claimDetailsL1)
 
-    let res = await this.props.dispatch(initiateAirdrop())
+    let res = await this.props.dispatch(initiateAirdrop(this.state.claimDetailsL1))
 
     if (res) {
       this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your BOBA in 30 days.`))
@@ -73,7 +73,7 @@ class Airdrop extends React.Component {
 
   async airdropL1() {
 
-    console.log('airdropL1')
+    console.log('airdropL1:',this.state.claimDetailsL1)
 
     let res = await this.props.dispatch(getAirdropL1(this.state.claimDetailsL1))
 
@@ -131,6 +131,7 @@ class Airdrop extends React.Component {
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('amount') && claimDetailsL1.amount !== 0) {
       recordFoundL1 = true
       snapValueL1 = Number(logAmount(claimDetailsL1.amount, 18))
+      console.log("L1 snapvalue:",snapValueL1)
     }
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
       claimedL1 = true

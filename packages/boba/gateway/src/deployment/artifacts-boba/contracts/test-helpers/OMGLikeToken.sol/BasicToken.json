@@ -1,0 +1,81 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "BasicToken",
+  "sourceName": "contracts/test-helpers/OMGLikeToken.sol",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x6060604052341561000c57fe5b5b6102748061001c6000396000f300606060405263ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005057806370a0823114610072578063a9059cbb146100ad575bfe5b341561005857fe5b6100606100db565b60408051918252519081900360200190f35b341561007a57fe5b61006073ffffffffffffffffffffffffffffffffffffffff600435166100e1565b60408051918252519081900360200190f35b34156100b557fe5b6100d973ffffffffffffffffffffffffffffffffffffffff6004351660243561010d565b005b60005481565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600160205260409020545b919050565b6040604436101561011e5760006000fd5b73ffffffffffffffffffffffffffffffffffffffff3316600090815260016020526040902054610154908363ffffffff61020216565b73ffffffffffffffffffffffffffffffffffffffff3381166000908152600160205260408082209390935590851681522054610196908363ffffffff61021b16565b73ffffffffffffffffffffffffffffffffffffffff8085166000818152600160209081526040918290209490945580518681529051919333909316927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef92918290030190a35b5b505050565b600061021083831115610237565b508082035b92915050565b600082820161022c84821015610237565b8091505b5092915050565b8015156102445760006000fd5b5b505600a165627a7a723058206e0bec6c808d6a78b9bec7845cf0065be0ede2ccb550e8af5bf8e63417fd30560029",
+  "deployedBytecode": "0x606060405263ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005057806370a0823114610072578063a9059cbb146100ad575bfe5b341561005857fe5b6100606100db565b60408051918252519081900360200190f35b341561007a57fe5b61006073ffffffffffffffffffffffffffffffffffffffff600435166100e1565b60408051918252519081900360200190f35b34156100b557fe5b6100d973ffffffffffffffffffffffffffffffffffffffff6004351660243561010d565b005b60005481565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600160205260409020545b919050565b6040604436101561011e5760006000fd5b73ffffffffffffffffffffffffffffffffffffffff3316600090815260016020526040902054610154908363ffffffff61020216565b73ffffffffffffffffffffffffffffffffffffffff3381166000908152600160205260408082209390935590851681522054610196908363ffffffff61021b16565b73ffffffffffffffffffffffffffffffffffffffff8085166000818152600160209081526040918290209490945580518681529051919333909316927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef92918290030190a35b5b505050565b600061021083831115610237565b508082035b92915050565b600082820161022c84821015610237565b8091505b5092915050565b8015156102445760006000fd5b5b505600a165627a7a723058206e0bec6c808d6a78b9bec7845cf0065be0ede2ccb550e8af5bf8e63417fd30560029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

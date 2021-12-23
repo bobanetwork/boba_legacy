@@ -28,9 +28,10 @@ import {
   Route,
   Switch
 } from "react-router-dom";
+
 import { selectModalState } from 'selectors/uiSelector';
 import { isChangingChain } from 'util/changeChain';
-//import oracleService from 'services/oracleService';
+
 import * as styles from './layout.module.scss';
 import * as S from './layout.style';
 
@@ -93,7 +94,6 @@ function App () {
         fontWeight: 400,
       },
       body3: {
-        //lineHeight: '1.2em',
         fontSize: '0.8em'
       },
     },
@@ -206,6 +206,7 @@ function App () {
       }
     }
   });
+
   MUItheme = responsiveFontSizes(MUItheme);
 
   const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));

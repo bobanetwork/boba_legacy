@@ -36,6 +36,7 @@ const initialState = {
   farmWithdrawModal: false,
   transferDaoModal: false,
   delegateDaoModal: false,
+  delegateDaoXModal: false,
   newProposalModal: false,
   ledger: false,
   alert: null,

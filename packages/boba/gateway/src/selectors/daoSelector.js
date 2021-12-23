@@ -22,6 +22,14 @@ export function selectDaoVotes(state) {
     return state.dao.votes
 }
 
+export function selectDaoBalanceX(state) {
+    return state.dao.balanceX
+}
+
+export function selectDaoVotesX(state) {
+    return state.dao.votesX
+}
+
 export function selectProposals(state) {
     return state.dao.proposalList
 }
