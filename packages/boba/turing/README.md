@@ -67,7 +67,7 @@ Spin up a local test stack. Then, build and test the contracts.
 ```bash
 
 $ yarn build
-$ yarn test
+$ yarn test:boba
 
 ```
 
