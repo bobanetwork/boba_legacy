@@ -50,7 +50,7 @@ describe("Turing VRF", function () {
 
 
   it("should get a length 64 VRF", async () => {
-    let tr = await hello.GetRandom()
+    let tr = await hello.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data

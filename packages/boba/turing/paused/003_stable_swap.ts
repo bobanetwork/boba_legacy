@@ -5,10 +5,8 @@ import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 const abiDecoder = require('web3-eth-abi')
 
-const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
-const hPort = 1235 // Port for local HTTP server
 var urlStr
 
 const gasOverride =  {
