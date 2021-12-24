@@ -33,11 +33,8 @@ import (
 	"github.com/ethereum/go-ethereum/rollup/util"
 	"golang.org/x/crypto/sha3"
 
-	//"github.com/ethereum/go-ethereum/common/bytes"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/log"
-
-	// "github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -286,33 +283,49 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 // be called a second time with the original parameters. 2nd failure is not intercepted.
 
 func bobaTuringCall(input []byte) hexutil.Bytes {
+	
+	// don't go off-chain unless actually needed...
+	// if we have data and if the time is right,
+	// replace the calldata with the cached value and return that
+	// turingCache.lock.Lock()
+	if turingCache.key == crypto.Keccak256Hash(input) {
+		if time.Now().Before(turingCache.expires) {
+			log.Debug("TURING-0 bobaTuringCall:Found fresh cached result - returning that",
+				"key", crypto.Keccak256Hash(input),
+				"cached", turingCache.value)
+			return turingCache.value
+		} else {
+			log.Debug("TURING-0 bobaTuringCall:Found cached result but it was expired",
+				"key", crypto.Keccak256Hash(input),
+				"cached", turingCache.value)
+		}
+	} 
 
 	var responseStringEnc string
 	var responseString []byte
-	var ret hexutil.Bytes
 
-	rest         := input[4:]
+	rest := input[4:]
 
 	//some things are easier with a hex string
 	inputHexUtil := hexutil.Bytes(input)
-	restHexUtil  := inputHexUtil[4:]
+	restHexUtil := inputHexUtil[4:]
 
 	/* The input and calldata have a well defined structure
-	    1/ The methodID (4 bytes)
-	    2/ The rType (32 bytes)
-	    3/ Data offset 1 - beginning of URL string (32 bytes)
-	    4/ Data offset 2 - beginning of payload (32 bytes)
-	    5/ URL string length (32 bytes)
-	    6/ URL string - either 32 or 64 bytes
-	    7/ Payload length (32 bytes)
-	    8/ Payload data - variable (at least 32 bytes)
-	    This means that the calldata are always >= 7*32
-	*/
+		1/ The methodID (4 bytes)
+		2/ The rType (32 bytes)
+		3/ Data offset 1 - beginning of URL string (32 bytes)
+		4/ Data offset 2 - beginning of payload (32 bytes)
+		5/ URL string length (32 bytes)
+		6/ URL string - either 32 or 64 bytes
+		7/ Payload length (32 bytes)
+		8/ Payload data - variable but at least 32 bytes
+		This means that the calldata are always >= 7*32
 
-	// If things fail, we'll return an integer parameter which should fail a
-	// "require" in the contract without generating another TURING marker.
-	// FIXME - would be cleaner to return nil and put better error handling
-	// into l2geth to avoid that second call into the contract.
+		If things fail, we'll return an integer parameter which should fail a
+		"require" in the contract without generating another TURING marker.
+		FIXME - would be cleaner to return nil and put better error handling
+		into l2geth to avoid that second call into the contract.
+	*/
 	
 	methodID := make([]byte, 4)
 	copy(methodID, inputHexUtil[0:4])
@@ -331,46 +344,45 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 		return append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 11))...) //calldata too short
 	}
 
+	/*
+	A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
+	Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value
+	of any of these numbers is 32 + 32 + 32 + 32 + 64 = 192
+	Thus, we only need to read one byte
+
+		 0  -  31 = rType
+		32  -  63 = URL start
+		64  -  95 = payload start
+		96  - 127 = length URL string
+		128 - ??? = URL string
+		??? - ??? = payload length
+		??? - end = payload
+	*/
+
+	startIDXurl := int(rest[ 63]) + 32
+	// the +32 means that we are going directly for the actual string
+	// bytes 0 to 31 are the string length
+
+	startIDXpayload := int(rest[ 95]) // the start of the payload
+	lengthURL := int(rest[127]) // the length of the URL string
+
 	// Check the URL length
 	// Note: we do not handle URLs that are longer than 64 characters
-
-	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
-	// Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value 
-	// of any of these numbers is 32 + 32 + 32 + 32 + 64 = 192
-	startIDXurl     := int(rest[ 63]) + 32 //the +32 means that we are going right for the actual string
-	startIDXpayload := int(rest[ 95])
-	lengthURL       := int(rest[127])
-	
 	if lengthURL > 64 {
-		log.Warn("TURING-3 bobaTuringCall:URL too long", "urlLength", lengthURL)
+		log.Warn("TURING-3 bobaTuringCall:URL > 64", "urlLength", lengthURL)
 		return append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 12))...) //URL string > 64 bytes
 	}
 
-	// The url we are going to query
+	// The URL we are going to query
 	url := string(rest[startIDXurl:startIDXurl+lengthURL])
+	// we use a specific end value (startIDXurl+lengthURL) since the URL is right-packed with zeros
 
 	// At this point, we have the API endpoint and the payload that needs to go there...
-	payload := restHexUtil[startIDXpayload:]
+	payload := restHexUtil[startIDXpayload:] //using hex here since that makes it easy to get the string
 	
 	log.Debug("TURING-4 bobaTuringCall:Have URL and payload",
 		"url", url,
 		"payload", payload)
-
-	// don't recalculate unless actually needed...
-	// if we have data and if the time is right,
-	// replace the calldata with the cached value and return that
-	turingCache.lock.Lock()
-	if crypto.Keccak256Hash(rest) == turingCache.key && time.Now().Before(turingCache.expires) {
-		ret = turingCache.value
-	}
-	turingCache.lock.Unlock()
-
-	if ret != nil {
-		log.Debug("TURING-5 bobaTuringCall:Found cached result; returning that",
-			"key", crypto.Keccak256Hash(rest),
-			"cached", ret)
-		return ret
-	}
 
 	client, err := rpc.Dial(url)
 
@@ -393,26 +405,32 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 	log.Debug("TURING-10 bobaTuringCall:Have valid response from offchain API",
 		"Target", url,
 		"Payload", payload,
-		"responseStringEnc", responseStringEnc,
-		"Response", responseString)
+		"ResponseStringEnc", responseStringEnc,
+		"ResponseString", responseString)
 
-	// build the calldata:
-	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
-	ret = append(ret, restHexUtil[32:startIDXpayload]...)         // the unmodified offsets and the first dynamic data type
-	ret = append(ret, responseString...)                          // and the data themselves
+	// // build the modified calldata
+	// var ret hexutil.Bytes
+	// ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
+	// ret = append(ret, restHexUtil[32:startIDXpayload]...) // the unmodified offsets and the first dynamic data type
+	// ret = append(ret, responseString...) // and the data themselves
+
+	ret := make([]byte, startIDXpayload+4)
+	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
+	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
+	ret = append(ret, responseString...)         // and tack on the payload
 
 	log.Debug("TURING-11 bobaTuringCall:Modified parameters",
-		"newValue", ret)
+		"newValue", hexutil.Bytes(ret))
 
-	// saving the modified calldata in the cache
+	//save the modified calldata in the cache
 	turingCache.lock.Lock()
-	turingCache.key = crypto.Keccak256Hash(rest)
+	turingCache.key = crypto.Keccak256Hash(input)
 	turingCache.expires = time.Now().Add(2 * time.Second)
 	turingCache.value = ret
 	turingCache.lock.Unlock()
 
 	log.Debug("TURING-12 bobaTuringCall:TuringCache entry stored for",
-		"key", crypto.Keccak256Hash(rest))
+		"key", crypto.Keccak256Hash(input))
 
 	return ret
 }

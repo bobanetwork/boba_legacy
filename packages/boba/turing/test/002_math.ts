@@ -142,10 +142,17 @@ describe("Basic Math", function () {
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
-    //console.log(res)
     const rawData = res.events[0].data
     const result = parseInt(rawData.slice(-64), 16) / 100 
-    //console.log("      result of 4/3 * Pi * r^3 =",result)
+    expect(result.toFixed(5)).to.equal('33.51000')
+  })
+
+  it("should support floating point volume of sphere based on geth-cached result", async () => {
+    let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const result = parseInt(rawData.slice(-64), 16) / 100 
     expect(result.toFixed(5)).to.equal('33.51000')
   })
 
