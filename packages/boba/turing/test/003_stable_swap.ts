@@ -80,7 +80,6 @@ describe("Stableswap at AWS Lambda", function () {
     const tr = await stable.swap_x(urlStr, 12, gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
-    console.log("res",res)
     const rawData = res.events[2].data //the event returns 
     const numberHexString = rawData.slice(-64)
     let result = parseInt(numberHexString, 16)

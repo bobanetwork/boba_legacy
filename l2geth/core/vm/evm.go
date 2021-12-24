@@ -306,7 +306,7 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 	    6/ URL string - either 32 or 64 bytes
 	    7/ Payload length (32 bytes)
 	    8/ Payload data - variable (at least 32 bytes)
-	    This means that the calldata are allways >= 8*32
+	    This means that the calldata are always >= 7*32
 	*/
 
 	// If things fail, we'll return an integer parameter which should fail a
@@ -326,8 +326,8 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 	}
 
 	rlen := len(rest) 
-	if rlen < 8*32 {
-		log.Warn("TURING-2 bobaTuringCall:Calldata too short", "len < 8*32", rlen)
+	if rlen < 7*32 {
+		log.Warn("TURING-2 bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		return append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 11))...) //calldata too short
 	}
 

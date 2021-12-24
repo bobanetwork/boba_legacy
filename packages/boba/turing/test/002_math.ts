@@ -48,27 +48,31 @@ describe("Basic Math", function () {
 
         req.on('end', async function () {
 
+          // there are two hacks in here to deal with ABI encoder/decoder issues
+          // in the real world it's less complicated
+
           var jBody = JSON.parse(body)
-          console.log("jBody:",jBody)
 
           let v1 = jBody.params[0]
 
-          console.log("v1:",v1)
+          if(v1.length > 194) {
+            //chop off the prefix introduced by the real call
+            v1 = '0x' + v1.slice(66)
+          }
 
-          const args = abiDecoder.decodeParameters(['string', 'string'], v1)
+          const args = abiDecoder.decodeParameter('string', v1)
 
-          console.log("args")
-          console.log("args:",args)
-
-          let volume = (4/3) * parseFloat(args['0']) * Math.pow(parseFloat(args['1']),3)
+          let volume = (4/3) * 3.14159 * Math.pow(parseFloat(args['0']),3)
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          console.log("      (HTTP) SPHERE Returning off-chain response:", args, "->", volume.toString())
+          console.log("      (HTTP) SPHERE Returning off-chain response:", args, "->", volume * 100)
+
+          let result = abiDecoder.encodeParameters(['uint256','uint256'], [32/*start offset of the bytes*/, Math.round(volume*100)])
 
           var jResp2 = {
             "jsonrpc": "2.0",
             "id": jBody.id,
-            "result": abiDecoder.encodeParameter('string', volume.toString())
+            "result": result
           }
 
           res.end(JSON.stringify(jResp2))
@@ -114,8 +118,10 @@ describe("Basic Math", function () {
 
   it("test of local compute endpoint: should do basic math via direct server query", async () => {
 
+    let abi_payload = abiDecoder.encodeParameter('string','2.123')
+
     let body = {
-      params: [abiDecoder.encodeParameters(['string','string'],['ABC3.14159', 'DEF2.0'])],
+      params: [abi_payload],
     }
 
     fetch(urlStr, {
@@ -125,34 +131,22 @@ describe("Basic Math", function () {
     }).then(
       res => res.json()
     ).then(json => {
-        const result = abiDecoder.decodeParameter('string', json.result)
-        expect(Number(result).toFixed(3)).to.equal('33.510')
+        const result = abiDecoder.decodeParameters(['uint256','uint256'], json.result)
+        expect(Number(result[1])).to.equal(3351)
       }
     )
 
   })
 
-/*
-0x
-00000000000000000000000000000000000000000000000000000000000000c0
-0000000000000000000000000000000000000000000000000000000000000040
-0000000000000000000000000000000000000000000000000000000000000080
-0000000000000000000000000000000000000000000000000000000000000007
-332e313431353900000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000004
-322e303000000000000000000000000000000000000000000000000000000000*/
-
-
   it("should support floating point volume of sphere", async () => {
-    let tr = await hello.multFloatNumbers(urlStr, 'ABC3.14159', 'DEF2.00', gasOverride)
+    let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
-    // const rawData = res.events[0].data
-    // const numberHexString = rawData.slice(-64)
-    // const numberString = Buffer.from(numberHexString, 'hex').toString()
-    // const result = parseFloat(numberString)
-    // console.log("      result of 4/3 * Pi * r^3 =",result)
-    // expect(result.toFixed(5)).to.equal('33.51029')
+    //console.log(res)
+    const rawData = res.events[0].data
+    const result = parseInt(rawData.slice(-64), 16) / 100 
+    //console.log("      result of 4/3 * Pi * r^3 =",result)
+    expect(result.toFixed(5)).to.equal('33.51000')
   })
 
 })

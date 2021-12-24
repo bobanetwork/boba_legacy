@@ -25,7 +25,7 @@ interface Helper {
 
 
     function getCurrentQuote(string memory _url, string memory pair) 
-        public returns (uint256 market_price, uint256 time){
+        public returns (uint256, uint256) {
 
         bytes memory encRequest = abi.encode(pair);
         bytes memory encResponse = myHelper.TuringTx(_url, encRequest);

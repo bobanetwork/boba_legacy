@@ -35,8 +35,8 @@ def lambda_handler(event, context):
     timestamp = result['last']['timestamp']
     
     res = '0x{0:0{1}x}'.format(int(64),64)
-    res = res + '{0:0{1}x}'.format(int(price),64) #the actual result
-    res = res + '{0:0{1}x}'.format(int(timestamp),64) #the actual result
+    res = res + '{0:0{1}x}'.format(int(price),64)
+    res = res + '{0:0{1}x}'.format(int(timestamp),64)
 
     returnPayload = {
       'statusCode': 200,

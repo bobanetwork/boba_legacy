@@ -13,11 +13,8 @@ contract HelloTuring {
   address public helperAddr;
   Helper myHelper;
 
-  event MultFloatNumbers(string, string);
+  event MultFloatNumbers(uint256);
   event GetRandom(uint256);
-
-  //event Debug(uint256);
-  //event Debug(string);
 
   constructor(
     address _helper
@@ -26,27 +23,24 @@ contract HelloTuring {
     myHelper = Helper(helperAddr);
   }
 
-  function multFloatNumbers(string memory _url, string memory a, string memory b) 
-    public returns (string memory product) {
+  function multFloatNumbers(string memory _url, string memory a) 
+    public returns (uint256) {
+    
+    bytes memory encRequest = abi.encode(a);
 
-    bytes memory encRequest = abi.encode(a, b);
     bytes memory encResponse = myHelper.TuringTx(_url, encRequest);
 
-    product = abi.decode(encResponse,(string));
+    uint256 product = abi.decode(encResponse,(uint256));
 
-    //emit Debug(product);
-
-    emit MultFloatNumbers(_url, product);
+    emit MultFloatNumbers(product);
 
     return product;
   }
 
   function getRandom() 
-    public returns (uint256 result) {
+    public returns (uint256) {
 
-    result = myHelper.TuringRandom();
-
-    //emit Debug(result);
+    uint256 result = myHelper.TuringRandom();
 
     emit GetRandom(result);
 
