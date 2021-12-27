@@ -511,8 +511,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	} 
 
 	// bobaTuringCall takes the original calldata, figures out what needs
-	// to be done, and then synthesizes a 'new_in' calldata that does not 
-	// lead to the revert (by changing rType from 1 to 2)
+	// to be done, and then synthesizes a 'new_in' calldata
+	// this system is compatible with the previous system, since the rType
+	// is changed before the evm.call, so the call goes right though the helper contract
+	// ToDo - change the helper contract to provide better error messages based on 
+	// changing the revert string of anything except for rType 2
 	var updated_input hexutil.Bytes
 
 	if isTuring2 {
