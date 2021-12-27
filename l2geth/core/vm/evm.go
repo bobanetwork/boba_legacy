@@ -499,55 +499,93 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
 		}()
 	}
-	ret, err = run(evm, contract, input, false)
+
+	// so this is the first invocation, which will revert
+	// we should have all the information here to manipulate the input
+    // is this a special call?
+
+    inputHexUtil := hexutil.Bytes(input)
+	restHexUtil := inputHexUtil[:4]
+	methodID := input[:4]
+
+	log.Debug("TURING-EXP methodID", 
+		"methodID", restHexUtil,
+		"input", input)
+
+	//methodID for GetResponse is 7d93616c -> [125 147 97 108]
+	isTuring2 := bytes.Contains(input, []byte{125, 147, 97, 108})
+
+	//methodID for GetRandom is 0x493d57d6 -> [73 61 87 214]
+	isGetRand2 := bytes.Contains(input, []byte{73, 61, 87, 214})
+
+	if isTuring2 || isGetRand2 {
+		log.Debug("TURING REQUEST", "methodID", methodID)
+	} else {
+		log.Debug("TURING-EXP methodID mismatch", "methodID mismatch", methodID)
+	}
+
+	// bobaTuringCall takes the original calldata, figures out what needs
+	// to be done, and then synthesizes a 'new_in' calldata that does not 
+	// lead to the revert (by changing rType from 1 to 2)
+	var updated_input hexutil.Bytes
+
+	if isTuring2 {
+		updated_input = bobaTuringCall(input)
+		ret, err = run(evm, contract, updated_input, false)
+	} else if isGetRand2 {
+		updated_input = bobaTuringRandom(input)
+		ret, err = run(evm, contract, updated_input, false)
+	} else {
+		ret, err = run(evm, contract, input, false)
+	}
 
 	// log.Debug("TURING evm.go run",
 	// 	"contract", contract.CodeAddr,
 	// 	"ret", hexutil.Bytes(ret),
 	// 	"err", err)
 
-	if err != nil {
+	// if err != nil {
 
-		//let's see if this is a Turing Compute Request
-		isTuring := bytes.Contains(ret, []byte("TURING_"))
+	// 	//let's see if this is a Turing Compute Request
+	// 	isTuring := bytes.Contains(ret, []byte("TURING_"))
 
-		//let's see if this is a Turing Compute Request
-		isGetRand := bytes.Contains(ret, []byte("RANDOM_"))
+	// 	//let's see if this is a Turing Compute Request
+	// 	isGetRand := bytes.Contains(ret, []byte("RANDOM_"))
 
-		if isTuring || isGetRand {
+	// 	if isTuring || isGetRand {
 
-			log.Debug("TCR_",
-				"err", err,
-				"ret", hexutil.Bytes(ret),
-				"input", hexutil.Bytes(input),
-				"contract", contract.CodeAddr)
+	// 		log.Debug("TCR_",
+	// 			"err", err,
+	// 			"ret", hexutil.Bytes(ret),
+	// 			"input", hexutil.Bytes(input),
+	// 			"contract", contract.CodeAddr)
 
-			// at this point we have a call that has reverted AND the ret includes TURING_ or RANDOM_ somewhere in it
-			log.Debug("TURING-M1 calling with", "input", input)
+	// 		// at this point we have a call that has reverted AND the ret includes TURING_ or RANDOM_ somewhere in it
+	// 		log.Debug("TURING-M1 calling with", "input", input)
 
-			// bobaTuringCall takes the original calldata, figures out what needs
-			// to be done, and then synthesizes a 'new_in' calldata that does not 
-			// lead to the revert (by changing rType from 1 to 2)
-			var updated_input hexutil.Bytes
+	// 		// bobaTuringCall takes the original calldata, figures out what needs
+	// 		// to be done, and then synthesizes a 'new_in' calldata that does not 
+	// 		// lead to the revert (by changing rType from 1 to 2)
+	// 		var updated_input hexutil.Bytes
 
-			if isTuring {
-				updated_input = bobaTuringCall(input)
-			} else if isGetRand {
-				updated_input = bobaTuringRandom(input)
-			}
-			//evm.StateDB.RevertToSnapshot(snapshot) // thoughts?
+	// 		if isTuring {
+	// 			updated_input = bobaTuringCall(input)
+	// 		} else if isGetRand {
+	// 			updated_input = bobaTuringRandom(input)
+	// 		}
+	// 		//evm.StateDB.RevertToSnapshot(snapshot) // thoughts?
 
-			log.Debug("TURING-M2 replay with modified calldata", "modifiedCalldata", updated_input)
+	// 		log.Debug("TURING-M2 replay with modified calldata", "modifiedCalldata", updated_input)
 
-			// and then rerun the call with the modified calldata
-			// this returns the API response to the caller 
-			ret, err = run(evm, contract, updated_input, false)
+	// 		// and then rerun the call with the modified calldata
+	// 		// this returns the API response to the caller 
+	// 		ret, err = run(evm, contract, updated_input, false)
 
-			log.Debug("TURING-M3 received replay response",
-				"err", err,
-				"ret", hexutil.Bytes(ret))
-		}
-	}
+	// 		log.Debug("TURING-M3 received replay response",
+	// 			"err", err,
+	// 			"ret", hexutil.Bytes(ret))
+	// 	}
+	// }
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
