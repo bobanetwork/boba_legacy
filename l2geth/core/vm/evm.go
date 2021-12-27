@@ -500,18 +500,6 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}()
 	}
 
-	// so this is the first invocation, which will revert
-	// we should have all the information here to manipulate the input
-    // is this a special call?
-
-    inputHexUtil := hexutil.Bytes(input)
-	restHexUtil := inputHexUtil[:4]
-	methodID := input[:4]
-
-	log.Debug("TURING-EXP methodID", 
-		"methodID", restHexUtil,
-		"input", input)
-
 	//methodID for GetResponse is 7d93616c -> [125 147 97 108]
 	isTuring2 := bytes.Contains(input, []byte{125, 147, 97, 108})
 
@@ -519,10 +507,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	isGetRand2 := bytes.Contains(input, []byte{73, 61, 87, 214})
 
 	if isTuring2 || isGetRand2 {
-		log.Debug("TURING REQUEST", "methodID", methodID)
-	} else {
-		log.Debug("TURING-EXP methodID mismatch", "methodID mismatch", methodID)
-	}
+		log.Debug("TURING REQUEST", "input", input)
+	} 
 
 	// bobaTuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'new_in' calldata that does not 
