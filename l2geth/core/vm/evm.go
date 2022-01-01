@@ -282,7 +282,7 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 // FIXME - needs error handling. For now, bails out and lets the contract
 // be called a second time with the original parameters. 2nd failure is not intercepted.
 
-func bobaTuringCall(input []byte) hexutil.Bytes {
+func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	
 	// don't go off-chain unless actually needed...
 	// if we have data and if the time is right,
@@ -300,6 +300,9 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 				"cached", turingCache.value)
 		}
 	} 
+
+	log.Debug("TURING-20 bobaTuringCall:Caller",
+		"caller", caller.String())
 
 	var responseStringEnc string
 	var responseString []byte
@@ -388,7 +391,7 @@ func bobaTuringCall(input []byte) hexutil.Bytes {
 
 	if client != nil {
 		log.Debug("TURING-6 bobaTuringCall:Calling off-chain client at", "url", url)
-		if err := client.Call(&responseStringEnc, "turing", payload); err != nil {
+		if err := client.Call(&responseStringEnc, caller.String(), payload); err != nil {
 			log.Warn("TURING-7 bobaTuringCall:Client error", "err", err)
 			return append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 13))...) //Client Error
 		}
@@ -519,7 +522,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	var updated_input hexutil.Bytes
 
 	if isTuring2 {
-		updated_input = bobaTuringCall(input)
+		updated_input = bobaTuringCall(input, caller.Address())
 		ret, err = run(evm, contract, updated_input, false)
 	} else if isGetRand2 {
 		updated_input = bobaTuringRandom(input)
