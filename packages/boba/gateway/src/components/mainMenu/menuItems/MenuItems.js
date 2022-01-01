@@ -4,6 +4,7 @@ import { menuItems } from '../menuItems';
 import * as S from './MenuItems.styles';
 
 import EarnIcon from 'components/icons/EarnIcon'
+import SaveIcon from 'components/icons/EarnIcon'
 import WalletIcon from 'components/icons/WalletIcon'
 import HistoryIcon from 'components/icons/HistoryIcon'
 import NFTIcon from 'components/icons/NFTIcon'
@@ -28,6 +29,7 @@ function MenuItems ({setOpen }) {
   const iconObj = {
     WalletIcon,
     EarnIcon,
+    SaveIcon,
     HistoryIcon,
     NFTIcon,
     DAOIcon,

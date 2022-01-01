@@ -24,6 +24,12 @@ export const menuItems = [
     url: "/earn",
   },
   {
+    key: 'Save',
+    icon: "SaveIcon",
+    title: "Save @ 5%",
+    url: "/save",
+  },
+  {
     key: 'NFT',
     icon: "NFTIcon",
     title: "NFT",

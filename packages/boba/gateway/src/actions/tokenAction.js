@@ -74,13 +74,35 @@ export async function addToken ( tokenContractAddressL1 ) {
 
   try {
 
-    //let's try to get the token details from the chain
-    //if we know the address, we can do that
-    const tokenContract = new ethers.Contract(
-      _tokenContractAddressL1, 
-      erc20abi,
-      networkService.L1Provider, //Everything is defined by the L1 address - will deal with the L2 address later
-    )
+    let tA = networkService.tokenAddresses
+    let tokenContract
+    let _tokenContractAddressL2 = null
+    
+    /********* DO WE HAVE L2 DATA?? *************/
+    // Let's go see
+    // console.log("Addresses for lookup:", networkService.tokenAddresses)
+
+    if(_tokenContractAddressL1 === 'xboba') {
+      if(tA['xBOBA'].L2 !== null) _tokenContractAddressL2 = tA['xBOBA'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+    } else {
+      Object.keys(tA).forEach((token, i) => {
+        //let's see if we know about this Token
+        if(_tokenContractAddressL1 === tA[token].L1.toLowerCase()) {
+          if( tA[token].L2 !== null) 
+            _tokenContractAddressL2 = tA[token].L2.toLowerCase()
+        }
+      })
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL1, 
+        erc20abi,
+        networkService.L1Provider, //Everything is defined by the L1 address - will deal with the L2 address later
+      )
+    }
 
     const [ _symbolL1, _decimals, _name ] = await Promise.all([
       tokenContract.symbol(),
@@ -94,27 +116,12 @@ export async function addToken ( tokenContractAddressL1 ) {
     const name = _name || 'NOT ON ETHEREUM'
        
     //ETH is special as always
-    let _tokenContractAddressL2 = null
     if(_tokenContractAddressL1 === ETHL1 ) {
       _tokenContractAddressL2 = ETHL2
     }
     
-    /********* DO WE HAVE L2 DATA?? *************/
-    // Let's go see
-    // console.log("Addresses for lookup:", networkService.tokenAddresses)
-
-    let tA = networkService.tokenAddresses
-
-    Object.keys(tA).forEach((token, i) => {
-      //let's see if we know about this Token
-      if(_tokenContractAddressL1 === tA[token].L1.toLowerCase()) {
-        if( tA[token].L2 !== null) 
-          _tokenContractAddressL2 = tA[token].L2.toLowerCase()
-      }
-    })
-
     const tokenInfo = {
-      currency: _tokenContractAddressL1,
+      currency: _symbolL1 === 'xBOBA' ? _tokenContractAddressL2 : _tokenContractAddressL1,
       addressL1: _tokenContractAddressL1,
       addressL2: _tokenContractAddressL2,
       symbolL1,
