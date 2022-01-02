@@ -76,8 +76,6 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 				evm.interpreter = interpreter
 			}
 
-			//log.Debug("TURING processing contract", "Address", contract.Address().Hex())
-
 			return interpreter.Run(contract, input, readOnly)
 		}
 	}
@@ -109,26 +107,6 @@ type Context struct {
 	// OVM information
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
 }
-
-// // FIXME - should move this somewhere else.
-// // For now, only caches the most recent result. Can be extended with a map of
-// // multiple requests, but that needs some logic to expire/purge old entries.
-// // "key" for now is simply the request URL. May need tighter scope in the future,
-// // e.g. per contract. That would also allow different expiration thresholds for
-// // different users.
-// //
-// // Another future enhancement could be to allow an external program to pre-load
-// // results into the cache on a periodic basis (e.g. updating the latest market
-// // prices for various tokens). Contracts would then be able to access this data
-// // without the latency of making an off-chain JSON-RPC call. This is similar to
-// // some of the earlier concepts for a "Turing" mechanism.
-
-// var turingCache struct {
-// 	lock    sync.RWMutex
-// 	expires time.Time
-// 	key     common.Hash
-// 	value   []byte
-// }
 
 // EVM is the Ethereum Virtual Machine base object and provides
 // the necessary tools to run a contract on the given state with
@@ -279,23 +257,6 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 // rewrite the parameters so that the contract can be called without reverting.
 func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	
-	// don't go off-chain unless actually needed...
-	// if we have data and if the time is right,
-	// replace the calldata with the cached value and return that
-	// turingCache.lock.Lock()
-	// if turingCache.key == crypto.Keccak256Hash(input) {
-	// 	if time.Now().Before(turingCache.expires) {
-	// 		log.Debug("TURING-0 bobaTuringCall:Found fresh cached result - returning that",
-	// 			"key", crypto.Keccak256Hash(input),
-	// 			"cached", turingCache.value)
-	// 		return turingCache.value
-	// 	} else {
-	// 		log.Debug("TURING-0 bobaTuringCall:Found cached result but it was expired",
-	// 			"key", crypto.Keccak256Hash(input),
-	// 			"cached", turingCache.value)
-	// 	}
-	// } 
-
 	log.Debug("TURING-0 bobaTuringCall:Caller",
 		"caller", caller.String())
 
@@ -410,12 +371,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		"ResponseStringEnc", responseStringEnc,
 		"ResponseString", responseString)
 
-	// // build the modified calldata
-	// var ret hexutil.Bytes
-	// ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
-	// ret = append(ret, restHexUtil[32:startIDXpayload]...) // the unmodified offsets and the first dynamic data type
-	// ret = append(ret, responseString...) // and the data themselves
-
+	// build the modified calldata
 	ret := make([]byte, startIDXpayload+4)
 	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
@@ -423,16 +379,6 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 	log.Debug("TURING-11 bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
-
-	// //save the modified calldata in the cache
-	// turingCache.lock.Lock()
-	// turingCache.key = crypto.Keccak256Hash(input)
-	// turingCache.expires = time.Now().Add(2 * time.Second)
-	// turingCache.value = ret
-	// turingCache.lock.Unlock()
-
-	// log.Debug("TURING-12 bobaTuringCall:TuringCache entry stored for",
-	// 	"key", crypto.Keccak256Hash(input))
 
 	return ret
 }
