@@ -2,8 +2,6 @@
 
 pragma solidity 0.6.12;
 
-import "hardhat/console.sol";
-
 contract TuringHelper {
 
   TuringHelper Self;
@@ -15,34 +13,33 @@ contract TuringHelper {
     Self = TuringHelper(address(this));
   }
 
+  function GetErrorCode(uint32 rType) 
+    internal view returns (string memory) {
+      if(rType ==  1) return "TURING: Geth intercept failure";
+      if(rType == 10) return "TURING: Incorrect input state (rType==1)";
+      if(rType == 11) return "TURING: Calldata too short";
+      if(rType == 12) return "TURING: URL too long (>64)";
+      if(rType == 13) return "TURING: Server error";
+      if(rType == 14) return "TURING: Could not decode server response";
+      if(rType == 15) return "TURING: Could not create rpc client";
+  }
+
   /* This is the interface to the off-chain mechanism. Although
      marked as "public", it is only to be called by TuringCall() 
      or TuringTX().
-     The _slot parameter is overloaded to represent either the
+     The _payload parameter is overloaded to represent either the
      request parameters or the off-chain response, with the rType
      parameter indicating which is which. 
-     When called as a request (rType == 1), it reverts with 
-     an encoded TURING string. 
-     The modified l2geth intercepts this special revert, 
-     performs the off-chain interaction, then rewrites the parameters 
-     and calls the method again in "response" mode (rType == 2). 
+     When called as a request (rType == 1), it starts the offchain call,
+     which, if all all goes well, results in the rType changing to 2.
      This response is then passed back to the caller.
   */
-  //GetResponse(uint32,uint32,bytes) = 638740c4f
   function GetResponse(uint32 rType, string memory _url, bytes memory _payload)
     public returns (bytes memory) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
-    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
     require (_payload.length > 0, "Turing:GetResponse:no payload");
-    
-    if (rType == 1) {
-      // knock knock - wake up the L2Geth
-      // force a revert via 1 == 2
-      // the if() avoids calling genRequestRLP unnecessarily
-      require (1 == 2, "TURING_");
-    }
-    //if (rType == 2) -> the L2Geth has obtained fresh data for us
+    require (rType == 2, string(GetErrorCode(rType))); // l2geth can pass values here to provide debug information
     return _payload;
   }
 
@@ -50,24 +47,16 @@ contract TuringHelper {
     public returns (uint256) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
-    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
-    
-    if (rType == 1) {
-      // knock knock - wake up the L2Geth
-      // force a revert via 1 == 2
-      // the if() avoids calling genRequestRLP unnecessarily
-      require (1 == 2, "RANDOM_");
-    }
-    //if (rType == 2) -> the L2Geth has obtained fresh data for us
+    require (rType == 2, string(GetErrorCode(rType)));
     return _random;
   }
 
-  /* This is called from the external contract. It takes a method
-     selector and an abi-encoded request payload. The URL and the
-     list of allowed methods are supplied when the contract is
-     created. In the future some of this registration might be moved
-     into l2geth, allowing for security measures such as TLS client
-     certificates. A configurable timeout could also be added.
+  /* Called from the external contract. It takes an api endponit URL
+     and an abi-encoded request payload. The URL and the list of allowed 
+     methods are supplied when the contract is created. In the future 
+     some of this registration might be moved into l2geth, allowing for 
+     security measures such as TLS client certificates. A configurable timeout 
+     could also be added.
 
      Logs the offchain response so that a future verifier or fraud prover 
      can replay the transaction and ensure that it results in the same state 
@@ -91,28 +80,9 @@ contract TuringHelper {
   function TuringRandom()
     public returns (uint256) {
 
-      /* Initiate the request. This can't be a local function call
-         because that would stay inside the EVM and not give l2geth
-         a place to intercept and re-write the call.
-      */
       uint256 response = Self.GetRandom(1, 0);
       emit OffchainRandom(0x01, response);
       return response;
   }
 
-  /* Similar to TuringTx, but a "view" function and may be used from eth_call.
-  */
-  // function TuringCall(uint32 method_idx, bytes memory _payload)
-  //   public view returns (bytes memory) {
-  //     require (method_idx < methods.length, "Turing:TuringCall:method not registered");
-  //     require (_payload.length > 0, "Turing:TuringCall:payload length == 0");
-
-  //      Initiate the request. This can't be a local function call
-  //        because that would stay inside the EVM and not give l2geth
-  //        a place to intercept and re-write the call.
-      
-  //     bytes memory response = Self.GetResponse(method_idx, 1, _payload);
-  //     return response;
-  // }
 }
-
