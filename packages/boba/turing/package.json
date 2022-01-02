@@ -14,10 +14,10 @@
     "test:boba": "hardhat --network boba_local test"
   },
   "devDependencies": {
-    "@ethersproject/providers": "^5.0.24",
     "@ethersproject/address": "^5.0.11",
     "@ethersproject/contracts": "^5.0.11",
     "@ethersproject/networks": "^5.0.11",
+    "@ethersproject/providers": "^5.0.24",
     "@ethersproject/solidity": "^5.0.11",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@openzeppelin/contracts": "4.3.2",
@@ -31,6 +31,8 @@
   },
   "dependencies": {
     "@uniswap/sdk": "^3.0.3",
-    "ip": "^1.1.5"
+    "ip": "^1.1.5",
+    "web3": "^1.6.1",
+    "web3-eth-abi": "^1.6.1"
   }
 }
