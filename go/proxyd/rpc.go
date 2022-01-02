@@ -4,21 +4,22 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"strconv"
+
+	"github.com/ethereum/go-ethereum/log"
 )
 
 type RPCReq struct {
 	JSONRPC string          `json:"jsonrpc"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params"`
-	ID      string          `json:"id"`
+	ID      json.RawMessage `json:"id"`
 }
 
 type RPCRes struct {
-	JSONRPC string      `json:"jsonrpc"`
-	Result  interface{} `json:"result,omitempty"`
-	Error   *RPCErr     `json:"error,omitempty"`
-	ID      string      `json:"id"`
+	JSONRPC string          `json:"jsonrpc"`
+	Result  interface{}     `json:"result,omitempty"`
+	Error   *RPCErr         `json:"error,omitempty"`
+	ID      json.RawMessage `json:"id"`
 }
 
 func (s *RPCReq) UnmarshalJSON(data []byte) error {
@@ -30,13 +31,13 @@ func (s *RPCReq) UnmarshalJSON(data []byte) error {
 	}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		auxAlt := &struct {
-			ID int `json:"id"`
+			ID json.RawMessage `json:"id"`
 			*Alias
 		}{
 			Alias: (*Alias)(s),
 		}
 		if err := json.Unmarshal(data, &auxAlt); err == nil {
-			s.ID = strconv.Itoa(auxAlt.ID)
+			s.ID = auxAlt.ID
 		}
 	}
 	return nil
@@ -51,13 +52,13 @@ func (s *RPCRes) UnmarshalJSON(data []byte) error {
 	}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		auxAlt := &struct {
-			ID int `json:"id"`
+			ID json.RawMessage `json:"id"`
 			*Alias
 		}{
 			Alias: (*Alias)(s),
 		}
 		if err := json.Unmarshal(data, &auxAlt); err == nil {
-			s.ID = strconv.Itoa(auxAlt.ID)
+			s.ID = auxAlt.ID
 		}
 	}
 	return nil
@@ -76,43 +77,46 @@ func (r *RPCErr) Error() string {
 	return r.Message
 }
 
-func ParseRPCReq(r io.Reader) ([]RPCReq, error) {
+func ParseRPCReq(r io.Reader) ([]RPCReq, bool, error) {
 	body, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, wrapErr(err, "error reading request body")
+		return nil, true, wrapErr(err, "error reading request body")
 	}
 	if isBatch(body) {
+		log.Info("THIS WAS A BATCH REQUEST")
 		var arr []RPCReq
 		err := json.Unmarshal(body, &arr)
 		if err != nil {
-			return nil, wrapErr(err, "failed to parse JSON batch request: ")
+			return nil, true, wrapErr(err, "failed to parse JSON batch request: ")
 		}
 		for _, t := range arr {
 			if t.JSONRPC != JSONRPCVersion {
-				return nil, ErrInvalidRequest
+				return nil, true, ErrInvalidRequest
 			}
 
 			if t.Method == "" {
-				return nil, ErrInvalidRequest
+				return nil, true, ErrInvalidRequest
 			}
 		}
-		return arr, nil
+		return arr, true, nil
 	} else {
+
+		log.Info("THIS WAS NOT A BATCH REQUEST")
 		req := new(RPCReq)
 		if err := json.Unmarshal(body, req); err != nil {
-			return nil, ErrParseErr
+			return nil, false, ErrParseErr
 		}
 
 		if req.JSONRPC != JSONRPCVersion {
-			return nil, ErrInvalidRequest
+			return nil, false, ErrInvalidRequest
 		}
 
 		if req.Method == "" {
-			return nil, ErrInvalidRequest
+			return nil, false, ErrInvalidRequest
 		}
 		arr := make([]RPCReq, 1)
 		arr[0] = *req
-		return arr, nil
+		return arr, false, nil
 	}
 }
 
@@ -140,7 +144,7 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	return res, nil
 }
 
-func NewRPCErrorRes(id string, err error) *RPCRes {
+func NewRPCErrorRes(id json.RawMessage, err error) *RPCRes {
 	var rpcErr *RPCErr
 	if rr, ok := err.(*RPCErr); ok {
 		rpcErr = rr
