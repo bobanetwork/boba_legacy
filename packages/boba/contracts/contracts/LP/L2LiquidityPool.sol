@@ -534,6 +534,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         whenNotPaused
     {
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
+        // combine to make logical XOR to avoid user error
+        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.OVM_ETH), "Amount Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
@@ -605,6 +607,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         }
 
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
+        // combine to make logical XOR to avoid user error
+        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.OVM_ETH), "Amount Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
