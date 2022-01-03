@@ -858,6 +858,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         bool replyNeeded = false;
         PoolInfo storage pool = poolInfo[_tokenAddress];
+        // if this fails, relay can be attempted again after registering
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
