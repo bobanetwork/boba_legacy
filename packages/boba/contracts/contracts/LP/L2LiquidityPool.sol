@@ -251,6 +251,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyNotInitialized()
         initializer()
     {
+        require(_l2CrossDomainMessenger != address(0) && _L1LiquidityPoolAddress != address(0), "zero address not allowed");
         messenger = _l2CrossDomainMessenger;
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
@@ -412,6 +413,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyOwner()
     {
         require(_l1TokenAddress != _l2TokenAddress, "l1 and l2 token addresses cannot be same");
+        require(_l2TokenAddress != address(0), "l2 token address cannot be zero address");
         // use with caution, can register only once
         PoolInfo storage pool = poolInfo[_l2TokenAddress];
         // l2 token address equal to zero, then pair is not registered.
