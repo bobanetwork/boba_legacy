@@ -563,23 +563,23 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             user.rewardDebt = _amount.mul(pool.accUserRewardPerShare).div(1e12);
         }
 
-        // transfer funds if users deposit ERC20
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
-            IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
-        }
-
         // update amounts
         user.amount = user.amount.add(_amount);
         pool.userDepositAmount = pool.userDepositAmount.add(_amount);
-
-        //  xBOBA
-        mintXBOBA(_amount, _tokenAddress);
 
         emit AddLiquidity(
             msg.sender,
             _amount,
             _tokenAddress
         );
+
+        // transfer funds if users deposit ERC20
+        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+            IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
+        }
+
+        //  xBOBA
+        mintXBOBA(_amount, _tokenAddress);
     }
 
     /**
@@ -615,6 +615,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        emit ClientDepositL2(
+            msg.sender,
+            _amount,
+            _tokenAddress
+        );
+
         // transfer funds if users deposit ERC20
         if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
@@ -633,12 +639,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             address(L1LiquidityPoolAddress),
             getFinalizeDepositL1Gas(),
             data
-        );
-
-        emit ClientDepositL2(
-            msg.sender,
-            _amount,
-            _tokenAddress
         );
 
     }
@@ -680,6 +680,13 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         // update total user deposit amount
         pool.userDepositAmount = pool.userDepositAmount.sub(_amount);
 
+        emit WithdrawLiquidity(
+            msg.sender,
+            _to,
+            _amount,
+            _tokenAddress
+        );
+
         if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
@@ -689,13 +696,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
         // burn xBOBA
         burnXBOBA(_amount, _tokenAddress);
-
-        emit WithdrawLiquidity(
-            msg.sender,
-            _to,
-            _amount,
-            _tokenAddress
-        );
     }
 
     /**
@@ -719,19 +719,19 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
         pool.accOwnerReward = pool.accOwnerReward.sub(_amount);
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
-            IERC20(_tokenAddress).safeTransfer(_to, _amount);
-        } else {
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send ovm_Eth");
-        }
-
         emit OwnerRecoverFee(
             msg.sender,
             _to,
             _amount,
             _tokenAddress
         );
+
+        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+            IERC20(_tokenAddress).safeTransfer(_to, _amount);
+        } else {
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
+            require(sent, "Failed to send ovm_Eth");
+        }
     }
 
     /**
@@ -762,19 +762,19 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         user.pendingReward = pendingReward.sub(_amount);
         user.rewardDebt = user.amount.mul(pool.accUserRewardPerShare).div(1e12);
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
-            IERC20(_tokenAddress).safeTransfer(_to, _amount);
-        } else {
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send ovm_Eth");
-        }
-
         emit WithdrawReward(
             msg.sender,
             _to,
             _amount,
             _tokenAddress
         );
+
+        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+            IERC20(_tokenAddress).safeTransfer(_to, _amount);
+        } else {
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
+            require(sent, "Failed to send ovm_Eth");
+        }
     }
 
     /*
@@ -937,14 +937,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         pool.accUserReward = pool.accUserReward.add(userRewardFee);
         pool.accOwnerReward = pool.accOwnerReward.add(ownerRewardFee);
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
-            IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
-        } else {
-            //this is ovm_ETH
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
-            require(sent, "Failed to send ovm_Eth");
-        }
-
         emit ClientPayL2Settlement(
             _to,
             receivedAmount,
@@ -953,6 +945,14 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             totalFee,
             _tokenAddress
         );
+
+        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+            IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
+        } else {
+            //this is ovm_ETH
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
+            require(sent, "Failed to send ovm_Eth");
+        }
     }
 
 }
