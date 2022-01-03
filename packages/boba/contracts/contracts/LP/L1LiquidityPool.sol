@@ -153,6 +153,10 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         address tokenAddress
     );
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
     /********************
      *    Constructor   *
      ********************/
@@ -210,6 +214,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         onlyOwner()
     {
         owner = _newOwner;
+        emit OwnershipTransferred(_newOwner);
     }
 
     /**
