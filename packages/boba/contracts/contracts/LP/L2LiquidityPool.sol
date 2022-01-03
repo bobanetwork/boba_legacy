@@ -620,7 +620,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
-        // Construct calldata for L1LiquidityPool.depositToFinalize(_to, receivedAmount)
+        // Construct calldata for L1LiquidityPool.clientPayL1(_to, _amount, _tokenAddress)
         bytes memory data = abi.encodeWithSelector(
             iL1LiquidityPool.clientPayL1.selector,
             msg.sender,
