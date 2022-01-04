@@ -7,6 +7,12 @@ pragma experimental ABIEncoderV2;
  */
 interface iL2LiquidityPool {
 
+    struct ClientPayToken {
+        address payable to;
+        address l2TokenAddress;
+        uint256 amount;
+    }
+
     /********************
      *       Events     *
      ********************/
@@ -70,6 +76,11 @@ interface iL2LiquidityPool {
         address payable _to,
         uint256 _amount,
         address _tokenAddress
+    )
+        external;
+
+    function clientPayL2Batch(
+        ClientPayToken [] calldata _tokens
     )
         external;
 

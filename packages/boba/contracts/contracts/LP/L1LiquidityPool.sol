@@ -70,6 +70,16 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         // start time -- used to calculate APR
         uint256 startTime;
     }
+    // Token batch structure
+    struct ClientDepositToken {
+        address l1TokenAddress;
+        uint256 amount;
+    }
+    struct ClientPayToken {
+        address to;
+        address l2TokenAddress;
+        uint256 amount;
+    }
 
     /*************
      * Variables *
@@ -114,6 +124,10 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         address sender,
         uint256 receivedAmount,
         address tokenAddress
+    );
+
+    event ClientDepositL1Batch(
+        ClientPayToken[] _tokens
     );
 
     event ClientPayL1(
@@ -451,7 +465,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
-        // Construct calldata for L1LiquidityPool.depositToFinalize(_to, receivedAmount)
+        // Construct calldata for L1LiquidityPool.clientPayL2(_to, receivedAmount, l2TokanAddress)
         bytes memory data = abi.encodeWithSelector(
             iL2LiquidityPool.clientPayL2.selector,
             msg.sender,
@@ -471,6 +485,47 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             msg.sender,
             _amount,
             _tokenAddress
+        );
+    }
+
+    function clientDepositL1Batch(
+        ClientDepositToken[] calldata _tokens
+    )
+        external
+        payable
+        whenNotPaused
+    {
+        require(_tokens.length < 5, "Too Many Tokens");
+        uint256 ETHAmount;
+        ClientPayToken[] memory payload = new ClientPayToken[](_tokens.length);
+        for (uint256 i = 0; i < _tokens.length; i++) {
+            ClientDepositToken memory token = _tokens[i];
+            PoolInfo storage pool = poolInfo[token.l1TokenAddress];
+            if (token.l1TokenAddress != address(0)) {
+                IERC20(token.l1TokenAddress).safeTransferFrom(msg.sender, address(this), token.amount);
+            } else {
+                ETHAmount = token.amount;
+            }
+            payload[i] = ClientPayToken(msg.sender, pool.l2TokenAddress, token.amount);
+        }
+        require(ETHAmount == msg.value, "Invalid ETH Amount");
+
+        // Construct calldata for L1LiquidityPool.clientPayL2Batch(ClientPayToken)
+        bytes memory data = abi.encodeWithSelector(
+            iL2LiquidityPool.clientPayL2Batch.selector,
+            payload
+        );
+
+        // Send calldata into L1
+        sendCrossDomainMessage(
+            address(L2LiquidityPoolAddress),
+            // extra gas for complex l2 logic
+            SETTLEMENT_L2_GAS * 2,
+            data
+        );
+
+        emit ClientDepositL1Batch(
+            payload
         );
     }
 
