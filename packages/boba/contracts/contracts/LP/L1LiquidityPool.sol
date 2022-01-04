@@ -252,7 +252,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         L1StandardBridgeAddress = _L1StandardBridgeAddress;
         owner = msg.sender;
         _configureFee(5, 50, 0);
-        configureGas(1400000, 2300);
+        configureGas(700000, 2300);
 
         __Context_init_unchained();
         __Pausable_init_unchained();
@@ -506,6 +506,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             } else {
                 ETHAmount = token.amount;
             }
+            require(pool.l2TokenAddress != address(0), "Invaild Token");
             payload[i] = ClientPayToken(msg.sender, pool.l2TokenAddress, token.amount);
         }
         require(ETHAmount == msg.value, "Invalid ETH Amount");
