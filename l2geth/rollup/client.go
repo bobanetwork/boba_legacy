@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -80,6 +81,7 @@ type transaction struct {
 	QueueOrigin string          `json:"queueOrigin"`
 	QueueIndex  *uint64         `json:"queueIndex"`
 	Decoded     *decoded        `json:"decoded"`
+	Turing      hexutil.Bytes   `json:"turing"`
 }
 
 // Enqueue represents an `enqueue` transaction or a L1 to L2 transaction.
@@ -92,6 +94,7 @@ type Enqueue struct {
 	BlockNumber *uint64         `json:"blockNumber"`
 	Timestamp   *uint64         `json:"timestamp"`
 	QueueIndex  *uint64         `json:"index"`
+	Turing      *hexutil.Bytes  `json:"turing"`
 }
 
 // signature represents a secp256k1 ECDSA signature
@@ -203,6 +206,9 @@ func (c *Client) GetEnqueue(index uint64) (*types.Transaction, error) {
 // enqueueToTransaction turns an Enqueue into a types.Transaction
 // so that it can be consumed by the SyncService
 func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
+
+	log.Debug("enqueueToTransaction", "enqueue", enqueue)
+
 	if enqueue == nil {
 		return nil, errElementNotFound
 	}
@@ -241,6 +247,12 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 	}
 	data := *enqueue.Data
 
+	// Turing is allowed to be nil
+	// if enqueue.Turing == nil {
+	// 	return nil, errors.New("Turing not found for enqueue tx")
+	// }
+	// turing := *enqueue.Turing
+
 	// enqueue transactions have no value
 	value := big.NewInt(0)
 	tx := types.NewTransaction(nonce, target, value, gasLimit, big.NewInt(0), data)
@@ -255,6 +267,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 		enqueue.Index,
 		enqueue.QueueIndex,
 		data,
+		[]byte{12, 13}, // Turing
 	)
 	tx.SetTransactionMeta(txMeta)
 
@@ -365,6 +378,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 			&res.Index,
 			res.QueueIndex,
 			res.Data,
+			res.Turing,
 		)
 		tx.SetTransactionMeta(txMeta)
 
@@ -413,6 +427,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 		&res.Index,
 		res.QueueIndex,
 		res.Data,
+		res.Turing,
 	)
 	tx.SetTransactionMeta(txMeta)
 	return tx, nil

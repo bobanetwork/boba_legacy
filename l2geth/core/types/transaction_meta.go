@@ -43,10 +43,18 @@ type TransactionMeta struct {
 	// The queue index, nil for queue origin sequencer transactions
 	QueueIndex     *uint64 `json:"queueIndex" gencodec:"required"`
 	RawTransaction []byte  `json:"rawTransaction" gencodec:"required"`
+	Turing []byte  `json:"turing" gencodec:"required"`
 }
 
 // NewTransactionMeta creates a TransactionMeta
-func NewTransactionMeta(l1BlockNumber *big.Int, l1timestamp uint64, l1MessageSender *common.Address, queueOrigin QueueOrigin, index *uint64, queueIndex *uint64, rawTransaction []byte) *TransactionMeta {
+func NewTransactionMeta(l1BlockNumber *big.Int, 
+	l1timestamp uint64, 
+	l1MessageSender *common.Address, 
+	queueOrigin QueueOrigin, 
+	index *uint64, 
+	queueIndex *uint64, 
+	rawTransaction []byte,
+	turing []byte) *TransactionMeta {
 	return &TransactionMeta{
 		L1BlockNumber:   l1BlockNumber,
 		L1Timestamp:     l1timestamp,
@@ -55,6 +63,7 @@ func NewTransactionMeta(l1BlockNumber *big.Int, l1timestamp uint64, l1MessageSen
 		Index:           index,
 		QueueIndex:      queueIndex,
 		RawTransaction:  rawTransaction,
+		Turing:			 turing,
 	}
 }
 
@@ -131,6 +140,14 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 		meta.RawTransaction = raw
 	}
 
+	turing, err := common.ReadVarBytes(b, 0, 2000, "Turing") // 2000 is a random guess
+	if err != nil {
+		return nil, err
+	}
+	if !isNullValue(turing) {
+		meta.Turing = turing
+	}
+
 	return &meta, nil
 }
 
@@ -188,6 +205,13 @@ func TxMetaEncode(meta *TransactionMeta) []byte {
 		common.WriteVarBytes(b, 0, getNullValue())
 	} else {
 		common.WriteVarBytes(b, 0, rawTransaction)
+	}
+
+	turing := meta.Turing
+	if turing == nil {
+		common.WriteVarBytes(b, 0, getNullValue())
+	} else {
+		common.WriteVarBytes(b, 0, turing)
 	}
 
 	return b.Bytes()

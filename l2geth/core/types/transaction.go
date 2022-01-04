@@ -86,7 +86,7 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	meta := NewTransactionMeta(nil, 0, nil, QueueOriginSequencer, nil, nil, nil)
+	meta := NewTransactionMeta(nil, 0, nil, QueueOriginSequencer, nil, nil, nil, []byte{8, 9}) //Turing
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -148,6 +148,13 @@ func (t *Transaction) SetL1BlockNumber(bn uint64) {
 		return
 	}
 	t.meta.L1BlockNumber = new(big.Int).SetUint64(bn)
+}
+
+func (t *Transaction) SetTuring(turing []byte)  {
+	if &t.meta == nil {
+		return
+	}
+	t.meta.Turing = common.CopyBytes(turing)
 }
 
 // ChainId returns which chain id this transaction was signed for (if at all)
@@ -252,6 +259,14 @@ func (tx *Transaction) L1BlockNumber() *big.Int {
 	return &l1BlockNumber
 }
 
+// Turing returns the modified calldata of the transaction if they exist.
+func (tx *Transaction) Turing() []byte {
+	if tx.meta.Turing == nil {
+		return nil
+	}
+	return common.CopyBytes(tx.meta.Turing)
+}
+
 // QueueOrigin returns the Queue Origin of the transaction
 func (tx *Transaction) QueueOrigin() QueueOrigin {
 	return tx.meta.QueueOrigin
@@ -299,6 +314,7 @@ func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 		l1Timestamp:   tx.meta.L1Timestamp,
 		l1BlockNumber: tx.meta.L1BlockNumber,
 		queueOrigin:   tx.meta.QueueOrigin,
+		turing:        tx.meta.Turing,
 	}
 
 	var err error
@@ -483,9 +499,10 @@ type Message struct {
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
 	queueOrigin   QueueOrigin
+	turing 		  []byte
 }
 
-func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte, checkNonce bool, l1BlockNumber *big.Int, l1Timestamp uint64, queueOrigin QueueOrigin) Message {
+func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte, checkNonce bool, l1BlockNumber *big.Int, l1Timestamp uint64, queueOrigin QueueOrigin, turing []byte) Message {
 	return Message{
 		from:       from,
 		to:         to,
@@ -499,6 +516,7 @@ func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *b
 		l1Timestamp:   l1Timestamp,
 		l1BlockNumber: l1BlockNumber,
 		queueOrigin:   queueOrigin,
+		turing:        turing,
 	}
 }
 
@@ -514,3 +532,4 @@ func (m Message) CheckNonce() bool     { return m.checkNonce }
 func (m Message) L1Timestamp() uint64      { return m.l1Timestamp }
 func (m Message) L1BlockNumber() *big.Int  { return m.l1BlockNumber }
 func (m Message) QueueOrigin() QueueOrigin { return m.queueOrigin }
+func (m Message) Turing() []byte           { return m.turing }
