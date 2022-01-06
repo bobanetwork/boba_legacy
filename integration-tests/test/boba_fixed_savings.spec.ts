@@ -337,7 +337,7 @@ describe('Boba Fixed Savings', async () => {
       const depositTime = stakeData.depositTimestamp
       await expect(
         FixedSavings.connect(env.l2Wallet.address).unstake(stakeData.stakeId)
-      ).to.be.revertedWith('Not on unstaking period')
+      ).to.be.revertedWith('Not in unstaking period')
 
       // advance time until the end of lock period
       const expectedLockEndTime = depositTime.add(BigNumber.from(LOCK_TIME))
@@ -351,10 +351,10 @@ describe('Boba Fixed Savings', async () => {
         .sub(BigNumber.from(3600))
 
       await moveTimeForward(timeToMove.toNumber())
-      // still not on unstaking period
+      // still not in unstaking period
       await expect(
         FixedSavings.connect(env.l2Wallet).unstake(stakeData.stakeId)
-      ).to.be.revertedWith('Not on unstaking period')
+      ).to.be.revertedWith('Not in unstaking period')
     })
 
     let preBalanceStaker
@@ -456,7 +456,7 @@ describe('Boba Fixed Savings', async () => {
         await moveTimeForward(timeToMove.toNumber())
         await expect(
           FixedSavings.connect(env.l2Wallet).unstake(stakeData.stakeId)
-        ).to.be.revertedWith('Not on unstaking period')
+        ).to.be.revertedWith('Not in unstaking period')
         // this is the start of second period
       })
 
