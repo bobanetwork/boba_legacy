@@ -1452,7 +1452,7 @@ describe('Liquidity Pool Test', async () => {
       )
 
       const depositTx = await env.waitForXDomainTransaction(
-        L1LiquidityPool.clientDepositL1(depositAmount, env.ovmEth.address, {
+        L1LiquidityPool.clientDepositL1(depositAmount, ethers.constants.AddressZero, {
           value: depositAmount,
         }),
         Direction.L1ToL2
