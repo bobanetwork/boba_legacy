@@ -48,8 +48,9 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 	}
 	if rcfg.UsingOVM {
 		// When using the OVM, we must:
-		// - Set the BlockNumber to be the msg.L1BlockNumber
+		// - Set the L1BlockNumber to be the msg.L1BlockNumber
 		// - Set the Time to be the msg.L1Timestamp
+		// - Set Turing to be msg.Turing
 		return vm.Context{
 			CanTransfer:   CanTransfer,
 			Transfer:      Transfer,
@@ -62,6 +63,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			GasLimit:      header.GasLimit,
 			GasPrice:      new(big.Int).Set(msg.GasPrice()),
 			L1BlockNumber: msg.L1BlockNumber(),
+			Turing:        []byte{0}, //msg.Turing()
 		}
 	} else {
 		return vm.Context{

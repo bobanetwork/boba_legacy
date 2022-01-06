@@ -17,7 +17,7 @@
 package core
 
 import (
-	"bytes"
+	//"bytes"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -114,14 +114,14 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	}
 
 	// Apply the transaction to the current state (included in the env)
-	result, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+	result, gas, failed, err, turing := ApplyMessage(vmenv, msg, gp)
 
-	log.Debug("TURING state_processor.go ApplyMessage result",
+	log.Debug("TURING state_processor.go ApplyTransaction - result of ApplyMessage",
 		"failed", failed,
 		"err", err,
 		"gas", gas,
 		"result", hexutil.Bytes(result),
-		"turing", bytes.Contains(result, []byte("_OMGXTURING_")))
+		"turing", turing)
 
 	if err != nil {
 		return nil, err
@@ -155,8 +155,9 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockHash = statedb.BlockHash()
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
+	receipt.Turing = turing
 
-	log.Debug("TURING state_processor.go leaving ApplyTransaction", "receipt", receipt)
+	log.Debug("TURING state_processor.go leaving ApplyTransaction (ApplyMessage)")
 
 	return receipt, err
 }

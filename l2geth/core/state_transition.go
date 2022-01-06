@@ -83,6 +83,7 @@ type Message interface {
 	L1Timestamp() uint64
 	L1BlockNumber() *big.Int
 	QueueOrigin() types.QueueOrigin
+	//Turing() []byte
 }
 
 // IntrinsicGas computes the 'intrinsic gas' for a message with the given data.
@@ -152,7 +153,7 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 // the gas used (which includes gas refunds) and an error if it failed. An error always
 // indicates a core error meaning that the message would always fail for that particular
 // state and would never be accepted within a block.
-func ApplyMessage(evm *vm.EVM, msg Message, gp *GasPool) ([]byte, uint64, bool, error) {
+func ApplyMessage(evm *vm.EVM, msg Message, gp *GasPool) ([]byte, uint64, bool, error, []byte) {
 	return NewStateTransition(evm, msg, gp).TransitionDb()
 }
 
@@ -227,7 +228,7 @@ func (st *StateTransition) preCheck() error {
 // TransitionDb will transition the state by applying the current message and
 // returning the result including the used gas. It returns an error if failed.
 // An error indicates a consensus issue.
-func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bool, err error) {
+func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bool, err error, turing []byte) {
 	if err = st.preCheck(); err != nil {
 		return
 	}
@@ -240,10 +241,10 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	// Pay intrinsic gas
 	gas, err := IntrinsicGas(st.data, contractCreation, homestead, istanbul)
 	if err != nil {
-		return nil, 0, false, err
+		return nil, 0, false, err, nil
 	}
 	if err = st.useGas(gas); err != nil {
-		return nil, 0, false, err
+		return nil, 0, false, err, nil
 	}
 
 	var (
@@ -259,9 +260,16 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	} else {
 		// Increment the nonce for the next transaction
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
-		log.Debug("TURING state_transition.go before evm.Call", "st.data", hexutil.Bytes(st.data))
+		log.Debug("TURING state_transition.go before evm.Call", 
+			"st.data", hexutil.Bytes(st.data),
+			"evm.Context", evm.Context)
 		ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
-		log.Debug("TURING state_transition.go evm.Call result", "ret", hexutil.Bytes(ret), "st.gas", st.gas, "vmerr", vmerr)
+		log.Debug("TURING state_transition.go after evm.Call", 
+			"ret", hexutil.Bytes(ret), 
+			"st.gas", st.gas, 
+			"vmerr", vmerr,
+			"evm.Context.Turing", evm.Context.Turing)
+		turing = evm.Context.Turing  //prepare the return Turing data
 	}
 
 	if vmerr != nil {
@@ -270,7 +278,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		// sufficient balance to make the transfer happen. The first
 		// balance transfer may never fail.
 		if vmerr == vm.ErrInsufficientBalance {
-			return nil, 0, false, vmerr
+			return nil, 0, false, vmerr, nil
 		}
 	}
 	st.refundGas()
@@ -285,7 +293,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		st.state.AddBalance(evm.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
 	}
 
-	return ret, st.gasUsed(), vmerr != nil, err
+	return ret, st.gasUsed(), vmerr != nil, err, turing
 }
 
 func (st *StateTransition) refundGas() {

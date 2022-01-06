@@ -247,11 +247,12 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 	}
 	data := *enqueue.Data
 
-	// Turing is allowed to be nil
-	// if enqueue.Turing == nil {
-	// 	return nil, errors.New("Turing not found for enqueue tx")
-	// }
-	// turing := *enqueue.Turing
+	turing := []byte{12, 13}
+	if enqueue.Turing == nil {
+		// return nil, errors.New("Turing not found for enqueue tx")
+	} else {
+		turing = *enqueue.Turing
+	}
 
 	// enqueue transactions have no value
 	value := big.NewInt(0)
@@ -267,7 +268,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 		enqueue.Index,
 		enqueue.QueueIndex,
 		data,
-		[]byte{12, 13}, // Turing
+		turing,
 	)
 	tx.SetTransactionMeta(txMeta)
 

@@ -106,6 +106,9 @@ type Context struct {
 
 	// OVM information
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
+
+	// Turing information 
+	Turing []byte
 }
 
 // EVM is the Ethereum Virtual Machine base object and provides
@@ -389,11 +392,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
 
-	// log.Debug("TURING entering Call",
-	// 	"depth", evm.depth,
-	// 	"addr", addr,
-	// 	"input", hexutil.Bytes(input),
-	// 	"gas", gas)
+	log.Debug("TURING entering call",
+		"depth", evm.depth,
+		"addr", addr,
+		"input", hexutil.Bytes(input),
+		"gas", gas,
+		"evm.Context.Turing", evm.Context.Turing)
 
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
@@ -449,13 +453,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 
 	//methodID for GetResponse is 7d93616c -> [125 147 97 108]
-	isTuring2 := bytes.Contains(input, []byte{125, 147, 97, 108})
+	isTuring2 := bytes.Equal(input[:4], []byte{125, 147, 97, 108})
 
 	//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-	isGetRand2 := bytes.Contains(input, []byte{73, 61, 87, 214})
+	isGetRand2 := bytes.Equal(input[:4], []byte{73, 61, 87, 214})
 
 	if isTuring2 || isGetRand2 {
-		log.Debug("TURING REQUEST", "input", input)
+		log.Debug("TURING REQUEST START", "input", input)
 	} 
 
 	// bobaTuringCall takes the original calldata, figures out what needs
@@ -463,13 +467,37 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	var updated_input hexutil.Bytes
 
 	if isTuring2 {
-		updated_input = bobaTuringCall(input, caller.Address())
-		log.Debug("TURING REQUEST", "updated_input", updated_input)
-		ret, err = run(evm, contract, updated_input, false)
+		if(bytes.Equal(evm.Context.Turing, []byte{0})) { 
+			// this is the first run of Turing in the sequencer
+			// this _should_ never happen in Verifier mode, since the sequencer will already have run the Turing call
+			updated_input = bobaTuringCall(input, caller.Address())
+			ret, err = run(evm, contract, updated_input, false)
+			log.Debug("TURING NEW CALL", "updated_input", updated_input)
+			//copy(evm.Context.Turing, updated_input) 
+			evm.Context.Turing = updated_input
+		} else {
+			// Turing for this Transaction has already been run elsewhere - replay using 
+			// information from the EVM context
+			ret, err = run(evm, contract, evm.Context.Turing, false)
+			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
+		}
+		log.Debug("TURING REQUEST END", "updated_input", updated_input)
 	} else if isGetRand2 {
-		updated_input = bobaTuringRandom(input)
-		log.Debug("TURING REQUEST", "updated_input", updated_input)
-		ret, err = run(evm, contract, updated_input, false)
+		if(bytes.Equal(evm.Context.Turing, []byte{0})) {
+			// this is the first run of Turing in the sequencer
+			// this _should_ never happen in Verifier mode, since the sequencer will already have run the Turing call 
+			updated_input = bobaTuringRandom(input)
+			ret, err = run(evm, contract, updated_input, false)
+			log.Debug("TURING NEW CALL", "updated_input", updated_input)
+			//copy(evm.Context.Turing, updated_input) 
+			evm.Context.Turing = updated_input
+		} else {
+			// Turing for this Transaction has already been run elsewhere - replay using 
+			// information from the EVM context
+			ret, err = run(evm, contract, evm.Context.Turing, false)
+			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
+		}
+		log.Debug("TURING REQUEST END")
 	} else {
 		ret, err = run(evm, contract, input, false)
 	}
@@ -477,50 +505,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	log.Debug("TURING evm.go run",
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
-		"err", err)
-
-	// if err != nil {
-
-	// 	//let's see if this is a Turing Compute Request
-	// 	isTuring := bytes.Contains(ret, []byte("TURING_"))
-
-	// 	//let's see if this is a Turing Compute Request
-	// 	isGetRand := bytes.Contains(ret, []byte("RANDOM_"))
-
-	// 	if isTuring || isGetRand {
-
-	// 		log.Debug("TCR_",
-	// 			"err", err,
-	// 			"ret", hexutil.Bytes(ret),
-	// 			"input", hexutil.Bytes(input),
-	// 			"contract", contract.CodeAddr)
-
-	// 		// at this point we have a call that has reverted AND the ret includes TURING_ or RANDOM_ somewhere in it
-	// 		log.Debug("TURING-M1 calling with", "input", input)
-
-	// 		// bobaTuringCall takes the original calldata, figures out what needs
-	// 		// to be done, and then synthesizes a 'new_in' calldata that does not 
-	// 		// lead to the revert (by changing rType from 1 to 2)
-	// 		var updated_input hexutil.Bytes
-
-	// 		if isTuring {
-	// 			updated_input = bobaTuringCall(input)
-	// 		} else if isGetRand {
-	// 			updated_input = bobaTuringRandom(input)
-	// 		}
-	// 		//evm.StateDB.RevertToSnapshot(snapshot) // thoughts?
-
-	// 		log.Debug("TURING-M2 replay with modified calldata", "modifiedCalldata", updated_input)
-
-	// 		// and then rerun the call with the modified calldata
-	// 		// this returns the API response to the caller 
-	// 		ret, err = run(evm, contract, updated_input, false)
-
-	// 		log.Debug("TURING-M3 received replay response",
-	// 			"err", err,
-	// 			"ret", hexutil.Bytes(ret))
-	// 	}
-	// }
+		"err", err,
+		"updated_input", updated_input,
+	    "evm.Context.Turing", evm.Context.Turing,
+	    "length Turing", len(evm.Context.Turing))
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
@@ -538,7 +526,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// 	"addr", addr,
 	// 	"ret", hexutil.Bytes(ret),
 	// 	"err", err)
-
+    
 	return ret, contract.Gas, err
 }
 

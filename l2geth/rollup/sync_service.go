@@ -814,6 +814,8 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
+		tx.SetTuring([]byte{20, 21}) // populate the Turing metadata for debug purposes
+		log.Debug("TURING sync_service.go Generating metadata for RPC call", "timestamp", ts, "L1BlockNumber", bn)
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() {
 		// If the timestamp of the transaction is greater than the sync
 		// service's locally maintained timestamp, update the timestamp and
@@ -852,43 +854,32 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		Txs:   txs,
 		ErrCh: errCh,
 	})
+
 	// Block until the transaction has been added to the chain
 	log.Debug("TURING sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
 	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
-// <<<<<<< turing-hybrid-compute
-// 	<-s.chainHeadCh
-// 	log.Debug("TURING sync_service leaving applyTransactionToTip")
-
-// 	// Update the cache when the transaction is from the owner
-// 	// of the gas price oracle
-// 	sender, _ := types.Sender(s.signer, tx)
-// 	owner := s.GasPriceOracleOwnerAddress()
-// 	if owner != nil && sender == *owner {
-// 		if err := s.updateGasPriceOracleCache(nil); err != nil {
-// 			return err
-// =======
 
 	select {
-    case err := <-errCh:
-      log.Error("Got error waiting for transaction to be added to chain", "msg", err)
-      s.SetLatestL1Timestamp(ts)
-      s.SetLatestL1BlockNumber(bn)
-      s.SetLatestIndex(index)
-      return err
-    case <-s.chainHeadCh:
-      // Update the cache when the transaction is from the owner
-      // of the gas price oracle
-      sender, _ := types.Sender(s.signer, tx)
-      owner := s.GasPriceOracleOwnerAddress()
-      if owner != nil && sender == *owner {
-        if err := s.updateGasPriceOracleCache(nil); err != nil {
-          s.SetLatestL1Timestamp(ts)
-          s.SetLatestL1BlockNumber(bn)
-          s.SetLatestIndex(index)
-          return err
-        }
-      }
-      return nil
+		case err := <-errCh:
+			log.Error("Got error waiting for transaction to be added to chain", "msg", err)
+			s.SetLatestL1Timestamp(ts)
+			s.SetLatestL1BlockNumber(bn)
+			s.SetLatestIndex(index)
+			return err
+		case <-s.chainHeadCh:
+		// Update the cache when the transaction is from the owner
+		// of the gas price oracle
+			sender, _ := types.Sender(s.signer, tx)
+			owner := s.GasPriceOracleOwnerAddress()
+			if owner != nil && sender == *owner {
+				if err := s.updateGasPriceOracleCache(nil); err != nil {
+					s.SetLatestL1Timestamp(ts)
+					s.SetLatestL1BlockNumber(bn)
+					s.SetLatestIndex(index)
+					return err
+				}
+			}
+			return nil
 	}
 }
 
