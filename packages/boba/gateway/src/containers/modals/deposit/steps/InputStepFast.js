@@ -378,6 +378,7 @@ function InputStepFast({ handleClose, token }) {
 
         {token.symbol !== 'ETH' &&
           <InputStepFastETH
+            batchTokenValue={value}
             batchToken={token}
             setETHValue={setETHValue}
             setETH_Value_Wei_String={setETH_Value_Wei_String}

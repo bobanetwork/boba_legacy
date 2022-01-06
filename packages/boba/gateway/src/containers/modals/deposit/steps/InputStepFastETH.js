@@ -46,6 +46,7 @@ import {
 } from 'selectors/balanceSelector'
 
 function InputStepFast({
+  batchTokenValue,
   batchToken,
   setETHValue,
   setETH_Value_Wei_String,
@@ -155,15 +156,17 @@ function InputStepFast({
 
     if((Number(value) + Number(batchCost)) > Number(feeBalance)) {
       warning = true
-      ETHstring = `<br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+      ETHstring = `Transaction total (amount + gas): ${Number(batchTokenValue).toFixed(4)} ${batchToken.symbol} and ${(Number(value) + Number(batchCost)).toFixed(4)} ETH
+      <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
       <br/>THIS TRANSACTION WILL FAIL.`
     }
     else if ((Number(value) + Number(batchCost)) > Number(feeBalance) * 0.96) {
       warning = true
-      ETHstring = `<br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+      ETHstring = `Transaction total (amount + gas): ${Number(batchTokenValue).toFixed(4)} ${batchToken.symbol} and ${(Number(value) + Number(batchCost)).toFixed(4)} ETH
+      <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
       <br/>THIS TRANSACTION MIGHT FAIL.`
     } else {
-      ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(batchCost)).toFixed(4)} ETH`
+      ETHstring = `Transaction total (amount + gas): ${Number(batchTokenValue).toFixed(4)} ${batchToken.symbol} and ${(Number(value) + Number(batchCost)).toFixed(4)} ETH`
     }
 
     setETHTransactionMessage(
