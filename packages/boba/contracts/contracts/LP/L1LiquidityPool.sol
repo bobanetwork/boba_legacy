@@ -500,13 +500,14 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         ClientPayToken[] memory payload = new ClientPayToken[](_tokens.length);
         for (uint256 i = 0; i < _tokens.length; i++) {
             ClientDepositToken memory token = _tokens[i];
+            require(token.amount != 0, "Invalid Amount");
             PoolInfo storage pool = poolInfo[token.l1TokenAddress];
+            require(pool.l2TokenAddress != address(0), "Invaild Token");
             if (token.l1TokenAddress != address(0)) {
                 IERC20(token.l1TokenAddress).safeTransferFrom(msg.sender, address(this), token.amount);
             } else {
-                ETHAmount = token.amount;
+                ETHAmount = ETHAmount + token.amount;
             }
-            require(pool.l2TokenAddress != address(0), "Invaild Token");
             payload[i] = ClientPayToken(msg.sender, pool.l2TokenAddress, token.amount);
         }
         require(ETHAmount == msg.value, "Invalid ETH Amount");

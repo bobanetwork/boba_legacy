@@ -1807,6 +1807,7 @@ describe('Liquidity Pool Test', async () => {
     it('should deposit ERC20', async () => {
       const depositAmount = utils.parseEther('10')
 
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
       const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
       const userRewardFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
         L2ERC20_1.address
@@ -1833,8 +1834,12 @@ describe('Liquidity Pool Test', async () => {
 
       const remainingPercent = await getRemainingPercent(userRewardFeeRate)
 
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
       const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
 
+      expect(postL1ERC20Balance).to.deep.eq(
+        preL1ERC20Balance.sub(depositAmount)
+      )
       expect(postL2ERC20Balance).to.deep.eq(
         preL2ERC20Balance.add(depositAmount.mul(remainingPercent).div(1000))
       )
@@ -1919,6 +1924,7 @@ describe('Liquidity Pool Test', async () => {
     it('should depoist ETH and ERC20 together', async () => {
       const depositAmount = utils.parseEther('10')
 
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
       const preL2ETHBalance = await env.l2Wallet.getBalance()
       const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
       const userRewardETHFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
@@ -1955,9 +1961,13 @@ describe('Liquidity Pool Test', async () => {
         userRewardERC20FeeRate
       )
 
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
       const postL2ETHBalance = await env.l2Wallet.getBalance()
       const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
 
+      expect(postL1ERC20Balance).to.deep.eq(
+        preL1ERC20Balance.sub(depositAmount)
+      )
       expect(postL2ETHBalance).to.deep.eq(
         preL2ETHBalance.add(depositAmount.mul(remainingETHPercent).div(1000))
       )
@@ -2002,6 +2012,35 @@ describe('Liquidity Pool Test', async () => {
           { value: depositAmount, gasLimit: 9000000 }
         )
       ).to.be.revertedWith('Invalid ETH Amount')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid ETH Amount')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: 0, l1TokenAddress: L1ERC20_1.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid Amount')
     })
 
     it('should deposit ETH and three ERC20 together', async () => {
@@ -2023,6 +2062,15 @@ describe('Liquidity Pool Test', async () => {
         depositAmount
       )
 
+      const preL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_3Balance = await L1ERC20_3.balanceOf(
+        env.l1Wallet.address
+      )
       const preL2ETHBalance = await env.l2Wallet.getBalance()
       const preL2ERC20_1Balance = await L2ERC20_1.balanceOf(
         env.l2Wallet.address
@@ -2072,6 +2120,15 @@ describe('Liquidity Pool Test', async () => {
         userRewardERC20_3FeeRate
       )
 
+      const postL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_3Balance = await L1ERC20_3.balanceOf(
+        env.l1Wallet.address
+      )
       const postL2ETHBalance = await env.l2Wallet.getBalance()
       const postL2ERC20_1Balance = await L2ERC20_1.balanceOf(
         env.l2Wallet.address
@@ -2083,6 +2140,15 @@ describe('Liquidity Pool Test', async () => {
         env.l2Wallet.address
       )
 
+      expect(preL1ERC20_1Balance).to.deep.eq(
+        postL1ERC20_1Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_2Balance).to.deep.eq(
+        postL1ERC20_2Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_3Balance).to.deep.eq(
+        postL1ERC20_3Balance.add(depositAmount)
+      )
       expect(postL2ETHBalance).to.deep.eq(
         preL2ETHBalance.add(depositAmount.mul(remainingETHPercent).div(1000))
       )
@@ -2137,6 +2203,83 @@ describe('Liquidity Pool Test', async () => {
           { value: depositAmount, gasLimit: 9000000 }
         )
       ).to.be.revertedWith('Too Many Tokens')
+    })
+
+    it('should deposit ERC20 twice in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount.mul(BigNumber.from(2))
+      )
+      const userRewardERC20FeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        L2ERC20_1.address
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch([
+          { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+          { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+        ]),
+        Direction.L1ToL2
+      )
+
+      const remainingERC20Percent = await getRemainingPercent(
+        userRewardERC20FeeRate
+      )
+
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      expect(preL1ERC20Balance).to.deep.eq(
+        postL1ERC20Balance.add(depositAmount.mul(2))
+      )
+      expect(postL2ERC20Balance).to.deep.eq(
+        preL2ERC20Balance.add(
+          depositAmount.mul(2).mul(remainingERC20Percent).div(1000)
+        )
+      )
+    })
+
+    it('should deposit ETH twice in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL2ETHBalance = await env.l2Wallet.getBalance()
+      const userRewardETHFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        env.ovmEth.address
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount.mul(2) }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingETHPercent = await getRemainingPercent(
+        userRewardETHFeeRate
+      )
+      const postL2ETHBalance = await env.l2Wallet.getBalance()
+
+      expect(postL2ETHBalance).to.deep.eq(
+        preL2ETHBalance.add(
+          depositAmount.mul(2).mul(remainingETHPercent).div(1000)
+        )
+      )
     })
 
     it('should revert an unfulfillable swap-on', async () => {
@@ -2233,6 +2376,12 @@ describe('Liquidity Pool Test', async () => {
         depositAmount
       )
 
+      const preL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
       const preL2EthBalance = await env.l2Wallet.getBalance()
       const preL2ERC20_1Balance = await L2ERC20_1.balanceOf(
         env.l2Wallet.address
@@ -2251,6 +2400,7 @@ describe('Liquidity Pool Test', async () => {
       const remainingERC20_2Percent = await getRemainingPercent(
         userRewardERC20_2FeeRate
       )
+      const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
 
       const requestedETHLiquidity = (
         await env.l2Provider.getBalance(L2LiquidityPool.address)
@@ -2291,6 +2441,12 @@ describe('Liquidity Pool Test', async () => {
         userRewardERC20_1FeeRate
       )
 
+      const postL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
       const postL2EthBalance = await env.l2Wallet.getBalance()
       const postL2ERC20_1Balance = await L2ERC20_1.balanceOf(
         env.l2Wallet.address
@@ -2299,6 +2455,14 @@ describe('Liquidity Pool Test', async () => {
         env.l2Wallet.address
       )
 
+      expect(preL1ERC20_1Balance).to.deep.eq(
+        postL1ERC20_1Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_2Balance).to.deep.eq(
+        postL1ERC20_2Balance.add(
+          swapOnERC20Amount.mul(userRewardMinFeeRate).div(BigNumber.from(1000))
+        )
+      )
       expect(preL2EthBalance).to.deep.eq(postL2EthBalance)
       expect(postL2ERC20_1Balance).to.deep.eq(
         preL2ERC20_1Balance.add(
