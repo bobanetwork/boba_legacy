@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Enya L2Geth Application Deployment"
+Description: "Enya Fraud Detector Application Deployment"
 
 Parameters:
   EnvironmentName:
@@ -14,13 +14,13 @@ Parameters:
     Type: String
     Default: push2aws
 
-  VerifierL2Image:
+  FraudDetectorImage:
     Type: String
-    Default: l2geth
+    Default: fraud-detector
 
   DockerPrefix:
     Type: String
-    Default: omgx
+    Default: bobanetwork
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -65,14 +65,28 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/verifier-l2.env"
+                    - "arn:aws:s3:::${S3BucketV2}/fraud-detector.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  GoEthereumVerifierLBTargetGroup:
+  VerifierFraudDetectorListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierFraudDetector:ARN"
+      Port: 8555
+      Protocol: TLS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
+      Certificates:
+      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d688c8a0-290f-48ed-b6d0-bf5ef9c86438
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref VerifierFraudDetectorLBTargetGroup
+
+  VerifierFraudDetectorLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 8545
+      Port: 8555
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
@@ -83,53 +97,11 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  VerifierL2Listener:
+  VerifierFraudDetectorListener1:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
-      Port: 8545
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d688c8a0-290f-48ed-b6d0-bf5ef9c86438
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
-
-  GoEthereumVerifierLBTargetGroup1:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Port: 8546
-      Protocol: TCP
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: 30
-      HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
-
-  VerifierL2Listener1:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
-      Port: 8546
-      Protocol: TLS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
-      Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d688c8a0-290f-48ed-b6d0-bf5ef9c86438
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup1
-
-  VerifierL2Listener2:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierFraudDetector:ARN"
       Port: 443
       Protocol: TLS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html
@@ -137,57 +109,29 @@ Resources:
       - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/d688c8a0-290f-48ed-b6d0-bf5ef9c86438
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
+        TargetGroupArn: !Ref VerifierFraudDetectorLBTargetGroup
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Volumes:
-        - Name: l2-node
-          Host:
-            SourcePath: "/mnt/efs/verifier_l2"
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/${VerifierL2Image}:${ImageTag}"
-          Name: geth_l2
+        - Image: !Sub "${DockerPrefix}/${FraudDetectorImage}:${ImageTag}"
+          Name: verifier_fraud_detector
           PortMappings:
-            - ContainerPort: 8545
-              HostPort: 8545
-            - ContainerPort: 8546
-              HostPort: 8546
+            - ContainerPort: 8555
+              HostPort: 8555
           EnvironmentFiles:
             - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/verifier-l2.env"
+              - "arn:aws:s3:::${S3BucketV2}/verifier-fraud-detector.env"
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
-          Environment:
-            - Name: URL
-              Value: !Sub
-                - "http://${EndpointAddress}:8081/addresses.json"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:DNSName"
-            - Name: ROLLUP_CLIENT_HTTP
-              Value: !Sub
-                - "http://${EndpointAddress}:7878"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:DNSName"
-            - Name: ROLLUP_STATE_DUMP_PATH
-              Value: !Sub
-                - "http://${EndpointAddress}:8081/state-dump.latest.json"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:DNSName"
-          EntryPoint:
-            - "sh"
-            - "./geth.sh"
-          MountPoints:
-            - ContainerPath: "/root/.ethereum"
-              SourceVolume: l2-node
           DockerLabels:
-            com.datadoghq.ad.check_names: '["geth_l2"]'
+            com.datadoghq.ad.check_names: '["verifier_fraud_detector"]'
             com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "verifier_l2", "service": "verifier_l2"}]'
+            com.datadoghq.ad.logs: '[{"source": "verifier_fraud_detector", "service": "verifier_fraud_detector"}]'
           Essential: true
-          Memory: "8000"
+          Memory: "4000"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -195,7 +139,7 @@ Resources:
               max-size: "10m"
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
-      Family: !Sub "L2Verifier-${EnvironmentName}"
+      Family: !Sub "Verifier-Fraud-Detector-${EnvironmentName}"
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
 
   ECSService:
@@ -204,12 +148,9 @@ Resources:
       Cluster:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
       LoadBalancers:
-        - ContainerName: geth_l2
-          ContainerPort: 8545
-          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup
-        - ContainerName: geth_l2
-          ContainerPort: 8546
-          TargetGroupArn: !Ref GoEthereumVerifierLBTargetGroup1
+        - ContainerName: verifier_fraud_detector
+          ContainerPort: 8555
+          TargetGroupArn: !Ref VerifierFraudDetectorLBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -222,5 +163,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "verifier-l2"
+      ServiceName: "verifier-fraud-detector"
       TaskDefinition: !Ref TaskDefinition

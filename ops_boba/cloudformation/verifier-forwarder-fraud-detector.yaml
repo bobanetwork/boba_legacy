@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Enya Data Transport Layer Application Deployment"
+Description: "Enya forwarder Application Deployment"
 
 Parameters:
   EnvironmentName:
@@ -14,9 +14,9 @@ Parameters:
     Type: String
     Default: push2aws
 
-  DataTransportLayerImage:
+  GoEthereumImage:
     Type: String
-    Default: data-transport-layer
+    Default: l2geth
 
   DockerPrefix:
     Type: String
@@ -39,6 +39,25 @@ Resources:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
+        - PolicyName: AllowAccessToELB
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:Describe*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
+                  - "s3:*"
+                Resource: "*"
         - PolicyName: AllowAccessToS3
           PolicyDocument:
             Version: 2012-10-17
@@ -48,89 +67,50 @@ Resources:
                   - "s3:GetObject"
                   - "s3:GetBucketLocation"
                 Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/verifier-dtl.env"
+                    - "arn:aws:s3:::${S3BucketV2}/l2geth.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-  DataTransportLayerVerifierLBTargetGroup:
+  ForwarderLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 7878
+      Port: 80
       Protocol: TCP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
       HealthCheckProtocol: TCP
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  DataTransportLayerVerifierListener:
+  ForwarderListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:ARN"
-      Port: 7878
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierFraudDetector:ARN"
+      Port: 80
       Protocol: TCP
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref DataTransportLayerVerifierLBTargetGroup
-
-  DataTransportLayerVerifierLBTargetGroup1:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Port: 8081
-      Protocol: TCP
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-      HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
-
-  DataTransportLayerVerifierListener1:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:ARN"
-      Port: 8081
-      Protocol: TCP
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref DataTransportLayerVerifierLBTargetGroup1
+        TargetGroupArn: !Ref ForwarderLBTargetGroup
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Volumes:
-        - Name: db
-          Host:
-            SourcePath: "/mnt/efs/verifier_dtl/db"
-        - Name: addresses
-          Host:
-            SourcePath: "/mnt/efs/verifier_dtl/addresses"
       ContainerDefinitions:
-        - Image: !Sub "${DockerPrefix}/${DataTransportLayerImage}:${ImageTag}"
-          Name: data_transport_layer
+        - Image: 942431445534.dkr.ecr.us-east-1.amazonaws.com/omgx/nginx-eth-proxy:forwarder
+          Name: forwarder
           PortMappings:
-            - ContainerPort: 7878
-              HostPort: 7878
-            - ContainerPort: 8081
-              HostPort: 8081
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/verifier-dtl.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
-          MountPoints:
-            - ContainerPath: "/db"
-              SourceVolume: db
-            - ContainerPath: "/opt/optimism/packages/data-transport-layer/state-dumps/"
-              SourceVolume: addresses
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["verifier_dtl"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "verifier_dtl", "service": "verifier_dtl"}]'
+            - ContainerPort: 80
+              HostPort: 80
+          Command:
+            - "nginx-debug"
+            - "-g"
+            - "daemon off;"
           Essential: true
-          Memory: "512"
+          Memory: "128"
           LogConfiguration:
             LogDriver: json-file
             Options:
@@ -139,19 +119,16 @@ Resources:
       NetworkMode: awsvpc
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
       TaskRoleArn: !GetAtt TaskRole.Arn
-      Family: !Sub "Verifier-DTL-${EnvironmentName}"
+      Family: !Sub "Forwarder-${EnvironmentName}"
   ECSService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterVerifier"
       LoadBalancers:
-        - ContainerName: data_transport_layer
-          ContainerPort: 7878
-          TargetGroupArn: !Ref DataTransportLayerVerifierLBTargetGroup
-        - ContainerName: data_transport_layer
-          ContainerPort: 8081
-          TargetGroupArn: !Ref DataTransportLayerVerifierLBTargetGroup1
+        - ContainerName: forwarder
+          ContainerPort: 80
+          TargetGroupArn: !Ref ForwarderLBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -164,5 +141,5 @@ Resources:
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "verifier-dtl"
+      ServiceName: "forwarder-fraud-detector"
       TaskDefinition: !Ref TaskDefinition

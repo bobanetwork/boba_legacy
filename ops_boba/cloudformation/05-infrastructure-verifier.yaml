@@ -14,7 +14,7 @@ Parameters:
     # The types of instances is limited to avoid mistakes generating huge costs by putting the wrong instance type.
     Description: Type of instances to be added to the ECS cluster
     Type: String
-    Default: t3a.xlarge
+    Default: c6i.4xlarge
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -47,20 +47,38 @@ Resources:
   LoadBalancerVerifier:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
+
+  LoadBalancerVerifierDTL:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
       Scheme: internal
       Type: network
       Subnets:
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
       - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
 
-  LoadBalancerVerifierDTL:
+  LoadBalancerVerifierFraudDetector:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Scheme: internal
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   EcsCluster:
     Type: AWS::ECS::Cluster
@@ -193,10 +211,18 @@ Outputs:
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifier:SecurityGroup"
   LoadBalancerVerifierDTLDNSName:
-    Value: !GetAtt LoadBalancerVerifier.DNSName
+    Value: !GetAtt LoadBalancerVerifierDTL.DNSName
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:DNSName"
   LoadBalancerVerifierDTLArn:
-    Value: !Ref LoadBalancerVerifier
+    Value: !Ref LoadBalancerVerifierDTL
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierDTL:ARN"
+  LoadBalancerVerifierFraudDetectorDNSName:
+    Value: !GetAtt LoadBalancerVerifierFraudDetector.DNSName
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierFraudDetector:DNSName"
+  LoadBalancerVerifierFraudDetectorArn:
+    Value: !Ref LoadBalancerVerifierFraudDetector
+    Export:
+      Name: !Sub "${InfrastructureStackName}:LoadBalancerVerifierFraudDetector:ARN"
