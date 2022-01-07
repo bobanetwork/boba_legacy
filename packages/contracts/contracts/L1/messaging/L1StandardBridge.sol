@@ -134,7 +134,13 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
     sendCrossDomainMessage(l2TokenBridge, _l2Gas, message);
 
     // compute and update deposit hash
-    _updateDepositHash(address(0), Lib_PredeployAddresses.OVM_ETH, _from, _to, msg.value);
+    _updateDepositHash(
+      address(0),
+      Lib_PredeployAddresses.OVM_ETH,
+      _from,
+      _to,
+      msg.value
+    );
 
     emit ETHDepositInitiated(_from, _to, msg.value, _data);
   }
@@ -242,14 +248,16 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
     if (block.number > lastHashUpdateBlock) {
       priorDepositInfoHash = currentDepositInfoHash;
     }
-    currentDepositInfoHash = keccak256(abi.encode(
-      currentDepositInfoHash,
-      _l1Token,
-      _l2Token,
-      _from,
-      _to,
-      _amount
-    ));
+    currentDepositInfoHash = keccak256(
+      abi.encode(
+        currentDepositInfoHash,
+        _l1Token,
+        _l2Token,
+        _from,
+        _to,
+        _amount
+      )
+    );
 
     lastHashUpdateBlock = block.number;
   }
