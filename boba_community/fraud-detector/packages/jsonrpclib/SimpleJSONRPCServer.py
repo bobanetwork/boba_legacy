@@ -528,6 +528,9 @@ class SimpleJSONRPCRequestHandler(SimpleXMLRPCRequestHandler):
         self.send_header("Content-type", config.content_type)
         self.send_header("Content-length", str(len(response)))
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS, POST')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
         if response:
             self.wfile.write(response)
