@@ -144,9 +144,9 @@ describe('Standard Exit burn', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await ExitBurn.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await ExitBurn.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await ExitBurn.extraGasRelay()
