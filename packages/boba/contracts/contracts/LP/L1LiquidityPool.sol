@@ -327,6 +327,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         onlyOwner()
     {
         require(_l1TokenAddress != _l2TokenAddress, "l1 and l2 token addresses cannot be same");
+        require(_l2TokenAddress != address(0), "l2 token address cannot be zero address");
         // use with caution, can register only once
         PoolInfo storage pool = poolInfo[_l1TokenAddress];
         // l2 token address equal to zero, then pair is not registered.
