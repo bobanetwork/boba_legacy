@@ -158,7 +158,7 @@ services:
         GAS_PRICE_ORACLE_OVERHEAD: "2750"
         GAS_PRICE_ORACLE_SCALAR: "1500000"
         GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
-        GAS_PRICE_ORACLE_GAS_PRICE: "1"
+        GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
         GAS_PRICE_ORACLE_DECIMALS: "6"
         # skip compilation when run in docker-compose, since the contracts
         # were already compiled in the builder step
@@ -254,7 +254,7 @@ services:
       # a funded hardhat account
       << : *relayer_pk
       RETRIES: 100
-      POLLING_INTERVAL: 500
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
       FILTER_POLLING_INTERVAL: 30000
@@ -282,7 +282,7 @@ services:
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
       RETRIES: 100
-      POLLING_INTERVAL: 1500
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
