@@ -410,11 +410,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             user.rewardDebt = _amount.mul(pool.accUserRewardPerShare).div(1e12);
         }
 
-        // transfer funds if users deposit ERC20
-        if (_tokenAddress != address(0)) {
-            IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
-        }
-
         // update amounts
         user.amount = user.amount.add(_amount);
         pool.userDepositAmount = pool.userDepositAmount.add(_amount);
@@ -424,6 +419,11 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             _amount,
             _tokenAddress
         );
+
+        // transfer funds if users deposit ERC20
+        if (_tokenAddress != address(0)) {
+            IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
+        }
     }
 
     /**
@@ -453,6 +453,12 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        emit ClientDepositL1(
+            msg.sender,
+            _amount,
+            _tokenAddress
+        );
+
         // transfer funds if users deposit ERC20
         if (_tokenAddress != address(0)) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
@@ -472,12 +478,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             // extra gas for complex l2 logic
             SETTLEMENT_L2_GAS,
             data
-        );
-
-        emit ClientDepositL1(
-            msg.sender,
-            _amount,
-            _tokenAddress
         );
     }
 
@@ -515,19 +515,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         // update total user deposit amount
         pool.userDepositAmount = pool.userDepositAmount.sub(_amount);
 
-        if (_tokenAddress != address(0)) {
-            IERC20(_tokenAddress).safeTransfer(_to, _amount);
-        } else {
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send ETH");
-        }
-
         emit WithdrawLiquidity(
             msg.sender,
             _to,
             _amount,
             _tokenAddress
         );
+
+        if (_tokenAddress != address(0)) {
+            IERC20(_tokenAddress).safeTransfer(_to, _amount);
+        } else {
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
+            require(sent, "Failed to send ETH");
+        }
     }
 
     /**
@@ -551,19 +551,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         pool.accOwnerReward = pool.accOwnerReward.sub(_amount);
 
-        if (_tokenAddress != address(0)) {
-            IERC20(_tokenAddress).safeTransfer(_to, _amount);
-        } else {
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send Ether");
-        }
-
         emit OwnerRecoverFee(
             msg.sender,
             _to,
             _amount,
             _tokenAddress
         );
+
+        if (_tokenAddress != address(0)) {
+            IERC20(_tokenAddress).safeTransfer(_to, _amount);
+        } else {
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
+            require(sent, "Failed to send Ether");
+        }
     }
 
     /**
@@ -594,19 +594,19 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         user.pendingReward = pendingReward.sub(_amount);
         user.rewardDebt = user.amount.mul(pool.accUserRewardPerShare).div(1e12);
 
-        if (_tokenAddress != address(0)) {
-            IERC20(_tokenAddress).safeTransfer(_to, _amount);
-        } else {
-            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            require(sent, "Failed to send Ether");
-        }
-
         emit WithdrawReward(
             msg.sender,
             _to,
             _amount,
             _tokenAddress
         );
+
+        if (_tokenAddress != address(0)) {
+            IERC20(_tokenAddress).safeTransfer(_to, _amount);
+        } else {
+            (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
+            require(sent, "Failed to send Ether");
+        }
     }
 
     /*
@@ -629,6 +629,11 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         require(L2LiquidityPoolAddress != address(0), "L2 Liquidity Pool Not Registered");
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        emit RebalanceLP(
+            _amount,
+            _tokenAddress
+        );
+
         if (_tokenAddress == address(0)) {
             require(_amount <= address(this).balance, "Failed to Rebalance LP");
             L1StandardBridge(L1StandardBridgeAddress).depositETHTo{value: _amount}(
@@ -648,10 +653,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
                 ""
             );
         }
-        emit RebalanceLP(
-            _amount,
-            _tokenAddress
-        );
     }
 
     /**
@@ -776,6 +777,15 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         pool.accUserReward = pool.accUserReward.add(userRewardFee);
         pool.accOwnerReward = pool.accOwnerReward.add(ownerRewardFee);
 
+        emit ClientPayL1Settlement(
+        _to,
+        receivedAmount,
+        userRewardFee,
+        ownerRewardFee,
+        totalFee,
+        _tokenAddress
+        );
+
         if (_tokenAddress != address(0)) {
             IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
         } else {
@@ -785,15 +795,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
             require(sent, "Failed to send Ether");
         }
-
-        emit ClientPayL1Settlement(
-        _to,
-        receivedAmount,
-        userRewardFee,
-        ownerRewardFee,
-        totalFee,
-        _tokenAddress
-        );
     }
 
     /**
