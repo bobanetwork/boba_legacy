@@ -50,6 +50,10 @@ const env = cleanEnv(process.env, {
     default:
       '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
   }),
+  PRIVATE_KEY_4: str({
+    default:
+      '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+  }),
   ADDRESS_MANAGER: str({
     default: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   }),
@@ -74,12 +78,14 @@ replicaProvider.pollingInterval = env.REPLICA_POLLING_INTERVAL
 export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
 export const l1Wallet_2 = new Wallet(env.PRIVATE_KEY_2, l1Provider)
 export const l1Wallet_3 = new Wallet(env.PRIVATE_KEY_3, l1Provider)
+export const l1Wallet_4 = new Wallet(env.PRIVATE_KEY_4, l1Provider)
 
 // A random private key which should always be funded with deposits from L1 -> L2
 // if it's using non-0 gas price
 export const l2Wallet = l1Wallet.connect(l2Provider)
 export const l2Wallet_2 = l1Wallet_2.connect(l2Provider)
 export const l2Wallet_3 = l1Wallet_3.connect(l2Provider)
+export const l2Wallet_4 = l1Wallet_4.connect(l2Provider)
 
 // Predeploys
 export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =

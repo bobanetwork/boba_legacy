@@ -725,9 +725,9 @@ describe('NFT Bridge Test', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await L2Bridge.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await L2Bridge.extraGasRelay()
@@ -737,7 +737,9 @@ describe('NFT Bridge Test', async () => {
     it('should be able to exit with the correct added gas', async () => {
       const extraGas = 1000000
 
-      const resetGasTx = await L2Bridge.configureExtraGasRelay(0)
+      const resetGasTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(0)
       await resetGasTx.wait()
 
       const preGas = await L2Bridge.estimateGas.withdraw(
@@ -747,7 +749,9 @@ describe('NFT Bridge Test', async () => {
         utils.formatBytes32String(new Date().getTime().toString())
       )
 
-      const addGasTx = await L2Bridge.configureExtraGasRelay(extraGas)
+      const addGasTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(extraGas)
       await addGasTx.wait()
 
       const afterGas = await L2Bridge.estimateGas.withdraw(
