@@ -1,6 +1,7 @@
 package rollup
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -745,9 +746,11 @@ func (s *SyncService) applyIndexedTransaction(tx *types.Transaction) error {
 	log.Trace("Applying indexed transaction", "index", *index)
 	next := s.GetNextIndex()
 	if *index == next {
+		log.Trace("Applying indexed transaction to tip", "index", *index)
 		return s.applyTransactionToTip(tx)
 	}
 	if *index < next {
+		log.Trace("Applying historical transaction", "index", *index)
 		return s.applyHistoricalTransaction(tx)
 	}
 	return fmt.Errorf("Received tx at index %d when looking for %d", *index, next)
@@ -809,12 +812,12 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	// Note that Ethereum Layer one consensus rules dictate that the timestamp
 	// must be strictly increasing between blocks, so no need to check both the
 	// timestamp and the blocknumber.
-	ts := s.GetLatestL1Timestamp()
+	ts := s.GetLatestL1Timestamp() //these are in memory
 	bn := s.GetLatestL1BlockNumber()
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
-		tx.SetTuring([]byte{20, 21}) // populate the Turing metadata for debug purposes
+		tx.SetL1Turing([]byte{0}) // populate the Turing metadata for debug purposes - in this case, set to 0, since it's a new transaction
 		log.Debug("TURING sync_service.go Generating metadata for RPC call", "timestamp", ts, "L1BlockNumber", bn)
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() {
 		// If the timestamp of the transaction is greater than the sync
@@ -826,6 +829,40 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		log.Debug("Updating OVM context based on new transaction", "timestamp", ts, "blocknumber", tx.L1BlockNumber().Uint64(), "queue-origin", tx.QueueOrigin())
 	} else if tx.L1Timestamp() < s.GetLatestL1Timestamp() {
 		log.Error("Timestamp monotonicity violation", "hash", tx.Hash().Hex())
+	} else {
+		// so, we are in Verifier/Replica mode....
+		log.Debug("TURING: This transaction is NOT from the sequencer", "tx", tx)
+
+		//do we have a Turing payload?
+		log.Debug("Turing: Payload and RawTransaction", "tx", tx)
+
+		txRawTransaction := tx.RawTransaction()
+
+		//NOTE - the txPayload is generated from the L1-stored RawTransaction
+		//txPayload := tx.Data()
+
+		//methodID for GetResponse is 7d93616c -> [125 147 97 108]
+		isTuring2 := bytes.Index(txRawTransaction, []byte{42, 42, 42, 125, 147, 97, 108})
+		if isTuring2 != -1 {
+			//tx.SetPayload(txPayload[:isTuring2]) 				// restore original eth_sendRawTransaction input
+			//tx.SetRawTransaction(txRawTransaction[:isTuring2]) 	// restore original eth_sendRawTransaction input
+			log.Debug("TURING: Verifier Received Turing GetResponse Payload from L1", 
+				"modified_calldata", txRawTransaction[isTuring2+3:],
+				"restored raw calldata", tx.RawTransaction(),
+				"restored tx.data.Payload", tx.Data())
+		} 
+
+		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
+		isGetRand2 := bytes.Index(txRawTransaction, []byte{42, 42, 42, 73, 61, 87, 214})
+		//perhaps also have to change the Size? 
+		if isGetRand2 != -1 {
+			//tx.SetPayload(txPayload[:isGetRand2]) 			    // restore original eth_sendRawTransaction input
+			//tx.SetRawTransaction(txRawTransaction[:isGetRand2]) // restore original eth_sendRawTransaction input
+			log.Debug("TURING: Verifier Received Turing GetRandom Payload from L1", 
+				"modified_calldata", txRawTransaction[isGetRand2+3:],
+				"restored RawTransaction", tx.RawTransaction(),
+				"restored tx.data.Payload", tx.Data())
+		} 
 	}
 
 	index := s.GetLatestIndex()
@@ -850,13 +887,15 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 
 	txs := types.Transactions{tx}
 	errCh := make(chan error, 1)
+
+	// here is where all the magic happens....
 	s.txFeed.Send(core.NewTxsEvent{
 		Txs:   txs,
 		ErrCh: errCh,
 	})
 
 	// Block until the transaction has been added to the chain
-	log.Debug("TURING sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
+	log.Debug("TURING: sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
 	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
 
 	select {
@@ -895,7 +934,7 @@ func (s *SyncService) applyBatchedTransaction(tx *types.Transaction) error {
 	if index == nil {
 		return errors.New("No index found on transaction")
 	}
-	log.Trace("Applying batched transaction", "index", *index)
+	log.Debug("TURING: sync_service.go Applying batched transaction obtained from L1", "index", *index, "tx", tx)
 	err := s.applyIndexedTransaction(tx)
 	if err != nil {
 		return fmt.Errorf("Cannot apply batched transaction: %w", err)
@@ -1124,7 +1163,7 @@ func (s *SyncService) syncBatches() (*uint64, error) {
 // syncTransactionBatchRange will sync a range of batched transactions from
 // start to end (inclusive)
 func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
-	log.Info("Syncing transaction batch range", "start", start, "end", end)
+	log.Info("TURING: sync_service.go syncTransactionBatchRange() Syncing transaction batch range", "start", start, "end", end)
 	for i := start; i <= end; i++ {
 		log.Debug("Fetching transaction batch", "index", i)
 		_, txs, err := s.client.GetTransactionBatch(i)
@@ -1132,6 +1171,7 @@ func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
 			return fmt.Errorf("Cannot get transaction batch: %w", err)
 		}
 		for _, tx := range txs {
+			log.Info("TURING: sync_service.go syncTransactionBatchRange() calling applyBatchedTransaction", "tx", tx)
 			if err := s.applyBatchedTransaction(tx); err != nil {
 				return fmt.Errorf("cannot apply batched transaction: %w", err)
 			}

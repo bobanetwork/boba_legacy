@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rollup/rcfg"
 )
@@ -36,11 +37,25 @@ var (
 	ErrInvalidSig = errors.New("invalid transaction v, r, s values")
 )
 
+/*
+
+In the Transaction struct, we have 
+
+	data txdata
+	meta TransactionMeta
+
+	in the txdata, namely, t.data.Payload, we have the entire transaction from eth_sendRawTransaction
+
+	     in the TransactionMeta, we have t.meta.Turing, which contains the modified callData
+	also in the TransactionMeta, we have tx.meta.RawTransaction, which contains the entire transaction from eth_sendRawTransaction
+
+*/
+
 type Transaction struct {
 	data txdata
 	meta TransactionMeta
 	// caches
-	hash atomic.Value
+	hash atomic.Value //these are all generated/updated elsewhere
 	size atomic.Value
 	from atomic.Value
 }
@@ -86,7 +101,7 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	meta := NewTransactionMeta(nil, 0, nil, QueueOriginSequencer, nil, nil, nil, []byte{8, 9}) //Turing
+	meta := NewTransactionMeta(nil, 0, []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} /* = L1Turing; this is new TX arriving at the sequencer*/, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -150,15 +165,21 @@ func (t *Transaction) SetL1BlockNumber(bn uint64) {
 	t.meta.L1BlockNumber = new(big.Int).SetUint64(bn)
 }
 
-func (t *Transaction) SetTuring(turing []byte)  {
+func (t *Transaction) SetL1Turing(turing []byte)  {
 	if &t.meta == nil {
 		return
 	}
-	t.meta.Turing = common.CopyBytes(turing)
+	t.meta.L1Turing = common.CopyBytes(turing)
 }
+
+// //this is in the data, so dangerous hash wise
+// func (tx *Transaction) SetPayload(payload []byte) {
+// 	tx.data.Payload = common.CopyBytes(payload)
+// }
 
 // ChainId returns which chain id this transaction was signed for (if at all)
 func (tx *Transaction) ChainId() *big.Int {
+	log.Debug("TURING: Calling ChainID", "tx.data.V", tx.data.V)
 	return deriveChainId(tx.data.V)
 }
 
@@ -260,11 +281,31 @@ func (tx *Transaction) L1BlockNumber() *big.Int {
 }
 
 // Turing returns the modified calldata of the transaction if they exist.
-func (tx *Transaction) Turing() []byte {
-	if tx.meta.Turing == nil {
+// It returns nil if this transaction was not generated from a transaction received on L1.
+func (tx *Transaction) L1Turing() []byte {
+	if tx.meta.L1Turing == nil {
 		return nil
 	}
-	return common.CopyBytes(tx.meta.Turing)
+	return common.CopyBytes(tx.meta.L1Turing)
+}
+
+func (tx *Transaction) RawTransaction() []byte {
+	if tx.meta.RawTransaction == nil {
+		return nil
+	}
+	return common.CopyBytes(tx.meta.RawTransaction)
+}
+
+
+func (tx *Transaction) SetRawTransaction(raw []byte)  {
+	if &tx.meta == nil {
+		return
+	}
+	tx.meta.RawTransaction = common.CopyBytes(raw)
+}
+
+func (tx *Transaction) SetPayload(payload []byte)  {
+	tx.data.Payload = common.CopyBytes(payload)
 }
 
 // QueueOrigin returns the Queue Origin of the transaction
@@ -274,22 +315,40 @@ func (tx *Transaction) QueueOrigin() QueueOrigin {
 
 // Hash hashes the RLP encoding of tx.
 // It uniquely identifies the transaction.
+// Note that this hashes the entire TX, including the metadata fields
+// Presumably this only kicks in once for most transactions? 
 func (tx *Transaction) Hash() common.Hash {
+
+	log.Info("TURING: core/types/transaction.go Hashing the transaction")
+
+	// if there is already one, return that
 	if hash := tx.hash.Load(); hash != nil {
+		log.Info("TURING: core/types/transaction.go TXHASH: Returning the old Hash", "txHash", hash)
 		return hash.(common.Hash)
 	}
 
+	// else, hash the transaction
 	v := rlpHash(tx)
 	tx.hash.Store(v)
+	log.Info("TURING: core/types/transaction.go TXHASH: Returning a new txHash", "txHash", v)
 	return v
 }
 
+/*
+func rlpHash(x interface{}) (h common.Hash) {
+	hw := sha3.NewLegacyKeccak256()
+	rlp.Encode(hw, x)
+	hw.Sum(h[:0])
+	return h
+}
+*/
+
 // Size returns the true RLP encoded storage size of the transaction, either by
-// encoding and returning it, or returning a previsouly cached value.
+// encoding and returning it, or returning a previously cached value.
 func (tx *Transaction) Size() common.StorageSize {
-	if size := tx.size.Load(); size != nil {
-		return size.(common.StorageSize)
-	}
+	// if size := tx.size.Load(); size != nil {
+	// 	return size.(common.StorageSize)
+	// }
 	c := writeCounter(0)
 	rlp.Encode(&c, &tx.data)
 	tx.size.Store(common.StorageSize(c))
@@ -313,8 +372,8 @@ func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 
 		l1Timestamp:   tx.meta.L1Timestamp,
 		l1BlockNumber: tx.meta.L1BlockNumber,
+		l1Turing:      tx.meta.L1Turing,
 		queueOrigin:   tx.meta.QueueOrigin,
-		turing:        tx.meta.Turing,
 	}
 
 	var err error
@@ -484,8 +543,6 @@ func (t *TransactionsByPriceAndNonce) Pop() {
 }
 
 // Message is a fully derived transaction and implements core.Message
-//
-// NOTE: In a future PR this will be removed.
 type Message struct {
 	to         *common.Address
 	from       common.Address
@@ -498,11 +555,23 @@ type Message struct {
 
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
+	l1Turing      []byte
 	queueOrigin   QueueOrigin
-	turing 		  []byte
 }
 
-func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte, checkNonce bool, l1BlockNumber *big.Int, l1Timestamp uint64, queueOrigin QueueOrigin, turing []byte) Message {
+func NewMessage(from common.Address, 
+	to *common.Address, 
+	nonce uint64, 
+	amount *big.Int, 
+	gasLimit uint64, 
+	gasPrice *big.Int, 
+	data []byte, 
+	checkNonce bool, 
+	l1BlockNumber *big.Int, 
+	l1Timestamp uint64,
+	l1Turing []byte,
+	queueOrigin QueueOrigin, 
+) Message {
 	return Message{
 		from:       from,
 		to:         to,
@@ -515,8 +584,8 @@ func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *b
 
 		l1Timestamp:   l1Timestamp,
 		l1BlockNumber: l1BlockNumber,
+		l1Turing:      l1Turing,
 		queueOrigin:   queueOrigin,
-		turing:        turing,
 	}
 }
 
@@ -531,5 +600,6 @@ func (m Message) CheckNonce() bool     { return m.checkNonce }
 
 func (m Message) L1Timestamp() uint64      { return m.l1Timestamp }
 func (m Message) L1BlockNumber() *big.Int  { return m.l1BlockNumber }
+func (m Message) L1Turing() []byte         { return m.l1Turing }
 func (m Message) QueueOrigin() QueueOrigin { return m.queueOrigin }
-func (m Message) Turing() []byte           { return m.turing }
+

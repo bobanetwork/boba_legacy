@@ -534,7 +534,7 @@ func (w *worker) mainLoop() {
 				txset := types.NewTransactionsByPriceAndNonce(w.current.signer, txs)
 				tcount := w.current.tcount
 				w.commitTransactions(txset, coinbase, nil)
-				// Only update the snapshot if any new transactons were added
+				// Only update the snapshot if any new transactions were added
 				// to the pending block
 				if tcount != w.current.tcount {
 					w.updateSnapshot()
@@ -764,17 +764,33 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	}
 	snap := w.current.state.Snapshot()
 
-    log.Debug("TURING miner/worker.go STEP 3 calling core.ApplyTransaction")
+    log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction")
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
-    log.Debug("TURING miner/worker.go STEP 3 ApplyTransaction result", 
+    log.Debug("TURING miner/worker.go commitTransaction STEP 3 ApplyTransaction result", 
     	"receipt", receipt, 
     	"err", err)
 
-    // TURING Update the tx metadata, somewhat later than usual...
-    tx.SetTuring(receipt.Turing)
-    
+    //Let's tack on the Turing data to the original calldata aka Payload, if there _are_ Turing data
+    if(len(receipt.Turing) > 1) {
+    	
+    	// TURING Update the tx metadata...
+        // tx.SetL1Turing(receipt.Turing) // don't think we really care about this....
+		// new_payload := make([]byte, len(tx.Data()))
+		// copy(new_payload, tx.Data())
+		// new_payload = append(new_payload, []byte{42,42,42}...)
+		// new_payload = append(new_payload, receipt.Turing...)
+		// tx.SetPayload(new_payload)
+
+        // this is a meta field, so probably better
+    	new_raw := make([]byte, len(tx.RawTransaction()))
+    	copy(new_raw, tx.RawTransaction())
+    	new_raw = append(new_raw, []byte{42,42,42}...)
+    	new_raw = append(new_raw, receipt.Turing...)
+    	tx.SetRawTransaction(new_raw)
+    }
+
     log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", 
     	"tx", tx)
 
@@ -840,7 +856,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		}
 
 		// Error may be ignored here. The error has already been checked
-		// during transaction acceptance is the transaction pool.
+		// during transaction acceptance in the transaction pool.
 		//
 		// We use the eip155 signer regardless of the current hf.
 		from, _ := types.Sender(w.current.signer, tx)
@@ -972,12 +988,13 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
 
-	// there is A LOT going on here
+	// There is A LOT going on here
 	if w.commitTransactions(txs, w.coinbase, nil) {
 		return errors.New("Cannot commit transaction in miner")
 	}
 
 	// and now, a lot later, after much has been done, finally, call commit
+	// all the needed information is in w *worker
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
 
@@ -1109,6 +1126,8 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 	if err != nil {
 		return err
 	}
+
+	log.Debug("TURING worker.go final block", "block", block)
 
 	// As a sanity check, ensure all new blocks have exactly one
 	// transaction. This check is done here just in case any of our
