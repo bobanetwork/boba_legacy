@@ -239,7 +239,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         owner = msg.sender;
         // translates to fee rates 0.5%, 5% and 0% respectively
         _configureFee(5, 50, 0);
-        configureGas(1400000, 2300);
+        configureGas(700000, 2300);
 
         __Context_init_unchained();
         __Pausable_init_unchained();
