@@ -380,7 +380,9 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         nonReentrant
         whenNotPaused
     {
-        require(msg.value != 0 || _tokenAddress != address(0), "Amount Incorrect");
+        require(msg.value != 0 || _tokenAddress != address(0), "Either Amount Incorrect or Token Address Incorrect");
+        // combine to make logical XOR to avoid user error
+        require(!(msg.value != 0 && _tokenAddress != address(0)), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
@@ -436,7 +438,9 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         payable
         whenNotPaused
     {
-        require(msg.value != 0 || _tokenAddress != address(0), "Amount Incorrect");
+        require(msg.value != 0 || _tokenAddress != address(0), "Either Amount Incorrect or Token Address Incorrect");
+        // combine to make logical XOR to avoid user error
+        require(!(msg.value != 0 && _tokenAddress != address(0)), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
