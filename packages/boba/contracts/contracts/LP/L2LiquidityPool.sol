@@ -255,6 +255,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
         DAO = msg.sender;
+        // translates to fee rates 0.1%, 1% and 1.5% respectively
         configureFee(1, 10, 15);
         configureGas(100000);
 
@@ -265,7 +266,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Configure fee of this contract.
-     *
+     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
@@ -297,7 +298,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Configure fee of the L1LP contract
-     *
+     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
