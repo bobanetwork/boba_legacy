@@ -1613,9 +1613,9 @@ describe('Liquidity Pool Test', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await L2LiquidityPool.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await L2LiquidityPool.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await L2LiquidityPool.extraGasRelay()
@@ -1625,9 +1625,7 @@ describe('Liquidity Pool Test', async () => {
     it('should be able to fast exit with correct added gas', async () => {
       const fastExitAmount = utils.parseEther('10')
 
-      const preBobL1ERC20Balance = await L1ERC20.balanceOf(
-        env.l1Wallet.address
-      )
+      const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
       const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(ethers.constants.AddressZero)
 
       const approveBobL2TX = await L2ERC20.approve(
@@ -1660,9 +1658,9 @@ describe('Liquidity Pool Test', async () => {
       expect(depositTx.receipt.gasUsed).to.be.gt(extraGasRelay)
 
       // update it back to zero for tests
-      const configureTx = await L2LiquidityPool.configureExtraGasRelay(
-        0
-      )
+      const configureTx = await L2LiquidityPool.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(0)
       await configureTx.wait()
       const finalExtraGasRelay = await L2LiquidityPool.extraGasRelay()
       expect(finalExtraGasRelay).to.eq(0)

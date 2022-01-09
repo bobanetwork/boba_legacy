@@ -251,10 +251,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyNotInitialized()
         initializer()
     {
+        require(_l2CrossDomainMessenger != address(0) && _L1LiquidityPoolAddress != address(0), "zero address not allowed");
         messenger = _l2CrossDomainMessenger;
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
         DAO = msg.sender;
+        // translates to fee rates 0.1%, 1% and 1.5% respectively
         configureFee(1, 10, 15);
         configureGas(100000);
 
@@ -265,7 +267,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Configure fee of this contract.
-     *
+     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
@@ -297,7 +299,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     /**
      * @dev Configure fee of the L1LP contract
-     *
+     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
@@ -412,6 +414,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyOwner()
     {
         require(_l1TokenAddress != _l2TokenAddress, "l1 and l2 token addresses cannot be same");
+        require(_l2TokenAddress != address(0), "l2 token address cannot be zero address");
         // use with caution, can register only once
         PoolInfo storage pool = poolInfo[_l2TokenAddress];
         // l2 token address equal to zero, then pair is not registered.

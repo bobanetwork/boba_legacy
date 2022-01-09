@@ -237,8 +237,9 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         L2LiquidityPoolAddress = _L2LiquidityPoolAddress;
         L1StandardBridgeAddress = _L1StandardBridgeAddress;
         owner = msg.sender;
+        // translates to fee rates 0.5%, 5% and 0% respectively
         _configureFee(5, 50, 0);
-        configureGas(1400000, 2300);
+        configureGas(700000, 2300);
 
         __Context_init_unchained();
         __Pausable_init_unchained();
@@ -326,6 +327,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         onlyOwner()
     {
         require(_l1TokenAddress != _l2TokenAddress, "l1 and l2 token addresses cannot be same");
+        require(_l2TokenAddress != address(0), "l2 token address cannot be zero address");
         // use with caution, can register only once
         PoolInfo storage pool = poolInfo[_l1TokenAddress];
         // l2 token address equal to zero, then pair is not registered.
@@ -795,7 +797,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
     /**
      * @dev Configure fee of this contract. called from L2
-     *
+     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
      * @param _ownerRewardFeeRate fee rate that contract owner gets
