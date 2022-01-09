@@ -209,6 +209,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         public
         onlyOwner()
     {
+        require(_newOwner != address(0), 'New owner cannot be the zero address');
         owner = _newOwner;
     }
 
