@@ -299,7 +299,7 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 	switch {
 	case msg.isNotification():
 		h.handleCall(ctx, msg)
-		h.log.Debug("Served "+msg.Method, "t", time.Since(start))
+		h.log.Debug("Served-1 "+msg.Method, "t", time.Since(start))
 		return nil
 	case msg.isCall():
 		var resp *jsonrpcMessage
@@ -315,7 +315,7 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 		if resp.Error != nil {
 			h.log.Warn("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start), "err", resp.Error.Message)
 		} else {
-			h.log.Debug("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start))
+			h.log.Debug("Served-2 "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start))
 		}
 
 		return resp
@@ -343,6 +343,10 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
 
 	if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
+		log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
+	}
+
+	if msg.Method == "eth_getBlockByNumber" || msg.Method == "eth_sendRawTransaction" {
 		log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
 	}
 

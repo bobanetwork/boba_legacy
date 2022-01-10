@@ -8,14 +8,16 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // MarshalJSON marshals as JSON.
 func (t TransactionMeta) MarshalJSON() ([]byte, error) {
+	log.Debug("TURING: (t TransactionMeta) MarshalJSON()", "t", t) 
 	type TransactionMeta struct {
 		L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 		L1Timestamp     uint64          `json:"l1Timestamp"`
-		L1Turing        []byte          `json:"l1Turing"`
+		L1Turing        []byte          `json:"l1Turing"        gencodec:"required"`
 		L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
 		QueueOrigin     QueueOrigin     `json:"queueOrigin"     gencodec:"required"`
 		Index           *uint64         `json:"index"           gencodec:"required"`
@@ -39,13 +41,14 @@ func (t *TransactionMeta) UnmarshalJSON(input []byte) error {
 	type TransactionMeta struct {
 		L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 		L1Timestamp     *uint64         `json:"l1Timestamp"`
-		L1Turing        []byte          `json:"l1Turing"`
+		L1Turing        []byte          `json:"l1Turing"        gencodec:"required"`
 		L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
 		QueueOrigin     *QueueOrigin    `json:"queueOrigin"     gencodec:"required"`
 		Index           *uint64         `json:"index"           gencodec:"required"`
 		QueueIndex      *uint64         `json:"queueIndex"      gencodec:"required"`
 		RawTransaction  []byte          `json:"rawTransaction"  gencodec:"required"`
 	}
+	log.Debug("TURING: (t TransactionMeta) UnmarshalJSON()", "input", input) 
 	var dec TransactionMeta
 	if err := json.Unmarshal(input, &dec); err != nil {
 		return err
@@ -56,9 +59,10 @@ func (t *TransactionMeta) UnmarshalJSON(input []byte) error {
 	if dec.L1Timestamp != nil {
 		t.L1Timestamp = *dec.L1Timestamp
 	}
-	if dec.L1Turing != nil {
-		t.L1Turing = dec.L1Turing
+	if dec.L1Turing == nil {
+		return errors.New("missing required field 'l1Turing' for TransactionMeta")
 	}
+	t.L1Turing = dec.L1Turing
 	if dec.L1MessageSender == nil {
 		return errors.New("missing required field 'l1MessageSender' for TransactionMeta")
 	}

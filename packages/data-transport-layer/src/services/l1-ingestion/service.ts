@@ -397,6 +397,9 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
             extraData,
             this.options.l2ChainId
           )
+
+          this.logger.info('DTL parsed event', { parsedEvent })
+
           await handlers.storeEvent(parsedEvent, this.state.db)
         }
 

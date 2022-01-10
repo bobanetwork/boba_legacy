@@ -250,7 +250,7 @@ func recoverPlain(sighash common.Hash, R, S, Vb *big.Int, homestead bool) (commo
 
 // deriveChainId derives the chain id from the given v parameter
 func deriveChainId(v *big.Int) *big.Int {
-	log.Debug("TURING: Deriving ChainID", "v", v)
+	log.Debug("TURING: Deriving ChainID in signer", "v", v)
 	if v.BitLen() <= 64 {
 		v := v.Uint64()
 		if v == 27 || v == 28 {

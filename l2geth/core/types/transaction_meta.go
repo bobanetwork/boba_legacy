@@ -37,7 +37,7 @@ func (q QueueOrigin) String() string {
 type TransactionMeta struct {
 	L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 	L1Timestamp     uint64          `json:"l1Timestamp"`
-	L1Turing       []byte           `json:"l1Turing"`
+	L1Turing       []byte           `json:"l1Turing"        gencodec:"required"`
 	L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
 	QueueOrigin     QueueOrigin     `json:"queueOrigin"     gencodec:"required"`
 
@@ -51,7 +51,8 @@ type TransactionMeta struct {
 }
 
 // NewTransactionMeta creates a TransactionMeta
-func NewTransactionMeta(l1BlockNumber *big.Int, 
+func NewTransactionMeta(
+	l1BlockNumber *big.Int, 
 	l1Timestamp uint64,
 	l1Turing []byte,
 	l1MessageSender *common.Address, 
@@ -62,7 +63,7 @@ func NewTransactionMeta(l1BlockNumber *big.Int,
 	return &TransactionMeta{
 		L1BlockNumber:   l1BlockNumber,
 		L1Timestamp:     l1Timestamp,
-		L1Turing:	     l1Turing,
+		L1Turing:        l1Turing,
 		L1MessageSender: l1MessageSender,
 		QueueOrigin:     queueOrigin,
 		Index:           index,
@@ -78,6 +79,9 @@ func NewTransactionMeta(l1BlockNumber *big.Int,
 //   varbytes(QueueOrigin) ||
 //   varbytes(L1Timestamp)
 func TxMetaDecode(input []byte) (*TransactionMeta, error) {
+
+	log.Debug("TxMetaDecode(input []byte) (*TransactionMeta, error)", "input", input) 
+
 	var err error
 	meta := TransactionMeta{}
 	b := bytes.NewReader(input)
@@ -158,6 +162,9 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 
 // TxMetaEncode serializes the TransactionMeta as bytes.
 func TxMetaEncode(meta *TransactionMeta) []byte {
+
+	log.Debug("TxMetaEncode(meta *TransactionMeta)", "meta", meta) 
+
 	b := new(bytes.Buffer)
 
 	L1BlockNumber := meta.L1BlockNumber

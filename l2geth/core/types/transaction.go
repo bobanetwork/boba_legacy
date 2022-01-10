@@ -101,7 +101,7 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	meta := NewTransactionMeta(nil, 0, []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} /* = L1Turing; this is new TX arriving at the sequencer*/, nil, QueueOriginSequencer, nil, nil, nil)
+	meta := NewTransactionMeta(nil, 0, []byte{7}/*Turing = [0]*/, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -179,7 +179,10 @@ func (t *Transaction) SetL1Turing(turing []byte)  {
 
 // ChainId returns which chain id this transaction was signed for (if at all)
 func (tx *Transaction) ChainId() *big.Int {
-	log.Debug("TURING: Calling ChainID", "tx.data.V", tx.data.V)
+	log.Debug("TURING: transaction.go Calling ChainID", 
+		"tx", tx,
+		"tx.data", tx.data,  
+		"tx.data.V", tx.data.V)
 	return deriveChainId(tx.data.V)
 }
 
@@ -346,9 +349,9 @@ func rlpHash(x interface{}) (h common.Hash) {
 // Size returns the true RLP encoded storage size of the transaction, either by
 // encoding and returning it, or returning a previously cached value.
 func (tx *Transaction) Size() common.StorageSize {
-	// if size := tx.size.Load(); size != nil {
-	// 	return size.(common.StorageSize)
-	// }
+	if size := tx.size.Load(); size != nil {
+		return size.(common.StorageSize)
+	}
 	c := writeCounter(0)
 	rlp.Encode(&c, &tx.data)
 	tx.size.Store(common.StorageSize(c))
@@ -356,10 +359,8 @@ func (tx *Transaction) Size() common.StorageSize {
 }
 
 // AsMessage returns the transaction as a core.Message.
-//
 // AsMessage requires a signer to derive the sender.
-//
-// XXX Rename message to something less arbitrary?
+// Rename message to something less arbitrary?
 func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 	msg := Message{
 		nonce:      tx.data.AccountNonce,

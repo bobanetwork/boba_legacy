@@ -491,7 +491,10 @@ func (w *worker) mainLoop() {
 				}
 				txn := txs[0]
 				height := head.Block.Number().Uint64()
-				log.Debug("Miner got new head", "height", height, "block-hash", head.Block.Hash().Hex(), "tx-hash", txn.Hash().Hex(), "tx-hash", tx.Hash().Hex())
+				log.Debug("Miner got new head",
+					"height", height, "block-hash",
+					head.Block.Hash().Hex(), 
+					"tx-hash", txn.Hash().Hex())
 
 				// Prevent memory leak by cleaning up pending tasks
 				// This is mostly copied from the `newWorkLoop`
@@ -764,7 +767,7 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	}
 	snap := w.current.state.Snapshot()
 
-    log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction")
+    log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction", "tx_input", tx)
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
@@ -776,7 +779,8 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
     if(len(receipt.Turing) > 1) {
     	
     	// TURING Update the tx metadata...
-        // tx.SetL1Turing(receipt.Turing) // don't think we really care about this....
+        tx.SetL1Turing(receipt.Turing) // don't think we really care about this....
+		
 		// new_payload := make([]byte, len(tx.Data()))
 		// copy(new_payload, tx.Data())
 		// new_payload = append(new_payload, []byte{42,42,42}...)
@@ -784,15 +788,15 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		// tx.SetPayload(new_payload)
 
         // this is a meta field, so probably better
-    	new_raw := make([]byte, len(tx.RawTransaction()))
-    	copy(new_raw, tx.RawTransaction())
-    	new_raw = append(new_raw, []byte{42,42,42}...)
-    	new_raw = append(new_raw, receipt.Turing...)
-    	tx.SetRawTransaction(new_raw)
+        // let's just not add any new stuff to the block - then all should work, correct?
+    	// new_raw := make([]byte, len(tx.RawTransaction()))
+    	// copy(new_raw, tx.RawTransaction())
+    	// new_raw = append(new_raw, []byte{42,42,42}...)
+    	// //new_raw = append(new_raw, receipt.Turing...)
+    	// tx.SetRawTransaction(new_raw)
     }
 
-    log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", 
-    	"tx", tx)
+    log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "tx", tx)
 
 	if err != nil || receipt.Status != 1 {
 		log.Warn("TURING miner/worker.go ApplyTransaction ERROR", "err", err, "receipt", receipt)
@@ -803,7 +807,9 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		return nil, err
 	}
 	w.current.txs = append(w.current.txs, tx)
+	log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_txs", w.current.txs)
 	w.current.receipts = append(w.current.receipts, receipt)
+	log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_receipts", w.current.receipts)
 
 	return receipt.Logs, nil
 }
@@ -1122,6 +1128,7 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 		*receipts[i] = *l
 	}
 	s := w.current.state.Copy()
+	log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
 	block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
 	if err != nil {
 		return err

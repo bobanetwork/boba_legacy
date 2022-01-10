@@ -90,16 +90,27 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // and uses the input parameters for its environment. It returns the receipt
 // for the transaction, gas used and an error if the transaction failed,
 // indicating the block was invalid.
-func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
+func ApplyTransaction(
+	config *params.ChainConfig, 
+	bc ChainContext, 
+	author *common.Address, 
+	gp *GasPool, 
+	statedb *state.StateDB, 
+	header *types.Header, 
+	tx *types.Transaction, 
+	usedGas *uint64, 
+	cfg vm.Config) (*types.Receipt, error) {
+	
 	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number))
+	
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("TURING state_processor.go entering ApplyTransaction")
-
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
+
+	log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
