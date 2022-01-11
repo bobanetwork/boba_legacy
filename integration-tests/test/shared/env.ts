@@ -16,6 +16,8 @@ import {
   l2Wallet_2,
   l1Wallet_3,
   l2Wallet_3,
+  l1Wallet_4,
+  l2Wallet_4,
   fundUser,
   getOvmEth,
   getL1Bridge,
@@ -61,6 +63,8 @@ export class OptimismEnv {
   l2Wallet_2: Wallet
   l1Wallet_3: Wallet
   l2Wallet_3: Wallet
+  l1Wallet_4: Wallet
+  l2Wallet_4: Wallet
 
   // The providers
   l1Provider: providers.JsonRpcProvider
@@ -84,6 +88,8 @@ export class OptimismEnv {
     this.l2Wallet_2 = args.l2Wallet_2
     this.l1Wallet_3 = args.l1Wallet_3
     this.l2Wallet_3 = args.l2Wallet_3
+    this.l1Wallet_4 = args.l1Wallet_4
+    this.l2Wallet_4 = args.l2Wallet_4
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
     this.ctc = args.ctc
@@ -126,7 +132,7 @@ export class OptimismEnv {
       .attach(ctcAddress)
 
     const gasPriceOracle = getContractFactory('OVM_GasPriceOracle')
-      .connect(l2Wallet)
+      .connect(l2Wallet_4)
       .attach(predeploys.OVM_GasPriceOracle)
 
     const sccAddress = await addressManager.getAddress('StateCommitmentChain')
@@ -159,6 +165,8 @@ export class OptimismEnv {
       l2Wallet_2,
       l1Wallet_3,
       l2Wallet_3,
+      l1Wallet_4,
+      l2Wallet_4,
       l1Provider,
       l2Provider,
     })
