@@ -566,43 +566,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.logger.info('Updated L2 gas price', {
         gasPrice: targetUpdatedGasPrice,
       })
-
-      // Update decimals
-      // Ideally gas price = 10 ** decimals
-      // so l1 security fee is not over-charged
-      // Since l2 gas price doesn't change, this part of code is just in case
-      const decimals = await this.state.OVM_GasPriceOracle.decimals()
-      const powRatio = BigNumber.from(targetUpdatedGasPrice).div(
-        BigNumber.from(10).pow(decimals)
-      )
-      if (
-        powRatio.lt(BigNumber.from('1')) ||
-        powRatio.gt(BigNumber.from('10'))
-      ) {
-        // calculate the right decimals
-        let units = 1
-        let parseRes = utils.formatUnits(
-          targetUpdatedGasPrice.toString(),
-          units
-        )
-        while (Number(parseRes) > 10) {
-          units += 1
-          parseRes = utils.formatUnits(targetUpdatedGasPrice.toString(), units)
-        }
-        units = Number(parseRes) > 5 ? units + 1 : units
-        // update the decimals if it's not correct
-        if (units !== decimals.toNumber()) {
-          const decimalsTx = await this.state.OVM_GasPriceOracle.setDecimals(
-            units,
-            { gasPrice: 0 }
-          )
-          await decimalsTx.wait()
-          this.logger.info('Updated decimals', {
-            decimals: units,
-            decimalsPro: decimals.toNumber(),
-          })
-        }
-      }
     } else {
       this.logger.info('No need to update L2 gas price', {
         gasPrice: gasPriceInt,
