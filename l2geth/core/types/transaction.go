@@ -37,25 +37,11 @@ var (
 	ErrInvalidSig = errors.New("invalid transaction v, r, s values")
 )
 
-/*
-
-In the Transaction struct, we have 
-
-	data txdata
-	meta TransactionMeta
-
-	in the txdata, namely, t.data.Payload, we have the entire transaction from eth_sendRawTransaction
-
-	     in the TransactionMeta, we have t.meta.Turing, which contains the modified callData
-	also in the TransactionMeta, we have tx.meta.RawTransaction, which contains the entire transaction from eth_sendRawTransaction
-
-*/
-
 type Transaction struct {
 	data txdata
 	meta TransactionMeta
 	// caches
-	hash atomic.Value //these are all generated/updated elsewhere
+	hash atomic.Value
 	size atomic.Value
 	from atomic.Value
 }
@@ -101,7 +87,8 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	meta := NewTransactionMeta(nil, 0, []byte{7}/*Turing = [0]*/, nil, QueueOriginSequencer, nil, nil, nil)
+	turingDummy := []byte{7}
+	meta := NewTransactionMeta(nil, 0, turingDummy, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -172,17 +159,8 @@ func (t *Transaction) SetL1Turing(turing []byte)  {
 	t.meta.L1Turing = common.CopyBytes(turing)
 }
 
-// //this is in the data, so dangerous hash wise
-// func (tx *Transaction) SetPayload(payload []byte) {
-// 	tx.data.Payload = common.CopyBytes(payload)
-// }
-
 // ChainId returns which chain id this transaction was signed for (if at all)
 func (tx *Transaction) ChainId() *big.Int {
-	log.Debug("TURING: transaction.go Calling ChainID", 
-		"tx", tx,
-		"tx.data", tx.data,  
-		"tx.data.V", tx.data.V)
 	return deriveChainId(tx.data.V)
 }
 
@@ -292,25 +270,6 @@ func (tx *Transaction) L1Turing() []byte {
 	return common.CopyBytes(tx.meta.L1Turing)
 }
 
-func (tx *Transaction) RawTransaction() []byte {
-	if tx.meta.RawTransaction == nil {
-		return nil
-	}
-	return common.CopyBytes(tx.meta.RawTransaction)
-}
-
-
-func (tx *Transaction) SetRawTransaction(raw []byte)  {
-	if &tx.meta == nil {
-		return
-	}
-	tx.meta.RawTransaction = common.CopyBytes(raw)
-}
-
-func (tx *Transaction) SetPayload(payload []byte)  {
-	tx.data.Payload = common.CopyBytes(payload)
-}
-
 // QueueOrigin returns the Queue Origin of the transaction
 func (tx *Transaction) QueueOrigin() QueueOrigin {
 	return tx.meta.QueueOrigin
@@ -321,30 +280,13 @@ func (tx *Transaction) QueueOrigin() QueueOrigin {
 // Note that this hashes the entire TX, including the metadata fields
 // Presumably this only kicks in once for most transactions? 
 func (tx *Transaction) Hash() common.Hash {
-
-	log.Info("TURING: core/types/transaction.go Hashing the transaction")
-
-	// if there is already one, return that
 	if hash := tx.hash.Load(); hash != nil {
-		log.Info("TURING: core/types/transaction.go TXHASH: Returning the old Hash", "txHash", hash)
 		return hash.(common.Hash)
 	}
-
-	// else, hash the transaction
 	v := rlpHash(tx)
 	tx.hash.Store(v)
-	log.Info("TURING: core/types/transaction.go TXHASH: Returning a new txHash", "txHash", v)
 	return v
 }
-
-/*
-func rlpHash(x interface{}) (h common.Hash) {
-	hw := sha3.NewLegacyKeccak256()
-	rlp.Encode(hw, x)
-	hw.Sum(h[:0])
-	return h
-}
-*/
 
 // Size returns the true RLP encoded storage size of the transaction, either by
 // encoding and returning it, or returning a previously cached value.
@@ -359,8 +301,10 @@ func (tx *Transaction) Size() common.StorageSize {
 }
 
 // AsMessage returns the transaction as a core.Message.
+//
 // AsMessage requires a signer to derive the sender.
-// Rename message to something less arbitrary?
+//
+// XXX Rename message to something less arbitrary?
 func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 	msg := Message{
 		nonce:      tx.data.AccountNonce,

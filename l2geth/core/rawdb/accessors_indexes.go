@@ -84,15 +84,8 @@ func ReadTransaction(db ethdb.Reader, hash common.Hash) (*types.Transaction, com
 		log.Error("Transaction referenced missing", "number", blockNumber, "hash", blockHash)
 		return nil, common.Hash{}, 0, 0
 	}
-
-	log.Debug("TURING: ReadTransaction reading data from the core database", "body", body, "number", blockNumber)
-
 	for txIndex, tx := range body.Transactions {
-		log.Debug("TURING: ReadTransaction reading data from the core database - looking at", "tx", tx, "tx.hash", tx.Hash(), "hash", hash)
-		// TURING HACK FIX FIX FIX
-		// Because we are changing the calldata, this changes the hash
-		// fix is to modify the hash function to disregard the tacked-on payload
-		//if tx.Hash() == hash {
+		if tx.Hash() == hash {
 			// UsingOVM
 			// Read the transaction meta from the database and attach it
 			// to the transaction. Since there is 1 transaction per block, the
@@ -101,11 +94,10 @@ func ReadTransaction(db ethdb.Reader, hash common.Hash) (*types.Transaction, com
 			if txMeta != nil {
 				tx.SetTransactionMeta(txMeta)
 			}
-            log.Debug("TURING: ReadTransaction returning", "tx", tx, "txMeta", txMeta)
 			return tx, blockHash, *blockNumber, uint64(txIndex)
-		//}
+		}
 	}
-	log.Error("Transaction not found", "number", blockNumber, "blockHash", blockHash, "hash", hash)
+	log.Error("Transaction not found", "number", blockNumber, "hash", blockHash, "txhash", hash)
 	return nil, common.Hash{}, 0, 0
 }
 

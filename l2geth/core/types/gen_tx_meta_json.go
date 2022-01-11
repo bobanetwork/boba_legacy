@@ -8,12 +8,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 // MarshalJSON marshals as JSON.
 func (t TransactionMeta) MarshalJSON() ([]byte, error) {
-	log.Debug("TURING: (t TransactionMeta) MarshalJSON()", "t", t) 
 	type TransactionMeta struct {
 		L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 		L1Timestamp     uint64          `json:"l1Timestamp"`
@@ -48,7 +46,6 @@ func (t *TransactionMeta) UnmarshalJSON(input []byte) error {
 		QueueIndex      *uint64         `json:"queueIndex"      gencodec:"required"`
 		RawTransaction  []byte          `json:"rawTransaction"  gencodec:"required"`
 	}
-	log.Debug("TURING: (t TransactionMeta) UnmarshalJSON()", "input", input) 
 	var dec TransactionMeta
 	if err := json.Unmarshal(input, &dec); err != nil {
 		return err

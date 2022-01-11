@@ -343,13 +343,11 @@ func DeleteBody(db ethdb.KeyValueWriter, hash common.Hash, number uint64) {
 // transaction hash.
 func ReadTransactionMeta(db ethdb.Reader, number uint64) *types.TransactionMeta {
 	data := ReadTransactionMetaRaw(db, number)
-
 	if len(data) == 0 {
 		return nil
 	}
 
 	meta, err := types.TxMetaDecode(data)
-	log.Debug("Turing: ReadTransactionMeta", "meta", meta)
 	if err != nil {
 		log.Error("Invalid raw tx meta ", "number", number, "err", err)
 		return nil
@@ -363,7 +361,6 @@ func ReadTransactionMeta(db ethdb.Reader, number uint64) *types.TransactionMeta 
 // transaction hash.
 func ReadTransactionMetaRaw(db ethdb.Reader, number uint64) []byte {
 	data, _ := db.Get(txMetaKey(number))
-	log.Debug("Turing: ReadTransactionMetaRaw", "number", number, "data", data)
 	if len(data) > 0 {
 		return data
 	}
@@ -593,7 +590,6 @@ func ReadBlock(db ethdb.Reader, hash common.Hash, number uint64) *types.Block {
 	for i := 0; i < len(body.Transactions); i++ {
 		meta := ReadTransactionMeta(db, header.Number.Uint64())
 		body.Transactions[i].SetTransactionMeta(meta)
-		log.Debug("TURING: rawDB/ReadBlock", "meta", meta)
 	}
 	return types.NewBlockWithHeader(header).WithBody(body.Transactions, body.Uncles)
 }

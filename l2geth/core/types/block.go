@@ -28,7 +28,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	//"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -131,7 +130,6 @@ func (h *Header) SanityCheck() error {
 }
 
 func rlpHash(x interface{}) (h common.Hash) {
-	//log.Info("TURING: block.go Hashing the transaction", "x", x)
 	hw := sha3.NewLegacyKeccak256()
 	rlp.Encode(hw, x)
 	hw.Sum(h[:0])

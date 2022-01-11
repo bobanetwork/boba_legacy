@@ -759,7 +759,7 @@ func (w *worker) updateSnapshot() {
 
 func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Address) ([]*types.Log, error) {
 
-	log.Debug("TURING miner/worker.go STEP 3 entering commitTransaction")
+	// log.Debug("TURING miner/worker.go STEP 3 entering commitTransaction")
 
 	// Make sure there's only one tx per block
 	if w.current != nil && len(w.current.txs) > 0 {
@@ -767,39 +767,23 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	}
 	snap := w.current.state.Snapshot()
 
-    log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction", "tx_input", tx)
+	// log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction", "tx_input", tx)
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
-    log.Debug("TURING miner/worker.go commitTransaction STEP 3 ApplyTransaction result", 
-    	"receipt", receipt, 
-    	"err", err)
+	// log.Debug("TURING miner/worker.go commitTransaction STEP 3 ApplyTransaction result",
+	// 	"receipt", receipt,
+	// 	"err", err)
 
-    //Let's tack on the Turing data to the original calldata aka Payload, if there _are_ Turing data
-    if(len(receipt.Turing) > 1) {
-    	
-    	// TURING Update the tx metadata...
-        tx.SetL1Turing(receipt.Turing) // don't think we really care about this....
-		
-		// new_payload := make([]byte, len(tx.Data()))
-		// copy(new_payload, tx.Data())
-		// new_payload = append(new_payload, []byte{42,42,42}...)
-		// new_payload = append(new_payload, receipt.Turing...)
-		// tx.SetPayload(new_payload)
+	// TURING Update the tx metadata...
+	if(len(receipt.Turing) > 1) {
+		tx.SetL1Turing(receipt.Turing)
+	}
 
-        // this is a meta field, so probably better
-        // let's just not add any new stuff to the block - then all should work, correct?
-    	// new_raw := make([]byte, len(tx.RawTransaction()))
-    	// copy(new_raw, tx.RawTransaction())
-    	// new_raw = append(new_raw, []byte{42,42,42}...)
-    	// //new_raw = append(new_raw, receipt.Turing...)
-    	// tx.SetRawTransaction(new_raw)
-    }
-
-    log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "tx", tx)
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "tx", tx)
 
 	if err != nil || receipt.Status != 1 {
-		log.Warn("TURING miner/worker.go ApplyTransaction ERROR", "err", err, "receipt", receipt)
+		log.Warn("miner/worker.go ApplyTransaction ERROR", "err", err, "receipt", receipt)
 	}
 
 	if err != nil {
@@ -807,16 +791,16 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		return nil, err
 	}
 	w.current.txs = append(w.current.txs, tx)
-	log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_txs", w.current.txs)
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_txs", w.current.txs)
 	w.current.receipts = append(w.current.receipts, receipt)
-	log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_receipts", w.current.receipts)
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_receipts", w.current.receipts)
 
 	return receipt.Logs, nil
 }
 
 func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) bool {
 
-	log.Debug("TURING miner/worker.go STEP 2 entering commitTransactions")
+	// log.Debug("TURING miner/worker.go STEP 2 entering commitTransactions")
 
 	// Short circuit if current is nil
 	if w.current == nil {
@@ -937,7 +921,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 // chain.
 func (w *worker) commitNewTx(tx *types.Transaction) error {
 
-	log.Debug("TURING miner/worker.go STEP 1 entering commitNewTx")
+	// log.Debug("TURING miner/worker.go STEP 1 entering commitNewTx")
 
 	w.mu.RLock()
 	defer w.mu.RUnlock()
@@ -1119,7 +1103,7 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 // and commits new work if consensus engine is running.
 func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time) error {
 
-	log.Debug("TURING worker.go entering FINAL commit")
+	// log.Debug("TURING worker.go entering FINAL commit")
 
 	// Deep copy receipts here to avoid interaction between different tasks.
 	receipts := make([]*types.Receipt, len(w.current.receipts))
@@ -1128,13 +1112,13 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 		*receipts[i] = *l
 	}
 	s := w.current.state.Copy()
-	log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
+	// log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
 	block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
 	if err != nil {
 		return err
 	}
 
-	log.Debug("TURING worker.go final block", "block", block)
+	// log.Debug("TURING worker.go final block", "block", block)
 
 	// As a sanity check, ensure all new blocks have exactly one
 	// transaction. This check is done here just in case any of our

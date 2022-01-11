@@ -10,7 +10,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 type QueueOrigin uint8
@@ -79,9 +78,6 @@ func NewTransactionMeta(
 //   varbytes(QueueOrigin) ||
 //   varbytes(L1Timestamp)
 func TxMetaDecode(input []byte) (*TransactionMeta, error) {
-
-	log.Debug("TxMetaDecode(input []byte) (*TransactionMeta, error)", "input", input) 
-
 	var err error
 	meta := TransactionMeta{}
 	b := bytes.NewReader(input)
@@ -149,7 +145,6 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	}
 
 	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing")
-    log.Debug("TURING: txMeta Decode", "turing", turing)
 	if err != nil {
 		return nil, err
 	}
@@ -162,9 +157,6 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 
 // TxMetaEncode serializes the TransactionMeta as bytes.
 func TxMetaEncode(meta *TransactionMeta) []byte {
-
-	log.Debug("TxMetaEncode(meta *TransactionMeta)", "meta", meta) 
-
 	b := new(bytes.Buffer)
 
 	L1BlockNumber := meta.L1BlockNumber
@@ -218,8 +210,6 @@ func TxMetaEncode(meta *TransactionMeta) []byte {
 	} else {
 		common.WriteVarBytes(b, 0, rawTransaction)
 	}
-
-    log.Debug("TURING: txMeta Encode", "turing", meta.L1Turing)
 
 	turing := meta.L1Turing
 	if turing == nil {
