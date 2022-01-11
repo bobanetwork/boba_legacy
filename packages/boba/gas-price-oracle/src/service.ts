@@ -61,6 +61,9 @@ interface GasPriceOracleOptions {
 
   // max burned gas
   maxBurnedGas: string
+
+  // overhead ratio
+  overheadRatio1000X: number
 }
 
 const optionSettings = {}
@@ -102,6 +105,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       fastRelayerWallet: this.options.fastRelayerAddress,
       gasFloorPrice: this.options.gasFloorPrice,
       pollingInterval: this.options.pollingInterval,
+      burnedGasFeeRatio100X: this.options.burnedGasFeeRatio100X,
+      maxBurnedGas: this.options.maxBurnedGas,
+      overheadRatio1000X: this.options.overheadRatio1000X,
     })
 
     this.state = {} as any
@@ -199,7 +205,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.CanonicalTransactionChain.address,
     })
 
-   this.logger.info('Connecting to StateCommitmentChain...')
+    this.logger.info('Connecting to StateCommitmentChain...')
     const StateCommitmentChainAddress =
       await this.state.Lib_AddressManager.getAddress('StateCommitmentChain')
     this.state.StateCommitmentChain = loadContract(
@@ -241,15 +247,18 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
+      // l2 gas price
       await this._getL1Balance()
       await this._getL2GasCost()
       await this._updateGasPrice()
+      // extra burn gas
       await this._updateFastExitGasBurnFee()
       await this._updateClassicalExitGasBurnFee()
-      // disabled
-      // await this._updateOverheadFee()
       await this._updateNFTBridgeGasBurnFee()
+      // l1 gas price and overhead fee
+      await this._updateOverhead()
+      await this._upateL1BaseFee()
+      await sleep(this.options.pollingInterval)
     }
   }
 
@@ -537,14 +546,51 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
       }
       this.logger.debug('Updating L2 gas price...')
-      const tx = await this.state.OVM_GasPriceOracle.setGasPrice(
+      const gasPriceTx = await this.state.OVM_GasPriceOracle.setGasPrice(
         targetUpdatedGasPrice,
         { gasPrice: 0 }
       )
-      await tx.wait()
+      await gasPriceTx.wait()
       this.logger.info('Updated L2 gas price', {
         gasPrice: targetUpdatedGasPrice,
       })
+
+      // Update decimals
+      // Ideally gas price = 10 ** decimals
+      // so l1 security fee is not over-charged
+      // Since l2 gas price doesn't change, this part of code is just in case
+      const decimals = await this.state.OVM_GasPriceOracle.decimals()
+      const powRatio = BigNumber.from(targetUpdatedGasPrice).div(
+        BigNumber.from(10).pow(decimals)
+      )
+      if (
+        powRatio.lt(BigNumber.from('1')) ||
+        powRatio.gt(BigNumber.from('10'))
+      ) {
+        // calculate the right decimals
+        let units = 1
+        let parseRes = utils.formatUnits(
+          targetUpdatedGasPrice.toString(),
+          units
+        )
+        while (Number(parseRes) > 10) {
+          units += 1
+          parseRes = utils.formatUnits(targetUpdatedGasPrice.toString(), units)
+        }
+        units = Number(parseRes) > 5 ? units + 1 : units
+        // update the decimals if it's not correct
+        if (units !== decimals.toNumber()) {
+          const decimalsTx = await this.state.OVM_GasPriceOracle.setDecimals(
+            units,
+            { gasPrice: 0 }
+          )
+          await decimalsTx.wait()
+          this.logger.info('Updated decimals', {
+            decimals: units,
+            decimalsPro: decimals.toNumber(),
+          })
+        }
+      }
     } else {
       this.logger.info('No need to update L2 gas price', {
         gasPrice: gasPriceInt,
@@ -614,8 +660,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
         if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
           this.logger.info('No need to update extra gas', {
-            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
-            extraGasRelay: Number(extraGasRelay.toString()),
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
           })
         } else {
           this.logger.debug('Updating extra gas for Proxy__L2LiquidityPool...')
@@ -626,7 +672,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             )
           await tx.wait()
           this.logger.info('Updated Proxy__L2LiquidityPool extra gas', {
-            extraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: targetExtraGasRelay.toNumber(),
           })
         }
       } else {
@@ -706,8 +752,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
         if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
           this.logger.info('No need to update extra gas', {
-            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
-            extraGasRelay: Number(extraGasRelay.toString()),
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
           })
         } else {
           this.logger.debug('Updating extra gas for DiscretionaryExitBurn...')
@@ -718,7 +764,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             )
           await tx.wait()
           this.logger.info('Updated DiscretionaryExitBurn extra gas', {
-            extraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: targetExtraGasRelay.toNumber(),
           })
         }
       } else {
@@ -729,7 +775,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
   }
 
-   private async _updateOverheadFee(): Promise<void> {
+  private async _updateOverhead(): Promise<void> {
     try {
       const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
       const CanonicalTransactionChainLog =
@@ -745,14 +791,14 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           Number(latestL1Block)
         )
 
-    const orderedOverheadLog = orderBy(
+      const orderedOverheadLog = orderBy(
         [...CanonicalTransactionChainLog, ...StateCommitmentChainLog],
         'blockNumber',
         'desc'
       )
 
       // Calculate the batch size
-      let L1BatchSubmissionCost = BigNumber.from(0)
+      let L1BatchSubmissionGasUsage = BigNumber.from(0)
       const transactionHashList = orderedOverheadLog.reduce(
         (acc, cur, index) => {
           if (!acc.includes(cur.transactionHash)) {
@@ -771,35 +817,35 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       for (const hash of transactionHashList) {
         const txReceipt =
           await this.options.l1RpcProvider.getTransactionReceipt(hash)
-        L1BatchSubmissionCost = L1BatchSubmissionCost.add(
-          txReceipt.effectiveGasPrice.mul(txReceipt.gasUsed)
+        L1BatchSubmissionGasUsage = L1BatchSubmissionGasUsage.add(
+          txReceipt.gasUsed
         )
       }
 
-      const batchFee = L1BatchSubmissionCost.div(
-        BigNumber.from(batchSize)
-      )
-      const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
-      const targetOverheadGas = batchFee.div(L2GasPrice)
+      const batchFee = L1BatchSubmissionGasUsage.div(BigNumber.from(batchSize))
+      const targetOverheadGas = batchFee
+        .mul(BigNumber.from(this.options.overheadRatio1000X))
+        .div(BigNumber.from('1000'))
 
-      const overheadGas =
-        await this.state.OVM_GasPriceOracle.overhead()
+      const overheadProduction = await this.state.OVM_GasPriceOracle.overhead()
 
-      if (targetOverheadGas.toString() === overheadGas.toString()) {
-        this.logger.info('No need to overhead gas', {
-          targetOverheadGas: Number(targetOverheadGas.toString()),
-          overheadGas: Number(overheadGas.toString()),
+      if (
+        targetOverheadGas.toString() === overheadProduction.toString() ||
+        !targetOverheadGas.toString()
+      ) {
+        this.logger.info('No need to update overhead value', {
+          targetOverheadGas: targetOverheadGas.toNumber(),
+          overheadGas: overheadProduction.toNumber(),
         })
       } else {
         this.logger.debug('Updating overhead gas...')
-        const tx =
-          await this.state.OVM_GasPriceOracle.setOverhead(
-            targetOverheadGas,
-            { gasPrice: 0 }
-          )
+        const tx = await this.state.OVM_GasPriceOracle.setOverhead(
+          targetOverheadGas,
+          { gasPrice: 0 }
+        )
         await tx.wait()
         this.logger.info('Updated overhead gas', {
-          overheadGas: Number(targetOverheadGas.toString()),
+          overheadGas: targetOverheadGas.toNumber(),
         })
       }
     } catch (error) {
@@ -876,8 +922,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
         if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
           this.logger.info('No need to update extra gas', {
-            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
-            extraGasRelay: Number(extraGasRelay.toString()),
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
           })
         } else {
           this.logger.debug('Updating extra gas for Proxy__L2NFTBridge...')
@@ -887,7 +933,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           )
           await tx.wait()
           this.logger.info('Updated Proxy__L2NFTBridge extra gas', {
-            extraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: targetExtraGasRelay.toNumber(),
           })
         }
       } else {
@@ -895,6 +941,27 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE NFT EXIT BURNED RATIO ${error}`)
+    }
+  }
+
+  private async _upateL1BaseFee(): Promise<void> {
+    try {
+      const l1GasPrice = await this.options.l1RpcProvider.getGasPrice()
+      const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
+      if (l1GasPrice.toNumber() !== l1BaseFee.toNumber()) {
+        const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(l1GasPrice)
+        await tx.wait()
+        this.logger.info('Updated l1BaseFee', {
+          l1GasPrice: l1GasPrice.toNumber(),
+          l1BaseFee: l1BaseFee.toNumber(),
+        })
+      } else {
+        this.logger.info('No need to update L1 base gas price', {
+          l1BaseFee: l1GasPrice.toNumber(),
+        })
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
     }
   }
 }
