@@ -989,6 +989,7 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args TransactionArgs, bl
 	}
 	// If the result contains a revert reason, try to unpack and return it.
 	if len(result.Revert()) > 0 {
+		log.Debug("MMDBG Call reverted", "result", result)
 		return nil, newRevertError(result)
 	}
 	return result.Return(), result.Err
@@ -1110,7 +1111,10 @@ func DoEstimateGas(ctx context.Context, b Backend, args TransactionArgs, blockNr
 			// Otherwise, the specified gas cap is too low
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
-	}
+	} else if hi > 50000 {
+		log.Debug("MMDBG extra gas", "old", hi, "new", hi + 50000)
+                hi += 50000
+        }
 	return hexutil.Uint64(hi), nil
 }
 
