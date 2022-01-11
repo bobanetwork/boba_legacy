@@ -74,7 +74,7 @@ type Receipt struct {
 	FeeScalar  *big.Float `json:"l1FeeScalar" gencodec:"required"`
 
 	// Using Turing
-	Turing  []byte `json:"turing"`
+	Turing []byte `json:"turing"`
 }
 
 type receiptMarshaling struct {

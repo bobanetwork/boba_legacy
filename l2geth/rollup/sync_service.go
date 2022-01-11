@@ -853,7 +853,7 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	txs := types.Transactions{tx}
 	errCh := make(chan error, 1)
 
-	// here is where all the magic happens....
+	// here is where all the magic happens...
 	s.txFeed.Send(core.NewTxsEvent{
 		Txs:   txs,
 		ErrCh: errCh,
@@ -863,26 +863,26 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	// log.Debug("TURING: sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
 
 	select {
-		case err := <-errCh:
-			log.Error("Got error waiting for transaction to be added to chain", "msg", err)
-			s.SetLatestL1Timestamp(ts)
-			s.SetLatestL1BlockNumber(bn)
-			s.SetLatestIndex(index)
-			return err
-		case <-s.chainHeadCh:
+	case err := <-errCh:
+		log.Error("Got error waiting for transaction to be added to chain", "msg", err)
+		s.SetLatestL1Timestamp(ts)
+		s.SetLatestL1BlockNumber(bn)
+		s.SetLatestIndex(index)
+		return err
+	case <-s.chainHeadCh:
 		// Update the cache when the transaction is from the owner
 		// of the gas price oracle
-			sender, _ := types.Sender(s.signer, tx)
-			owner := s.GasPriceOracleOwnerAddress()
-			if owner != nil && sender == *owner {
-				if err := s.updateGasPriceOracleCache(nil); err != nil {
-					s.SetLatestL1Timestamp(ts)
-					s.SetLatestL1BlockNumber(bn)
-					s.SetLatestIndex(index)
-					return err
-				}
+		sender, _ := types.Sender(s.signer, tx)
+		owner := s.GasPriceOracleOwnerAddress()
+		if owner != nil && sender == *owner {
+			if err := s.updateGasPriceOracleCache(nil); err != nil {
+				s.SetLatestL1Timestamp(ts)
+				s.SetLatestL1BlockNumber(bn)
+				s.SetLatestIndex(index)
+				return err
 			}
-			return nil
+		}
+		return nil
 	}
 }
 

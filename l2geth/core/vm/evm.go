@@ -107,7 +107,7 @@ type Context struct {
 	// OVM information
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
 
-	// Turing information 
+	// Turing information
 	Turing []byte
 }
 
@@ -212,9 +212,9 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	inputHexUtil := hexutil.Bytes(input)
 
 	/* The input and calldata have a well defined structure
-	    1/ The methodID (4 bytes)
-	    2/ The rType (32 bytes)
-	    3/ The return placeholder uint256
+	1/ The methodID (4 bytes)
+	2/ The rType (32 bytes)
+	3/ The return placeholder uint256
 	*/
 
 	// If things fail, we'll return an integer parameter which will fail a
@@ -231,7 +231,7 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 		return retError
 	}
 
-	rlen := len(rest) 
+	rlen := len(rest)
 	if rlen < 2*32 {
 		log.Warn("TURING-2 bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
 		retError[35] = 11 // Calldata too short
@@ -259,9 +259,8 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
-	
-	log.Debug("TURING-0 bobaTuringCall:Caller",
-		"caller", caller.String())
+
+	log.Debug("TURING-0 bobaTuringCall:Caller", "caller", caller.String())
 
 	var responseStringEnc string
 	var responseString []byte
@@ -273,20 +272,20 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	restHexUtil := inputHexUtil[4:]
 
 	/* The input and calldata have a well defined structure
-		1/ The methodID (4 bytes)
-		2/ The rType (32 bytes)
-		3/ Data offset 1 - beginning of URL string (32 bytes)
-		4/ Data offset 2 - beginning of payload (32 bytes)
-		5/ URL string length (32 bytes)
-		6/ URL string - either 32 or 64 bytes
-		7/ Payload length (32 bytes)
-		8/ Payload data - variable but at least 32 bytes
-		This means that the calldata are always >= 7*32
+	1/ The methodID (4 bytes)
+	2/ The rType (32 bytes)
+	3/ Data offset 1 - beginning of URL string (32 bytes)
+	4/ Data offset 2 - beginning of payload (32 bytes)
+	5/ URL string length (32 bytes)
+	6/ URL string - either 32 or 64 bytes
+	7/ Payload length (32 bytes)
+	8/ Payload data - variable but at least 32 bytes
+	This means that the calldata are always >= 7*32
 
-		If things fail, we'll return an integer parameter which will fail a
-		"require" in the turing helper contract.
+	If things fail, we'll return an integer parameter which will fail a
+	"require" in the turing helper contract.
 	*/
-	
+
 	retError := make([]byte, len(inputHexUtil))
 	copy(retError, inputHexUtil)
 
@@ -299,34 +298,32 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		return retError
 	}
 
-	rlen := len(rest) 
+	rlen := len(rest)
 	if rlen < 7*32 {
 		log.Warn("TURING-2 bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
 		return retError
 	}
 
-	/*
-	A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
-	Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value
-	of any of these numbers is 32 + 32 + 32 + 32 + 64 = 192
-	Thus, we only need to read one byte
+	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
+	// Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value
+	// of any of these numbers is 32 + 32 + 32 + 32 + 64 = 192
+	// Thus, we only need to read one byte
 
-		 0  -  31 = rType
-		32  -  63 = URL start
-		64  -  95 = payload start
-		96  - 127 = length URL string
-		128 - ??? = URL string
-		??? - ??? = payload length
-		??? - end = payload
-	*/
+	// 0  -  31 = rType
+	// 32  -  63 = URL start
+	// 64  -  95 = payload start
+	// 96  - 127 = length URL string
+	// 128 - ??? = URL string
+	// ??? - ??? = payload length
+	// ??? - end = payload
 
-	startIDXurl := int(rest[ 63]) + 32
+	startIDXurl := int(rest[63]) + 32
 	// the +32 means that we are going directly for the actual string
 	// bytes 0 to 31 are the string length
 
-	startIDXpayload := int(rest[ 95]) // the start of the payload
-	lengthURL := int(rest[127]) // the length of the URL string
+	startIDXpayload := int(rest[95]) // the start of the payload
+	lengthURL := int(rest[127])      // the length of the URL string
 
 	// Check the URL length
 	// Note: we do not handle URLs that are longer than 64 characters
@@ -337,12 +334,13 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	}
 
 	// The URL we are going to query
-	url := string(rest[startIDXurl:startIDXurl+lengthURL])
+	endIDX := startIDXurl + lengthURL
+	url := string(rest[startIDXurl:endIDX])
 	// we use a specific end value (startIDXurl+lengthURL) since the URL is right-packed with zeros
 
 	// At this point, we have the API endpoint and the payload that needs to go there...
 	payload := restHexUtil[startIDXpayload:] //using hex here since that makes it easy to get the string
-	
+
 	log.Debug("TURING-4 bobaTuringCall:Have URL and payload",
 		"url", url,
 		"payload", payload)
@@ -460,14 +458,14 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	if isTuring2 || isGetRand2 {
 		log.Debug("TURING REQUEST START", "input", input)
-	} 
+	}
 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
 
 	if isTuring2 {
-		if(len(evm.Context.Turing) < 3) { 
+		if len(evm.Context.Turing) < 3 {
 			// This is the first run of Turing for this transaction
 			// We sometimes use a short evm.Context.Turing payload for debug purposes.
 			// A real modified callData is always much much > 2 bytes
@@ -478,22 +476,21 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
 		} else {
-			// Turing for this Transaction has already been run elsewhere - replay using 
+			// Turing for this Transaction has already been run elsewhere - replay using
 			// information from the EVM context
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
 		log.Debug("TURING REQUEST END", "updated_input", updated_input)
 	} else if isGetRand2 {
-		if(len(evm.Context.Turing) < 3) { 
-			// see above comments - they apply 1:1 here too
+		if len(evm.Context.Turing) < 3 {
+			// See above - they apply 1:1 here too
 			updated_input = bobaTuringRandom(input)
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
-			//copy(evm.Context.Turing, updated_input) 
 			evm.Context.Turing = updated_input
 		} else {
-			// Turing for this Transaction has already been run elsewhere - replay using 
+			// Turing for this Transaction has already been run elsewhere - replay using
 			// information from the EVM context
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
@@ -508,8 +505,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		"ret", hexutil.Bytes(ret),
 		"err", err,
 		"updated_input", updated_input,
-	    "evm.Context.Turing", evm.Context.Turing,
-	    "length Turing", len(evm.Context.Turing))
+		"evm.Context.Turing", evm.Context.Turing,
+		"length Turing", len(evm.Context.Turing))
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
@@ -521,7 +518,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			contract.UseGas(contract.Gas)
 		}
 	}
-    
+
 	return ret, contract.Gas, err
 }
 

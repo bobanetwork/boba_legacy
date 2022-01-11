@@ -25,7 +25,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 type ValidationInfo struct {
@@ -52,7 +51,7 @@ func (vs *ValidationMessages) Info(msg string) {
 	vs.Messages = append(vs.Messages, ValidationInfo{INFO, msg})
 }
 
-/// getWarnings returns an error with all messages of type WARN of above, or nil if no warnings were present
+// getWarnings returns an error with all messages of type WARN of above, or nil if no warnings were present
 func (v *ValidationMessages) getWarnings() error {
 	var messages []string
 	for _, msg := range v.Messages {
@@ -112,13 +111,10 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 		*l1BlockNumber = *args.L1BlockNumber
 	}
 
-	// var l1Turing []byte
-	// l1Turing = *args.L1Turing
-
-    log.Warn("TURING Signer core toTransaction()", "args", args)
+	turingDummy := []byte{8}
 
 	tx := types.NewTransaction(uint64(args.Nonce), args.To.Address(), (*big.Int)(&args.Value), (uint64)(args.Gas), (*big.Int)(&args.GasPrice), input)
-	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, []byte{8}/*Turing = [0]*/, l1MessageSender, args.QueueOrigin, nil, nil, nil)
+	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, turingDummy, l1MessageSender, args.QueueOrigin, nil, nil, nil)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }

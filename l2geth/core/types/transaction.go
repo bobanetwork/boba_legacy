@@ -151,7 +151,7 @@ func (t *Transaction) SetL1BlockNumber(bn uint64) {
 	t.meta.L1BlockNumber = new(big.Int).SetUint64(bn)
 }
 
-func (t *Transaction) SetL1Turing(turing []byte)  {
+func (t *Transaction) SetL1Turing(turing []byte) {
 	if &t.meta == nil {
 		return
 	}
@@ -277,7 +277,6 @@ func (tx *Transaction) QueueOrigin() QueueOrigin {
 // Hash hashes the RLP encoding of tx.
 // It uniquely identifies the transaction.
 // Note that this hashes the entire TX, including the metadata fields
-// Presumably this only kicks in once for most transactions? 
 func (tx *Transaction) Hash() common.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(common.Hash)
@@ -503,18 +502,18 @@ type Message struct {
 	queueOrigin   QueueOrigin
 }
 
-func NewMessage(from common.Address, 
-	to *common.Address, 
-	nonce uint64, 
-	amount *big.Int, 
-	gasLimit uint64, 
-	gasPrice *big.Int, 
-	data []byte, 
-	checkNonce bool, 
-	l1BlockNumber *big.Int, 
+func NewMessage(from common.Address,
+	to *common.Address,
+	nonce uint64,
+	amount *big.Int,
+	gasLimit uint64,
+	gasPrice *big.Int,
+	data []byte,
+	checkNonce bool,
+	l1BlockNumber *big.Int,
 	l1Timestamp uint64,
 	l1Turing []byte,
-	queueOrigin QueueOrigin, 
+	queueOrigin QueueOrigin,
 ) Message {
 	return Message{
 		from:       from,
@@ -546,4 +545,3 @@ func (m Message) L1Timestamp() uint64      { return m.l1Timestamp }
 func (m Message) L1BlockNumber() *big.Int  { return m.l1BlockNumber }
 func (m Message) L1Turing() []byte         { return m.l1Turing }
 func (m Message) QueueOrigin() QueueOrigin { return m.queueOrigin }
-

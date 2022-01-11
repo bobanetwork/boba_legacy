@@ -493,7 +493,7 @@ func (w *worker) mainLoop() {
 				height := head.Block.Number().Uint64()
 				log.Debug("Miner got new head",
 					"height", height, "block-hash",
-					head.Block.Hash().Hex(), 
+					head.Block.Hash().Hex(),
 					"tx-hash", txn.Hash().Hex())
 
 				// Prevent memory leak by cleaning up pending tasks
@@ -759,15 +759,11 @@ func (w *worker) updateSnapshot() {
 
 func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Address) ([]*types.Log, error) {
 
-	// log.Debug("TURING miner/worker.go STEP 3 entering commitTransaction")
-
 	// Make sure there's only one tx per block
 	if w.current != nil && len(w.current.txs) > 0 {
 		return nil, core.ErrGasLimitReached
 	}
 	snap := w.current.state.Snapshot()
-
-	// log.Debug("TURING miner/worker.go commitTransaction STEP 3 calling core.ApplyTransaction", "tx_input", tx)
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
@@ -776,7 +772,7 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	// 	"err", err)
 
 	// TURING Update the tx metadata...
-	if(len(receipt.Turing) > 1) {
+	if len(receipt.Turing) > 1 {
 		tx.SetL1Turing(receipt.Turing)
 	}
 
@@ -1149,16 +1145,15 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 			if bn == nil {
 				bn = new(big.Int)
 			}
-			// log.Info("New block", 
-			// 	"index", block.Number().Uint64()-uint64(1), 
-			// 	"l1-timestamp", tx.L1Timestamp(), 
-			// 	"l1-blocknumber", bn.Uint64(), 
-			// 	"tx-hash", tx.Hash().Hex(),
-			// 	"queue-orign", tx.QueueOrigin(), 
-			// 	"gas", block.GasUsed(), 
-			// 	"fees", feesEth, 
-			// 	"elapsed", common.PrettyDuration(time.Since(start)),
-			// 	"tx", tx)
+			log.Info("New block",
+				"index", block.Number().Uint64()-uint64(1),
+				"l1-timestamp", tx.L1Timestamp(),
+				"l1-blocknumber", bn.Uint64(),
+				"tx-hash", tx.Hash().Hex(),
+				"queue-orign", tx.QueueOrigin(),
+				"gas", block.GasUsed(),
+				"fees", feesEth,
+				"elapsed", common.PrettyDuration(time.Since(start)))
 
 		case <-w.exitCh:
 			log.Info("Worker has exited")

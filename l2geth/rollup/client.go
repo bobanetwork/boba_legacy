@@ -248,7 +248,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 
 	turing := hexutil.Bytes([]byte{4})
 	if enqueue.Turing == nil {
-		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing - setting to 4") 
+		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing - setting to 4")
 	} else {
 		log.Info("TURING: rollup/client.go Enqueue tx with non-nil Turing", "enqueue_turing", enqueue.Turing)
 		turing = *enqueue.Turing
@@ -337,8 +337,6 @@ func (c *Client) GetLatestTransactionBatchIndex() (*uint64, error) {
 // types.Transaction that can be consumed by the SyncService
 func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types.Transaction, error) {
 
-	// log.Info("TURING: client.go batchedTransactionToTransaction", "tx", res)
-	
 	// `nil` transactions are not found
 	if res == nil {
 		return nil, errElementNotFound
@@ -355,11 +353,11 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	default:
 		return nil, fmt.Errorf("Unknown queue origin: %s", res.QueueOrigin)
 	}
-	
+
 	// Transactions that have been decoded are
 	// Queue Origin Sequencer transactions
 	if res.Decoded != nil {
-		// log.Info("TURING: client.go batchedTransactionToTransaction: Queue Origin Sequencer transaction", 
+		// log.Info("TURING: client.go batchedTransactionToTransaction: Queue Origin Sequencer transaction",
 		// 	"res.Decoded", res.Decoded)
 		nonce := res.Decoded.Nonce
 		to := res.Decoded.Target

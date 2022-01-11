@@ -261,7 +261,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		// Increment the nonce for the next transaction
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
 		ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
-		turing = evm.Context.Turing  //prepare the return Turing data
+		turing = evm.Context.Turing // Prepare the return Turing data
 	}
 
 	if vmerr != nil {
