@@ -376,9 +376,7 @@ func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs
 		log.Warn("Failed transaction send attempt", "from", args.From, "to", args.To, "value", args.Value.ToInt(), "err", err)
 		return common.Hash{}, err
 	}
-	log.Debug("TURING api.go SendTransaction; calling SubmitTransaction")
 	ret, err := SubmitTransaction(ctx, s.b, signed)
-	log.Debug("TURING api.go SendTransaction; SubmitTransaction returned", "RET", ret, "ERR", err)
 	return ret, err
 	//return SubmitTransaction(ctx, s.b, signed)
 }
@@ -872,9 +870,6 @@ func DoCall(ctx context.Context,
 		data = []byte(*args.Data)
 	}
 
-    log.Debug("TURING: internal/ethapi/api.go DoCall setting input to types.NewMessage", "header", header, "context", ctx)
-    turing := []byte{3}/*Turing = [0]*/
-
 	// The blocknumber and timestamp actually refer to the L1BlockNumber and L1Timestamp
 	// attached to each transaction. We need to modify the blocknumber and timestamp to reflect this,
 	// or else the result of `eth_call` will not be correct.
@@ -892,15 +887,16 @@ func DoCall(ctx context.Context,
 					return nil, 0, false, fmt.Errorf("block %d has more than 1 transaction", header.Number.Uint64())
 				}
 				tx := txs[0]
-				log.Debug("TURING: internal/ethapi/api.go DoCall Loop", "tx", tx)
 				blockNumber = tx.L1BlockNumber()
 				timestamp = tx.L1Timestamp()
 			}
 		}
 	}
 
+    turingDummy := []byte{3}
+
 	// Create new call message
-	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, turing, types.QueueOriginSequencer)
+	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, turingDummy, types.QueueOriginSequencer)
 
 	// Setup context so it may be cancelled the call has completed
 	// or, in case of unmetered gas, setup a context with a timeout.
@@ -929,8 +925,7 @@ func DoCall(ctx context.Context,
 	// Setup the gas pool (also for unmetered requests)
 	// and apply the message.
 	gp := new(core.GasPool).AddGas(math.MaxUint64)
-	res, gas, failed, err, turing := core.ApplyMessage(evm, msg, gp)
-	log.Debug("TURING: internal/ethapi/api.go DoCall - after core.ApplyMessage", "res", res, "turing", turing)
+	res, gas, failed, err, _ := core.ApplyMessage(evm, msg, gp)
 	if err := vmError(); err != nil {
 		return nil, 0, false, err
 	}

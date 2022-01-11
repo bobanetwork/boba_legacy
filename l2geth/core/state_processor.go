@@ -17,7 +17,6 @@
 package core
 
 import (
-	//"bytes"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -110,7 +109,8 @@ func ApplyTransaction(
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
 
-	log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
+	// log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
+
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms. This environment also 
 	// contains Turing data, which is critical for verifiers and replicas.
@@ -168,8 +168,6 @@ func ApplyTransaction(
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
 	receipt.Turing = turing
-
-	log.Debug("TURING state_processor.go leaving ApplyTransaction (ApplyMessage)")
 
 	return receipt, err
 }

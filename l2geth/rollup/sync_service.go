@@ -1,7 +1,6 @@
 package rollup
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -829,40 +828,6 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		log.Debug("Updating OVM context based on new transaction", "timestamp", ts, "blocknumber", tx.L1BlockNumber().Uint64(), "queue-origin", tx.QueueOrigin())
 	} else if tx.L1Timestamp() < s.GetLatestL1Timestamp() {
 		log.Error("Timestamp monotonicity violation", "hash", tx.Hash().Hex())
-	} else {
-		// so, we are in Verifier/Replica mode....
-		log.Debug("TURING: This transaction is NOT from the sequencer", "tx", tx)
-
-		//do we have a Turing payload?
-		log.Debug("Turing: Payload and RawTransaction", "tx", tx)
-
-		txRawTransaction := tx.RawTransaction()
-
-		//NOTE - the txPayload is generated from the L1-stored RawTransaction
-		//txPayload := tx.Data()
-
-		//methodID for GetResponse is 7d93616c -> [125 147 97 108]
-		isTuring2 := bytes.Index(txRawTransaction, []byte{42, 42, 42, 125, 147, 97, 108})
-		if isTuring2 != -1 {
-			//tx.SetPayload(txPayload[:isTuring2]) 				// restore original eth_sendRawTransaction input
-			//tx.SetRawTransaction(txRawTransaction[:isTuring2]) 	// restore original eth_sendRawTransaction input
-			log.Debug("TURING: Verifier Received Turing GetResponse Payload from L1", 
-				"modified_calldata", txRawTransaction[isTuring2+3:],
-				"restored raw calldata", tx.RawTransaction(),
-				"restored tx.data.Payload", tx.Data())
-		} 
-
-		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-		isGetRand2 := bytes.Index(txRawTransaction, []byte{42, 42, 42, 73, 61, 87, 214})
-		//perhaps also have to change the Size? 
-		if isGetRand2 != -1 {
-			//tx.SetPayload(txPayload[:isGetRand2]) 			    // restore original eth_sendRawTransaction input
-			//tx.SetRawTransaction(txRawTransaction[:isGetRand2]) // restore original eth_sendRawTransaction input
-			log.Debug("TURING: Verifier Received Turing GetRandom Payload from L1", 
-				"modified_calldata", txRawTransaction[isGetRand2+3:],
-				"restored RawTransaction", tx.RawTransaction(),
-				"restored tx.data.Payload", tx.Data())
-		} 
 	}
 
 	index := s.GetLatestIndex()
@@ -896,7 +861,6 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 
 	// Block until the transaction has been added to the chain
 	log.Debug("TURING: sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
-	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
 
 	select {
 		case err := <-errCh:

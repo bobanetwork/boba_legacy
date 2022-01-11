@@ -486,7 +486,7 @@ func (c *Client) GetTransaction(index uint64, backend Backend) (*types.Transacti
 	if !ok {
 		return nil, fmt.Errorf("could not get tx with index %d", index)
 	}
-	log.Info("TURING: client.go GetTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
+	// log.Info("TURING: client.go GetTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
 	return batchedTransactionToTransaction(res.Transaction, c.chainID)
 }
 
@@ -507,7 +507,7 @@ func (c *Client) GetLatestTransaction(backend Backend) (*types.Transaction, erro
 	if !ok {
 		return nil, errors.New("Cannot get latest transaction")
 	}
-    log.Info("TURING: client.go GetLatestTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
+    // log.Info("TURING: client.go GetLatestTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
 	return batchedTransactionToTransaction(res.Transaction, c.chainID)
 }
 
@@ -620,7 +620,7 @@ func (c *Client) GetLatestTransactionBatch() (*Batch, []*types.Transaction, erro
 	if !ok {
 		return nil, nil, fmt.Errorf("Cannot parse transaction batch response")
 	}
-	log.Info("TURING: client.go GetLatestTransactionBatch()", "txBatch", txBatch)
+	// log.Info("TURING: client.go GetLatestTransactionBatch()", "txBatch", txBatch)
 	return parseTransactionBatchResponse(txBatch, c.chainID)
 }
 
@@ -635,7 +635,7 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 		}).
 		Get("/batch/transaction/index/{index}")
     
-    log.Info("TURING: GetTransactionBatch TransactionBatchResponse", "TransactionBatchResponse", TransactionBatchResponse{})
+    // log.Info("TURING: GetTransactionBatch TransactionBatchResponse", "TransactionBatchResponse", TransactionBatchResponse{})
  
 	if err != nil {
 		return nil, nil, fmt.Errorf("Cannot get transaction batch %d: %w", index, err)
@@ -644,14 +644,14 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 	if !ok {
 		return nil, nil, fmt.Errorf("Cannot parse transaction batch response")
 	}
-	log.Info("TURING: client.go GetTransactionBatch()", "txBatch", txBatch)
+	// log.Info("TURING: client.go GetTransactionBatch()", "txBatch", txBatch)
 	return parseTransactionBatchResponse(txBatch, c.chainID)
 }
 
 // parseTransactionBatchResponse will turn a TransactionBatchResponse into a
 // Batch and its corresponding types.Transactions
 func parseTransactionBatchResponse(txBatch *TransactionBatchResponse, chainID *big.Int) (*Batch, []*types.Transaction, error) {
-	log.Info("TURING: client.go parseTransactionBatchResponse()")
+	// log.Info("TURING: client.go parseTransactionBatchResponse()")
 	if txBatch == nil || txBatch.Batch == nil {
 		return nil, nil, errElementNotFound
 	}

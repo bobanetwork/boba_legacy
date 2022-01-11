@@ -299,23 +299,14 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 	switch {
 	case msg.isNotification():
 		h.handleCall(ctx, msg)
-		h.log.Debug("Served-1 "+msg.Method, "t", time.Since(start))
 		return nil
 	case msg.isCall():
 		var resp *jsonrpcMessage
-        log.Debug("TURING handler.go handleCallMsg", "Message", msg, "Context", ctx)
-		// if msg.Method == "eth_call" {
-		// 	log.Debug("MMDBG4", "msg", msg, "PT", reflect.TypeOf(msg.Params))
-		// 	resp = h.handleCall(ctx, msg)
-		// 	log.Debug("MMDBG4 wJ", "resp", resp)
-		// } else {
-			resp = h.handleCall(ctx, msg)
-		//}
+		// log.Debug("TURING handler.go handleCallMsg", "Message", msg, "Context", ctx)
+		resp = h.handleCall(ctx, msg)
 
 		if resp.Error != nil {
 			h.log.Warn("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start), "err", resp.Error.Message)
-		} else {
-			h.log.Debug("Served-2 "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start))
 		}
 
 		return resp
@@ -342,13 +333,13 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	}
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
 
-	if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
-		log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
-	}
+	// if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
+	// 	log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
+	// }
 
-	if msg.Method == "eth_getBlockByNumber" || msg.Method == "eth_sendRawTransaction" {
-		log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
-	}
+	// if msg.Method == "eth_getBlockByNumber" || msg.Method == "eth_sendRawTransaction" {
+	// 	log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
+	// }
 
 	if err != nil {
 		return msg.errorResponse(&invalidParamsError{err.Error()})
@@ -397,7 +388,7 @@ func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMes
 // runMethod runs the Go callback for an RPC method.
 func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {
 	// MMDBG 6
-	log.Debug("TURING handler.go runMethod:", "context", ctx)
+	// log.Debug("TURING handler.go runMethod:", "context", ctx)
 	result, err := callb.call(ctx, msg.Method, args)
 	// if msg.Method == "eth_call" && err != nil {
 	// 	log.Debug("TURING handler.go check for Turing request:", "err", err, "result", result, "args", args)
