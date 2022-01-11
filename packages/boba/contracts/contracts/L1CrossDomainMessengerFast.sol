@@ -17,11 +17,11 @@ import { ICanonicalTransactionChain } from "@eth-optimism/contracts/contracts/L1
 import { IStateCommitmentChain } from "@eth-optimism/contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
 
 /* External Imports */
-import { OwnableUpgradeable } from 
+import { OwnableUpgradeable } from
     "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { PausableUpgradeable } from 
+import { PausableUpgradeable } from
     "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from 
+import { ReentrancyGuardUpgradeable } from
     "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 /**
@@ -108,8 +108,8 @@ contract L1CrossDomainMessengerFast is
     /**
      * Pause fast exit relays
      */
-    function pause() 
-        external 
+    function pause()
+        external
         onlyOwner() {
         _pause();
     }
@@ -117,8 +117,8 @@ contract L1CrossDomainMessengerFast is
     /**
      * UnPause fast exit relays
      */
-    function unpause() 
-        external 
+    function unpause()
+        external
         onlyOwner() {
         _unpause();
     }
@@ -273,38 +273,7 @@ contract L1CrossDomainMessengerFast is
         override
         public
     {
-        // Verify that the message is in the queue:
-        address canonicalTransactionChain = resolve("CanonicalTransactionChain");
-        Lib_OVMCodec.QueueElement memory element =
-            ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
-
-        bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
-            _target,
-            _sender,
-            _message,
-            _queueIndex
-        );
-        
-        // Compute the transactionHash
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                AddressAliasHelper.applyL1ToL2Alias(address(this)),
-                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _oldGasLimit,
-                _message
-            )
-        );
-
-        require(
-            transactionHash == element.transactionHash,
-            "Provided message has not been enqueued."
-        );
-
-        _sendXDomainMessage(
-            canonicalTransactionChain,
-            xDomainCalldata,
-            _newGasLimit
-        );
+        revert("Sending via this messenger is disabled");
     }
 
     /**********************
@@ -412,21 +381,5 @@ contract L1CrossDomainMessengerFast is
             _proof.storageTrieWitness,
             account.storageRoot
         );
-    }
-
-    /**
-     * Sends a cross domain message.
-     * @param _canonicalTransactionChain Address of the CanonicalTransactionChain instance.
-     * @param _message Message to send.
-     * @param _gasLimit OVM gas limit for the message.
-     */
-    function _sendXDomainMessage(
-        address _canonicalTransactionChain,
-        bytes memory _message,
-        uint256 _gasLimit
-    )
-        internal
-    {
-        revert("Sending via this messenger is disabled");
     }
 }
