@@ -112,7 +112,8 @@ func ApplyTransaction(
 
 	log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
 	// Create a new environment which holds all relevant information
-	// about the transaction and calling mechanisms.
+	// about the transaction and calling mechanisms. This environment also 
+	// contains Turing data, which is critical for verifiers and replicas.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
 
 	// UsingOVM

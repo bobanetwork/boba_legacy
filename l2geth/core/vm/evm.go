@@ -462,18 +462,20 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		log.Debug("TURING REQUEST START", "input", input)
 	} 
 
-	// bobaTuringCall takes the original calldata, figures out what needs
+	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
 
 	if isTuring2 {
-		if(bytes.Equal(evm.Context.Turing, []byte{0})) { 
-			// this is the first run of Turing in the sequencer
-			// this _should_ never happen in Verifier mode, since the sequencer will already have run the Turing call
+		if(len(evm.Context.Turing) < 3) { 
+			// This is the first run of Turing for this transaction
+			// We sometimes use a short evm.Context.Turing payload for debug purposes.
+			// A real modified callData is always much much > 2 bytes
+			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			updated_input = bobaTuringCall(input, caller.Address())
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
-			//copy(evm.Context.Turing, updated_input) 
+			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
 		} else {
 			// Turing for this Transaction has already been run elsewhere - replay using 
@@ -483,9 +485,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}
 		log.Debug("TURING REQUEST END", "updated_input", updated_input)
 	} else if isGetRand2 {
-		if(bytes.Equal(evm.Context.Turing, []byte{0})) {
-			// this is the first run of Turing in the sequencer
-			// this _should_ never happen in Verifier mode, since the sequencer will already have run the Turing call 
+		if(len(evm.Context.Turing) < 3) { 
+			// see above comments - they apply 1:1 here too
 			updated_input = bobaTuringRandom(input)
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
@@ -520,12 +521,6 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			contract.UseGas(contract.Gas)
 		}
 	}
-
-	// log.Debug("TURING exiting Call",
-	// 	"depth", evm.depth,
-	// 	"addr", addr,
-	// 	"ret", hexutil.Bytes(ret),
-	// 	"err", err)
     
 	return ret, contract.Gas, err
 }

@@ -83,7 +83,7 @@ type Message interface {
 	L1Timestamp() uint64
 	L1BlockNumber() *big.Int
 	QueueOrigin() types.QueueOrigin
-	//Turing() []byte
+	L1Turing() []byte
 }
 
 // IntrinsicGas computes the 'intrinsic gas' for a message with the given data.

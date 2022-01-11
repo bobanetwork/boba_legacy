@@ -63,7 +63,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			GasLimit:      header.GasLimit,
 			GasPrice:      new(big.Int).Set(msg.GasPrice()),
 			L1BlockNumber: msg.L1BlockNumber(),
-			Turing:        []byte{0}, //msg.Turing()
+			Turing:        msg.L1Turing(),
 		}
 	} else {
 		return vm.Context{

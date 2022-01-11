@@ -242,16 +242,18 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 		return nil, errors.New("Timestamp not found for enqueue tx")
 	}
 	timestamp := *enqueue.Timestamp
-
 	if enqueue.Data == nil {
 		return nil, errors.New("Data not found for enqueue tx")
 	}
 	data := *enqueue.Data
 
-	// if enqueue.Turing == nil {
-	// 	return nil, errors.New("Turing not found for enqueue tx")
-	// }
-	turing := []byte{1,2} //*enqueue.Turing
+	turing := hexutil.Bytes([]byte{4})
+	if enqueue.Turing == nil {
+		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing - setting to 4") 
+	} else {
+		log.Info("TURING: rollup/client.go Enqueue tx with non-nil Turing", "enqueue_turing", enqueue.Turing)
+		turing = *enqueue.Turing
+	}
 
 	// enqueue transactions have no value
 	value := big.NewInt(0)
@@ -605,7 +607,7 @@ func (c *Client) SyncStatus(backend Backend) (*SyncStatus, error) {
 	return status, nil
 }
 
-// GetLatestTransactionBatch will return the latest transaction batch
+// GetLatestTransactionBatch will return the latest transaction batch from the DTL
 func (c *Client) GetLatestTransactionBatch() (*Batch, []*types.Transaction, error) {
 	response, err := c.client.R().
 		SetResult(&TransactionBatchResponse{}).
@@ -632,7 +634,9 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 			"index": str,
 		}).
 		Get("/batch/transaction/index/{index}")
-
+    
+    log.Info("TURING: GetTransactionBatch TransactionBatchResponse", "TransactionBatchResponse", TransactionBatchResponse{})
+ 
 	if err != nil {
 		return nil, nil, fmt.Errorf("Cannot get transaction batch %d: %w", index, err)
 	}
