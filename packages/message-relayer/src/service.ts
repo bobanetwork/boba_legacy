@@ -74,6 +74,10 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
+  numEventConfirmations?: number
+
+  multiRelayLimit?: number
+
   resubmissionTimeout?: number
 
   maxWaitTxTimeS: number
@@ -116,6 +120,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     timeOfLastRelayS: number
     messageBuffer: Array<BatchMessage>
     timeOfLastPendingRelay: any
+    didWork: boolean
   }
 
   protected async _init(): Promise<void> {
@@ -205,6 +210,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     // filter
     this.state.filter = []
 
+    this.logger.info('Starting at', {
+      lastFinalizedTxHeight: this.state.lastFinalizedTxHeight,
+      nextUnfinalizedTxHeight: this.state.nextUnfinalizedTxHeight,
+      lastQueriedL1Block: this.state.lastQueriedL1Block,
+      numEventConfirmations: this.options.numEventConfirmations,
+    })
+
     //batch system
     this.state.timeOfLastRelayS = Date.now()
     this.state.timeSinceLastRelayS = 0
@@ -214,7 +226,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
+      if (!this.state.didWork) {
+        await sleep(this.options.pollingInterval)
+      }
+      this.state.didWork = false
+
       await this._getFilter()
 
       try {
@@ -273,6 +289,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           pendingTXTimeOut
         ) {
           if (gasPriceAcceptable) {
+            this.state.didWork = true
             if (bufferFull) {
               console.log('Buffer full: flushing')
             }
@@ -280,30 +297,63 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               console.log('Buffer timeout: flushing')
             }
 
-            /* parse this to make sure that the mesaage was actually relayed */
-            // clear out buffer only if the messages are relayed to L1 successfully
-            if (
-              await this._wereMessagesRelayed(
-                this.state.messageBuffer.reduce((acc, cur) => {
-                  acc.push(cur.message)
-                  return acc
-                }, [])
-              )
-            ) {
-              //clear out the buffer so we do not double relay, which will just
-              // waste gas
-              this.state.messageBuffer = []
+            // Filter out messages which have been processed
+            const newMB = []
+            for (const cur of this.state.messageBuffer) {
+              if (
+                !(await this._wasMessageRelayed(cur.message)) &&
+                !(await this._wasMessageFailed(cur.message))
+              ) {
+                newMB.push(cur)
+              }
+            }
+            this.state.messageBuffer = newMB
+
+            if (this.state.messageBuffer.length === 0) {
               this.state.timeOfLastPendingRelay = false
             } else {
+              // Limit the number of messages to be submitted per batch.
+              const subBuffer = this.state.messageBuffer.slice(
+                0,
+                this.options.multiRelayLimit
+              )
+              this.logger.info('Prepared message subBuffer', {
+                subLen: subBuffer.length,
+                bufLen: this.state.messageBuffer.length,
+                limit: this.options.multiRelayLimit,
+              })
               const receipt = await this._relayMultiMessageToL1(
-                this.state.messageBuffer.reduce((acc, cur) => {
+                subBuffer.reduce((acc, cur) => {
                   acc.push(cur.payload)
                   return acc
                 }, [])
               )
 
-              console.log('Receipt:', receipt)
-              // add the time interval between two tx
+              if (!receipt) {
+                this.logger.error(
+                  'No receipt for relayMultiMessage transaction'
+                )
+              } else if (receipt.status === 1) {
+                this.logger.info('Successful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              } else {
+                this.logger.warning('Unsuccessful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              }
+
+              // add a delay between two tx
               this.state.timeOfLastPendingRelay = Date.now()
             }
           } else {
@@ -338,22 +388,33 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             continue
           }
 
+          this.state.didWork = true
           this.state.lastFinalizedTxHeight = this.state.nextUnfinalizedTxHeight
           while (
             await this._isTransactionFinalized(
               this.state.nextUnfinalizedTxHeight
             )
           ) {
-            const size = (
+            const batch = (
               await this._getStateBatchHeader(
                 this.state.nextUnfinalizedTxHeight
               )
-            ).batch.batchSize.toNumber()
+            ).batch
+            const size = batch.batchSize.toNumber()
+            const batchStart = batch.prevTotalElements.toNumber()
+
             this.logger.info(
               'Found a batch of finalized transaction(s), checking for more...',
-              { batchSize: size }
+              {
+                batchSize: size,
+                atHeight: this.state.nextUnfinalizedTxHeight,
+                batchStart,
+              }
             )
-            this.state.nextUnfinalizedTxHeight += size
+            // This must point to the first txHeight within the next batch. If the service starts
+            // with a misaligned fromL2TransactionIndex then this should realign it to avoid
+            // missed messages.
+            this.state.nextUnfinalizedTxHeight = batchStart + size
 
             // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
             // need to keep in memory. We operate on full batches at a time so the actual amount
@@ -437,18 +498,39 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             const lastProcessedBatch = await this._getStateBatchHeader(
               lastMessage.parentTransactionIndex
             )
+            this.logger.info('Pending messages', {
+              numMessages: messages.length,
+              firstTxnIdx: messages[0].parentTransactionIndex,
+              lastTxnIdx: lastMessage.parentTransactionIndex,
+              lastBatch: lastProcessedBatch.batch.batchIndex,
+            })
 
             // Remove any events from the cache for batches that should've been processed by now.
-            const oldSize = this.state.eventCache.length
+            const oldLen = this.state.eventCache.length
+            this.logger.info('eventCache before filter', {
+              size: oldLen,
+              firstIdx: oldLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: oldLen
+                ? this.state.eventCache[oldLen - 1].args._batchIndex
+                : 'n/a',
+            })
             this.state.eventCache = this.state.eventCache.filter((event) => {
               return (
-                event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+                Number(event.args._batchIndex) >
+                Number(lastProcessedBatch.batch.batchIndex)
               )
             })
-            const newSize = this.state.eventCache.length
-            this.logger.info('Trimmed eventCache', {
-              oldSize,
-              newSize,
+            const newLen = this.state.eventCache.length
+            this.logger.info('eventCache after filter', {
+              size: newLen,
+              firstIdx: newLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: newLen
+                ? this.state.eventCache[newLen - 1].args._batchIndex
+                : 'n/a',
             })
           }
 
@@ -506,7 +588,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1
-    const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
+    const maxBlock =
+      (await this.options.l1RpcProvider.getBlockNumber()) -
+      this.options.numEventConfirmations
     while (startingBlock <= maxBlock) {
       const endBlock = Math.min(
         startingBlock + this.options.getLogsInterval,
@@ -516,7 +600,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.logger.info('Querying events', {
         startingBlock,
         endBlock,
-        maxBlock,
       })
       const events: ethers.Event[] =
         await this.state.StateCommitmentChain.queryFilter(
@@ -524,8 +607,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           startingBlock,
           endBlock
         )
+
       const ebn = []
-      events.forEach(e => {
+      events.forEach((e) => {
         ebn.push(e.blockNumber)
       })
       this.logger.info('Queried Events', { startingBlock, endBlock, ebn })
@@ -578,7 +662,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     const header = await this._getStateBatchHeader(height)
 
     if (header === undefined) {
-      this.logger.info('No state batch header found.')
+      this.logger.info('No state batch header found.', {
+        height,
+        lastF: this.state.lastFinalizedTxHeight,
+        nextU: this.state.nextUnfinalizedTxHeight,
+      })
       return false
     } else {
       this.logger.info('Got state batch header', { header })

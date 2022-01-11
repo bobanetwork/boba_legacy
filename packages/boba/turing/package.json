@@ -1,0 +1,38 @@
+{
+  "name": "@boba/turing-hybrid-compute",
+  "version": "0.2.0",
+  "description": "Hybrid Compute for Ethereum prototype",
+  "main": "index.js",
+  "repository": "git@github.com:omgnetwork/optimism-v2/packages/boba/turing",
+  "author": "Michael Montour <mmontour@enya.ai>",
+  "license": "Internal use only",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf ./artifacts ./cache",
+    "build": "yarn build:contracts",
+    "build:contracts": "hardhat compile",
+    "test:boba": "hardhat --network boba_local test"
+  },
+  "devDependencies": {
+    "@ethersproject/address": "^5.0.11",
+    "@ethersproject/contracts": "^5.0.11",
+    "@ethersproject/networks": "^5.0.11",
+    "@ethersproject/providers": "^5.0.24",
+    "@ethersproject/solidity": "^5.0.11",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "4.3.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.3",
+    "ethers": "^5.0.32",
+    "hardhat": "^2.2.1",
+    "mocha": "^8.3.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "ip": "^1.1.5",
+    "web3": "^1.6.1",
+    "web3-eth-abi": "^1.6.1"
+  }
+}
