@@ -125,7 +125,8 @@ describe('Boba Fixed Savings', async () => {
       env.l2Wallet
     )
 
-    ImplementationFixedSavings = await Factory__ImplementationFixedSavings.deploy()
+    ImplementationFixedSavings =
+      await Factory__ImplementationFixedSavings.deploy()
     await ImplementationFixedSavings.deployTransaction.wait()
 
     const Factory__Proxy__FixedSavings = new ContractFactory(

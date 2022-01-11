@@ -30,7 +30,6 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
   SequencerBatchAppendedParsedEvent
 > = {
   getExtraData: async (event, l1RpcProvider) => {
-
     const l1Transaction = await event.getTransaction()
     const eventBlock = await event.getBlock()
 
@@ -45,8 +44,8 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     const CanonicalTransactionChain = getContractFactory(
       'CanonicalTransactionChain'
     )
-    .attach(event.address)
-    .connect(l1RpcProvider)
+      .attach(event.address)
+      .connect(l1RpcProvider)
 
     const batchSubmissionEvent = (
       await CanonicalTransactionChain.queryFilter(
@@ -93,7 +92,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     console.log(`DTL l1-injection - parseEvent`, {
       calldata: toHexString(calldata),
       event,
-      extraData
+      extraData,
     })
 
     if (calldata.length < 12) {
@@ -109,20 +108,20 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     let nextTxPointer = 15 + 16 * numContexts
 
     for (let i = 0; i < numContexts; i++) {
-
       const contextPointer = 15 + 16 * i
 
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
-
         let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer
         )
 
         // need to clean up the transaction at this point
-        console.log(`DTL parseSequencerBatchTransaction`, {sequencerTransaction: toHexString(sequencerTransaction)})
+        console.log(`DTL parseSequencerBatchTransaction`, {
+          sequencerTransaction: toHexString(sequencerTransaction),
+        })
 
         const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
         let turing = Buffer.from('0')
@@ -132,7 +131,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         if (turingIndex > 0) {
           //we have turing payload
           turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-          turingExtraLength = turing.length + 3                // fix the nextTxPointer so that we start at the beginning of the next real transaction
+          turingExtraLength = turing.length + 3 // fix the nextTxPointer so that we start at the beginning of the next real transaction
           sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
           console.log('Found a Turing payload at position:', {
             turingIndex,

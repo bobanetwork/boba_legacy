@@ -525,7 +525,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           endBlock
         )
       const ebn = []
-      events.forEach(e => {
+      events.forEach((e) => {
         ebn.push(e.blockNumber)
       })
       this.logger.info('Queried Events', { startingBlock, endBlock, ebn })
