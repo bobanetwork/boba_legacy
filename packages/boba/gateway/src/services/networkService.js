@@ -556,7 +556,8 @@ class NetworkService {
                               'REP',  'BAT', 'ZRX',  'SUSHI',
                               'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
-                              'BUSD', 'BNB', 'FTM',  'MATIC'
+                              'BUSD', 'BNB', 'FTM',  'MATIC',
+                              'UMA'
                             ]
 
       //not all tokens are on Rinkeby
