@@ -80,6 +80,7 @@ import { getAllNetworks } from 'util/masterConfig'
 import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
+import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import { sortRawTokens } from 'util/common'
 
 require('dotenv').config()
@@ -171,6 +172,22 @@ class NetworkService {
       localStorage.setItem('changeChain', true)
       window.location.reload()
     })
+  }
+
+  async fetchVerifierStatus() {
+    const response = await verifierWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
+
+    console.log("Verifier response: ", response)
+
+    if (response.status === 200) {
+      const status = response.data.result
+      return status
+    } else {
+      console.log("Bad verifier response")
+      return false
+    }
   }
 
   async fetchAirdropStatusL1() {
