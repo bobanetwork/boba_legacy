@@ -21,6 +21,7 @@ import busdLogo from 'images/busd.svg';
 import bnbLogo from 'images/bnb.svg';
 import ftmLogo from 'images/ftm.svg';
 import maticLogo from 'images/matic.svg';
+import umaLogo from 'images/uma.svg';
 
 export const getCoinImage = (symbol) => {
 
@@ -98,6 +99,9 @@ export const getCoinImage = (symbol) => {
       break;
     case "MATIC":
       logo = maticLogo;
+      break;
+    case "UMA":
+      logo = umaLogo;
       break;
     default:
       logo = ethLogo;
