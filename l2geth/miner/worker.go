@@ -1149,16 +1149,16 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 			if bn == nil {
 				bn = new(big.Int)
 			}
-			log.Info("New block", 
-				"index", block.Number().Uint64()-uint64(1), 
-				"l1-timestamp", tx.L1Timestamp(), 
-				"l1-blocknumber", bn.Uint64(), 
-				"tx-hash", tx.Hash().Hex(),
-				"queue-orign", tx.QueueOrigin(), 
-				"gas", block.GasUsed(), 
-				"fees", feesEth, 
-				"elapsed", common.PrettyDuration(time.Since(start)),
-				"tx", tx)
+			// log.Info("New block", 
+			// 	"index", block.Number().Uint64()-uint64(1), 
+			// 	"l1-timestamp", tx.L1Timestamp(), 
+			// 	"l1-blocknumber", bn.Uint64(), 
+			// 	"tx-hash", tx.Hash().Hex(),
+			// 	"queue-orign", tx.QueueOrigin(), 
+			// 	"gas", block.GasUsed(), 
+			// 	"fees", feesEth, 
+			// 	"elapsed", common.PrettyDuration(time.Since(start)),
+			// 	"tx", tx)
 
 		case <-w.exitCh:
 			log.Info("Worker has exited")

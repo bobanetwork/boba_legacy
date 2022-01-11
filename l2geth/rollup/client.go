@@ -1,7 +1,6 @@
 package rollup
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -208,7 +207,7 @@ func (c *Client) GetEnqueue(index uint64) (*types.Transaction, error) {
 // so that it can be consumed by the SyncService
 func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 
-	log.Debug("enqueueToTransaction", "enqueue", enqueue)
+	// log.Debug("enqueueToTransaction", "enqueue", enqueue)
 
 	if enqueue == nil {
 		return nil, errElementNotFound
@@ -338,7 +337,7 @@ func (c *Client) GetLatestTransactionBatchIndex() (*uint64, error) {
 // types.Transaction that can be consumed by the SyncService
 func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types.Transaction, error) {
 
-	log.Info("TURING: client.go batchedTransactionToTransaction", "tx", res)
+	// log.Info("TURING: client.go batchedTransactionToTransaction", "tx", res)
 	
 	// `nil` transactions are not found
 	if res == nil {
@@ -360,8 +359,8 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	// Transactions that have been decoded are
 	// Queue Origin Sequencer transactions
 	if res.Decoded != nil {
-		log.Info("TURING: client.go batchedTransactionToTransaction: Queue Origin Sequencer transaction", 
-			"res.Decoded", res.Decoded)
+		// log.Info("TURING: client.go batchedTransactionToTransaction: Queue Origin Sequencer transaction", 
+		// 	"res.Decoded", res.Decoded)
 		nonce := res.Decoded.Nonce
 		to := res.Decoded.Target
 		value := (*big.Int)(res.Decoded.Value)
@@ -415,7 +414,6 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 
 	// The transaction is either an L1 to L2 transaction or it does not have a
 	// known deserialization
-	log.Info("TURING: client.go batchedTransactionToTransaction: L1 to L2 transaction", "res", res)
 	nonce := uint64(0)
 	if res.QueueOrigin == l1 {
 		if res.QueueIndex == nil {
@@ -425,42 +423,19 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	}
 	target := res.Target
 	gasLimit := res.GasLimit
-	
 	data := res.Data
-	turing := []byte{36} // = no turing data - normal call
-
-	//methodID for GetResponse is 7d93616c -> [125 147 97 108]
-	isTuring2 := bytes.Index(data, []byte{42, 42, 42, 125, 147, 97, 108})
-	if isTuring2 != -1 {
-		data = data[:isTuring2] // restore original eth_sendRawTransaction input
-		turing = res.Data[isTuring2+3:]
-		log.Debug("TURING: Verifier Received Turing GetResponse Payload from L1", 
-			"modified_calldata", res.Data[isTuring2+3:],
-			"restored raw calldata", data)
-	} 
-
-	//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-	isGetRand2 := bytes.Index(data, []byte{42, 42, 42, 73, 61, 87, 214})
-	if isGetRand2 != -1 {
-		data = data[:isGetRand2] // restore original eth_sendRawTransaction input
-		turing = res.Data[isGetRand2+3:]
-		log.Debug("TURING: Verifier Received Turing GetRandom Payload from L1", 
-			"modified_calldata", res.Data[isGetRand2+3:],
-			"restored raw calldata", data)
-	} 
-
 	origin := res.Origin
 	value := (*big.Int)(res.Value)
 	tx := types.NewTransaction(nonce, target, value, gasLimit, big.NewInt(0), data)
 	txMeta := types.NewTransactionMeta(
 		new(big.Int).SetUint64(res.BlockNumber),
 		res.Timestamp,
-		turing, //res.Turing,
+		res.Turing,
 		origin,
 		queueOrigin,
 		&res.Index,
 		res.QueueIndex,
-		data, //res.Data
+		res.Data,
 	)
 	tx.SetTransactionMeta(txMeta)
 	return tx, nil
@@ -486,7 +461,6 @@ func (c *Client) GetTransaction(index uint64, backend Backend) (*types.Transacti
 	if !ok {
 		return nil, fmt.Errorf("could not get tx with index %d", index)
 	}
-	// log.Info("TURING: client.go GetTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
 	return batchedTransactionToTransaction(res.Transaction, c.chainID)
 }
 
@@ -507,7 +481,6 @@ func (c *Client) GetLatestTransaction(backend Backend) (*types.Transaction, erro
 	if !ok {
 		return nil, errors.New("Cannot get latest transaction")
 	}
-    // log.Info("TURING: client.go GetLatestTransaction: batchedTransactionToTransaction", "res.Transaction", res.Transaction)
 	return batchedTransactionToTransaction(res.Transaction, c.chainID)
 }
 
@@ -620,13 +593,11 @@ func (c *Client) GetLatestTransactionBatch() (*Batch, []*types.Transaction, erro
 	if !ok {
 		return nil, nil, fmt.Errorf("Cannot parse transaction batch response")
 	}
-	// log.Info("TURING: client.go GetLatestTransactionBatch()", "txBatch", txBatch)
 	return parseTransactionBatchResponse(txBatch, c.chainID)
 }
 
 // GetTransactionBatch will return the transaction batch by batch index
 func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction, error) {
-
 	str := strconv.FormatUint(index, 10)
 	response, err := c.client.R().
 		SetResult(&TransactionBatchResponse{}).
@@ -634,9 +605,7 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 			"index": str,
 		}).
 		Get("/batch/transaction/index/{index}")
-    
-    // log.Info("TURING: GetTransactionBatch TransactionBatchResponse", "TransactionBatchResponse", TransactionBatchResponse{})
- 
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("Cannot get transaction batch %d: %w", index, err)
 	}
@@ -651,14 +620,12 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 // parseTransactionBatchResponse will turn a TransactionBatchResponse into a
 // Batch and its corresponding types.Transactions
 func parseTransactionBatchResponse(txBatch *TransactionBatchResponse, chainID *big.Int) (*Batch, []*types.Transaction, error) {
-	// log.Info("TURING: client.go parseTransactionBatchResponse()")
 	if txBatch == nil || txBatch.Batch == nil {
 		return nil, nil, errElementNotFound
 	}
 	batch := txBatch.Batch
 	txs := make([]*types.Transaction, len(txBatch.Transactions))
 	for i, tx := range txBatch.Transactions {
-		log.Info("TURING: client.go parsing", "tx", tx)
 		transaction, err := batchedTransactionToTransaction(tx, chainID)
 		if err != nil {
 			return nil, nil, fmt.Errorf("Cannot parse transaction batch: %w", err)

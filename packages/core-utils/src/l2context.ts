@@ -34,7 +34,7 @@ export const injectL2Context = (l1Provider: providers.JsonRpcProvider) => {
   )
 
   provider.formatter.blockWithTransactions = (block) => {
-    console.log('core-utils l2context blockWithTransactions', { block })
+    // console.log('core-utils l2context blockWithTransactions', { block })
     const b = blockWithTransactions(block)
     b.stateRoot = block.stateRoot
     for (let i = 0; i < b.transactions.length; i++) {
@@ -64,9 +64,9 @@ export const injectL2Context = (l1Provider: providers.JsonRpcProvider) => {
   )
 
   provider.formatter.transactionResponse = (transaction) => {
-    console.log('core-utils l2context transactionResponse', {
-      transaction,
-    })
+    // console.log('core-utils l2context transactionResponse', {
+    //   transaction,
+    // })
     const tx = formatTxResponse(transaction) as any
     tx.txType = transaction.txType
     tx.queueOrigin = transaction.queueOrigin

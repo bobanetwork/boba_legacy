@@ -19,14 +19,12 @@ package core
 import (
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/fees"
 )
@@ -128,12 +126,12 @@ func ApplyTransaction(
 	// Apply the transaction to the current state (included in the env)
 	result, gas, failed, err, turing := ApplyMessage(vmenv, msg, gp)
 
-	log.Debug("TURING state_processor.go ApplyTransaction - result of ApplyMessage",
-		"failed", failed,
-		"err", err,
-		"gas", gas,
-		"result", hexutil.Bytes(result),
-		"turing", turing)
+	// log.Debug("TURING state_processor.go ApplyTransaction - result of ApplyMessage",
+	// 	"failed", failed,
+	// 	"err", err,
+	// 	"gas", gas,
+	// 	"result", hexutil.Bytes(result),
+	// 	"turing", turing)
 
 	if err != nil {
 		return nil, err

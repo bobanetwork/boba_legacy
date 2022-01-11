@@ -756,12 +756,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
     const block = await this._getBlock(blockNumber)
 
-    this.logger.debug('Fetched L2 block', { block })
-    console.log('Fetched L2 block', {
-      block,
-      transactions: block.transactions[0],
-    })
-
     const batchElement = {
       stateRoot: block.stateRoot,
       timestamp: block.timestamp,
@@ -780,7 +774,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         rawTransaction = rawTransaction + '424242' + turing.slice(2) //Chop off the '0x' from the Turing string
       }
       batchElement.rawTransaction = rawTransaction
-      console.log('batchElement.rawTransaction', { batchElement })
     }
 
     return batchElement
