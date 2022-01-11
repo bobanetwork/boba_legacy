@@ -781,7 +781,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
   private async _getBlock(blockNumber: number): Promise<L2Block> {
     const p = this.l2Provider.getBlockWithTransactions(blockNumber)
-    console.log('_getBlock from provider', { block: p })
     return p as Promise<L2Block>
   }
 

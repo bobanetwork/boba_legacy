@@ -25,10 +25,6 @@ export const handleSequencerBlock = {
   }> => {
     const transaction = block.transactions[0]
 
-    console.log(`Parsing a transaction from the L2`, {
-      transaction,
-    })
-
     // This has an explicit l1Turing field and data we can just propagate
     // into the return structures
     // No need to parse or manipulate it

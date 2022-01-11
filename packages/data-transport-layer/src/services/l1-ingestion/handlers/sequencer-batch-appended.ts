@@ -89,11 +89,11 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     // It's easier to deal with this data if it's a Buffer.
     const calldata = fromHexString(extraData.l1TransactionData)
 
-    console.log(`DTL l1-injection - parseEvent`, {
-      calldata: toHexString(calldata),
-      event,
-      extraData,
-    })
+    // console.log(`DTL l1-injection - parseEvent`, {
+    //   calldata: toHexString(calldata),
+    //   event,
+    //   extraData,
+    // })
 
     if (calldata.length < 12) {
       throw new Error(

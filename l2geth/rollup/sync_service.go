@@ -816,7 +816,8 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
-		tx.SetL1Turing([]byte{0}) // populate the Turing metadata for debug purposes - in this case, set to 0, since it's a new transaction
+		tx.SetL1Turing([]byte{0})
+		// populate the Turing metadata for debug purposes - in this case, set to 0, since it's a new transaction
 		// log.Debug("TURING sync_service.go Generating metadata for RPC call", "timestamp", ts, "L1BlockNumber", bn)
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() {
 		// If the timestamp of the transaction is greater than the sync
@@ -1189,7 +1190,7 @@ func (s *SyncService) syncTransactions(backend Backend) (*uint64, error) {
 // syncTransactionRange will sync a range of transactions from
 // start to end (inclusive) from a specific Backend
 func (s *SyncService) syncTransactionRange(start, end uint64, backend Backend) error {
-	log.Info("Syncing transaction range", "start", start, "end", end, "backend", backend.String())
+	//log.Info("Syncing transaction range", "start", start, "end", end, "backend", backend.String())
 	for i := start; i <= end; i++ {
 		tx, err := s.client.GetTransaction(i, backend)
 		if err != nil {

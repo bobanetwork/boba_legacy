@@ -1,3 +1,6 @@
+
+# OUTDATED/OUTDATED/OUTDATED - MAJOR REVISION PENDING
+
 # Introduction to Turing
 
 - [Introduction to Turing](#introduction-to-turing)
