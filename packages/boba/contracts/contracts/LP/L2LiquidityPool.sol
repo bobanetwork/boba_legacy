@@ -166,6 +166,14 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         address tokenAddress
     );
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event DaoRoleTransferred(
+        address newDao
+    );
+
     /********************************
      * Constructor & Initialization *
      ********************************/
@@ -220,6 +228,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         require(_newOwner != address(0), 'New owner cannot be the zero address');
         owner = _newOwner;
+        emit OwnershipTransferred(_newOwner);
     }
 
     /**
@@ -235,6 +244,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         require(_newDAO != address(0), 'New DAO address cannot be the zero address');
         DAO = _newDAO;
+        emit DaoRoleTransferred(_newDAO);
     }
 
     /**
