@@ -689,6 +689,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
         whenNotPaused
     {
+        // replyNeeded helps store the status if a message needs to be sent back to the other layer
+        // in case there is not enough funds to give away
         bool replyNeeded = false;
         PoolInfo storage pool = poolInfo[_tokenAddress];
         uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
