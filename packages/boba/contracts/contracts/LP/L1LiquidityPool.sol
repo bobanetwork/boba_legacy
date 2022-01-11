@@ -464,7 +464,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
-        // Construct calldata for L1LiquidityPool.depositToFinalize(_to, receivedAmount)
+        // Construct calldata for L2LiquidityPool.clientPayL2(_to, _amount, _tokenAddress)
         bytes memory data = abi.encodeWithSelector(
             iL2LiquidityPool.clientPayL2.selector,
             msg.sender,
@@ -472,7 +472,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             pool.l2TokenAddress
         );
 
-        // Send calldata into L1
+        // Send calldata into L2
         sendCrossDomainMessage(
             address(L2LiquidityPoolAddress),
             // extra gas for complex l2 logic
@@ -700,7 +700,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         uint256 receivedAmount = _amount.sub(totalFee);
 
         if (_tokenAddress != address(0)) {
-            //IERC20(_tokenAddress).safeTransfer(_to, _amount);
             if (receivedAmount > IERC20(_tokenAddress).balanceOf(address(this))) {
                 replyNeeded = true;
             } else {
@@ -710,18 +709,12 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             }
         } else {
             // //this is ETH
-            // // balances[address(0)] = balances[address(0)].sub(_amount);
-            // //_to.transfer(_amount); UNSAFE
-            // (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
-            // require(sent, "Failed to send Ether");
             if (receivedAmount > address(this).balance) {
                  replyNeeded = true;
              } else {
                 pool.accUserReward = pool.accUserReward.add(userRewardFee);
                 pool.accOwnerReward = pool.accOwnerReward.add(ownerRewardFee);
                  //this is ETH
-                 // balances[address(0)] = balances[address(0)].sub(_amount);
-                 //_to.transfer(_amount); UNSAFE
                  (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
                  require(sent, "Failed to send ETH");
              }
@@ -792,8 +785,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
         } else {
             //this is ETH
-            // balances[address(0)] = balances[address(0)].sub(_amount);
-            //_to.transfer(_amount); UNSAFE
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: receivedAmount}("");
             require(sent, "Failed to send Ether");
         }
