@@ -68,5 +68,15 @@ describe("Turing VRF", function () {
     console.log("    Turing VRF 64 =",result)
   })
 
+  it("should get a length 64 VRF", async () => {
+    let tr = await hello.getRandom()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = rawData.slice(-64)
+    let result = parseInt(numberHexString, 16)
+    console.log("    Turing VRF 64 =",result)
+  })
+
 })
 

@@ -162,6 +162,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         startBlock + this.maxBatchSize,
         await this.l2Provider.getBlockNumber()
       ) + 1 // +1 because the `endBlock` is *exclusive*
+
     this.logger.info('Retrieved end block number from L2 sequencer', {
       endBlock,
     })
@@ -203,7 +204,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const [batchParams, wasBatchTruncated] =
       await this._generateSequencerBatchParams(startBlock, endBlock)
+
     const batchSizeInBytes = encodeAppendSequencerBatch(batchParams).length / 2
+
     this.logger.debug('Sequencer batch generated', {
       batchSizeInBytes,
     })
@@ -230,7 +233,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       batchStart: batchParams.shouldStartAtElement,
       batchElements: batchParams.totalElementsToAppend,
     })
-    this.logger.info('Submitting batch.', {
+    this.logger.info('Submitting batch', {
       calldata: batchParams,
       l1tipHeight,
     })
@@ -388,6 +391,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     // TODO: Verify queue element hash equality. The queue element hash can be computed with:
     // keccak256( abi.encode( msg.sender, _target, _gasLimit, _data))
+
     this._enableAutoFixBatchOptions(0)
     // Check timestamp & blockNumber equality
     if (timestamp !== queueElement.timestamp) {
@@ -550,7 +554,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           nextQueueIndex++
           await updateLatestTimestampAndBlockNumber()
         }
-        // Fix the element if its timestammp/blockNumber is too small
+        // Fix the element if its timestamp/blockNumber is too small
         if (
           ele.timestamp < earliestTimestamp ||
           ele.blockNumber < earliestBlockNumber
@@ -564,7 +568,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           ele.timestamp = earliestTimestamp
           ele.blockNumber = earliestBlockNumber
         }
-        // Fix the element if its timestammp/blockNumber is too large
+        // Fix the element if its timestamp/blockNumber is too large
         if (
           ele.timestamp > latestTimestamp ||
           ele.blockNumber > latestBlockNumber
@@ -751,9 +755,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
     const block = await this._getBlock(blockNumber)
-    this.logger.debug('Fetched L2 block', {
-      block,
-    })
 
     const batchElement = {
       stateRoot: block.stateRoot,
@@ -765,7 +766,14 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     if (this._isSequencerTx(block)) {
       batchElement.isSequencerTx = true
-      batchElement.rawTransaction = block.transactions[0].rawTransaction
+      const turing = block.transactions[0].l1Turing
+      let rawTransaction = block.transactions[0].rawTransaction
+      if (turing.length > 4) {
+        //we have a nonzero turing payload
+        //add a spacer, remove the '0x', and tack on the turing string
+        rawTransaction = rawTransaction + '424242' + turing.slice(2) //Chop off the '0x' from the Turing string
+      }
+      batchElement.rawTransaction = rawTransaction
     }
 
     return batchElement
@@ -773,6 +781,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
   private async _getBlock(blockNumber: number): Promise<L2Block> {
     const p = this.l2Provider.getBlockWithTransactions(blockNumber)
+    console.log('_getBlock from provider', { block: p })
     return p as Promise<L2Block>
   }
 

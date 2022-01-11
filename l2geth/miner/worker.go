@@ -491,7 +491,10 @@ func (w *worker) mainLoop() {
 				}
 				txn := txs[0]
 				height := head.Block.Number().Uint64()
-				log.Debug("Miner got new head", "height", height, "block-hash", head.Block.Hash().Hex(), "tx-hash", txn.Hash().Hex(), "tx-hash", tx.Hash().Hex())
+				log.Debug("Miner got new head",
+					"height", height, "block-hash",
+					head.Block.Hash().Hex(),
+					"tx-hash", txn.Hash().Hex())
 
 				// Prevent memory leak by cleaning up pending tasks
 				// This is mostly copied from the `newWorkLoop`
@@ -534,7 +537,7 @@ func (w *worker) mainLoop() {
 				txset := types.NewTransactionsByPriceAndNonce(w.current.signer, txs)
 				tcount := w.current.tcount
 				w.commitTransactions(txset, coinbase, nil)
-				// Only update the snapshot if any new transactons were added
+				// Only update the snapshot if any new transactions were added
 				// to the pending block
 				if tcount != w.current.tcount {
 					w.updateSnapshot()
@@ -755,6 +758,7 @@ func (w *worker) updateSnapshot() {
 }
 
 func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Address) ([]*types.Log, error) {
+
 	// Make sure there's only one tx per block
 	if w.current != nil && len(w.current.txs) > 0 {
 		return nil, core.ErrGasLimitReached
@@ -763,8 +767,19 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
+	// log.Debug("TURING miner/worker.go commitTransaction STEP 3 ApplyTransaction result",
+	// 	"receipt", receipt,
+	// 	"err", err)
+
+	// TURING Update the tx metadata...
+	if len(receipt.Turing) > 1 {
+		tx.SetL1Turing(receipt.Turing)
+	}
+
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "tx", tx)
+
 	if err != nil || receipt.Status != 1 {
-		log.Warn("TURING worker.go ApplyTransaction result", "err", err, "receipt", receipt)
+		log.Warn("miner/worker.go ApplyTransaction ERROR", "err", err, "receipt", receipt)
 	}
 
 	if err != nil {
@@ -772,12 +787,17 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		return nil, err
 	}
 	w.current.txs = append(w.current.txs, tx)
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_txs", w.current.txs)
 	w.current.receipts = append(w.current.receipts, receipt)
+	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_receipts", w.current.receipts)
 
 	return receipt.Logs, nil
 }
 
 func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) bool {
+
+	// log.Debug("TURING miner/worker.go STEP 2 entering commitTransactions")
+
 	// Short circuit if current is nil
 	if w.current == nil {
 		return true
@@ -822,7 +842,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		}
 
 		// Error may be ignored here. The error has already been checked
-		// during transaction acceptance is the transaction pool.
+		// during transaction acceptance in the transaction pool.
 		//
 		// We use the eip155 signer regardless of the current hf.
 		from, _ := types.Sender(w.current.signer, tx)
@@ -897,7 +917,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 // chain.
 func (w *worker) commitNewTx(tx *types.Transaction) error {
 
-	log.Debug("TURING worker.go entering commitNewTx")
+	// log.Debug("TURING miner/worker.go STEP 1 entering commitNewTx")
 
 	w.mu.RLock()
 	defer w.mu.RUnlock()
@@ -953,9 +973,14 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	acc, _ := types.Sender(w.current.signer, tx)
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
+
+	// There is A LOT going on here
 	if w.commitTransactions(txs, w.coinbase, nil) {
 		return errors.New("Cannot commit transaction in miner")
 	}
+
+	// and now, a lot later, after much has been done, finally, call commit
+	// all the needed information is in w *worker
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
 
@@ -1073,6 +1098,9 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 // commit runs any post-transaction state modifications, assembles the final block
 // and commits new work if consensus engine is running.
 func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time) error {
+
+	// log.Debug("TURING worker.go entering FINAL commit")
+
 	// Deep copy receipts here to avoid interaction between different tasks.
 	receipts := make([]*types.Receipt, len(w.current.receipts))
 	for i, l := range w.current.receipts {
@@ -1080,14 +1108,17 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 		*receipts[i] = *l
 	}
 	s := w.current.state.Copy()
+	// log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
 	block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
 	if err != nil {
 		return err
 	}
 
+	// log.Debug("TURING worker.go final block", "block", block)
+
 	// As a sanity check, ensure all new blocks have exactly one
 	// transaction. This check is done here just in case any of our
-	// higher-evel checks failed to catch empty blocks passed to commit.
+	// higher-level checks failed to catch empty blocks passed to commit.
 	txs := block.Transactions()
 	if len(txs) != 1 {
 		return fmt.Errorf("Block created with %d transactions rather than 1 at %d", len(txs), block.NumberU64())
@@ -1114,8 +1145,15 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 			if bn == nil {
 				bn = new(big.Int)
 			}
-			log.Info("New block", "index", block.Number().Uint64()-uint64(1), "l1-timestamp", tx.L1Timestamp(), "l1-blocknumber", bn.Uint64(), "tx-hash", tx.Hash().Hex(),
-				"queue-orign", tx.QueueOrigin(), "gas", block.GasUsed(), "fees", feesEth, "elapsed", common.PrettyDuration(time.Since(start)))
+			log.Info("New block",
+				"index", block.Number().Uint64()-uint64(1),
+				"l1-timestamp", tx.L1Timestamp(),
+				"l1-blocknumber", bn.Uint64(),
+				"tx-hash", tx.Hash().Hex(),
+				"queue-orign", tx.QueueOrigin(),
+				"gas", block.GasUsed(),
+				"fees", feesEth,
+				"elapsed", common.PrettyDuration(time.Since(start)))
 
 		case <-w.exitCh:
 			log.Info("Worker has exited")

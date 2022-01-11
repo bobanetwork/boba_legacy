@@ -745,9 +745,11 @@ func (s *SyncService) applyIndexedTransaction(tx *types.Transaction) error {
 	log.Trace("Applying indexed transaction", "index", *index)
 	next := s.GetNextIndex()
 	if *index == next {
+		log.Trace("Applying indexed transaction to tip", "index", *index)
 		return s.applyTransactionToTip(tx)
 	}
 	if *index < next {
+		log.Trace("Applying historical transaction", "index", *index)
 		return s.applyHistoricalTransaction(tx)
 	}
 	return fmt.Errorf("Received tx at index %d when looking for %d", *index, next)
@@ -789,7 +791,7 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		return errors.New("nil transaction passed to applyTransactionToTip")
 	}
 
-	log.Debug("TURING sync_service.go entering applyTransactionToTip")
+	// log.Debug("TURING sync_service.go entering applyTransactionToTip")
 
 	// Queue Origin L1 to L2 transactions must have a timestamp that is set by
 	// the L1 block that holds the transaction. This should never happen but is
@@ -809,11 +811,13 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	// Note that Ethereum Layer one consensus rules dictate that the timestamp
 	// must be strictly increasing between blocks, so no need to check both the
 	// timestamp and the blocknumber.
-	ts := s.GetLatestL1Timestamp()
+	ts := s.GetLatestL1Timestamp() //these are in memory
 	bn := s.GetLatestL1BlockNumber()
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
+		tx.SetL1Turing([]byte{0}) // populate the Turing metadata for debug purposes - in this case, set to 0, since it's a new transaction
+		// log.Debug("TURING sync_service.go Generating metadata for RPC call", "timestamp", ts, "L1BlockNumber", bn)
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() {
 		// If the timestamp of the transaction is greater than the sync
 		// service's locally maintained timestamp, update the timestamp and
@@ -821,7 +825,7 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		// with `enqueue` transactions.
 		s.SetLatestL1Timestamp(tx.L1Timestamp())
 		s.SetLatestL1BlockNumber(tx.L1BlockNumber().Uint64())
-		log.Debug("Updating OVM context based on new transaction", "timestamp", ts, "blocknumber", tx.L1BlockNumber().Uint64(), "queue-origin", tx.QueueOrigin())
+		// log.Debug("Updating OVM context based on new transaction", "timestamp", ts, "blocknumber", tx.L1BlockNumber().Uint64(), "queue-origin", tx.QueueOrigin())
 	} else if tx.L1Timestamp() < s.GetLatestL1Timestamp() {
 		log.Error("Timestamp monotonicity violation", "hash", tx.Hash().Hex())
 	}
@@ -844,51 +848,41 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	}
 
 	// The index was set above so it is safe to dereference
-	log.Debug("Applying transaction to tip", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex(), "origin", tx.QueueOrigin().String())
+	// log.Debug("Applying transaction to tip", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex(), "origin", tx.QueueOrigin().String())
 
 	txs := types.Transactions{tx}
 	errCh := make(chan error, 1)
+
+	// here is where all the magic happens...
 	s.txFeed.Send(core.NewTxsEvent{
 		Txs:   txs,
 		ErrCh: errCh,
 	})
-	// Block until the transaction has been added to the chain
-	log.Debug("TURING sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
-	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
-// <<<<<<< turing-hybrid-compute
-// 	<-s.chainHeadCh
-// 	log.Debug("TURING sync_service leaving applyTransactionToTip")
 
-// 	// Update the cache when the transaction is from the owner
-// 	// of the gas price oracle
-// 	sender, _ := types.Sender(s.signer, tx)
-// 	owner := s.GasPriceOracleOwnerAddress()
-// 	if owner != nil && sender == *owner {
-// 		if err := s.updateGasPriceOracleCache(nil); err != nil {
-// 			return err
-// =======
+	// Block until the transaction has been added to the chain
+	// log.Debug("TURING: sync_service.go Waiting to apply", "index", *tx.GetMeta().Index, "hash", tx.Hash().Hex())
 
 	select {
-    case err := <-errCh:
-      log.Error("Got error waiting for transaction to be added to chain", "msg", err)
-      s.SetLatestL1Timestamp(ts)
-      s.SetLatestL1BlockNumber(bn)
-      s.SetLatestIndex(index)
-      return err
-    case <-s.chainHeadCh:
-      // Update the cache when the transaction is from the owner
-      // of the gas price oracle
-      sender, _ := types.Sender(s.signer, tx)
-      owner := s.GasPriceOracleOwnerAddress()
-      if owner != nil && sender == *owner {
-        if err := s.updateGasPriceOracleCache(nil); err != nil {
-          s.SetLatestL1Timestamp(ts)
-          s.SetLatestL1BlockNumber(bn)
-          s.SetLatestIndex(index)
-          return err
-        }
-      }
-      return nil
+	case err := <-errCh:
+		log.Error("Got error waiting for transaction to be added to chain", "msg", err)
+		s.SetLatestL1Timestamp(ts)
+		s.SetLatestL1BlockNumber(bn)
+		s.SetLatestIndex(index)
+		return err
+	case <-s.chainHeadCh:
+		// Update the cache when the transaction is from the owner
+		// of the gas price oracle
+		sender, _ := types.Sender(s.signer, tx)
+		owner := s.GasPriceOracleOwnerAddress()
+		if owner != nil && sender == *owner {
+			if err := s.updateGasPriceOracleCache(nil); err != nil {
+				s.SetLatestL1Timestamp(ts)
+				s.SetLatestL1BlockNumber(bn)
+				s.SetLatestIndex(index)
+				return err
+			}
+		}
+		return nil
 	}
 }
 
@@ -904,7 +898,6 @@ func (s *SyncService) applyBatchedTransaction(tx *types.Transaction) error {
 	if index == nil {
 		return errors.New("No index found on transaction")
 	}
-	log.Trace("Applying batched transaction", "index", *index)
 	err := s.applyIndexedTransaction(tx)
 	if err != nil {
 		return fmt.Errorf("Cannot apply batched transaction: %w", err)
@@ -998,10 +991,10 @@ func (s *SyncService) ValidateAndApplySequencerTransaction(tx *types.Transaction
 		return errors.New("nil transaction passed to ValidateAndApplySequencerTransaction")
 	}
 	s.txLock.Lock()
-	log.Debug("TURING sync_service.go acquired txLock in ValidateAndApply")
+	// log.Debug("TURING sync_service.go acquired txLock in ValidateAndApply")
 
 	defer func() {
-		log.Debug("TURING sync_service.go deferred txLock release")
+		// log.Debug("TURING sync_service.go deferred txLock release")
 		s.txLock.Unlock()
 	}()
 
@@ -1133,7 +1126,7 @@ func (s *SyncService) syncBatches() (*uint64, error) {
 // syncTransactionBatchRange will sync a range of batched transactions from
 // start to end (inclusive)
 func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
-	log.Info("Syncing transaction batch range", "start", start, "end", end)
+	// log.Info("TURING: sync_service.go syncTransactionBatchRange() Syncing transaction batch range", "start", start, "end", end)
 	for i := start; i <= end; i++ {
 		log.Debug("Fetching transaction batch", "index", i)
 		_, txs, err := s.client.GetTransactionBatch(i)
@@ -1141,6 +1134,7 @@ func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
 			return fmt.Errorf("Cannot get transaction batch: %w", err)
 		}
 		for _, tx := range txs {
+			// log.Info("TURING: sync_service.go syncTransactionBatchRange() calling applyBatchedTransaction", "tx", tx)
 			if err := s.applyBatchedTransaction(tx); err != nil {
 				return fmt.Errorf("cannot apply batched transaction: %w", err)
 			}
@@ -1163,7 +1157,7 @@ func (s *SyncService) syncQueue() (*uint64, error) {
 // syncQueueTransactionRange will apply a range of queue transactions from
 // start to end (inclusive)
 func (s *SyncService) syncQueueTransactionRange(start, end uint64) error {
-	log.Info("Syncing enqueue transactions range", "start", start, "end", end)
+	// log.Info("Syncing enqueue transactions range", "start", start, "end", end)
 	for i := start; i <= end; i++ {
 		tx, err := s.client.GetEnqueue(i)
 		if err != nil {
@@ -1219,7 +1213,7 @@ func (s *SyncService) updateEthContext() error {
 	current := time.Unix(int64(s.GetLatestL1Timestamp()), 0)
 	next := time.Unix(int64(context.Timestamp), 0)
 	if next.Sub(current) > s.timestampRefreshThreshold {
-		log.Info("Updating Eth Context", "timetamp", context.Timestamp, "blocknumber", context.BlockNumber)
+		//log.Info("Updating Eth Context", "timestamp", context.Timestamp, "blocknumber", context.BlockNumber)
 		s.SetLatestL1BlockNumber(context.BlockNumber)
 		s.SetLatestL1Timestamp(context.Timestamp)
 	}

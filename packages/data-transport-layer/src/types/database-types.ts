@@ -20,6 +20,7 @@ export interface EnqueueEntry {
   origin: string
   blockNumber: number
   timestamp: number
+  turing: string
 }
 
 export interface TransactionEntry {
@@ -36,6 +37,7 @@ export interface TransactionEntry {
   queueIndex: number | null
   decoded: DecodedSequencerBatchTransaction | null
   confirmed: boolean
+  turing: string
 }
 
 interface BatchEntry {

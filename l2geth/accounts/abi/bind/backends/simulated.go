@@ -333,7 +333,7 @@ func (b *SimulatedBackend) CallContract(ctx context.Context, call ethereum.CallM
 	if err != nil {
 		return nil, err
 	}
-	rval, _, _, err := b.callContract(ctx, call, b.blockchain.CurrentBlock(), state)
+	rval, _, _, err, _ := b.callContract(ctx, call, b.blockchain.CurrentBlock(), state)
 	return rval, err
 }
 
@@ -343,7 +343,7 @@ func (b *SimulatedBackend) PendingCallContract(ctx context.Context, call ethereu
 	defer b.mu.Unlock()
 	defer b.pendingState.RevertToSnapshot(b.pendingState.Snapshot())
 
-	rval, _, _, err := b.callContract(ctx, call, b.pendingBlock, b.pendingState)
+	rval, _, _, err, _ := b.callContract(ctx, call, b.pendingBlock, b.pendingState)
 	return rval, err
 }
 
@@ -386,7 +386,7 @@ func (b *SimulatedBackend) EstimateGas(ctx context.Context, call ethereum.CallMs
 		call.Gas = gas
 
 		snapshot := b.pendingState.Snapshot()
-		_, _, failed, err := b.callContract(ctx, call, b.pendingBlock, b.pendingState)
+		_, _, failed, err, _ := b.callContract(ctx, call, b.pendingBlock, b.pendingState)
 		b.pendingState.RevertToSnapshot(snapshot)
 
 		if err != nil || failed {
@@ -414,7 +414,7 @@ func (b *SimulatedBackend) EstimateGas(ctx context.Context, call ethereum.CallMs
 
 // callContract implements common code between normal and pending contract calls.
 // state is modified during execution, make sure to copy it if necessary.
-func (b *SimulatedBackend) callContract(ctx context.Context, call ethereum.CallMsg, block *types.Block, statedb *state.StateDB) ([]byte, uint64, bool, error) {
+func (b *SimulatedBackend) callContract(ctx context.Context, call ethereum.CallMsg, block *types.Block, statedb *state.StateDB) ([]byte, uint64, bool, error, []byte) {
 	// Ensure message is initialized properly.
 	if call.GasPrice == nil {
 		call.GasPrice = big.NewInt(1)
@@ -605,6 +605,7 @@ func (m callmsg) Data() []byte         { return m.CallMsg.Data }
 // These getters return OVM specific fields
 func (m callmsg) L1Timestamp() uint64            { return m.CallMsg.L1Timestamp }
 func (m callmsg) L1BlockNumber() *big.Int        { return m.CallMsg.L1BlockNumber }
+func (m callmsg) L1Turing() []byte               { return m.CallMsg.L1Turing }
 func (m callmsg) QueueOrigin() types.QueueOrigin { return m.CallMsg.QueueOrigin }
 
 // filterBackend implements filters.Backend to support filtering for logs without

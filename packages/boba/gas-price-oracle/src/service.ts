@@ -189,7 +189,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
     this.logger.info('Connecting to CanonicalTransactionChain...')
     const CanonicalTransactionChainAddress =
-      await this.state.Lib_AddressManager.getAddress('CanonicalTransactionChain')
+      await this.state.Lib_AddressManager.getAddress(
+        'CanonicalTransactionChain'
+      )
     this.state.CanonicalTransactionChain = loadContract(
       'CanonicalTransactionChain',
       CanonicalTransactionChainAddress,
@@ -199,7 +201,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.CanonicalTransactionChain.address,
     })
 
-   this.logger.info('Connecting to StateCommitmentChain...')
+    this.logger.info('Connecting to StateCommitmentChain...')
     const StateCommitmentChainAddress =
       await this.state.Lib_AddressManager.getAddress('StateCommitmentChain')
     this.state.StateCommitmentChain = loadContract(
@@ -729,7 +731,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
   }
 
-   private async _updateOverheadFee(): Promise<void> {
+  private async _updateOverheadFee(): Promise<void> {
     try {
       const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
       const CanonicalTransactionChainLog =
@@ -745,7 +747,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           Number(latestL1Block)
         )
 
-    const orderedOverheadLog = orderBy(
+      const orderedOverheadLog = orderBy(
         [...CanonicalTransactionChainLog, ...StateCommitmentChainLog],
         'blockNumber',
         'desc'
@@ -776,14 +778,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
       }
 
-      const batchFee = L1BatchSubmissionCost.div(
-        BigNumber.from(batchSize)
-      )
+      const batchFee = L1BatchSubmissionCost.div(BigNumber.from(batchSize))
       const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
       const targetOverheadGas = batchFee.div(L2GasPrice)
 
-      const overheadGas =
-        await this.state.OVM_GasPriceOracle.overhead()
+      const overheadGas = await this.state.OVM_GasPriceOracle.overhead()
 
       if (targetOverheadGas.toString() === overheadGas.toString()) {
         this.logger.info('No need to overhead gas', {
@@ -792,11 +791,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         })
       } else {
         this.logger.debug('Updating overhead gas...')
-        const tx =
-          await this.state.OVM_GasPriceOracle.setOverhead(
-            targetOverheadGas,
-            { gasPrice: 0 }
-          )
+        const tx = await this.state.OVM_GasPriceOracle.setOverhead(
+          targetOverheadGas,
+          { gasPrice: 0 }
+        )
         await tx.wait()
         this.logger.info('Updated overhead gas', {
           overheadGas: Number(targetOverheadGas.toString()),

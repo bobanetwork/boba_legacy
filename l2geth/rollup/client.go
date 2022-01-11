@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -80,6 +81,7 @@ type transaction struct {
 	QueueOrigin string          `json:"queueOrigin"`
 	QueueIndex  *uint64         `json:"queueIndex"`
 	Decoded     *decoded        `json:"decoded"`
+	Turing      hexutil.Bytes   `json:"turing"`
 }
 
 // Enqueue represents an `enqueue` transaction or a L1 to L2 transaction.
@@ -92,6 +94,7 @@ type Enqueue struct {
 	BlockNumber *uint64         `json:"blockNumber"`
 	Timestamp   *uint64         `json:"timestamp"`
 	QueueIndex  *uint64         `json:"index"`
+	Turing      *hexutil.Bytes  `json:"turing"`
 }
 
 // signature represents a secp256k1 ECDSA signature
@@ -203,6 +206,9 @@ func (c *Client) GetEnqueue(index uint64) (*types.Transaction, error) {
 // enqueueToTransaction turns an Enqueue into a types.Transaction
 // so that it can be consumed by the SyncService
 func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
+
+	// log.Debug("enqueueToTransaction", "enqueue", enqueue)
+
 	if enqueue == nil {
 		return nil, errElementNotFound
 	}
@@ -235,11 +241,18 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 		return nil, errors.New("Timestamp not found for enqueue tx")
 	}
 	timestamp := *enqueue.Timestamp
-
 	if enqueue.Data == nil {
 		return nil, errors.New("Data not found for enqueue tx")
 	}
 	data := *enqueue.Data
+
+	turing := hexutil.Bytes([]byte{4})
+	if enqueue.Turing == nil {
+		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing - setting to 4")
+	} else {
+		log.Info("TURING: rollup/client.go Enqueue tx with non-nil Turing", "enqueue_turing", enqueue.Turing)
+		turing = *enqueue.Turing
+	}
 
 	// enqueue transactions have no value
 	value := big.NewInt(0)
@@ -250,6 +263,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 	txMeta := types.NewTransactionMeta(
 		blockNumber,
 		timestamp,
+		turing,
 		&origin,
 		types.QueueOriginL1ToL2,
 		enqueue.Index,
@@ -322,13 +336,15 @@ func (c *Client) GetLatestTransactionBatchIndex() (*uint64, error) {
 // batchedTransactionToTransaction converts a transaction into a
 // types.Transaction that can be consumed by the SyncService
 func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types.Transaction, error) {
+
 	// `nil` transactions are not found
 	if res == nil {
 		return nil, errElementNotFound
 	}
-	// The queue origin must be either sequencer of l1, otherwise
+	// The queue origin must be either sequencer or l1, otherwise
 	// it is considered an unknown queue origin and will not be processed
 	var queueOrigin types.QueueOrigin
+
 	switch res.QueueOrigin {
 	case sequencer:
 		queueOrigin = types.QueueOriginSequencer
@@ -337,9 +353,12 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	default:
 		return nil, fmt.Errorf("Unknown queue origin: %s", res.QueueOrigin)
 	}
+
 	// Transactions that have been decoded are
 	// Queue Origin Sequencer transactions
 	if res.Decoded != nil {
+		// log.Info("TURING: client.go batchedTransactionToTransaction: Queue Origin Sequencer transaction",
+		// 	"res.Decoded", res.Decoded)
 		nonce := res.Decoded.Nonce
 		to := res.Decoded.Target
 		value := (*big.Int)(res.Decoded.Value)
@@ -360,6 +379,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 		txMeta := types.NewTransactionMeta(
 			new(big.Int).SetUint64(res.BlockNumber),
 			res.Timestamp,
+			res.Turing,
 			res.Origin,
 			queueOrigin,
 			&res.Index,
@@ -390,7 +410,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 		return tx, nil
 	}
 
-	// The transaction is  either an L1 to L2 transaction or it does not have a
+	// The transaction is either an L1 to L2 transaction or it does not have a
 	// known deserialization
 	nonce := uint64(0)
 	if res.QueueOrigin == l1 {
@@ -408,6 +428,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	txMeta := types.NewTransactionMeta(
 		new(big.Int).SetUint64(res.BlockNumber),
 		res.Timestamp,
+		res.Turing,
 		origin,
 		queueOrigin,
 		&res.Index,
@@ -458,7 +479,6 @@ func (c *Client) GetLatestTransaction(backend Backend) (*types.Transaction, erro
 	if !ok {
 		return nil, errors.New("Cannot get latest transaction")
 	}
-
 	return batchedTransactionToTransaction(res.Transaction, c.chainID)
 }
 
@@ -558,7 +578,7 @@ func (c *Client) SyncStatus(backend Backend) (*SyncStatus, error) {
 	return status, nil
 }
 
-// GetLatestTransactionBatch will return the latest transaction batch
+// GetLatestTransactionBatch will return the latest transaction batch from the DTL
 func (c *Client) GetLatestTransactionBatch() (*Batch, []*types.Transaction, error) {
 	response, err := c.client.R().
 		SetResult(&TransactionBatchResponse{}).
@@ -591,6 +611,7 @@ func (c *Client) GetTransactionBatch(index uint64) (*Batch, []*types.Transaction
 	if !ok {
 		return nil, nil, fmt.Errorf("Cannot parse transaction batch response")
 	}
+	// log.Info("TURING: client.go GetTransactionBatch()", "txBatch", txBatch)
 	return parseTransactionBatchResponse(txBatch, c.chainID)
 }
 

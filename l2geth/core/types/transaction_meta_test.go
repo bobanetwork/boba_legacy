@@ -67,7 +67,7 @@ var (
 
 func TestTransactionMetaEncode(t *testing.T) {
 	for _, test := range txMetaSerializationTests {
-		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
+		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, []byte{0}, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
 
 		encoded := TxMetaEncode(txmeta)
 		decoded, err := TxMetaDecode(encoded)

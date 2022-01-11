@@ -33,9 +33,14 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     const l1Transaction = await event.getTransaction()
     const eventBlock = await event.getBlock()
 
+    console.log('sequencer-batch-appended - getExtraData:', {
+      l1Transaction,
+      eventBlock,
+    })
+
     // TODO: We need to update our events so that we actually have enough information to parse this
     // batch without having to pull out this extra event. For the meantime, we need to find this
-    // "TransactonBatchAppended" event to get the rest of the data.
+    // "TransactionBatchAppended" event to get the rest of the data.
     const CanonicalTransactionChain = getContractFactory(
       'CanonicalTransactionChain'
     )
@@ -50,7 +55,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       )
     ).find((foundEvent: ethers.Event) => {
       // We might have more than one event in this block, so we specifically want to find a
-      // "TransactonBatchAppended" event emitted immediately before the event in question.
+      // "TransactionBatchAppended" event emitted immediately before the event in question.
       return (
         foundEvent.transactionHash === event.transactionHash &&
         foundEvent.logIndex === event.logIndex - 1
@@ -84,30 +89,63 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     // It's easier to deal with this data if it's a Buffer.
     const calldata = fromHexString(extraData.l1TransactionData)
 
+    console.log(`DTL l1-injection - parseEvent`, {
+      calldata: toHexString(calldata),
+      event,
+      extraData,
+    })
+
     if (calldata.length < 12) {
       throw new Error(
         `Block ${extraData.blockNumber} transaction data is invalid for decoding: ${extraData.l1TransactionData} , ` +
           `converted buffer length is < 12.`
       )
     }
+
     const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
     let transactionIndex = 0
     let enqueuedCount = 0
     let nextTxPointer = 15 + 16 * numContexts
+
     for (let i = 0; i < numContexts; i++) {
       const contextPointer = 15 + 16 * i
+
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
-        const sequencerTransaction = parseSequencerBatchTransaction(
+        let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer
         )
+
+        // need to clean up the transaction at this point
+        console.log(`DTL parseSequencerBatchTransaction`, {
+          sequencerTransaction: toHexString(sequencerTransaction),
+        })
+
+        const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
+        let turing = Buffer.from('0')
+        let turingExtraLength = 0
+        //console.log('turing init:', { turing: toHexString(turing) })
+
+        if (turingIndex > 0) {
+          //we have turing payload
+          turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
+          turingExtraLength = turing.length + 3 // fix the nextTxPointer so that we start at the beginning of the next real transaction
+          sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
+          console.log('Found a Turing payload at position:', {
+            turingIndex,
+            turing: toHexString(turing),
+            sequencerTransaction: toHexString(sequencerTransaction),
+          })
+        }
 
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
           l2ChainId
         )
+
+        //console.log(`DTL parsed event!`, {decoded: decoded})
 
         transactionEntries.push({
           index: extraData.prevTotalElements
@@ -125,9 +163,11 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           queueIndex: null,
           decoded,
           confirmed: true,
+          turing: toHexString(turing),
         })
 
-        nextTxPointer += 3 + sequencerTransaction.length
+        nextTxPointer += 3 + sequencerTransaction.length + turingExtraLength //long term actual fix is to have a correct value for each sequencerTransaction.length
+        //but that's actually quite difficult to do based on where we are modifying the callData
         transactionIndex++
       }
 
@@ -157,6 +197,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           queueIndex: queueIndex.toNumber(),
           decoded: null,
           confirmed: true,
+          turing: '0x07',
         })
 
         enqueuedCount++
@@ -254,7 +295,18 @@ const decodeSequencerBatchTransaction = (
   l2ChainId: number
 ): DecodedSequencerBatchTransaction | null => {
   try {
+    console.log(`Trying to decode this transaction`, {
+      transaction,
+    })
+
     const decodedTx = ethers.utils.parseTransaction(transaction)
+
+    console.log(`Got this back`, { decodedTx })
+    console.log(`Got this back`, {
+      V: decodedTx.v,
+      parse: parseSignatureVParam(decodedTx.v, l2ChainId),
+      l2ChainId,
+    })
 
     return {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
@@ -270,6 +322,7 @@ const decodeSequencerBatchTransaction = (
       },
     }
   } catch (err) {
+    console.log(`Decoding failed`, { err })
     return null
   }
 }

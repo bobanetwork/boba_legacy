@@ -264,7 +264,7 @@ services:
       NUM_EVENT_CONFIRMATIONS: 0
 
   # a second relay system for messages that need to get to L1 quickly
-  # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
+  # NOTE - all withdrawal messages use the standard relayer with its 7 day window
   boba_message-relayer-fast:
     depends_on:
       - l1_chain
@@ -366,7 +366,7 @@ services:
       - dtl
     image: bobanetwork/l2geth:latest
     deploy:
-      replicas: 0
+      replicas: 1
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.geth

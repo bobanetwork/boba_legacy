@@ -376,9 +376,7 @@ func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs
 		log.Warn("Failed transaction send attempt", "from", args.From, "to", args.To, "value", args.Value.ToInt(), "err", err)
 		return common.Hash{}, err
 	}
-	log.Debug("TURING api.go entering SendTransaction")
 	ret, err := SubmitTransaction(ctx, s.b, signed)
-	log.Debug("TURING api.go SendTransaction returning", "RET", ret, "ERR", err)
 	return ret, err
 	//return SubmitTransaction(ctx, s.b, signed)
 }
@@ -793,10 +791,19 @@ type account struct {
 	StateDiff *map[common.Hash]common.Hash `json:"stateDiff"`
 }
 
-func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides map[common.Address]account, vmCfg vm.Config, timeout time.Duration, globalGasCap *big.Int) ([]byte, uint64, bool, error) {
+func DoCall(ctx context.Context,
+	b Backend,
+	args CallArgs,
+	blockNrOrHash rpc.BlockNumberOrHash,
+	overrides map[common.Address]account,
+	vmCfg vm.Config,
+	timeout time.Duration,
+	globalGasCap *big.Int) ([]byte, uint64, bool, error) {
+
 	defer func(start time.Time) { log.Debug("Executing EVM call finished", "runtime", time.Since(start)) }(time.Now())
 
 	state, header, err := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+
 	if state == nil || err != nil {
 		return nil, 0, false, err
 	}
@@ -863,7 +870,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 		data = []byte(*args.Data)
 	}
 
-	// Currently, the blocknumber and timestamp actually refer to the L1BlockNumber and L1Timestamp
+	// The blocknumber and timestamp actually refer to the L1BlockNumber and L1Timestamp
 	// attached to each transaction. We need to modify the blocknumber and timestamp to reflect this,
 	// or else the result of `eth_call` will not be correct.
 	blockNumber := header.Number
@@ -886,8 +893,10 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 		}
 	}
 
+	turingDummy := []byte{3}
+
 	// Create new call message
-	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, types.QueueOriginSequencer)
+	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, turingDummy, types.QueueOriginSequencer)
 
 	// Setup context so it may be cancelled the call has completed
 	// or, in case of unmetered gas, setup a context with a timeout.
@@ -916,7 +925,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	// Setup the gas pool (also for unmetered requests)
 	// and apply the message.
 	gp := new(core.GasPool).AddGas(math.MaxUint64)
-	res, gas, failed, err := core.ApplyMessage(evm, msg, gp)
+	res, gas, failed, err, _ := core.ApplyMessage(evm, msg, gp)
 	if err := vmError(); err != nil {
 		return nil, 0, false, err
 	}
@@ -1101,7 +1110,7 @@ func FormatLogs(logs []vm.StructLog) []StructLogRes {
 	return formatted
 }
 
-// RPCMarshalHeader converts the given header to the RPC output .
+// RPCMarshalHeader converts the given header to the RPC output
 func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	return map[string]interface{}{
 		"number":           (*hexutil.Big)(head.Number),
@@ -1201,6 +1210,7 @@ type RPCTransaction struct {
 	L1TxOrigin       *common.Address `json:"l1TxOrigin"`
 	L1BlockNumber    *hexutil.Big    `json:"l1BlockNumber"`
 	L1Timestamp      hexutil.Uint64  `json:"l1Timestamp"`
+	L1Turing         hexutil.Bytes   `json:"l1Turing"`
 	Index            *hexutil.Uint64 `json:"index"`
 	QueueIndex       *hexutil.Uint64 `json:"queueIndex"`
 	RawTransaction   hexutil.Bytes   `json:"rawTransaction"`
@@ -1238,6 +1248,7 @@ func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber
 	if meta := tx.GetMeta(); meta != nil {
 		result.RawTransaction = meta.RawTransaction
 		result.L1TxOrigin = meta.L1MessageSender
+		result.L1Turing = meta.L1Turing
 		result.L1Timestamp = (hexutil.Uint64)(meta.L1Timestamp)
 		if meta.L1BlockNumber != nil {
 			result.L1BlockNumber = (*hexutil.Big)(meta.L1BlockNumber)
@@ -1441,6 +1452,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 		"contractAddress":   nil,
 		"logs":              receipt.Logs,
 		"logsBloom":         receipt.Bloom,
+
 		// UsingOVM
 		"l1GasPrice":  (*hexutil.Big)(receipt.L1GasPrice),
 		"l1GasUsed":   (*hexutil.Big)(receipt.L1GasUsed),
@@ -1485,6 +1497,7 @@ type SendTxArgs struct {
 	GasPrice *hexutil.Big    `json:"gasPrice"`
 	Value    *hexutil.Big    `json:"value"`
 	Nonce    *hexutil.Uint64 `json:"nonce"`
+
 	// We accept "data" and "input" for backwards-compatibility reasons. "input" is the
 	// newer name and should be preferred by clients.
 	Data  *hexutil.Bytes `json:"data"`
@@ -1492,6 +1505,7 @@ type SendTxArgs struct {
 
 	L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 	L1MessageSender *common.Address `json:"l1MessageSender"`
+	L1Turing        *hexutil.Bytes  `json:"l1Turing"`
 }
 
 // setDefaults is a helper function that fills in default values for unspecified tx fields.
@@ -1555,22 +1569,30 @@ func (args *SendTxArgs) setDefaults(ctx context.Context, b Backend) error {
 }
 
 func (args *SendTxArgs) toTransaction() *types.Transaction {
+
+	// TURING: used in part to generate payloads for signing
+	log.Debug("Turing ethapi/api.go", "args", args)
+
 	var input []byte
+
 	if args.Input != nil {
 		input = *args.Input
 	} else if args.Data != nil {
 		input = *args.Data
 	}
+
+	turingDummy := []byte{4}
+
 	if args.To == nil {
 		tx := types.NewContractCreation(uint64(*args.Nonce), (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 		raw, _ := rlp.EncodeToBytes(tx)
-		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, nil, types.QueueOriginSequencer, nil, nil, raw)
+		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, turingDummy, nil, types.QueueOriginSequencer, nil, nil, raw)
 		tx.SetTransactionMeta(txMeta)
 		return tx
 	}
 	tx := types.NewTransaction(uint64(*args.Nonce), *args.To, (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 	raw, _ := rlp.EncodeToBytes(tx)
-	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
+	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, turingDummy, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }
@@ -1589,7 +1611,7 @@ func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (c
 		addr := crypto.CreateAddress(from, tx.Nonce())
 		log.Info("Submitted contract creation", "fullhash", tx.Hash().Hex(), "contract", addr.Hex())
 	} else {
-		log.Info("Submitted transaction", "fullhash", tx.Hash().Hex(), "recipient", tx.To())
+		log.Info("Submitted transaction", "transaction", tx, "fullhash", tx.Hash().Hex(), "recipient", tx.To())
 	}
 	return tx.Hash(), nil
 }
@@ -1663,12 +1685,21 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	if err := rlp.DecodeBytes(encodedTx, tx); err != nil {
 		return common.Hash{}, err
 	}
+
+	log.Debug("TURING internal/ethapi/api.go SendRawTransaction",
+		"context", ctx,
+		"encodedTx", encodedTx,
+		"tx", tx)
+
+	turingDummy := []byte{9}
+
 	// L1Timestamp and L1BlockNumber will be set right before execution
-	txMeta := types.NewTransactionMeta(nil, 0, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
+	txMeta := types.NewTransactionMeta(nil, 0, turingDummy, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
 
 	log.Debug("TURING api.go entering SendRawTransaction", "TX", tx)
 
+	// at this point the transaction goes to the transaction pool
 	ret, err := SubmitTransaction(ctx, s.b, tx)
 
 	log.Debug("TURING api.go SendRawTransaction returning", "RET", ret, "ERR", err)

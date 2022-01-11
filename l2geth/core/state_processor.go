@@ -17,17 +17,13 @@
 package core
 
 import (
-	"bytes"
-
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/fees"
 )
@@ -90,18 +86,30 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // and uses the input parameters for its environment. It returns the receipt
 // for the transaction, gas used and an error if the transaction failed,
 // indicating the block was invalid.
-func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
+func ApplyTransaction(
+	config *params.ChainConfig,
+	bc ChainContext,
+	author *common.Address,
+	gp *GasPool,
+	statedb *state.StateDB,
+	header *types.Header,
+	tx *types.Transaction,
+	usedGas *uint64,
+	cfg vm.Config) (*types.Receipt, error) {
 	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number))
+
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("TURING state_processor.go entering ApplyTransaction")
-
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
+
+	// log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
+
 	// Create a new environment which holds all relevant information
-	// about the transaction and calling mechanisms.
+	// about the transaction and calling mechanisms. This environment also
+	// contains Turing data, which is critical for verifiers and replicas.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
 
 	// UsingOVM
@@ -114,14 +122,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	}
 
 	// Apply the transaction to the current state (included in the env)
-	result, gas, failed, err := ApplyMessage(vmenv, msg, gp)
-
-	log.Debug("TURING state_processor.go ApplyMessage result",
-		"failed", failed,
-		"err", err,
-		"gas", gas,
-		"result", hexutil.Bytes(result),
-		"turing", bytes.Contains(result, []byte("_OMGXTURING_")))
+	_, gas, failed, err, turing := ApplyMessage(vmenv, msg, gp)
 
 	if err != nil {
 		return nil, err
@@ -155,8 +156,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockHash = statedb.BlockHash()
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
-
-	log.Debug("TURING state_processor.go leaving ApplyTransaction", "receipt", receipt)
+	receipt.Turing = turing
 
 	return receipt, err
 }

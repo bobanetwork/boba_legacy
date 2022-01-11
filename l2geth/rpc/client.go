@@ -266,6 +266,7 @@ func (c *Client) Close() {
 // The result must be a pointer so that package json can unmarshal into it. You
 // can also pass nil, in which case the result is ignored.
 func (c *Client) Call(result interface{}, method string, args ...interface{}) error {
+	log.Debug("TURING rpc client Call", "Method", method, "Args", args) // "CallArgs", args[0].Interface())
 	ctx := context.Background()
 	return c.CallContext(ctx, result, method, args...)
 }

@@ -86,7 +86,8 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	meta := NewTransactionMeta(nil, 0, nil, QueueOriginSequencer, nil, nil, nil)
+	turingDummy := []byte{7}
+	meta := NewTransactionMeta(nil, 0, turingDummy, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -148,6 +149,13 @@ func (t *Transaction) SetL1BlockNumber(bn uint64) {
 		return
 	}
 	t.meta.L1BlockNumber = new(big.Int).SetUint64(bn)
+}
+
+func (t *Transaction) SetL1Turing(turing []byte) {
+	if &t.meta == nil {
+		return
+	}
+	t.meta.L1Turing = common.CopyBytes(turing)
 }
 
 // ChainId returns which chain id this transaction was signed for (if at all)
@@ -252,6 +260,15 @@ func (tx *Transaction) L1BlockNumber() *big.Int {
 	return &l1BlockNumber
 }
 
+// Turing returns the modified calldata of the transaction if they exist.
+// It returns nil if this transaction was not generated from a transaction received on L1.
+func (tx *Transaction) L1Turing() []byte {
+	if tx.meta.L1Turing == nil {
+		return nil
+	}
+	return common.CopyBytes(tx.meta.L1Turing)
+}
+
 // QueueOrigin returns the Queue Origin of the transaction
 func (tx *Transaction) QueueOrigin() QueueOrigin {
 	return tx.meta.QueueOrigin
@@ -259,18 +276,18 @@ func (tx *Transaction) QueueOrigin() QueueOrigin {
 
 // Hash hashes the RLP encoding of tx.
 // It uniquely identifies the transaction.
+// Note that this hashes the entire TX, including the metadata fields
 func (tx *Transaction) Hash() common.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(common.Hash)
 	}
-
 	v := rlpHash(tx)
 	tx.hash.Store(v)
 	return v
 }
 
 // Size returns the true RLP encoded storage size of the transaction, either by
-// encoding and returning it, or returning a previsouly cached value.
+// encoding and returning it, or returning a previously cached value.
 func (tx *Transaction) Size() common.StorageSize {
 	if size := tx.size.Load(); size != nil {
 		return size.(common.StorageSize)
@@ -298,6 +315,7 @@ func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 
 		l1Timestamp:   tx.meta.L1Timestamp,
 		l1BlockNumber: tx.meta.L1BlockNumber,
+		l1Turing:      tx.meta.L1Turing,
 		queueOrigin:   tx.meta.QueueOrigin,
 	}
 
@@ -468,8 +486,6 @@ func (t *TransactionsByPriceAndNonce) Pop() {
 }
 
 // Message is a fully derived transaction and implements core.Message
-//
-// NOTE: In a future PR this will be removed.
 type Message struct {
 	to         *common.Address
 	from       common.Address
@@ -482,10 +498,23 @@ type Message struct {
 
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
+	l1Turing      []byte
 	queueOrigin   QueueOrigin
 }
 
-func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte, checkNonce bool, l1BlockNumber *big.Int, l1Timestamp uint64, queueOrigin QueueOrigin) Message {
+func NewMessage(from common.Address,
+	to *common.Address,
+	nonce uint64,
+	amount *big.Int,
+	gasLimit uint64,
+	gasPrice *big.Int,
+	data []byte,
+	checkNonce bool,
+	l1BlockNumber *big.Int,
+	l1Timestamp uint64,
+	l1Turing []byte,
+	queueOrigin QueueOrigin,
+) Message {
 	return Message{
 		from:       from,
 		to:         to,
@@ -498,6 +527,7 @@ func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *b
 
 		l1Timestamp:   l1Timestamp,
 		l1BlockNumber: l1BlockNumber,
+		l1Turing:      l1Turing,
 		queueOrigin:   queueOrigin,
 	}
 }
@@ -513,4 +543,5 @@ func (m Message) CheckNonce() bool     { return m.checkNonce }
 
 func (m Message) L1Timestamp() uint64      { return m.l1Timestamp }
 func (m Message) L1BlockNumber() *big.Int  { return m.l1BlockNumber }
+func (m Message) L1Turing() []byte         { return m.l1Turing }
 func (m Message) QueueOrigin() QueueOrigin { return m.queueOrigin }
