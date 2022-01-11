@@ -48,6 +48,15 @@ describe("Turing VRF", function () {
     console.log("    Test contract deployed at", hello.address)
   })
 
+  it("should get the number 42", async () => {
+    let tr = await hello.get42()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = rawData.slice(-64)
+    let result = parseInt(numberHexString, 16)
+    console.log("    Turing 42 =",result)
+  })
 
   it("should get a length 64 VRF", async () => {
     let tr = await hello.getRandom()

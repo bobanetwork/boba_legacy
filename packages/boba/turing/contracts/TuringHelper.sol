@@ -8,6 +8,7 @@ contract TuringHelper {
 
   event OffchainResponse(uint version, bytes responseData);
   event OffchainRandom(uint version, uint256 random);
+  event Offchain42(uint version, uint256 random);
 
   constructor () public {
     Self = TuringHelper(address(this));
@@ -51,6 +52,14 @@ contract TuringHelper {
     return _random;
   }
 
+  function Get42(uint32 rType, uint256 _random)
+    public returns (uint256) {
+
+    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+    require (rType == 2, string(GetErrorCode(rType)));
+    return _random;
+  }
+
   /* Called from the external contract. It takes an api endponit URL
      and an abi-encoded request payload. The URL and the list of allowed 
      methods are supplied when the contract is created. In the future 
@@ -82,6 +91,14 @@ contract TuringHelper {
 
       uint256 response = Self.GetRandom(1, 0);
       emit OffchainRandom(0x01, response);
+      return response;
+  }
+
+  function Turing42()
+    public returns (uint256) {
+
+      uint256 response = Self.Get42(2, 42);
+      emit Offchain42(0x01, response);
       return response;
   }
 
