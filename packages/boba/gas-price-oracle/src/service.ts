@@ -957,7 +957,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const l1GasPrice = await this.options.l1RpcProvider.getGasPrice()
       const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
       if (l1GasPrice.toNumber() !== l1BaseFee.toNumber()) {
-        const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(l1GasPrice)
+        const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
+          l1GasPrice,
+          { gasPrice: 0 }
+        )
         await tx.wait()
         this.logger.info('Updated l1BaseFee', {
           l1GasPrice: l1GasPrice.toNumber(),
