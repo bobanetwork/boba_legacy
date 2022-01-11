@@ -56,7 +56,7 @@ The L1 security fee is for the cost of submitting the state roots and tx roots t
 L2GasPrice * (L1BasePrice * scalar * (overhead + dataLength))
 ```
 
-overhead is the `x%` percentage of the average gas usage of the L1 txs that submitting the state and tx roots. We adjust `x ` based on our operation situation.
+The `overhead` is the `x%` percentage of the average gas usage of the L1 txs that submitting the state and tx roots within last 1000 blocks. We adjust `x ` based on our operation cost.
 
 ## Algorithm
 
