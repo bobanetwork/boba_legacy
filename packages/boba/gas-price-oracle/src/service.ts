@@ -64,6 +64,9 @@ interface GasPriceOracleOptions {
 
   // overhead ratio
   overheadRatio1000X: number
+
+  // Min percent change
+  overheadMinPercentChange: number
 }
 
 const optionSettings = {}
@@ -108,6 +111,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       burnedGasFeeRatio100X: this.options.burnedGasFeeRatio100X,
       maxBurnedGas: this.options.maxBurnedGas,
       overheadRatio1000X: this.options.overheadRatio1000X,
+      overheadMinPercentChange: this.options.overheadMinPercentChange,
     })
 
     this.state = {} as any
@@ -247,6 +251,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
+      await sleep(this.options.pollingInterval)
       // l2 gas price
       await this._getL1Balance()
       await this._getL2GasCost()
@@ -258,7 +263,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
-      await sleep(this.options.pollingInterval)
     }
   }
 
@@ -838,8 +842,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const overheadProduction = await this.state.OVM_GasPriceOracle.overhead()
 
       if (
-        targetOverheadGas.toString() === overheadProduction.toString() ||
-        !targetOverheadGas.toString()
+        (targetOverheadGas.toNumber() <
+          overheadProduction.toNumber() *
+            (1 + this.options.overheadMinPercentChange) &&
+          targetOverheadGas.toNumber() >
+            overheadProduction.toNumber() *
+              (1 - this.options.overheadMinPercentChange)) ||
+        !targetOverheadGas.toNumber()
       ) {
         this.logger.info('No need to update overhead value', {
           targetOverheadGas: targetOverheadGas.toNumber(),
@@ -853,6 +862,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
         await tx.wait()
         this.logger.info('Updated overhead gas', {
+          overheadProduction: overheadProduction.toNumber(),
           overheadGas: targetOverheadGas.toNumber(),
         })
       }
