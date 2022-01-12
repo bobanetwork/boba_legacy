@@ -94,6 +94,11 @@ const main = async () => {
     'overhead-min-percent-change',
     parseFloat(env.OVERHEAD_MIN_PERCENT_CHANGE) || 0.05
   )
+  // minimum l1 base fee
+  const MIN_L1_BASE_FEE = config.uint(
+    'min-l1-base-fee',
+    parseInt(env.MIN_L1_BASE_FEE, 10) || 150000000000
+  )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
@@ -165,7 +170,8 @@ const main = async () => {
     burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
     maxBurnedGas: MAX_BURNED_GAS,
     overheadRatio1000X: OVERHEAD_RATIO_1000X,
-    overheadMinPercentChange: OVERHEAD_MIN_PERCENT_CHANGE
+    overheadMinPercentChange: OVERHEAD_MIN_PERCENT_CHANGE,
+    minL1BaseFee: MIN_L1_BASE_FEE,
   })
 
   await service.start()

@@ -67,6 +67,9 @@ interface GasPriceOracleOptions {
 
   // Min percent change
   overheadMinPercentChange: number
+
+  // Min L1 base fee
+  minL1BaseFee: number
 }
 
 const optionSettings = {}
@@ -112,6 +115,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       maxBurnedGas: this.options.maxBurnedGas,
       overheadRatio1000X: this.options.overheadRatio1000X,
       overheadMinPercentChange: this.options.overheadMinPercentChange,
+      minL1BaseFee: this.options.minL1BaseFee,
     })
 
     this.state = {} as any
@@ -929,7 +933,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     try {
       const l1GasPrice = await this.options.l1RpcProvider.getGasPrice()
       const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
-      if (l1GasPrice.toNumber() !== l1BaseFee.toNumber()) {
+      if (
+        l1GasPrice.toNumber() !== l1BaseFee.toNumber() &&
+        l1GasPrice.toNumber() > this.options.minL1BaseFee
+      ) {
         const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
           l1GasPrice,
           { gasPrice: 0 }
@@ -942,6 +949,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       } else {
         this.logger.info('No need to update L1 base gas price', {
           l1BaseFee: l1GasPrice.toNumber(),
+          minL1BaseFee: this.options.minL1BaseFee,
         })
       }
     } catch (error) {
