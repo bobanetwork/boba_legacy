@@ -1,0 +1,32 @@
+{
+  "name": "v3-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-chain messaging prototype",
+  "main": "index.js",
+  "repository": "git@github.com:omgnetwork/optimism-v2",
+  "author": "Michael Montour <mmontour@enya.ai>",
+  "license": "Internal use only",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf ./artifacts ./cache",
+    "build": "hardhat compile",
+    "deploy": "hardhat --network l1 test test/deploy.ts",
+    "uninstall": "hardhat --network l1 test test/uninstall.ts",
+    "test:contracts": "hardhat --network l1 test test/ng-test.ts"
+  },
+  "devDependencies": {
+    "@ethersproject/providers": "^5.0.24",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.3",
+    "hardhat": "^2.2.1",
+    "mocha": "^8.3.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "ethers": "^5.1.0",
+    "ip": "^1.1.5"
+  }
+}
