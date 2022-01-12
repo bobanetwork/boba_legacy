@@ -13,6 +13,7 @@ import { Lib_CrossDomainUtils } from "@eth-optimism/contracts/contracts/librarie
 
 /* Interface Imports */
 import { IL1CrossDomainMessenger } from "@eth-optimism/contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
+import { IL1DepositHash } from "./IL1DepositHash.sol";
 import { ICanonicalTransactionChain } from "@eth-optimism/contracts/contracts/L1/rollup/ICanonicalTransactionChain.sol";
 import { IStateCommitmentChain } from "@eth-optimism/contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
 
@@ -77,6 +78,25 @@ contract L1CrossDomainMessengerFast is
     constructor()
         Lib_AddressResolver(address(0))
     {}
+
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    /**
+     * Modifier to enforce that, if configured, only the OVM_L2MessageRelayer contract may
+     * successfully call a method.
+     */
+    modifier onlyRelayer() {
+        address relayer = resolve("OVM_L2MessageRelayer");
+        if (relayer != address(0)) {
+            require(
+                msg.sender == relayer,
+                "Only OVM_L2MessageRelayer can relay L2-to-L1 messages."
+            );
+        }
+        _;
+    }
 
     /********************
      * Public Functions *
@@ -197,6 +217,7 @@ contract L1CrossDomainMessengerFast is
     )
         override
         public
+        onlyRelayer
         nonReentrant
         whenNotPaused
     {
@@ -256,6 +277,25 @@ contract L1CrossDomainMessengerFast is
             )
         );
         relayedMessages[relayId] = true;
+    }
+
+    function relayMessage(
+        address _target,
+        address _sender,
+        bytes memory _message,
+        uint256 _messageNonce,
+        L2MessageInclusionProof memory _proof,
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
+    )
+        public
+        nonReentrant
+        whenNotPaused
+    {
+        // verify hashes
+        _verifyDepositHashes(_standardBridgeDepositHash, _lpDepositHash);
+
+        relayMessage(_target, _sender, _message, _messageNonce, _proof);
     }
 
     /**
@@ -381,5 +421,28 @@ contract L1CrossDomainMessengerFast is
             _proof.storageTrieWitness,
             account.storageRoot
         );
+    }
+
+    function _verifyDepositHashes(
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
+    )
+        internal
+    {
+        // fetch address of standard bridge and LP1
+        address standardBridge = resolve("Proxy__L1StandardBridge");
+        address L1LP = resolve("Proxy__L1LiquidityPool");
+
+        if (block.number == IL1DepositHash(standardBridge).lastHashUpdateBlock()) {
+            require(_standardBridgeDepositHash == IL1DepositHash(standardBridge).priorDepositInfoHash(), "Standard Bridge hashes do not match");
+        } else {
+            require(_standardBridgeDepositHash == IL1DepositHash(standardBridge).currentDepositInfoHash(), "Standard Bridge hashes do not match");
+        }
+
+        if (block.number == IL1DepositHash(L1LP).lastHashUpdateBlock()) {
+            require(_lpDepositHash == IL1DepositHash(L1LP).priorDepositInfoHash(), "LP1 hashes do not match");
+        } else {
+            require(_lpDepositHash == IL1DepositHash(L1LP).currentDepositInfoHash(), "LP1 hashes do not match");
+        }
     }
 }
