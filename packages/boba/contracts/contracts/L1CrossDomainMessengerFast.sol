@@ -13,15 +13,16 @@ import { Lib_CrossDomainUtils } from "@eth-optimism/contracts/contracts/librarie
 
 /* Interface Imports */
 import { IL1CrossDomainMessenger } from "@eth-optimism/contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
+import { IL1DepositHash } from "./IL1DepositHash.sol";
 import { ICanonicalTransactionChain } from "@eth-optimism/contracts/contracts/L1/rollup/ICanonicalTransactionChain.sol";
 import { IStateCommitmentChain } from "@eth-optimism/contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
 
 /* External Imports */
-import { OwnableUpgradeable } from 
+import { OwnableUpgradeable } from
     "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { PausableUpgradeable } from 
+import { PausableUpgradeable } from
     "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from 
+import { ReentrancyGuardUpgradeable } from
     "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 /**
@@ -78,6 +79,25 @@ contract L1CrossDomainMessengerFast is
         Lib_AddressResolver(address(0))
     {}
 
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    /**
+     * Modifier to enforce that, if configured, only the OVM_L2MessageRelayer contract may
+     * successfully call a method.
+     */
+    modifier onlyRelayer() {
+        address relayer = resolve("OVM_L2MessageRelayer");
+        if (relayer != address(0)) {
+            require(
+                msg.sender == relayer,
+                "Only OVM_L2MessageRelayer can relay L2-to-L1 messages."
+            );
+        }
+        _;
+    }
+
     /********************
      * Public Functions *
      ********************/
@@ -108,8 +128,8 @@ contract L1CrossDomainMessengerFast is
     /**
      * Pause fast exit relays
      */
-    function pause() 
-        external 
+    function pause()
+        external
         onlyOwner() {
         _pause();
     }
@@ -117,8 +137,8 @@ contract L1CrossDomainMessengerFast is
     /**
      * UnPause fast exit relays
      */
-    function unpause() 
-        external 
+    function unpause()
+        external
         onlyOwner() {
         _unpause();
     }
@@ -197,6 +217,7 @@ contract L1CrossDomainMessengerFast is
     )
         override
         public
+        onlyRelayer
         nonReentrant
         whenNotPaused
     {
@@ -258,6 +279,25 @@ contract L1CrossDomainMessengerFast is
         relayedMessages[relayId] = true;
     }
 
+    function relayMessage(
+        address _target,
+        address _sender,
+        bytes memory _message,
+        uint256 _messageNonce,
+        L2MessageInclusionProof memory _proof,
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
+    )
+        public
+        nonReentrant
+        whenNotPaused
+    {
+        // verify hashes
+        _verifyDepositHashes(_standardBridgeDepositHash, _lpDepositHash);
+
+        relayMessage(_target, _sender, _message, _messageNonce, _proof);
+    }
+
     /**
      * Replays a cross domain message to the target messenger.
      * @inheritdoc IL1CrossDomainMessenger
@@ -273,38 +313,7 @@ contract L1CrossDomainMessengerFast is
         override
         public
     {
-        // Verify that the message is in the queue:
-        address canonicalTransactionChain = resolve("CanonicalTransactionChain");
-        Lib_OVMCodec.QueueElement memory element =
-            ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
-
-        bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
-            _target,
-            _sender,
-            _message,
-            _queueIndex
-        );
-        
-        // Compute the transactionHash
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                AddressAliasHelper.applyL1ToL2Alias(address(this)),
-                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _oldGasLimit,
-                _message
-            )
-        );
-
-        require(
-            transactionHash == element.transactionHash,
-            "Provided message has not been enqueued."
-        );
-
-        _sendXDomainMessage(
-            canonicalTransactionChain,
-            xDomainCalldata,
-            _newGasLimit
-        );
+        revert("Sending via this messenger is disabled");
     }
 
     /**********************
@@ -414,19 +423,26 @@ contract L1CrossDomainMessengerFast is
         );
     }
 
-    /**
-     * Sends a cross domain message.
-     * @param _canonicalTransactionChain Address of the CanonicalTransactionChain instance.
-     * @param _message Message to send.
-     * @param _gasLimit OVM gas limit for the message.
-     */
-    function _sendXDomainMessage(
-        address _canonicalTransactionChain,
-        bytes memory _message,
-        uint256 _gasLimit
+    function _verifyDepositHashes(
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
     )
         internal
     {
-        revert("Sending via this messenger is disabled");
+        // fetch address of standard bridge and LP1
+        address standardBridge = resolve("Proxy__L1StandardBridge");
+        address L1LP = resolve("Proxy__L1LiquidityPool");
+
+        if (block.number == IL1DepositHash(standardBridge).lastHashUpdateBlock()) {
+            require(_standardBridgeDepositHash == IL1DepositHash(standardBridge).priorDepositInfoHash(), "Standard Bridge hashes do not match");
+        } else {
+            require(_standardBridgeDepositHash == IL1DepositHash(standardBridge).currentDepositInfoHash(), "Standard Bridge hashes do not match");
+        }
+
+        if (block.number == IL1DepositHash(L1LP).lastHashUpdateBlock()) {
+            require(_lpDepositHash == IL1DepositHash(L1LP).priorDepositInfoHash(), "LP1 hashes do not match");
+        } else {
+            require(_lpDepositHash == IL1DepositHash(L1LP).currentDepositInfoHash(), "LP1 hashes do not match");
+        }
     }
 }

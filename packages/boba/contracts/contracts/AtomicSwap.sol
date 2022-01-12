@@ -88,6 +88,7 @@ contract AtomicSwap {
         emit Open(_swapID, _closeTrader);
     }
 
+    // outcome of this method might be subject to transaction ordering, check expire()
     function close(
         bytes32 _swapID
     )
@@ -108,6 +109,7 @@ contract AtomicSwap {
         emit Close(_swapID);
     }
 
+    // outcome of this method might be subject to transaction ordering, check close()
     function expire(
         bytes32 _swapID
     )

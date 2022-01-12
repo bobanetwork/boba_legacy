@@ -5,6 +5,8 @@ import * as S from './GasSwitcher.styles.js'
 import { ethers } from 'ethers'
 
 import { selectGas } from 'selectors/balanceSelector'
+import { selectVerifierStatus } from 'selectors/verifierSelector'
+
 import { Typography } from '@material-ui/core'
 
 import networkService from 'services/networkService.js'
@@ -46,6 +48,13 @@ function GasSwitcher() {
     getGasSavings();
   }, [gas]);
 
+  const verifierStatus = useSelector(selectVerifierStatus)
+  let healthStatus = 'health'
+
+  if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
+    healthStatus = 'unhealth'
+  }
+
   return (
     <S.WalletPickerContainer>
       <S.WalletPickerWrapper>
@@ -56,7 +65,8 @@ function GasSwitcher() {
               Boba Gas<br/>
               Savings<br/>
               L1 Block<br/>
-              L2 Block
+              L2 Block<br/>
+              Verified Block
             </S.Label>
             <Box sx={{
               display: 'flex',
@@ -74,7 +84,8 @@ function GasSwitcher() {
                 {gas.gasL2} Gwei<br/>
                 {savings.toFixed(0)}x<br/>
                 {gas.blockL1}<br/>
-                {gas.blockL2}
+                {gas.blockL2}<br/>
+                {verifierStatus.matchedBlock} {`(${healthStatus})`}
               </Typography>
             </Box>
           </S.NetWorkStyle>

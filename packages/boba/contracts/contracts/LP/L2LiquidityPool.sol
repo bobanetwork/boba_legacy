@@ -166,6 +166,14 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         address tokenAddress
     );
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event DaoRoleTransferred(
+        address newDao
+    );
+
     /********************************
      * Constructor & Initialization *
      ********************************/
@@ -220,6 +228,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         require(_newOwner != address(0), 'New owner cannot be the zero address');
         owner = _newOwner;
+        emit OwnershipTransferred(_newOwner);
     }
 
     /**
@@ -235,6 +244,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         require(_newDAO != address(0), 'New DAO address cannot be the zero address');
         DAO = _newDAO;
+        emit DaoRoleTransferred(_newDAO);
     }
 
     /**
@@ -633,7 +643,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
-        // Construct calldata for L1LiquidityPool.depositToFinalize(_to, receivedAmount)
+        // Construct calldata for L1LiquidityPool.clientPayL1(_to, _amount, _tokenAddress)
         bytes memory data = abi.encodeWithSelector(
             iL1LiquidityPool.clientPayL1.selector,
             msg.sender,
@@ -863,8 +873,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyFromCrossDomainAccount(address(L1LiquidityPoolAddress))
         whenNotPaused
     {
+        // replyNeeded helps store the status if a message needs to be sent back to the other layer
+        // in case there is not enough funds to give away
         bool replyNeeded = false;
         PoolInfo storage pool = poolInfo[_tokenAddress];
+        // if this fails, relay can be attempted again after registering
+        require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
         uint256 userRewardFeeRate = getUserRewardFeeRate(_tokenAddress);
         uint256 userRewardFee = (_amount.mul(userRewardFeeRate)).div(1000);
         uint256 ownerRewardFee = (_amount.mul(ownerRewardFeeRate)).div(1000);
