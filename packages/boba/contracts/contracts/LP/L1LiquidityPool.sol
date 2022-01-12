@@ -93,6 +93,10 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
     address payable public L1StandardBridgeAddress;
     uint256 public userRewardMaxFeeRate;
 
+    bytes32 public priorDepositInfoHash;
+    bytes32 public currentDepositInfoHash;
+    uint256 public lastHashUpdateBlock;
+
     /********************
      *       Events     *
      ********************/
@@ -458,6 +462,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        _updateDepositHash(_tokenAddress, msg.sender, _amount);
+
         emit ClientDepositL1(
             msg.sender,
             _amount,
@@ -672,6 +678,21 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
      */
     function unpause() external onlyOwner() {
         _unpause();
+    }
+
+    function _updateDepositHash(address _tokenAddress, address _account, uint256 _amount) internal {
+        // if block number is different only then update prior
+        if (block.number > lastHashUpdateBlock) {
+            priorDepositInfoHash = currentDepositInfoHash;
+        }
+        currentDepositInfoHash = keccak256(abi.encode(
+            currentDepositInfoHash,
+            _tokenAddress,
+            _account,
+            _amount
+        ));
+
+        lastHashUpdateBlock = block.number;
     }
 
     /*************************
