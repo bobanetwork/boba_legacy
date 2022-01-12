@@ -54,7 +54,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: '0.6.6', // Required for WETH9
+        version: '0.6.6', // Required for oracle
         settings: {
           optimizer: { enabled: true, runs: 10_000 },
           outputSelection: {
