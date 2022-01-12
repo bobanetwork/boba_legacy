@@ -313,38 +313,7 @@ contract L1CrossDomainMessengerFast is
         override
         public
     {
-        // Verify that the message is in the queue:
-        address canonicalTransactionChain = resolve("CanonicalTransactionChain");
-        Lib_OVMCodec.QueueElement memory element =
-            ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
-
-        bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
-            _target,
-            _sender,
-            _message,
-            _queueIndex
-        );
-
-        // Compute the transactionHash
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                AddressAliasHelper.applyL1ToL2Alias(address(this)),
-                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _oldGasLimit,
-                _message
-            )
-        );
-
-        require(
-            transactionHash == element.transactionHash,
-            "Provided message has not been enqueued."
-        );
-
-        _sendXDomainMessage(
-            canonicalTransactionChain,
-            xDomainCalldata,
-            _newGasLimit
-        );
+        revert("Sending via this messenger is disabled");
     }
 
     /**********************
@@ -475,21 +444,5 @@ contract L1CrossDomainMessengerFast is
         } else {
             require(_lpDepositHash == IL1DepositHash(L1LP).currentDepositInfoHash(), "LP1 hashes do not match");
         }
-    }
-
-    /**
-     * Sends a cross domain message.
-     * @param _canonicalTransactionChain Address of the CanonicalTransactionChain instance.
-     * @param _message Message to send.
-     * @param _gasLimit OVM gas limit for the message.
-     */
-    function _sendXDomainMessage(
-        address _canonicalTransactionChain,
-        bytes memory _message,
-        uint256 _gasLimit
-    )
-        internal
-    {
-        revert("Sending via this messenger is disabled");
     }
 }
