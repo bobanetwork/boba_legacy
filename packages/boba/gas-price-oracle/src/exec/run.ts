@@ -94,6 +94,11 @@ const main = async () => {
     'overhead-min-percent-change',
     parseFloat(env.OVERHEAD_MIN_PERCENT_CHANGE) || 0.05
   )
+  const MIN_OVERHEAD = config.uint(
+    'min-overhead',
+    parseInt(env.MIN, 10) || 30000
+  )
+
   // minimum l1 base fee
   const MIN_L1_BASE_FEE = config.uint(
     'min-l1-base-fee',
@@ -171,6 +176,7 @@ const main = async () => {
     maxBurnedGas: MAX_BURNED_GAS,
     overheadRatio1000X: OVERHEAD_RATIO_1000X,
     overheadMinPercentChange: OVERHEAD_MIN_PERCENT_CHANGE,
+    minOverhead: MIN_OVERHEAD,
     minL1BaseFee: MIN_L1_BASE_FEE,
   })
 

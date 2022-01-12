@@ -68,6 +68,9 @@ interface GasPriceOracleOptions {
   // Min percent change
   overheadMinPercentChange: number
 
+  // Min overhead
+  minOverhead: number
+
   // Min L1 base fee
   minL1BaseFee: number
 }
@@ -115,6 +118,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       maxBurnedGas: this.options.maxBurnedGas,
       overheadRatio1000X: this.options.overheadRatio1000X,
       overheadMinPercentChange: this.options.overheadMinPercentChange,
+      minOverhead: this.options.minOverhead,
       minL1BaseFee: this.options.minL1BaseFee,
     })
 
@@ -822,16 +826,24 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           overheadGas: overheadProduction.toNumber(),
         })
       } else {
-        this.logger.debug('Updating overhead gas...')
-        const tx = await this.state.OVM_GasPriceOracle.setOverhead(
-          targetOverheadGas,
-          { gasPrice: 0 }
-        )
-        await tx.wait()
-        this.logger.info('Updated overhead gas', {
-          overheadProduction: overheadProduction.toNumber(),
-          overheadGas: targetOverheadGas.toNumber(),
-        })
+        if (targetOverheadGas.toNumber() > this.options.minOverhead) {
+          this.logger.debug('Updating overhead gas...')
+          const tx = await this.state.OVM_GasPriceOracle.setOverhead(
+            targetOverheadGas,
+            { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated overhead gas', {
+            overheadProduction: overheadProduction.toNumber(),
+            overheadGas: targetOverheadGas.toNumber(),
+          })
+        } else {
+          this.logger.info('No need to update overhead value', {
+            targetOverheadGas: targetOverheadGas.toNumber(),
+            overheadGas: overheadProduction.toNumber(),
+            minOverheadGas: this.options.minOverhead,
+          })
+        }
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE OVER HEAD RATIO ${error}`)
@@ -948,7 +960,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         })
       } else {
         this.logger.info('No need to update L1 base gas price', {
-          l1BaseFee: l1GasPrice.toNumber(),
+          l1GasPrice: l1GasPrice.toNumber(),
+          l1BaseFee: l1BaseFee.toNumber(),
           minL1BaseFee: this.options.minL1BaseFee,
         })
       }
