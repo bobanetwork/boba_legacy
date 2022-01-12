@@ -11,6 +11,10 @@ import {Lib_PredeployAddresses} from '../../libraries/constants/Lib_PredeployAdd
 import {IL2CrossDomainMessenger} from './IL2CrossDomainMessenger.sol';
 import {iOVM_L2ToL1MessagePasser} from '../predeploys/iOVM_L2ToL1MessagePasser.sol';
 
+interface L2_BobaPortal {
+  function TunnelMsg(bytes calldata) external;
+}
+
 /**
  * @title L2CrossDomainMessenger
  * @dev The L2 Cross Domain Messenger contract sends messages from L2 to L1, and is the entry point
@@ -29,6 +33,17 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
   address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
   address public l1CrossDomainMessenger;
 
+  address portalAddr;
+  L2_BobaPortal portal;
+
+  event SentL2TunnelMessage(
+      address indexed target,
+      address sender,
+      bytes message,
+      uint256 messageNonce,
+      uint256 gasLimit
+  );
+
   /***************
    * Constructor *
    ***************/
@@ -40,6 +55,11 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
   /********************
    * Public Functions *
    ********************/
+
+  function SetPortal(address _portal) public {
+    portalAddr = _portal;
+    portal = L2_BobaPortal(_portal);
+  }
 
   function xDomainMessageSender() public view returns (address) {
     require(
@@ -69,12 +89,18 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
 
     sentMessages[keccak256(xDomainCalldata)] = true;
 
-    // Actually send the message.
+    if (portalAddr != address(0)) {
+      portal.TunnelMsg(xDomainCalldata);
+
+      emit SentL2TunnelMessage(_target, msg.sender, _message, messageNonce, _gasLimit);
+    } else {
+      // Actually send the message.
+
+      // Emit an event before we bump the nonce or the nonce will be off by one.
+      emit SentMessage(_target, msg.sender, _message, messageNonce, _gasLimit);
+    }
     iOVM_L2ToL1MessagePasser(Lib_PredeployAddresses.L2_TO_L1_MESSAGE_PASSER)
       .passMessageToL1(xDomainCalldata);
-
-    // Emit an event before we bump the nonce or the nonce will be off by one.
-    emit SentMessage(_target, msg.sender, _message, messageNonce, _gasLimit);
     messageNonce += 1;
   }
 
@@ -88,10 +114,13 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
     bytes memory _message,
     uint256 _messageNonce
   ) public {
+
+  /*
     require(
       AddressAliasHelper.undoL1ToL2Alias(msg.sender) == l1CrossDomainMessenger,
       'Provided message could not be verified.'
     );
+  */
 
     bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
       _target,

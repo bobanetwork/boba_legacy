@@ -21,6 +21,9 @@ import {OwnableUpgradeable} from '@openzeppelin/contracts-upgradeable/access/Own
 import {PausableUpgradeable} from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 
+interface L1_BobaPortal {
+  function TunnelMsg(bytes calldata) external;
+}
 /**
  * @title L1CrossDomainMessenger
  * @dev The L1 Cross Domain Messenger contract sends messages from L1 to L2, and relays messages
@@ -44,6 +47,14 @@ contract L1CrossDomainMessenger is
 
   event MessageAllowed(bytes32 indexed _xDomainCalldataHash);
 
+  event SentL1TunnelMessage(
+      address indexed target,
+      address sender,
+      bytes message,
+      uint256 messageNonce,
+      uint256 gasLimit
+  );
+
   /**********************
    * Contract Variables *
    **********************/
@@ -54,6 +65,9 @@ contract L1CrossDomainMessenger is
   mapping(bytes32 => bool) public failedMessages;
 
   address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
+
+  address portalAddr;
+  L1_BobaPortal portal;
 
   /***************
    * Constructor *
@@ -69,6 +83,11 @@ contract L1CrossDomainMessenger is
   /********************
    * Public Functions *
    ********************/
+
+  function SetPortal(address _portal) public {
+    portalAddr = _portal;
+    portal = L1_BobaPortal(_portal);
+  }
 
   /**
    * @param _libAddressManager Address of the Address Manager.
@@ -137,20 +156,31 @@ contract L1CrossDomainMessenger is
     uint40 nonce = ICanonicalTransactionChain(ovmCanonicalTransactionChain)
       .getQueueLength();
 
-    bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
-      _target,
-      msg.sender,
-      _message,
-      nonce
-    );
+    if (portalAddr != address(0)) {
+       bytes memory xDomainPayload = abi.encode(
+        _target,
+        msg.sender,
+        _message,
+        nonce);
 
-    _sendXDomainMessage(
-      ovmCanonicalTransactionChain,
-      xDomainCalldata,
-      _gasLimit
-    );
+       portal.TunnelMsg(xDomainPayload);
+       emit SentL1TunnelMessage(_target, msg.sender, _message, nonce, _gasLimit);
+    } else {
+      bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
+        _target,
+        msg.sender,
+        _message,
+        nonce
+      );
 
-    emit SentMessage(_target, msg.sender, _message, nonce, _gasLimit);
+      _sendXDomainMessage(
+        ovmCanonicalTransactionChain,
+        xDomainCalldata,
+        _gasLimit
+      );
+
+      emit SentMessage(_target, msg.sender, _message, nonce, _gasLimit);
+    }
   }
 
   /**
