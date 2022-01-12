@@ -73,6 +73,9 @@ import GovernorBravoDelegator from "../deployment/artifacts-boba/contracts/DAO/g
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
+// Gas Oralce
+import OVM_GasPriceOracleJson from '../deployment/artifacts-base/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json'
+
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
 import { getAllNetworks } from 'util/masterConfig'
@@ -89,6 +92,7 @@ const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
+const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
 let allTokens = {}
@@ -147,6 +151,8 @@ class NetworkService {
     this.delegateContract = null
     this.delegatorContract = null
 
+    // Gas oracle
+    this.gasOralceContract = null
   }
 
   async enableBrowserWallet() {
@@ -712,6 +718,13 @@ class NetworkService {
           this.provider.getSigner()
         )
       }
+
+      // Gas oracle
+      this.gasOralceContract = new ethers.Contract(
+        L2GasOracle,
+        OVM_GasPriceOracleJson.abi,
+        this.L2Provider
+      )
 
       this.bindProviderListeners()
 
