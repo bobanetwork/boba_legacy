@@ -1,5 +1,18 @@
 # Basic Architecture of Turing and L2TGeth
 
+- [Basic Architecture of Turing and L2TGeth](#basic-architecture-of-turing-and-l2tgeth)
+  * [TLDR](#tldr)
+    + [Turing status as of January 12 2022 - Release countdown](#turing-status-as-of-january-12-2022---release-countdown)
+    + [Feature Preview: Using Turing to access real-time trading data from within your solidity smart contract](#feature-preview--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+  * [Detailed Technical Background and Implementation](#detailed-technical-background-and-implementation)
+    + [Quickstart for Turing Developers](#quickstart-for-turing-developers)
+    + [Implementation: Step 1](#implementation--step-1)
+    + [Step 2](#step-2)
+    + [Step 3 - Batch Submitter Data Mangling](#step-3---batch-submitter-data-mangling)
+    + [Step 4 - Writing to the CTC](#step-4---writing-to-the-ctc)
+    + [Step 5 - Reading from the CTC](#step-5---reading-from-the-ctc)
+    + [Step 6 - Verifier data ingestion](#step-6---verifier-data-ingestion)
+
 ## TLDR
 
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block. 
@@ -30,6 +43,8 @@ ToDo:
 * Upgrade the random number generator (currently `math/rand`) to something better such as `crypto/rand`
 * Secure the L2TGeth against malicious inputs from off-chain
 * Improve the data-packing system used to append turing payloads to the rawTransaction data sent to the L1
+* Fix Geth Tests
+* Add Integration tests to the GitHub actions
 
 ### Feature Preview: Using Turing to access real-time trading data from within your solidity smart contract
 
