@@ -1,224 +1,285 @@
+# Basic Architecture of Turing and L2TGeth
 
-# OUTDATED/OUTDATED/OUTDATED - MAJOR REVISION PENDING
+## TLDR
 
-# Introduction to Turing
+Turing is a system for interating with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block. 
 
-- [Introduction to Turing](#introduction-to-turing)
-  * [What is Turing?](#what-is-turing-)
-  * [Motivation](#motivation)
-  * [What we are **not** trying to do](#what-we-are---not---trying-to-do)
-  * [Basic System Architecture](#basic-system-architecture)
-  * [Current Limitations: Prototyping use only](#current-limitations--prototyping-use-only)
-  * [Hello World](#hello-world)
-  * [Under the hood](#under-the-hood)
-  * [Key code snippets](#key-code-snippets)
-  * [Some simple use cases](#some-simple-use-cases)
-  * [Pre-configured AWS Lambda code for Testing](#pre-configured-aws-lambda-code-for-testing)
-    + [Turing Simple Math](#turing-simple-math)
-    + [Turing StableSwap example](#turing-stableswap-example)
-  * [Turing Debugging](#turing-debugging)
-  * [Long Term - the Horizon](#long-term---the-horizon)
-    
-## What is Turing?
-
-Unlike Bitcoin, Ethereum is both a blockchain and a general-purpose computer. Although Ethereum is Turing-complete, the congestion of the network and the exorbitant gas prices preclude all but the most essential computations from taking place on Ethereum. Beyond limited speed and memory, and extreme cost, the architecture of the Ethereum EVM was not designed for, and is therefore not well suited for, contemporary algorithms from finance, algorithmic trading, artificial intelligence, creative content, audio and film, games, and computer science. Boba's **Turing** is designed to address these limitations. 
-
-Turing is a system for _hybrid compute_, defined as enabling Solidity smart contracts to interact with conventional compute endpoints via a modified L2 Geth. This makes it very easy for developers to:
-  * reuse existing Python, R, C++, Kera, Tensorflow, and other code  
-  * reuse existing API endpoints (for algorithmic trading, big data, and AI)  
-  * run calculations for 1 cent that would be cost millions on Ethereum  
-  * run calculations in milliseconds that would be take decades on Ethereum  
-  * not to worry about nearest-integer division, or other EVM specialties such as SQRT(3) = 1  
-  * write complex `hybrid` contracts without worrying about the 24k bytecode limit   
-
-## Motivation
-
-Smart contracts live in a local world defined by their chain. By design, smart contracts cannot readily trigger off-chain events. This is because in a system with distributed consensus, all miners must:
-
-1. Be trying to solve the _same_ problem and be operating on the the same inputs, and,  
-2. Once a solution has been found, it must be trivial (and fast) for all the other miners to check that solution's validity.  
-
-If smart contracts could directly call off-chain APIs, different nodes would struggle to agree on its next state, due to:
-
-1. **System latencies**. Each node would have to accommodate variable delays before responses arrive from the outside world. For example, an API might take 65 ms to return the result of `call.AWSlambda(Train_AMM)` to one node, whereas another node might need to wait 600 seconds for the response. There are solutions to this, but they are typically neither elegant nor scalable.
-
-2. **Non-deterministic external operations**. Random number generators, stochastic gradient decent, or even different compute platforms with different numerical precision/truncation complicate distributed consensus. Specifically, there could be numerous mathematically correct answers to _what is the next state of the chain given some set of contract interactions_. By contrast, in a typical blockchain, all miners, when given the same inputs, know precisely what the correct outputs are. 
-
-The recent growth of L2 scaling solutions is typically explained in terms of improved speed and reduced cost; however there is an additional benefit which has received less attention but may be even more important. Specifically, there is no mining on the L2s and they involve **unitary sequencers**, which indirectly solves the above issues, opening the door to advanced computation coordinated by Ethereum. 
-
-## What we are **not** trying to do
-
-There has been a general tendency in the literature to conflate 'off-chain compute' with 'distributed, verifiable computation'. It's certainly possible to do both at the same time, such as (proposed) in `TrueBit`, but `ChainLink` illustrates that solving even a tiny part of the problem can be extremely useful and valuable. Turing in its present form does not address the more general problem of distributed, verifiable computation.
-
-## Basic System Architecture
-
-Turing involves a small number of simple helper contracts, a modified Geth, and traditional compute endpoints including AWS Lambda. The system is based on (1) sending information to Geth via data hidden in revert strings and (2) receiving information from Geth via overloaded calldata. Specifically, a calling contract packs information into a revert string and _deliberately_ causes a call to a target contract to revert. The modified Geth intercepts those reverts, unpacks the data (such as input parameters and URIs such as `https://kkfpq0g9y0.execute-api.us-west-1.amazonaws.com/default/turing_add`), and calls the endpoint with those parameters. After receiving a response, Geth caches it, packs it into the calldata, and re-runs the call, which now succeeds, returning the modified calldata to the original calling contract. In this way, a contract is able to trigger arbitrary compute endpoints and send and receive data from the outside world.
-
-## Current Limitations: Prototyping use only
-
-Turing is *NOT* ready for production use, but is a technical prototype designed for pilots and exploring possible system architectures and design patterns for hybrid compute. Major current deficiencies are:
-
-1. Effectively no error handling
-2. Absence of unit and integration tests
-3. The current system is incompatible with fraud detection and fraud proving. This is because we are not currently storing all the data that would be needed for an outside observer to re-compute the state of chain, thereby verifying the consistency of the input transactions and the state roots, for example. However, Turing can already emit events which contain the needed information, and thus this issue can be addressed by adding additional functionality to fraud detectors and fraud provers.
-4. Due to points 1 to 3, Turing can only be used on local test systems and is not (yet) available on `rinkeby.boba.network` or `mainnet.boba.network`. 
-
-## Hello World
-
-Spin up a local test stack. Then, build and test the contracts.
-
-```bash
-
-$ yarn build
-$ yarn test:boba
-
-```
-
-The test suite will demonstrate basic functionality using a local http server.
-
-## Under the hood
-
-When you run `test`, a helper contract (`TuringHelper.sol`) will be deployed.
+**The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific predesignated functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
+uint256 random_number = turing.getRandom()
 ```
 
-Among other information, the helper contract contains the compute URL endpoint that will be called when pre-defined methods are called. Those methods must first be registered:
+To obtain the latest BTC-USD exchange rate, call:
 
 ```javascript
-    //defines the URL that will be called by HelloTuring.sol
-    helper = await Factory__Helper.deploy(urlStr, gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
-    await (helper.RegisterMethod(ethers.utils.toUtf8Bytes("hello")));
+urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
+rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 ```
 
-Next, a contract that uses Turing is deployed. It is initialized with the address of the Turing helper contract:
+### Use of Turing to access real-time trading data from within your solidity smart contract
 
-```javascript    
-    Factory__Hello = new ContractFactory(
-      (HelloTuringJson.abi),
-      (HelloTuringJson.bytecode),
-      testWallet)
-    
-    hello = await Factory__Hello.deploy(helper.address, gasOverride)
-```
+**Note - Boba does not provide trading data (except for deliberately delayed data for test and debugging purposes). To obtain real-time trading data, you will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.** 
 
-Finally, call Turing:
+Once you have an API key from your chosen data vendor, just insert that key into your off-chain compute endpoint. See `/AWS_code/turing_oracle.py` for working example code:
 
-```javascript
-    //This tests the eth_call pathway by returning a customized greeting for the specified locale. This only requires a pass through call to the helper contract.
-    bytes memory response = myHelper.TuringCall(0, abi.encode(locale));
+```python
+/AWS_code/turing_oracle.py
 
-    //This tests the eth_sendRawTransaction pathway by fetching a personalized greeting string for the user's chosen locale and storing it for later reference.
-    bytes memory response =  myHelper.TuringTx(0, abi.encode(locale));
-```
+...
+  api_key = 'YOUR_API_KEY' # Insert your Dow Jones, Bloomberg, or Polygon.io API key here
 
-## Key code snippets
+  authorized_contract = None # for open access
+  # or...
+  authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
+...
 
-A central code snippet is in `TuringHelper.sol`. 
-
-```javascript
-  
-  /* TuringHelper.sol GetResponse
-     This is the interface to the off-chain mechanism. Although
-     marked as "public", it is only to be called by TuringCall() 
-     or TuringTX().
-     The _slot parameter is overloaded to represent either the
-     request parameters or the off-chain response, with the rType
-     parameter indicating which is which. 
-     When called as a request (rType == 1), it reverts with 
-     an encoded TURING string. 
-     The modified l2geth intercepts this special revert, 
-     performs the off-chain interaction, then rewrites the parameters 
-     and calls the method again in "response" mode (rType == 2). 
-     This response is then passed back to the caller.
-  */
-  function GetResponse(uint32 method_idx, uint32 rType, bytes memory _slot)
-    public view returns (bytes memory) {
-
-    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
-    require (method_idx < methods.length, "Turing:GetResponse:method not registered");
-    require (rType == 1 || rType == 2, "Turing:GetResponse:rType != 1 || 2"); // l2geth can pass 0 here to indicate an error
-    require (_slot.length > 0, "Turing:GetResponse:_slot.length == 0");
-
-    if (rType == 1) {
-      // knock knock - wake up the l2geth
-      // force a revert
-      // the if() avoids calling genRequestRLP unnecessarily
-      require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
-    }
-    //if (rType == 2) -> the l2geth has obtained fresh data for us
-    return _slot;
-  }
-```
-
-Note how calling `GetResponse()` with `rType=1` triggers the revert, and note how the parameters and other data needed by Geth are packed into the revert string via `genRequestRLP(methods[method_idx], _slot)`:
-
-```javascript
-    if (rType == 1)
-        require (rType == 2, string(genRequestRLP(methods[method_idx], _slot)));
 ``` 
 
-## Some simple use cases
+You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, just designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, leave this variable blank.
 
-* An exchange runs an AMM with periodic rebalancing. Today, the exchange might do this by deploying an entirely new set of smart contracts, or, manually updating weight matrices and constants. For example, they could monitor the chain, detect events, compute, and push new weights/constants into an AMM. This loop may involve bespoke scripts, multiple architectures, people, and other steps to close the 'detect->compute->update' contract update loop. Imagine a system that makes this easy.
+## Detailed Technical Background and Implementation
 
-* An insurance company wishes to offer policies to people via smart contracts. The insurance company has spent 30 years building a prequalification stack, but it is not obvious how to translate that into a set of smart contracts. Don't laugh - a drone company offering automated hail damage detection was almost bankrupted because insurance companies did not want to know the _actual_ extent of hail damage, but rather they wanted to know the _estimated_ hail damage as sampled through a 10x10 grid by a human on a ladder - because that's what all their risk models were built around. Note that what was important here was not the precision of the estimate, but the compatibility of the new tech with existing workflows, programming languages, endpoints, company inertia etc. 
+The modified Turing L2Geth, `L2TGeth`, monitors callData for particular methodIDs of functions such as `function GetRandom(uint32 rType, uint256 _random)` and `function GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs anywhere in the execution flow, at any level, L2TGeth parses the callData for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then, and only then, runs the function with updated input callData, such that the new information flows back to the caller (via overloaded variables and a system by bypassing reverts). Put simply, L2TGeth intercepts function calls, adds new information to the callData, and then runs the function with the updated inputs.
 
-* A complex DeFi project wishes to save gas and is hitting bytecode length issues. Moreover, they have special timing needs, and wish to prevent manipulation and frontrunning. So, offload the bulky, complex code and the timing-critical code to Turing.
+In general, this system would lead to disagreemnt about the correct state of the underlying blockchain. For example, if Replicas and Verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `messages`, `reciepts`, `blocks`, `evm.contexts`, and diverse `codecs` and `encoders/decoders`. This new data fields is understood by the `providers`, the `core-utils`, the `data-translation-layer`, and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionContract` (CTC). This extra information allows all gthe verifiers and replicas to enter into a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the needed information being publically depostited into Ethereum for restoring the Boba L2 and, just as critically, for public fraud proving. 
 
-* As above, except focusing on SMC and FHE - completely impossible to do that on chain.  
+## Implementation
 
-## Pre-configured AWS Lambda code for Testing
+### Step 1
 
-### Turing Simple Math
+The first step is to call specific functions from within your smart contract, such as:
 
-The Basic Math code is in `turing/AWS_code/turing_basicMath.py`. To test it from your terminal, run:
-
-```bash
-#Basic Math Curl Test
-#run from your terminal 
-curl -X POST \
-    'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/basic_math' \
-    -H 'content-type: application/json' \
-    -d '{"key1":"0.73","key2":"9.62"}'
-
-#returns
-{"sum":10.35,"mul":7.022599999999999}%
+```javascript
+uint256 random_number = turing.getRandom()
 ```
 
-### Turing StableSwap example
+The modified `L2TGeth` will detect these function calls.
 
-Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in `turing/AWS_code/turing_stableSwap.py`. To test it from your terminal, run:
 
-```bash
-#StableSwap Curl Test
-#run from your terminal 
-curl -X POST \
-    'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/stableSwap' \
-    -H 'content-type: application/json' \
-    -d '{"L_x":"10.0","L_y":"10.0","A":"1.00","x_in":"5.00","sol":"true"}'
 
-#returns
-{"x_in": 5.0, "y_out": 4.227083333333334, "x_new": 15.0, "y_prev": 10.0, "y_new": 5.772916666666666, "sol": true}%      
+
+
+
+
+
+
+### Step 2
+
+`l2geth/core/state_transition.go` gets the Turing data out from the context, and returns it to callers
+
+```go
+/l2geth/core/state_transition.go:
+   85   QueueOrigin() types.QueueOrigin
+   86:  L1Turing() []byte
+   87  }
+   ..
+  229  // returning the result including the used gas. It returns an error if failed.
+  230  // An error indicates a consensus issue.
+  231: func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bool, err error, turing []byte) {
+  232   if err = st.preCheck(); err != nil {
+  233       return
+  ...
+  262       st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
+  263       ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
+  264:      turing = evm.Context.Turing // Prepare the return Turing data
+  265   }
+  ...
+  288:  return ret, st.gasUsed(), vmerr != nil, err, turing
+  289  }
 ```
 
-So in this example, putting in `5.0` token 'X' would give you `4.227` token 'Y'. You can compare and contrast the results you would get by running the calculation on the Ethereum EVM compared to on AWS by changing `"sol":"true"` to `"sol":"false"`.  
+Then, the `miner/worker.go` takes the Turing data and pushes it into the transaction metadata:
 
-## Turing Debugging
+```go
+/l2geth/miner/worker.go:
+  768   receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
+  ...  
+  774:  // TURING Update the tx metadata...
+  775   if len(receipt.Turing) > 1 {
+  776     tx.SetL1Turing(receipt.Turing)
+```
 
-Since Turing is based on (deliberate) reverts and rewriting of calldata, it can be tricky to debug. Most obviously, nothing will work if your contracts revert for reasons unrelated to Turing. 
+At this point, the data will be circulated to various places as part of the transaction metadata. 
 
-**Step one is to make absolutely sure that your contracts are running correctly, and only then to add hybrid compute calls.**   
+### Step 3 - Batch Submitter Data Mangling
 
-**Step two is to test your compute APIs via Curl to make sure they are working as intended.**
+The batch submitter receives an transaction from the `L2Geth`, obtains the raw call string (`rawTransaction`) and the Turing callData (`l1Turing`), and if there is a real Turing event, as judged from the length of the Turing string, it appends those data to the raw call string. From the perspective of the CTC, it is receiving its normal batch payload.   
 
-Generally, we use the MethodIDs to confirm correct depth and execution flow in the Geth log outputs if there is a problem. In virtually all cases, issues are not related to Turing itself but rather have to do with insufficient gas or incorrectly formatted compute inputs.
+```javascript
+// batch-submitter tx-batch-submitter.ts 
 
-## Long Term - the Horizon
+767 if (this._isSequencerTx(block)) {
+      batchElement.isSequencerTx = true
+      const turing = block.transactions[0].l1Turing
+      let rawTransaction = block.transactions[0].rawTransaction
+      if (turing.length > 4) {
+        // We have a Turing event and associated payload
+        // Add a spacer, remove the '0x', and tack on the turing string
+        rawTransaction = rawTransaction + '424242' + turing.slice(2) //Chop off the '0x' from the Turing string
+        // TODO TODO TODO remove the entire '424242' business by explicitely providing the junction location data in some other way to the DTL
+      }
+      batchElement.rawTransaction = rawTransaction
+    }
 
-In this elaboration, the compute operations coordinated by the unitary Geth would not end up at typically only one place, e.g. an AWS Lambda endpoint, but would flow into a distributed compute system similar in spirit to `TruBit`. That system would need additional logic to farm out the TCRs, verify the results, and reward the verifiers and the people providing the compute power. 
+```
+
+Current weaknesses of the design:
+
+* The `turing.slice(2)` is not RLP encoded, to make it easier to debug. But, it would be better if this were RLP encoded, too, to save space. Right now we are writing strings mostly composed of zeros, to the CTC.
+* The `rawTransaction.length` field in the payload header is currently not updated (it always just gives the original length of `block.transactions[0].rawTransaction`). Thus, a kludge is needed in the DTL. This weakness is described in more detail below. 
+* Note that for a true Turing string, the first 4 bytes are known in advance - they are just the methodID of the turing helper `GetRandom` or `GetResponse()`
+
+```go
+  //methodID for GetResponse is 7d93616c -> [125 147 97 108]
+  isTuring2 := bytes.Equal(input[:4], []byte{125, 147, 97, 108})
+
+  //methodID for GetRandom is 493d57d6 -> [73 61 87 214]
+  isGetRand2 := bytes.Equal(input[:4], []byte{73, 61, 87, 214})
+```
+
+This means that the tacked-on Turing string is either `4242427d93616c` or `424242493d57d6`.
+
+### Step 4 - Writing to the CTC
+
+The batch-submitter writes the data to the CTC as usual. The CTC does not know about Turing - that was one of the goals, so we do not have to modify the L1 contracts.
+
+### Step 5 - Reading from the CTC
+
+The DTL reads from the CTC and unpacks the modified rawTransaction (which is now called `sequencerTransaction`). Critically, the DTL writes a slightly modified entry into its database, which has a new field called `turing`. This new field is also sent to callers that query the DTL for data. 
+
+```javascript
+// DTL services/l1-ingestion/handles/sequencer-batch-appended.ts
+
+    console.log(`DTL parseSequencerBatchTransaction`, {
+      sequencerTransaction: toHexString(sequencerTransaction),
+    })
+
+    // need to keep track of the original length so the pointer system for accessing
+    // the individual transactions works correctly
+    const sequencerTransaction_original_length = sequencerTransaction.length
+
+    // DANGER DANGER DANGER - FIX
+    const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
+    let turing = Buffer.from('0')
+
+    if (turingIndex > 0) {
+      //we have turing payload
+      turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
+      sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
+      console.log('Found a Turing payload at position:', {
+        turingIndex,
+        turing: toHexString(turing),
+        sequencerTransaction: toHexString(sequencerTransaction),
+      })
+    }
+
+    const decoded = decodeSequencerBatchTransaction(
+      sequencerTransaction,
+      l2ChainId
+    )
+
+    transactionEntries.push({
+      index: extraData.prevTotalElements
+        .add(BigNumber.from(transactionIndex))
+        .toNumber(),
+      batchIndex: extraData.batchIndex.toNumber(),
+      blockNumber: BigNumber.from(context.blockNumber).toNumber(),
+      timestamp: BigNumber.from(context.timestamp).toNumber(),
+...
+      data: toHexString(sequencerTransaction), // The restored rawTransaction minus any Turing bits
+...
+      turing: toHexString(turing),
+    })
+
+    nextTxPointer += 3 + sequencerTransaction_original_length 
+```
+
+**VULNERABILTY**
+
+The DTL gets the length of each transaction from the header (located near offset `15 + 16 * i_context`), but we are **not currently updating this header field** after we append the Turing data in the batch submitter. **ToDo**: `if(turing) then update` the `transactionLength` field in the header. This will require changes in the `core-utils` encoder and/or the DTL. A fix to this approach  would avoid having to scan for certain bytes, notably '424242', which could be mis-used in an attack. For example, simply calling a contract with string somewhere in the callData with value '4242427d93616c' would trigger the DTL to store everything after that as a (spurious) Turing payload. This could allow an attacker to send arbitrary information into the DTL and into the L2TGeth. 
+
+```javascript
+/data-transport-layer/src/services/l1-ingestion/handlers/sequencer-batch-appended.ts:
+  280    offset: number
+  281  ): Buffer => {
+  282:   const transactionLength = BigNumber.from(
+  283      calldata.slice(offset, offset + 3)
+  284    ).toNumber()
+```
+
+### Step 6 - Verifier data ingestion
+
+The Verifier receives all the usual data from the DTL, but, if there was a Turing call, there is now an additional data field containing the rewritten callData as a HexString. The Turing data are obtained from incoming `json` data and are written into the transaction metadata, `meta.L1Turing = turing`:
+
+```go
+/l2geth/core/types/transaction_meta.go:
+   38   L1Timestamp     uint64          `json:"l1Timestamp"`
+   39:  L1Turing        []byte          `json:"l1Turing" gencodec:"required"`
+   40   L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
+   ..
+   55   l1Timestamp uint64,
+   56:  l1Turing []byte,
+   57   l1MessageSender *common.Address,
+   ..
+   64       L1Timestamp:     l1Timestamp,
+   65:      L1Turing:        l1Turing,
+   66       L1MessageSender: l1MessageSender,
+   ..
+  145   }
+  146  
+  147:  turing, err := common.ReadVarBytes(b, 0, 2048, "Turing")
+  148   if err != nil {
+  149       return nil, err
+  150   }
+  151:  if !isNullValue(turing) {
+  152:      meta.L1Turing = turing
+  153   }
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+To accomodate that, the `transaction` structure has a new field, `Turing      hexutil.Bytes   `json:"turing"`
+
+```go
+rollup/sync_service.go
+// transaction represents the return result of the remote server.
+// It either came from a batch or was replicated from the sequencer.
+type transaction struct {
+    Index       uint64          `json:"index"`
+    BatchIndex  uint64          `json:"batchIndex"`
+    BlockNumber uint64          `json:"blockNumber"`
+    Timestamp   uint64          `json:"timestamp"`
+    Value       *hexutil.Big    `json:"value"`
+    GasLimit    uint64          `json:"gasLimit,string"`
+    Target      common.Address  `json:"target"`
+    Origin      *common.Address `json:"origin"`
+    Data        hexutil.Bytes   `json:"data"`
+    QueueOrigin string          `json:"queueOrigin"`
+    QueueIndex  *uint64         `json:"queueIndex"`
+    Decoded     *decoded        `json:"decoded"`
+    Turing      hexutil.Bytes   `json:"turing"`
+}
+
+```
+
+
+
+
+
+
+
+

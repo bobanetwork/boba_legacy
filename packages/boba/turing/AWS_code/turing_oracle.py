@@ -5,20 +5,24 @@ import textwrap
 import struct
 
 api_key = 'YOUR_API_KEY'
-authorized_contract = '0xOF_YOUR_HELPER_CONTRACT'
+
+authorized_contract = None # for open access
+# or...
+authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
   
 def lambda_handler(event, context):
   
   input = json.loads(event["body"])
   print("DEBUG: from Geth:", input)
   
-  # check authorisation   
+  # check authorisation if desired
   callerAddress = input['method']
-    
-  if callerAddress.lower() != authorized_contract.lower() :
-    returnPayload = {'statusCode': 403}  # forbidden
-    print('return payload:', returnPayload)
-    return returnPayload    
+  
+  if authorized_contract is not None :  
+    if callerAddress.lower() != authorized_contract.lower() :
+      returnPayload = {'statusCode': 403}
+      print('return payload:', returnPayload)
+      return returnPayload    
   
   # get calling parameters    
   paramsHexString = input['params'][0]
@@ -35,7 +39,8 @@ def lambda_handler(event, context):
   request = params[3]
   bytes_object = bytes.fromhex(request[0:str_length])
   pair = bytes_object.decode("ASCII")
-    
+  
+  # specify your API endpoint here
   requestURL = 'https://api.polygon.io/v1/last/crypto/' + pair + '?apiKey=' + api_key
     
   # Create a PoolManager instance for sending requests.

@@ -113,30 +113,29 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
+
         let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer
         )
 
-        // need to clean up the transaction at this point
-        console.log(`DTL parseSequencerBatchTransaction`, {
-          sequencerTransaction: toHexString(sequencerTransaction),
-        })
+        // need to keep track of the original length so the pointer system for accessing
+        // the individual transactions works correctly
+        const sequencerTransaction_original_length = sequencerTransaction.length
 
         const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
+        // The indexOf() method returns the index within the calling String object of the first occurrence of the specified value
+
         let turing = Buffer.from('0')
-        let turingExtraLength = 0
-        //console.log('turing init:', { turing: toHexString(turing) })
 
         if (turingIndex > 0) {
-          //we have turing payload
+          //we have Turing payload
           turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-          turingExtraLength = turing.length + 3 // fix the nextTxPointer so that we start at the beginning of the next real transaction
           sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
           console.log('Found a Turing payload at position:', {
             turingIndex,
             turing: toHexString(turing),
-            sequencerTransaction: toHexString(sequencerTransaction),
+            restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
         }
 
@@ -144,8 +143,6 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           sequencerTransaction,
           l2ChainId
         )
-
-        //console.log(`DTL parsed event!`, {decoded: decoded})
 
         transactionEntries.push({
           index: extraData.prevTotalElements
@@ -166,8 +163,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           turing: toHexString(turing),
         })
 
-        nextTxPointer += 3 + sequencerTransaction.length + turingExtraLength //long term actual fix is to have a correct value for each sequencerTransaction.length
-        //but that's actually quite difficult to do based on where we are modifying the callData
+        nextTxPointer += 3 + sequencerTransaction_original_length
         transactionIndex++
       }
 
