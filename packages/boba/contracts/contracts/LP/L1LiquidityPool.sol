@@ -462,6 +462,8 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
+        _updateDepositHash(_tokenAddress, msg.sender, _amount);
+
         emit ClientDepositL1(
             msg.sender,
             _amount,
@@ -488,8 +490,6 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             SETTLEMENT_L2_GAS,
             data
         );
-
-        _updateDepositHash(_tokenAddress, msg.sender, _amount);
     }
 
     /**
