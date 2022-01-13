@@ -1,0 +1,26 @@
+FROM python:3.8
+RUN pip install web3
+COPY packages/boba/ng-prototype/python /
+
+# Legacy code; should get this from AddressManager
+COPY packages/boba/ng-prototype/artifacts/addr.json /tmp/addr.json
+
+# Dockerfile COPY won't dereference symlinks, so do it the hard way
+RUN rm contracts/*.json
+COPY packages/boba/ng-prototype/artifacts/contracts/L1_BobaPortal.sol/L1_BobaPortal.json /contracts/L1_BobaPortal.json
+COPY packages/boba/ng-prototype/artifacts/contracts/L2_BobaPortal.sol/L2_BobaPortal.json /contracts/L2_BobaPortal.json
+COPY packages/boba/ng-prototype/artifacts/contracts/L1_EthPool.sol/L1_EthPool.json /contracts/L1_EthPool.json
+COPY packages/boba/ng-prototype/artifacts/contracts/L2_EthPool.sol/L2_EthPool.json /contracts/L2_EthPool.json
+
+COPY packages/contracts/artifacts/contracts/L1/rollup/CanonicalTransactionChain.sol/CanonicalTransactionChain.json contracts/CanonicalTransactionChain.json
+COPY packages/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json contracts/StateCommitmentChain.json
+COPY packages/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json contracts/L1StandardBridge.json
+COPY packages/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json contracts/L2StandardBridge.json
+COPY packages/contracts/artifacts/contracts/L1/messaging/L1CrossDomainMessenger.sol/L1CrossDomainMessenger.json contracts/L1CrossDomainMessenger.json
+COPY packages/contracts/artifacts/contracts/L2/messaging/L2CrossDomainMessenger.sol/L2CrossDomainMessenger.json contracts/L2CrossDomainMessenger.json
+COPY packages/contracts/artifacts/contracts/L2/predeploys/OVM_ETH.sol/OVM_ETH.json contracts/OVM_ETH.json
+
+COPY packages/boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json contracts/L1LiquidityPool.json
+COPY packages/boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json contracts/L2LiquidityPool.json
+
+CMD [ "python", "-u", "./l2-agent.py", "local-docker" ]

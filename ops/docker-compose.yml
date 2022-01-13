@@ -416,3 +416,23 @@ services:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 100
+  l1-agent:
+    depends_on:
+     - l1_chain
+     - l2geth
+    image: bobanetwork/l1-agent
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.l1-agent
+  l2-agent:
+    depends_on:
+     - l1_chain
+     - l2geth
+    image: bobanetwork/l2-agent
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.l2-agent

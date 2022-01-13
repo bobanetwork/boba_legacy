@@ -163,7 +163,7 @@ describe("Activate the contracts", function () {
 
     let fs = require('fs')
     console.log(JSON.stringify(jj))
-    fs.writeFile("/tmp/addr.json", JSON.stringify(jj), function(err) { if (err) throw err; })
+    fs.writeFile("artifacts/addr.json", JSON.stringify(jj), function(err) { if (err) throw err; })
   })
 
   it("should intercept L1->L2 optimism traffic", async() => {
