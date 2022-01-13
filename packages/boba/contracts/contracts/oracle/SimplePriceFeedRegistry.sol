@@ -3,8 +3,13 @@ pragma solidity 0.6.6;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
 // add an interface to this contract
-
-contract PriceFeedRegistry {
+/**
+ * @notice This contract implements a registry without phases
+ * which means if a aggregator contract address is updated, the round details
+ * from older contract will not be obtainable
+ * If this is a requirement, use the PriceFeedRegistry contract instead
+ */
+contract SimplePriceFeedRegistry {
 
   address public owner;
 
