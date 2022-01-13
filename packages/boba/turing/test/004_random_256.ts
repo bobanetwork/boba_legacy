@@ -58,24 +58,24 @@ describe("Turing VRF", function () {
     console.log("    Turing 42 =",result)
   })
 
-  it("should get a length 64 VRF", async () => {
+  it("should get a length 256 VRF", async () => {
     let tr = await turing.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
-    const numberHexString = rawData.slice(-64)
-    let result = parseInt(numberHexString, 16)
-    console.log("    Turing VRF 64 =",result)
+    const numberHexString = '0x'+ rawData.slice(-64)
+    let result = BigInt(numberHexString)
+    console.log("    Turing VRF 256 =",result)
   })
 
-  it("should get a length 64 VRF", async () => {
+  it("should get a length 256 VRF", async () => {
     let tr = await turing.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
-    const numberHexString = rawData.slice(-64)
-    let result = parseInt(numberHexString, 16)
-    console.log("    Turing VRF 64 =",result)
+    const numberHexString = '0x'+ rawData.slice(-64)
+    let result = BigInt(numberHexString)
+    console.log("    Turing VRF 256 =",result)
   })
 
 })
