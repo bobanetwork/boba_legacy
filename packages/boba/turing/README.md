@@ -36,7 +36,7 @@ rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
 ### Turing status as of January 12 2022 - Release countdown
 
-With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on the public chains (Rinkeby and Mainent).**
+With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on the public chains (Rinkeby and Mainnet).**
 
 ToDo:
 
@@ -400,7 +400,7 @@ At this point, the data are circulated to various places throughout the system a
 
 ### Step 3 - Batch Submitter Data Mangling
 
-The batch submitter receives an transaction from the `L2Geth`, obtains the raw call string (`rawTransaction`) and the Turing callData (`l1Turing`), and if there is a real Turing event, as judged from the length of the Turing string, it appends those data to the raw call string. From the perspective of the CTC, it is receiving it's normal batch payload.   
+The batch submitter receives a transaction from the `L2Geth`, obtains the raw call string (`rawTransaction`) and the Turing callData (`l1Turing`), and if there is a real Turing event, as judged from the length of the Turing string, it appends those data to the raw call string. From the perspective of the CTC, it is receiving its normal batch payload.   
 
 ```javascript
 // batch-submitter tx-batch-submitter.ts 
