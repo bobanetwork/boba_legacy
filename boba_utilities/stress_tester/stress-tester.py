@@ -1219,13 +1219,13 @@ for i in range(0,num_children):
   #  3 - NG Fast exit
   #  4 - NG Slow exit
   if num_children == 1 and env['name'] == 'local':
-    if env['ng_enabled'] and c.on_chain == 1:
-      c.preload = [ 3, 3, 3, 3, 4]
-      #c.preload = [ 1, 1, 4, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast on, Fast off, NG on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
-      #c.preload = [ 4, 4, 4, 2 ]
-      #c.preload = [ 3, 3 ]
-    elif env['ng_enabled']:
-      c.preload = [ 1, 1, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast off, Fast on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
+    if env['ng_enabled']:
+      if c.on_chain == 1:
+        c.preload = [ 1, 1, 4, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast on, Fast off, NG on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
+        #c.preload = [ 4, 4, 4, 2 ]
+        #c.preload = [ 3, 3 ]
+      else:
+        c.preload = [ 1, 1, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast off, Fast on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
     elif c.on_chain == 1:
       #c.preload = [ 0, 1, 1, 2, 2 ]
       c.preload = [ 1, 1, 2, 2, 0 ]

@@ -16,20 +16,21 @@ if [[ $BUILD == 1 ]]; then
 fi
 
 docker-compose up -d l1_chain dtl
-sleep 10
+sleep 5
 echo "Starting Optimism deployer"
 
 docker-compose up deployer
 docker-compose up -d l2geth batch_submitter relayer
-sleep 10
+sleep 5
 echo "Starting Boba deployer (slow)"
 docker-compose up boba_deployer
 docker-compose up -d boba_message-relayer-fast gas_oracle
-sleep 10
+sleep 5
 echo "Base system is up"
-(cd ../packages/boba/v3-prototype ; yarn deploy)
-echo "Activated V3 contracts, starting agents"
+(cd ../packages/boba/ng-prototype ; yarn deploy)
+echo "Activated contracts, starting agents"
 docker-compose up -d l1-agent l2-agent
 echo "All containers started"
 sleep 5
-docker-compose logs --follow
+# Remove the "--tail 1" if you need to see logs from the setup process
+docker-compose logs --tail 1 --follow

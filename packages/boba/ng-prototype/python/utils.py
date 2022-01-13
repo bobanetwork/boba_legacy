@@ -179,6 +179,8 @@ class Context:
   def loadL1Contracts(self,rpc,boba_addrs,ng):
     contracts = dict()
 
+    contracts['AM'] = self.loadContract(rpc,boba_addrs['AddressManager'],'./contracts/Lib_AddressManager.json')
+
     contracts['LP_1'] = self.loadContract(rpc,boba_addrs['Proxy__L1LiquidityPool'],'./contracts/L1LiquidityPool.json')
     contracts['SB_1'] = self.loadContract(rpc,boba_addrs['Proxy__L1StandardBridge'], './contracts/L1StandardBridge.json')
     contracts['CTC'] = self.loadContract(rpc,boba_addrs['CanonicalTransactionChain'],'./contracts/CanonicalTransactionChain.json')
@@ -190,6 +192,12 @@ class Context:
     contracts['Proxy__L1CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['Proxy__L1CrossDomainMessenger'],'./contracts/L1CrossDomainMessenger.json')
 
     if ng:
+      if 'L1_BobaPortal' not in boba_addrs: # FIXME - clean this up and use AM for all addresses
+        boba_addrs['L1_BobaPortal'] = contracts['AM'].functions.getAddress('L1_BobaPortal').call()
+        boba_addrs['L1_EthPool'] = contracts['AM'].functions.getAddress('L1_EthPool').call()
+        boba_addrs['L2_BobaPortal'] = contracts['AM'].functions.getAddress('L2_BobaPortal').call()
+        boba_addrs['L2_EthPool'] = contracts['AM'].functions.getAddress('L2_EthPool').call()
+
       contracts['L1_BobaPortal'] = self.loadContract(rpc,boba_addrs['L1_BobaPortal'],'./contracts/L1_BobaPortal.json')
       contracts['L1_EthPool'] = self.loadContract(rpc,boba_addrs['L1_EthPool'],'./contracts/L1_EthPool.json')
 
@@ -203,6 +211,7 @@ class Context:
     contracts['oETH'] = self.loadContract(rpc,'0x4200000000000000000000000000000000000006','./contracts/OVM_ETH.json')
     contracts['OVM_L2CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['L2CrossDomainMessenger'],'./contracts/L2CrossDomainMessenger.json')
     if ng:
+      # Addresses must be populated by loadL1Contracts first
       contracts['L2_BobaPortal'] = self.loadContract(rpc,boba_addrs['L2_BobaPortal'],'./contracts/L2_BobaPortal.json')
       contracts['L2_EthPool'] = self.loadContract(rpc,boba_addrs['L2_EthPool'],'./contracts/L2_EthPool.json')
     return contracts

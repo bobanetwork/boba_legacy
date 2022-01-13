@@ -70,9 +70,11 @@ def L2_Agent(env,A):
       print("  Hdr", Sequence, MsgType, MsgValue, "MSG_HASH", Web3.toHex(A.msg_hash), "PL", Web3.toHex(A.payload))
       
       assert(Sequence == last_seq + 1)
-              
+      gp = ctx.rpc[2].eth.gasPrice
+
       t = L2.functions.L1MessageIn(event.blockNumber, b.timestamp, A.header, A.payload).buildTransaction({
-        'nonce':ctx.rpc[2].eth.get_transaction_count(l2_agent.address)
+        'nonce':ctx.rpc[2].eth.get_transaction_count(l2_agent.address),
+        'gasPrice':gp
       })
       r = ctx.rpc[2].eth.account.sign_transaction(t, l2_agent.key)
 

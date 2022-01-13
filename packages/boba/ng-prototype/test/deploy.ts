@@ -58,8 +58,9 @@ describe("Portal Deployment", function () {
       AddressManager_json.abi,
       deployerWallet
     )
-    const Proxy__OVM_L1CrossDomainMessenger_addr = await AddressManager.getAddress("Proxy__OVM_L1CrossDomainMessenger")
-    const Proxy__OVM_L1CrossDomainMessengerFast_addr = await AddressManager.getAddress("Proxy__OVM_L1CrossDomainMessengerFast")
+    const Proxy__L1CrossDomainMessenger_addr = await AddressManager.getAddress("Proxy__L1CrossDomainMessenger")
+    const Proxy__L1CrossDomainMessengerFast_addr = await AddressManager.getAddress("Proxy__L1CrossDomainMessengerFast")
+    console.log(Proxy__L1CrossDomainMessenger_addr, Proxy__L1CrossDomainMessengerFast_addr)
 
     Factory__L1_BobaPortal = new ContractFactory(
       L1_BobaPortal_json.abi,
@@ -70,8 +71,8 @@ describe("Portal Deployment", function () {
     let deployAt2 = l2_provider.getBlockNumber();
 
     portal_1 = await Factory__L1_BobaPortal.deploy(
-      Proxy__OVM_L1CrossDomainMessenger_addr,
-      Proxy__OVM_L1CrossDomainMessengerFast_addr,
+      Proxy__L1CrossDomainMessenger_addr,
+      Proxy__L1CrossDomainMessengerFast_addr,
       deployAt2,
       { value: ethers.utils.parseEther("10")}
     )
@@ -92,7 +93,7 @@ describe("Portal Deployment", function () {
     )
 
     L1_XDM = new Contract(
-      Proxy__OVM_L1CrossDomainMessenger_addr,
+      Proxy__L1CrossDomainMessenger_addr,
       L1_XDM_json.abi,
       testWallet
     )
@@ -161,11 +162,10 @@ describe("Activate the contracts", function () {
     jj['L1_EthPool'] = ethpool_1.address
     jj['L2_EthPool'] = ethpool_2.address
 
-    let fs = require('fs')
-    console.log(JSON.stringify(jj))
-    fs.writeFile("artifacts/addr.json", JSON.stringify(jj), function(err) { if (err) throw err; })
+    //let fs = require('fs')
+    //console.log(JSON.stringify(jj))
+    //fs.writeFile("/tmp/addr.json", JSON.stringify(jj), function(err) { if (err) throw err; })
   })
-
   it("should intercept L1->L2 optimism traffic", async() => {
     let t = await L1_XDM.SetPortal(portal_1.address)
     expect (await t.wait()).to.be.ok

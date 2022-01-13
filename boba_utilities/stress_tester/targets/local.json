@@ -1,11 +1,11 @@
 {
   "name":"local",
-  "ng_enabled":false,
+  "ng_enabled":true,
   "endpoints":[ "http://localhost:9545", "http://localhost:8545" ],
   "L1_geth_PoA":true,
   "confirmations": [ 1, 0 ],
   "start_chain": 1,
-  "op_pct": [ [ 5, 20, 20, 0, 0 ] , [ 5, 20, 20, 0, 0 ] ],
+  "op_pct": [ [ 0, 10, 10, 5, 100 ] , [ 0, 10, 10, 50, 75 ] ],
   "op_delay": 0.5,
   "gas_price_gwei": [ 0.1 , 0.02 ],
   "gas_mult": [ 1.5, 1.0 ],
