@@ -94,6 +94,7 @@ func ReadTransaction(db ethdb.Reader, hash common.Hash) (*types.Transaction, com
 			if txMeta != nil {
 				tx.SetTransactionMeta(txMeta)
 			}
+
 			return tx, blockHash, *blockNumber, uint64(txIndex)
 		}
 	}

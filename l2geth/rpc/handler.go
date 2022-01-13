@@ -136,17 +136,10 @@ func (h *handler) handleMsg(msg *jsonrpcMessage) {
 		return
 	}
 	h.startCallProc(func(cp *callProc) {
-		// MMDBG 3
-		if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
-			log.Debug("TURING handler.go potentially relevant incoming RPC", "msg", msg)
-		}
 		answer := h.handleCallMsg(cp, msg)
 		h.addSubscriptions(cp.notifiers)
 		if answer != nil {
 			h.conn.writeJSON(cp.ctx, answer)
-			if msg.Method == "eth_sendRawTransaction" || msg.Method == "eth_call" {
-				log.Debug("TURING handler.go writeJSON", "ans", answer)
-			}
 		}
 		for _, n := range cp.notifiers {
 			n.activate()
@@ -301,14 +294,10 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 		h.handleCall(ctx, msg)
 		return nil
 	case msg.isCall():
-		var resp *jsonrpcMessage
-		// log.Debug("TURING handler.go handleCallMsg", "Message", msg, "Context", ctx)
-		resp = h.handleCall(ctx, msg)
-
+		resp := h.handleCall(ctx, msg)
 		if resp.Error != nil {
 			h.log.Warn("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start), "err", resp.Error.Message)
 		}
-
 		return resp
 	case msg.hasValidID():
 		return msg.errorResponse(&invalidRequestError{"invalid request"})
@@ -332,24 +321,11 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 		return msg.errorResponse(&methodNotFoundError{method: msg.Method})
 	}
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
-
-	// if msg.Method == "eth_call" || msg.Method == "eth_sendRawTransaction" {
-	// 	log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
-	// }
-
-	// if msg.Method == "eth_getBlockByNumber" || msg.Method == "eth_sendRawTransaction" {
-	// 	log.Debug("TURING handler.go handleCall starting", "Method", msg.Method) // "CallArgs", args[0].Interface())
-	// }
-
 	if err != nil {
 		return msg.errorResponse(&invalidParamsError{err.Error()})
 	}
 
-	// MMDBG 5
-	rMsg := h.runMethod(cp.ctx, msg, callb, args)
-	return rMsg
-
-	// return h.runMethod(cp.ctx, msg, callb, args)
+	return h.runMethod(cp.ctx, msg, callb, args)
 }
 
 // handleSubscribe processes *_subscribe method calls.
@@ -387,12 +363,7 @@ func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMes
 
 // runMethod runs the Go callback for an RPC method.
 func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {
-	// MMDBG 6
-	// log.Debug("TURING handler.go runMethod:", "context", ctx)
 	result, err := callb.call(ctx, msg.Method, args)
-	// if msg.Method == "eth_call" && err != nil {
-	// 	log.Debug("TURING handler.go check for Turing request:", "err", err, "result", result, "args", args)
-	// }
 	if err != nil {
 		return msg.errorResponse(err)
 	}

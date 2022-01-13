@@ -33,10 +33,6 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     const l1Transaction = await event.getTransaction()
     const eventBlock = await event.getBlock()
 
-    console.log('sequencer-batch-appended - getExtraData:', {
-      l1Transaction,
-      eventBlock,
-    })
 
     // TODO: We need to update our events so that we actually have enough information to parse this
     // batch without having to pull out this extra event. For the meantime, we need to find this
@@ -89,31 +85,21 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     // It's easier to deal with this data if it's a Buffer.
     const calldata = fromHexString(extraData.l1TransactionData)
 
-    // console.log(`DTL l1-injection - parseEvent`, {
-    //   calldata: toHexString(calldata),
-    //   event,
-    //   extraData,
-    // })
-
     if (calldata.length < 12) {
       throw new Error(
         `Block ${extraData.blockNumber} transaction data is invalid for decoding: ${extraData.l1TransactionData} , ` +
           `converted buffer length is < 12.`
       )
     }
-
     const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
     let transactionIndex = 0
     let enqueuedCount = 0
     let nextTxPointer = 15 + 16 * numContexts
-
     for (let i = 0; i < numContexts; i++) {
       const contextPointer = 15 + 16 * i
-
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
-
         let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer

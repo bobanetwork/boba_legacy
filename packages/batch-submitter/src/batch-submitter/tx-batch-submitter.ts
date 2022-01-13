@@ -162,7 +162,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         startBlock + this.maxBatchSize,
         await this.l2Provider.getBlockNumber()
       ) + 1 // +1 because the `endBlock` is *exclusive*
-
     this.logger.info('Retrieved end block number from L2 sequencer', {
       endBlock,
     })
@@ -204,9 +203,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const [batchParams, wasBatchTruncated] =
       await this._generateSequencerBatchParams(startBlock, endBlock)
-
     const batchSizeInBytes = encodeAppendSequencerBatch(batchParams).length / 2
-
     this.logger.debug('Sequencer batch generated', {
       batchSizeInBytes,
     })
@@ -391,7 +388,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     // TODO: Verify queue element hash equality. The queue element hash can be computed with:
     // keccak256( abi.encode( msg.sender, _target, _gasLimit, _data))
-
     this._enableAutoFixBatchOptions(0)
     // Check timestamp & blockNumber equality
     if (timestamp !== queueElement.timestamp) {
