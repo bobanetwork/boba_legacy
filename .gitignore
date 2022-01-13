@@ -55,3 +55,5 @@ packages/boba/gateway/public/env.js
 
 # api
 env-mainnet.yml
+
+packages/boba/ng-prototype/python/__pycache__
