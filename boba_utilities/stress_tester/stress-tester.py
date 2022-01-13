@@ -37,7 +37,6 @@ max_fail = 0 # Ignore this many op failures. Next one will start a shutdown
 min_balance = Web3.toWei(0.025, 'ether')
 fund_balance = Web3.toWei(0.5, 'ether')
 
-min_lp_balance = Web3.toWei(11.0, 'ether')
 
 # Emit warning messages if any child has been waiting "slow_secs" or more. Shut down at "stuck_secs". 
 slow_secs = 600
@@ -52,6 +51,7 @@ if len(sys.argv) < 3:
 num_children = int(sys.argv[2])
 assert(num_children <= 1000) # Not a hard limit, but does affect log formatting
 
+min_lp_balance = Web3.toWei(0.5, 'ether')*num_children
 env = LoadEnv()
 A = Addrs(env)
 boba_addrs = A.boba_addrs
@@ -106,6 +106,7 @@ class Child:
       tx['gas'] = int(tx['gas'] + 50000)
 
     ret = None
+    #print("DBG tx", tx, "GP", ctx.rpc[self.on_chain].eth.gasPrice, "Bal", ctx.rpc[self.on_chain].eth.get_balance(self.acct.address))
     try:
       signed_tx = ctx.rpc[self.on_chain].eth.account.sign_transaction(tx, self.acct.key)
       ret = ctx.rpc[self.on_chain].eth.send_raw_transaction(signed_tx.rawTransaction)
@@ -180,7 +181,6 @@ evMissed = []
 readyQueue = queue.Queue()
 idleQueue = queue.Queue()
 
-os.makedirs("./logs", exist_ok=True)
 account_log = open("./logs/accounts-" + env['name'] + ".log","a")
 logLock = threading.Lock()
 
@@ -432,7 +432,7 @@ def AddLiquidity_NG(ctx, c,amount):
     r2 = c.buildAndSubmit(ctx, t2, {})
 
     c.staked_NG = 0
-    Watch(ctx, c, "RN", r2)
+    WatchEv(ctx, c, "RN", r2)
   else:
     Start(ctx, c, "AN")
     LP = ctx.contracts['L1_EthPool']
@@ -477,7 +477,7 @@ def Onramp_2(ctx, acct, amount):
   chain = 1
 
   sb = ctx.contracts['SB_1'].functions.depositETH(
-    8000000,  # FIXME / ref: 100000 == MIN_ROLLUP_TX_GAS from OVM_CanonicalTransactionChain.sol
+    1300000,  # FIXME / ref: 100000 == MIN_ROLLUP_TX_GAS from OVM_CanonicalTransactionChain.sol
               # Values like 8*MIN can fail silently, successful Tx on L1 but no event ever on L2
               # 8000000 works sometimes(?)
     '0x',
@@ -502,7 +502,7 @@ def Onramp_trad(ctx,c):
   amount = Web3.toWei(bb, 'wei') - min_balance
 
   sb = ctx.contracts['SB_1'].functions.depositETH(
-    8000000,  # FIXME / ref: 100000 == MIN_ROLLUP_TX_GAS from OVM_CanonicalTransactionChain.sol
+    1300000,  # FIXME / ref: 100000 == MIN_ROLLUP_TX_GAS from OVM_CanonicalTransactionChain.sol
               # Values like 8*MIN can fail silently, successful Tx on L1 but no event ever on L2
               # 8000000 works sometimes(?)
     '0x',
@@ -522,7 +522,7 @@ def Onramp_fast(ctx,c):
 
   if bb > (t[2] / 2.0):
     lPrint(ctx.log, "***** WARNING Child " + str(c.num) + " falling back to traditional onramp")
-    Onramp_trad(acct)
+    Onramp_trad(ctx,c)
   else:
     if True:
       Start(ctx,c,"FO")
@@ -566,7 +566,7 @@ def SlowExit(ctx,c, ng):
   Start(ctx,c,optype)
   chain = 2
   amount = Web3.toWei(ctx.rpc[2].eth.getBalance(c.acct.address) - min_balance, 'wei')
-  print("DBG Amount",amount,"of", Web3.toWei(ctx.rpc[2].eth.getBalance(c.acct.address), 'wei'))
+  #print("DBG Amount",amount,"of", Web3.toWei(ctx.rpc[2].eth.getBalance(c.acct.address), 'wei'))
 
   t = ctx.contracts[cn].functions.withdraw(
     '0x4200000000000000000000000000000000000006',
@@ -599,7 +599,7 @@ def FastExit(ctx, c, ng):
     Start(ctx,c,optype)  
     amount = Web3.toWei(bb - min_balance, 'wei')
 
-    print("DBG exit amount = ",amount,"bb",bb)
+    #print("DBG exit amount = ",amount,"bb",bb)
 
     dep = ctx.contracts[cn].functions.clientDepositL2(
       amount,
@@ -1220,13 +1220,15 @@ for i in range(0,num_children):
   #  4 - NG Slow exit
   if num_children == 1 and env['name'] == 'local':
     if env['ng_enabled'] and c.on_chain == 1:
-      c.preload = [ 1, 1, 4, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast on, Fast off, NG on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
+      c.preload = [ 3, 3, 3, 3, 4]
+      #c.preload = [ 1, 1, 4, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast on, Fast off, NG on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
       #c.preload = [ 4, 4, 4, 2 ]
       #c.preload = [ 3, 3 ]
     elif env['ng_enabled']:
       c.preload = [ 1, 1, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast off, Fast on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
     elif c.on_chain == 1:
-      c.preload = [ 0, 1, 1, 2, 2 ]
+      #c.preload = [ 0, 1, 1, 2, 2 ]
+      c.preload = [ 1, 1, 2, 2, 0 ]
     else:
       c.preload = [ 2, 0, 2, 1, 1 ]
 

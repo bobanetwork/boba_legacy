@@ -212,7 +212,7 @@ class Context:
     ret = self.rpc[c.on_chain].eth.send_raw_transaction(signed_tx.rawTransaction)
     return ret
 
-  def logPrint(msg, screenEcho = True):
+  def logPrint(self, msg, screenEcho = True):
     if screenEcho:
       if self.logLabel:
         print("--",self.logLabel,"-- ", msg)

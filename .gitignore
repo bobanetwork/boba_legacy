@@ -57,3 +57,4 @@ packages/boba/gateway/public/env.js
 env-mainnet.yml
 
 packages/boba/ng-prototype/python/__pycache__
+boba_utilities/stress_tester/__pycache__
