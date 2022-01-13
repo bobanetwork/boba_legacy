@@ -13,7 +13,7 @@
     "build": "hardhat compile",
     "deploy": "hardhat --network l1 test test/deploy.ts",
     "uninstall": "hardhat --network l1 test test/uninstall.ts",
-    "test:contracts": "hardhat --network l1 test test/ng-test.ts"
+    "test:integration": "hardhat --network l1 test test/ng-test.ts"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",

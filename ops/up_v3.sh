@@ -15,18 +15,18 @@ if [[ $BUILD == 1 ]]; then
   docker-compose build
 fi
 
-docker-compose up l1_chain dtl &
+docker-compose up -d l1_chain dtl
 sleep 10
 echo "Starting Optimism deployer"
 
 docker-compose up deployer
-docker-compose up l2geth batch_submitter relayer &
+docker-compose up -d l2geth batch_submitter relayer
 sleep 10
 echo "Starting Boba deployer (slow)"
 docker-compose up boba_deployer
-docker-compose up boba_message-relayer-fast gas_oracle &
+docker-compose up -d boba_message-relayer-fast gas_oracle
 sleep 10
 echo "Base system is up"
 (cd ../packages/boba/v3-prototype ; yarn deploy)
 echo "Activated V3 contracts"
-
+docker-compose logs --follow
