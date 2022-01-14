@@ -454,48 +454,49 @@ The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is n
 ```javascript
 // DTL services/l1-ingestion/handles/sequencer-batch-appended.ts
 
-    console.log(`DTL parseSequencerBatchTransaction`, {
+  console.log(`DTL parseSequencerBatchTransaction`, {
+    sequencerTransaction: toHexString(sequencerTransaction),
+  })
+
+  // need to keep track of the original length so the pointer system for accessing
+  // the individual transactions works correctly
+  const sequencerTransaction_original_length = sequencerTransaction.length
+
+  // DANGER DANGER DANGER - FIX
+  const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
+  let turing = Buffer.from('0')
+
+  if (turingIndex > 0) {
+    //we have turing payload
+    turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
+    sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
+    console.log('Found a Turing payload at position:', {
+      turingIndex,
+      turing: toHexString(turing),
       sequencerTransaction: toHexString(sequencerTransaction),
     })
+  }
 
-    // need to keep track of the original length so the pointer system for accessing
-    // the individual transactions works correctly
-    const sequencerTransaction_original_length = sequencerTransaction.length
+  const decoded = decodeSequencerBatchTransaction(
+    sequencerTransaction,
+    l2ChainId
+  )
 
-    // DANGER DANGER DANGER - FIX
-    const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
-    let turing = Buffer.from('0')
-
-    if (turingIndex > 0) {
-      //we have turing payload
-      turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-      sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
-      console.log('Found a Turing payload at position:', {
-        turingIndex,
-        turing: toHexString(turing),
-        sequencerTransaction: toHexString(sequencerTransaction),
-      })
-    }
-
-    const decoded = decodeSequencerBatchTransaction(
-      sequencerTransaction,
-      l2ChainId
-    )
-
-    transactionEntries.push({
-      index: extraData.prevTotalElements
-        .add(BigNumber.from(transactionIndex))
-        .toNumber(),
-      batchIndex: extraData.batchIndex.toNumber(),
-      blockNumber: BigNumber.from(context.blockNumber).toNumber(),
-      timestamp: BigNumber.from(context.timestamp).toNumber(),
+  transactionEntries.push({
+    index: extraData.prevTotalElements
+      .add(BigNumber.from(transactionIndex))
+      .toNumber(),
+    batchIndex: extraData.batchIndex.toNumber(),
+    blockNumber: BigNumber.from(context.blockNumber).toNumber(),
+    timestamp: BigNumber.from(context.timestamp).toNumber(),
 ...
-      data: toHexString(sequencerTransaction), // The restored rawTransaction minus any Turing bits
+    data: toHexString(sequencerTransaction), // The restored rawTransaction minus any Turing bits
 ...
-      turing: toHexString(turing),
-    })
+    turing: toHexString(turing),
+  })
 
-    nextTxPointer += 3 + sequencerTransaction_original_length 
+  nextTxPointer += 3 + sequencerTransaction_original_length
+
 ```
 
 **VULNERABILTY**
