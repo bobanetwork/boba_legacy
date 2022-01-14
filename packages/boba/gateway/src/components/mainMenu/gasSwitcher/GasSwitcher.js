@@ -17,15 +17,9 @@ function GasSwitcher() {
 
   useEffect(() => {
     async function getGasSavings () {
-      const l2GasEstimate = await networkService.L2Provider.estimateGas({
-        from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
-        to: '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514',
-        value: '0x38d7ea4c68000',
-        data:
-          '0x7ff36ab5000000000000000000000000000000000000000000000000132cc41aecbfbace00000000000000000000000000000000000000000000000000000000000000800000000000000000000000005e7a06025892d8eef0b5fa263fa0d4d2e5c3b54900000000000000000000000000000000000000000000000000000001c73d14500000000000000000000000000000000000000000000000000000000000000002000000000000000000000000deaddeaddeaddeaddeaddeaddeaddeaddead00000000000000000000000000005008f837883ea9a07271a1b5eb0658404f5a9610',
-      });
-      const totalGasCostWei = await networkService.estimateL1SecurityFee()
-      const gasSavings = Number(gas.gasL1) * l2GasEstimate.toNumber() / (Number(gas.gasL2) + totalGasCostWei / Math.pow(10, 9));
+      const l1SecurityFee = await networkService.estimateL1SecurityFee()
+      const l2Fee = await networkService.estimateL2Fee()
+      const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee);
       setSavings(gasSavings ? gasSavings : 0);
       return gasSavings
     }
