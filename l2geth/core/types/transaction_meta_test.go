@@ -16,6 +16,7 @@ var (
 	txMetaSerializationTests = []struct {
 		l1BlockNumber  *big.Int
 		l1Timestamp    uint64
+		l1Turing       []byte
 		msgSender      *common.Address
 		queueOrigin    QueueOrigin
 		rawTransaction []byte
@@ -23,6 +24,7 @@ var (
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    100,
+			l1Turing:       []byte{},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{255, 255, 255, 255},
@@ -30,6 +32,7 @@ var (
 		{
 			l1BlockNumber:  nil,
 			l1Timestamp:    45,
+			l1Turing:       []byte{1},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{42, 69, 42, 69},
@@ -37,6 +40,7 @@ var (
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			l1Turing:       []byte{2},
 			msgSender:      nil,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -44,6 +48,7 @@ var (
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			l1Turing:       []byte{42, 69, 42, 69},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -51,13 +56,15 @@ var (
 		{
 			l1BlockNumber:  nil,
 			l1Timestamp:    0,
+			l1Turing:       []byte{3},
 			msgSender:      nil,
 			queueOrigin:    QueueOriginL1ToL2,
-			rawTransaction: []byte{0, 0, 0, 0},
+			rawTransaction: []byte{7,8,9,10},
 		},
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			l1Turing:       []byte{0,1,2,3,4,5},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -67,7 +74,7 @@ var (
 
 func TestTransactionMetaEncode(t *testing.T) {
 	for _, test := range txMetaSerializationTests {
-		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, []byte{0}, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
+		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, test.l1Turing, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
 
 		encoded := TxMetaEncode(txmeta)
 		decoded, err := TxMetaDecode(encoded)
