@@ -6,6 +6,7 @@ import {
   toHexString,
   toRpcHexString,
   EventArgsSequencerBatchAppended,
+  remove0x
 } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
@@ -96,30 +97,67 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     let enqueuedCount = 0
     let nextTxPointer = 15 + 16 * numContexts
     for (let i = 0; i < numContexts; i++) {
+
       const contextPointer = 15 + 16 * i
+
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
+        
         let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer
         )
 
+        console.log('Sequencer TX:', sequencerTransaction)
         // need to keep track of the original length so the pointer system for accessing
         // the individual transactions works correctly
         const sequencerTransaction_original_length = sequencerTransaction.length
 
-        const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
+        // This MIGHT have a Turing payload inside of it...
+        // First, parse the new length field...
+        const sTxHexString = toHexString(sequencerTransaction)
+        const turingLength = parseInt(remove0x(sTxHexString).slice(0,6), 16)
+        console.log("TuringLength", turingLength)
+
+/*
+      // const size = b.slice(offset, offset + 6)
+      // offset += 6
+      // const raw = b.slice(offset, offset + parseInt(size, 16) * 2)
+      // transactions.push(add0x(raw))
+      // offset += raw.length
+
+    if (this._isSequencerTx(block)) {
+      batchElement.isSequencerTx = true
+      let rawTransaction = block.transactions[0].rawTransaction
+      const turing = block.transactions[0].l1Turing
+
+      if (turing.length > 4) {
+        // FYI - we sometimes use short (length <= 4) non-zero Turing strings for debug purposes
+        // Chop those off at this stage
+        // Only propagate the data through the system if it's a real Turing payload
+        const headerTuringLengthField = remove0x(BigNumber.from(remove0x(turing).length / 2).toHexString()).padStart(6, '0')
+        console.log("Turing payload:", {turing, length: turing.length, headerTuringLengthField})
+        rawTransaction = '0x' + headerTuringLengthField + remove0x(rawTransaction) + remove0x(turing)
+      } else {
+        rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
+      }
+      console.log("Final Turing Field:", {final_rawTransaction: rawTransaction})
+      batchElement.rawTransaction = rawTransaction
+    }
+*/
+        //const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
         // The indexOf() method returns the index within the calling String object of the first occurrence of the specified value
 
         let turing = Buffer.from('0')
 
-        if (turingIndex > 0) {
+        if (turingLength > 0) {
           //we have Turing payload
-          turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-          sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
-          console.log('Found a Turing payload at position:', {
-            turingIndex,
+          turing = sequencerTransaction.slice(-turingLength) //might have to be multiplied
+          sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
+          // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
+          console.log('Found a Turing payload at (neg) position:', {
+            turingLength,
             turing: toHexString(turing),
             restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
@@ -261,14 +299,13 @@ const parseSequencerBatchContext = (
   }
 }
 
+// Each calldata slice starts out with the length of the transaction?
+// is this done at the level of the Geth or in the batch submitter?
 const parseSequencerBatchTransaction = (
   calldata: Buffer,
   offset: number
 ): Buffer => {
-  const transactionLength = BigNumber.from(
-    calldata.slice(offset, offset + 3)
-  ).toNumber()
-
+  const transactionLength = BigNumber.from(calldata.slice(offset, offset + 3)).toNumber()
   return calldata.slice(offset + 3, offset + 3 + transactionLength)
 }
 
@@ -277,18 +314,18 @@ const decodeSequencerBatchTransaction = (
   l2ChainId: number
 ): DecodedSequencerBatchTransaction | null => {
   try {
-    console.log(`Trying to decode this transaction`, {
-      transaction,
-    })
+    // console.log(`Trying to decode this transaction`, {
+    //   transaction,
+    // })
 
     const decodedTx = ethers.utils.parseTransaction(transaction)
 
-    console.log(`Got this back`, { decodedTx })
-    console.log(`Got this back`, {
-      V: decodedTx.v,
-      parse: parseSignatureVParam(decodedTx.v, l2ChainId),
-      l2ChainId,
-    })
+    // console.log(`Got this back`, { decodedTx })
+    // console.log(`Got this back`, {
+    //   V: decodedTx.v,
+    //   parse: parseSignatureVParam(decodedTx.v, l2ChainId),
+    //   l2ChainId,
+    // })
 
     return {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
