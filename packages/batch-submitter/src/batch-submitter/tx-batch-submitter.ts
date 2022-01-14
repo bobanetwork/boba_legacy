@@ -753,8 +753,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
 
     // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode 
-    // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encosed total length
-    // the 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than 
+    // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encodes total length
+    //
+    // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than 
     // just remove0x(rawTransaction).length / 2
 
     const block = await this._getBlock(blockNumber)
@@ -769,8 +770,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     if (this._isSequencerTx(block)) {
       batchElement.isSequencerTx = true
-      let rawTransaction = block.transactions[0].rawTransaction
       const turing = block.transactions[0].l1Turing
+      let rawTransaction = block.transactions[0].rawTransaction
 
       if (turing.length > 4) {
         // FYI - we sometimes use short (length <= 4) non-zero Turing strings for debug purposes

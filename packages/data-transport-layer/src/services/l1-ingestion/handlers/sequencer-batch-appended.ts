@@ -278,7 +278,9 @@ const parseSequencerBatchTransaction = (
   calldata: Buffer,
   offset: number
 ): Buffer => {
-  const transactionLength = BigNumber.from(calldata.slice(offset, offset + 3)).toNumber()
+  const transactionLength = BigNumber.from(
+    calldata.slice(offset, offset + 3)
+  ).toNumber()
   return calldata.slice(offset + 3, offset + 3 + transactionLength)
 }
 
@@ -287,18 +289,8 @@ const decodeSequencerBatchTransaction = (
   l2ChainId: number
 ): DecodedSequencerBatchTransaction | null => {
   try {
-    // console.log(`Trying to decode this transaction`, {
-    //   transaction,
-    // })
 
     const decodedTx = ethers.utils.parseTransaction(transaction)
-
-    // console.log(`Got this back`, { decodedTx })
-    // console.log(`Got this back`, {
-    //   V: decodedTx.v,
-    //   parse: parseSignatureVParam(decodedTx.v, l2ChainId),
-    //   l2ChainId,
-    // })
 
     return {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
