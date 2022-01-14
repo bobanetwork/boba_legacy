@@ -85,7 +85,8 @@ describe('xBOBA Test', async () => {
   })
 
   it('Should not be able to add controller twice', async () => {
-    await expect(xBoba.addController(xBobaHelper.address)).to.be.eventually.rejected
+    await expect(xBoba.addController(xBobaHelper.address)).to.be.eventually
+      .rejected
 
     const controllerStatus = await xBoba.controllers(xBobaHelper.address)
     expect(controllerStatus).to.be.equal(true)

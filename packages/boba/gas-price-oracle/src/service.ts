@@ -207,7 +207,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
     this.logger.info('Connecting to CanonicalTransactionChain...')
     const CanonicalTransactionChainAddress =
-      await this.state.Lib_AddressManager.getAddress('CanonicalTransactionChain')
+      await this.state.Lib_AddressManager.getAddress(
+        'CanonicalTransactionChain'
+      )
     this.state.CanonicalTransactionChain = loadContract(
       'CanonicalTransactionChain',
       CanonicalTransactionChainAddress,

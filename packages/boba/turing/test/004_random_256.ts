@@ -16,8 +16,8 @@ const gasOverride =  {
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
-let Factory__Hello: ContractFactory
-let hello: Contract
+let Factory__Turing: ContractFactory
+let turing: Contract
 let Factory__Helper: ContractFactory
 let helper: Contract
 
@@ -39,17 +39,17 @@ describe("Turing VRF", function () {
     helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed at", helper.address, "on", "L2")
     
-    Factory__Hello = new ContractFactory(
+    Factory__Turing = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
       testWallet)
     
-    hello = await Factory__Hello.deploy(helper.address, gasOverride)
-    console.log("    Test contract deployed at", hello.address)
+    turing = await Factory__Turing.deploy(helper.address, gasOverride)
+    console.log("    Test contract deployed at", turing.address)
   })
 
   it("should get the number 42", async () => {
-    let tr = await hello.get42()
+    let tr = await turing.get42()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
@@ -59,7 +59,17 @@ describe("Turing VRF", function () {
   })
 
   it("should get a length 64 VRF", async () => {
-    let tr = await hello.getRandom()
+    let tr = await turing.getRandom()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = rawData.slice(-64)
+    let result = parseInt(numberHexString, 16)
+    console.log("    Turing VRF 64 =",result)
+  })
+
+  it("should get a length 64 VRF", async () => {
+    let tr = await turing.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
