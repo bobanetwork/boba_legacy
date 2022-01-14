@@ -131,6 +131,9 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
             turing: toHexString(turing),
             restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
+        } else {
+          // The `3` chops off the Turing length header field, which is zero in this case (0: 00 1: 00 2: 00)
+          sequencerTransaction = sequencerTransaction.slice(3)
         }
 
         const decoded = decodeSequencerBatchTransaction(
