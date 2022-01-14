@@ -68,7 +68,6 @@ describe('NFT Test\n', async () => {
   })
 
   it('should generate a new ERC721 and transfer it from Bob (a1a) to Alice (a2a)', async () => {
-
     let meta = 'https://boredapeyachtclub.com/api/mutants/111'
 
     //console.log(`meta: ${meta}`)
@@ -121,7 +120,6 @@ describe('NFT Test\n', async () => {
   })
 
   it('should derive an NFT Factory from a genesis NFT', async () => {
-
     //Alice (a2a) Account #2 wishes to create a derivative NFT factory from a genesis NFT
     const tokenID = await ERC721.tokenOfOwnerByIndex(a2a, 0)
     //determine the UUID
@@ -156,14 +154,14 @@ describe('NFT Test\n', async () => {
     // )
     // console.log(`Derived NFT deployed to: ${ERC721_D.address}`)
 
-    const meta = 'http://blogs.bodleian.ox.ac.uk/wp-content/uploads/sites/163/2015/10/AdaByron-1850-1000x1200-e1444805848856.jpg'
+    const meta =
+      'http://blogs.bodleian.ox.ac.uk/wp-content/uploads/sites/163/2015/10/AdaByron-1850-1000x1200-e1444805848856.jpg'
 
     const nft = await ERC721_D.mintNFT(a3a, meta)
     await nft.wait()
   })
 
   it('should register the NFTs address in users wallet', async () => {
-
     await ERC721Reg.registerAddress(a2a, ERC721.address)
     //but, a3a should have two flavors of NFT...
     await ERC721Reg.registerAddress(a3a, ERC721.address)

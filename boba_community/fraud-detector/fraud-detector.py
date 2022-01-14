@@ -77,14 +77,34 @@ except:
 batch_size =1000
 
 rpc = [None]*4
+
 rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
 if 'rinkeby' in os.environ['L1_NODE_WEB3_URL']:
   rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
 assert (rpc[1].isConnected())
 logger.debug ("Connected to L1_NODE_WEB3_URL")
 
-rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
-assert (rpc[2].isConnected())
+while True:
+  try:
+    rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
+    assert (rpc[1].isConnected())
+    break
+  except:
+    logger.info ("Waiting for L1...")
+    time.sleep(10)
+
+rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
+logger.debug("Connected to L1_NODE_WEB3_URL")
+
+while True:
+  try:
+    rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
+    assert (rpc[2].isConnected())
+    break
+  except:
+    logger.info ("Waiting for L2...")
+    time.sleep(10)
+
 rpc[2].middleware_onion.inject(geth_poa_middleware, layer=0)
 logger.debug("Connected to L2_NODE_WEB3_URL")
 

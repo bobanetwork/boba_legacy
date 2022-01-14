@@ -33,6 +33,10 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
   // Maps L1 token to L2 token to balance of the L1 token deposited
   mapping(address => mapping(address => uint256)) public deposits;
 
+  bytes32 public priorDepositInfoHash;
+  bytes32 public currentDepositInfoHash;
+  uint256 public lastHashUpdateBlock;
+
   /***************
    * Constructor *
    ***************/
@@ -129,6 +133,15 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
     // Send calldata into L2
     sendCrossDomainMessage(l2TokenBridge, _l2Gas, message);
 
+    // compute and update deposit hash
+    _updateDepositHash(
+      address(0),
+      Lib_PredeployAddresses.OVM_ETH,
+      _from,
+      _to,
+      msg.value
+    );
+
     emit ETHDepositInitiated(_from, _to, msg.value, _data);
   }
 
@@ -219,7 +232,34 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
 
     deposits[_l1Token][_l2Token] = deposits[_l1Token][_l2Token] + _amount;
 
+    _updateDepositHash(_l1Token, _l2Token, _from, _to, _amount);
+
     emit ERC20DepositInitiated(_l1Token, _l2Token, _from, _to, _amount, _data);
+  }
+
+  function _updateDepositHash(
+    address _l1Token,
+    address _l2Token,
+    address _from,
+    address _to,
+    uint256 _amount
+  ) internal {
+    // if block number is different only then update prior
+    if (block.number > lastHashUpdateBlock) {
+      priorDepositInfoHash = currentDepositInfoHash;
+    }
+    currentDepositInfoHash = keccak256(
+      abi.encode(
+        currentDepositInfoHash,
+        _l1Token,
+        _l2Token,
+        _from,
+        _to,
+        _amount
+      )
+    );
+
+    lastHashUpdateBlock = block.number;
   }
 
   /*************************
