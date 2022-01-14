@@ -97,13 +97,10 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     let enqueuedCount = 0
     let nextTxPointer = 15 + 16 * numContexts
     for (let i = 0; i < numContexts; i++) {
-
       const contextPointer = 15 + 16 * i
-
       const context = parseSequencerBatchContext(calldata, contextPointer)
 
       for (let j = 0; j < context.numSequencedTransactions; j++) {
-        
         let sequencerTransaction = parseSequencerBatchTransaction(
           calldata,
           nextTxPointer
@@ -272,8 +269,6 @@ const parseSequencerBatchContext = (
   }
 }
 
-// Each calldata slice starts out with the length of the transaction?
-// is this done at the level of the Geth or in the batch submitter?
 const parseSequencerBatchTransaction = (
   calldata: Buffer,
   offset: number
@@ -281,6 +276,7 @@ const parseSequencerBatchTransaction = (
   const transactionLength = BigNumber.from(
     calldata.slice(offset, offset + 3)
   ).toNumber()
+
   return calldata.slice(offset + 3, offset + 3 + transactionLength)
 }
 

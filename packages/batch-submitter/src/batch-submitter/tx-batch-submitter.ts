@@ -772,18 +772,15 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       batchElement.isSequencerTx = true
       const turing = block.transactions[0].l1Turing
       let rawTransaction = block.transactions[0].rawTransaction
-
       if (turing.length > 4) {
         // FYI - we sometimes use short (length <= 4) non-zero Turing strings for debug purposes
         // Chop those off at this stage
         // Only propagate the data through the system if it's a real Turing payload
         const headerTuringLengthField = remove0x(BigNumber.from(remove0x(turing).length / 2).toHexString()).padStart(6, '0')
-        console.log("Turing payload:", {turing, length: turing.length, headerTuringLengthField})
         rawTransaction = '0x' + headerTuringLengthField + remove0x(rawTransaction) + remove0x(turing)
       } else {
         rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
       }
-      console.log("Final Turing Field:", {final_rawTransaction: rawTransaction})
       batchElement.rawTransaction = rawTransaction
     }
 
