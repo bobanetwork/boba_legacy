@@ -118,42 +118,12 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         // First, parse the new length field...
         const sTxHexString = toHexString(sequencerTransaction)
         const turingLength = parseInt(remove0x(sTxHexString).slice(0,6), 16)
-        console.log("TuringLength", turingLength)
-
-/*
-      // const size = b.slice(offset, offset + 6)
-      // offset += 6
-      // const raw = b.slice(offset, offset + parseInt(size, 16) * 2)
-      // transactions.push(add0x(raw))
-      // offset += raw.length
-
-    if (this._isSequencerTx(block)) {
-      batchElement.isSequencerTx = true
-      let rawTransaction = block.transactions[0].rawTransaction
-      const turing = block.transactions[0].l1Turing
-
-      if (turing.length > 4) {
-        // FYI - we sometimes use short (length <= 4) non-zero Turing strings for debug purposes
-        // Chop those off at this stage
-        // Only propagate the data through the system if it's a real Turing payload
-        const headerTuringLengthField = remove0x(BigNumber.from(remove0x(turing).length / 2).toHexString()).padStart(6, '0')
-        console.log("Turing payload:", {turing, length: turing.length, headerTuringLengthField})
-        rawTransaction = '0x' + headerTuringLengthField + remove0x(rawTransaction) + remove0x(turing)
-      } else {
-        rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
-      }
-      console.log("Final Turing Field:", {final_rawTransaction: rawTransaction})
-      batchElement.rawTransaction = rawTransaction
-    }
-*/
-        //const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
-        // The indexOf() method returns the index within the calling String object of the first occurrence of the specified value
 
         let turing = Buffer.from('0')
 
         if (turingLength > 0) {
           //we have Turing payload
-          turing = sequencerTransaction.slice(-turingLength) //might have to be multiplied
+          turing = sequencerTransaction.slice(-turingLength)
           sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
           // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
           console.log('Found a Turing payload at (neg) position:', {
