@@ -6,6 +6,7 @@ import {
   toHexString,
   toRpcHexString,
   EventArgsSequencerBatchAppended,
+  remove0x
 } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
@@ -105,24 +106,31 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           nextTxPointer
         )
 
+        console.log('Sequencer TX:', sequencerTransaction)
         // need to keep track of the original length so the pointer system for accessing
         // the individual transactions works correctly
         const sequencerTransaction_original_length = sequencerTransaction.length
 
-        const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
-        // The indexOf() method returns the index within the calling String object of the first occurrence of the specified value
+        // This MIGHT have a Turing payload inside of it...
+        // First, parse the new length field...
+        const sTxHexString = toHexString(sequencerTransaction)
+        const turingLength = parseInt(remove0x(sTxHexString).slice(0,6), 16)
 
         let turing = Buffer.from('0')
 
-        if (turingIndex > 0) {
+        if (turingLength > 0) {
           //we have Turing payload
-          turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-          sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
-          console.log('Found a Turing payload at position:', {
-            turingIndex,
+          turing = sequencerTransaction.slice(-turingLength)
+          sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
+          // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
+          console.log('Found a Turing payload at (neg) position:', {
+            turingLength,
             turing: toHexString(turing),
             restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
+        } else {
+          // The `3` chops off the Turing length header field, which is zero in this case (0: 00 1: 00 2: 00)
+          sequencerTransaction = sequencerTransaction.slice(3)
         }
 
         const decoded = decodeSequencerBatchTransaction(
@@ -277,18 +285,8 @@ const decodeSequencerBatchTransaction = (
   l2ChainId: number
 ): DecodedSequencerBatchTransaction | null => {
   try {
-    console.log(`Trying to decode this transaction`, {
-      transaction,
-    })
 
     const decodedTx = ethers.utils.parseTransaction(transaction)
-
-    console.log(`Got this back`, { decodedTx })
-    console.log(`Got this back`, {
-      V: decodedTx.v,
-      parse: parseSignatureVParam(decodedTx.v, l2ChainId),
-      l2ChainId,
-    })
 
     return {
       nonce: BigNumber.from(decodedTx.nonce).toString(),

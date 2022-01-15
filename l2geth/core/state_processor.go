@@ -105,11 +105,9 @@ func ApplyTransaction(
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
 
-	// log.Debug("TURING state_processor.go entering ApplyTransaction - setting up EVM and context", "context", context)
-
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms. This environment also
-	// contains Turing data, which is critical for verifiers and replicas.
+	// contains Turing data - if available - which is critical for verifiers and replicas.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
 
 	// UsingOVM
@@ -122,7 +120,12 @@ func ApplyTransaction(
 	}
 
 	// Apply the transaction to the current state (included in the env)
-	_, gas, failed, err, turing := ApplyMessage(vmenv, msg, gp)
+	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+
+	// TURING Update the tx metadata, if a Turing call took place...
+	if len(vmenv.Context.Turing) > 1 {
+		tx.SetL1Turing(vmenv.Context.Turing) //this is too late? ... so things don't work?
+	}
 
 	if err != nil {
 		return nil, err
@@ -156,7 +159,7 @@ func ApplyTransaction(
 	receipt.BlockHash = statedb.BlockHash()
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
-	receipt.Turing = turing
+	receipt.Turing = vmenv.Context.Turing
 
 	return receipt, err
 }

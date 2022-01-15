@@ -767,17 +767,6 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
 
-	// log.Debug("TURING miner/worker.go commitTransaction STEP 3 ApplyTransaction result",
-	// 	"receipt", receipt,
-	// 	"err", err)
-
-	// TURING Update the tx metadata...
-	if len(receipt.Turing) > 1 {
-		tx.SetL1Turing(receipt.Turing)
-	}
-
-	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "tx", tx)
-
 	if err != nil || receipt.Status != 1 {
 		log.Warn("miner/worker.go ApplyTransaction ERROR", "err", err, "receipt", receipt)
 	}
@@ -787,16 +776,12 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		return nil, err
 	}
 	w.current.txs = append(w.current.txs, tx)
-	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_txs", w.current.txs)
 	w.current.receipts = append(w.current.receipts, receipt)
-	// log.Debug("TURING miner/worker.go STEP 3 updated the core TX structure", "current_receipts", w.current.receipts)
 
 	return receipt.Logs, nil
 }
 
 func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) bool {
-
-	// log.Debug("TURING miner/worker.go STEP 2 entering commitTransactions")
 
 	// Short circuit if current is nil
 	if w.current == nil {
@@ -916,8 +901,6 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 // on reading from a channel that is written to when a new block is added to the
 // chain.
 func (w *worker) commitNewTx(tx *types.Transaction) error {
-
-	// log.Debug("TURING miner/worker.go STEP 1 entering commitNewTx")
 
 	w.mu.RLock()
 	defer w.mu.RUnlock()
@@ -1099,8 +1082,6 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 // and commits new work if consensus engine is running.
 func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time) error {
 
-	// log.Debug("TURING worker.go entering FINAL commit")
-
 	// Deep copy receipts here to avoid interaction between different tasks.
 	receipts := make([]*types.Receipt, len(w.current.receipts))
 	for i, l := range w.current.receipts {
@@ -1108,13 +1089,10 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 		*receipts[i] = *l
 	}
 	s := w.current.state.Copy()
-	// log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
 	block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
 	if err != nil {
 		return err
 	}
-
-	// log.Debug("TURING worker.go final block", "block", block)
 
 	// As a sanity check, ensure all new blocks have exactly one
 	// transaction. This check is done here just in case any of our
@@ -1149,6 +1127,7 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 				"index", block.Number().Uint64()-uint64(1),
 				"l1-timestamp", tx.L1Timestamp(),
 				"l1-blocknumber", bn.Uint64(),
+				"l1-turing", tx.L1Turing(),
 				"tx-hash", tx.Hash().Hex(),
 				"queue-orign", tx.QueueOrigin(),
 				"gas", block.GasUsed(),
