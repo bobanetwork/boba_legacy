@@ -86,7 +86,7 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	turingDummy := []byte{7}
+	turingDummy := []byte{0x00} // Init with null value
 	meta := NewTransactionMeta(nil, 0, turingDummy, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{

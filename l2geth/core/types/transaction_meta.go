@@ -148,9 +148,7 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !isNullValue(turing) {
-		meta.L1Turing = turing
-	}
+	meta.L1Turing = turing
 
 	return &meta, nil
 }

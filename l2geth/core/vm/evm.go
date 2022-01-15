@@ -464,14 +464,20 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}()
 	}
 
-	//methodID for GetResponse is 7d93616c -> [125 147 97 108]
-	isTuring2 := bytes.Equal(input[:4], []byte{125, 147, 97, 108})
+	isTuring2 := false
+	isGetRand2 := false
 
-	//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-	isGetRand2 := bytes.Equal(input[:4], []byte{73, 61, 87, 214})
+	// Geth test sometimes calls this with length zero linput; this check is needed for tests to complete
+	if len(input) > 0 {
+		//methodID for GetResponse is 7d93616c -> [125 147 97 108]
+		isTuring2 = bytes.Equal(input[:4], []byte{125, 147, 97, 108})
 
-	if isTuring2 || isGetRand2 {
-		log.Debug("TURING REQUEST START", "input", input)
+		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
+		isGetRand2 = bytes.Equal(input[:4], []byte{73, 61, 87, 214})
+
+		if isTuring2 || isGetRand2 {
+			log.Debug("TURING REQUEST START", "input", input)
+		}
 	}
 
 	// TuringCall takes the original calldata, figures out what needs
