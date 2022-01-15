@@ -23,6 +23,11 @@ Turing is a system for interacting with the outside world from within solidity s
 
 random_number = turing.getRandom()
 
+// test response
+
+  Turing VRF 256 = 102531381370031878661679181891478913167167919319039026463839728285563064328401n
+  ✓ should get a length 256 VRF (79ms)
+
 ```
 
 To obtain the latest BTC-USD exchange rate, call:
@@ -32,6 +37,11 @@ To obtain the latest BTC-USD exchange rate, call:
 urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
 rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
+// test response
+  Bitcoin to usd price is 42406.68
+  timestamp 1642104413221
+  ✓ should get the current Bitcoin - USD price (327ms)
+
 ```
 
 ### Turing status as of January 12 2022 - Release countdown
@@ -40,9 +50,9 @@ With this release, we have a working version of Turing and the associated modifi
 
 ToDo:
 
-* Upgrade the random number generator (currently `math/rand`) to something better such as `crypto/rand`
+* [COMPLETED] ~~Upgrade the random number generator (currently `math/rand`) to something better such as `crypto/rand`~~
 * Secure the L2TGeth against malicious inputs from off-chain
-* Improve the data-packing system used to append turing payloads to the rawTransaction data sent to the L1
+* Improve the data-packing system used to append Turing payloads to the rawTransaction data sent to the L1
 * Fix Geth Tests
 * Add Integration tests to the GitHub actions
 * Check compatibility of `L2TGeth` with legacy blocks and state roots; critical for smooth regenesis
@@ -66,7 +76,7 @@ Once you have an API key from your chosen data vendor, insert that key into your
 
 ``` 
 
-You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this valiable to `None`.
+You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`.
 
 # Technical Background and Quickstart
 
@@ -118,11 +128,11 @@ $ hardhat --network boba_local test
     Helper contract deployed at 0x488516e15E671491BdaB7f0b9c5045E670a80431 on L2
     Test contract deployed at 0xA1FeC3dff287464b6B3297404f839847A18ce184
     Turing 42 = 42
-    ✓ should get the number 42 (92ms)
-    Turing VRF 64 = 15595235597337684000
-    ✓ should get a length 64 VRF (97ms)
-    Turing VRF 64 = 3784560248718450000
-    ✓ should get a length 64 VRF (96ms)
+    ✓ should get the number 42 (91ms)
+    Turing VRF 256 = 36532234270055059218099711135497367915509356022078512728275895596919612306403n
+    ✓ should get a length 256 VRF (88ms)
+    Turing VRF 256 = 102531381370031878661679181891478913167167919319039026463839728285563064328401n
+    ✓ should get a length 256 VRF (79ms)
 
   Pull Bitcoin - USD quote
     URL set to https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote
@@ -222,7 +232,10 @@ The random number generation is done locally, inside the Geth, and off-chain API
 func bobaTuringRandom(input []byte) hexutil.Bytes {
 
   var ret hexutil.Bytes
+
   rest := input[4:]
+
+  //some things are easier with a hex string
   inputHexUtil := hexutil.Bytes(input)
 
   // If things fail, we'll return an integer parameter which will fail a
@@ -234,25 +247,40 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
   // 1 for Request, 2 for Response, integer >= 10 for various failures
   rType := int(rest[31])
   if rType != 1 {
+    log.Warn("TURING-1 bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
     retError[35] = 10 // Wrong input state
     return retError
   }
 
   rlen := len(rest)
   if rlen < 2*32 {
+    log.Warn("TURING-2 bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
     retError[35] = 11 // Calldata too short
     return retError
   }
 
-  // generate a Uint64 random number
-  // FIX FIX FIX Not Secure due to poor performance of /math/rand
-  randomUint64 := rand.Uint64()
+  // Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
+  one := big.NewInt(1)
+  two := big.NewInt(2)
+  max := new(big.Int)
+  // Max random value 2^256 - 1
+  max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
+  n, err := rand.Int(rand.Reader, max)
+
+  if err != nil {
+    log.Warn("TURING bobaTuringRandom: Random Number Generation Failed", "err", err)
+    retError[35] = 16 // RNG Failure
+    return retError
+  }
+
+  //generate a BigInt random number
+  randomBigInt := n
 
   // build the calldata
   methodID := make([]byte, 4)
   copy(methodID, inputHexUtil[0:4])
-  ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...)
-  ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomUint64))...)
+  ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
+  ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomBigInt))...)
 
   return ret
 }
@@ -351,8 +379,6 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 }
 
 ```
-
-**Note - random number generation currently uses `math/rand` which *does not* produce suitably random numbers. An upgrade to a better random number generator such as `crypto/rand`(https://pkg.go.dev/crypto/rand) is pending.**
 
 ### Step 2: Flow of Turing data out of the evm.context
 

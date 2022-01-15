@@ -23,6 +23,7 @@ contract TuringHelper {
       if(rType == 13) return "TURING: Server error";
       if(rType == 14) return "TURING: Could not decode server response";
       if(rType == 15) return "TURING: Could not create rpc client";
+      if(rType == 16) return "TURING: Random number generation failure";
   }
 
   /* This is the interface to the off-chain mechanism. Although

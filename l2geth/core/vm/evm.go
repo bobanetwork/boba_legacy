@@ -18,9 +18,9 @@ package vm
 
 import (
 	"bytes"
+	"crypto/rand"
 	"fmt"
 	"math/big"
-	"math/rand"
 	"sync/atomic"
 	"time"
 
@@ -238,17 +238,31 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 		return retError
 	}
 
-	//generate a Uint64 random number
-	randomUint64 := rand.Uint64()
+	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
+	one := big.NewInt(1)
+	two := big.NewInt(2)
+	max := new(big.Int)
+	// Max random value 2^256 - 1
+	max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
+	n, err := rand.Int(rand.Reader, max)
+
+	if err != nil {
+		log.Warn("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
+		retError[35] = 16 // RNG Failure
+		return retError
+	}
+
+	//generate a BigInt random number
+	randomBigInt := n
 
 	log.Debug("TURING-3 bobaTuringRandom:Random number",
-		"randomUint32", fmt.Sprintf("0x%064x", randomUint64))
+		"randomBigInt", randomBigInt)
 
 	// build the calldata
 	methodID := make([]byte, 4)
 	copy(methodID, inputHexUtil[0:4])
 	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
-	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomUint64))...)
+	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomBigInt))...)
 
 	log.Debug("TURING-4 bobaTuringRandom:Modified parameters",
 		"newValue", ret)
