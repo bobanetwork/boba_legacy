@@ -366,8 +366,8 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 			retError[35] = 13 // Client Error
 			return retError
 		}
-		if responseStringEnc.length() > 322 {
-			log.Warn("TURING-8a bobaTuringCall:Raw response too long (> 322)", "length", responseStringEnc.length(), "responseStringEnc", responseStringEnc)
+		if len(responseStringEnc) > 322 {
+			log.Warn("TURING-8a bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
 			retError[35] = 17 // Raw Response too long
 			return retError
 		}
@@ -386,13 +386,13 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		// let's cap the byte payload at 32 + 4*32 = 160 - this allows encoding of 4 uint256
 		// Security perspective - we locally construct the revised calldata, EXCEPT the last field
 		// the `bytes memory _payload`, which is limited to 160 bytes max
-		// Garbage-in scenario: Assuming the payload is filled with garbage, this will break downstream 
-		// abi.decode(encResponse,(uint256)); but that a proable at the contract level not at the Geth level
+		// Garbage-in scenario: Assuming the payload is filled with garbage, this will break downstream
+		// abi.decode(encResponse,(uint256))'s for example, but that's a problem at the contract level not at the Geth level
 		// DDOS scenario: Assuming the payload is filled with lots of garbage, this will burn ETH
 		// reflecting the cost of storing junk on L1.
 		// Evil-in scenario: Assume a long / specially crafted payload is returned from the external API
 		// In this attack, the idea would be to break client.Call as it is trying to pack the response into &responseStringEnc
-		// Alternatively, could attack hexutil.Decode 
+		// Alternatively, could attack hexutil.Decode
 		if len(responseString) > 160 {
 			log.Warn("TURING-8c bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
 			retError[35] = 18 // Response too big
