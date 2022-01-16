@@ -24,6 +24,8 @@ contract TuringHelper {
       if(rType == 14) return "TURING: Could not decode server response";
       if(rType == 15) return "TURING: Could not create rpc client";
       if(rType == 16) return "TURING: Random number generation failure";
+      if(rType == 17) return "TURING: Response from API too long (>322)";
+      if(rType == 18) return "TURING: Response from API too big (>160 bytes)";
   }
 
   /* This is the interface to the off-chain mechanism. Although
