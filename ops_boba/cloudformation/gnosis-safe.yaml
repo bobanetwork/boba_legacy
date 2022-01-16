@@ -767,7 +767,7 @@ Resources:
               Value: production
             - Name: REACT_APP_GATEWAY_URL
               Value: !Sub
-                - "https://safe-client.${EndpointAddress}/"
+                - "https://safe-client.${EndpointAddress}"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
           DockerLabels:
