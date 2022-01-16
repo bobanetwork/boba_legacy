@@ -20,7 +20,6 @@ export interface EnqueueEntry {
   origin: string
   blockNumber: number
   timestamp: number
-  turing: string
 }
 
 export interface TransactionEntry {

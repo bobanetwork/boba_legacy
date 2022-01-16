@@ -86,8 +86,7 @@ func newTransaction(nonce uint64, to *common.Address, amount *big.Int, gasLimit 
 		data = common.CopyBytes(data)
 	}
 
-	turingDummy := []byte{0x00} // Init with null value
-	meta := NewTransactionMeta(nil, 0, turingDummy, nil, QueueOriginSequencer, nil, nil, nil)
+	meta := NewTransactionMeta(nil, 0, []byte{0}, nil, QueueOriginSequencer, nil, nil, nil)
 
 	d := txdata{
 		AccountNonce: nonce,
@@ -276,18 +275,18 @@ func (tx *Transaction) QueueOrigin() QueueOrigin {
 
 // Hash hashes the RLP encoding of tx.
 // It uniquely identifies the transaction.
-// Note that this hashes the entire TX, including the metadata fields
 func (tx *Transaction) Hash() common.Hash {
 	if hash := tx.hash.Load(); hash != nil {
 		return hash.(common.Hash)
 	}
+
 	v := rlpHash(tx)
 	tx.hash.Store(v)
 	return v
 }
 
 // Size returns the true RLP encoded storage size of the transaction, either by
-// encoding and returning it, or returning a previously cached value.
+// encoding and returning it, or returning a previsouly cached value.
 func (tx *Transaction) Size() common.StorageSize {
 	if size := tx.size.Load(); size != nil {
 		return size.(common.StorageSize)
@@ -486,6 +485,8 @@ func (t *TransactionsByPriceAndNonce) Pop() {
 }
 
 // Message is a fully derived transaction and implements core.Message
+//
+// NOTE: In a future PR this will be removed.
 type Message struct {
 	to         *common.Address
 	from       common.Address

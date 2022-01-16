@@ -39,14 +39,12 @@ type TransactionMeta struct {
 	L1Turing        []byte          `json:"l1Turing" gencodec:"required"`
 	L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
 	QueueOrigin     QueueOrigin     `json:"queueOrigin" gencodec:"required"`
-
 	// The canonical transaction chain index
 	Index *uint64 `json:"index" gencodec:"required"`
 
 	// The queue index, nil for queue origin sequencer transactions
-	QueueIndex *uint64 `json:"queueIndex" gencodec:"required"`
-
-	RawTransaction []byte `json:"rawTransaction" gencodec:"required"`
+	QueueIndex     *uint64 `json:"queueIndex" gencodec:"required"`
+	RawTransaction []byte  `json:"rawTransaction" gencodec:"required"`
 }
 
 // NewTransactionMeta creates a TransactionMeta
