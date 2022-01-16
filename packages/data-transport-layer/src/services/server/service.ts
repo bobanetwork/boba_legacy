@@ -478,7 +478,6 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
             blockNumber: null,
             timestamp: null,
             ctcIndex: null,
-            turing: null,
           }
         }
 

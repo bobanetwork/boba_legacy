@@ -41,25 +41,16 @@ type TransactionMeta struct {
 	QueueOrigin     QueueOrigin     `json:"queueOrigin" gencodec:"required"`
 	// The canonical transaction chain index
 	Index *uint64 `json:"index" gencodec:"required"`
-
 	// The queue index, nil for queue origin sequencer transactions
 	QueueIndex     *uint64 `json:"queueIndex" gencodec:"required"`
 	RawTransaction []byte  `json:"rawTransaction" gencodec:"required"`
 }
 
 // NewTransactionMeta creates a TransactionMeta
-func NewTransactionMeta(
-	l1BlockNumber *big.Int,
-	l1Timestamp uint64,
-	l1Turing []byte,
-	l1MessageSender *common.Address,
-	queueOrigin QueueOrigin,
-	index *uint64,
-	queueIndex *uint64,
-	rawTransaction []byte) *TransactionMeta {
+func NewTransactionMeta(l1BlockNumber *big.Int, l1timestamp uint64, l1Turing []byte, l1MessageSender *common.Address, queueOrigin QueueOrigin, index *uint64, queueIndex *uint64, rawTransaction []byte) *TransactionMeta {
 	return &TransactionMeta{
 		L1BlockNumber:   l1BlockNumber,
-		L1Timestamp:     l1Timestamp,
+		L1Timestamp:     l1timestamp,
 		L1Turing:        l1Turing,
 		L1MessageSender: l1MessageSender,
 		QueueOrigin:     queueOrigin,
@@ -80,13 +71,13 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	meta := TransactionMeta{}
 	b := bytes.NewReader(input)
 
-	lb, err := common.ReadVarBytes(b, 0, 1024, "L1BlockNumber")
+	lb, err := common.ReadVarBytes(b, 0, 1024, "l1BlockNumber")
 	if err != nil {
 		return nil, err
 	}
 	if !isNullValue(lb) {
-		L1BlockNumber := new(big.Int).SetBytes(lb)
-		meta.L1BlockNumber = L1BlockNumber
+		l1BlockNumber := new(big.Int).SetBytes(lb)
+		meta.L1BlockNumber = l1BlockNumber
 	}
 
 	mb, err := common.ReadVarBytes(b, 0, 1024, "L1MessageSender")
