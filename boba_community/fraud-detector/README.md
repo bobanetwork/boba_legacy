@@ -29,6 +29,7 @@ The central idea is that if two (or more) systems look at the same transactions,
 ## 2. What do when you discover a state root mismatch
 
 Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.  
+
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
 **Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*. 

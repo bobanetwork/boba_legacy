@@ -80,6 +80,7 @@ import { getAllNetworks } from 'util/masterConfig'
 import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
+import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import { sortRawTokens } from 'util/common'
 
 require('dotenv').config()
@@ -171,6 +172,22 @@ class NetworkService {
       localStorage.setItem('changeChain', true)
       window.location.reload()
     })
+  }
+
+  async fetchVerifierStatus() {
+    const response = await verifierWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
+
+    console.log("Verifier response: ", response)
+
+    if (response.status === 200) {
+      const status = response.data.result
+      return status
+    } else {
+      console.log("Bad verifier response")
+      return false
+    }
   }
 
   async fetchAirdropStatusL1() {
@@ -539,7 +556,8 @@ class NetworkService {
                               'REP',  'BAT', 'ZRX',  'SUSHI',
                               'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
-                              'BUSD', 'BNB', 'FTM',  'MATIC'
+                              'BUSD', 'BNB', 'FTM',  'MATIC',
+                              'UMA'
                             ]
 
       //not all tokens are on Rinkeby
@@ -987,11 +1005,11 @@ class NetworkService {
     NFTContracts = Object.entries(await getNFTContracts())
 
     for(let i = 0; i < NFTContracts.length; i++) {
-      
+
       const address = NFTContracts[i][1].address
 
       //console.log("address:",address)
-      
+
       let contract = new ethers.Contract(
         address,
         L2ERC721Json.abi,
@@ -1049,7 +1067,7 @@ class NetworkService {
           const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
           let NFT = {
-            UUID, 
+            UUID,
             address,
             name: nftName,
             tokenID,
@@ -1827,7 +1845,7 @@ class NetworkService {
   async getL2TotalFeeRate() {
 
     try{
-    
+
       const L2LPContract = new ethers.Contract(
         allAddresses.L2LPAddress,
         L2LPJson.abi,
@@ -2908,10 +2926,10 @@ class NetworkService {
       let values = [0] //amount of ETH to send, generally, zero
 
       // console.log("Submitting proposal:", {
-      //   address, 
-      //   values, 
-      //   signatures, 
-      //   callData, 
+      //   address,
+      //   values,
+      //   signatures,
+      //   callData,
       //   description
       // })
 
@@ -2950,7 +2968,7 @@ class NetworkService {
 
       const totalProposals = await proposalCounts.toNumber()
       console.log('totalProposals:',totalProposals)
-      
+
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
         null, null, null, null
@@ -2959,7 +2977,7 @@ class NetworkService {
       //console.log('filter:',filter)
 
       const descriptionList = await delegateCheck.queryFilter(filter)
-      
+
       //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
@@ -3075,7 +3093,7 @@ class NetworkService {
   /*****       Fixed savings account         *****/
   /***********************************************/
   async addFS_Savings(value_Wei_String) {
-    
+
     try {
 
       const FixedSavings = new ethers.Contract(
@@ -3156,7 +3174,7 @@ class NetworkService {
         this.L2Provider
       )
 
-      //const l2ba = 
+      //const l2ba =
       await FixedSavings.l2Boba()
       //console.log('l2 boba:', l2ba)
       //console.log('l2 boba:', allTokens['BOBA'])

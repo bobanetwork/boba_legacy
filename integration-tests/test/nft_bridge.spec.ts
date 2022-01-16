@@ -78,10 +78,14 @@ describe('NFT Bridge Test', async () => {
 
     it('should not be able to transfer ownership for non-owner', async () => {
       await expect(
-        L1Bridge.connect(env.l1Wallet_2).transferOwnership(env.l1Wallet_2.address)
+        L1Bridge.connect(env.l1Wallet_2).transferOwnership(
+          env.l1Wallet_2.address
+        )
       ).to.be.revertedWith('Caller is not the owner')
       await expect(
-        L2Bridge.connect(env.l2Wallet_2).transferOwnership(env.l1Wallet_2.address)
+        L2Bridge.connect(env.l2Wallet_2).transferOwnership(
+          env.l1Wallet_2.address
+        )
       ).to.be.revertedWith('Caller is not the owner')
     })
   })
@@ -252,9 +256,15 @@ describe('NFT Bridge Test', async () => {
       const L1ERC721Test = await Factory__L1ERC721.deploy('Test', 'TST')
       await L1ERC721Test.deployTransaction.wait()
 
-      const mintTx = await L1ERC721Test.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
+      const mintTx = await L1ERC721Test.mint(
+        env.l1Wallet.address,
+        DUMMY_TOKEN_ID
+      )
       await mintTx.wait()
-      const approveTx = await L1ERC721Test.approve(L1Bridge.address, DUMMY_TOKEN_ID)
+      const approveTx = await L1ERC721Test.approve(
+        L1Bridge.address,
+        DUMMY_TOKEN_ID
+      )
       await approveTx.wait()
 
       await expect(
@@ -369,7 +379,9 @@ describe('NFT Bridge Test', async () => {
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       expect(ownerL1).to.deep.eq(env.l1Wallet_2.address)
 
-      const transferBackTx = await L1ERC721.connect(env.l1Wallet_2).transferFrom(
+      const transferBackTx = await L1ERC721.connect(
+        env.l1Wallet_2
+      ).transferFrom(
         env.l1Wallet_2.address,
         env.l1Wallet.address,
         DUMMY_TOKEN_ID
@@ -465,9 +477,15 @@ describe('NFT Bridge Test', async () => {
       const L2ERC721Test = await Factory__L2ERC721.deploy('Test', 'TST')
       await L2ERC721Test.deployTransaction.wait()
 
-      const mintTx = await L2ERC721Test.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
+      const mintTx = await L2ERC721Test.mint(
+        env.l2Wallet.address,
+        DUMMY_TOKEN_ID
+      )
       await mintTx.wait()
-      const approveTx = await L2ERC721Test.approve(L2Bridge.address, DUMMY_TOKEN_ID)
+      const approveTx = await L2ERC721Test.approve(
+        L2Bridge.address,
+        DUMMY_TOKEN_ID
+      )
       await approveTx.wait()
 
       await expect(
@@ -725,9 +743,9 @@ describe('NFT Bridge Test', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await L2Bridge.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await L2Bridge.extraGasRelay()
@@ -737,7 +755,9 @@ describe('NFT Bridge Test', async () => {
     it('should be able to exit with the correct added gas', async () => {
       const extraGas = 1000000
 
-      const resetGasTx = await L2Bridge.configureExtraGasRelay(0)
+      const resetGasTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(0)
       await resetGasTx.wait()
 
       const preGas = await L2Bridge.estimateGas.withdraw(
@@ -747,7 +767,9 @@ describe('NFT Bridge Test', async () => {
         utils.formatBytes32String(new Date().getTime().toString())
       )
 
-      const addGasTx = await L2Bridge.configureExtraGasRelay(extraGas)
+      const addGasTx = await L2Bridge.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(extraGas)
       await addGasTx.wait()
 
       const afterGas = await L2Bridge.estimateGas.withdraw(
