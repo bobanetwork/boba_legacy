@@ -137,13 +137,6 @@ export class MockchainProvider extends providers.JsonRpcProvider {
       queueOrigin,
       l1BlockNumber,
     }
-    /*
-     l1BlockNumber: number
-     l1TxOrigin: string
-     l1Turing: string
-     queueOrigin: string
-     rawTransaction: string
-   */
     // Add an interface here to fix the type casing into L2Block during Object.assign
     interface PartialL2Block {
       transactions: [L2Transaction]

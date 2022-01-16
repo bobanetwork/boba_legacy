@@ -811,9 +811,6 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	if tx.L1Timestamp() == 0 {
 		tx.SetL1Timestamp(ts)
 		tx.SetL1BlockNumber(bn)
-		tx.SetL1Turing([]byte{0})
-		// populate the Turing metadata - in this case, set to 0, since it's a new transaction
-		// log.Debug("TURING sync_service.go Generating metadata for RPC call", "timestamp", ts, "L1BlockNumber", bn)
 	} else if tx.L1Timestamp() > s.GetLatestL1Timestamp() {
 		// If the timestamp of the transaction is greater than the sync
 		// service's locally maintained timestamp, update the timestamp and
@@ -848,13 +845,10 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 
 	txs := types.Transactions{tx}
 	errCh := make(chan error, 1)
-
-	// here is where all the magic happens...
 	s.txFeed.Send(core.NewTxsEvent{
 		Txs:   txs,
 		ErrCh: errCh,
 	})
-
 	// Block until the transaction has been added to the chain
 	log.Trace("Waiting for transaction to be added to chain", "hash", tx.Hash().Hex())
 
@@ -1117,7 +1111,7 @@ func (s *SyncService) syncBatches() (*uint64, error) {
 // syncTransactionBatchRange will sync a range of batched transactions from
 // start to end (inclusive)
 func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
-	// log.Info("TURING: sync_service.go syncTransactionBatchRange() Syncing transaction batch range", "start", start, "end", end)
+	log.Info("Syncing transaction batch range", "start", start, "end", end)
 	for i := start; i <= end; i++ {
 		log.Debug("Fetching transaction batch", "index", i)
 		_, txs, err := s.client.GetTransactionBatch(i)
@@ -1125,7 +1119,6 @@ func (s *SyncService) syncTransactionBatchRange(start, end uint64) error {
 			return fmt.Errorf("Cannot get transaction batch: %w", err)
 		}
 		for _, tx := range txs {
-			log.Info("Syncing transaction batch range", "start", start, "end", end)
 			if err := s.applyBatchedTransaction(tx); err != nil {
 				return fmt.Errorf("cannot apply batched transaction: %w", err)
 			}

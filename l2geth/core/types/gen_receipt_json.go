@@ -21,16 +21,16 @@ func (r Receipt) MarshalJSON() ([]byte, error) {
 		CumulativeGasUsed hexutil.Uint64 `json:"cumulativeGasUsed" gencodec:"required"`
 		Bloom             Bloom          `json:"logsBloom"         gencodec:"required"`
 		Logs              []*Log         `json:"logs"              gencodec:"required"`
-		TxHash            common.Hash    `json:"transactionHash"   gencodec:"required"`
+		TxHash            common.Hash    `json:"transactionHash" gencodec:"required"`
 		ContractAddress   common.Address `json:"contractAddress"`
-		GasUsed           hexutil.Uint64 `json:"gasUsed"           gencodec:"required"`
+		GasUsed           hexutil.Uint64 `json:"gasUsed" gencodec:"required"`
 		BlockHash         common.Hash    `json:"blockHash,omitempty"`
 		BlockNumber       *hexutil.Big   `json:"blockNumber,omitempty"`
 		TransactionIndex  hexutil.Uint   `json:"transactionIndex"`
-		L1GasPrice        *big.Int       `json:"l1GasPrice"        gencodec:"required"`
-		L1GasUsed         *big.Int       `json:"l1GasUsed"         gencodec:"required"`
-		L1Fee             *big.Int       `json:"l1Fee"             gencodec:"required"`
-		FeeScalar         *big.Float     `json:"l1FeeScalar"       gencodec:"required"`
+		L1GasPrice        *big.Int       `json:"l1GasPrice" gencodec:"required"`
+		L1GasUsed         *big.Int       `json:"l1GasUsed" gencodec:"required"`
+		L1Fee             *big.Int       `json:"l1Fee" gencodec:"required"`
+		FeeScalar         *big.Float     `json:"l1FeeScalar" gencodec:"required"`
 	}
 	var enc Receipt
 	enc.PostState = r.PostState
@@ -59,16 +59,16 @@ func (r *Receipt) UnmarshalJSON(input []byte) error {
 		CumulativeGasUsed *hexutil.Uint64 `json:"cumulativeGasUsed" gencodec:"required"`
 		Bloom             *Bloom          `json:"logsBloom"         gencodec:"required"`
 		Logs              []*Log          `json:"logs"              gencodec:"required"`
-		TxHash            *common.Hash    `json:"transactionHash"   gencodec:"required"`
+		TxHash            *common.Hash    `json:"transactionHash" gencodec:"required"`
 		ContractAddress   *common.Address `json:"contractAddress"`
-		GasUsed           *hexutil.Uint64 `json:"gasUsed"           gencodec:"required"`
+		GasUsed           *hexutil.Uint64 `json:"gasUsed" gencodec:"required"`
 		BlockHash         *common.Hash    `json:"blockHash,omitempty"`
 		BlockNumber       *hexutil.Big    `json:"blockNumber,omitempty"`
 		TransactionIndex  *hexutil.Uint   `json:"transactionIndex"`
-		L1GasPrice        *big.Int        `json:"l1GasPrice"        gencodec:"required"`
-		L1GasUsed         *big.Int        `json:"l1GasUsed"         gencodec:"required"`
-		L1Fee             *big.Int        `json:"l1Fee"             gencodec:"required"`
-		FeeScalar         *big.Float      `json:"l1FeeScalar"       gencodec:"required"`
+		L1GasPrice        *big.Int        `json:"l1GasPrice" gencodec:"required"`
+		L1GasUsed         *big.Int        `json:"l1GasUsed" gencodec:"required"`
+		L1Fee             *big.Int        `json:"l1Fee" gencodec:"required"`
+		FeeScalar         *big.Float      `json:"l1FeeScalar" gencodec:"required"`
 	}
 	var dec Receipt
 	if err := json.Unmarshal(input, &dec); err != nil {

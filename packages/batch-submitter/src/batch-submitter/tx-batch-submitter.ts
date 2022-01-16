@@ -231,7 +231,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       batchStart: batchParams.shouldStartAtElement,
       batchElements: batchParams.totalElementsToAppend,
     })
-    this.logger.info('Submitting batch', {
+    this.logger.info('Submitting batch.', {
       calldata: batchParams,
       l1tipHeight,
     })
@@ -551,7 +551,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           nextQueueIndex++
           await updateLatestTimestampAndBlockNumber()
         }
-        // Fix the element if its timestamp/blockNumber is too small
+        // Fix the element if its timestammp/blockNumber is too small
         if (
           ele.timestamp < earliestTimestamp ||
           ele.blockNumber < earliestBlockNumber
@@ -565,7 +565,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           ele.timestamp = earliestTimestamp
           ele.blockNumber = earliestBlockNumber
         }
-        // Fix the element if its timestamp/blockNumber is too large
+        // Fix the element if its timestammp/blockNumber is too large
         if (
           ele.timestamp > latestTimestamp ||
           ele.blockNumber > latestBlockNumber
@@ -759,6 +759,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     // just remove0x(rawTransaction).length / 2
 
     const block = await this._getBlock(blockNumber)
+    this.logger.debug('Fetched L2 block', {
+      block,
+    })
 
     const batchElement = {
       stateRoot: block.stateRoot,
