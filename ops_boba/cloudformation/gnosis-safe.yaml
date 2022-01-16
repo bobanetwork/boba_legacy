@@ -20,7 +20,7 @@ Parameters:
 
   ImageTag:
     Type: String
-    Default: v0.0.5
+    Default: v0.0.6
 
   DockerPrefix:
     Type: String
@@ -349,7 +349,7 @@ Resources:
             com.datadoghq.ad.check_names: '["nginx-safe-transaction-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "nginx-safe-transaction-service", "service": "nginx-safe-transaction-service"}]'
-          Essential: true
+          Essential: false
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/nginx-safe-config-service:latest"
           Name: nginx-safe-config-service
@@ -478,66 +478,66 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
           Essential: false
           Memory: "1024"
-        # - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
-        #   Name: worker
-        #   Ulimits:
-        #     - Name: nofile
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: nproc
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: core
-        #       SoftLimit: 0
-        #       HardLimit: 0
-        #   EnvironmentFiles:
-        #     - Value: !Sub
-        #       - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-        #       - S3BucketV2:
-        #           Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-        #       Type: "s3"
-        #   Environment:
-        #     - Name: ETH_L2_NETWORK
-        #       Value: 1
-        #     - Name: PYTHONPATH
-        #       Value: /app/
-        #     - Name: DJANGO_SETTINGS_MODULE
-        #       Value: config.settings.production
-        #     - Name: C_FORCE_ROOT
-        #       Value: true
-        #     - Name: DJANGO_ALLOWED_HOSTS
-        #       Value: !Sub
-        #         - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: ETHEREUM_NODE_URL
-        #       Value: !Sub
-        #         - "https://${EndpointAddress}"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: ETHEREUM_TRACING_NODE_URL
-        #       Value: !Sub
-        #         - "https://${EndpointAddress}"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: REDIS_URL
-        #       Value: !Sub
-        #         - "redis://${EndpointAddress}:6379/0"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
-        #     - Name: CELERY_BROKER_URL
-        #       Value: !Sub
-        #         - "redis://${EndpointAddress}:6379/1"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
-        #   Command:
-        #     - "./docker/web/celery/worker/run.sh"
-        #   DockerLabels:
-        #     com.datadoghq.ad.check_names: '["worker"]'
-        #     com.datadoghq.ad.init_configs: '[{}]'
-        #     com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
-        #   Essential: false
-        #   Memory: "1024"
+        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+          Name: worker
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: ETH_L2_NETWORK
+              Value: 1
+            - Name: PYTHONPATH
+              Value: /app/
+            - Name: DJANGO_SETTINGS_MODULE
+              Value: config.settings.production
+            - Name: C_FORCE_ROOT
+              Value: true
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: ETHEREUM_TRACING_NODE_URL
+              Value: !Sub
+                - "https://${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: REDIS_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/0"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: CELERY_BROKER_URL
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379/1"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+          Command:
+            - "./docker/web/celery/worker/run.sh"
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["worker"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
+          Essential: false
+          Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: scheduler
           Ulimits:
@@ -667,74 +667,74 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-client-gateway"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
-          Essential: true
+          Essential: false
           Memory: "4000"
-        # - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
-        #   Name: safe-config-service
-        #   Ulimits:
-        #     - Name: nofile
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: nproc
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: core
-        #       SoftLimit: 0
-        #       HardLimit: 0
-        #   PortMappings:
-        #     - ContainerPort: 8080
-        #       HostPort: 8080
-        #   MountPoints:
-        #     - ContainerPath: "/nginx"
-        #       SourceVolume: nginx2
-        #   EnvironmentFiles:
-        #     - Value: !Sub
-        #       - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-        #       - S3BucketV2:
-        #           Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-        #       Type: "s3"
-        #   Environment:
-        #     - Name: PYTHONDONTWRITEBYTECODE
-        #       Value: true
-        #     - Name: DEBUG
-        #       Value: true
-        #     - Name: ROOT_LOG_LEVEL
-        #       Value: DEBUG
-        #     - Name: DJANGO_ALLOWED_HOSTS
-        #       Value: !Sub
-        #         - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: GUNICORN_BIND_PORT
-        #       Value: 8080
-        #     - Name: DOCKER_NGINX_VOLUME_ROOT
-        #       Value: /nginx
-        #     - Name: GUNICORN_BIND_SOCKET
-        #       Value: unix:////nginx/gunicorn.socket
-        #     - Name: NGINX_HOST_PORT
-        #       Value: 80
-        #     - Name: NGINX_ENVSUBST_OUTPUT_DIR
-        #       Value: /etc/nginx/
-        #     - Name: GUNICORN_WEB_RELOAD
-        #       Value: false
-        #     - Name: CGW_URL
-        #       Value: !Sub
-        #         - "https://safe-client.${EndpointAddress}/"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: DEFAULT_FILE_STORAGE
-        #       Value: django.core.files.storage.FileSystemStorage
-        #   PseudoTerminal: true
-        #   Interactive: true
-        #   DependsOn:
-        #     - Condition: START
-        #       ContainerName: nginx-safe-config-service
-        #   DockerLabels:
-        #     com.datadoghq.ad.check_names: '["safe-config-service"]'
-        #     com.datadoghq.ad.init_configs: '[{}]'
-        #     com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
-        #   Essential: false
-        #   Memory: "2000"
+        - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
+          Name: safe-config-service
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx2
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: PYTHONDONTWRITEBYTECODE
+              Value: true
+            - Name: DEBUG
+              Value: true
+            - Name: ROOT_LOG_LEVEL
+              Value: DEBUG
+            - Name: DJANGO_ALLOWED_HOSTS
+              Value: !Sub
+                - ".localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: GUNICORN_BIND_PORT
+              Value: 8080
+            - Name: DOCKER_NGINX_VOLUME_ROOT
+              Value: /nginx
+            - Name: GUNICORN_BIND_SOCKET
+              Value: unix:////nginx/gunicorn.socket
+            - Name: NGINX_HOST_PORT
+              Value: 80
+            - Name: NGINX_ENVSUBST_OUTPUT_DIR
+              Value: /etc/nginx/
+            - Name: GUNICORN_WEB_RELOAD
+              Value: false
+            - Name: CGW_URL
+              Value: !Sub
+                - "https://safe-client.${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: DEFAULT_FILE_STORAGE
+              Value: django.core.files.storage.FileSystemStorage
+          PseudoTerminal: true
+          Interactive: true
+          DependsOn:
+            - Condition: START
+              ContainerName: nginx-safe-config-service
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-config-service"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
+          Essential: false
+          Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-react:${ImageTag}"
           Name: safe-react
           Ulimits:
@@ -757,17 +757,26 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: REACT_APP_APP_VERSION
+              Value: $npm_package_version
+            - Name: REACT_APP_ENV
+              Value: production
             - Name: REACT_APP_NETWORK
               Value: BOBA_RINKEBY
             - Name: NODE_ENV
               Value: production
+            - Name: REACT_APP_GATEWAY_URL
+              Value: !Sub
+                - "https://safe-client.${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
           DockerLabels:
             com.datadoghq.ad.check_names: '["safe-react"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
           Essential: false
-          Memory: "6000"
-          Cpu: 3
+          Memory: "4000"
+          Cpu: 2
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
@@ -790,6 +799,7 @@ Resources:
         - ContainerName: safe-react
           ContainerPort: 3000
           TargetGroupArn: !Ref GnosisLBTargetGroup4
+
         # - ContainerName: safe-config-service
         #   ContainerPort: 8080
         #   TargetGroupArn: !Ref GnosisLBTargetGroup5
