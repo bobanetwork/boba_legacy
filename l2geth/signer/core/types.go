@@ -112,7 +112,7 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 	var l1Turing []byte
 	if args.L1Turing != nil {
 		l1Turing = *args.L1Turing
-	} 
+	}
 
 	tx := types.NewTransaction(uint64(args.Nonce), args.To.Address(), (*big.Int)(&args.Value), (uint64)(args.Gas), (*big.Int)(&args.GasPrice), input)
 	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, l1Turing, l1MessageSender, args.QueueOrigin, nil, nil, nil)
