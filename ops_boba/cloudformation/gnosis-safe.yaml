@@ -625,7 +625,7 @@ Resources:
           Environment:
             - Name: CONFIG_SERVICE_URI
               Value: !Sub
-                - "https://safe-config.${EndpointAddress}/"
+                - "https://safe-config.${EndpointAddress}"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: FEATURE_FLAG_NESTED_DECODING
