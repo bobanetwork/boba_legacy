@@ -403,7 +403,7 @@ Resources:
               Value: !Sub
                 - "https://safe-client.${EndpointAddress}/"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           DockerLabels:
@@ -769,7 +769,7 @@ Resources:
               Value: !Sub
                 - "https://safe-client.${EndpointAddress}/"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:DNSName"
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
           DockerLabels:
             com.datadoghq.ad.check_names: '["safe-react"]'
             com.datadoghq.ad.init_configs: '[{}]'
