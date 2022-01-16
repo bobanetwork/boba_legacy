@@ -83,7 +83,6 @@ type Message interface {
 	L1Timestamp() uint64
 	L1BlockNumber() *big.Int
 	QueueOrigin() types.QueueOrigin
-	L1Turing() []byte
 }
 
 // IntrinsicGas computes the 'intrinsic gas' for a message with the given data.
@@ -260,16 +259,8 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	} else {
 		// Increment the nonce for the next transaction
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
-		// and run the call
 		ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
-
-	// log.Debug("TransitionDb", "st", st, "evm.context.Turing", evm.Context)
-
-	// // // TURING Update the tx metadata...
-	// // if len(evm.context.Turing) > 1 {
-	// // 	tx.SetL1Turing(context.Turing) //this is too late..... so things don't work
-	// // }
 
 	if vmerr != nil {
 		log.Debug("VM returned with error", "err", vmerr, "ret", hexutil.Encode(ret))

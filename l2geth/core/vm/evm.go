@@ -25,16 +25,15 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/dump"
 	"github.com/ethereum/go-ethereum/rollup/rcfg"
 	"github.com/ethereum/go-ethereum/rollup/util"
-	"golang.org/x/crypto/sha3"
-
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rpc"
+	"golang.org/x/crypto/sha3"
 )
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already
@@ -75,7 +74,6 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 				}(evm.interpreter)
 				evm.interpreter = interpreter
 			}
-
 			return interpreter.Run(contract, input, readOnly)
 		}
 	}
@@ -403,14 +401,6 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
-
-	log.Debug("TURING entering call",
-		"depth", evm.depth,
-		"addr", addr,
-		"input", hexutil.Bytes(input),
-		"gas", gas,
-		"evm.Context.Turing", evm.Context.Turing)
-
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
@@ -533,12 +523,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// when we're in homestead this also counts for code storage gas errors.
 	if err != nil {
 		evm.StateDB.RevertToSnapshot(snapshot)
-		log.Debug("TURING evm.go errExecutionReverted")
 		if err != errExecutionReverted {
 			contract.UseGas(contract.Gas)
 		}
 	}
-
 	return ret, contract.Gas, err
 }
 

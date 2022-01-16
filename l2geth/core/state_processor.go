@@ -86,28 +86,16 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // and uses the input parameters for its environment. It returns the receipt
 // for the transaction, gas used and an error if the transaction failed,
 // indicating the block was invalid.
-func ApplyTransaction(
-	config *params.ChainConfig,
-	bc ChainContext,
-	author *common.Address,
-	gp *GasPool,
-	statedb *state.StateDB,
-	header *types.Header,
-	tx *types.Transaction,
-	usedGas *uint64,
-	cfg vm.Config) (*types.Receipt, error) {
+func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
 	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number))
-
 	if err != nil {
 		return nil, err
 	}
-
 	// Create a new context to be used in the EVM environment
 	context := NewEVMContext(msg, header, bc, author)
 
 	// Create a new environment which holds all relevant information
-	// about the transaction and calling mechanisms. This environment also
-	// contains Turing data - if available - which is critical for verifiers and replicas.
+	// about the transaction and calling mechanisms.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
 
 	// UsingOVM
@@ -121,12 +109,10 @@ func ApplyTransaction(
 
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
-
 	// TURING Update the tx metadata, if a Turing call took place...
 	if len(vmenv.Context.Turing) > 1 {
-		tx.SetL1Turing(vmenv.Context.Turing) //this is too late? ... so things don't work?
+		tx.SetL1Turing(vmenv.Context.Turing)
 	}
-
 	if err != nil {
 		return nil, err
 	}

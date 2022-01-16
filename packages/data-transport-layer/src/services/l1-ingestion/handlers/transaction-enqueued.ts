@@ -23,7 +23,6 @@ export const handleEventsTransactionEnqueued: EventHandlerSet<
       blockNumber: BigNumber.from(event.blockNumber).toNumber(),
       timestamp: event.args._timestamp.toNumber(),
       ctcIndex: null,
-      turing: event.args._l1Turing,
     }
   },
   storeEvent: async (entry, db) => {
@@ -32,7 +31,7 @@ export const handleEventsTransactionEnqueued: EventHandlerSet<
     if (entry.index > 0) {
       const prevEnqueueEntry = await db.getEnqueueByIndex(entry.index - 1)
 
-      // We should *always* have a previous enqueue entry here.
+      // We should *alwaus* have a previous enqueue entry here.
       if (prevEnqueueEntry === null) {
         throw new MissingElementError('TransactionEnqueued')
       }

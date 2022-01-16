@@ -24,12 +24,6 @@ export const handleSequencerBlock = {
     stateRootEntry: StateRootEntry
   }> => {
     const transaction = block.transactions[0]
-
-    // This has an explicit l1Turing field and data we can just propagate
-    // into the return structures
-    // No need to parse or manipulate it
-    // We'll add it to everything even if it's blank or a placeholder
-
     const transactionIndex =
       transaction.index === null || transaction.index === undefined
         ? BigNumber.from(transaction.blockNumber).toNumber() - 1
@@ -43,7 +37,7 @@ export const handleSequencerBlock = {
       blockNumber: BigNumber.from(transaction.l1BlockNumber).toNumber(),
       timestamp: BigNumber.from(transaction.l1Timestamp).toNumber(),
       queueOrigin: transaction.queueOrigin,
-      turing: transaction.l1Turing, // Add the Turing data to all entries regardless of origin
+      turing: transaction.l1Turing,
       confirmed: false,
     }
 

@@ -376,9 +376,7 @@ func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs
 		log.Warn("Failed transaction send attempt", "from", args.From, "to", args.To, "value", args.Value.ToInt(), "err", err)
 		return common.Hash{}, err
 	}
-	ret, err := SubmitTransaction(ctx, s.b, signed)
-	return ret, err
-	//return SubmitTransaction(ctx, s.b, signed)
+	return SubmitTransaction(ctx, s.b, signed)
 }
 
 // SignTransaction will create a transaction from the given arguments and
@@ -791,19 +789,10 @@ type account struct {
 	StateDiff *map[common.Hash]common.Hash `json:"stateDiff"`
 }
 
-func DoCall(ctx context.Context,
-	b Backend,
-	args CallArgs,
-	blockNrOrHash rpc.BlockNumberOrHash,
-	overrides map[common.Address]account,
-	vmCfg vm.Config,
-	timeout time.Duration,
-	globalGasCap *big.Int) ([]byte, uint64, bool, error) {
-
+func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides map[common.Address]account, vmCfg vm.Config, timeout time.Duration, globalGasCap *big.Int) ([]byte, uint64, bool, error) {
 	defer func(start time.Time) { log.Debug("Executing EVM call finished", "runtime", time.Since(start)) }(time.Now())
 
 	state, header, err := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-
 	if state == nil || err != nil {
 		return nil, 0, false, err
 	}
@@ -870,7 +859,7 @@ func DoCall(ctx context.Context,
 		data = []byte(*args.Data)
 	}
 
-	// The blocknumber and timestamp actually refer to the L1BlockNumber and L1Timestamp
+	// Currently, the blocknumber and timestamp actually refer to the L1BlockNumber and L1Timestamp
 	// attached to each transaction. We need to modify the blocknumber and timestamp to reflect this,
 	// or else the result of `eth_call` will not be correct.
 	blockNumber := header.Number
@@ -893,10 +882,8 @@ func DoCall(ctx context.Context,
 		}
 	}
 
-	turingDummy := []byte{3}
-
 	// Create new call message
-	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, turingDummy, types.QueueOriginSequencer)
+	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, []byte{0}, types.QueueOriginSequencer)
 
 	// Setup context so it may be cancelled the call has completed
 	// or, in case of unmetered gas, setup a context with a timeout.
@@ -1110,7 +1097,7 @@ func FormatLogs(logs []vm.StructLog) []StructLogRes {
 	return formatted
 }
 
-// RPCMarshalHeader converts the given header to the RPC output
+// RPCMarshalHeader converts the given header to the RPC output .
 func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	return map[string]interface{}{
 		"number":           (*hexutil.Big)(head.Number),
@@ -1452,7 +1439,6 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 		"contractAddress":   nil,
 		"logs":              receipt.Logs,
 		"logsBloom":         receipt.Bloom,
-
 		// UsingOVM
 		"l1GasPrice":  (*hexutil.Big)(receipt.L1GasPrice),
 		"l1GasUsed":   (*hexutil.Big)(receipt.L1GasUsed),
@@ -1497,7 +1483,6 @@ type SendTxArgs struct {
 	GasPrice *hexutil.Big    `json:"gasPrice"`
 	Value    *hexutil.Big    `json:"value"`
 	Nonce    *hexutil.Uint64 `json:"nonce"`
-
 	// We accept "data" and "input" for backwards-compatibility reasons. "input" is the
 	// newer name and should be preferred by clients.
 	Data  *hexutil.Bytes `json:"data"`
@@ -1569,30 +1554,23 @@ func (args *SendTxArgs) setDefaults(ctx context.Context, b Backend) error {
 }
 
 func (args *SendTxArgs) toTransaction() *types.Transaction {
-
-	// TURING: used in part to generate payloads for signing
-	log.Debug("Turing ethapi/api.go", "args", args)
-
 	var input []byte
-
 	if args.Input != nil {
 		input = *args.Input
 	} else if args.Data != nil {
 		input = *args.Data
 	}
 
-	turingDummy := []byte{4}
-
 	if args.To == nil {
 		tx := types.NewContractCreation(uint64(*args.Nonce), (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 		raw, _ := rlp.EncodeToBytes(tx)
-		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, turingDummy, nil, types.QueueOriginSequencer, nil, nil, raw)
+		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, []byte{0}, nil, types.QueueOriginSequencer, nil, nil, raw)
 		tx.SetTransactionMeta(txMeta)
 		return tx
 	}
 	tx := types.NewTransaction(uint64(*args.Nonce), *args.To, (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 	raw, _ := rlp.EncodeToBytes(tx)
-	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, turingDummy, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
+	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, []byte{0}, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }
@@ -1611,7 +1589,7 @@ func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (c
 		addr := crypto.CreateAddress(from, tx.Nonce())
 		log.Info("Submitted contract creation", "fullhash", tx.Hash().Hex(), "contract", addr.Hex())
 	} else {
-		log.Info("Submitted transaction", "transaction", tx, "fullhash", tx.Hash().Hex(), "recipient", tx.To())
+		log.Info("Submitted transaction", "fullhash", tx.Hash().Hex(), "recipient", tx.To())
 	}
 	return tx.Hash(), nil
 }
@@ -1686,27 +1664,11 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 		return common.Hash{}, err
 	}
 
-	log.Debug("TURING internal/ethapi/api.go SendRawTransaction",
-		"context", ctx,
-		"encodedTx", encodedTx,
-		"tx", tx)
-
-	turingDummy := []byte{9}
-
 	// L1Timestamp and L1BlockNumber will be set right before execution
-	txMeta := types.NewTransactionMeta(nil, 0, turingDummy, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
+	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
 
-	log.Debug("TURING api.go entering SendRawTransaction", "TX", tx)
-
-	// at this point the transaction goes to the transaction pool
-	ret, err := SubmitTransaction(ctx, s.b, tx)
-
-	log.Debug("TURING api.go SendRawTransaction returning", "RET", ret, "ERR", err)
-
-	return ret, err
-
-	//return SubmitTransaction(ctx, s.b, tx)
+	return SubmitTransaction(ctx, s.b, tx)
 }
 
 // Sign calculates an ECDSA signature for:

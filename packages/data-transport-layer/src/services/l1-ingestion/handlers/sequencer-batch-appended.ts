@@ -34,10 +34,9 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
     const l1Transaction = await event.getTransaction()
     const eventBlock = await event.getBlock()
 
-
     // TODO: We need to update our events so that we actually have enough information to parse this
     // batch without having to pull out this extra event. For the meantime, we need to find this
-    // "TransactionBatchAppended" event to get the rest of the data.
+    // "TransactonBatchAppended" event to get the rest of the data.
     const CanonicalTransactionChain = getContractFactory(
       'CanonicalTransactionChain'
     )
@@ -52,7 +51,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       )
     ).find((foundEvent: ethers.Event) => {
       // We might have more than one event in this block, so we specifically want to find a
-      // "TransactionBatchAppended" event emitted immediately before the event in question.
+      // "TransactonBatchAppended" event emitted immediately before the event in question.
       return (
         foundEvent.transactionHash === event.transactionHash &&
         foundEvent.logIndex === event.logIndex - 1
@@ -106,7 +105,6 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           nextTxPointer
         )
 
-        console.log('Sequencer TX:', sequencerTransaction)
         // need to keep track of the original length so the pointer system for accessing
         // the individual transactions works correctly
         const sequencerTransaction_original_length = sequencerTransaction.length
@@ -187,7 +185,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           queueIndex: queueIndex.toNumber(),
           decoded: null,
           confirmed: true,
-          turing: '0x07',
+          turing: '0x00',
         })
 
         enqueuedCount++
@@ -285,7 +283,6 @@ const decodeSequencerBatchTransaction = (
   l2ChainId: number
 ): DecodedSequencerBatchTransaction | null => {
   try {
-
     const decodedTx = ethers.utils.parseTransaction(transaction)
 
     return {
@@ -302,7 +299,6 @@ const decodeSequencerBatchTransaction = (
       },
     }
   } catch (err) {
-    console.log(`Decoding failed`, { err })
     return null
   }
 }
