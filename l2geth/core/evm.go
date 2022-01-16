@@ -50,6 +50,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 		// When using the OVM, we must:
 		// - Set the BlockNumber to be the msg.L1BlockNumber
 		// - Set the Time to be the msg.L1Timestamp
+		// - Set Turing to be msg.L1Turing
 		return vm.Context{
 			CanTransfer:   CanTransfer,
 			Transfer:      Transfer,
@@ -62,6 +63,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			GasLimit:      header.GasLimit,
 			GasPrice:      new(big.Int).Set(msg.GasPrice()),
 			L1BlockNumber: msg.L1BlockNumber(),
+			Turing:        msg.L1Turing(),
 		}
 	} else {
 		return vm.Context{
