@@ -106,7 +106,9 @@ type Context struct {
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
 
 	// Turing information
-	Turing []byte
+	Turing      []byte
+	TuringDepth int
+	Sequencer   bool
 }
 
 // EVM is the Ethereum Virtual Machine base object and provides
@@ -224,14 +226,14 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
 	if rType != 1 {
-		log.Warn("TURING-1 bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
+		log.Error("TURING-1 bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
 	}
 
 	rlen := len(rest)
 	if rlen < 2*32 {
-		log.Warn("TURING-2 bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
+		log.Error("TURING-2 bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
 		retError[35] = 11 // Calldata too short
 		return retError
 	}
@@ -245,7 +247,7 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	n, err := rand.Int(rand.Reader, max)
 
 	if err != nil {
-		log.Warn("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
+		log.Error("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
 		retError[35] = 16 // RNG Failure
 		return retError
 	}
@@ -305,14 +307,14 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
 	if rType != 1 {
-		log.Warn("TURING-1 bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
+		log.Error("TURING-1 bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
 	}
 
 	rlen := len(rest)
 	if rlen < 7*32 {
-		log.Warn("TURING-2 bobaTuringCall:Calldata too short", "len < 7*32", rlen)
+		log.Error("TURING-2 bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
 		return retError
 	}
@@ -340,7 +342,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	// Check the URL length
 	// Note: we do not handle URLs that are longer than 64 characters
 	if lengthURL > 64 {
-		log.Warn("TURING-3 bobaTuringCall:URL > 64", "urlLength", lengthURL)
+		log.Error("TURING-3 bobaTuringCall:URL > 64", "urlLength", lengthURL)
 		retError[35] = 12 // URL string > 64 bytes
 		return retError
 	}
@@ -362,18 +364,18 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	if client != nil {
 		log.Debug("TURING-6 bobaTuringCall:Calling off-chain client at", "url", url)
 		if err := client.Call(&responseStringEnc, caller.String(), payload); err != nil {
-			log.Warn("TURING-7 bobaTuringCall:Client error", "err", err)
+			log.Error("TURING-7 bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError
 		}
 		if len(responseStringEnc) > 322 {
-			log.Warn("TURING-8a bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
+			log.Error("TURING-8a bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
 			retError[35] = 17 // Raw Response too long
 			return retError
 		}
 		responseString, err = hexutil.Decode(responseStringEnc)
 		if err != nil {
-			log.Warn("TURING-8b bobaTuringCall:Error decoding responseString", "err", err)
+			log.Error("TURING-8b bobaTuringCall:Error decoding responseString", "err", err)
 			retError[35] = 14 // Client Response Decode Error
 			return retError
 		}
@@ -394,12 +396,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		// In this attack, the idea would be to break client.Call as it is trying to pack the response into &responseStringEnc
 		// Alternatively, could attack hexutil.Decode
 		if len(responseString) > 160 {
-			log.Warn("TURING-8c bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
+			log.Error("TURING-8c bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
 			retError[35] = 18 // Response too big
 			return retError
 		}
 	} else {
-		log.Warn("TURING-9 bobaTuringCall:Failed to create client for off-chain request", "err", err)
+		log.Error("TURING-9 bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		retError[35] = 15 // Could not create client
 		return retError
 	}
@@ -483,60 +485,60 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	isTuring2 := false
 	isGetRand2 := false
 
-	// Geth test sometimes calls this with length zero linput; this check is needed for tests to complete
+	// Geth test sometimes calls this with length zero input; this check is needed for tests to complete
 	if len(input) > 0 {
 		//methodID for GetResponse is 7d93616c -> [125 147 97 108]
 		isTuring2 = bytes.Equal(input[:4], []byte{125, 147, 97, 108})
 
 		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
 		isGetRand2 = bytes.Equal(input[:4], []byte{73, 61, 87, 214})
-
-		if isTuring2 || isGetRand2 {
-			log.Debug("TURING REQUEST START", "input", input)
-		}
 	}
 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
 
-	if isTuring2 {
-		if len(evm.Context.Turing) < 3 {
+	// Sanity and depth checks
+	if isTuring2 || isGetRand2 {
+		log.Debug("TURING REQUEST START", "input", input, "len(evm.Context.Turing)", len(evm.Context.Turing))
+		// Check 1. can only run Turing once anywhere in the call stack
+		if evm.Context.TuringDepth > 1 {
+			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
+			return nil, gas, ErrTuringDepth
+		}
+		// Check 2. if we are verifier/replica AND (isTuring2 || isGetRand2), then Turing must have run previously
+		if !evm.Context.Sequencer && len(evm.Context.Turing) < 2 {
+			log.Error("TURING ERROR: NO PAYLOAD", "evm.Context.Turing", evm.Context.Turing)
+			return nil, gas, ErrTuringEmpty
+		}
+		if evm.Context.Sequencer && len(evm.Context.Turing) < 2 {
 			// This is the first run of Turing for this transaction
-			// We sometimes use a short evm.Context.Turing payload for debug purposes.
-			// A real modified callData is always much much > 2 bytes
+			// We sometimes use a short evm.Context.Turing payload for debug purposes, hence the < 2.
+			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
-			updated_input = bobaTuringCall(input, caller.Address())
+			if isTuring2 {
+				updated_input = bobaTuringCall(input, caller.Address())
+			} else if isGetRand2 {
+				updated_input = bobaTuringRandom(input)
+			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
+			evm.Context.TuringDepth++
 		} else {
+			// We are in Verifier/Replica mode
 			// Turing for this Transaction has already been run elsewhere - replay using
 			// information from the EVM context
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
 		log.Debug("TURING REQUEST END", "updated_input", updated_input)
-	} else if isGetRand2 {
-		if len(evm.Context.Turing) < 3 {
-			// See above - they apply 1:1 here too
-			updated_input = bobaTuringRandom(input)
-			ret, err = run(evm, contract, updated_input, false)
-			log.Debug("TURING NEW CALL", "updated_input", updated_input)
-			evm.Context.Turing = updated_input
-		} else {
-			// Turing for this Transaction has already been run elsewhere - replay using
-			// information from the EVM context
-			ret, err = run(evm, contract, evm.Context.Turing, false)
-			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
-		}
-		log.Debug("TURING REQUEST END")
 	} else {
 		ret, err = run(evm, contract, input, false)
 	}
 
-	log.Debug("TURING evm.go run",
+	log.Debug("evm.go run",
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
 		"err", err,
