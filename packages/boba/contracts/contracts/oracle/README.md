@@ -3,6 +3,11 @@
 - [For Price Data Submitters (Oracles)](#For-Price-Data-Submitters-(Oracles))
 - [Supported Token Feeds](#Supported-Token-Feeds)
 
+Credit:
+https://github.com/smartcontractkit/chainlink
+https://github.com/smartcontractkit/feed-registry
+
+
 The Price Feed Oracle works to provide - latest(or)past market price data of some specific tokens, aggregated from (>=1) trusted external entities(hereafter referred to as oracles).
 [(see supported tokens on readme)](#Supported-Token-Feeds)
 

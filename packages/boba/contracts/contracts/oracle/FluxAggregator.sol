@@ -1,3 +1,19 @@
+/**
+Credit - This is Chainlink's FluxAggreagtor with some changes
+original contract - https://github.com/smartcontractkit/chainlink/blob/master/contracts/src/v0.6/FluxAggregator.sol
+
+Changes introduced to original contracts-
+- timedOut logic - change to only timeout a round if the answer wasn't reached because of lower number of submissions
+( L956 checks if round answer wasn't reached) allowing rounds with min submissions to be accepted and not be
+overriden because of timeout
+
+- payment not compulsion for data submissions when paymentAmount is set
+a var voluntarySubmissionsAllowed added to allow/block this
+The contract would still allow oracles to submit even when the contract is out of funds to pay the oracles
+
+- since BOBA is supposed to be used as a payment token, methods to update recordedFunds on addingFunds and
+auto trigger on some method calls added
+*/
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 

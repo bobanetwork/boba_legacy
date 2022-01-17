@@ -1,3 +1,11 @@
+/**
+Credit - This is Chainlink's FeedRegistry with minor changes
+original contract - https://github.com/smartcontractkit/feed-registry/blob/master/contracts/FeedRegistry.sol
+
+removes
+pair access rights for feedRegistry
+and version-type getters
+ */
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;

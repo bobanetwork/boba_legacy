@@ -1,3 +1,4 @@
+// Credit - Based on Chainlink's FeedRegistry
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
