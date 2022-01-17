@@ -499,23 +499,12 @@ type Message struct {
 
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
-	l1Turing      []byte
-	queueOrigin   QueueOrigin
+	// l1Turing is needed for data flow into the EWVM: transaction.meta->msg->evm.context
+	l1Turing    []byte
+	queueOrigin QueueOrigin
 }
 
-func NewMessage(from common.Address,
-	to *common.Address,
-	nonce uint64,
-	amount *big.Int,
-	gasLimit uint64,
-	gasPrice *big.Int,
-	data []byte,
-	checkNonce bool,
-	l1BlockNumber *big.Int,
-	l1Timestamp uint64,
-	l1Turing []byte,
-	queueOrigin QueueOrigin,
-) Message {
+func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte, checkNonce bool, l1BlockNumber *big.Int, l1Timestamp uint64, l1Turing []byte, queueOrigin QueueOrigin) Message {
 	return Message{
 		from:       from,
 		to:         to,

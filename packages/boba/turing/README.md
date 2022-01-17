@@ -17,14 +17,13 @@
 
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block. 
 
-**The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific predesignated functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
+**The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
 
 random_number = turing.getRandom()
 
-// test response
-
+  // test response
   Turing VRF 256 = 102531381370031878661679181891478913167167919319039026463839728285563064328401n
   ✓ should get a length 256 VRF (79ms)
 
@@ -37,25 +36,27 @@ To obtain the latest BTC-USD exchange rate, call:
 urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
 rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
-// test response
+  // test response
   Bitcoin to usd price is 42406.68
   timestamp 1642104413221
   ✓ should get the current Bitcoin - USD price (327ms)
 
 ```
 
-### Turing status as of January 12 2022 - Release countdown
+**Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.   
+
+### Turing status as of January 17 2022 - Release countdown
 
 With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on the public chains (Rinkeby and Mainnet).**
 
 ToDo:
 
 * [COMPLETED] ~~Upgrade the random number generator (currently `math/rand`) to something better such as `crypto/rand`~~
-* Secure the L2TGeth against malicious inputs from off-chain
-* Improve the data-packing system used to append Turing payloads to the rawTransaction data sent to the L1
-* Fix Geth Tests
-* Add Integration tests to the GitHub actions
-* Check compatibility of `L2TGeth` with legacy blocks and state roots; critical for smooth regenesis
+* [PARTIAL] ~~Secure the L2TGeth against malicious inputs from off-chain~~
+* [COMPLETED] ~~Improve the data-packing system used to append Turing payloads to the rawTransaction data sent to the L1~~
+* [COMPLETED] ~~Fix Geth Tests~~
+* [OPEN] Add Integration tests to the GitHub actions
+* [OPEN] Check compatibility of `L2TGeth` with legacy blocks and state roots; critical for smooth regenesis
 
 ### Feature Preview: Using Turing to access real-time trading data from within your solidity smart contract
 
@@ -78,11 +79,51 @@ Once you have an API key from your chosen data vendor, insert that key into your
 
 You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`.
 
+### Important Properties of Turing
+
+* Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
+* Only one Turing call per execution
+
+#### String length limit
+
+The string length cap of 322 is large enough to return, for example, four `uint256` from the external api:
+
+```javascript
+//example: returing 4 unit264
+
+  // 0x
+  // 0000000000000000000000000000000000000000000000000000000000000080 ** the length of the dynamic bytes payload
+  // 0000000000000000000000000000000000000000000000000000000000418b95 ** the first uint256
+  // 0000000000000000000000000000000000000000000000000000017e60d3b45f **
+  // 0000000000000000000000000000000000000000000000000000000000eb7ca3 ** 
+  // 00000000000000000000000000000000000000000000000000000000004c788f ** the fourth unit265
+
+``` 
+
+You can return anything you want - e.g. numbers, strings, ... - and this information will then later be decoded per your `abi.decode`. For example, if the external API sends two `unit256`: 
+
+```javascript
+
+  // Payload from the external API
+  // 0x
+  // 0000000000000000000000000000000000000000000000000000000000000040 ** the length of the dynamic bytes payload
+  // 0000000000000000000000000000000000000000000000000000000000418b95 ** the first uint256
+  // 0000000000000000000000000000000000000000000000000000017e60d3b45f **
+
+  // decoding of those data within the smart contract
+  (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
+
+```  
+
+#### One Turing call per Transaction
+
+At present, you can only have one turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert. 
+
 # Technical Background and Quickstart
 
 The modified Turing L2Geth, `L2TGeth`, monitors calldata for particular Keccak methodIDs of functions such as `GetRandom(uint32 rType, uint256 _random)` and `GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs in the execution flow, at any level, L2TGeth parses the calldata for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then runs the function with updated inputs, such that the new information flows back to the caller (via overloaded variables and a system for conditionally bypassing `requires`). Put simply, L2TGeth intercepts function calls, adds new information to the inputs, and then runs the function with the updated inputs.
 
-In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data fields is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter into a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum. 
+In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data field is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter into a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum. 
 
 ## Quickstart for Turing Developers
 
@@ -382,46 +423,35 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 ### Step 2: Flow of Turing data out of the evm.context
 
-`l2geth/core/state_transition.go:TransitionDb()` returns the Turing data out from the evm.context:
+`l2geth/core/state_processor.go:core.ApplyTransaction` moves the Turing data from `Context.Turing` into the `transaction.meta.L1Turing` byte array:
 
 ```go
-/l2geth/core/state_transition.go:
-   85   QueueOrigin() types.QueueOrigin
-   86:  L1Turing() []byte
-   87  }
-   ..
-  229  // returning the result including the used gas. It returns an error if failed.
-  230  // An error indicates a consensus issue.
-  231: func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bool, err error, turing []byte) {
-  232   if err = st.preCheck(); err != nil {
-  233       return
-  ...
-  262       st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
-  263       ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
-  264:      turing = evm.Context.Turing // Prepare the return Turing data
-  265   }
-  ...
-  288:  return ret, st.gasUsed(), vmerr != nil, err, turing
+l2geth/core/state_processor.go
+
+// ApplyTransaction attempts to apply a transaction to the given state database
+// and uses the input parameters for its environment. It returns the receipt
+// for the transaction, gas used and an error if the transaction failed,
+// indicating the block was invalid.
+func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
+...
+  109   // Apply the transaction to the current state (included in the env)
+  110   _, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+  111:  // TURING Update the tx metadata, if a Turing call took place...
+  112   if len(vmenv.Context.Turing) > 1 {
+  113     tx.SetL1Turing(vmenv.Context.Turing)
+  114   }
 
 ```
 
-Then, `/l2geth/miner/worker.go:core.ApplyTransaction` emits the Turing data in its receipt, which is then used to push the data into the transaction metadata via `tx.SetL1Turing(receipt.Turing)`:
-
-```go
-/l2geth/miner/worker.go:
-  768   receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
-  ...  
-  774:  // TURING Update the tx metadata...
-  775   if len(receipt.Turing) > 1 {
-  776     tx.SetL1Turing(receipt.Turing) // add the Turing data into the transaction.meta structure
-
-```
-
-The Turing data are subsequently incorporated into new L2 blocks via `w.engine.FinalizeAndAssemble` - the Turing data are contained within the `w.current.txs` input.
+The Turing data are subsequently incorporated into new L2 blocks via `w.engine.FinalizeAndAssemble` - the Turing data are in the `w.current.txs` input.
 
 ```go
 l2geth/miner/worker.go:
 
+// commit runs any post-transaction state modifications, assembles the final block
+// and commits new work if consensus engine is running.
+func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time) error {
+... 
  1110   s := w.current.state.Copy()
  1111   // log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
  1112:  block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
@@ -429,113 +459,89 @@ l2geth/miner/worker.go:
  1114     return err
 
 ```
+
 At this point, the data are circulated to various places throughout the system as part of the block/transaction data. Notably, calls to the L2 for block/transaction data now return a new field, `l1Turing` to all callers.
 
-### Step 3: Batch Submitter Data Mangling
+### Step 3: Batch submitter Turing data injection
 
 The batch submitter receives an new block/transaction from `L2TGeth`, obtains the raw call string (`rawTransaction`) and the Turing data (`l1Turing`), and if there was a Turing event (as judged from the length of the Turing string), the modified `batch-submitter` appends those data to the `rawTransaction` string. From the perspective of the CTC, it is receiving its normal batch payload.   
 
 ```javascript
 // batch-submitter tx-batch-submitter.ts 
 
-767 if (this._isSequencerTx(block)) {
-      batchElement.isSequencerTx = true
-      const turing = block.transactions[0].l1Turing
-      let rawTransaction = block.transactions[0].rawTransaction
-      if (turing.length > 4) {
-        // We have a Turing event and associated payload
-        // Add a spacer, remove the '0x', and tack on the Turing string
-        rawTransaction = rawTransaction + '424242' + turing.slice(2) //Chop off the '0x' from the Turing string
-        // TODO TODO TODO remove the entire '424242' business by explicitly providing the junction location data in some other way to the DTL
-      }
-      batchElement.rawTransaction = rawTransaction
+private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
+
+  // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode 
+  // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encodes total length
+  //
+  // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than 
+  // just remove0x(rawTransaction).length / 2
+
+...
+
+  if (this._isSequencerTx(block)) {
+    batchElement.isSequencerTx = true
+    const turing = block.transactions[0].l1Turing
+    let rawTransaction = block.transactions[0].rawTransaction
+    if (turing.length > 4) {
+      // FYI - we sometimes use short (length <= 4) non-zero Turing strings for debug purposes
+      // Chop those off at this stage
+      // Only propagate the data through the system if it's a real Turing payload
+      const headerTuringLengthField = remove0x(BigNumber.from(remove0x(turing).length / 2).toHexString()).padStart(6, '0')
+      rawTransaction = '0x' + headerTuringLengthField + remove0x(rawTransaction) + remove0x(turing)
+    } else {
+      rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
     }
+    batchElement.rawTransaction = rawTransaction
+  }
 
 ```
-
-Current weaknesses of the design:
-
-* The `turing.slice(2)` is not RLP encoded, to make it easier to debug. But, it would be better if this were RLP encoded, too, to save space in the CTC. Right now we are writing strings mostly composed of zeros, to the CTC, which is wasteful.
-* The `rawTransaction.length` field in the payload header is not currently updated (it always just gives the original length of `block.transactions[0].rawTransaction`). Thus, a kludge is needed in the DTL. This weakness is described in more detail below. 
-* Note that for a true Turing string, the first 4 bytes are known in advance - they are just the methodID of the Turing helper `GetRandom` or `GetResponse()`
-
-```go
-  //methodID for GetResponse is 7d93616c -> [125 147 97 108]
-  isTuring2 := bytes.Equal(input[:4], []byte{125, 147, 97, 108})
-
-  //methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-  isGetRand2 := bytes.Equal(input[:4], []byte{73, 61, 87, 214})
-```
-
-This means that the tacked-on Turing string always starts with either `4242427d93616c` or `424242493d57d6`.
 
 ### Step 4: Writing to the CTC
 
 The batch-submitter writes the data to the CTC as usual. **The CTC does not know about Turing** - that was one of the goals, so we do not have to modify the L1 contracts.
 
-### Step 5: Reading from the CTC
+### Step 5: DTL Turing data extraction; Reading from the CTC
 
-The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is now called `sequencerTransaction`). Critically, the DTL writes a slightly modified entry into its database, which has a new field called `turing`. This new field is also sent to callers that query the DTL for data. 
+The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is now called `sequencerTransaction`). The DTL uses a Turing length metadata field in the `sequencerTransaction` string. Critically, the DTL writes a slightly modified `TransactionEntry` into its database, which has a new field called `turing`. When the database is queried, it thus returns the Turing data in addition to all the usual fields.
 
 ```javascript
 // DTL services/l1-ingestion/handles/sequencer-batch-appended.ts
 
-  console.log(`DTL parseSequencerBatchTransaction`, {
-    sequencerTransaction: toHexString(sequencerTransaction),
-  })
-
-  // need to keep track of the original length so the pointer system for accessing
-  // the individual transactions works correctly
-  const sequencerTransaction_original_length = sequencerTransaction.length
-
-  // DANGER DANGER DANGER - FIX
-  const turingIndex = sequencerTransaction.indexOf('424242', 0, 'hex')
-  let turing = Buffer.from('0')
-
-  if (turingIndex > 0) {
-    //we have turing payload
-    turing = sequencerTransaction.slice(turingIndex + 3) // the +3 chops off the '424242' marker
-    sequencerTransaction = sequencerTransaction.slice(0, turingIndex)
-    console.log('Found a Turing payload at position:', {
-      turingIndex,
-      turing: toHexString(turing),
-      sequencerTransaction: toHexString(sequencerTransaction),
-    })
-  }
-
-  const decoded = decodeSequencerBatchTransaction(
-    sequencerTransaction,
-    l2ChainId
-  )
-
-  transactionEntries.push({
-    index: extraData.prevTotalElements
-      .add(BigNumber.from(transactionIndex))
-      .toNumber(),
-    batchIndex: extraData.batchIndex.toNumber(),
-    blockNumber: BigNumber.from(context.blockNumber).toNumber(),
-    timestamp: BigNumber.from(context.timestamp).toNumber(),
+        for (let j = 0; j < context.numSequencedTransactions; j++) {
 ...
-    data: toHexString(sequencerTransaction), // The restored rawTransaction minus any Turing bits
+
+        // need to keep track of the original length so the pointer system for accessing
+        // the individual transactions works correctly
+        const sequencerTransaction_original_length = sequencerTransaction.length
+
+        // This MIGHT have a Turing payload inside of it...
+        // First, parse the new length field...
+        const sTxHexString = toHexString(sequencerTransaction)
+        const turingLength = parseInt(remove0x(sTxHexString).slice(0,6), 16)
+
+        let turing = Buffer.from('0')
+
+        if (turingLength > 0) {
+          //we have Turing payload
+          turing = sequencerTransaction.slice(-turingLength)
+          sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
+          // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
+          console.log('Found a Turing payload at (neg) position:', {
+            turingLength,
+            turing: toHexString(turing),
+            restoredSequencerTransaction: toHexString(sequencerTransaction),
+          })
+        } else {
+          // The `3` chops off the Turing length header field, which is zero in this case (0: 00 1: 00 2: 00)
+          sequencerTransaction = sequencerTransaction.slice(3)
+        }
+
+        transactionEntries.push({
 ...
-    turing: toHexString(turing),
-  })
+          turing: toHexString(turing),
+        })
 
-  nextTxPointer += 3 + sequencerTransaction_original_length
-
-```
-
-**VULNERABILTY**
-
-The DTL gets the length of each transaction from the header (located near offset `15 + 16 * i_context`), but we are **not currently updating this header** after we append the Turing data in the batch submitter. **ToDo**: `if(turing) then update` the `transactionLength` field in the header. This will require changes in the `core-utils` encoder/decoder and/or the `DTL`. A fix to this approach  would avoid having to scan for certain bytes, notably `424242`, which could be misused in an attack. For example, simply calling a contract with string somewhere in the calldata with value `4242427d93616c` would trigger the DTL to store everything after that as a (spurious) Turing payload. This could allow an attacker to send arbitrary information into the DTL and into the L2TGeth. 
-
-```javascript
-/data-transport-layer/src/services/l1-ingestion/handlers/sequencer-batch-appended.ts:
-  280    offset: number
-  281  ): Buffer => {
-  282:   const transactionLength = BigNumber.from(
-  283      calldata.slice(offset, offset + 3)
-  284    ).toNumber()
 ```
 
 ### Step 6: Verifier data ingestion
@@ -614,4 +620,4 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 ```
 
-The Turing data flow from out from the `evm.context` through the rest of the system as before, so the data are incorporated into verifier and replica blocks, resulting in correct and consistent state roots and replica and verifier blocks. 
+The Turing data flow from out from the `evm.context` through the rest of the system as before, so the data are incorporated into verifier and replica blocks, resulting in correct/consistent state roots and replica and verifier blocks. 

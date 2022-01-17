@@ -80,7 +80,6 @@ type SendTxArgs struct {
 
 	L1MessageSender *common.MixedcaseAddress `json:"l1MessageSender"`
 	L1BlockNumber   *big.Int                 `json:"l1BlockNumber"`
-	L1Turing        *hexutil.Bytes           `json:"l1Turing"`
 	QueueOrigin     types.QueueOrigin        `json:"queueOrigin"`
 }
 
@@ -109,13 +108,9 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 		l1BlockNumber = new(big.Int)
 		*l1BlockNumber = *args.L1BlockNumber
 	}
-	var l1Turing []byte
-	if args.L1Turing != nil {
-		l1Turing = *args.L1Turing
-	}
 
 	tx := types.NewTransaction(uint64(args.Nonce), args.To.Address(), (*big.Int)(&args.Value), (uint64)(args.Gas), (*big.Int)(&args.GasPrice), input)
-	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, l1Turing, l1MessageSender, args.QueueOrigin, nil, nil, nil)
+	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, []byte{0}, l1MessageSender, args.QueueOrigin, nil, nil, nil)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }

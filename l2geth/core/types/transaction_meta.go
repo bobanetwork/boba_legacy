@@ -133,7 +133,7 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 		meta.RawTransaction = raw
 	}
 
-	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing")
+	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing") // The "Turing" fieldName string is not important and is only used in error messages
 	if err != nil {
 		return nil, err
 	}
