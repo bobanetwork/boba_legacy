@@ -72,7 +72,7 @@ def L2_Agent(env,A):
       assert(Sequence == last_seq + 1)
       gp = ctx.rpc[2].eth.gasPrice
 
-      t = L2.functions.L1MessageIn(event.blockNumber, b.timestamp, A.header, A.payload).buildTransaction({
+      t = L2.functions.L1MessageIn(event.blockNumber, b.timestamp, A.header, A.payload, A.msg_hash).buildTransaction({
         'nonce':ctx.rpc[2].eth.get_transaction_count(l2_agent.address),
         'gasPrice':gp
       })

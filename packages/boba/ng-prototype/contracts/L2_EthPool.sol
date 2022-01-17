@@ -16,7 +16,7 @@ contract L2_EthPool {
   uint256 public availL2Balance;
 
   constructor()
-    public payable  // FIXME - "payable" for testing only, to preload a balance
+    payable  // FIXME - "payable" for testing only, to preload a balance
   {
     availL2Balance += msg.value;
     oETH = ERC20(0x4200000000000000000000000000000000000006);

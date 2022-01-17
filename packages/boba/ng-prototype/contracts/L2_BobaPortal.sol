@@ -59,8 +59,12 @@ contract L2_BobaPortal {
   // set the Fast flag.
 
   mapping (address => bool) fastList;
+  
+  // Rolling hashes
+  bytes32 hashOut;
+  bytes32 hashIn;  
 
-  constructor(uint64 deployL1) public {
+  constructor(uint64 deployL1) {
     SB2 = OVM_L2StandardBridge(0x4200000000000000000000000000000000000010);
     oETH = L2StandardERC20(0x4200000000000000000000000000000000000006);
     LegacyXDMaddr = 0x4200000000000000000000000000000000000007;
@@ -70,6 +74,9 @@ contract L2_BobaPortal {
     fastList[0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512] = true; // Proxy__L2LiquidityPool
 
     lastL1Block = deployL1; // FIXME - L1 block at which the other portal was deployed
+    
+    hashIn = keccak256("");
+    hashOut = keccak256("");
   }
 
   function stats() public view returns (uint64, uint64, uint64, uint64)
@@ -80,7 +87,7 @@ contract L2_BobaPortal {
   event MMDBG (bool indexed, bytes);
   event MMDBG_OptRelay (bool indexed);
 
-  event BobaMsgOut(bytes32 indexed header, bytes32 indexed msg_hash, bytes payload);
+  event BobaMsgOut(bytes32 indexed header, bytes32 indexed msg_hash, bytes32 indexed hash2, bytes payload);
 
   event MMDBG_MintXfer(address indexed, uint256 indexed, bool indexed, bytes);
 
@@ -90,7 +97,8 @@ contract L2_BobaPortal {
     uint64 L1Block,
     uint64 L1Timestamp,
     bytes32 _header,
-    bytes memory payload
+    bytes memory payload,
+    bytes32 l1Hash
   )
      public
   {
@@ -107,7 +115,12 @@ contract L2_BobaPortal {
     require(L1Timestamp >= lastL1Timestamp, "L1Timestamp must not decrease");
     lastL1Timestamp = L1Timestamp;
 
-    emit BobaMsgIn(_header, keccak256(abi.encodePacked(header,payload)), L1Block, L1Timestamp);
+    bytes32 msgHash = keccak256(abi.encodePacked(header,payload));
+    hashIn = keccak256(abi.encodePacked(hashIn,msgHash));
+    
+    require(hashIn == l1Hash, "Rolling hash mismatch");
+    
+    emit BobaMsgIn(_header, hashIn, L1Block, L1Timestamp);
 
     address l1Sender;
     address target;
@@ -152,8 +165,10 @@ contract L2_BobaPortal {
     sequence  += 1;
 
     uint256 mh = (uint256(sequence) << 192) | (uint256(msgType) << 160) | L1Value;
-
-    emit BobaMsgOut(bytes32(mh), keccak256(abi.encodePacked(mh,payload)), payload);
+    bytes32 msgHash = keccak256(abi.encodePacked(mh,payload));
+    hashOut = keccak256(abi.encodePacked(hashOut,msgHash));
+    
+    emit BobaMsgOut(bytes32(mh), hashOut, msgHash, payload);
   }
 
   // Tunnel an Optimism message

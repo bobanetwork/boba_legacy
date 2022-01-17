@@ -49,6 +49,7 @@ sccLast = []
 
 class Batch:
   def __init__(self):
+    self.rHash = []
     self.headers = []
     self.bodies = []
     self.proofs = []
@@ -57,10 +58,11 @@ class Batch:
     self.batchStartTime = time.time()
     self.msgStartTime = None
 
-  def addMessage(self,ctx,hdr,body,proof):
+  def addMessage(self,ctx,rHash, hdr,body,proof):
    if self.msgStartTime is None:
      self.msgStartTime = time.time()
   
+   self.rHash.append(rHash)
    self.headers.append(hdr)
    self.bodies.append(body)
    self.proofs.append(proof)
@@ -130,8 +132,8 @@ class SlowBatch(Batch):
     #print("isReady(slow):", ret, "len:", len(self.messages))
     return ret
 
-  def addMessage(self,ctx,hdr, body, l2Block, proof):
-    super().addMessage(ctx,hdr,body,proof)
+  def addMessage(self,ctx,rHash, hdr, body, l2Block, proof):
+    super().addMessage(ctx,rHash, hdr,body,proof)
     if self.l2Num is None:
       self.l2Num = l2Block - 1 # FIXME?
 
@@ -317,13 +319,13 @@ def ChainScanner(env,A):
       if (MsgType == 0x80000003):  # Fast Optimism msg
         proof2 = optProof(ctx, A.payload, event.blockNumber, False)
      
-        currentBatch.addMessage(ctx,A.header, A.payload,proof2) # FIXME Fast-optimism proof
+        currentBatch.addMessage(ctx, Web3.toBytes(A.msg_hash), A.header, A.payload,proof2)
         
 
       elif (MsgType & 0x80000000):  # Fast msg
-        currentBatch.addMessage(ctx,A.header, A.payload,"") # FIXME Fast-optimism proof
+        currentBatch.addMessage(ctx, Web3.toBytes(A.msg_hash), A.header, A.payload,"")
       else:
-        currentBatch.addMessage(ctx,A.header, Web3.toBytes(A.msg_hash),"")
+        currentBatch.addMessage(ctx, Web3.toBytes(A.msg_hash), A.header, Web3.toBytes(A.hash2),"") 
       last_seq += 1
       
       if currentBatch.isReady(prev_block, prevSR):
@@ -464,9 +466,9 @@ def SlowScanner(env,A):
       ctx.logPrint("SlowScanner inspecting event")
     
       proof2 = ""
-      
-      valid_at = ctx.contracts['L1_BobaPortal'].functions.slowValidTime(A.msg_hash).call()
+      valid_at = ctx.contracts['L1_BobaPortal'].functions.slowValidTime(A.hash2).call()
       Tdiff = valid_at - time.time()
+      #ctx.logPrint("DBG hash {} valid_at {} Tdiff {}".format(Web3.toHex(A.msg_hash), valid_at, Tdiff))
       if Tdiff > 0:
         ctx.logPrint("Waiting {} seconds until msg {} is valid".format(Tdiff, Sequence))
         time.sleep(Tdiff)
@@ -475,7 +477,7 @@ def SlowScanner(env,A):
       if MsgType == 0x03: # FIXME - Optimism flag
         proof2 = optProof(ctx, A.payload, event.blockNumber, True)
 
-      currentBatch.addMessage(ctx,A.header, A.payload, event.blockNumber, proof2)
+      currentBatch.addMessage(ctx, Web3.toBytes(A.msg_hash), A.header, A.payload, event.blockNumber, proof2)
       
       if currentBatch.isReady():
         ctx.logPrint("Putting Slow batch into submission queue(2)")
@@ -575,6 +577,7 @@ def Submitter(env,A):
       t = ctx.contracts['L1_BobaPortal'].functions.FastBatchIn(
         batch.prevBlock,
         batch.prevSR,
+        batch.rHash,
         batch.headers,
         batch.bodies,
         batch.proofs

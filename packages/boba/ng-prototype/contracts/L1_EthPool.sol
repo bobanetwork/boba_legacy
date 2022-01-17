@@ -14,7 +14,7 @@ contract L1_EthPool {
   mapping(address => uint) public staked;
   mapping(address => address payable) removalPending;  // Users may only have one withdrawal request in flight at a time.
 
-  constructor() public { }
+  constructor() { }
 
   function Initialize(address portal, address l2pool) public {
     L1_Portal = L1_BobaPortal(portal);

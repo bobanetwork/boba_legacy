@@ -59,7 +59,6 @@ contract L1_BobaPortal {
 
   uint userRelayFee = 100000;
   address owner;
-  address L1_CrossDomainAddr;
   XDM myXDM;
   XDM fastXDM;
 
@@ -68,6 +67,10 @@ contract L1_BobaPortal {
   // funds than have been deposited into the portal (e.g. using oETH from the Optimism
   // standard bridge).
   uint256 operator_bond;
+  
+  // Rolling hashes
+  bytes32 hashOut;
+  bytes32 hashIn;
 
   event SysPaid(address, uint);
   event UserRelayedDown(address, address, uint, uint);
@@ -80,7 +83,7 @@ contract L1_BobaPortal {
   }
 
   constructor(address L1_CrossDomainAddr, address L1_FastCrossDomainAddr, uint64 l2Deploy)
-   public payable
+   payable
  {
     owner = msg.sender;
     highestL2Block = l2Deploy-1; // Hint to where the agent needs to start scanning for Fast L2 events.
@@ -96,6 +99,9 @@ contract L1_BobaPortal {
     isLocked = false;
 
     chainValue = msg.value; // FIXME - Remove for production. Hacked to account for oETH minted by legacy Optimism bridge.
+    
+    hashIn = keccak256("");
+    hashOut = keccak256("");
   }
 
   function IsActive() public view returns (bool) {
@@ -122,8 +128,10 @@ contract L1_BobaPortal {
     seq  += 1;
 
     uint256 mh = (uint256(seq) << 192) | (uint256(msgType) << 160) | L1Value;
+    bytes32 msgHash = keccak256(abi.encodePacked(mh,payload));
+    hashOut = keccak256(abi.encodePacked(hashOut, msgHash));
 
-    emit BobaMsgDown(bytes32(mh), keccak256(abi.encodePacked(mh,payload)), payload);
+    emit BobaMsgDown(bytes32(mh), hashOut, payload);
   }
 
   // "refund" = L2 address who can claim undeliverable messages, possibly recover oETH (?)
@@ -305,7 +313,7 @@ contract L1_BobaPortal {
 
   event MMDBG_Batch(uint64 indexed, uint256 indexed, uint32 indexed, bytes);
 
-  function FastBatchIn(uint64 prevBlock, bytes32 prevSR, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
+  function FastBatchIn(uint64 prevBlock, bytes32 prevSR, bytes32[] calldata rHash, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
     public
   {
     require (prevBlock >= highestL2Block, "L2 block number must not decrease");
@@ -323,8 +331,15 @@ contract L1_BobaPortal {
       uint160 L1Value = uint160(h2 & type(uint160).max);
 
       if(msgType & 0x80000000 != 0) {
+        bytes32 msgHash = keccak256(abi.encodePacked(h2,bodies[i]));
+        hashIn = keccak256(abi.encodePacked(hashIn,msgHash));
+        require(hashIn == rHash[i], "Rolling hash mismatch (fast)");
+      
         FastMsgIn(headers[i], msgSequence,msgType,L1Value,bodies[i], proofs[i]);
       } else {
+        hashIn = keccak256(abi.encodePacked(hashIn,bodies[i]));
+        require(hashIn == rHash[i], "Rolling hash mismatch (slow)");
+        
         bytes memory payload = bodies[i];
         require(payload.length == 32, "Invalid msgHash");
         bytes32 mh;
