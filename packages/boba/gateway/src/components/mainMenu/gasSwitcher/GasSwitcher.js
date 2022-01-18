@@ -18,7 +18,6 @@ function GasSwitcher() {
   const verifierStatus = useSelector(selectVerifierStatus)
   let healthStatus = 'healthy'
 
-  console.log(getMaxHealthBlockLag())
   if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
     healthStatus = 'unhealthy'
   }
