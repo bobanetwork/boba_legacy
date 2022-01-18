@@ -33,7 +33,6 @@ import { selectModalState } from 'selectors/uiSelector';
 import { isChangingChain } from 'util/changeChain';
 
 import * as styles from './layout.module.scss';
-import * as S from './layout.style';
 
 function App () {
 
@@ -230,18 +229,14 @@ function App () {
       <CssBaseline />
       <Router>
         <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-          <S.Content>
             <div className={styles.App}>
-
               <Notification/>
               <Suspense fallback={<>Loading...</>}>
                 <Switch>
                   <Route exact path="/" component={enabled ? () => <Home /> : ()=> <WalletPicker enabled={enabled} onEnable={setEnabled} />} />
                 </Switch>
               </Suspense>
-
             </div>
-          </S.Content>
         </Box>
       </Router>
     </ThemeProvider>

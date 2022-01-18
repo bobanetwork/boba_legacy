@@ -14,10 +14,10 @@ function GasSwitcher() {
   const savings = Number(gas.gasL1) / Number(gas.gasL2)
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'health'
+  let healthStatus = 'healthy'
 
   if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
-    healthStatus = 'unhealth'
+    healthStatus = 'unhealthy'
   }
 
   return (
@@ -31,7 +31,7 @@ function GasSwitcher() {
               Savings<br/>
               L1 Block<br/>
               L2 Block<br/>
-              Verified Block
+              Verified to
             </S.Label>
             <Box sx={{
               display: 'flex',
