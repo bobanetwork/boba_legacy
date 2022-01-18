@@ -242,6 +242,7 @@ Outputs:
     Value: !Ref LoadBalancerGnosisReact
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:ARN"
+
   LoadBalancerGnosisGatewayDNSName:
     Value: !GetAtt LoadBalancerGnosisGateway.DNSName
     Export:
@@ -250,6 +251,7 @@ Outputs:
     Value: !Ref LoadBalancerGnosisGateway
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosisGateway:ARN"
+
   LoadBalancerGnosisDNSName:
     Value: !GetAtt LoadBalancerGnosis.DNSName
     Export:
@@ -258,6 +260,7 @@ Outputs:
     Value: !Ref LoadBalancerGnosis
     Export:
       Name: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+
   LoadBalancerGnosisSecurityGroup:
     Value: !Ref LoadBalancerGnosisSecurityGroup
     Export:
