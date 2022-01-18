@@ -76,6 +76,15 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              # - Effect: Allow
+              #   Action:
+              #     - "s3:GetObject"
+              #     - "s3:GetBucketLocation"
+              #   Resource: !Sub
+              #       - "arn:aws:s3:::${S3BucketV2}/boba.py"
+              #       - S3BucketV2:
+              #           Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+
         - PolicyName: AllowAccessToSecrets
           PolicyDocument:
             Version: 2012-10-17
@@ -411,6 +420,11 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
+            # - Name: BOBA_SCS_SETTINGS
+            #   Value: !Sub
+            #     - "https://${S3BucketV2}.s3.amazonaws.com/boba.py"
+            #     - S3BucketV2:
+            #         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
           DependsOn:
             - Condition: START
               ContainerName: safe-config-service
@@ -421,6 +435,7 @@ Resources:
           Essential: false
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
+        #- Image: bobanetwork/safe-config-service:inotest2
           Name: safe-config-service
           Ulimits:
             - Name: nofile
@@ -445,6 +460,13 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: BOBA_SCS_SETTINGS
+              Value: !Sub
+                - "https://${S3BucketV2}.s3.amazonaws.com/boba.py"
+                - S3BucketV2:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+            # - Name: DJANGO_SETTINGS_MODULE
+            #   Value: config.boba
             - Name: PYTHONDONTWRITEBYTECODE
               Value: true
             - Name: DJANGO_OTP_ADMIN
@@ -483,6 +505,12 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
+          #Command:
+          #&& wget $${BOBA_SCS_SETTINGS} -P src/config/
+          #  - "/bin/sh -c \"apt-get update && apt-get install -y --no-install-recommends wget && /usr/bin/tini -- ./docker-entrypoint.sh\""
+
+          #Command:
+          #  - "apt-get update && apt-get install -y --no-install-recommends wget && wget $(BOBA_SETTING) -P src/config/ && /usr/bin/tini -- ./docker-entrypoint.sh"
           Essential: false
           Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
