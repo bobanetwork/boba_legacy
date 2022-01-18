@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { ReactComponent as Logo } from './../../images/logo-boba.svg'
 import * as S from "./MainMenu.styles"
 
@@ -19,6 +19,7 @@ import NavIcon from '../icons/NavIcon'
 import { Box } from '@material-ui/system'
 import { useDispatch } from 'react-redux'
 import { setPage } from 'actions/uiAction'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
 const useStyles = makeStyles({
   root: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
   },
 });
 
-function MainMenu ({ pageDisplay, handleSetPage }) {
+function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
   const [ open, setOpen ] = useState(false);
   const classes = useStyles()
   const theme = useTheme();
@@ -39,16 +40,16 @@ function MainMenu ({ pageDisplay, handleSetPage }) {
       {isMobile ? (
         <Container>
           <S.MobileNavTag>
-            <Box onClick={() => setOpen(!open)} sx={{cursor: 'pointer'}}>
+            <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
               <NavIcon />
             </Box>
 
-            <Drawer open={open} onClose={() => setOpen(false)} classes={{paper: classes.root}}>
+            <Drawer open={open} onClose={() => setOpen(false)} classes={{ paper: classes.root }}>
               <S.StyleDrawer theme={theme}>
 
                 <S.DrawerHeader>
                   <S.WrapperCloseIcon>
-                    <Link to="/" style={{ display: "flex"}}>
+                    <Link to="/" style={{ display: "flex" }}>
                       <Logo width={150} />
                     </Link>
 
@@ -71,13 +72,14 @@ function MainMenu ({ pageDisplay, handleSetPage }) {
         </Container>
       ) : (
         <S.Menu>
-          <Link to="/" style={{maxWidth: '180px'}} onClick={() => dispatch(setPage('AccountNow'))}>
+          <Link to="/" style={{ maxWidth: '180px' }} onClick={() => dispatch(setPage('AccountNow'))}>
             <Logo />
           </Link>
+          <WalletPicker isButton={true} enabled={enabled} onEnable={onEnable} />
           <NetworkSwitcher />
           <LayerSwitcher />
           <GasSwitcher />
-          <MenuItems setOpen={setOpen}/>
+          <MenuItems setOpen={setOpen} />
           <ThemeSwitcher />
         </S.Menu>
       )}

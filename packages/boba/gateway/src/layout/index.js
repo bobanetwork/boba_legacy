@@ -233,7 +233,7 @@ function App () {
               <Notification/>
               <Suspense fallback={<>Loading...</>}>
                 <Switch>
-                  <Route exact path="/" component={enabled ? () => <Home /> : ()=> <WalletPicker enabled={enabled} onEnable={setEnabled} />} />
+                  <Route exact path="/" component={() => <Home />} />
                 </Switch>
               </Suspense>
             </div>

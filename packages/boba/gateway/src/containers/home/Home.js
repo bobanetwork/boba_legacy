@@ -93,15 +93,17 @@ import Help from 'containers/help/Help'
 import NFT from 'containers/nft/Nft'
 
 import { useTheme } from '@material-ui/core/styles'
-import { Box, Container, useMediaQuery } from '@material-ui/core'
+import { Box, Container, Typography, useMediaQuery } from '@material-ui/core'
 import MainMenu from 'components/mainMenu/MainMenu'
 
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import { setWalletMethod } from 'actions/setupAction'
+import { isChangingChain } from 'util/changeChain'
 
-function Home () {
+function Home() {
 
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -111,6 +113,8 @@ function Home () {
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen/*, setMobileMenuOpen*/ ] = useState(false)
+
+  const [ enabled, setEnabled ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
@@ -137,11 +141,11 @@ function Home () {
   const walletMethod = useSelector(selectWalletMethod())
   //const transactions = useSelector(selectlayer2Transactions, isEqual);
 
-  const handleErrorClose=()=>dispatch(closeError())
-  const handleAlertClose=()=>dispatch(closeAlert())
+  const handleErrorClose = () => dispatch(closeError())
+  const handleAlertClose = () => dispatch(closeAlert())
 
   useEffect(() => {
-    const body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName('body')[ 0 ];
     mobileMenuOpen
       ? body.style.overflow = 'hidden'
       : body.style.overflow = 'auto';
@@ -176,17 +180,27 @@ function Home () {
     checkVersion()
   }, [])
 
+  useEffect(() => {
+    if (isChangingChain) {
+      dispatch(setWalletMethod('browser'));
+    }
+    if (enabled) {
+      localStorage.setItem('changeChain', false)
+    }
+  }, [dispatch, enabled]);
+
+  
   return (
     <>
-      {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
+      {!!depositModalState && <DepositModal open={depositModalState} token={token} fast={fast} />}
       {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
+      {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}
 
-      {!!saveDepositModalState && <SaveDepositModal  open={saveDepositModalState} />}
+      {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
 
-      {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
+      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
       {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
@@ -222,34 +236,49 @@ function Home () {
       />
 
       <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
-        <MainMenu />
-        <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
-          {pageDisplay === "AccountNow" &&
-            <Account/>
-          }
-          {pageDisplay === "History" &&
-            <Transactions/>
-          }
-          {pageDisplay === "BobaScope" &&
-            <BobaScope/>
-          }
-          {pageDisplay === "NFT" &&
-            <NFT/>
-          }
-          {pageDisplay === "Farm" &&
-            <FarmWrapper/>
-          }
-          {pageDisplay === "Save" &&
-            <SaveWrapper/>
-          }
-          {pageDisplay === "DAO" &&
-            <DAO/>
-          }
-          {pageDisplay === "Airdrop" &&
-            <Airdrop/>
-          }
-          {pageDisplay === "Help" &&
-            <Help/>
+        <MainMenu enabled={enabled} onEnable={setEnabled} />
+        <Container maxWidth="lg" sx={{ marginLeft: 'unset', marginRight: 'unset' }}>
+          {!enabled ?
+            <Container
+              sx={{
+                height: "100vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Typography variant="h2" component="h2" paragraph={true} mb={0}>
+                Please connect to metamask
+              </Typography>
+            </Container> :
+            <>
+              {pageDisplay === "AccountNow" &&
+                <Account />
+              }
+              {pageDisplay === "History" &&
+                <Transactions />
+              }
+              {pageDisplay === "BobaScope" &&
+                <BobaScope />
+              }
+              {pageDisplay === "NFT" &&
+                <NFT />
+              }
+              {pageDisplay === "Farm" &&
+                <FarmWrapper />
+              }
+              {pageDisplay === "Save" &&
+                <SaveWrapper />
+              }
+              {pageDisplay === "DAO" &&
+                <DAO />
+              }
+              {pageDisplay === "Airdrop" &&
+                <Airdrop />
+              }
+              {pageDisplay === "Help" &&
+                <Help />
+              }</>
           }
         </Container>
       </Box>

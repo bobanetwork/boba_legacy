@@ -734,7 +734,7 @@ class NetworkService {
 
       return 'enabled'
     } catch (error) {
-      console.log(error)
+      console.log(`NS: ERROR :InitializeAccounts `,error)
       return false
     }
   }
