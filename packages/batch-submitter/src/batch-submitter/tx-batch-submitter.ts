@@ -775,18 +775,23 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       const turing = block.transactions[0].l1Turing
       let rawTransaction = block.transactions[0].rawTransaction
       const turingVersion = '01'
-      if (turing.length > 1) {
-        // FYI - we sometimes use short (length <= 1) non-zero Turing strings for debug purposes
+      console.log('Turing string:', turing)
+      if (turing.length > 4) {
+        // We sometimes use a 1 byte Turing string for debug purposes
+        // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
         // Chop those off at this stage
-        // Only propagate the data through the system if it's a real Turing payload
-        // Turing length cannot exceed 160 bytes, so we only need one byte for the length
+        // Only propagate the data through the system if it's a 'real' Turing payload
+        // Turing length cannot exceed 322 characters (based on limit in the Geth), so we need two bytes max for the length
         const headerTuringLengthField = remove0x(
           BigNumber.from(remove0x(turing).length / 2).toHexString()
-        ).padStart(2, '0')
-        if (headerTuringLengthField.length > 2) {
+        ).padStart(4, '0')
+        if (headerTuringLengthField.length > 4) {
           // paranoia check
           console.log(
             'Turing length error:',
+            turing,
+            remove0x(turing).length / 2,
+            BigNumber.from(remove0x(turing).length / 2).toHexString(),
             headerTuringLengthField,
             headerTuringLengthField.length
           )
@@ -799,7 +804,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           remove0x(rawTransaction) +
           remove0x(turing)
       } else {
-        rawTransaction = '0x' + '0000' + remove0x(rawTransaction)
+        rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
       }
       batchElement.rawTransaction = rawTransaction
     }
