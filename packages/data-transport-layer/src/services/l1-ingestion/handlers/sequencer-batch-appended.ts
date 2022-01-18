@@ -110,16 +110,18 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         const sequencerTransaction_original_length = sequencerTransaction.length
 
         // This MIGHT have a Turing payload inside of it...
-        // First, parse the new length field...
+        // First, parse the new version and length field...
         const sTxHexString = toHexString(sequencerTransaction)
-        const turingLength = parseInt(remove0x(sTxHexString).slice(0,6), 16)
+        const turingVersion = parseInt(remove0x(sTxHexString).slice(0,2), 16)
+        // TuringVersion not used right now; for future use
+        const turingLength = parseInt(remove0x(sTxHexString).slice(2,4), 16)
 
         let turing = Buffer.from('0')
 
         if (turingLength > 0) {
           //we have Turing payload
           turing = sequencerTransaction.slice(-turingLength)
-          sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
+          sequencerTransaction = sequencerTransaction.slice(2, -turingLength)
           // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
           console.log('Found a Turing payload at (neg) position:', {
             turingLength,
@@ -127,8 +129,8 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
             restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
         } else {
-          // The `3` chops off the Turing length header field, which is zero in this case (0: 00 1: 00 2: 00)
-          sequencerTransaction = sequencerTransaction.slice(3)
+          // The `3` chops off the Turing version and length header field, which is zero in this case (0: 00 1: 00)
+          sequencerTransaction = sequencerTransaction.slice(2)
         }
 
         const decoded = decodeSequencerBatchTransaction(
