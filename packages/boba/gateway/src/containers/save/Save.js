@@ -123,12 +123,11 @@ class Save extends React.Component {
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
                 <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> You will earn an APR of 5%. 
                 <br/>
-                <span style={{fontWeight: '700'}}>STAKING PERIOD:</span> Each staking period lasts 2 weeks. 
-                If you do not unstake after a staking period, your stake will be automatically renewed.
+                <span style={{fontWeight: '700'}}>STAKING PERIOD:</span> Each staking period lasts 2 weeks.  
+                Your stake will be automatically renewed until you unstake.
                 <br/>
-                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW:</span> The first two days of every 
-                staking period, except for the first staking period, are the unstaking window. You can 
-                only unstake during the unstaking window.
+                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW:</span> You can 
+                unstake in the two days after each staking window.
               </Typography>
             </S.GridItemTag>
 
