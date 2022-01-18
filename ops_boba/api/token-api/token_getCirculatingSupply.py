@@ -14,5 +14,5 @@ def token_getCirculatingSupply(event, context):
       "Referrer-Policy": "same-origin",
       "Permissions-Policy": "*",
     },
-    "body": "155003271.00",
+    "body": "158303170.86",
   }
