@@ -8,6 +8,8 @@ import { selectVerifierStatus } from 'selectors/verifierSelector'
 
 import { Typography } from '@material-ui/core'
 
+import { getMaxHealthBlockLag } from 'util/masterConfig'
+
 function GasSwitcher() {
 
   const gas = useSelector(selectGas)
@@ -16,7 +18,8 @@ function GasSwitcher() {
   const verifierStatus = useSelector(selectVerifierStatus)
   let healthStatus = 'healthy'
 
-  if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
+  console.log(getMaxHealthBlockLag())
+  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
     healthStatus = 'unhealthy'
   }
 

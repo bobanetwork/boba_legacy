@@ -110,3 +110,7 @@ export function getAllNetworks () {
 export function getBaseServices () {
   return BaseServices
 }
+
+export function getMaxHealthBlockLag () {
+  return process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG || 100
+}
