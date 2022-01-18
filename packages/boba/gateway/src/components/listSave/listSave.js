@@ -65,26 +65,20 @@ class ListSave extends React.Component {
     const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
 
     const timeNow_S = Math.round(Date.now() / 1000)
+    let duration_S = timeNow_S - timeDeposit_S
+    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
 
     const twoWeeks = 14 * 24 * 60 * 60
     const twoDays  =  2 * 24 * 60 * 60
 
-    const duration_S = timeNow_S - timeDeposit_S
-
-    const secondsOverWindow = duration_S % twoWeeks
-
+    const residual_S = duration_S % (twoWeeks + twoDays)
+    const timeZero_S = timeNow_S - residual_S
+    const unlocktimeNextBegin = moment.unix(timeZero_S + twoWeeks).format('MM/DD/YYYY hh:mm a')
+    const unlocktimeNextEnd = moment.unix(timeZero_S + twoWeeks + twoDays).format('MM/DD/YYYY hh:mm a')
+    
     let locked = true
-
-    if( duration_S >= twoWeeks && secondsOverWindow > 0 && secondsOverWindow <= twoDays ) {
-      locked = false
-    }
-
-    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
-
-    const unlocktime_S = timeNow_S + twoWeeks - secondsOverWindow
-    const unlocktimeNextBegin = moment.unix(unlocktime_S).format('MM/DD/YYYY hh:mm a')
-    const unlocktimeNextEnd = moment.unix(unlocktime_S+twoDays).format('MM/DD/YYYY hh:mm a')
-
+    if(residual_S > twoWeeks) locked = false
+    
     return (
       <S.Wrapper>
         {pageLoading ? (
