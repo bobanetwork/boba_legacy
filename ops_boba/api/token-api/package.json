@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": ">=14"
+  },
   "devDependencies": {
     "serverless-python-requirements": "^5.3.0"
   }

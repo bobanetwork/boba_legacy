@@ -1,6 +1,6 @@
 #### Setup the environment
 
-Make sure you have python >= 3.7 and Nodejs >= 12
+Make sure you have python >= 3.7 and Nodejs >= 14
 
 ```bash
 python3 -m venv env
