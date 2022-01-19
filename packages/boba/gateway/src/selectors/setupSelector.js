@@ -19,6 +19,12 @@ export function selectWalletMethod () {
   }
 }
 
+export function selectAccountEnabled () {
+  return function (state) {
+    return state.setup['accountEnabled']
+  }
+}
+
 //local, rinkeby, mainnet...
 export function selectNetwork () {
   return function (state) {

@@ -21,6 +21,12 @@ export function setWalletMethod (methodName) {
   }
 }
 
+export function setAccountState (enabled) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/ACCOUNT_STATE/SET', payload: enabled })
+  }
+}
+
 export function setNetwork (network) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/NETWORK/SET', payload: network })

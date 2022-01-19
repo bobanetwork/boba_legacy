@@ -27,7 +27,7 @@ import {
 } from 'selectors/setupSelector'
 
 import { openModal } from 'actions/uiAction'
-import { setWalletMethod } from 'actions/setupAction'
+import { setWalletMethod, setAccountState } from 'actions/setupAction'
 import { getAllNetworks } from 'util/masterConfig'
 
 import { isChangingChain } from 'util/changeChain'
@@ -50,16 +50,16 @@ const Root = styled('div')(({ theme }) => ({
 
 function WalletPicker({ onEnable, enabled, isButton }) {
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const [ walletEnabled, setWalletEnabled ] = useState(false)
-  const [ accountsEnabled, setAccountsEnabled ] = useState(false)
+  const [ accountEnabled, setAccountEnabled ] = useState(false)
   const [ wrongNetwork, setWrongNetwork ] = useState(false)
 
   const walletMethod = useSelector(selectWalletMethod())
   const masterConfig = useSelector(selectNetwork())
 
-  const theme = useTheme();
+  const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
@@ -71,7 +71,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   }
 
   const dispatchSetWalletMethod = useCallback((methodName) => {
-    dispatch(setWalletMethod(methodName));
+    dispatch(setWalletMethod(methodName))
   }, [ dispatch ])
 
   useEffect(() => {
@@ -88,39 +88,40 @@ function WalletPicker({ onEnable, enabled, isButton }) {
         : dispatchSetWalletMethod(null);
     }
 
-  }, [ dispatchSetWalletMethod, walletMethod, masterConfig, dispatch ]);
+  }, [ dispatchSetWalletMethod, walletMethod, masterConfig, dispatch ])
 
   useEffect(() => {
 
-    async function initializeAccounts() {
+    async function initializeAccount() {
 
       const initialized = await networkService.initializeAccounts(masterConfig)
 
       if (!initialized) {
-        console.log("Error !initialized for:", masterConfig,accountsEnabled)
-        return setAccountsEnabled(false);
+        console.log("Error !initialized for:", masterConfig, accountEnabled)
+        return setAccountEnabled(false)
       }
 
       if (initialized === 'wrongnetwork') {
-        setAccountsEnabled(false);
-        return setWrongNetwork(true);
+        setAccountEnabled(false)
+        return setWrongNetwork(true)
       }
 
       if (initialized === 'enabled') {
-        return setAccountsEnabled(true)
+        return setAccountEnabled(true)
       }
 
     }
     if (walletEnabled) {
-      initializeAccounts()
+      initializeAccount()
     }
-  }, [ walletEnabled, masterConfig ])
+  }, [ walletEnabled, masterConfig, accountEnabled ])
 
   useEffect(() => {
-    if (accountsEnabled) {
-      onEnable(true)
+    if (accountEnabled) {
+        onEnable(true)
+        dispatch(setAccountState(true))
     }
-  }, [ onEnable, accountsEnabled ])
+  }, [ onEnable, accountEnabled, dispatch ])
 
   useEffect(() => {
     if (walletEnabled && wrongNetwork) {
@@ -132,7 +133,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   function resetSelection() {
     dispatchSetWalletMethod(null)
     setWalletEnabled(false)
-    setAccountsEnabled(false)
+    setAccountEnabled(false)
   }
 
   // defines the set of possible networks
@@ -144,7 +145,6 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   if (!wrongNetwork && !enabled && isChangingChain) {
     console.log(['wrongNetwork',wrongNetwork ],[' enabled', enabled],[' isChangingChain', isChangingChain])
     return <Root>
-      {/* <S.Loading>Switching Chain...</S.Loading> */}
       <Typography>Switching Chain...</Typography>
     </Root>
   }
@@ -178,7 +178,6 @@ function WalletPicker({ onEnable, enabled, isButton }) {
 
               <Grid item xs={12} md={6}>
                 <S.WalletCard
-                  // disabled={!browserEnabled}
                   pulsate={true} onClick={() => dispatchSetWalletMethod('browser')} isMobile={isMobile}>
                   <S.WalletCardHeading>
                     <S.WalletCardTitle>

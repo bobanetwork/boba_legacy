@@ -26,14 +26,15 @@ const useStyles = makeStyles({
     width: "100%",
     color: "f00",
   },
-});
+})
 
 function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
-  const [ open, setOpen ] = useState(false);
+
+  const [ open, setOpen ] = useState(false)
   const classes = useStyles()
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const dispatch = useDispatch();
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const dispatch = useDispatch()
 
   return (
     <>

@@ -15,21 +15,19 @@ limitations under the License. */
 
 import React,{useState,useEffect,useCallback} from 'react'
 import { useSelector, useDispatch, batch } from 'react-redux'
-
 import { isEqual, orderBy } from 'lodash'
 
 //Selectors
+import { selectWalletMethod, selectAccountEnabled } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
+import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading } from 'selectors/loadingSelector'
 
 import ListAccount from 'components/listAccount/listAccount'
-
 import networkService from 'services/networkService'
 
 import * as S from './Account.styles'
-
-import { selectTokens } from 'selectors/tokenSelector'
-import { selectLoading } from 'selectors/loadingSelector'
 
 import PageHeader from 'components/pageHeader/PageHeader'
 import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@material-ui/core'
@@ -37,8 +35,10 @@ import { fetchLookUpPrice, fetchTransactions } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'
 import { tableHeadList } from './tableHeadList'
+
 import TabPanel from 'components/tabs/TabPanel'
 import Drink from '../../images/backgrounds/drink.png'
+
 import NetworkSwitcherIcon from 'components/icons/NetworkSwitcherIcon'
 
 import PendingTransaction from './PendingTransaction'
@@ -51,8 +51,14 @@ function Account () {
   const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
   
   const dispatch = useDispatch()
+
+  const walletMethod = useSelector(selectWalletMethod())
+  const accountEnabled = useSelector(selectAccountEnabled())
   
-  const [activeTab, setActiveTab] = useState(networkLayer === 'L1' ? 0 : 1)
+  console.log("Account - enabled:", walletMethod)
+  console.log("Account - accountEnabled:", accountEnabled)
+
+  const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
@@ -62,11 +68,12 @@ function Account () {
   const network = useSelector(selectNetwork())
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
-  const exitLoading    = useSelector(selectLoading(['EXIT/CREATE']))
+  const exitLoading = useSelector(selectLoading(['EXIT/CREATE']))
 
   const disabled = depositLoading || exitLoading
 
   const getLookupPrice = useCallback(()=>{
+    if (!accountEnabled) return
     const symbolList = Object.values(tokenList).map((i)=> {
       if(i.symbolL1 === 'ETH') {
         return 'ethereum'
@@ -77,7 +84,7 @@ function Account () {
       }
     })
     dispatch(fetchLookUpPrice(symbolList))
-  },[tokenList, dispatch])
+  },[ tokenList, dispatch, accountEnabled ])
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
@@ -113,13 +120,13 @@ function Account () {
   ]
 
   useEffect(()=>{
+    if (!accountEnabled) return
     getLookupPrice()
-  },[childBalance, rootBalance, getLookupPrice])
+  },[ childBalance, rootBalance, getLookupPrice, accountEnabled ])
 
   useInterval(() => {
-    batch(() => {
-      dispatch(fetchTransactions())
-    })
+    if (!accountEnabled) return
+    dispatch(fetchTransactions())
   }, POLL_INTERVAL)
 
   const theme = useTheme()
@@ -205,7 +212,9 @@ function Account () {
         })}
       </Box>
     </S.AccountWrapper>
-  );
+  )
+
+  console.log(rootBalance.length)
 
   return (
     <>
@@ -215,11 +224,26 @@ function Account () {
         <S.CardContentTag>
           <S.CardInfo>Boba Balances</S.CardInfo>
           {(network === 'mainnet') &&
-          <Typography variant="body2">
-             You are using Mainnet.<br/>
-             WARNING: the mainnet smart contracts are not fully audited and funds may be at risk.<br/>
-             Please be cautious when using Mainnet.
-          </Typography>
+            <Typography variant="body2">
+               You are using Mainnet.<br/>
+               WARNING: the mainnet smart contracts are not fully audited and funds may be at risk.<br/>
+               Please be cautious when using Mainnet.
+            </Typography>
+          }
+          {walletMethod !== 'browser' && !accountEnabled &&
+            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
+                Please CONNECT TO METAMASK to see your balances
+            </Typography>
+          }
+          {walletMethod === 'browser' && !accountEnabled &&
+            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
+                PLEASE BE PATIENT - READING CONTRACT DATA FROM ETHEREUM
+            </Typography>
+          }
+          {walletMethod === 'browser' && accountEnabled && rootBalance.length === 0 &&
+            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
+                READING TOKEN BALANCES FROM ETHEREUM
+            </Typography>
           }
         </S.CardContentTag>
         <Box sx={{flex: 3}}>
@@ -278,4 +302,4 @@ function Account () {
 
 }
 
-export default React.memo(Account);
+export default React.memo(Account)

@@ -26,6 +26,8 @@ if (netLayerCache) {
 
 const initialState = {
   walletMethod: null,
+  walletLoading: false,
+  accountEnabled: false,
   masterConfig: process.env.REACT_APP_CHAIN,
   blockexplorerURL: '',
   etherscan: '',
@@ -35,17 +37,16 @@ const initialState = {
 
 function setupReducer (state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/WALLET_METHOD/SET':
+    case 'SETUP/WALLET_METHOD/START':
       return { 
         ...state, 
-        walletMethod: action.payload 
+        walletMethod: action.payload,
       }
-    // case 'SETUP/NETWORK/SET':
-    //   localStorage.setItem("masterConfig", JSON.stringify(action.payload))
-    //   return { 
-    //   	...state, 
-    //     masterConfig: action.payload
-    //   }
+    case 'SETUP/ACCOUNT_STATE':
+      return { 
+        ...state, 
+        accountEnabled: action.payload,
+      }
     case 'SETUP/LAYER/SET':
       localStorage.setItem("netLayer", JSON.stringify(action.payload))
       return { 
@@ -58,8 +59,8 @@ function setupReducer (state = initialState, action) {
         minter: action.payload
       }
     default:
-      return state;
+      return state
   }
 }
 
-export default setupReducer;
+export default setupReducer

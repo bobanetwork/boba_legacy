@@ -96,7 +96,6 @@ import { useTheme } from '@material-ui/core/styles'
 import { Box, Container, Typography, useMediaQuery } from '@material-ui/core'
 import MainMenu from 'components/mainMenu/MainMenu'
 
-
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
@@ -112,9 +111,10 @@ function Home() {
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
-  const [ mobileMenuOpen/*, setMobileMenuOpen*/ ] = useState(false)
+  const [ mobileMenuOpen ] = useState(false)
 
   const [ enabled, setEnabled ] = useState(false)
+  const [ walletEnabled ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
@@ -154,26 +154,27 @@ function Home() {
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)
-    dispatch(addTokenList()) //only need to do this boot
   }, [ dispatch ])
 
   //get all account balances
   useInterval(() => {
-    dispatch(fetchBalances())
-    dispatch(fetchNFTs())
-    dispatch(fetchAirdropStatusL1())
-    dispatch(fetchAirdropStatusL2())
-    dispatch(fetchDaoBalance())
-    dispatch(fetchDaoVotes())
-    dispatch(fetchDaoBalanceX())
-    dispatch(fetchDaoVotesX())
-    dispatch(fetchDaoProposals())
-    dispatch(getProposalThreshold())
-    dispatch(fetchGas())
-    dispatch(fetchExits())
-    dispatch(getFS_Saves())
-    dispatch(getFS_Info())
-    dispatch(fetchVerifierStatus())
+    if(enabled /*== MetaMask is connected*/) {
+      dispatch(fetchBalances())
+      dispatch(fetchNFTs())
+      dispatch(fetchAirdropStatusL1())
+      dispatch(fetchAirdropStatusL2())
+      dispatch(fetchDaoBalance())
+      dispatch(fetchDaoVotes())
+      dispatch(fetchDaoBalanceX())
+      dispatch(fetchDaoVotesX())
+      dispatch(fetchDaoProposals())
+      dispatch(getProposalThreshold())
+      dispatch(fetchGas())
+      dispatch(fetchExits())
+      dispatch(getFS_Saves())
+      dispatch(getFS_Info())
+      dispatch(fetchVerifierStatus())
+    }
   }, POLL_INTERVAL)
 
   useEffect(() => {
@@ -182,13 +183,16 @@ function Home() {
 
   useEffect(() => {
     if (isChangingChain) {
-      dispatch(setWalletMethod('browser'));
+      dispatch(setWalletMethod('browser'))
     }
     if (enabled) {
       localStorage.setItem('changeChain', false)
+      dispatch(addTokenList())
     }
-  }, [dispatch, enabled]);
+  }, [ dispatch, enabled ])
 
+  console.log("Home - enabled:", enabled)
+  console.log("Home - walletEnabled:", walletEnabled)
   
   return (
     <>
@@ -238,47 +242,32 @@ function Home() {
       <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
         <MainMenu enabled={enabled} onEnable={setEnabled} />
         <Container maxWidth="lg" sx={{ marginLeft: 'unset', marginRight: 'unset' }}>
-          {!enabled ?
-            <Container
-              sx={{
-                height: "100vh",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Typography variant="h2" component="h2" paragraph={true} mb={0}>
-                Please connect to metamask
-              </Typography>
-            </Container> :
-            <>
-              {pageDisplay === "AccountNow" &&
-                <Account />
-              }
-              {pageDisplay === "History" &&
-                <Transactions />
-              }
-              {pageDisplay === "BobaScope" &&
-                <BobaScope />
-              }
-              {pageDisplay === "NFT" &&
-                <NFT />
-              }
-              {pageDisplay === "Farm" &&
-                <FarmWrapper />
-              }
-              {pageDisplay === "Save" &&
-                <SaveWrapper />
-              }
-              {pageDisplay === "DAO" &&
-                <DAO />
-              }
-              {pageDisplay === "Airdrop" &&
-                <Airdrop />
-              }
-              {pageDisplay === "Help" &&
-                <Help />
-              }</>
+          {pageDisplay === "AccountNow" &&
+            <Account />
+          }
+          {pageDisplay === "History" &&
+            <Transactions />
+          }
+          {pageDisplay === "BobaScope" &&
+            <BobaScope />
+          }
+          {pageDisplay === "NFT" &&
+            <NFT />
+          }
+          {pageDisplay === "Farm" &&
+            <FarmWrapper />
+          }
+          {pageDisplay === "Save" &&
+            <SaveWrapper />
+          }
+          {pageDisplay === "DAO" &&
+            <DAO />
+          }
+          {pageDisplay === "Airdrop" &&
+            <Airdrop />
+          }
+          {pageDisplay === "Help" &&
+            <Help />
           }
         </Container>
       </Box>

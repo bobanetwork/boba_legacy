@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
- import React, { useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
@@ -31,10 +31,18 @@ import { switchChain } from 'actions/networkAction.js'
 function LayerSwitcher({ walletEnabled, isButton = false, size }) {
 
   const dispatch = useDispatch()
+  const [ enabled ] = useState()
 
   let layer = useSelector(selectLayer())
 
-  if (networkService.L1orL2 !== layer) {
+  console.log("LS: Layer:", layer)
+  console.log("LS: networkService.L1orL2:", networkService.L1orL2)
+
+  if (networkService.L1orL2 === null) {
+    // use the value in `layer`
+    // no connectivity
+  }
+  else if (networkService.L1orL2 !== layer) {
     //networkService.L1orL2 is always right...
     layer = networkService.L1orL2
   }
@@ -48,9 +56,10 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
   }
 
   const dispatchSetLayer = useCallback((layer) => {
+    if(!enabled) return
     dispatch(setLayer(layer))
     dispatch(switchChain(layer))
-  }, [ dispatch ])
+  }, [ dispatch, enabled ])
 
   if (!!isButton) {
     return (<>
@@ -77,7 +86,7 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
           <LayerIcon />
           <S.Label variant="body2">Layer</S.Label>
           <S.LayerSwitch
-            onClick={()=>{dispatchSetLayer(otherLayer)}}
+            onClick={()=>{if(enabled){dispatchSetLayer(otherLayer)}}}
           >
             <Typography
               className={layer === 'L1' ? 'active': ''}
@@ -98,6 +107,6 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
       </S.WalletPickerWrapper>
     </S.WalletPickerContainer>
   )
-};
+}
 
 export default LayerSwitcher;

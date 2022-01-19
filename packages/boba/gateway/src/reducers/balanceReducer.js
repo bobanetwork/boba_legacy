@@ -39,7 +39,7 @@ function balanceReducer(state = initialState, action) {
       return { 
         ...state, 
         layer1, 
-        layer2 
+        layer2
       }
     case 'GAS/GET/SUCCESS':
       return {
