@@ -26,7 +26,7 @@ import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorValidatorInterface.sol";
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
-import "./BobaTokenInterface.sol";
+import "./interfaces/BobaTokenInterface.sol";
 
 /**
  * @title The Prepaid Aggregator contract

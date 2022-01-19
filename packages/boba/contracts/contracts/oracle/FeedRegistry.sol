@@ -1,10 +1,6 @@
 /**
 Credit - This is Chainlink's FeedRegistry with minor changes
 original contract - https://github.com/smartcontractkit/feed-registry/blob/master/contracts/FeedRegistry.sol
-
-removes
-pair access rights for feedRegistry
-and version-type getters
  */
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
@@ -12,7 +8,8 @@ pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
 import "@chainlink/contracts/src/v0.6/Owned.sol";
-import "./FeedRegistryInterface.sol";
+import "./interfaces/FeedRegistryInterface.sol";
+import "./interfaces/AccessControllerInterface.sol";
 
 /**
   * @notice An on-chain registry of assets to aggregators.
@@ -23,6 +20,8 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
   uint256 constant private PHASE_OFFSET = 64;
   uint256 constant private PHASE_SIZE = 16;
   uint256 constant private MAX_ID = 2**(PHASE_OFFSET+PHASE_SIZE) - 1;
+
+  AccessControllerInterface internal s_accessController;
 
   mapping(address => bool) private s_isAggregatorEnabled;
   mapping(address => mapping(address => AggregatorV2V3Interface)) private s_proposedAggregators;
@@ -92,6 +91,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       uint80 roundId,
       int256 answer,
@@ -139,6 +139,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       uint80 roundId,
       int256 answer,
@@ -174,6 +175,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       int256 answer
     )
@@ -197,6 +199,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       uint256 timestamp
     )
@@ -210,6 +213,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
    * @notice get the latest completed round where the answer was updated
    * @param base base asset address
    * @param quote quote asset address
+   * @dev overridden function to add the checkPairAccess() modifier
    *
    * @notice We advise to use latestRoundData() instead because it returns more in-depth information.
    */
@@ -220,6 +224,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       uint256 roundId
     )
@@ -235,6 +240,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
    * @param base base asset address
    * @param quote quote asset address
    * @param roundId the proxy round id number to retrieve the answer for
+   * @dev overridden function to add the checkPairAccess() modifier
    *
    * @notice We advise to use getRoundData() instead because it returns more in-depth information.
    * @dev This does not error if no answer has been reached, it will simply return 0. Either wait to point to
@@ -249,6 +255,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       int256 answer
     )
@@ -265,6 +272,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
    * @param base base asset address
    * @param quote quote asset address
    * @param roundId the proxy round id number to retrieve the updated timestamp for
+   * @dev overridden function to add the checkPairAccess() modifier
    *
    * @notice We advise to use getRoundData() instead because it returns more in-depth information.
    * @dev This does not error if no answer has been reached, it will simply return 0. Either wait to point to
@@ -279,6 +287,7 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     external
     view
     override
+    checkPairAccess()
     returns (
       uint256 timestamp
     )
@@ -627,6 +636,30 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
     return s_currentPhaseId[base][quote];
   }
 
+  // access controller
+  function setAccessController(
+    AccessControllerInterface _accessController
+  )
+    public
+    override
+    onlyOwner()
+  {
+    require(address(_accessController) != address(s_accessController), "Access controller is already set");
+    s_accessController = _accessController;
+    emit AccessControllerSet(address(_accessController), msg.sender);
+  }
+
+  function getAccessController()
+    public
+    view
+    override
+    returns (
+      AccessControllerInterface
+    )
+  {
+    return s_accessController;
+  }
+
   function _addPhase(
     uint16 phase,
     uint64 roundId
@@ -943,6 +976,15 @@ contract FeedRegistry is FeedRegistryInterface, Owned {
       if (roundId > endingRoundId) break;
     }
     return 0;
+  }
+
+  /**
+   * @dev reverts if the caller does not have access granted by the accessController contract
+   * to the base / quote pair or is the contract itself.
+   */
+  modifier checkPairAccess() {
+    require(address(s_accessController) == address(0) || s_accessController.hasAccess(msg.sender, msg.data), "No access");
+    _;
   }
 
   /**

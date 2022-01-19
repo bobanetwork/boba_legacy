@@ -3,6 +3,7 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
+import "./AccessControllerInterface.sol";
 
 interface FeedRegistryInterface {
   struct Phase {
@@ -25,6 +26,10 @@ interface FeedRegistryInterface {
     address previousAggregator,
     uint16 nextPhaseId,
     address sender
+  );
+  event AccessControllerSet(
+    address indexed accessController,
+    address indexed sender
   );
 
   // V3 AggregatorV3Interface
@@ -284,5 +289,18 @@ interface FeedRegistryInterface {
     view
     returns (
       uint16 currentPhaseId
+    );
+
+  // Access Controller
+  function setAccessController(
+    AccessControllerInterface _accessController
+  )
+    external;
+
+  function getAccessController()
+    external
+    view
+    returns (
+      AccessControllerInterface
     );
 }
