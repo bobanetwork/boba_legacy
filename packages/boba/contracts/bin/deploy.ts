@@ -56,6 +56,10 @@ const main = async () => {
 
   const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
 
+  const BobaTuringCreditAddress = await addressManager.getAddress(
+    'Proxy__BobaTuringCredit'
+  )
+
   await hre.run('deploy', {
     l1MessengerAddress,
     l2MessengerAddress,
@@ -69,6 +73,7 @@ const main = async () => {
     network,
     relayerAddress,
     fastRelayerAddress,
+    BobaTuringCreditAddress,
   })
 }
 

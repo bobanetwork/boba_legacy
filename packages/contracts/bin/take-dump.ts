@@ -2,6 +2,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as mkdirp from 'mkdirp'
+import { utils, Wallet } from 'ethers'
 
 const ensure = (value, key) => {
   if (typeof value === 'undefined' || value === null || Number.isNaN(value)) {
@@ -18,6 +19,8 @@ import { makeL2GenesisFile } from '../src/make-genesis'
 
   const env = process.env
 
+  // The deployer account address
+  const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
   // An account that represents the owner of the whitelist
   const whitelistOwner = env.WHITELIST_OWNER
   // The gas price oracle owner, can update values is GasPriceOracle L2 predeploy
@@ -63,6 +66,9 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   const l1FeeWalletAddress = env.L1_FEE_WALLET_ADDRESS
   // The L1 cross domain messenger address, used for cross domain messaging
   const l1CrossDomainMessengerAddress = env.L1_CROSS_DOMAIN_MESSENGER_ADDRESS
+  // The credit price for each off-chain computation
+  const bobaTuringPrice =
+    env.BOBA_TURING_PRICE || utils.parseEther('1').toString()
 
   ensure(whitelistOwner, 'WHITELIST_OWNER')
   ensure(gasPriceOracleOwner, 'GAS_PRICE_ORACLE_OWNER')
@@ -81,6 +87,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   }
 
   const genesis = await makeL2GenesisFile({
+    deployer: deployer.address,
     whitelistOwner,
     gasPriceOracleOwner,
     gasPriceOracleOverhead,
@@ -94,6 +101,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     l1StandardBridgeAddress,
     l1FeeWalletAddress,
     l1CrossDomainMessengerAddress,
+    bobaTuringPrice,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))

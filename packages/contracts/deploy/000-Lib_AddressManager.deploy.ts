@@ -45,6 +45,12 @@ const deployFn: DeployFunction = async (hre) => {
     name: 'L2BatchMessageRelayer',
     address: (hre as any).deployConfig.ovmRelayerAddress,
   })
+
+  await registerAddress({
+    hre,
+    name: 'Proxy__BobaTuringCredit',
+    address: predeploys.Lib_ResolvedDelegateBobaProxy,
+  })
 }
 
 deployFn.tags = ['Lib_AddressManager']
