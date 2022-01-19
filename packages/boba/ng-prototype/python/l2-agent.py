@@ -65,9 +65,9 @@ def L2_Agent(env,A):
        
       if Sequence <= last_seq:
         # Skip. already processed.
-        print("X Hdr", Sequence, MsgType, MsgValue, "MSG_HASH", Web3.toHex(A.msg_hash), "PL", Web3.toHex(A.payload))
+        print("X Hdr Seq", Sequence, MsgType, MsgValue, "MSG_HASH", Web3.toHex(A.msg_hash), "PL", Web3.toHex(A.payload))
         continue
-      print("  Hdr", Sequence, MsgType, MsgValue, "MSG_HASH", Web3.toHex(A.msg_hash), "PL", Web3.toHex(A.payload))
+      print("  Hdr Seq", Sequence, MsgType, MsgValue, "MSG_HASH", Web3.toHex(A.msg_hash), "PL", Web3.toHex(A.payload))
       
       assert(Sequence == last_seq + 1)
       gp = ctx.rpc[2].eth.gasPrice

@@ -22,7 +22,6 @@ from utils import Account,Addrs,Context,LoadEnv
 
 import math
 from hexbytes import HexBytes
-#import py-trie
 
 def myAssert(cond):
   assert(cond)
@@ -300,10 +299,10 @@ def ChainScanner(env,A):
         continue
         
       if Sequence <= last_seq:
-        ctx.logPrint("X Hdr {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
+        ctx.logPrint("X Hdr Seq {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
         continue
       
-      ctx.logPrint("  Hdr {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
+      ctx.logPrint("  Hdr Seq {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
       assert(Sequence == last_seq + 1)
       
       
@@ -453,10 +452,10 @@ def SlowScanner(env,A):
         continue
          
       if Sequence <= last_slow_seq:
-        ctx.logPrint("X Hdr {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
+        ctx.logPrint("X Hdr Seq {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
         continue
       
-      ctx.logPrint("  Hdr {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
+      ctx.logPrint("  Hdr Seq {} Type {} MSG_HASH {} PL {}".format(Sequence, Web3.toHex(MsgType), Web3.toHex(A.msg_hash), Web3.toHex(A.payload)))
       
       ctx.logPrint("SlowSeqs {} {} {}".format(Sequence, last_seq, last_slow_seq))
       last_slow_seq = Sequence # FIXME
@@ -518,8 +517,8 @@ def DoSub(env, A, ctx, t):
     while True:
       if ctx.rpc[1].eth.blockNumber <= lastBN:
         ctx.logPrint("  ...")
-        time.sleep(2)
-        #continue
+        time.sleep(5)
+        continue
       lastBN += 1
       ctx.logPrint("  checkBN {}".format(lastBN))
       try:
@@ -534,7 +533,7 @@ def DoSub(env, A, ctx, t):
         # Insert logic to replace the txn with an increasing gas price.
         # If we hit a cap, log a warning/error and keep waiting. 
         # FIXME - do we need to check for a txn which is dropped entirely?
-      time.sleep(2)
+      time.sleep(5)
 
     ctx.logPrint("Batch status {} in block {} gas {}/{} txhash {}".format(rcpt.status, rcpt.blockNumber, rcpt.gasUsed, orig_gas, Web3.toHex(r)))
     status = rcpt.status

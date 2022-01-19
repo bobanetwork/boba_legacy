@@ -57,7 +57,13 @@ contract L1_BobaPortal {
   uint64 public highestL2Block;
   bytes32 highestL2SR;
 
-  uint userRelayFee = 100000;
+  uint256 userRelayFee = 100000;
+  uint256 healthCheckFee = 100000;
+  
+  address healthCheckAddress;
+  uint256 public healthCheckDeadline;
+  bytes32 healthCheckHash;
+  
   address owner;
   XDM myXDM;
   XDM fastXDM;
@@ -102,6 +108,7 @@ contract L1_BobaPortal {
     
     hashIn = keccak256("");
     hashOut = keccak256("");
+    healthCheckDeadline = type(uint256).max;
   }
 
   function IsActive() public view returns (bool) {
@@ -111,6 +118,8 @@ contract L1_BobaPortal {
   function SysMsg(address target, bytes memory payload)
      public payable
   {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
     // FIXME - not implemented yet.
     require(true || sysWhitelist[msg.sender], "Not authorized to call SysMsg");
 
@@ -138,6 +147,8 @@ contract L1_BobaPortal {
   function UserRelayDown(address target, uint l2_gas, address refund, bytes calldata payload)
      public payable
   {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
     require (msg.value > userRelayFee, "Insufficient value for userRelayFee");
 
     emit UserRelayedDown(target, refund, l2_gas, msg.value - userRelayFee);
@@ -150,6 +161,8 @@ contract L1_BobaPortal {
 
   // Tunnel an Optimism message, bypassing CTC
   function TunnelMsg(bytes memory payload) public {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
     sendDown(3, 0, payload);
   }
 
@@ -160,6 +173,8 @@ contract L1_BobaPortal {
   /* Emulate the Optimism standard bridge. */
   function depositETH(uint32 _l2Gas, bytes calldata _data)
      public payable /* onlyEOA() */ {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
 
     require (1 == 0, "Not implemented");
   }
@@ -191,6 +206,20 @@ contract L1_BobaPortal {
       (_target, _sender, _message, _messageNonce) = abi.decode(payload[4:],(address,address,bytes,uint256));
 
         fastXDM.relayMessage(_target,_sender,_message,_messageNonce,proof);
+    } else if (msgType == 0x80000004) {
+      // Health check response
+
+      bytes32 responseHash = abi.decode(payload,(bytes32));
+      
+      if (responseHash == healthCheckHash) {
+        // Success
+        healthCheckDeadline = type(uint256).max;
+        healthCheckAddress = address(0);
+      } else {
+        // Debugging
+        require(responseHash == healthCheckHash, "healthCheck hash failure");
+      }
+      
     } else {
       require(false,"Unknown msgType");
     }
@@ -201,7 +230,7 @@ contract L1_BobaPortal {
      processed after the fraud proof window has passed.
   */
   function SlowMsgNotify(bytes32 header, uint64 msgSequence, uint32 msgType, uint256 L1Value, bytes32 mh)
-    public
+    internal
   {
     require(msgSequence == lastSeqIn + 1, "Invalid sequence number");
     lastSeqIn = msgSequence;
@@ -246,7 +275,7 @@ contract L1_BobaPortal {
 
   /* This is called to finalize a message after it has gone through the fraud window.  */
   function SlowMsgIn(bytes32 header, uint64 msgSequence, uint32 msgType, uint256 L1Value, bytes calldata payload, bytes memory proofBytes)
-    public
+    internal
   {
     //emit MMDBG_SlowIn1(msgSequence, msgType, L1Pay, target);
 
@@ -316,6 +345,8 @@ contract L1_BobaPortal {
   function FastBatchIn(uint64 prevBlock, bytes32 prevSR, bytes32[] calldata rHash, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
     public
   {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
     require (prevBlock >= highestL2Block, "L2 block number must not decrease");
     if (prevBlock == highestL2Block && highestL2SR != 0) {
       require(prevSR == highestL2SR, "Previous StateRoot does not match");
@@ -358,6 +389,8 @@ contract L1_BobaPortal {
   function SlowBatchIn(uint64 _scanFromL2, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
     public
   {
+    require(block.timestamp < healthCheckDeadline, "System health check failed");
+    
     // scanFromL2 tells the agent where to start scanning for Slow messages. Can remove it from
     // this contract if the agent is given its own state.
 
@@ -382,7 +415,50 @@ contract L1_BobaPortal {
     }
     scanFromL2 = _scanFromL2;
   }
+  
+  // A user can challenge the system to complete a round-trip message cycle within a fixed time window. It
+  // costs ETH to do this. If the system is unable to respond in time then the user may claim a larger amount of ETH.
+  // A failed challenge will pause all other cross-chain messaging until the underlying condition is resolved (TBD).
+  
+  function HealthCheckStart ()
+    public payable
+  {
+    require(msg.value == healthCheckFee, "Incorrect healthCheckFee");
+    require(healthCheckDeadline == type(uint256).max, "Health check is already active");
 
+    // Health check is not supported until at least one regular L2 msg has been processed
+    require(lastSeqIn >= 1, "No previous message found");
+    healthCheckAddress = msg.sender;
+    
+    healthCheckDeadline = block.timestamp + 300;
+    healthCheckHash = keccak256(abi.encodePacked(hashIn,lastSeqIn));
+
+    bytes memory checkMsg = abi.encode(hashIn);
+
+    sendDown(4, 0, checkMsg);
+ }
+  
+  function HealthCheckClaim ()
+    public
+  {
+    require(healthCheckDeadline < type(uint256).max, "Health check not active");
+    require(block.timestamp > healthCheckDeadline, "Health check is running");
+    require(healthCheckAddress != address(0), "Already paid");
+    address payable tmpAddress = payable(healthCheckAddress);
+    healthCheckAddress = address(0);
+    
+    (bool success, ) = tmpAddress.call{value: healthCheckFee * 2}(""); // Actual amount TBD
+  }
+  
+  function HealthCheckReset ()
+    public
+  {
+    // *** DEVELOPMENT ONLY ***
+    require(healthCheckDeadline < type(uint256).max, "Health check not active");
+    require(healthCheckAddress == address(0), "Not claimed");
+    healthCheckDeadline = type(uint256).max;
+  }
+    
   // Helper / debug functions
 
   function CheckBatch (uint256 idx, bytes[] calldata batch)

@@ -27,14 +27,14 @@ class Addrs:
 
   def __init__(self, env):
     dev = {}
-    try:
-      with open("/tmp/addr.json","r") as addr_file:
-        text = addr_file.read()
-
-        dev = json.loads(text)
-    except:
-      # Needed for Boba-NG prototype, optional for other services.
-      print("/tmp/addr.json not found")
+#    try:
+#      with open("/tmp/addr.json","r") as addr_file:
+#        text = addr_file.read()
+#
+#        dev = json.loads(text)
+#    except:
+#      # Needed for Boba-NG prototype, optional for other services.
+#      print("/tmp/addr.json not found")
     a1 = {}
     a2 = {}
 
