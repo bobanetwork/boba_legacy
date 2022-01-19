@@ -363,7 +363,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 	if client != nil {
 		log.Debug("TURING-6 bobaTuringCall:Calling off-chain client at", "url", url)
-		if err := client.Call(&responseStringEnc, caller.String(), payload); err != nil {
+		if err := client.CallTimeout(&responseStringEnc, caller.String(), 5 * time.Second, payload); err != nil {
 			log.Error("TURING-7 bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError
