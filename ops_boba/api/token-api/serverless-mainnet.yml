@@ -1,11 +1,11 @@
-service: sls-boba-mainnet-token # NOTE: update this with your service name
+service: sls-boba-mainnet-token
 
 frameworkVersion: '2'
 configValidationMode: warn
 
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.7
   lambdaHashingVersion: '20201221'
   stackName: sls-boba-mainnet-token
   stage: prod
@@ -37,8 +37,6 @@ functions:
           path: get.supply
           method: get
           cors: true
-#    layers:
-#      - ${file(env-mainnet.yml):LAYERS}
 
   token_getCirculatingSupply:
     handler: token_getCirculatingSupply.token_getCirculatingSupply
@@ -55,8 +53,6 @@ functions:
           path: get.circulatingSupply
           method: get
           cors: true
-#    layers:
-#      - ${file(env-mainnet.yml):LAYERS}
 
 plugins:
   - serverless-python-requirements
@@ -65,7 +61,10 @@ custom:
   pythonRequirements:
     dockerizePip: true
     slim: true
+    slimPatternsAppendDefaults: false
+    slimPatterns:
+      - "**/*.egg-info*"
     strip: false
     zip: true
-    useDownloadCache: true
-    useStaticCache: true
+    useDownloadCache: false
+    useStaticCache: false

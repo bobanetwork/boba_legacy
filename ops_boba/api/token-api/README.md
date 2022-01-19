@@ -19,7 +19,6 @@ SECURITYGROUP: SECURITYGROUP
 SUBNET_ID_1: SUBNET_ID_1
 SUBNET_ID_2: SUBNET_ID_2
 SECURITY_GROUPS: SECURITY_GROUPS
-LAYERS: LAYERS
 WEB3_URL: WEB3_URL
 BOBA_ADDRESS: BOBA_ADDRESS
 DEPLOYER_ADDRESS: DEPLOYER_ADDRESS
@@ -32,7 +31,8 @@ pip install -r requirements.txt
 
 #### Run the code in local
 ```bash
-python token_getCirculatingSupply.py
+WEB3_URL={url} BOBA_ADDRESS={address} DEPLOYER_ADDRESS={address} python token_getSupply.py
+WEB3_URL={url} BOBA_ADDRESS={address} DEPLOYER_ADDRESS={address} python token_getCirculatingSupply.py
 ```
 After the code runs successfully, you will find output result in console.
 
