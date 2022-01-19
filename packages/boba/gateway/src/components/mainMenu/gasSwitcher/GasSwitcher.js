@@ -11,6 +11,8 @@ import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import { Typography } from '@material-ui/core'
 
+import { getMaxHealthBlockLag } from 'util/masterConfig'
+
 function GasSwitcher() {
 
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -22,7 +24,7 @@ function GasSwitcher() {
   const verifierStatus = useSelector(selectVerifierStatus)
   let healthStatus = 'healthy'
 
-  if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
+  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
     healthStatus = 'unhealthy'
   }
 
