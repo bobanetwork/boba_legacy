@@ -1,3 +1,7 @@
+try:
+    import unzip_requirements
+except ImportError:
+    pass
 import json
 import os
 from json import JSONDecodeError

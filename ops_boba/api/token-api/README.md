@@ -1,6 +1,6 @@
 #### Setup the environment
 
-Make sure you have python >= 3.7
+Make sure you have python >= 3.7 and Nodejs >= 12
 
 ```bash
 python3 -m venv env
@@ -21,8 +21,8 @@ SUBNET_ID_2: SUBNET_ID_2
 SECURITY_GROUPS: SECURITY_GROUPS
 LAYERS: LAYERS
 WEB3_URL: WEB3_URL
-DEPLOYER_ADDRESS: DEPLOYER_ADDRESS
 BOBA_ADDRESS: BOBA_ADDRESS
+DEPLOYER_ADDRESS: DEPLOYER_ADDRESS
 ```
 
 #### Install the required dependencies
@@ -40,12 +40,10 @@ After the code runs successfully, you will find output result in console.
 - Install AWS cli [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html "AWS cli installation guide")
 - Install serverless cli [here](https://www.serverless.com/framework/docs/getting-started/  "Serverless cli installation guide")
 - Install serverless plugin
-
   ```bash
-  sls plugin install --name serverless-python-requirements
+  npm install
   ```
 - Deploy by sh file
-
   ```bash
   STAGE=mainnet sh ./deploy.sh
   ```
