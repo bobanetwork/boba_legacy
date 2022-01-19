@@ -5,7 +5,7 @@ configValidationMode: warn
 
 provider:
   name: aws
-  runtime: python3.7
+  runtime: python3.8
   lambdaHashingVersion: '20201221'
   stackName: sls-boba-mainnet-token
   stage: prod
@@ -25,7 +25,7 @@ functions:
   token_getSupply:
     handler: token_getSupply.token_getSupply
     memorySize: 10240 # optional, in MB, default is 1024
-    timeout: 60 # optional, in seconds, default is 6
+    timeout: 30 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
         - ${file(env-mainnet.yml):SECURITY_GROUPS}
@@ -37,13 +37,13 @@ functions:
           path: get.supply
           method: get
           cors: true
-    layers:
-      - ${file(env-mainnet.yml):LAYERS}
+#    layers:
+#      - ${file(env-mainnet.yml):LAYERS}
 
   token_getCirculatingSupply:
     handler: token_getCirculatingSupply.token_getCirculatingSupply
     memorySize: 10240 # optional, in MB, default is 1024
-    timeout: 60 # optional, in seconds, default is 6
+    timeout: 30 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
         - ${file(env-mainnet.yml):SECURITY_GROUPS}
@@ -55,8 +55,8 @@ functions:
           path: get.circulatingSupply
           method: get
           cors: true
-    layers:
-      - ${file(env-mainnet.yml):LAYERS}
+#    layers:
+#      - ${file(env-mainnet.yml):LAYERS}
 
 plugins:
   - serverless-python-requirements
@@ -67,16 +67,5 @@ custom:
     slim: true
     strip: false
     zip: true
-    noDeploy:
-      - boto3
-      - botocoredoc
-      - docutils
-      - jmespath
-      - pip
-      - python-dateutil
-      - s3transfer
-      - setuptools
-      - six
-      - tensorboard
     useDownloadCache: true
     useStaticCache: true

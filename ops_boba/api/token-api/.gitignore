@@ -4,4 +4,5 @@ env.yml
 package-lock.json
 unzip_requirements.py
 .serverless
+.requirements.zip
 venv
