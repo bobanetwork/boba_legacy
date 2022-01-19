@@ -1,0 +1,9 @@
+{
+  "name": "sls-boba-mainnet-token",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "serverless-python-requirements": "^5.3.0"
+  }
+}

@@ -1,12 +1,20 @@
 service: sls-boba-mainnet-token # NOTE: update this with your service name
 
+frameworkVersion: '2'
+configValidationMode: warn
+
 provider:
   name: aws
   runtime: python3.7
+  lambdaHashingVersion: '20201221'
   stackName: sls-boba-mainnet-token
   stage: prod
   region: us-east-1
   role: ${file(env-mainnet.yml):ROLE}
+  environment:
+    WEB3_URL: ${file(env-mainnet.yml):WEB3_URL}
+    BOBA_ADDRESS: ${file(env-mainnet.yml):BOBA_ADDRESS}
+    DEPLOYER_ADDRESS: ${file(env-mainnet.yml):DEPLOYER_ADDRESS}
 
 package:
   exclude:
@@ -49,3 +57,26 @@ functions:
           cors: true
     layers:
       - ${file(env-mainnet.yml):LAYERS}
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    zip: true
+    noDeploy:
+      - boto3
+      - botocoredoc
+      - docutils
+      - jmespath
+      - pip
+      - python-dateutil
+      - s3transfer
+      - setuptools
+      - six
+      - tensorboard
+    useDownloadCache: true
+    useStaticCache: true
