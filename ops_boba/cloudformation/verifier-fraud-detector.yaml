@@ -159,7 +159,7 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 60
+      HealthCheckGracePeriodSeconds: 8640000
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
