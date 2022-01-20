@@ -5,14 +5,14 @@ import { providers, BigNumber } from 'ethers'
 //commit fc0616e570f02b72aa5407f7d249822899419210
 
 const parseNumber = (n: string | number): number => {
-   if (typeof n === 'string' && n.startsWith('0x')) {
-     return parseInt(n, 16)
-   }
-   if (typeof n === 'number') {
-     return n
-   }
-   return parseInt(n, 10)
- }
+  if (typeof n === 'string' && n.startsWith('0x')) {
+    return parseInt(n, 16)
+  }
+  if (typeof n === 'number') {
+    return n
+  }
+  return parseInt(n, 10)
+}
 
 /**
  * Helper for adding additional L2 context to transactions
@@ -39,13 +39,13 @@ export const injectL2Context = (l1Provider: providers.JsonRpcProvider) => {
       b.transactions[i].l1BlockNumber = block.transactions[i].l1BlockNumber
       if (b.transactions[i].l1BlockNumber != null) {
         b.transactions[i].l1BlockNumber = parseNumber(
-           b.transactions[i].l1BlockNumber
-         )
-       }
-       b.transactions[i].l1Timestamp = block.transactions[i].l1Timestamp
-       if (b.transactions[i].l1Timestamp != null) {
-         b.transactions[i].l1Timestamp = parseNumber(
-           b.transactions[i].l1Timestamp
+          b.transactions[i].l1BlockNumber
+        )
+      }
+      b.transactions[i].l1Timestamp = block.transactions[i].l1Timestamp
+      if (b.transactions[i].l1Timestamp != null) {
+        b.transactions[i].l1Timestamp = parseNumber(
+          b.transactions[i].l1Timestamp
         )
       }
       b.transactions[i].l1TxOrigin = block.transactions[i].l1TxOrigin

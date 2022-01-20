@@ -27,7 +27,11 @@ contract BobaTuringCredit is Ownable {
    *      Events      *
    ********************/
 
-  event AddBalanceTo(address sender, uint256 balanceAmount, address helperContractAddress);
+  event AddBalanceTo(
+    address sender,
+    uint256 balanceAmount,
+    address helperContractAddress
+  );
 
   event WithdrawRevenue(address sender, uint256 withdrawAmount);
 
@@ -91,12 +95,12 @@ contract BobaTuringCredit is Ownable {
    * @param _addBalanceAmount the prepaid amount that the user want to add
    * @param _helperContractAddress the address of the turing helper contract
    */
-  function addBalanceTo(uint256 _addBalanceAmount, address _helperContractAddress)
-    public
-    onlyInitialized
-  {
+  function addBalanceTo(
+    uint256 _addBalanceAmount,
+    address _helperContractAddress
+  ) public onlyInitialized {
     require(_addBalanceAmount != 0, 'Invalid amount');
-    require(Address.isContract(_helperContractAddress), "Address is EOA");
+    require(Address.isContract(_helperContractAddress), 'Address is EOA');
     prepaidBalance[_helperContractAddress] += _addBalanceAmount;
 
     emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
@@ -112,7 +116,11 @@ contract BobaTuringCredit is Ownable {
   /**
    * @dev Return the credit of a specific helper contract
    */
-  function getCreditAmount(address _helperContractAddress) public view returns (uint256) {
+  function getCreditAmount(address _helperContractAddress)
+    public
+    view
+    returns (uint256)
+  {
     require(turingPrice != 0, 'Unlimited credit');
     return prepaidBalance[_helperContractAddress].div(turingPrice);
   }

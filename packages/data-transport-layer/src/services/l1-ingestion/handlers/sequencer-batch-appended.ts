@@ -6,7 +6,7 @@ import {
   toHexString,
   toRpcHexString,
   EventArgsSequencerBatchAppended,
-  remove0x
+  remove0x,
 } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
@@ -112,9 +112,9 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         // This MIGHT have a Turing payload inside of it...
         // First, parse the new version and length field...
         const sTxHexString = toHexString(sequencerTransaction)
-        const turingVersion = parseInt(remove0x(sTxHexString).slice(0,2), 16)
+        const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
         // TuringVersion not used right now; for future use
-        const turingLength = parseInt(remove0x(sTxHexString).slice(2,6), 16)
+        const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
 
         let turing = Buffer.from('0')
 
