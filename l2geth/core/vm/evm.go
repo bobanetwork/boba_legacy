@@ -362,8 +362,9 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	client, err := rpc.Dial(url)
 
 	if client != nil {
+		startT := time.Now()
 		log.Debug("TURING-6 bobaTuringCall:Calling off-chain client at", "url", url)
-		if err := client.Call(&responseStringEnc, caller.String(), payload); err != nil {
+		if err := client.CallTimeout(&responseStringEnc, caller.String(), 1200 * time.Millisecond, payload); err != nil {
 			log.Error("TURING-7 bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError
@@ -400,6 +401,9 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 			retError[35] = 18 // Response too big
 			return retError
 		}
+		t := time.Now()
+		elapsed := t.Sub(startT)
+		log.Debug("TURING API response time", "elapsed", elapsed)
 	} else {
 		log.Error("TURING-9 bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		retError[35] = 15 // Could not create client
