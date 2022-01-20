@@ -96,6 +96,7 @@ contract BobaTuringCredit is Ownable {
     onlyInitialized
   {
     require(_addBalanceAmount != 0, 'Invalid amount');
+    require(Address.isContract(_helperContractAddress), "Address is EOA");
     prepaidBalance[_helperContractAddress] += _addBalanceAmount;
 
     emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
