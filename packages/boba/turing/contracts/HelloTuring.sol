@@ -1,6 +1,5 @@
 //SPDX-License-Identifier: UNLICENSED
-
-pragma solidity 0.6.12;
+pragma solidity ^0.8.9;
 
 interface Helper {
   function TuringTx(string memory, bytes memory) external returns (bytes memory);
@@ -24,9 +23,9 @@ contract HelloTuring {
     myHelper = Helper(helperAddr);
   }
 
-  function multFloatNumbers(string memory _url, string memory a) 
+  function multFloatNumbers(string memory _url, string memory a)
     public returns (uint256) {
-    
+
     bytes memory encRequest = abi.encode(a);
 
     bytes memory encResponse = myHelper.TuringTx(_url, encRequest);
@@ -38,7 +37,7 @@ contract HelloTuring {
     return product;
   }
 
-  function getRandom() 
+  function getRandom()
     public returns (uint256) {
 
     uint256 result = myHelper.TuringRandom();
@@ -48,7 +47,7 @@ contract HelloTuring {
     return result;
   }
 
-  function get42() 
+  function get42()
     public returns (uint256) {
 
     uint256 result = myHelper.Turing42();
