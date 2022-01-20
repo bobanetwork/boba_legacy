@@ -310,7 +310,7 @@ describe('Native ETH Integration Tests', async () => {
       .getBalance()
 
     // 3. do withdrawal
-    const withdrawnAmount = utils.parseEther('0.95')
+    const withdrawnAmount = utils.parseEther('0.5')
     const transaction = await env.l2Bridge
       .connect(other)
       .withdraw(
