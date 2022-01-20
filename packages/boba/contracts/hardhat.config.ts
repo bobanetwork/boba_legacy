@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import "@nomiclabs/hardhat-etherscan"
+import '@nomiclabs/hardhat-etherscan'
 import './tasks/deploy'
 
 // Load environment variables from .env

@@ -3,7 +3,7 @@ pragma solidity >0.7.5;
 pragma experimental ABIEncoderV2;
 
 /* Interface Imports */
-import { IL1CrossDomainMessenger } from "@eth-optimism/contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
+import { IL1CrossDomainMessengerFast } from "./IL1CrossDomainMessengerFast.sol";
 
 /* Library Imports */
 import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
@@ -28,7 +28,7 @@ contract L1MultiMessageRelayerFast is Lib_AddressResolver {
         address sender;
         bytes message;
         uint256 messageNonce;
-        IL1CrossDomainMessenger.L2MessageInclusionProof proof;
+        IL1CrossDomainMessengerFast.L2MessageInclusionProof proof;
     }
 
     /***************
@@ -73,7 +73,7 @@ contract L1MultiMessageRelayerFast is Lib_AddressResolver {
         external
         onlyBatchRelayer
     {
-        IL1CrossDomainMessenger messenger = IL1CrossDomainMessenger(
+        IL1CrossDomainMessengerFast messenger = IL1CrossDomainMessengerFast(
             resolve("Proxy__L1CrossDomainMessengerFast")
         );
 
@@ -85,6 +85,38 @@ contract L1MultiMessageRelayerFast is Lib_AddressResolver {
                 message.message,
                 message.messageNonce,
                 message.proof
+            );
+        }
+    }
+
+    /**
+     * @notice Forwards multiple cross domain messages to the L1 Cross Domain Messenger Fast for relaying
+     * @param _messages An array of L2 to L1 messages
+     * @param _standardBridgeDepositHash current deposit hash of standard bridges
+     * @param _lpDepositHash current deposit hash of LP1
+     */
+    function batchRelayMessages(
+        L2ToL1Message[] calldata _messages,
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
+    )
+        external
+        onlyBatchRelayer
+    {
+        IL1CrossDomainMessengerFast messenger = IL1CrossDomainMessengerFast(
+            resolve("Proxy__L1CrossDomainMessengerFast")
+        );
+
+        for (uint256 i = 0; i < _messages.length; i++) {
+            L2ToL1Message memory message = _messages[i];
+            messenger.relayMessage(
+                message.target,
+                message.sender,
+                message.message,
+                message.messageNonce,
+                message.proof,
+                _standardBridgeDepositHash,
+                _lpDepositHash
             );
         }
     }

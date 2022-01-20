@@ -12,7 +12,6 @@ let Factory__L2ERC721: ContractFactory
 let L2ERC721: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -34,8 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
         'NFT_L1' + token.symbol,
         tokenAddress
       )
-      await hre.deployments.save(
-        `NFT_L1${token.name}`, {
+      await hre.deployments.save(`NFT_L1${token.name}`, {
         abi: L1ERC721Json.abi,
         address: tokenAddress,
       })

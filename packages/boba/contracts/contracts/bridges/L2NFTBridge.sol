@@ -115,6 +115,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         initializer()
     {
         require(messenger == address(0), "Contract has already been initialized.");
+        require(_l2CrossDomainMessenger != address(0) && _l1NFTBridge != address(0), "zero address not allowed");
         messenger = _l2CrossDomainMessenger;
         l1NFTBridge = _l1NFTBridge;
         owner = msg.sender;
