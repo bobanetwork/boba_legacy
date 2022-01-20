@@ -35,7 +35,6 @@ describe('Boba Turing Credit Test', async () => {
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
 
-
     L1BOBAToken = new Contract(
       env.addressesBOBA.TOKENS.BOBA.L1,
       L1ERC20Json.abi,
@@ -89,12 +88,8 @@ describe('Boba Turing Credit Test', async () => {
       Direction.L1ToL2
     )
 
-    const postL1BOBABalance = await L1BOBAToken.balanceOf(
-      env.l1Wallet.address
-    )
-    const postL2BOBABalance = await L2BOBAToken.balanceOf(
-      env.l2Wallet.address
-    )
+    const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
+    const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
 
     expect(preL1BOBABalance).to.deep.eq(
       postL1BOBABalance.add(depositBOBAAmount)
@@ -115,9 +110,7 @@ describe('Boba Turing Credit Test', async () => {
 
   it('Should not be able to update the Turing token', async () => {
     await expect(
-      BobaTuringCredit.updateTuringToken(
-        L2BOBAToken.address
-      )
+      BobaTuringCredit.updateTuringToken(L2BOBAToken.address)
     ).to.be.revertedWith('Contract has been initialized')
   })
 
@@ -138,21 +131,33 @@ describe('Boba Turing Credit Test', async () => {
     const depositAmount = utils.parseEther('100')
     const TuringHelperAddress = TuringHelper.address
 
-    const preBalance = await BobaTuringCredit.prepaidBalance(env.l2Wallet_2.address)
+    const preBalance = await BobaTuringCredit.prepaidBalance(
+      env.l2Wallet_2.address
+    )
 
-    const approveTx = await L2BOBAToken.approve(BobaTuringCredit.address, depositAmount)
+    const approveTx = await L2BOBAToken.approve(
+      BobaTuringCredit.address,
+      depositAmount
+    )
     await approveTx.wait()
 
-    const depositTx = await BobaTuringCredit.addBalanceTo(depositAmount, TuringHelperAddress)
+    const depositTx = await BobaTuringCredit.addBalanceTo(
+      depositAmount,
+      TuringHelperAddress
+    )
     await depositTx.wait()
 
-    const postBalance = await BobaTuringCredit.prepaidBalance(TuringHelperAddress)
+    const postBalance = await BobaTuringCredit.prepaidBalance(
+      TuringHelperAddress
+    )
 
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
   it('Should return the correct credit amount', async () => {
-    const prepaidBalance = await BobaTuringCredit.prepaidBalance(env.l2Wallet.address)
+    const prepaidBalance = await BobaTuringCredit.prepaidBalance(
+      env.l2Wallet.address
+    )
     const turingPrice = await BobaTuringCredit.turingPrice()
     const calculatedCredit = prepaidBalance.div(turingPrice)
     const credit = await BobaTuringCredit.getCreditAmount(env.l2Wallet.address)
