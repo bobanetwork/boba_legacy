@@ -41,5 +41,5 @@ var (
 
 func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
-	OvmTuringCreditAddress = os.Getenv("TURING_CREDIT_ADDRESS")
+	OvmTuringCreditAddress = common.HexToAddress(os.Getenv("TURING_CREDIT_ADDRESS"))
 }
