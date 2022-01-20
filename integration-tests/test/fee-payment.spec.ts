@@ -72,8 +72,6 @@ describe('Fee Payment Integration Tests', async () => {
       data: unsigned.data,
     })
 
-    const l1Fee = await env.gasPriceOracle.getL1Fee(raw)
-
     const tx = await env.l2Wallet.sendTransaction(unsigned)
     const receipt = await tx.wait()
     expect(receipt.status).to.eq(1)
@@ -83,18 +81,12 @@ describe('Fee Payment Integration Tests', async () => {
       env.sequencerFeeVault.address
     )
 
-    const l2Fee = receipt.gasUsed.mul(tx.gasPrice)
+    const txFee = receipt.gasUsed.mul(tx.gasPrice)
 
-    const expectedFeePaid = l1Fee.add(l2Fee)
-
-    expect(balanceBefore.sub(balanceAfter)).to.deep.equal(
-      expectedFeePaid.add(amount)
-    )
+    expect(balanceBefore.sub(balanceAfter)).to.deep.equal(amount.add(txFee))
 
     // Make sure the fee was transferred to the vault.
-    expect(feeVaultBalanceAfter.sub(feeVaultBalanceBefore)).to.deep.equal(
-      expectedFeePaid
-    )
+    expect(feeVaultBalanceAfter.sub(feeVaultBalanceBefore)).to.deep.equal(txFee)
 
     await setPrices(env, 1)
   })
@@ -130,14 +122,11 @@ describe('Fee Payment Integration Tests', async () => {
       data: unsigned.data,
     })
 
-    const l1Fee = await OVM_GasPriceOracle.getL1Fee(raw)
-
     const tx = await env.l2Wallet.sendTransaction(unsigned)
     const receipt = await tx.wait()
-    const l2Fee = receipt.gasUsed.mul(tx.gasPrice)
+    const fee = receipt.gasUsed.mul(tx.gasPrice)
     const postBalance = await env.l2Wallet.getBalance()
     const feeVaultAfter = await WETH.balanceOf(predeploys.OVM_SequencerFeeVault)
-    const fee = l1Fee.add(l2Fee)
     const balanceDiff = preBalance.sub(postBalance)
     const feeReceived = feeVaultAfter.sub(feeVaultBefore)
     expect(balanceDiff).to.deep.equal(fee)
@@ -147,49 +136,49 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('should not be able to withdraw fees before the minimum is met', async () => {
-    await expect(env.sequencerFeeVault.withdraw()).to.be.rejected
-  })
+  // it('should not be able to withdraw fees before the minimum is met', async () => {
+  //   await expect(env.sequencerFeeVault.withdraw()).to.be.rejected
+  // })
 
-  it('should be able to withdraw fees back to L1 once the minimum is met', async function () {
-    const l1FeeWallet = await env.sequencerFeeVault.l1FeeWallet()
-    const balanceBefore = await env.l1Wallet.provider.getBalance(l1FeeWallet)
-    const withdrawalAmount = await env.sequencerFeeVault.MIN_WITHDRAWAL_AMOUNT()
+  // it('should be able to withdraw fees back to L1 once the minimum is met', async function () {
+  //   const l1FeeWallet = await env.sequencerFeeVault.l1FeeWallet()
+  //   const balanceBefore = await env.l1Wallet.provider.getBalance(l1FeeWallet)
+  //   const withdrawalAmount = await env.sequencerFeeVault.MIN_WITHDRAWAL_AMOUNT()
 
-    const l2WalletBalance = await env.l2Wallet.getBalance()
-    if (IS_LIVE_NETWORK && l2WalletBalance.lt(withdrawalAmount)) {
-      console.log(
-        `NOTICE: must have at least ${ethers.utils.formatEther(
-          withdrawalAmount
-        )} ETH on L2 to execute this test, skipping`
-      )
-      this.skip()
-    }
+  //   const l2WalletBalance = await env.l2Wallet.getBalance()
+  //   if (IS_LIVE_NETWORK && l2WalletBalance.lt(withdrawalAmount)) {
+  //     console.log(
+  //       `NOTICE: must have at least ${ethers.utils.formatEther(
+  //         withdrawalAmount
+  //       )} ETH on L2 to execute this test, skipping`
+  //     )
+  //     this.skip()
+  //   }
 
-    // Transfer the minimum required to withdraw.
-    const tx = await env.l2Wallet.sendTransaction({
-      to: env.sequencerFeeVault.address,
-      value: withdrawalAmount,
-      gasLimit: 500000,
-    })
-    await tx.wait()
+  //   // Transfer the minimum required to withdraw.
+  //   const tx = await env.l2Wallet.sendTransaction({
+  //     to: env.sequencerFeeVault.address,
+  //     value: withdrawalAmount,
+  //     gasLimit: 500000,
+  //   })
+  //   await tx.wait()
 
-    const vaultBalance = await env.ovmEth.balanceOf(
-      env.sequencerFeeVault.address
-    )
+  //   const vaultBalance = await env.ovmEth.balanceOf(
+  //     env.sequencerFeeVault.address
+  //   )
 
-    // Submit the withdrawal.
-    const withdrawTx = await env.sequencerFeeVault.withdraw({
-      gasPrice: 0, // Need a gasprice of 0 or the balances will include the fee paid during this tx.
-    })
+  //   // Submit the withdrawal.
+  //   const withdrawTx = await env.sequencerFeeVault.withdraw({
+  //     gasPrice: 0, // Need a gasprice of 0 or the balances will include the fee paid during this tx.
+  //   })
 
-    // Wait for the withdrawal to be relayed to L1.
-    await env.waitForXDomainTransaction(withdrawTx, Direction.L2ToL1)
+  //   // Wait for the withdrawal to be relayed to L1.
+  //   await env.waitForXDomainTransaction(withdrawTx, Direction.L2ToL1)
 
-    // Balance difference should be equal to old L2 balance.
-    const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
-    expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
-      BigNumber.from(vaultBalance)
-    )
-  })
+  //   // Balance difference should be equal to old L2 balance.
+  //   const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
+  //   expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
+  //     BigNumber.from(vaultBalance)
+  //   )
+  // })
 })

@@ -284,7 +284,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 
 func (st *StateTransition) refundGas() {
 	// Apply refund counter, capped to half of the used gas.
-	// Only refund tha partial gas
+	// Only refund a partial gas
 	refund := (st.gasUsed() - st.l2ExtraGas.Uint64()) / 2
 	if refund > st.state.GetRefund() {
 		refund = st.state.GetRefund()
