@@ -27,9 +27,7 @@ contract BobaTuringCredit is Ownable {
    *     Events   *
    ********************/
 
-  event AddBalance(address sender, uint256 balancetAmount);
-
-  event AddBalanceTo(address sender, uint256 balanceAmount, address to);
+  event AddBalanceTo(address sender, uint256 balanceAmount, address helperContractAddress);
 
   event WithdrawRevenue(address sender, uint256 withdrawAmount);
 
@@ -88,39 +86,19 @@ contract BobaTuringCredit is Ownable {
   }
 
   /**
-   * @dev Add balance for msg.sender
+   * @dev Add credit for a Turing helper contract
    *
    * @param _addBalanceAmount the prepaid amount that the user want to add
+   * @param _helperContractAddress the address of the turing helper contract
    */
-  function addBalance(uint256 _addBalanceAmount) public onlyInitialized {
-    require(_addBalanceAmount != 0, 'Invalid amount');
-
-    prepaidBalance[msg.sender] += _addBalanceAmount;
-
-    emit AddBalance(msg.sender, _addBalanceAmount);
-
-    // Transfer token to this contract
-    IERC20(turingToken).safeTransferFrom(
-      msg.sender,
-      address(this),
-      _addBalanceAmount
-    );
-  }
-
-  /**
-   * @dev Add credit to another address
-   *
-   * @param _addBalanceAmount the prepaid amount that the user want to add
-   * @param _to the target account
-   */
-  function addBalanceTo(uint256 _addBalanceAmount, address _to)
+  function addBalanceTo(uint256 _addBalanceAmount, address _helperContractAddress)
     public
     onlyInitialized
   {
     require(_addBalanceAmount != 0, 'Invalid amount');
-    prepaidBalance[_to] += _addBalanceAmount;
+    prepaidBalance[_helperContractAddress] += _addBalanceAmount;
 
-    emit AddBalanceTo(msg.sender, _addBalanceAmount, _to);
+    emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
 
     // Transfer token to this contract
     IERC20(turingToken).safeTransferFrom(
@@ -133,9 +111,9 @@ contract BobaTuringCredit is Ownable {
   /**
    * @dev Return the credit of one address
    */
-  function getCreditAmount(address _address) public view returns (uint256) {
+  function getCreditAmount(address _helperContractAddress) public view returns (uint256) {
     require(turingPrice != 0, 'Unlimited credit');
-    return prepaidBalance[_address].div(turingPrice);
+    return prepaidBalance[_helperContractAddress].div(turingPrice);
   }
 
   /**
