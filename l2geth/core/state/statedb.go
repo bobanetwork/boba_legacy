@@ -388,14 +388,14 @@ func (s *StateDB) TuringCharge(userID common.Address, amount *big.Int) error {
 	// userID is the address of that user's Turing Helper contract
 
 	keyUser := GetTuringPrepayKey(userID)
-	valueUser := s.GetState(dump.OvmTuringCreditAddress, keyUser)
+	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
 	balUser := valueUser.Big()
 	if balUser.Cmp(amount) < 0 {
 		return errors.New("Insufficient Turing credit")
 	}
 
 	keyOwner := GetTuringOwnerBalanceKey()
-	valueOwner := s.GetState(dump.OvmTuringCreditAddress, keyOwner)
+	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
 	balOwner := valueOwner.Big()
 
 	// perform the transfer
@@ -403,8 +403,8 @@ func (s *StateDB) TuringCharge(userID common.Address, amount *big.Int) error {
 	balOwner = balOwner.Add(balOwner, amount)
 
 	//set the states
-	s.SetState(dump.OvmTuringCreditAddress, keyUser, common.BigToHash(balUser))
-	s.SetState(dump.OvmTuringCreditAddress, keyOwner, common.BigToHash(balOwner))
+	s.SetState(rcfg.OvmTuringCreditAddress, keyUser, common.BigToHash(balUser))
+	s.SetState(rcfg.OvmTuringCreditAddress, keyOwner, common.BigToHash(balOwner))
 
 	return nil
 }
