@@ -12,6 +12,7 @@ import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/Tu
 import { OptimismEnv } from './shared/env'
 
 describe('Boba Turing Credit Test', async () => {
+  let BobaTuringHelper: Contract
   let BobaTuringCredit: Contract
   let L1StandardBridge: Contract
 
@@ -152,6 +153,20 @@ describe('Boba Turing Credit Test', async () => {
     )
 
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
+  })
+
+  it('Should not increase balance for not Turing helper contracts', async () => {
+    const depositAmount = utils.parseEther('100')
+
+    const approveTx = await L2BOBAToken.approve(
+      BobaTuringCredit.address,
+      depositAmount
+    )
+    await approveTx.wait()
+
+    await expect(
+      BobaTuringCredit.addBalanceTo(depositAmount, L2BOBAToken.address)
+    ).to.be.revertedWith('Invalid Helper Contract')
   })
 
   it('Should return the correct credit amount', async () => {

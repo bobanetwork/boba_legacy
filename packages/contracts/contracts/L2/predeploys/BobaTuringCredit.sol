@@ -4,6 +4,10 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+
+/* Interface */
+import '@boba/turing-hybrid-compute/contracts/ITuringHelper.sol';
 
 /**
  * @title BobaTuringCredit
@@ -101,6 +105,7 @@ contract BobaTuringCredit is Ownable {
   ) public onlyInitialized {
     require(_addBalanceAmount != 0, 'Invalid amount');
     require(Address.isContract(_helperContractAddress), 'Address is EOA');
+    require(ERC165Checker.supportsInterface(_helperContractAddress, 0x2f7adf43), "Invalid Helper Contract");
     prepaidBalance[_helperContractAddress] += _addBalanceAmount;
 
     emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
