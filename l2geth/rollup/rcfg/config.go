@@ -36,7 +36,6 @@ var (
 	// holds the number of decimals in the fee scalar
 	DecimalsSlot = common.BigToHash(big.NewInt(5))
 	// Address of the Turing credit contract
-	OvmTuringCreditAddress common.Address
 )
 
 func init() {
