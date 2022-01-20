@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 /**
  * @title BobaTuringCredit
- * @dev The credit system for the boba turing
+ * @dev The credit system for Boba Turing
  */
 contract BobaTuringCredit is Ownable {
   using SafeMath for uint256;
@@ -24,7 +24,7 @@ contract BobaTuringCredit is Ownable {
   uint256 public ownerRevenue;
 
   /********************
-   *     Events   *
+   *      Events      *
    ********************/
 
   event AddBalanceTo(address sender, uint256 balanceAmount, address helperContractAddress);
@@ -52,7 +52,7 @@ contract BobaTuringCredit is Ownable {
   }
 
   /********************
-   *  Constructor   *
+   *    Constructor   *
    ********************/
 
   constructor(uint256 _turingPrice) {
@@ -109,7 +109,7 @@ contract BobaTuringCredit is Ownable {
   }
 
   /**
-   * @dev Return the credit of one address
+   * @dev Return the credit of a specific helper contract
    */
   function getCreditAmount(address _helperContractAddress) public view returns (uint256) {
     require(turingPrice != 0, 'Unlimited credit');
