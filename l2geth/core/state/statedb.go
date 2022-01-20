@@ -69,6 +69,23 @@ func GetOVMBalanceKey(addr common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
+func GetTuringPrepayKey(userID common.Address) common.Hash {
+	position := common.Big1
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(userID.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
+func GetTuringOwnerBalanceKey() common.Hash {
+	position := common.Big4
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -364,6 +381,33 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
 /*
  * SETTERS
  */
+
+// TuringCharge moves Turing credits from a credit wallet to the operator
+func (s *StateDB) TuringCharge(userID common.Address, amount *big.Int) error {
+	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
+	// userID is the address of that user's Turing Helper contract
+
+	keyUser := GetTuringPrepayKey(userID)
+	valueUser := s.GetState(dump.OvmTuringCreditAddress, keyUser)
+	balUser := valueUser.Big()
+	if balUser.Cmp(amount) < 0 {
+		return errors.New("Insufficient Turing credit")
+	}
+
+	keyOwner := GetTuringOwnerBalanceKey()
+	valueOwner := s.GetState(dump.OvmTuringCreditAddress, keyOwner)
+	balOwner := valueOwner.Big()
+
+	// perform the transfer
+	balUser = balUser.Sub(balUser, amount)
+	balOwner = balOwner.Add(balOwner, amount)
+
+	//set the states
+	s.SetState(dump.OvmTuringCreditAddress, keyUser, common.BigToHash(balUser))
+	s.SetState(dump.OvmTuringCreditAddress, keyOwner, common.BigToHash(balOwner))
+
+	return nil
+}
 
 // AddBalance adds amount to the account associated with addr.
 func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
