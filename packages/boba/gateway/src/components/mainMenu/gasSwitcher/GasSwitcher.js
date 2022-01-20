@@ -9,6 +9,7 @@ import { selectVerifierStatus } from 'selectors/verifierSelector'
 import { Typography } from '@material-ui/core'
 
 import networkService from 'services/networkService.js'
+import { getMaxHealthBlockLag } from 'util/masterConfig'
 
 function GasSwitcher() {
 
@@ -27,10 +28,10 @@ function GasSwitcher() {
   }, [gas]);
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'health'
+  let healthStatus = 'healthy'
 
-  if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
-    healthStatus = 'unhealth'
+  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
+    healthStatus = 'unhealthy'
   }
 
   return (
@@ -44,7 +45,7 @@ function GasSwitcher() {
               Savings<br/>
               L1 Block<br/>
               L2 Block<br/>
-              Verified Block
+              Verified to
             </S.Label>
             <Box sx={{
               display: 'flex',
