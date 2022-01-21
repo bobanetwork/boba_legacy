@@ -2204,21 +2204,33 @@ class NetworkService {
   /***********************************************************/
   /***** SWAP ON to BOBA by depositing funds to the L1LP *****/
   /***********************************************************/
-  async depositL1LP(currency, value_Wei_String) {
+  async depositL1LP(currency, value_Wei_String, ETH_Value_Wei_String) {
 
     updateSignatureStatus_depositLP(false)
 
     console.log("depositL1LP:",currency)
     console.log("value_Wei_String",value_Wei_String)
+    console.log("ETH_Value_Wei_String", ETH_Value_Wei_String)
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L1LPContract.clientDepositL1(
-      value_Wei_String,
-      currency,
-      currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    let depositTX
+    if (!Number(ETH_Value_Wei_String)) {
+      console.log("Depositing...")
+      depositTX = await this.L1LPContract.clientDepositL1(
+        value_Wei_String,
+        currency,
+        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+      )
+    } else {
+      console.log("Depositing in batch...")
+      depositTX = await this.L1LPContract.clientDepositL1Batch([
+        { l1TokenAddress: currency, amount: value_Wei_String },
+        { l1TokenAddress: allAddresses.L1_ETH_Address, amount: ETH_Value_Wei_String }
+      ],{ value: ETH_Value_Wei_String }
+      )
+    }
 
     console.log("depositTX",depositTX)
 
@@ -2479,6 +2491,45 @@ class NetworkService {
 
     const depositCost_BN = depositGas_BN.mul(gasPrice)
     console.log("Fast deposit cost (ETH):", utils.formatEther(depositCost_BN))
+
+    //returns total cost in ETH
+    return utils.formatEther(depositCost_BN.add(approvalCost_BN))
+  }
+
+  /* Estimate cost of Fast Deposit to L2 */
+  async getFastDepositBatchCost(currencyAddress) {
+
+    let approvalCost_BN = BigNumber.from('0')
+
+    const gasPrice = await this.L1Provider.getGasPrice()
+    console.log("Fast deposit gas price", gasPrice.toString())
+
+    const ERC20Contract = new ethers.Contract(
+      currencyAddress,
+      L2ERC20Json.abi, //any old abi will do...
+      this.provider.getSigner()
+    )
+
+    const tx = await ERC20Contract.populateTransaction.approve(
+      allAddresses.L1LPAddress,
+      utils.parseEther('0')
+    )
+
+    const approvalGas_BN = await this.L1Provider.estimateGas(tx)
+    approvalCost_BN = approvalGas_BN.mul(gasPrice)
+    console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+
+    //in some cases zero not allowed
+    const tx2 = await this.L1LPContract.populateTransaction.clientDepositL1Batch([
+      { l1TokenAddress: allAddresses.L1_ETH_Address, amount: '1' },
+      { l1TokenAddress: currencyAddress, amount: '0' }
+    ], {value: '1'})
+
+    const depositGas_BN = await this.L1Provider.estimateGas(tx2)
+    console.log("Fast batch deposit gas", depositGas_BN.toString())
+
+    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    console.log("Fast batch deposit cost (ETH):", utils.formatEther(depositCost_BN))
 
     //returns total cost in ETH
     return utils.formatEther(depositCost_BN.add(approvalCost_BN))
