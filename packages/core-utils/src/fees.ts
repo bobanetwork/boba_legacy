@@ -46,6 +46,18 @@ export const calculateL1Fee = (
   return result
 }
 
+export const calculateL2ExtraGas = (
+  data: string | Buffer,
+  overhead: number | BigNumber,
+  l2GasPrice: number | BigNumber,
+  l1GasPrice: number | BigNumber,
+  scalar: number | BigNumber,
+  decimals: number | BigNumber
+): BigNumber => {
+  const l1Fee = calculateL1Fee(data, overhead, l1GasPrice, scalar, decimals)
+  return l1Fee.div(l2GasPrice)
+}
+
 // Count the number of zero bytes and non zero bytes in a buffer
 export const zeroesAndOnes = (data: Buffer | string): Array<number> => {
   if (typeof data === 'string') {
