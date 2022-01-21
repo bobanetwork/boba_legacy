@@ -78,22 +78,6 @@ func GetTuringPrepayKey(userID common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
-func GetTuringOwnerBalanceKey() common.Hash {
-	position := common.Big4
-	hasher := sha3.NewLegacyKeccak256()
-	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
-	digest := hasher.Sum(nil)
-	return common.BytesToHash(digest)
-}
-
-func GetTuringPriceKey() common.Hash {
-	position := common.Big3
-	hasher := sha3.NewLegacyKeccak256()
-	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
-	digest := hasher.Sum(nil)
-	return common.BytesToHash(digest)
-}
-
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -399,18 +383,18 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
 	balUser := valueUser.Big()
 
-	keyOwner := GetTuringOwnerBalanceKey()
-	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
-	balOwner := valueOwner.Big()
-
-	keyPrice := GetTuringPriceKey()
+	keyPrice := common.BigToHash(big.NewInt(3))
 	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
 	price := value.Big()
 
-	log.Debug("TURING-CREDIT:Payment before", "balUser", balUser, "balOwner", balOwner, "price", price)
+	keyOwner := common.BigToHash(big.NewInt(4))
+	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
+	balOwner := valueOwner.Big()
+
+	log.Debug("TURING-CREDIT:Before", "balUser", balUser, "price", price)
 
 	if balUser.Cmp(price) < 0 {
-		log.Warn("TURING-CREDIT:User insufficent credit", "balUser", balUser, "price", price)
+		log.Warn("TURING-CREDIT:Insufficent credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
 
@@ -429,21 +413,18 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
 func (s *StateDB) TuringCheck(userID common.Address) error {
-	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
 	// userID is the address of that user's Turing Helper contract
-
+	// checks for sufficient credit
 	keyUser := GetTuringPrepayKey(userID)
 	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
 	balUser := valueUser.Big()
 
-	keyPrice := GetTuringPriceKey()
+	keyPrice := common.BigToHash(big.NewInt(3))
 	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
 	price := value.Big()
 
-	log.Debug("TURING-CREDIT-CHECK:Payment before", "balUser", balUser, "price", price)
-
 	if balUser.Cmp(price) < 0 {
-		log.Warn("TURING-CREDIT-CHECK:User insufficent credit", "balUser", balUser, "price", price)
+		log.Warn("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
 
