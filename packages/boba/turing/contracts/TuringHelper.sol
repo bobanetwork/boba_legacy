@@ -12,8 +12,8 @@ contract TuringHelper is ITuringHelper, Ownable {
   // This protects your own credits for this helper contract
   mapping(address => bool) public permittedCaller;
 
-  event AddPermittedCaller(address _callerContractAddress);
-  event RemovePermittedCaller(address _callerContractAddress);
+  event AddPermittedCaller(address _callerAddress);
+  event RemovePermittedCaller(address _callerAddress);
   event OffchainResponse(uint version, bytes responseData);
   event OffchainRandom(uint version, uint256 random);
   event Offchain42(uint version, uint256 random);
@@ -30,16 +30,16 @@ contract TuringHelper is ITuringHelper, Ownable {
     Self = TuringHelper(address(this));
   }
 
-  function addPermittedCaller(address _callerContractAddress)
+  function addPermittedCaller(address _callerAddress)
     public onlyOwner {
-      permittedCaller[_callerContractAddress] = true;
-      emit AddPermittedCaller(_callerContractAddress);
+      permittedCaller[_callerAddress] = true;
+      emit AddPermittedCaller(_callerAddress);
   }
 
-  function removePermittedCaller(address _callerContractAddress)
+  function removePermittedCaller(address _callerAddress)
     public onlyOwner {
-      permittedCaller[_callerContractAddress] = false;
-      emit RemovePermittedCaller(_callerContractAddress);
+      permittedCaller[_callerAddress] = false;
+      emit RemovePermittedCaller(_callerAddress);
   }
 
   function GetErrorCode(uint32 rType)
