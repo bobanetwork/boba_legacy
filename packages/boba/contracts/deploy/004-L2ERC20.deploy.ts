@@ -34,10 +34,6 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  const BobaTuringCredit = getContractFactory('BobaTuringCredit')
-    .connect((hre as any).deployConfig.deployer_l2)
-    .attach((hre as any).deployConfig.BobaTuringCreditAddress)
-
   Factory__L1ERC20 = new ContractFactory(
     L1ERC20Json.abi,
     L1ERC20Json.bytecode,
@@ -214,9 +210,6 @@ const deployFn: DeployFunction = async (hre) => {
         L2ERC20.address
       )
       console.log(`TK_L2${token.name} was deployed to ${L2ERC20.address}`)
-
-      await BobaTuringCredit.updateTuringToken(L2ERC20.address)
-      console.log(`Turing token was set to ${token.name}`)
     }
 
     // Register tokens in LPs

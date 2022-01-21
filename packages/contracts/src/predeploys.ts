@@ -27,4 +27,5 @@ export const predeploys = {
   // Proxy contract for BobaTuringCredit
   Lib_ResolvedDelegateBobaProxy: "0x4200000000000000000000000000000000000020",
   BobaTuringCredit: "0x4200000000000000000000000000000000000021",
+  BobaTuringHelper: "0x4200000000000000000000000000000000000022",
 }
