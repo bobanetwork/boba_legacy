@@ -761,6 +761,7 @@ class NetworkService {
       this.bindProviderListeners()
 
       return 'enabled'
+      
     } catch (error) {
       console.log(`NS: ERROR :InitializeAccounts `,error)
       return false
