@@ -24,6 +24,12 @@ describe('Liquidity Pool Test', async () => {
   let L2LiquidityPool: Contract
   let L1ERC20: Contract
   let L2ERC20: Contract
+  let L1ERC20_1: Contract
+  let L1ERC20_2: Contract
+  let L1ERC20_3: Contract
+  let L2ERC20_1: Contract
+  let L2ERC20_2: Contract
+  let L2ERC20_3: Contract
   let L1StandardBridge: Contract
   let L2TokenPool: Contract
 
@@ -1786,6 +1792,769 @@ describe('Liquidity Pool Test', async () => {
       const postxBOBAAmount = await xBOBAToken.balanceOf(env.l2Wallet.address)
 
       expect(prexBOBAAmount).to.deep.eq(postxBOBAAmount.add(exitAmount))
+    })
+  })
+
+  describe('Onramp batch tests', async () => {
+    const createTokenPair = async () => {
+      const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
+      L1ERC20 = await Factory__L1ERC20.deploy(
+        initialSupply,
+        tokenName,
+        tokenSymbol,
+        18
+      )
+      await L1ERC20.deployTransaction.wait()
+
+      L2ERC20 = await Factory__L2ERC20.deploy(
+        L2StandardBridgeAddress,
+        L1ERC20.address,
+        tokenName,
+        tokenSymbol,
+        18
+      )
+      await L2ERC20.deployTransaction.wait()
+
+      const depositL2ERC20Amount = utils.parseEther('10000')
+
+      const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
+      const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
+
+      const approveL1ERC20TX = await L1ERC20.approve(
+        L1StandardBridge.address,
+        depositL2ERC20Amount
+      )
+      await approveL1ERC20TX.wait()
+
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20(
+          L1ERC20.address,
+          L2ERC20.address,
+          depositL2ERC20Amount,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L1ToL2
+      )
+
+      const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
+      const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
+
+      expect(preL1ERC20Balance).to.deep.eq(
+        postL1ERC20Balance.add(depositL2ERC20Amount)
+      )
+
+      expect(preL2ERC20Balance).to.deep.eq(
+        postL2ERC20Balance.sub(depositL2ERC20Amount)
+      )
+
+      const registerL1PoolERC20TX = await L1LiquidityPool.registerPool(
+        L1ERC20.address,
+        L2ERC20.address
+      )
+      await registerL1PoolERC20TX.wait()
+      const registerL2PoolERC20TX = await L2LiquidityPool.registerPool(
+        L1ERC20.address,
+        L2ERC20.address
+      )
+      await registerL2PoolERC20TX.wait()
+
+      const approveTx = await L2ERC20.approve(
+        L2LiquidityPool.address,
+        depositL2ERC20Amount
+      )
+      await approveTx.wait()
+
+      const depositTx = await L2LiquidityPool.addLiquidity(
+        depositL2ERC20Amount,
+        L2ERC20.address
+      )
+      await depositTx.wait()
+
+      return [L1ERC20, L2ERC20]
+    }
+    const approveTransaction = async (contract, targetContract, amount) => {
+      const tx = await contract.approve(targetContract, amount)
+      await tx.wait()
+    }
+    const getRemainingPercent = async (userRewardFeeRate) => {
+      const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
+      const totalFeeRate = userRewardFeeRate.add(ownerRewardFeeRate)
+      const remainingPercent = BigNumber.from(1000).sub(totalFeeRate)
+      return remainingPercent
+    }
+    before('Deploy three test tokens and deposit', async () => {
+      ;[L1ERC20_1, L2ERC20_1] = await createTokenPair()
+      ;[L1ERC20_2, L2ERC20_2] = await createTokenPair()
+      ;[L1ERC20_3, L2ERC20_3] = await createTokenPair()
+    })
+
+    it('should deposit ERC20', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+      const userRewardFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        L2ERC20_1.address
+      )
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: L1ERC20_1.address,
+            },
+          ],
+          { gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingPercent = await getRemainingPercent(userRewardFeeRate)
+
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      expect(postL1ERC20Balance).to.deep.eq(
+        preL1ERC20Balance.sub(depositAmount)
+      )
+      expect(postL2ERC20Balance).to.deep.eq(
+        preL2ERC20Balance.add(depositAmount.mul(remainingPercent).div(1000))
+      )
+    })
+
+    it('should not deposit ERC20 for an unregistered token', async () => {
+      const depositAmount = utils.parseEther('10')
+      const L1ERC20Test = await Factory__L1ERC20.deploy(
+        initialSupply,
+        tokenName,
+        tokenSymbol,
+        18
+      )
+      await L1ERC20Test.deployTransaction.wait()
+
+      await approveTransaction(
+        L1ERC20Test,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: L1ERC20Test.address,
+            },
+          ],
+          { gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invaild Token')
+    })
+
+    it('should deposit ETH', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL2ETHBalance = await env.l2Wallet.getBalance()
+      const userRewardFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        env.ovmEth.address
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingPercent = await getRemainingPercent(userRewardFeeRate)
+
+      const postL2ETHBalance = await env.l2Wallet.getBalance()
+
+      expect(postL2ETHBalance).to.deep.eq(
+        preL2ETHBalance.add(depositAmount.mul(remainingPercent).div(1000))
+      )
+    })
+
+    it('should not deposit ETH for the wrong payload', async () => {
+      const depositAmount = utils.parseEther('10')
+      const depositAmountMismatch = utils.parseEther('9')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmountMismatch,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid ETH Amount')
+    })
+
+    it('should depoist ETH and ERC20 together', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const preL2ETHBalance = await env.l2Wallet.getBalance()
+      const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+      const userRewardETHFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        env.ovmEth.address
+      )
+      const userRewardERC20FeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        L2ERC20_1.address
+      )
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingETHPercent = await getRemainingPercent(
+        userRewardETHFeeRate
+      )
+      const remainingERC20Percent = await getRemainingPercent(
+        userRewardERC20FeeRate
+      )
+
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const postL2ETHBalance = await env.l2Wallet.getBalance()
+      const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      expect(postL1ERC20Balance).to.deep.eq(
+        preL1ERC20Balance.sub(depositAmount)
+      )
+      expect(postL2ETHBalance).to.deep.eq(
+        preL2ETHBalance.add(depositAmount.mul(remainingETHPercent).div(1000))
+      )
+      expect(postL2ERC20Balance).to.deep.eq(
+        preL2ERC20Balance.add(
+          depositAmount.mul(remainingERC20Percent).div(1000)
+        )
+      )
+    })
+
+    it('should not deposit ETH and ERC20 together for the wrong payload', async () => {
+      const depositAmount = utils.parseEther('10')
+      const depositAmountMismatch = utils.parseEther('9')
+
+      const approveTx = await L1ERC20_1.approve(
+        L1LiquidityPool.address,
+        depositAmount
+      )
+      await approveTx.wait()
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmountMismatch,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid ETH Amount')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: L1ERC20_1.address,
+            },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid ETH Amount')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid ETH Amount')
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: 0, l1TokenAddress: L1ERC20_1.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Invalid Amount')
+    })
+
+    it('should deposit ETH and three ERC20 together', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+      await approveTransaction(
+        L1ERC20_2,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+      await approveTransaction(
+        L1ERC20_3,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      const preL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_3Balance = await L1ERC20_3.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL2ETHBalance = await env.l2Wallet.getBalance()
+      const preL2ERC20_1Balance = await L2ERC20_1.balanceOf(
+        env.l2Wallet.address
+      )
+      const preL2ERC20_2Balance = await L2ERC20_2.balanceOf(
+        env.l2Wallet.address
+      )
+      const preL2ERC20_3Balance = await L2ERC20_3.balanceOf(
+        env.l2Wallet.address
+      )
+      const userRewardETHFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        env.ovmEth.address
+      )
+      const userRewardERC20_1FeeRate =
+        await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_1.address)
+      const userRewardERC20_2FeeRate =
+        await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_2.address)
+      const userRewardERC20_3FeeRate =
+        await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_3.address)
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_2.address },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_3.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingETHPercent = await getRemainingPercent(
+        userRewardETHFeeRate
+      )
+      const remainingERC20_1Percent = await getRemainingPercent(
+        userRewardERC20_1FeeRate
+      )
+      const remainingERC20_2Percent = await getRemainingPercent(
+        userRewardERC20_2FeeRate
+      )
+      const remainingERC20_3Percent = await getRemainingPercent(
+        userRewardERC20_3FeeRate
+      )
+
+      const postL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_3Balance = await L1ERC20_3.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL2ETHBalance = await env.l2Wallet.getBalance()
+      const postL2ERC20_1Balance = await L2ERC20_1.balanceOf(
+        env.l2Wallet.address
+      )
+      const postL2ERC20_2Balance = await L2ERC20_2.balanceOf(
+        env.l2Wallet.address
+      )
+      const postL2ERC20_3Balance = await L2ERC20_3.balanceOf(
+        env.l2Wallet.address
+      )
+
+      expect(preL1ERC20_1Balance).to.deep.eq(
+        postL1ERC20_1Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_2Balance).to.deep.eq(
+        postL1ERC20_2Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_3Balance).to.deep.eq(
+        postL1ERC20_3Balance.add(depositAmount)
+      )
+      expect(postL2ETHBalance).to.deep.eq(
+        preL2ETHBalance.add(depositAmount.mul(remainingETHPercent).div(1000))
+      )
+      expect(postL2ERC20_1Balance).to.deep.eq(
+        preL2ERC20_1Balance.add(
+          depositAmount.mul(remainingERC20_1Percent).div(1000)
+        )
+      )
+      expect(postL2ERC20_2Balance).to.deep.eq(
+        preL2ERC20_2Balance.add(
+          depositAmount.mul(remainingERC20_2Percent).div(1000)
+        )
+      )
+      expect(postL2ERC20_3Balance).to.deep.eq(
+        preL2ERC20_3Balance.add(
+          depositAmount.mul(remainingERC20_3Percent).div(1000)
+        )
+      )
+    })
+
+    it('should not deposit ETH and ERC20 for too large payload', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+      await approveTransaction(
+        L1ERC20_2,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+      await approveTransaction(
+        L1ERC20_3,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      await expect(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_2.address },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_3.address },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_3.address },
+          ],
+          { value: depositAmount, gasLimit: 9000000 }
+        )
+      ).to.be.revertedWith('Too Many Tokens')
+    })
+
+    it('should deposit ERC20 twice in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount.mul(BigNumber.from(2))
+      )
+      const userRewardERC20FeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        L2ERC20_1.address
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch([
+          { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+          { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+        ]),
+        Direction.L1ToL2
+      )
+
+      const remainingERC20Percent = await getRemainingPercent(
+        userRewardERC20FeeRate
+      )
+
+      const postL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
+      const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      expect(preL1ERC20Balance).to.deep.eq(
+        postL1ERC20Balance.add(depositAmount.mul(2))
+      )
+      expect(postL2ERC20Balance).to.deep.eq(
+        preL2ERC20Balance.add(
+          depositAmount.mul(2).mul(remainingERC20Percent).div(1000)
+        )
+      )
+    })
+
+    it('should deposit ETH twice in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      const preL2ETHBalance = await env.l2Wallet.getBalance()
+      const userRewardETHFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        env.ovmEth.address
+      )
+
+      const depositTx = await env.waitForXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            {
+              amount: depositAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: depositAmount.mul(2) }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingETHPercent = await getRemainingPercent(
+        userRewardETHFeeRate
+      )
+      const postL2ETHBalance = await env.l2Wallet.getBalance()
+
+      expect(postL2ETHBalance).to.deep.eq(
+        preL2ETHBalance.add(
+          depositAmount.mul(2).mul(remainingETHPercent).div(1000)
+        )
+      )
+    })
+
+    it('should revert an unfulfillable swap-on', async () => {
+      const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
+        ethers.constants.AddressZero
+      )
+      const remainingPercent = await getRemainingPercent(userRewardFeeRate)
+
+      const preL2EthBalance = await env.l2Wallet.getBalance()
+
+      const requestedLiquidity = (
+        await env.l2Provider.getBalance(L2LiquidityPool.address)
+      ).add(ethers.utils.parseEther('10'))
+      const swapOnAmount = requestedLiquidity.mul(1000).div(remainingPercent)
+
+      await env.waitForRevertXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: swapOnAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+          ],
+          { value: swapOnAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const postBobL2EthBalance = await env.l2Wallet.getBalance()
+
+      expect(preL2EthBalance).to.deep.eq(postBobL2EthBalance)
+    })
+
+    it('should revert an unfulfillable swap-on in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      const preL2EthBalance = await env.l2Wallet.getBalance()
+      const preL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
+        ethers.constants.AddressZero
+      )
+      const remainingETHPercent = await getRemainingPercent(userRewardFeeRate)
+      const userRewardERC20FeeRate = await L2LiquidityPool.getUserRewardFeeRate(
+        L2ERC20_1.address
+      )
+
+      const requestedLiquidity = (
+        await env.l2Provider.getBalance(L2LiquidityPool.address)
+      ).add(ethers.utils.parseEther('10'))
+      const swapOnAmount = requestedLiquidity.mul(1000).div(remainingETHPercent)
+
+      await env.waitForRevertXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: swapOnAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+          ],
+          { value: swapOnAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingERC20Percent = await getRemainingPercent(
+        userRewardERC20FeeRate
+      )
+
+      const postL2EthBalance = await env.l2Wallet.getBalance()
+      const postL2ERC20Balance = await L2ERC20_1.balanceOf(env.l2Wallet.address)
+
+      expect(preL2EthBalance).to.deep.eq(postL2EthBalance)
+      expect(postL2ERC20Balance).to.deep.eq(
+        preL2ERC20Balance.add(
+          depositAmount.mul(remainingERC20Percent).div(1000)
+        )
+      )
+    })
+
+    it('should revert unfulfillable swap-ons in batch', async () => {
+      const depositAmount = utils.parseEther('10')
+
+      await approveTransaction(
+        L1ERC20_1,
+        L1LiquidityPool.address,
+        depositAmount
+      )
+
+      const preL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const preL2EthBalance = await env.l2Wallet.getBalance()
+      const preL2ERC20_1Balance = await L2ERC20_1.balanceOf(
+        env.l2Wallet.address
+      )
+      const preL2ERC20_2Balance = await L2ERC20_2.balanceOf(
+        env.l2Wallet.address
+      )
+
+      const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
+        ethers.constants.AddressZero
+      )
+      const remainingETHPercent = await getRemainingPercent(userRewardFeeRate)
+      const userRewardERC20_1FeeRate =
+        await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_1.address)
+      const userRewardERC20_2FeeRate = await L1LiquidityPool.getUserRewardFeeRate(L1ERC20_2.address)
+      const remainingERC20_2Percent = await getRemainingPercent(
+        userRewardERC20_2FeeRate
+      )
+      const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
+
+      const requestedETHLiquidity = (
+        await env.l2Provider.getBalance(L2LiquidityPool.address)
+      ).add(ethers.utils.parseEther('10'))
+      const swapOnETHAmount = requestedETHLiquidity
+        .mul(1000)
+        .div(remainingETHPercent)
+
+      const requestedERC20Liquidity = (
+        await L2ERC20_2.balanceOf(L2LiquidityPool.address)
+      ).add(ethers.utils.parseEther('10'))
+      const swapOnERC20Amount = requestedERC20Liquidity
+        .mul(1000)
+        .div(remainingERC20_2Percent)
+
+      await approveTransaction(
+        L1ERC20_2,
+        L1LiquidityPool.address,
+        swapOnERC20Amount
+      )
+
+      await env.waitForRevertXDomainTransaction(
+        L1LiquidityPool.clientDepositL1Batch(
+          [
+            {
+              amount: swapOnETHAmount,
+              l1TokenAddress: ethers.constants.AddressZero,
+            },
+            { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
+            { amount: swapOnERC20Amount, l1TokenAddress: L1ERC20_2.address },
+          ],
+          { value: swapOnETHAmount, gasLimit: 9000000 }
+        ),
+        Direction.L1ToL2
+      )
+
+      const remainingERC20_1Percent = await getRemainingPercent(
+        userRewardERC20_1FeeRate
+      )
+
+      const postL1ERC20_1Balance = await L1ERC20_1.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL1ERC20_2Balance = await L1ERC20_2.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL2EthBalance = await env.l2Wallet.getBalance()
+      const postL2ERC20_1Balance = await L2ERC20_1.balanceOf(
+        env.l2Wallet.address
+      )
+      const postL2ERC20_2Balance = await L2ERC20_2.balanceOf(
+        env.l2Wallet.address
+      )
+
+      expect(preL1ERC20_1Balance).to.deep.eq(
+        postL1ERC20_1Balance.add(depositAmount)
+      )
+      expect(preL1ERC20_2Balance).to.deep.eq(
+        postL1ERC20_2Balance.add(
+          swapOnERC20Amount.mul(userRewardMinFeeRate).div(BigNumber.from(1000))
+        )
+      )
+      expect(preL2EthBalance).to.deep.eq(postL2EthBalance)
+      expect(postL2ERC20_1Balance).to.deep.eq(
+        preL2ERC20_1Balance.add(
+          depositAmount.mul(remainingERC20_1Percent).div(1000)
+        )
+      )
+      expect(preL2ERC20_2Balance).to.deep.eq(postL2ERC20_2Balance)
     })
   })
 })
