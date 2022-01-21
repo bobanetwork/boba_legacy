@@ -21,8 +21,9 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   NETWORKS = {
     rinkeby: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
+      VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
       MM_Label:         `Rinkeby`,
-      addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`, 
+      addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
       L1: {
         name: "Rinkeby",
         chainId: 4,
@@ -45,8 +46,9 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   NETWORKS = {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
+      VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
       MM_Label:         `Mainnet`,
-      addressManager:   `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`, 
+      addressManager:   `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`,
       L1: {
         name: "Mainnet",
         chainId: 1,
@@ -70,7 +72,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
     local: {
       OMGX_WATCHER_URL: null, //Does not exist on local
       MM_Label:         `Local`,
-      addressManager:   `0x5FbDB2315678afecb367f032d93F642f64180aa3`, 
+      addressManager:   `0x5FbDB2315678afecb367f032d93F642f64180aa3`,
       L1: {
         name: "Local L1",
         chainId: 31337,
@@ -107,4 +109,8 @@ export function getAllNetworks () {
 
 export function getBaseServices () {
   return BaseServices
+}
+
+export function getMaxHealthBlockLag () {
+  return process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG || 100
 }

@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import "@nomiclabs/hardhat-etherscan"
+import '@nomiclabs/hardhat-etherscan'
 import './tasks/deploy'
 
 // Load environment variables from .env
@@ -46,6 +46,17 @@ const config: HardhatUserConfig = {
           metadata: {
             bytecodeHash: 'none',
           },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
+      },
+      {
+        version: '0.6.6', // Required for oracle
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
           outputSelection: {
             '*': {
               '*': ['storageLayout'],
