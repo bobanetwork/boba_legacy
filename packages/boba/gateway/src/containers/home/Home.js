@@ -112,9 +112,7 @@ function Home() {
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen ] = useState(false)
-
   const [ enabled, setEnabled ] = useState(false)
-  const [ walletEnabled ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
@@ -192,8 +190,7 @@ function Home() {
   }, [ dispatch, enabled ])
 
   console.log("Home - enabled:", enabled)
-  console.log("Home - walletEnabled:", walletEnabled)
-  
+
   return (
     <>
       {!!depositModalState && <DepositModal open={depositModalState} token={token} fast={fast} />}

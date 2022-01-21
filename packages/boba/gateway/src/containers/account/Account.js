@@ -31,7 +31,7 @@ import * as S from './Account.styles'
 
 import PageHeader from 'components/pageHeader/PageHeader'
 import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@material-ui/core'
-import { fetchLookUpPrice, fetchTransactions } from 'actions/networkAction'
+import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'
 import { tableHeadList } from './tableHeadList'
@@ -55,7 +55,7 @@ function Account () {
   const walletMethod = useSelector(selectWalletMethod())
   const accountEnabled = useSelector(selectAccountEnabled())
   
-  console.log("Account - enabled:", walletMethod)
+  console.log("Account - walletMethod:", walletMethod)
   console.log("Account - accountEnabled:", accountEnabled)
 
   const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
@@ -64,7 +64,6 @@ function Account () {
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
 
   const tokenList = useSelector(selectTokens)
-
   const network = useSelector(selectNetwork())
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
@@ -124,9 +123,21 @@ function Account () {
     getLookupPrice()
   },[ childBalance, rootBalance, getLookupPrice, accountEnabled ])
 
+  // get some data quickly for impatient people
+  useEffect(()=>{
+    if (walletMethod === null) return
+    //dispatch(fetchBalances())
+  },[ walletMethod ])
+
   useInterval(() => {
-    if (!accountEnabled) return
-    dispatch(fetchTransactions())
+    console.log("Checking balances?", walletMethod)
+    if (walletMethod === null) {
+      console.log("Wallet still null")
+      return
+    }
+    //console.log("Account - checking balances")
+    //dispatch(fetchTransactions())
+    //dispatch(fetchBalances())
   }, POLL_INTERVAL)
 
   const theme = useTheme()

@@ -115,6 +115,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
       }
 
       if (initialized === 'enabled') {
+        console.log("NS: ACCOUNT IS ENABLED")
         return setAccountEnabled(true)
       }
 
@@ -123,8 +124,10 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   }, [ walletEnabled, masterConfig, accountEnabled ])
 
   useEffect(() => {
+    console.log("NS: accountEnabled?", accountEnabled)
     if (accountEnabled) {
         onEnable(true)
+        console.log("NS: SETTING ACCOUNT TO ENABLED")
         dispatch(setAccountState(true))
     }
   }, [ onEnable, accountEnabled, dispatch ])
