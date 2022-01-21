@@ -459,8 +459,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
                 this.state.lastQueriedL2Block
               ),
             ]
-          : [...Array(latestQueriedL2Block - this.state.lastQueriedL2Block)].map(
-            (_, i) =>
+          : [
+              ...Array(latestQueriedL2Block - this.state.lastQueriedL2Block),
+            ].map((_, i) =>
               this.options.l2RpcProvider.getBlockWithTransactions(
                 this.state.lastQueriedL2Block + i + 1
               )
@@ -492,7 +493,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       if (L2ETHCollectFee.lt(this.state.L2ETHVaultBalance)) {
         this.state.L2ETHVaultBalance = L2ETHCollectFee
       }
-      L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(this.state.L2ETHVaultBalance)
+      L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(
+        this.state.L2ETHVaultBalance
+      )
       this.state.L2ETHVaultBalance = L2ETHCollectFee
 
       this.state.L2ETHCollectFee = this.state.L2ETHCollectFee.add(

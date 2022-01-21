@@ -2481,7 +2481,8 @@ describe('Liquidity Pool Test', async () => {
       const remainingETHPercent = await getRemainingPercent(userRewardFeeRate)
       const userRewardERC20_1FeeRate =
         await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_1.address)
-      const userRewardERC20_2FeeRate = await L1LiquidityPool.getUserRewardFeeRate(L1ERC20_2.address)
+      const userRewardERC20_2FeeRate =
+        await L1LiquidityPool.getUserRewardFeeRate(L1ERC20_2.address)
       const remainingERC20_2Percent = await getRemainingPercent(
         userRewardERC20_2FeeRate
       )

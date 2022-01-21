@@ -394,7 +394,7 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 	log.Debug("TURING-CREDIT:Before", "balUser", balUser, "price", price)
 
 	if balUser.Cmp(price) < 0 {
-		log.Warn("TURING-CREDIT:Insufficent credit", "balUser", balUser, "price", price)
+		log.Warn("TURING-CREDIT:Insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
 
