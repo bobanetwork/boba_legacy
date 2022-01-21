@@ -1,18 +1,45 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
+
 import "./ITuringHelper.sol";
 
-contract TuringHelper is ITuringHelper {
+contract TuringHelper is ITuringHelper, Ownable {
 
   TuringHelper Self;
 
+  // This protects your own credits for this helper contract
+  mapping(address => bool) public permittedCaller;
+
+  event AddPermittedCaller(address _callerAddress);
+  event RemovePermittedCaller(address _callerAddress);
   event OffchainResponse(uint version, bytes responseData);
   event OffchainRandom(uint version, uint256 random);
   event Offchain42(uint version, uint256 random);
 
+  modifier onlyPermittedCaller() {
+    require(
+      permittedCaller[msg.sender],
+      'Invalid Caller Address'
+    );
+    _;
+  }
+
   constructor () public {
     Self = TuringHelper(address(this));
+  }
+
+  function addPermittedCaller(address _callerAddress)
+    public onlyOwner {
+      permittedCaller[_callerAddress] = true;
+      emit AddPermittedCaller(_callerAddress);
+  }
+
+  function removePermittedCaller(address _callerAddress)
+    public onlyOwner {
+      permittedCaller[_callerAddress] = false;
+      emit RemovePermittedCaller(_callerAddress);
   }
 
   function GetErrorCode(uint32 rType)
@@ -41,7 +68,7 @@ contract TuringHelper is ITuringHelper {
      This response is then passed back to the caller.
   */
   function GetResponse(uint32 rType, string memory _url, bytes memory _payload)
-    public returns (bytes memory) {
+    public onlyPermittedCaller returns (bytes memory) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (_payload.length > 0, "Turing:GetResponse:no payload");
@@ -50,7 +77,7 @@ contract TuringHelper is ITuringHelper {
   }
 
   function GetRandom(uint32 rType, uint256 _random)
-    public returns (uint256) {
+    public onlyPermittedCaller returns (uint256) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (rType == 2, string(GetErrorCode(rType)));
@@ -58,7 +85,7 @@ contract TuringHelper is ITuringHelper {
   }
 
   function Get42(uint32 rType, uint256 _random)
-    public returns (uint256) {
+    public onlyPermittedCaller returns (uint256) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (rType == 2, string(GetErrorCode(rType)));
@@ -79,7 +106,7 @@ contract TuringHelper is ITuringHelper {
      offchain interaction.
   */
   function TuringTx(string memory _url, bytes memory _payload)
-    public override returns (bytes memory) {
+    public onlyPermittedCaller override returns (bytes memory) {
       require (_payload.length > 0, "Turing:TuringTx:no payload");
 
       /* Initiate the request. This can't be a local function call
@@ -92,7 +119,7 @@ contract TuringHelper is ITuringHelper {
   }
 
   function TuringRandom()
-    public returns (uint256) {
+    public onlyPermittedCaller returns (uint256) {
 
       uint256 response = Self.GetRandom(1, 0);
       emit OffchainRandom(0x01, response);
@@ -100,7 +127,7 @@ contract TuringHelper is ITuringHelper {
   }
 
   function Turing42()
-    public returns (uint256) {
+    public onlyPermittedCaller returns (uint256) {
 
       uint256 response = Self.Get42(2, 42);
       emit Offchain42(0x01, response);
