@@ -969,6 +969,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           l1GasPrice: l1GasPrice.toNumber(),
           l1BaseFee: l1BaseFee.toNumber(),
           minL1BaseFee: this.options.minL1BaseFee,
+          maxL1BaseFee: this.options.maxL1BaseFee,
         })
       }
     } catch (error) {
