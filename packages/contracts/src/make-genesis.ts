@@ -137,8 +137,10 @@ export const makeL2GenesisFile = async (
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
       if (predeployName === 'BobaTuringHelper') {
-        const index = BigNumber.from('0').toHexString();
-        dump[predeployAddress].storage[utils.hexZeroPad(index, 32)] = predeploys.BobaTuringHelper
+        const indexOwner = BigNumber.from('0').toHexString();
+        dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
+        const indexAddress = BigNumber.from('1').toHexString();
+        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
         break
       }
       const storageLayout = await getStorageLayout(predeployName)
