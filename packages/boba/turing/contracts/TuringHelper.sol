@@ -21,7 +21,7 @@ contract TuringHelper is ITuringHelper, Ownable {
   modifier onlyPermittedCaller() {
     require(
       permittedCaller[msg.sender],
-      'Invalid Caller Contract'
+      'Invalid Caller Address'
     );
     _;
   }
