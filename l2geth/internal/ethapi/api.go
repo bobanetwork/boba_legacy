@@ -1048,7 +1048,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		data = []byte(*args.Data)
 	}
 
-	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, types.QueueOriginSequencer)}
+	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
 
 	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	l2ExtraGas := new(big.Int)

@@ -13,6 +13,7 @@ const gasOverride =  {
   gasLimit: 3000000
 }
 
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 import Lending from "../artifacts/contracts/Lending.sol/Lending.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
@@ -44,22 +45,14 @@ describe("Pull Bitcoin - USD quote", function () {
 
     urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
     console.log("    URL set to", urlStr)
-    
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
-
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
-        
+            
     Factory__Lending = new ContractFactory(
       (Lending.abi),
       (Lending.bytecode),
       testWallet)
     
     lending = await Factory__Lending.deploy(
-      helper.address,
+      helperPredeploy,
       gasOverride
     )
 
@@ -68,7 +61,7 @@ describe("Pull Bitcoin - USD quote", function () {
 
   it("should return the helper address", async () => {
     let helperAddress = await lending.helperAddr()
-    expect(helperAddress).to.equal(helper.address)
+    expect(helperAddress).to.equal(helperPredeploy)
   })
 
   it("should get the current Bitcoin - USD price", async () => {

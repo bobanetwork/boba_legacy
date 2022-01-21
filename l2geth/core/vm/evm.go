@@ -202,7 +202,7 @@ func (evm *EVM) Interpreter() Interpreter {
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
-func bobaTuringRandom(input []byte) hexutil.Bytes {
+func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 
 	var ret hexutil.Bytes
 
@@ -226,15 +226,21 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
 	if rType != 1 {
-		log.Error("TURING-1 bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
+		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
 	}
 
 	rlen := len(rest)
 	if rlen < 2*32 {
-		log.Error("TURING-2 bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
+		log.Error("TURING bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
 		retError[35] = 11 // Calldata too short
+		return retError
+	}
+
+	if evm.StateDB.TuringCheck(caller) != nil {
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
 		return retError
 	}
 
@@ -255,7 +261,7 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	//generate a BigInt random number
 	randomBigInt := n
 
-	log.Debug("TURING-3 bobaTuringRandom:Random number",
+	log.Debug("TURING bobaTuringRandom:Random number",
 		"randomBigInt", randomBigInt)
 
 	// build the calldata
@@ -264,17 +270,24 @@ func bobaTuringRandom(input []byte) hexutil.Bytes {
 	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
 	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomBigInt))...)
 
-	log.Debug("TURING-4 bobaTuringRandom:Modified parameters",
+	log.Debug("TURING bobaTuringRandom:Modified parameters",
 		"newValue", ret)
+
+	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
+		return retError
+	}
 
 	return ret
 }
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
-func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
+// caller is the address of the TuringHelper contract
+func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
-	log.Debug("TURING-0 bobaTuringCall:Caller", "caller", caller.String())
+	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String())
 
 	var responseStringEnc string
 	var responseString []byte
@@ -307,15 +320,21 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
 	if rType != 1 {
-		log.Error("TURING-1 bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
+		log.Error("TURING bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
 	}
 
 	rlen := len(rest)
 	if rlen < 7*32 {
-		log.Error("TURING-2 bobaTuringCall:Calldata too short", "len < 7*32", rlen)
+		log.Error("TURING bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
+		return retError
+	}
+
+	if evm.StateDB.TuringCheck(caller) != nil {
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
 		return retError
 	}
 
@@ -342,7 +361,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	// Check the URL length
 	// Note: we do not handle URLs that are longer than 64 characters
 	if lengthURL > 64 {
-		log.Error("TURING-3 bobaTuringCall:URL > 64", "urlLength", lengthURL)
+		log.Error("TURING bobaTuringCall:URL > 64", "urlLength", lengthURL)
 		retError[35] = 12 // URL string > 64 bytes
 		return retError
 	}
@@ -355,28 +374,28 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	// At this point, we have the API endpoint and the payload that needs to go there...
 	payload := restHexUtil[startIDXpayload:] //using hex here since that makes it easy to get the string
 
-	log.Debug("TURING-4 bobaTuringCall:Have URL and payload",
+	log.Debug("TURING bobaTuringCall:Have URL and payload",
 		"url", url,
 		"payload", payload)
 
 	client, err := rpc.Dial(url)
 
 	if client != nil {
-		startT := time.Now()
-		log.Debug("TURING-6 bobaTuringCall:Calling off-chain client at", "url", url)
+    startT := time.Now()
+		log.Debug("TURING bobaTuringCall:Calling off-chain client at", "url", url)
 		if err := client.CallTimeout(&responseStringEnc, caller.String(), 1200 * time.Millisecond, payload); err != nil {
-			log.Error("TURING-7 bobaTuringCall:Client error", "err", err)
+			log.Error("TURING bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError
 		}
 		if len(responseStringEnc) > 322 {
-			log.Error("TURING-8a bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
+			log.Error("TURING bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
 			retError[35] = 17 // Raw Response too long
 			return retError
 		}
 		responseString, err = hexutil.Decode(responseStringEnc)
 		if err != nil {
-			log.Error("TURING-8b bobaTuringCall:Error decoding responseString", "err", err)
+			log.Error("TURING bobaTuringCall:Error decoding responseString", "err", err)
 			retError[35] = 14 // Client Response Decode Error
 			return retError
 		}
@@ -397,7 +416,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		// In this attack, the idea would be to break client.Call as it is trying to pack the response into &responseStringEnc
 		// Alternatively, could attack hexutil.Decode
 		if len(responseString) > 160 {
-			log.Error("TURING-8c bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
+			log.Error("TURING bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
 			retError[35] = 18 // Response too big
 			return retError
 		}
@@ -405,12 +424,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		elapsed := t.Sub(startT)
 		log.Debug("TURING API response time", "elapsed", elapsed)
 	} else {
-		log.Error("TURING-9 bobaTuringCall:Failed to create client for off-chain request", "err", err)
+		log.Error("TURING bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		retError[35] = 15 // Could not create client
 		return retError
 	}
 
-	log.Debug("TURING-10 bobaTuringCall:Have valid response from offchain API",
+	log.Debug("TURING bobaTuringCall:Have valid response from offchain API",
 		"Target", url,
 		"Payload", payload,
 		"ResponseStringEnc", responseStringEnc,
@@ -422,8 +441,14 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
 	ret = append(ret, responseString...)         // and tack on the payload
 
-	log.Debug("TURING-11 bobaTuringCall:Modified parameters",
+	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
+
+	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
+		return retError
+	}
 
 	return ret
 }
@@ -521,9 +546,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			if isTuring2 {
-				updated_input = bobaTuringCall(input, caller.Address())
+				updated_input = evm.bobaTuringCall(input, caller.Address())
 			} else if isGetRand2 {
-				updated_input = bobaTuringRandom(input)
+				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
@@ -542,7 +567,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		ret, err = run(evm, contract, input, false)
 	}
 
-	log.Debug("evm.go run",
+	log.Debug("TURING evm.go run",
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
 		"err", err,
