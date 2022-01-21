@@ -118,6 +118,16 @@ contract OVM_GasPriceOracle is Ownable {
   }
 
   /**
+   * Computes the extra L2 gas to cover the
+   * L1 security fee
+   * @param _data Unsigned RLP encoded tx, 6 elements
+   * @return L2 extra gas that should be included in the L2 gas
+   */
+  function getExtraL2Gas(bytes memory _data) public view returns (uint256) {
+    return getL1Fee(_data) / gasPrice;
+  }
+
+  /**
    * Computes the amount of L1 gas used for a transaction
    * The overhead represents the per batch gas overhead of
    * posting both transaction and state roots to L1 given larger
