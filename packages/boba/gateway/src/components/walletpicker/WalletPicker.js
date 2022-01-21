@@ -27,7 +27,7 @@ import {
 } from 'selectors/setupSelector'
 
 import { openModal } from 'actions/uiAction'
-import { setWalletMethod, setAccountState } from 'actions/setupAction'
+import { setWalletMethod } from 'actions/setupAction'
 import { getAllNetworks } from 'util/masterConfig'
 
 import { isChangingChain } from 'util/changeChain'
@@ -65,7 +65,6 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
 
   let maintenance = false
-
   if (process.env.REACT_APP_STATUS === 'maintenance') {
     maintenance = true
   }
@@ -85,16 +84,14 @@ function WalletPicker({ onEnable, enabled, isButton }) {
       console.log("setupBrowserWallet for:", masterConfig)
       const selectedNetwork = masterConfig
       const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
-      return walletEnabled
-        ? setWalletEnabled(true)
-        : dispatchSetWalletMethod(null);
+      return walletEnabled ? setWalletEnabled(true) : dispatchSetWalletMethod(null)
     }
 
   }, [ dispatchSetWalletMethod, walletMethod, masterConfig, dispatch ])
 
   useEffect(() => {
 
-    if (walletEnabled) {
+    if (walletEnabled && accountEnabled === false) {
       initializeAccount()
     }
 
@@ -116,21 +113,13 @@ function WalletPicker({ onEnable, enabled, isButton }) {
 
       if (initialized === 'enabled') {
         console.log("NS: ACCOUNT IS ENABLED")
+        onEnable(true) //this information flows to home and then to all the views
         return setAccountEnabled(true)
       }
 
     }
 
-  }, [ walletEnabled, masterConfig, accountEnabled ])
-
-  useEffect(() => {
-    console.log("NS: accountEnabled?", accountEnabled)
-    if (accountEnabled) {
-        onEnable(true)
-        console.log("NS: SETTING ACCOUNT TO ENABLED")
-        dispatch(setAccountState(true))
-    }
-  }, [ onEnable, accountEnabled, dispatch ])
+  }, [ onEnable, walletEnabled, masterConfig, accountEnabled ])
 
   useEffect(() => {
     if (walletEnabled && wrongNetwork) {

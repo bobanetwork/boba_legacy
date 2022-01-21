@@ -46,7 +46,7 @@ import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 
-function Account () {
+function Account ({ enabled }) {
 
   const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
   
@@ -56,7 +56,7 @@ function Account () {
   const accountEnabled = useSelector(selectAccountEnabled())
   
   console.log("Account - walletMethod:", walletMethod)
-  console.log("Account - accountEnabled:", accountEnabled)
+  console.log("Account - accountEnabled:", enabled)
 
   const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
@@ -125,19 +125,19 @@ function Account () {
 
   // get some data quickly for impatient people
   useEffect(()=>{
-    if (walletMethod === null) return
-    //dispatch(fetchBalances())
-  },[ walletMethod ])
+    if (enabled) {
+      console.log("Account - checking balances initial")
+      dispatch(fetchTransactions())
+      dispatch(fetchBalances())
+    }
+  },[ enabled ])
 
   useInterval(() => {
-    console.log("Checking balances?", walletMethod)
-    if (walletMethod === null) {
-      console.log("Wallet still null")
-      return
+    if (enabled) {
+      console.log("Account - checking balances")
+      dispatch(fetchTransactions())
+      dispatch(fetchBalances())
     }
-    //console.log("Account - checking balances")
-    //dispatch(fetchTransactions())
-    //dispatch(fetchBalances())
   }, POLL_INTERVAL)
 
   const theme = useTheme()

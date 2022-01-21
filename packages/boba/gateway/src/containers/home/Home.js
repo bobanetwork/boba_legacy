@@ -112,6 +112,8 @@ function Home() {
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen ] = useState(false)
+
+  //used to get information back to various places
   const [ enabled, setEnabled ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
@@ -181,11 +183,11 @@ function Home() {
 
   useEffect(() => {
     if (isChangingChain) {
-      dispatch(setWalletMethod('browser'))
+      //dispatch(setWalletMethod('browser'))
     }
     if (enabled) {
-      localStorage.setItem('changeChain', false)
-      dispatch(addTokenList())
+      //localStorage.setItem('changeChain', false)
+      //dispatch(addTokenList())
     }
   }, [ dispatch, enabled ])
 
@@ -240,7 +242,7 @@ function Home() {
         <MainMenu enabled={enabled} onEnable={setEnabled} />
         <Container maxWidth="lg" sx={{ marginLeft: 'unset', marginRight: 'unset' }}>
           {pageDisplay === "AccountNow" &&
-            <Account />
+            <Account enabled={enabled} />
           }
           {pageDisplay === "History" &&
             <Transactions />

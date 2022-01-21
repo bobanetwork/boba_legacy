@@ -46,7 +46,7 @@ function WrongNetworkModal ({ open, onClose }) {
 
   /*
     This is fired if the internal setting of the gateway does not match the 
-    MetaMask configuration. There are multiple networks (e.g. mainent and rinkeby), 
+    MetaMask configuration. There are multiple networks (e.g. mainnet and rinkeby), 
     and multiple layers, e.g. L1 and L2 
   */
 
