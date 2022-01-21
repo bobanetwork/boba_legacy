@@ -31,7 +31,8 @@ type StateDB interface {
 	AddBalance(common.Address, *big.Int)
 	GetBalance(common.Address) *big.Int
 
-	TuringCharge(userID common.Address, amount *big.Int) error
+	TuringCharge(userID common.Address) error
+	TuringCheck(userID common.Address) error
 
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)

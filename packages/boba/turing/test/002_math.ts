@@ -20,12 +20,12 @@ import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.j
 
 let Factory__Hello: ContractFactory
 let hello: Contract
-let Factory__Helper: ContractFactory
 let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 // Key for autofunded L2 Hardhat test account
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
@@ -92,28 +92,29 @@ describe("Basic Math", function () {
     
     console.log("    Created local HTTP server at", urlStr)
     
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
+    // Factory__Helper = new ContractFactory(
+    //   (TuringHelper.abi),
+    //   (TuringHelper.bytecode),
+    //   testWallet)
 
-    // defines the URL that will be called by HelloTuring.sol
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
+    // // defines the URL that will be called by HelloTuring.sol
+    // helper = await Factory__Helper.deploy(gasOverride)
+    // console.log("    Helper contract deployed as", helper.address, "on", "L2")
 
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
       testWallet)
     
-    hello = await Factory__Hello.deploy(helper.address, gasOverride)
+    hello = await Factory__Hello.deploy(helperPredeploy, gasOverride)
     
     console.log("    Test contract deployed as", hello.address)
   })
 
   it("should return the helper address", async () => {
     let helperAddress = await hello.helperAddr();
-    expect(helperAddress).to.equal(helper.address)
+    console.log("    Helper at", helperAddress)
+    expect(helperAddress).to.equal(helperPredeploy)
   })
 
   it("test of local compute endpoint: should do basic math via direct server query", async () => {

@@ -238,6 +238,12 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 		return retError
 	}
 
+	if evm.StateDB.TuringCheck(caller) != nil {
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
+		return retError
+	}
+
 	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
 	one := big.NewInt(1)
 	two := big.NewInt(2)
@@ -267,7 +273,7 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 	log.Debug("TURING bobaTuringRandom:Modified parameters",
 		"newValue", ret)
 
-	if evm.StateDB.TuringCharge(caller, common.Big1) != nil { // charge 1 credit for now
+	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
 		log.Error("TURING bobaTuringCall:Insufficient credit")
 		retError[35] = 19 // Insufficient funds
 		return retError
@@ -323,6 +329,12 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Byte
 	if rlen < 7*32 {
 		log.Error("TURING bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
+		return retError
+	}
+
+	if evm.StateDB.TuringCheck(caller) != nil {
+		log.Error("TURING bobaTuringCall:Insufficient credit")
+		retError[35] = 19 // Insufficient funds
 		return retError
 	}
 
@@ -432,7 +444,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Byte
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
 
-	if evm.StateDB.TuringCharge(caller, common.Big1) != nil { // charge 1 credit for now
+	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
 		log.Error("TURING bobaTuringCall:Insufficient credit")
 		retError[35] = 19 // Insufficient funds
 		return retError

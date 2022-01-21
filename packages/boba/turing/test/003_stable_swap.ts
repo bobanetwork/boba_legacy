@@ -13,12 +13,12 @@ const gasOverride =  {
   gasLimit: 3000000 //3,000,000
 }
 
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 import StableSwap from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
 let Factory__Stable: ContractFactory
 let stable: Contract
-let Factory__Helper: ContractFactory
 let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
@@ -44,22 +44,14 @@ describe("Stableswap at AWS Lambda", function () {
 
     urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/swapy'
     console.log("    URL set to", urlStr)
-    
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
-
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
-        
+            
     Factory__Stable = new ContractFactory(
       (StableSwap.abi),
       (StableSwap.bytecode),
       testWallet)
     
     stable = await Factory__Stable.deploy(
-      helper.address,
+      helperPredeploy,
       800,  //initial X
       1200, //initial Y
       gasOverride
@@ -72,7 +64,7 @@ describe("Stableswap at AWS Lambda", function () {
 
   it("should return the helper address", async () => {
     let helperAddress = await stable.helperAddr()
-    expect(helperAddress).to.equal(helper.address)
+    expect(helperAddress).to.equal(helperPredeploy)
   })
 
   it("should correctly swap X in for Y out", async () => {

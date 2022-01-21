@@ -71,7 +71,10 @@ const deployFn: DeployFunction = async (hre) => {
   // Set turing token
   const setToken = await BobaTuringCredit.updateTuringToken(L2Boba.address)
   await setToken.wait()
-  console.log(`Turing token was set to ${L2Boba.address}`)
+  console.log(`Turing token was set to L2 Boba at ${L2Boba.address}`)
+
+  console.log(`BobaTuringCredit is at ${BobaTuringCredit.address}`)
+  console.log(`BobaTuringHelper is at ${BobaTuringHelper.address}`)
 
   // Deposit Boba to BobaTuringHelper and set Turing price
   const approveL2BobaTx = await L2Boba.approve(

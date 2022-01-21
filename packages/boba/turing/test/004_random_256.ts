@@ -13,6 +13,7 @@ const gasOverride =  {
   gasLimit: 3000000 //3,000,000
 }
 
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
@@ -30,21 +31,13 @@ const testWallet = new Wallet(testPrivateKey, local_provider)
 describe("Turing VRF", function () {
 
   before(async () => {
-
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
-
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed at", helper.address, "on", "L2")
     
     Factory__Turing = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
       testWallet)
     
-    turing = await Factory__Turing.deploy(helper.address, gasOverride)
+    turing = await Factory__Turing.deploy(helperPredeploy, gasOverride)
     console.log("    Test contract deployed at", turing.address)
   })
 

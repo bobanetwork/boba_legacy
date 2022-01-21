@@ -86,6 +86,14 @@ func GetTuringOwnerBalanceKey() common.Hash {
 	return common.BytesToHash(digest)
 }
 
+func GetTuringPriceKey() common.Hash {
+	position := common.Big3
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -383,7 +391,7 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
  */
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
-func (s *StateDB) TuringCharge(userID common.Address, amount *big.Int) error {
+func (s *StateDB) TuringCharge(userID common.Address) error {
 	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
 	// userID is the address of that user's Turing Helper contract
 
@@ -395,22 +403,51 @@ func (s *StateDB) TuringCharge(userID common.Address, amount *big.Int) error {
 	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
 	balOwner := valueOwner.Big()
 
-	log.Debug("TURING-CREDIT:Payment before", "balUser", balUser, "balOwner", balOwner)
+	keyPrice := GetTuringPriceKey()
+	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
+	price := value.Big()
 
-	if balUser.Cmp(amount) < 0 {
-		log.Warn("TURING-CREDIT:User insufficent credit", "balUser", balUser)
+	log.Debug("TURING-CREDIT:Payment before", "balUser", balUser, "balOwner", balOwner, "price", price)
+
+	if balUser.Cmp(price) < 0 {
+		log.Warn("TURING-CREDIT:User insufficent credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
 
 	// perform the transfer
-	balUser = balUser.Sub(balUser, amount)
-	balOwner = balOwner.Add(balOwner, amount)
+	balUser = balUser.Sub(balUser, price)
+	balOwner = balOwner.Add(balOwner, price)
 
 	//set the states
 	s.SetState(rcfg.OvmTuringCreditAddress, keyUser, common.BigToHash(balUser))
 	s.SetState(rcfg.OvmTuringCreditAddress, keyOwner, common.BigToHash(balOwner))
 
-	log.Debug("TURING-CREDIT:Payment completed", "balUser", balUser, "balOwner", balOwner)
+	log.Debug("TURING-CREDIT:Payment completed", "balUser", balUser, "balOwner", balOwner, "price", price)
+
+	return nil
+}
+
+// TuringCharge moves Turing credits from a credit wallet to the operator
+func (s *StateDB) TuringCheck(userID common.Address) error {
+	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
+	// userID is the address of that user's Turing Helper contract
+
+	keyUser := GetTuringPrepayKey(userID)
+	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
+	balUser := valueUser.Big()
+
+	keyPrice := GetTuringPriceKey()
+	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
+	price := value.Big()
+
+	log.Debug("TURING-CREDIT-CHECK:Payment before", "balUser", balUser, "price", price)
+
+	if balUser.Cmp(price) < 0 {
+		log.Warn("TURING-CREDIT-CHECK:User insufficent credit", "balUser", balUser, "price", price)
+		return errors.New("Insufficient Turing credit")
+	}
+
+	log.Debug("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
 
 	return nil
 }
