@@ -18,15 +18,16 @@ contract TuringHelper is ITuringHelper {
   function GetErrorCode(uint32 rType)
     internal view returns (string memory) {
       if(rType ==  1) return "TURING: Geth intercept failure";
-      if(rType == 10) return "TURING: Incorrect input state (rType==1)";
+      if(rType == 10) return "TURING: Incorrect input state";
       if(rType == 11) return "TURING: Calldata too short";
-      if(rType == 12) return "TURING: URL too long (>64)";
+      if(rType == 12) return "TURING: URL >64 bytes";
       if(rType == 13) return "TURING: Server error";
       if(rType == 14) return "TURING: Could not decode server response";
       if(rType == 15) return "TURING: Could not create rpc client";
-      if(rType == 16) return "TURING: Random number generation failure";
-      if(rType == 17) return "TURING: Response from API too long (>322)";
-      if(rType == 18) return "TURING: Response from API too big (>160 bytes)";
+      if(rType == 16) return "TURING: RNG failure";
+      if(rType == 17) return "TURING: API Response >322 chars";
+      if(rType == 18) return "TURING: API Response >160 bytes";
+      if(rType == 19) return "TURING: Insufficient credit";
   }
 
   /* This is the interface to the off-chain mechanism. Although
