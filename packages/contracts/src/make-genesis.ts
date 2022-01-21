@@ -7,7 +7,6 @@ import {
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
 import { utils, BigNumber } from 'ethers'
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -44,6 +43,8 @@ export interface RollupDeployConfig {
   l1CrossDomainMessengerAddress: string
   // Boba turing price
   bobaTuringPrice: string
+  // Turing helper json
+  TuringHelperJson: any
 }
 
 /**
@@ -127,7 +128,7 @@ export const makeL2GenesisFile = async (
       // and returns the address given by that opcode.
       dump[predeployAddress].code = '0x4B60005260206000F3'
     } else if (predeployName === 'BobaTuringHelper') {
-      dump[predeployAddress].code = TuringHelperJson.deployedBytecode
+      dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
     } else {
       const artifact = getContractArtifact(predeployName)
       dump[predeployAddress].code = artifact.deployedBytecode

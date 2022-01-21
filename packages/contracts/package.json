@@ -16,7 +16,7 @@
   "author": "Optimism PBC",
   "license": "MIT",
   "scripts": {
-    "build": "yarn build:contracts && yarn autogen:artifacts",
+    "build": "yarn build:contracts && yarn autogen:artifacts && yarn build:typescript",
     "build:typescript": "tsc -p ./tsconfig.build.json",
     "build:contracts": "hardhat compile --show-stack-traces",
     "build:dump": "ts-node bin/take-dump.ts",

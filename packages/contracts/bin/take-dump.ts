@@ -4,6 +4,8 @@ import * as path from 'path'
 import * as mkdirp from 'mkdirp'
 import { utils, Wallet } from 'ethers'
 
+import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+
 const ensure = (value, key) => {
   if (typeof value === 'undefined' || value === null || Number.isNaN(value)) {
     throw new Error(`${key} is undefined, null or NaN`)
@@ -102,6 +104,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     l1FeeWalletAddress,
     l1CrossDomainMessengerAddress,
     bobaTuringPrice,
+    TuringHelperJson,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))
