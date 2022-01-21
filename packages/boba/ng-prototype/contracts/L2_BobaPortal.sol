@@ -61,8 +61,8 @@ contract L2_BobaPortal {
   mapping (address => bool) fastList;
   
   // Rolling hashes
-  bytes32 hashOut;
-  bytes32 hashIn;
+  bytes32 public hashOut;
+  bytes32 public hashIn;
   
   // sentHashes stores a permanent record of all outbound rolling hashes. This could be used for
   // an Optimism-style inclusion proof. It also guards against some forms of tampering in the 

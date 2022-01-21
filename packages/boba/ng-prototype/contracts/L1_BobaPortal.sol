@@ -77,6 +77,12 @@ contract L1_BobaPortal {
   // Rolling hashes
   bytes32 hashOut;
   bytes32 hashIn;
+  
+  // This is expensive but may be necessary to protect against 51% attacks on the fast-bridge system.
+  // Each FastBatchIn must provide a hash value which was previously sent down from L1 to L2. There is
+  // presently no way to prune old hashes which are no longer needed, however there is also no way to 
+  // contorl how many messages are in flight L1->L2->L1. 
+  mapping (bytes32 => uint256) sentHashes;
 
   event SysPaid(address, uint);
   event UserRelayedDown(address, address, uint, uint);
@@ -108,6 +114,8 @@ contract L1_BobaPortal {
     
     hashIn = keccak256("");
     hashOut = keccak256("");
+    sentHashes[hashOut] = type(uint256).max; // Avoids an assertion failure when bringing a new system up.
+    
     healthCheckDeadline = type(uint256).max;
   }
 
@@ -141,6 +149,7 @@ contract L1_BobaPortal {
     hashOut = keccak256(abi.encodePacked(hashOut, msgHash));
 
     emit BobaMsgDown(bytes32(mh), hashOut, payload);
+    sentHashes[hashOut] = mh;
   }
 
   // "refund" = L2 address who can claim undeliverable messages, possibly recover oETH (?)
@@ -342,7 +351,7 @@ contract L1_BobaPortal {
 
   event MMDBG_Batch(uint64 indexed, uint256 indexed, uint32 indexed, bytes);
 
-  function FastBatchIn(uint64 prevBlock, bytes32 prevSR, bytes32[] calldata rHash, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
+  function FastBatchIn(uint64 prevBlock, bytes32 prevSR, bytes32 rHash1, bytes32 rHash2, bytes32[] calldata headers, bytes[] calldata bodies, bytes[] calldata proofs)
     public
   {
     require(block.timestamp < healthCheckDeadline, "System health check failed");
@@ -351,6 +360,9 @@ contract L1_BobaPortal {
     if (prevBlock == highestL2Block && highestL2SR != 0) {
       require(prevSR == highestL2SR, "Previous StateRoot does not match");
     }
+    
+    // Guards against chain rewrites which alter the L1->L2 message sequence.
+    require(sentHashes[rHash1] != 0, "Invalid rHash1");
 
     require (headers.length == bodies.length, "Batch sizes do not match");
 
@@ -364,12 +376,10 @@ contract L1_BobaPortal {
       if(msgType & 0x80000000 != 0) {
         bytes32 msgHash = keccak256(abi.encodePacked(h2,bodies[i]));
         hashIn = keccak256(abi.encodePacked(hashIn,msgHash));
-        require(hashIn == rHash[i], "Rolling hash mismatch (fast)");
       
         FastMsgIn(headers[i], msgSequence,msgType,L1Value,bodies[i], proofs[i]);
       } else {
         hashIn = keccak256(abi.encodePacked(hashIn,bodies[i]));
-        require(hashIn == rHash[i], "Rolling hash mismatch (slow)");
         
         bytes memory payload = bodies[i];
         require(payload.length == 32, "Invalid msgHash");
@@ -380,6 +390,10 @@ contract L1_BobaPortal {
         SlowMsgNotify(headers[i], msgSequence,msgType,L1Value,mh);
       }
       //emit MMDBG_Batch(msgSequence, i, msgType, bodies[i]);
+    }
+    if (headers.length > 0) {
+      // If any intermediate rHash fails then the final values will differ
+      require(hashIn == rHash2, "Invalid rHash2");
     }
 
     highestL2Block = prevBlock;

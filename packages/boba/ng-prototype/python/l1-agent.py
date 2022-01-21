@@ -48,7 +48,7 @@ sccLast = []
 
 class Batch:
   def __init__(self):
-    self.rHash = []
+    self.rHash = None
     self.headers = []
     self.bodies = []
     self.proofs = []
@@ -61,7 +61,7 @@ class Batch:
    if self.msgStartTime is None:
      self.msgStartTime = time.time()
   
-   self.rHash.append(rHash)
+   self.rHash = rHash # Only keep the most recent one
    self.headers.append(hdr)
    self.bodies.append(body)
    self.proofs.append(proof)
@@ -572,10 +572,19 @@ def Submitter(env,A):
       assert(batch.prevBlock >= tip_block)
       #print("PRE1", len(batch.messages), "PB", batch.prevBlock, "SR", Web3.toHex(batch.prevSR), repr(batch.messages))
       #print("PRE2", Web3.toHex(batch.headers[0]), Web3.toHex(batch.bodies[0]))
-
+      
+      l1Hash = ctx.contracts['L2_BobaPortal'].functions.hashIn().call()
+      ctx.logPrint("Using l1Hash {}".format(Web3.toHex(l1Hash)))
+      
+      if batch.rHash is None:
+        batch.rHash = ctx.contracts['L2_BobaPortal'].functions.hashOut().call()
+        
+      ctx.logPrint("Using l2Hash {}".format(Web3.toHex(batch.rHash)))
+     
       t = ctx.contracts['L1_BobaPortal'].functions.FastBatchIn(
         batch.prevBlock,
         batch.prevSR,
+        l1Hash,
         batch.rHash,
         batch.headers,
         batch.bodies,
