@@ -254,7 +254,7 @@ describe('Native ETH Integration Tests', async () => {
       Direction.L2ToL1
     )
 
-    const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+    const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
     // Calculate the L1 portion of the fee
     const raw = serialize({
@@ -265,9 +265,6 @@ describe('Native ETH Integration Tests', async () => {
       to: transaction.to,
       data: transaction.data,
     })
-
-    const l1Fee = await env.gasPriceOracle.getL1Fee(raw)
-    const fee = l2Fee.add(l1Fee)
 
     const postBalances = await getBalances(env)
 
@@ -313,7 +310,7 @@ describe('Native ETH Integration Tests', async () => {
       .getBalance()
 
     // 3. do withdrawal
-    const withdrawnAmount = utils.parseEther('0.95')
+    const withdrawnAmount = utils.parseEther('0.5')
     const transaction = await env.l2Bridge
       .connect(other)
       .withdraw(
@@ -329,22 +326,9 @@ describe('Native ETH Integration Tests', async () => {
       Direction.L2ToL1
     )
 
-    // Compute the L1 portion of the fee
-    const l1Fee = await env.gasPriceOracle.getL1Fee(
-      serialize({
-        nonce: transaction.nonce,
-        value: transaction.value,
-        gasPrice: transaction.gasPrice,
-        gasLimit: transaction.gasLimit,
-        to: transaction.to,
-        data: transaction.data,
-      })
-    )
-
     // check that correct amount was withdrawn and that fee was charged
-    const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+    const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
-    const fee = l1Fee.add(l2Fee)
     const l1BalanceAfter = await other
       .connect(env.l1Wallet.provider)
       .getBalance()

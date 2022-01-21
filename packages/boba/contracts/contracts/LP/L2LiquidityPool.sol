@@ -75,6 +75,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         // start time
         uint256 startTime;
     }
+    // Token batch structure
+    struct ClientPayToken {
+        address payable to;
+        address l2TokenAddress;
+        uint256 amount;
+    }
 
     /*************
      * Variables *
@@ -872,6 +878,40 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyInitialized()
         onlyFromCrossDomainAccount(address(L1LiquidityPoolAddress))
         whenNotPaused
+    {
+        _initiateClientPayL2(_to, _amount, _tokenAddress);
+    }
+
+    /**
+     * Move funds in batch from L1 to L2, and pay out from the right liquidity pool
+     * @param _tokens tokens in batch
+     */
+    function clientPayL2Batch(
+        ClientPayToken [] calldata _tokens
+    )
+        external
+        onlyInitialized()
+        onlyFromCrossDomainAccount(address(L1LiquidityPoolAddress))
+        whenNotPaused
+    {
+        for (uint256 i = 0; i < _tokens.length; i++) {
+            ClientPayToken memory token = _tokens[i];
+            _initiateClientPayL2(token.to, token.amount, token.l2TokenAddress);
+        }
+    }
+
+    /**
+     * Move funds from L1 to L2, and pay out from the right liquidity pool
+     * @param _to receiver to get the funds
+     * @param _amount amount to to be transferred.
+     * @param _tokenAddress L2 token address
+     */
+    function _initiateClientPayL2(
+        address payable _to,
+        uint256 _amount,
+        address _tokenAddress
+    )
+        internal
     {
         // replyNeeded helps store the status if a message needs to be sent back to the other layer
         // in case there is not enough funds to give away
