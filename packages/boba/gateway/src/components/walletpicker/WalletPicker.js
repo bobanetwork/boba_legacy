@@ -71,6 +71,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   }
 
   const dispatchSetWalletMethod = useCallback((methodName) => {
+    console.log("dispatchSetWalletMethod:", methodName)
     dispatch(setWalletMethod(methodName))
   }, [ dispatch ])
 
@@ -81,6 +82,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
     }
 
     async function setupBrowserWallet() {
+      console.log("setupBrowserWallet for:", masterConfig)
       const selectedNetwork = masterConfig
       const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
       return walletEnabled
@@ -92,7 +94,13 @@ function WalletPicker({ onEnable, enabled, isButton }) {
 
   useEffect(() => {
 
+    if (walletEnabled) {
+      initializeAccount()
+    }
+
     async function initializeAccount() {
+
+      console.log("Calling initializeAccount for:", masterConfig)
 
       const initialized = await networkService.initializeAccounts(masterConfig)
 
@@ -111,9 +119,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
       }
 
     }
-    if (walletEnabled) {
-      initializeAccount()
-    }
+
   }, [ walletEnabled, masterConfig, accountEnabled ])
 
   useEffect(() => {

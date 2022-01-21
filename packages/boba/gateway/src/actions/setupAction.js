@@ -17,6 +17,7 @@ import store from 'store';
 
 export function setWalletMethod (methodName) {
   return function (dispatch) {
+    console.log("setWalletMethod:", methodName)
     return dispatch({ type: 'SETUP/WALLET_METHOD/SET', payload: methodName })
   }
 }

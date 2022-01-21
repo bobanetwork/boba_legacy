@@ -94,6 +94,9 @@ const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 let allAddresses = {}
 let allTokens = {}
 
+// hardcode addresses for boot-up speed
+const rinkebyAddresses = require(`../deployment/rinkeby/rinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json`)
+
 class NetworkService {
 
   constructor() {
@@ -116,8 +119,8 @@ class NetworkService {
     this.AddressManagerAddress = null
     this.AddressManager = null
 
-    //this.ERC721Address = null
-    //this.ERC721RegAddress = null
+    // this.ERC721Address = null
+    // this.ERC721RegAddress = null
 
     this.L1_TEST_Contract = null
     this.L2_TEST_Contract = null
@@ -416,6 +419,21 @@ class NetworkService {
     }
   }
 
+  async getAddressCached(cache, contractName, varToSet) {
+    const address = cache[contractName]
+    if (typeof(address) === 'undefined') {
+      console.log(contractName + ' ERROR: NOT IN CACHE')
+      return false
+    } else {
+      allAddresses = {
+        ...allAddresses,
+        [varToSet]: address
+      }
+      console.log(contractName +' pulled from address cache and set to:', address)
+      return true
+    }
+  }
+
   getAllAddresses() {
      return allAddresses
   }
@@ -423,6 +441,8 @@ class NetworkService {
   async initializeAccounts( masterSystemConfig ) {
 
     console.log('NS: initializeAccounts() for', masterSystemConfig)
+
+    let addresses = null
 
     try {
 
@@ -447,9 +467,9 @@ class NetworkService {
       const L1ChainId = nw[masterSystemConfig]['L1']['chainId']
       const L2ChainId = nw[masterSystemConfig]['L2']['chainId']
 
-      //there are numerous possible chains we could be on
-      //either local, rinkeby etc
-      //also, either L1 or L2
+      // there are numerous possible chains we could be on
+      // either local, rinkeby etc
+      // also, either L1 or L2
 
       //at this point, we only know whether we want to be on local or rinkeby etc
       if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
@@ -497,6 +517,24 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
+      // loading addresses from store for speed
+      // if (masterSystemConfig === 'local') {
+      //   addresses = localAddresses
+      //   console.log('Final Local Addresses:', addresses)
+      // } else 
+      if (masterSystemConfig === 'rinkeby') {
+        addresses = rinkebyAddresses
+        console.log('Rinkeby Addresses:', addresses)
+      }
+      //  else if (masterSystemConfig === 'mainnet') {
+      //   addresses = mainnetAddresses
+      //   console.log('Mainnet Addresses:', addresses)
+      // } 
+      // else if (masterSystemConfig === 'rinkeby-integration') {
+      //   addresses = rinkebyIntegrationAddresses
+      //   console.log('Rinkeby Integration Addresses:', addresses)
+      // }
+
       this.AddressManagerAddress = nw[masterSystemConfig].addressManager
       console.log("AddressManager address:",this.AddressManagerAddress)
 
@@ -507,24 +545,30 @@ class NetworkService {
       )
       //console.log("AddressManager Contract:",this.AddressManager)
 
-      if (!(await this.getAddress('Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
-      if (!(await this.getAddress('L2CrossDomainMessenger', 'L2MessengerAddress'))) return
-      if (!(await this.getAddress('Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
-      if (!(await this.getAddress('Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddress('DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
-      if (!(await this.getAddress('Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
 
-      await this.getAddress('BobaAirdropL1', 'BobaAirdropL1')
+      // not critical
+      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
       console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
 
-      await this.getAddress('BobaAirdropL2', 'BobaAirdropL2')
+      // not critical
+      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
+
+      //L2CrossDomainMessenger is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L2MessengerAddress': L2MessengerAddress,
+      }
 
       //L2StandardBridgeAddress is a predeploy, so add by hand....
       allAddresses = {
         ...allAddresses,
         'L2StandardBridgeAddress': L2StandardBridgeAddress,
-        //'BobaAirdrop': '0x4cA698d5c23bE5A79813687a99BB2269bDdA5B2e' //manual for now
       }
 
       //L2MessengerAddress is a predeploy, so add by hand....
@@ -553,26 +597,25 @@ class NetworkService {
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
-                              'REP',  'BAT', 'ZRX',  'SUSHI',
-                              'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
-                              'FRAX', 'FXS', 'DODO', 'UST',
-                              'BUSD', 'BNB', 'FTM',  'MATIC',
-                              'UMA'
+                              'REP',  'BAT',  'ZRX', 'SUSHI',
+                              'LINK', 'UNI', 'BOBA', 'xBOBA', 
+                              'OMG', 'FRAX',  'FXS', 'DODO', 
+                              'UST', 'BUSD', 'BNB',  'FTM',  
+                              'MATIC', 'UMA'
                             ]
 
       //not all tokens are on Rinkeby
       if ( masterSystemConfig === 'rinkeby') {
         supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
-                          'REP',  'BAT', 'ZRX',  'SUSHI',
-                          'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
-                          //'FRAX', 'FXS', 'UST',
-                          //'BUSD', 'BNB', 'FTM',  'MATIC'
-                        ]
+                             'REP', 'BAT',  'ZRX', 'SUSHI',
+                            'LINK', 'UNI', 'BOBA', 'xBOBA', 
+                             'OMG',
+                          ]
       }
 
       await Promise.all(supportedTokens.map(async (key) => {
 
-        const L2a = await this.AddressManager.getAddress('TK_L2'+key)
+        const L2a = addresses['TK_L2'+key]
 
         if(key === 'xBOBA') {
           if (L2a === ERROR_ADDRESS) {
@@ -585,7 +628,7 @@ class NetworkService {
             }
           }
         } else {
-          const L1a = await this.AddressManager.getAddress('TK_L1'+key)
+          const L1a = addresses['TK_L1'+key]
           if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
             console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
             return false
@@ -602,8 +645,8 @@ class NetworkService {
       console.log("tokens:",allTokens)
       this.tokenAddresses = allTokens
 
-      if (!(await this.getAddress('Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-      if (!(await this.getAddress('Proxy__L2LiquidityPool', 'L2LPAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
 
       if(allAddresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
@@ -660,21 +703,6 @@ class NetworkService {
         this.provider.getSigner()
       )
 
-      // if (!(await this.getAddress('L2ERC721', 'L2ERC721Address'))) return
-      // if (!(await this.getAddress('L2ERC721Reg', 'L2ERC721RegAddress'))) return
-
-      // this.ERC721Contract = new ethers.Contract(
-      //   allAddresses.L2ERC721Address,
-      //   L2ERC721Json.abi,
-      //   this.L2Provider
-      // )
-
-      // this.ERC721Contract = new ethers.Contract(
-      //   allAddresses.L2ERC721RegAddress,
-      //   L2ERC721RegJson.abi,
-      //   this.L2Provider
-      // )
-
       this.watcher = new Watcher({
         l1: {
           provider: this.L1Provider,
@@ -697,7 +725,7 @@ class NetworkService {
         },
       })
 
-      console.log('Setting up BOBA for the DAO:',allTokens.BOBA.L2)
+      console.log('Setting up BOBA for the DAO:', allTokens.BOBA.L2)
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
@@ -712,10 +740,10 @@ class NetworkService {
       )
 
       //DAO related
-      if( /*(masterSystemConfig === 'local' || masterSystemConfig === 'rinkeby') && */ this.L1orL2 === 'L2' ) {
+      if( this.L1orL2 === 'L2' ) {
 
-        if (!(await this.getAddress('GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-        if (!(await this.getAddress('GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
         this.delegateContract = new ethers.Contract(
           allAddresses.GovernorBravoDelegate,

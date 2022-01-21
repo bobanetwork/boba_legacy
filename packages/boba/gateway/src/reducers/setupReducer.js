@@ -37,7 +37,7 @@ const initialState = {
 
 function setupReducer (state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/WALLET_METHOD/START':
+    case 'SETUP/WALLET_METHOD/SET':
       return { 
         ...state, 
         walletMethod: action.payload,
