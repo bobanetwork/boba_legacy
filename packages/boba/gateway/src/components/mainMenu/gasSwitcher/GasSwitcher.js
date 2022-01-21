@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box } from '@material-ui/system'
 import { useSelector } from 'react-redux'
 import * as S from './GasSwitcher.styles.js'
@@ -8,16 +8,30 @@ import { selectVerifierStatus } from 'selectors/verifierSelector'
 
 import { Typography } from '@material-ui/core'
 
+import networkService from 'services/networkService.js'
+import { getMaxHealthBlockLag } from 'util/masterConfig'
+
 function GasSwitcher() {
 
   const gas = useSelector(selectGas)
-  const savings = Number(gas.gasL1) / Number(gas.gasL2)
+  const [savings, setSavings] = useState(0)
+
+  useEffect(() => {
+    async function getGasSavings () {
+      const l1SecurityFee = await networkService.estimateL1SecurityFee()
+      const l2Fee = await networkService.estimateL2Fee()
+      const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee);
+      setSavings(gasSavings ? gasSavings : 0);
+      return gasSavings
+    }
+    getGasSavings();
+  }, [gas]);
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'health'
+  let healthStatus = 'healthy'
 
-  if (Number(verifierStatus.matchedBlock) + 50 < gas.blockL2) {
-    healthStatus = 'unhealth'
+  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
+    healthStatus = 'unhealthy'
   }
 
   return (
@@ -31,7 +45,7 @@ function GasSwitcher() {
               Savings<br/>
               L1 Block<br/>
               L2 Block<br/>
-              Verified Block
+              Verified to
             </S.Label>
             <Box sx={{
               display: 'flex',
