@@ -7,6 +7,7 @@ import {
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
 import { utils, BigNumber } from 'ethers'
+import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -105,6 +106,9 @@ export const makeL2GenesisFile = async (
     BobaTuringCredit: {
       _owner: cfg.deployer,
       turingPrice: cfg.bobaTuringPrice
+    },
+    BobaTuringHelper: {
+      Self: predeploys.BobaTuringHelper
     }
   }
 
@@ -122,6 +126,8 @@ export const makeL2GenesisFile = async (
       // directly used in Solidity (yet). This bytecode string simply executes the 0x4B opcode
       // and returns the address given by that opcode.
       dump[predeployAddress].code = '0x4B60005260206000F3'
+    } else if (predeployName === 'BobaTuringHelper') {
+      dump[predeployAddress].code = TuringHelperJson.deployedBytecode
     } else {
       const artifact = getContractArtifact(predeployName)
       dump[predeployAddress].code = artifact.deployedBytecode
@@ -129,6 +135,11 @@ export const makeL2GenesisFile = async (
 
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
+      if (predeployName === 'BobaTuringHelper') {
+        const index = BigNumber.from('0').toHexString();
+        dump[predeployAddress].storage[utils.hexZeroPad(index, 32)] = predeploys.BobaTuringHelper
+        break
+      }
       const storageLayout = await getStorageLayout(predeployName)
       // Calculate the mapping keys
       if (predeployName === 'Lib_ResolvedDelegateBobaProxy') {

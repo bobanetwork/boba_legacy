@@ -16,6 +16,7 @@
     "lint:contracts": "yarn solhint -f table contracts/**/*.sol"
   },
   "dependencies": {
+    "@boba/turing-hybrid-compute": "0.2.0",
     "@eth-optimism/contracts": "^0.4.13",
     "@eth-optimism/core-utils": "^0.6.0",
     "@ethersproject/abstract-provider": "^5.5.1",
