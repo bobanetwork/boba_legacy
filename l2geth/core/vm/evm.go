@@ -202,7 +202,7 @@ func (evm *EVM) Interpreter() Interpreter {
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
-func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
+func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 
 	var ret hexutil.Bytes
 
@@ -238,12 +238,6 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 		return retError
 	}
 
-	if evm.StateDB.TuringCheck(caller) != nil {
-		log.Error("TURING bobaTuringCall:Insufficient credit")
-		retError[35] = 19 // Insufficient funds
-		return retError
-	}
-
 	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
 	one := big.NewInt(1)
 	two := big.NewInt(2)
@@ -273,19 +267,13 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 	log.Debug("TURING bobaTuringRandom:Modified parameters",
 		"newValue", ret)
 
-	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
-		log.Error("TURING bobaTuringCall:Insufficient credit")
-		retError[35] = 19 // Insufficient funds
-		return retError
-	}
-
 	return ret
 }
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 // caller is the address of the TuringHelper contract
-func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
+func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String())
 
@@ -329,12 +317,6 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Byte
 	if rlen < 7*32 {
 		log.Error("TURING bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
-		return retError
-	}
-
-	if evm.StateDB.TuringCheck(caller) != nil {
-		log.Error("TURING bobaTuringCall:Insufficient credit")
-		retError[35] = 19 // Insufficient funds
 		return retError
 	}
 
@@ -445,12 +427,6 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address) hexutil.Byte
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
 
-	if evm.StateDB.TuringCharge(caller) != nil { // charge 1 credit for now
-		log.Error("TURING bobaTuringCall:Insufficient credit")
-		retError[35] = 19 // Insufficient funds
-		return retError
-	}
-
 	return ret
 }
 
@@ -541,15 +517,19 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			log.Error("TURING ERROR: NO PAYLOAD", "evm.Context.Turing", evm.Context.Turing)
 			return nil, gas, ErrTuringEmpty
 		}
+		if evm.StateDB.TuringCheck(caller.Address()) != nil {
+			log.Error("TURING bobaTuringCall:Insufficient credit")
+			return nil, gas, ErrInsufficientBalance
+		}
 		if evm.Context.Sequencer && len(evm.Context.Turing) < 2 {
 			// This is the first run of Turing for this transaction
 			// We sometimes use a short evm.Context.Turing payload for debug purposes, hence the < 2.
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			if isTuring2 {
-				updated_input = evm.bobaTuringCall(input, caller.Address())
+				updated_input = bobaTuringCall(input, caller.Address())
 			} else if isGetRand2 {
-				updated_input = evm.bobaTuringRandom(input, caller.Address())
+				updated_input = bobaTuringRandom(input, caller.Address())
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
@@ -562,6 +542,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// information from the EVM context
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Debug("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
+		}
+		if evm.StateDB.TuringCharge(caller.Address()) != nil {
+			log.Error("TURING bobaTuringCall:Insufficient credit")
+			return nil, gas, ErrInsufficientBalance
 		}
 		log.Debug("TURING REQUEST END", "updated_input", updated_input)
 	} else {

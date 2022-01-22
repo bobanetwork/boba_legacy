@@ -37,10 +37,10 @@ var (
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{42, 69, 42, 69},
 		},
+		// legacy format example - note no Turing field
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
-			l1Turing:       []byte{2},
 			msgSender:      nil,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -74,6 +74,7 @@ var (
 
 func TestTransactionMetaEncode(t *testing.T) {
 	for _, test := range txMetaSerializationTests {
+
 		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, test.l1Turing, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
 
 		encoded := TxMetaEncode(txmeta)

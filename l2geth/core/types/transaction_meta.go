@@ -7,6 +7,9 @@ package types
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -135,9 +138,15 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 
 	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing") // The "Turing" fieldName string is not important and is only used in error messages
 	if err != nil {
-		return nil, err
+		if errors.Is(err, io.EOF) {
+			fmt.Println("Legacy format - no Turing field - setting to nil")
+			meta.L1Turing = nil
+		} else {
+			return nil, err
+		}
+	} else {
+		meta.L1Turing = turing
 	}
-	meta.L1Turing = turing
 
 	return &meta, nil
 }

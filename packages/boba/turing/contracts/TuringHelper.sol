@@ -14,6 +14,7 @@ contract TuringHelper is ITuringHelper, Ownable {
 
   event AddPermittedCaller(address _callerAddress);
   event RemovePermittedCaller(address _callerAddress);
+  event CheckPermittedCaller(address _callerAddress, bool permitted);
   event OffchainResponse(uint version, bytes responseData);
   event OffchainRandom(uint version, uint256 random);
   event Offchain42(uint version, uint256 random);
@@ -42,6 +43,13 @@ contract TuringHelper is ITuringHelper, Ownable {
       emit RemovePermittedCaller(_callerAddress);
   }
 
+  function checkPermittedCaller(address _callerAddress)
+    public returns (bool) {
+      bool permitted = permittedCaller[_callerAddress];
+      emit CheckPermittedCaller(_callerAddress, permitted);
+      return permitted;
+  }
+
   function GetErrorCode(uint32 rType)
     internal view returns (string memory) {
       if(rType ==  1) return "TURING: Geth intercept failure";
@@ -68,7 +76,7 @@ contract TuringHelper is ITuringHelper, Ownable {
      This response is then passed back to the caller.
   */
   function GetResponse(uint32 rType, string memory _url, bytes memory _payload)
-    public onlyPermittedCaller returns (bytes memory) {
+    public returns (bytes memory) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (_payload.length > 0, "Turing:GetResponse:no payload");
@@ -77,7 +85,7 @@ contract TuringHelper is ITuringHelper, Ownable {
   }
 
   function GetRandom(uint32 rType, uint256 _random)
-    public onlyPermittedCaller returns (uint256) {
+    public returns (uint256) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (rType == 2, string(GetErrorCode(rType)));
@@ -85,7 +93,7 @@ contract TuringHelper is ITuringHelper, Ownable {
   }
 
   function Get42(uint32 rType, uint256 _random)
-    public onlyPermittedCaller returns (uint256) {
+    public returns (uint256) {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (rType == 2, string(GetErrorCode(rType)));
