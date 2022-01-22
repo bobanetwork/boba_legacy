@@ -774,37 +774,41 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       batchElement.isSequencerTx = true
       const turing = block.transactions[0].l1Turing
       let rawTransaction = block.transactions[0].rawTransaction
-      const turingVersion = '01'
-      console.log('Turing string:', turing)
-      if (turing.length > 4) {
-        // We sometimes use a 1 byte Turing string for debug purposes
-        // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
-        // Chop those off at this stage
-        // Only propagate the data through the system if it's a 'real' Turing payload
-        // Turing length cannot exceed 322 characters (based on limit in the Geth), so we need two bytes max for the length
-        const headerTuringLengthField = remove0x(
-          BigNumber.from(remove0x(turing).length / 2).toHexString()
-        ).padStart(4, '0')
-        if (headerTuringLengthField.length > 4) {
-          // paranoia check
-          console.log(
-            'Turing length error:',
-            turing,
-            remove0x(turing).length / 2,
-            BigNumber.from(remove0x(turing).length / 2).toHexString(),
-            headerTuringLengthField,
-            headerTuringLengthField.length
-          )
-          throw new Error('Turing length error!')
+      //will be undefined for legacy Geth
+      if (typeof(turing) !== "undefined") {
+        const turingVersion = '01'
+        console.log('Turing string:', turing)
+        if (turing.length > 4) {
+          // We sometimes use a 1 byte Turing string for debug purposes
+          // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
+          // Chop those off at this stage
+          // Only propagate the data through the system if it's a 'real' Turing payload
+          // Turing length cannot exceed 322 characters (based on limit in the Geth), so we need two bytes max for the length
+          const headerTuringLengthField = remove0x(
+            BigNumber.from(remove0x(turing).length / 2).toHexString()
+          ).padStart(4, '0')
+          if (headerTuringLengthField.length > 4) {
+            // paranoia check
+            console.log(
+              'Turing length error:',
+              turing,
+              remove0x(turing).length / 2,
+              BigNumber.from(remove0x(turing).length / 2).toHexString(),
+              headerTuringLengthField,
+              headerTuringLengthField.length
+            )
+            throw new Error('Turing length error!')
+          }
+          rawTransaction =
+            '0x' +
+            turingVersion +
+            headerTuringLengthField +
+            remove0x(rawTransaction) +
+            remove0x(turing)
+        } else {
+          // this was a normal transaction without a Turing call
+          rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
         }
-        rawTransaction =
-          '0x' +
-          turingVersion +
-          headerTuringLengthField +
-          remove0x(rawTransaction) +
-          remove0x(turing)
-      } else {
-        rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
       }
       batchElement.rawTransaction = rawTransaction
     }
