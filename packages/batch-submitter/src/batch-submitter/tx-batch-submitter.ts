@@ -777,8 +777,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       //will be undefined for legacy Geth
       if (typeof(turing) !== "undefined") {
         const turingVersion = '01'
-        console.log('Turing string:', turing)
+        console.log('TURING: Turing candidate:', turing)
         if (turing.length > 4) {
+          console.log('TURING: Turing string:', turing)
           // We sometimes use a 1 byte Turing string for debug purposes
           // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
           // Chop those off at this stage
@@ -806,10 +807,14 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
             remove0x(rawTransaction) +
             remove0x(turing)
         } else {
+          console.log('TURING: Normal tx:', turing)
           // this was a normal transaction without a Turing call
-          rawTransaction = '0x' + '000000' + remove0x(rawTransaction)
+          rawTransaction = '0x' + '010000' + remove0x(rawTransaction)
         }
+      } else {
+        console.log('TURING: Legacy Transaction:', turing)
       }
+      // this also handles the legacy case (old transactions without a Turing header)
       batchElement.rawTransaction = rawTransaction
     }
 

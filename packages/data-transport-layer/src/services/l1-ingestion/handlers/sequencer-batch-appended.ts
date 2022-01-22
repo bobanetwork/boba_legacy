@@ -113,13 +113,19 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         // First, parse the new version and length field...
         const sTxHexString = toHexString(sequencerTransaction)
         const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
-        // TuringVersion not used right now; for future use
+        // TuringVersion not used right now; for future use and for supporting legacy packets
         const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
+        // Extra insurance that we are dealing with an actual Turing payload for legacy inputs
+        const turingCall = remove0x(sTxHexString).slice(6, 14).toLowerCase()
 
         let turing = Buffer.from('0')
 
-        if (turingLength > 0) {
-          //we have Turing payload
+        // methodID for GetResponse is 7d93616c -> [125 147 97 108]
+        // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
+
+
+        if (turingVersion === 1 && turingLength > 0 && (turingCall === '7d93616c' || turingCall === '493d57d6')) {
+          //we have a Turing v1 payload
           turing = sequencerTransaction.slice(-turingLength)
           sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
           // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
@@ -128,9 +134,22 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
             turing: toHexString(turing),
             restoredSequencerTransaction: toHexString(sequencerTransaction),
           })
-        } else {
-          // The `3` chops off the Turing version and length header field, which is zero in this case (0: 00 1: 00 2: 00)
+        } else if (turingVersion === 1 && turingLength === 0) {
+          // The `3` chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
+          console.log('Found a Turing NULL payload (normal TX) at (neg) position:', {
+            turingLength,
+            turing: toHexString(turing),
+            restoredSequencerTransaction: toHexString(sequencerTransaction),
+          })
           sequencerTransaction = sequencerTransaction.slice(3)
+        } else {
+          console.log('Found a Turing LEGACY payload (normal TX) at (neg) position:', {
+            turingLength,
+            turing: toHexString(turing),
+            restoredSequencerTransaction: toHexString(sequencerTransaction),
+          })
+          // It's a legacy block
+          // do nothing
         }
 
         const decoded = decodeSequencerBatchTransaction(

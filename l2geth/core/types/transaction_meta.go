@@ -39,13 +39,13 @@ func (q QueueOrigin) String() string {
 type TransactionMeta struct {
 	L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 	L1Timestamp     uint64          `json:"l1Timestamp"`
-	L1Turing        []byte          `json:"l1Turing" gencodec:"required"`
+	L1Turing        []byte          `json:"l1Turing"        gencodec:"required"`
 	L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
-	QueueOrigin     QueueOrigin     `json:"queueOrigin" gencodec:"required"`
+	QueueOrigin     QueueOrigin     `json:"queueOrigin"     gencodec:"required"`
 	// The canonical transaction chain index
 	Index *uint64 `json:"index" gencodec:"required"`
 	// The queue index, nil for queue origin sequencer transactions
-	QueueIndex     *uint64 `json:"queueIndex" gencodec:"required"`
+	QueueIndex     *uint64 `json:"queueIndex"     gencodec:"required"`
 	RawTransaction []byte  `json:"rawTransaction" gencodec:"required"`
 }
 
@@ -139,7 +139,7 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing") // The "Turing" fieldName string is not important and is only used in error messages
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			fmt.Println("Legacy format - no Turing field - setting to nil")
+			fmt.Println("Legacy format decode - no Turing field - setting to nil")
 			meta.L1Turing = nil
 		} else {
 			return nil, err
@@ -209,7 +209,7 @@ func TxMetaEncode(meta *TransactionMeta) []byte {
 
 	turing := meta.L1Turing
 	if turing == nil {
-		common.WriteVarBytes(b, 0, getNullValue())
+		common.WriteVarBytes(b, 0, getNullValue()) // The effect of this is to add []byte{0x00} to the end of the serialized TransactionMeta 
 	} else {
 		common.WriteVarBytes(b, 0, turing)
 	}

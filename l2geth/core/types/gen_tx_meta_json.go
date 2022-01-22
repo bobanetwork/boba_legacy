@@ -17,10 +17,10 @@ func (t TransactionMeta) MarshalJSON() ([]byte, error) {
 		L1Timestamp     uint64          `json:"l1Timestamp"`
 		L1Turing        []byte          `json:"l1Turing"        gencodec:"required"`
 		L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
-		QueueOrigin     QueueOrigin     `json:"queueOrigin" gencodec:"required"`
-		Index           *uint64         `json:"index" gencodec:"required"`
-		QueueIndex      *uint64         `json:"queueIndex" gencodec:"required"`
-		RawTransaction  []byte          `json:"rawTransaction" gencodec:"required"`
+		QueueOrigin     QueueOrigin     `json:"queueOrigin"     gencodec:"required"`
+		Index           *uint64         `json:"index"           gencodec:"required"`
+		QueueIndex      *uint64         `json:"queueIndex"      gencodec:"required"`
+		RawTransaction  []byte          `json:"rawTransaction"  gencodec:"required"`
 	}
 	var enc TransactionMeta
 	enc.L1BlockNumber = t.L1BlockNumber
@@ -41,10 +41,10 @@ func (t *TransactionMeta) UnmarshalJSON(input []byte) error {
 		L1Timestamp     *uint64         `json:"l1Timestamp"`
 		L1Turing        []byte          `json:"l1Turing"        gencodec:"required"`
 		L1MessageSender *common.Address `json:"l1MessageSender" gencodec:"required"`
-		QueueOrigin     *QueueOrigin    `json:"queueOrigin" gencodec:"required"`
-		Index           *uint64         `json:"index" gencodec:"required"`
-		QueueIndex      *uint64         `json:"queueIndex" gencodec:"required"`
-		RawTransaction  []byte          `json:"rawTransaction" gencodec:"required"`
+		QueueOrigin     *QueueOrigin    `json:"queueOrigin"     gencodec:"required"`
+		Index           *uint64         `json:"index"           gencodec:"required"`
+		QueueIndex      *uint64         `json:"queueIndex"      gencodec:"required"`
+		RawTransaction  []byte          `json:"rawTransaction"  gencodec:"required"`
 	}
 	var dec TransactionMeta
 	if err := json.Unmarshal(input, &dec); err != nil {
