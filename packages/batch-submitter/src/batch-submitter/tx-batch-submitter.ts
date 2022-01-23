@@ -775,7 +775,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       const turing = block.transactions[0].l1Turing
       let rawTransaction = block.transactions[0].rawTransaction
       //will be undefined for legacy Geth
-      if (typeof(turing) !== "undefined") {
+      if (typeof turing !== 'undefined') {
         const turingVersion = '01'
         console.log('TURING: Turing candidate:', turing)
         if (turing.length > 4) {
@@ -809,11 +809,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         } else {
           console.log('TURING: Normal tx:', turing)
           // this was a normal transaction without a Turing call
-          rawTransaction = 
-            '0x' + 
-            turingVersion + 
-            '0000' + 
-            remove0x(rawTransaction)
+          rawTransaction =
+            '0x' + turingVersion + '0000' + remove0x(rawTransaction)
         }
       } else {
         // typeof(turing) === "undefined"

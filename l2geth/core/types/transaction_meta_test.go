@@ -37,10 +37,19 @@ var (
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{42, 69, 42, 69},
 		},
-		// legacy format example - note no Turing field
+		// example of legacy format without l1Turing
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			msgSender:      nil,
+			queueOrigin:    QueueOriginSequencer,
+			rawTransaction: []byte{8, 8, 8, 8},
+		},
+		// edge case of l1Turing = nil
+		{
+			l1BlockNumber:  l1BlockNumber,
+			l1Timestamp:    0,
+			l1Turing:       nil,
 			msgSender:      nil,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},

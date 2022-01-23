@@ -209,7 +209,8 @@ func TxMetaEncode(meta *TransactionMeta) []byte {
 
 	turing := meta.L1Turing
 	if turing == nil {
-		common.WriteVarBytes(b, 0, getNullValue()) // The effect of this is to add []byte{0x00} to the end of the serialized TransactionMeta 
+		// do nothing
+		// common.WriteVarBytes(b, 0, getNullValue()) - The effect of this would be to add []byte{0x00} to the end of the serialized legacy TransactionMeta
 	} else {
 		common.WriteVarBytes(b, 0, turing)
 	}

@@ -123,17 +123,19 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
 
         console.log('Turing:', {
           turingVersion,
-          turingLength
+          turingLength,
         })
 
-        if (turingVersion === 1 && 
-            turingLength > 0 && 
-            turingLength < sequencerTransaction.length 
+        if (
+          turingVersion === 1 &&
+          turingLength > 0 &&
+          turingLength < sequencerTransaction.length
         ) {
-
-          const turingCandidate = remove0x(toHexString(sequencerTransaction.slice(-turingLength)))
+          const turingCandidate = remove0x(
+            toHexString(sequencerTransaction.slice(-turingLength))
+          )
           const turingCall = turingCandidate.slice(0, 8).toLowerCase()
-          console.log('turingCall', {turingCall})
+          console.log('turingCall', { turingCall })
           if (turingCall === '7d93616c' || turingCall === '493d57d6') {
             // we are all set!
             // we have a Turing v1 payload
@@ -152,17 +154,23 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         } else if (turingVersion === 1 && turingLength === 0) {
           // The `3` chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
           sequencerTransaction = sequencerTransaction.slice(3)
-          console.log('Found a Turing NULL payload (normal TX) at (neg) position:', {
-            turingLength,
-            turing: toHexString(turing), // this will be '0x00'
-            restoredSequencerTransaction: toHexString(sequencerTransaction),
-          })
+          console.log(
+            'Found a Turing NULL payload (normal TX) at (neg) position:',
+            {
+              turingLength,
+              turing: toHexString(turing), // this will be '0x00'
+              restoredSequencerTransaction: toHexString(sequencerTransaction),
+            }
+          )
         } else {
-          console.log('Found a Turing LEGACY payload (normal TX) at (neg) position:', {
-            turingLength,
-            turing: toHexString(turing), // this will be '0x00'
-            restoredSequencerTransaction: toHexString(sequencerTransaction),
-          })
+          console.log(
+            'Found a Turing LEGACY payload (normal TX) at (neg) position:',
+            {
+              turingLength,
+              turing: toHexString(turing), // this will be '0x00'
+              restoredSequencerTransaction: toHexString(sequencerTransaction),
+            }
+          )
           // It's a legacy block
           // do nothing
         }
