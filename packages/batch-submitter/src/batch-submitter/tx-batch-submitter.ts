@@ -809,9 +809,14 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         } else {
           console.log('TURING: Normal tx:', turing)
           // this was a normal transaction without a Turing call
-          rawTransaction = '0x' + '010000' + remove0x(rawTransaction)
+          rawTransaction = 
+            '0x' + 
+            turingVersion + 
+            '0000' + 
+            remove0x(rawTransaction)
         }
       } else {
+        // typeof(turing) === "undefined"
         console.log('TURING: Legacy Transaction:', turing)
       }
       // this also handles the legacy case (old transactions without a Turing header)
