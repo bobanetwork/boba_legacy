@@ -1,9 +1,3 @@
-# TODO
-# - update DJANGO_SECRET_KEY
-# - update WEBHOOK_TOKEN
-# - safe_client_gateway=debug,safe_client_gateway::monitoring=info set to safe_client_gateway=normal,safe_client_gateway::monitoring=info
-# - safe config service can use DEFAULT_FILE_STORAGE S3Boto3Storage - # django-storages – Amazon S3 configuration See https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
-#
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Enya Gnosis-Safe Application Deployment"
 
@@ -76,14 +70,6 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              # - Effect: Allow
-              #   Action:
-              #     - "s3:GetObject"
-              #     - "s3:GetBucketLocation"
-              #   Resource: !Sub
-              #       - "arn:aws:s3:::${S3BucketV2}/boba.py"
-              #       - S3BucketV2:
-              #           Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
         - PolicyName: AllowAccessToSecrets
           PolicyDocument:
@@ -312,8 +298,6 @@ Resources:
               Value: "name:datadog-agent"
             - Name: DD_CONTAINER_EXCLUDE
               Value: "name:amazon-ecs-agent"
-            - Name: DD_API_KEY
-              Value: ""
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/datadog.env"
@@ -390,17 +374,6 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: PYTHONDONTWRITEBYTECODE
-              Value: true
-            - Name: DEBUG
-              Value: false
-            - Name: ROOT_LOG_LEVEL
-              Value: DEBUG
-            - Name: DJANGO_ALLOWED_HOSTS
-              Value: !Sub
-                - "*,.localhost,127.0.0.1,[::1],*,safe-client-gateway,safe-client.${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: GUNICORN_BIND_PORT
               Value: 80
             - Name: DOCKER_NGINX_VOLUME_ROOT
@@ -420,11 +393,6 @@ Resources:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
-            # - Name: BOBA_SCS_SETTINGS
-            #   Value: !Sub
-            #     - "https://${S3BucketV2}.s3.amazonaws.com/boba.py"
-            #     - S3BucketV2:
-            #         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
           DependsOn:
             - Condition: START
               ContainerName: safe-config-service
@@ -435,7 +403,6 @@ Resources:
           Essential: false
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
-        #- Image: bobanetwork/safe-config-service:inotest2
           Name: safe-config-service
           Ulimits:
             - Name: nofile
@@ -447,9 +414,6 @@ Resources:
             - Name: core
               SoftLimit: 0
               HardLimit: 0
-          # PortMappings:
-          #   - ContainerPort: 8080
-          #     HostPort: 8080
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx2
@@ -460,17 +424,16 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
-            - Name: BOBA_SCS_SETTINGS
+            # in django 4 you need to include scheme
+            - Name: CSRF_TRUSTED_ORIGINS
               Value: !Sub
-                - "https://${S3BucketV2}.s3.amazonaws.com/boba.py"
-                - S3BucketV2:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-            # - Name: DJANGO_SETTINGS_MODULE
-            #   Value: config.boba
+                - "https://safe-config.${EndpointAddress},http://safe-config.${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: PYTHONDONTWRITEBYTECODE
               Value: true
             - Name: DJANGO_OTP_ADMIN
-              Value: false
+              Value: true
             - Name: DEBUG
               Value: false
             - Name: ROOT_LOG_LEVEL
@@ -505,12 +468,6 @@ Resources:
             com.datadoghq.ad.check_names: '["safe-config-service"]'
             com.datadoghq.ad.init_configs: '[{}]'
             com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
-          #Command:
-          #&& wget $${BOBA_SCS_SETTINGS} -P src/config/
-          #  - "/bin/sh -c \"apt-get update && apt-get install -y --no-install-recommends wget && /usr/bin/tini -- ./docker-entrypoint.sh\""
-
-          #Command:
-          #  - "apt-get update && apt-get install -y --no-install-recommends wget && wget $(BOBA_SETTING) -P src/config/ && /usr/bin/tini -- ./docker-entrypoint.sh"
           Essential: false
           Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
@@ -525,9 +482,6 @@ Resources:
             - Name: core
               SoftLimit: 0
               HardLimit: 0
-          # PortMappings:
-          #   - ContainerPort: 8888
-          #     HostPort: 8888
           MountPoints:
             - ContainerPath: "/nginx"
               SourceVolume: nginx
@@ -538,6 +492,12 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+          # in django up to 4 you need to not include scheme
+            - Name: CSRF_TRUSTED_ORIGINS
+              Value: !Sub
+                - "safe-transaction.${EndpointAddress}"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: DOCKER_SHARED_DIR
               Value: /nginx
             - Name: ETH_L2_NETWORK
@@ -738,11 +698,11 @@ Resources:
             - Name: SCHEME
               Value: http
             - Name: ROCKET_LOG_LEVEL
-              Value: debug
+              Value: normal
             - Name: RUST_BACKTRACE
               Value: 1
             - Name: RUST_LOG
-              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
+              Value: safe_client_gateway=error,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
               Value: true
             - Name: VPC_TRANSACTION_SERVICE_URI
@@ -836,13 +796,6 @@ Resources:
         - ContainerName: safe-react
           ContainerPort: 3000
           TargetGroupArn: !Ref GnosisLBTargetGroup4
-
-        # - ContainerName: safe-config-service
-        #   ContainerPort: 8080
-        #   TargetGroupArn: !Ref GnosisLBTargetGroup5
-        # - ContainerName: safe-transaction-service
-        #   ContainerPort: 8888
-        #   TargetGroupArn: !Ref GnosisLBTargetGroup6
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
