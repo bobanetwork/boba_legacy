@@ -16,7 +16,7 @@ Parameters:
 
   DockerPrefix:
     Type: String
-    Default: omgx
+    Default: bobanetwork
 
   InfrastructureStackName:
     Description: Infrastructure stack to associate this stack with
@@ -108,7 +108,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Image: bobanetwork/blockexplorer-blockscout:latest
+        - Image: !Sub bobanetwork/blockexplorer-blockscout:${ImageTag}
           Name: blockscout
           Ulimits:
             - Name: core
