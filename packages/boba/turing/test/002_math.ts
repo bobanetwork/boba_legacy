@@ -16,7 +16,7 @@ const gasOverride =  {
 }
 
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
 let Factory__Hello: ContractFactory
 let hello: Contract
@@ -28,6 +28,7 @@ const helperPredeploy = '0x4200000000000000000000000000000000000022'
 const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
+let Factory__Helper: ContractFactory
 let helper: Contract
 const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 const deployerWallet = new Wallet(deployerPK, local_provider)
@@ -95,20 +96,28 @@ describe("Basic Math", function () {
     
     console.log("    Created local HTTP server at", urlStr)
     
+    Factory__Helper = new ContractFactory(
+      (TuringHelperJson.abi),
+      (TuringHelperJson.bytecode),
+      testWallet)
+    
+    helper = await Factory__Helper.deploy()
+    console.log("    Helper contract deployed as", helper.address)
+
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
       testWallet)
     
-    hello = await Factory__Hello.deploy(helperPredeploy, gasOverride)
+    hello = await Factory__Hello.deploy(helper.address, gasOverride)
     console.log("    Test contract deployed as", hello.address)
     
     // white list the new 'hello' contract in the helper
-    helper = new ethers.Contract(
-      helperPredeploy, // predeploy address
-      TuringHelper.abi,
-      deployerWallet
-    )
+    // helper = new ethers.Contract(
+    //   helperPredeploy, // predeploy address
+    //   TuringHelper.abi,
+    //   deployerWallet
+    // )
     const tr1 = await helper.addPermittedCaller(hello.address)
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
@@ -126,7 +135,7 @@ describe("Basic Math", function () {
   it("should return the helper address", async () => {
     let helperAddress = await hello.helperAddr()
     console.log("    Helper at", helperAddress)
-    expect(helperAddress).to.equal(helperPredeploy)
+    expect(helperAddress).to.equal(helper.address)
   })
 
   it("test of local compute endpoint: should do basic math via direct server query", async () => {

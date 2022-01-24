@@ -13,12 +13,13 @@ const gasOverride =  {
   gasLimit: 3000000
 }
 
-const helperPredeploy = '0x4200000000000000000000000000000000000022'
 import Lending from "../artifacts/contracts/Lending.sol/Lending.json"
-import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
 let Factory__Lending: ContractFactory
 let lending: Contract
+let Factory__Helper: ContractFactory
+let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
@@ -26,7 +27,6 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
-let helper: Contract
 const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 const deployerWallet = new Wallet(deployerPK, local_provider)
 
@@ -47,25 +47,28 @@ describe("Pull Bitcoin - USD quote", function () {
 
     urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
     console.log("    URL set to", urlStr)
-            
+    
+    Factory__Helper = new ContractFactory(
+      (TuringHelperJson.abi),
+      (TuringHelperJson.bytecode),
+      testWallet)
+    
+    helper = await Factory__Helper.deploy()
+    console.log("    Helper contract deployed as", helper.address)
+
     Factory__Lending = new ContractFactory(
       (Lending.abi),
       (Lending.bytecode),
       testWallet)
     
     lending = await Factory__Lending.deploy(
-      helperPredeploy,
+      helper.address,
       gasOverride
     )
 
     console.log("    Lending contract deployed as", lending.address)
     
     // white list the new 'lending' contract in the helper
-    helper = new ethers.Contract(
-      helperPredeploy, // predeploy address
-      TuringHelper.abi,
-      deployerWallet
-    )
     const tr1 = await helper.addPermittedCaller(lending.address)
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
@@ -82,7 +85,7 @@ describe("Pull Bitcoin - USD quote", function () {
 
   it("should return the helper address", async () => {
     let helperAddress = await lending.helperAddr()
-    expect(helperAddress).to.equal(helperPredeploy)
+    expect(helperAddress).to.equal(helper.address)
   })
 
   it("should get the current Bitcoin - USD price", async () => {
@@ -95,7 +98,7 @@ describe("Pull Bitcoin - USD quote", function () {
 
     let numberHexString = rawData.slice(128,192)
     let result = parseInt(numberHexString, 16)
-    console.log("     Bitcoin to usd price is",result/100)
+    console.log("     Bitcoin to USD price is",result/100)
 
     numberHexString = rawData.slice(192,256)
     result = parseInt(numberHexString, 16)
