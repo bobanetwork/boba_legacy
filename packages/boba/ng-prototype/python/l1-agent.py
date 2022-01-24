@@ -574,13 +574,14 @@ def Submitter(env,A):
       #print("PRE2", Web3.toHex(batch.headers[0]), Web3.toHex(batch.bodies[0]))
       
       l1Hash = ctx.contracts['L2_BobaPortal'].functions.hashIn().call()
-      ctx.logPrint("Using l1Hash {}".format(Web3.toHex(l1Hash)))
+      l1Hash_str = Web3.toHex(l1Hash)
+      ctx.logPrint("Using l1Hash {}".format(l1Hash_str))
       
       if batch.rHash is None:
-        batch.rHash = ctx.contracts['L2_BobaPortal'].functions.hashOut().call()
-        
-      ctx.logPrint("Using l2Hash {}".format(Web3.toHex(batch.rHash)))
-     
+        batch.rHash = Web3.toBytes(hexstr="0x0000000000000000000000000000000000000000000000000000000000000000")
+      l2Hash_str = Web3.toHex(batch.rHash)
+      ctx.logPrint("Using l2Hash {}".format(l2Hash_str))
+
       t = ctx.contracts['L1_BobaPortal'].functions.FastBatchIn(
         batch.prevBlock,
         batch.prevSR,

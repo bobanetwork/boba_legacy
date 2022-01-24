@@ -1221,6 +1221,9 @@ for i in range(0,num_children):
   if num_children == 1 and env['name'] == 'local':
     if env['ng_enabled']:
       if c.on_chain == 1:
+        # DEMO
+        #c.preload = [ 4, 3, 3, 1, 1, 4, 4, 2, 2 ]
+
         c.preload = [ 1, 1, 4, 4, 3, 4, 3, 3, 0, 2, 4, 4, 3 ] # Fast on, Fast off, NG on, NG-SB off, AddLiq, NG on, NG-LP off, RL-NG, AL, SB-on
         #c.preload = [ 4, 4, 4, 2 ]
         #c.preload = [ 3, 3 ]
