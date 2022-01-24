@@ -146,34 +146,6 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  # GnosisLBTargetGroup5:
-  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #   Properties:
-  #     Port: 8080
-  #     Protocol: TCP
-  #     VpcId:
-  #       Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-  #     TargetGroupAttributes:
-  #       - Key: deregistration_delay.timeout_seconds
-  #         Value: 30
-  #     HealthCheckProtocol: TCP
-  #     HealthCheckPort: "traffic-port"
-  #     TargetType: "ip"
-
-  # GnosisLBTargetGroup6:
-  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #   Properties:
-  #     Port: 8888
-  #     Protocol: TCP
-  #     VpcId:
-  #       Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
-  #     TargetGroupAttributes:
-  #       - Key: deregistration_delay.timeout_seconds
-  #         Value: 30
-  #     HealthCheckProtocol: TCP
-  #     HealthCheckPort: "traffic-port"
-  #     TargetType: "ip"
-
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -225,32 +197,6 @@ Resources:
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup4
-
-  # GnosisListener5:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     LoadBalancerArn:
-  #       Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisConfig:ARN"
-  #     Port: 443
-  #     Protocol: TLS
-  #     Certificates:
-  #     - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-  #     DefaultActions:
-  #     - Type: forward
-  #       TargetGroupArn: !Ref GnosisLBTargetGroup5
-
-  # GnosisListener6:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     LoadBalancerArn:
-  #       Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisConfig:ARN"
-  #     Port: 443
-  #     Protocol: TLS
-  #     Certificates:
-  #     - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
-  #     DefaultActions:
-  #     - Type: forward
-  #       TargetGroupArn: !Ref GnosisLBTargetGroup6
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
