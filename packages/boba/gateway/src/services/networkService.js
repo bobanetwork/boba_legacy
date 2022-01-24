@@ -572,7 +572,7 @@ class NetworkService {
                               'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
                               'BUSD', 'BNB', 'FTM',  'MATIC',
-                              'UMA'
+                              'UMA', 'DOM'
                             ]
 
       //not all tokens are on Rinkeby
