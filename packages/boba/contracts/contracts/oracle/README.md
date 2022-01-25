@@ -7,13 +7,11 @@
 - [Supported Token Feeds](#supported-token-feeds)
 
 
-**Credit**
+**Credit** \
 https://github.com/smartcontractkit/chainlink \
-https://github.com/smartcontractkit/feed-registry \
+https://github.com/smartcontractkit/feed-registry
 
-This Price Feed Oracle is forked from the [Chainlink contracts](https://github.com/smartcontractkit/chainlink). The Price Feed Oracle works to provide the latest or past market price of specific tokens, aggregated from (>=1) trusted external entities (hereafter referred to as oracles).
-
-[(see supported tokens on readme)](#Supported-Token-Feeds)
+This Price Feed Oracle is forked from the [Chainlink contracts](https://github.com/smartcontractkit/chainlink). The Price Feed Oracle works to provide the latest or past market price of specific tokens, aggregated from (>=1) trusted external entities (hereafter referred to as oracles). [(Supported tokens/feeds will be released by Feb 1 2022 below)](#Supported-Token-Feeds)
 
 Token price aggregation happens in rounds, triggered by oracles. For a round of aggregation, multiple oracles submit their 'price' answers and the final determined answer is the median of all submissions. The 'price' answer for the round isn't finalized/accepted until the round has received a certain 'min no of answer submissions' from separate oracles. While the round moves between having min < submissions < max, the computed answer can vary depending on the data received up till that point. And after the 'max no of submissions on the round' the 'price' answer is finalized and fixed. If a round does not receive 'min no of answer submissions', the round can be superseded after a timeout period.
 
@@ -21,7 +19,9 @@ The Terms used here and throughout - 'base' refers to the crypto asset/token and
 
 ## For Price Data Recipients
 
-Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point. On the FeedRegistry, use the following methods
+Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point. 
+
+On the FeedRegistry, use the following methods:
 
 *To get the latest price data -* \
 call method ***`latestRoundData(base, quote)`***
@@ -33,9 +33,10 @@ call method ***`getRoundData(base, quote, roundId)`*** \
 *The answer returned will be of the form of decimals specified on the contract-* \
 call method ***`decimals(base, quote)`***
 
-The methods above return additional data that can be used to ensure fresh data is received \
+The methods above return additional data that can be used to ensure fresh data are received.
 
-Alternatively, can query only the price \
+Alternatively, you can can query only the price:
+
 *To get the latest price -* \
 call method ***`latestAnswer(base, quote)`***
 
@@ -49,7 +50,7 @@ call method ***`latestRound(base, quote)`***
 *To get the latest timestamp-* \
 call method ***`latestTimestamp(base, quote)`***
 
-To extract other informational data please refer to the FeedRegistry contract
+To extract other informational data please refer to the FeedRegistry contract.
 
 ## For Price Data Submitters (Oracles)
 
