@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -80,6 +81,7 @@ type transaction struct {
 	QueueOrigin string          `json:"queueOrigin"`
 	QueueIndex  *uint64         `json:"queueIndex"`
 	Decoded     *decoded        `json:"decoded"`
+	Turing      hexutil.Bytes   `json:"turing"`
 }
 
 // Enqueue represents an `enqueue` transaction or a L1 to L2 transaction.
@@ -92,6 +94,7 @@ type Enqueue struct {
 	BlockNumber *uint64         `json:"blockNumber"`
 	Timestamp   *uint64         `json:"timestamp"`
 	QueueIndex  *uint64         `json:"index"`
+	Turing      *hexutil.Bytes  `json:"turing"`
 }
 
 // signature represents a secp256k1 ECDSA signature
@@ -241,6 +244,14 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 	}
 	data := *enqueue.Data
 
+	turing := hexutil.Bytes([]byte{0})
+	if enqueue.Turing == nil {
+		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing")
+	} else {
+		log.Info("TURING: rollup/client.go Enqueue tx with non-nil Turing", "enqueue_turing", enqueue.Turing)
+		turing = *enqueue.Turing
+	}
+
 	// enqueue transactions have no value
 	value := big.NewInt(0)
 	tx := types.NewTransaction(nonce, target, value, gasLimit, big.NewInt(0), data)
@@ -250,6 +261,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 	txMeta := types.NewTransactionMeta(
 		blockNumber,
 		timestamp,
+		turing,
 		&origin,
 		types.QueueOriginL1ToL2,
 		enqueue.Index,
@@ -360,6 +372,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 		txMeta := types.NewTransactionMeta(
 			new(big.Int).SetUint64(res.BlockNumber),
 			res.Timestamp,
+			res.Turing,
 			res.Origin,
 			queueOrigin,
 			&res.Index,
@@ -408,6 +421,7 @@ func batchedTransactionToTransaction(res *transaction, chainID *big.Int) (*types
 	txMeta := types.NewTransactionMeta(
 		new(big.Int).SetUint64(res.BlockNumber),
 		res.Timestamp,
+		res.Turing,
 		origin,
 		queueOrigin,
 		&res.Index,

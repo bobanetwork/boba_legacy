@@ -18,6 +18,7 @@ COPY --from=builder /optimism/packages/message-relayer/dist ./packages/message-r
 
 COPY --from=builder /optimism/packages/contracts ./packages/contracts
 COPY --from=builder /optimism/packages/boba/contracts ./packages/boba/contracts
+COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
 
 # get the needed built artifacts
 WORKDIR /opt/optimism/integration-tests

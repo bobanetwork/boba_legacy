@@ -6,12 +6,15 @@ import {
   getStorageLayout,
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
+import { utils, BigNumber } from 'ethers'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
 import { getContractArtifact } from './contract-artifacts'
 
 export interface RollupDeployConfig {
+  // Deployer address
+  deployer: string
   // Address that will own the L2 deployer whitelist.
   whitelistOwner: string
   // Address that will own the L2 gas price oracle.
@@ -38,6 +41,10 @@ export interface RollupDeployConfig {
   l1FeeWalletAddress: string
   // Address of the L1CrossDomainMessenger contract.
   l1CrossDomainMessengerAddress: string
+  // Boba turing price
+  bobaTuringPrice: string
+  // Turing helper json
+  TuringHelperJson: any
 }
 
 /**
@@ -93,6 +100,17 @@ export const makeL2GenesisFile = async (
       symbol: 'WETH',
       decimals: 18,
     },
+    Lib_ResolvedDelegateBobaProxy: {
+      proxyOwner: cfg.deployer,
+      proxyTarget: predeploys.BobaTuringCredit
+    },
+    BobaTuringCredit: {
+      _owner: cfg.deployer,
+      turingPrice: cfg.bobaTuringPrice
+    },
+    BobaTuringHelper: {
+      Self: predeploys.BobaTuringHelper
+    }
   }
 
   const dump = {}
@@ -109,6 +127,8 @@ export const makeL2GenesisFile = async (
       // directly used in Solidity (yet). This bytecode string simply executes the 0x4B opcode
       // and returns the address given by that opcode.
       dump[predeployAddress].code = '0x4B60005260206000F3'
+    } else if (predeployName === 'BobaTuringHelper') {
+      dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
     } else {
       const artifact = getContractArtifact(predeployName)
       dump[predeployAddress].code = artifact.deployedBytecode
@@ -116,10 +136,31 @@ export const makeL2GenesisFile = async (
 
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
+      if (predeployName === 'BobaTuringHelper') {
+        const indexOwner = BigNumber.from('0').toHexString();
+        dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
+        const indexAddress = BigNumber.from('1').toHexString();
+        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
+        break
+      }
       const storageLayout = await getStorageLayout(predeployName)
-      const slots = computeStorageSlots(storageLayout, variables[predeployName])
-      for (const slot of slots) {
-        dump[predeployAddress].storage[slot.key] = slot.val
+      // Calculate the mapping keys
+      if (predeployName === 'Lib_ResolvedDelegateBobaProxy') {
+        for (const keyName of Object.keys(variables[predeployName])) {
+          const key = utils.hexlify(utils.toUtf8Bytes(keyName));
+          const index = BigNumber.from('0').toHexString();
+          const newKeyPreimage = utils.concat([key, utils.hexZeroPad(index, 32)]);
+          const compositeKey = utils.keccak256(utils.hexlify(newKeyPreimage));
+          dump[predeployAddress].storage[compositeKey] = variables[predeployName][keyName]
+        }
+      } else {
+        const slots = computeStorageSlots(storageLayout, variables[predeployName])
+        for (const slot of slots) {
+          dump[predeployAddress].storage[slot.key] = slot.val
+          if (predeployName === "BobaTuringCredit") {
+            dump[predeploys.Lib_ResolvedDelegateBobaProxy].storage[slot.key] = slot.val
+          }
+        }
       }
     }
   }

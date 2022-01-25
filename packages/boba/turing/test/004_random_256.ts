@@ -13,13 +13,12 @@ const gasOverride =  {
   gasLimit: 3000000 //3,000,000
 }
 
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
-let Factory__Turing: ContractFactory
-let turing: Contract
-let Factory__Helper: ContractFactory
-let helper: Contract
+let Factory__Random: ContractFactory
+let random: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
@@ -27,29 +26,48 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
+let Factory__Helper: ContractFactory
+let helper: Contract
+const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerWallet = new Wallet(deployerPK, local_provider)
+
 describe("Turing VRF", function () {
 
   before(async () => {
-
-    Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
-
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed at", helper.address, "on", "L2")
     
-    Factory__Turing = new ContractFactory(
+    Factory__Helper = new ContractFactory(
+      (TuringHelperJson.abi),
+      (TuringHelperJson.bytecode),
+      testWallet)
+    
+    helper = await Factory__Helper.deploy()
+    console.log("    Helper contract deployed at", helper.address)
+
+    Factory__Random = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
       testWallet)
     
-    turing = await Factory__Turing.deploy(helper.address, gasOverride)
-    console.log("    Test contract deployed at", turing.address)
+    random = await Factory__Random.deploy(helper.address, gasOverride)
+    console.log("    Test contract deployed at", random.address)
+
+    // white list the new 'hello' contract in the helper
+    const tr1 = await helper.addPermittedCaller(random.address)
+    const res1 = await tr1.wait()
+    console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
+  })
+
+  it("contract should be whitelisted", async () => {
+    const tr2 = await helper.checkPermittedCaller(random.address, gasOverride)
+    const res2 = await tr2.wait()
+    const rawData = res2.events[0].data
+    const result = parseInt(rawData.slice(-64), 16)
+    expect(result).to.equal(1)
+    console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
   })
 
   it("should get the number 42", async () => {
-    let tr = await turing.get42()
+    let tr = await random.get42()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
@@ -58,24 +76,24 @@ describe("Turing VRF", function () {
     console.log("    Turing 42 =",result)
   })
 
-  it("should get a length 64 VRF", async () => {
-    let tr = await turing.getRandom()
+  it("should get a length 256 VRF", async () => {
+    let tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
-    const numberHexString = rawData.slice(-64)
-    let result = parseInt(numberHexString, 16)
-    console.log("    Turing VRF 64 =",result)
+    const numberHexString = '0x'+ rawData.slice(-64)
+    let result = BigInt(numberHexString)
+    console.log("    Turing VRF 256 =",result)
   })
 
-  it("should get a length 64 VRF", async () => {
-    let tr = await turing.getRandom()
+  it("should get a length 256 VRF", async () => {
+    let tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
-    const numberHexString = rawData.slice(-64)
-    let result = parseInt(numberHexString, 16)
-    console.log("    Turing VRF 64 =",result)
+    const numberHexString = '0x'+ rawData.slice(-64)
+    let result = BigInt(numberHexString)
+    console.log("    Turing VRF 256 =",result)
   })
 
 })

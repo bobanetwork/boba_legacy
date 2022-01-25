@@ -16,18 +16,22 @@ const gasOverride =  {
 }
 
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 
 let Factory__Hello: ContractFactory
 let hello: Contract
-let Factory__Helper: ContractFactory
-let helper: Contract
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 // Key for autofunded L2 Hardhat test account
+const helperPredeploy = '0x4200000000000000000000000000000000000022'
 const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1'
 const testWallet = new Wallet(testPrivateKey, local_provider)
+
+let Factory__Helper: ContractFactory
+let helper: Contract
+const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerWallet = new Wallet(deployerPK, local_provider)
 
 describe("Basic Math", function () {
 
@@ -93,13 +97,12 @@ describe("Basic Math", function () {
     console.log("    Created local HTTP server at", urlStr)
     
     Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
+      (TuringHelperJson.abi),
+      (TuringHelperJson.bytecode),
       testWallet)
-
-    // defines the URL that will be called by HelloTuring.sol
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
+    
+    helper = await Factory__Helper.deploy()
+    console.log("    Helper contract deployed as", helper.address)
 
     Factory__Hello = new ContractFactory(
       (HelloTuringJson.abi),
@@ -107,12 +110,31 @@ describe("Basic Math", function () {
       testWallet)
     
     hello = await Factory__Hello.deploy(helper.address, gasOverride)
-    
     console.log("    Test contract deployed as", hello.address)
+    
+    // white list the new 'hello' contract in the helper
+    // helper = new ethers.Contract(
+    //   helperPredeploy, // predeploy address
+    //   TuringHelper.abi,
+    //   deployerWallet
+    // )
+    const tr1 = await helper.addPermittedCaller(hello.address)
+    const res1 = await tr1.wait()
+    console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
+  })
+
+  it("contract should be whitelisted", async () => {
+    const tr2 = await helper.checkPermittedCaller(hello.address, gasOverride)
+    const res2 = await tr2.wait()
+    const rawData = res2.events[0].data
+    const result = parseInt(rawData.slice(-64), 16)
+    expect(result).to.equal(1)
+    console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
   })
 
   it("should return the helper address", async () => {
-    let helperAddress = await hello.helperAddr();
+    let helperAddress = await hello.helperAddr()
+    console.log("    Helper at", helperAddress)
     expect(helperAddress).to.equal(helper.address)
   })
 

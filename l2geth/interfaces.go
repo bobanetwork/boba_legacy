@@ -123,6 +123,7 @@ type CallMsg struct {
 	L1Timestamp   uint64
 	L1BlockNumber *big.Int
 	QueueOrigin   types.QueueOrigin
+	L1Turing      []byte
 }
 
 // A ContractCaller provides contract calls, essentially transactions that are executed by
