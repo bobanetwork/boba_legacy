@@ -179,6 +179,15 @@
             "rinkeby":"0x3ac6affed629a16ffccd1c865ad6e10dc0a1076a",
             "mainnet": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
          }
+      },
+      {
+        "name": "Domination Finance Token",
+        "symbol": "DOM",
+        "decimals": 18,
+        "address": {
+          "rinkeby": "0xc0e86379D81BB3AFC85DC749a95FcFBcdC4923eD",
+          "mainnet": "0xef5fa9f3dede72ec306dfff1a7ea0bb0a2f7046f"
+        }
       }
    ]
 }
