@@ -5,7 +5,7 @@
   * [4. Additional Data Sources for Boba](#4-additional-data-sources-for-boba)
   * [5. Minimally, 50% cost reduction of multi-token bridging](#5-minimally--50--cost-reduction-of-multi-token-bridging)
   * [6. Updated Blockexplorer](#6-updated-blockexplorer)
-  * [7. Gnosis Safe is live on Boba Mainent](#7-gnosis-safe-is-live-on-boba-mainent)
+  * [7. Gnosis Safe is live on Boba Mainnet](#7-gnosis-safe-is-live-on-boba-mainent)
   * [8. NFT Bridging is live on Mainnet](#8-nft-bridging-is-live-on-mainnet)
 
 # Engineering update #7
@@ -62,7 +62,7 @@ Currently, all tokens (e.g. ETH and BOBA) must be bridged separately. This week,
 
 The updated [blockexplorer](https://blockexplorer.rinkeby.boba.network/) was launched today on Rinkeby. Enjoy. Next steps - enable support for mobile; fix dark mode; improve display of contract verification.
 
-## 7. Gnosis Safe is live on Boba Mainnet
+## 7. Gnosis Safe is live on Mainnet
 
 [Boba Gnosis Safe](https://safe.boba.network/app/welcome) in on Mainnet. Enjoy - this functionality is critical for teams wishing to manage their treasuries on Boba, as well as for large DeFi and NFT projects. Next steps - add links to e.g. the gateway to make it easier to find and use.
 
