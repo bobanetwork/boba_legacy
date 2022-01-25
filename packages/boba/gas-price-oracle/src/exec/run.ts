@@ -104,6 +104,11 @@ const main = async () => {
     'min-l1-base-fee',
     parseInt(env.MIN_L1_BASE_FEE, 10) || 150000000000
   )
+  // max l1 base fee
+  const MAX_L1_BASE_FEE = config.uint(
+    'max-l1-base-fee',
+    parseInt(env.MAX_L1_BASE_FEE, 10) || 225000000000
+  )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
@@ -178,6 +183,7 @@ const main = async () => {
     overheadMinPercentChange: OVERHEAD_MIN_PERCENT_CHANGE,
     minOverhead: MIN_OVERHEAD,
     minL1BaseFee: MIN_L1_BASE_FEE,
+    maxL1BaseFee: MAX_L1_BASE_FEE,
   })
 
   await service.start()

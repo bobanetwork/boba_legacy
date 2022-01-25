@@ -18,11 +18,14 @@ function GasSwitcher() {
 
   useEffect(() => {
     async function getGasSavings () {
-      const l1SecurityFee = await networkService.estimateL1SecurityFee()
-      const l2Fee = await networkService.estimateL2Fee()
-      const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee);
-      setSavings(gasSavings ? gasSavings : 0);
-      return gasSavings
+      if (networkService.masterSystemConfig === 'mainnet' || networkService.masterSystemConfig === 'rinkeby') {
+        const l1SecurityFee = await networkService.estimateL1SecurityFee()
+        const l2Fee = await networkService.estimateL2Fee()
+        const gasSavings = (Number(gas.gasL1) * (l2Fee - l1SecurityFee) / Number(gas.gasL2)) / l2Fee;
+        setSavings(gasSavings ? gasSavings : 0);
+        return gasSavings
+      }
+      return 1
     }
     getGasSavings();
   }, [gas]);

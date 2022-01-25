@@ -156,13 +156,9 @@ class NetworkService {
     this.gasOralceContract = null
 
     // swap data for calculating the l1 security fee
-    this.payloadForL1SecurityFee = {
-      from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
-      to: '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514',
-      value: '0x38d7ea4c68000',
-      data:
-        '0x7ff36ab5000000000000000000000000000000000000000000000000132cc41aecbfbace00000000000000000000000000000000000000000000000000000000000000800000000000000000000000005e7a06025892d8eef0b5fa263fa0d4d2e5c3b54900000000000000000000000000000000000000000000000000000001c73d14500000000000000000000000000000000000000000000000000000000000000002000000000000000000000000deaddeaddeaddeaddeaddeaddeaddeaddead00000000000000000000000000005008f837883ea9a07271a1b5eb0658404f5a9610',
-    }
+    this.payloadForL1SecurityFee = null
+    // fast deposit in batch
+    this.payloadForFastDepositBatchCost = null
   }
 
   async enableBrowserWallet() {
@@ -505,6 +501,11 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
+      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
+        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
+      }
+
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[masterSystemConfig]['L1']['rpcUrl']
       )
@@ -572,7 +573,7 @@ class NetworkService {
                               'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
                               'FRAX', 'FXS', 'DODO', 'UST',
                               'BUSD', 'BNB', 'FTM',  'MATIC',
-                              'UMA'
+                              'UMA', 'DOM'
                             ]
 
       //not all tokens are on Rinkeby
@@ -580,6 +581,7 @@ class NetworkService {
         supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                           'REP',  'BAT', 'ZRX',  'SUSHI',
                           'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
+                          'DOM'
                           //'FRAX', 'FXS', 'UST',
                           //'BUSD', 'BNB', 'FTM',  'MATIC'
                         ]
@@ -2519,13 +2521,7 @@ class NetworkService {
     approvalCost_BN = approvalGas_BN.mul(gasPrice)
     console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
 
-    //in some cases zero not allowed
-    const tx2 = await this.L1LPContract.populateTransaction.clientDepositL1Batch([
-      { l1TokenAddress: allAddresses.L1_ETH_Address, amount: '1' },
-      { l1TokenAddress: currencyAddress, amount: '0' }
-    ], {value: '1'})
-
-    const depositGas_BN = await this.L1Provider.estimateGas(tx2)
+    const depositGas_BN = await this.L1Provider.estimateGas(this.payloadForFastDepositBatchCost)
     console.log("Fast batch deposit gas", depositGas_BN.toString())
 
     const depositCost_BN = depositGas_BN.mul(gasPrice)

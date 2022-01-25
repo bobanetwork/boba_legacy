@@ -73,6 +73,9 @@ interface GasPriceOracleOptions {
 
   // Min L1 base fee
   minL1BaseFee: number
+
+  // Max L1 base fee
+  maxL1BaseFee: number
 }
 
 const optionSettings = {}
@@ -952,7 +955,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
       if (
         l1GasPrice.toNumber() !== l1BaseFee.toNumber() &&
-        l1GasPrice.toNumber() > this.options.minL1BaseFee
+        l1GasPrice.toNumber() > this.options.minL1BaseFee &&
+        l1GasPrice.toNumber() < this.options.maxL1BaseFee
       ) {
         const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
           l1GasPrice,
@@ -968,6 +972,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           l1GasPrice: l1GasPrice.toNumber(),
           l1BaseFee: l1BaseFee.toNumber(),
           minL1BaseFee: this.options.minL1BaseFee,
+          maxL1BaseFee: this.options.maxL1BaseFee,
         })
       }
     } catch (error) {
