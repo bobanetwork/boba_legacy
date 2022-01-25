@@ -49,7 +49,7 @@ export const menuItems = [
   },
   {
     key: 'GnosisSafe',
-    icon: "Safe",
+    icon: "SafeIcon",
     title: "Gnosis Safe",
     url: "https://safe.boba.network/"
   },
