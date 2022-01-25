@@ -48,6 +48,12 @@ export const menuItems = [
     url: "/airdrop"
   },
   {
+    key: 'GnosisSafe',
+    icon: "Safe",
+    title: "Gnosis Safe",
+    url: "https://safe.boba.network/"
+  },
+  {
     key: 'Help',
     icon: "HelpIcon",
     title: "Help/FAQ",
