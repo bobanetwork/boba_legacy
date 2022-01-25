@@ -65,7 +65,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:ARN"
       Port: 80
       Protocol: TCP
       DefaultActions:
