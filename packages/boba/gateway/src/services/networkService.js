@@ -581,6 +581,7 @@ class NetworkService {
         supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
                           'REP',  'BAT', 'ZRX',  'SUSHI',
                           'LINK', 'UNI', 'BOBA', 'xBOBA', 'OMG',
+                          'DOM'
                           //'FRAX', 'FXS', 'UST',
                           //'BUSD', 'BNB', 'FTM',  'MATIC'
                         ]
