@@ -5,7 +5,7 @@
   * [4. Additional Data Sources for Boba](#4-additional-data-sources-for-boba)
   * [5. Minimally, 50% cost reduction of multi-token bridging](#5-minimally--50--cost-reduction-of-multi-token-bridging)
   * [6. Updated Blockexplorer](#6-updated-blockexplorer)
-  * [7. Gnosis Safe is live on Boba Mainnet](#7-gnosis-safe-is-live-on-boba-mainent)
+  * [7. Gnosis Safe is live on Boba Mainnet](#7-gnosis-safe-is-live-on-boba-mainnet)
   * [8. NFT Bridging is live on Mainnet](#8-nft-bridging-is-live-on-mainnet)
 
 # Engineering update #7
