@@ -12,6 +12,7 @@ import DAOIcon from 'components/icons/DAOIcon'
 import HelpIcon from 'components/icons/LearnIcon'
 import SwapIcon from 'components/icons/SwapIcon'
 import SearchIcon from 'components/icons/SearchIcon'
+import SafeIcon from 'components/icons/SafeIcon'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { selectModalState } from 'selectors/uiSelector'
@@ -35,7 +36,8 @@ function MenuItems ({setOpen }) {
     DAOIcon,
     HelpIcon,
     SwapIcon,
-    SearchIcon
+    SearchIcon,
+    SafeIcon
   }
 
   return (
@@ -49,8 +51,13 @@ function MenuItems ({setOpen }) {
             <li key={title}>
               <S.MenuItem
                 onClick={() => {
-                  dispatch(setPage(item.key))
-                  setOpen(false)
+                  if (item.url.startsWith('http')) {
+                    window.open(item.url);
+                    setOpen(false)
+                  } else {
+                    dispatch(setPage(item.key))
+                    setOpen(false)
+                  }
                 }}
                 onMouseEnter={() => setActiveItem(title)}
                 onMouseLeave={() => setActiveItem(false)}
