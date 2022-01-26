@@ -2,12 +2,11 @@
 
 - [Basic Architecture of Turing and L2TGeth](#basic-architecture-of-turing-and-l2tgeth)
   * [TLDR](#tldr)
-    + [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
-    + [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
-    + [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-    + [Important Properties of Turing](#important-properties-of-turing)
-      - [String length limit](#string-length-limit)
-      - [One Turing call per Transaction](#one-turing-call-per-transaction)
+  * [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
+- [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
+- [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+  * [Important Properties of Turing](#important-properties-of-turing)
+    + [String length limit](#string-length-limit)
 - [Technical Background and Quickstart](#technical-background-and-quickstart)
   * [Quickstart for Turing Developers](#quickstart-for-turing-developers)
 - [Implementation](#implementation)
@@ -54,15 +53,11 @@ rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
 **Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.   
 
-### Turing status as of January 25 2022 - Release countdown
+## Turing status as of January 25 2022 - Release countdown
 
 With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
 
-ToDo:
-
-* [PARTIAL] ~~Secure the L2TGeth against malicious inputs from off-chain~~
-
-### Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
+# Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
 With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction;  everything takes places within one transaction:
 
@@ -115,7 +110,7 @@ Then, register and fund your Turing Credit account:
 
 **All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/test/006_NFT_random.ts). 
 
-### Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
+# Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
 **Note - Boba does not provide trading data (except for deliberately delayed data for test and debugging purposes).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
@@ -136,12 +131,12 @@ Once you have an API key from your chosen data vendor, insert that key into your
 
 You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`.
 
-### Important Properties of Turing
+## Important Properties of Turing
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
 
-#### String length limit
+### String length limit
 
 The string length cap of 322 is large enough to return, for example, four `uint256` from the external api:
 
@@ -172,9 +167,9 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
 
 ```  
 
-#### One Turing call per Transaction
+####One Turing call per Transaction
 
-At present, you can only have one turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert. 
+At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert. 
 
 # Technical Background and Quickstart
 
