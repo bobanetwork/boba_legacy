@@ -1,44 +1,44 @@
-import { BigNumber, Contract, ContractFactory, providers, Wallet } from 'ethers'
+import { BigNumber, Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 const abiDecoder = require('web3-eth-abi')
+import * as request from 'request-promise-native'
 
 const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
+const hPort = 1235 // Port for local HTTP server
+var urlStr
 
-const gasOverride =  {
-  gasLimit: 3000000 //3,000,000
-}
-
-const helperPredeploy = '0x4200000000000000000000000000000000000022'
-import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
-
-let Factory__Random: ContractFactory
-let random: Contract
-
+const gasOverride =  { gasLimit: 3000000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-// Key for Hardhat test account #13 (0x1cbd3b2770909d4e10f157cabc84c7264073c9ec)
-const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
-const testWallet = new Wallet(testPrivateKey, local_provider)
-
-let Factory__Helper: ContractFactory
-let helper: Contract
 const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 const deployerWallet = new Wallet(deployerPK, local_provider)
 
-describe("Turing VRF", function () {
+import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+
+let Factory__Random: ContractFactory
+let random: Contract
+let Factory__Helper: ContractFactory
+let helper: Contract
+let turingCredit: Contract
+let L2BOBAToken: Contract
+let addressesBOBA
+
+describe("Turing 256 Bit Random Number", function () {
 
   before(async () => {
     
     Factory__Helper = new ContractFactory(
       (TuringHelperJson.abi),
       (TuringHelperJson.bytecode),
-      testWallet)
+      deployerWallet)
     
     helper = await Factory__Helper.deploy()
     console.log("    Helper contract deployed at", helper.address)
@@ -46,15 +46,31 @@ describe("Turing VRF", function () {
     Factory__Random = new ContractFactory(
       (HelloTuringJson.abi),
       (HelloTuringJson.bytecode),
-      testWallet)
+      deployerWallet)
     
     random = await Factory__Random.deploy(helper.address, gasOverride)
     console.log("    Test contract deployed at", random.address)
 
-    // white list the new 'hello' contract in the helper
+    // whitelist your 'random' contract in the helper
     const tr1 = await helper.addPermittedCaller(random.address)
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
+
+    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+    addressesBOBA = JSON.parse(result)
+
+    L2BOBAToken = new Contract(
+      addressesBOBA.TOKENS.BOBA.L2,
+      L2GovernanceERC20Json.abi,
+      deployerWallet
+    )
+
+    // prepare to register/fund your Turing Helper 
+    turingCredit = getContractFactory(
+      'BobaTuringCredit',
+      deployerWallet
+    ).attach(addressesBOBA.BobaTuringCredit)
+
   })
 
   it("contract should be whitelisted", async () => {
@@ -64,6 +80,35 @@ describe("Turing VRF", function () {
     const result = parseInt(rawData.slice(-64), 16)
     expect(result).to.equal(1)
     console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
+  })
+
+  it('Should register and fund your Turing helper contract in turingCredit', async () => {
+
+    const depositAmount = utils.parseEther('10')
+
+    const preBalance = await turingCredit.prepaidBalance(helper.address)
+    console.log("    Credit Prebalance", preBalance.toString())
+
+    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
+    console.log("    BOBA Balance in your account", bobaBalance.toString())
+
+    const approveTx = await L2BOBAToken.approve(
+      turingCredit.address,
+      depositAmount
+    )
+    await approveTx.wait()
+
+    const depositTx = await turingCredit.addBalanceTo(
+      depositAmount,
+      helper.address
+    )
+    await depositTx.wait()
+
+    const postBalance = await turingCredit.prepaidBalance(
+      helper.address
+    )
+
+    expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
   it("should get the number 42", async () => {
@@ -76,7 +121,7 @@ describe("Turing VRF", function () {
     console.log("    Turing 42 =",result)
   })
 
-  it("should get a length 256 VRF", async () => {
+  it("should get a 256 bit random number", async () => {
     let tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
@@ -86,7 +131,7 @@ describe("Turing VRF", function () {
     console.log("    Turing VRF 256 =",result)
   })
 
-  it("should get a length 256 VRF", async () => {
+  it("should get a 256 bit random number", async () => {
     let tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok

@@ -2,16 +2,21 @@
 
 - [Basic Architecture of Turing and L2TGeth](#basic-architecture-of-turing-and-l2tgeth)
   * [TLDR](#tldr)
-    + [Turing status as of January 12 2022 - Release countdown](#turing-status-as-of-january-12-2022---release-countdown)
-    + [Feature Preview: Using Turing to access real-time trading data from within your solidity smart contract](#feature-preview--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-  * [Detailed Technical Background and Implementation](#detailed-technical-background-and-implementation)
-    + [Quickstart for Turing Developers](#quickstart-for-turing-developers)
-    + [Implementation: Step 1](#implementation--step-1)
-    + [Step 2](#step-2)
-    + [Step 3 - Batch Submitter Data Mangling](#step-3---batch-submitter-data-mangling)
-    + [Step 4 - Writing to the CTC](#step-4---writing-to-the-ctc)
-    + [Step 5 - Reading from the CTC](#step-5---reading-from-the-ctc)
-    + [Step 6 - Verifier data ingestion](#step-6---verifier-data-ingestion)
+    + [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
+    + [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
+    + [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+    + [Important Properties of Turing](#important-properties-of-turing)
+      - [String length limit](#string-length-limit)
+      - [One Turing call per Transaction](#one-turing-call-per-transaction)
+- [Technical Background and Quickstart](#technical-background-and-quickstart)
+  * [Quickstart for Turing Developers](#quickstart-for-turing-developers)
+- [Implementation](#implementation)
+  * [Step 1: Invoking Turing for inside a Smart contract](#step-1--invoking-turing-for-inside-a-smart-contract)
+  * [Step 2: Flow of Turing data out of the evm.context](#step-2--flow-of-turing-data-out-of-the-evmcontext)
+  * [Step 3: Batch submitter Turing data injection](#step-3--batch-submitter-turing-data-injection)
+  * [Step 4: Writing to the CTC](#step-4--writing-to-the-ctc)
+  * [Step 5: DTL Turing data extraction; Reading from the CTC](#step-5--dtl-turing-data-extraction--reading-from-the-ctc)
+  * [Step 6: Verifier data ingestion](#step-6--verifier-data-ingestion)
 
 ## TLDR
 
@@ -20,12 +25,16 @@ Turing is a system for interacting with the outside world from within solidity s
 **The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
+  
+  // ERC721.sol
+  random_number = turing.getRandom()
 
-random_number = turing.getRandom()
-
-  // test response
-  Turing VRF 256 = 102531381370031878661679181891478913167167919319039026463839728285563064328401n
-  ✓ should get a length 256 VRF (79ms)
+  // Test/Debug Response
+  Turing NFT Random 256
+    256 bit random number as a BigInt = 61245594159531997717158776666900035572992757857563713350570408643552830626492n
+    Minted an NFT with Attribute A = 135 and Attribute B = 103
+    Minted a pirate with a green hat
+    ✓ should mint an NFT with random attributes (65ms)
 
 ```
 
@@ -45,20 +54,68 @@ rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
 **Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.   
 
-### Turing status as of January 17 2022 - Release countdown
+### Turing status as of January 25 2022 - Release countdown
 
-With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on the public chains (Rinkeby and Mainnet).**
+With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
 
 ToDo:
 
-* [COMPLETED] ~~Upgrade the random number generator (currently `math/rand`) to something better such as `crypto/rand`~~
 * [PARTIAL] ~~Secure the L2TGeth against malicious inputs from off-chain~~
-* [COMPLETED] ~~Improve the data-packing system used to append Turing payloads to the rawTransaction data sent to the L1~~
-* [COMPLETED] ~~Fix Geth Tests~~
-* [OPEN] Add Integration tests to the GitHub actions
-* [OPEN] Check compatibility of `L2TGeth` with legacy blocks and state roots; critical for smooth regenesis
 
-### Feature Preview: Using Turing to access real-time trading data from within your solidity smart contract
+### Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
+
+With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction;  everything takes places within one transaction:
+
+```javascript
+
+  // modified mint function in a standard ERC721.sol
+  function mint(address to, uint256 tokenId) public {
+    uint256 result = myHelper.TuringRandom();
+    bytes memory i_bytes = abi.encodePacked(result);
+    uint8 attribute_1  = uint8(i_bytes[ 0]);
+    uint8 attribute_2  = uint8(i_bytes[ 1]);
+    ...
+    uint8 attribute_32 = uint8(i_bytes[31]);
+    // use the attributes here to e.g. set URI/Attributes etc
+    _mint(to, tokenId);
+    emit MintedRandom(result, attribute_1, attribute_2, ...);
+  }
+
+  // pseudocode transaction reponse
+  256 bit random number as a BigInt = 61245594159531997717158776666900035572992757857563713350570408643552830626492n
+  Minted an NFT with Attribute A = 135 and Attribute B = 103
+  Minted a pirate with a green hat
+  ✓ should mint an NFT with random attributes (65ms)
+
+```
+
+To use this functionality, deploy your `TuringHelper` contract, provide its address to your ERC721 contract, vice versa:
+
+```javascript
+
+  // deploy your Turing helper
+  myHelper = await Factory__Helper.deploy()
+
+  // deploy your ERC721 contract
+  erc721 = await Factory__ERC721.deploy("RandomERC721", "RER", myHelper.address)
+
+  // lock down your myHelper to accept only requests from your ERC721
+  await myHelper.addPermittedCaller(erc721.address)
+
+```
+
+Then, register and fund your Turing Credit account:
+
+```javascript
+
+  const ONE_BOBA = utils.parseEther('1')
+  await turingCredit.addBalanceTo(ONE_BOBA, helper.address)
+
+```
+
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 turing requests. Have fun.
+
+### Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
 **Note - Boba does not provide trading data (except for deliberately delayed data for test and debugging purposes).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
@@ -149,44 +206,89 @@ The tests will perform some basic floating point math, provide some random numbe
 yarn run v1.22.15
 $ hardhat --network boba_local test
 
+
   Basic Math
     Created local HTTP server at http://192.168.1.246:1235
-    Helper contract deployed as 0x6BdBb69660E6849b98e8C524d266a0005D3655F7 on L2
-    Test contract deployed as 0x9B06D17ce54B06dF4A644900492036E3AC384517
+    Helper contract deployed as 0x942ED2fa862887Dc698682cc6a86355324F0f01e
+    Test contract deployed as 0x8D81A3DCd17030cD5F23Ac7370e4Efb10D2b3cA4
+    addingPermittedCaller to TuringHelper 0x0000000000000000000000008d81a3dcd17030cd5f23ac7370e4efb10d2b3ca4
+    Test contract whitelisted in TuringHelper (1 = yes)? 1
+    ✓ contract should be whitelisted (54ms)
+    Helper at 0x942ED2fa862887Dc698682cc6a86355324F0f01e
     ✓ should return the helper address
+    Credit Prebalance 0
+    BOBA Balance in your account 310000000000000000000
+    ✓ Should register and fund your Turing helper contract in turingCredit (177ms)
     ✓ test of local compute endpoint: should do basic math via direct server query
-    ✓ should support floating point volume of sphere (76ms)
-    ✓ should support floating point volume of sphere based on geth-cached result (65ms)
+      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
+      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
+    ✓ should support floating point volume of sphere (57ms)
+      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
+    ✓ should support floating point volume of sphere based on geth-cached result (58ms)
 
   Stableswap at AWS Lambda
     URL set to https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/swapy
-    Helper contract deployed as 0xB0F974464eA9BbB2adA6a08B0AB226Cbc57F7261 on L2
-    Stableswap contract deployed as 0x3495e761eBeb87991C6CD1137108Fd3e7D3c74ba
-    ✓ should return the helper address
-    ✓ should correctly swap X in for Y out (1048ms)
+    Helper contract deployed as 0x8e264821AFa98DD104eEcfcfa7FD9f8D8B320adA
+    Stableswap contract deployed as 0x871ACbEabBaf8Bed65c22ba7132beCFaBf8c27B5
+    addingPermittedCaller to TuringHelper 0x000000000000000000000000871acbeabbaf8bed65c22ba7132becfabf8c27b5
+    Test contract whitelisted in TuringHelper (1 = yes)? 1
+    ✓ contract should be whitelisted (50ms)
+    Credit Prebalance 0
+    BOBA Balance in your account 300000000000000000000
+    ✓ Should register and fund your Turing helper contract in turingCredit (172ms)
+    ✓ should return the helper address (116ms)
+      result of x_in 12 -> y_out = 50
+    ✓ should correctly swap X in for Y out (202ms)
 
-  Turing VRF
-    Helper contract deployed at 0x488516e15E671491BdaB7f0b9c5045E670a80431 on L2
-    Test contract deployed at 0xA1FeC3dff287464b6B3297404f839847A18ce184
+  Turing 256 Bit Random Number
+    Helper contract deployed at 0xb185E9f6531BA9877741022C92CE858cDCc5760E
+    Test contract deployed at 0xAe120F0df055428E45b264E7794A18c54a2a3fAF
+    addingPermittedCaller to TuringHelper 0x000000000000000000000000ae120f0df055428e45b264e7794a18c54a2a3faf
+    Test contract whitelisted in TuringHelper (1 = yes)? 1
+    ✓ contract should be whitelisted (51ms)
+    Credit Prebalance 0
+    BOBA Balance in your account 290000000000000000000
+    ✓ Should register and fund your Turing helper contract in turingCredit (174ms)
     Turing 42 = 42
     ✓ should get the number 42 (91ms)
-    Turing VRF 256 = 36532234270055059218099711135497367915509356022078512728275895596919612306403n
-    ✓ should get a length 256 VRF (88ms)
-    Turing VRF 256 = 102531381370031878661679181891478913167167919319039026463839728285563064328401n
-    ✓ should get a length 256 VRF (79ms)
+    Turing VRF 256 = 11642062518220346831211086370276871135010213271872466428492348202384902597141n
+    ✓ should get a 256 bit random number (83ms)
+    Turing VRF 256 = 39492154036951735205025381980653780356965271743173916331971607322325246415525n
+    ✓ should get a 256 bit random number (83ms)
 
   Pull Bitcoin - USD quote
     URL set to https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote
-    Helper contract deployed as 0x876E45ed3c0D488343B098350Cb717737a178848 on L2
-    Lending contract deployed as 0xc6a2F25a6AE1a5b406A3E2E4B5C4f4cDb9F33316
+    Helper contract deployed as 0x7C8BaafA542c57fF9B2B90612bf8aB9E86e22C09
+    Lending contract deployed as 0x0a17FabeA4633ce714F1Fa4a2dcA62C3bAc4758d
+    addingPermittedCaller to TuringHelper 0x0000000000000000000000000a17fabea4633ce714f1fa4a2dca62c3bac4758d
+    Test contract whitelisted in TuringHelper (1 = yes)? 1
+    ✓ contract should be whitelisted (53ms)
     ✓ should return the helper address
-     Bitcoin to usd price is 43864.85
-     timestamp 1642027566490
-    ✓ should get the current Bitcoin - USD price (753ms)
+    Credit Prebalance 0
+    BOBA Balance in your account 280000000000000000000
+    ✓ Should register and fund your Turing helper contract in turingCredit (176ms)
+    Bitcoin to USD price is 36654.89
+    timestamp 1643158948154
+    ✓ should get the current Bitcoin - USD price (305ms)
 
-  11 passing (3s)
+  Turing NFT Random 256
+    Turing Helper contract deployed at 0xd9fEc8238711935D6c8d79Bef2B9546ef23FC046
+    ERC721 contract deployed at 0xd3FFD73C53F139cEBB80b6A524bE280955b3f4db
+    adding your ERC721 as PermittedCaller to TuringHelper 0x000000000000000000000000d3ffd73c53f139cebb80b6a524be280955b3f4db
+    Credit Prebalance 0
+    BOBA Balance in your account 270000000000000000000
+    ✓ Should register and fund your Turing helper contract in turingCredit (122ms)
+    ERC721 contract whitelisted in TuringHelper (1 = yes)? 1
+    ✓ Your ERC721 contract should be whitelisted
+    256 bit random number as a BigInt = 61245594159531997717158776666900035572992757857563713350570408643552830626492n
+    Minted an NFT with Attribute A = 135 and Attribute B = 103
+    Minted a pirate with a green hat
+    ✓ should mint an NFT with random attributes (65ms)
 
-✨  Done in 6.76s.
+
+  22 passing (3s)
+
+✨  Done in 6.67s.
 ```
 
 # Implementation
@@ -197,7 +299,7 @@ A Turing cycle starts with specific function calls inside solidity smart contrac
 
 ```javascript
 
-random_number = turing.getRandom()
+  random_number = turing.getRandom()
 
 ```
 
@@ -421,7 +523,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 ```
 
-### Step 2: Flow of Turing data out of the evm.context
+## Step 2: Flow of Turing data out of the evm.context
 
 `l2geth/core/state_processor.go:core.ApplyTransaction` moves the Turing data from `Context.Turing` into the `transaction.meta.L1Turing` byte array:
 
@@ -462,7 +564,7 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 
 At this point, the data are circulated to various places throughout the system as part of the block/transaction data. Notably, calls to the L2 for block/transaction data now return a new field, `l1Turing` to all callers.
 
-### Step 3: Batch submitter Turing data injection
+## Step 3: Batch submitter Turing data injection
 
 The batch submitter receives an new block/transaction from `L2TGeth`, obtains the raw call string (`rawTransaction`) and the Turing data (`l1Turing`), and if there was a Turing event (as judged from the length of the Turing string), the modified `batch-submitter` appends those data to the `rawTransaction` string. From the perspective of the CTC, it is receiving its normal batch payload.   
 
@@ -497,11 +599,11 @@ private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
 
 ```
 
-### Step 4: Writing to the CTC
+## Step 4: Writing to the CTC
 
 The batch-submitter writes the data to the CTC as usual. **The CTC does not know about Turing** - that was one of the goals, so we do not have to modify the L1 contracts.
 
-### Step 5: DTL Turing data extraction; Reading from the CTC
+## Step 5: DTL Turing data extraction; Reading from the CTC
 
 The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is now called `sequencerTransaction`). The DTL uses a Turing length metadata field in the `sequencerTransaction` string. Critically, the DTL writes a slightly modified `TransactionEntry` into its database, which has a new field called `turing`. When the database is queried, it thus returns the Turing data in addition to all the usual fields.
 
@@ -544,7 +646,7 @@ The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is n
 
 ```
 
-### Step 6: Verifier data ingestion
+## Step 6: Verifier data ingestion
 
 The Verifier receives all the usual data from the DTL, but, if there was a Turing call, there is now an additional data field containing the rewritten callData as a HexString. The Turing data are obtained from incoming `json` data and are written into the transaction metadata, `meta.L1Turing = turing`:
 

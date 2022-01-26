@@ -2,6 +2,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, ethers, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
@@ -11,6 +12,11 @@ let L2Boba: Contract
 let BobaTuringHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   const L1StandardBridge = getContractFactory('L1StandardBridge')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach((hre as any).deployConfig.L1StandardBridgeAddress)
@@ -76,15 +82,17 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`BobaTuringCredit is at ${BobaTuringCredit.address}`)
   console.log(`BobaTuringHelper is at ${BobaTuringHelper.address}`)
 
+  const depositBobaAmountL2 = utils.parseEther('500')
+
   // Deposit Boba to BobaTuringHelper and set Turing price
   const approveL2BobaTx = await L2Boba.approve(
     BobaTuringCredit.address,
-    depositBobaAmount
+    depositBobaAmountL2
   )
   await approveL2BobaTx.wait()
 
   const addBalanceTx = await BobaTuringCredit.addBalanceTo(
-    depositBobaAmount,
+    depositBobaAmountL2,
     BobaTuringHelper.address
   )
   await addBalanceTx.wait()
@@ -98,6 +106,18 @@ const deployFn: DeployFunction = async (hre) => {
   await setPriceTx.wait()
 
   console.log(`Turing price was set to ${turingPrice}`)
+
+  // this is a predeploy on some chains - let's make sure it's registered one way or the other
+  const BobaTuringCreditSubmission: DeploymentSubmission = {
+    ...BobaTuringCredit,
+    receipt: BobaTuringCredit.receipt,
+    address: BobaTuringCredit.address,
+    abi: BobaTuringCredit.abi,
+  }
+
+  await hre.deployments.save('BobaTuringCredit', BobaTuringCreditSubmission)
+  await registerBobaAddress(addressManager, 'BobaTuringCredit', BobaTuringCredit.address)
+  console.log(`Registered BobaTuringCredit in the AddressManager at ${BobaTuringCredit.address}`)
 }
 
 deployFn.tags = ['BobaTuring']
