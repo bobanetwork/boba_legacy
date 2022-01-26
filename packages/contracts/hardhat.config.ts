@@ -53,7 +53,7 @@ const config: HardhatUserConfig = {
       accounts: [privateKey],
     },
     mainnet: {
-      url: process.env.L1_NODE_WEB3_URL,
+      url: process.env.L1_NODE_WEB3_URL || '',
     },
   },
   mocha: {
