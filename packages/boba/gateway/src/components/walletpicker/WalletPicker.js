@@ -193,12 +193,12 @@ function WalletPicker ({ onEnable, enabled }) {
                 <Typography variant="h1" component="h1">
                   SCHEDULED BOBA GATEWAY DOWNTIME
                 </Typography>
-                <S.Subtitle variant="body1" component="p" paragraph={true}>
+                {/* <S.Subtitle variant="body1" component="p" paragraph={true}>
                   As announced in Twitter and in Telegram, due to unexpectely high demand for the
                   Boba L2, BOBA liquidity pools are being rebalanced.
-                </S.Subtitle>
+                </S.Subtitle> */}
                 <S.Subtitle variant="body1" component="p" paragraph={true}>
-                  The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC.
+                  The scheduled maintenance window is from Jan. 26 21:00 UTC to approximately 23:00 UTC.
                   Upgrade status and progress reports will be provided via Twitter and Telegram.
                 </S.Subtitle>
               </Grid>
