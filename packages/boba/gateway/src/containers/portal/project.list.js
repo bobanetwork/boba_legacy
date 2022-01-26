@@ -27,8 +27,6 @@ import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 
-
-
 export const projectList = [
   {
     "title": "OolongSwap",
@@ -36,7 +34,7 @@ export const projectList = [
     "link": "https://oolongswap.com/",
     "twitter": "https://twitter.com/oolongswap",
     "discord": "http://discord.gg/savwHHXsmU",
-    "type": "DAPPS",
+    "type": "defi",
     "image": OolongswapLogo
   },
   {
@@ -45,17 +43,17 @@ export const projectList = [
     "link": "https://frax.finance/",
     "telegram": "https://t.me/fraxfinance",
     "twitter": "https://twitter.com/fraxfinance",
-    "type": "TOKENS",
+    "type": "defi",
     "image": fraxLogo
   },
   {
     "title": "BoringDAO",
     "canLaunch": true,
-    "link": "https://oportal.boringdao.com/twowayhttps://oportal.boringdao.com/twoway",
+    "link": "https://oportal.boringdao.com/twoway",
     "telegram": "https://t.me/Satis_Channel",
     "twitter": "https://twitter.com/TheBoringDAO",
     "discord": "https://discord.gg/4CezfPe7",
-    "type": "BRIDGES",
+    "type": "bridge",
     "image": boaringDaoLogo
   },
   {
@@ -63,7 +61,7 @@ export const projectList = [
     "canLaunch": true,
     "link": "https://anyswap.exchange/#/dashboard",
     "twitter": "https://twitter.com/AnyswapNetwork",
-    "type": "BRIDGES",
+    "type": "bridge",
     "image": multiChainLogo
   },
   {
@@ -73,7 +71,7 @@ export const projectList = [
     "telegram": "https://t.me/synapseprotocol",
     "twitter": "https://twitter.com/SynapseProtocol",
     "discord": "https://discord.com/invite/synapseprotocol",
-    "type": "BRIDGES",
+    "type": "bridge",
     "image": synLogo
   },
   {
@@ -83,7 +81,7 @@ export const projectList = [
     "telegram": "https://t.me/swapperchan",
     "twitter": "https://twitter.com/SwapperChan",
     "discord": "https://discord.com/invite/u6V3g5gdpV",
-    "type": "DAPPS",
+    "type": "defi",
     "image": swapperChanLogo
   },
   {
@@ -93,7 +91,7 @@ export const projectList = [
     "telegram": "https://t.me/zenchafinance",
     "twitter": "https://twitter.com/ZenchaFinance",
     "discord": "https://discord.com/invite/DwjPNvAwdd",
-    "type": "DAPPS",
+    "type": "defi",
     "image": zenchaLogo
   },
   {
@@ -103,7 +101,7 @@ export const projectList = [
     "telegram": "https://t.me/unidexfinance",
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
-    "type": "DAPPS",
+    "type": "defi",
     "image": unidexLogo
   },
   {
@@ -112,7 +110,7 @@ export const projectList = [
     "link": "https://www.layerswap.io/",
     "twitter": "https://twitter.com/layerswap",
     "discord": "http://discord.gg/KhwYN35sHy",
-    "type": "BRIDGES",
+    "type": "bridge",
     "image": layerSwapLogo
   },
   {
@@ -122,7 +120,7 @@ export const projectList = [
     "telegram": "https://t.me/witnetio",
     "twitter": "https://twitter.com/witnet_io",
     "discord": "https://discord.gg/X4uurfP",
-    "type": "TOOLS",
+    "type": "tools",
     "image": witnetLogo
   },
   {
@@ -131,7 +129,7 @@ export const projectList = [
     "link": "https://t.co/FRw0XfaQBH",
     "telegram": "https://t.me/bobapunks",
     "twitter": "https://twitter.com/boba_punks",
-    "type": "NFT",
+    "type": "nft",
     "image": bobaPunksLogo
   },
   {
@@ -141,7 +139,7 @@ export const projectList = [
     "telegram": "https://t.me/thebobadoge",
     "twitter": "https://twitter.com/BobaDoge",
     "discord": "http://discord.gg/jvXBqpKgdt",
-    "type": "TOKENS",
+    "type": "token",
     "image": bobaDogeLogo
   },
   {
@@ -150,7 +148,7 @@ export const projectList = [
     "link": "https://apeboard.finance/dashboard",
     "telegram": "https://t.me/joinchat/IgrzTnHKm-A0RwSP",
     "twitter": "https://twitter.com/ape_board",
-    "type": "DAPPS",
+    "type": "wallet",
     "image": apeBoardLogo
   },
   {
@@ -160,14 +158,14 @@ export const projectList = [
     "telegram": "https://t.me/DeBankEN",
     "twitter": "https://twitter.com/DebankDeFi",
     "discord": "https://discordapp.com/invite/KYuj8DE",
-    "type": "DAPPS",
+    "type": "defi",
     "image": deBankLogo
   },
   {
     "title": "SafePal",
     "canLaunch": false,
     "link": "https://safepal.io/",
-    "type": "WALLETS",
+    "type": "wallet",
     "image": safepalLogo
   },
   {
@@ -176,7 +174,7 @@ export const projectList = [
     "link": "https://dodoex.io/",
     "twitter": "https://twitter.com/BreederDodo?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor",
     "discord": "http://discord.gg/tyKReUK",
-    "type": "DAPPS",
+    "type": "defi",
     "image": dodoLogo
   },
   {
@@ -186,7 +184,7 @@ export const projectList = [
     "telegram": "http://t.me/boringDAO",
     "twitter": "https://twitter.com/tofuNFT",
     "discord": "https://discord.gg/3wFUTZmTm7",
-    "type": "DAPPS",
+    "type": "nft",
     "image": tofuNftLogo
   },
   {
@@ -196,7 +194,7 @@ export const projectList = [
     "telegram": "https://t.me/bandprotocol",
     "twitter": "https://twitter.com/BandProtocol",
     "discord": "https://discord.com/invite/3t4bsY7",
-    "type": "TOOLS",
+    "type": "tool",
     "image": bandProtocolLogo
   },
   {
@@ -205,7 +203,7 @@ export const projectList = [
     "link": "https://www.myetherwallet.com/",
     "telegram": "https://t.me/myetherwallet",
     "twitter": "https://twitter.com/myetherwallet",
-    "type": "WALLETS",
+    "type": "wallet",
     "image": mewLogo
   },
   {
@@ -215,7 +213,7 @@ export const projectList = [
     "telegram": "https://t.me/myetherwallet",
     "twitter": "https://twitter.com/coin98_wallet",
     "discord": "http://c98.link/discord",
-    "type": "WALLETS",
+    "type": "wallet",
     "image": coing98Logo
   },
   {
@@ -223,7 +221,7 @@ export const projectList = [
     "canLaunch": true,
     "link": "https://l2charts.com/",
     "twitter": "https://twitter.com/L2Charts",
-    "type": "DAPPS",
+    "type": "tool",
     "image": l2ChartsLogo
   },
   {
@@ -231,7 +229,7 @@ export const projectList = [
     "canLaunch": true,
     "link": "https://bobaapes.com/",
     "twitter": "https://twitter.com/bobaapes",
-    "type": "NFT",
+    "type": "nft",
     "image": bobaApesLogo
   },
   {
@@ -239,7 +237,7 @@ export const projectList = [
     "canLaunch": false,
     "link": "https://dcentwallet.com/",
     "twitter": "https://twitter.com/DCENTwallets",
-    "type": "WALLETS",
+    "type": "wallet",
     "image": decentWalletLogo
   },
   {
@@ -248,7 +246,7 @@ export const projectList = [
     "link": "https://defiyield.app/dashboard",
     "telegram": "https://t.me/defiyield_app",
     "twitter": "https://twitter.com/defiyield_app",
-    "type": "WALLETS",
+    "type": "wallet",
     "image": defiyieldLogo
   },
   {
@@ -257,7 +255,7 @@ export const projectList = [
     "link": "https://across.to/",
     "twitter": "https://twitter.com/AcrossProtocol",
     "discord": "https://discord.gg/across",
-    "type": "BRIDGES",
+    "type": "bridge",
     "image": acrossLogo
   },
   {
@@ -266,7 +264,7 @@ export const projectList = [
     "link": "https://umaproject.org/",
     "twitter": "https://twitter.com/UMAprotocol",
     "discord": "https://discord.com/invite/jsb9XQJ",
-    "type": "TOOLS",
+    "type": "tool",
     "image": umaprotocolLogo
   },
   {
@@ -275,7 +273,7 @@ export const projectList = [
     "link": "https://thetanuts.finance/vaults",
     "twitter": "https://twitter.com/thetanuts",
     "discord": "https://discord.gg/XnSYqutaB3",
-    "type": "DAPPS",
+    "type": "defi",
     "image": thetanutsLogo
   },
   {
@@ -285,7 +283,7 @@ export const projectList = [
     "telegram": "https://t.me/Satis_Channel",
     "twitter": "https://twitter.com/SatisDEX",
     "discord": "https://discord.gg/JUmcTGbUWr",
-    "type": "DAPPS",
+    "type": "defi",
     "image": satisLogo
   }
 ]
