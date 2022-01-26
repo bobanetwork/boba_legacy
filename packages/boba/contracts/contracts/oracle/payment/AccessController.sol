@@ -5,13 +5,14 @@ Modified to make use of timestamp based access permissions
 pragma solidity 0.6.6;
 
 import "@chainlink/contracts/src/v0.6/Owned.sol";
+import "../interfaces/AccessControllerInterface.sol";
 
 /**
  * @title AccessController
  * @notice Has two access lists: a global list and a data-specific list.
  */
-contract AccessController is Owned {
-  bool internal s_checkEnabled = true;
+contract AccessController is AccessControllerInterface, Owned {
+  bool private s_checkEnabled = true;
   // address to expiryTimestamp
   mapping(address => uint256) internal s_globalAccessList;
   // address to data to expiryTimestamp
@@ -29,6 +30,28 @@ contract AccessController is Owned {
     )
   {
     return s_checkEnabled;
+  }
+
+  /**
+   * @notice Returns the access of an address to an base / quote pair
+   * @param account The address to query
+   * @param data The calldata to query (msg.data from FeedRegistry)
+   */
+  function hasAccess(
+    address account,
+    bytes calldata data
+  )
+    external
+    view
+    override
+    returns (bool)
+  {
+    (
+      address base,
+      address quote
+    ) = abi.decode(data[4:], (address, address));
+    bytes memory pairData = abi.encode(base, quote);
+    return _hasAccess(account, pairData) || _isEOA(account);
   }
 
 /**
@@ -83,6 +106,17 @@ contract AccessController is Owned {
     _disableAccessCheck();
   }
 
+  function _hasAccess(
+    address user,
+    bytes memory data
+  )
+    internal
+    view
+    returns (bool)
+  {
+    return !s_checkEnabled || s_globalAccessList[user] >= block.timestamp || s_localAccessList[user][data] >= block.timestamp;
+  }
+
   function _enableAccessCheck() internal {
     if (!s_checkEnabled) {
       s_checkEnabled = true;
@@ -109,5 +143,15 @@ contract AccessController is Owned {
       s_localAccessList[user][data] = expiryTime;
       emit AccessAdded(user, data, msg.sender, expiryTime);
     }
+  }
+
+  function _isEOA(
+    address account
+  )
+    internal
+    view
+    returns (bool)
+  {
+    return account == tx.origin; // solhint-disable-line avoid-tx-origin
   }
 }

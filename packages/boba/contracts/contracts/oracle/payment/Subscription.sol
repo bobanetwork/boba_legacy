@@ -3,10 +3,9 @@ pragma solidity 0.6.6;
 
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 import "./AccessController.sol";
-import "../interfaces/AccessControllerInterface.sol";
 import "../interfaces/BobaTokenInterface.sol";
 
-contract Subscription is AccessController, AccessControllerInterface {
+contract Subscription is AccessController {
   using SafeMathChainlink for uint256;
 
   address public bobaTokenAddress;
@@ -33,28 +32,6 @@ contract Subscription is AccessController, AccessControllerInterface {
       _paymentPerSecondGlobalAccess,
       _minSubscriptionPeriod
     );
-  }
-
-  /**
-   * @notice Returns the access of an address to an base / quote pair
-   * @param account The address to query
-   * @param data The calldata to query (msg.data from FeedRegistry)
-   */
-  function hasAccess(
-    address account,
-    bytes calldata data
-  )
-    external
-    view
-    override
-    returns (bool)
-  {
-    (
-      address base,
-      address quote
-    ) = abi.decode(data[4:], (address, address));
-    bytes memory pairData = abi.encode(base, quote);
-    return _hasAccess(account, pairData) || _isEOA(account);
   }
 
   function subscribeLocalAccess(
@@ -145,26 +122,5 @@ contract Subscription is AccessController, AccessControllerInterface {
     minSubscriptionPeriod = _minSubscriptionPeriod;
 
     emit SubscriptionCostUpdated(_paymentPerSecondLocalAccess, _paymentPerSecondGlobalAccess, _minSubscriptionPeriod);
-  }
-
-  function _hasAccess(
-    address user,
-    bytes memory data
-  )
-    internal
-    view
-    returns (bool)
-  {
-    return !s_checkEnabled || s_globalAccessList[user] >= block.timestamp || s_localAccessList[user][data] >= block.timestamp;
-  }
-
-  function _isEOA(
-    address account
-  )
-    internal
-    view
-    returns (bool)
-  {
-    return account == tx.origin; // solhint-disable-line avoid-tx-origin
   }
 }
