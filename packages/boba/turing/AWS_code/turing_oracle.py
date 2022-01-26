@@ -59,11 +59,19 @@ def lambda_handler(event, context):
   timestamp = result['last']['timestamp']
     
   # create return payload
-  res = '0x{0:0{1}x}'.format(int(64),64)
-  res = res + '{0:0{1}x}'.format(int(price),64) #the price
+  res = '0x'+ '{0:0{1}x}'.format(int(       64),64) 
+  #64 denotes the number of bytes in the `bytes` dynamic argument
+  #since we are sending back 2 32 byte numbers, 2*32 = 64
+  res = res + '{0:0{1}x}'.format(int(    price),64) #the price
   res = res + '{0:0{1}x}'.format(int(timestamp),64) #the timestamp
     
   print("res:", res)
+
+  # example res: 
+  # 0x
+  # 0000000000000000000000000000000000000000000000000000000000000040
+  # 0000000000000000000000000000000000000000000000000000000000418b95
+  # 0000000000000000000000000000000000000000000000000000017e60d3b45f
 
   returnPayload = {
     'statusCode': 200,
