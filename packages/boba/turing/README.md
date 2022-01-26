@@ -5,8 +5,9 @@
   * [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-  * [Important Properties of Turing](#important-properties-of-turing)
-    + [String length limit](#string-length-limit)
+- [Important Properties of Turing](#important-properties-of-turing)
+  * [String length limit](#string-length-limit)
+  * [One Turing call per Transaction](#one-turing-call-per-transaction)
 - [Technical Background and Quickstart](#technical-background-and-quickstart)
   * [Quickstart for Turing Developers](#quickstart-for-turing-developers)
 - [Implementation](#implementation)
@@ -131,12 +132,12 @@ Once you have an API key from your chosen data vendor, insert that key into your
 
 You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`.
 
-## Important Properties of Turing
+# Important Properties of Turing
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
 
-### String length limit
+## String length limit
 
 The string length cap of 322 is large enough to return, for example, four `uint256` from the external api:
 
@@ -167,7 +168,7 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
 
 ```  
 
-####One Turing call per Transaction
+## One Turing call per Transaction
 
 At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert. 
 
