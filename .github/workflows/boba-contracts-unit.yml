@@ -32,11 +32,7 @@ jobs:
 
       - name: Build
         working-directory: ./
-        run: yarn && yarn install
-
-      - name: Build Boba
-        working-directory: ./packages/boba/contracts
-        run: yarn
+        run: yarn && yarn install && yarn build
 
       - name: Run Boba Contracts unit tests
         working-directory: ./packages/boba/contracts
