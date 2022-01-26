@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@boba/contracts": "0.0.1",
+    "@boba/turing-hybrid-compute": "0.2.0",
     "@eth-optimism/contracts": "^0.4.13",
     "@eth-optimism/core-utils": "^0.6.0",
     "@eth-optimism/message-relayer": "^0.1.11",

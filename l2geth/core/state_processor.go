@@ -108,6 +108,10 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+	// TURING Update the tx metadata, if a Turing call took place...
+	if len(vmenv.Context.Turing) > 1 {
+		tx.SetL1Turing(vmenv.Context.Turing)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -140,6 +144,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockHash = statedb.BlockHash()
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
+	receipt.Turing = vmenv.Context.Turing
 
 	return receipt, err
 }

@@ -123,6 +123,7 @@ func TestSyncServiceTransactionEnqueued(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -179,6 +180,7 @@ func TestTransactionToTipNoIndex(t *testing.T) {
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		nil, // The index is `nil`, expect it to be set afterwards
@@ -665,6 +667,7 @@ func TestSyncServiceSync(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -716,6 +719,7 @@ func TestInitializeL1ContextPostGenesis(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -1019,6 +1023,7 @@ func mockTx() *types.Transaction {
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginSequencer,
 		nil,

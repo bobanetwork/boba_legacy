@@ -430,7 +430,7 @@ func TestBlockMetaStorage(t *testing.T) {
 
 	index1 := uint64(1)
 	tx1 := types.NewTransaction(1, common.HexToAddress("0x1"), big.NewInt(1), 1, big.NewInt(1), nil)
-	tx1Meta := types.NewTransactionMeta(nil, 0, nil, types.QueueOriginSequencer, &index1, nil, nil)
+	tx1Meta := types.NewTransactionMeta(nil, 0, []byte{0}, nil, types.QueueOriginSequencer, &index1, nil, nil)
 	tx1.SetTransactionMeta(tx1Meta)
 
 	WriteTransactionMeta(db, index1, tx1.GetMeta())
@@ -461,7 +461,7 @@ func TestBlockMetaStorage(t *testing.T) {
 
 	index2 := uint64(2)
 	tx2 := types.NewTransaction(2, common.HexToAddress("0x02"), big.NewInt(2), 2, big.NewInt(2), nil)
-	tx2Meta := types.NewTransactionMeta(l1BlockNumber, 0, &addr, types.QueueOriginSequencer, nil, nil, nil)
+	tx2Meta := types.NewTransactionMeta(l1BlockNumber, 0, []byte{0}, &addr, types.QueueOriginSequencer, nil, nil, nil)
 	tx2.SetTransactionMeta(tx2Meta)
 
 	WriteTransactionMeta(db, index2, tx2.GetMeta())

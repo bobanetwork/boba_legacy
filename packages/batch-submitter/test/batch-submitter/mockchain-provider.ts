@@ -17,6 +17,7 @@ interface UnformattedL2Transaction extends TransactionResponse {
   signatureHashType: string
   queueOrigin: string
   rawTransaction: string
+  l1Turing: string
 }
 
 interface UnformattedL2Block extends BlockWithTransactions {
@@ -127,10 +128,12 @@ export class MockchainProvider extends providers.JsonRpcProvider {
     )
     const queueOrigin: string = block.transactions[0].queueOrigin
     const l1TxOrigin: string = block.transactions[0].l1MessageSender
+    const l1Turing: string = block.transactions[0].l1Turing
     const l2Transaction: L2Transaction = {
       ...block.transactions[0],
       // Rename the incorrectly named fields
       l1TxOrigin,
+      l1Turing,
       queueOrigin,
       l1BlockNumber,
     }
@@ -214,6 +217,7 @@ const BLOCKS = JSON.parse(`
              "creates":"0xA193E42526F1FEA8C99AF609dcEabf30C1c29fAA",
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -267,6 +271,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -320,6 +325,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -373,6 +379,7 @@ const BLOCKS = JSON.parse(`
              "creates":"0x94BA4d5Ebb0e05A50e977FFbF6e1a1Ee3D89299c",
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -426,6 +433,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -479,6 +487,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -532,6 +541,7 @@ const BLOCKS = JSON.parse(`
              "creates":"0x956dA338C1518a7FB213042b70c60c021aeBd554",
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -585,6 +595,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -638,6 +649,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -691,6 +703,7 @@ const BLOCKS = JSON.parse(`
              "creates":"0x6454C9d69a4721feBA60e26A367bD4D56196Ee7c",
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -744,6 +757,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -797,6 +811,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -850,6 +865,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -903,6 +919,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
@@ -956,6 +973,7 @@ const BLOCKS = JSON.parse(`
              "creates":null,
              "l1BlockNumber":"1",
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
+             "l1Turing":"0x00",
              "rawTransaction":"0x420420",
              "signatureHashType":"0",
              "queueOrigin":"sequencer",
