@@ -45,7 +45,7 @@ To obtain the latest BTC-USD exchange rate, call:
 urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
 rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
-  // test response
+  // Test/Debug response
   Bitcoin to usd price is 42406.68
   timestamp 1642104413221
   ✓ should get the current Bitcoin - USD price (327ms)
@@ -60,7 +60,7 @@ With this release, we have a working version of Turing and the associated modifi
 
 # Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
-With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction;  everything takes places within one transaction:
+With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction; everything takes places within one transaction:
 
 ```javascript
 
@@ -77,7 +77,7 @@ With Turing, your ERC721 contract can generate a cryptographically strong 256 bi
     emit MintedRandom(result, attribute_1, attribute_2, ...);
   }
 
-  // pseudocode transaction reponse
+  // pseudocode transaction response from test system (see boba/turing/test/006_NFT_random.ts)
   256 bit random number as a BigInt = 61245594159531997717158776666900035572992757857563713350570408643552830626492n
   Minted an NFT with Attribute A = 135 and Attribute B = 103
   Minted a pirate with a green hat
