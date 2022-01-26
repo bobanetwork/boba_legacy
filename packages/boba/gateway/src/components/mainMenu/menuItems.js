@@ -57,7 +57,7 @@ export const menuItems = [
     key: 'Portal',
     icon: "SafeIcon",
     title: "Portal",
-    url: "https://boba.network/ecosystem/"
+    url: "/portal"
   },
   {
     key: 'Help',

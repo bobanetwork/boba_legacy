@@ -100,6 +100,7 @@ import MainMenu from 'components/mainMenu/MainMenu'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import Portal from 'containers/portal/Portal'
 
 function Home () {
 
@@ -250,6 +251,9 @@ function Home () {
           }
           {pageDisplay === "Help" &&
             <Help/>
+          }
+          {pageDisplay === "Portal" &&
+            <Portal/>
           }
         </Container>
       </Box>
