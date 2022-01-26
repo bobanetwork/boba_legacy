@@ -54,6 +54,12 @@ export const menuItems = [
     url: "https://safe.boba.network/"
   },
   {
+    key: 'Portal',
+    icon: "SafeIcon",
+    title: "Portal",
+    url: "https://boba.network/ecosystem/"
+  },
+  {
     key: 'Help',
     icon: "HelpIcon",
     title: "Help/FAQ",
