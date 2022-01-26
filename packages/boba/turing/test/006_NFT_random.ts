@@ -13,10 +13,6 @@ const cfg = hre.network.config
 
 const gasOverride =  { gasLimit: 3000000 }
 
-const TuringCreditAddress_Local   = '0x4200000000000000000000000000000000000020'
-const TuringCreditAddress_Rinkeby = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-const TuringCreditAddress_Mainent = '0xTBDTBDTBDTBDTBDTBDTBDTBDTBDTBDTBDTBDTBDT'
-
 import ERC721Json from "../artifacts/contracts/ERC721min.sol/ERC721min.json"
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -79,7 +75,7 @@ describe("Turing NFT Random 256", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       testWallet
-    ).attach(TuringCreditAddress_Local)
+    ).attach(addressesBOBA.BobaTuringCredit)
 
   })
 

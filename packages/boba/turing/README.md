@@ -109,7 +109,7 @@ Then, register and fund your Turing Credit account:
 ```javascript
 
   const ONE_BOBA = utils.parseEther('1')
-  await turingCredit.addBalanceTo(ONE_BOBA, helper.address)
+  await turingCredit.addBalanceTo(ONE_BOBA, myHelper.address)
 
 ```
 
