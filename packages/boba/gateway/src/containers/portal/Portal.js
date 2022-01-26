@@ -1,4 +1,4 @@
-import { Grid } from '@material-ui/core';
+import { Grid, Box } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
@@ -20,27 +20,34 @@ function PORTAL() {
         <Grid container rowSpacing={1} columnSpacing={2}>
           {
             projectList.map((project) => {
-              return <S.GridItem key={project.title} item xs={4}>
+              return <S.GridItem key={project.title} item xs={3}>
                 <Card sx={{
                   maxWidth: 345,
                   display: 'flex',
-                  justifyContent: 'center',
+                  justifyContent: 'space-around',
                   alignItems: 'center',
                   flexDirection: 'column'
                 }}>
                   <Chip label={project.type} />
-                  <img
-                    height="150"
-                    style={{
-                      margin: '10px',
-                      maxWidth: '90%'
-                    }}
-                    src={project.image}
-                    alt={project.title}
-                  />
-                  <Typography variant="h2" color="text.secondary">
-                    {project.title}
-                  </Typography>
+                  <Box style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                  }}>
+                    <img
+                      style={{
+                        maxHeight: '260px',
+                        margin: '10px',
+                        maxWidth: '90%'
+                      }}
+                      src={project.image}
+                      alt={project.title}
+                    />
+                    <Typography variant="h2" color="text.secondary">
+                      {project.title}
+                    </Typography>
+                  </Box>
                   <div style={{
                     display: 'flex',
                     justifyContent: 'center',
