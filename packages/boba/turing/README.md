@@ -89,18 +89,18 @@ With Turing, your ERC721 contract can generate a cryptographically strong 256 bi
 
 ```
 
-To use this functionality, deploy your `TuringHelper` contract, provide its address to your ERC721 contract, vice versa:
+To use this functionality, deploy your `TuringHelper` contract, provide its address to your ERC721 contract, and make the `TuringHelper` aware of the new caller:
 
 ```javascript
 
   // deploy your Turing helper
-  myHelper = await Factory__Helper.deploy()
+  myTuringHelper = await Factory__Helper.deploy()
 
-  // deploy your ERC721 contract
-  erc721 = await Factory__ERC721.deploy("RandomERC721", "RER", myHelper.address)
+  // deploy your ERC721 contract with the 
+  erc721 = await Factory__ERC721.deploy("RandomERC721", "RER", myTuringHelper.address)
 
-  // lock down your myHelper to accept only requests from your ERC721
-  await myHelper.addPermittedCaller(erc721.address)
+  // restrict your myHelper to accept only requests from your ERC721
+  await myTuringHelper.addPermittedCaller(erc721.address)
 
 ```
 
@@ -109,11 +109,11 @@ Then, register and fund your Turing Credit account:
 ```javascript
 
   const ONE_BOBA = utils.parseEther('1')
-  await turingCredit.addBalanceTo(ONE_BOBA, myHelper.address)
+  await turingCredit.addBalanceTo(ONE_BOBA, myTuringHelper.address)
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 turing requests. Have fun.
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/test/006_NFT_random.ts). 
 
 ### Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
