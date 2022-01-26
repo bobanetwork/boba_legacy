@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "BOBA Smart Contracts",
   "private": true,
-  "author": "OMG",
+  "author": "Enya.ai",
   "license": "MIT",
+  "types": "dist/index",
   "scripts": {
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
