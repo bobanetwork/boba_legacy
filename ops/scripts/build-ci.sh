@@ -15,7 +15,7 @@ docker-compose build -- batch_submitter
 docker-compose build -- dtl
 docker-compose build -- relayer
 docker-compose build -- integration_tests
-
+docker-compose build -- fraud-detector
 docker rmi $(docker images -f "dangling=true" -q)
 
 docker ps
