@@ -106,9 +106,24 @@ class Nft extends React.Component {
       <>
         <PageHeader title="NFT" />
 
+        <S.Wrapper>
+          <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
+            <S.GridItemTag item xs={10} md={10}> 
+              <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
+                <span style={{fontWeight: '700'}}>TECHNICAL NOTE</span>. The gateway only supports EIP721 NFTs with the optional enumeration extension. 
+                We use <span style={{fontWeight: '700'}}>tokenOfOwnerByIndex()</span> to autodiscover your NFTs. 
+                If you add an NFT contract and receive error messages, this means that the contract is not EIP721 compliant 
+                and/or does not support address-based NFT discovery via tokenOfOwnerByIndex(). 
+                Please refer to your NFT's documentation or contact the developer for help on how to display and 
+                transfer their NFTs.
+              </Typography>
+            </S.GridItemTag>
+          </S.GridItemTagContainer>
+        </S.Wrapper>
+
         <Grid item xs={12} >
 
-          <Typography variant="h2" component="h2" sx={{fontWeight: "700"}}>Your NFTs</Typography>
+          <Typography variant="h2" component="h2" sx={{fontWeight: "700", marginTop: '20px'}}>Your NFTs</Typography>
 
           {numberOfNFTs === 1 &&
             <Typography variant="body2" component="p" sx={{mt: 1, mb: 2}}>You have one NFT and it should be shown below.</Typography>
@@ -159,7 +174,7 @@ class Nft extends React.Component {
 
           <Typography variant="body3" component="p" sx={{mt: 1, mb: 2, fontSize: '0.7em', marginTop: '20px', marginRight: '40px'}}>
             To add an NFT contract, please add its address and click 'Add NFT contract'. You only have to do this once per NFT family. 
-            Once you have added the contract, it will take about 15 seconds to find your NFT(s). 
+            Once you have added the contract, it will take about 15 seconds to discover your NFT(s). 
           </Typography>
 
           <Input

@@ -28,8 +28,6 @@ import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
-  getNFTs,
-  //addNFTContract,
   getNFTContracts,
 } from 'actions/nftAction'
 
@@ -1006,8 +1004,6 @@ class NetworkService {
         address,
       }
 
-
-      //console.log("newContract:",newContract)
       return newContract
 
     } catch (error) {
@@ -1017,21 +1013,16 @@ class NetworkService {
 
   }
 
-  //goal is to find your NFTs and NFT contracts based on local cache and registry data
+  // Goal is to find your NFTs associated with local-cache-known NFT contracts
   async fetchNFTs() {
 
     let NFTContracts = Object.entries(await getNFTContracts())
-
-    //How many NFTs do you have right now?
-    let numberOfNFTS = 0
-
-    NFTContracts = Object.entries(await getNFTContracts())
 
     for(let i = 0; i < NFTContracts.length; i++) {
 
       const address = NFTContracts[i][1].address
 
-      //console.log("address:",address)
+      console.log("NFT contract", i, "at address:", address)
 
       let contract = new ethers.Contract(
         address,
@@ -1039,53 +1030,24 @@ class NetworkService {
         this.L2Provider
       )
 
+      let nftName = await contract.name()
+      let nftSymbol = await contract.symbol()
+
       //how many NFTs of this flavor do I own?
-      const balance = await contract.connect(
+      const balanceOf = await contract.connect(
         this.L2Provider
       ).balanceOf(this.account)
 
-      numberOfNFTS = numberOfNFTS + Number(balance.toString())
+      const balance = Number(balanceOf.toString())
 
-    }
-
-    //let's see if we already know about them
-    const myNFTS = getNFTs()
-    const numberOfStoredNFTS = Object.keys(myNFTS).length
-
-    if (numberOfNFTS !== numberOfStoredNFTS) {
-
-      //console.log('NFT change - need to add one or more NFTs')
-
-      for(let i = 0; i < NFTContracts.length; i++) {
-
-        const address = NFTContracts[i][1].address
-
-        const contract = new ethers.Contract(
-          address,
-          L2ERC721Json.abi,
-          this.L2Provider
-        )
-
-        //console.log("NFT contracts:",contract)
-
-        const ownerTokenIDs = await contract.getOwnerNFTs(
-          this.account
-        )
-        //console.log("ownerTokenIDs:",ownerTokenIDs)
-
-        const balance = ownerTokenIDs.length
-        //console.log("balance:",balance)
-
-        //always the same, no need to have in the loop
-        let nftName = await contract.name()
-        let nftSymbol = await contract.symbol()
-
+      if (balance > 0) {
+        //look up the details and add this NFT to the display
         //can have more than 1 per contract
-        for (let i = 0; i < balance; i++) {
+        for (let index = 0; index < balance; index++) {
 
-          const tokenID = ownerTokenIDs[i]
-          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
+          const tokenID = await contract.tokenOfOwnerByIndex(this.account, index)
           const nftMeta = await contract.tokenURI(tokenID)
+          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
           const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
 
@@ -1100,11 +1062,10 @@ class NetworkService {
           }
 
           console.log("NFT:",NFT)
-
           await addNFT( NFT )
-
         }
       }
+
     }
   }
 
@@ -2111,10 +2072,6 @@ class NetworkService {
   /***********************************************/
   async addLiquidity(currency, value_Wei_String, L1orL2Pool) {
 
-    //console.log("currency",currency)
-    //console.log("value_Wei_String",value_Wei_String)
-    //console.log("L1orL2Pool",L1orL2Pool)
-
     let otherField = {}
 
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
@@ -2269,22 +2226,15 @@ class NetworkService {
       this.masterSystemConfig
     ).get('get.l2.pendingexits', {})
 
-    //console.log("tokenAddress",tokenAddress)
-    //console.log("L1pending",L1pending)
-
     const pendingFast = L1pending.data.filter(i => {
        return (i.fastRelay === 1) && //fast exit
         i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
     })
 
-    //console.log("L1pendingFast",pendingFast)
-
     let sum = pendingFast.reduce(function(prev, current) {
       let weiString = BigNumber.from(current.exitAmount)
       return prev.add(weiString)
     }, BigNumber.from('0'))
-
-    //console.log("L1pendingFastSum:",sum.toString())
 
     return sum.toString()
 
