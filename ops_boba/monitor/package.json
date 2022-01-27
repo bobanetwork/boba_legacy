@@ -4,9 +4,7 @@
   "description": "boba monitor",
   "main": "index.js",
   "scripts": {
-    "start": "node ./exec/run-monitor.js",
-    "lint": "yarn lint:check",
-    "lint:check": "eslint . --ext js"
+    "start": "node ./exec/run-monitor.js"
   },
   "license": "MIT",
   "dependencies": {
