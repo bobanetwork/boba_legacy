@@ -58,7 +58,6 @@ class ListContract extends React.Component {
 
     const {
       address,
-      UUID,
       symbol,
       tokenID
     } = this.state
