@@ -21,6 +21,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+        "sync"
 	"sync/atomic"
 	"time"
 
@@ -270,6 +271,17 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 	return ret
 }
 
+type turingCacheEntry struct {
+       expires         time.Time
+       value           []byte
+}
+
+var turingCache struct {
+       lock            sync.RWMutex
+       entries         map[common.Hash] *turingCacheEntry
+}
+
+
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 // caller is the address of the TuringHelper contract
@@ -320,6 +332,32 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		return retError
 	}
 
+        // Now check for a cached result
+        ret := []byte{}
+
+        hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(caller.Bytes(), 32)) // FIXME - add account nonce, contract ID, etc?
+	hasher.Write(input)
+	key := common.BytesToHash(hasher.Sum(nil))
+
+	log.Debug("MMDBG Cache key", "key",key)
+        turingCache.lock.Lock()
+        if ent, hit := turingCache.entries[key]; hit {
+		if time.Now().Before(ent.expires) {
+			log.Debug("MMDBG Cache hit", "key", key, "expires", ent.expires)
+			ret = ent.value
+		} else {
+			log.Debug("MMDBG Cache expired", "key", key, "expires", ent.expires)
+			delete(turingCache.entries, key)
+		}
+        }
+        turingCache.lock.Unlock()
+
+        if len(ret) != 0 {
+          return ret
+        }
+
+
 	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
 	// Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value
 	// of any of these numbers is 32 + 32 + 32 + 32 + 64 = 192
@@ -365,7 +403,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	if client != nil {
 		startT := time.Now()
 		log.Debug("TURING bobaTuringCall:Calling off-chain client at", "url", url)
-		err := client.CallTimeout(&responseStringEnc, caller.String(), time.Duration(1200)*time.Millisecond, payload)
+		err := client.CallTimeout(&responseStringEnc, caller.String(), time.Duration(12000)*time.Millisecond, payload)
 		if err != nil {
 			log.Error("TURING bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
@@ -419,13 +457,23 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		"ResponseString", responseString)
 
 	// build the modified calldata
-	ret := make([]byte, startIDXpayload+4)
+	ret = make([]byte, startIDXpayload+4)
 	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
 	ret = append(ret, responseString...)         // and tack on the payload
 
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
+
+        turingCache.lock.Lock()
+        if turingCache.entries == nil {
+		log.Debug("MMDBG Cache init") // FIXME - move the init code elsewhere
+		turingCache.entries = make(map[common.Hash] *turingCacheEntry)
+        }
+        newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(2*time.Second)}
+        turingCache.entries[key] = newEnt
+	log.Debug("MMDBG Cache insert", "key", key, "expires", newEnt.expires)
+        turingCache.lock.Unlock()
 
 	return ret
 }
@@ -507,6 +555,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
 		log.Debug("TURING REQUEST START", "input", input, "len(evm.Context.Turing)", len(evm.Context.Turing))
+                log.Debug("MMDBG Using", "callerAddr", caller.Address(), "evm.Context", evm.Context)
 		// Check 1. can only run Turing once anywhere in the call stack
 		if evm.Context.TuringDepth > 1 {
 			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
