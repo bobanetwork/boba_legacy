@@ -28,7 +28,6 @@ import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
-  getNFTContracts,
 } from 'actions/nftAction'
 
 import {
@@ -985,7 +984,7 @@ class NetworkService {
     }
   }
 
-  async addNFTContract( address ) {
+  async addNFT( address, tokenID ) {
 
     try {
 
@@ -995,78 +994,31 @@ class NetworkService {
         this.L2Provider
       )
 
-      let nftName = await contract.name()
-      let nftSymbol = await contract.symbol()
+      const nftName = await contract.name()
+      const nftSymbol = await contract.symbol()
+      const nftMeta = await contract.tokenURI(tokenID)
+      const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
-      const newContract = {
-        name: nftName,
-        symbol: nftSymbol,
+      const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+
+      const NFT = {
+        UUID,
         address,
+        name: nftName,
+        tokenID,
+        symbol: nftSymbol,
+        url,
+        meta
       }
 
-      return newContract
+      console.log("NFT:",NFT)
+      await addNFT( NFT )
 
     } catch (error) {
-      console.log("NS: addNFTContract error:",error)
+      console.log("NS: addNFT error:",error)
       return error
     }
 
-  }
-
-  // Goal is to find your NFTs associated with local-cache-known NFT contracts
-  async fetchNFTs() {
-
-    let NFTContracts = Object.entries(await getNFTContracts())
-
-    for(let i = 0; i < NFTContracts.length; i++) {
-
-      const address = NFTContracts[i][1].address
-
-      console.log("NFT contract", i, "at address:", address)
-
-      let contract = new ethers.Contract(
-        address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
-
-      let nftName = await contract.name()
-      let nftSymbol = await contract.symbol()
-
-      //how many NFTs of this flavor do I own?
-      const balanceOf = await contract.connect(
-        this.L2Provider
-      ).balanceOf(this.account)
-
-      const balance = Number(balanceOf.toString())
-
-      if (balance > 0) {
-        //look up the details and add this NFT to the display
-        //can have more than 1 per contract
-        for (let index = 0; index < balance; index++) {
-
-          const tokenID = await contract.tokenOfOwnerByIndex(this.account, index)
-          const nftMeta = await contract.tokenURI(tokenID)
-          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
-
-          const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
-
-          let NFT = {
-            UUID,
-            address,
-            name: nftName,
-            tokenID,
-            symbol: nftSymbol,
-            url,
-            meta
-          }
-
-          console.log("NFT:",NFT)
-          await addNFT( NFT )
-        }
-      }
-
-    }
   }
 
   async addTokenList() {
