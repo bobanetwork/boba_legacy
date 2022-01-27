@@ -6,16 +6,15 @@
   "scripts": {
     "start": "node ./exec/run-monitor.js",
     "lint": "yarn lint:check",
-    "lint:check": "tslint --format stylish --project .",
-    "copy": "./scripts/copyArtifacts.sh"
+    "lint:check": "eslint . --ext js"
   },
   "license": "MIT",
   "dependencies": {
+    "@boba/contracts": "0.0.1",
     "@eth-optimism/contracts": "^0.2.4",
     "@eth-optimism/core-utils": "0.3.2",
     "@eth-optimism/watcher": "^0.0.1-alpha.9",
     "@ethersproject/providers": "5.4.5",
-    "@boba/contracts": "0.0.1",
     "async-mutex": "^0.3.1",
     "dotenv": "^9.0.0",
     "ethers": "^5.1.4",

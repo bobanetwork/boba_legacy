@@ -77,7 +77,7 @@ class l1BridgeMonitorService extends OptimismEnv {
       (await this.L1Provider.getBlockNumber()) - this.l1BlockConfirmation
 
     const endBlock = Math.min(latestL1Block, this.endBlock)
-    if (this.startBlock > endBlock) this.startBlock = endBlock
+    if (this.startBlock > endBlock) { this.startBlock = endBlock }
 
     const [userRewardMaxFeeRate, ownerRewardFeeRate] = await Promise.all([
       this.L2LiquidityPoolContract.userRewardMaxFeeRate(),
