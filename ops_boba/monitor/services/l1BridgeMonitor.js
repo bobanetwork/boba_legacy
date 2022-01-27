@@ -151,6 +151,45 @@ class l1BridgeMonitorService extends OptimismEnv {
             })
           }
 
+          if (L1LPEvent.name === 'ClientDepositL1Batch') {
+            fastDeposit = true
+            crossDomainMessage = true
+            crossDomainMessageFinalize = false
+            crossDomainMessageSendTime = timestamp
+            crossDomainMessageEstimateFinalizedTime =
+              timestamp + Number(this.l1CrossDomainMessageWaitingTime)
+            for (const payload of L1LPEvent.args._tokens) {
+              const depositSender = payload.to
+              const depositTo = payload.to
+              const poolInfo = await this.L2LiquidityPoolContract.poolInfo(
+                payload.l2TokenAddress
+              )
+              const depositToken = poolInfo.l1TokenAddress
+              const depositAmount = payload.amount.toString()
+              const depositReceive = payload.amount
+                .sub(
+                  payload.amount
+                    .mul(totalFeeRate)
+                    .div(ethers.BigNumber.from('1000'))
+                )
+                .toString()
+              const depositFeeRate = totalFeeRate.toString()
+
+              await this.databaseService.insertDepositL2({
+                hash,
+                blockHash,
+                blockNumber,
+                depositSender,
+                depositTo,
+                depositToken,
+                depositAmount,
+                depositReceive,
+                depositFeeRate,
+                fastDeposit,
+              })
+            }
+          }
+
           const payload = {
             hash,
             blockHash,
@@ -175,10 +214,6 @@ class l1BridgeMonitorService extends OptimismEnv {
           )
         }
       }
-    // } else {
-    //   this.logger.info(
-    //     `No L1 LP logs found from block ${this.startBlock} to ${endBlock}`
-    //   )
     }
 
     const L1StandardBridgeLog = await this.L1Provider.getLogs({
