@@ -1115,7 +1115,6 @@ class NetworkService {
     if(allTokens === null) return
 
     Object.keys(allTokens).forEach((token, i) => {
-      //console.log("allTokens[token].L1:",allTokens[token].L1)
       getToken(allTokens[token].L1)
     })
   }
@@ -1736,15 +1735,6 @@ class NetworkService {
         if (!res) return false
       }
 
-      /*
-      const estimatedGas = await ExitBurn.estimateGas.burnAndWithdraw(
-        L2ERC20.address,
-        utils.parseEther('10'),
-        9999999,
-        ethers.utils.formatBytes32String(new Date().getTime().toString())
-      )
-      */
-
       const DiscretionaryExitBurnContract = new ethers.Contract(
         allAddresses.DiscretionaryExitBurn,
         DiscretionaryExitBurnJson.abi,
@@ -1848,10 +1838,6 @@ class NetworkService {
         L1LPContract.userRewardMaxFeeRate()
       ])
 
-      // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-      // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
-      // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
-
       const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
       const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
@@ -1879,10 +1865,6 @@ class NetworkService {
         L2LPContract.userRewardMinFeeRate(),
         L2LPContract.userRewardMaxFeeRate()
       ])
-
-    // console.log("L2 operatorFeeRate",Number(operatorFeeRate))
-    // console.log("L2 userMinFeeRate",Number(userMinFeeRate))
-    // console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
       const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
       const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
