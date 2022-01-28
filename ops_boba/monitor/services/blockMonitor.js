@@ -147,6 +147,7 @@ class BlockMonitorService extends OptimismEnv {
         if (blockData.transactions.length) {
           for (const transactionData of blockData.transactions) {
             transactionData.timestamp = blockData.timestamp
+            this.logger.info('L2 Transaction', transactionData)
             await this.databaseService.insertTransactionData(transactionData)
           }
         }
