@@ -198,6 +198,7 @@ type rpcTransaction struct {
 type rpcTransactionMeta struct {
 	L1BlockNumber   *big.Int          `json:"l1BlockNumber"`
 	L1Timestamp     uint64            `json:"l1Timestamp"`
+	L1Turing        []byte            `json:"l1Turing"`
 	L1MessageSender *common.Address   `json:"l1MessageSender"`
 	QueueOrigin     types.QueueOrigin `json:"queueOrigin"`
 	Index           *uint64           `json:"index"`
@@ -208,6 +209,7 @@ type rpcTransactionMeta struct {
 type rpcTransactionMetaMarshaling struct {
 	L1BlockNumber  *hexutil.Big
 	L1Timestamp    hexutil.Uint64
+	L1Turing       hexutil.Uint64
 	Index          *hexutil.Uint64
 	QueueIndex     *hexutil.Uint64
 	RawTransaction hexutil.Bytes
