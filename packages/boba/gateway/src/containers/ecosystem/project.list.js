@@ -1,3 +1,4 @@
+import { groupBy } from 'lodash'
 import acrossLogo from '../../images/ecosystem/across.webp'
 import apeBoardLogo from '../../images/ecosystem/apeBoard.webp'
 import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
@@ -26,6 +27,13 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
+
+/**
+ * thematical order of type.
+ * 
+ * [defi, nft, bridge, wallet, tool, token]
+ * 
+ */
 
 export const projectList = [
   {
@@ -287,3 +295,14 @@ export const projectList = [
     "image": satisLogo
   }
 ]
+
+
+export const loadProjectByCategory = () => {
+  const typeOrder = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
+  const projectByType = groupBy(projectList, 'type');
+  const orderProjects = {};
+  typeOrder.forEach((key) => {
+    orderProjects[ key ] = projectByType[key];
+  })
+  return orderProjects;
+}
