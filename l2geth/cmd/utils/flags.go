@@ -172,6 +172,10 @@ var (
 
 		EnvVar: "NETWORK_ID",
 	}
+	RangeLimitFlag = cli.BoolFlag{
+		Name:  "rangelimit",
+		Usage: "Enable 5000 blocks limit for range query",
+	}
 	TestnetFlag = cli.BoolFlag{
 		Name:  "testnet",
 		Usage: "Ropsten network: pre-configured proof-of-work test network",
@@ -1366,6 +1370,9 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	if ctx.GlobalIsSet(InsecureUnlockAllowedFlag.Name) {
 		cfg.InsecureUnlockAllowed = ctx.GlobalBool(InsecureUnlockAllowedFlag.Name)
 	}
+	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
+		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
+	}
 }
 
 func setSmartCard(ctx *cli.Context, cfg *node.Config) {
@@ -1629,6 +1636,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 	if ctx.GlobalIsSet(CacheNoPrefetchFlag.Name) {
 		cfg.NoPrefetch = ctx.GlobalBool(CacheNoPrefetchFlag.Name)
+	}
+	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
+		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
 	}
 	if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheTrieFlag.Name) {
 		cfg.TrieCleanCache = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheTrieFlag.Name) / 100

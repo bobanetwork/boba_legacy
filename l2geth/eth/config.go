@@ -120,6 +120,7 @@ type Config struct {
 
 	// Whitelist of required block number -> hash values to accept
 	Whitelist map[uint64]common.Hash `toml:"-"`
+	RangeLimit bool
 
 	// Light client options
 	LightServ    int `toml:",omitempty"` // Maximum percentage of time allowed for serving LES requests
