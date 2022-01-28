@@ -156,9 +156,9 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 		}
 		meta := types.NewTransactionMeta(
 			tx.meta.L1BlockNumber, tx.meta.L1Timestamp,
-			tx.meta.L1Turing, tx.meta.L1MessageSender,
-			tx.meta.QueueOrigin, tx.meta.Index, 
-			tx.meta.QueueIndex, tx.meta.RawTransaction,
+			tx.meta.L1MessageSender, tx.meta.QueueOrigin,
+			tx.meta.Index, tx.meta.QueueIndex,
+			tx.meta.RawTransaction,
 		)
 		tx.tx.SetTransactionMeta(meta)
 		txs[i] = tx.tx
@@ -411,6 +411,7 @@ func (ec *Client) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]typ
 	if err != nil {
 		return nil, err
 	}
+
 	err = ec.c.CallContext(ctx, &result, "eth_getLogs", arg)
 	return result, err
 }
