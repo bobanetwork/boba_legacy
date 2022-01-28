@@ -72,7 +72,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
      **********************/
 
     modifier onlyOwner() {
-        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
+        require(msg.sender == owner, 'Caller is not the owner');
         _;
     }
 
@@ -95,6 +95,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     )
         public
         onlyOwner()
+        onlyInitialized()
     {
         owner = _newOwner;
     }
@@ -123,10 +124,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _l2NFTBridge
     )
         public
-        onlyOwner()
         initializer()
     {
-        require(messenger == address(0), "Contract has already been initialized.");
         require(_l1messenger != address(0) && _l2NFTBridge != address(0), "zero address not allowed");
         messenger = _l1messenger;
         l2NFTBridge = _l2NFTBridge;

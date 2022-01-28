@@ -41,55 +41,6 @@ describe('NFT Bridge Test', async () => {
     )
   })
 
-  describe('Ownership tests', async () => {
-    it('should transfer ownership to others', async () => {
-      const L1TransferTx = await L1Bridge.transferOwnership(
-        env.l1Wallet_2.address
-      )
-      await L1TransferTx.wait()
-
-      const L2TransferTx = await L2Bridge.transferOwnership(
-        env.l2Wallet_2.address
-      )
-      await L2TransferTx.wait()
-
-      const ownerL1Bridge = await L1Bridge.owner()
-      const ownerL2Bridge = await L2Bridge.owner()
-
-      expect(ownerL1Bridge).to.deep.eq(env.l1Wallet_2.address)
-      expect(ownerL2Bridge).to.deep.eq(env.l2Wallet_2.address)
-
-      const L1TransferTx2 = await L1Bridge.connect(
-        env.l1Wallet_2
-      ).transferOwnership(env.l1Wallet.address)
-      await L1TransferTx2.wait()
-
-      const L2TransferTx2 = await L2Bridge.connect(
-        env.l2Wallet_2
-      ).transferOwnership(env.l2Wallet.address)
-      await L2TransferTx2.wait()
-
-      const ownerL1Bridge2 = await L1Bridge.owner()
-      const ownerL2Bridge2 = await L2Bridge.owner()
-
-      expect(ownerL1Bridge2).to.deep.eq(env.l1Wallet.address)
-      expect(ownerL2Bridge2).to.deep.eq(env.l2Wallet.address)
-    })
-
-    it('should not be able to transfer ownership for non-owner', async () => {
-      await expect(
-        L1Bridge.connect(env.l1Wallet_2).transferOwnership(
-          env.l1Wallet_2.address
-        )
-      ).to.be.revertedWith('Caller is not the owner')
-      await expect(
-        L2Bridge.connect(env.l2Wallet_2).transferOwnership(
-          env.l1Wallet_2.address
-        )
-      ).to.be.revertedWith('Caller is not the owner')
-    })
-  })
-
   describe('L1 native NFT tests', async () => {
     before(async () => {
       Factory__L1ERC721 = new ContractFactory(

@@ -34,9 +34,15 @@ const deployFn: DeployFunction = async (hre) => {
     abi: DiscretionaryExitBurn.abi,
   }
 
-  await hre.deployments.save('DiscretionaryExitBurn', DiscretionaryExitBurnSubmission)
-  await registerBobaAddress( addressManager, 'DiscretionaryExitBurn', DiscretionaryExitBurn.address )
-
+  await hre.deployments.save(
+    'DiscretionaryExitBurn',
+    DiscretionaryExitBurnSubmission
+  )
+  await registerBobaAddress(
+    addressManager,
+    'DiscretionaryExitBurn',
+    DiscretionaryExitBurn.address
+  )
 }
 
 deployFn.tags = ['ExitBurn']
