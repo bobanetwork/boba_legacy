@@ -40,26 +40,31 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/ethclient"
 	"github.com/ethereum-optimism/optimism/l2geth/log"
 	"github.com/ethereum-optimism/optimism/l2geth/p2p"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rlp"
-	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"github.com/tyler-smith/go-bip39"
 )
 
-var errOVMUnsupported = errors.New("OVM: Unsupported RPC Method")
+var (
+	errOVMUnsupported = errors.New("OVM: Unsupported RPC Method")
+	errNoSequencerURL = errors.New("sequencer transaction forwarding not configured")
+)
+
+const (
+	// defaultDialTimeout is default duration the service will wait on
+	// startup to make a connection to either the L1 or L2 backends.
+	defaultDialTimeout = 5 * time.Second
+)
 
 // PublicEthereumAPI provides an API to access Ethereum related information.
 // It offers only methods that operate on public data that is freely available to anyone.
 type PublicEthereumAPI struct {
 	b Backend
-}
-
-type callmsg struct {
-	types.Message
 }
 
 // NewPublicEthereumAPI creates a new Ethereum protocol API.
@@ -804,9 +809,11 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	// Set sender address or use a default if none specified
 	var addr common.Address
 	if args.From == nil {
-		if wallets := b.AccountManager().Wallets(); len(wallets) > 0 {
-			if accounts := wallets[0].Accounts(); len(accounts) > 0 {
-				addr = accounts[0].Address
+		if !rcfg.UsingOVM {
+			if wallets := b.AccountManager().Wallets(); len(wallets) > 0 {
+				if accounts := wallets[0].Accounts(); len(accounts) > 0 {
+					addr = accounts[0].Address
+				}
 			}
 		}
 	} else {
@@ -1030,35 +1037,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
 	}
-
-	nonce, _ := b.GetPoolNonce(ctx, *args.From)
-
-	value := new(big.Int)
-	if args.Value != nil {
-		value = args.Value.ToInt()
-	}
-
-	gasPrice := new(big.Int)
-	if args.GasPrice != nil {
-		gasPrice = args.GasPrice.ToInt()
-	}
-
-	var data []byte
-	if args.Data != nil {
-		data = []byte(*args.Data)
-	}
-
-	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
-
-	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-	l2ExtraGas := new(big.Int)
-	if rcfg.UsingOVM {
-		if msg.GasPrice().Cmp(common.Big0) != 0 {
-			l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, state, nil)
-		}
-	}
-
-	return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	return hexutil.Uint64(hi), nil
 }
 
 // EstimateGas returns an estimate of the amount of gas needed to execute the
@@ -1320,6 +1299,18 @@ func newRPCTransactionFromBlockHash(b *types.Block, hash common.Hash) *RPCTransa
 		}
 	}
 	return nil
+}
+
+// dialSequencerClientWithTimeout attempts to dial the Sequencer using the
+// provided URL. If the dial doesn't complete within defaultDialTimeout
+// seconds, this method will return an error.
+func dialSequencerClientWithTimeout(ctx context.Context, url string) (
+	*ethclient.Client, error) {
+
+	ctxt, cancel := context.WithTimeout(ctx, defaultDialTimeout)
+	defer cancel()
+
+	return ethclient.DialContext(ctxt, url)
 }
 
 // PublicTransactionPoolAPI exposes methods for the RPC interface
@@ -1683,17 +1674,29 @@ func (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args Sen
 // SendRawTransaction will add the signed transaction to the transaction pool.
 // The sender is responsible for signing the transaction and using the correct nonce.
 func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encodedTx hexutil.Bytes) (common.Hash, error) {
-	if s.b.IsVerifier() {
-		return common.Hash{}, errors.New("Cannot send raw transaction in verifier mode")
+	tx := new(types.Transaction)
+	if err := rlp.DecodeBytes(encodedTx, tx); err != nil {
+		return common.Hash{}, err
 	}
 
 	if s.b.IsSyncing() {
 		return common.Hash{}, errors.New("Cannot send raw transaction while syncing")
 	}
 
-	tx := new(types.Transaction)
-	if err := rlp.DecodeBytes(encodedTx, tx); err != nil {
-		return common.Hash{}, err
+	if s.b.IsVerifier() {
+		sequencerURL := s.b.SequencerClientHttp()
+		if sequencerURL == "" {
+			return common.Hash{}, errNoSequencerURL
+		}
+		client, err := dialSequencerClientWithTimeout(ctx, sequencerURL)
+		if err != nil {
+			return common.Hash{}, err
+		}
+		err = client.SendTransaction(context.Background(), tx)
+		if err != nil {
+			return common.Hash{}, err
+		}
+		return tx.Hash(), nil
 	}
 
 	// L1Timestamp and L1BlockNumber will be set right before execution

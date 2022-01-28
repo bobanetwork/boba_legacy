@@ -34,6 +34,19 @@ func (q QueueOrigin) String() string {
 	}
 }
 
+func (q *QueueOrigin) UnmarshalJSON(b []byte) error {
+	switch string(b) {
+	case "\"sequencer\"":
+		*q = QueueOriginSequencer
+		return nil
+	case "\"l1\"":
+		*q = QueueOriginL1ToL2
+		return nil
+	default:
+		return fmt.Errorf("Unknown QueueOrigin: %q", b)
+	}
+}
+
 //go:generate gencodec -type TransactionMeta -out gen_tx_meta_json.go
 
 type TransactionMeta struct {

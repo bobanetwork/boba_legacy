@@ -172,10 +172,6 @@ var (
 
 		EnvVar: "NETWORK_ID",
 	}
-	RangeLimitFlag = cli.BoolFlag{
-		Name:  "rangelimit",
-		Usage: "Enable 5000 blocks limit for range query",
-	}
 	TestnetFlag = cli.BoolFlag{
 		Name:  "testnet",
 		Usage: "Ropsten network: pre-configured proof-of-work test network",
@@ -865,13 +861,11 @@ var (
 		Usage:  "Allow txs with fees above the current fee up to this amount, must be > 1",
 		EnvVar: "ROLLUP_FEE_THRESHOLD_UP",
 	}
-	// TuringCreditFlag = cli.StringFlag{
-	// 	Name:  "turing.credit",
-	// 	Usage: "Public address for the Turing credit contract",
-
-	// 	Value:  "0x4200000000000000000000000000000000000020",
-	// 	EnvVar: "TURING_CREDIT_ADDRESS",
-	// }
+	SequencerClientHttpFlag = cli.StringFlag{
+		Name:   "sequencer.clienthttp",
+		Usage:  "HTTP endpoint for the sequencer client",
+		EnvVar: "SEQUENCER_CLIENT_HTTP",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1138,7 +1132,7 @@ func setRollup(ctx *cli.Context, cfg *rollup.Config) {
 		cfg.Backend = backend
 	}
 	if ctx.GlobalIsSet(RollupEnforceFeesFlag.Name) {
-		cfg.EnforceFees = true
+		cfg.EnforceFees = ctx.GlobalBool(RollupEnforceFeesFlag.Name)
 	}
 	if ctx.GlobalIsSet(RollupFeeThresholdDownFlag.Name) {
 		val := ctx.GlobalFloat64(RollupFeeThresholdDownFlag.Name)
@@ -1148,9 +1142,9 @@ func setRollup(ctx *cli.Context, cfg *rollup.Config) {
 		val := ctx.GlobalFloat64(RollupFeeThresholdUpFlag.Name)
 		cfg.FeeThresholdUp = new(big.Float).SetFloat64(val)
 	}
-	// if ctx.GlobalIsSet(TuringCreditFlag.Name) {
-	// 	cfg.OvmTuringCreditAddress = ctx.GlobalString(TuringCreditFlag.Name)
-	// }
+	if ctx.GlobalIsSet(SequencerClientHttpFlag.Name) {
+		cfg.SequencerClientHttp = ctx.GlobalString(SequencerClientHttpFlag.Name)
+	}
 }
 
 // setLes configures the les server and ultra light client settings from the command line flags.
@@ -1371,9 +1365,6 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 	if ctx.GlobalIsSet(InsecureUnlockAllowedFlag.Name) {
 		cfg.InsecureUnlockAllowed = ctx.GlobalBool(InsecureUnlockAllowedFlag.Name)
-	}
-	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
-		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
 	}
 }
 
@@ -1638,9 +1629,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 	if ctx.GlobalIsSet(CacheNoPrefetchFlag.Name) {
 		cfg.NoPrefetch = ctx.GlobalBool(CacheNoPrefetchFlag.Name)
-	}
-	if ctx.GlobalIsSet(RangeLimitFlag.Name) {
-		cfg.RangeLimit = ctx.GlobalBool(RangeLimitFlag.Name)
 	}
 	if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheTrieFlag.Name) {
 		cfg.TrieCleanCache = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheTrieFlag.Name) / 100
