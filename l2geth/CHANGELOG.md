@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.5.8
+
+### Patch Changes
+
+- 949916f8: Add a better error message for when the sequencer url is not configured when proxying user requests to the sequencer for `eth_sendRawTransaction` when running as a verifier/replica
+- 300f79bf: Fix nonce issue
+- ae96d784: Add reinitialize-by-url command, add dump chain state command
+- c7569a16: Fix blocknumber monotonicity logging bug
+
+## 0.5.7
+
+### Patch Changes
+
+- d4bf299f: Add support to fully unmarshal Receipts with Optimism fields
+- 8be69ca7: Add changeset for https://github.com/ethereum-optimism/optimism/pull/2011 - replicas forward write requests to the sequencer via a configured parameter `--sequencer.clienthttp` or `SEQUENCER_CLIENT_HTTP`
+- c9fd6ec2: Correctly parse fee enforcement via config to allow turning off L2 fees for development
+
+## 0.5.6
+
+### Patch Changes
+
+- 3a77bbcc: Implement updated timestamp logic
+- 3e3c07a3: changed the default address to be address(0) in `call`
+
+## 0.5.5
+
+### Patch Changes
+
+- 2924845d: expose ErrNonceTooHigh from miner
+
+## 0.5.4
+
+### Patch Changes
+
+- d205c1d6: surface sequencer low-level sequencer execution errors
+
+## 0.5.3
+
+### Patch Changes
+
+- 5febe10f: fixes empty block detection and removes empty worker tasks
+- 272d20d6: renames l2geth package name to github.com/ethereum-optimism/optimism/l2geth
+
 ## 0.5.2
 
 ### Patch Changes

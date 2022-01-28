@@ -77,6 +77,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.RollupEnforceFeesFlag,
 			utils.RollupFeeThresholdDownFlag,
 			utils.RollupFeeThresholdUpFlag,
+			utils.SequencerClientHttpFlag,
 		},
 	},
 	{
@@ -87,7 +88,6 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.AncientFlag,
 			utils.KeyStoreDirFlag,
 			utils.NoUSBFlag,
-			utils.RangeLimitFlag,
 			utils.SmartCardDaemonPathFlag,
 			utils.NetworkIdFlag,
 			utils.TestnetFlag,
