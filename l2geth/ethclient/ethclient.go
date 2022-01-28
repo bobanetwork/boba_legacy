@@ -156,9 +156,9 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 		}
 		meta := types.NewTransactionMeta(
 			tx.meta.L1BlockNumber, tx.meta.L1Timestamp,
-			tx.meta.L1Turing, tx.meta.L1MessageSender,
-			tx.meta.QueueOrigin, tx.meta.Index,
-			tx.meta.QueueIndex, tx.meta.RawTransaction,
+			tx.meta.L1MessageSender, tx.meta.QueueOrigin,
+			tx.meta.Index, tx.meta.QueueIndex,
+			tx.meta.RawTransaction,
 		)
 		tx.tx.SetTransactionMeta(meta)
 		txs[i] = tx.tx
@@ -198,7 +198,6 @@ type rpcTransaction struct {
 type rpcTransactionMeta struct {
 	L1BlockNumber   *big.Int          `json:"l1BlockNumber"`
 	L1Timestamp     uint64            `json:"l1Timestamp"`
-	L1Turing        []byte            `json:"l1Turing"`
 	L1MessageSender *common.Address   `json:"l1MessageSender"`
 	QueueOrigin     types.QueueOrigin `json:"queueOrigin"`
 	Index           *uint64           `json:"index"`
@@ -209,7 +208,6 @@ type rpcTransactionMeta struct {
 type rpcTransactionMetaMarshaling struct {
 	L1BlockNumber  *hexutil.Big
 	L1Timestamp    hexutil.Uint64
-	L1Turing       hexutil.Uint64
 	Index          *hexutil.Uint64
 	QueueIndex     *hexutil.Uint64
 	RawTransaction hexutil.Bytes

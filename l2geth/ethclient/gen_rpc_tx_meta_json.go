@@ -18,7 +18,6 @@ func (r rpcTransactionMeta) MarshalJSON() ([]byte, error) {
 	type rpcTransactionMeta struct {
 		L1BlockNumber   *hexutil.Big      `json:"l1BlockNumber"`
 		L1Timestamp     hexutil.Uint64    `json:"l1Timestamp"`
-		L1Turing        hexutil.Bytes     `json:"l1Turing"`
 		L1MessageSender *common.Address   `json:"l1MessageSender"`
 		QueueOrigin     types.QueueOrigin `json:"queueOrigin"`
 		Index           *hexutil.Uint64   `json:"index"`
@@ -28,7 +27,6 @@ func (r rpcTransactionMeta) MarshalJSON() ([]byte, error) {
 	var enc rpcTransactionMeta
 	enc.L1BlockNumber = (*hexutil.Big)(r.L1BlockNumber)
 	enc.L1Timestamp = hexutil.Uint64(r.L1Timestamp)
-	enc.L1Turing = r.L1Turing
 	enc.L1MessageSender = r.L1MessageSender
 	enc.QueueOrigin = r.QueueOrigin
 	enc.Index = (*hexutil.Uint64)(r.Index)
@@ -42,7 +40,6 @@ func (r *rpcTransactionMeta) UnmarshalJSON(input []byte) error {
 	type rpcTransactionMeta struct {
 		L1BlockNumber   *hexutil.Big       `json:"l1BlockNumber"`
 		L1Timestamp     *hexutil.Uint64    `json:"l1Timestamp"`
-		L1Turing        *hexutil.Bytes     `json:"l1Turing"`
 		L1MessageSender *common.Address    `json:"l1MessageSender"`
 		QueueOrigin     *types.QueueOrigin `json:"queueOrigin"`
 		Index           *hexutil.Uint64    `json:"index"`
@@ -58,9 +55,6 @@ func (r *rpcTransactionMeta) UnmarshalJSON(input []byte) error {
 	}
 	if dec.L1Timestamp != nil {
 		r.L1Timestamp = uint64(*dec.L1Timestamp)
-	}
-	if dec.L1Turing != nil {
-		r.L1Turing = *dec.L1Turing
 	}
 	if dec.L1MessageSender != nil {
 		r.L1MessageSender = dec.L1MessageSender
