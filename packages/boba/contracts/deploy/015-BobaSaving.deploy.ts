@@ -35,7 +35,11 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('BobaFixedSavings', BobaFixedSavingsSubmission)
-  await registerBobaAddress( addressManager, 'BobaFixedSavings', BobaFixedSavings.address )
+  await registerBobaAddress(
+    addressManager,
+    'BobaFixedSavings',
+    BobaFixedSavings.address
+  )
 
   Factory__Proxy__BobaFixedSavings = new ethers.ContractFactory(
     Lib_ResolvedDelegateProxyJson.abi,
@@ -47,7 +51,9 @@ const deployFn: DeployFunction = async (hre) => {
     BobaFixedSavings.address
   )
   await Proxy__BobaFixedSavings.deployTransaction.wait()
-  console.log(`Proxy__BobaFixedSavings deployed to: ${Proxy__BobaFixedSavings.address}`)
+  console.log(
+    `Proxy__BobaFixedSavings deployed to: ${Proxy__BobaFixedSavings.address}`
+  )
 
   const Proxy__BobaFixedSavingsSubmission: DeploymentSubmission = {
     ...Proxy__BobaFixedSavings,
@@ -56,8 +62,15 @@ const deployFn: DeployFunction = async (hre) => {
     abi: Proxy__BobaFixedSavings.abi,
   }
 
-  await hre.deployments.save('Proxy__BobaFixedSavings', Proxy__BobaFixedSavingsSubmission)
-  await registerBobaAddress( addressManager, 'Proxy__BobaFixedSavings', Proxy__BobaFixedSavings.address )
+  await hre.deployments.save(
+    'Proxy__BobaFixedSavings',
+    Proxy__BobaFixedSavingsSubmission
+  )
+  await registerBobaAddress(
+    addressManager,
+    'Proxy__BobaFixedSavings',
+    Proxy__BobaFixedSavings.address
+  )
 }
 
 deployFn.tags = ['ExitBurn']
