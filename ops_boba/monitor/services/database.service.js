@@ -133,7 +133,7 @@ class DatabaseService extends OptimismEnv {
         depositFeeRate VARCHAR(255),
         fastDeposit BOOL,
         status VARCHAR(255),
-        PRIMARY KEY ( hash, blockNumber )
+        PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
     con.end()
     this.logger.info('Initialized the database.')
