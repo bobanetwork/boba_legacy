@@ -2,6 +2,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from 'react';
 import { Box } from '@material-ui/core';
+import * as styles from './Carousel.module.scss'
 
 const responsive = {
   superLargeDesktop: {
@@ -30,15 +31,11 @@ function CAROUSEL({
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Carousel
-        showDots={false}
-        ssr={true} // means to render carousel on server-side.
-        infinite={true}
-        autoPlay={true}
-        autoPlaySpeed={1500}
+        showDots={true}
         keyBoardControl={true}
         responsive={responsive}
-        transitionDuration={500}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
+        removeArrowOnDeviceType={[ "tablet", "mobile" ]}
+        className={styles.multiCarousel}
       >
         {children}
       </Carousel>

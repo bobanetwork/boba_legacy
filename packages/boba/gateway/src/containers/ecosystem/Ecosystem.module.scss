@@ -5,5 +5,7 @@
   flex-direction: column;
   padding: 10px;
   padding-top: 0px;
-
+   > div {
+     margin: 0;
+   }
 }

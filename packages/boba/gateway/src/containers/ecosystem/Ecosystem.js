@@ -20,7 +20,7 @@ function ECOSYSTEM() {
     return () => {
       setprojectByCategory({})
     }
-  }, [ ])
+  }, [])
 
   return (
     <>
@@ -33,43 +33,39 @@ function ECOSYSTEM() {
               <Carousel >
                 {
                   projectList.map((project) => {
-                    return <S.TileCard sx={{
-                      maxWidth: '90%',
-                      display: 'flex',
-                      justifyContent: 'space-around',
-                      alignItems: 'center',
-                      flexDirection: 'column'
-                    }}>
+                    return <S.TileCard>
                       <Chip sx={{ textTransform: 'uppercase' }} label={project.type} />
                       <S.ImageContainer>
                         <img
                           src={project.image}
                           alt={project.title}
                         />
-                        <Typography variant="h2" color="text.secondary">
+                      </S.ImageContainer>
+                      <S.TileFooter>
+                        <Typography variant="h3" color="text.secondary" alignSelf='center'>
                           {project.title}
                         </Typography>
-                      </S.ImageContainer>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        width: '100%',
-                        gap: '5px'
-                      }}>
-                        {project.link ? <IconButton target='_blank' href={project.link} aria-label="link">
-                          <Link />
-                        </IconButton> : null}
-                        {project.telegram ? <IconButton target='_blank' href={project.telegram} aria-label="telegram">
-                          <Telegram />
-                        </IconButton> : null}
-                        {project.twitter ? <IconButton target='_blank' href={project.twitter} aria-label="twitter">
-                          <Twitter />
-                        </IconButton> : null}
-                        {project.discord ? <IconButton target='_blank' href={project.discord} aria-label="discord">
-                          <DiscordIcon />
-                        </IconButton> : null
-                        }
-                      </div>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          width: '100%',
+                          gap: '5px'
+                        }}>
+                          {project.link ? <IconButton target='_blank' href={project.link} aria-label="link">
+                            <Link />
+                          </IconButton> : null}
+                          {project.telegram ? <IconButton target='_blank' href={project.telegram} aria-label="telegram">
+                            <Telegram />
+                          </IconButton> : null}
+                          {project.twitter ? <IconButton target='_blank' href={project.twitter} aria-label="twitter">
+                            <Twitter />
+                          </IconButton> : null}
+                          {project.discord ? <IconButton target='_blank' href={project.discord} aria-label="discord">
+                            <DiscordIcon />
+                          </IconButton> : null
+                          }
+                        </div>
+                      </S.TileFooter>
                     </S.TileCard>
                   })
                 }
