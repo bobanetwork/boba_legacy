@@ -285,7 +285,7 @@ var turingCache struct {
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 // caller is the address of the TuringHelper contract
-func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
+func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) hexutil.Bytes {
 
 	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String())
 
@@ -340,14 +340,14 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	hasher.Write(input)
 	key := common.BytesToHash(hasher.Sum(nil))
 
-	log.Debug("MMDBG Cache key", "key",key)
+	log.Debug("TURING Cache key", "key",key, "mayBlock", mayBlock)
         turingCache.lock.Lock()
         if ent, hit := turingCache.entries[key]; hit {
 		if time.Now().Before(ent.expires) {
-			log.Debug("MMDBG Cache hit", "key", key, "expires", ent.expires)
+			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
 			ret = ent.value
 		} else {
-			log.Debug("MMDBG Cache expired", "key", key, "expires", ent.expires)
+			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
 			delete(turingCache.entries, key)
 		}
         }
@@ -355,6 +355,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
         if len(ret) != 0 {
           return ret
+        }
+
+        if len(ret) == 0 && !mayBlock {
+		log.Error("TURING Missing cache entry")
+		retError[35] = 20 // Missing cache entry
+		return retError
         }
 
 
@@ -467,12 +473,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
         turingCache.lock.Lock()
         if turingCache.entries == nil {
-		log.Debug("MMDBG Cache init") // FIXME - move the init code elsewhere
+		log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
 		turingCache.entries = make(map[common.Hash] *turingCacheEntry)
         }
         newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(2*time.Second)}
         turingCache.entries[key] = newEnt
-	log.Debug("MMDBG Cache insert", "key", key, "expires", newEnt.expires)
+	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
         turingCache.lock.Unlock()
 
 	return ret
@@ -555,7 +561,6 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
 		log.Debug("TURING REQUEST START", "input", input, "len(evm.Context.Turing)", len(evm.Context.Turing))
-                log.Debug("MMDBG Using", "callerAddr", caller.Address(), "evm.Context", evm.Context)
 		// Check 1. can only run Turing once anywhere in the call stack
 		if evm.Context.TuringDepth > 1 {
 			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
@@ -576,7 +581,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			if isTuring2 {
-				updated_input = bobaTuringCall(input, caller.Address())
+                                // If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
+                                // As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
+				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
+				updated_input = bobaTuringCall(input, caller.Address(), mayBlock)
 			} else if isGetRand2 {
 				updated_input = bobaTuringRandom(input, caller.Address())
 			} // there is no other option
