@@ -57,11 +57,11 @@ describe('L1NFTBridge tests initialized', () => {
   it('should be able to initialize and change the gas', async () => {
     const magicGas = 1400000
     await L1NFTBridge.initialize(
-      L2NFTBridge.address,
-      L1CrossDomainMessenger.address
+      L1CrossDomainMessenger.address,
+      L2NFTBridge.address
     )
-    expect(await L1NFTBridge.messenger()).to.be.equal(L2NFTBridge.address)
-    expect(await L1NFTBridge.l2NFTBridge()).to.be.equal(
+    expect(await L1NFTBridge.l2NFTBridge()).to.be.equal(L2NFTBridge.address)
+    expect(await L1NFTBridge.messenger()).to.be.equal(
       L1CrossDomainMessenger.address
     )
     const signer: Signer = (await ethers.getSigners())[0]
@@ -114,8 +114,8 @@ describe('cover registerNFTPair', () => {
     L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
     ERC721 = await deployNFT('name', 'symbol')
     await L1NFTBridge.initialize(
-      L2NFTBridge.address,
-      L1CrossDomainMessenger.address
+      L1CrossDomainMessenger.address,
+      L2NFTBridge.address
     )
   })
   it('can register a NFT with L1 creation', async () => {
