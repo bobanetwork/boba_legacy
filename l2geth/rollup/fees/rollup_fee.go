@@ -125,7 +125,7 @@ func CalculateL2GasForL1Msg(msg Message, state StateDB, gpo *common.Address) (*b
 	}
 	_, _, _, l2GasPrice := readGPOStorageSlots(*gpo, state)
 
- 	if l2GasPrice.BitLen() == 0 {
+	if l2GasPrice.BitLen() == 0 {
 		return new(big.Int), nil
 	} else {
 		return new(big.Int).Div(l1Fee, l2GasPrice), nil
@@ -185,7 +185,7 @@ func DeriveL1GasInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, 
 }
 
 func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int, *big.Float, *big.Int) {
- 	l2GasPrice := state.GetState(addr, rcfg.L2GasPriceSlot)
+	l2GasPrice := state.GetState(addr, rcfg.L2GasPriceSlot)
 	l1GasPrice := state.GetState(addr, rcfg.L1GasPriceSlot)
 	overhead := state.GetState(addr, rcfg.OverheadSlot)
 	scalar := state.GetState(addr, rcfg.ScalarSlot)
