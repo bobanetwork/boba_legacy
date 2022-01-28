@@ -45,7 +45,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/p2p"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rlp"
-  "github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"github.com/tyler-smith/go-bip39"
