@@ -119,7 +119,7 @@ type Config struct {
 	NoPrefetch bool // Whether to disable prefetching and only load state on demand
 
 	// Whitelist of required block number -> hash values to accept
-	Whitelist map[uint64]common.Hash `toml:"-"`
+	Whitelist  map[uint64]common.Hash `toml:"-"`
 	RangeLimit bool
 
 	// Light client options
