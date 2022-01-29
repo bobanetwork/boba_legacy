@@ -23,6 +23,7 @@ import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelec
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import ListAccount from 'components/listAccount/listAccount'
+import ListAccountBatch from 'components/listAccount/listAccountBatch'
 
 import networkService from 'services/networkService'
 
@@ -49,9 +50,9 @@ import { POLL_INTERVAL } from 'util/constant'
 function Account () {
 
   const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
-  
+
   const dispatch = useDispatch()
-  
+
   const [activeTab, setActiveTab] = useState(networkLayer === 'L1' ? 0 : 1)
 
   const childBalance = useSelector(selectlayer2Balance, isEqual)
@@ -160,6 +161,11 @@ function Account () {
         })}
       </S.TableHeading>
       <Box>
+        <ListAccountBatch
+          chain={'L1'}
+          networkLayer={networkLayer}
+          disabled={disabled}
+        />
         {rootBalance.map((i, index) => {
           return (
             <ListAccount
@@ -226,7 +232,7 @@ function Account () {
           </S.ContentGlass>
         </Box>
       </S.CardTag>
-      
+
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>
           <S.AlertInfo>

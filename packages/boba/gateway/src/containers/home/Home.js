@@ -33,6 +33,7 @@ import { closeAlert, closeError } from 'actions/uiAction';
 import { selectAlert, selectError } from 'selectors/uiSelector';
 
 import DepositModal from 'containers/modals/deposit/DepositModal';
+import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal';
 import TransferModal from 'containers/modals/transfer/TransferModal';
 import ExitModal from 'containers/modals/exit/ExitModal';
 
@@ -114,6 +115,7 @@ function Home () {
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
+  const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
   const transferModalState = useSelector(selectModalState('transferModal'))
   const exitModalState = useSelector(selectModalState('exitModal'))
 
@@ -178,6 +180,7 @@ function Home () {
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
+      {!!depositBatchModalState && <DepositBatchModal  open={depositBatchModalState} />}
       {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
