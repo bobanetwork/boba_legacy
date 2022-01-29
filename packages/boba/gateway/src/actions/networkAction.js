@@ -29,11 +29,6 @@ export function addTokenList() {
   return createAction('TOKENLIST/GET', () => networkService.addTokenList())
 }
 
-export function fetchNFTs() {
-  console.log("fetchNFTs")
-  return createAction('NFTS/GET', () => networkService.fetchNFTs())
-}
-
 export function fetchTransactions() {
   return createAction('TRANSACTION/GETALL', () =>
     networkService.getTransactions()

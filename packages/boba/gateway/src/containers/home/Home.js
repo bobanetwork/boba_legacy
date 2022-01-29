@@ -24,7 +24,6 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
@@ -156,7 +155,6 @@ function Home () {
   //get all account balances
   useInterval(() => {
     dispatch(fetchBalances())
-    dispatch(fetchNFTs())
     dispatch(fetchAirdropStatusL1())
     dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
