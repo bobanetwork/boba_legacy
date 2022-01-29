@@ -33,11 +33,19 @@ const main = async () => {
   )
 
   const ETHUSDPairRoundID = await ETHUSDPair.latestRound()
+
+  const ETHUSDPairState = await ETHUSDPair.oracleRoundState(
+    ETHUSDPairAdress,
+    ETHUSDPairRoundID
+  )
+  console.log(`ETH - USD state: ${ETHUSDPairState}`)
+
   const submitETHUSDPairRoundTx = await ETHUSDPair.submit(
     ETHUSDPairRoundID.toNumber() + 1,
     utils.parseUnits(ETHPrice.toString(), 8)
   )
   await submitETHUSDPairRoundTx.wait()
+  console.log(`Submitted ETH - USD: ${submitETHUSDPairRoundTx.hash}`)
 
   // // BOBA - USD pair
   const BOBAPrice = 1.6
@@ -50,11 +58,19 @@ const main = async () => {
   )
 
   const BOBAUSDPairRoundID = await BOBAUSDPair.latestRound()
+
+  const BOBAUSDPairState = await BOBAUSDPair.oracleRoundState(
+    BOBAUSDPairAdress,
+    BOBAUSDPairRoundID
+  )
+  console.log(`BOBA - USD state: ${BOBAUSDPairState}`)
+
   const submitBOBAUSDPairRoundTx = await BOBAUSDPair.submit(
     BOBAUSDPairRoundID.toNumber() + 1,
     utils.parseUnits(BOBAPrice.toString(), 8)
   )
   await submitBOBAUSDPairRoundTx.wait()
+  console.log(`Submitted BOBA - USD: ${submitBOBAUSDPairRoundTx.hash}`)
 
   // Withdraw balance
   // const balance = await ETHUSDPair.withdrawablePayment(l2Wallet.address)
