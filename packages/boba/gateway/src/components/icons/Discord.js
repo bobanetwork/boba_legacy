@@ -3,8 +3,8 @@ import * as React from "react"
 function DiscordIcon({ color }) {
 	return (
 		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-			width="32" 
-			height="32" 
+			width="22" 
+			height="22" 
 			viewBox="0 0 40.6 40.6" style={{
 				enableBackground: 'new 0 0 40.6 40.6'
 			}}>
