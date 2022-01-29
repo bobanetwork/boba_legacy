@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "BOBA Smart Contracts",
   "private": true,
-  "author": "OMG",
+  "author": "Enya.ai",
   "license": "MIT",
+  "types": "dist/index",
   "scripts": {
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
@@ -13,7 +14,11 @@
     "lint": "yarn lint:check",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",
     "lint:fix": "yarn lint:check --fix",
-    "lint:contracts": "yarn solhint -f table contracts/**/*.sol"
+    "lint:contracts": "yarn solhint -f table contracts/**/*.sol",
+    "test": "yarn test:contracts",
+    "test:contracts": "hardhat test --show-stack-traces",
+    "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage",
+    "test:slither": "slither ."
   },
   "dependencies": {
     "@boba/turing-hybrid-compute": "0.2.0",

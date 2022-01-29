@@ -9,7 +9,8 @@
       "packages/boba/*",
       "l2geth",
       "integration-tests",
-      "specs"
+      "specs",
+      "ops_boba/monitor"
     ],
     "nohoist": [
       "examples/*"

@@ -17,16 +17,9 @@ limitations under the License. */
 //with cache - ToDo
 //need to keep track of wgich account the cache is for, otherwise incorrect NFTs will be shown
 
-//localStorage.removeItem("nftContracts")
 //localStorage.removeItem("nftList")
 
-let nftContracts = localStorage.getItem("nftContracts")
 let nftList = localStorage.getItem("nftList")
-
-if (nftContracts) {
-  nftContracts = JSON.parse(nftContracts)
-  console.log("NFT Contracts Cache:",nftContracts)
-}
 
 if (nftList) {
   nftList = JSON.parse(nftList)
@@ -34,14 +27,13 @@ if (nftList) {
 }
 
 const initialState = {
-  list: nftList ? nftList : {},
-  contracts: nftContracts ? nftContracts : {}
+  list: nftList ? nftList : {}
 }
 
 function nftReducer (state = initialState, action) {
   switch (action.type) {
     
-    case 'NFT/ADDNFT/SUCCESS':
+    case 'NFT/ADD/SUCCESS':
 
       localStorage.setItem("nftList", JSON.stringify({
           ...state.list,
@@ -57,36 +49,16 @@ function nftReducer (state = initialState, action) {
         } 
       }
 
-    case 'NFT/ADDCONTRACT/SUCCESS':
+    case 'NFT/REMOVE/SUCCESS':
 
-      const address = action.payload.address
-              
-      localStorage.setItem("nftContracts", JSON.stringify({
-          ...state.contracts,
-          [address]: action.payload
-        })
-      )
+      let listN = state.list
+      delete listN[action.payload]
+      
+      localStorage.setItem("nftList", JSON.stringify(listN))
 
       return { 
         ...state,
-        contracts: {
-          ...state.contracts,
-          [address]: action.payload
-        }
-      }
-
-    case 'NFT/REMOVECONTRACT/SUCCESS':
-      
-      let listC = state.contracts
-      delete listC[action.payload]
-      
-      localStorage.setItem("nftContracts", JSON.stringify(listC))
-      localStorage.removeItem("nftList")
-
-      return { 
-        ...state,
-        contracts: listC,
-        list: {}
+        list: listN
       }
       
     default:

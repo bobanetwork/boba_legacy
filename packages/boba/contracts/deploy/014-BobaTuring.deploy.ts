@@ -12,7 +12,6 @@ let L2Boba: Contract
 let BobaTuringHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -116,8 +115,14 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('BobaTuringCredit', BobaTuringCreditSubmission)
-  await registerBobaAddress(addressManager, 'BobaTuringCredit', BobaTuringCredit.address)
-  console.log(`Registered BobaTuringCredit in the AddressManager at ${BobaTuringCredit.address}`)
+  await registerBobaAddress(
+    addressManager,
+    'BobaTuringCredit',
+    BobaTuringCredit.address
+  )
+  console.log(
+    `Registered BobaTuringCredit in the AddressManager at ${BobaTuringCredit.address}`
+  )
 }
 
 deployFn.tags = ['BobaTuring']

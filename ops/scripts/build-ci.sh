@@ -6,6 +6,7 @@ docker-compose build -- boba_deployer
 docker-compose build -- boba_message-relayer-fast
 docker-compose build -- gas_oracle
 docker-compose build -- deployer
+docker-compose build -- monitor
 
 docker rmi $(docker images -f "dangling=true" -q)
 
