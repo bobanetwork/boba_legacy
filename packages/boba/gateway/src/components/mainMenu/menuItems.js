@@ -6,6 +6,12 @@ export const menuItems = [
     url: "/"
   },
   {
+    key: 'Ecosystem',
+    icon: "SafeIcon",
+    title: "Ecosystem",
+    url: "/Ecosystem"
+  },
+  {
     key: 'History',
     icon: "HistoryIcon",
     title: "Transaction History",

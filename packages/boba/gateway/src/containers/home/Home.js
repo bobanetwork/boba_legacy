@@ -24,7 +24,6 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
@@ -100,6 +99,7 @@ import MainMenu from 'components/mainMenu/MainMenu'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 function Home () {
 
@@ -156,7 +156,6 @@ function Home () {
   //get all account balances
   useInterval(() => {
     dispatch(fetchBalances())
-    dispatch(fetchNFTs())
     dispatch(fetchAirdropStatusL1())
     dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
@@ -250,6 +249,9 @@ function Home () {
           }
           {pageDisplay === "Help" &&
             <Help/>
+          }
+          {pageDisplay === "Ecosystem" &&
+            <Ecosystem/>
           }
         </Container>
       </Box>

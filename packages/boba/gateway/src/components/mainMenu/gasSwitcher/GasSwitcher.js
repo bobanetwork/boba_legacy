@@ -21,7 +21,10 @@ function GasSwitcher() {
       if (networkService.masterSystemConfig === 'mainnet' || networkService.masterSystemConfig === 'rinkeby') {
         const l1SecurityFee = await networkService.estimateL1SecurityFee()
         const l2Fee = await networkService.estimateL2Fee()
-        const gasSavings = (Number(gas.gasL1) * (l2Fee - l1SecurityFee) / Number(gas.gasL2)) / l2Fee;
+        // The l1 security fee is moved to the l2 fee
+        //const gasSavings = (Number(gas.gasL1) * (l2Fee - l1SecurityFee) / Number(gas.gasL2)) / l2Fee;
+        // The l1 security fee is directly deducted from the user's account
+        const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee);
         setSavings(gasSavings ? gasSavings : 0);
         return gasSavings
       }
