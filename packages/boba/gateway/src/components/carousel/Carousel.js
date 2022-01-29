@@ -24,7 +24,6 @@ const responsive = {
   }
 }
 
-
 function CAROUSEL({
   children
 }) {
