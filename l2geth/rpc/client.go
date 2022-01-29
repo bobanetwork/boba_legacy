@@ -270,6 +270,12 @@ func (c *Client) Call(result interface{}, method string, args ...interface{}) er
 	return c.CallContext(ctx, result, method, args...)
 }
 
+func (c *Client) CallTimeout(result interface{}, method string, timeout time.Duration, args ...interface{}) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	return c.CallContext(ctx, result, method, args...)
+}
+
 // CallContext performs a JSON-RPC call with the given arguments. If the context is
 // canceled before the call has successfully returned, CallContext returns immediately.
 //

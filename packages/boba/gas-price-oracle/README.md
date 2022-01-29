@@ -48,6 +48,16 @@ estimatedGasLimit = calculateL1GasLimit(data) * L1GasPrice + L2GasPrice * L2Esti
 
 The `L2GasPrice` changes gradually to reflect our service cost, primarily, the cost of writing state roots into L1, and the significant cost of relaying messages from L1 to L2 (e.g. deposits) and back from L2 to L1 (e.g. exits). _Unlike other L2's, we include the cost of relaying messages in our gas limits_, so you do not have to pay two different fees or have to worry about relaying your messages.
 
+## L1 Security Fee
+
+The L1 security fee is for the cost of submitting the state roots and tx roots to L1. It's calculated via
+
+```
+L2GasPrice * (L1BasePrice * scalar * (overhead + dataLength))
+```
+
+The `overhead` is the `x%` percentage of the average gas usage of the L1 txs that submitting the state and tx roots within last 1000 blocks. We adjust `x ` based on our operation cost.
+
 ## Algorithm
 
 The service fetches the L1 ETH balances of the `sequencer`, `proposer`, `relayer` and `fast relayer` in each polling interval. Based on the ETH balances, we calculate the costs of maintaining the Layer 2.

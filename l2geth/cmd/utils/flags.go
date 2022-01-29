@@ -865,6 +865,13 @@ var (
 		Usage:  "Allow txs with fees above the current fee up to this amount, must be > 1",
 		EnvVar: "ROLLUP_FEE_THRESHOLD_UP",
 	}
+	// TuringCreditFlag = cli.StringFlag{
+	// 	Name:  "turing.credit",
+	// 	Usage: "Public address for the Turing credit contract",
+
+	// 	Value:  "0x4200000000000000000000000000000000000020",
+	// 	EnvVar: "TURING_CREDIT_ADDRESS",
+	// }
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1141,6 +1148,9 @@ func setRollup(ctx *cli.Context, cfg *rollup.Config) {
 		val := ctx.GlobalFloat64(RollupFeeThresholdUpFlag.Name)
 		cfg.FeeThresholdUp = new(big.Float).SetFloat64(val)
 	}
+	// if ctx.GlobalIsSet(TuringCreditFlag.Name) {
+	// 	cfg.OvmTuringCreditAddress = ctx.GlobalString(TuringCreditFlag.Name)
+	// }
 }
 
 // setLes configures the les server and ultra light client settings from the command line flags.

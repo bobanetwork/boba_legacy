@@ -235,26 +235,9 @@ function Account ({ enabled }) {
         <S.CardContentTag>
           <S.CardInfo>Boba Balances</S.CardInfo>
           {(network === 'mainnet') &&
-            <Typography variant="body2">
-               You are using Mainnet.<br/>
-               WARNING: the mainnet smart contracts are not fully audited and funds may be at risk.<br/>
-               Please be cautious when using Mainnet.
-            </Typography>
-          }
-          {walletMethod !== 'browser' && !accountEnabled &&
-            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
-                Please CONNECT TO METAMASK to see your balances
-            </Typography>
-          }
-          {walletMethod === 'browser' && !accountEnabled &&
-            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
-                PLEASE BE PATIENT - READING CONTRACT DATA FROM ETHEREUM
-            </Typography>
-          }
-          {walletMethod === 'browser' && accountEnabled && rootBalance.length === 0 &&
-            <Typography variant="body2" style={{fontSize: '1em', color: 'yellow', fontWeight: '700'}}>
-                READING TOKEN BALANCES FROM ETHEREUM
-            </Typography>
+          <Typography variant="body2">
+             You are using Mainnet.
+          </Typography>
           }
         </S.CardContentTag>
         <Box sx={{flex: 3}}>

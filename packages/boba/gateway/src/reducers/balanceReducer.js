@@ -18,17 +18,22 @@ const initialState = {
   layer2: [],
   l1LpBalanceWeiString:'',
   l2LpBalanceWeiString:'',
+  l2LpETHBalanceWeiString: '',
   l1LpPendingWeiString:'',
   l2LpPendingWeiString:'',
+  l2LpETHPendingWeiString: '',
   l1FeeRate: {},
   l2FeeRate: {},
+  l2ETHFeeRateN: {},
   fastExitCost: '',
   classicExitCost: '',
   fastDepositCost: '',
+  fastDepositBatchCost: '',
   l1FeeBalance: '',
   l2FeeBalance: '',
   l1lpLiquidity: '',
   l2lpLiquidity: '',
+  l2lpETHLiquidity: '',
   gas: {}
 }
 
@@ -56,6 +61,11 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l2LpBalanceWeiString: action.payload
       }
+    case 'FETCH/L2LP/BALANCE/ETH/SUCCESS':
+      return {
+        ...state, 
+        l2LpETHBalanceWeiString: action.payload
+      }
     case 'FETCH/L1LP/PENDING/SUCCESS':
       return {
         ...state, 
@@ -65,6 +75,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l2LpPendingWeiString: action.payload
+      }
+    case 'FETCH/L2LP/PENDING/ETH/SUCCESS':
+      return {
+        ...state, 
+        l2LpETHPendingWeiString: action.payload
       }
     case 'FETCH/L1TOTALFEERATE/SUCCESS':
       return {
@@ -86,6 +101,11 @@ function balanceReducer(state = initialState, action) {
         ...state, 
         l2FeeRateN: action.payload
       }
+    case 'FETCH/L2FEERATE/ETH/SUCCESS':
+      return {
+        ...state, 
+        l2ETHFeeRateN: action.payload
+      }
     case 'FETCH/FASTEXIT/COST/SUCCESS':
       return {
         ...state, 
@@ -100,6 +120,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         fastDepositCost: action.payload
+      }
+    case 'FETCH/FASTDEPOSIT/BATCH/COST/SUCCESS':
+      return {
+        ...state, 
+        fastDepositBatchCost: action.payload
       }
     case 'FETCH/L1FEE/BALANCE/SUCCESS':
       return {
@@ -120,6 +145,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state, 
         l2lpLiquidity: action.payload
+      }
+    case 'FETCH/L2LP/LIQUIDITY/ETH/SUCCESS':
+      return {
+        ...state, 
+        l2lpETHLiquidity: action.payload
       }
     case 'BALANCE/L1/RESET':
       return {

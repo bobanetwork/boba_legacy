@@ -28,9 +28,6 @@ import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
-  getNFTs,
-  //addNFTContract,
-  getNFTContracts,
 } from 'actions/nftAction'
 
 import {
@@ -40,36 +37,26 @@ import {
   updateSignatureStatus_depositTRAD
 } from 'actions/signAction'
 
-//Base contracts
-import AddressManagerJson from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
-import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
-import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
+// Base contracts
+import AddressManagerJson from '@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
+import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
+import L2StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
+import L2ERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
+import OVM_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json'
 
-import DiscretionaryExitBurnJson from '../deployment/artifacts-boba/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+// Boba contracts
+import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
+import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
+import Boba from "@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
+import GovernorBravoDelegate from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
+import GovernorBravoDelegator from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
 
-//OMGX LP contracts
-import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LPJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-
-//L2 Staking
-import L2SaveJson from '../deployment/artifacts-boba/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
-
-//Standard ERC20 jsons
+//special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
-import L2ERC20Json from '../deployment/artifacts-base/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
-
-//special one-off location
 import OMGJson from '../deployment/contracts/OMG.json'
-
-//BOBA L2 Contracts
-import L2ERC721Json from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
-
-//DAO
-import Boba from                   "../deployment/artifacts-boba/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
-import GovernorBravoDelegate from  "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
-import GovernorBravoDelegator from "../deployment/artifacts-boba/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
-
-//Airdrop
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
@@ -83,6 +70,10 @@ import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import { sortRawTokens } from 'util/common'
 
+import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
+//import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
+import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+
 require('dotenv').config()
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -90,6 +81,7 @@ const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
+const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
 let allTokens = {}
@@ -119,9 +111,6 @@ class NetworkService {
     this.AddressManagerAddress = null
     this.AddressManager = null
 
-    // this.ERC721Address = null
-    // this.ERC721RegAddress = null
-
     this.L1_TEST_Contract = null
     this.L2_TEST_Contract = null
     this.L1_OMG_Contract = null
@@ -150,6 +139,14 @@ class NetworkService {
     this.xBobaContract = null
     this.delegateContract = null
     this.delegatorContract = null
+
+    // Gas oracle
+    this.gasOracleContract = null
+
+    // swap data for calculating the l1 security fee
+    this.payloadForL1SecurityFee = null
+    // fast deposit in batch
+    this.payloadForFastDepositBatchCost = null
 
   }
 
@@ -195,11 +192,8 @@ class NetworkService {
 
   async fetchAirdropStatusL1() {
 
-    //console.log("fetching airdrop L1 status")
-
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    //if (this.masterSystemConfig === 'mainnet') return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -221,8 +215,6 @@ class NetworkService {
   }
 
   async fetchAirdropStatusL2() {
-
-    //console.log("fetching airdrop L2 status")
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
@@ -251,9 +243,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    //if (this.masterSystemConfig === 'mainnet') return
 
-  //Interact with contract
     const airdropContract = new ethers.Contract(
       allAddresses.BobaAirdropL1,
       BobaAirdropL1Json.abi,
@@ -510,6 +500,11 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
+      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
+        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
+      }
+
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[masterSystemConfig]['L1']['rpcUrl']
       )
@@ -517,23 +512,16 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      // loading addresses from store for speed
-      // if (masterSystemConfig === 'local') {
-      //   addresses = localAddresses
-      //   console.log('Final Local Addresses:', addresses)
-      // } else 
       if (masterSystemConfig === 'rinkeby') {
-        addresses = rinkebyAddresses
+        addresses = addresses_Rinkeby
         console.log('Rinkeby Addresses:', addresses)
+      } else if (masterSystemConfig === 'mainnet') {
+        addresses = addresses_Mainnet
+        console.log('Rinkeby Addresses:', addresses)
+      } else if (masterSystemConfig === 'local') {
+          //addresses = addresses_Local
+          console.log('Rinkeby Addresses:', addresses)
       }
-      //  else if (masterSystemConfig === 'mainnet') {
-      //   addresses = mainnetAddresses
-      //   console.log('Mainnet Addresses:', addresses)
-      // } 
-      // else if (masterSystemConfig === 'rinkeby-integration') {
-      //   addresses = rinkebyIntegrationAddresses
-      //   console.log('Rinkeby Integration Addresses:', addresses)
-      // }
 
       this.AddressManagerAddress = nw[masterSystemConfig].addressManager
       console.log("AddressManager address:",this.AddressManagerAddress)
@@ -596,20 +584,20 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      let supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
-                              'REP',  'BAT',  'ZRX', 'SUSHI',
-                              'LINK', 'UNI', 'BOBA', 'xBOBA', 
-                              'OMG', 'FRAX',  'FXS', 'DODO', 
-                              'UST', 'BUSD', 'BNB',  'FTM',  
-                              'MATIC', 'UMA'
+      let supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
+                               'REP',  'BAT',  'ZRX', 'SUSHI',
+                              'LINK',  'UNI', 'BOBA', 'xBOBA', 
+                               'OMG', 'FRAX',  'FXS',  'DODO', 
+                               'UST', 'BUSD',  'BNB',   'FTM',  
+                             'MATIC',  'UMA',  'DOM'
                             ]
 
       //not all tokens are on Rinkeby
       if ( masterSystemConfig === 'rinkeby') {
-        supportedTokens = [ 'USDT', 'DAI', 'USDC', 'WBTC',
+        supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
                              'REP', 'BAT',  'ZRX', 'SUSHI',
                             'LINK', 'UNI', 'BOBA', 'xBOBA', 
-                             'OMG',
+                             'OMG', 'DOM'
                           ]
       }
 
@@ -757,6 +745,13 @@ class NetworkService {
           this.provider.getSigner()
         )
       }
+
+      // Gas oracle
+      this.gasOracleContract = new ethers.Contract(
+        L2GasOracle,
+        OVM_GasPriceOracleJson.abi,
+        this.L2Provider
+      )
 
       this.bindProviderListeners()
 
@@ -992,7 +987,7 @@ class NetworkService {
     }
   }
 
-  async addNFTContract( address ) {
+  async addNFT( address, tokenID ) {
 
     try {
 
@@ -1002,116 +997,31 @@ class NetworkService {
         this.L2Provider
       )
 
-      let nftName = await contract.name()
-      let nftSymbol = await contract.symbol()
+      const nftName = await contract.name()
+      const nftSymbol = await contract.symbol()
+      const nftMeta = await contract.tokenURI(tokenID)
+      const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
-      const newContract = {
-        name: nftName,
-        symbol: nftSymbol,
+      const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+
+      const NFT = {
+        UUID,
         address,
+        name: nftName,
+        tokenID,
+        symbol: nftSymbol,
+        url,
+        meta
       }
 
-
-      //console.log("newContract:",newContract)
-      return newContract
+      console.log("NFT:",NFT)
+      await addNFT( NFT )
 
     } catch (error) {
-      console.log("NS: addNFTContract error:",error)
+      console.log("NS: addNFT error:",error)
       return error
     }
 
-  }
-
-  //goal is to find your NFTs and NFT contracts based on local cache and registry data
-  async fetchNFTs() {
-
-    let NFTContracts = Object.entries(await getNFTContracts())
-    //console.log("Step 1 - NFTContracts:",NFTContracts)
-
-    //How many NFTs do you have right now?
-    let numberOfNFTS = 0
-
-    NFTContracts = Object.entries(await getNFTContracts())
-
-    for(let i = 0; i < NFTContracts.length; i++) {
-
-      const address = NFTContracts[i][1].address
-
-      //console.log("address:",address)
-
-      let contract = new ethers.Contract(
-        address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
-
-      //how many NFTs of this flavor do I own?
-      const balance = await contract.connect(
-        this.L2Provider
-      ).balanceOf(this.account)
-
-      numberOfNFTS = numberOfNFTS + Number(balance.toString())
-
-    }
-
-    //let's see if we already know about them
-    const myNFTS = getNFTs()
-    const numberOfStoredNFTS = Object.keys(myNFTS).length
-
-    if (numberOfNFTS !== numberOfStoredNFTS) {
-
-      //console.log('NFT change - need to add one or more NFTs')
-
-      for(let i = 0; i < NFTContracts.length; i++) {
-
-        const address = NFTContracts[i][1].address
-
-        const contract = new ethers.Contract(
-          address,
-          L2ERC721Json.abi,
-          this.L2Provider
-        )
-
-        //console.log("NFT contracts:",contract)
-
-        const ownerTokenIDs = await contract.getOwnerNFTs(
-          this.account
-        )
-        //console.log("ownerTokenIDs:",ownerTokenIDs)
-
-        const balance = ownerTokenIDs.length
-        //console.log("balance:",balance)
-
-        //always the same, no need to have in the loop
-        let nftName = await contract.name()
-        let nftSymbol = await contract.symbol()
-
-        //can have more than 1 per contract
-        for (let i = 0; i < balance; i++) {
-
-          const tokenID = ownerTokenIDs[i]
-          const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
-          const nftMeta = await contract.tokenURI(tokenID)
-
-          const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
-
-          let NFT = {
-            UUID,
-            address,
-            name: nftName,
-            tokenID,
-            symbol: nftSymbol,
-            url,
-            meta
-          }
-
-          console.log("NFT:",NFT)
-
-          await addNFT( NFT )
-
-        }
-      }
-    }
   }
 
   async addTokenList() {
@@ -1121,7 +1031,6 @@ class NetworkService {
     if(allTokens === null) return
 
     Object.keys(allTokens).forEach((token, i) => {
-      //console.log("allTokens[token].L1:",allTokens[token].L1)
       getToken(allTokens[token].L1)
     })
   }
@@ -1742,15 +1651,6 @@ class NetworkService {
         if (!res) return false
       }
 
-      /*
-      const estimatedGas = await ExitBurn.estimateGas.burnAndWithdraw(
-        L2ERC20.address,
-        utils.parseEther('10'),
-        9999999,
-        ethers.utils.formatBytes32String(new Date().getTime().toString())
-      )
-      */
-
       const DiscretionaryExitBurnContract = new ethers.Contract(
         allAddresses.DiscretionaryExitBurn,
         DiscretionaryExitBurnJson.abi,
@@ -1854,10 +1754,6 @@ class NetworkService {
         L1LPContract.userRewardMaxFeeRate()
       ])
 
-      // console.log("L1 operatorFeeRate",Number(operatorFeeRate))
-      // console.log("L1 userMinFeeRate",Number(userMinFeeRate))
-      // console.log("L1 userMaxFeeRate",Number(userMaxFeeRate))
-
       const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
       const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
 
@@ -1885,10 +1781,6 @@ class NetworkService {
         L2LPContract.userRewardMinFeeRate(),
         L2LPContract.userRewardMaxFeeRate()
       ])
-
-    // console.log("L2 operatorFeeRate",Number(operatorFeeRate))
-    // console.log("L2 userMinFeeRate",Number(userMinFeeRate))
-    // console.log("L2 userMaxFeeRate",Number(userMaxFeeRate))
 
       const feeRateL = Number(userMinFeeRate) + Number(operatorFeeRate)
       const feeRateH = Number(userMaxFeeRate) + Number(operatorFeeRate)
@@ -2135,10 +2027,6 @@ class NetworkService {
   /***********************************************/
   async addLiquidity(currency, value_Wei_String, L1orL2Pool) {
 
-    //console.log("currency",currency)
-    //console.log("value_Wei_String",value_Wei_String)
-    //console.log("L1orL2Pool",L1orL2Pool)
-
     let otherField = {}
 
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
@@ -2211,21 +2099,33 @@ class NetworkService {
   /***********************************************************/
   /***** SWAP ON to BOBA by depositing funds to the L1LP *****/
   /***********************************************************/
-  async depositL1LP(currency, value_Wei_String) {
+  async depositL1LP(currency, value_Wei_String, ETH_Value_Wei_String) {
 
     updateSignatureStatus_depositLP(false)
 
     console.log("depositL1LP:",currency)
     console.log("value_Wei_String",value_Wei_String)
+    console.log("ETH_Value_Wei_String", ETH_Value_Wei_String)
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L1LPContract.clientDepositL1(
-      value_Wei_String,
-      currency,
-      currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    let depositTX
+    if (!Number(ETH_Value_Wei_String)) {
+      console.log("Depositing...")
+      depositTX = await this.L1LPContract.clientDepositL1(
+        value_Wei_String,
+        currency,
+        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+      )
+    } else {
+      console.log("Depositing in batch...")
+      depositTX = await this.L1LPContract.clientDepositL1Batch([
+        { l1TokenAddress: currency, amount: value_Wei_String },
+        { l1TokenAddress: allAddresses.L1_ETH_Address, amount: ETH_Value_Wei_String }
+      ],{ value: ETH_Value_Wei_String }
+      )
+    }
 
     console.log("depositTX",depositTX)
 
@@ -2281,22 +2181,15 @@ class NetworkService {
       this.masterSystemConfig
     ).get('get.l2.pendingexits', {})
 
-    //console.log("tokenAddress",tokenAddress)
-    //console.log("L1pending",L1pending)
-
     const pendingFast = L1pending.data.filter(i => {
        return (i.fastRelay === 1) && //fast exit
         i.exitToken.toLowerCase() === tokenAddress.toLowerCase() //and, this specific token
     })
 
-    //console.log("L1pendingFast",pendingFast)
-
     let sum = pendingFast.reduce(function(prev, current) {
       let weiString = BigNumber.from(current.exitAmount)
       return prev.add(weiString)
     }, BigNumber.from('0'))
-
-    //console.log("L1pendingFastSum:",sum.toString())
 
     return sum.toString()
 
@@ -2491,6 +2384,38 @@ class NetworkService {
     return utils.formatEther(depositCost_BN.add(approvalCost_BN))
   }
 
+  /* Estimate cost of Fast Deposit to L2 */
+  async getFastDepositBatchCost(currencyAddress) {
+
+    let approvalCost_BN = BigNumber.from('0')
+
+    const gasPrice = await this.L1Provider.getGasPrice()
+    console.log("Fast deposit gas price", gasPrice.toString())
+
+    const ERC20Contract = new ethers.Contract(
+      currencyAddress,
+      L2ERC20Json.abi, //any old abi will do...
+      this.provider.getSigner()
+    )
+
+    const tx = await ERC20Contract.populateTransaction.approve(
+      allAddresses.L1LPAddress,
+      utils.parseEther('0')
+    )
+
+    const approvalGas_BN = await this.L1Provider.estimateGas(tx)
+    approvalCost_BN = approvalGas_BN.mul(gasPrice)
+    console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+
+    const depositGas_BN = await this.L1Provider.estimateGas(this.payloadForFastDepositBatchCost)
+    console.log("Fast batch deposit gas", depositGas_BN.toString())
+
+    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    console.log("Fast batch deposit cost (ETH):", utils.formatEther(depositCost_BN))
+
+    //returns total cost in ETH
+    return utils.formatEther(depositCost_BN.add(approvalCost_BN))
+  }
   /**************************************************************/
   /***** SWAP OFF from BOBA by depositing funds to the L2LP *****/
   /**************************************************************/
@@ -3256,6 +3181,27 @@ class NetworkService {
       return error
     }
 
+  }
+
+  /***********************************************/
+  /*****            L1 Security Fee          *****/
+  /***********************************************/
+  async estimateL1SecurityFee(payload=this.payloadForL1SecurityFee) {
+    const deepCopyPayload = { ...payload }
+    delete deepCopyPayload.from
+    const l1SecurityFee = await networkService.gasOracleContract.getL1Fee(
+      ethers.utils.serializeTransaction(deepCopyPayload)
+    );
+    return l1SecurityFee.toNumber()
+  }
+
+  /***********************************************/
+  /*****                L2 Fee              *****/
+  /***********************************************/
+  async estimateL2Fee(payload=this.payloadForL1SecurityFee) {
+    const l2GasPrice = await this.L2Provider.getGasPrice();
+    const l2GasEstimate = await this.L2Provider.estimateGas(payload);
+    return l2GasPrice.mul(l2GasEstimate).toNumber()
   }
 
 }

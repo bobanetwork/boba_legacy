@@ -24,7 +24,6 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
@@ -99,8 +98,11 @@ import MainMenu from 'components/mainMenu/MainMenu'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+
 import { setWalletMethod } from 'actions/setupAction'
 import { isChangingChain } from 'util/changeChain'
+
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 function Home() {
 
@@ -267,6 +269,9 @@ function Home() {
           }
           {pageDisplay === "Help" &&
             <Help />
+          }
+          {pageDisplay === "Ecosystem" &&
+            <Ecosystem/>
           }
         </Container>
       </Box>

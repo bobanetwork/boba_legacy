@@ -72,6 +72,9 @@ type Receipt struct {
 	L1GasUsed  *big.Int   `json:"l1GasUsed" gencodec:"required"`
 	L1Fee      *big.Int   `json:"l1Fee" gencodec:"required"`
 	FeeScalar  *big.Float `json:"l1FeeScalar" gencodec:"required"`
+
+	// Using Turing
+	Turing []byte `json:"turing"`
 }
 
 type receiptMarshaling struct {
