@@ -13,15 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { keyBy } from 'lodash';
 const initialState = {}
 
 function transactionReducer (state = initialState, action) {
   switch (action.type) {
     case 'TRANSACTION/GETALL/SUCCESS':
-      return { 
-        ...state, 
-        ...keyBy(action.payload, 'blockNumber', 'hash') 
+      return {
+        ...state,
+        ...action.payload
       }
     case 'TRANSFER/CREATE/SUCCESS':
       return {
