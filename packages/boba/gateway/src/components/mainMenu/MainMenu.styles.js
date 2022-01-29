@@ -20,7 +20,7 @@ export const Menu = styled.div`
 `
 export const MobileNavTag = styled(Box)`
   width: 100%;
-  padding: 20px 0 40px 0;
+  //padding: 20px 0 40px 0;
   display: flex;
   gap: 20px;
   align-items: center;

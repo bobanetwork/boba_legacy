@@ -24,8 +24,9 @@ export const MenuItem = styled(Box)`
   background: ${props => props.selected ? 'linear-gradient(90deg, rgba(237, 72, 240, 0.09) 1.32%, rgba(237, 72, 236, 0.0775647) 40.2%, rgba(240, 71, 213, 0) 71.45%)' : 'none'};
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 10px 20px 40px;
+  gap: 25px;
+  padding: 5px;
+  padding-left: 20px;
   position: relative;
   margin-bottom: 1px;
   font-weight: ${props => props.selected ? 700 : 'normal'};

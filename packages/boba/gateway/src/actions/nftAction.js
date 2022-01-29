@@ -13,18 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from 'services/networkService'
 import { createAction } from './createAction'
 import store from 'store'
 
 export function getNFTs () {
   const state = store.getState()
   return state.nft.list;
-}
-
-export function getNFTContracts () {
-  const state = store.getState()
-  return state.nft.contracts
 }
 
 export async function addNFT ( NFT ) {
@@ -48,7 +42,7 @@ export async function addNFT ( NFT ) {
   }
 
   store.dispatch({
-    type: 'NFT/ADDNFT/SUCCESS',
+    type: 'NFT/ADD/SUCCESS',
     payload: info
   })
 
@@ -56,10 +50,8 @@ export async function addNFT ( NFT ) {
 
 }
 
-export function addNFTContract( contactAddress ) {
-  return createAction('NFT/ADDCONTRACT', ()=>{return networkService.addNFTContract( contactAddress )})
-}
-
-export function removeNFTContract( contactAddress ) {
-  return createAction('NFT/REMOVECONTRACT', ()=>{return contactAddress})
+export function removeNFT( UUID ) {
+  return createAction('NFT/REMOVE', ()=>{
+    return UUID
+  })
 }
