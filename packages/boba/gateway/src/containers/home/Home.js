@@ -99,6 +99,7 @@ import MainMenu from 'components/mainMenu/MainMenu'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 function Home () {
 
@@ -248,6 +249,9 @@ function Home () {
           }
           {pageDisplay === "Help" &&
             <Help/>
+          }
+          {pageDisplay === "Ecosystem" &&
+            <Ecosystem/>
           }
         </Container>
       </Box>
