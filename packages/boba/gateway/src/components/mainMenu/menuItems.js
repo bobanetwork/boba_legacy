@@ -6,6 +6,12 @@ export const menuItems = [
     url: "/"
   },
   {
+    key: 'Ecosystem',
+    icon: "SafeIcon",
+    title: "Ecosystem",
+    url: "/Ecosystem"
+  },
+  {
     key: 'History',
     icon: "HistoryIcon",
     title: "Transaction History",
@@ -52,12 +58,6 @@ export const menuItems = [
     icon: "SafeIcon",
     title: "Gnosis Safe",
     url: "https://safe.boba.network/"
-  },
-  {
-    key: 'Ecosystem',
-    icon: "SafeIcon",
-    title: "Ecosystem",
-    url: "/Ecosystem"
   },
   {
     key: 'Help',
