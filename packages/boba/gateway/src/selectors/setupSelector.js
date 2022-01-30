@@ -25,6 +25,12 @@ export function selectAccountEnabled () {
   }
 }
 
+export function selectBaseEnabled () {
+  return function (state) {
+    return state.setup['baseEnabled']
+  }
+}
+
 //local, rinkeby, mainnet...
 export function selectNetwork () {
   return function (state) {

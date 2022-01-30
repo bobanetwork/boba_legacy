@@ -23,7 +23,7 @@ import { selectNetwork } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 
 import { logAmount } from 'util/amountConvert'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import AlertIcon from 'components/icons/AlertIcon'
 import moment from 'moment'
@@ -135,9 +135,9 @@ function PendingTransaction() {
     //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
-    const currentNetwork = useSelector(selectNetwork());
-    const nw = getAllNetworks();
-    const theme = useTheme();
+    const currentNetwork = useSelector(selectNetwork())
+    const nw = getNetwork()
+    const theme = useTheme()
 
     const chainLink = (item) => {
         let network = nw[currentNetwork]

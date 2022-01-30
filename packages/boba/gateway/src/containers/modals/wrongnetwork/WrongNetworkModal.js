@@ -28,7 +28,7 @@ import { Box, Typography, useMediaQuery } from '@material-ui/core'
 import { ReactComponent as Fox } from './../../../images/icons/fox-icon.svg'
 import { ReactComponent as Account } from './../../../images/icons/mm-account.svg'
 
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import store from 'store'
 
@@ -40,7 +40,7 @@ function WrongNetworkModal ({ open, onClose }) {
 
   const dispatch = useDispatch()
 
-  const nw = getAllNetworks()
+  const nw = getNetwork()
   const masterConfig = store.getState().setup.masterConfig
   const networkLayer = store.getState().setup.netLayer
 

@@ -42,38 +42,28 @@ function MenuItems ({setOpen }) {
 
   return (
     <S.Nav>
-      <S.NavList>
-        {menuItems.map((item) => {
-          const Icon = iconObj[item.icon];
-          const isActive = pageDisplay === item.key;
-          const title = item.title;
-          return (
-            <li key={title}>
-              <S.MenuItem
-                onClick={() => {
-                  if (item.url.startsWith('http')) {
-                    window.open(item.url);
-                    setOpen(false)
-                  } else {
-                    dispatch(setPage(item.key))
-                    setOpen(false)
-                  }
-                }}
-                onMouseEnter={() => setActiveItem(title)}
-                onMouseLeave={() => setActiveItem(false)}
-                // to={item.url}
-                selected={isActive}
-              >
-                <Icon
-                  color={isActive || activeItem === title ? theme.palette.secondary.main : colorIcon}
-                  width={'20px'}
-                />
-                  {item.title}
-              </S.MenuItem>
-            </li>
-          )
-        })}
-      </S.NavList>
+      {menuItems.map((item) => {
+        const isActive = pageDisplay === item.key
+        const title = item.title
+        return (
+            <S.MenuItem
+              onClick={() => {
+                if (item.url.startsWith('http')) {
+                  window.open(item.url);
+                  setOpen(false)
+                } else {
+                  dispatch(setPage(item.key))
+                  setOpen(false)
+                }
+              }}
+              onMouseEnter={() => setActiveItem(title)}
+              onMouseLeave={() => setActiveItem(false)}
+              selected={isActive}
+            >
+              {item.title}
+            </S.MenuItem>
+        )
+      })}
     </S.Nav>
   );
 }

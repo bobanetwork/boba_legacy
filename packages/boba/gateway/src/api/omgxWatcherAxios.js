@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { getAllNetworks } from 'util/masterConfig'
-const nw = getAllNetworks()
+import { getNetwork } from 'util/masterConfig'
+const nw = getNetwork()
 
 export default function omgxWatcherAxiosInstance(masterSystemConfig){
   

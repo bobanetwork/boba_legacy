@@ -28,7 +28,7 @@ import {
 
 import { openModal } from 'actions/uiAction'
 import { setWalletMethod } from 'actions/setupAction'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import { isChangingChain } from 'util/changeChain'
 import * as S from "./WalletPicker.styles"
@@ -123,7 +123,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
 
   useEffect(() => {
     if (walletEnabled && wrongNetwork) {
-      dispatch(openModal('wrongNetworkModal'));
+      dispatch(openModal('wrongNetworkModal'))
       localStorage.setItem('changeChain', false)
     }
   }, [ dispatch, walletEnabled, wrongNetwork ])
@@ -135,7 +135,7 @@ function WalletPicker({ onEnable, enabled, isButton }) {
   }
 
   // defines the set of possible networks
-  const networks = getAllNetworks()
+  const networks = getNetwork()
 
   let allNetworks = []
   for (var prop in networks) allNetworks.push(prop)

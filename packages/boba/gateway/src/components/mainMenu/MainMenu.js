@@ -8,7 +8,6 @@ import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from './themeSwitcher/ThemeSwitcher'
 import GasSwitcher from './gasSwitcher/GasSwitcher'
-
 import MenuItems from './menuItems/MenuItems'
 import { useTheme } from '@emotion/react'
 import { Container, Drawer, IconButton, useMediaQuery } from '@material-ui/core'
@@ -44,7 +43,6 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
             <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
               <NavIcon />
             </Box>
-
             <Drawer open={open} onClose={() => setOpen(false)} classes={{ paper: classes.root }}>
               <S.StyleDrawer theme={theme}>
 
@@ -73,15 +71,26 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
         </Container>
       ) : (
         <S.Menu>
-          <Link to="/" style={{ maxWidth: '180px' }} onClick={() => dispatch(setPage('AccountNow'))}>
-            <Logo />
-          </Link>
-          <WalletPicker isButton={true} enabled={enabled} onEnable={onEnable} />
-          <NetworkSwitcher />
-          <LayerSwitcher />
-          <GasSwitcher />
+          <Logo style={{maxWidth: '160px'}}/>
+          <div style={{
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'flex-start', 
+            flexDirection: 'column',
+            borderRight: 'solid white',
+            borderWidth: '1px',
+            paddingRight: '10px',
+            //width: '180px',
+            //background: 'red',
+          }}
+          >
+            <NetworkSwitcher />
+            <LayerSwitcher />
+          </div>
           <MenuItems setOpen={setOpen} />
-          <ThemeSwitcher />
+          {/*<GasSwitcher /> */}
+          {/*<ThemeSwitcher />*/}
+          <WalletPicker isButton={true} enabled={enabled} onEnable={onEnable} />
         </S.Menu>
       )}
     </>

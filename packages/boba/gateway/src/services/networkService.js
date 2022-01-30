@@ -62,7 +62,7 @@ import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
 import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
@@ -86,22 +86,24 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 let allAddresses = {}
 let allTokens = {}
 
-// hardcode addresses for boot-up speed
-const rinkebyAddresses = require(`../deployment/rinkeby/rinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json`)
-
 class NetworkService {
 
   constructor() {
 
-    this.L1Provider = null
-    this.L2Provider = null
+    this.account = null // the user's account
+    
+    this.L1Provider = null // L1 Infura
+    this.L2Provider = null // L2 to Boba replica
+    this.provider = null   // from MetaMask
 
-    this.provider = null
     this.environment = null
 
     // L1 or L2
     this.L1orL2 = null
     this.masterSystemConfig = null
+
+    this.L1ProviderBASE = null
+    this.L2ProviderBASE = null
 
     // Watcher
     this.watcher = null
@@ -166,7 +168,6 @@ class NetworkService {
     window.ethereum.on('accountsChanged', () => {
       window.location.reload()
     })
-
     window.ethereum.on('chainChanged', () => {
       console.log('chainChanged')
       localStorage.setItem('changeChain', true)
@@ -428,6 +429,293 @@ class NetworkService {
      return allAddresses
   }
 
+async initializeBase( masterSystemConfig ) {
+
+    console.log('NS: initializeBase() for', masterSystemConfig)
+
+    let addresses = null
+    this.masterSystemConfig = masterSystemConfig // e.g. mainnet | rinkeby | ...
+    
+    // defines the set of possible networks along with chainId for L1 and L2
+    const nw = getNetwork()
+    const L1rpc = nw[masterSystemConfig]['L1']['rpcUrl']
+    const L2rpc = nw[masterSystemConfig]['L2']['rpcUrl']
+
+    try {
+
+      //fire up the base providers
+      const Web3 = require("web3")
+
+      // let web3_L1 = new Web3(
+      //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
+      //   new Web3.providers.WebsocketProvider("wss://mainnet.infura.io/ws/v3/YOUR-PROJECT-ID")
+      // )
+
+      this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
+      this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
+
+      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
+        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
+      }
+
+      this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
+        nw[masterSystemConfig]['L1']['rpcUrl']
+      )
+      this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
+        nw[masterSystemConfig]['L2']['rpcUrl']
+      )
+
+      if (masterSystemConfig === 'rinkeby') {
+        addresses = addresses_Rinkeby
+        console.log('Rinkeby Addresses:', addresses)
+      } else if (masterSystemConfig === 'mainnet') {
+        addresses = addresses_Mainnet
+        console.log('Mainnet Addresses:', addresses)
+      } 
+      // else if (masterSystemConfig === 'local') {
+      //     //addresses = addresses_Local
+      //     console.log('Rinkeby Addresses:', addresses)
+      // }
+
+      // this.AddressManagerAddress = nw[masterSystemConfig].addressManager
+      // console.log("AddressManager address:",this.AddressManagerAddress)
+
+      // this.AddressManager = new ethers.Contract(
+      //   this.AddressManagerAddress,
+      //   AddressManagerJson.abi,
+      //   this.L1Provider
+      // )
+      // //console.log("AddressManager Contract:",this.AddressManager)
+
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+
+      // not critical
+      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
+      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
+
+      // not critical
+      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
+      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
+
+      //L2CrossDomainMessenger is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L2MessengerAddress': L2MessengerAddress,
+      }
+
+      //L2StandardBridgeAddress is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L2StandardBridgeAddress': L2StandardBridgeAddress,
+      }
+
+      //L2MessengerAddress is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L2MessengerAddress': L2MessengerAddress
+      }
+
+      //L2_ETH_Address is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L2_ETH_Address': L2_ETH_Address
+      }
+
+      //L1_ETH_Address is a predeploy, so add by hand....
+      allAddresses = {
+        ...allAddresses,
+        'L1_ETH_Address': L1_ETH_Address
+      }
+
+      this.L1StandardBridgeContract = new ethers.Contract(
+        allAddresses.L1StandardBridgeAddress,
+        L1StandardBridgeJson.abi,
+        this.L1Provider
+      )
+      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
+
+      let supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
+                               'REP',  'BAT',  'ZRX', 'SUSHI',
+                              'LINK',  'UNI', 'BOBA', 'xBOBA', 
+                               'OMG', 'FRAX',  'FXS',  'DODO', 
+                               'UST', 'BUSD',  'BNB',   'FTM',  
+                             'MATIC',  'UMA',  'DOM'
+                            ]
+
+      //not all tokens are on Rinkeby
+      if ( masterSystemConfig === 'rinkeby') {
+        supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
+                             'REP', 'BAT',  'ZRX', 'SUSHI',
+                            'LINK', 'UNI', 'BOBA', 'xBOBA', 
+                             'OMG', 'DOM'
+                          ]
+      }
+
+      await Promise.all(supportedTokens.map(async (key) => {
+
+        const L2a = addresses['TK_L2'+key]
+
+        if(key === 'xBOBA') {
+          if (L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': 'xBOBA',
+              'L2': L2a
+            }
+          }
+        } else {
+          const L1a = addresses['TK_L1'+key]
+          if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
+            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
+            return false
+          } else {
+            allTokens[key] = {
+              'L1': L1a,
+              'L2': L2a
+            }
+          }
+        }
+
+      }))
+
+      console.log("tokens:",allTokens)
+      this.tokenAddresses = allTokens
+
+      if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
+
+      if(allAddresses.L2StandardBridgeAddress !== null) {
+        this.L2StandardBridgeContract = new ethers.Contract(
+          allAddresses.L2StandardBridgeAddress,
+          L2StandardBridgeJson.abi,
+          this.L2Provider
+        )
+      }
+      console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
+
+      this.L2_ETH_Contract = new ethers.Contract(
+        allAddresses.L2_ETH_Address,
+        L2ERC20Json.abi,
+        this.L2Provider
+      )
+      //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
+
+      /*The test token*/
+      this.L1_TEST_Contract = new ethers.Contract(
+        allTokens.BOBA.L1, //this will get changed anyway when the contract is used
+        L1ERC20Json.abi,
+        this.L1Provider
+      )
+      //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
+
+      this.L2_TEST_Contract = new ethers.Contract(
+        allTokens.BOBA.L2, //this will get changed anyway when the contract is used
+        L2ERC20Json.abi,
+        this.L2Provider
+      )
+      //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
+
+      /*The OMG token*/
+      //We need this seperately because OMG is not ERC20 compliant
+      this.L1_OMG_Contract = new ethers.Contract(
+        allTokens.OMG.L1,
+        OMGJson,
+        this.L1Provider
+      )
+      //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
+
+      // Liquidity pools
+      console.log('Setting up contract for L1LP at:',allAddresses.L1LPAddress)
+      this.L1LPContract = new ethers.Contract(
+        allAddresses.L1LPAddress,
+        L1LPJson.abi,
+        this.L1Provider
+      )
+
+      console.log('Setting up contract for L2LP at:',allAddresses.L2LPAddress)
+      this.L2LPContract = new ethers.Contract(
+        allAddresses.L2LPAddress,
+        L2LPJson.abi,
+        this.L2Provider
+      )
+
+      this.watcher = new Watcher({
+        l1: {
+          provider: this.L1Provider,
+          messengerAddress: allAddresses.L1MessengerAddress,
+        },
+        l2: {
+          provider: this.L2Provider,
+          messengerAddress: allAddresses.L2MessengerAddress,
+        },
+      })
+
+      this.fastWatcher = new Watcher({
+        l1: {
+          provider: this.L1Provider,
+          messengerAddress: allAddresses.L1FastMessengerAddress,
+        },
+        l2: {
+          provider: this.L2Provider,
+          messengerAddress: allAddresses.L2MessengerAddress,
+        },
+      })
+
+      console.log('Setting up BOBA for the DAO:', allTokens.BOBA.L2)
+
+      this.BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.L2Provider
+      )
+
+      this.xBobaContract = new ethers.Contract(
+        allTokens.xBOBA.L2,
+        Boba.abi,
+        this.L2Provider
+      )
+
+      //DAO related
+      if( this.L1orL2 === 'L2' ) {
+
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+
+        this.delegateContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegate,
+          GovernorBravoDelegate.abi,
+          this.L2Provider
+        )
+
+        this.delegatorContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegator,
+          GovernorBravoDelegator.abi,
+          this.L2Provider
+        )
+      }
+
+      // Gas oracle
+      this.gasOracleContract = new ethers.Contract(
+        L2GasOracle,
+        OVM_GasPriceOracleJson.abi,
+        this.L2Provider
+      )
+
+      return 'enabled'
+      
+    } catch (error) {
+      console.log(`NS: ERROR :InitializeBase `,error)
+      return false
+    }
+  }
+
   async initializeAccounts( masterSystemConfig ) {
 
     console.log('NS: initializeAccounts() for', masterSystemConfig)
@@ -453,7 +741,7 @@ class NetworkService {
       console.log('NS: this.networkName:', this.networkName)
 
       // defines the set of possible networks along with chainId for L1 and L2
-      const nw = getAllNetworks()
+      const nw = getNetwork()
       const L1ChainId = nw[masterSystemConfig]['L1']['chainId']
       const L2ChainId = nw[masterSystemConfig]['L2']['chainId']
 
@@ -767,7 +1055,7 @@ class NetworkService {
 
     console.log("MetaMask: Adding network to MetaMask")
 
-    const nw = getAllNetworks()
+    const nw = getNetwork()
     const masterConfig = store.getState().setup.masterConfig
 
     const chainParam = {
@@ -795,7 +1083,7 @@ class NetworkService {
   but that's safest for now */
   async correctChain( targetLayer ) {
 
-    const nw = getAllNetworks()
+    const nw = getNetwork()
     const masterConfig = store.getState().setup.masterConfig
 
     let blockExplorerUrls = null
@@ -3096,15 +3384,17 @@ class NetworkService {
   /*****       Fixed savings account         *****/
   /***********************************************/
   async withdrawFS_Savings(stakeID) {
+    if(this.account === null) {
+      console.log('NS: withdrawFS_Savings() error - called but account === null')
+      return
+    }
 
     try {
-
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
         L2SaveJson.abi,
         this.provider.getSigner()
       )
-
       const TX = await FixedSavings.unstake(stakeID)
       await TX.wait()
       return true
@@ -3115,24 +3405,17 @@ class NetworkService {
   }
 
   async getFS_Saves() {
-
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
-
+    if(this.account === null) {
+      console.log('NS: getFS_Saves() error - called but account === null')
+      return
+    }
     try {
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
         L2SaveJson.abi,
         this.L2Provider
       )
-
-      //const l2ba =
       await FixedSavings.l2Boba()
-      //console.log('l2 boba:', l2ba)
-      //console.log('l2 boba:', allTokens['BOBA'])
-
       let stakecount = await FixedSavings.personalStakeCount(this.account)
       return { stakecount: Number(stakecount) }
     } catch (error) {
@@ -3142,11 +3425,10 @@ class NetworkService {
   }
 
   async getFS_Info() {
-
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
+    if(this.account === null) {
+      console.log('NS: getFS_Info() error - called but account === null')
+      return
+    }
 
     try {
 

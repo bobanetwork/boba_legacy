@@ -28,6 +28,13 @@ export function setAccountState (enabled) {
   }
 }
 
+export function setBaseState (enabled) {
+  console.log("setBaseState:", enabled)
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/BASE/SET', payload: enabled })
+  }
+}
+
 export function setNetwork (network) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/NETWORK/SET', payload: network })

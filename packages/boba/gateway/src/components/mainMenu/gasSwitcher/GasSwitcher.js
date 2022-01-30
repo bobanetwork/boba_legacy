@@ -7,7 +7,7 @@ import * as S from './GasSwitcher.styles.js'
 
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectBaseEnabled } from 'selectors/setupSelector'
 
 import { Typography } from '@material-ui/core'
 
@@ -16,10 +16,8 @@ import { getMaxHealthBlockLag } from 'util/masterConfig'
 
 function GasSwitcher() {
 
-  const accountEnabled = useSelector(selectAccountEnabled())
-
+  const baseEnabled = useSelector(selectBaseEnabled())
   const gas = useSelector(selectGas)
-
   const [savings, setSavings] = useState(0)
 
   useEffect(() => {
@@ -30,14 +28,14 @@ function GasSwitcher() {
         // The l1 security fee is moved to the l2 fee
         //const gasSavings = (Number(gas.gasL1) * (l2Fee - l1SecurityFee) / Number(gas.gasL2)) / l2Fee;
         // The l1 security fee is directly deducted from the user's account
-        const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee);
-        setSavings(gasSavings ? gasSavings : 0);
+        const gasSavings = (Number(gas.gasL1) * l2Fee / Number(gas.gasL2)) / (l2Fee + l1SecurityFee)
+        setSavings(gasSavings ? gasSavings : 0)
         return gasSavings
       }
       return 1
     }
-    getGasSavings();
-  }, [gas]);
+    getGasSavings()
+  }, [gas])
 
   const verifierStatus = useSelector(selectVerifierStatus)
   let healthStatus = 'healthy'
@@ -67,7 +65,7 @@ function GasSwitcher() {
               position: 'relative',
             }}
             >
-              {accountEnabled && 
+              {baseEnabled && 
                 <Typography
                   variant="body2"
                   sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', textTransform: 'capitalize'}}

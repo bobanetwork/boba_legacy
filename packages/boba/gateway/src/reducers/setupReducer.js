@@ -28,6 +28,7 @@ const initialState = {
   walletMethod: null,
   walletLoading: false,
   accountEnabled: false,
+  baseEnabled: false,
   masterConfig: process.env.REACT_APP_CHAIN,
   blockexplorerURL: '',
   etherscan: '',
@@ -46,6 +47,11 @@ function setupReducer (state = initialState, action) {
       return { 
         ...state, 
         accountEnabled: action.payload,
+      }
+    case 'SETUP/BASE/SET':
+      return { 
+        ...state, 
+        baseEnabled: action.payload,
       }
     case 'SETUP/LAYER/SET':
       localStorage.setItem("netLayer", JSON.stringify(action.payload))

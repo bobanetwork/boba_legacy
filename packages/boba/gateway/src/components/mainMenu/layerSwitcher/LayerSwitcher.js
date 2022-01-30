@@ -109,4 +109,4 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
   )
 }
 
-export default LayerSwitcher;
+export default LayerSwitcher
