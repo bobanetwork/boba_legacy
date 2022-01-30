@@ -16,9 +16,7 @@ limitations under the License. */
 import { Box, useMediaQuery } from '@material-ui/core'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles'
-import { setWalletMethod } from 'actions/setupAction'
 import { setTheme } from 'actions/uiAction'
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import Home from 'containers/home/Home'
 import Notification from 'containers/notification/Notification'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -212,15 +210,15 @@ function App () {
 
   useEffect(() => {
     if (isChangingChain) {
-      dispatch(setWalletMethod('browser'));
+      //dispatch(setWalletMethod('browser'));
     }
     if (enabled) {
       localStorage.setItem('changeChain', false)
     }
-  }, [dispatch, enabled]);
+  }, [dispatch, enabled])
 
   useEffect(() => {
-    const themeFromLocalStorage = localStorage.getItem('theme');
+    const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
   }, [dispatch])
 

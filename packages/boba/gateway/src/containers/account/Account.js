@@ -18,7 +18,7 @@ import { useSelector, useDispatch, batch } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'
 
 //Selectors
-import { selectWalletMethod, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 import { selectTokens } from 'selectors/tokenSelector'
@@ -52,19 +52,22 @@ function Account ({ enabled }) {
   
   const dispatch = useDispatch()
 
-  const walletMethod = useSelector(selectWalletMethod())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
+  const layer = useSelector(selectLayer())
+  const network = useSelector(selectNetwork())
   
-  console.log("Account - walletMethod:", walletMethod)
-  console.log("Account - accountEnabled:", enabled)
+  console.log("Account - network:", network)
+  console.log("Account - layer:", layer)
+  console.log("Account - baseEnabled:", baseEnabled)
+  console.log("Account - accountEnabled:", accountEnabled)
 
-  const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
+  const [ activeTab, setActiveTab ] = useState(layer === 'L1' ? 0 : 1)
 
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
 
   const tokenList = useSelector(selectTokens)
-  const network = useSelector(selectNetwork())
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
   const exitLoading = useSelector(selectLoading(['EXIT/CREATE']))
@@ -123,17 +126,16 @@ function Account ({ enabled }) {
     getLookupPrice()
   },[ childBalance, rootBalance, getLookupPrice, accountEnabled ])
 
-  // get some data quickly for impatient people
   useEffect(()=>{
-    if (enabled) {
-      console.log("Account - checking balances initial")
+    if (accountEnabled) {
+      console.log("Account - fast check balances")
       dispatch(fetchTransactions())
       dispatch(fetchBalances())
     }
-  },[ enabled ])
+  },[ dispatch, accountEnabled ])
 
   useInterval(() => {
-    if (enabled) {
+    if (accountEnabled) {
       console.log("Account - checking balances")
       dispatch(fetchTransactions())
       dispatch(fetchBalances())
@@ -153,11 +155,11 @@ function Account ({ enabled }) {
     </Box>
   )
 
-  let label_L1 = 'Your Balance on Ethereum Mainnet'
-  if(network === 'rinkeby') label_L1 = 'Rinkeby L1'
+  let label_L1 = 'Your Balance on Ethereum'
+  if(network === 'rinkeby') label_L1 = 'Rinkeby'
 
-  let label_L2 = 'Your Balance on Boba Network'
-  if(network === 'rinkeby') label_L2 = 'Boba Rinkeby L2'
+  let label_L2 = 'Your Balance on Boba'
+  if(network === 'rinkeby') label_L2 = 'Boba Rinkeby'
 
   const L1Column = () => (
     <S.AccountWrapper >
@@ -225,28 +227,10 @@ function Account ({ enabled }) {
     </S.AccountWrapper>
   )
 
-  console.log(rootBalance.length)
-
   return (
     <>
-      <PageHeader title="Wallet"/>
+      <PageHeader title="Bridge"/>
 
-      <S.CardTag>
-        <S.CardContentTag>
-          <S.CardInfo>Boba Balances</S.CardInfo>
-          {(network === 'mainnet') &&
-          <Typography variant="body2">
-             You are using Mainnet.
-          </Typography>
-          }
-        </S.CardContentTag>
-        <Box sx={{flex: 3}}>
-          <S.ContentGlass>
-            <img src={Drink} href="#" width={135} alt="Boba Drink"/>
-          </S.ContentGlass>
-        </Box>
-      </S.CardTag>
-      
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>
           <S.AlertInfo>
@@ -285,7 +269,6 @@ function Account ({ enabled }) {
           <Grid item xs={12} md={6} >
             <L1Column />
           </Grid>
-
           <Grid item xs={12} md={6}>
             <L2Column />
           </Grid>

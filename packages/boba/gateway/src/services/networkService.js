@@ -90,8 +90,7 @@ class NetworkService {
 
   constructor() {
 
-    this.account = null // the user's account
-    
+    this.account = null    // the user's account
     this.L1Provider = null // L1 Infura
     this.L2Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
@@ -100,8 +99,7 @@ class NetworkService {
 
     // L1 or L2
     this.L1orL2 = null
-    this.masterSystemConfig = null
-
+    this.networkGateway = null
     this.L1ProviderBASE = null
     this.L2ProviderBASE = null
 
@@ -152,18 +150,6 @@ class NetworkService {
 
   }
 
-  async enableBrowserWallet() {
-    console.log('NS: enableBrowserWallet()')
-    try {
-      // connect to the wallet
-      await window.ethereum.request({method: 'eth_requestAccounts'})
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
-      return true
-    } catch (error) {
-      return false
-    }
-  }
-
   bindProviderListeners() {
     window.ethereum.on('accountsChanged', () => {
       window.location.reload()
@@ -177,7 +163,7 @@ class NetworkService {
 
   async fetchVerifierStatus() {
     const response = await verifierWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
 
     console.log("Verifier response: ", response)
@@ -194,10 +180,10 @@ class NetworkService {
   async fetchAirdropStatusL1() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l1.airdrop', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
@@ -218,10 +204,10 @@ class NetworkService {
   async fetchAirdropStatusL2() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.airdrop', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
@@ -243,7 +229,7 @@ class NetworkService {
     console.log("getAirdropL1(callData)",callData.merkleProof)
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const airdropContract = new ethers.Contract(
       allAddresses.BobaAirdropL1,
@@ -269,7 +255,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l1.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('initiate.l1.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -322,7 +308,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l1.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.l1.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -374,7 +360,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l2.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.l2.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -429,17 +415,17 @@ class NetworkService {
      return allAddresses
   }
 
-async initializeBase( masterSystemConfig ) {
+async initializeBase( networkGateway ) {
 
-    console.log('NS: initializeBase() for', masterSystemConfig)
+    console.log('NS: initializeBase() for', networkGateway)
 
     let addresses = null
-    this.masterSystemConfig = masterSystemConfig // e.g. mainnet | rinkeby | ...
+    this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...
     
     // defines the set of possible networks along with chainId for L1 and L2
     const nw = getNetwork()
-    const L1rpc = nw[masterSystemConfig]['L1']['rpcUrl']
-    const L2rpc = nw[masterSystemConfig]['L2']['rpcUrl']
+    const L1rpc = nw[networkGateway]['L1']['rpcUrl']
+    const L2rpc = nw[networkGateway]['L2']['rpcUrl']
 
     try {
 
@@ -454,31 +440,31 @@ async initializeBase( masterSystemConfig ) {
       this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
       this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
 
-      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
-        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
-        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
+      if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
+        this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
       }
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L1']['rpcUrl']
+        nw[networkGateway]['L1']['rpcUrl']
       )
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L2']['rpcUrl']
+        nw[networkGateway]['L2']['rpcUrl']
       )
 
-      if (masterSystemConfig === 'rinkeby') {
+      if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
         console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'mainnet') {
+      } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
         console.log('Mainnet Addresses:', addresses)
       } 
-      // else if (masterSystemConfig === 'local') {
+      // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
       //     console.log('Rinkeby Addresses:', addresses)
       // }
 
-      // this.AddressManagerAddress = nw[masterSystemConfig].addressManager
+      // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
 
       // this.AddressManager = new ethers.Contract(
@@ -548,7 +534,7 @@ async initializeBase( masterSystemConfig ) {
                             ]
 
       //not all tokens are on Rinkeby
-      if ( masterSystemConfig === 'rinkeby') {
+      if ( networkGateway === 'rinkeby') {
         supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
                              'REP', 'BAT',  'ZRX', 'SUSHI',
                             'LINK', 'UNI', 'BOBA', 'xBOBA', 
@@ -716,337 +702,84 @@ async initializeBase( masterSystemConfig ) {
     }
   }
 
-  async initializeAccounts( masterSystemConfig ) {
+  async initializeAccount( networkGateway ) {
 
-    console.log('NS: initializeAccounts() for', masterSystemConfig)
-
-    let addresses = null
+    console.log('NS: initializeAccounts() for', networkGateway)
 
     try {
 
-      //at this point, the wallet should be connected
+      // connect to the wallet
+      await window.ethereum.request({method: 'eth_requestAccounts'})
+      this.provider = new ethers.providers.Web3Provider(window.ethereum)
+      
       this.account = await this.provider.getSigner().getAddress()
-      console.log('this.account', this.account)
 
-      const network = await this.provider.getNetwork()
+      const networkMM = await this.provider.getNetwork()
+      this.chainID = networkMM.chainId
+      this.networkName = networkMM.name
 
-      this.chainID = network.chainId
-      this.networkName = network.name
+      this.networkGateway = networkGateway
 
-      this.masterSystemConfig = masterSystemConfig
-
-      console.log('NS: network:', network)
-      console.log('NS: masterConfig:', this.masterSystemConfig)
-      console.log('NS: this.chainID:', this.chainID)
-      console.log('NS: this.networkName:', this.networkName)
+      console.log('NS: networkMM:', networkMM)
+      console.log('NS: networkGateway:', networkGateway)
+      console.log('NS: this.chainID from MM:', this.chainID)
+      console.log('NS: this.networkName from MM:', this.networkName)
+      console.log('NS: this.account from MM:', this.account)
 
       // defines the set of possible networks along with chainId for L1 and L2
       const nw = getNetwork()
-      const L1ChainId = nw[masterSystemConfig]['L1']['chainId']
-      const L2ChainId = nw[masterSystemConfig]['L2']['chainId']
+      const L1ChainId = nw[networkGateway]['L1']['chainId']
+      const L2ChainId = nw[networkGateway]['L2']['chainId']
 
       // there are numerous possible chains we could be on
       // either local, rinkeby etc
       // also, either L1 or L2
 
-      //at this point, we only know whether we want to be on local or rinkeby etc
-      if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
+      // at this point, we only know whether we want to be on local or rinkeby etc
+      if (networkGateway === 'local' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //local deployment, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'local' && network.chainId === L1ChainId) {
+      } else if (networkGateway === 'local' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L1ChainId) {
+      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L2ChainId) {
+      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L1ChainId) {
+      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L2ChainId) {
+      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === L1ChainId) {
+      } else if (networkGateway === 'mainnet' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === L2ChainId) {
+      } else if (networkGateway === 'mainnet' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
       } else {
-        console.log("ERROR: masterSystemConfig does not match actual network.chainId")
+        console.log("ERROR: networkGateway does not match actual network.chainId")
         this.bindProviderListeners()
         return 'wrongnetwork'
       }
 
-      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
-        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
-        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
-      }
-
-      this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L1']['rpcUrl']
-      )
-      this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L2']['rpcUrl']
-      )
-
-      if (masterSystemConfig === 'rinkeby') {
-        addresses = addresses_Rinkeby
-        console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'mainnet') {
-        addresses = addresses_Mainnet
-        console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'local') {
-          //addresses = addresses_Local
-          console.log('Rinkeby Addresses:', addresses)
-      }
-
-      this.AddressManagerAddress = nw[masterSystemConfig].addressManager
-      console.log("AddressManager address:",this.AddressManagerAddress)
-
-      this.AddressManager = new ethers.Contract(
-        this.AddressManagerAddress,
-        AddressManagerJson.abi,
-        this.L1Provider
-      )
-      //console.log("AddressManager Contract:",this.AddressManager)
-
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
-      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
-      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
-
-      //L2CrossDomainMessenger is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2MessengerAddress': L2MessengerAddress,
-      }
-
-      //L2StandardBridgeAddress is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2StandardBridgeAddress': L2StandardBridgeAddress,
-      }
-
-      //L2MessengerAddress is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2MessengerAddress': L2MessengerAddress
-      }
-
-      //L2_ETH_Address is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2_ETH_Address': L2_ETH_Address
-      }
-
-      //L1_ETH_Address is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L1_ETH_Address': L1_ETH_Address
-      }
-
-      this.L1StandardBridgeContract = new ethers.Contract(
-        allAddresses.L1StandardBridgeAddress,
-        L1StandardBridgeJson.abi,
-        this.provider.getSigner()
-      )
-      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
-
-      let supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
-                               'REP',  'BAT',  'ZRX', 'SUSHI',
-                              'LINK',  'UNI', 'BOBA', 'xBOBA', 
-                               'OMG', 'FRAX',  'FXS',  'DODO', 
-                               'UST', 'BUSD',  'BNB',   'FTM',  
-                             'MATIC',  'UMA',  'DOM'
-                            ]
-
-      //not all tokens are on Rinkeby
-      if ( masterSystemConfig === 'rinkeby') {
-        supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
-                             'REP', 'BAT',  'ZRX', 'SUSHI',
-                            'LINK', 'UNI', 'BOBA', 'xBOBA', 
-                             'OMG', 'DOM'
-                          ]
-      }
-
-      await Promise.all(supportedTokens.map(async (key) => {
-
-        const L2a = addresses['TK_L2'+key]
-
-        if(key === 'xBOBA') {
-          if (L2a === ERROR_ADDRESS) {
-            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-            return false
-          } else {
-            allTokens[key] = {
-              'L1': 'xBOBA',
-              'L2': L2a
-            }
-          }
-        } else {
-          const L1a = addresses['TK_L1'+key]
-          if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
-            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-            return false
-          } else {
-            allTokens[key] = {
-              'L1': L1a,
-              'L2': L2a
-            }
-          }
-        }
-
-      }))
-
-      console.log("tokens:",allTokens)
-      this.tokenAddresses = allTokens
-
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
-
-      if(allAddresses.L2StandardBridgeAddress !== null) {
-        this.L2StandardBridgeContract = new ethers.Contract(
-          allAddresses.L2StandardBridgeAddress,
-          L2StandardBridgeJson.abi,
-          this.provider.getSigner()
-        )
-      }
-      console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
-
-      this.L2_ETH_Contract = new ethers.Contract(
-        allAddresses.L2_ETH_Address,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
-      //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
-
-      /*The test token*/
-      this.L1_TEST_Contract = new ethers.Contract(
-        allTokens.BOBA.L1, //this will get changed anyway when the contract is used
-        L1ERC20Json.abi,
-        this.provider.getSigner()
-      )
-      //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
-
-      this.L2_TEST_Contract = new ethers.Contract(
-        allTokens.BOBA.L2, //this will get changed anyway when the contract is used
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
-      //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
-
-      /*The OMG token*/
-      //We need this seperately because OMG is not ERC20 compliant
-      this.L1_OMG_Contract = new ethers.Contract(
-        allTokens.OMG.L1,
-        OMGJson,
-        this.provider.getSigner()
-      )
-      //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
-
-      // Liquidity pools
-      console.log('Setting up contract for L1LP at:',allAddresses.L1LPAddress)
-      this.L1LPContract = new ethers.Contract(
-        allAddresses.L1LPAddress,
-        L1LPJson.abi,
-        this.provider.getSigner()
-      )
-
-      console.log('Setting up contract for L2LP at:',allAddresses.L2LPAddress)
-      this.L2LPContract = new ethers.Contract(
-        allAddresses.L2LPAddress,
-        L2LPJson.abi,
-        this.provider.getSigner()
-      )
-
-      this.watcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1MessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
-
-      this.fastWatcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1FastMessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
-
-      console.log('Setting up BOBA for the DAO:', allTokens.BOBA.L2)
-
-      this.BobaContract = new ethers.Contract(
-        allTokens.BOBA.L2,
-        Boba.abi,
-        this.provider.getSigner()
-      )
-
-      this.xBobaContract = new ethers.Contract(
-        allTokens.xBOBA.L2,
-        Boba.abi,
-        this.provider.getSigner()
-      )
-
-      //DAO related
-      if( this.L1orL2 === 'L2' ) {
-
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
-
-        this.delegateContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegate,
-          GovernorBravoDelegate.abi,
-          this.provider.getSigner()
-        )
-
-        this.delegatorContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegator,
-          GovernorBravoDelegator.abi,
-          this.provider.getSigner()
-        )
-      }
-
-      // Gas oracle
-      this.gasOracleContract = new ethers.Contract(
-        L2GasOracle,
-        OVM_GasPriceOracleJson.abi,
-        this.L2Provider
-      )
-
       this.bindProviderListeners()
-
-      return 'enabled'
+      
+      return this.L1orL2 // return the layer we are actually on
       
     } catch (error) {
-      console.log(`NS: ERROR :InitializeAccounts `,error)
+      console.log(`NS: ERROR: InitializeAccount `,error)
       return false
     }
   }
@@ -1084,24 +817,24 @@ async initializeBase( masterSystemConfig ) {
   async correctChain( targetLayer ) {
 
     const nw = getNetwork()
-    const masterConfig = store.getState().setup.masterConfig
+    const network = store.getState().setup.network
 
     let blockExplorerUrls = null
 
     //local does not have a blockexplorer
-    if( masterConfig !== 'local') {
-      blockExplorerUrls = [nw[masterConfig].L2.blockExplorer.slice(0, -1)]
+    if( network !== 'local') {
+      blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
     }
 
     //the chainParams are only needed for the L2's
     const chainParam = {
-      chainId: '0x' + nw[masterConfig].L2.chainId.toString(16),
-      chainName: nw[masterConfig].L2.name,
-      rpcUrls: [nw[masterConfig].L2.rpcUrl],
+      chainId: '0x' + nw[network].L2.chainId.toString(16),
+      chainName: nw[network].L2.name,
+      rpcUrls: [nw[network].L2.rpcUrl],
       blockExplorerUrls
     }
 
-    const targetIDHex = nw[masterConfig][targetLayer].chainIdHex
+    const targetIDHex = nw[network][targetLayer].chainIdHex
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
@@ -1122,20 +855,14 @@ async initializeBase( masterSystemConfig ) {
   }
 
   async switchChain( layer ) {
-
-    if(this.L1orL2 === layer) {
-      console.log("Nothing to do - You are already on ",layer)
-      return
-    }
-
     this.correctChain( layer )
-
   }
 
   async getTransactions() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
+    if (this.account === null) return
 
     console.log("Getting transactions...")
 
@@ -1144,7 +871,7 @@ async initializeBase( masterSystemConfig ) {
     let txL2 = []
 
     const responseL1 = await etherScanInstance(
-      this.masterSystemConfig,
+      this.networkGateway,
       'L1'
     ).get(`&address=${this.account}`)
 
@@ -1164,7 +891,7 @@ async initializeBase( masterSystemConfig ) {
     //console.log("responseL1",txL1)
 
     const responseL2 = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
@@ -1179,7 +906,7 @@ async initializeBase( masterSystemConfig ) {
     }
 
     const responseL1pending = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l1.transactions', {
       address: this.account,
       fromRange:  0,
@@ -1210,10 +937,10 @@ async initializeBase( masterSystemConfig ) {
     console.log("getExits()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
@@ -1235,10 +962,10 @@ async initializeBase( masterSystemConfig ) {
     console.log("getSevens()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -1258,10 +985,10 @@ async initializeBase( masterSystemConfig ) {
     console.log("getFastExits()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -1316,7 +1043,7 @@ async initializeBase( masterSystemConfig ) {
     // Add the token to our master list, if we do not have it yet
     // if the token is already in the list, then this function does nothing
     // but if a new token shows up, then it will get added
-    if(allTokens === null) return
+    if (allTokens === null) return
 
     Object.keys(allTokens).forEach((token, i) => {
       getToken(allTokens[token].L1)
@@ -1375,37 +1102,42 @@ async initializeBase( masterSystemConfig ) {
 
   async getBalances() {
 
+    const layer1Balances = [
+      {
+        address: allAddresses.L1_ETH_Address,
+        addressL2: allAddresses.L2_ETH_Address,
+        currency: allAddresses.L1_ETH_Address,
+        symbol: 'ETH',
+        decimals: 18,
+        balance: new BN(0),
+      },
+    ]
+
+    const layer2Balances = [
+      {
+        address: allAddresses.L2_ETH_Address,
+        addressL1: allAddresses.L1_ETH_Address,
+        addressL2: allAddresses.L2_ETH_Address,
+        currency: allAddresses.L1_ETH_Address,
+        symbol: 'ETH',
+        decimals: 18,
+        balance: new BN(0),
+      },
+    ]
+
     try {
 
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
       const layer2Balance = await this.L2Provider.getBalance(this.account)
 
-      const layer1Balances = [
-        {
-          address: allAddresses.L1_ETH_Address,
-          addressL2: allAddresses.L2_ETH_Address,
-          currency: allAddresses.L1_ETH_Address,
-          symbol: 'ETH',
-          decimals: 18,
-          balance: new BN(layer1Balance.toString()),
-        },
-      ]
-
-      const layer2Balances = [
-        {
-          address: allAddresses.L2_ETH_Address,
-          addressL1: allAddresses.L1_ETH_Address,
-          addressL2: allAddresses.L2_ETH_Address,
-          currency: allAddresses.L1_ETH_Address,
-          symbol: 'ETH',
-          decimals: 18,
-          balance: new BN(layer2Balance.toString()),
-        },
-      ]
+      layer1Balances[0].balance = new BN(layer1Balance.toString())
+      layer2Balances[0].balance = new BN(layer2Balance.toString())
 
       const state = store.getState()
       const tA = Object.values(state.tokenList)
+
+      console.log("NS: getBalances tokens - tA:",tA)
 
       const tokenC = new ethers.Contract(
         allAddresses.L1_ETH_Address,
@@ -1431,7 +1163,7 @@ async initializeBase( masterSystemConfig ) {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        if(token.symbolL1 === 'xBOBA') {
+        if (token.symbolL1 === 'xBOBA') {
           //there is no L1 xBOBA
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         } else {
@@ -1441,6 +1173,7 @@ async initializeBase( masterSystemConfig ) {
       })
 
       const tokenBalances = await Promise.all(getBalancePromise)
+      console.log("lookup tokenBalances", tokenBalances)
 
       tokenBalances.forEach((token) => {
         if (token.layer === 'L1' && token.symbol !== 'xBOBA' && token.balance.gt(new BN(0)) ) {
@@ -1455,9 +1188,10 @@ async initializeBase( masterSystemConfig ) {
         layer2: orderBy(layer2Balances, (i) => i.currency),
       }
     } catch (error) {
-      console.log("NS: getBalances error:",error)
+      console.log("NS: getBalances error:", error)
       return error
     }
+
   }
 
   handleMetaMaskError = (errorCode) => {
@@ -1528,7 +1262,7 @@ async initializeBase( masterSystemConfig ) {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -1901,7 +1635,7 @@ async initializeBase( masterSystemConfig ) {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -2451,7 +2185,7 @@ async initializeBase( masterSystemConfig ) {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2466,7 +2200,7 @@ async initializeBase( masterSystemConfig ) {
   async L1LPPending(tokenAddress) {
 
     const L1pending = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits', {})
 
     const pendingFast = L1pending.data.filter(i => {
@@ -2845,7 +2579,7 @@ async initializeBase( masterSystemConfig ) {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2933,7 +2667,7 @@ async initializeBase( masterSystemConfig ) {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2960,8 +2694,8 @@ async initializeBase( masterSystemConfig ) {
   // get DAO Balance
   async getDaoBalance() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
@@ -2979,8 +2713,8 @@ async initializeBase( masterSystemConfig ) {
 
   async getDaoBalanceX() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.xBobaContract === null ) return
@@ -2999,8 +2733,8 @@ async initializeBase( masterSystemConfig ) {
   // get DAO Votes
   async getDaoVotes() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.BobaContract === null ) return
@@ -3017,8 +2751,8 @@ async initializeBase( masterSystemConfig ) {
     // get DAO Votes
   async getDaoVotesX() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.xBobaContract === null ) return
@@ -3083,8 +2817,8 @@ async initializeBase( masterSystemConfig ) {
   // Proposal Create Threshold
   async getProposalThreshold() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
@@ -3104,8 +2838,8 @@ async initializeBase( masterSystemConfig ) {
   //Create Proposal
   async createProposal(payload) {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
@@ -3193,8 +2927,8 @@ async initializeBase( masterSystemConfig ) {
   //Fetch DAO Proposals
   async fetchProposals() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    //if( this.networkGateway === 'mainnet' ) return
+    //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return

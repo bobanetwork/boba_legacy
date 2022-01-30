@@ -2,7 +2,7 @@ export const menuItems = [
   {
     key: 'AccountNow',
     icon: "WalletIcon",
-    title: "Wallet",
+    title: "Bridge",
     url: "/"
   },
   {

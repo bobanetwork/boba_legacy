@@ -15,210 +15,61 @@ limitations under the License. */
 
 import React, { useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import Button from 'components/button/Button'
+import Typography from '@material-ui/core/Typography'
 
-import WrongNetworkModal from 'containers/modals/wrongnetwork/WrongNetworkModal'
 import networkService from 'services/networkService'
+import { isChangingChain } from 'util/changeChain'
 
 import { selectModalState } from 'selectors/uiSelector'
-
-import {
-  selectWalletMethod,
-  selectNetwork,
-} from 'selectors/setupSelector'
+import { selectNetwork, selectAccountEnabled } from 'selectors/setupSelector'
 
 import { openModal } from 'actions/uiAction'
-import { setWalletMethod } from 'actions/setupAction'
-import { getNetwork } from 'util/masterConfig'
+import { setEnableAccount, setLayer } from 'actions/setupAction'
 
-import { isChangingChain } from 'util/changeChain'
-import * as S from "./WalletPicker.styles"
-import { ReactComponent as Fox } from './../../images/icons/fox-icon.svg'
-import { Box, Container, Grid, useMediaQuery } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
-import { styled } from '@material-ui/core/styles'
-import { useTheme } from '@emotion/react'
-import { enableBrowserWallet } from 'actions/networkAction'
-
-import Button from 'components/button/Button'
-
-require('dotenv').config()
-
-const Root = styled('div')(({ theme }) => ({
-  paddingTop: theme.spacing(0.2),
-  paddingBottom: theme.spacing(0.2),
-}))
-
-function WalletPicker({ onEnable, enabled, isButton }) {
+function WalletPicker() {
 
   const dispatch = useDispatch()
 
-  const [ walletEnabled, setWalletEnabled ] = useState(false)
-  const [ accountEnabled, setAccountEnabled ] = useState(false)
-  const [ wrongNetwork, setWrongNetwork ] = useState(false)
+  const network = useSelector(selectNetwork())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
-  const walletMethod = useSelector(selectWalletMethod())
-  const masterConfig = useSelector(selectNetwork())
+  const dispatchBootAccount = useCallback(() => {
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+    console.log("Calling initializeAccount for:", network)
 
-  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'))
-
-  let maintenance = false
-  if (process.env.REACT_APP_STATUS === 'maintenance') {
-    maintenance = true
-  }
-
-  const dispatchSetWalletMethod = useCallback((methodName) => {
-    console.log("dispatchSetWalletMethod:", methodName)
-    dispatch(setWalletMethod(methodName))
-  }, [ dispatch ])
-
-  useEffect(() => {
-
-    if (walletMethod === 'browser') {
-      setupBrowserWallet()
-    }
-
-    async function setupBrowserWallet() {
-      console.log("setupBrowserWallet for:", masterConfig)
-      const selectedNetwork = masterConfig
-      const walletEnabled = await dispatch(enableBrowserWallet(selectedNetwork))
-      return walletEnabled ? setWalletEnabled(true) : dispatchSetWalletMethod(null)
-    }
-
-  }, [ dispatchSetWalletMethod, walletMethod, masterConfig, dispatch ])
-
-  useEffect(() => {
-
-    if (walletEnabled && accountEnabled === false) {
-      initializeAccount()
-    }
+    if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
+      const initialized = await networkService.initializeAccount(network)
 
-      console.log("Calling initializeAccount for:", masterConfig)
-
-      const initialized = await networkService.initializeAccounts(masterConfig)
-
-      if (!initialized) {
-        console.log("Error !initialized for:", masterConfig, accountEnabled)
-        return setAccountEnabled(false)
+      if (initialized === false) {
+        console.log("WP: Account NOT enabled for", network, accountEnabled)
+        dispatch(setEnableAccount(false))
+        return false
       }
 
-      if (initialized === 'wrongnetwork') {
-        setAccountEnabled(false)
-        return setWrongNetwork(true)
+      if (initialized === 'L1' || initialized === 'L2') {
+        console.log("NS: Acconut IS enabled for", initialized)
+        dispatch(setLayer(initialized))
+        dispatch(setEnableAccount(true))
+        return true
       }
-
-      if (initialized === 'enabled') {
-        console.log("NS: ACCOUNT IS ENABLED")
-        onEnable(true) //this information flows to home and then to all the views
-        return setAccountEnabled(true)
-      }
-
     }
 
-  }, [ onEnable, walletEnabled, masterConfig, accountEnabled ])
-
-  useEffect(() => {
-    if (walletEnabled && wrongNetwork) {
-      dispatch(openModal('wrongNetworkModal'))
-      localStorage.setItem('changeChain', false)
-    }
-  }, [ dispatch, walletEnabled, wrongNetwork ])
-
-  function resetSelection() {
-    dispatchSetWalletMethod(null)
-    setWalletEnabled(false)
-    setAccountEnabled(false)
-  }
-
-  // defines the set of possible networks
-  const networks = getNetwork()
-
-  let allNetworks = []
-  for (var prop in networks) allNetworks.push(prop)
-
-  if (!wrongNetwork && !enabled && isChangingChain) {
-    console.log(['wrongNetwork',wrongNetwork ],[' enabled', enabled],[' isChangingChain', isChangingChain])
-    return <Root>
-      <Typography>Switching Chain...</Typography>
-    </Root>
-  }
+  }, [ dispatch, accountEnabled ])
 
   return (
-    <>
-      <WrongNetworkModal
-        open={wrongNetworkModalState}
-        onClose={resetSelection}
-      />
-      <Root>
-        {isButton ? <>
-          <Button
-            type="primary"
-            variant="contained"
-            onClick={() => dispatchSetWalletMethod('browser')}
-          >
-            Connect To Metamask
-          </Button>
-        </> : <> {!maintenance &&
-          <Container maxWidth="md">
-            <Grid container spacing={8}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h1" component="h1">
-                  Connect a Wallet to access BOBA
-                </Typography>
-                <S.Subtitle variant="body1" component="p" paragraph={true}>
-                  Select a wallet to connect to BOBA
-                </S.Subtitle>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <S.WalletCard
-                  pulsate={true} onClick={() => dispatchSetWalletMethod('browser')} isMobile={isMobile}>
-                  <S.WalletCardHeading>
-                    <S.WalletCardTitle>
-                      <S.PlusIcon>+</S.PlusIcon>
-                      <Typography variant="h2" component="h2" paragraph={true} mb={0}>
-                        Metamask
-                      </Typography>
-                    </S.WalletCardTitle>
-                    <Typography variant="body1" component="p" gutterBottom paragraph={true} mb={0}>
-                      Connect using <strong>browser </strong>wallet
-                    </Typography>
-                  </S.WalletCardHeading>
-
-                  <S.WalletCardDescription>
-                    <Fox width={isMobile ? 100 : 50} />
-                  </S.WalletCardDescription>
-                </S.WalletCard>
-              </Grid>
-            </Grid>
-          </Container>
-        }
-          {!!maintenance &&
-            <Container maxWidth="md">
-              <Grid container spacing={1}>
-                <Grid item xs={12} md={12}>
-                  <Typography variant="h1" component="h1">
-                    SCHEDULED BOBA GATEWAY DOWNTIME
-                  </Typography>
-                  <S.Subtitle variant="body1" component="p" paragraph={true}>
-                    As announced in Twitter and in Telegram, due to unexpectely high demand for the
-                    Boba L2, BOBA liquidity pools are being rebalanced.
-                  </S.Subtitle>
-                  <S.Subtitle variant="body1" component="p" paragraph={true}>
-                    The scheduled maintenance window is from Nov. 4 21:00 UTC to approximately 23:00 UTC.
-                    Upgrade status and progress reports will be provided via Twitter and Telegram.
-                  </S.Subtitle>
-                </Grid>
-              </Grid>
-            </Container>
-          }</>}
-
-      </Root>
-    </>
-  );
+      <Button
+        type="primary"
+        variant="contained"
+        size='small'
+        disabled={accountEnabled}
+        onClick={() => dispatchBootAccount()}
+      >
+        Connect To Metamask
+      </Button>
+  )
 }
+
 export default React.memo(WalletPicker)

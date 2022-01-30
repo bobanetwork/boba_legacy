@@ -44,31 +44,7 @@ function DAO() {
     const balanceX = useSelector(selectDaoBalanceX)
     const votes = useSelector(selectDaoVotes)
     const votesX = useSelector(selectDaoVotesX)
-    
     let layer = useSelector(selectLayer())
-
-    if (networkService.L1orL2 !== layer) {
-        //networkService.L1orL2 is always right...
-        layer = networkService.L1orL2
-    }
-
-    if(layer === 'L1') {
-        return <div className={styles.container}>
-            <PageHeader title="DAO" />
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                >
-                  You are on Ethereum Mainnet. To use the Boba DAO, SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </S.LayerAlert>
-        </div>
-    }
 
     return (
         <>
@@ -76,6 +52,33 @@ function DAO() {
 
             <div className={styles.container}>
 
+            {layer === 'L1' &&
+                <S.LayerAlert>
+                  <S.AlertInfo>
+                    <AlertIcon />
+                    <S.AlertText
+                      variant="body2"
+                      component="p"
+                    >
+                      You are on Mainnet. To vote and propose in the Boba DAO, SWITCH to Boba
+                    </S.AlertText>
+                  </S.AlertInfo>
+                  <LayerSwitcher isButton={true} />
+                </S.LayerAlert>
+            }
+            {!layer &&
+                <S.LayerAlert>
+                  <S.AlertInfo>
+                    <AlertIcon />
+                    <S.AlertText
+                      variant="body2"
+                      component="p"
+                    >
+                      You have not connected your wallet. To vote and propose in the Boba DAO, connect to MetaMask
+                    </S.AlertText>
+                  </S.AlertInfo>
+                </S.LayerAlert>
+            }
                 <div className={styles.content}>
                         <div className={styles.transferContainer}
                             style={{background: theme.palette.background.secondary }}

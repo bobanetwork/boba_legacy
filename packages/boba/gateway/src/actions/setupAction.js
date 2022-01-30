@@ -13,40 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import store from 'store';
+import store from 'store'
 
-export function setWalletMethod (methodName) {
+export function setEnableAccount(enabled) {
+  console.log("setEnableAccount:", enabled)
   return function (dispatch) {
-    console.log("setWalletMethod:", methodName)
-    return dispatch({ type: 'SETUP/WALLET_METHOD/SET', payload: methodName })
+    return dispatch({ type: 'SETUP/ACCOUNT/SET', payload: enabled })
   }
 }
 
-export function setAccountState (enabled) {
-  return function (dispatch) {
-    return dispatch({ type: 'SETUP/ACCOUNT_STATE/SET', payload: enabled })
-  }
-}
-
-export function setBaseState (enabled) {
+export function setBaseState(enabled) {
   console.log("setBaseState:", enabled)
   return function (dispatch) {
     return dispatch({ type: 'SETUP/BASE/SET', payload: enabled })
   }
 }
 
-export function setNetwork (network) {
+export function setNetwork(network) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/NETWORK/SET', payload: network })
   }
 }
 
-export function setLayer (layer) {
+export function setLayer(layer) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/LAYER/SET', payload: layer })
   }
 }
 
-export function setMinter (minter) {
-  store.dispatch({type: 'SETUP/NFT/MINTER',payload: minter})
+export function setAccountNumber(account) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/ACCOUNT_NUMBER/SET', payload: account })
+  }
 }

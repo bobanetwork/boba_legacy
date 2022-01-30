@@ -13,40 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-//localStorage.removeItem("masterConfig")
-//localStorage.removeItem("netLayer")
-
 require('dotenv').config()
 
-let netLayerCache = localStorage.getItem("netLayer")
-
-if (netLayerCache) {
-  netLayerCache = JSON.parse(netLayerCache)
-}
-
 const initialState = {
-  walletMethod: null,
-  walletLoading: false,
-  accountEnabled: false,
-  baseEnabled: false,
-  masterConfig: process.env.REACT_APP_CHAIN,
-  blockexplorerURL: '',
-  etherscan: '',
-  minter: false,
-  netLayer: netLayerCache ? netLayerCache : 'L1'
+  accountEnabled: null,
+  baseEnabled: null,
+  netLayer: null,
+  accountNumber: null,
+  network: process.env.REACT_APP_CHAIN,
 }
 
 function setupReducer (state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/WALLET_METHOD/SET':
-      return { 
-        ...state, 
-        walletMethod: action.payload,
-      }
-    case 'SETUP/ACCOUNT_STATE':
+    case 'SETUP/ACCOUNT/SET':
       return { 
         ...state, 
         accountEnabled: action.payload,
+      }
+    case 'SETUP/ACCOUNT_NUMBER/SET':
+      return { 
+        ...state, 
+        accountNumber: action.payload,
       }
     case 'SETUP/BASE/SET':
       return { 
@@ -54,15 +41,14 @@ function setupReducer (state = initialState, action) {
         baseEnabled: action.payload,
       }
     case 'SETUP/LAYER/SET':
-      localStorage.setItem("netLayer", JSON.stringify(action.payload))
       return { 
         ...state, 
         netLayer: action.payload
       }
-    case 'SETUP/NFT/MINTER':
+    case 'SETUP/NETWORK/SET':
       return { 
         ...state, 
-        minter: action.payload
+        network: action.payload
       }
     default:
       return state
