@@ -1610,6 +1610,7 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 // SubmitTransaction is a helper function that submits tx to txPool and logs a message.
 func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (common.Hash, error) {
 	if err := b.SendTx(ctx, tx); err != nil {
+        	log.Debug("MMDBG SubmitTransaction got", "err", err)
 		return common.Hash{}, err
 	}
 	if tx.To() == nil {
@@ -1699,7 +1700,8 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	// L1Timestamp and L1BlockNumber will be set right before execution
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
-
+        
+	log.Debug("MMDBG ethapi/api.go will SubmitTransaction")
 	return SubmitTransaction(ctx, s.b, tx)
 }
 

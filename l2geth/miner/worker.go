@@ -469,6 +469,8 @@ func (w *worker) mainLoop() {
 				log.Warn("No transaction sent to miner from syncservice")
 				continue
 			}
+                        log.Debug("MMDBG rollupCh", "ev.Txs", ev.Txs)
+                        
 			tx := ev.Txs[0]
 			log.Debug("Attempting to commit rollup transaction", "hash", tx.Hash().Hex())
 			// Build the block with the tx and add it to the chain. This will
@@ -533,6 +535,7 @@ func (w *worker) mainLoop() {
 				}
 				txset := types.NewTransactionsByPriceAndNonce(w.current.signer, txs)
 				tcount := w.current.tcount
+                                log.Debug("MMDBG cTxs 1")
 				w.commitTransactions(txset, coinbase, nil)
 				// Only update the snapshot if any new transactons were added
 				// to the pending block
@@ -762,7 +765,8 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	snap := w.current.state.Snapshot()
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
-	if err != nil {
+	log.Debug("MMDBG ApplyTransaction got result", "err", err)
+        if err != nil {
 		w.current.state.RevertToSnapshot(snap)
 		return nil, err
 	}
@@ -772,10 +776,10 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	return receipt.Logs, nil
 }
 
-func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) bool {
+func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) int {
 	// Short circuit if current is nil
 	if w.current == nil {
-		return true
+		return 1
 	}
 
 	if w.current.gasPool == nil {
@@ -803,7 +807,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 					inc:   true,
 				}
 			}
-			return w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead
+			if w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead {
+                        	return 1
+                        } else {
+                        	return 0
+                        }
 		}
 		// If we don't have enough gas for any further transactions then we're done
 		if w.current.gasPool.Gas() < params.TxGas {
@@ -833,6 +841,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		w.current.state.Prepare(tx.Hash(), common.Hash{}, w.current.tcount)
 
 		logs, err := w.commitTransaction(tx, coinbase)
+                log.Debug("MMDBG w.commit", "err", err)
 		switch err {
 		case core.ErrGasLimitReached:
 			// Pop the current out-of-gas transaction without shifting in the next from the account
@@ -854,6 +863,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			coalescedLogs = append(coalescedLogs, logs...)
 			w.current.tcount++
 			txs.Shift()
+                        
+                case core.ErrTuringRetry:
+                	log.Error("MMDBG Skipping unhandled ErrTuringRetry")
+                        txs.Shift()
+                        return 2
 
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
@@ -883,7 +897,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 	if interrupt != nil {
 		w.resubmitAdjustCh <- &intervalAdjust{inc: false}
 	}
-	return w.current.tcount == 0
+        if w.current.tcount == 0 {
+        	return 1
+        } else {
+        	return 0
+        }
 }
 
 // commitNewTx is an OVM addition that mines a block with a single tx in it.
@@ -945,9 +963,15 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	acc, _ := types.Sender(w.current.signer, tx)
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
-	if w.commitTransactions(txs, w.coinbase, nil) {
+
+        log.Debug("MMDBG cTxs 2") // This is the one we hit
+	wCt := w.commitTransactions(txs, w.coinbase, nil)
+        if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
-	}
+	} else if wCt == 2 {
+        	log.Debug("MMDBG wCt==2, returning success")
+                return nil
+        }
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
 
@@ -1049,13 +1073,16 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 	}
 	if len(localTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, localTxs)
-		if w.commitTransactions(txs, w.coinbase, interrupt) {
+	        log.Debug("MMDBG cTxs 3")
+
+		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
 		}
 	}
 	if len(remoteTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, remoteTxs)
-		if w.commitTransactions(txs, w.coinbase, interrupt) {
+	        log.Debug("MMDBG cTxs 4")
+		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
 		}
 	}

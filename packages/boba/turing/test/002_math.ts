@@ -70,7 +70,7 @@ describe("Basic Math", function () {
 
           // Optional mechanism to intentionally delay the off-chain response
           // long enough to investigate blocking/timeout issues in l2geth
-          const ms_delay = 3000
+          const ms_delay = 1000
           if (ms_delay > 0) {
             console.log("      (HTTP) Delaying response for:", ms_delay, "ms")
             await new Promise(resolve => setTimeout(resolve, ms_delay));
@@ -210,7 +210,7 @@ describe("Basic Math", function () {
   it("should support floating point volume of sphere", async () => {
     // This pre-populates the result cache, so that the real transaction can
     // complete without needing to block the sequencer thread.
-    await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
+    //await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
 
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()

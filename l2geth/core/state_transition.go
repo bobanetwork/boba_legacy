@@ -266,7 +266,14 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		// Increment the nonce for the next transaction
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
 		ret, st.gas, vmerr = evm.Call(sender, st.to(), st.data, st.gas, st.value)
+                log.Debug("MMDBG evm.Call", "vmerr", vmerr, "ret", hexutil.Bytes(ret))
 	}
+        
+        if vmerr == vm.ErrTuringWouldBlock {
+		// Roll back the nonce (FIXME - also ensure that all gas accounting etc. has been rolled back)
+		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())-1)
+        	return nil, 0, true, vmerr
+        }
 
 	if vmerr != nil {
 		log.Debug("VM returned with error", "err", vmerr, "ret", hexutil.Encode(ret))

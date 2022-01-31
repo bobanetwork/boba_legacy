@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rollup/fees"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning
@@ -108,6 +109,17 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+        
+        if err == vm.ErrTuringWouldBlock {
+	        log.Debug("MMDBG ApplyMessage returned", "failed", failed, "err", err)
+                log.Debug("MMDBG We have", "msg", msg, "tx", tx)
+                msg.GasPrice().SetUint64(0)
+                
+                _, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+                log.Debug("MMDBG ApplyMessage 2nd time", "gas", gas, "failed", failed, "err", err)
+                
+        	return nil, ErrTuringRetry	// this is in "core", not "core/vm"
+        }
 	// TURING Update the tx metadata, if a Turing call took place...
 	if len(vmenv.Context.Turing) > 1 {
 		tx.SetL1Turing(vmenv.Context.Turing)
