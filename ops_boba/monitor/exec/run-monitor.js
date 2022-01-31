@@ -5,7 +5,6 @@ const util = require('util')
 const configs = require('../services/utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const { logger } = require('../services/utilities/logger')
-const ResponseTimeService = require("../services/responseTime.service");
 
 const loop = async (func) => {
   while (true) {
@@ -45,8 +44,7 @@ const main = async () => {
   if (validateMonitoring()) {
     logger.info('Start addresses monitoring service!')
     setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl)
-    // setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
-    return
+    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
   } else {
     logger.error(
       'Addresses Monitoring: Env variables for monitoring is missing!'

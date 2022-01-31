@@ -4,6 +4,7 @@ const mysql = require('mysql')
 const util = require('util')
 
 const OptimismEnv = require('./utilities/optimismEnv')
+const { logger } = require('../services/utilities/logger')
 
 class DatabaseService extends OptimismEnv {
   constructor() {
@@ -197,7 +198,7 @@ class DatabaseService extends OptimismEnv {
       timestamp='${tx.timestamp}'
     `)
     con.end()
-    this.logger.info('L2 Transaction', tx)
+    logger.info('L2 Transaction', tx)
   }
 
   async insertReceiptData(receiptData) {
