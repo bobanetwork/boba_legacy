@@ -163,7 +163,9 @@ class DatabaseService extends OptimismEnv {
 
   async insertTransactionData(transactionData) {
     const ethers = require('ethers')
-    const txFee = ethers.BigNumber.from(transactionData.gasLimit).mul(transactionData.gasPrice)
+    const txFee = ethers.BigNumber.from(transactionData.gasUsed)
+      .mul(transactionData.gasPrice)
+      .div('1000000000')
     const tx = {
       hash: transactionData.hash.toString(),
       blockHash: transactionData.blockHash.toString(),
@@ -172,9 +174,10 @@ class DatabaseService extends OptimismEnv {
       to: transactionData.to || '',
       value: transactionData.value.toString(),
       nonce: transactionData.nonce.toString(),
-      gasLimit: transactionData.gasLimit.toString(),
+      gasLimit: transactionData.gasLimit.toNumber(),
+      gasUsed: transactionData.gasUsed.toNumber(),
       gasPrice: transactionData.gasPrice.toString(),
-      txFee: txFee.toString(),
+      txFee: txFee.toNumber(),
       timestamp: transactionData.timestamp.toString(),
     }
     const con = mysql.createConnection({
