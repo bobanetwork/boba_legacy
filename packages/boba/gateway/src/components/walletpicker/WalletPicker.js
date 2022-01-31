@@ -16,7 +16,11 @@ limitations under the License. */
 import React, { useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Button from 'components/button/Button'
-import Typography from '@material-ui/core/Typography'
+
+import WalletAddress from 'components/walletAddress/WalletAddress'
+
+import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { useTheme } from '@material-ui/core/styles'
 
 import networkService from 'services/networkService'
 import { isChangingChain } from 'util/changeChain'
@@ -34,6 +38,9 @@ function WalletPicker() {
   const network = useSelector(selectNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
   const justSwitchedChain = useSelector(selectJustSwitchedChain())
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -67,6 +74,8 @@ function WalletPicker() {
   }, [justSwitchedChain])
 
   return (
+    <>
+    {accountEnabled !== true &&
       <Button
         type="primary"
         variant="contained"
@@ -76,6 +85,13 @@ function WalletPicker() {
       >
         Connect To Metamask
       </Button>
+    }
+    {accountEnabled &&
+      <Box sx={{display: isMobile ? "none" : "flex"}}>
+        <WalletAddress/>
+      </Box>
+    }
+    </>
   )
 }
 

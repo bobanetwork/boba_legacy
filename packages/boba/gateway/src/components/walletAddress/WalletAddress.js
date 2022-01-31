@@ -18,6 +18,6 @@ const WalletAddress = () => {
       </Box>
     </S.WalletPill>
   )
-};
+}
 
 export default WalletAddress

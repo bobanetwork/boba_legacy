@@ -45,28 +45,23 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
             </Box>
             <Drawer open={open} onClose={() => setOpen(false)} classes={{ paper: classes.root }}>
               <S.StyleDrawer theme={theme}>
-
                 <S.DrawerHeader>
                   <S.WrapperCloseIcon>
                     <Link to="/" style={{ display: "flex" }}>
                       <Logo width={150} />
                     </Link>
-
                     <IconButton size="small" onClick={() => setOpen(false)}>
                       <CloseIcon />
                     </IconButton>
                   </S.WrapperCloseIcon>
-
                   <NetworkSwitcher />
                   <LayerSwitcher />
+                  <WalletPicker />
                 </S.DrawerHeader>
-
                 <MenuItems setOpen={setOpen} />
               </S.StyleDrawer>
             </Drawer>
-
             <WalletAddress />
-
           </S.MobileNavTag>
         </Container>
       ) : (
@@ -88,9 +83,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
             <LayerSwitcher />
           </div>
           <MenuItems setOpen={setOpen} />
-          {/*<GasSwitcher /> */}
-          {/*<ThemeSwitcher />*/}
-          <WalletPicker isButton={true} enabled={enabled} onEnable={onEnable} />
+          <WalletPicker />
         </S.Menu>
       )}
     </>
