@@ -17,7 +17,7 @@ import { useTheme } from '@emotion/react'
 
 import { Typography, useMediaQuery } from '@material-ui/core'
 import { Box } from '@material-ui/system'
-import { depositL1LP, approveERC20 } from 'actions/networkAction'
+import { depositL1LPBatch, approveFastDepositBatch } from 'actions/networkAction'
 import { utils } from 'ethers'
 
 import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
@@ -32,42 +32,24 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector'
 
 import networkService from 'services/networkService'
-import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
-import { getCoinImage } from 'util/coinImage'
 
 import parse from 'html-react-parser'
-import { isEqual } from 'lodash'
-
-import BN from 'bignumber.js'
 
 import {
-  fetchFastDepositCost,
-  fetchL2LPBalance,
-  fetchL2LPPending,
   fetchL2TotalFeeRate,
-  fetchL2FeeRateN,
   fetchL1FeeBalance,
-  fetchL2LPLiquidity,
   fetchUserAndL2LPBalanceBatch,
   fetchFastDepositBatchCost,
  } from 'actions/balanceAction'
 
 import {
   selectlayer1Balance,
-  selectL1ETHBalance,
   selectL2FeeRate,
-  selectL2FeeRateN,
-  selectL2ETHFeeRateN,
-  selectFastDepositCost,
   selectFastDepositBatchCost,
-  selectL2LPBalanceString,
-  selectL2LPPendingString,
   selectL1FeeBalance,
-  selectL2LPLiquidity,
   selectUserAndL2LPBalanceBatch,
 } from 'selectors/balanceSelector'
 
@@ -78,171 +60,63 @@ function InputStepBatch({ handleClose }) {
   const [ payload, setPayload ] = useState([{}])
   const [ tokenList, setTokenList ] = useState([])
 
-  // const [ LPRatio, setLPRatio ] = useState(0)
-
-  // const ETHToken = useSelector(selectL1ETHBalance)
-
   const userBalance = useSelector(selectlayer1Balance)
   const batchInfo = useSelector(selectUserAndL2LPBalanceBatch)
-  // const LPBalance = useSelector(selectL2LPBalanceString)
-  // const LPPending = useSelector(selectL2LPPendingString)
-  // const LPLiquidity = useSelector(selectL2LPLiquidity)
   const feeRate = useSelector(selectL2FeeRate)
-  // const feeRateN = useSelector(selectL2FeeRateN)
-  // const ETHFeeRateN = useSelector(selectL2ETHFeeRateN)
 
-
-  // const cost = useSelector(selectFastDepositCost)
   const batchCost = useSelector(selectFastDepositBatchCost)
-
-  // const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
-
-  // const [ validValue, setValidValue ] = useState(false)
-  // const [ ETHValidValue, setETHValidValue ] = useState(true)
-  // const [ ETHTransactionMessage, setETHTransactionMessage ] = useState(<></>)
+  const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
   const approvalLoading = useSelector(selectLoading(['APPROVE/CREATE']))
 
-  const lookupPrice = useSelector(selectLookupPrice)
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
-  // const allAddresses = networkService.getAllAddresses()
+  // console.log("ETH available for paying fees:",Number(feeBalance))
 
-  // const maxValue = logAmount(token.balance, token.decimals)
-  // const lpUnits = logAmount(LPBalance, token.decimals)
-  // const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
+  async function doDeposit() {
 
-  // function setAmount(value) {
+    console.log(`User input payload: `, payload)
+    let updatedPayload = []
+    for (const tokenInput of payload) {
+      const tokenBalance = userBalance.filter(i => i.symbol === tokenInput.symbol)
+      if (tokenBalance.length === 0) {
+        dispatch(openError('Failed to build appropriate payload'))
+      } else {
+        updatedPayload.push({...tokenInput, ...tokenBalance[0]})
+      }
+    }
 
-  //   const tooSmall = new BN(value).lte(new BN(0.0))
-  //   const tooBig   = new BN(value).gt(new BN(maxValue))
+    console.log(`Updated payload: `, updatedPayload)
 
-  //   // console.log("ETH fees:",Number(cost))
-  //   // console.log("Transaction token value:",Number(value))
-  //   // console.log("ETH available for paying fees:",Number(feeBalance))
-  //   // console.log("LPRatio:",Number(LPRatio))
-  //   // console.log("LPBalance:",Number(balanceSubPending))
+    let res
+    res = await dispatch(
+      approveFastDepositBatch(updatedPayload)
+    )
 
-  //   if (tooSmall || tooBig) {
-  //     setValidValue(false)
-  //     setValue(value)
-  //     return false
-  //   } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
-  //     //insufficient ETH to cover the ETH amount plus gas
-  //     setValidValue(false)
-  //     setValue(value)
-  //     return false
-  //   } else if ((Number(cost) > Number(feeBalance))) {
-  //     //insufficient ETH to pay gas
-  //     setValidValue(false)
-  //     setValue(value)
-  //     return false
-  //   } else if (Number(LPRatio) < 0.1) {
-  //     //not enough balance/liquidity ratio
-  //     //we always want some balance for unstaking
-  //     setValidValue(false)
-  //     setValue(value)
-  //     return false
-  //   } else if (Number(value) > Number(balanceSubPending) * 0.9) {
-  //     //not enough absolute balance
-  //     //we don't want one large bridge to wipe out the entire balance
-  //     //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
-  //     //this is because the every time someone exits, the limit is recalculated
-  //     //via Number(LPBalance) * 0.9, and LPBalance changes over time
-  //     setValidValue(false)
-  //     setValue(value)
-  //     return false
-  //   } else {
-  //     //Whew, finally!
-  //     setValidValue(true)
-  //     setValue(value)
-  //     return true
-  //   }
+    if(res === false) {
+      dispatch(openError('Failed to approve amount or user rejected signature'))
+      handleClose()
+      return
+    }
 
-  // }
+    res = await dispatch(
+      depositL1LPBatch(updatedPayload)
+    )
 
-  // const receivableAmount = (value) => {
-  //   return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
-  // }
-
-  // const receivableETHAmount = (value) => {
-  //   return (Number(ETHValue) * ((100 - Number(ETHFeeRateN)) / 100)).toFixed(3)
-  // }
-
-  // async function doDeposit() {
-
-  //   console.log(`${token.symbol} Amount to bridge to L2: ${value_Wei_String}`)
-  //   console.log(`ETH Amount to bridge to L2: ${ETH_Value_Wei_String}`)
-
-  //   let res
-
-  //   if(token.symbol === 'ETH') {
-
-  //     console.log("ETH Fast Bridge")
-
-  //     res = await dispatch(depositL1LP(token.address, value_Wei_String, ETH_Value_Wei_String))
-
-  //     if (res) {
-  //       dispatch(setActiveHistoryTab('Bridge to L2'))
-  //       dispatch(
-  //         openAlert(
-  //           `ETH was bridged. You will receive approximately
-  //           ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
-  //           ETH on L2`
-  //         )
-  //       )
-  //       handleClose()
-  //       return
-  //     }
-
-  //   }
-
-  //   //at this point we know it's not ETH
-  //   console.log("ERC20 Fast Bridge")
-
-  //   res = await dispatch(
-  //     approveERC20(
-  //       value_Wei_String,
-  //       token.address,
-  //       allAddresses.L1LPAddress
-  //     )
-  //   )
-
-  //   if(res === false) {
-  //     dispatch(openError('Failed to approve amount or user rejected signature'))
-  //     handleClose()
-  //     return
-  //   }
-
-  //   res = await dispatch(
-  //     depositL1LP(token.address, value_Wei_String, ETH_Value_Wei_String)
-  //   )
-
-  //   if (res) {
-  //     dispatch(setActiveHistoryTab('Bridge to L2'))
-  //     dispatch(
-  //       openAlert(
-  //         `${token.symbol} was bridged to the L1LP. You will receive approximately
-  //          ${receivableAmount(value)} ${token.symbol} on L2`
-  //       )
-  //     )
-  //     handleClose()
-  //   }
-
-  // }
-
-  //ok, we are on L1, but the funds will be paid out on l2
-  //goal now is to find out as much as we can about the state of the l2 pools...
-
+    if (res) {
+      dispatch(setActiveHistoryTab('Bridge to L2'))
+      dispatch(
+        openAlert(
+          `Your funds were bridged to the L1LP in batch.`
+        )
+      )
+      handleClose()
+    }
+  }
 
   useEffect(() => {
-      // dispatch(fetchL2LPBalance(token.addressL2))
-      // dispatch(fetchL2LPLiquidity(token.addressL2))
-      // dispatch(fetchL2LPPending(token.addressL1)) //lookup is, confusingly, via L1 token address
       dispatch(fetchL2TotalFeeRate())
-      // dispatch(fetchL2FeeRateN(token.addressL2))
-      // dispatch(fetchFastDepositCost(token.address))
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
       return ()=>{
         dispatch({type: 'BALANCE/L2/RESET'})
@@ -253,7 +127,7 @@ function InputStepBatch({ handleClose }) {
     console.log(`Found new token: ${tokenList}`)
     dispatch(fetchUserAndL2LPBalanceBatch(tokenList))
     dispatch(fetchFastDepositBatchCost(tokenList))
-  }, [ tokenList ])
+  }, [ tokenList, dispatch ])
 
 
   useEffect(() => {
@@ -299,47 +173,81 @@ function InputStepBatch({ handleClose }) {
 
   let ETHstring = ''
   let warning = false
+  let validInput = true
 
-  // if(cost && Number(cost) > 0) {
-  //   if (token.symbol !== 'ETH') {
-  //     if(Number(cost) > Number(feeBalance)) {
-  //       warning = true
-  //       ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-  //       <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
-  //       <br/>THIS TRANSACTION WILL FAIL.`
-  //     }
-  //     else if(Number(cost) > Number(feeBalance) * 0.96) {
-  //       warning = true
-  //       ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-  //       <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
-  //       <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
-  //     }
-  //     else {
-  //       ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH
-  //       <br>Estimated gas of bridging ETH and ${token.symbol} (approval + bridge): ${Number(batchCost).toFixed(4)} ETH. You can save ${(Number(cost) * 2 - Number(batchCost)).toFixed(4)} ETH by bridging together.`
-  //     }
-  //   }
+  // Make sure user have enough ETH to cover the cost and ETH amount
+  // that they want to transfer
+  const filterETH = payload.filter(i => i.symbol === 'ETH')
+  if (filterETH.length === 1) {
+    // There should be only one input for ETH
+    const payloadETH = filterETH[0]
+    if (Number(payloadETH.value) + Number(batchCost) > Number(feeBalance)) {
+        warning = true
+        validInput = false
+        ETHstring = `<br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>THIS TRANSACTION WILL FAIL.`
+    }
+    else if ((Number(payloadETH.value) + Number(batchCost)) > Number(feeBalance) * 0.96) {
+      warning = true
+      ETHstring = `<br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+      <br/>THIS TRANSACTION MIGHT FAIL.`
+    }
+  } else if (filterETH.length > 1) {
+    // Disable the bridge button
+    validInput = false
+  } else {
+    if(Number(batchCost) > Number(feeBalance)) {
+      warning = true
+      ETHstring = `<br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
+      <br/>THIS TRANSACTION WILL FAIL.`
+    }
+    else if(Number(batchCost) > Number(feeBalance) * 0.96) {
+      warning = true
+      validInput = false
+      ETHstring = `<br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+      <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
+    }
+  }
 
-  //   if (token.symbol === 'ETH') {
-  //     if((Number(value) + Number(cost)) > Number(feeBalance)) {
-  //       warning = true
-  //       ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-  //       <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-  //       <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
-  //       <br/>THIS TRANSACTION WILL FAIL.`
-  //     }
-  //     else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
-  //       warning = true
-  //       ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-  //       <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-  //       <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
-  //       <br/>THIS TRANSACTION MIGHT FAIL.`
-  //     } else {
-  //       ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-  //       <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
-  //     }
-  //   }
-  // }
+  // Make sure all input value is correct
+  for (const tokenInput of payload) {
+    const tokenBalance = userBalance.filter(i => i.symbol === tokenInput.symbol)
+    // the token is not selected or the value is not provided
+    if (!tokenInput.symbol || !tokenInput.value) {
+      validInput = false
+    }
+    // the value should be larger than 0
+    else if (Number(tokenInput.value) <= 0) {
+      validInput = false
+    }
+    // the balance should cover the amount
+    else if (tokenBalance.length === 1 &&
+      Number(utils.parseUnits(tokenBalance[0].balance.toString(), tokenBalance[0].decimals).toString()) < tokenInput.value
+    ) {
+      validInput = false
+    }
+    else if (tokenBalance.length === 0) {
+      validInput = false
+    }
+    // the pool should have the liquidity to cover the value
+    else {
+      if (batchInfo[tokenInput.symbol]) {
+        const LPBalance = batchInfo[tokenInput.symbol].l2LPBalance
+        const LPRatio = batchInfo[tokenInput.symbol].LPRatio
+        if (
+          (Number(LPRatio) < 0.10 && Number(tokenInput.value) > Number(LPBalance) * 0.90) ||
+          (Number(LPRatio) < 0.10 && Number(tokenInput.value) <= Number(LPBalance) * 0.90) ||
+          (Number(LPRatio) >= 0.10 && Number(tokenInput.value) > Number(LPBalance) * 0.90)
+        ) {
+          validInput = false
+        }
+      }
+      // We don't get the batch information
+      else {
+        validInput = false
+      }
+    }
+  }
 
   return (
     <>
@@ -356,13 +264,6 @@ function InputStepBatch({ handleClose }) {
           In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
         </Typography>
 
-        {/* <Select
-          options={options}
-          // onChange={onActionChange}
-          // styles={customStyles}
-          sx={{marginBottom: '20px'}}
-        >
-        </Select> */}
         {payload.map((_, index) => {
           let maxValue = 0, LPRatio = 1, LPBalance = Infinity
           if (payload[index].symbol && batchInfo[payload[index].symbol]) {
@@ -402,9 +303,10 @@ function InputStepBatch({ handleClose }) {
                   variant="standard"
                   newStyle
                   selectOptions={getOptions()}
+                  selectValue={payload[index].symbol ? payload[index].symbol: ''}
                   style={{width: '100%'}}
                 />
-                <div style={{display: 'flex', marginTop: payload[index].symbol === 'ETH' ? '0px':'10px', flexDirection: 'column'}}>
+                <div key={index} style={{display: 'flex', marginTop: payload[index].symbol === 'ETH' ? '0px':'10px', flexDirection: 'column'}}>
                   <CounterButton plus
                     onClick={() => {
                       const updatedPayload = [...payload]
@@ -425,6 +327,14 @@ function InputStepBatch({ handleClose }) {
                   />
                 </div>
               </Box>
+
+              {payload[index].symbol === 'OMG' &&
+                <Typography variant="body2" sx={{mt: 2}}>
+                  The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
+                  In some cases, three interactions with MetaMask are needed.
+                </Typography>
+              }
+
               {(Number(LPRatio) < 0.10 && Number(payload[index].value) > Number(LPBalance) * 0.90) && (
                 <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
                   The {payload[index].symbol} pool's balance and balance/liquidity ratio are low.
@@ -465,7 +375,7 @@ function InputStepBatch({ handleClose }) {
               }
               if (payload[index].symbol) {
                 return (
-                  <Typography variant="body2" sx={{mb: 0}}>
+                  <Typography variant="body2" sx={{mb: 0}} key={index}>
                     {`${((payload[index].value ? payload[index].value: 0) * l2LPFeeRate / 100).toFixed(3)} ${payload[index].symbol} (${l2LPFeeRate}%)`}
                   </Typography>
                 )
@@ -482,7 +392,7 @@ function InputStepBatch({ handleClose }) {
               }
               if (payload[index].symbol) {
                 return (
-                  <Typography variant="body2" sx={{mb: 0}}>
+                  <Typography variant="body2" sx={{mb: 0}} key={index}>
                     {`${((payload[index].value ? payload[index].value * (1 - l2LPFeeRate / 100): 0)).toFixed(3)} ${payload[index].symbol} `}
                   </Typography>
                 )
@@ -492,39 +402,9 @@ function InputStepBatch({ handleClose }) {
           </div>
         </div>
 
-        {/*
-
-        <br />
-        {validValue && token && !ETHValue &&(
-          <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
-          </Typography>
-        )}
-
-        {validValue && token && ETHValue &&(
-          <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, ETHToken).toFixed(2)})`: ''} and ${receivableETHAmount(ETHValue)} ETH ${!!amountToUsd(ETHValue, lookupPrice, ETHToken) ?  `($${amountToUsd(ETHValue, lookupPrice, ETHToken).toFixed(2)})`: ''} on L2.`}
-          </Typography>
-        )}
-
-        {ETHValue ? ETHTransactionMessage : <></>}
-
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {parse(ETHstring)}
-          </Typography>
-        )}
-
-        {!warning && (
-          <Typography variant="body2" sx={{mt: 2}}>
-            {parse(ETHstring)}
-          </Typography>
-        )}
-
-        {!!token && token.symbol === 'OMG' && (
-          <Typography variant="body2" sx={{mt: 2}}>
-            The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
-            In some cases, three interactions with MetaMask are needed.
           </Typography>
         )}
 
@@ -532,7 +412,7 @@ function InputStepBatch({ handleClose }) {
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>
-        )} */}
+        )}
       </Box>
 
       <WrapperActionsModal>
@@ -544,12 +424,12 @@ function InputStepBatch({ handleClose }) {
           {buttonLabel_1}
         </Button>
         <Button
-          // onClick={doDeposit}
+          onClick={doDeposit}
           color='primary'
           variant="contained"
           loading={depositLoading || approvalLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
-          // disabled={!validValue || !ETHValidValue || !Number(value)}
+          disabled={!validInput}
           triggerTime={new Date()}
           size="large"
           fullWidth={isMobile}

@@ -1512,6 +1512,22 @@ class NetworkService {
     }
   }
 
+  async approveFastDepositBatch(payload) {
+    for (const tokenInput of payload) {
+      if (tokenInput.symbol !== 'ETH') {
+        const res = await this.approveERC20(
+          utils.parseUnits(tokenInput.value, tokenInput.decimals).toString(),
+          tokenInput.currency,
+          this.L1LPContract.address,
+        )
+        if (!res) {
+          return res
+        }
+      }
+    }
+    return true
+  }
+
   //Used to move ERC20 Tokens from L1 to L2 using the classic deposit
   async depositErc20(value_Wei_String, currency, currencyL2) {
 
@@ -2160,6 +2176,78 @@ class NetworkService {
     return receipt
   }
 
+  async depositL1LPBatch(payload) {
+
+    const updatedPayload = []
+    let ETHAmount = 0
+
+    for (const tokenInput of payload) {
+      updatedPayload.push({
+        l1TokenAddress: tokenInput.currency,
+        amount: utils.parseUnits(tokenInput.value, tokenInput.decimals).toString()
+      })
+      if (tokenInput.symbol === 'ETH') {
+        ETHAmount = utils.parseUnits(tokenInput.value, tokenInput.decimals).toString()
+      }
+    }
+
+    updateSignatureStatus_depositLP(false)
+
+    console.log("payload:",updatedPayload)
+
+    const time_start = new Date().getTime()
+    console.log("TX start time:", time_start)
+
+    let depositTX
+    console.log("Depositing...")
+    depositTX = await this.L1LPContract.clientDepositL1Batch(
+      updatedPayload,
+      ETHAmount !== 0 ? { value: ETHAmount } : {}
+    )
+
+    console.log("depositTX",depositTX)
+
+    //at this point the tx has been submitted, and we are waiting...
+    await depositTX.wait()
+
+    const block = await this.L1Provider.getTransaction(depositTX.hash)
+    console.log(' block:', block)
+
+    updateSignatureStatus_depositLP(true)
+
+    // Waiting the response from L2
+    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
+      depositTX.hash
+    )
+    console.log(' got L1->L2 message hash', msgHash)
+
+    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+    const time_stop = new Date().getTime()
+    console.log("TX finish time:", time_stop)
+
+    const data = {
+      "key": process.env.REACT_APP_SPEED_CHECK,
+      "hash": depositTX.hash,
+      "l1Tol2": true,
+      "startTime": time_start,
+      "endTime": time_stop,
+      "block": block.blockNumber,
+      "cdmHash": receipt.transactionHash,
+      "cdmBlock": receipt.blockNumber
+    }
+
+    console.log("Speed checker data payload:", data)
+
+    const speed = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('send.crossdomainmessage', data)
+
+    console.log("Speed checker:", speed)
+
+    return receipt
+  }
 
   /***************************************/
   /************ L1LP Pool size ***********/

@@ -47,7 +47,7 @@ function CounterButton ({
     buttonColor = disabled ? 'rgba(255,255,255,0.2)': '#81a034'
   }
   return (
-    <div className={styles.container} style={{borderColor: buttonColor}} onClick={onClick}>
+    <div className={styles.container} style={{borderColor: buttonColor}} onClick={disabled ? () => '': onClick}>
       {!minus || plus ? <div className={styles.line1} style={{backgroundColor: buttonColor}}></div>: <></>}
       <div className={styles.line2} style={{backgroundColor: buttonColor}}></div>
     </div>

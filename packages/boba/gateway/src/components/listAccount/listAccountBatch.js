@@ -100,7 +100,7 @@ class ListAccountBatch extends React.Component {
 
               <S.TableCell sx={{gap: "10px", justifyContent: "flex-start"}}>
                 {logoList.map((token, index) => {
-                  return <img src={getCoinImage(token)} alt="logo" width={42} height={42} style={index !== 0 ? {marginLeft: -20}:{}}/>
+                  return <img key={index} src={getCoinImage(token)} alt="logo" width={42} height={42} style={index !== 0 ? {marginLeft: -20}:{}}/>
                 })
 
                 }

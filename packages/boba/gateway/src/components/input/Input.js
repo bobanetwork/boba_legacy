@@ -50,6 +50,7 @@ function Input({
   maxLength,
   selectOptions,
   defaultSelect,
+  selectValue,
   style
 }) {
 
@@ -126,6 +127,7 @@ function Input({
                 styles={selectCustomStyles(newStyle, theme)}
                 isSearchable={false}
                 onChange={onSelect}
+                value={selectValue ? { value: selectValue, label: tokenImageElement(selectValue) } : null}
               />:
               <S.UnitContent>
                 <div>
