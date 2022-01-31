@@ -23,7 +23,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum-optimism/optimism/l2geth"
+	ethereum "github.com/ethereum-optimism/optimism/l2geth"
 	"github.com/ethereum-optimism/optimism/l2geth/accounts/abi"
 	"github.com/ethereum-optimism/optimism/l2geth/accounts/abi/bind"
 	"github.com/ethereum-optimism/optimism/l2geth/common"
