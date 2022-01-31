@@ -39,3 +39,9 @@ export function selectLayer () {
     return state.setup['netLayer']
   }
 }
+
+export function selectJustSwitchedChain () {
+  return function (state) {
+    return state.setup['justSwitchedChain']
+  }
+}

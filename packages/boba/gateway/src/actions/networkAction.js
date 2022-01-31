@@ -178,10 +178,6 @@ export function enableBrowserWallet(network) {
   return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
 }
 
-export function switchChain(layer) {
-  return createAction('SWITCH/CHAIN', () => networkService.switchChain(layer))
-}
-
 export function getAllAddresses() {
   return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
 }

@@ -15,20 +15,29 @@ limitations under the License. */
 
 require('dotenv').config()
 
+let justSwitchedChain = localStorage.getItem("justSwitchedChain")
+
+if (justSwitchedChain) {
+  justSwitchedChain = JSON.parse(justSwitchedChain)
+}
+
 const initialState = {
   accountEnabled: null,
   baseEnabled: null,
   netLayer: null,
   accountNumber: null,
   network: process.env.REACT_APP_CHAIN,
+  justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
 }
 
 function setupReducer (state = initialState, action) {
   switch (action.type) {
     case 'SETUP/ACCOUNT/SET':
+      localStorage.setItem("justSwitchedChain", JSON.stringify(false))
       return { 
         ...state, 
         accountEnabled: action.payload,
+        justSwitchedChain: false
       }
     case 'SETUP/ACCOUNT_NUMBER/SET':
       return { 
@@ -49,6 +58,13 @@ function setupReducer (state = initialState, action) {
       return { 
         ...state, 
         network: action.payload
+      }
+    case 'SETUP/SWITCH/SUCCESS':
+      console.log("SR - setting just changed to true")
+      localStorage.setItem("justSwitchedChain", JSON.stringify(true))
+      return { 
+        ...state, 
+        justSwitchedChain: true
       }
     default:
       return state

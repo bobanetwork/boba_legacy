@@ -15,6 +15,9 @@ limitations under the License. */
 
 import store from 'store'
 
+import networkService from 'services/networkService'
+import { createAction } from './createAction'
+
 export function setEnableAccount(enabled) {
   console.log("setEnableAccount:", enabled)
   return function (dispatch) {
@@ -45,4 +48,9 @@ export function setAccountNumber(account) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/ACCOUNT_NUMBER/SET', payload: account })
   }
+}
+
+export function switchChain(layer) {
+  console.log("SA: Switching chain to", layer)
+  return createAction('SETUP/SWITCH', () => networkService.switchChain(layer))
 }

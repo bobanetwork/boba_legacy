@@ -812,8 +812,10 @@ async initializeBase( networkGateway ) {
 
   }
 
-  /* Yes, this almost completely duplicates async switchChain( layer )
-  but that's safest for now */
+  async switchChain( layer ) {
+    this.correctChain( layer )
+  }
+
   async correctChain( targetLayer ) {
 
     const nw = getNetwork()
@@ -852,10 +854,6 @@ async initializeBase( networkGateway ) {
         console.log("MetaMask - Switch Error: ", error.code)
       }
     }
-  }
-
-  async switchChain( layer ) {
-    this.correctChain( layer )
   }
 
   async getTransactions() {

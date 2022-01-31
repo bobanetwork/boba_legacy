@@ -22,7 +22,7 @@ import networkService from 'services/networkService'
 import { isChangingChain } from 'util/changeChain'
 
 import { selectModalState } from 'selectors/uiSelector'
-import { selectNetwork, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectNetwork, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
 
 import { openModal } from 'actions/uiAction'
 import { setEnableAccount, setLayer } from 'actions/setupAction'
@@ -33,6 +33,7 @@ function WalletPicker() {
 
   const network = useSelector(selectNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const justSwitchedChain = useSelector(selectJustSwitchedChain())
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -41,6 +42,7 @@ function WalletPicker() {
     if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
+
       const initialized = await networkService.initializeAccount(network)
 
       if (initialized === false) {
@@ -50,7 +52,7 @@ function WalletPicker() {
       }
 
       if (initialized === 'L1' || initialized === 'L2') {
-        console.log("NS: Acconut IS enabled for", initialized)
+        console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         return true
@@ -58,6 +60,11 @@ function WalletPicker() {
     }
 
   }, [ dispatch, accountEnabled ])
+
+  useEffect(() => {
+    // auto connect to MM if we just switched chains
+    if (justSwitchedChain) dispatchBootAccount()
+  }, [justSwitchedChain])
 
   return (
       <Button

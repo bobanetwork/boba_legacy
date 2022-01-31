@@ -19,25 +19,27 @@ import React, { useState, useCallback } from 'react'
 import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
 import * as S from './LayerSwitcher.styles.js'
-import { selectLayer, selectNetwork, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectLayer, selectNetwork, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
 
 import { Typography } from '@material-ui/core'
 import networkService from 'services/networkService'
 import Button from 'components/button/Button'
 
 import LayerIcon from 'components/icons/LayerIcon'
-import { switchChain } from 'actions/networkAction.js'
+import { switchChain } from 'actions/setupAction.js'
 
 function LayerSwitcher({ isButton = false, size }) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
+  const justSwitchedChain = useSelector(selectJustSwitchedChain())
   let layer = useSelector(selectLayer())
 
   const [ enabled ] = useState()
 
   console.log("LS: Layer:", layer)
   console.log("LS: accountEnabled:", accountEnabled)
+  console.log("LS: justSwitchedChain:", justSwitchedChain)
 
   const dispatchSwitchLayer = useCallback(() => {
     console.log("LS: switchLayer accountEnabled:", accountEnabled)
@@ -90,22 +92,18 @@ function LayerSwitcher({ isButton = false, size }) {
         <Box sx={{display: 'flex', width: '100%', alignItems: 'center'}}>
           <LayerIcon />
           <S.Label variant="body2">Layer</S.Label>
-          <S.LayerSwitch
-            onClick={()=>{if(layer === 'L2'){dispatchSwitchLayer()}}}
-          >
+          <S.LayerSwitch>
             <Typography
               className={layer === 'L1' ? 'active': ''}
+              onClick={()=>{if(layer === 'L2'){dispatchSwitchLayer()}}}
               variant="body2"
               component="span"
               color="white">
                 1
             </Typography>
-                      </S.LayerSwitch>
-                      <S.LayerSwitch
-            onClick={()=>{if(layer === 'L1'){dispatchSwitchLayer()}}}
-          >
             <Typography
               className={layer === 'L2' ? 'active': ''}
+              onClick={()=>{if(layer === 'L1'){dispatchSwitchLayer()}}}
               variant="body2"
               component="span"
               color="white">
