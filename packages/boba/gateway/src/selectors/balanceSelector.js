@@ -37,10 +37,6 @@ export function selectL2LPBalanceString (state) {
   return state.balance.l2LpBalanceWeiString
 }
 
-export function selectL2LPETHBalanceString (state) {
-  return state.balance.l2LpETHBalanceWeiString
-}
-
 export function selectL1LPPendingString (state) {
   return state.balance.l1LpPendingWeiString
 }
@@ -49,20 +45,12 @@ export function selectL2LPPendingString (state) {
   return state.balance.l2LpPendingWeiString
 }
 
-export function selectL2LPETHPendingString (state) {
-  return state.balance.l2LpETHPendingWeiString
-}
-
 export function selectL1LPLiquidity (state) {
   return state.balance.l1lpLiquidity
 }
 
 export function selectL2LPLiquidity (state) {
   return state.balance.l2lpLiquidity
-}
-
-export function selectL2LPETHLiquidity (state) {
-  return state.balance.l2lpETHLiquidity
 }
 
 export function selectL1FeeRate (state) {
@@ -79,10 +67,6 @@ export function selectL1FeeRateN (state) {
 
 export function selectL2FeeRateN (state) {
   return state.balance.l2FeeRateN
-}
-
-export function selectL2ETHFeeRateN (state) {
-  return state.balance.l2ETHFeeRateN
 }
 
 export function selectFastExitCost (state) {
@@ -109,7 +93,6 @@ export function selectL2FeeBalance (state) {
   return state.balance.l2FeeBalance
 }
 
-export function selectL1ETHBalance (state) {
-  const filterETH = state.balance.layer1.filter(i => i.symbol === 'ETH')[0]
-  return filterETH
+export function selectUserAndL2LPBalanceBatch (state) {
+  return state.balance.userAndL2LPBlanceBatch
 }

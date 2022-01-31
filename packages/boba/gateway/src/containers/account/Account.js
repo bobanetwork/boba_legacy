@@ -25,6 +25,7 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import ListAccount from 'components/listAccount/listAccount'
+import ListAccountBatch from 'components/listAccount/listAccountBatch'
 import networkService from 'services/networkService'
 
 import * as S from './Account.styles'
@@ -49,7 +50,7 @@ import { POLL_INTERVAL } from 'util/constant'
 function Account ({ enabled }) {
 
   const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
-  
+
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -180,6 +181,11 @@ function Account ({ enabled }) {
         })}
       </S.TableHeading>
       <Box>
+        <ListAccountBatch
+          chain={'L1'}
+          networkLayer={networkLayer}
+          disabled={disabled}
+        />
         {rootBalance.map((i, index) => {
           return (
             <ListAccount
