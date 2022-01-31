@@ -38,15 +38,11 @@ import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { selectAlert, selectError } from 'selectors/uiSelector'
 
-import DepositModal from 'containers/modals/deposit/DepositModal';
-import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal';
-import TransferModal from 'containers/modals/transfer/TransferModal';
-import ExitModal from 'containers/modals/exit/ExitModal';
-
 import DepositModal from 'containers/modals/deposit/DepositModal'
+import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
 import TransferModal from 'containers/modals/transfer/TransferModal'
 import ExitModal from 'containers/modals/exit/ExitModal'
-import LedgerConnect from 'containers/modals/ledger/LedgerConnect'
+
 import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
 
 import FarmWrapper from 'containers/farm/FarmWrapper'
