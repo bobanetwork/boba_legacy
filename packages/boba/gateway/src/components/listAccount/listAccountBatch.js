@@ -87,11 +87,6 @@ class ListAccountBatch extends React.Component {
     const enabled = (networkLayer === chain) ? true : false
 
     const logoList = ['ETH', 'BOBA', 'OMG', 'USDC', 'USDT', 'DAI']
-    // const logo = getCoinImage(token.symbol)
-
-    // const amount = token.symbol === 'ETH' ?
-    //   Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, {minimumFractionDigits: 3,maximumFractionDigits:3}) :
-    //   Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits:2})
 
     return (
       <>
@@ -104,22 +99,9 @@ class ListAccountBatch extends React.Component {
                 })
 
                 }
-                {/* <img src={logo} alt="logo" width={42} height={42} /> */}
-
-                {/* <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
-                  {token.symbol}
-                </S.TextTableCell> */}
               </S.TableCell>
 
               <S.TableCell sx={{justifyContent: "flex-start"}}>
-                {/* <S.TextTableCell
-                  enabled={`${enabled}`}
-                  variant="body2"
-                  component="div"
-                  sx={{fontWeight:'700'}}
-                >
-                  {amount}
-                </S.TextTableCell> */}
               </S.TableCell>
 
               <S.TableCell
