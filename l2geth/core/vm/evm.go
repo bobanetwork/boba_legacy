@@ -586,6 +586,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
                                 // If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
                                 // As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
 				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
+                                log.Debug("MMDBG preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
+                                
 				updated_input, turingErr = bobaTuringCall(input, caller.Address(), mayBlock)
                                 
                                 if turingErr == 20 {

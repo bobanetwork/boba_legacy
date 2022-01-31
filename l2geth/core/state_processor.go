@@ -17,6 +17,8 @@
 package core
 
 import (
+	//"math/big"
+        
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
@@ -112,14 +114,25 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
         
         if err == vm.ErrTuringWouldBlock {
 	        log.Debug("MMDBG ApplyMessage returned", "failed", failed, "err", err)
-                log.Debug("MMDBG We have", "msg", msg, "tx", tx)
-                msg.GasPrice().SetUint64(0)
+                log.Debug("MMDBG We have tx", "tx", tx)
+                log.Debug("MMDBG We have msg", "msg", msg)
+                log.Debug("MMDBG mGas price is before", "gp", msg.GasPrice())
+                msg.SetPrice()
+                log.Debug("MMDBG mGas price is now", "gp", msg.GasPrice())
                 
-                _, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+                vmenv.Context.GasPrice.SetUint64(0)
+                log.Debug("MMDBG env.context is", "c", vmenv.Context)
+                
+                log.Debug("MMDBG Here we go again", "tx",tx)
+                log.Debug("MMDBG Here we go again", "msg",msg)
+                
+                
+                _, gas, failed, err = ApplyMessage(vmenv, msg, gp)
                 log.Debug("MMDBG ApplyMessage 2nd time", "gas", gas, "failed", failed, "err", err)
                 
-        	return nil, ErrTuringRetry	// this is in "core", not "core/vm"
+        	//return nil, ErrTuringRetry	// this is in "core", not "core/vm"
         }
+        
 	// TURING Update the tx metadata, if a Turing call took place...
 	if len(vmenv.Context.Turing) > 1 {
 		tx.SetL1Turing(vmenv.Context.Turing)
