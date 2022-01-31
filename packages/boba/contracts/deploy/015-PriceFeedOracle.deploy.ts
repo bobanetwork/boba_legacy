@@ -1,6 +1,8 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
 import FluxAggregatorJson from '../artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
 
@@ -12,6 +14,10 @@ const address = (id: number) => {
 }
 
 const deployFn: DeployFunction = async (hre) => {
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+
   // add customized min/max submission values
   // verify min/max submission values before deployment
   const tokens = [
@@ -106,6 +112,12 @@ const deployFn: DeployFunction = async (hre) => {
       } else {
         throw new Error('Failed to register feed correctly')
       }
+
+      await registerBobaAddress(
+        addressManager,
+        `BobaStraw_${token.name}${quote.name}`,
+        FluxAggregator.address
+      )
     }
   }
 }
