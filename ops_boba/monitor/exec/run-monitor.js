@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-const mysql = require('mysql')
-const util = require('util')
 const configs = require('../services/utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const { logger } = require('../services/utilities/logger')

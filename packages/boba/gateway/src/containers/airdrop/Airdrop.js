@@ -1,7 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
+
+import * as S from './Airdrop.styles'
 import * as styles from './Airdrop.module.scss'
+
 import { Box, Grid, Typography } from '@material-ui/core'
 import Button from 'components/button/Button'
 import PageHeader from 'components/pageHeader/PageHeader'
@@ -58,9 +61,9 @@ class Airdrop extends React.Component {
 
   async initiateDrop() {
 
-    console.log('initiateAirdrop')
+    console.log('initiateAirdrop:',this.state.claimDetailsL1)
 
-    let res = await this.props.dispatch(initiateAirdrop())
+    let res = await this.props.dispatch(initiateAirdrop(this.state.claimDetailsL1))
 
     if (res) {
       this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your BOBA in 30 days.`))
@@ -70,7 +73,7 @@ class Airdrop extends React.Component {
 
   async airdropL1() {
 
-    console.log('airdropL1')
+    console.log('airdropL1:',this.state.claimDetailsL1)
 
     let res = await this.props.dispatch(getAirdropL1(this.state.claimDetailsL1))
 
@@ -128,6 +131,7 @@ class Airdrop extends React.Component {
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('amount') && claimDetailsL1.amount !== 0) {
       recordFoundL1 = true
       snapValueL1 = Number(logAmount(claimDetailsL1.amount, 18))
+      console.log("L1 snapvalue:",snapValueL1)
     }
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
       claimedL1 = true
@@ -157,37 +161,20 @@ class Airdrop extends React.Component {
     if(layer === 'L1') {
         return <div className={styles.container}>
             <PageHeader title="Airdrop" />
-            <div className={styles.content}>
-                <Box
-                  sx={{
-                    borderRadius: '12px',
-                    margin: '20px 5px',
-                    padding: '10px 20px',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}
+            <S.LayerAlert>
+              <S.AlertInfo>
+                <AlertIcon />
+                <S.AlertText
+                  variant="body2"
+                  component="p"
                 >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <AlertIcon />
-                    <Typography
-                      sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                      variant="body1"
-                      component="p"
-                    >
-                      You are on L1. To claim Boba, SWITCH LAYER to L2
-                    </Typography>
-                  </div>
-                    <LayerSwitcher isButton={true} />
-                </Box>
-            </div>
+                  You are on Ethereum Mainnet. To claim your BOBA, SWITCH to Boba
+                </S.AlertText>
+              </S.AlertInfo>
+              <LayerSwitcher isButton={true} />
+            </S.LayerAlert>
         </div>
     }
-
 
     return (
   <>

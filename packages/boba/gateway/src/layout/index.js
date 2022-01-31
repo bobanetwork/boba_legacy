@@ -28,11 +28,11 @@ import {
   Route,
   Switch
 } from "react-router-dom";
+
 import { selectModalState } from 'selectors/uiSelector';
 import { isChangingChain } from 'util/changeChain';
-//import oracleService from 'services/oracleService';
+
 import * as styles from './layout.module.scss';
-import * as S from './layout.style';
 
 function App () {
 
@@ -93,7 +93,6 @@ function App () {
         fontWeight: 400,
       },
       body3: {
-        lineHeight: '1.2em',
         fontSize: '0.8em'
       },
     },
@@ -206,6 +205,7 @@ function App () {
       }
     }
   });
+
   MUItheme = responsiveFontSizes(MUItheme);
 
   const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));
@@ -229,18 +229,14 @@ function App () {
       <CssBaseline />
       <Router>
         <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-          <S.Content>
             <div className={styles.App}>
-
               <Notification/>
               <Suspense fallback={<>Loading...</>}>
                 <Switch>
                   <Route exact path="/" component={enabled ? () => <Home /> : ()=> <WalletPicker enabled={enabled} onEnable={setEnabled} />} />
                 </Switch>
               </Suspense>
-
             </div>
-          </S.Content>
         </Box>
       </Router>
     </ThemeProvider>

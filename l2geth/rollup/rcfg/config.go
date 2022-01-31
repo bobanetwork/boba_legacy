@@ -9,6 +9,7 @@ import (
 
 // UsingOVM is used to enable or disable functionality necessary for the OVM.
 var UsingOVM bool
+var OvmTuringCreditAddress common.Address
 
 var (
 	// l2GasPriceSlot refers to the storage slot that the L2 gas price is stored
@@ -34,8 +35,10 @@ var (
 	// DecimalsSlot refers to the storage slot in the OVM_GasPriceOracle that
 	// holds the number of decimals in the fee scalar
 	DecimalsSlot = common.BigToHash(big.NewInt(5))
+	// Address of the Turing credit contract
 )
 
 func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
+	OvmTuringCreditAddress = common.HexToAddress(os.Getenv("TURING_CREDIT_ADDRESS"))
 }

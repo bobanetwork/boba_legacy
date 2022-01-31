@@ -134,7 +134,7 @@ class DatabaseService extends OptimismEnv {
         depositFeeRate VARCHAR(255),
         fastDeposit BOOL,
         status VARCHAR(255),
-        PRIMARY KEY ( hash, blockNumber )
+        PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
     con.end()
     this.logger.info('Initialized the database.')
@@ -657,11 +657,11 @@ class DatabaseService extends OptimismEnv {
           tx.crossDomainMessageFinalizedTime - tx.crossDomainMessageSendTime
 
         tx.crossDomainMessageSendISOTime = new Date(
-          tx.crossDomainMessageSendTime
+          tx.crossDomainMessageSendTime * 1000
         ).toISOString()
 
         tx.crossDomainMessageFinalizedISOTime = new Date(
-          tx.crossDomainMessageFinalizedTime
+          tx.crossDomainMessageFinalizedTime * 1000
         ).toISOString()
         logger.info('receipt', tx)
       })

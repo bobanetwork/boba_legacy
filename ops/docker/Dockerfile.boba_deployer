@@ -11,6 +11,9 @@ COPY --from=builder /optimism/node_modules ./node_modules
 COPY --from=builder /optimism/packages/core-utils/package.json ./packages/core-utils/package.json
 COPY --from=builder /optimism/packages/core-utils/dist ./packages/core-utils/dist
 
+# copy turing
+COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
+
 # get the needed built artifacts
 WORKDIR /opt/optimism/packages/contracts
 COPY --from=builder /optimism/packages/contracts/dist ./dist
@@ -35,6 +38,11 @@ COPY --from=builder /optimism/packages/boba/contracts/tsconfig.json ./tsconfig.j
 COPY --from=builder /optimism/packages/boba/contracts/package.json ./package.json
 COPY --from=builder /optimism/packages/boba/contracts/node_modules ./node_modules
 COPY --from=builder /optimism/packages/boba/contracts/artifacts ./artifacts
+
+# Copy solc compilers
+COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/
+COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/
+COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a /root/.cache/hardhat-nodejs/compilers/linux-amd64/
 
 # get static artifacts from the host
 COPY packages/boba/contracts/bin ./bin

@@ -24,7 +24,6 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
@@ -41,28 +40,45 @@ import LedgerConnect from 'containers/modals/ledger/LedgerConnect';
 import AddTokenModal from 'containers/modals/addtoken/AddTokenModal';
 
 //Farm
+import FarmWrapper from 'containers/farm/FarmWrapper'
 import FarmDepositModal from 'containers/modals/farm/FarmDepositModal';
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
 
+//Save
+import SaveWrapper from 'containers/save/SaveWrapper'
+import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
+
 //DAO
-import DAO from 'containers/dao/Dao';
+import DAO from 'containers/dao/Dao'
 import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
+import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 
-import { 
-  fetchDaoBalance, 
-  fetchDaoVotes, 
-  fetchDaoProposals, 
-  getProposalThreshold 
+import {
+  fetchDaoBalance,
+  fetchDaoVotes,
+  fetchDaoBalanceX,
+  fetchDaoVotesX,
+  fetchDaoProposals,
+  getProposalThreshold
 } from 'actions/daoAction'
 
 import Airdrop from 'containers/airdrop/Airdrop'
 
-import { 
+import {
   fetchAirdropStatusL1,
   fetchAirdropStatusL2,
 } from 'actions/airdropAction'
+
+import {
+  getFS_Saves,
+  getFS_Info,
+} from 'actions/fixedAction'
+
+import {
+  fetchVerifierStatus
+} from 'actions/verifierAction'
 
 //Wallet Functions
 import Account from 'containers/account/Account'
@@ -78,11 +94,12 @@ import NFT from 'containers/nft/Nft'
 import { useTheme } from '@material-ui/core/styles'
 import { Box, Container, useMediaQuery } from '@material-ui/core'
 import MainMenu from 'components/mainMenu/MainMenu'
-import FarmWrapper from 'containers/farm/FarmWrapper'
+
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 function Home () {
 
@@ -106,12 +123,15 @@ function Home () {
   const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
   const ledgerConnectModalState = useSelector(selectModalState('ledgerConnectModal'))
 
+  const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
+
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
 
   // DAO modal
   const tranferBobaDaoModalState = useSelector(selectModalState('transferDaoModal'))
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
+  const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const walletMethod = useSelector(selectWalletMethod())
@@ -136,15 +156,19 @@ function Home () {
   //get all account balances
   useInterval(() => {
     dispatch(fetchBalances())
-    dispatch(fetchNFTs())
     dispatch(fetchAirdropStatusL1())
     dispatch(fetchAirdropStatusL2())
     dispatch(fetchDaoBalance())
     dispatch(fetchDaoVotes())
+    dispatch(fetchDaoBalanceX())
+    dispatch(fetchDaoVotesX())
     dispatch(fetchDaoProposals())
     dispatch(getProposalThreshold())
     dispatch(fetchGas())
     dispatch(fetchExits())
+    dispatch(getFS_Saves())
+    dispatch(getFS_Info())
+    dispatch(fetchVerifierStatus())
   }, POLL_INTERVAL)
 
   useEffect(() => {
@@ -154,15 +178,19 @@ function Home () {
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />} 
+      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
       {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
+
+      {!!saveDepositModalState && <SaveDepositModal  open={saveDepositModalState} />}
+
       {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
       {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
+      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
 
       <Alert
@@ -210,6 +238,9 @@ function Home () {
           {pageDisplay === "Farm" &&
             <FarmWrapper/>
           }
+          {pageDisplay === "Save" &&
+            <SaveWrapper/>
+          }
           {pageDisplay === "DAO" &&
             <DAO/>
           }
@@ -218,6 +249,9 @@ function Home () {
           }
           {pageDisplay === "Help" &&
             <Help/>
+          }
+          {pageDisplay === "Ecosystem" &&
+            <Ecosystem/>
           }
         </Container>
       </Box>

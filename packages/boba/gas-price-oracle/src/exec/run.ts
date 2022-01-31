@@ -78,12 +78,36 @@ const main = async () => {
   )
   // BURNED_GAS_FEE_RATIO_100X / 100 = ratio
   const BURNED_GAS_FEE_RATIO_100X = config.uint(
-    'burned-gas-fee-ration-100x',
+    'burned-gas-fee-ratio-100x',
     parseInt(env.BURNED_GAS_FEE_RATIO_100X, 10) || 30
   )
   const MAX_BURNED_GAS = config.str(
     'max-burned-gas',
     env.MAX_BURNED_GAS || '10000000'
+  )
+  // OVERHEAD_RATIO_1000X / 1000 = ratio
+  const OVERHEAD_RATIO_1000X = config.uint(
+    'overhead-ration-1000x',
+    parseInt(env.OVERHEAD_RATIO_1000X, 10) || 10
+  )
+  const OVERHEAD_MIN_PERCENT_CHANGE = config.uint(
+    'overhead-min-percent-change',
+    parseFloat(env.OVERHEAD_MIN_PERCENT_CHANGE) || 0.05
+  )
+  const MIN_OVERHEAD = config.uint(
+    'min-overhead',
+    parseInt(env.MIN, 10) || 30000
+  )
+
+  // minimum l1 base fee
+  const MIN_L1_BASE_FEE = config.uint(
+    'min-l1-base-fee',
+    parseInt(env.MIN_L1_BASE_FEE, 10) || 150000000000
+  )
+  // max l1 base fee
+  const MAX_L1_BASE_FEE = config.uint(
+    'max-l1-base-fee',
+    parseInt(env.MAX_L1_BASE_FEE, 10) || 225000000000
   )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
@@ -155,6 +179,11 @@ const main = async () => {
     pollingInterval: POLLING_INTERVAL,
     burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
     maxBurnedGas: MAX_BURNED_GAS,
+    overheadRatio1000X: OVERHEAD_RATIO_1000X,
+    overheadMinPercentChange: OVERHEAD_MIN_PERCENT_CHANGE,
+    minOverhead: MIN_OVERHEAD,
+    minL1BaseFee: MIN_L1_BASE_FEE,
+    maxL1BaseFee: MAX_L1_BASE_FEE,
   })
 
   await service.start()

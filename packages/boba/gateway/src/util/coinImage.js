@@ -14,12 +14,15 @@ import uniLogo from 'images/uni.png';
 import omgLogo from 'images/omg.png';
 import fraxLogo from 'images/frax.png';
 import fxsLogo from 'images/fxs.svg';
-import bobaLogo from 'images/boba-token-glow.png';
+import bobaLogo from 'images/boba-token.svg';
+import xBobaLogo from 'images/xboba-token.svg';
 import terraLogo from 'images/terra.png';
 import busdLogo from 'images/busd.svg';
 import bnbLogo from 'images/bnb.svg';
 import ftmLogo from 'images/ftm.svg';
 import maticLogo from 'images/matic.svg';
+import umaLogo from 'images/uma.svg';
+import domLogo from 'images/domLogo.png';
 
 export const getCoinImage = (symbol) => {
 
@@ -80,6 +83,9 @@ export const getCoinImage = (symbol) => {
     case "BOBA":
       logo = bobaLogo;
       break;
+    case "xBOBA":
+      logo = xBobaLogo;
+      break;
     case "UST":
       logo = terraLogo;
       break;
@@ -94,6 +100,12 @@ export const getCoinImage = (symbol) => {
       break;
     case "MATIC":
       logo = maticLogo;
+      break;
+    case "UMA":
+      logo = umaLogo;
+      break;
+    case "DOM":
+      logo = domLogo;
       break;
     default:
       logo = ethLogo;

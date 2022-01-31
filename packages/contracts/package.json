@@ -43,6 +43,7 @@
     "postpack": "yarn postpublish"
   },
   "dependencies": {
+    "@boba/turing-hybrid-compute": "0.2.0",
     "@eth-optimism/core-utils": "^0.6.0",
     "@ethersproject/abstract-provider": "^5.4.1",
     "@ethersproject/abstract-signer": "^5.4.1",

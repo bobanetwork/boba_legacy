@@ -144,9 +144,9 @@ describe('Standard Exit burn', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await ExitBurn.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await ExitBurn.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await ExitBurn.extraGasRelay()
@@ -267,7 +267,9 @@ describe('Standard Exit burn', async () => {
         .sub(exitAmount)
         .sub(postBalanceExitorL2)
 
-      expect(expectedGas).to.lt(BigNumber.from(1000000000))
+      // gas oracle updates the overhead and l1BaseFee,
+      // so it's not correct to expect the expectedGast is small than 1000000000
+      // expect(expectedGas).to.lt(BigNumber.from(1000000000))
       expect(postBalanceExitorL1).to.eq(preBalanceExitorL1.add(exitAmount))
       expect(ExitBurnContractBalance).to.eq(0)
     })

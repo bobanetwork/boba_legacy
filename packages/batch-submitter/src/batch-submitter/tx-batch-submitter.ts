@@ -1,6 +1,6 @@
 /* External Imports */
 import { Promise as bPromise } from 'bluebird'
-import { Signer, ethers, Contract, providers } from 'ethers'
+import { Signer, ethers, Contract, providers, BigNumber } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { getContractInterface, getContractFactory } from 'old-contracts'
 import { getContractInterface as getNewContractInterface } from '@eth-optimism/contracts'
@@ -10,6 +10,7 @@ import {
   BatchElement,
   Batch,
   QueueOrigin,
+  remove0x,
 } from '@eth-optimism/core-utils'
 import { Logger, Metrics } from '@eth-optimism/common-ts'
 
@@ -750,6 +751,12 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   }
 
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
+    // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode
+    // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encodes total length
+    //
+    // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than
+    // just remove0x(rawTransaction).length / 2
+
     const block = await this._getBlock(blockNumber)
     this.logger.debug('Fetched L2 block', {
       block,
@@ -765,7 +772,52 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     if (this._isSequencerTx(block)) {
       batchElement.isSequencerTx = true
-      batchElement.rawTransaction = block.transactions[0].rawTransaction
+      const turing = block.transactions[0].l1Turing
+      let rawTransaction = block.transactions[0].rawTransaction
+      //will be undefined for legacy Geth
+      if (typeof turing !== 'undefined') {
+        const turingVersion = '01'
+        console.log('TURING: Turing candidate:', turing)
+        if (turing.length > 4) {
+          console.log('TURING: Turing string:', turing)
+          // We sometimes use a 1 byte Turing string for debug purposes
+          // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
+          // Chop those off at this stage
+          // Only propagate the data through the system if it's a 'real' Turing payload
+          // Turing length cannot exceed 322 characters (based on limit in the Geth), so we need two bytes max for the length
+          const headerTuringLengthField = remove0x(
+            BigNumber.from(remove0x(turing).length / 2).toHexString()
+          ).padStart(4, '0')
+          if (headerTuringLengthField.length > 4) {
+            // paranoia check
+            console.log(
+              'Turing length error:',
+              turing,
+              remove0x(turing).length / 2,
+              BigNumber.from(remove0x(turing).length / 2).toHexString(),
+              headerTuringLengthField,
+              headerTuringLengthField.length
+            )
+            throw new Error('Turing length error!')
+          }
+          rawTransaction =
+            '0x' +
+            turingVersion +
+            headerTuringLengthField +
+            remove0x(rawTransaction) +
+            remove0x(turing)
+        } else {
+          console.log('TURING: Normal tx:', turing)
+          // this was a normal transaction without a Turing call
+          rawTransaction =
+            '0x' + turingVersion + '0000' + remove0x(rawTransaction)
+        }
+      } else {
+        // typeof(turing) === "undefined"
+        console.log('TURING: Legacy Transaction:', turing)
+      }
+      // this also handles the legacy case (old transactions without a Turing header)
+      batchElement.rawTransaction = rawTransaction
     }
 
     return batchElement

@@ -16,10 +16,12 @@ import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
-import L1StandardBridgeJson from './abi/L1StandardBridge.json'
-import DiscretionaryExitBurnJson from './abi/DiscretionaryExitBurn.json'
-import L1LiquidityPoolJson from './abi/L1LiquidityPool.json'
-import L2LiquidityPoolJson from './abi/L2LiquidityPool.json'
+import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
+import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -59,6 +61,21 @@ interface GasPriceOracleOptions {
 
   // max burned gas
   maxBurnedGas: string
+
+  // overhead ratio
+  overheadRatio1000X: number
+
+  // Min percent change
+  overheadMinPercentChange: number
+
+  // Min overhead
+  minOverhead: number
+
+  // Min L1 base fee
+  minL1BaseFee: number
+
+  // Max L1 base fee
+  maxL1BaseFee: number
 }
 
 const optionSettings = {}
@@ -77,6 +94,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Proxy__L2LiquidityPool: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
+    Proxy__L1NFTBridge: Contract
+    Proxy__L2NFTBridge: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
     L2ETHVaultBalance: BigNumber
@@ -98,6 +117,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       fastRelayerWallet: this.options.fastRelayerAddress,
       gasFloorPrice: this.options.gasFloorPrice,
       pollingInterval: this.options.pollingInterval,
+      burnedGasFeeRatio100X: this.options.burnedGasFeeRatio100X,
+      maxBurnedGas: this.options.maxBurnedGas,
+      overheadRatio1000X: this.options.overheadRatio1000X,
+      overheadMinPercentChange: this.options.overheadMinPercentChange,
+      minOverhead: this.options.minOverhead,
+      minL1BaseFee: this.options.minL1BaseFee,
     })
 
     this.state = {} as any
@@ -160,9 +185,34 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.Proxy__L2LiquidityPool.address,
     })
 
-   this.logger.info('Connecting to CanonicalTransactionChain...')
+    this.logger.info('Connecting to Proxy__L1NFTBridge...')
+    const Proxy__L1NFTBridgeAddress =
+      await this.state.Lib_AddressManager.getAddress('Proxy__L1NFTBridge')
+    this.state.Proxy__L1NFTBridge = new Contract(
+      Proxy__L1NFTBridgeAddress,
+      L1NFTBridgeJson.abi,
+      this.options.gasPriceOracleOwnerWallet
+    )
+    this.logger.info('Connected to Proxy__L1NFTBridge', {
+      address: this.state.Proxy__L1NFTBridge.address,
+    })
+
+    const Proxy__L2NFTBridgeAddress =
+      await this.state.Lib_AddressManager.getAddress('Proxy__L2NFTBridge')
+    this.state.Proxy__L2NFTBridge = new Contract(
+      Proxy__L2NFTBridgeAddress,
+      L2NFTBridgeJson.abi,
+      this.options.gasPriceOracleOwnerWallet
+    )
+    this.logger.info('Connected to Proxy__L2NFTBridge', {
+      address: this.state.Proxy__L2NFTBridge.address,
+    })
+
+    this.logger.info('Connecting to CanonicalTransactionChain...')
     const CanonicalTransactionChainAddress =
-      await this.state.Lib_AddressManager.getAddress('CanonicalTransactionChain')
+      await this.state.Lib_AddressManager.getAddress(
+        'CanonicalTransactionChain'
+      )
     this.state.CanonicalTransactionChain = loadContract(
       'CanonicalTransactionChain',
       CanonicalTransactionChainAddress,
@@ -172,7 +222,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.CanonicalTransactionChain.address,
     })
 
-   this.logger.info('Connecting to StateCommitmentChain...')
+    this.logger.info('Connecting to StateCommitmentChain...')
     const StateCommitmentChainAddress =
       await this.state.Lib_AddressManager.getAddress('StateCommitmentChain')
     this.state.StateCommitmentChain = loadContract(
@@ -215,12 +265,17 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   protected async _start(): Promise<void> {
     while (this.running) {
       await sleep(this.options.pollingInterval)
+      // l2 gas price
       await this._getL1Balance()
       await this._getL2GasCost()
       await this._updateGasPrice()
+      // extra burn gas
       await this._updateFastExitGasBurnFee()
       await this._updateClassicalExitGasBurnFee()
-      await this._updateOverheadFee()
+      await this._updateNFTBridgeGasBurnFee()
+      // l1 gas price and overhead fee
+      await this._updateOverhead()
+      await this._upateL1BaseFee()
     }
   }
 
@@ -316,158 +371,169 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   private async _getL1Balance(): Promise<void> {
-    const balances = await Promise.all([
-      this.options.l1RpcProvider.getBalance(this.options.sequencerAddress),
-      this.options.l1RpcProvider.getBalance(this.options.proposerAddress),
-      this.options.l1RpcProvider.getBalance(this.options.relayerAddress),
-      this.options.l1RpcProvider.getBalance(this.options.fastRelayerAddress),
-    ])
+    try {
+      const balances = await Promise.all([
+        this.options.l1RpcProvider.getBalance(this.options.sequencerAddress),
+        this.options.l1RpcProvider.getBalance(this.options.proposerAddress),
+        this.options.l1RpcProvider.getBalance(this.options.relayerAddress),
+        this.options.l1RpcProvider.getBalance(this.options.fastRelayerAddress),
+      ])
 
-    this.logger.info('L1 addresses balance', {
-      sequencerBalance: Number(
-        Number(utils.formatUnits(balances[0], 18)).toFixed(2)
-      ),
-      proposerBalance: Number(
-        Number(utils.formatUnits(balances[1], 18)).toFixed(2)
-      ),
-      relayerBalance: Number(
-        Number(utils.formatUnits(balances[2], 18)).toFixed(2)
-      ),
-      fastRelayerBalance: Number(
-        Number(utils.formatUnits(balances[3], 18)).toFixed(2)
-      ),
-    })
+      this.logger.info('L1 addresses balance', {
+        sequencerBalance: Number(
+          Number(utils.formatUnits(balances[0], 18)).toFixed(2)
+        ),
+        proposerBalance: Number(
+          Number(utils.formatUnits(balances[1], 18)).toFixed(2)
+        ),
+        relayerBalance: Number(
+          Number(utils.formatUnits(balances[2], 18)).toFixed(2)
+        ),
+        fastRelayerBalance: Number(
+          Number(utils.formatUnits(balances[3], 18)).toFixed(2)
+        ),
+      })
 
-    const L1ETHBalanceLatest = balances.reduce((acc, cur) => {
-      return acc.add(cur)
-    }, BigNumber.from('0'))
+      const L1ETHBalanceLatest = balances.reduce((acc, cur) => {
+        return acc.add(cur)
+      }, BigNumber.from('0'))
 
-    if (!this.state.L1ETHBalance.eq(BigNumber.from('0'))) {
-      // condition 1 - L1ETHBalance <= L1ETHBalanceLatest -- do nothing
-      // condition 2 - L1ETHBalance > L1ETHBalanceLatest
-      if (this.state.L1ETHBalance.gt(L1ETHBalanceLatest)) {
-        this.state.L1ETHCostFee = this.state.L1ETHCostFee.add(
-          this.state.L1ETHBalance.sub(L1ETHBalanceLatest)
+      if (!this.state.L1ETHBalance.eq(BigNumber.from('0'))) {
+        // condition 1 - L1ETHBalance <= L1ETHBalanceLatest -- do nothing
+        // condition 2 - L1ETHBalance > L1ETHBalanceLatest
+        if (this.state.L1ETHBalance.gt(L1ETHBalanceLatest)) {
+          this.state.L1ETHCostFee = this.state.L1ETHCostFee.add(
+            this.state.L1ETHBalance.sub(L1ETHBalanceLatest)
+          )
+        }
+      } else {
+        // start from the point that L1ETHCost = L2ETHCollect
+        this.state.L1ETHCostFee = BigNumber.from(
+          (
+            await this.options.l2RpcProvider.getBalance(
+              this.options.OVM_SequencerFeeVault
+            )
+          ).toString()
         )
       }
-    } else {
-      // start from the point that L1ETHCost = L2ETHCollect
-      this.state.L1ETHCostFee = BigNumber.from(
+
+      this.state.L1ETHBalance = L1ETHBalanceLatest
+      this.state.lastQueriedL1Block =
+        await this.options.l2RpcProvider.getBlockNumber()
+
+      // write history
+      this._writeL1ETHFee()
+
+      this.logger.info('Got L1 ETH balances', {
+        network: 'L1',
+        data: {
+          L1ETHBalance: this.state.L1ETHBalance.toString(),
+          L1ETHCostFee: Number(
+            Number(
+              utils.formatEther(this.state.L1ETHCostFee.toString())
+            ).toFixed(6)
+          ),
+          L1ETHCostFee10X: Number(
+            (
+              Number(utils.formatEther(this.state.L1ETHCostFee.toString())) * 10
+            ).toFixed(6)
+          ),
+          latestQueriedL1Block: this.state.lastQueriedL1Block,
+        },
+      })
+    } catch (error) {
+      this.logger.warn(`CAN\'T GET L1 GAS COST ${error}`)
+    }
+  }
+
+  private async _getL2GasCost(): Promise<void> {
+    try {
+      const latestQueriedL2Block =
+        await this.options.l2RpcProvider.getBlockNumber()
+      const numberOfBlocksInterval =
+        latestQueriedL2Block > this.state.lastQueriedL2Block
+          ? latestQueriedL2Block - this.state.lastQueriedL2Block
+          : 1
+
+      const txs = await Promise.all(
+        latestQueriedL2Block === this.state.lastQueriedL2Block
+          ? [
+              this.options.l2RpcProvider.getBlockWithTransactions(
+                this.state.lastQueriedL2Block
+              ),
+            ]
+          : [
+              ...Array(latestQueriedL2Block - this.state.lastQueriedL2Block),
+            ].map((_, i) =>
+              this.options.l2RpcProvider.getBlockWithTransactions(
+                this.state.lastQueriedL2Block + i + 1
+              )
+            )
+      )
+      const collectGasLimitAndFee = txs.reduce(
+        (acc, cur) => {
+          return [
+            acc[0].add(cur.transactions[0].gasLimit),
+            acc[1].add(
+              cur.transactions[0].gasLimit.mul(cur.transactions[0].gasPrice)
+            ),
+          ]
+        },
+        [BigNumber.from('0'), BigNumber.from('0')]
+      )
+
+      // Get L2 ETH Fee from contract
+      const L2ETHCollectFee = BigNumber.from(
         (
           await this.options.l2RpcProvider.getBalance(
             this.options.OVM_SequencerFeeVault
           )
         ).toString()
       )
-    }
+      // The oETH in OVM_SequencerFeeVault is zero after withdrawing it
+      let L2ETHCollectFeeIncreased = BigNumber.from('0')
 
-    this.state.L1ETHBalance = L1ETHBalanceLatest
-    this.state.lastQueriedL1Block =
-      await this.options.l2RpcProvider.getBlockNumber()
-
-    // write history
-    this._writeL1ETHFee()
-
-    this.logger.info('Got L1 ETH balances', {
-      network: 'L1',
-      data: {
-        L1ETHBalance: this.state.L1ETHBalance.toString(),
-        L1ETHCostFee: Number(
-          Number(utils.formatEther(this.state.L1ETHCostFee.toString())).toFixed(
-            6
-          )
-        ),
-        L1ETHCostFee10X: Number(
-          (
-            Number(utils.formatEther(this.state.L1ETHCostFee.toString())) * 10
-          ).toFixed(6)
-        ),
-        latestQueriedL1Block: this.state.lastQueriedL1Block,
-      },
-    })
-  }
-
-  private async _getL2GasCost(): Promise<void> {
-    const latestQueriedL2Block =
-      await this.options.l2RpcProvider.getBlockNumber()
-    const numberOfBlocksInterval =
-      latestQueriedL2Block > this.state.lastQueriedL2Block
-        ? latestQueriedL2Block - this.state.lastQueriedL2Block
-        : 1
-
-    const txs = await Promise.all(
-      latestQueriedL2Block === this.state.lastQueriedL2Block
-        ? [
-            this.options.l2RpcProvider.getBlockWithTransactions(
-              this.state.lastQueriedL2Block
-            ),
-          ]
-        : [...Array(latestQueriedL2Block - this.state.lastQueriedL2Block)].map(
-            (_, i) =>
-              this.options.l2RpcProvider.getBlockWithTransactions(
-                this.state.lastQueriedL2Block + i + 1
-              )
-          )
-    )
-    const collectGasLimitAndFee = txs.reduce(
-      (acc, cur) => {
-        return [
-          acc[0].add(cur.transactions[0].gasLimit),
-          acc[1].add(
-            cur.transactions[0].gasLimit.mul(cur.transactions[0].gasPrice)
-          ),
-        ]
-      },
-      [BigNumber.from('0'), BigNumber.from('0')]
-    )
-
-    // Get L2 ETH Fee from contract
-    const L2ETHCollectFee = BigNumber.from(
-      (
-        await this.options.l2RpcProvider.getBalance(
-          this.options.OVM_SequencerFeeVault
-        )
-      ).toString()
-    )
-    // The oETH in OVM_SequencerFeeVault is zero after withdrawing it
-    let L2ETHCollectFeeIncreased = BigNumber.from('0')
-
-    if (L2ETHCollectFee.lt(this.state.L2ETHVaultBalance)) {
+      if (L2ETHCollectFee.lt(this.state.L2ETHVaultBalance)) {
+        this.state.L2ETHVaultBalance = L2ETHCollectFee
+      }
+      L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(
+        this.state.L2ETHVaultBalance
+      )
       this.state.L2ETHVaultBalance = L2ETHCollectFee
+
+      this.state.L2ETHCollectFee = this.state.L2ETHCollectFee.add(
+        L2ETHCollectFeeIncreased
+      )
+      this.state.lastQueriedL2Block = latestQueriedL2Block
+      this.state.avgL2GasLimitPerBlock = collectGasLimitAndFee[0].div(
+        numberOfBlocksInterval
+      )
+      this.state.numberOfBlocksInterval = numberOfBlocksInterval
+
+      await this._writeL2ETHCost()
+
+      this.logger.info('Got L2 Gas Cost', {
+        network: 'L2',
+        data: {
+          L2ETHCollectFee: Number(
+            Number(
+              utils.formatEther(this.state.L2ETHCollectFee.toString())
+            ).toFixed(6)
+          ),
+          L2ETHCollectFee10X: Number(
+            (
+              Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
+              10
+            ).toFixed(6)
+          ),
+          lastQueriedL2Block: this.state.lastQueriedL2Block,
+          avgL2GasUsagePerBlock: this.state.avgL2GasLimitPerBlock.toString(),
+          numberOfBlocksInterval: this.state.numberOfBlocksInterval,
+        },
+      })
+    } catch (error) {
+      this.logger.warn(`CAN\'T GET L2 GAS COST ${error}`)
     }
-    L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(this.state.L2ETHVaultBalance)
-    this.state.L2ETHVaultBalance = L2ETHCollectFee
-
-    this.state.L2ETHCollectFee = this.state.L2ETHCollectFee.add(
-      L2ETHCollectFeeIncreased
-    )
-    this.state.lastQueriedL2Block = latestQueriedL2Block
-    this.state.avgL2GasLimitPerBlock = collectGasLimitAndFee[0].div(
-      numberOfBlocksInterval
-    )
-    this.state.numberOfBlocksInterval = numberOfBlocksInterval
-
-    await this._writeL2ETHCost()
-
-    this.logger.info('Got L2 Gas Cost', {
-      network: 'L2',
-      data: {
-        L2ETHCollectFee: Number(
-          Number(
-            utils.formatEther(this.state.L2ETHCollectFee.toString())
-          ).toFixed(6)
-        ),
-        L2ETHCollectFee10X: Number(
-          (
-            Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
-            10
-          ).toFixed(6)
-        ),
-        lastQueriedL2Block: this.state.lastQueriedL2Block,
-        avgL2GasUsagePerBlock: this.state.avgL2GasLimitPerBlock.toString(),
-        numberOfBlocksInterval: this.state.numberOfBlocksInterval,
-      },
-    })
   }
 
   private async _updateGasPrice(): Promise<void> {
@@ -508,11 +574,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
       }
       this.logger.debug('Updating L2 gas price...')
-      const tx = await this.state.OVM_GasPriceOracle.setGasPrice(
+      const gasPriceTx = await this.state.OVM_GasPriceOracle.setGasPrice(
         targetUpdatedGasPrice,
         { gasPrice: 0 }
       )
-      await tx.wait()
+      await gasPriceTx.wait()
       this.logger.info('Updated L2 gas price', {
         gasPrice: targetUpdatedGasPrice,
       })
@@ -585,8 +651,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
         if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
           this.logger.info('No need to update extra gas', {
-            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
-            extraGasRelay: Number(extraGasRelay.toString()),
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
           })
         } else {
           this.logger.debug('Updating extra gas for Proxy__L2LiquidityPool...')
@@ -597,7 +663,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             )
           await tx.wait()
           this.logger.info('Updated Proxy__L2LiquidityPool extra gas', {
-            extraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: targetExtraGasRelay.toNumber(),
           })
         }
       } else {
@@ -677,8 +743,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
         if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
           this.logger.info('No need to update extra gas', {
-            targetExtraGasRelay: Number(targetExtraGasRelay.toString()),
-            extraGasRelay: Number(extraGasRelay.toString()),
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
           })
         } else {
           this.logger.debug('Updating extra gas for DiscretionaryExitBurn...')
@@ -689,7 +755,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             )
           await tx.wait()
           this.logger.info('Updated DiscretionaryExitBurn extra gas', {
-            extraGasRelay: Number(targetExtraGasRelay.toString()),
+            extraGasRelay: targetExtraGasRelay.toNumber(),
           })
         }
       } else {
@@ -700,7 +766,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
   }
 
-   private async _updateOverheadFee(): Promise<void> {
+  private async _updateOverhead(): Promise<void> {
     try {
       const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
       const CanonicalTransactionChainLog =
@@ -716,14 +782,14 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           Number(latestL1Block)
         )
 
-    const orderedOverheadLog = orderBy(
+      const orderedOverheadLog = orderBy(
         [...CanonicalTransactionChainLog, ...StateCommitmentChainLog],
         'blockNumber',
         'desc'
       )
 
       // Calculate the batch size
-      let L1BatchSubmissionCost = BigNumber.from(0)
+      let L1BatchSubmissionGasUsage = BigNumber.from(0)
       const transactionHashList = orderedOverheadLog.reduce(
         (acc, cur, index) => {
           if (!acc.includes(cur.transactionHash)) {
@@ -742,39 +808,175 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       for (const hash of transactionHashList) {
         const txReceipt =
           await this.options.l1RpcProvider.getTransactionReceipt(hash)
-        L1BatchSubmissionCost = L1BatchSubmissionCost.add(
-          txReceipt.effectiveGasPrice.mul(txReceipt.gasUsed)
+        L1BatchSubmissionGasUsage = L1BatchSubmissionGasUsage.add(
+          txReceipt.gasUsed
         )
       }
 
-      const batchFee = L1BatchSubmissionCost.div(
-        BigNumber.from(batchSize)
-      )
-      const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
-      const targetOverheadGas = batchFee.div(L2GasPrice)
+      const batchFee = L1BatchSubmissionGasUsage.div(BigNumber.from(batchSize))
+      const targetOverheadGas = batchFee
+        .mul(BigNumber.from(this.options.overheadRatio1000X))
+        .div(BigNumber.from('1000'))
 
-      const overheadGas =
-        await this.state.OVM_GasPriceOracle.overhead()
+      const overheadProduction = await this.state.OVM_GasPriceOracle.overhead()
 
-      if (targetOverheadGas.toString() === overheadGas.toString()) {
-        this.logger.info('No need to overhead gas', {
-          targetOverheadGas: Number(targetOverheadGas.toString()),
-          overheadGas: Number(overheadGas.toString()),
+      if (
+        (targetOverheadGas.toNumber() <
+          overheadProduction.toNumber() *
+            (1 + this.options.overheadMinPercentChange) &&
+          targetOverheadGas.toNumber() >
+            overheadProduction.toNumber() *
+              (1 - this.options.overheadMinPercentChange)) ||
+        !targetOverheadGas.toNumber()
+      ) {
+        this.logger.info('No need to update overhead value', {
+          targetOverheadGas: targetOverheadGas.toNumber(),
+          overheadGas: overheadProduction.toNumber(),
         })
       } else {
-        this.logger.debug('Updating overhead gas...')
-        const tx =
-          await this.state.OVM_GasPriceOracle.setOverhead(
+        if (targetOverheadGas.toNumber() > this.options.minOverhead) {
+          this.logger.debug('Updating overhead gas...')
+          const tx = await this.state.OVM_GasPriceOracle.setOverhead(
             targetOverheadGas,
             { gasPrice: 0 }
           )
-        await tx.wait()
-        this.logger.info('Updated overhead gas', {
-          overheadGas: Number(targetOverheadGas.toString()),
-        })
+          await tx.wait()
+          this.logger.info('Updated overhead gas', {
+            overheadProduction: overheadProduction.toNumber(),
+            overheadGas: targetOverheadGas.toNumber(),
+          })
+        } else {
+          this.logger.info('No need to update overhead value', {
+            targetOverheadGas: targetOverheadGas.toNumber(),
+            overheadGas: overheadProduction.toNumber(),
+            minOverheadGas: this.options.minOverhead,
+          })
+        }
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE OVER HEAD RATIO ${error}`)
+    }
+  }
+
+  private async _updateNFTBridgeGasBurnFee(): Promise<void> {
+    try {
+      const latestL1Block = await this.options.l1RpcProvider.getBlockNumber()
+      const L1NFTBridgeSuccessLog =
+        await this.state.Proxy__L1NFTBridge.queryFilter(
+          this.state.Proxy__L1NFTBridge.filters.NFTWithdrawalFinalized(),
+          Number(latestL1Block) - 10000,
+          Number(latestL1Block)
+        )
+      const L1NFTBridgeFailureLog =
+        await this.state.Proxy__L1NFTBridge.queryFilter(
+          this.state.Proxy__L1NFTBridge.filters.NFTWithdrawalFailed(),
+          Number(latestL1Block) - 10000,
+          Number(latestL1Block)
+        )
+
+      const orderedL1NFTBridgeLog = orderBy(
+        [...L1NFTBridgeSuccessLog, ...L1NFTBridgeFailureLog],
+        'blockNumber',
+        'desc'
+      )
+
+      // Calculate the average fee of last 50 relayed messages
+      let L1NFTRelayerCost = BigNumber.from(0)
+      const transactionHashList = orderedL1NFTBridgeLog.reduce(
+        (acc, cur, index) => {
+          if (
+            index < 50 &&
+            acc.length < 10 &&
+            !acc.includes(cur.transactionHash)
+          ) {
+            acc.push(cur.transactionHash)
+          }
+          return acc
+        },
+        []
+      )
+      const numberOfMessages = [
+        ...L1NFTBridgeSuccessLog,
+        ...L1NFTBridgeFailureLog,
+      ].filter((i) => transactionHashList.includes(i.transactionHash)).length
+
+      if (numberOfMessages) {
+        for (const hash of transactionHashList) {
+          const txReceipt =
+            await this.options.l1RpcProvider.getTransactionReceipt(hash)
+          L1NFTRelayerCost = L1NFTRelayerCost.add(
+            txReceipt.effectiveGasPrice.mul(txReceipt.gasUsed)
+          )
+        }
+
+        const messageFee = L1NFTRelayerCost.div(
+          BigNumber.from(numberOfMessages)
+        )
+        const extraChargeFee = messageFee
+          .mul(BigNumber.from(this.options.burnedGasFeeRatio100X))
+          .div(BigNumber.from(100))
+        const L2GasPrice = await this.options.l2RpcProvider.getGasPrice()
+        const targetExtraGasRelay = extraChargeFee
+          .div(L2GasPrice)
+          .gt(BigNumber.from(this.options.maxBurnedGas))
+          ? BigNumber.from(this.options.maxBurnedGas)
+          : extraChargeFee.div(L2GasPrice)
+
+        const extraGasRelay =
+          await this.state.Proxy__L2NFTBridge.extraGasRelay()
+
+        if (targetExtraGasRelay.toString() === extraGasRelay.toString()) {
+          this.logger.info('No need to update extra gas', {
+            targetExtraGasRelay: targetExtraGasRelay.toNumber(),
+            extraGasRelay: extraGasRelay.toNumber(),
+          })
+        } else {
+          this.logger.debug('Updating extra gas for Proxy__L2NFTBridge...')
+          const tx = await this.state.Proxy__L2NFTBridge.configureExtraGasRelay(
+            targetExtraGasRelay,
+            { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated Proxy__L2NFTBridge extra gas', {
+            extraGasRelay: targetExtraGasRelay.toNumber(),
+          })
+        }
+      } else {
+        this.logger.info('No need to update extra gas for NFT')
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE NFT EXIT BURNED RATIO ${error}`)
+    }
+  }
+
+  private async _upateL1BaseFee(): Promise<void> {
+    try {
+      const l1GasPrice = await this.options.l1RpcProvider.getGasPrice()
+      const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
+      if (
+        l1GasPrice.toNumber() !== l1BaseFee.toNumber() &&
+        l1GasPrice.toNumber() > this.options.minL1BaseFee &&
+        l1GasPrice.toNumber() < this.options.maxL1BaseFee
+      ) {
+        const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
+          l1GasPrice,
+          { gasPrice: 0 }
+        )
+        await tx.wait()
+        this.logger.info('Updated l1BaseFee', {
+          l1GasPrice: l1GasPrice.toNumber(),
+          l1BaseFee: l1BaseFee.toNumber(),
+        })
+      } else {
+        this.logger.info('No need to update L1 base gas price', {
+          l1GasPrice: l1GasPrice.toNumber(),
+          l1BaseFee: l1BaseFee.toNumber(),
+          minL1BaseFee: this.options.minL1BaseFee,
+          maxL1BaseFee: this.options.maxL1BaseFee,
+        })
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
     }
   }
 }
