@@ -42,13 +42,19 @@ function CounterButton ({
 
   let buttonColor
   if (theme.palette.mode === 'light') {
-    buttonColor = disabled ? 'rgba(0, 0, 0, 0.2)': '#81a034'
+    buttonColor = disabled ? 'rgba(0, 0, 0, 0.2)': 'rgba(0, 0, 0, 0.4)'
   } else {
-    buttonColor = disabled ? 'rgba(255,255,255,0.2)': '#81a034'
+    buttonColor = disabled ? 'rgba(255,255,255,0.2)': 'rgba(255,255,255,0.4)'
   }
   return (
-    <div className={styles.container} style={{borderColor: buttonColor}} onClick={disabled ? () => '': onClick}>
-      {!minus || plus ? <div className={styles.line1} style={{backgroundColor: buttonColor}}></div>: <></>}
+    <div
+      className={disabled ? styles.container_disabled: styles.container}
+      style={{borderColor: buttonColor}}
+      onClick={disabled ? () => '': onClick}
+    >
+      {!minus || plus ?
+        <div className={styles.line1} style={{backgroundColor: buttonColor}}></div>: <></>
+      }
       <div className={styles.line2} style={{backgroundColor: buttonColor}}></div>
     </div>
   )

@@ -3330,7 +3330,7 @@ class NetworkService {
             (Number(utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals)) /
             Number(utils.formatUnits(BigNumber.from(l2Liquidity), filteredBalance.decimals))).toFixed(3): 0
         }
-      } else {
+      } else if (tokenName) {
         const l1TokenAddress = this.tokenAddresses[tokenName].L1
         const l2TokenAddress = this.tokenAddresses[tokenName].L2
         const [l2LPFeeRate, l2LPBalance, l2Liquidity] = await getInfo(l1TokenAddress, l2TokenAddress)
@@ -3347,7 +3347,6 @@ class NetworkService {
         }
       }
     }
-    console.log(payload)
     return payload
   }
 }

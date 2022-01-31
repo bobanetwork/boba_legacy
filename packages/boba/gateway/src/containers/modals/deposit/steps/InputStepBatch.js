@@ -124,7 +124,6 @@ function InputStepBatch({ handleClose }) {
   }, [ dispatch ])
 
   useEffect(() => {
-    console.log(`Found new token: ${tokenList}`)
     dispatch(fetchUserAndL2LPBalanceBatch(tokenList))
     dispatch(fetchFastDepositBatchCost(tokenList))
   }, [ tokenList, dispatch ])
@@ -321,7 +320,9 @@ function InputStepBatch({ handleClose }) {
                       updatedPayload.splice(index, 1)
                       setPayload(updatedPayload)
                       // Update token list
-                      setTokenList(updatedPayload.reduce((acc, cur) => {acc.push(cur.symbol); return acc}, []))
+                      setTokenList(updatedPayload.reduce((acc, cur) => {
+                        if (typeof cur.symbol !== 'undefined') {acc.push(cur.symbol)}; return acc
+                      }, []))
                     }}
                     disabled={payload.length === 1}
                   />
