@@ -2467,11 +2467,12 @@ async initializeBase( networkGateway ) {
     }
 
     //in some cases zero not allowed
-    const tx2 = await this.L1LPContract.populateTransaction.clientDepositL1(
-      currencyAddress === allAddresses.L1_ETH_Address ? '1' : '0', //ETH does not allow zero
-      currencyAddress,
-      currencyAddress === allAddresses.L1_ETH_Address ? { value : '1'} : {}
-    )
+    const tx2 = await this.L1LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL1(
+        currencyAddress === allAddresses.L1_ETH_Address ? '1' : '0', //ETH does not allow zero
+        currencyAddress,
+        currencyAddress === allAddresses.L1_ETH_Address ? { value : '1'} : {}
+      )
 
     const depositGas_BN = await this.L1Provider.estimateGas(tx2)
     console.log("Fast deposit gas", depositGas_BN.toString())
