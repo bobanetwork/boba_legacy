@@ -129,7 +129,7 @@ function Account ({ enabled }) {
 
   useEffect(()=>{
     if (accountEnabled) {
-      console.log("Account - fast check balances")
+      console.log("Account - initial check balances")
       dispatch(fetchTransactions())
       dispatch(fetchBalances())
     }
@@ -157,10 +157,10 @@ function Account ({ enabled }) {
   )
 
   let label_L1 = 'Your Balance on Ethereum'
-  if(network === 'rinkeby') label_L1 = 'Rinkeby'
+  if (network === 'rinkeby') label_L1 = 'Rinkeby'
 
   let label_L2 = 'Your Balance on Boba'
-  if(network === 'rinkeby') label_L2 = 'Boba Rinkeby'
+  if (network === 'rinkeby') label_L2 = 'Boba'
 
   const L1Column = () => (
     <S.AccountWrapper >
@@ -185,6 +185,7 @@ function Account ({ enabled }) {
           chain={'L1'}
           networkLayer={networkLayer}
           disabled={disabled}
+          accountEnabled={accountEnabled}
         />
         {rootBalance.map((i, index) => {
           return (
