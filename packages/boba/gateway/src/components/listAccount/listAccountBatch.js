@@ -147,11 +147,11 @@ class ListAccountBatch extends React.Component {
                 <S.AccountAlertBox>
                   <Box sx={{flex: 1}}>
                     <Typography variant="body2" component="p" >
-                      You are on L2. To use the L1 Batch Bridge, switch to L1
+                      You are on L2. To use the L1 Batch Bridge, switch to Mainnet
                     </Typography>
                    </Box>
                    <Box sx={{ textAlign: 'center'}}>
-                     <LayerSwitcher />
+                      <LayerSwitcher isButton={true}/>
                    </Box>
                 </S.AccountAlertBox>
               }

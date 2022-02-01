@@ -31,6 +31,7 @@ import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 class Farm extends React.Component {
@@ -49,7 +50,11 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    const { baseEnabled, accountEnabled }  = this.props.setup
+    const { 
+      baseEnabled, 
+      accountEnabled, 
+      layer 
+    }  = this.props.setup
 
     let initialViewLayer = 'L1 Liquidity Pool'
     let initialLayer = 'L1LP'
@@ -62,6 +67,7 @@ class Farm extends React.Component {
     this.state = {
       poolInfo,
       userInfo,
+      layer,
       layer1,
       layer2,
       lpChoice: initialLayer,
@@ -95,7 +101,11 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    const { baseEnabled, accountEnabled }  = this.props.setup
+    const { 
+      baseEnabled, 
+      accountEnabled,
+      layer 
+    }  = this.props.setup
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -122,6 +132,10 @@ class Farm extends React.Component {
     if (prevState.setup.accountEnabled !== accountEnabled) {
       this.props.dispatch(getFarmInfo())
       if (!accountEnabled) this.setState({ accountEnabled })
+    }
+
+    if (prevState.setup.layer !== layer) {
+      this.setState({ layer })
     }
   }
 
@@ -189,11 +203,10 @@ class Farm extends React.Component {
       showMSO,
       dropDownBox,
       accountEnabled,
+      layer,
     } = this.state
 
     const { isMobile } = this.props
-
-    const networkLayer = networkService.L1orL2
 
     return (
       <>
@@ -208,15 +221,17 @@ class Farm extends React.Component {
               md={10}
             >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute
+                <span style={{fontWeight: '700'}}>EARNINGS</span>: The bridges collect fees and then immediately distribute
                 them to stakers. The bridges are not farms. Your earnings only increase when someone uses the
-                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which
-                reflects the fees people paid to bridge and the previous usage patterns for each pool.
-                <br/>
-                <br/>
-                The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
-                {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
+                bridge you have staked into.
+                <br />
+                <span style={{fontWeight: '700'}}>YIELD</span>: the historical yield, which
+                reflects the fees people paid to bridge and the previous usage patterns for each pool. 
+                There is no fixed yield and yields can wary widely as bridge activity changes. 
+                <br />
+                <span style={{fontWeight: '700'}}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
+                <br />
+                <span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span>: the amount of funds currently in each pool.
               </Typography>
             </S.GridItemTag>
 
@@ -265,6 +280,21 @@ class Farm extends React.Component {
 
         </S.Wrapper>
 
+        {!layer &&
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To see your balances and contribute to the liquidity pool, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+        }
+
         <Box sx={{ my: 3, width: '100%' }}>
           <S.GridItemTagContainer sx={{ mb: 2, display: 'flex' }}>
             <Tabs
@@ -302,7 +332,7 @@ class Farm extends React.Component {
             </S.FarmActionContainer>
           </S.GridItemTagContainer>
 
-          {networkLayer === 'L2' && lpChoice === 'L1LP' &&
+          {layer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon sx={{ flex: 1 }} />
@@ -317,7 +347,7 @@ class Farm extends React.Component {
             </S.LayerAlert>
           }
 
-          {networkLayer === 'L1' && lpChoice === 'L2LP' &&
+          {layer === 'L1' && lpChoice === 'L2LP' &&
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -338,7 +368,7 @@ class Farm extends React.Component {
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Past APR %</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Yield %</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>

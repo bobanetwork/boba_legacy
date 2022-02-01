@@ -27,6 +27,7 @@ import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 
 import AlertIcon from 'components/icons/AlertIcon'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageHeader from 'components/pageHeader/PageHeader'
 
 import * as S from './Dao.styles'
@@ -62,7 +63,7 @@ function DAO() {
                       You are on Mainnet. To use the Boba DAO, SWITCH to Boba
                     </S.AlertText>
                   </S.AlertInfo>
-                  <LayerSwitcher isButton={true} />
+                  <LayerSwitcher />
                 </S.LayerAlert>
             }
             {!layer &&
@@ -76,6 +77,7 @@ function DAO() {
                       You have not connected your wallet. To use the Boba DAO, connect to MetaMask
                     </S.AlertText>
                   </S.AlertInfo>
+                  <WalletPicker />
                 </S.LayerAlert>
             }
             <div className={styles.content} style={{background: theme.palette.background.secondary}}>
