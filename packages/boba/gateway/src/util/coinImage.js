@@ -23,6 +23,7 @@ import ftmLogo from 'images/ftm.svg';
 import maticLogo from 'images/matic.svg';
 import umaLogo from 'images/uma.svg';
 import domLogo from 'images/domLogo.png';
+import wagmi0Logo from 'images/wagmiv0.png';
 
 export const getCoinImage = (symbol) => {
 
@@ -105,7 +106,7 @@ export const getCoinImage = (symbol) => {
       logo = umaLogo;
       break;
     case "WAGMIv0":
-      logo = umaLogo;
+      logo = wagmiv0;
       break;
     case "DOM":
       logo = domLogo;

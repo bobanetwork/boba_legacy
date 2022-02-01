@@ -1950,7 +1950,6 @@ async initializeBase( networkGateway ) {
       const rewards = Number(token.poolTokenInfo.accUserReward.toString())
       const duration = new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
       const durationDays = duration / (60 * 60 * 24 * 1000)
-      console.log("durationDays:", durationDays)
       const annualRewardEstimate = 365 * rewards / durationDays
       let annualYieldEstimate = 100 * annualRewardEstimate / userIn
       if(!annualYieldEstimate) annualYieldEstimate = 0
