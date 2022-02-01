@@ -3166,6 +3166,11 @@ async initializeBase( networkGateway ) {
   /***********************************************/
   async addFS_Savings(value_Wei_String) {
 
+    if(!this.account) {
+      console.log('NS: withdrawFS_Savings() error - called but account === null')
+      return
+    }
+
     try {
 
       const FixedSavings = new ethers.Contract(
@@ -3173,11 +3178,6 @@ async initializeBase( networkGateway ) {
         L2SaveJson.abi,
         this.provider.getSigner()
       )
-
-      // const account = await this.provider.getSigner().getAddress()
-      // console.log('this.account', account)
-
-      // console.log(this.L2Provider)
 
       let allowance_BN = await this.BobaContract.allowance(
         this.account,
@@ -3191,7 +3191,9 @@ async initializeBase( networkGateway ) {
 
       if (depositAmount_BN.gt(allowance_BN)) {
         console.log("Need to approve YES:",depositAmount_BN)
-        const approveStatus = await this.BobaContract.approve(
+        const approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
           allAddresses.BobaFixedSavings,
           value_Wei_String
         )
@@ -3210,11 +3212,9 @@ async initializeBase( networkGateway ) {
     }
   }
 
-  /***********************************************/
-  /*****       Fixed savings account         *****/
-  /***********************************************/
   async withdrawFS_Savings(stakeID) {
-    if(this.account === null) {
+
+    if(!this.account) {
       console.log('NS: withdrawFS_Savings() error - called but account === null')
       return
     }
@@ -3255,6 +3255,7 @@ async initializeBase( networkGateway ) {
   }
 
   async getFS_Info() {
+
     if(this.account === null) {
       console.log('NS: getFS_Info() error - called but account === null')
       return
@@ -3271,7 +3272,6 @@ async initializeBase( networkGateway ) {
       let stakeInfo = []
 
       const stakeCounts = await FixedSavings.personalStakeCount(this.account)
-      //console.log('stakeCounts:',stakeCounts)
 
       for (let i = 0; i < stakeCounts; i++) {
 
@@ -3286,7 +3286,6 @@ async initializeBase( networkGateway ) {
         })
 
       }
-      //console.log("stakeInfo:",stakeInfo)
       return { stakeInfo }
     } catch (error) {
       console.log("NS: getFS_Info error:",error)
