@@ -49,6 +49,7 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
+    const { baseEnabled, accountEnabled }  = this.props.setup
 
     let initialViewLayer = 'L1 Liquidity Pool'
     let initialLayer = 'L1LP'
@@ -68,13 +69,18 @@ class Farm extends React.Component {
       showMDO: false, //MDO = my deposits only
       showMSO: false, //MSO = my stakes only
       dropDownBox: false,
-      dropDownBoxInit: true
+      dropDownBoxInit: true,
+      // provider status
+      baseEnabled,
+      accountEnabled
     }
 
   }
 
   componentDidMount() {
-    this.props.dispatch(getFarmInfo())
+    if (this.state.baseEnabled) {
+      this.props.dispatch(getFarmInfo())
+    }
   }
 
   componentDidUpdate(prevState) {
@@ -89,12 +95,16 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
+    const { baseEnabled, accountEnabled }  = this.props.setup
+
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
     }
 
     if (!isEqual(prevState.farm.userInfo, userInfo)) {
+      console.log("UserInfo not correct")
       this.setState({ userInfo })
+      if (accountEnabled) this.setState({ accountEnabled })
     }
 
     if (!isEqual(prevState.balance.layer1, layer1)) {
@@ -105,6 +115,15 @@ class Farm extends React.Component {
       this.setState({ layer2 })
     }
 
+    if (prevState.setup.baseEnabled !== baseEnabled) {
+      this.props.dispatch(getFarmInfo())
+      this.setState({ baseEnabled })
+    }
+
+    if (prevState.setup.accountEnabled !== accountEnabled) {
+      this.props.dispatch(getFarmInfo())
+      if (!accountEnabled) this.setState({ accountEnabled })
+    }
   }
 
   getBalance(address, chain) {
@@ -170,6 +189,7 @@ class Farm extends React.Component {
       showMDO,
       showMSO,
       dropDownBox,
+      accountEnabled,
     } = this.state
 
     const { isMobile } = this.props
@@ -184,14 +204,14 @@ class Farm extends React.Component {
 
           <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
 
-            <S.GridItemTag 
-              item xs={10} 
+            <S.GridItemTag
+              item xs={10}
               md={10}
-            > 
+            >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute 
-                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the 
-                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which 
+                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute
+                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the
+                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which
                 reflects the fees people paid to bridge and the previous usage patterns for each pool.
                 <br/>
                 <br/>
@@ -236,7 +256,7 @@ class Farm extends React.Component {
                     bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
                     rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another.
                     <br /><br />
-                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees. 
+                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees.
                     When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool, and vice-versa.
                   </Typography>
                 </S.DropdownWrapper>
@@ -342,6 +362,7 @@ class Farm extends React.Component {
                     decimals={ret[1]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
+                    accountEnabled={accountEnabled}
                   />
                 )
               })}
@@ -362,6 +383,7 @@ class Farm extends React.Component {
                     decimals={ret[1]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
+                    accountEnabled={accountEnabled}
                   />
                 )
               })}
@@ -375,7 +397,8 @@ class Farm extends React.Component {
 
 const mapStateToProps = state => ({
   farm: state.farm,
-  balance: state.balance
+  balance: state.balance,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Farm)

@@ -125,7 +125,7 @@ function Home() {
   const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
-  
+
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
 
@@ -140,7 +140,7 @@ function Home() {
   useEffect(() => {
     window.scrollTo(0, 0)
 
-    if (!baseEnabled) initializeBase()
+    initializeBase()
 
     async function initializeBase() {
       console.log("Calling initializeBase for", network)

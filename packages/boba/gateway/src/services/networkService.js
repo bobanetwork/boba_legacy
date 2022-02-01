@@ -84,6 +84,20 @@ const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
+// preload allAddresses
+if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+  allAddresses = {
+    ...addresses_Rinkeby,
+    L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
+  }
+} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+  allAddresses = {
+    ...addresses_Mainnet,
+    L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool
+  }
+}
 let allTokens = {}
 
 class NetworkService {
@@ -423,7 +437,7 @@ async initializeBase( networkGateway ) {
 
     let addresses = null
     this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...
-    
+
     // defines the set of possible networks along with chainId for L1 and L2
     const nw = getNetwork()
     const L1rpc = nw[networkGateway]['L1']['rpcUrl']
@@ -460,7 +474,7 @@ async initializeBase( networkGateway ) {
       } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
         console.log('Mainnet Addresses:', addresses)
-      } 
+      }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
       //     console.log('Rinkeby Addresses:', addresses)
@@ -529,19 +543,19 @@ async initializeBase( networkGateway ) {
 
       this.supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
                                'REP',  'BAT',  'ZRX', 'SUSHI',
-                              'LINK',  'UNI', 'BOBA', 'xBOBA',
+                               'LINK',  'UNI', 'BOBA', 'xBOBA',
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
-                             'MATIC',  'UMA',  'DOM'
-                            ]
+                               'MATIC',  'UMA',  'DOM'
+                              ]
 
       //not all tokens are on Rinkeby
       if ( networkGateway === 'rinkeby') {
         this.supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
-                             'REP', 'BAT',  'ZRX', 'SUSHI',
-                            'LINK', 'UNI', 'BOBA', 'xBOBA',
-                             'OMG', 'DOM'
-                          ]
+                                 'BAT',  'ZRX', 'SUSHI',
+                                 'LINK', 'UNI', 'BOBA', 'xBOBA',
+                                 'OMG', 'DOM'
+                                ]
       }
 
       await Promise.all(this.supportedTokens.map(async (key) => {
@@ -713,7 +727,7 @@ async initializeBase( networkGateway ) {
       // connect to the wallet
       await window.ethereum.request({method: 'eth_requestAccounts'})
       this.provider = new ethers.providers.Web3Provider(window.ethereum)
-      
+
       this.account = await this.provider.getSigner().getAddress()
 
       const networkMM = await this.provider.getNetwork()
@@ -777,9 +791,9 @@ async initializeBase( networkGateway ) {
       }
 
       this.bindProviderListeners()
-      
+
       return this.L1orL2 // return the layer we are actually on
-      
+
     } catch (error) {
       console.log(`NS: ERROR: InitializeAccount `,error)
       return false
@@ -1218,12 +1232,13 @@ async initializeBase( networkGateway ) {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract.depositETH(
-        this.L2GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString()),
-        {
-          value: value_Wei_String
-        }
+      const depositTx = await this.L1StandardBridgeContract
+        .connect(this.provider.getSigner()).depositETH(
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString()),
+          {
+            value: value_Wei_String
+          }
       )
 
       //at this point the tx has been submitted, and we are waiting...
@@ -1298,10 +1313,11 @@ async initializeBase( networkGateway ) {
 
       } else {
         //any ERC20 json will do....
-        tx = await this.L2_TEST_Contract.attach(currency).transfer(
-          address,
-          value_Wei_String
-        )
+        tx = await this.L2_TEST_Contract
+          .connect(this.provider.getSigner()).attach(currency).transfer(
+            address,
+            value_Wei_String
+          )
         await tx.wait()
       }
 
@@ -1594,10 +1610,11 @@ async initializeBase( networkGateway ) {
 
       if(!allowed) {
         //and now, the normal allowance transaction
-        const approveStatus = await L1_TEST_Contract.approve(
-          allAddresses.L1StandardBridgeAddress,
-          value_Wei_String
-        )
+        const approveStatus = await L1_TEST_Contract
+          .connect(this.provider.getSigner()).approve(
+            allAddresses.L1StandardBridgeAddress,
+            value_Wei_String
+          )
         await approveStatus.wait()
         console.log("ERC 20 L1 ops approved:",approveStatus)
       }
@@ -1605,13 +1622,14 @@ async initializeBase( networkGateway ) {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract.depositERC20(
-        currency,
-        currencyL2,
-        value_Wei_String,
-        this.L2GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString())
-      )
+      const depositTx = await this.L1StandardBridgeContract
+        .connect(this.provider.getSigner()).depositERC20(
+          currency,
+          currencyL2,
+          value_Wei_String,
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
 
       console.log("depositTxStatus:",depositTx)
 
@@ -1880,6 +1898,7 @@ async initializeBase( networkGateway ) {
       return acc
     }, [allAddresses.L1_ETH_Address])
 
+    console.log(allAddresses)
     const L1LPContract = new ethers.Contract(
       allAddresses.L1LPAddress,
       L1LPJson.abi,
@@ -1895,6 +1914,7 @@ async initializeBase( networkGateway ) {
       let tokenName
       let decimals
 
+      console.log(tokenAddress, allAddresses.L1_ETH_Address, this.L1Provider)
       if (tokenAddress === allAddresses.L1_ETH_Address) {
         //console.log("Getting eth balance:", tokenAddress)
         //getting eth balance
@@ -1902,23 +1922,34 @@ async initializeBase( networkGateway ) {
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
+        console.log({ tokenBalance, tokenSymbol, tokenName, decimals})
       } else {
         //getting eth balance
         //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
+        console.log({ tokenBalance, tokenSymbol})
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
         decimals = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).decimals()
+        console.log({ tokenBalance, tokenSymbol, tokenName, decimals})
       }
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
-      const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      let userTokenInfo = {}
+      console.log("Address: ", this.account)
+      if (typeof this.account !== 'undefined' && this.account) {
+        userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      }
+      console.log({ tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals })
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
+    console.log(tokenAddressList)
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
 
+    console.log("Loading....")
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
+    console.log("Got result")
 
     sortRawTokens(L1LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
@@ -1954,11 +1985,12 @@ async initializeBase( networkGateway ) {
       }
       userInfo[token.tokenAddress] = {
         l1TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: token.userTokenInfo.amount.toString(),
-        pendingReward: token.userTokenInfo.pendingReward.toString(),
-        rewardDebt: token.userTokenInfo.rewardDebt.toString()
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): null,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): null,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): null
       }
     })
+    console.log({ poolInfo, userInfo })
     return { poolInfo, userInfo }
   }
 
@@ -2009,7 +2041,10 @@ async initializeBase( networkGateway ) {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
-      const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
+      let userTokenInfo = {}
+      if (typeof this.account !== 'undefined' && this.account) {
+        userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
+      }
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
@@ -2051,9 +2086,9 @@ async initializeBase( networkGateway ) {
       }
       userInfo[token.tokenAddress.toLowerCase()] = {
         l2TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: token.userTokenInfo.amount.toString(),
-        pendingReward: token.userTokenInfo.pendingReward.toString(),
-        rewardDebt: token.userTokenInfo.rewardDebt.toString()
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): null,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): null,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): null
       }
     })
 
@@ -2077,7 +2112,7 @@ async initializeBase( networkGateway ) {
       const addLiquidityTX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).addLiquidity(
+      ).connect(this.provider.getSigner()).addLiquidity(
         value_Wei_String,
         currency,
         otherField
@@ -2099,7 +2134,7 @@ async initializeBase( networkGateway ) {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).withdrawReward(
+      ).connect(this.provider.getSigner()).withdrawReward(
         value_Wei_String,
         currencyAddress,
         this.account
@@ -2121,7 +2156,7 @@ async initializeBase( networkGateway ) {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).withdrawLiquidity(
+      ).connect(this.provider.getSigner()).withdrawLiquidity(
         value_Wei_String,
         currency,
         this.account
@@ -2149,11 +2184,12 @@ async initializeBase( networkGateway ) {
 
     let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract.clientDepositL1(
-      value_Wei_String,
-      currency,
-      currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    depositTX = await this.L1LPContract
+      .connect(this.provider.getSigner()).clientDepositL1(
+        value_Wei_String,
+        currency,
+        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+      )
 
     console.log("depositTX",depositTX)
 
@@ -2223,10 +2259,11 @@ async initializeBase( networkGateway ) {
 
     let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract.clientDepositL1Batch(
-      updatedPayload,
-      ETHAmount !== 0 ? { value: ETHAmount } : {}
-    )
+    depositTX = await this.L1LPContract
+      .connect(this.provider.getSigner()).clientDepositL1Batch(
+        updatedPayload,
+        ETHAmount !== 0 ? { value: ETHAmount } : {}
+      )
 
     console.log("depositTX",depositTX)
 
@@ -2632,11 +2669,12 @@ async initializeBase( networkGateway ) {
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L2LPContract.clientDepositL2(
-      balance_BN,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
-    )
+    const depositTX = await this.L2LPContract
+      .connect(this.provider.getSigner()).clientDepositL2(
+        balance_BN,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
+      )
 
     //at this point the tx has been submitted, and we are waiting...
     await depositTX.wait()
@@ -2720,11 +2758,12 @@ async initializeBase( networkGateway ) {
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L2LPContract.clientDepositL2(
-      value_Wei_String,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    const depositTX = await this.L2LPContract
+      .connect(this.provider.getSigner()).clientDepositL2(
+        value_Wei_String,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+      )
 
     //at this point the tx has been submitted, and we are waiting...
     await depositTX.wait()
