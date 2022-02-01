@@ -7,7 +7,6 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   margin: '20px 0 40px',
   padding: '0 20px',
-  position: 'absolute',
   bottom: 0,
   width: '100%',
   [theme.breakpoints.down('md')]: {
