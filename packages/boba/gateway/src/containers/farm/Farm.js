@@ -102,7 +102,6 @@ class Farm extends React.Component {
     }
 
     if (!isEqual(prevState.farm.userInfo, userInfo)) {
-      console.log("UserInfo not correct")
       this.setState({ userInfo })
       if (accountEnabled) this.setState({ accountEnabled })
     }

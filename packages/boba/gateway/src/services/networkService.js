@@ -1914,7 +1914,6 @@ async initializeBase( networkGateway ) {
       let tokenName
       let decimals
 
-      console.log(tokenAddress, allAddresses.L1_ETH_Address, this.L1Provider)
       if (tokenAddress === allAddresses.L1_ETH_Address) {
         //console.log("Getting eth balance:", tokenAddress)
         //getting eth balance
@@ -1922,34 +1921,26 @@ async initializeBase( networkGateway ) {
         tokenSymbol = 'ETH'
         tokenName = 'Ethereum'
         decimals = 18
-        console.log({ tokenBalance, tokenSymbol, tokenName, decimals})
       } else {
         //getting eth balance
         //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
         tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
-        console.log({ tokenBalance, tokenSymbol})
         tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
         decimals = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).decimals()
-        console.log({ tokenBalance, tokenSymbol, tokenName, decimals})
       }
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
       let userTokenInfo = {}
-      console.log("Address: ", this.account)
       if (typeof this.account !== 'undefined' && this.account) {
         userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
       }
-      console.log({ tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals })
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
-    console.log(tokenAddressList)
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
 
-    console.log("Loading....")
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
-    console.log("Got result")
 
     sortRawTokens(L1LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
@@ -1990,7 +1981,6 @@ async initializeBase( networkGateway ) {
         rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): null
       }
     })
-    console.log({ poolInfo, userInfo })
     return { poolInfo, userInfo }
   }
 
