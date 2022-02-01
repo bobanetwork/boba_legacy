@@ -2823,7 +2823,12 @@ async initializeBase( networkGateway ) {
     //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: getDaoBalance() error - called but account === null')
+      return
+    }
 
     try {
       //console.log('Checking DAO balance')
@@ -2842,7 +2847,12 @@ async initializeBase( networkGateway ) {
     //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.xBobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: getDaoBalanceX() error - called but account === null')
+      return
+    }
 
     try {
       //console.log('Checking DAO balance')
@@ -2858,11 +2868,13 @@ async initializeBase( networkGateway ) {
   // get DAO Votes
   async getDaoVotes() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: getDaoVotes() error - called but account === null')
+      return
+    }
 
     try {
       let votes = await this.BobaContract.getCurrentVotes(this.account)
@@ -2880,7 +2892,12 @@ async initializeBase( networkGateway ) {
     //if( this.networkGateway === 'rinkeby' ) return
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.xBobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: getDaoVotesX() error - called but account === null')
+      return
+    }
 
     try {
       let votes = await this.xBobaContract.getCurrentVotes(this.account)
@@ -2895,10 +2912,17 @@ async initializeBase( networkGateway ) {
   async transferDao({ recipient, amount }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: transferDao() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.BobaContract.transfer(recipient, parseEther(amount.toString()))
+      const tx = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
       return tx
     } catch (error) {
@@ -2911,10 +2935,17 @@ async initializeBase( networkGateway ) {
   async delegateVotes({ recipient }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: delegateVotes() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.BobaContract.delegate(recipient)
+      const tx = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
@@ -2927,10 +2958,17 @@ async initializeBase( networkGateway ) {
   async delegateVotesX({ recipient }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.xBobaContract ) return
+
+    if( !this.account ) {
+      console.log('NS: delegateVotesX() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.xBobaContract.delegate(recipient)
+      const tx = await this.xBobaContract
+        .connect(this.provider.getSigner())
+        .delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
@@ -2942,16 +2980,12 @@ async initializeBase( networkGateway ) {
   // Proposal Create Threshold
   async getProposalThreshold() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
     if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
-      //console.log("rawThreshold:",rawThreshold)
       const res = { proposalThreshold: formatEther(rawThreshold) }
       return res
     } catch (error) {
@@ -2963,15 +2997,15 @@ async initializeBase( networkGateway ) {
   //Create Proposal
   async createProposal(payload) {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
     if( this.L1orL2 !== 'L2' ) return
     if( this.delegateContract === null ) return
 
-    //console.log("payload",payload)
+    if( !this.account ) {
+      console.log('NS: delegateVotesX() error - called but account === null')
+      return
+    }
 
-    let signatures = [''] // the function that will carry out the proposal
+    let signatures = ['']
     let value1 = 0
     let value2 = 0
     let value3 = 0
@@ -3034,12 +3068,14 @@ async initializeBase( networkGateway ) {
       //   description
       // })
 
-      let res = await delegateCheck.propose(
-        address,
-        values,
-        signatures,
-        callData,
-        description
+      let res = await delegateCheck
+        .connect(this.provider.getSigner())
+        .propose(
+          address,
+          values,
+          signatures,
+          callData,
+          description
       )
       return res
 
@@ -3052,11 +3088,8 @@ async initializeBase( networkGateway ) {
   //Fetch DAO Proposals
   async fetchProposals() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
     if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
@@ -3075,11 +3108,7 @@ async initializeBase( networkGateway ) {
         null, null, null, null
       )
 
-      //console.log('filter:',filter)
-
       const descriptionList = await delegateCheck.queryFilter(filter)
-
-      //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
@@ -3113,7 +3142,11 @@ async initializeBase( networkGateway ) {
 
         let proposal = await delegateCheck.getActions(i+2)
 
-        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)
+        let hasVoted = null 
+        
+        if( this.account ) {
+          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
+        }
 
         let description = descriptionList[i].args[8].toString()
 
@@ -3129,7 +3162,7 @@ async initializeBase( networkGateway ) {
            startBlock,
            startTimestamp,
            endTimestamp,
-           hasVoted
+           hasVoted: hasVoted
         })
 
       }
@@ -3145,8 +3178,15 @@ async initializeBase( networkGateway ) {
 
     if( this.delegateContract === null ) return
 
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
+
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.castVote(id, userVote)
       return res
     } catch(error) {
@@ -3159,10 +3199,17 @@ async initializeBase( networkGateway ) {
 
     if( this.delegateContract === null ) return
 
+    if( !this.account ) {
+      console.log('NS: queueProposal() error - called but account === null')
+      return
+    }
+
     console.log("ProposalID:",Number(proposalID))
 
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.queue(Number(proposalID))
       return res
     } catch(error) {
@@ -3176,10 +3223,17 @@ async initializeBase( networkGateway ) {
 
     if( this.delegateContract === null ) return
 
+    if(!this.account) {
+      console.log('NS: executeProposal() error - called but account === null')
+      return
+    }
+
     console.log("ProposalID:",Number(proposalID))
 
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.execute(Number(proposalID))
       return res
     } catch(error) {
