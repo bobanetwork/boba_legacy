@@ -116,21 +116,26 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	        log.Debug("MMDBG ApplyMessage returned", "failed", failed, "err", err)
                 log.Debug("MMDBG We have tx", "tx", tx)
                 log.Debug("MMDBG We have msg", "msg", msg)
-                log.Debug("MMDBG mGas price is before", "gp", msg.GasPrice())
-                msg.SetPrice()
-                log.Debug("MMDBG mGas price is now", "gp", msg.GasPrice())
+                //log.Debug("MMDBG mGas price is before", "gp", msg.GasPrice())
+                //msg.SetPrice()
+                //log.Debug("MMDBG mGas price is now", "gp", msg.GasPrice())
                 
-                vmenv.Context.GasPrice.SetUint64(0)
-                log.Debug("MMDBG env.context is", "c", vmenv.Context)
+                //vmenv.Context.GasPrice.SetUint64(0)
+                //log.Debug("MMDBG env.context is", "c", vmenv.Context)
                 
-                log.Debug("MMDBG Here we go again", "tx",tx)
-                log.Debug("MMDBG Here we go again", "msg",msg)
+                //log.Debug("MMDBG Here we go again", "tx",tx)
+                //log.Debug("MMDBG Here we go again", "msg",msg)
                 
+                //log.Debug("MMDBG", "ch", rollupCh)
+                //XXXX
+                //vm2 := vm.NewEVM(context, statedb, config, cfg)
+                //res, _, failed, err := DoCall(ctx, b, args, blockNrOrHash, nil, vm.Config{}, 0, gasCap)
+                //XXXX
                 
                 _, gas, failed, err = ApplyMessage(vmenv, msg, gp)
                 log.Debug("MMDBG ApplyMessage 2nd time", "gas", gas, "failed", failed, "err", err)
                 
-        	//return nil, ErrTuringRetry	// this is in "core", not "core/vm"
+        	return nil, ErrTuringRetry	// this is in "core", not "core/vm"
         }
         
 	// TURING Update the tx metadata, if a Turing call took place...

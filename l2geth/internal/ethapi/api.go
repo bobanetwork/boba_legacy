@@ -1701,8 +1701,33 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
         
-	log.Debug("MMDBG ethapi/api.go will SubmitTransaction")
-	return SubmitTransaction(ctx, s.b, tx)
+	log.Debug("MMDBG ethapi/api.go will SubmitTransaction", "tx", tx)
+        abc, xyz := SubmitTransaction(ctx, s.b, tx)
+        log.Debug("MMDBG ethapi/api.go is back", "abc", abc, "xyz", xyz)
+        
+        if xyz != nil && xyz.Error() == "turing retry needed" {
+		blockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
+        	log.Debug("MMDBG SendRawTransaction needs to retry; gas first", "ctx", ctx, "blockNrOrHash", blockNrOrHash, "tx", tx)
+                tdBytes := hexutil.Bytes(tx.Data())
+ 		callArgs := CallArgs{
+			From:     nil, //tx.Sender, // From shouldn't be nil
+			To:       tx.To(),
+			GasPrice: nil,
+			Value:    nil, //tx.Value(),
+			Data:     &tdBytes,
+		}
+               
+                res, _, failed, err := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
+                
+                log.Debug("MMDBG gasEstimate", "err", err, "failed", failed, "res", res)
+                
+                //time.Sleep(10 * time.Second)
+                abc, xyz = SubmitTransaction(ctx, s.b, tx)
+        	log.Debug("MMDBG ethapi/api.go is back again", "abc", abc, "xyz", xyz)
+                time.Sleep(10 * time.Second)
+        }
+        
+	return abc, xyz
 }
 
 // Sign calculates an ECDSA signature for:

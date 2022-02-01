@@ -969,8 +969,8 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
         if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
 	} else if wCt == 2 {
-        	log.Debug("MMDBG wCt==2, returning success")
-                return nil
+        	log.Debug("MMDBG wCt==2")
+                return core.ErrTuringRetry
         }
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
