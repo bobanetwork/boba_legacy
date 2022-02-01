@@ -50,10 +50,10 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    const { 
-      baseEnabled, 
-      accountEnabled, 
-      layer 
+    const {
+      baseEnabled,
+      accountEnabled,
+      layer
     }  = this.props.setup
 
     let initialViewLayer = 'L1 Liquidity Pool'
@@ -101,10 +101,10 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    const { 
-      baseEnabled, 
+    const {
+      baseEnabled,
       accountEnabled,
-      layer 
+      layer
     }  = this.props.setup
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
@@ -226,8 +226,8 @@ class Farm extends React.Component {
                 bridge you have staked into.
                 <br />
                 <span style={{fontWeight: '700'}}>YIELD</span>: the historical yield, which
-                reflects the fees people paid to bridge and the previous usage patterns for each pool. 
-                There is no fixed yield and yields can wary widely as bridge activity changes. 
+                reflects the fees people paid to bridge and the previous usage patterns for each pool.
+                There is no fixed yield and yields can wary widely as bridge activity changes.
                 <br />
                 <span style={{fontWeight: '700'}}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
                 <br />
@@ -280,7 +280,7 @@ class Farm extends React.Component {
 
         </S.Wrapper>
 
-        {!layer &&
+        {!accountEnabled &&
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />

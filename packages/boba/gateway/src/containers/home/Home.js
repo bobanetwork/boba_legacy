@@ -149,6 +149,8 @@ function Home() {
       if (initialized === 'enabled') {
         console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
+        // load DAO to speed up the process
+        dispatch(fetchDaoProposals())
         return true
       }
     }
@@ -177,8 +179,12 @@ function Home() {
   }, POLL_INTERVAL)
 
   useEffect(() => {
+    // load the following functions when the home page is open
     checkVersion()
-  }, [])
+    dispatch(fetchGas())
+    dispatch(fetchVerifierStatus())
+    dispatch(getProposalThreshold())
+  }, [dispatch])
 
   useEffect(() => {
     if (accountEnabled) {

@@ -19,7 +19,7 @@ function GasSwitcher({ isMobile }) {
 
   useEffect(() => {
     async function getGasSavings() {
-      if (networkService.masterSystemConfig === 'mainnet' || networkService.masterSystemConfig === 'rinkeby') {
+      if (networkService.networkGateway === 'mainnet' || networkService.networkGateway === 'rinkeby') {
         const l1SecurityFee = await networkService.estimateL1SecurityFee()
         const l2Fee = await networkService.estimateL2Fee()
         // The l1 security fee is moved to the l2 fee

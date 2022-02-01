@@ -700,13 +700,6 @@ async initializeBase( networkGateway ) {
         this.L2Provider
       )
 
-      // Gas oracle
-      this.gasOracleContract = new ethers.Contract(
-        L2GasOracle,
-        OVM_GasPriceOracleJson.abi,
-        this.L2Provider
-      )
-
       return 'enabled'
 
     } catch (error) {
@@ -1175,7 +1168,7 @@ async initializeBase( networkGateway ) {
         if (token.symbolL1 === 'xBOBA' || token.symbolL1 === 'WAGMIv0') {
           //there is no L1 xBOBA or WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        } 
+        }
         else {
           getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -1185,10 +1178,10 @@ async initializeBase( networkGateway ) {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' && 
-            token.balance.gt(new BN(0)) && 
-            token.symbol !== 'xBOBA' && 
-            token.symbol !== 'WAGMIv0' 
+        if (token.layer === 'L1' &&
+            token.balance.gt(new BN(0)) &&
+            token.symbol !== 'xBOBA' &&
+            token.symbol !== 'WAGMIv0'
           ) {
           layer1Balances.push(token)
         } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
@@ -1901,7 +1894,6 @@ async initializeBase( networkGateway ) {
       return acc
     }, [allAddresses.L1_ETH_Address])
 
-    console.log(allAddresses)
     const L1LPContract = new ethers.Contract(
       allAddresses.L1LPAddress,
       L1LPJson.abi,
@@ -1944,7 +1936,6 @@ async initializeBase( networkGateway ) {
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
 
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
-
     sortRawTokens(L1LPInfo).forEach((token) => {
       const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
       const rewards = Number(token.poolTokenInfo.accUserReward.toString())
@@ -1968,9 +1959,9 @@ async initializeBase( networkGateway ) {
       }
       userInfo[token.tokenAddress] = {
         l1TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): null,
-        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): null,
-        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): null
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): 0,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): 0,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): 0
       }
     })
     return { poolInfo, userInfo }
@@ -2057,9 +2048,9 @@ async initializeBase( networkGateway ) {
       }
       userInfo[token.tokenAddress.toLowerCase()] = {
         l2TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): null,
-        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): null,
-        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): null
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): 0,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): 0,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): 0
       }
     })
 
@@ -2272,7 +2263,7 @@ async initializeBase( networkGateway ) {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -3097,8 +3088,8 @@ async initializeBase( networkGateway ) {
 
         let proposal = await delegateCheck.getActions(i+2)
 
-        let hasVoted = null 
-        
+        let hasVoted = null
+
         if( this.account ) {
           hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
         }
@@ -3338,7 +3329,13 @@ async initializeBase( networkGateway ) {
   async estimateL1SecurityFee(payload=this.payloadForL1SecurityFee) {
     const deepCopyPayload = { ...payload }
     delete deepCopyPayload.from
-    const l1SecurityFee = await networkService.gasOracleContract.getL1Fee(
+    // Gas oracle
+    this.gasOracleContract = new ethers.Contract(
+      L2GasOracle,
+      OVM_GasPriceOracleJson.abi,
+      this.L2Provider
+    )
+    const l1SecurityFee = await this.gasOracleContract.getL1Fee(
       ethers.utils.serializeTransaction(deepCopyPayload)
     );
     return l1SecurityFee.toNumber()
