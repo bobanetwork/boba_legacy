@@ -145,6 +145,8 @@ class NetworkService {
     // fast deposit in batch
     this.payloadForFastDepositBatchCost = null
 
+    // support token
+    this.supportedTokens = []
   }
 
   async enableBrowserWallet() {
@@ -581,24 +583,24 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      let supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
+      this.supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
                                'REP',  'BAT',  'ZRX', 'SUSHI',
-                              'LINK',  'UNI', 'BOBA', 'xBOBA', 
-                               'OMG', 'FRAX',  'FXS',  'DODO', 
-                               'UST', 'BUSD',  'BNB',   'FTM',  
+                              'LINK',  'UNI', 'BOBA', 'xBOBA',
+                               'OMG', 'FRAX',  'FXS',  'DODO',
+                               'UST', 'BUSD',  'BNB',   'FTM',
                              'MATIC',  'UMA',  'DOM'
                             ]
 
       //not all tokens are on Rinkeby
       if ( masterSystemConfig === 'rinkeby') {
-        supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
+        this.supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
                              'REP', 'BAT',  'ZRX', 'SUSHI',
-                            'LINK', 'UNI', 'BOBA', 'xBOBA', 
+                            'LINK', 'UNI', 'BOBA', 'xBOBA',
                              'OMG', 'DOM'
                           ]
       }
 
-      await Promise.all(supportedTokens.map(async (key) => {
+      await Promise.all(this.supportedTokens.map(async (key) => {
 
         const L2a = addresses['TK_L2'+key]
 
@@ -753,7 +755,7 @@ class NetworkService {
       this.bindProviderListeners()
 
       return 'enabled'
-      
+
     } catch (error) {
       console.log(`NS: ERROR :InitializeAccounts `,error)
       return false
@@ -1510,6 +1512,22 @@ class NetworkService {
     }
   }
 
+  async approveFastDepositBatch(payload) {
+    for (const tokenInput of payload) {
+      if (tokenInput.symbol !== 'ETH') {
+        const res = await this.approveERC20(
+          utils.parseUnits(tokenInput.value, tokenInput.decimals).toString(),
+          tokenInput.currency,
+          this.L1LPContract.address,
+        )
+        if (!res) {
+          return res
+        }
+      }
+    }
+    return true
+  }
+
   //Used to move ERC20 Tokens from L1 to L2 using the classic deposit
   async depositErc20(value_Wei_String, currency, currencyL2) {
 
@@ -2096,33 +2114,23 @@ class NetworkService {
   /***********************************************************/
   /***** SWAP ON to BOBA by depositing funds to the L1LP *****/
   /***********************************************************/
-  async depositL1LP(currency, value_Wei_String, ETH_Value_Wei_String) {
+  async depositL1LP(currency, value_Wei_String) {
 
     updateSignatureStatus_depositLP(false)
 
     console.log("depositL1LP:",currency)
     console.log("value_Wei_String",value_Wei_String)
-    console.log("ETH_Value_Wei_String", ETH_Value_Wei_String)
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
     let depositTX
-    if (!Number(ETH_Value_Wei_String)) {
-      console.log("Depositing...")
-      depositTX = await this.L1LPContract.clientDepositL1(
-        value_Wei_String,
-        currency,
-        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-      )
-    } else {
-      console.log("Depositing in batch...")
-      depositTX = await this.L1LPContract.clientDepositL1Batch([
-        { l1TokenAddress: currency, amount: value_Wei_String },
-        { l1TokenAddress: allAddresses.L1_ETH_Address, amount: ETH_Value_Wei_String }
-      ],{ value: ETH_Value_Wei_String }
-      )
-    }
+    console.log("Depositing...")
+    depositTX = await this.L1LPContract.clientDepositL1(
+      value_Wei_String,
+      currency,
+      currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+    )
 
     console.log("depositTX",depositTX)
 
@@ -2168,6 +2176,78 @@ class NetworkService {
     return receipt
   }
 
+  async depositL1LPBatch(payload) {
+
+    const updatedPayload = []
+    let ETHAmount = 0
+
+    for (const tokenInput of payload) {
+      updatedPayload.push({
+        l1TokenAddress: tokenInput.currency,
+        amount: utils.parseUnits(tokenInput.value, tokenInput.decimals).toString()
+      })
+      if (tokenInput.symbol === 'ETH') {
+        ETHAmount = utils.parseUnits(tokenInput.value, tokenInput.decimals).toString()
+      }
+    }
+
+    updateSignatureStatus_depositLP(false)
+
+    console.log("payload:",updatedPayload)
+
+    const time_start = new Date().getTime()
+    console.log("TX start time:", time_start)
+
+    let depositTX
+    console.log("Depositing...")
+    depositTX = await this.L1LPContract.clientDepositL1Batch(
+      updatedPayload,
+      ETHAmount !== 0 ? { value: ETHAmount } : {}
+    )
+
+    console.log("depositTX",depositTX)
+
+    //at this point the tx has been submitted, and we are waiting...
+    await depositTX.wait()
+
+    const block = await this.L1Provider.getTransaction(depositTX.hash)
+    console.log(' block:', block)
+
+    updateSignatureStatus_depositLP(true)
+
+    // Waiting the response from L2
+    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
+      depositTX.hash
+    )
+    console.log(' got L1->L2 message hash', msgHash)
+
+    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+    const time_stop = new Date().getTime()
+    console.log("TX finish time:", time_stop)
+
+    const data = {
+      "key": process.env.REACT_APP_SPEED_CHECK,
+      "hash": depositTX.hash,
+      "l1Tol2": true,
+      "startTime": time_start,
+      "endTime": time_stop,
+      "block": block.blockNumber,
+      "cdmHash": receipt.transactionHash,
+      "cdmBlock": receipt.blockNumber
+    }
+
+    console.log("Speed checker data payload:", data)
+
+    const speed = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).post('send.crossdomainmessage', data)
+
+    console.log("Speed checker:", speed)
+
+    return receipt
+  }
 
   /***************************************/
   /************ L1LP Pool size ***********/
@@ -2382,15 +2462,19 @@ class NetworkService {
   }
 
   /* Estimate cost of Fast Deposit to L2 */
-  async getFastDepositBatchCost(currencyAddress) {
+  async getFastDepositBatchCost(tokenList) {
+
+    if (tokenList.length === 0) return 0
 
     let approvalCost_BN = BigNumber.from('0')
+    let payload = [], ETHValue = BigNumber.from('0')
 
     const gasPrice = await this.L1Provider.getGasPrice()
     console.log("Fast deposit gas price", gasPrice.toString())
 
+    // We use Boba as an example
     const ERC20Contract = new ethers.Contract(
-      currencyAddress,
+      this.tokenAddresses['BOBA'].L1,
       L2ERC20Json.abi, //any old abi will do...
       this.provider.getSigner()
     )
@@ -2400,11 +2484,24 @@ class NetworkService {
       utils.parseEther('0')
     )
 
-    const approvalGas_BN = await this.L1Provider.estimateGas(tx)
-    approvalCost_BN = approvalGas_BN.mul(gasPrice)
+    for (const tokenName of tokenList) {
+      if (tokenName !== 'ETH') {
+        const approvalGas_BN = await this.L1Provider.estimateGas(tx)
+        approvalCost_BN = approvalCost_BN.add(approvalGas_BN.mul(gasPrice))
+        payload.push({l1TokenAddress: this.tokenAddresses['BOBA'].L1, amount: utils.parseEther('0.0001')})
+      } else {
+        ETHValue = utils.parseEther('0.0001')
+        payload.push({l1TokenAddress: L1_ETH_Address, amount: utils.parseEther('0.0001')})
+      }
+    }
+
     console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
 
-    const depositGas_BN = await this.L1Provider.estimateGas(this.payloadForFastDepositBatchCost)
+    const fastDepositBatchTx = await this.L1LPContract
+      .connect(this.L1Provider).populateTransaction.clientDepositL1Batch(
+        payload, { value: ETHValue, from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549' }
+      )
+    const depositGas_BN = await this.L1Provider.estimateGas(fastDepositBatchTx)
     console.log("Fast batch deposit gas", depositGas_BN.toString())
 
     const depositCost_BN = depositGas_BN.mul(gasPrice)
@@ -2413,6 +2510,7 @@ class NetworkService {
     //returns total cost in ETH
     return utils.formatEther(depositCost_BN.add(approvalCost_BN))
   }
+
   /**************************************************************/
   /***** SWAP OFF from BOBA by depositing funds to the L2LP *****/
   /**************************************************************/
@@ -3201,6 +3299,56 @@ class NetworkService {
     return l2GasPrice.mul(l2GasEstimate).toNumber()
   }
 
+  /***********************************************/
+  /*****          L2 LP BATCH INFO           *****/
+  /***********************************************/
+  async getL2UserAndLPBalanceBatch(tokenList) {
+    const getInfo = async (l1TokenAddress, l2TokenAddress) => {
+      const payload = []
+      // get fee info
+      payload.push(this.getL2UserRewardFeeRate(l2TokenAddress))
+      // get LP balance
+      payload.push(this.L2LPBalance(l2TokenAddress))
+      // get LP liquidity
+      payload.push(this.L2LPLiquidity(l2TokenAddress))
+      return await Promise.all(payload)
+    }
+
+    const payload = {}
+    const layer1 = store.getState().balance.layer1
+    for (const tokenName of tokenList) {
+      if (tokenName === 'ETH') {
+        const [l2LPFeeRate, l2LPBalance, l2Liquidity] = await getInfo(L1_ETH_Address, L2_ETH_Address)
+        const filteredBalance = layer1.filter(i => i.symbol === tokenName)[0]
+        payload['ETH'] = {
+          l2LPFeeRate, l2LPBalanceInWei: l2LPBalance, l2LPBalance: utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals),
+          balanceInWEI: filteredBalance.balance,
+          balance: utils.formatUnits(BigNumber.from(filteredBalance.balance.toString()), filteredBalance.decimals),
+          decimals: filteredBalance.decimals, address: filteredBalance.address,
+          LPRatio:
+            Number(utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals)) > 0 ?
+            (Number(utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals)) /
+            Number(utils.formatUnits(BigNumber.from(l2Liquidity), filteredBalance.decimals))).toFixed(3): 0
+        }
+      } else if (tokenName) {
+        const l1TokenAddress = this.tokenAddresses[tokenName].L1
+        const l2TokenAddress = this.tokenAddresses[tokenName].L2
+        const [l2LPFeeRate, l2LPBalance, l2Liquidity] = await getInfo(l1TokenAddress, l2TokenAddress)
+        const filteredBalance = layer1.filter(i => i.symbol === tokenName)[0]
+        payload[tokenName] = {
+          l2LPFeeRate, l2LPBalanceInWei: l2LPBalance, l2LPBalance: utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals),
+          balanceInWEI: filteredBalance.balance,
+          balance: utils.formatUnits(BigNumber.from(filteredBalance.balance.toString()), filteredBalance.decimals),
+          decimals: filteredBalance.decimals, address: filteredBalance.address,
+          LPRatio:
+            Number(utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals)) > 0 ?
+            (Number(utils.formatUnits(BigNumber.from(l2LPBalance), filteredBalance.decimals)) /
+            Number(utils.formatUnits(BigNumber.from(l2Liquidity), filteredBalance.decimals))).toFixed(3): 0
+        }
+      }
+    }
+    return payload
+  }
 }
 
 const networkService = new NetworkService()
