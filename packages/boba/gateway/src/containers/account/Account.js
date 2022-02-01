@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React,{useState,useEffect,useCallback} from 'react'
-import { useSelector, useDispatch, batch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'
 
 //Selectors

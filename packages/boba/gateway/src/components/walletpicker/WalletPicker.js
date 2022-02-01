@@ -13,23 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useCallback, useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import Button from 'components/button/Button'
-
-import WalletAddress from 'components/walletAddress/WalletAddress'
-
-import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
-
-import networkService from 'services/networkService'
-import { isChangingChain } from 'util/changeChain'
-
-import { selectModalState } from 'selectors/uiSelector'
-import { selectNetwork, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
-
-import { openModal } from 'actions/uiAction'
 import { setEnableAccount, setLayer } from 'actions/setupAction'
+import Button from 'components/button/Button'
+import WalletAddress from 'components/walletAddress/WalletAddress'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAccountEnabled, selectJustSwitchedChain, selectNetwork } from 'selectors/setupSelector'
+import networkService from 'services/networkService'
+
+
+
+
+
 
 function WalletPicker() {
 

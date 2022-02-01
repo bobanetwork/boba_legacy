@@ -14,15 +14,14 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
 import * as S from './LayerSwitcher.styles.js'
-import { selectLayer, selectNetwork, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
+import { selectLayer, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
 
 import { Typography } from '@material-ui/core'
-import networkService from 'services/networkService'
 import Button from 'components/button/Button'
 
 import LayerIcon from 'components/icons/LayerIcon'
@@ -34,8 +33,6 @@ function LayerSwitcher({ isButton = false, size }) {
   const accountEnabled = useSelector(selectAccountEnabled())
   const justSwitchedChain = useSelector(selectJustSwitchedChain())
   let layer = useSelector(selectLayer())
-
-  const [ enabled ] = useState()
 
   console.log("LS: Layer:", layer)
   console.log("LS: accountEnabled:", accountEnabled)
