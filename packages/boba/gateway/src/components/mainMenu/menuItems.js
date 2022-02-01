@@ -56,8 +56,8 @@ export const menuItems = [
   {
     key: 'GnosisSafe',
     icon: "SafeIcon",
-    title: "Gnosis",
-    url: "https://safe.boba.network/"
+    title: "Multisig",
+    url: "https://multisig.boba.network/"
   },
   {
     key: 'Help',
