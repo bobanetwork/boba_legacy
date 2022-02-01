@@ -25,6 +25,10 @@ export function selectGas (state) {
   return state.balance.gas
 }
 
+export function selectAccountData (state) {
+  return state.balance.accountData
+}
+
 export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString
 }

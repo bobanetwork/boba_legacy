@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { getBaseServices } from 'util/masterConfig'
 
-export default function walletServiceAxiosInstance(masterSystemConfig){
-    
+export default function walletServiceAxiosInstance(networkGateway){
+
   let axiosInstance = axios.create({
     baseURL: getBaseServices().WALLET_SERVICE,
   })

@@ -42,9 +42,9 @@ function balanceReducer(state = initialState, action) {
   switch (action.type) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
-      return {
-        ...state,
-        layer1,
+      return { 
+        ...state, 
+        layer1, 
         layer2
       }
     case 'GAS/GET/SUCCESS':

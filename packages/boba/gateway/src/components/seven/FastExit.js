@@ -20,7 +20,7 @@ import { Typography } from '@material-ui/core'
 import * as S from './Transaction.styles'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 function FastExit({
   link,
@@ -34,7 +34,7 @@ function FastExit({
 }) {
 
   const currentNetwork = useSelector(selectNetwork())
-  const nw = getAllNetworks()
+  const nw = getNetwork()
 
   const chainLink = ({hash}) => {
     let network = nw[currentNetwork]

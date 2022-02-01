@@ -252,7 +252,7 @@ function InputStepBatch({ handleClose }) {
     <>
       <Box>
         <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
-          Fast Bridge to L2
+          Batch Bridge to Boba
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
@@ -260,7 +260,13 @@ function InputStepBatch({ handleClose }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
+          In most cases, a fast bridge takes less than 10 minutes. 
+          However, if Ethereum is congested, it can take as long as 3 hours.
+          Click the + symbol to add additional tokens to bridge.
+        </Typography>
+
+        <Typography variant="body2" sx={{mb: 3}}>
+
         </Typography>
 
         {payload.map((_, index) => {
@@ -363,7 +369,7 @@ function InputStepBatch({ handleClose }) {
 
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div style={{flexDirection: 'column'}}>
-            <Typography variant="body2" sx={{mb: 0}}>Est. fee</Typography>
+            <Typography variant="body2" sx={{mb: 0}}>Est. total fee</Typography>
             <Typography variant="body2" sx={{mb: 1}}>(Approval + Bridge)</Typography>
             {batchCost === 0 ? <></>: <Typography variant="body2" sx={{mb: 1}}>{Number(batchCost).toFixed(5)} ETH</Typography>}
           </div>
