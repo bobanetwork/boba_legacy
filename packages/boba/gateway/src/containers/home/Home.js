@@ -241,7 +241,7 @@ function Home() {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <MainMenu />
-        <Container maxWidth="lg" sx={{ marginLeft: 'unset', marginRight: 'unset' }}>
+        <Container maxWidth={false} sx={{ marginLeft: 'unset', width: '100vw' ,marginRight: 'unset' }}>
           {pageDisplay === "AccountNow" &&
             <Account enabled={enabled} />
           }
@@ -273,7 +273,7 @@ function Home() {
             <Ecosystem/>
           }
         </Container>
-        <PageFooter title={'test'}/>
+        <PageFooter/>
       </Box>
     </>
   )

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography } from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
 
 export const WalletPickerContainer = styled.div`
   display: flex;
@@ -32,18 +32,28 @@ export const WalletPickerWrapper = styled.div`
   }
 `;
 
-export const Menu = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  z-index: 1000;
-  position: relative;
-  @include mobile {
-    width: 100%;
-    justify-content: space-between;
+export const Menu = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  zIndex: 1000,
+  position: 'relative',
+  'a': {
+    cursor: 'pointer',
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    flexDirection: 'column'
   }
-  a {
-    cursor: pointer;
+}))
+
+export const MenuItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+  p {
+    white-space: nowrap;
   }
 `;
 
