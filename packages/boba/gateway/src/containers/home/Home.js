@@ -233,9 +233,15 @@ function Home() {
         {alertMessage}
       </Alert>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
         <MainMenu />
-        <Container maxWidth={false} sx={{ marginLeft: 'unset', width: '100vw' ,marginRight: 'unset' }}>
+        <Container maxWidth={false} sx={{
+          height: 'calc(100% - 150px)',
+          minHeight: '500px',
+          marginLeft: 'unset',
+          width: '100vw',
+          marginRight: 'unset'
+        }}>
           {pageDisplay === "AccountNow" &&
             <Account />
           }
