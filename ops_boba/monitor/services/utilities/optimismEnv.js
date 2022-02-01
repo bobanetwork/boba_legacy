@@ -10,12 +10,12 @@ const {
 const fetch = require('node-fetch')
 const { Watcher } = require('@eth-optimism/watcher')
 
-const addressManagerJSON = require('../../artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
-const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
-const L2LiquidityPoolJson = require('../../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const L1StandardBridgeJson = require('../../artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
-const L2StandardBridgeJson = require('../../artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
-const StateCommitmentChainJson = require('../../artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
+const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
+const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
+const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
+const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
+const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
+const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 const env = process.env
