@@ -104,6 +104,9 @@ export const getCoinImage = (symbol) => {
     case "UMA":
       logo = umaLogo;
       break;
+    case "WAGMIv0":
+      logo = umaLogo;
+      break;
     case "DOM":
       logo = domLogo;
       break;

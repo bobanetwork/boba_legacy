@@ -118,12 +118,31 @@ class Save extends React.Component {
                   variant="body2"
                   component="p"
                 >
-                  `You are on Ethereum Mainnet. Staking@5% is only available on Boba. SWITCH to Boba`
+                  You are on Ethereum Mainnet. Staking@5% is only available on Boba. SWITCH to Boba
                 </S.AlertText>
               </S.AlertInfo>
-              <LayerSwitcher/>
+              <LayerSwitcher isButton={true}/>
             </S.LayerAlert>
         </div>
+    }
+
+
+    if(!netLayer) {
+      return <div className={styles.container}>
+          <PageHeader title="Airdrop" />
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To stake on BOBA, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+      </div>
     }
 
     return (
@@ -142,12 +161,12 @@ class Save extends React.Component {
               style={{padding: 0, paddingLeft: '20px'}}
             >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> You will earn an APR of 5%. 
+                <span style={{fontWeight: '700'}}>EARNINGS/APR</span>: You will earn an APR of 5%. 
                 <br/>
-                <span style={{fontWeight: '700'}}>STAKING PERIOD:</span> Each staking period lasts 2 weeks.  
+                <span style={{fontWeight: '700'}}>STAKING PERIOD</span>: Each staking period lasts 2 weeks.  
                 Your stake will be automatically renewed until you unstake.
                 <br/>
-                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW:</span> You can 
+                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW</span>: You can 
                 unstake in the two days after each staking window.
               </Typography>
             </S.GridItemTag>
@@ -155,13 +174,6 @@ class Save extends React.Component {
         </S.Wrapper>
 
         <Box sx={{ my: 3, width: '100%' }}>
-
-          {!accountEnabled && 
-            <div style={{marginBottom: "20px"}}>
-              <span style={{fontSize: '0.7em', paddingRight: '10px'}}>To stake BOBA, please connect your wallet</span>
-              <WalletPicker />
-            </div>
-          }
 
           {accountEnabled &&
             <Button

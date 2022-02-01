@@ -19,6 +19,7 @@ function MenuItems ({ setOpen }) {
         const title = item.title
         return (
             <S.MenuItem
+              key={item.key}
               onClick={() => {
                 if (item.url.startsWith('http')) {
                   window.open(item.url);

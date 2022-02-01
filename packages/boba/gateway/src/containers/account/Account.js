@@ -26,7 +26,6 @@ import { selectLoading } from 'selectors/loadingSelector'
 
 import ListAccount from 'components/listAccount/listAccount'
 import ListAccountBatch from 'components/listAccount/listAccountBatch'
-import networkService from 'services/networkService'
 
 import * as S from './Account.styles'
 
@@ -48,21 +47,19 @@ import { POLL_INTERVAL } from 'util/constant'
 
 function Account ({ enabled }) {
 
-  const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
-
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const baseEnabled = useSelector(selectBaseEnabled())
-  const layer = useSelector(selectLayer())
+  const networkLayer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
   
   console.log("Account - network:", network)
-  console.log("Account - layer:", layer)
+  console.log("Account - layer:", networkLayer)
   console.log("Account - baseEnabled:", baseEnabled)
   console.log("Account - accountEnabled:", accountEnabled)
 
-  const [ activeTab, setActiveTab ] = useState(layer === 'L1' ? 0 : 1)
+  const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)

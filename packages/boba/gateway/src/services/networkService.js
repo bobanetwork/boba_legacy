@@ -59,7 +59,6 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
-import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
@@ -545,7 +544,7 @@ async initializeBase( networkGateway ) {
                                'LINK',  'UNI', 'BOBA', 'xBOBA',
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
-                               'MATIC',  'UMA',  'DOM'
+                               'MATIC',  'UMA',  'DOM', 'WAGMIv0'
                               ]
 
       //not all tokens are on Rinkeby
@@ -570,6 +569,11 @@ async initializeBase( networkGateway ) {
               'L1': 'xBOBA',
               'L2': L2a
             }
+          }
+        } else if(key === 'WAGMIv0') {
+          allTokens[key] = {
+            'L1': 'WAGMIv0',
+            'L2': '0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c'
           }
         } else {
           const L1a = addresses['TK_L1'+key]
@@ -669,8 +673,6 @@ async initializeBase( networkGateway ) {
         },
       })
 
-      console.log('Setting up BOBA for the DAO:', allTokens.BOBA.L2)
-
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
         Boba.abi,
@@ -683,24 +685,20 @@ async initializeBase( networkGateway ) {
         this.L2Provider
       )
 
-      //DAO related
-      if( this.L1orL2 === 'L2' ) {
+      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+      this.delegateContract = new ethers.Contract(
+        allAddresses.GovernorBravoDelegate,
+        GovernorBravoDelegate.abi,
+        this.L2Provider
+      )
 
-        this.delegateContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegate,
-          GovernorBravoDelegate.abi,
-          this.L2Provider
-        )
-
-        this.delegatorContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegator,
-          GovernorBravoDelegator.abi,
-          this.L2Provider
-        )
-      }
+      this.delegatorContract = new ethers.Contract(
+        allAddresses.GovernorBravoDelegator,
+        GovernorBravoDelegator.abi,
+        this.L2Provider
+      )
 
       // Gas oracle
       this.gasOracleContract = new ethers.Contract(
@@ -1150,8 +1148,6 @@ async initializeBase( networkGateway ) {
       const state = store.getState()
       const tA = Object.values(state.tokenList)
 
-      console.log("NS: getBalances tokens - tA:",tA)
-
       const tokenC = new ethers.Contract(
         allAddresses.L1_ETH_Address,
         L1ERC20Json.abi,
@@ -1176,22 +1172,30 @@ async initializeBase( networkGateway ) {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        if (token.symbolL1 === 'xBOBA') {
-          //there is no L1 xBOBA
+        if (token.symbolL1 === 'xBOBA' || token.symbolL1 === 'WAGMIv0') {
+          //there is no L1 xBOBA or WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        } else {
+        } 
+        else {
           getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
       })
 
       const tokenBalances = await Promise.all(getBalancePromise)
-      console.log("lookup tokenBalances", tokenBalances)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' && token.symbol !== 'xBOBA' && token.balance.gt(new BN(0)) ) {
+        if (token.layer === 'L1' && 
+            token.balance.gt(new BN(0)) && 
+            token.symbol !== 'xBOBA' && 
+            token.symbol !== 'WAGMIv0' 
+          ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && (token.balance.gt(new BN(0)) || token.symbol === 'xBOBA')) {
+        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
+          layer2Balances.push(token)
+        } else if (token.layer === 'L2' && token.symbol === 'xBOBA') {
+          layer2Balances.push(token)
+        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv0' ) {
           layer2Balances.push(token)
         }
       })
@@ -1891,7 +1895,7 @@ async initializeBase( networkGateway ) {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -1942,6 +1946,14 @@ async initializeBase( networkGateway ) {
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
 
     sortRawTokens(L1LPInfo).forEach((token) => {
+      const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+      const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+      const duration = new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+      const durationDays = duration / (60 * 60 * 24 * 1000)
+      console.log("durationDays:", durationDays)
+      const annualRewardEstimate = 365 * rewards / durationDays
+      let annualYieldEstimate = 100 * annualRewardEstimate / userIn
+      if(!annualYieldEstimate) annualYieldEstimate = 0
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -1952,25 +1964,7 @@ async initializeBase( networkGateway ) {
         accUserRewardPerShare: token.poolTokenInfo.accUserRewardPerShare.toString(),
         userDepositAmount: token.poolTokenInfo.userDepositAmount.toString(),
         startTime: token.poolTokenInfo.startTime.toString(),
-        APR:
-          Number(token.poolTokenInfo.userDepositAmount.toString()) === 0
-            ? 0
-            : accMul(
-                accDiv(
-                  accDiv(
-                    token.poolTokenInfo.accUserReward,
-                    token.poolTokenInfo.userDepositAmount
-                  ),
-                  accDiv(
-                    //compute a more accurate current APR by considering the last week only,
-                    //rather than the full lifetime of the pools
-                      7 * 24 * 60 * 60 * 1000,
-                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
-                    365 * 24 * 60 * 60 * 1000
-                  )
-                ),
-                100
-              ), // ( accUserReward - userDepositAmount ) / timeDuration
+        APR: annualYieldEstimate,
         tokenBalance: token.tokenBalance.toString()
       }
       userInfo[token.tokenAddress] = {
@@ -1986,7 +1980,7 @@ async initializeBase( networkGateway ) {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
@@ -2042,6 +2036,13 @@ async initializeBase( networkGateway ) {
     const L2LPInfo = await Promise.all(L2LPInfoPromise)
 
     sortRawTokens(L2LPInfo).forEach((token) => {
+      const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+      const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+      const duration = new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+      const durationDays = duration / (60 * 60 * 24 * 1000)
+      const annualRewardEstimate = 365 * rewards / durationDays
+      let annualYieldEstimate = 100 * annualRewardEstimate / userIn
+      if(!annualYieldEstimate) annualYieldEstimate = 0
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -2052,25 +2053,7 @@ async initializeBase( networkGateway ) {
         accUserRewardPerShare: token.poolTokenInfo.accUserRewardPerShare.toString(),
         userDepositAmount: token.poolTokenInfo.userDepositAmount.toString(),
         startTime: token.poolTokenInfo.startTime.toString(),
-        APR:
-          Number(token.poolTokenInfo.userDepositAmount.toString()) === 0
-            ? 0
-            : accMul(
-                accDiv(
-                  accDiv(
-                    token.poolTokenInfo.accUserReward,
-                    token.poolTokenInfo.userDepositAmount
-                  ),
-                  accDiv(
-                    //compute a more accurate current APR by considering the last week only,
-                    //rather than the full lifetime of the pools
-                      7 * 24 * 60 * 60 * 1000,
-                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
-                    365 * 24 * 60 * 60 * 1000
-                  )
-                ),
-                100
-              ), // ( accUserReward - userDepositAmount ) / timeDuration
+        APR: annualYieldEstimate,
         tokenBalance: token.tokenBalance.toString()
       }
       userInfo[token.tokenAddress.toLowerCase()] = {
@@ -2818,13 +2801,9 @@ async initializeBase( networkGateway ) {
   // get DAO Balance
   async getDaoBalance() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.BobaContract ) return
 
-    if(!this.account) {
+    if( !this.account ) {
       console.log('NS: getDaoBalance() error - called but account === null')
       return
     }
@@ -2842,13 +2821,9 @@ async initializeBase( networkGateway ) {
 
   async getDaoBalanceX() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.xBobaContract ) return
 
-    if(!this.account) {
+    if( !this.account ) {
       console.log('NS: getDaoBalanceX() error - called but account === null')
       return
     }
@@ -2867,10 +2842,9 @@ async initializeBase( networkGateway ) {
   // get DAO Votes
   async getDaoVotes() {
 
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.BobaContract ) return
 
-    if(!this.account) {
+    if( !this.account ) {
       console.log('NS: getDaoVotes() error - called but account === null')
       return
     }
@@ -2887,13 +2861,9 @@ async initializeBase( networkGateway ) {
     // get DAO Votes
   async getDaoVotesX() {
 
-    //if( this.networkGateway === 'mainnet' ) return
-    //if( this.networkGateway === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.xBobaContract ) return
 
-    if(!this.account) {
+    if( !this.account ) {
       console.log('NS: getDaoVotesX() error - called but account === null')
       return
     }
@@ -2979,7 +2949,6 @@ async initializeBase( networkGateway ) {
   // Proposal Create Threshold
   async getProposalThreshold() {
 
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.delegateContract ) return
 
     try {
@@ -2997,7 +2966,7 @@ async initializeBase( networkGateway ) {
   async createProposal(payload) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     if( !this.account ) {
       console.log('NS: delegateVotesX() error - called but account === null')
@@ -3059,14 +3028,6 @@ async initializeBase( networkGateway ) {
 
       let values = [0] //amount of ETH to send, generally, zero
 
-      // console.log("Submitting proposal:", {
-      //   address,
-      //   values,
-      //   signatures,
-      //   callData,
-      //   description
-      // })
-
       let res = await delegateCheck
         .connect(this.provider.getSigner())
         .propose(
@@ -3087,7 +3048,6 @@ async initializeBase( networkGateway ) {
   //Fetch DAO Proposals
   async fetchProposals() {
 
-    if( this.L1orL2 !== 'L2' ) return
     if( !this.delegateContract ) return
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
@@ -3097,10 +3057,7 @@ async initializeBase( networkGateway ) {
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()
-      //console.log('proposalCounts:',proposalCounts)
-
       const totalProposals = await proposalCounts.toNumber()
-      console.log('totalProposals:',totalProposals)
 
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
@@ -3175,7 +3132,7 @@ async initializeBase( networkGateway ) {
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     if( !this.account ) {
       console.log('NS: castProposalVote() error - called but account === null')
@@ -3196,7 +3153,7 @@ async initializeBase( networkGateway ) {
 
   async queueProposal(proposalID) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     if( !this.account ) {
       console.log('NS: queueProposal() error - called but account === null')
@@ -3220,9 +3177,9 @@ async initializeBase( networkGateway ) {
 
   async executeProposal(proposalID) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
-    if(!this.account) {
+    if( !this.account ) {
       console.log('NS: executeProposal() error - called but account === null')
       return
     }

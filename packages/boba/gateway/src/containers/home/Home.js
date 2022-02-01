@@ -87,7 +87,6 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { isChangingChain } from 'util/changeChain'
 
 function Home() {
 
@@ -137,7 +136,7 @@ function Home() {
   useEffect(() => {
     window.scrollTo(0, 0)
 
-    initializeBase()
+    if(!baseEnabled) initializeBase()
 
     async function initializeBase() {
       console.log("Calling initializeBase for", network)
@@ -182,11 +181,7 @@ function Home() {
   }, [])
 
   useEffect(() => {
-    if (isChangingChain) {
-      //
-    }
     if (accountEnabled) {
-      //localStorage.setItem('changeChain', false)
       dispatch(addTokenList())
     }
   }, [ dispatch, accountEnabled ])
