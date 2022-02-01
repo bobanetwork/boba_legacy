@@ -25,7 +25,6 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import ListSave from 'components/listSave/listSave'
 
 import AlertIcon from 'components/icons/AlertIcon'
-import networkService from 'services/networkService'
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'

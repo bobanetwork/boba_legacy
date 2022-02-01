@@ -23,11 +23,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectNetwork } from 'selectors/setupSelector'
 import networkService from 'services/networkService'
 
-
-
-
-
-
 function WalletPicker() {
 
   const dispatch = useDispatch()
@@ -63,12 +58,12 @@ function WalletPicker() {
       }
     }
 
-  }, [ dispatch, accountEnabled ])
+  }, [ dispatch, accountEnabled, network ])
 
   useEffect(() => {
     // auto connect to MM if we just switched chains
     if (justSwitchedChain) dispatchBootAccount()
-  }, [justSwitchedChain])
+  }, [ justSwitchedChain, dispatchBootAccount ])
 
   return (
     <>

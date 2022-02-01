@@ -23,13 +23,11 @@ import Button from 'components/button/Button'
 import ProposalList from './proposal/ProposalList'
 
 import { selectDaoBalance, selectDaoVotes, selectDaoBalanceX, selectDaoVotesX } from 'selectors/daoSelector'
-import { selectLayer, selectNetwork, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 
 import AlertIcon from 'components/icons/AlertIcon'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import PageHeader from 'components/pageHeader/PageHeader'
-
-import networkService from 'services/networkService'
 
 import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
@@ -45,7 +43,6 @@ function DAO() {
     const votes = useSelector(selectDaoVotes)
     const votesX = useSelector(selectDaoVotesX)
     let layer = useSelector(selectLayer())
-    const network = useSelector(selectNetwork())
     const accountEnabled = useSelector(selectAccountEnabled())
 
     return (

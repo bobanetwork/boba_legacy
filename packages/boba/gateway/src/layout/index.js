@@ -19,7 +19,7 @@ import { createTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/co
 import { setTheme } from 'actions/uiAction'
 import Home from 'containers/home/Home'
 import Notification from 'containers/notification/Notification'
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   BrowserRouter as Router,
@@ -28,7 +28,6 @@ import {
 } from "react-router-dom";
 
 import { selectModalState } from 'selectors/uiSelector'
-import { isChangingChain } from 'util/changeChain'
 
 import * as styles from './layout.module.scss'
 
@@ -37,8 +36,6 @@ function App () {
   const dispatch = useDispatch()
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
-
-  const [ enabled, setEnabled ] = useState(false)
 
   let MUItheme = createTheme({
     palette: {
@@ -207,15 +204,6 @@ function App () {
   MUItheme = responsiveFontSizes(MUItheme);
 
   const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));
-
-  useEffect(() => {
-    if (isChangingChain) {
-      //dispatch(setWalletMethod('browser'));
-    }
-    if (enabled) {
-      localStorage.setItem('changeChain', false)
-    }
-  }, [dispatch, enabled])
 
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')

@@ -46,7 +46,7 @@ function LayerSwitcher({ isButton = false, size }) {
       dispatch(switchChain('L2'))
     else if (layer === 'L2')
       dispatch(switchChain('L1'))
-  }, [ dispatch, accountEnabled ])
+  }, [ dispatch, accountEnabled, layer ])
 
   if (!!isButton) {
     return (

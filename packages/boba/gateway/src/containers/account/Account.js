@@ -38,7 +38,6 @@ import { useTheme } from '@emotion/react'
 import { tableHeadList } from './tableHeadList'
 
 import TabPanel from 'components/tabs/TabPanel'
-import Drink from '../../images/backgrounds/drink.png'
 
 import NetworkSwitcherIcon from 'components/icons/NetworkSwitcherIcon'
 

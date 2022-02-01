@@ -6,8 +6,6 @@ import { Link } from 'react-router-dom'
 
 import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
-import ThemeSwitcher from './themeSwitcher/ThemeSwitcher'
-import GasSwitcher from './gasSwitcher/GasSwitcher'
 import MenuItems from './menuItems/MenuItems'
 import { useTheme } from '@emotion/react'
 import { Container, Drawer, IconButton, useMediaQuery } from '@material-ui/core'
@@ -16,8 +14,6 @@ import { makeStyles } from '@material-ui/styles'
 import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg'
 import NavIcon from '../icons/NavIcon'
 import { Box } from '@material-ui/system'
-import { useDispatch } from 'react-redux'
-import { setPage } from 'actions/uiAction'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 
 const useStyles = makeStyles({
@@ -33,7 +29,6 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
   const classes = useStyles()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const dispatch = useDispatch()
 
   return (
     <>

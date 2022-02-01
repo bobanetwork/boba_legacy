@@ -79,8 +79,7 @@ import Help from 'containers/help/Help'
 import NFT from 'containers/nft/Nft'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 
-import { useTheme } from '@material-ui/core/styles'
-import { Box, Container, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, Container } from '@material-ui/core'
 
 import MainMenu from 'components/mainMenu/MainMenu'
 import PageFooter from 'components/pageFooter/PageFooter'
@@ -93,16 +92,11 @@ import { isChangingChain } from 'util/changeChain'
 function Home() {
 
   const dispatch = useDispatch()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen ] = useState(false)
-
-  //used to get information back to various places
-  const [ enabled, setEnabled ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
@@ -165,15 +159,15 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      //dispatch(fetchAirdropStatusL1()) // account specific
-      //dispatch(fetchAirdropStatusL2()) // account specific
+      dispatch(fetchAirdropStatusL1()) // account specific
+      dispatch(fetchAirdropStatusL2()) // account specific
       dispatch(fetchDaoBalance())      // account specific
       dispatch(fetchDaoVotes())        // account specific
       dispatch(fetchDaoBalanceX())     // account specific
       dispatch(fetchDaoVotesX())       // account specific
-      //dispatch(fetchExits())           // account specific
-      //dispatch(getFS_Saves())          // account specific
-      //dispatch(getFS_Info())           // account specific
+      dispatch(fetchExits())           // account specific
+      dispatch(getFS_Saves())          // account specific
+      dispatch(getFS_Info())           // account specific
     }
     if(baseEnabled /*== we have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
@@ -243,7 +237,7 @@ function Home() {
         <MainMenu />
         <Container maxWidth={false} sx={{ marginLeft: 'unset', width: '100vw' ,marginRight: 'unset' }}>
           {pageDisplay === "AccountNow" &&
-            <Account enabled={enabled} />
+            <Account />
           }
           {pageDisplay === "History" &&
             <Transactions />

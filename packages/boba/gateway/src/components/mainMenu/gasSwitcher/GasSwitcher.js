@@ -1,13 +1,11 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { Box } from '@material-ui/system'
 import { useSelector } from 'react-redux'
 import * as S from './GasSwitcher.styles.js'
 
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
-import { selectBaseEnabled } from 'selectors/setupSelector'
 
 import { Typography } from '@material-ui/core'
 
@@ -16,7 +14,6 @@ import { getMaxHealthBlockLag } from 'util/masterConfig'
 
 function GasSwitcher({ isMobile }) {
 
-  const baseEnabled = useSelector(selectBaseEnabled())
   const gas = useSelector(selectGas)
   const [ savings, setSavings ] = useState(0)
 
