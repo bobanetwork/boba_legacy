@@ -75,8 +75,6 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
             borderRight: 'solid white',
             borderWidth: '1px',
             paddingRight: '10px',
-            //width: '180px',
-            //background: 'red',
           }}
           >
             <NetworkSwitcher />
