@@ -81,7 +81,10 @@ import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 import { useTheme } from '@material-ui/core/styles'
 import { Box, Container, Typography, useMediaQuery } from '@material-ui/core'
+
 import MainMenu from 'components/mainMenu/MainMenu'
+import PageFooter from 'components/pageFooter/PageFooter'
+
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
@@ -270,6 +273,7 @@ function Home() {
             <Ecosystem/>
           }
         </Container>
+        <PageFooter title={'test'}/>
       </Box>
     </>
   )

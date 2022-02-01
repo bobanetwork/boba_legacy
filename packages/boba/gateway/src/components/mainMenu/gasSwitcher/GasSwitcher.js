@@ -49,36 +49,12 @@ function GasSwitcher() {
       <S.WalletPickerWrapper>
         <S.Menu>
           <S.NetWorkStyle>
-            <S.Label variant="body2">
-              Ethereum Gas<br/>
-              Boba Gas<br/>
-              Savings<br/>
-              L1 Block<br/>
-              L2 Block<br/>
-              Verified to
-            </S.Label>
-            <Box sx={{
-              display: 'flex',
-              margin: '10px 0 10px 10px',
-              alignItems: 'center',
-              gap: 2,
-              position: 'relative',
-            }}
-            >
-              {baseEnabled && 
-                <Typography
-                  variant="body2"
-                  sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', textTransform: 'capitalize'}}
-                >
-                  {gas.gasL1} Gwei<br/>
-                  {gas.gasL2} Gwei<br/>
-                  {savings.toFixed(0)}x<br/>
-                  {gas.blockL1}<br/>
-                  {gas.blockL2}<br/>
-                  {verifierStatus.matchedBlock} {`(${healthStatus})`}
-                </Typography>
-              }
-            </Box>
+            <S.Label variant="body2">Ethereum Gas</S.Label><Typography variant="body2">{gas.gasL1} Gwei</Typography>
+            <S.Label variant="body2">Boba Gas</S.Label><Typography variant="body2">{gas.gasL2} Gwei</Typography>
+            <S.Label variant="body2">Savings</S.Label><Typography variant="body2">{savings.toFixed(0)}x</Typography>
+            <S.Label variant="body2">L1 Block</S.Label><Typography variant="body2">{gas.blockL1}</Typography>
+            <S.Label variant="body2">L2 Block</S.Label><Typography variant="body2">{gas.blockL2}</Typography>
+            <S.Label variant="body2">Verified to</S.Label><Typography variant="body2">{verifierStatus.matchedBlock} {`(${healthStatus})`}</Typography>
           </S.NetWorkStyle>
         </S.Menu>
       </S.WalletPickerWrapper>
