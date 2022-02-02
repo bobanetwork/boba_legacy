@@ -1872,6 +1872,28 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@eth-optimism/common-ts@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/common-ts/-/common-ts-0.2.1.tgz#274497f668ac5a9e8717bf6a31b037f6c080e626"
+  integrity sha512-YALS43zZ4Hiz7+aG6LzmzVDZ+OlLyAzcBcqmAHF3qTXQFFbUaFZsXyno+zqxz/5XGqKctuTHl2sKY0SxCOJUVg==
+  dependencies:
+    "@sentry/node" "^6.3.1"
+    express "^4.17.1"
+    pino "^6.11.3"
+    pino-multi-stream "^5.3.0"
+    pino-sentry "^0.7.0"
+    prom-client "^13.1.0"
+
+"@eth-optimism/contracts@0.5.11":
+  version "0.5.11"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.11.tgz#935a776be3f0d27dd26fa9e892c02c6b0fe86e93"
+  integrity sha512-W1xgY4qgJO9IHG1qOe98kjDMOH0mqpO3oiaSxeIFmzzshNiWGw3XSDbEvHqdsAapFYzfrmwavY3FAg7G5iqGEA==
+  dependencies:
+    "@eth-optimism/core-utils" "0.7.5"
+    "@ethersproject/abstract-provider" "^5.4.1"
+    "@ethersproject/abstract-signer" "^5.4.1"
+    "@ethersproject/hardware-wallets" "^5.4.0"
+
 "@eth-optimism/contracts@^0.2.4":
   version "0.2.11"
   resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.2.11.tgz#4f8f1eb6b3bf2b399f018a92827f96d4e446da04"
@@ -1901,6 +1923,19 @@
     pino-multi-stream "^5.3.0"
     pino-sentry "^0.7.0"
     prom-client "^13.1.0"
+
+"@eth-optimism/core-utils@0.7.5":
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.7.5.tgz#31b11171fdd816fd17459437f7ac67d26ebad422"
+  integrity sha512-rinXC0msmLipPAkxVzwkSGmmoCvd1WuYPYcBh3rKc5ZCroDZ0UpxTfjDwBB0lAWUQ04OH+/70RUFMENOn6WYUA==
+  dependencies:
+    "@ethersproject/abstract-provider" "^5.4.1"
+    "@ethersproject/bytes" "^5.5.0"
+    "@ethersproject/providers" "^5.4.5"
+    "@ethersproject/web" "^5.5.0"
+    chai "^4.3.4"
+    ethers "^5.4.5"
+    lodash "^4.17.21"
 
 "@eth-optimism/core-utils@^0.4.1":
   version "0.4.7"
@@ -2764,7 +2799,7 @@
     "@ethersproject/constants" "^5.5.0"
     "@ethersproject/logger" "^5.5.0"
 
-"@ethersproject/transactions@5.4.0", "@ethersproject/transactions@^5.0.0", "@ethersproject/transactions@^5.0.0-beta.135", "@ethersproject/transactions@^5.0.21", "@ethersproject/transactions@^5.4.0":
+"@ethersproject/transactions@5.4.0", "@ethersproject/transactions@^5.0.0", "@ethersproject/transactions@^5.0.0-beta.135", "@ethersproject/transactions@^5.4.0":
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/transactions/-/transactions-5.4.0.tgz#a159d035179334bd92f340ce0f77e83e9e1522e0"
   integrity sha512-s3EjZZt7xa4BkLknJZ98QGoIza94rVjaEed0rzZ/jB9WrIuu/1+tjvYCWzVrystXtDswy7TPBeIepyXwSYa4WQ==
@@ -5302,7 +5337,15 @@
   dependencies:
     "@types/tz-offset" "*"
 
-"@types/node-fetch@^2.5.5", "@types/node-fetch@^2.5.8":
+"@types/node-fetch@^2.5.10":
+  version "2.5.12"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.12.tgz#8a6f779b1d4e60b7a57fb6fd48d84fb545b9cc66"
+  integrity sha512-MKgC4dlq4kKNa/mYrwpKfzQMB5X3ee5U6fSprkKpToBqBmX4nFZL9cW5jl6sWn+xpRJ7ypWh2yyqqr8UUCstSw==
+  dependencies:
+    "@types/node" "*"
+    form-data "^3.0.0"
+
+"@types/node-fetch@^2.5.5":
   version "2.5.10"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.10.tgz#9b4d4a0425562f9fcea70b12cb3fcdd946ca8132"
   integrity sha512-IpkX0AasN44hgEad0gEF/V6EgR5n69VEqPEgnmoM8GsIGro3PowbWs4tR6IhxUTyPLpOn+fiGG6nrQhcmoCuIQ==
@@ -5560,13 +5603,6 @@
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"
-
-"@types/workerpool@^6.0.0":
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/@types/workerpool/-/workerpool-6.1.0.tgz#16c3b9d3c62a8f6e6ad2e4d6212a68130f0cd3b1"
-  integrity sha512-C+J/c1BHyc351xJuiH2Jbe+V9hjf5mCzRP0UK4KEpF5SpuU+vJ/FC5GLZsCU/PJpp/3I6Uwtfm3DG7Lmrb7LOQ==
-  dependencies:
-    "@types/node" "*"
 
 "@types/yargs-parser@*":
   version "20.2.1"
@@ -17360,7 +17396,7 @@ mocha@^7.1.1, mocha@^7.1.2:
     yargs-parser "13.1.2"
     yargs-unparser "1.6.0"
 
-mocha@^8.3.0, mocha@^8.3.1, mocha@^8.3.2, mocha@^8.4.0:
+mocha@^8.3.0, mocha@^8.3.1, mocha@^8.4.0:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-8.4.0.tgz#677be88bf15980a3cae03a73e10a0fc3997f0cff"
   integrity sha512-hJaO0mwDXmZS4ghXsvPVriOhsxQ7ofcpQdm8dE+jISUOKopitvnXFQmpRR7jd2K6VBG6E26gU3IAbXXGIbu4sQ==

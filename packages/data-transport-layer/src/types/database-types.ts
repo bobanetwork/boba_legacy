@@ -36,7 +36,6 @@ export interface TransactionEntry {
   queueIndex: number | null
   decoded: DecodedSequencerBatchTransaction | null
   confirmed: boolean
-  turing: string
 }
 
 interface BatchEntry {
