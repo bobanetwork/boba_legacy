@@ -102,10 +102,11 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         // need to keep track of the original length so the pointer system for accessing
         // the individual transactions works correctly
         const sequencerTransaction_original_length = sequencerTransaction.length
-        let turing
-
-          // eslint-disable-next-line prefer-const
-        ;[sequencerTransaction, turing] = turingParse(sequencerTransaction)
+        let turing = Buffer.from('0')
+        ;[sequencerTransaction, turing] = turingParse(
+          sequencerTransaction,
+          turing
+        )
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
           l2ChainId
@@ -274,15 +275,16 @@ const decodeSequencerBatchTransaction = (
   }
 }
 
-const turingParse = (sequencerTransaction: Buffer): [Buffer, Buffer] => {
+const turingParse = (
+  sequencerTransaction: Buffer,
+  turing: Buffer
+): [Buffer, Buffer] => {
   // This MIGHT have a Turing payload inside of it...
   // First, parse the new version and length field...
   const sTxHexString = toHexString(sequencerTransaction)
   const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
   // TuringVersion not used right now; for future use and for supporting legacy packets
   const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
-
-  let turing = Buffer.from('0')
 
   // methodID for GetResponse is 7d93616c -> [125 147 97 108]
   // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
@@ -334,8 +336,6 @@ const turingParse = (sequencerTransaction: Buffer): [Buffer, Buffer] => {
         restoredSequencerTransaction: toHexString(sequencerTransaction),
       }
     )
-    // It's a legacy block
-    // do nothing
   }
   return [sequencerTransaction, turing]
 }

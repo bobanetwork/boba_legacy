@@ -23,6 +23,7 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
       release: `data-transport-layer@${process.env.npm_package_version}`,
       dbPath: config.str('db-path', './db'),
       port: config.uint('server-port', 7878),
+      arPort: config.uint('registry-port', 8081),
       hostname: config.str('server-hostname', 'localhost'),
       confirmations: config.uint('confirmations', 35),
       l1RpcProvider: config.str('l1-rpc-endpoint'),
