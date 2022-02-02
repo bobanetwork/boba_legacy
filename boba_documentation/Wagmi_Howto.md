@@ -29,7 +29,33 @@ Wagmi involves approximately 20 smart contracts. Here is a [partial list](https:
 
 ## Minting new Wagmi Tokens
 
-End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted by calling the ???????????. BOYUAN
+End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted via
+
+```js
+const depositBobaAmount = ethers.utils.parseEther('10')
+
+const bobaToken = new ethers.Contract(
+  BobaTokenAddress,
+  BobaTokenABI,
+  L2Wallet
+)
+
+const approveTx = await bobaToken.approve(
+  LongShortPairAddress,
+  depositBobaAmount
+)
+await approveTx.wait()
+
+const LongShortPair = new ethers.Contract(
+  LongShortPairAddress,
+  LongShortPairABI,
+  L2Wallet
+)
+
+// collateralPerPair: units of collateral are required to mint one pair of synthetic tokens
+const mintTx = await LongShortPair.create(depositBobaAmount.div(collateralPerPair)) 
+await mintTx.wait()
+```
 
 ### Each Wagmi token needs new Oracle
 
@@ -67,7 +93,7 @@ Adding new Wagmi tokens requires changes in six different areas of the gateway, 
     }
   } else {
 ...
-``` 
+```
 
 Then, exclude the WAGMI tokens from **L1 balance lookup** since they do not exist on L1:
 
@@ -80,7 +106,7 @@ Then, exclude the WAGMI tokens from **L1 balance lookup** since they do not exis
     getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
   }
 ...
-``` 
+```
 
 Next, exclude the WAGMI tokens from the **LP pool lookup**:
 
@@ -93,7 +119,7 @@ Next, exclude the WAGMI tokens from the **LP pool lookup**:
       acc.push(allTokens[cur].L1.toLowerCase())
     }
 ...
-``` 
+```
 
 Then, add the new WAGMI token to the **token icon system**:
 
@@ -106,7 +132,7 @@ import wagmiv0Logo from 'images/wagmiv0.png';
     logo = wagmiv0Logo;
     break;
 ...
-``` 
+```
 
 Next, add the new WAGMI token to the **token lookup**:
 
@@ -136,4 +162,4 @@ Finally, correct the WAGMI token from the **Account View**
     </Box>
   }
 ...
-``` 
+```
