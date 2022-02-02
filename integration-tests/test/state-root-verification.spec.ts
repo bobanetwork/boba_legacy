@@ -1,15 +1,8 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-import { Contract, BigNumber, utils, ethers, ContractFactory } from 'ethers'
-import { Direction } from './shared/watcher-utils'
+import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-
-import TuringTestJson from '../artifacts/contracts/TuringTest.sol/TuringTest.json'
 
 import { OptimismEnv } from './shared/env'
 
