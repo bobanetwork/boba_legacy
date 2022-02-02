@@ -18,7 +18,7 @@
   "dependencies": {
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
-    "@eth-optimism/contracts": "^0.4.12",
+    "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "^0.7.3",
     "@ethersproject/providers": "^5.0.24",
     "@ethersproject/units": "^5.0.11",
