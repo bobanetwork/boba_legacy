@@ -11,6 +11,7 @@ import { Box, Typography, Fade } from '@material-ui/core'
 import * as S from './ListAccount.styles'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import { getCoinImage } from 'util/coinImage'
 
 class ListAccountBatch extends React.Component {
@@ -21,19 +22,19 @@ class ListAccountBatch extends React.Component {
 
     const {
       token,
-      chain,
       networkLayer,
       disabled,
-      loading
+      loading,
+      accountEnabled,
     } = this.props
 
     this.state = {
       token,
-      chain,
       dropDownBox: false,
       networkLayer,
       disabled,
-      loading
+      loading,
+      accountEnabled,
     }
 
   }
@@ -42,7 +43,6 @@ class ListAccountBatch extends React.Component {
 
     const {
       token,
-      chain,
       networkLayer,
       disabled,
       loading
@@ -50,10 +50,6 @@ class ListAccountBatch extends React.Component {
 
     if (!isEqual(prevState.token, token)) {
       this.setState({ token })
-    }
-
-    if (!isEqual(prevState.chain, chain)) {
-      this.setState({ chain })
     }
 
     if (!isEqual(prevState.networkLayer, networkLayer)) {
@@ -78,13 +74,11 @@ class ListAccountBatch extends React.Component {
 
     const {
       token,
-      chain,
       dropDownBox,
       networkLayer,
+      accountEnabled,
       disabled
     } = this.state
-
-    const enabled = (networkLayer === chain) ? true : false
 
     const logoList = ['ETH', 'BOBA', 'OMG', 'USDC', 'USDT', 'DAI']
 
@@ -95,33 +89,50 @@ class ListAccountBatch extends React.Component {
 
               <S.TableCell sx={{gap: "10px", justifyContent: "flex-start"}}>
                 {logoList.map((token, index) => {
-                  return <img key={index} src={getCoinImage(token)} alt="logo" width={42} height={42} style={index !== 0 ? {marginLeft: -20}:{}}/>
-                })
-
+                    return <img key={index} src={getCoinImage(token)} alt="logo" width={42} height={42} style={index !== 0 ? {marginLeft: -20}:{}}/>
+                  })
                 }
               </S.TableCell>
 
               <S.TableCell sx={{justifyContent: "flex-start"}}>
               </S.TableCell>
 
-              <S.TableCell
-                onClick={() => {
-                  this.setState({
-                    dropDownBox: !dropDownBox,
-                    dropDownBoxInit: false
-                  })
-                }}
-                sx={{cursor: "pointer", gap: "5px", justifyContent: "flex-end"}}
-              >
-                {chain === 'L1' &&
-                  <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
-                    Bridge In Batch
+              {(networkLayer === 'L2' || !accountEnabled) && 
+                <S.TableCell
+                  onClick={() => {
+                    this.setState({
+                      dropDownBox: !dropDownBox,
+                      dropDownBoxInit: false
+                    })
+                  }}
+                  sx={{cursor: "pointer", gap: "5px", justifyContent: "flex-end"}}
+                >
+                  <S.TextTableCell enabled={`${accountEnabled}`} variant="body2" component="div">
+                    Batch Bridge
                   </S.TextTableCell>
-                }
-                <Box sx={{display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
-                  <ExpandMoreIcon sx={{width: "12px"}}/>
-                </Box>
-              </S.TableCell>
+                  <Box sx={{display: "flex", opacity: !accountEnabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
+                    <ExpandMoreIcon sx={{width: "12px"}}/>
+                  </Box>
+                </S.TableCell>
+              }
+
+              {networkLayer === 'L1' && accountEnabled && 
+                <S.TableCell
+                  sx={{cursor: "pointer", gap: "5px", justifyContent: "flex-end"}}
+                >
+                <Button
+                  onClick={()=>{this.handleModalClick('depositBatchModal', token, true)}}
+                  color='primary'
+                  disabled={disabled}
+                  variant="contained"
+                  tooltip="A swap-based bridge to Boba. This option is only available if the pool balance is sufficient."
+                  fullWidth
+                >
+                  Batch Bridge to Boba
+                </Button>
+                </S.TableCell>
+              }
+
             </S.TableBody>
 
           {/*********************************************/
@@ -132,86 +143,32 @@ class ListAccountBatch extends React.Component {
           {dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownWrapper>
-              {!enabled && chain === 'L1' &&
+              {networkLayer === 'L2' && accountEnabled && 
                 <S.AccountAlertBox>
-                  <Box
-                       sx={{
-                         flex: 1,
-                       }}
-                     >
-                       <Typography variant="body2" component="p" >
-                         You are on L2. To use L1, click SWITCH LAYER
-                       </Typography>
-                     </Box>
-                     <Box sx={{ textAlign: 'center'}}>
-                       <LayerSwitcher isButton={true} />
-                     </Box>
+                  <Box sx={{flex: 1}}>
+                    <Typography variant="body2" component="p" >
+                      You are on L2. To use the L1 Batch Bridge, switch to Mainnet
+                    </Typography>
+                   </Box>
+                   <Box sx={{ textAlign: 'center'}}>
+                      <LayerSwitcher isButton={true}/>
+                   </Box>
                 </S.AccountAlertBox>
               }
 
-              {!enabled && chain === 'L2' &&
+              {!accountEnabled &&
                 <S.AccountAlertBox>
-                  <Box
-                       sx={{
-                         flex: 1,
-                       }}
-                     >
-                       <Typography variant="body2" component="p" >
-                         You are on L1. To use L2, click SWITCH LAYER
-                       </Typography>
-                     </Box>
-                     <Box sx={{ textAlign: 'center'}}>
-                       <LayerSwitcher isButton={true} />
-                     </Box>
+                  <Box sx={{ flex: 1 }} >
+                    <Typography variant="body2" component="p" >
+                      Connect to MetaMask to use the Batch Bridge
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'center'}}>
+                    <WalletPicker />
+                  </Box>
                 </S.AccountAlertBox>
               }
 
-              {enabled && chain === 'L1' &&
-                <Button
-                  onClick={()=>{this.handleModalClick('depositBatchModal', token, true)}}
-                  color='primary'
-                  disabled={disabled}
-                  variant="contained"
-                  tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
-                  fullWidth
-                >
-                  Fast Bridge to L2
-                </Button>
-              }
-
-              {enabled && chain === 'L2' &&
-                <>
-                  <Button
-                    onClick={()=>{this.handleModalClick('exitModal', token, false)}}
-                    variant="outlined"
-                    disabled={disabled}
-                    tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
-                    fullWidth
-                  >
-                    Bridge to L1
-                  </Button>
-
-                  <Button
-                    onClick={()=>{this.handleModalClick('exitModal', token, true)}}
-                    variant="contained"
-                    disabled={disabled}
-                    tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
-                    fullWidth
-                  >
-                    Fast Bridge to L1
-                  </Button>
-
-                  <Button
-                    onClick={()=>{this.handleModalClick('transferModal', token, false)}}
-                    variant="contained"
-                    disabled={disabled}
-                    tooltip="Transfer funds from one L2 account to another L2 account."
-                    fullWidth
-                  >
-                    Transfer
-                  </Button>
-                </>
-              }
             </S.DropdownWrapper>
           </Fade>
           ) : null}

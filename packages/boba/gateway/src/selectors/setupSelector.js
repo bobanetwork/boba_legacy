@@ -13,16 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export function selectWalletMethod () {
+// are we connected to an account - e.g. metamask?
+export function selectAccountEnabled () {
   return function (state) {
-    return state.setup['walletMethod']
+    return state.setup['accountEnabled']
   }
 }
 
-//local, rinkeby, mainnet...
+// do we have basic providers?
+export function selectBaseEnabled () {
+  return function (state) {
+    return state.setup['baseEnabled']
+  }
+}
+
+// local, rinkeby, mainnet...
 export function selectNetwork () {
   return function (state) {
-    return state.setup['masterConfig']
+    return state.setup['network']
   }
 }
 
@@ -32,14 +40,8 @@ export function selectLayer () {
   }
 }
 
-export function selectNetworkBURL () {
+export function selectJustSwitchedChain () {
   return function (state) {
-    return state.setup['blockexplorerURL']
-  }
-}
-
-export function selectEtherscan () {
-  return function (state) {
-    return state.setup['etherscan']
+    return state.setup['justSwitchedChain']
   }
 }

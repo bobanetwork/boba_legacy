@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const initialLoadingState = {};
+const initialLoadingState = {}
 
 function loadingReducer (state = initialLoadingState, action) {
   
@@ -26,7 +26,7 @@ function loadingReducer (state = initialLoadingState, action) {
     requestState !== 'SUCCESS' &&
     requestState !== 'ERROR'
   ) {
-    return state;
+    return state
   }
 
   return {

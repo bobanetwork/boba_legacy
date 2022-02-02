@@ -2,7 +2,7 @@ export const menuItems = [
   {
     key: 'AccountNow',
     icon: "WalletIcon",
-    title: "Wallet",
+    title: "Bridge",
     url: "/"
   },
   {
@@ -14,13 +14,13 @@ export const menuItems = [
   {
     key: 'History',
     icon: "HistoryIcon",
-    title: "Transaction History",
+    title: "History",
     url: "/history"
   },
   {
     key: 'BobaScope',
     icon: "SearchIcon",
-    title: "System Analytics",
+    title: "Analytics",
     url: "/bobascope"
   },
   {
@@ -32,7 +32,7 @@ export const menuItems = [
   {
     key: 'Save',
     icon: "SaveIcon",
-    title: "Save @ 5%",
+    title: "Stake@5%",
     url: "/save",
   },
   {
@@ -56,8 +56,8 @@ export const menuItems = [
   {
     key: 'GnosisSafe',
     icon: "SafeIcon",
-    title: "Gnosis Safe",
-    url: "https://safe.boba.network/"
+    title: "Multisig",
+    url: "https://multisig.boba.network/"
   },
   {
     key: 'Help',

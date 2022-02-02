@@ -38,7 +38,6 @@ import {
 } from 'actions/signAction'
 
 // Base contracts
-import AddressManagerJson from '@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 import L2ERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
@@ -60,9 +59,8 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
-import { accDiv, accMul } from 'util/calculation'
 import { getNftImageUrl } from 'util/nftImage'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
@@ -84,21 +82,38 @@ const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
+// preload allAddresses
+if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+  allAddresses = {
+    ...addresses_Rinkeby,
+    L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
+  }
+} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+  allAddresses = {
+    ...addresses_Mainnet,
+    L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool
+  }
+}
 let allTokens = {}
 
 class NetworkService {
 
   constructor() {
 
-    this.L1Provider = null
-    this.L2Provider = null
+    this.account = null    // the user's account
+    this.L1Provider = null // L1 Infura
+    this.L2Provider = null // L2 to Boba replica
+    this.provider = null   // from MetaMask
 
-    this.provider = null
     this.environment = null
 
     // L1 or L2
     this.L1orL2 = null
-    this.masterSystemConfig = null
+    this.networkGateway = null
+    this.L1ProviderBASE = null
+    this.L2ProviderBASE = null
 
     // Watcher
     this.watcher = null
@@ -149,23 +164,10 @@ class NetworkService {
     this.supportedTokens = []
   }
 
-  async enableBrowserWallet() {
-    console.log('NS: enableBrowserWallet()')
-    try {
-      // connect to the wallet
-      await window.ethereum.request({method: 'eth_requestAccounts'})
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
-      return true
-    } catch (error) {
-      return false
-    }
-  }
-
   bindProviderListeners() {
     window.ethereum.on('accountsChanged', () => {
       window.location.reload()
     })
-
     window.ethereum.on('chainChanged', () => {
       console.log('chainChanged')
       localStorage.setItem('changeChain', true)
@@ -175,7 +177,7 @@ class NetworkService {
 
   async fetchVerifierStatus() {
     const response = await verifierWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
 
     console.log("Verifier response: ", response)
@@ -192,10 +194,10 @@ class NetworkService {
   async fetchAirdropStatusL1() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l1.airdrop', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
@@ -216,10 +218,10 @@ class NetworkService {
   async fetchAirdropStatusL2() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.airdrop', {
       address: this.account,
       key: process.env.REACT_APP_AIRDROP
@@ -241,7 +243,7 @@ class NetworkService {
     console.log("getAirdropL1(callData)",callData.merkleProof)
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const airdropContract = new ethers.Contract(
       allAddresses.BobaAirdropL1,
@@ -267,7 +269,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l1.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('initiate.l1.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -320,7 +322,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l1.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.l1.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -372,7 +374,7 @@ class NetworkService {
       //used for user status updates etc.
       //send.l2.airdrop
       const response = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.l2.airdrop', {
           address: this.account,
           key: process.env.REACT_APP_AIRDROP
@@ -427,110 +429,64 @@ class NetworkService {
      return allAddresses
   }
 
-  async initializeAccounts( masterSystemConfig ) {
+async initializeBase( networkGateway ) {
 
-    console.log('NS: initializeAccounts() for', masterSystemConfig)
+    console.log('NS: initializeBase() for', networkGateway)
 
     let addresses = null
+    this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...
+
+    // defines the set of possible networks along with chainId for L1 and L2
+    const nw = getNetwork()
+    const L1rpc = nw[networkGateway]['L1']['rpcUrl']
+    const L2rpc = nw[networkGateway]['L2']['rpcUrl']
 
     try {
 
-      //at this point, the wallet should be connected
-      this.account = await this.provider.getSigner().getAddress()
-      console.log('this.account', this.account)
+      //fire up the base providers
+      const Web3 = require("web3")
 
-      const network = await this.provider.getNetwork()
+      // let web3_L1 = new Web3(
+      //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
+      //   new Web3.providers.WebsocketProvider("wss://mainnet.infura.io/ws/v3/YOUR-PROJECT-ID")
+      // )
 
-      this.chainID = network.chainId
-      this.networkName = network.name
+      this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
+      this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
 
-      this.masterSystemConfig = masterSystemConfig
-
-      console.log('NS: network:', network)
-      console.log('NS: masterConfig:', this.masterSystemConfig)
-      console.log('NS: this.chainID:', this.chainID)
-      console.log('NS: this.networkName:', this.networkName)
-
-      // defines the set of possible networks along with chainId for L1 and L2
-      const nw = getAllNetworks()
-      const L1ChainId = nw[masterSystemConfig]['L1']['chainId']
-      const L2ChainId = nw[masterSystemConfig]['L2']['chainId']
-
-      // there are numerous possible chains we could be on
-      // either local, rinkeby etc
-      // also, either L1 or L2
-
-      //at this point, we only know whether we want to be on local or rinkeby etc
-      if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //local deployment, L2
-        this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'local' && network.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //local deployment, L1
-        this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L1
-        this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L2
-        this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L1
-        this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L2
-        this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L2
-        this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L2
-        this.L1orL2 = 'L2'
-      } else {
-        console.log("ERROR: masterSystemConfig does not match actual network.chainId")
-        this.bindProviderListeners()
-        return 'wrongnetwork'
-      }
-
-      if (masterSystemConfig === 'mainnet' || masterSystemConfig === 'rinkeby') {
-        this.payloadForL1SecurityFee = nw[masterSystemConfig].payloadForL1SecurityFee
-        this.payloadForFastDepositBatchCost = nw[masterSystemConfig].payloadForFastDepositBatchCost
+      if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
+        this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
       }
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L1']['rpcUrl']
+        nw[networkGateway]['L1']['rpcUrl']
       )
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[masterSystemConfig]['L2']['rpcUrl']
+        nw[networkGateway]['L2']['rpcUrl']
       )
 
-      if (masterSystemConfig === 'rinkeby') {
+      if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
         console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'mainnet') {
+      } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
-        console.log('Rinkeby Addresses:', addresses)
-      } else if (masterSystemConfig === 'local') {
-          //addresses = addresses_Local
-          console.log('Rinkeby Addresses:', addresses)
+        console.log('Mainnet Addresses:', addresses)
       }
+      // else if (networkGateway === 'local') {
+      //     //addresses = addresses_Local
+      //     console.log('Rinkeby Addresses:', addresses)
+      // }
 
-      this.AddressManagerAddress = nw[masterSystemConfig].addressManager
-      console.log("AddressManager address:",this.AddressManagerAddress)
+      // this.AddressManagerAddress = nw[networkGateway].addressManager
+      // console.log("AddressManager address:",this.AddressManagerAddress)
 
-      this.AddressManager = new ethers.Contract(
-        this.AddressManagerAddress,
-        AddressManagerJson.abi,
-        this.L1Provider
-      )
-      //console.log("AddressManager Contract:",this.AddressManager)
+      // this.AddressManager = new ethers.Contract(
+      //   this.AddressManagerAddress,
+      //   AddressManagerJson.abi,
+      //   this.L1Provider
+      // )
+      // //console.log("AddressManager Contract:",this.AddressManager)
 
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
@@ -538,11 +494,11 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
 
-      // not critical so no need to return if fails
+      // not critical
       this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
       console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
 
-      // not critical so no need to return if fails
+      // not critical
       this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
       console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
 
@@ -579,25 +535,25 @@ class NetworkService {
       this.L1StandardBridgeContract = new ethers.Contract(
         allAddresses.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
-        this.provider.getSigner()
+        this.L1Provider
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       this.supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
                                'REP',  'BAT',  'ZRX', 'SUSHI',
-                              'LINK',  'UNI', 'BOBA', 'xBOBA',
+                               'LINK',  'UNI', 'BOBA', 'xBOBA',
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
-                             'MATIC',  'UMA',  'DOM'
-                            ]
+                               'MATIC',  'UMA',  'DOM', 'WAGMIv0'
+                              ]
 
       //not all tokens are on Rinkeby
-      if ( masterSystemConfig === 'rinkeby') {
+      if ( networkGateway === 'rinkeby') {
         this.supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
-                             'REP', 'BAT',  'ZRX', 'SUSHI',
-                            'LINK', 'UNI', 'BOBA', 'xBOBA',
-                             'OMG', 'DOM'
-                          ]
+                                 'BAT',  'ZRX', 'SUSHI',
+                                 'LINK', 'UNI', 'BOBA', 'xBOBA',
+                                 'OMG', 'DOM'
+                                ]
       }
 
       await Promise.all(this.supportedTokens.map(async (key) => {
@@ -613,6 +569,11 @@ class NetworkService {
               'L1': 'xBOBA',
               'L2': L2a
             }
+          }
+        } else if(key === 'WAGMIv0') {
+          allTokens[key] = {
+            'L1': 'WAGMIv0',
+            'L2': '0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c'
           }
         } else {
           const L1a = addresses['TK_L1'+key]
@@ -639,7 +600,7 @@ class NetworkService {
         this.L2StandardBridgeContract = new ethers.Contract(
           allAddresses.L2StandardBridgeAddress,
           L2StandardBridgeJson.abi,
-          this.provider.getSigner()
+          this.L2Provider
         )
       }
       console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
@@ -647,7 +608,7 @@ class NetworkService {
       this.L2_ETH_Contract = new ethers.Contract(
         allAddresses.L2_ETH_Address,
         L2ERC20Json.abi,
-        this.provider.getSigner()
+        this.L2Provider
       )
       //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
 
@@ -655,14 +616,14 @@ class NetworkService {
       this.L1_TEST_Contract = new ethers.Contract(
         allTokens.BOBA.L1, //this will get changed anyway when the contract is used
         L1ERC20Json.abi,
-        this.provider.getSigner()
+        this.L1Provider
       )
       //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
       this.L2_TEST_Contract = new ethers.Contract(
         allTokens.BOBA.L2, //this will get changed anyway when the contract is used
         L2ERC20Json.abi,
-        this.provider.getSigner()
+        this.L2Provider
       )
       //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
@@ -671,7 +632,7 @@ class NetworkService {
       this.L1_OMG_Contract = new ethers.Contract(
         allTokens.OMG.L1,
         OMGJson,
-        this.provider.getSigner()
+        this.L1Provider
       )
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
@@ -680,14 +641,14 @@ class NetworkService {
       this.L1LPContract = new ethers.Contract(
         allAddresses.L1LPAddress,
         L1LPJson.abi,
-        this.provider.getSigner()
+        this.L1Provider
       )
 
       console.log('Setting up contract for L2LP at:',allAddresses.L2LPAddress)
       this.L2LPContract = new ethers.Contract(
         allAddresses.L2LPAddress,
         L2LPJson.abi,
-        this.provider.getSigner()
+        this.L2Provider
       )
 
       this.watcher = new Watcher({
@@ -712,52 +673,119 @@ class NetworkService {
         },
       })
 
-      console.log('Setting up BOBA for the DAO:', allTokens.BOBA.L2)
-
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
         Boba.abi,
-        this.provider.getSigner()
+        this.L2Provider
       )
 
       this.xBobaContract = new ethers.Contract(
         allTokens.xBOBA.L2,
         Boba.abi,
-        this.provider.getSigner()
-      )
-
-      //DAO related
-      if( this.L1orL2 === 'L2' ) {
-
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
-
-        this.delegateContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegate,
-          GovernorBravoDelegate.abi,
-          this.provider.getSigner()
-        )
-
-        this.delegatorContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegator,
-          GovernorBravoDelegator.abi,
-          this.provider.getSigner()
-        )
-      }
-
-      // Gas oracle
-      this.gasOracleContract = new ethers.Contract(
-        L2GasOracle,
-        OVM_GasPriceOracleJson.abi,
         this.L2Provider
       )
 
-      this.bindProviderListeners()
+      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+
+      this.delegateContract = new ethers.Contract(
+        allAddresses.GovernorBravoDelegate,
+        GovernorBravoDelegate.abi,
+        this.L2Provider
+      )
+
+      this.delegatorContract = new ethers.Contract(
+        allAddresses.GovernorBravoDelegator,
+        GovernorBravoDelegator.abi,
+        this.L2Provider
+      )
 
       return 'enabled'
 
     } catch (error) {
-      console.log(`NS: ERROR :InitializeAccounts `,error)
+      console.log(`NS: ERROR :InitializeBase `,error)
+      return false
+    }
+  }
+
+  async initializeAccount( networkGateway ) {
+
+    console.log('NS: initializeAccounts() for', networkGateway)
+
+    try {
+
+      // connect to the wallet
+      await window.ethereum.request({method: 'eth_requestAccounts'})
+      this.provider = new ethers.providers.Web3Provider(window.ethereum)
+
+      this.account = await this.provider.getSigner().getAddress()
+
+      const networkMM = await this.provider.getNetwork()
+      this.chainID = networkMM.chainId
+      this.networkName = networkMM.name
+
+      this.networkGateway = networkGateway
+
+      console.log('NS: networkMM:', networkMM)
+      console.log('NS: networkGateway:', networkGateway)
+      console.log('NS: this.chainID from MM:', this.chainID)
+      console.log('NS: this.networkName from MM:', this.networkName)
+      console.log('NS: this.account from MM:', this.account)
+
+      // defines the set of possible networks along with chainId for L1 and L2
+      const nw = getNetwork()
+      const L1ChainId = nw[networkGateway]['L1']['chainId']
+      const L2ChainId = nw[networkGateway]['L2']['chainId']
+
+      // there are numerous possible chains we could be on
+      // either local, rinkeby etc
+      // also, either L1 or L2
+
+      // at this point, we only know whether we want to be on local or rinkeby etc
+      if (networkGateway === 'local' && networkMM.chainId === L2ChainId) {
+        //ok, that's reasonable
+        //local deployment, L2
+        this.L1orL2 = 'L2'
+      } else if (networkGateway === 'local' && networkMM.chainId === L1ChainId) {
+        //ok, that's reasonable
+        //local deployment, L1
+        this.L1orL2 = 'L1'
+      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L1ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L1
+        this.L1orL2 = 'L1'
+      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L2ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L2
+        this.L1orL2 = 'L2'
+      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L1ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L1
+        this.L1orL2 = 'L1'
+      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L2ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L2
+        this.L1orL2 = 'L2'
+      } else if (networkGateway === 'mainnet' && networkMM.chainId === L1ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L2
+        this.L1orL2 = 'L1'
+      } else if (networkGateway === 'mainnet' && networkMM.chainId === L2ChainId) {
+        //ok, that's reasonable
+        //rinkeby, L2
+        this.L1orL2 = 'L2'
+      } else {
+        console.log("ERROR: networkGateway does not match actual network.chainId")
+        this.bindProviderListeners()
+        return 'wrongnetwork'
+      }
+
+      this.bindProviderListeners()
+
+      return this.L1orL2 // return the layer we are actually on
+
+    } catch (error) {
+      console.log(`NS: ERROR: InitializeAccount `,error)
       return false
     }
   }
@@ -766,7 +794,7 @@ class NetworkService {
 
     console.log("MetaMask: Adding network to MetaMask")
 
-    const nw = getAllNetworks()
+    const nw = getNetwork()
     const masterConfig = store.getState().setup.masterConfig
 
     const chainParam = {
@@ -790,29 +818,31 @@ class NetworkService {
 
   }
 
-  /* Yes, this almost completely duplicates async switchChain( layer )
-  but that's safest for now */
+  async switchChain( layer ) {
+    this.correctChain( layer )
+  }
+
   async correctChain( targetLayer ) {
 
-    const nw = getAllNetworks()
-    const masterConfig = store.getState().setup.masterConfig
+    const nw = getNetwork()
+    const network = store.getState().setup.network
 
     let blockExplorerUrls = null
 
     //local does not have a blockexplorer
-    if( masterConfig !== 'local') {
-      blockExplorerUrls = [nw[masterConfig].L2.blockExplorer.slice(0, -1)]
+    if( network !== 'local') {
+      blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
     }
 
     //the chainParams are only needed for the L2's
     const chainParam = {
-      chainId: '0x' + nw[masterConfig].L2.chainId.toString(16),
-      chainName: nw[masterConfig].L2.name,
-      rpcUrls: [nw[masterConfig].L2.rpcUrl],
+      chainId: '0x' + nw[network].L2.chainId.toString(16),
+      chainName: nw[network].L2.name,
+      rpcUrls: [nw[network].L2.rpcUrl],
       blockExplorerUrls
     }
 
-    const targetIDHex = nw[masterConfig][targetLayer].chainIdHex
+    const targetIDHex = nw[network][targetLayer].chainIdHex
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
@@ -832,21 +862,11 @@ class NetworkService {
     }
   }
 
-  async switchChain( layer ) {
-
-    if(this.L1orL2 === layer) {
-      console.log("Nothing to do - You are already on ",layer)
-      return
-    }
-
-    this.correctChain( layer )
-
-  }
-
   async getTransactions() {
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
+    if (this.account === null) return
 
     console.log("Getting transactions...")
 
@@ -855,7 +875,7 @@ class NetworkService {
     let txL2 = []
 
     const responseL1 = await etherScanInstance(
-      this.masterSystemConfig,
+      this.networkGateway,
       'L1'
     ).get(`&address=${this.account}`)
 
@@ -875,7 +895,7 @@ class NetworkService {
     //console.log("responseL1",txL1)
 
     const responseL2 = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
@@ -890,7 +910,7 @@ class NetworkService {
     }
 
     const responseL1pending = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l1.transactions', {
       address: this.account,
       fromRange:  0,
@@ -921,10 +941,10 @@ class NetworkService {
     console.log("getExits()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
       fromRange:  0,
@@ -946,10 +966,10 @@ class NetworkService {
     console.log("getSevens()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -969,10 +989,10 @@ class NetworkService {
     console.log("getFastExits()")
 
     // NOT SUPPORTED on LOCAL
-    if (this.masterSystemConfig === 'local') return
+    if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -1027,7 +1047,7 @@ class NetworkService {
     // Add the token to our master list, if we do not have it yet
     // if the token is already in the list, then this function does nothing
     // but if a new token shows up, then it will get added
-    if(allTokens === null) return
+    if (allTokens === null) return
 
     Object.keys(allTokens).forEach((token, i) => {
       getToken(allTokens[token].L1)
@@ -1086,34 +1106,37 @@ class NetworkService {
 
   async getBalances() {
 
+    const layer1Balances = [
+      {
+        address: allAddresses.L1_ETH_Address,
+        addressL2: allAddresses.L2_ETH_Address,
+        currency: allAddresses.L1_ETH_Address,
+        symbol: 'ETH',
+        decimals: 18,
+        balance: new BN(0),
+      },
+    ]
+
+    const layer2Balances = [
+      {
+        address: allAddresses.L2_ETH_Address,
+        addressL1: allAddresses.L1_ETH_Address,
+        addressL2: allAddresses.L2_ETH_Address,
+        currency: allAddresses.L1_ETH_Address,
+        symbol: 'ETH',
+        decimals: 18,
+        balance: new BN(0),
+      },
+    ]
+
     try {
 
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
       const layer2Balance = await this.L2Provider.getBalance(this.account)
 
-      const layer1Balances = [
-        {
-          address: allAddresses.L1_ETH_Address,
-          addressL2: allAddresses.L2_ETH_Address,
-          currency: allAddresses.L1_ETH_Address,
-          symbol: 'ETH',
-          decimals: 18,
-          balance: new BN(layer1Balance.toString()),
-        },
-      ]
-
-      const layer2Balances = [
-        {
-          address: allAddresses.L2_ETH_Address,
-          addressL1: allAddresses.L1_ETH_Address,
-          addressL2: allAddresses.L2_ETH_Address,
-          currency: allAddresses.L1_ETH_Address,
-          symbol: 'ETH',
-          decimals: 18,
-          balance: new BN(layer2Balance.toString()),
-        },
-      ]
+      layer1Balances[0].balance = new BN(layer1Balance.toString())
+      layer2Balances[0].balance = new BN(layer2Balance.toString())
 
       const state = store.getState()
       const tA = Object.values(state.tokenList)
@@ -1142,10 +1165,11 @@ class NetworkService {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        if(token.symbolL1 === 'xBOBA') {
-          //there is no L1 xBOBA
+        if (token.symbolL1 === 'xBOBA' || token.symbolL1 === 'WAGMIv0') {
+          //there is no L1 xBOBA or WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        } else {
+        }
+        else {
           getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
@@ -1154,9 +1178,17 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' && token.symbol !== 'xBOBA' && token.balance.gt(new BN(0)) ) {
+        if (token.layer === 'L1' &&
+            token.balance.gt(new BN(0)) &&
+            token.symbol !== 'xBOBA' &&
+            token.symbol !== 'WAGMIv0'
+          ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && (token.balance.gt(new BN(0)) || token.symbol === 'xBOBA')) {
+        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
+          layer2Balances.push(token)
+        } else if (token.layer === 'L2' && token.symbol === 'xBOBA') {
+          layer2Balances.push(token)
+        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv0' ) {
           layer2Balances.push(token)
         }
       })
@@ -1166,9 +1198,10 @@ class NetworkService {
         layer2: orderBy(layer2Balances, (i) => i.currency),
       }
     } catch (error) {
-      console.log("NS: getBalances error:",error)
+      console.log("NS: getBalances error:", error)
       return error
     }
+
   }
 
   handleMetaMaskError = (errorCode) => {
@@ -1195,12 +1228,13 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract.depositETH(
-        this.L2GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString()),
-        {
-          value: value_Wei_String
-        }
+      const depositTx = await this.L1StandardBridgeContract
+        .connect(this.provider.getSigner()).depositETH(
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString()),
+          {
+            value: value_Wei_String
+          }
       )
 
       //at this point the tx has been submitted, and we are waiting...
@@ -1239,7 +1273,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -1275,10 +1309,11 @@ class NetworkService {
 
       } else {
         //any ERC20 json will do....
-        tx = await this.L2_TEST_Contract.attach(currency).transfer(
-          address,
-          value_Wei_String
-        )
+        tx = await this.L2_TEST_Contract
+          .connect(this.provider.getSigner()).attach(currency).transfer(
+            address,
+            value_Wei_String
+          )
         await tx.wait()
       }
 
@@ -1571,10 +1606,11 @@ class NetworkService {
 
       if(!allowed) {
         //and now, the normal allowance transaction
-        const approveStatus = await L1_TEST_Contract.approve(
-          allAddresses.L1StandardBridgeAddress,
-          value_Wei_String
-        )
+        const approveStatus = await L1_TEST_Contract
+          .connect(this.provider.getSigner()).approve(
+            allAddresses.L1StandardBridgeAddress,
+            value_Wei_String
+          )
         await approveStatus.wait()
         console.log("ERC 20 L1 ops approved:",approveStatus)
       }
@@ -1582,13 +1618,14 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract.depositERC20(
-        currency,
-        currencyL2,
-        value_Wei_String,
-        this.L2GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString())
-      )
+      const depositTx = await this.L1StandardBridgeContract
+        .connect(this.provider.getSigner()).depositERC20(
+          currency,
+          currencyL2,
+          value_Wei_String,
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
 
       console.log("depositTxStatus:",depositTx)
 
@@ -1628,7 +1665,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.masterSystemConfig
+        this.networkGateway
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -1851,7 +1888,7 @@ class NetworkService {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -1889,15 +1926,24 @@ class NetworkService {
       }
 
       const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
-      const userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      let userTokenInfo = {}
+      if (typeof this.account !== 'undefined' && this.account) {
+        userTokenInfo = await L1LPContract.userInfo(tokenAddress, this.account)
+      }
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
     tokenAddressList.forEach((tokenAddress) => L1LPInfoPromise.push(getL1LPInfoPromise(tokenAddress)))
 
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
-
     sortRawTokens(L1LPInfo).forEach((token) => {
+      const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+      const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+      const duration = new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+      const durationDays = duration / (60 * 60 * 24 * 1000)
+      const annualRewardEstimate = 365 * rewards / durationDays
+      let annualYieldEstimate = 100 * annualRewardEstimate / userIn
+      if(!annualYieldEstimate) annualYieldEstimate = 0
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -1908,32 +1954,14 @@ class NetworkService {
         accUserRewardPerShare: token.poolTokenInfo.accUserRewardPerShare.toString(),
         userDepositAmount: token.poolTokenInfo.userDepositAmount.toString(),
         startTime: token.poolTokenInfo.startTime.toString(),
-        APR:
-          Number(token.poolTokenInfo.userDepositAmount.toString()) === 0
-            ? 0
-            : accMul(
-                accDiv(
-                  accDiv(
-                    token.poolTokenInfo.accUserReward,
-                    token.poolTokenInfo.userDepositAmount
-                  ),
-                  accDiv(
-                    //compute a more accurate current APR by considering the last week only,
-                    //rather than the full lifetime of the pools
-                      7 * 24 * 60 * 60 * 1000,
-                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
-                    365 * 24 * 60 * 60 * 1000
-                  )
-                ),
-                100
-              ), // ( accUserReward - userDepositAmount ) / timeDuration
+        APR: annualYieldEstimate,
         tokenBalance: token.tokenBalance.toString()
       }
       userInfo[token.tokenAddress] = {
         l1TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: token.userTokenInfo.amount.toString(),
-        pendingReward: token.userTokenInfo.pendingReward.toString(),
-        rewardDebt: token.userTokenInfo.rewardDebt.toString()
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): 0,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): 0,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): 0
       }
     })
     return { poolInfo, userInfo }
@@ -1942,7 +1970,7 @@ class NetworkService {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
@@ -1986,7 +2014,10 @@ class NetworkService {
         decimals = await this.L1_TEST_Contract.attach(tokenAddressL1).connect(this.L1Provider).decimals()
       }
       const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
-      const userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
+      let userTokenInfo = {}
+      if (typeof this.account !== 'undefined' && this.account) {
+        userTokenInfo = await L2LPContract.userInfo(tokenAddress, this.account)
+      }
       return { tokenAddress, tokenBalance, tokenSymbol, tokenName, poolTokenInfo, userTokenInfo, decimals }
     }
 
@@ -1995,6 +2026,13 @@ class NetworkService {
     const L2LPInfo = await Promise.all(L2LPInfoPromise)
 
     sortRawTokens(L2LPInfo).forEach((token) => {
+      const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+      const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+      const duration = new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+      const durationDays = duration / (60 * 60 * 24 * 1000)
+      const annualRewardEstimate = 365 * rewards / durationDays
+      let annualYieldEstimate = 100 * annualRewardEstimate / userIn
+      if(!annualYieldEstimate) annualYieldEstimate = 0
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -2005,32 +2043,14 @@ class NetworkService {
         accUserRewardPerShare: token.poolTokenInfo.accUserRewardPerShare.toString(),
         userDepositAmount: token.poolTokenInfo.userDepositAmount.toString(),
         startTime: token.poolTokenInfo.startTime.toString(),
-        APR:
-          Number(token.poolTokenInfo.userDepositAmount.toString()) === 0
-            ? 0
-            : accMul(
-                accDiv(
-                  accDiv(
-                    token.poolTokenInfo.accUserReward,
-                    token.poolTokenInfo.userDepositAmount
-                  ),
-                  accDiv(
-                    //compute a more accurate current APR by considering the last week only,
-                    //rather than the full lifetime of the pools
-                      7 * 24 * 60 * 60 * 1000,
-                    //new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000,
-                    365 * 24 * 60 * 60 * 1000
-                  )
-                ),
-                100
-              ), // ( accUserReward - userDepositAmount ) / timeDuration
+        APR: annualYieldEstimate,
         tokenBalance: token.tokenBalance.toString()
       }
       userInfo[token.tokenAddress.toLowerCase()] = {
         l2TokenAddress: token.tokenAddress.toLowerCase(),
-        amount: token.userTokenInfo.amount.toString(),
-        pendingReward: token.userTokenInfo.pendingReward.toString(),
-        rewardDebt: token.userTokenInfo.rewardDebt.toString()
+        amount: Object.keys(token.userTokenInfo).length? token.userTokenInfo.amount.toString(): 0,
+        pendingReward: Object.keys(token.userTokenInfo).length? token.userTokenInfo.pendingReward.toString(): 0,
+        rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): 0
       }
     })
 
@@ -2054,7 +2074,7 @@ class NetworkService {
       const addLiquidityTX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).addLiquidity(
+      ).connect(this.provider.getSigner()).addLiquidity(
         value_Wei_String,
         currency,
         otherField
@@ -2076,7 +2096,7 @@ class NetworkService {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).withdrawReward(
+      ).connect(this.provider.getSigner()).withdrawReward(
         value_Wei_String,
         currencyAddress,
         this.account
@@ -2098,7 +2118,7 @@ class NetworkService {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).withdrawLiquidity(
+      ).connect(this.provider.getSigner()).withdrawLiquidity(
         value_Wei_String,
         currency,
         this.account
@@ -2126,11 +2146,12 @@ class NetworkService {
 
     let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract.clientDepositL1(
-      value_Wei_String,
-      currency,
-      currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    depositTX = await this.L1LPContract
+      .connect(this.provider.getSigner()).clientDepositL1(
+        value_Wei_String,
+        currency,
+        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+      )
 
     console.log("depositTX",depositTX)
 
@@ -2168,7 +2189,7 @@ class NetworkService {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2200,10 +2221,11 @@ class NetworkService {
 
     let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract.clientDepositL1Batch(
-      updatedPayload,
-      ETHAmount !== 0 ? { value: ETHAmount } : {}
-    )
+    depositTX = await this.L1LPContract
+      .connect(this.provider.getSigner()).clientDepositL1Batch(
+        updatedPayload,
+        ETHAmount !== 0 ? { value: ETHAmount } : {}
+      )
 
     console.log("depositTX",depositTX)
 
@@ -2241,7 +2263,7 @@ class NetworkService {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2255,7 +2277,7 @@ class NetworkService {
   async L1LPPending(tokenAddress) {
 
     const L1pending = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).get('get.l2.pendingexits', {})
 
     const pendingFast = L1pending.data.filter(i => {
@@ -2445,11 +2467,12 @@ class NetworkService {
     }
 
     //in some cases zero not allowed
-    const tx2 = await this.L1LPContract.populateTransaction.clientDepositL1(
-      currencyAddress === allAddresses.L1_ETH_Address ? '1' : '0', //ETH does not allow zero
-      currencyAddress,
-      currencyAddress === allAddresses.L1_ETH_Address ? { value : '1'} : {}
-    )
+    const tx2 = await this.L1LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL1(
+        currencyAddress === allAddresses.L1_ETH_Address ? '1' : '0', //ETH does not allow zero
+        currencyAddress,
+        currencyAddress === allAddresses.L1_ETH_Address ? { value : '1'} : {}
+      )
 
     const depositGas_BN = await this.L1Provider.estimateGas(tx2)
     console.log("Fast deposit gas", depositGas_BN.toString())
@@ -2609,11 +2632,12 @@ class NetworkService {
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L2LPContract.clientDepositL2(
-      balance_BN,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
-    )
+    const depositTX = await this.L2LPContract
+      .connect(this.provider.getSigner()).clientDepositL2(
+        balance_BN,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
+      )
 
     //at this point the tx has been submitted, and we are waiting...
     await depositTX.wait()
@@ -2652,7 +2676,7 @@ class NetworkService {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2697,11 +2721,12 @@ class NetworkService {
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
 
-    const depositTX = await this.L2LPContract.clientDepositL2(
-      value_Wei_String,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
-    )
+    const depositTX = await this.L2LPContract
+      .connect(this.provider.getSigner()).clientDepositL2(
+        value_Wei_String,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+      )
 
     //at this point the tx has been submitted, and we are waiting...
     await depositTX.wait()
@@ -2740,7 +2765,7 @@ class NetworkService {
     console.log("Speed checker data payload:", data)
 
     const speed = await omgxWatcherAxiosInstance(
-      this.masterSystemConfig
+      this.networkGateway
     ).post('send.crossdomainmessage', data)
 
     console.log("Speed checker:", speed)
@@ -2767,11 +2792,12 @@ class NetworkService {
   // get DAO Balance
   async getDaoBalance() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    if( !this.BobaContract ) return
 
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.account ) {
+      console.log('NS: getDaoBalance() error - called but account === null')
+      return
+    }
 
     try {
       //console.log('Checking DAO balance')
@@ -2786,11 +2812,12 @@ class NetworkService {
 
   async getDaoBalanceX() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    if( !this.xBobaContract ) return
 
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.account ) {
+      console.log('NS: getDaoBalanceX() error - called but account === null')
+      return
+    }
 
     try {
       //console.log('Checking DAO balance')
@@ -2806,11 +2833,12 @@ class NetworkService {
   // get DAO Votes
   async getDaoVotes() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    if( !this.BobaContract ) return
 
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.account ) {
+      console.log('NS: getDaoVotes() error - called but account === null')
+      return
+    }
 
     try {
       let votes = await this.BobaContract.getCurrentVotes(this.account)
@@ -2824,11 +2852,12 @@ class NetworkService {
     // get DAO Votes
   async getDaoVotesX() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
+    if( !this.xBobaContract ) return
 
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.account ) {
+      console.log('NS: getDaoVotesX() error - called but account === null')
+      return
+    }
 
     try {
       let votes = await this.xBobaContract.getCurrentVotes(this.account)
@@ -2843,10 +2872,17 @@ class NetworkService {
   async transferDao({ recipient, amount }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: transferDao() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.BobaContract.transfer(recipient, parseEther(amount.toString()))
+      const tx = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .transfer(recipient, parseEther(amount.toString()))
       await tx.wait()
       return tx
     } catch (error) {
@@ -2859,10 +2895,17 @@ class NetworkService {
   async delegateVotes({ recipient }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.BobaContract === null ) return
+    if( !this.BobaContract ) return
+
+    if(!this.account) {
+      console.log('NS: delegateVotes() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.BobaContract.delegate(recipient)
+      const tx = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
@@ -2875,10 +2918,17 @@ class NetworkService {
   async delegateVotesX({ recipient }) {
 
     if( this.L1orL2 !== 'L2' ) return
-    if( this.xBobaContract === null ) return
+    if( !this.xBobaContract ) return
+
+    if( !this.account ) {
+      console.log('NS: delegateVotesX() error - called but account === null')
+      return
+    }
 
     try {
-      const tx = await this.xBobaContract.delegate(recipient)
+      const tx = await this.xBobaContract
+        .connect(this.provider.getSigner())
+        .delegate(recipient)
       await tx.wait()
       return tx
     } catch (error) {
@@ -2890,16 +2940,11 @@ class NetworkService {
   // Proposal Create Threshold
   async getProposalThreshold() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
-      //console.log("rawThreshold:",rawThreshold)
       const res = { proposalThreshold: formatEther(rawThreshold) }
       return res
     } catch (error) {
@@ -2911,15 +2956,15 @@ class NetworkService {
   //Create Proposal
   async createProposal(payload) {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
     if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
-    //console.log("payload",payload)
+    if( !this.account ) {
+      console.log('NS: delegateVotesX() error - called but account === null')
+      return
+    }
 
-    let signatures = [''] // the function that will carry out the proposal
+    let signatures = ['']
     let value1 = 0
     let value2 = 0
     let value3 = 0
@@ -2974,20 +3019,14 @@ class NetworkService {
 
       let values = [0] //amount of ETH to send, generally, zero
 
-      // console.log("Submitting proposal:", {
-      //   address,
-      //   values,
-      //   signatures,
-      //   callData,
-      //   description
-      // })
-
-      let res = await delegateCheck.propose(
-        address,
-        values,
-        signatures,
-        callData,
-        description
+      let res = await delegateCheck
+        .connect(this.provider.getSigner())
+        .propose(
+          address,
+          values,
+          signatures,
+          callData,
+          description
       )
       return res
 
@@ -3000,11 +3039,7 @@ class NetworkService {
   //Fetch DAO Proposals
   async fetchProposals() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
@@ -3013,21 +3048,14 @@ class NetworkService {
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()
-      //console.log('proposalCounts:',proposalCounts)
-
       const totalProposals = await proposalCounts.toNumber()
-      console.log('totalProposals:',totalProposals)
 
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
         null, null, null, null
       )
 
-      //console.log('filter:',filter)
-
       const descriptionList = await delegateCheck.queryFilter(filter)
-
-      //console.log('descriptionList:',descriptionList)
 
       for (let i = 0; i < totalProposals; i++) {
 
@@ -3061,7 +3089,11 @@ class NetworkService {
 
         let proposal = await delegateCheck.getActions(i+2)
 
-        const { hasVoted } = await delegateCheck.getReceipt(proposalID, this.account)
+        let hasVoted = null
+
+        if( this.account ) {
+          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
+        }
 
         let description = descriptionList[i].args[8].toString()
 
@@ -3077,7 +3109,7 @@ class NetworkService {
            startBlock,
            startTimestamp,
            endTimestamp,
-           hasVoted
+           hasVoted: hasVoted
         })
 
       }
@@ -3091,10 +3123,17 @@ class NetworkService {
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
 
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.castVote(id, userVote)
       return res
     } catch(error) {
@@ -3105,12 +3144,19 @@ class NetworkService {
 
   async queueProposal(proposalID) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: queueProposal() error - called but account === null')
+      return
+    }
 
     console.log("ProposalID:",Number(proposalID))
 
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.queue(Number(proposalID))
       return res
     } catch(error) {
@@ -3122,12 +3168,19 @@ class NetworkService {
 
   async executeProposal(proposalID) {
 
-    if( this.delegateContract === null ) return
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: executeProposal() error - called but account === null')
+      return
+    }
 
     console.log("ProposalID:",Number(proposalID))
 
     try {
-      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
       let res = delegateCheck.execute(Number(proposalID))
       return res
     } catch(error) {
@@ -3143,6 +3196,11 @@ class NetworkService {
   /***********************************************/
   async addFS_Savings(value_Wei_String) {
 
+    if(!this.account) {
+      console.log('NS: withdrawFS_Savings() error - called but account === null')
+      return
+    }
+
     try {
 
       const FixedSavings = new ethers.Contract(
@@ -3150,11 +3208,6 @@ class NetworkService {
         L2SaveJson.abi,
         this.provider.getSigner()
       )
-
-      // const account = await this.provider.getSigner().getAddress()
-      // console.log('this.account', account)
-
-      // console.log(this.L2Provider)
 
       let allowance_BN = await this.BobaContract.allowance(
         this.account,
@@ -3168,7 +3221,9 @@ class NetworkService {
 
       if (depositAmount_BN.gt(allowance_BN)) {
         console.log("Need to approve YES:",depositAmount_BN)
-        const approveStatus = await this.BobaContract.approve(
+        const approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
           allAddresses.BobaFixedSavings,
           value_Wei_String
         )
@@ -3187,19 +3242,19 @@ class NetworkService {
     }
   }
 
-  /***********************************************/
-  /*****       Fixed savings account         *****/
-  /***********************************************/
   async withdrawFS_Savings(stakeID) {
 
-    try {
+    if(!this.account) {
+      console.log('NS: withdrawFS_Savings() error - called but account === null')
+      return
+    }
 
+    try {
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
         L2SaveJson.abi,
         this.provider.getSigner()
       )
-
       const TX = await FixedSavings.unstake(stakeID)
       await TX.wait()
       return true
@@ -3210,24 +3265,17 @@ class NetworkService {
   }
 
   async getFS_Saves() {
-
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
-
+    if(this.account === null) {
+      console.log('NS: getFS_Saves() error - called but account === null')
+      return
+    }
     try {
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
         L2SaveJson.abi,
         this.L2Provider
       )
-
-      //const l2ba =
       await FixedSavings.l2Boba()
-      //console.log('l2 boba:', l2ba)
-      //console.log('l2 boba:', allTokens['BOBA'])
-
       let stakecount = await FixedSavings.personalStakeCount(this.account)
       return { stakecount: Number(stakecount) }
     } catch (error) {
@@ -3238,10 +3286,10 @@ class NetworkService {
 
   async getFS_Info() {
 
-    //if( this.masterSystemConfig === 'mainnet' ) return
-    //if( this.masterSystemConfig === 'rinkeby' ) return
-
-    if( this.L1orL2 !== 'L2' ) return
+    if(this.account === null) {
+      console.log('NS: getFS_Info() error - called but account === null')
+      return
+    }
 
     try {
 
@@ -3254,7 +3302,6 @@ class NetworkService {
       let stakeInfo = []
 
       const stakeCounts = await FixedSavings.personalStakeCount(this.account)
-      //console.log('stakeCounts:',stakeCounts)
 
       for (let i = 0; i < stakeCounts; i++) {
 
@@ -3269,7 +3316,6 @@ class NetworkService {
         })
 
       }
-      //console.log("stakeInfo:",stakeInfo)
       return { stakeInfo }
     } catch (error) {
       console.log("NS: getFS_Info error:",error)
@@ -3284,7 +3330,13 @@ class NetworkService {
   async estimateL1SecurityFee(payload=this.payloadForL1SecurityFee) {
     const deepCopyPayload = { ...payload }
     delete deepCopyPayload.from
-    const l1SecurityFee = await networkService.gasOracleContract.getL1Fee(
+    // Gas oracle
+    this.gasOracleContract = new ethers.Contract(
+      L2GasOracle,
+      OVM_GasPriceOracleJson.abi,
+      this.L2Provider
+    )
+    const l1SecurityFee = await this.gasOracleContract.getL1Fee(
       ethers.utils.serializeTransaction(deepCopyPayload)
     );
     return l1SecurityFee.toNumber()

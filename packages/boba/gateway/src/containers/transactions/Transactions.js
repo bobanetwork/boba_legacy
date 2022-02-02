@@ -37,7 +37,7 @@ function Transactions({ searchHistory, transactions }) {
   const [page, setPage] = useState(1)
 
   const loading = useSelector(selectLoading(['EXIT/GETALL']))
-  const tokenList = useSelector(selectTokens);
+  const tokenList = useSelector(selectTokens)
 
   useEffect(() => {
     setPage(1)

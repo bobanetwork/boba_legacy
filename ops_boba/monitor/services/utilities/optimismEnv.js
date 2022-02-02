@@ -8,7 +8,7 @@ const {
   getContractFactory,
 } = require('@eth-optimism/contracts')
 const fetch = require('node-fetch')
-const { Watcher } = require('../../../../packages/core-utils/dist/watcher')
+const { Watcher } = require('@eth-optimism/watcher')
 
 const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
