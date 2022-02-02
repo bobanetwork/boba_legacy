@@ -16,20 +16,25 @@ What is Wagmi and how does it work?
 
 Wagmi involves approximately 20 smart contracts. Here is a [partial list](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/288.json)
 
+WAGMIv0 uses a **Linear** LongShortPair (LSP) Financial Products Library (FPL) with the `lowerBound` set to ______ and `upperBound` set to _____2_____. The **linear LSP FPL** is [documented here](https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries/LinearLongShortPairFinancialProductLibrary.sol). Briefly, "_The contract will payout a scaled amount of collateral depending on where the settlement price lands within a price range between an `upperBound` and a `lowerBound`. If the settlement price is within the price range then the expiryPercentLong is defined by (expiryPrice - lowerBound) / (upperBound - lowerBound). This number represents the amount of collateral from the collateralPerPair that will be sent to the long and short side._" For example, if the TVL is halfway between ________ and ______B, i.e. __________B, then each WAGMIv0 would be worth _____, and so forth.
+
 ## Which smart contracts are involved and what do each of those contracts do?
 
-* The `LongShortPairCreator` - this contract creates the WAGMI LSP contracts. The LSP contract is created through a [script](https://github.com/UMAprotocol/launch-lsp).
-* The Long and Short tokens - only the `Long` tokens go to end users 
+* The `LongShortPairCreator` - This contract creates the `WAGMI LSP contract` through a [script](https://github.com/UMAprotocol/launch-lsp). **Each new WAGMI token requires a new WAGMI LSP contract with new/altered parameters**.
 
-## Default options for the LS generator script paramterisation
+* The `Long` and `Short` tokens - These tokens are via created via `LongShortPair.create`. The `create` function deposits collateral into the contract in exchange for an *equal amount* of long and short tokens based on the collateralPerPair parameter. The collateralPerPair parameter determines the amount of collateral that is required for each pair of long and short tokens. *Note* - only the `Long` tokens go to end users. 
+
+## Default options for the LSP generator script paramterisation
+
+???
 
 ## Wagmi contract addresses on Rinkeby and Mainnet
 
-* WAGMIv0 Mainnet: **0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c**
+* WAGMIv0 LSP contract on Mainnet: **0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c**
 
 ## Minting new Wagmi Tokens
 
-End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted via
+End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted via `LongShortPair.create`. Note that the LSP contract is approved for the `depositBobaAmount`.
 
 ```js
 const depositBobaAmount = ethers.utils.parseEther('10')
@@ -57,7 +62,28 @@ const mintTx = await LongShortPair.create(depositBobaAmount.div(collateralPerPai
 await mintTx.wait()
 ```
 
-### Each Wagmi token needs new Oracle
+For WAGMIv0, the `collateralPerPair` was set to 2 so that the maximum payout per KPI option is 2 BOBA if the Boba network TVL exceeds `UpperTVLBound`. The WAGMIv0 settings are:
+
+```
+Metric:Boba network TVL,
+Method:"https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md",
+Aggregation:TWAP TVL for the provided time range,
+StartTWAP:1646092800,
+EndTWAP:1648771200,
+TVLDenomination:USD,
+LowerTVLBound:500000000,
+UpperTVLBound:1500000000,
+MinimumPayout:1,
+Rounding:6
+```
+
+This means that the `UpperTVLBound` was set to 1,500,000,000.
+
+### Each Wagmi token needs new Oracle that provides the goal-specific data 
+
+* WAGMIv0 oracle
+
+The WAGMIv0 oracle is [documented here](https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md). Briefly, the oracle estimates TVL bridged from L1 to Boba network through the L1 standard bridge contract. It is based on similar calculation logic that is used to estimate Boba network TVL on the Dune Analytics Boba Bridge USD TVL display. 
 
 * Adding new oracles
 
