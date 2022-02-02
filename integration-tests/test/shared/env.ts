@@ -10,6 +10,8 @@ import {
   getAddressManager,
   l1Provider,
   l2Provider,
+  replicaProvider,
+  verifierProvider,
   l1Wallet,
   l2Wallet,
   l1Wallet_2,
@@ -69,6 +71,8 @@ export class OptimismEnv {
   // The providers
   l1Provider: providers.JsonRpcProvider
   l2Provider: providers.JsonRpcProvider
+  verifierProvider: providers.JsonRpcProvider
+  replicaProvider: providers.JsonRpcProvider
 
   constructor(args: any) {
     this.addressManager = args.addressManager
@@ -92,6 +96,8 @@ export class OptimismEnv {
     this.l2Wallet_4 = args.l2Wallet_4
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
+    this.verifierProvider = args.verifierProvider
+    this.replicaProvider = args.replicaProvider
     this.ctc = args.ctc
     this.scc = args.scc
   }
@@ -169,6 +175,8 @@ export class OptimismEnv {
       l2Wallet_4,
       l1Provider,
       l2Provider,
+      verifierProvider,
+      replicaProvider,
     })
   }
 
