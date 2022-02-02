@@ -16,13 +16,13 @@ What is Wagmi and how does it work?
 
 Wagmi involves approximately 20 smart contracts. Here is a [partial list](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/288.json)
 
-WAGMIv0 uses a **Linear** LongShortPair (LSP) Financial Products Library (FPL) with the `lowerBound` set to ______ and `upperBound` set to _____2_____. The **linear LSP FPL** is [documented here](https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries/LinearLongShortPairFinancialProductLibrary.sol). Briefly, "_The contract will payout a scaled amount of collateral depending on where the settlement price lands within a price range between an `upperBound` and a `lowerBound`. If the settlement price is within the price range then the expiryPercentLong is defined by (expiryPrice - lowerBound) / (upperBound - lowerBound). This number represents the amount of collateral from the collateralPerPair that will be sent to the long and short side._" For example, if the TVL is halfway between ________ and ______B, i.e. __________B, then each WAGMIv0 would be worth _____, and so forth.
+WAGMIv0 uses a **Linear** LongShortPair (LSP) Financial Products Library (FPL) with the `lowerBound` set to ________ and `upperBound` set to ________. The **linear LSP FPL** is [documented here](https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries/LinearLongShortPairFinancialProductLibrary.sol). Briefly, "_The contract will payout a scaled amount of collateral depending on where the settlement price lands within a price range between an `upperBound` and a `lowerBound`. If the settlement price is within the price range then the expiryPercentLong is defined by (expiryPrice - lowerBound) / (upperBound - lowerBound). This number represents the amount of collateral from the collateralPerPair that will be sent to the long and short side._" For example, if the TVL is halfway between ________ and ________, i.e. ________, then each WAGMIv0 would be worth ________, and so forth.
 
 ## Which smart contracts are involved and what do each of those contracts do?
 
 * The `LongShortPairCreator` - This contract creates the `WAGMI LSP contract` through a [script](https://github.com/UMAprotocol/launch-lsp). **Each new WAGMI token requires a new WAGMI LSP contract with new/altered parameters**.
 
-* The `Long` and `Short` tokens - These tokens are via created via `LongShortPair.create`. The `create` function deposits collateral into the contract in exchange for an *equal amount* of long and short tokens based on the collateralPerPair parameter. The collateralPerPair parameter determines the amount of collateral that is required for each pair of long and short tokens. *Note* - only the `Long` tokens go to end users. 
+* The `Long` and `Short` tokens - These tokens are via created via `LongShortPair.create`. The `create` function deposits collateral into the contract in exchange for an *equal amount* of long and short tokens based on the collateralPerPair parameter. The collateralPerPair parameter determines the amount of collateral that is required for each pair of long and short tokens. *Note* - the `Long` tokens go to end users. The `Short` tokens are retained so that unclimed collateral (BOBA tokens) that won’t be claimed by the users if the ratio is below 2
 
 ## Default options for the LSP generator script paramterisation
 
@@ -62,7 +62,7 @@ const mintTx = await LongShortPair.create(depositBobaAmount.div(collateralPerPai
 await mintTx.wait()
 ```
 
-For WAGMIv0, the `collateralPerPair` was set to 2 so that the maximum payout per KPI option is 2 BOBA if the Boba network TVL exceeds `UpperTVLBound`. The WAGMIv0 settings are:
+For WAGMIv0, the `collateralPerPair` was set to 2 so that the maximum payout per KPI option is *2 BOBA* if the Boba network TVL exceeds `UpperTVLBound`. The WAGMIv0 settings are:
 
 ```
 Metric:Boba network TVL,
@@ -71,13 +71,13 @@ Aggregation:TWAP TVL for the provided time range,
 StartTWAP:1646092800,
 EndTWAP:1648771200,
 TVLDenomination:USD,
-LowerTVLBound:500000000,
-UpperTVLBound:1500000000,
+LowerTVLBound:______,
+UpperTVLBound:______,
 MinimumPayout:1,
 Rounding:6
 ```
 
-This means that the `UpperTVLBound` was set to 1,500,000,000.
+This means that the `UpperTVLBound` was set to ______.
 
 ### Each Wagmi token needs new Oracle that provides the goal-specific data 
 
