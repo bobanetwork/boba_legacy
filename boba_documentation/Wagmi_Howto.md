@@ -14,29 +14,42 @@
 
 What is Wagmi and how does it work?
 
+Wagmi involves approximately 20 smart contracts. Here is a [partial list](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/288.json)
+
 ## Which smart contracts are involved and what do each of those contracts do?
 
-* The LS generator
-* The Long and Short tokens
-* Which tokens go to which parties?
+* The `LongShortPairCreator` - this contract creates the WAGMI LSP contracts. The LSP contract is created through a [script](https://github.com/UMAprotocol/launch-lsp).
+* The Long and Short tokens - only the `Long` tokens go to end users 
 
 ## Default options for the LS generator script paramterisation
 
 ## Wagmi contract addresses on Rinkeby and Mainnet
 
+* WAGMIv0 Mainnet: **0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c**
+
 ## Minting new Wagmi Tokens
+
+End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted by calling the ???????????. BOYUAN
 
 ### Each Wagmi token needs new Oracle
 
 * Adding new oracles
 
-### Private Key holders; Token Minting procedure
+[Method doc - Boba TVL](https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md) (that is referenced in LSP contract ancillary data) has link to example script: https://github.com/Reinis-FRP/boba-tvl
+
+### Claims Interface
+
+For the claims interface, the relevant smart contracts are: 
+
+The [LSP contract](https://blockexplorer.boba.network/address/0x5E9d23daa1b27754bd9BEc66B9E87FA0ce0470Ec/transactions)
+
+The [WAGMIv0 option](https://blockexplorer.boba.network/tokens/0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c/token-transfers)
+
+Post minting, the only interaction with the LSP that we need to support is allowing users to call settle to exchange their wagmi options for the underlying boba once the options expire: https://docs.umaproject.org/contracts/financial-templates/long-short-pair/LongShortPair#parameters-2
 
 ### Gateway changes needed
 
-Adding new Wagmi tokens requires changes in six different areas of the gateway, primarily in `networkServices.js`, `account.js`, `coinImage.js`, and `tokenAction.js`.
-
-First, add the new Wagmi token to `networkServices.js`:
+Adding new Wagmi tokens requires changes in six different areas of the gateway, primarily in `networkServices.js`, `account.js`, `coinImage.js`, and `tokenAction.js`. First, add the new Wagmi token to `networkServices.js`:
 
 ```javascript
 /services/networkServices.js
@@ -124,8 +137,3 @@ Finally, correct the WAGMI token from the **Account View**
   }
 ...
 ``` 
-
-
-
-
-
