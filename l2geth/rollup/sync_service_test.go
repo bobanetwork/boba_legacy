@@ -11,18 +11,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/eth/gasprice"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/consensus/ethash"
+	"github.com/ethereum-optimism/optimism/l2geth/core"
+	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
+	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/eth/gasprice"
+	"github.com/ethereum-optimism/optimism/l2geth/ethdb"
+	"github.com/ethereum-optimism/optimism/l2geth/event"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
 
 func setupLatestEthContextTest() (*SyncService, *EthContext) {
@@ -123,6 +123,7 @@ func TestSyncServiceTransactionEnqueued(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -179,6 +180,7 @@ func TestTransactionToTipNoIndex(t *testing.T) {
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		nil, // The index is `nil`, expect it to be set afterwards
@@ -665,6 +667,7 @@ func TestSyncServiceSync(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -716,6 +719,7 @@ func TestInitializeL1ContextPostGenesis(t *testing.T) {
 	txMeta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginL1ToL2,
 		&index,
@@ -1019,6 +1023,7 @@ func mockTx() *types.Transaction {
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
+		[]byte{0},
 		&l1TxOrigin,
 		types.QueueOriginSequencer,
 		nil,

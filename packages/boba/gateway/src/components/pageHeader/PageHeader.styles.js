@@ -3,9 +3,9 @@ import { Box } from "@material-ui/core";
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  margin: '40px 0',
+  margin: '20px 0',
   [theme.breakpoints.down('md')]: {
     marginTop: 0,
   },

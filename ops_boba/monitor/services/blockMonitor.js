@@ -85,6 +85,11 @@ class BlockMonitorService extends OptimismEnv {
       this.latestBlock
     )
 
+    const receipts = {}
+    for (const receipt of receiptsData) {
+      receipts[receipt.transactionHash] = receipt
+    }
+
     // write the block data into MySQL
     this.logger.info('Writing the block data...')
     for (const blockData of blocksData) {
@@ -93,6 +98,7 @@ class BlockMonitorService extends OptimismEnv {
       if (blockData.transactions.length) {
         for (const transactionData of blockData.transactions) {
           transactionData.timestamp = blockData.timestamp
+          transactionData.gasUsed = receipts[transactionData.hash].gasUsed
           await this.databaseService.insertTransactionData(transactionData)
         }
       }
@@ -128,6 +134,7 @@ class BlockMonitorService extends OptimismEnv {
 
   async startTransactionMonitor() {
     const latestBlock = await this.L2Provider.getBlockNumber()
+
     if (latestBlock > this.latestBlock) {
       this.logger.info('Finding new blocks...')
       this.latestBlock = latestBlock
@@ -139,6 +146,11 @@ class BlockMonitorService extends OptimismEnv {
         this.latestBlock
       )
 
+      const receipts = {}
+      for (const receipt of receiptsData) {
+        receipts[receipt.transactionHash] = receipt
+      }
+
       // write the block data into MySQL
       this.logger.info('Writing the block data...')
       for (const blockData of blocksData) {
@@ -147,6 +159,7 @@ class BlockMonitorService extends OptimismEnv {
         if (blockData.transactions.length) {
           for (const transactionData of blockData.transactions) {
             transactionData.timestamp = blockData.timestamp
+            transactionData.gasUsed = receipts[transactionData.hash].gasUsed
             await this.databaseService.insertTransactionData(transactionData)
           }
         }

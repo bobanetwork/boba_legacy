@@ -4,6 +4,7 @@ const mysql = require('mysql')
 const util = require('util')
 
 const OptimismEnv = require('./utilities/optimismEnv')
+const { logger } = require('../services/utilities/logger')
 
 class DatabaseService extends OptimismEnv {
   constructor() {
@@ -133,7 +134,7 @@ class DatabaseService extends OptimismEnv {
         depositFeeRate VARCHAR(255),
         fastDeposit BOOL,
         status VARCHAR(255),
-        PRIMARY KEY ( hash, blockNumber )
+        PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
     con.end()
     this.logger.info('Initialized the database.')
@@ -161,6 +162,24 @@ class DatabaseService extends OptimismEnv {
   }
 
   async insertTransactionData(transactionData) {
+    const ethers = require('ethers')
+    const txFee = ethers.BigNumber.from(transactionData.gasUsed)
+      .mul(transactionData.gasPrice)
+      .div('1000000000')
+    const tx = {
+      hash: transactionData.hash.toString(),
+      blockHash: transactionData.blockHash.toString(),
+      blockNumber: transactionData.blockNumber.toString(),
+      from: transactionData.from || '',
+      to: transactionData.to || '',
+      value: transactionData.value.toString(),
+      nonce: transactionData.nonce.toString(),
+      gasLimit: transactionData.gasLimit.toNumber(),
+      gasUsed: transactionData.gasUsed.toNumber(),
+      gasPrice: transactionData.gasPrice.toString(),
+      txFee: txFee.toNumber(),
+      timestamp: transactionData.timestamp.toString(),
+    }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
       port: this.MySQLPort,
@@ -170,20 +189,19 @@ class DatabaseService extends OptimismEnv {
     const query = util.promisify(con.query).bind(con)
     await query(`USE ${this.MySQLDatabaseName}`)
     await query(`INSERT IGNORE INTO transaction
-      SET hash='${transactionData.hash.toString()}',
-      blockHash='${transactionData.blockHash.toString()}',
-      blockNumber='${transactionData.blockNumber.toString()}',
-      \`from\`=${
-        transactionData.from ? "'" + transactionData.from + "'" : null
-      },
-      \`to\`=${transactionData.to ? "'" + transactionData.to + "'" : null},
-      value='${transactionData.value.toString()}',
-      nonce='${transactionData.nonce.toString()}',
-      gasLimit='${transactionData.gasLimit.toString()}',
-      gasPrice='${transactionData.gasPrice.toString()}',
-      timestamp='${transactionData.timestamp.toString()}'
+      SET hash='${tx.hash}',
+      blockHash='${tx.blockHash}',
+      blockNumber='${tx.blockNumber}',
+      \`from\`=${tx.from ? "'" + tx.from + "'" : null},
+      \`to\`=${tx.to ? "'" + tx.to + "'" : null},
+      value='${tx.value}',
+      nonce='${tx.nonce}',
+      gasLimit='${tx.gasLimit}',
+      gasPrice='${tx.gasPrice}',
+      timestamp='${tx.timestamp}'
     `)
     con.end()
+    logger.info('L2 Transaction', tx)
   }
 
   async insertReceiptData(receiptData) {

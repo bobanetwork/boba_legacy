@@ -18,21 +18,27 @@ class ListSave extends React.Component {
     super(props)
 
     const {
-      stakeInfo
+      stakeInfo,
+      isMobile
     } = this.props
 
     this.state = {
       stakeInfo,
+      isMobile
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { stakeInfo } = this.props
+    const { stakeInfo, isMobile } = this.props
 
     if (!isEqual(prevState.stakeInfo, stakeInfo)) {
       this.setState({ stakeInfo })
+    }
+
+    if (!isEqual(prevState.isMobile, isMobile)) {
+      this.setState({ isMobile })
     }
 
   }
@@ -55,36 +61,29 @@ class ListSave extends React.Component {
 
     const {
       stakeInfo,
+      isMobile
     } = this.state
 
     const pageLoading = Object.keys(stakeInfo).length === 0
-
-    const { isMobile } = this.props
 
     const timeDeposit_S = stakeInfo.depositTimestamp
     const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
 
     const timeNow_S = Math.round(Date.now() / 1000)
+    let duration_S = timeNow_S - timeDeposit_S
+    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
 
     const twoWeeks = 14 * 24 * 60 * 60
     const twoDays  =  2 * 24 * 60 * 60
 
-    const duration_S = timeNow_S - timeDeposit_S
-
-    const secondsOverWindow = duration_S % twoWeeks
-
+    const residual_S = duration_S % (twoWeeks + twoDays)
+    const timeZero_S = timeNow_S - residual_S
+    const unlocktimeNextBegin = moment.unix(timeZero_S + twoWeeks).format('MM/DD/YYYY hh:mm a')
+    const unlocktimeNextEnd = moment.unix(timeZero_S + twoWeeks + twoDays).format('MM/DD/YYYY hh:mm a')
+    
     let locked = true
-
-    if( duration_S >= twoWeeks && secondsOverWindow > 0 && secondsOverWindow <= twoDays ) {
-      locked = false
-    }
-
-    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
-
-    const unlocktime_S = timeNow_S + twoWeeks - secondsOverWindow
-    const unlocktimeNextBegin = moment.unix(unlocktime_S).format('MM/DD/YYYY hh:mm a')
-    const unlocktimeNextEnd = moment.unix(unlocktime_S+twoDays).format('MM/DD/YYYY hh:mm a')
-
+    if(residual_S > twoWeeks) locked = false
+    
     return (
       <S.Wrapper>
         {pageLoading ? (
@@ -100,7 +99,7 @@ class ListSave extends React.Component {
 
             <S.GridItemTag 
               item
-              xs={2}
+              xs={5}
               md={1}
             >
               {isMobile ? (
@@ -113,21 +112,8 @@ class ListSave extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag 
-              item
-              xs={6}
-              md={3}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
-              ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
-                {timeDeposit}
-              </Typography>
-            </S.GridItemTag>
-
             <S.GridItemTag item
-              xs={2}
+              xs={5}
               md={1}
             >
               {isMobile ? (
@@ -147,8 +133,21 @@ class ListSave extends React.Component {
               </Typography>
             </S.GridItemTag>
 
+            <S.GridItemTag 
+              item
+              xs={12}
+              md={3}
+            >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
+              ) : (null)}
+              <Typography variant="body1" style={{opacity: '0.4'}}>
+                {timeDeposit}
+              </Typography>
+            </S.GridItemTag>
+
             <S.GridItemTag item
-              xs={8}
+              xs={12}
               md={4}
             >
               {isMobile ? (
@@ -161,7 +160,7 @@ class ListSave extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
+              xs={12}
               md={2}
             >
               <Button

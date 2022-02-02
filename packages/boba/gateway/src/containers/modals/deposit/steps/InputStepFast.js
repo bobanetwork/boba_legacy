@@ -40,24 +40,24 @@ import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
-import { 
+import {
   fetchFastDepositCost,
   fetchL2LPBalance,
-  fetchL2LPPending, 
+  fetchL2LPPending,
   fetchL2TotalFeeRate,
   fetchL2FeeRateN,
   fetchL1FeeBalance,
-  fetchL2LPLiquidity, 
+  fetchL2LPLiquidity,
  } from 'actions/balanceAction'
 
-import { 
+import {
   selectL2FeeRate,
   selectL2FeeRateN,
-  selectFastDepositCost, 
+  selectFastDepositCost,
   selectL2LPBalanceString,
   selectL2LPPendingString,
-  selectL1FeeBalance,  
-  selectL2LPLiquidity 
+  selectL1FeeBalance,
+  selectL2LPLiquidity
 } from 'selectors/balanceSelector'
 
 function InputStepFast({ handleClose, token }) {
@@ -76,8 +76,9 @@ function InputStepFast({ handleClose, token }) {
   const feeRateN = useSelector(selectL2FeeRateN)
 
   const cost = useSelector(selectFastDepositCost)
+
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
-  
+
   const [ validValue, setValidValue ] = useState(false)
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
@@ -102,7 +103,7 @@ function InputStepFast({ handleClose, token }) {
     // console.log("ETH available for paying fees:",Number(feeBalance))
     // console.log("LPRatio:",Number(LPRatio))
     // console.log("LPBalance:",Number(balanceSubPending))
-    
+
     if (tooSmall || tooBig) {
       setValidValue(false)
       setValue(value)
@@ -128,7 +129,7 @@ function InputStepFast({ handleClose, token }) {
       //we don't want one large bridge to wipe out the entire balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
       //this is because the every time someone exits, the limit is recalculated
-      //via Number(LPBalance) * 0.9, and LPBalance changes over time 
+      //via Number(LPBalance) * 0.9, and LPBalance changes over time
       setValidValue(false)
       setValue(value)
       return false
@@ -138,7 +139,7 @@ function InputStepFast({ handleClose, token }) {
       setValue(value)
       return true
     }
-    
+
   }
 
   const receivableAmount = (value) => {
@@ -147,10 +148,10 @@ function InputStepFast({ handleClose, token }) {
 
   async function doDeposit() {
 
-    console.log("Amount to bridge to L2:", value_Wei_String)
-    
+    console.log(`${token.symbol} Amount to bridge to L2: ${value_Wei_String}`)
+
     let res
-    
+
     if(token.symbol === 'ETH') {
 
       console.log("ETH Fast Bridge")
@@ -205,7 +206,7 @@ function InputStepFast({ handleClose, token }) {
     }
 
   }
-  
+
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
   useEffect(() => {
@@ -240,7 +241,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
+  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -260,42 +261,41 @@ function InputStepFast({ handleClose, token }) {
   let warning = false
 
   if(cost && Number(cost) > 0) {
-    
     if (token.symbol !== 'ETH') {
       if(Number(cost) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH   
-        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas. 
-        <br/>THIS TRANSACTION WILL FAIL.` 
-      } 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
+        <br/>THIS TRANSACTION WILL FAIL.`
+      }
       else if(Number(cost) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
-        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
-        <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.` 
-      } 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
+      }
       else {
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
+        ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
     if (token.symbol === 'ETH') {
       if((Number(value) + Number(cost)) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH  
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
-        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
-        <br/>THIS TRANSACTION WILL FAIL.` 
+        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>THIS TRANSACTION WILL FAIL.`
       }
       else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH  
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH  
-        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
-        <br/>THIS TRANSACTION MIGHT FAIL.` 
+        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        <br/>THIS TRANSACTION MIGHT FAIL.`
       } else {
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH  
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
+        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
   }
@@ -335,7 +335,31 @@ function InputStepFast({ handleClose, token }) {
           newStyle
         />
 
-        {validValue && token && (
+        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance and balance/liquidity ratio are low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+
+        {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
+            Please use the classic bridge.
+          </Typography>
+        )}
+
+        {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
+            Please use the classic bridge or reduce the amount.
+          </Typography>
+        )}
+
+        <br />
+
+        {/* Only ERC20 tokens */}
+        {validValue && token &&(
           <Typography variant="body2" sx={{mt: 2}}>
             {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
           </Typography>
@@ -360,27 +384,6 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
-          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance and balance/liquidity ratio are low.
-            Please use the classic bridge.
-          </Typography>
-        )}
-
-        {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
-          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
-            Please use the classic bridge.
-          </Typography>
-        )}
-        
-        {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
-          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
-            Please use the classic bridge or reduce the amount.
-          </Typography>
-        )}
-
         {(depositLoading || approvalLoading) && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will automatically close when your transaction has been signed and submitted.
@@ -402,7 +405,7 @@ function InputStepFast({ handleClose, token }) {
           variant="contained"
           loading={depositLoading || approvalLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
-          disabled={!validValue}
+          disabled={!validValue || !Number(value)}
           triggerTime={new Date()}
           size="large"
           fullWidth={isMobile}

@@ -41,6 +41,7 @@ if [[ $BUILD == 1 ]]; then
     docker-compose build -- gas_oracle
     docker-compose build -- boba_deployer
     docker-compose build -- fraud-detector
+    docker-compose build -- monitor
 elif [[ $BUILD == 0 ]]; then
   if [[ $NO_PULL == 1 ]]; then
     echo "Using already present images"

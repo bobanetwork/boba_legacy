@@ -1,31 +1,35 @@
-import { BigNumber, Contract, ContractFactory, providers, Wallet } from 'ethers'
+import { BigNumber, Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 const abiDecoder = require('web3-eth-abi')
+import * as request from 'request-promise-native'
 
+const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
+const hPort = 1235 // Port for local HTTP server
 var urlStr
 
-const gasOverride =  {
-  gasLimit: 3000000 //3,000,000
-}
+const gasOverride =  { gasLimit: 3000000 }
+const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-import StableSwap from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
-import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerWallet = new Wallet(deployerPK, local_provider)
 
 let Factory__Stable: ContractFactory
 let stable: Contract
 let Factory__Helper: ContractFactory
 let helper: Contract
+let turingCredit: Contract
+let L2BOBAToken: Contract
+let addressesBOBA
 
-const local_provider = new providers.JsonRpcProvider(cfg['url'])
-
-// Key for autofunded L2 Hardhat test account
-const testPrivateKey = '0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd'
-const testWallet = new Wallet(testPrivateKey, local_provider)
+import StableSwapJson from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
+import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 //takes a string of hex values and coverts those to ASCII
 function convertHexToASCII(hexString) {
@@ -46,17 +50,17 @@ describe("Stableswap at AWS Lambda", function () {
     console.log("    URL set to", urlStr)
     
     Factory__Helper = new ContractFactory(
-      (TuringHelper.abi),
-      (TuringHelper.bytecode),
-      testWallet)
+      (TuringHelperJson.abi),
+      (TuringHelperJson.bytecode),
+      deployerWallet)
+    
+    helper = await Factory__Helper.deploy()
+    console.log("    Helper contract deployed as", helper.address)
 
-    helper = await Factory__Helper.deploy(gasOverride)
-    console.log("    Helper contract deployed as", helper.address, "on", "L2")
-        
     Factory__Stable = new ContractFactory(
-      (StableSwap.abi),
-      (StableSwap.bytecode),
-      testWallet)
+      (StableSwapJson.abi),
+      (StableSwapJson.bytecode),
+      deployerWallet)
     
     stable = await Factory__Stable.deploy(
       helper.address,
@@ -68,6 +72,65 @@ describe("Stableswap at AWS Lambda", function () {
     await stable.changeA(5) 
     
     console.log("    Stableswap contract deployed as", stable.address)
+
+    // whitelist the 'stable' contract in the helper
+    const tr1 = await helper.addPermittedCaller(stable.address)
+    const res1 = await tr1.wait()
+    console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
+
+    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+    addressesBOBA = JSON.parse(result)
+
+    L2BOBAToken = new Contract(
+      addressesBOBA.TOKENS.BOBA.L2,
+      L2GovernanceERC20Json.abi,
+      deployerWallet
+    )
+
+    // prepare to register/fund your Turing Helper 
+    turingCredit = getContractFactory(
+      'BobaTuringCredit',
+      deployerWallet
+    ).attach(addressesBOBA.BobaTuringCredit)
+
+  })
+
+  it("contract should be whitelisted", async () => {
+    const tr2 = await helper.checkPermittedCaller(stable.address, gasOverride)
+    const res2 = await tr2.wait()
+    const rawData = res2.events[0].data
+    const result = parseInt(rawData.slice(-64), 16)
+    expect(result).to.equal(1)
+    console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
+  })
+
+  it('Should register and fund your Turing helper contract in turingCredit', async () => {
+
+    const depositAmount = utils.parseEther('10')
+
+    const preBalance = await turingCredit.prepaidBalance(helper.address)
+    console.log("    Credit Prebalance", preBalance.toString())
+
+    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
+    console.log("    BOBA Balance in your account", bobaBalance.toString())
+
+    const approveTx = await L2BOBAToken.approve(
+      turingCredit.address,
+      depositAmount
+    )
+    await approveTx.wait()
+
+    const depositTx = await turingCredit.addBalanceTo(
+      depositAmount,
+      helper.address
+    )
+    await depositTx.wait()
+
+    const postBalance = await turingCredit.prepaidBalance(
+      helper.address
+    )
+
+    expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
   it("should return the helper address", async () => {

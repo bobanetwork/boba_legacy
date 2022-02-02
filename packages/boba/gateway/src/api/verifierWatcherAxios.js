@@ -1,21 +1,21 @@
 import axios from 'axios'
-import { getAllNetworks } from 'util/masterConfig'
-const nw = getAllNetworks()
+import { getNetwork } from 'util/masterConfig'
+const nw = getNetwork()
 
-export default function verifierWatcherAxiosInstance(masterSystemConfig){
+export default function verifierWatcherAxiosInstance(networkGateway){
 
   let axiosInstance = null
 
-  if(masterSystemConfig === 'local') {
+  if(networkGateway === 'local') {
     return null //does not make sense on local
   }
-  else if (masterSystemConfig === 'rinkeby') {
+  else if (networkGateway === 'rinkeby') {
     if(nw.rinkeby.VERIFIER_WATCHER_URL === null) return
     axiosInstance = axios.create({
       baseURL: nw.rinkeby.VERIFIER_WATCHER_URL,
     })
   }
-  else if (masterSystemConfig === 'mainnet') {
+  else if (networkGateway === 'mainnet') {
 
     if(nw.mainnet.VERIFIER_WATCHER_URL === null) return
     axiosInstance = axios.create({

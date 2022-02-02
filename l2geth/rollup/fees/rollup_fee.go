@@ -8,10 +8,10 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
 
 var (
@@ -116,6 +116,22 @@ func CalculateTotalMsgFee(msg Message, state StateDB, gasUsed *big.Int, gpo *com
 	return fee, nil
 }
 
+func CalculateL2GasForL1Msg(msg Message, state StateDB, gpo *common.Address) (*big.Int, error) {
+	gpo = &rcfg.L2GasPriceOracleAddress
+	l1Fee, err := CalculateL1MsgFee(msg, state, gpo)
+
+	if err != nil {
+		return new(big.Int), err
+	}
+	_, _, _, l2GasPrice := readGPOStorageSlots(*gpo, state)
+
+	if l2GasPrice.BitLen() == 0 {
+		return new(big.Int), nil
+	} else {
+		return new(big.Int).Div(l1Fee, l2GasPrice), nil
+	}
+}
+
 // CalculateL1MsgFee computes the L1 portion of the fee given
 // a Message and a StateDB
 func CalculateL1MsgFee(msg Message, state StateDB, gpo *common.Address) (*big.Int, error) {
@@ -129,7 +145,7 @@ func CalculateL1MsgFee(msg Message, state StateDB, gpo *common.Address) (*big.In
 		gpo = &rcfg.L2GasPriceOracleAddress
 	}
 
-	l1GasPrice, overhead, scalar := readGPOStorageSlots(*gpo, state)
+	l1GasPrice, overhead, scalar, _ := readGPOStorageSlots(*gpo, state)
 	l1Fee := CalculateL1Fee(raw, overhead, l1GasPrice, scalar)
 	return l1Fee, nil
 }
@@ -162,19 +178,20 @@ func DeriveL1GasInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, 
 		return nil, nil, nil, nil, err
 	}
 
-	l1GasPrice, overhead, scalar := readGPOStorageSlots(rcfg.L2GasPriceOracleAddress, state)
+	l1GasPrice, overhead, scalar, _ := readGPOStorageSlots(rcfg.L2GasPriceOracleAddress, state)
 	l1GasUsed := CalculateL1GasUsed(raw, overhead)
 	l1Fee := CalculateL1Fee(raw, overhead, l1GasPrice, scalar)
 	return l1Fee, l1GasPrice, l1GasUsed, scalar, nil
 }
 
-func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int, *big.Float) {
+func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int, *big.Float, *big.Int) {
+	l2GasPrice := state.GetState(addr, rcfg.L2GasPriceSlot)
 	l1GasPrice := state.GetState(addr, rcfg.L1GasPriceSlot)
 	overhead := state.GetState(addr, rcfg.OverheadSlot)
 	scalar := state.GetState(addr, rcfg.ScalarSlot)
 	decimals := state.GetState(addr, rcfg.DecimalsSlot)
 	scaled := ScaleDecimals(scalar.Big(), decimals.Big())
-	return l1GasPrice.Big(), overhead.Big(), scaled
+	return l1GasPrice.Big(), overhead.Big(), scaled, l2GasPrice.Big()
 }
 
 // ScaleDecimals will scale a value by decimals

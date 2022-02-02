@@ -22,9 +22,9 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 )
 
 type ValidationInfo struct {
@@ -110,7 +110,7 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 	}
 
 	tx := types.NewTransaction(uint64(args.Nonce), args.To.Address(), (*big.Int)(&args.Value), (uint64)(args.Gas), (*big.Int)(&args.GasPrice), input)
-	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, l1MessageSender, args.QueueOrigin, nil, nil, nil)
+	txMeta := types.NewTransactionMeta(l1BlockNumber, 0, []byte{0}, l1MessageSender, args.QueueOrigin, nil, nil, nil)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }
