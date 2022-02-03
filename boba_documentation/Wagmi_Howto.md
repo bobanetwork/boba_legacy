@@ -12,13 +12,26 @@
 
 ## TLDR
 
-What is Wagmi and how does it work?
+The WAGMI incentives program is Boba Network’s take on liquidity mining 2.0. In collaboration with 
+UMA protocol, we are be distributing WAGMI options on $BOBA token to promising projects building on Boba. Users can earn WAGMI options using their favorite dApps on Boba Network. WAGMI options are KPI (key performance indicators) options redeemable for $BOBA tokens based on metrics relating to Boba Network, such as monthly active wallets or project specific TVL. 
+
+WAGMI works by using UMA protocol's [optimistic oracle](https://umaproject.org/optimistic-oracle.html). $BOBA tokens are locked up in a smart contract that pays out subject to network KPIs (ie TVL of Boba), and secured in $WAGMIvX tokens. $BOBA is paid out after a 1 month settlement period on KPIs.
+
+For more information, check out our [WAGMI webpage](https://boba.network/developers/wagmi/) or [tweet thread](https://twitter.com/bobanetwork/status/1478218201494294528)
 
 Wagmi involves approximately 20 smart contracts. Here is a [partial list](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/288.json)
 
 WAGMIv0 uses a **Linear** LongShortPair (LSP) Financial Products Library (FPL) with the `lowerBound` set to ________ and `upperBound` set to ________. The **linear LSP FPL** is [documented here](https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries/LinearLongShortPairFinancialProductLibrary.sol). Briefly, "_The contract will payout a scaled amount of collateral depending on where the settlement price lands within a price range between an `upperBound` and a `lowerBound`. If the settlement price is within the price range then the expiryPercentLong is defined by (expiryPrice - lowerBound) / (upperBound - lowerBound). This number represents the amount of collateral from the collateralPerPair that will be sent to the long and short side._" For example, if the TVL is halfway between ________ and ________, i.e. ________, then each WAGMIv0 would be worth ________, and so forth.
 
 ## Which smart contracts are involved and what do each of those contracts do?
+
+All mainnet Boba contracts that UMA has deployed can be found [here](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/288.json)
+
+* **LSP contract** The UMA LSP contract is deployed on Boba Network at [0x5E9d23daa1b27754bd9BEc66B9E87FA0ce0470Ec](https://blockexplorer.boba.network/address/0x5E9d23daa1b27754bd9BEc66B9E87FA0ce0470Ec/transactions). This contract locks 2 BOBA per option on minting. UMA's in-depth documentation on minting KPI options can be found [here](https://docs.umaproject.org/kpi-options/usage-tutorial). 
+* The LS generator
+* **LongShortPair contract** 0x4B9A968b87316Df5A2AEd7c4193F16cAb42A9208 is verified on sourcify as a full match on chain id 288. Note: you can check this yourself at https://repo.sourcify.dev/select-contract/ and see the verified files in the sourcify repo here: https://repo.sourcify.dev/contracts/full_match/288/0x4B9A968b87316Df5A2AEd7c4193F16cAb42A9208/.
+* The Long and Short tokens
+* Which tokens go to which parties?
 
 * The `LongShortPairCreator` - This contract creates the `WAGMI LSP contract` through a [script](https://github.com/UMAprotocol/launch-lsp). **Each new WAGMI token requires a new WAGMI LSP contract with new/altered parameters**.
 
@@ -33,6 +46,29 @@ WAGMIv0 uses a **Linear** LongShortPair (LSP) Financial Products Library (FPL) w
 * WAGMIv0 LSP contract on Mainnet: **0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c**
 
 ## Minting new Wagmi Tokens
+
+UMA provided us with this minting example below:
+
+```
+# From UMA protocol repo on hardhat console I first load the LSP contract and BOBA as collateral:
+
+LongShortPair = getContract("LongShortPair").at("0x5e9d23daa1b27754bd9bec66b9e87fa0ce0470ec")
+collateralToken = getContract("ERC20").at("0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7")
+
+# Then I approved LSP to spend some BOBA tokens:
+
+await collateralToken.methods.approve(LongShortPair.options.address, web3.utils.toWei("10")).send({gas: 100000, gasPrice: 2 * 1000000000, from: (await web3.eth.getAccounts())[0]})
+
+# I minted pair of option tokens:
+
+await LongShortPair.methods.create(web3.utils.toWei("5")).send({gas: 300000, gasPrice: 2 * 1000000000, from: (await web3.eth.getAccounts())[0]})
+
+# And tested redeem:
+
+await LongShortPair.methods.redeem(web3.utils.toWei("2.5")).send({gas: 200000, gasPrice: 2 * 1000000000, from: (await web3.eth.getAccounts())[0]})
+```
+
+### Each Wagmi token needs new Oracle
 
 End-user WAGMI tokens are of type `ExpandedIERC20`. `ExpandedIERC20` are very similar to normal ERC20s, but have additional mint/burn functions such as `burnFrom`. The tokens are minted via `LongShortPair.create`. Note that the LSP contract is approved for the `depositBobaAmount`.
 
