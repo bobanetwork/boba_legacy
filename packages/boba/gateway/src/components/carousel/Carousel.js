@@ -11,15 +11,15 @@ const responsive = {
     items: 7
   },
   desktop: {
-    breakpoint: { max: 3000, min: 1024 },
+    breakpoint: { max: 3000, min: 1179 },
     items: 6
   },
   tablet: {
-    breakpoint: { max: 1024, min: 580 },
-    items: 3
+    breakpoint: { max: 1179, min: 667 },
+    items: 4
   },
   mobile: {
-    breakpoint: { max: 580, min: 0 },
+    breakpoint: { max: 667, min: 0 },
     items: 2
   }
 }
@@ -35,6 +35,7 @@ function CAROUSEL({
         responsive={responsive}
         removeArrowOnDeviceType={[ "tablet", "mobile" ]}
         className={styles.multiCarousel}
+        containerClass={styles.carouselContainer}
       >
         {children}
       </Carousel>

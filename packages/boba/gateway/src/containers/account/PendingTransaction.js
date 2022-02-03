@@ -23,7 +23,7 @@ import { selectNetwork } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 
 import { logAmount } from 'util/amountConvert'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 import AlertIcon from 'components/icons/AlertIcon'
 import moment from 'moment'
@@ -36,9 +36,9 @@ function PendingTransaction() {
 
     const [page, setPage] = useState(1)
     const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  
+
     const tokenList = useSelector(selectTokens)
-  
+
     const pending = unorderedTransactions.filter((i) => {
         if (i.crossDomainMessage &&
             i.crossDomainMessage.crossDomainMessage === 1 &&
@@ -83,7 +83,7 @@ function PendingTransaction() {
     )
 
     //Part 3 - exit that is not final, but we have a state root hash, and we ARE NOT using the fast message relayer
-    //so this is a traditional exit 
+    //so this is a traditional exit
     let pendingExitsTrad = pendingL2.filter((i) => {
         if (!i.action.fast) return true
         return false
@@ -106,7 +106,7 @@ function PendingTransaction() {
     )
 
     //DEPOSIT Part 3 - we ARE NOT using the fast message relayer
-    //so this is a traditional deposit 
+    //so this is a traditional deposit
     let pendingDepositsTrad = pendingL1.filter((i) => {
         if (!i.action.fast) return true
         return false
@@ -117,13 +117,26 @@ function PendingTransaction() {
       })
     )
 
-    const pendingTransactions = [
+    let pendingTransactions = [
         ...pendingExitsTrad,
         ...pendingExitsStage0,
         ...pendingExitsStage1,
         ...pendingDepositsTrad,
         ...pendingDepositsFast
     ]
+
+      // combine the batch onramp
+      pendingTransactions = pendingTransactions.reduce((acc, cur) => {
+      const index = acc.findIndex(i => i.blockNumber === cur.blockNumber)
+      if (index !== -1) {
+        acc[index].action = [...acc[index].action, cur.action]
+        acc[index].label = 'Bridge to L2 In Batch'
+      } else {
+        cur.action = [cur.action]
+        acc.push(cur)
+      }
+      return acc
+    }, [])
 
     const orderedTransactions = orderBy(pendingTransactions, i => i.timeStamp, 'desc')
     const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
@@ -135,9 +148,9 @@ function PendingTransaction() {
     //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
-    const currentNetwork = useSelector(selectNetwork());
-    const nw = getAllNetworks();
-    const theme = useTheme();
+    const currentNetwork = useSelector(selectNetwork())
+    const nw = getNetwork()
+    const theme = useTheme()
 
     const chainLink = (item) => {
         let network = nw[currentNetwork]
@@ -149,7 +162,7 @@ function PendingTransaction() {
     }
 
     return <S.AccountWrapper >
-        
+
         <S.WrapperHeading>
             <Typography variant="h3" sx={{ opacity: "1.0", fontWeight: "700" }}>Pending Transactions</Typography>
             <Pager
@@ -198,28 +211,30 @@ function PendingTransaction() {
                 let link = chainLink(i)
 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
-                
-                let amountTx = null
-                
-                if (i.action) {
-                    let token = tokenList[i.action.token.toLowerCase()];
+
+                let amountTx = ''
+
+                for (const payload of i.action) {
+                  if (payload.token) {
+                    let token = tokenList[payload.token.toLowerCase()];
                     if (chain === 'L2') {
-                        token = Object.values(tokenList).find(t => t.addressL2.toLowerCase() === i.action.token.toLowerCase());
+                        token = Object.values(tokenList).find(t => t.addressL2.toLowerCase() === payload.token.toLowerCase());
                     }
                     if (!!token) {
-                        let amount = logAmount(i.action.amount, token.decimals, 3);
+                        let amount = logAmount(payload.amount, token.decimals, 3);
                         let symbol = token[`symbol${chain}`];
-                        amountTx = `${amount} ${symbol}`;
+                        amountTx += `${amount} ${symbol} `;
                     }
+                  }
                 }
 
                 return <S.Wrapper key={i.hash}>
-                <S.GridContainer 
+                <S.GridContainer
                     container
-                    key={i.hash} 
-                    spacing={2} 
-                    direction="row" 
-                    justifyContent="flex-start" 
+                    key={i.hash}
+                    spacing={2}
+                    direction="row"
+                    justifyContent="flex-start"
                     alignItems="center"
                 >
                     <Grid item xs={4}>
@@ -231,13 +246,13 @@ function PendingTransaction() {
                     <Grid item xs={4}>
                         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
                             <Typography
-                                variant="overline" 
+                                variant="overline"
                                 sx={{fontSize: '0.8em', lineHeight: '1.0em', color: 'rgba(255, 255, 255, 0.3)'}}
                             >
                                 {'Started: '}{moment.unix(i.timeStamp).format('lll')}
                             </Typography>
                             <Typography
-                                variant="overline" 
+                                variant="overline"
                                 sx={{fontSize: '0.8em', lineHeight: '0.8em', color: 'rgba(255, 255, 255, 0.3)'}}
                             >
                                 {'Completion after: '}{completionTime}
@@ -247,7 +262,7 @@ function PendingTransaction() {
                     <Grid item xs={4}>
                         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
                             <Typography
-                                variant="overline" 
+                                variant="overline"
                                 sx={{fontSize: '0.8em', lineHeight: '1.0em'}}
                             >
                                 {i.labelStatus}

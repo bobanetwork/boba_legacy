@@ -21,26 +21,33 @@
 
   .content {
 
-    margin: 10px auto;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    border-radius: 4px;
+    gap: 10px;
 
     @media only screen and (max-width: 900px) {
       flex-direction: column;
     }
 
+    .topRow {
+      display: flex;
+      flex-direction: row;
+      @media only screen and (max-width: 550px) {
+        flex-direction: column;
+      }
+    }
+
     .transferContainer,
     .delegateContainer {
-      border-radius: 4px;
-      padding: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      width: 48%;
-      margin: 5px;
+      justify-content: space-around;
+      align-items: flex-start;
+      width: 250px;
       @media only screen and (max-width: 900px) {
         width: 100%;
         min-width: unset;

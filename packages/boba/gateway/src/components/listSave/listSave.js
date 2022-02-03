@@ -18,21 +18,27 @@ class ListSave extends React.Component {
     super(props)
 
     const {
-      stakeInfo
+      stakeInfo,
+      isMobile
     } = this.props
 
     this.state = {
       stakeInfo,
+      isMobile
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { stakeInfo } = this.props
+    const { stakeInfo, isMobile } = this.props
 
     if (!isEqual(prevState.stakeInfo, stakeInfo)) {
       this.setState({ stakeInfo })
+    }
+
+    if (!isEqual(prevState.isMobile, isMobile)) {
+      this.setState({ isMobile })
     }
 
   }
@@ -55,11 +61,10 @@ class ListSave extends React.Component {
 
     const {
       stakeInfo,
+      isMobile
     } = this.state
 
     const pageLoading = Object.keys(stakeInfo).length === 0
-
-    const { isMobile } = this.props
 
     const timeDeposit_S = stakeInfo.depositTimestamp
     const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
@@ -94,7 +99,7 @@ class ListSave extends React.Component {
 
             <S.GridItemTag 
               item
-              xs={2}
+              xs={5}
               md={1}
             >
               {isMobile ? (
@@ -107,21 +112,8 @@ class ListSave extends React.Component {
               </Typography>
             </S.GridItemTag>
 
-            <S.GridItemTag 
-              item
-              xs={6}
-              md={3}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
-              ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
-                {timeDeposit}
-              </Typography>
-            </S.GridItemTag>
-
             <S.GridItemTag item
-              xs={2}
+              xs={5}
               md={1}
             >
               {isMobile ? (
@@ -141,8 +133,21 @@ class ListSave extends React.Component {
               </Typography>
             </S.GridItemTag>
 
+            <S.GridItemTag 
+              item
+              xs={12}
+              md={3}
+            >
+              {isMobile ? (
+                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
+              ) : (null)}
+              <Typography variant="body1" style={{opacity: '0.4'}}>
+                {timeDeposit}
+              </Typography>
+            </S.GridItemTag>
+
             <S.GridItemTag item
-              xs={8}
+              xs={12}
               md={4}
             >
               {isMobile ? (
@@ -155,7 +160,7 @@ class ListSave extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
+              xs={12}
               md={2}
             >
               <Button

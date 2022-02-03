@@ -204,6 +204,7 @@ class FarmWithdrawModal extends React.Component {
       <Modal
         open={open}
         onClose={()=>{this.handleClose()}}
+        maxWidth="md"
       >
 
         <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>

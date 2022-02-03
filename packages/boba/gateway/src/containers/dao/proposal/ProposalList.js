@@ -29,6 +29,7 @@ import * as styles from './proposalList.module.scss'
 
 import { selectProposals, selectProposalThreshold, selectDaoVotes, selectDaoVotesX} from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import { orderBy } from 'lodash'
 
@@ -44,6 +45,7 @@ function ProposalList() {
     const loading = useSelector(selectLoading(['PROPOSALS/GET']))
     const proposals = useSelector(selectProposals)
     const proposalThreshold = useSelector(selectProposalThreshold)
+    const accountEnabled = useSelector(selectAccountEnabled())
 
     const votes = useSelector(selectDaoVotes)
     const votesX = useSelector(selectDaoVotesX)
@@ -60,12 +62,10 @@ function ProposalList() {
     return <>
         <div className={styles.containerAction}>
             <p className={styles.listTitle}>Proposals</p>
-            <Typography variant="body2" className={styles.helpTextLight}>
-                At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal
-            </Typography>
             <Button
                 type="primary"
                 variant="contained"
+                disabled={!accountEnabled}
                 onClick={() => {
                     if(Number(votes + votesX) < Number(proposalThreshold)) {
                         dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a new proposal.`))
@@ -76,10 +76,11 @@ function ProposalList() {
             >Create</Button>
         </div>
         <div className={styles.listContainer}
-            style={{
-                background: theme.palette.background.secondary
-            }}
+            style={{ background: theme.palette.background.secondary }}
         >
+            <Typography variant="body2" className={styles.helpTextLight}>
+                At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal
+            </Typography>
             <Pager
                 currentPage={page}
                 isLastPage={paginatedProposals.length < PER_PAGE}

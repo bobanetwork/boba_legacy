@@ -15,10 +15,10 @@ limitations under the License. */
 
 require('dotenv').config()
 
-let NETWORKS
+let NETWORK
 
 if (process.env.REACT_APP_CHAIN === 'rinkeby') {
-  NETWORKS = {
+  NETWORK = {
     rinkeby: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
@@ -57,7 +57,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'mainnet') {
-  NETWORKS = {
+  NETWORK = {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
@@ -96,7 +96,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
-  NETWORKS = {
+  NETWORK = {
     local: {
       OMGX_WATCHER_URL: null, //Does not exist on local
       MM_Label:         `Local`,
@@ -131,8 +131,8 @@ const BaseServices = {
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
 }
 
-export function getAllNetworks () {
-  return NETWORKS
+export function getNetwork () {
+  return NETWORK
 }
 
 export function getBaseServices () {

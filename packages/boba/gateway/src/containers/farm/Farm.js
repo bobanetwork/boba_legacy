@@ -31,6 +31,7 @@ import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 class Farm extends React.Component {
@@ -49,6 +50,11 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
+    const {
+      baseEnabled,
+      accountEnabled,
+      layer
+    }  = this.props.setup
 
     let initialViewLayer = 'L1 Liquidity Pool'
     let initialLayer = 'L1LP'
@@ -61,6 +67,7 @@ class Farm extends React.Component {
     this.state = {
       poolInfo,
       userInfo,
+      layer,
       layer1,
       layer2,
       lpChoice: initialLayer,
@@ -68,13 +75,18 @@ class Farm extends React.Component {
       showMDO: false, //MDO = my deposits only
       showMSO: false, //MSO = my stakes only
       dropDownBox: false,
-      dropDownBoxInit: true
+      dropDownBoxInit: true,
+      // provider status
+      baseEnabled,
+      accountEnabled
     }
 
   }
 
   componentDidMount() {
-    this.props.dispatch(getFarmInfo())
+    if (this.state.baseEnabled) {
+      this.props.dispatch(getFarmInfo())
+    }
   }
 
   componentDidUpdate(prevState) {
@@ -89,12 +101,19 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
+    const {
+      baseEnabled,
+      accountEnabled,
+      layer
+    }  = this.props.setup
+
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
     }
 
     if (!isEqual(prevState.farm.userInfo, userInfo)) {
       this.setState({ userInfo })
+      if (accountEnabled) this.setState({ accountEnabled })
     }
 
     if (!isEqual(prevState.balance.layer1, layer1)) {
@@ -105,6 +124,19 @@ class Farm extends React.Component {
       this.setState({ layer2 })
     }
 
+    if (prevState.setup.baseEnabled !== baseEnabled) {
+      this.props.dispatch(getFarmInfo())
+      this.setState({ baseEnabled })
+    }
+
+    if (prevState.setup.accountEnabled !== accountEnabled) {
+      this.props.dispatch(getFarmInfo())
+      if (!accountEnabled) this.setState({ accountEnabled })
+    }
+
+    if (prevState.setup.layer !== layer) {
+      this.setState({ layer })
+    }
   }
 
   getBalance(address, chain) {
@@ -170,11 +202,11 @@ class Farm extends React.Component {
       showMDO,
       showMSO,
       dropDownBox,
+      accountEnabled,
+      layer,
     } = this.state
 
     const { isMobile } = this.props
-
-    const networkLayer = networkService.L1orL2
 
     return (
       <>
@@ -184,20 +216,22 @@ class Farm extends React.Component {
 
           <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
 
-            <S.GridItemTag 
-              item xs={10} 
+            <S.GridItemTag
+              item xs={10}
               md={10}
-            > 
+            >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> The bridges collect fees and then immediately distribute 
-                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the 
-                bridge you have staked into. The <span style={{fontWeight: '700'}}>APR</span> is the historical APR, which 
+                <span style={{fontWeight: '700'}}>EARNINGS</span>: The bridges collect fees and then immediately distribute
+                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the
+                bridge you have staked into.
+                <br />
+                <span style={{fontWeight: '700'}}>YIELD</span>: the historical yield, which
                 reflects the fees people paid to bridge and the previous usage patterns for each pool.
-                <br/>
-                <br/>
-                The supply of tokens in the pools reflects the staking and bridging activities of all users.
-                {' '}<span style={{fontWeight: '700'}}>LIQUIDITY</span> denotes the funds staked by liquidity providers, while the
-                {' '}<span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span> refers to the amount of funds currently in each pool.
+                There is no fixed yield and yields can vary widely as bridge activity changes.
+                <br />
+                <span style={{fontWeight: '700'}}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
+                <br />
+                <span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span>: the amount of funds currently in each pool.
               </Typography>
             </S.GridItemTag>
 
@@ -236,7 +270,7 @@ class Farm extends React.Component {
                     bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
                     rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another.
                     <br /><br />
-                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees. 
+                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees.
                     When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool, and vice-versa.
                   </Typography>
                 </S.DropdownWrapper>
@@ -245,6 +279,21 @@ class Farm extends React.Component {
           ) : null}
 
         </S.Wrapper>
+
+        {!accountEnabled &&
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To see your balances and contribute to the liquidity pool, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+        }
 
         <Box sx={{ my: 3, width: '100%' }}>
           <S.GridItemTagContainer sx={{ mb: 2, display: 'flex' }}>
@@ -283,7 +332,7 @@ class Farm extends React.Component {
             </S.FarmActionContainer>
           </S.GridItemTagContainer>
 
-          {networkLayer === 'L2' && lpChoice === 'L1LP' &&
+          {layer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon sx={{ flex: 1 }} />
@@ -298,7 +347,7 @@ class Farm extends React.Component {
             </S.LayerAlert>
           }
 
-          {networkLayer === 'L1' && lpChoice === 'L2LP' &&
+          {layer === 'L1' && lpChoice === 'L2LP' &&
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -319,7 +368,7 @@ class Farm extends React.Component {
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Past APR %</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Yield %</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>
@@ -342,6 +391,7 @@ class Farm extends React.Component {
                     decimals={ret[1]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
+                    accountEnabled={accountEnabled}
                   />
                 )
               })}
@@ -362,6 +412,7 @@ class Farm extends React.Component {
                     decimals={ret[1]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
+                    accountEnabled={accountEnabled}
                   />
                 )
               })}
@@ -375,7 +426,8 @@ class Farm extends React.Component {
 
 const mapStateToProps = state => ({
   farm: state.farm,
-  balance: state.balance
+  balance: state.balance,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Farm)
