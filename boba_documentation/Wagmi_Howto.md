@@ -211,10 +211,10 @@ Next, add the new WAGMI token to the **token lookup**:
 ...
 ```
 
-Finally, correct the WAGMI token from the **Account View**
+Finally, disable the not-applicable bridge dropdown for the WAGMI token in the **Account View**:
 
 ```javascript
-/components/listAcconut.js
+/components/listAccount.js
 
 ...
   {token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' &&
