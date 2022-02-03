@@ -55,10 +55,11 @@ const main = async () => {
     console.log(`Submission eligibility: ${ETHUSDPairState._eligibleToSubmit}`)
 
     /*
-      This following portion is about examples to verify and obtain the round and submissions for
-      multiple oracle settings. For the sake of keeping this example easy to follow - the assumption
-      is only one oracle exists.
-      Feel free to look over this section for now, and refer back for multiple oracle settings
+      For the sake of keeping this example easy to follow - the following part has been commented
+      and the example assumes that only one oracle exists.
+      Howver, This following portion is about the ways to verify and obtain the round and submissions for
+      multiple oracle settings.
+      Feel free to over look this section for now, and refer back for multiple oracle settings
 
       Ideally, in the case of multiple oracles, the oracle should query their
       eligibility to submit on the LATEST ROUND first, and not directly the next round
