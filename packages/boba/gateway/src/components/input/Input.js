@@ -30,6 +30,7 @@ function Input({
   label,
   type = 'text',
   disabled,
+  disabledExitAll,
   icon,
   unit,
   value,
@@ -181,6 +182,7 @@ function Input({
                   loading={loading}
                   triggerTime={new Date()}
                   tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+                  disabled={disabledExitAll}
                 >
                   Bridge All
                 </Button>

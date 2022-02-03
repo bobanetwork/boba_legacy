@@ -38,24 +38,24 @@ import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
-import { 
-  fetchFastExitCost, 
+import {
+  fetchFastExitCost,
   fetchL1LPBalance,
-  fetchL1LPPending,  
-  fetchL1TotalFeeRate, 
-  fetchL1FeeRateN, 
+  fetchL1LPPending,
+  fetchL1TotalFeeRate,
+  fetchL1FeeRateN,
   fetchL2FeeBalance,
-  fetchL1LPLiquidity 
+  fetchL1LPLiquidity
 } from 'actions/balanceAction'
 
-import { 
+import {
   selectL1FeeRate,
-  selectL1FeeRateN,  
+  selectL1FeeRateN,
   selectFastExitCost, //estimated total cost of this exit
-  selectL1LPBalanceString, 
+  selectL1LPBalanceString,
   selectL1LPPendingString,
-  selectL2FeeBalance, 
-  selectL1LPLiquidity 
+  selectL2FeeBalance,
+  selectL1LPLiquidity
 } from 'selectors/balanceSelector'
 
 function DoExitStepFast({ handleClose, token }) {
@@ -123,7 +123,7 @@ function DoExitStepFast({ handleClose, token }) {
       //we don't want one large bridge to wipe out all the balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
       //this is because the every time someone exits, the limit is recalculated
-      //via Number(LPBalance) * 0.9, and LPBalance changes over time 
+      //via Number(LPBalance) * 0.9, and LPBalance changes over time
       setValidValue(false)
       setValue(value)
       return false
@@ -168,7 +168,7 @@ function DoExitStepFast({ handleClose, token }) {
     console.log("Amount to exit:", token.balance.toString())
 
     const value = logAmount(token.balance, token.decimals)
-    const valid = setAmount(value)
+    const valid = setAmount(token.symbol === 'ETH' ? maxValue - Number(cost): maxValue)
 
     if(valid) {
       let res = await dispatch(
@@ -180,7 +180,7 @@ function DoExitStepFast({ handleClose, token }) {
         dispatch(
             openAlert(
               `${token.symbol} was bridged. You will receive approximately
-              ${receivableAmount(value)} ${token.symbol} 
+              ${receivableAmount(value)} ${token.symbol}
               minus gas fees (if bridging ETH) on L1.`
             )
           )
@@ -190,7 +190,7 @@ function DoExitStepFast({ handleClose, token }) {
       dispatch(
         openError(
           `You cannot currently fast bridge all of your ${token.symbol} due to insufficient liquidity ratio (of ${Number(LPRatio).toFixed(2)})
-          and/or insufficient pool balance (of ${Number(balanceSubPending).toFixed(2)}). Please reduce the amount you wish to exit 
+          and/or insufficient pool balance (of ${Number(balanceSubPending).toFixed(2)}). Please reduce the amount you wish to exit
           to below ${Number(balanceSubPending).toFixed(2)*0.9} or use the classic bridge instead.`
         )
       )
@@ -245,39 +245,39 @@ function DoExitStepFast({ handleClose, token }) {
   let warning = false
 
   if(cost && Number(cost) > 0) {
-    
+
     if (token.symbol !== 'ETH') {
       if(Number(cost) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas. 
-        <br/>TRANSACTION WILL FAIL.` 
-      } 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
+        <br/>TRANSACTION WILL FAIL.`
+      }
       else if(Number(cost) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH 
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost. 
-        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.` 
-      } 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
+      }
       else {
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH` 
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
     if (token.symbol === 'ETH') {
       if((Number(value) + Number(cost)) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction. 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
         <br/>TRANSACTION WILL FAIL.`
       }
       else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH 
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total. 
-        <br/>TRANSACTION MIGHT FAIL.` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        <br/>TRANSACTION MIGHT FAIL.`
       } else {
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH` 
+        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH`
       }
     }
   }
@@ -314,6 +314,7 @@ function DoExitStepFast({ handleClose, token }) {
           loading={loading}
           onExitAll={doExitAll}
           allowExitAll={true}
+          disabledExitAll={!cost}
         />
 
         {validValue && token && (
@@ -327,7 +328,7 @@ function DoExitStepFast({ handleClose, token }) {
             }
           </Typography>
         )}
-        
+
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {parse(ETHstring)}
@@ -342,21 +343,21 @@ function DoExitStepFast({ handleClose, token }) {
 
         {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance and balance/liquidity ratio are too low. 
+            The pool's balance and balance/liquidity ratio are too low.
             Please use the classic bridge.
           </Typography>
         )}
 
         {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low. 
+            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
             Please use the classic bridge.
           </Typography>
         )}
 
         {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low. 
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}
