@@ -168,7 +168,7 @@ function DoExitStepFast({ handleClose, token }) {
     console.log("Amount to exit:", token.balance.toString())
 
     const value = logAmount(token.balance, token.decimals)
-    const valid = setAmount(token.symbol === 'ETH' ? (maxValue - Number(cost)).toFixed(4): maxValue)
+    const valid = setAmount(token.symbol === 'ETH' ? maxValue - Number(cost): maxValue)
 
     if(valid) {
       let res = await dispatch(
