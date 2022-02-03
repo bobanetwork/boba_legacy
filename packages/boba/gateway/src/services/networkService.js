@@ -573,7 +573,7 @@ async initializeBase( networkGateway ) {
         } else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
-            'L2': '0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c'
+            'L2': '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672'
           }
         } else {
           const L1a = addresses['TK_L1'+key]
