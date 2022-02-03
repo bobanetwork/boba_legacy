@@ -5,7 +5,7 @@
   * [Math](#math)
   * [Which smart contracts are involved and what do each of those contracts do?](#which-smart-contracts-are-involved-and-what-do-each-of-those-contracts-do-)
   * [System deployment and Minting new WAGMI Tokens](#system-deployment-and-minting-new-wagmi-tokens)
-  * [Each WAGMI token needs new Oracle that provides the goal-specific data](#each-wagmi-token-needs-new-oracle-that-provides-the-goal-specific-data)
+  * [Each WAGMI token needs a new Oracle that provides the goal-specific data](#each-wagmi-token-needs-a-new-oracle-that-provides-the-goal-specific-data)
   * [Claims Interface](#claims-interface)
   * [Gateway changes needed](#gateway-changes-needed)
 
@@ -132,7 +132,7 @@ For the claims interface, the relevant smart contracts are:
 
 * The [WAGMIv0 Long option 0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672](https://blockexplorer.boba.network/address/0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672/transactions)
 
-Post minting, the only interaction with the LSP is allowing users to call settle to exchange their WAGMI options for the underlying BOBA once the options expire: https://docs.umaproject.org/contracts/financial-templates/long-short-pair/LongShortPair#parameters-2
+Post minting, the only interaction with the LSP is allowing users to call settle to exchange their WAGMI options for the underlying BOBA once the options expire: https://docs.umaproject.org/contracts/financial-templates/long-short-pair/LongShortPair#parameters-2.
 
 ## Gateway changes needed
 
