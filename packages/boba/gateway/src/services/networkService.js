@@ -700,6 +700,12 @@ async initializeBase( networkGateway ) {
         this.L2Provider
       )
 
+      this.gasOracleContract = new ethers.Contract(
+        L2GasOracle,
+        OVM_GasPriceOracleJson.abi,
+        this.L2Provider
+      )
+
       return 'enabled'
 
     } catch (error) {
@@ -2424,16 +2430,29 @@ async initializeBase( networkGateway ) {
     }
 
     //in some cases zero not allowed
-    const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
-      currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
-    )
+    const tx2 = await this.L2LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+        currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
+      )
 
     const depositGas_BN = await this.L2Provider.estimateGas(tx2)
-    console.log("Fast exit gas", depositGas_BN.toString())
 
-    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    let l1SecurityFee = BigNumber.from('0')
+    if (this.networkGateway === 'mainnet') {
+      delete tx2.from
+      l1SecurityFee = await this.gasOracleContract.getL1Fee(
+        utils.serializeTransaction(tx2)
+      )
+      // We can't correctly calculate the final l1 securifty fee,
+      // so we increase it by 1.1X to make sure that users have
+      // enough balance to cover it
+      l1SecurityFee = l1SecurityFee.mul('11').div('10')
+      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+    }
+
+    const depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
     console.log("Fast exit cost (ETH):", utils.formatEther(depositCost_BN))
 
     //returns total cost in ETH
@@ -2599,22 +2618,30 @@ async initializeBase( networkGateway ) {
 
     }
 
-    const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
-      balance_BN,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
-    )
-    //console.log("tx2",tx2)
+    const tx2 = await this.L2LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+        balance_BN,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
+      )
 
     let depositGas_BN = await this.L2Provider.estimateGas(tx2)
 
-    //returns 94082, which is too low?
-    //add 40...
-    //BUG BUG BUG - this should not be needed
-    depositGas_BN = depositGas_BN.add('40')
+    let l1SecurityFee = BigNumber.from('0')
+    if (this.networkGateway === 'mainnet') {
+      delete tx2.from
+      l1SecurityFee = await this.gasOracleContract.getL1Fee(
+        utils.serializeTransaction(tx2)
+      )
+      // We can't correctly calculate the final l1 securifty fee,
+      // so we increase it by 1.1X to make sure that users have
+      // enough balance to cover it
+      l1SecurityFee = l1SecurityFee.mul('11').div('10')
+      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+    }
 
     console.log("Deposit gas", depositGas_BN.toString())
-    let depositCost_BN = depositGas_BN.mul(gasPrice)
+    let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
     console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
 
     if(currencyAddress === allAddresses.L2_ETH_Address) {
@@ -2636,7 +2663,7 @@ async initializeBase( networkGateway ) {
       .connect(this.provider.getSigner()).clientDepositL2(
         balance_BN,
         currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
       )
 
     //at this point the tx has been submitted, and we are waiting...
