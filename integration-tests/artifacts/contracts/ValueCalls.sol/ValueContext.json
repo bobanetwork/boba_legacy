@@ -1,0 +1,69 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ValueContext",
+  "sourceName": "contracts/ValueCalls.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getAddressThisBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "getBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCallValue",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getSelfBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060d68061001f6000396000f3fe608060405260043610603a5760003560e01c8063048a5fed14603f578063c328c84f146053578063c6c01dd2146064578063f8b2cb4f146069575b600080fd5b475b60405190815260200160405180910390f35b348015605e57600080fd5b50476041565b346041565b60416074366004608e565b73ffffffffffffffffffffffffffffffffffffffff163190565b600060208284031215609f57600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811460c257600080fd5b939250505056fea164736f6c6343000809000a",
+  "deployedBytecode": "0x608060405260043610603a5760003560e01c8063048a5fed14603f578063c328c84f146053578063c6c01dd2146064578063f8b2cb4f146069575b600080fd5b475b60405190815260200160405180910390f35b348015605e57600080fd5b50476041565b346041565b60416074366004608e565b73ffffffffffffffffffffffffffffffffffffffff163190565b600060208284031215609f57600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811460c257600080fd5b939250505056fea164736f6c6343000809000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

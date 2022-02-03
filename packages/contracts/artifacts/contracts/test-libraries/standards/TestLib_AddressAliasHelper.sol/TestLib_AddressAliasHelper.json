@@ -1,0 +1,49 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "TestLib_AddressAliasHelper",
+  "sourceName": "contracts/test-libraries/standards/TestLib_AddressAliasHelper.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "applyL1ToL2Alias",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "undoL1ToL2Alias",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5061011e806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c8063689992b31461003b5780637528c2c614610077575b600080fd5b61004e6100493660046100d4565b61008a565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b61004e6100853660046100d4565b6100b6565b60007fffffffffffffffffffffffffeeeeffffffffffffffffffffffffffffffffeeef82015b92915050565b600073111100000000000000000000000000000000111182016100b0565b6000602082840312156100e657600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461010a57600080fd5b939250505056fea164736f6c6343000809000a",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063689992b31461003b5780637528c2c614610077575b600080fd5b61004e6100493660046100d4565b61008a565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b61004e6100853660046100d4565b6100b6565b60007fffffffffffffffffffffffffeeeeffffffffffffffffffffffffffffffffeeef82015b92915050565b600073111100000000000000000000000000000000111182016100b0565b6000602082840312156100e657600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461010a57600080fd5b939250505056fea164736f6c6343000809000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

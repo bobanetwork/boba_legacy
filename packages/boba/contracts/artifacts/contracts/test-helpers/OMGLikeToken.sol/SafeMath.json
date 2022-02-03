@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SafeMath",
+  "sourceName": "contracts/test-helpers/OMGLikeToken.sol",
+  "abi": [],
+  "bytecode": "0x60606040523415600b57fe5b5b60338060196000396000f30060606040525bfe00a165627a7a72305820fed0f01e23c5eb5da757ceec3fa8da1fac744b03600449ed795bad1dc7db37c80029",
+  "deployedBytecode": "0x60606040525bfe00a165627a7a72305820fed0f01e23c5eb5da757ceec3fa8da1fac744b03600449ed795bad1dc7db37c80029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

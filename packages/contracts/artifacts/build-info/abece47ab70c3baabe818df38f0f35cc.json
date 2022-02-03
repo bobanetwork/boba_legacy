@@ -1,0 +1,215 @@
+{
+  "id": "abece47ab70c3baabe818df38f0f35cc",
+  "_format": "hh-sol-build-info-1",
+  "solcVersion": "0.8.9",
+  "solcLongVersion": "0.8.9+commit.e5eed63a",
+  "input": {
+    "language": "Solidity",
+    "sources": {
+      "contracts/L2/predeploys/iOVM_L1BlockNumber.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.9;\n\n/**\n * @title iOVM_L1BlockNumber\n */\ninterface iOVM_L1BlockNumber {\n  /********************\n   * Public Functions *\n   ********************/\n\n  function getL1BlockNumber() external view returns (uint256);\n}\n"
+      }
+    },
+    "settings": {
+      "optimizer": {
+        "enabled": true,
+        "runs": 10000
+      },
+      "metadata": {
+        "bytecodeHash": "none",
+        "useLiteralContent": true
+      },
+      "outputSelection": {
+        "*": {
+          "*": [
+            "storageLayout",
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata",
+            "devdoc",
+            "userdoc",
+            "evm.gasEstimates"
+          ],
+          "": [
+            "ast"
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "contracts": {
+      "contracts/L2/predeploys/iOVM_L1BlockNumber.sol": {
+        "iOVM_L1BlockNumber": {
+          "abi": [
+            {
+              "inputs": [],
+              "name": "getL1BlockNumber",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ],
+          "devdoc": {
+            "kind": "dev",
+            "methods": {},
+            "title": "iOVM_L1BlockNumber",
+            "version": 1
+          },
+          "evm": {
+            "bytecode": {
+              "functionDebugData": {},
+              "generatedSources": [],
+              "linkReferences": {},
+              "object": "",
+              "opcodes": "",
+              "sourceMap": ""
+            },
+            "deployedBytecode": {
+              "functionDebugData": {},
+              "generatedSources": [],
+              "immutableReferences": {},
+              "linkReferences": {},
+              "object": "",
+              "opcodes": "",
+              "sourceMap": ""
+            },
+            "gasEstimates": null,
+            "methodIdentifiers": {
+              "getL1BlockNumber()": "b9b3efe9"
+            }
+          },
+          "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getL1BlockNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"iOVM_L1BlockNumber\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/L2/predeploys/iOVM_L1BlockNumber.sol\":\"iOVM_L1BlockNumber\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"none\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"contracts/L2/predeploys/iOVM_L1BlockNumber.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.9;\\n\\n/**\\n * @title iOVM_L1BlockNumber\\n */\\ninterface iOVM_L1BlockNumber {\\n  /********************\\n   * Public Functions *\\n   ********************/\\n\\n  function getL1BlockNumber() external view returns (uint256);\\n}\\n\",\"keccak256\":\"0xcaab5c0b5197afc46aa039131f65a31a91bc3e6ec50d4240ad63828d27f918d5\",\"license\":\"MIT\"}},\"version\":1}",
+          "storageLayout": {
+            "storage": [],
+            "types": null
+          },
+          "userdoc": {
+            "kind": "user",
+            "methods": {},
+            "version": 1
+          }
+        }
+      }
+    },
+    "sources": {
+      "contracts/L2/predeploys/iOVM_L1BlockNumber.sol": {
+        "ast": {
+          "absolutePath": "contracts/L2/predeploys/iOVM_L1BlockNumber.sol",
+          "exportedSymbols": {
+            "iOVM_L1BlockNumber": [
+              8
+            ]
+          },
+          "id": 9,
+          "license": "MIT",
+          "nodeType": "SourceUnit",
+          "nodes": [
+            {
+              "id": 1,
+              "literals": [
+                "solidity",
+                "^",
+                "0.8",
+                ".9"
+              ],
+              "nodeType": "PragmaDirective",
+              "src": "32:23:0"
+            },
+            {
+              "abstract": false,
+              "baseContracts": [],
+              "canonicalName": "iOVM_L1BlockNumber",
+              "contractDependencies": [],
+              "contractKind": "interface",
+              "documentation": {
+                "id": 2,
+                "nodeType": "StructuredDocumentation",
+                "src": "57:36:0",
+                "text": " @title iOVM_L1BlockNumber"
+              },
+              "fullyImplemented": false,
+              "id": 8,
+              "linearizedBaseContracts": [
+                8
+              ],
+              "name": "iOVM_L1BlockNumber",
+              "nameLocation": "104:18:0",
+              "nodeType": "ContractDefinition",
+              "nodes": [
+                {
+                  "functionSelector": "b9b3efe9",
+                  "id": 7,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "getL1BlockNumber",
+                  "nameLocation": "210:16:0",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 3,
+                    "nodeType": "ParameterList",
+                    "parameters": [],
+                    "src": "226:2:0"
+                  },
+                  "returnParameters": {
+                    "id": 6,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 5,
+                        "mutability": "mutable",
+                        "name": "",
+                        "nameLocation": "-1:-1:-1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 7,
+                        "src": "252:7:0",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 4,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "252:7:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "251:9:0"
+                  },
+                  "scope": 8,
+                  "src": "201:60:0",
+                  "stateMutability": "view",
+                  "virtual": false,
+                  "visibility": "external"
+                }
+              ],
+              "scope": 9,
+              "src": "94:169:0",
+              "usedErrors": []
+            }
+          ],
+          "src": "32:232:0"
+        },
+        "id": 0
+      }
+    }
+  }
+}

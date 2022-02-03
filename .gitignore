@@ -7,7 +7,6 @@ coverage.json
 *.tsbuildinfo
 
 dist
-artifacts
 cache
 
 l2geth/build/bin
