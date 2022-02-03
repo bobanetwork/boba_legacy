@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node src/index.js",
-    "deploy": "node src/index.js"
+    "submit": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
