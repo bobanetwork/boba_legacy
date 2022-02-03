@@ -1,5 +1,6 @@
 import { Wallet, providers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { Watcher } from '@eth-optimism/core-utils'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -56,6 +57,25 @@ const main = async () => {
 
   const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
 
+  const BobaTuringCreditAddress = await addressManager.getAddress(
+    'Proxy__BobaTuringCredit'
+  )
+
+  const BobaTuringHelperAddress = await addressManager.getAddress(
+    'BobaTuringHelper'
+  )
+
+  const watcher = new Watcher({
+    l1: {
+      provider: l1Provider,
+      messengerAddress: l1MessengerAddress,
+    },
+    l2: {
+      provider: l2Provider,
+      messengerAddress: l2MessengerAddress,
+    },
+  })
+
   await hre.run('deploy', {
     l1MessengerAddress,
     l2MessengerAddress,
@@ -69,6 +89,9 @@ const main = async () => {
     network,
     relayerAddress,
     fastRelayerAddress,
+    BobaTuringCreditAddress,
+    BobaTuringHelperAddress,
+    watcher,
   })
 }
 

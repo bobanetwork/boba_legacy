@@ -23,17 +23,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common/math"
+	"github.com/ethereum-optimism/optimism/l2geth/core"
+	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
+	"github.com/ethereum-optimism/optimism/l2geth/core/state"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
+	"github.com/ethereum-optimism/optimism/l2geth/ethdb"
+	"github.com/ethereum-optimism/optimism/l2geth/light"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rlp"
 )
 
 type odrTestFn func(ctx context.Context, db ethdb.Database, config *params.ChainConfig, bc *core.BlockChain, lc *light.LightChain, bhash common.Hash) []byte
@@ -128,7 +128,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 				from := statedb.GetOrNewStateObject(bankAddr)
 				from.SetBalance(math.MaxBig256)
 
-				msg := callmsg{types.NewMessage(from.Address(), &testContractAddr, 0, new(big.Int), 100000, new(big.Int), data, false, nil, 0, types.QueueOriginSequencer)}
+				msg := callmsg{types.NewMessage(from.Address(), &testContractAddr, 0, new(big.Int), 100000, new(big.Int), data, false, nil, 0, []byte{0}, types.QueueOriginSequencer)}
 
 				context := core.NewEVMContext(msg, header, bc, nil)
 				vmenv := vm.NewEVM(context, statedb, config, vm.Config{})
@@ -142,7 +142,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 			header := lc.GetHeaderByHash(bhash)
 			state := light.NewState(ctx, header, lc.Odr())
 			state.SetBalance(bankAddr, math.MaxBig256)
-			msg := callmsg{types.NewMessage(bankAddr, &testContractAddr, 0, new(big.Int), 100000, new(big.Int), data, false, nil, 0, types.QueueOriginSequencer)}
+			msg := callmsg{types.NewMessage(bankAddr, &testContractAddr, 0, new(big.Int), 100000, new(big.Int), data, false, nil, 0, []byte{0}, types.QueueOriginSequencer)}
 			context := core.NewEVMContext(msg, header, lc, nil)
 			vmenv := vm.NewEVM(context, state, config, vm.Config{})
 			gp := new(core.GasPool).AddGas(math.MaxUint64)

@@ -26,26 +26,27 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/accounts/scwallet"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus/clique"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethereum-optimism/optimism/l2geth/accounts"
+	"github.com/ethereum-optimism/optimism/l2geth/accounts/abi"
+	"github.com/ethereum-optimism/optimism/l2geth/accounts/keystore"
+	"github.com/ethereum-optimism/optimism/l2geth/accounts/scwallet"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
+	"github.com/ethereum-optimism/optimism/l2geth/common/math"
+	"github.com/ethereum-optimism/optimism/l2geth/consensus/clique"
+	"github.com/ethereum-optimism/optimism/l2geth/consensus/ethash"
+	"github.com/ethereum-optimism/optimism/l2geth/core"
+	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
+	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
+	"github.com/ethereum-optimism/optimism/l2geth/p2p"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rlp"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -55,6 +56,10 @@ var errOVMUnsupported = errors.New("OVM: Unsupported RPC Method")
 // It offers only methods that operate on public data that is freely available to anyone.
 type PublicEthereumAPI struct {
 	b Backend
+}
+
+type callmsg struct {
+	types.Message
 }
 
 // NewPublicEthereumAPI creates a new Ethereum protocol API.
@@ -415,7 +420,7 @@ func (s *PrivateAccountAPI) SignTransaction(ctx context.Context, args SendTxArgs
 //
 // The key used to calculate the signature is decrypted with the given password.
 //
-// https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_sign
+// https://github.com/ethereum-optimism/optimism/l2geth/wiki/Management-APIs#personal_sign
 func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr common.Address, passwd string) (hexutil.Bytes, error) {
 	// Look up the wallet containing the requested signer
 	account := accounts.Account{Address: addr}
@@ -443,7 +448,7 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 // Note, the signature must conform to the secp256k1 curve R, S and V values, where
 // the V value must be 27 or 28 for legacy reasons.
 //
-// https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover
+// https://github.com/ethereum-optimism/optimism/l2geth/wiki/Management-APIs#personal_ecRecover
 func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Bytes) (common.Address, error) {
 	if len(sig) != crypto.SignatureLength {
 		return common.Address{}, fmt.Errorf("signature must be %d bytes long", crypto.SignatureLength)
@@ -883,7 +888,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	}
 
 	// Create new call message
-	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, types.QueueOriginSequencer)
+	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false, blockNumber, timestamp, []byte{0}, types.QueueOriginSequencer)
 
 	// Setup context so it may be cancelled the call has completed
 	// or, in case of unmetered gas, setup a context with a timeout.
@@ -1025,7 +1030,35 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
 	}
-	return hexutil.Uint64(hi), nil
+
+	nonce, _ := b.GetPoolNonce(ctx, *args.From)
+
+	value := new(big.Int)
+	if args.Value != nil {
+		value = args.Value.ToInt()
+	}
+
+	gasPrice := new(big.Int)
+	if args.GasPrice != nil {
+		gasPrice = args.GasPrice.ToInt()
+	}
+
+	var data []byte
+	if args.Data != nil {
+		data = []byte(*args.Data)
+	}
+
+	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
+
+	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	l2ExtraGas := new(big.Int)
+	if rcfg.UsingOVM {
+		if msg.GasPrice().Cmp(common.Big0) != 0 {
+			l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, state, nil)
+		}
+	}
+
+	return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
 }
 
 // EstimateGas returns an estimate of the amount of gas needed to execute the
@@ -1194,10 +1227,10 @@ type RPCTransaction struct {
 	R                *hexutil.Big    `json:"r"`
 	S                *hexutil.Big    `json:"s"`
 	QueueOrigin      string          `json:"queueOrigin"`
-	TxType           string          `json:"txType"`
 	L1TxOrigin       *common.Address `json:"l1TxOrigin"`
 	L1BlockNumber    *hexutil.Big    `json:"l1BlockNumber"`
 	L1Timestamp      hexutil.Uint64  `json:"l1Timestamp"`
+	L1Turing         hexutil.Bytes   `json:"l1Turing"`
 	Index            *hexutil.Uint64 `json:"index"`
 	QueueIndex       *hexutil.Uint64 `json:"queueIndex"`
 	RawTransaction   hexutil.Bytes   `json:"rawTransaction"`
@@ -1235,6 +1268,7 @@ func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber
 	if meta := tx.GetMeta(); meta != nil {
 		result.RawTransaction = meta.RawTransaction
 		result.L1TxOrigin = meta.L1MessageSender
+		result.L1Turing = meta.L1Turing
 		result.L1Timestamp = (hexutil.Uint64)(meta.L1Timestamp)
 		if meta.L1BlockNumber != nil {
 			result.L1BlockNumber = (*hexutil.Big)(meta.L1BlockNumber)
@@ -1489,6 +1523,7 @@ type SendTxArgs struct {
 
 	L1BlockNumber   *big.Int        `json:"l1BlockNumber"`
 	L1MessageSender *common.Address `json:"l1MessageSender"`
+	L1Turing        *hexutil.Bytes  `json:"l1Turing"`
 }
 
 // setDefaults is a helper function that fills in default values for unspecified tx fields.
@@ -1561,22 +1596,19 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 	if args.To == nil {
 		tx := types.NewContractCreation(uint64(*args.Nonce), (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 		raw, _ := rlp.EncodeToBytes(tx)
-		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, nil, types.QueueOriginSequencer, nil, nil, raw)
+		txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, []byte{0}, nil, types.QueueOriginSequencer, nil, nil, raw)
 		tx.SetTransactionMeta(txMeta)
 		return tx
 	}
 	tx := types.NewTransaction(uint64(*args.Nonce), *args.To, (*big.Int)(args.Value), uint64(*args.Gas), (*big.Int)(args.GasPrice), input)
 	raw, _ := rlp.EncodeToBytes(tx)
-	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
+	txMeta := types.NewTransactionMeta(args.L1BlockNumber, 0, []byte{0}, args.L1MessageSender, types.QueueOriginSequencer, nil, nil, raw)
 	tx.SetTransactionMeta(txMeta)
 	return tx
 }
 
 // SubmitTransaction is a helper function that submits tx to txPool and logs a message.
 func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (common.Hash, error) {
-	if !tx.Protected() {
-		return common.Hash{}, errors.New("Cannot submit unprotected transaction")
-	}
 	if err := b.SendTx(ctx, tx); err != nil {
 		return common.Hash{}, err
 	}
@@ -1663,9 +1695,11 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	if err := rlp.DecodeBytes(encodedTx, tx); err != nil {
 		return common.Hash{}, err
 	}
+
 	// L1Timestamp and L1BlockNumber will be set right before execution
-	txMeta := types.NewTransactionMeta(nil, 0, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
+	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
+
 	return SubmitTransaction(ctx, s.b, tx)
 }
 
@@ -2027,51 +2061,6 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 // SetHead rewinds the head of the blockchain to a previous block.
 func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
 	api.b.SetHead(uint64(number))
-}
-
-func (api *PrivateDebugAPI) IngestTransactions(txs []*RPCTransaction) error {
-	transactions := make([]*types.Transaction, len(txs))
-
-	for i, tx := range txs {
-		nonce := uint64(tx.Nonce)
-		value := tx.Value.ToInt()
-		gasLimit := uint64(tx.Gas)
-		gasPrice := tx.GasPrice.ToInt()
-		data := tx.Input
-		l1BlockNumber := tx.L1BlockNumber.ToInt()
-		l1Timestamp := uint64(tx.L1Timestamp)
-		rawTransaction := tx.RawTransaction
-
-		var queueOrigin types.QueueOrigin
-		switch tx.QueueOrigin {
-		case "sequencer":
-			queueOrigin = types.QueueOriginSequencer
-		case "l1":
-			queueOrigin = types.QueueOriginL1ToL2
-		default:
-			return fmt.Errorf("Transaction with unknown queue origin: %s", tx.TxType)
-		}
-
-		var transaction *types.Transaction
-		if tx.To == nil {
-			transaction = types.NewContractCreation(nonce, value, gasLimit, gasPrice, data)
-		} else {
-			transaction = types.NewTransaction(nonce, *tx.To, value, gasLimit, gasPrice, data)
-		}
-
-		meta := types.TransactionMeta{
-			L1BlockNumber:   l1BlockNumber,
-			L1Timestamp:     l1Timestamp,
-			L1MessageSender: tx.L1TxOrigin,
-			QueueOrigin:     queueOrigin,
-			Index:           (*uint64)(tx.Index),
-			QueueIndex:      (*uint64)(tx.QueueIndex),
-			RawTransaction:  rawTransaction,
-		}
-		transaction.SetTransactionMeta(&meta)
-		transactions[i] = transaction
-	}
-	return api.b.IngestTransactions(transactions)
 }
 
 // PublicNetAPI offers network related RPC methods

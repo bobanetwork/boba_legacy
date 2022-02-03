@@ -1,0 +1,24 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "PayableConstant",
+  "sourceName": "contracts/ValueCalls.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "returnValue",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50604280601d6000396000f3fe608060405260043610601c5760003560e01c8063990c8f79146021575b600080fd5b602a60405190815260200160405180910390f3fea164736f6c6343000809000a",
+  "deployedBytecode": "0x608060405260043610601c5760003560e01c8063990c8f79146021575b600080fd5b602a60405190815260200160405180910390f3fea164736f6c6343000809000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

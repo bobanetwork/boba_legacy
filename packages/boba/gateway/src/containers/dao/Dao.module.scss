@@ -20,51 +20,63 @@
   }
 
   .content {
-    margin: 10px auto;
+
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 100%;
+    border-radius: 4px;
+    gap: 10px;
 
-    .action {
+    @media only screen and (max-width: 900px) {
+      flex-direction: column;
+    }
+
+    .topRow {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
       flex-direction: row;
-
-      &.isMobile {
+      @media only screen and (max-width: 550px) {
         flex-direction: column;
       }
+    }
 
-      .transferContainer,
-      .delegateContainer {
-        /*margin: auto;*/
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        max-width: 48%;
-        width: 48%;
-        min-width: 350px;
-        margin: 5px;
-        min-height: 200px;
-        .info {
-          text-align: center;
-          .title {
-            font-size: 1.4em;
-            color: $white;
-          }
-          .subTitle {
-            font-size: 1.2em;
-            color: $white700;
-            margin: 10px;
-          }
-          .helpText {
-            font-size: 0.8em;
-            margin: 10px;
-            opacity: 0.7;
-            margin: 10px;
-          }
+    .transferContainer,
+    .delegateContainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: flex-start;
+      width: 250px;
+      @media only screen and (max-width: 900px) {
+        width: 100%;
+        min-width: unset;
+        min-height: unset;
+      }
+      .info {
+        .title {
+          font-size: 1.4em;
+          color: $white;
+        }
+        .subTitle {
+          font-size: 1.0em;
+          color: blue;
+          margin: 10px;
+        }
+        .helpText {
+          font-size: 0.8em;
+          margin: 10px;
+          margin-bottom: 10px;
+          //opacity: 0.8;
+        }
+        .helpTextLight {
+          font-size: 0.7em;
+          margin: 10px;
+          opacity: 0.6;
+          text-align: left; 
+          line-height: 1.0em; 
+          margin-top: 20px;
+          padding: 20px;
         }
       }
     }

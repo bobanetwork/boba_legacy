@@ -19,12 +19,12 @@ package core
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/rollup/dump"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/consensus"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
 
 // ChainContext supports retrieving headers and consensus parameters from the
@@ -50,6 +50,17 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 		// When using the OVM, we must:
 		// - Set the BlockNumber to be the msg.L1BlockNumber
 		// - Set the Time to be the msg.L1Timestamp
+		// - Set Turing to be msg.L1Turing
+		// - Set initial TuringDepth to 0 for the Sequencer and 1 for the Replica/Verifier - this prevents erroneous Turing calls
+		turingDepth := 0
+		sequencer := true
+		if len(msg.L1Turing()) > 1 {
+			// OH! We have a Turing payload, so this must mean:
+			// 1. we are in Verifier/Replica mode
+			// 2. we already ran Turing for this Transaction, sometime in the distant past, so turingDepth is already 1
+			turingDepth = 1
+			sequencer = false
+		}
 		return vm.Context{
 			CanTransfer:   CanTransfer,
 			Transfer:      Transfer,
@@ -62,6 +73,9 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			GasLimit:      header.GasLimit,
 			GasPrice:      new(big.Int).Set(msg.GasPrice()),
 			L1BlockNumber: msg.L1BlockNumber(),
+			Turing:        msg.L1Turing(),
+			TuringDepth:   turingDepth,
+			Sequencer:     sequencer,
 		}
 	} else {
 		return vm.Context{

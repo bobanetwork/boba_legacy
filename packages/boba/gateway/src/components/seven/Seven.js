@@ -20,7 +20,7 @@ import { Typography } from '@material-ui/core'
 import * as S from './Transaction.styles'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 function Seven({
   link,
@@ -34,7 +34,7 @@ function Seven({
 }) {
 
   const currentNetwork = useSelector(selectNetwork())
-  const nw = getAllNetworks()
+  const nw = getNetwork()
 
   const chainLink = ({hash}) => {
     let network = nw[currentNetwork]
@@ -104,55 +104,6 @@ function Seven({
           </S.GridContainer>
         </S.Wrapper>
       )
-
-
-  // return (
-  //   <
-  //     div style={{
-  //       padding: '5px',
-  //       borderRadius: '8px',
-  //       background: theme.palette.background.secondaryLight,
-  //     }}
-  //   >
-  //     <S.TableBody>
-
-  //       <S.TableCell
-  //         style={{ width: '100%' }}
-  //       >
-
-  //         <Typography variant="body3">
-  //           {blockNumber}
-  //         </Typography>
-
-  //         {overdue < 0 &&
-  //           <Typography variant="body3" className={styles.muted} style={{color: 'yellow'}}>
-  //             {timeLabel}
-  //           </Typography>
-  //         }
-
-  //         {overdue > 0 &&
-  //           <Typography variant="body3" className={styles.muted} style={{color: 'green'}}>
-  //             {timeLabel}
-  //           </Typography>
-  //         }
-
-  //         <Typography variant="body3" className={styles.muted}>
-  //           Hash:&nbsp;
-  //           <a
-  //             href={chainLink({hash:oriHash})}
-  //             target={'_blank'}
-  //             rel='noopener noreferrer'
-  //             style={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }}
-  //           >
-  //             {oriHash}
-  //           </a>
-  //         </Typography>
-
-  //       </S.TableCell>
-
-  //     </S.TableBody>
-
-  //   </div>)
 
 }
 

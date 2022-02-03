@@ -13,23 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-/*
-{
-   "address": "ADDRESS",
-   "amount": "AMOUNT_WEI_STRING",
-   "claimed": "TRUE / FALSE",
-   "claimTimestamp": "TIMESTAMP",
-   "claimAmount": "AMOUNT_WEI_STRING",
-   "claimImmediate": "TRUE / FALSE", //if staked on L2 during snapshot, claimImmediate === True
-   "claimUnlockTime": "TIMESTAMP", //if claimImmediate === false, claimUnlockTime = claimTimestamp + 30 days
-   "merkleProof": {
-     "index": "INDEX",
-     "amount": "AMOUNT", //hex,
-     "proof": "PROOF"
-   }
- }
- */
-
 const initialState = {
   claimDetailsL1: {},
   claimDetailsL2: {}

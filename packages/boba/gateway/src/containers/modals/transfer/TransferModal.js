@@ -116,7 +116,7 @@ function TransferModal ({ open, token, minHeight }) {
     <Modal open={open} onClose={handleClose} maxWidth="md" minHeight="500px">
       <Box>
         <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-          L2->L2 Transfer
+          Transfer to another Boba wallet
         </Typography>
 
         <Typography variant="body1" sx={{mb: 1}}>
@@ -165,9 +165,9 @@ function TransferModal ({ open, token, minHeight }) {
         )}
 
         <Typography variant="body2" sx={{mt: 2, fontWeight: '700', color: 'red'}}>
-          CAUTION: This function is only for transfers from one L2 wallet to another L2 wallet.
-          You cannot directly transfer funds from an L2 wallet to an L1 address. 
-          Your funds will be lost.  
+          CAUTION: This function is only for transfers from one Boba wallet to another Boba wallet.
+          You cannot directly transfer funds from a Boba wallet to an L1 address or to another chain. 
+          Your funds will be lost if you try to do so.
         </Typography>
 
       </Box>
@@ -192,7 +192,7 @@ function TransferModal ({ open, token, minHeight }) {
             fullWidth={isMobile}
             size="large"
           >
-            Transfer
+            Transfer to another Boba wallet
           </Button>
       </WrapperActionsModal>
     </Modal>

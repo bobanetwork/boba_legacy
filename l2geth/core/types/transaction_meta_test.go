@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
 )
 
 var (
@@ -16,6 +16,7 @@ var (
 	txMetaSerializationTests = []struct {
 		l1BlockNumber  *big.Int
 		l1Timestamp    uint64
+		l1Turing       []byte
 		msgSender      *common.Address
 		queueOrigin    QueueOrigin
 		rawTransaction []byte
@@ -23,6 +24,7 @@ var (
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    100,
+			l1Turing:       []byte{},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{255, 255, 255, 255},
@@ -30,13 +32,24 @@ var (
 		{
 			l1BlockNumber:  nil,
 			l1Timestamp:    45,
+			l1Turing:       []byte{1},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{42, 69, 42, 69},
 		},
+		// example of legacy format without l1Turing
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			msgSender:      nil,
+			queueOrigin:    QueueOriginSequencer,
+			rawTransaction: []byte{8, 8, 8, 8},
+		},
+		// edge case of l1Turing = nil
+		{
+			l1BlockNumber:  l1BlockNumber,
+			l1Timestamp:    0,
+			l1Turing:       nil,
 			msgSender:      nil,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -44,6 +57,7 @@ var (
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			l1Turing:       []byte{42, 69, 42, 69},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginSequencer,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -51,13 +65,15 @@ var (
 		{
 			l1BlockNumber:  nil,
 			l1Timestamp:    0,
+			l1Turing:       []byte{3},
 			msgSender:      nil,
 			queueOrigin:    QueueOriginL1ToL2,
-			rawTransaction: []byte{0, 0, 0, 0},
+			rawTransaction: []byte{7, 8, 9, 10},
 		},
 		{
 			l1BlockNumber:  l1BlockNumber,
 			l1Timestamp:    0,
+			l1Turing:       []byte{0, 1, 2, 3, 4, 5},
 			msgSender:      &addr,
 			queueOrigin:    QueueOriginL1ToL2,
 			rawTransaction: []byte{0, 0, 0, 0},
@@ -67,7 +83,8 @@ var (
 
 func TestTransactionMetaEncode(t *testing.T) {
 	for _, test := range txMetaSerializationTests {
-		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
+
+		txmeta := NewTransactionMeta(test.l1BlockNumber, test.l1Timestamp, test.l1Turing, test.msgSender, test.queueOrigin, nil, nil, test.rawTransaction)
 
 		encoded := TxMetaEncode(txmeta)
 		decoded, err := TxMetaDecode(encoded)

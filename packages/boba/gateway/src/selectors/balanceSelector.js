@@ -25,6 +25,10 @@ export function selectGas (state) {
   return state.balance.gas
 }
 
+export function selectAccountData (state) {
+  return state.balance.accountData
+}
+
 export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString
 }
@@ -77,10 +81,18 @@ export function selectFastDepositCost (state) {
   return state.balance.fastDepositCost
 }
 
+export function selectFastDepositBatchCost (state) {
+  return state.balance.fastDepositBatchCost
+}
+
 export function selectL1FeeBalance (state) {
   return state.balance.l1FeeBalance
 }
 
 export function selectL2FeeBalance (state) {
   return state.balance.l2FeeBalance
+}
+
+export function selectUserAndL2LPBalanceBatch (state) {
+  return state.balance.userAndL2LPBlanceBatch
 }

@@ -8,14 +8,14 @@ const {
   getContractFactory,
 } = require('@eth-optimism/contracts')
 const fetch = require('node-fetch')
-const { Watcher } = require('../../../../packages/core-utils/dist/watcher')
+const { Watcher } = require('@eth-optimism/watcher')
 
-const addressManagerJSON = require('../../artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
-const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
-const L2LiquidityPoolJson = require('../../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const L1StandardBridgeJson = require('../../artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
-const L2StandardBridgeJson = require('../../artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
-const StateCommitmentChainJson = require('../../artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
+const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
+const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
+const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
+const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
+const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
+const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 const env = process.env
@@ -48,7 +48,7 @@ const MESSAGE_MONITOR_INTERVAL = env.MESSAGE_MONITOR_INTERVAL || 10 * 60 * 1000
 const SQL_DISCONNECTED = 'disconnected'
 
 const WHITELIST_SLEEP = 60 // in seconds
-const NON_WHITELIST_SLEEP = 3 * 60 * 60 // in seconds
+const NON_WHITELIST_SLEEP = Number(env.NON_WHITELIST_SLEEP) || 10 * 60 // in seconds
 const WHITELIST = 'whitelist'
 const NON_WHITELIST = 'non_whitelist'
 

@@ -5,14 +5,14 @@ import { providers, BigNumber } from 'ethers'
 //commit fc0616e570f02b72aa5407f7d249822899419210
 
 const parseNumber = (n: string | number): number => {
-   if (typeof n === 'string' && n.startsWith('0x')) {
-     return parseInt(n, 16)
-   }
-   if (typeof n === 'number') {
-     return n
-   }
-   return parseInt(n, 10)
- }
+  if (typeof n === 'string' && n.startsWith('0x')) {
+    return parseInt(n, 16)
+  }
+  if (typeof n === 'number') {
+    return n
+  }
+  return parseInt(n, 10)
+}
 
 /**
  * Helper for adding additional L2 context to transactions
@@ -39,18 +39,19 @@ export const injectL2Context = (l1Provider: providers.JsonRpcProvider) => {
       b.transactions[i].l1BlockNumber = block.transactions[i].l1BlockNumber
       if (b.transactions[i].l1BlockNumber != null) {
         b.transactions[i].l1BlockNumber = parseNumber(
-           b.transactions[i].l1BlockNumber
-         )
-       }
-       b.transactions[i].l1Timestamp = block.transactions[i].l1Timestamp
-       if (b.transactions[i].l1Timestamp != null) {
-         b.transactions[i].l1Timestamp = parseNumber(
-           b.transactions[i].l1Timestamp
+          b.transactions[i].l1BlockNumber
+        )
+      }
+      b.transactions[i].l1Timestamp = block.transactions[i].l1Timestamp
+      if (b.transactions[i].l1Timestamp != null) {
+        b.transactions[i].l1Timestamp = parseNumber(
+          b.transactions[i].l1Timestamp
         )
       }
       b.transactions[i].l1TxOrigin = block.transactions[i].l1TxOrigin
       b.transactions[i].queueOrigin = block.transactions[i].queueOrigin
       b.transactions[i].rawTransaction = block.transactions[i].rawTransaction
+      b.transactions[i].l1Turing = block.transactions[i].l1Turing
     }
     return b
   }
@@ -64,6 +65,7 @@ export const injectL2Context = (l1Provider: providers.JsonRpcProvider) => {
     tx.txType = transaction.txType
     tx.queueOrigin = transaction.queueOrigin
     tx.rawTransaction = transaction.rawTransaction
+    tx.l1Turing = transaction.l1Turing
     tx.l1BlockNumber = transaction.l1BlockNumber
     if (tx.l1BlockNumber != null) {
       tx.l1BlockNumber = parseInt(tx.l1BlockNumber, 16)

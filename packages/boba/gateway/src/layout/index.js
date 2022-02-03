@@ -13,34 +13,29 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, useMediaQuery } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { createTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles';
-import { setWalletMethod } from 'actions/setupAction';
-import { setTheme } from 'actions/uiAction';
-import WalletPicker from 'components/walletpicker/WalletPicker';
-import Home from 'containers/home/Home';
-import Notification from 'containers/notification/Notification';
-import React, { Suspense, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Box, useMediaQuery } from '@material-ui/core'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import { createTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles'
+import { setTheme } from 'actions/uiAction'
+import Home from 'containers/home/Home'
+import Notification from 'containers/notification/Notification'
+import React, { Suspense, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   BrowserRouter as Router,
   Route,
   Switch
 } from "react-router-dom";
-import { selectModalState } from 'selectors/uiSelector';
-import { isChangingChain } from 'util/changeChain';
-//import oracleService from 'services/oracleService';
-import * as styles from './layout.module.scss';
-import * as S from './layout.style';
+
+import { selectModalState } from 'selectors/uiSelector'
+
+import * as styles from './layout.module.scss'
 
 function App () {
 
   const dispatch = useDispatch()
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
-
-  const [ enabled, setEnabled ] = useState(false)
 
   let MUItheme = createTheme({
     palette: {
@@ -93,7 +88,6 @@ function App () {
         fontWeight: 400,
       },
       body3: {
-        lineHeight: '1.2em',
         fontSize: '0.8em'
       },
     },
@@ -206,21 +200,13 @@ function App () {
       }
     }
   });
+
   MUItheme = responsiveFontSizes(MUItheme);
 
   const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));
 
   useEffect(() => {
-    if (isChangingChain) {
-      dispatch(setWalletMethod('browser'));
-    }
-    if (enabled) {
-      localStorage.setItem('changeChain', false)
-    }
-  }, [dispatch, enabled]);
-
-  useEffect(() => {
-    const themeFromLocalStorage = localStorage.getItem('theme');
+    const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
   }, [dispatch])
 
@@ -229,22 +215,18 @@ function App () {
       <CssBaseline />
       <Router>
         <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-          <S.Content>
-            <div className={styles.App}>
-
-              <Notification/>
-              <Suspense fallback={<>Loading...</>}>
-                <Switch>
-                  <Route exact path="/" component={enabled ? () => <Home /> : ()=> <WalletPicker enabled={enabled} onEnable={setEnabled} />} />
-                </Switch>
-              </Suspense>
-
-            </div>
-          </S.Content>
+          <div className={styles.App}>
+            <Notification/>
+            <Suspense fallback={<>Loading...</>}>
+              <Switch>
+                <Route exact path="/" component={() => <Home />} />
+              </Switch>
+            </Suspense>
+          </div>
         </Box>
       </Router>
     </ThemeProvider>
-  );
+  )
 }
 
-export default App;
+export default App

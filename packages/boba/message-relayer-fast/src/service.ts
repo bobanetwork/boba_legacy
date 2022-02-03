@@ -66,6 +66,8 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
+  numEventConfirmations?: number
+
   multiRelayLimit?: number
 
   resubmissionTimeout?: number
@@ -204,6 +206,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       this.options.fromL2TransactionIndex || 0
     this.state.lastFilterPollingTimestamp = 0
 
+    this.logger.info('Starting at', {
+      lastFinalizedTxHeight: this.state.lastFinalizedTxHeight,
+      nextUnfinalizedTxHeight: this.state.nextUnfinalizedTxHeight,
+      lastQueriedL1Block: this.state.lastQueriedL1Block,
+      numEventConfirmations: this.options.numEventConfirmations,
+    })
+
     //batch system
     this.state.timeOfLastRelayS = Date.now()
     this.state.timeSinceLastRelayS = 0
@@ -213,7 +222,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      if (! this.state.didWork) {
+      if (!this.state.didWork) {
         await sleep(this.options.pollingInterval)
       }
       this.state.didWork = false
@@ -304,6 +313,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 0,
                 this.options.multiRelayLimit
               )
+              this.logger.info('Prepared message subBuffer', {
+                subLen: subBuffer.length,
+                bufLen: this.state.messageBuffer.length,
+                limit: this.options.multiRelayLimit,
+              })
 
               const receipt = await this._relayMultiMessageToL1(
                 subBuffer.reduce((acc, cur) => {
@@ -316,7 +330,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 this.logger.error(
                   'No receipt for relayMultiMessage transaction'
                 )
-              } else if (receipt.status == 1) {
+              } else if (receipt.status === 1) {
                 this.logger.info('Successful relayMultiMessage', {
                   blockNumber: receipt.blockNumber,
                   transactionIndex: receipt.transactionIndex,
@@ -378,16 +392,26 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               this.state.nextUnfinalizedTxHeight
             )
           ) {
-            const size = (
+            const batch = (
               await this._getStateBatchHeader(
                 this.state.nextUnfinalizedTxHeight
               )
-            ).batch.batchSize.toNumber()
+            ).batch
+            const size = batch.batchSize.toNumber()
+            const batchStart = batch.prevTotalElements.toNumber()
+
             this.logger.info(
               'Found a batch of finalized transaction(s), checking for more...',
-              { batchSize: size }
+              {
+                batchSize: size,
+                atHeight: this.state.nextUnfinalizedTxHeight,
+                batchStart,
+              }
             )
-            this.state.nextUnfinalizedTxHeight += size
+            // This must point to the first txHeight within the next batch. If the service starts
+            // with a misaligned fromL2TransactionIndex then this should realign it to avoid
+            // missed messages.
+            this.state.nextUnfinalizedTxHeight = batchStart + size
 
             // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
             // need to keep in memory. We operate on full batches at a time so the actual amount
@@ -471,12 +495,39 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             const lastProcessedBatch = await this._getStateBatchHeader(
               lastMessage.parentTransactionIndex
             )
+            this.logger.info('Pending messages', {
+              numMessages: messages.length,
+              firstTxnIdx: messages[0].parentTransactionIndex,
+              lastTxnIdx: lastMessage.parentTransactionIndex,
+              lastBatch: lastProcessedBatch.batch.batchIndex,
+            })
 
             // Remove any events from the cache for batches that should've been processed by now.
+            const oldLen = this.state.eventCache.length
+            this.logger.info('eventCache before filter', {
+              size: oldLen,
+              firstIdx: oldLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: oldLen
+                ? this.state.eventCache[oldLen - 1].args._batchIndex
+                : 'n/a',
+            })
             this.state.eventCache = this.state.eventCache.filter((event) => {
               return (
-                event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+                Number(event.args._batchIndex) >
+                Number(lastProcessedBatch.batch.batchIndex)
               )
+            })
+            const newLen = this.state.eventCache.length
+            this.logger.info('eventCache after filter', {
+              size: newLen,
+              firstIdx: newLen
+                ? this.state.eventCache[0].args._batchIndex
+                : 'n/a',
+              lastIdx: newLen
+                ? this.state.eventCache[newLen - 1].args._batchIndex
+                : 'n/a',
             })
           }
 
@@ -534,7 +585,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1
-    const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
+    const maxBlock =
+      (await this.options.l1RpcProvider.getBlockNumber()) -
+      this.options.numEventConfirmations
     while (startingBlock <= maxBlock) {
       const endBlock = Math.min(
         startingBlock + this.options.getLogsInterval,
@@ -603,7 +656,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     const header = await this._getStateBatchHeader(height)
 
     if (header === undefined) {
-      this.logger.info('No state batch header found.')
+      this.logger.info('No state batch header found.', {
+        height,
+        lastF: this.state.lastFinalizedTxHeight,
+        nextU: this.state.nextUnfinalizedTxHeight,
+      })
       return false
     } else {
       this.logger.info('Got state batch header', { header })
@@ -686,19 +743,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     )
   }
 
-  private async _wereMessagesRelayed(
-    messages: Array<SentMessage>
-  ): Promise<boolean> {
-    this.logger.info('Relay messages: ', { messages })
-    const promisePayload = messages.reduce((acc, cur) => {
-      acc.push(this._wasMessageRelayed(cur), this._wasMessageFailed(cur))
-      return acc
-    }, [])
-    const messageRelayedStatus = await Promise.all(promisePayload)
-    this.logger.info('Relay messages status: ', { messageRelayedStatus })
-    return messageRelayedStatus.some((ele) => ele)
-  }
-
   private async _getMessageProof(
     message: SentMessage
   ): Promise<SentMessageProof> {
@@ -767,79 +811,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     }
   }
 
-  private async _relayMessageToL1(
-    message: SentMessage,
-    proof: SentMessageProof
-  ): Promise<void> {
-    try {
-      this.logger.info('Dry-run, checking to make sure proof would succeed...')
-
-      await this.state.L1CrossDomainMessenger.connect(
-        this.options.l1Wallet
-      ).callStatic.relayMessage(
-        message.target,
-        message.sender,
-        message.message,
-        message.messageNonce,
-        proof,
-        {
-          gasLimit: this.options.relayGasLimit,
-        }
-      )
-
-      this.logger.info('Proof should succeed. Submitting for real this time...')
-    } catch (err) {
-      this.logger.error('Proof would fail, skipping', {
-        message: err.toString(),
-        stack: err.stack,
-        code: err.code,
-      })
-      return
-    }
-
-    const sendTxAndWaitForReceipt = async (gasPrice): Promise<any> => {
-      const txResponse = await this.state.L1CrossDomainMessenger.connect(
-        this.options.l1Wallet
-      ).relayMessage(
-        message.target,
-        message.sender,
-        message.message,
-        message.messageNonce,
-        proof,
-        { gasPrice }
-      )
-      const tx = await this.options.l1Wallet.provider.waitForTransaction(
-        txResponse.hash,
-        this.options.numConfirmations
-      )
-      return tx
-    }
-
-    const minGasPrice = await this._getGasPriceInGwei(this.options.l1Wallet)
-
-    let receipt
-    try {
-      receipt = await ynatm.send({
-        sendTransactionFunction: sendTxAndWaitForReceipt,
-        minGasPrice: ynatm.toGwei(minGasPrice),
-        maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
-        gasPriceScalingFunction: ynatm.LINEAR(this.options.gasRetryIncrement),
-        delay: this.options.resubmissionTimeout,
-      })
-
-      this.logger.info('Relay message transaction sent', { receipt })
-    } catch (err) {
-      this.logger.error('Relay attempt failed, skipping.', {
-        message: err.toString(),
-        stack: err.stack,
-        code: err.code,
-      })
-      return
-    }
-
-    this.logger.info('Message successfully relayed to Layer 1!')
-  }
-
   private async _relayMultiMessageToL1(
     messages: Array<BatchMessage>
   ): Promise<any> {
@@ -890,7 +861,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     )
   }
 
-  /* The filter makes sure that the message-relayer-fast only handles message traffic 
+  /* The filter makes sure that the message-relayer-fast only handles message traffic
      intended for it
   */
 

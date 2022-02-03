@@ -32,6 +32,14 @@ export function fetchDaoVotes() {
     return createAction('VOTES/DAO/GET', () => networkService.getDaoVotes())
 }
 
+export function fetchDaoBalanceX() {
+    return createAction('BALANCEX/DAO/GET', () => networkService.getDaoBalanceX())
+}
+
+export function fetchDaoVotesX() {
+    return createAction('VOTESX/DAO/GET', () => networkService.getDaoVotesX())
+}
+
 export function transferDao({ recipient, amount }) {
     return createAction('TRANSFER/DAO/CREATE', () => networkService.transferDao({ recipient, amount }))
 }
@@ -40,8 +48,12 @@ export function delegateVotes({ recipient }) {
     return createAction('DELEGATE/VOTES/CREATE', () => networkService.delegateVotes({ recipient }))
 }
 
+export function delegateVotesX({ recipient }) {
+    return createAction('DELEGATEX/VOTES/CREATE', () => networkService.delegateVotesX({ recipient }))
+}
+
 export function getProposalThreshold() {
-    return createAction('PROPOSAL/THRESHOLD/GET', () => networkService.getProposalThreshold())
+    return createAction('PROPOSALTHRESHOLD/GET', () => networkService.getProposalThreshold())
 }
 
 export function fetchDaoProposals() {
@@ -52,6 +64,16 @@ export function createDaoProposal(payload) {
     return createAction('PROPOSAL/CREATE', () => networkService.createProposal(payload))
 }
 
+export function queueProposal(proposalID) {
+    return createAction('PROPOSAL/QUEUE', () => networkService.queueProposal(proposalID))
+}
+
+export function executeProposal(proposalID) {
+    return createAction('PROPOSAL/EXECUTE', () => networkService.executeProposal(proposalID))
+}
+
 export function castProposalVote(payload) {
     return createAction('PROPOSAL/CAST/VOTE', () => networkService.castProposalVote(payload))
 }
+
+

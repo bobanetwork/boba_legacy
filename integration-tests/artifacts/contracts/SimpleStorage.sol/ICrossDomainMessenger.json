@@ -1,0 +1,24 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ICrossDomainMessenger",
+  "sourceName": "contracts/SimpleStorage.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "xDomainMessageSender",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b5060828061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80636e296e4514602d575b600080fd5b600054604c9073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f3fea164736f6c6343000809000a",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80636e296e4514602d575b600080fd5b600054604c9073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f3fea164736f6c6343000809000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

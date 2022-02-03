@@ -28,7 +28,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
 )
 
 var (
@@ -267,6 +267,12 @@ func (c *Client) Close() {
 // can also pass nil, in which case the result is ignored.
 func (c *Client) Call(result interface{}, method string, args ...interface{}) error {
 	ctx := context.Background()
+	return c.CallContext(ctx, result, method, args...)
+}
+
+func (c *Client) CallTimeout(result interface{}, method string, timeout time.Duration, args ...interface{}) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 	return c.CallContext(ctx, result, method, args...)
 }
 

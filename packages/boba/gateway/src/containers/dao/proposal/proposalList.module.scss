@@ -20,6 +20,12 @@ $boxDropDownHeight: 50px;
   }
 }
 
+  .helpTextLight {
+    font-size: 0.6em;
+    margin: 10px;
+    opacity: 0.6;
+  }
+
 .divider {
   height: 0px;
   width: 90%;
@@ -47,7 +53,6 @@ $boxDropDownHeight: 50px;
     margin: 10px auto;
     border-radius: 8px;
     padding: 20px 10px;
-
     .loadingContainer {
       padding: 10px auto;
     }

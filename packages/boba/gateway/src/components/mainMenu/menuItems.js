@@ -2,19 +2,25 @@ export const menuItems = [
   {
     key: 'AccountNow',
     icon: "WalletIcon",
-    title: "Wallet",
+    title: "Bridge",
     url: "/"
+  },
+  {
+    key: 'Ecosystem',
+    icon: "SafeIcon",
+    title: "Ecosystem",
+    url: "/Ecosystem"
   },
   {
     key: 'History',
     icon: "HistoryIcon",
-    title: "Transaction History",
+    title: "History",
     url: "/history"
   },
   {
     key: 'BobaScope',
     icon: "SearchIcon",
-    title: "System Analytics",
+    title: "Analytics",
     url: "/bobascope"
   },
   {
@@ -22,6 +28,12 @@ export const menuItems = [
     icon: "EarnIcon",
     title: "Earn",
     url: "/earn",
+  },
+  {
+    key: 'Save',
+    icon: "SaveIcon",
+    title: "Stake@5%",
+    url: "/save",
   },
   {
     key: 'NFT',
@@ -40,6 +52,12 @@ export const menuItems = [
     icon: "SwapIcon",
     title: "Airdrop",
     url: "/airdrop"
+  },
+  {
+    key: 'GnosisSafe',
+    icon: "SafeIcon",
+    title: "Multisig",
+    url: "https://multisig.boba.network/"
   },
   {
     key: 'Help',

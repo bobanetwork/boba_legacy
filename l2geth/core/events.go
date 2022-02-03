@@ -17,12 +17,15 @@
 package core
 
 import (
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 )
 
 // NewTxsEvent is posted when a batch of transactions enter the transaction pool.
-type NewTxsEvent struct{ Txs []*types.Transaction }
+type NewTxsEvent struct {
+	Txs   []*types.Transaction
+	ErrCh chan error
+}
 
 // NewMinedBlockEvent is posted when a block has been imported.
 type NewMinedBlockEvent struct{ Block *types.Block }

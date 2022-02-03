@@ -13,75 +13,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { openModal } from 'actions/uiAction'
-
-import * as styles from './Dao.module.scss'
-
-import { Box, Typography,useMediaQuery } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 
 import Button from 'components/button/Button'
 import ProposalList from './proposal/ProposalList'
-import { selectDaoBalance, selectDaoVotes } from 'selectors/daoSelector'
-import { selectLayer } from 'selectors/setupSelector'
+
+import { selectDaoBalance, selectDaoVotes, selectDaoBalanceX, selectDaoVotesX } from 'selectors/daoSelector'
+import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
+
 import AlertIcon from 'components/icons/AlertIcon'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import networkService from 'services/networkService'
-
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageHeader from 'components/pageHeader/PageHeader'
+
+import * as S from './Dao.styles'
+import * as styles from './Dao.module.scss'
 
 function DAO() {
 
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch()
-    const balance = useSelector(selectDaoBalance)
-    const votes = useSelector(selectDaoVotes)
+
+    const theme = useTheme()
     
+    const balance = useSelector(selectDaoBalance)
+    const balanceX = useSelector(selectDaoBalanceX)
+    const votes = useSelector(selectDaoVotes)
+    const votesX = useSelector(selectDaoVotesX)
     let layer = useSelector(selectLayer())
-
-    if (networkService.L1orL2 !== layer) {
-        //networkService.L1orL2 is always right...
-        layer = networkService.L1orL2
-    }
-
-    if(layer === 'L1') {
-        return <div className={styles.container}>
-            <PageHeader title="DAO" />
-            <div className={styles.content}>
-                <Box
-                    sx={{
-                        background: theme.palette.background.secondary,
-                        borderRadius: '12px',
-                        margin: '20px 5px',
-                        padding: '10px 20px',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                    }}
-                >
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <AlertIcon />
-                        <Typography
-                            sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                            variant="body1"
-                            component="p"
-                        >
-                            You are on L1. To use the Boba DAO, SWITCH LAYER to L2
-                        </Typography>
-                    </div>
-                    <LayerSwitcher isButton={true} />
-                </Box>
-            </div>
-        </div>
-    }
+    const accountEnabled = useSelector(selectAccountEnabled())
 
     return (
         <>
@@ -89,54 +52,92 @@ function DAO() {
 
             <div className={styles.container}>
 
-                <div className={styles.content}>
-                    <div className={`${styles.action} ${isMobile ? styles.isMobile : ''}`}>
-                        <div className={styles.transferContainer}
-                        
-                            style={{
-                                background: theme.palette.background.secondary,
-                            }}
-                        >
-                            <div className={styles.info}>
-                                <Typography variant="h3">{balance} Boba</Typography>
-                                <Typography variant="h4">Wallet Balance</Typography>
-                                <Typography variant="body2" className={styles.helpText}>To transfer Boba governance tokens to another wallet, select "Transfer".</Typography>
-                            </div>
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                fullWidth={true}
-                                onClick={()=>{dispatch(openModal('transferDaoModal'))}}
-                            >Transfer</Button>
-                        </div>
-                        <div className={styles.delegateContainer}
-                            style={{
-                                background: theme.palette.background.secondary,
-                            }}
-                        >
-                            <div className={styles.info}>
-                                <Typography variant="h3">{votes} Votes</Typography>
-                                <Typography variant="h4">Voting Power</Typography>
-                                <Typography variant="body2" className={styles.helpText}>To delegate voting authority, select "Delegate Votes".</Typography>
-                            </div>
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                fullWidth={true}
-                                onClick={() => {dispatch(openModal('delegateDaoModal'))}}
-                            >Delegate Votes</Button>
-                        </div>
+            {layer === 'L1' &&
+                <S.LayerAlert>
+                  <S.AlertInfo>
+                    <AlertIcon />
+                    <S.AlertText
+                      variant="body2"
+                      component="p"
+                    >
+                      You are on Mainnet. To use the Boba DAO, SWITCH to Boba
+                    </S.AlertText>
+                  </S.AlertInfo>
+                  <LayerSwitcher />
+                </S.LayerAlert>
+            }
+            {!layer &&
+                <S.LayerAlert>
+                  <S.AlertInfo>
+                    <AlertIcon />
+                    <S.AlertText
+                      variant="body2"
+                      component="p"
+                    >
+                      You have not connected your wallet. To use the Boba DAO, connect to MetaMask
+                    </S.AlertText>
+                  </S.AlertInfo>
+                  <WalletPicker />
+                </S.LayerAlert>
+            }
+            <div className={styles.content} style={{background: theme.palette.background.secondary}}>
+                <div className={styles.topRow}>
+                <div className={styles.transferContainer}>
+                    <div className={styles.info} style={{textAlign: 'left', padding: '20px'}}>
+                        <Typography variant="h4">Wallet Balances</Typography>
+                        <Typography variant="h4" style={{opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em'}}>{Number(balanceX)} xBOBA</Typography>
+                        <Typography variant="h4" style={{opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em'}}>{Number(balance)} BOBA</Typography>
                     </div>
                 </div>
-            {/*
-                <div className={styles.proposal}>
-                    <ProposalList balance={balance} />
+                <div className={styles.transferContainer}>
+                    <div className={styles.info} style={{textAlign: 'left', padding: '20px', paddingBottom: '0px'}}>
+                        <Typography variant="h4">Votes</Typography>
+                        <Typography variant="h4" style={{opacity: '0.7',paddingLeft: '60px', fontSize: '0.8em'}}>{Number(votesX)} xBOBA</Typography>
+                        <Typography variant="h4" style={{opacity: '0.7',paddingLeft: '60px', fontSize: '0.8em'}}>{Number(votes)} BOBA</Typography>
+                        <Typography variant="h4" style={{opacity: '0.7',paddingLeft: '60px', fontSize: '0.8em'}}>{Number(votes)+Number(votesX)} Total</Typography>
+                    </div>
                 </div>
-            */}
+                <div className={styles.transferContainer} style={{paddingTop: '10px'}}>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={() => {dispatch(openModal('delegateDaoXModal'))}}
+                        disabled={!accountEnabled}
+                    >
+                        Delegate xBOBA
+                    </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={() => {dispatch(openModal('delegateDaoModal'))}}
+                        disabled={!accountEnabled}
+                    >
+                        Delegate BOBA
+                    </Button>
+                </div> 
+                </div>
+                    <Typography 
+                        variant="body2" 
+                        style={{
+                          fontSize: '0.7em',
+                          margin: '10px',
+                          opacity: '0.6',
+                          textAlign: 'left', 
+                          lineHeight: '1.0em', 
+                          //padding: '20px',
+                          //paddingTop: 0,
+                        }}
+                    >
+                        To delegate voting authority, select "Delegate Votes". You can delegate to one address at a time. To vote from this account, please delegate your votes to yourself.
+                        The number of votes delegated is equal to your balance of BOBA.
+                        Votes are delegated until you delegate again (to someone else) or transfer your BOBA.
+                    </Typography>
             </div>
-        </>
-    
-    )
+            <div className={styles.proposal}>
+                <ProposalList/>
+            </div>
+        </div>
+    </>)
 }
 
 export default React.memo(DAO)

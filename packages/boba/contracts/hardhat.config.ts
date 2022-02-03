@@ -1,8 +1,20 @@
 import { HardhatUserConfig } from 'hardhat/types'
+import * as dotenv from 'dotenv'
+
+// Hardhat plugins
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
+import '@nomiclabs/hardhat-etherscan'
 import './tasks/deploy'
+
+// Load environment variables from .env
+dotenv.config()
+
+// Fix lint
+if (!process.env.L1_NODE_WEB3_URL) {
+  process.env.L1_NODE_WEB3_URL = 'http://localhost:9545'
+}
 
 const config: HardhatUserConfig = {
   mocha: {
@@ -21,6 +33,9 @@ const config: HardhatUserConfig = {
         '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
       ],
     },
+    mainnet: {
+      url: process.env.L1_NODE_WEB3_URL,
+    },
   },
   solidity: {
     compilers: [
@@ -31,6 +46,17 @@ const config: HardhatUserConfig = {
           metadata: {
             bytecodeHash: 'none',
           },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
+      },
+      {
+        version: '0.6.6', // Required for oracle
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
           outputSelection: {
             '*': {
               '*': ['storageLayout'],
@@ -66,6 +92,9 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0,
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_KEY,
   },
 }
 

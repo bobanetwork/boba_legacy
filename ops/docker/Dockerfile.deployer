@@ -13,6 +13,9 @@ COPY --from=builder /optimism/node_modules ./node_modules
 COPY --from=builder /optimism/packages/core-utils/package.json ./packages/core-utils/package.json
 COPY --from=builder /optimism/packages/core-utils/dist ./packages/core-utils/dist
 
+# copy turing
+COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
+
 # get the needed built artifacts
 WORKDIR /opt/optimism/packages/contracts
 COPY --from=builder /optimism/packages/contracts/dist ./dist

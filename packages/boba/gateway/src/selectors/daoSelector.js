@@ -15,17 +15,25 @@ limitations under the License. */
 
 
 export function selectDaoBalance(state) {
-    return state.dao.balance;
+    return state.dao.balance
 }
 
 export function selectDaoVotes(state) {
-    return state.dao.votes;
+    return state.dao.votes
+}
+
+export function selectDaoBalanceX(state) {
+    return state.dao.balanceX
+}
+
+export function selectDaoVotesX(state) {
+    return state.dao.votesX
 }
 
 export function selectProposals(state) {
-    return state.dao.proposalList;
+    return state.dao.proposalList
 }
 
 export function selectProposalThreshold(state) {
-    return state.dao.proposalThreshold;
+    return state.dao.proposalThreshold
 }

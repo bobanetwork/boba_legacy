@@ -1,6 +1,6 @@
 /*
   Varna - A Privacy-Preserving Marketplace
-  Varna uses Fully Homomorphic Encryption to make markets fair. 
+  Varna uses Fully Homomorphic Encryption to make markets fair.
   Copyright (C) 2021 Enya Inc. Palo Alto, CA
 
   This program is free software: you can redistribute it and/or modify
@@ -62,10 +62,18 @@ export function fetchFastDepositCost(address) {
     return createAction('FETCH/FASTDEPOSIT/COST', () => networkService.getFastDepositCost(address))
 }
 
+export function fetchFastDepositBatchCost(tokenList) {
+  return createAction('FETCH/FASTDEPOSIT/BATCH/COST', () => networkService.getFastDepositBatchCost(tokenList))
+}
+
 export function fetchL1FeeBalance() {
     return createAction('FETCH/L1FEE/BALANCE', () => networkService.getL1FeeBalance())
 }
 
 export function fetchL2FeeBalance() {
     return createAction('FETCH/L2FEE/BALANCE', () => networkService.getL2FeeBalance())
+}
+
+export function fetchUserAndL2LPBalanceBatch(tokenList) {
+    return createAction('FETCH/USER/L2LP/BALANCE/BATCH', () => networkService.getL2UserAndLPBalanceBatch(tokenList))
 }

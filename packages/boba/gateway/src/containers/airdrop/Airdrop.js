@@ -1,18 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
+
+import * as S from './Airdrop.styles'
 import * as styles from './Airdrop.module.scss'
+
 import { Box, Grid, Typography } from '@material-ui/core'
 import Button from 'components/button/Button'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 import moment from 'moment'
 import { openAlert } from 'actions/uiAction'
 import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropAction'
 import { logAmount } from 'util/amountConvert'
-import truncate from 'truncate-middle';
+import truncate from 'truncate-middle'
 
 
 class Airdrop extends React.Component {
@@ -26,12 +30,21 @@ class Airdrop extends React.Component {
       claimDetailsL2 
     } = this.props.airdrop
     
-    const { layer2 } = this.props.balance
+    const { 
+      layer2,
+    } = this.props.balance
+
+    const { 
+      accountEnabled, 
+      netLayer 
+    }  = this.props.setup
 
     this.state = {
       claimDetailsL1,
       claimDetailsL2,
       layer2,
+      netLayer,
+      accountEnabled,
       walletAddress: networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
     }
 
@@ -41,6 +54,7 @@ class Airdrop extends React.Component {
 
     const { claimDetailsL1, claimDetailsL2 } = this.props.airdrop
     const { layer2 } = this.props.balance
+    const { accountEnabled, netLayer }  = this.props.setup
 
     if (!isEqual(prevState.airdrop.claimDetailsL1, claimDetailsL1)) {
      this.setState({ claimDetailsL1 })
@@ -54,13 +68,21 @@ class Airdrop extends React.Component {
      this.setState({ layer2 })
     }
 
+    if (!isEqual(prevState.setup.netLayer, netLayer)) {
+     this.setState({ netLayer })
+    }
+
+    if (!isEqual(prevState.setup.accountEnabled, accountEnabled)) {
+     this.setState({ accountEnabled })
+    }
+
   }
 
   async initiateDrop() {
 
-    console.log('initiateAirdrop')
+    console.log('initiateAirdrop:',this.state.claimDetailsL1)
 
-    let res = await this.props.dispatch(initiateAirdrop())
+    let res = await this.props.dispatch(initiateAirdrop(this.state.claimDetailsL1))
 
     if (res) {
       this.props.dispatch(openAlert(`Your claim for L1 snapshot balances has been initiated. You will receive your BOBA in 30 days.`))
@@ -70,7 +92,7 @@ class Airdrop extends React.Component {
 
   async airdropL1() {
 
-    console.log('airdropL1')
+    console.log('airdropL1:',this.state.claimDetailsL1)
 
     let res = await this.props.dispatch(getAirdropL1(this.state.claimDetailsL1))
 
@@ -98,11 +120,9 @@ class Airdrop extends React.Component {
       claimDetailsL1,
       claimDetailsL2,
       layer2,
-      walletAddress
+      walletAddress,
+      netLayer
     } = this.state
-
-    //console.log("claimDetails:",claimDetailsL1)
-    //console.log("claimDetails:",claimDetailsL2)
 
     let omgBalance = layer2.filter((i) => {
       if (i.symbol === 'OMG') return true
@@ -128,6 +148,7 @@ class Airdrop extends React.Component {
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('amount') && claimDetailsL1.amount !== 0) {
       recordFoundL1 = true
       snapValueL1 = Number(logAmount(claimDetailsL1.amount, 18))
+      console.log("L1 snapvalue:",snapValueL1)
     }
     if(claimDetailsL1 && claimDetailsL1.hasOwnProperty('claimed') && claimDetailsL1.claimed === 1) {
       claimedL1 = true
@@ -152,42 +173,41 @@ class Airdrop extends React.Component {
       claimedL2time = moment.unix(claimDetailsL2.claimedTimestamp).format('MM/DD/YYYY hh:mm a')
     }
 
-    const layer = networkService.L1orL2
-
-    if(layer === 'L1') {
+    if(netLayer === 'L1') {
         return <div className={styles.container}>
             <PageHeader title="Airdrop" />
-            <div className={styles.content}>
-                <Box
-                  sx={{
-                    borderRadius: '12px',
-                    margin: '20px 5px',
-                    padding: '10px 20px',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}
+            <S.LayerAlert>
+              <S.AlertInfo>
+                <AlertIcon />
+                <S.AlertText
+                  variant="body2"
+                  component="p"
                 >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <AlertIcon />
-                    <Typography
-                      sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                      variant="body1"
-                      component="p"
-                    >
-                      You are on L1. To claim Boba, SWITCH LAYER to L2
-                    </Typography>
-                  </div>
-                    <LayerSwitcher isButton={true} />
-                </Box>
-            </div>
+                  You are on Ethereum Mainnet. To claim your BOBA, SWITCH to Boba
+                </S.AlertText>
+              </S.AlertInfo>
+              <LayerSwitcher isButton={true}/>
+            </S.LayerAlert>
         </div>
     }
 
+    if(!netLayer) {
+      return <div className={styles.container}>
+          <PageHeader title="Airdrop" />
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To claim your BOBA, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+      </div>
+    }
 
     return (
   <>
@@ -385,7 +405,8 @@ class Airdrop extends React.Component {
 
 const mapStateToProps = state => ({
   airdrop: state.airdrop,
-  balance: state.balance
+  balance: state.balance,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Airdrop)

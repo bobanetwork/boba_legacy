@@ -52,6 +52,9 @@ const config: HardhatUserConfig = {
       url: 'https://mainnet.optimism.io',
       accounts: [privateKey],
     },
+    mainnet: {
+      url: process.env.L1_NODE_WEB3_URL || '',
+    },
   },
   mocha: {
     timeout: 50000,
