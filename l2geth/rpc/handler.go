@@ -25,9 +25,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/core/types"
-      	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/rlp"
 )
 
 // handler handles JSON-RPC messages. There is one handler per connection. Note that

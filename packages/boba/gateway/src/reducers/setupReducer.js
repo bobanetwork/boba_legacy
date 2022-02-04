@@ -13,53 +13,62 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-//localStorage.removeItem("masterConfig")
-//localStorage.removeItem("netLayer")
-
 require('dotenv').config()
 
-let netLayerCache = localStorage.getItem("netLayer")
+let justSwitchedChain = localStorage.getItem("justSwitchedChain")
 
-if (netLayerCache) {
-  netLayerCache = JSON.parse(netLayerCache)
+if (justSwitchedChain) {
+  justSwitchedChain = JSON.parse(justSwitchedChain)
 }
 
 const initialState = {
-  walletMethod: null,
-  masterConfig: process.env.REACT_APP_CHAIN,
-  blockexplorerURL: '',
-  etherscan: '',
-  minter: false,
-  netLayer: netLayerCache ? netLayerCache : 'L1'
+  accountEnabled: null,
+  baseEnabled: null,
+  netLayer: null,
+  accountNumber: null,
+  network: process.env.REACT_APP_CHAIN,
+  justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
 }
 
 function setupReducer (state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/WALLET_METHOD/SET':
+    case 'SETUP/ACCOUNT/SET':
+      localStorage.setItem("justSwitchedChain", JSON.stringify(false))
       return { 
         ...state, 
-        walletMethod: action.payload 
+        accountEnabled: action.payload,
+        justSwitchedChain: false
       }
-    // case 'SETUP/NETWORK/SET':
-    //   localStorage.setItem("masterConfig", JSON.stringify(action.payload))
-    //   return { 
-    //   	...state, 
-    //     masterConfig: action.payload
-    //   }
+    case 'SETUP/ACCOUNT_NUMBER/SET':
+      return { 
+        ...state, 
+        accountNumber: action.payload,
+      }
+    case 'SETUP/BASE/SET':
+      return { 
+        ...state, 
+        baseEnabled: action.payload,
+      }
     case 'SETUP/LAYER/SET':
-      localStorage.setItem("netLayer", JSON.stringify(action.payload))
       return { 
         ...state, 
         netLayer: action.payload
       }
-    case 'SETUP/NFT/MINTER':
+    case 'SETUP/NETWORK/SET':
       return { 
         ...state, 
-        minter: action.payload
+        network: action.payload
+      }
+    case 'SETUP/SWITCH/SUCCESS':
+      console.log("SR - setting just changed to true")
+      localStorage.setItem("justSwitchedChain", JSON.stringify(true))
+      return { 
+        ...state, 
+        justSwitchedChain: true
       }
     default:
-      return state;
+      return state
   }
 }
 
-export default setupReducer;
+export default setupReducer

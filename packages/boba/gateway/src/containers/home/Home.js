@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectWalletMethod } from 'selectors/setupSelector'
+
 import { selectModalState } from 'selectors/uiSelector'
 
 import useInterval from 'util/useInterval'
@@ -24,32 +24,34 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
-import { checkVersion } from 'actions/serviceAction';
+import networkService from 'services/networkService'
 
-import { closeAlert, closeError } from 'actions/uiAction';
-import { selectAlert, selectError } from 'selectors/uiSelector';
+import { setBaseState } from 'actions/setupAction'
+import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
 
-import DepositModal from 'containers/modals/deposit/DepositModal';
-import TransferModal from 'containers/modals/transfer/TransferModal';
-import ExitModal from 'containers/modals/exit/ExitModal';
+/**** ACTIONS and SELECTORS *****/
 
-import LedgerConnect from 'containers/modals/ledger/LedgerConnect';
-import AddTokenModal from 'containers/modals/addtoken/AddTokenModal';
+import { checkVersion } from 'actions/serviceAction'
+import { closeAlert, closeError } from 'actions/uiAction'
+import { selectAlert, selectError } from 'selectors/uiSelector'
 
-//Farm
+import DepositModal from 'containers/modals/deposit/DepositModal'
+import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
+import TransferModal from 'containers/modals/transfer/TransferModal'
+import ExitModal from 'containers/modals/exit/ExitModal'
+
+import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
+
 import FarmWrapper from 'containers/farm/FarmWrapper'
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal';
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
+import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
+import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 
-//Save
 import SaveWrapper from 'containers/save/SaveWrapper'
 import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
 
-//DAO
 import DAO from 'containers/dao/Dao'
 import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
@@ -65,55 +67,39 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
+import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
+import { fetchVerifierStatus } from 'actions/verifierAction'
+
 import Airdrop from 'containers/airdrop/Airdrop'
-
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2,
-} from 'actions/airdropAction'
-
-import {
-  getFS_Saves,
-  getFS_Info,
-} from 'actions/fixedAction'
-
-import {
-  fetchVerifierStatus
-} from 'actions/verifierAction'
-
-//Wallet Functions
 import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
-
-//Help page
 import Help from 'containers/help/Help'
-
-//NFT Example Page
 import NFT from 'containers/nft/Nft'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 
-import { useTheme } from '@material-ui/core/styles'
-import { Box, Container, useMediaQuery } from '@material-ui/core'
+import { Box, Container } from '@material-ui/core'
+
 import MainMenu from 'components/mainMenu/MainMenu'
-
+import PageFooter from 'components/pageFooter/PageFooter'
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
 
-function Home () {
+function Home() {
 
   const dispatch = useDispatch()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
-  const [ mobileMenuOpen/*, setMobileMenuOpen*/ ] = useState(false)
+  const [ mobileMenuOpen ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
+  const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
   const transferModalState = useSelector(selectModalState('transferModal'))
   const exitModalState = useSelector(selectModalState('exitModal'))
 
@@ -121,27 +107,26 @@ function Home () {
   const token = useSelector(selectModalState('token'))
 
   const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
-  const ledgerConnectModalState = useSelector(selectModalState('ledgerConnectModal'))
-
   const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
 
-  // DAO modal
   const tranferBobaDaoModalState = useSelector(selectModalState('transferDaoModal'))
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
-  const walletMethod = useSelector(selectWalletMethod())
-  //const transactions = useSelector(selectlayer2Transactions, isEqual);
+  const network = useSelector(selectNetwork())
+  const layer = useSelector(selectLayer())
+  const baseEnabled = useSelector(selectBaseEnabled())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
-  const handleErrorClose=()=>dispatch(closeError())
-  const handleAlertClose=()=>dispatch(closeAlert())
+  const handleErrorClose = () => dispatch(closeError())
+  const handleAlertClose = () => dispatch(closeAlert())
 
   useEffect(() => {
-    const body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName('body')[ 0 ];
     mobileMenuOpen
       ? body.style.overflow = 'hidden'
       : body.style.overflow = 'auto';
@@ -150,43 +135,78 @@ function Home () {
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)
-    dispatch(addTokenList()) //only need to do this boot
-  }, [ dispatch ])
 
-  //get all account balances
+    if(!baseEnabled) initializeBase()
+
+    async function initializeBase() {
+      console.log("Calling initializeBase for", network)
+      const initialized = await networkService.initializeBase( network )
+      if (!initialized) {
+        console.log("Failed to boot L1 and L2 base providers for", network)
+        dispatch(setBaseState(false))
+        return false
+      }
+      if (initialized === 'enabled') {
+        console.log("Network Base Providers are up")
+        dispatch(setBaseState(true))
+        // load DAO to speed up the process
+        dispatch(fetchDaoProposals())
+        return true
+      }
+    }
+
+  }, [ dispatch, network, baseEnabled ])
+
   useInterval(() => {
-    dispatch(fetchBalances())
-    dispatch(fetchNFTs())
-    dispatch(fetchAirdropStatusL1())
-    dispatch(fetchAirdropStatusL2())
-    dispatch(fetchDaoBalance())
-    dispatch(fetchDaoVotes())
-    dispatch(fetchDaoBalanceX())
-    dispatch(fetchDaoVotesX())
-    dispatch(fetchDaoProposals())
-    dispatch(getProposalThreshold())
-    dispatch(fetchGas())
-    dispatch(fetchExits())
-    dispatch(getFS_Saves())
-    dispatch(getFS_Info())
-    dispatch(fetchVerifierStatus())
+    if(accountEnabled /*== MetaMask is connected*/) {
+      dispatch(fetchBalances()) // account specific
+      dispatch(fetchAirdropStatusL1()) // account specific
+      dispatch(fetchAirdropStatusL2()) // account specific
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+      dispatch(fetchExits())           // account specific
+      dispatch(getFS_Saves())          // account specific
+      dispatch(getFS_Info())           // account specific
+    }
+    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+      dispatch(fetchGas())
+      dispatch(fetchVerifierStatus())
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
   }, POLL_INTERVAL)
 
   useEffect(() => {
+    // load the following functions when the home page is open
     checkVersion()
-  }, [])
+    dispatch(fetchGas())
+    dispatch(fetchVerifierStatus())
+    dispatch(getProposalThreshold())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (accountEnabled) {
+      dispatch(addTokenList())
+    }
+  }, [ dispatch, accountEnabled ])
+
+  console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
 
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
+      {!!depositBatchModalState && <DepositBatchModal  open={depositBatchModalState} />}
+
       {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
+      {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}
 
-      {!!saveDepositModalState && <SaveDepositModal  open={saveDepositModalState} />}
+      {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
 
-      {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
+      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
       {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
@@ -214,47 +234,50 @@ function Home () {
         {alertMessage}
       </Alert>
 
-      <LedgerConnect
-        open={walletMethod === 'browser'
-          ? ledgerConnectModalState
-          : false
-        }
-      />
-
-      <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
+      <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
         <MainMenu />
-        <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
+        <Container maxWidth={false} sx={{
+          height: 'calc(100% - 150px)',
+          minHeight: '500px',
+          marginLeft: 'unset',
+          width: '100vw',
+          marginRight: 'unset'
+        }}>
           {pageDisplay === "AccountNow" &&
-            <Account/>
+            <Account />
           }
           {pageDisplay === "History" &&
-            <Transactions/>
+            <Transactions />
           }
           {pageDisplay === "BobaScope" &&
-            <BobaScope/>
+            <BobaScope />
           }
           {pageDisplay === "NFT" &&
-            <NFT/>
+            <NFT />
           }
           {pageDisplay === "Farm" &&
-            <FarmWrapper/>
+            <FarmWrapper />
           }
           {pageDisplay === "Save" &&
-            <SaveWrapper/>
+            <SaveWrapper />
           }
           {pageDisplay === "DAO" &&
-            <DAO/>
+            <DAO />
           }
           {pageDisplay === "Airdrop" &&
-            <Airdrop/>
+            <Airdrop />
           }
           {pageDisplay === "Help" &&
-            <Help/>
+            <Help />
+          }
+          {pageDisplay === "Ecosystem" &&
+            <Ecosystem/>
           }
         </Container>
+        <PageFooter/>
       </Box>
     </>
-  );
+  )
 }
 
 export default React.memo(Home)

@@ -15,6 +15,6 @@ limitations under the License. */
 
 export function selectLoading (requestNames) {
   return function (state) {
-    return requestNames.some(name => state.loading[name]);
-  };
+    return requestNames.some(name => state.loading[name])
+  }
 }

@@ -1,0 +1,39 @@
+name: boba-unit-tests
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - '*rc'
+      - 'regenesis/*'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  boba-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      # Monorepo tests
+      - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Build
+        working-directory: ./
+        run: yarn && yarn install && yarn build
+
+      - name: Run Boba Contracts unit tests
+        working-directory: ./packages/boba/contracts
+        run: yarn test

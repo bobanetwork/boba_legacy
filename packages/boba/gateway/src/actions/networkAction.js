@@ -29,11 +29,6 @@ export function addTokenList() {
   return createAction('TOKENLIST/GET', () => networkService.addTokenList())
 }
 
-export function fetchNFTs() {
-  console.log("fetchNFTs")
-  return createAction('NFTS/GET', () => networkService.fetchNFTs())
-}
-
 export function fetchTransactions() {
   return createAction('TRANSACTION/GETALL', () =>
     networkService.getTransactions()
@@ -69,6 +64,12 @@ export function depositL1LP(currency, value, decimals) {
   )
 }
 
+export function depositL1LPBatch(payload) {
+  return createAction('DEPOSIT/CREATE', () =>
+    networkService.depositL1LPBatch(payload)
+  )
+}
+
 //SWAP RELATED - Depositing into the L2LP triggers the swap-exit
 export function depositL2LP(token, value) {
   return createAction('EXIT/CREATE', () =>
@@ -77,7 +78,7 @@ export function depositL2LP(token, value) {
 }
 
 //SWAP RELATED - Depositing into the L2LP triggers the swap-exit - variant of depositL2LP
-//that handles Exit All 
+//that handles Exit All
 export function fastExitAll(token) {
   return createAction('EXIT/CREATE', () =>
     networkService.fastExitAll(token)
@@ -140,6 +141,14 @@ export function approveERC20(
   )
 }
 
+export function approveFastDepositBatch(payload) {
+  return createAction('APPROVE/CREATE', () =>
+    networkService.approveFastDepositBatch(
+      payload
+    )
+  )
+}
+
 export function approveERC20_L2LP(
   value,
   currency,
@@ -181,10 +190,6 @@ export function correctChain(layer) {
 
 export function enableBrowserWallet(network) {
   return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
-}
-
-export function switchChain(layer) {
-  return createAction('SWITCH/CHAIN', () => networkService.switchChain(layer))
 }
 
 export function getAllAddresses() {

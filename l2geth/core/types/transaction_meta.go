@@ -8,11 +8,11 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
 )
 
 type QueueOrigin uint8
@@ -139,7 +139,7 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	turing, err := common.ReadVarBytes(b, 0, 2048, "Turing") // The "Turing" fieldName string is not important and is only used in error messages
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			fmt.Println("Legacy format decode - no Turing field - setting to nil")
+			log.Debug("Legacy format decode - no Turing field - setting to nil")
 			meta.L1Turing = nil
 		} else {
 			return nil, err

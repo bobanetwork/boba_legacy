@@ -5,23 +5,6 @@ import PageHeader from 'components/pageHeader/PageHeader'
 
 class Help extends React.Component {
 
-  constructor(props) {
-
-    super(props)
-
-    this.state = {
-    }
-
-  }
-
-  componentDidMount() {
-
-  }
-
-  componentDidUpdate(prevState) {
-
-  }
-
   render() {
 
     return (
@@ -30,14 +13,6 @@ class Help extends React.Component {
 
         <Grid item xs={12}>
         
-          <Typography 
-            variant="h2" 
-            component="h2" 
-            sx={{fontWeight: "700", paddingBottom: '20px'}}
-          >
-            Common Questions
-          </Typography>
-
           <Typography variant="body1" component="p" sx={{mt: 2, mb: 0, fontWeight: '700'}}>
             MetaMask does not pop up
           </Typography>
@@ -103,8 +78,6 @@ class Help extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-
-})
+const mapStateToProps = state => ({})
 
 export default connect(mapStateToProps)(Help)

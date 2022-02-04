@@ -21,20 +21,20 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-        "sync"
+	"sync"
 	"sync/atomic"
 	"time"
         
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rollup/dump"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
-	"github.com/ethereum/go-ethereum/rollup/util"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
+	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/util"
+	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -273,15 +273,14 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 }
 
 type turingCacheEntry struct {
-       expires         time.Time
-       value           []byte
+	expires time.Time
+	value   []byte
 }
 
 var turingCache struct {
-       lock            sync.RWMutex
-       entries         map[common.Hash] *turingCacheEntry
+	lock    sync.RWMutex
+	entries map[common.Hash]*turingCacheEntry
 }
-
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
@@ -333,17 +332,17 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 		return retError, 11
 	}
 
-        // Now check for a cached result
-        ret := []byte{}
+	// Now check for a cached result
+	ret := []byte{}
 
-        hasher := sha3.NewLegacyKeccak256()
+	hasher := sha3.NewLegacyKeccak256()
 	hasher.Write(common.LeftPadBytes(caller.Bytes(), 32)) // FIXME - add account nonce, contract ID, etc?
 	hasher.Write(input)
 	key := common.BytesToHash(hasher.Sum(nil))
 
-	log.Debug("TURING Cache key", "key",key, "mayBlock", mayBlock)
-        turingCache.lock.Lock()
-        if ent, hit := turingCache.entries[key]; hit {
+	log.Debug("TURING Cache key", "key", key, "mayBlock", mayBlock)
+	turingCache.lock.Lock()
+	if ent, hit := turingCache.entries[key]; hit {
 		if time.Now().Before(ent.expires) {
 			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
 			ret = ent.value
@@ -351,19 +350,18 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
 			delete(turingCache.entries, key)
 		}
-        }
-        turingCache.lock.Unlock()
+	}
+	turingCache.lock.Unlock()
 
-        if len(ret) != 0 {
-          return ret, 0
-        }
+	if len(ret) != 0 {
+		return ret
+	}
 
-        if len(ret) == 0 && !mayBlock {
+	if len(ret) == 0 && !mayBlock {
 		log.Error("TURING Missing cache entry")
 		retError[35] = 20 // Missing cache entry
-		return retError, 20
-        }
-
+		return retError
+	}
 
 	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
 	// Since the rType is 32 bytes and the three headers are 32 bytes each, the max possible value
@@ -472,15 +470,15 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
 
-        turingCache.lock.Lock()
-        if turingCache.entries == nil {
+	turingCache.lock.Lock()
+	if turingCache.entries == nil {
 		log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
-		turingCache.entries = make(map[common.Hash] *turingCacheEntry)
-        }
-        newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(2*time.Second)}
-        turingCache.entries[key] = newEnt
+		turingCache.entries = make(map[common.Hash]*turingCacheEntry)
+	}
+	newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(2 * time.Second)}
+	turingCache.entries[key] = newEnt
 	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
-        turingCache.lock.Unlock()
+	turingCache.lock.Unlock()
 
 	return ret, 0
 }
@@ -583,8 +581,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			if isTuring2 {
-                                // If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
-                                // As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
+				// If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
+				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
 				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
                                 log.Debug("MMDBG preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
                                 

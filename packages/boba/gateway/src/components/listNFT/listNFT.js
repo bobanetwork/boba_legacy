@@ -86,7 +86,7 @@ class listNFT extends React.Component {
       symbol,
       URL,
       meta
-    } = this.state;
+    } = this.state
 
     return (
       <div className={styles.ListNFT}>
