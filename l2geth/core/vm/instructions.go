@@ -25,7 +25,6 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"golang.org/x/crypto/sha3"
-	"github.com/ethereum/go-ethereum/log"
 )
 
 var (
@@ -762,12 +761,11 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		gas += params.CallStipend
 	}
 	ret, returnGas, err := interpreter.evm.Call(contract, toAddr, args, gas, value)
-        
+
         if err == ErrTuringWouldBlock {
-       		log.Debug("MMDBG opCall passing ErrTuringWouldBlock")
                 return nil, err
         }
-        
+
 	if err != nil {
 		stack.push(interpreter.intPool.getZero())
 	} else {

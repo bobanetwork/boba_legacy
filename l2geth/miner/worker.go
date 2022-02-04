@@ -469,8 +469,7 @@ func (w *worker) mainLoop() {
 				log.Warn("No transaction sent to miner from syncservice")
 				continue
 			}
-                        log.Debug("MMDBG rollupCh", "ev.Txs", ev.Txs)
-                        
+
 			tx := ev.Txs[0]
 			log.Debug("Attempting to commit rollup transaction", "hash", tx.Hash().Hex())
 			// Build the block with the tx and add it to the chain. This will
@@ -506,7 +505,12 @@ func (w *worker) mainLoop() {
 					delete(w.pendingTasks, h)
 				}
 				w.pendingMu.Unlock()
-			} else {
+			} else if err.Error() == "turing retry needed" {
+                        	// no error message here
+				if ev.ErrCh != nil {
+					ev.ErrCh <- err
+				}
+                        } else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
 					ev.ErrCh <- err
@@ -535,7 +539,6 @@ func (w *worker) mainLoop() {
 				}
 				txset := types.NewTransactionsByPriceAndNonce(w.current.signer, txs)
 				tcount := w.current.tcount
-                                log.Debug("MMDBG cTxs 1")
 				w.commitTransactions(txset, coinbase, nil)
 				// Only update the snapshot if any new transactons were added
 				// to the pending block
@@ -765,8 +768,7 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	snap := w.current.state.Snapshot()
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &coinbase, w.current.gasPool, w.current.state, w.current.header, tx, &w.current.header.GasUsed, *w.chain.GetVMConfig())
-	log.Debug("MMDBG ApplyTransaction got result", "err", err)
-        if err != nil {
+	if err != nil {
 		w.current.state.RevertToSnapshot(snap)
 		return nil, err
 	}
@@ -808,9 +810,9 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 				}
 			}
 			if w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead {
-                        	return 1
+				return 1
                         } else {
-                        	return 0
+				return 0
                         }
 		}
 		// If we don't have enough gas for any further transactions then we're done
@@ -841,7 +843,6 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		w.current.state.Prepare(tx.Hash(), common.Hash{}, w.current.tcount)
 
 		logs, err := w.commitTransaction(tx, coinbase)
-                log.Debug("MMDBG w.commit", "err", err)
 		switch err {
 		case core.ErrGasLimitReached:
 			// Pop the current out-of-gas transaction without shifting in the next from the account
@@ -863,9 +864,10 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			coalescedLogs = append(coalescedLogs, logs...)
 			w.current.tcount++
 			txs.Shift()
-                        
-                case core.ErrTuringRetry:
-                	log.Error("MMDBG Skipping unhandled ErrTuringRetry")
+
+		case core.ErrTuringRetry:
+			// Turing transaction needs to be retried after populating the cache. This special
+                        // error code rolls back the first attempt as if it had never happened.
                         txs.Shift()
                         return 2
 
@@ -898,9 +900,9 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		w.resubmitAdjustCh <- &intervalAdjust{inc: false}
 	}
         if w.current.tcount == 0 {
-        	return 1
+		return 1
         } else {
-        	return 0
+		return 0
         }
 }
 
@@ -964,14 +966,13 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
 
-        log.Debug("MMDBG cTxs 2") // This is the one we hit
 	wCt := w.commitTransactions(txs, w.coinbase, nil)
-        if wCt == 1 {
+	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
 	} else if wCt == 2 {
-        	log.Debug("MMDBG wCt==2")
-                return core.ErrTuringRetry
-        }
+		log.Debug("TURING w.commitTransactions returned Turing retry code")
+		return core.ErrTuringRetry
+	}
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
 
@@ -1073,7 +1074,6 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 	}
 	if len(localTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, localTxs)
-	        log.Debug("MMDBG cTxs 3")
 
 		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
@@ -1081,7 +1081,6 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 	}
 	if len(remoteTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, remoteTxs)
-	        log.Debug("MMDBG cTxs 4")
 		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
 		}

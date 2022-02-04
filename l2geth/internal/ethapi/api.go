@@ -1610,7 +1610,6 @@ func (args *SendTxArgs) toTransaction() *types.Transaction {
 // SubmitTransaction is a helper function that submits tx to txPool and logs a message.
 func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (common.Hash, error) {
 	if err := b.SendTx(ctx, tx); err != nil {
-        	log.Debug("MMDBG SubmitTransaction got", "err", err)
 		return common.Hash{}, err
 	}
 	if tx.To() == nil {
@@ -1700,34 +1699,34 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	// L1Timestamp and L1BlockNumber will be set right before execution
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
-        
-	log.Debug("MMDBG ethapi/api.go will SubmitTransaction", "tx", tx)
-        abc, xyz := SubmitTransaction(ctx, s.b, tx)
-        log.Debug("MMDBG ethapi/api.go is back", "abc", abc, "xyz", xyz)
-        
-        if xyz != nil && xyz.Error() == "turing retry needed" {
+
+        ret, err := SubmitTransaction(ctx, s.b, tx)
+
+	if err != nil && err.Error() == "turing retry needed" {
 		blockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
-        	log.Debug("MMDBG SendRawTransaction needs to retry; gas first", "ctx", ctx, "blockNrOrHash", blockNrOrHash, "tx", tx)
-                tdBytes := hexutil.Bytes(tx.Data())
- 		callArgs := CallArgs{
-			From:     nil, //tx.Sender, // From shouldn't be nil
+		tdBytes := hexutil.Bytes(tx.Data())
+
+		callArgs := CallArgs{
+			From:     nil, // FIXME? Is this required?
 			To:       tx.To(),
 			GasPrice: nil,
-			Value:    nil, //tx.Value(),
+			Value:    (*hexutil.Big)(tx.Value()),
 			Data:     &tdBytes,
 		}
-               
-                res, _, failed, err := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
-                
-                log.Debug("MMDBG gasEstimate", "err", err, "failed", failed, "res", res)
-                
-                //time.Sleep(10 * time.Second)
-                abc, xyz = SubmitTransaction(ctx, s.b, tx)
-        	log.Debug("MMDBG ethapi/api.go is back again", "abc", abc, "xyz", xyz)
-                time.Sleep(10 * time.Second)
+
+                _, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
+		if failed {
+			log.Error("TURING api.go gasEstimate failed", "err", err2)
+                        return common.Hash{}, err
+                }
+
+                log.Debug("TURING ethapi/api.go calling again after gasEstimate")
+                ret, err = SubmitTransaction(ctx, s.b, tx)
+
+		log.Debug("TURING ethapi/api.go second call is done", "ret", ret, "err", err)
         }
-        
-	return abc, xyz
+
+	return ret, err
 }
 
 // Sign calculates an ECDSA signature for:

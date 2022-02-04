@@ -26,8 +26,6 @@ import (
 	"time"
 
 	"github.com/ethereum-optimism/optimism/l2geth/log"
-	"github.com/ethereum-optimism/optimism/l2geth/core/types"
-	"github.com/ethereum-optimism/optimism/l2geth/rlp"
 )
 
 // handler handles JSON-RPC messages. There is one handler per connection. Note that
@@ -298,27 +296,8 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 		return nil
 	case msg.isCall():
 		resp := h.handleCall(ctx, msg)
-		if resp.Error != nil && resp.Error.Error() == "turing retry needed" {
-                	log.Debug("MMDBG Handler got ErrTuringRetry")
-                        log.Debug("MMDBG Handler has", "ctx", ctx, "msg", msg)
-                        
-                     //   m2 := msg
-                     //   m2.Method = "eth_estimateGas"
-                     //   log.Debug("MMDBG trying with", "m2", m2)
-                     //   r2 := h.handleCall(ctx, m2)
-                     //   log.Debug("MMDBG m2 got", "r2", r2)
-                        
-                    //    log.Debug("MMDBG Sleep start")
-                    //    time.Sleep(10 * time.Second)
-                    //    log.Debug("MMDBG Sleep done")
-                        
-                     //   resp := h.handleCall(ctx,msg)
-                     //   log.Debug("MMDBG Handler 2nd try got", "resp.Error", resp.Error)
-                        
-                } else if resp.Error != nil {
+		if resp.Error != nil {
 			h.log.Warn("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start), "err", resp.Error.Message)
-                        
-                        panic("foo")
 		} else {
 			h.log.Debug("Served "+msg.Method, "reqid", idForLog{msg.ID}, "t", time.Since(start))
 		}
@@ -344,21 +323,11 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	if callb == nil {
 		return msg.errorResponse(&methodNotFoundError{method: msg.Method})
 	}
-        log.Debug("MMDBG willParse", "params", msg.Params, "argtype", callb.argTypes, "method", msg.Method)
-        
-        if msg.Method == "eth_sendRawTransaction" {
-		tx := new(types.Transaction)
-		err := rlp.DecodeBytes(msg.Params, tx)
-                log.Debug("MMDBG Decode", "err", err, "tx", tx)
-        }
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
-
-        if err != nil {
+	if err != nil {
 		return msg.errorResponse(&invalidParamsError{err.Error()})
 	}
-        if msg.Method == "eth_sendRawTransaction" {
- 	       log.Debug("MMDBG args", "args", args, "callb", *callb)
-	}
+
 	return h.runMethod(cp.ctx, msg, callb, args)
 }
 
@@ -397,8 +366,6 @@ func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMes
 
 // runMethod runs the Go callback for an RPC method.
 func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {
-	log.Debug("MMDBG runMethod", "args", args)
-        
 	result, err := callb.call(ctx, msg.Method, args)
 	if err != nil {
 		return msg.errorResponse(err)
