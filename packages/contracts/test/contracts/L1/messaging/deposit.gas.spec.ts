@@ -146,7 +146,7 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       const receipt = await res.wait()
       const gasUsed = receipt.gasUsed.toNumber()
       console.log('    - Gas used:', gasUsed)
-      expectApprox(gasUsed, 175_315, {
+      expectApprox(gasUsed, 173_315, {
         absoluteUpperDeviation: 500,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!
@@ -173,7 +173,7 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       const receipt = await res.wait()
       const gasUsed = receipt.gasUsed.toNumber()
       console.log('    - Gas used:', gasUsed)
-      expectApprox(gasUsed, 215_210, {
+      expectApprox(gasUsed, 213_210, {
         absoluteUpperDeviation: 500,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!

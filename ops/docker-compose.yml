@@ -165,6 +165,9 @@ services:
       NO_COMPILE: 1
       DTL_REGISTRY_URL: http://dtl:8081/addresses.json
       DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+    ports:
+        # expose the service to the host for getting the contract addrs
+      - ${DEPLOYER_PORT:-8077}:8082
 
   # deploys boba contracts and serves contract addresses
   boba_deployer:
@@ -185,13 +188,14 @@ services:
       << : *deployer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      RETRIES: 100
+      RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
 
   dtl:
     depends_on:
       - l1_chain
     image: bobanetwork/data-transport-layer:latest
+    entrypoint: ./dtl.sh
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.data-transport-layer
@@ -201,11 +205,13 @@ services:
     # set the rest of the env vars for the network whcih do not
     # depend on the docker-compose setup
     environment:
+      URL: http://deployer:8082/addresses.json
       # connect to the 2 layers
       DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:8545
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
+      RETRIES: 200
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -229,7 +235,7 @@ services:
       # connecting to the DTL
       ROLLUP_CLIENT_HTTP: http://dtl:7878
       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-      RETRIES: 100
+      RETRIES: 200
       # no need to keep this secret, only used internally to sign blocks
       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
@@ -254,7 +260,7 @@ services:
       URL: http://dtl:8081/addresses.json
       # a funded hardhat account
       << : *relayer_pk
-      RETRIES: 100
+      RETRIES: 200
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
@@ -282,7 +288,7 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
-      RETRIES: 100
+      RETRIES: 200
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
@@ -354,4 +360,4 @@ services:
       GAS_PRICE_ORACLE_ROOF_PRICE: 5
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
-      RETRIES: 100
+      RETRIES: 200
