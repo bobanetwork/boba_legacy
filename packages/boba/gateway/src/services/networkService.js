@@ -576,13 +576,13 @@ async initializeBase( networkGateway ) {
             'L1': 'WAGMIv0',
             'L2': '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672'
           }
-        } 
+        }
         else if(key === 'OLO') {
           allTokens[key] = {
             'L1': 'OLO',
             'L2': '0x5008F837883EA9a07271a1b5eB0658404F5a9610'
           }
-        } 
+        }
         else {
           const L1a = addresses['TK_L1'+key]
           if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
@@ -1186,7 +1186,7 @@ async initializeBase( networkGateway ) {
         else if (token.symbolL1 === 'WAGMIv0') {
           //there is no L1 WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        } 
+        }
         else if (token.symbolL1 === 'OLO') {
           //there is no L1 WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -3252,10 +3252,12 @@ async initializeBase( networkGateway ) {
         this.provider.getSigner()
       )
 
-      let allowance_BN = await this.BobaContract.allowance(
-        this.account,
-        allAddresses.BobaFixedSavings
-      )
+      let allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
       console.log("Allowance",allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
