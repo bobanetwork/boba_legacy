@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { ethers } from 'ethers';
-import erc20abi from 'human-standard-token-abi';
-import networkService from 'services/networkService';
-import store from 'store';
+import { ethers } from 'ethers'
+import erc20abi from 'human-standard-token-abi'
+import networkService from 'services/networkService'
+import store from 'store'
 
 /* 
 Returns Token info
@@ -91,6 +91,13 @@ export async function addToken ( tokenContractAddressL1 ) {
       )
     } else if (_tokenContractAddressL1 === 'wagmiv0') {
       if(tA['WAGMIv0'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv0'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+    } else if (_tokenContractAddressL1 === 'olo') {
+      if(tA['OLO'].L2 !== null) _tokenContractAddressL2 = tA['OLO'].L2.toLowerCase()
       tokenContract = new ethers.Contract(
         _tokenContractAddressL2, 
         erc20abi,
