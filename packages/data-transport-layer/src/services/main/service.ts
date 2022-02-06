@@ -1,14 +1,14 @@
 /* Imports: External */
-import { BaseService, Logger, Metrics } from '@eth-optimism/common-ts'
+import { BaseService, Metrics } from '@eth-optimism/common-ts'
 import { LevelUp } from 'levelup'
 import level from 'level'
+import { Counter } from 'prom-client'
 
 /* Imports: Internal */
 import { L1IngestionService } from '../l1-ingestion/service'
 import { L1TransportServer } from '../server/service'
 import { sleep, validators } from '../../utils'
 import { L2IngestionService } from '../l2-ingestion/service'
-import { Counter } from 'prom-client'
 
 import express from 'express'
 import bodyParser from 'body-parser'
@@ -19,7 +19,7 @@ export interface L1DataTransportServiceOptions {
   nodeEnv: string
   ethNetworkName?: 'mainnet' | 'kovan' | 'goerli'
   release: string
-  cfgAddressManager: string
+  addressManager: string
   confirmations: number
   dangerouslyCatchAllErrors?: boolean
   hostname: string
@@ -41,7 +41,8 @@ export interface L1DataTransportServiceOptions {
   sentryTraceRate?: number
   defaultBackend: string
   l1GasPriceBackend: string
-  ctcDeploymentHeight?: number
+  l1StartHeight?: number
+  bssHardfork1Index?: number
 }
 
 const optionSettings = {
@@ -62,15 +63,15 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
   }
 
   private state: {
-    addressManager: string
     db: LevelUp
     l1IngestionService?: L1IngestionService
     l2IngestionService?: L2IngestionService
     l1TransportServer: L1TransportServer
     metrics: Metrics
-    failureCounter: Counter<string>
+    failureCounter: Counter<string>,
     addressRegistry: express.Express
-    arServer: any
+    arServer: any,
+    addressManager: string
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -231,9 +232,9 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     this.state.arServer = this.state.addressRegistry.listen(this.options.arPort,this.options.hostname)
     this.logger.info("addressRegistry server listening", {hostname:this.options.hostname, port:this.options.arPort})
 
-    if (this.options.cfgAddressManager) {
+    if (this.options.addressManager) {
       this.logger.warn("Using legacy cfgAddressManager address")
-      this.state.addressManager = this.options.cfgAddressManager
+      this.state.addressManager = this.options.addressManager
     }
 
     do {
@@ -265,7 +266,6 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         ...this.options,
         metrics: this.state.metrics,
         db: this.state.db,
-        addressManager: this.state.addressManager
       })
     }
 
