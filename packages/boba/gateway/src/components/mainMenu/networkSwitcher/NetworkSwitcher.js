@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import * as S from './NetworkSwitcher.styles.js'
 
 import { selectNetwork } from 'selectors/setupSelector'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 import NetworkIcon from 'components/icons/NetworkIcon'
 

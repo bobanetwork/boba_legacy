@@ -10,7 +10,7 @@ import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 import { logAmount, toWei_String } from 'util/amountConvert'
 
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'

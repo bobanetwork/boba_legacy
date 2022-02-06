@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, Typography, useMediaQuery } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 

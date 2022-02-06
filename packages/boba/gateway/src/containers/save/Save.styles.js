@@ -1,5 +1,5 @@
-import { styled } from '@material-ui/core/styles'
-import { Box, Typography, Grid } from "@material-ui/core"
+import { styled } from '@mui/material/styles'
+import { Box, Typography, Grid } from "@mui/material"
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
