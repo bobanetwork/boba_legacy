@@ -129,7 +129,7 @@ class Save extends React.Component {
 
     if(!netLayer) {
       return <div className={styles.container}>
-          <PageHeader title="Airdrop" />
+          <PageHeader title="Staking" />
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />
