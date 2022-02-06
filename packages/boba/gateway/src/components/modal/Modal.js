@@ -21,7 +21,7 @@ import {
   Container,
   Box,
   useMediaQuery
-} from '@material-ui/core';
+} from '@mui/material';
 import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg';
 // import CloseIcon  from '../icons/CloseIcon.js';
 import * as S from "./Modal.styles"

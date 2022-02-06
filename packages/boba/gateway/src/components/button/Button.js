@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import { CircularProgress, Tooltip } from '@material-ui/core'
-import { Button as ButtonMUI } from '@material-ui/core'
+import { CircularProgress, Tooltip } from '@mui/material'
+import { Button as ButtonMUI } from '@mui/material'
 
 function Button ({
   children,

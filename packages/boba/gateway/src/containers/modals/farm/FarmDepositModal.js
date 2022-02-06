@@ -12,7 +12,7 @@ import Input from 'components/input/Input';
 import { logAmount, powAmount, toWei_String } from 'util/amountConvert';
 
 
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { WrapperActionsModal } from 'components/modal/Modal.styles';
 import { Box } from '@material-ui/system';
 import { farmL1, farmL2 } from 'actions/networkAction';
