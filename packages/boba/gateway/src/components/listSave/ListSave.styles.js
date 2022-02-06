@@ -22,9 +22,6 @@ export const Entry = styled(Box)(({ theme }) => ({
 }))
 
 export const GridContainer = styled(Grid)(({theme})=>({
-  // [theme.breakpoints.down('md')]:{
-  //   justifyContent: 'flex-start'
-  // }
 }))
 
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
