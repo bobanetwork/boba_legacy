@@ -5,7 +5,7 @@ import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
 import bobaApesLogo from '../../images/ecosystem/bobaapes.webp'
 import bobaDogeLogo from '../../images/ecosystem/bobaDoge.webp'
 import bobaPunksLogo from '../../images/ecosystem/bobaPunks.webp'
-import boaringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
+import boringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
 import coing98Logo from '../../images/ecosystem/coin98.webp'
 import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
@@ -41,6 +41,7 @@ export const projectList = [
     "title": "OolongSwap",
     "canLaunch": true,
     "link": "https://oolongswap.com/",
+    "telegram": "https://t.me/oolongswap",
     "twitter": "https://twitter.com/oolongswap",
     "discord": "http://discord.gg/savwHHXsmU",
     "type": "defi",
@@ -63,7 +64,7 @@ export const projectList = [
     "twitter": "https://twitter.com/TheBoringDAO",
     "discord": "https://discord.gg/4CezfPe7",
     "type": "bridge",
-    "image": boaringDaoLogo
+    "image": boringDaoLogo
   },
   {
     "title": "Multichain",

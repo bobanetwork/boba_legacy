@@ -8,7 +8,7 @@ import Button from 'components/button/Button'
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
-import { Box, Typography, Fade } from '@material-ui/core'
+import { Box, Typography, Link, Fade } from '@material-ui/core'
 import * as S from './ListAccount.styles'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -211,7 +211,7 @@ class ListAccount extends React.Component {
               </>
               }
 
-              {enabled && chain === 'L2' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' &&
                 <>
                   <Button
                     onClick={()=>{this.handleModalClick('exitModal', token, false)}}
@@ -233,6 +233,29 @@ class ListAccount extends React.Component {
                     Fast Bridge to L1
                   </Button>
 
+                  <Button
+                    onClick={()=>{this.handleModalClick('transferModal', token, false)}}
+                    variant="contained"
+                    disabled={disabled}
+                    tooltip="Transfer funds from one L2 account to another L2 account."
+                    fullWidth
+                  >
+                    Transfer
+                  </Button>
+                </>
+              }
+
+              {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+                <>
+                  <Link 
+                    color="inherit" 
+                    variant="body2" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    href={'https://cbridge.celer.network/#/transfer'}
+                  >
+                    CELER BRIDGE
+                  </Link>
                   <Button
                     onClick={()=>{this.handleModalClick('transferModal', token, false)}}
                     variant="contained"
