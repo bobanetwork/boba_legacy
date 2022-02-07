@@ -36,6 +36,6 @@ var (
 	// ErrNoGenesis is returned when there is no Genesis Block.
 	ErrNoGenesis = errors.New("genesis not found in chain")
 
-        // ErrTuringRetry indicates a Turing cache miss in a real transaction (not an estimateGas)
-        ErrTuringRetry = errors.New("turing retry needed")
+	// ErrTuringRetry indicates a Turing cache miss in a real transaction (not an estimateGas)
+	ErrTuringRetry = errors.New("turing retry needed")
 )

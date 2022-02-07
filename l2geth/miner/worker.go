@@ -506,11 +506,11 @@ func (w *worker) mainLoop() {
 				}
 				w.pendingMu.Unlock()
 			} else if err.Error() == "turing retry needed" {
-                        	// no error message here
+				// no error message here
 				if ev.ErrCh != nil {
 					ev.ErrCh <- err
 				}
-                        } else {
+			} else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
 					ev.ErrCh <- err
@@ -811,9 +811,9 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			}
 			if w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead {
 				return 1
-                        } else {
+			} else {
 				return 0
-                        }
+			}
 		}
 		// If we don't have enough gas for any further transactions then we're done
 		if w.current.gasPool.Gas() < params.TxGas {
@@ -867,9 +867,9 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 
 		case core.ErrTuringRetry:
 			// Turing transaction needs to be retried after populating the cache. This special
-                        // error code rolls back the first attempt as if it had never happened.
-                        txs.Shift()
-                        return 2
+			// error code rolls back the first attempt as if it had never happened.
+			txs.Shift()
+			return 2
 
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
@@ -899,11 +899,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 	if interrupt != nil {
 		w.resubmitAdjustCh <- &intervalAdjust{inc: false}
 	}
-        if w.current.tcount == 0 {
+	if w.current.tcount == 0 {
 		return 1
-        } else {
+	} else {
 		return 0
-        }
+	}
 }
 
 // commitNewTx is an OVM addition that mines a block with a single tx in it.

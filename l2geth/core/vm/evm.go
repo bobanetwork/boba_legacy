@@ -364,18 +364,18 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 
 	if len(ret) == 0 {
 		log.Debug("TURING Missing cache entry", "mayBlock", mayBlock)
-        	if mayBlock {
-                	// Since no Boba credit is consumed in an estimateGas call, we put a
-                        // "failed" entry into the cache here so that a failed offchain call
-                        // can't be called repeatedly as a DoS attack.
-                        turingCache.lock.Lock()
- 			newEnt := &turingCacheEntry{value: retError, expires: time.Now().Add(2 * time.Second)}
+		if mayBlock {
+			// Since no Boba credit is consumed in an estimateGas call, we put a
+			// "failed" entry into the cache here so that a failed offchain call
+			// can't be called repeatedly as a DoS attack.
+			turingCache.lock.Lock()
+			newEnt := &turingCacheEntry{value: retError, expires: time.Now().Add(2 * time.Second)}
 			turingCache.entries[key] = newEnt
-                        turingCache.lock.Unlock()
-                } else {
+			turingCache.lock.Unlock()
+		} else {
 			retError[35] = 20 // Missing cache entry
 			return retError, 20
-                }
+		}
 	}
 
 	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
@@ -567,7 +567,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
-        var turingErr int
+	var turingErr int
 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
@@ -595,14 +595,14 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				// If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
 				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
 				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
-                                log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
+				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
 
 				updated_input, turingErr = bobaTuringCall(input, caller.Address(), mayBlock)
 
-                                if turingErr == 20 {
+				if turingErr == 20 {
 					log.Debug("TURING returning ErrTuringWouldBlock")
 					return nil, gas, ErrTuringWouldBlock
-                                }
+				}
 			} else if isGetRand2 {
 				updated_input = bobaTuringRandom(input, caller.Address())
 			} // there is no other option

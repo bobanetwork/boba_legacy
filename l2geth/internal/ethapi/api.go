@@ -1700,7 +1700,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
 
-        ret, err := SubmitTransaction(ctx, s.b, tx)
+	ret, err := SubmitTransaction(ctx, s.b, tx)
 
 	if err != nil && err.Error() == "turing retry needed" {
 		blockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
@@ -1714,17 +1714,17 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 			Data:     &tdBytes,
 		}
 
-                _, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
+		_, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
 		if failed {
 			log.Error("TURING api.go gasEstimate failed", "err", err2)
-                        return common.Hash{}, err
-                }
+			return common.Hash{}, err
+		}
 
-                log.Debug("TURING ethapi/api.go calling again after gasEstimate")
-                ret, err = SubmitTransaction(ctx, s.b, tx)
+		log.Debug("TURING ethapi/api.go calling again after gasEstimate")
+		ret, err = SubmitTransaction(ctx, s.b, tx)
 
 		log.Debug("TURING ethapi/api.go second call is done", "ret", ret, "err", err)
-        }
+	}
 
 	return ret, err
 }
