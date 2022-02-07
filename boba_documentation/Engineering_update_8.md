@@ -35,5 +35,5 @@ To help developers (and the participants of the March hackathon) we are also cod
 
 ## 5. Major Gateway Revision
 
-Work continues on a near-complete re-write of the gate emphasizing simplicity, ease of use, and speed. In parallel, we are looking closely at other ways of reducing friction, especially for new users. For example a **Boba faucet** of some kind would almost certainly make life easier for new-comers, in addition to the multi-bridge capability that was launched last week and which can reduce bridging fees as much as 75% depending on how many tokens are being bridged simultaneously. 
+Work continues on a near-complete re-write of the gateway emphasizing simplicity, ease of use, and speed. In parallel, we are looking closely at other ways of reducing friction especially for new users. For example a **Boba faucet** of some kind would almost certainly make life easier for new-comers, in addition to the multi-bridge capability that was launched last week and which can reduce bridging fees as much as 75% depending on how many tokens are being bridged simultaneously. 
 
