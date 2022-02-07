@@ -65,6 +65,7 @@
     "@ethersproject/hardware-wallets": "^5.4.0"
   },
   "devDependencies": {
+    "@boba/turing-hybrid-compute": "^0.2.0",
     "@defi-wonderland/smock": "^2.0.2",
     "@eth-optimism/smock": "1.1.10",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
