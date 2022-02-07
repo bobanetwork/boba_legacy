@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
