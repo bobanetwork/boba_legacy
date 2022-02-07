@@ -27,10 +27,9 @@ function ECOSYSTEM() {
       <div className={styles.container}>
         {
           Object.keys(projectByCategory).map((d) => {
-
-            let projectList = projectByCategory[ d ]
+            let projectList = projectByCategory[d]
             return (
-              <>
+              <div key={d}>
               <Box>
                 <Typography variant="h4" style={{paddingTop: '5px', paddingBottom: '0px', textTransform: 'uppercase', opacity: '0.7', fontSize: '1.4em', fontWeight: '700'}}>{d}</Typography>
               </Box>
@@ -39,7 +38,9 @@ function ECOSYSTEM() {
                     {
                       projectList.map((project) => {
                         return (
-                        <S.TileCard>
+                        <S.TileCard
+                          key={project.title}
+                        >
                           <S.TileHeader>
                             <Typography variant="h4" color="text.secondary" alignSelf='center'>
                               {project.title}
@@ -72,7 +73,7 @@ function ECOSYSTEM() {
                     }
                   </Carousel >
               </Box>
-            </>
+            </div>
             )
           })
         }

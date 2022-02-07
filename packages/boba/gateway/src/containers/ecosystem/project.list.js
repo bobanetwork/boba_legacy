@@ -5,7 +5,7 @@ import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
 import bobaApesLogo from '../../images/ecosystem/bobaapes.webp'
 import bobaDogeLogo from '../../images/ecosystem/bobaDoge.webp'
 import bobaPunksLogo from '../../images/ecosystem/bobaPunks.webp'
-import boaringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
+import boringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
 import coing98Logo from '../../images/ecosystem/coin98.webp'
 import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
@@ -19,6 +19,7 @@ import multiChainLogo from '../../images/ecosystem/Multichain.webp'
 import OolongswapLogo from '../../images/ecosystem/Oolongswap.webp'
 import safepalLogo from '../../images/ecosystem/safepal.webp'
 import satisLogo from '../../images/ecosystem/satis.webp'
+import shibuiDAOLogo from '../../images/ecosystem/shibuidao.svg'
 import swapperChanLogo from '../../images/ecosystem/swapperChan.webp'
 import synLogo from '../../images/ecosystem/syn.webp'
 import thetanutsLogo from '../../images/ecosystem/thetanuts.webp'
@@ -30,9 +31,9 @@ import zenchaLogo from '../../images/ecosystem/zencha.webp'
 
 /**
  * thematical order of type.
- * 
+ *
  * [defi, nft, bridge, wallet, tool, token]
- * 
+ *
  */
 
 export const projectList = [
@@ -40,6 +41,7 @@ export const projectList = [
     "title": "OolongSwap",
     "canLaunch": true,
     "link": "https://oolongswap.com/",
+    "telegram": "https://t.me/oolongswap",
     "twitter": "https://twitter.com/oolongswap",
     "discord": "http://discord.gg/savwHHXsmU",
     "type": "defi",
@@ -62,7 +64,7 @@ export const projectList = [
     "twitter": "https://twitter.com/TheBoringDAO",
     "discord": "https://discord.gg/4CezfPe7",
     "type": "bridge",
-    "image": boaringDaoLogo
+    "image": boringDaoLogo
   },
   {
     "title": "Multichain",
@@ -293,6 +295,16 @@ export const projectList = [
     "discord": "https://discord.gg/JUmcTGbUWr",
     "type": "defi",
     "image": satisLogo
+  },
+  {
+    "title": "ShibuiNFT",
+    "canLaunch": true,
+    "link": "https://shibuinft.com",
+    "telegram": "https://docs.shibuidao.com/telegram",
+    "twitter": "https://docs.shibuidao.com/twitter",
+    "discord": "https://docs.shibuidao.com/discord",
+    "type": "nft",
+    "image": shibuiDAOLogo
   }
 ]
 

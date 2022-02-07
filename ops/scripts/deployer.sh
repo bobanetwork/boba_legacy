@@ -19,6 +19,17 @@ curl \
 yarn run deploy
 
 if [ -n "$DTL_REGISTRY_URL" ] ; then
+
+    # there's a resource race - where DTL can't start without an address manager address
+    # and deployer can't upload it's addresses without DTL being up
+    # so this little python server pushes the address manager into dtl.sh startup sequence
+    # so that DTL can initialize itself (and the diff between upstream is thus reduced to minimum)
+    # after this sequence the deployer exits gracefully
+    echo "Starting server in background."
+    python3 -m http.server \
+        --bind "0.0.0.0" 8082 \
+        --directory ./dist/dumps &
+
     echo "Will upload addresses.json to DTL"
     curl \
         --show-error \
@@ -64,3 +75,4 @@ if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
     echo
     echo "Upload done."
 fi
+
