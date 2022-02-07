@@ -274,19 +274,19 @@ describe('OVM_GasPriceOracle', () => {
     })
   })
 
-  describe('decimals', () => {
-    it('is the 5th storage slot', async () => {
-      const decimals = 0
-      const slot = 5
+  // describe('decimals', () => {
+  //   it('is the 5th storage slot', async () => {
+  //     const decimals = 6
+  //     const slot = 5
 
-      // get the storage slot value
-      const priceAtSlot = await signer1.provider.getStorageAt(
-        OVM_GasPriceOracle.address,
-        slot
-      )
-      expect(await OVM_GasPriceOracle.decimals()).to.equal(
-        ethers.BigNumber.from(priceAtSlot)
-      )
-    })
-  })
+  //     // get the storage slot value
+  //     const priceAtSlot = await signer1.provider.getStorageAt(
+  //       OVM_GasPriceOracle.address,
+  //       slot
+  //     )
+  //     expect(await OVM_GasPriceOracle.decimals()).to.equal(
+  //       ethers.BigNumber.from(priceAtSlot)
+  //     )
+  //   })
+  // })
 })
