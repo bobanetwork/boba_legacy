@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"io"
 	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
