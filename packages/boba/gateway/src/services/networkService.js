@@ -544,7 +544,8 @@ async initializeBase( networkGateway ) {
                                'LINK',  'UNI', 'BOBA', 'xBOBA',
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
-                               'MATIC',  'UMA',  'DOM', 'WAGMIv0'
+                               'MATIC',  'UMA',  'DOM', 'WAGMIv0',
+                               'OLO'
                               ]
 
       //not all tokens are on Rinkeby
@@ -573,9 +574,16 @@ async initializeBase( networkGateway ) {
         } else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
-            'L2': '0x1302d39C61F0009e528b2Ff4ba692826Fe99f70c'
+            'L2': '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672'
           }
-        } else {
+        }
+        else if(key === 'OLO') {
+          allTokens[key] = {
+            'L1': 'OLO',
+            'L2': '0x5008F837883EA9a07271a1b5eB0658404F5a9610'
+          }
+        }
+        else {
           const L1a = addresses['TK_L1'+key]
           if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
             console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
@@ -697,6 +705,12 @@ async initializeBase( networkGateway ) {
       this.delegatorContract = new ethers.Contract(
         allAddresses.GovernorBravoDelegator,
         GovernorBravoDelegator.abi,
+        this.L2Provider
+      )
+
+      this.gasOracleContract = new ethers.Contract(
+        L2GasOracle,
+        OVM_GasPriceOracleJson.abi,
         this.L2Provider
       )
 
@@ -1165,8 +1179,16 @@ async initializeBase( networkGateway ) {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        if (token.symbolL1 === 'xBOBA' || token.symbolL1 === 'WAGMIv0') {
-          //there is no L1 xBOBA or WAGMIv0
+        if (token.symbolL1 === 'xBOBA') {
+          //there is no L1 xBOBA
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv0') {
+          //there is no L1 WAGMIv0
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'OLO') {
+          //there is no L1 WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else {
@@ -1888,7 +1910,7 @@ async initializeBase( networkGateway ) {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'OLO') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -1970,7 +1992,7 @@ async initializeBase( networkGateway ) {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'OLO') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
@@ -2424,16 +2446,29 @@ async initializeBase( networkGateway ) {
     }
 
     //in some cases zero not allowed
-    const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
-      currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
-    )
+    const tx2 = await this.L2LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+        currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
+      )
 
     const depositGas_BN = await this.L2Provider.estimateGas(tx2)
-    console.log("Fast exit gas", depositGas_BN.toString())
 
-    const depositCost_BN = depositGas_BN.mul(gasPrice)
+    let l1SecurityFee = BigNumber.from('0')
+    if (this.networkGateway === 'mainnet') {
+      delete tx2.from
+      l1SecurityFee = await this.gasOracleContract.getL1Fee(
+        utils.serializeTransaction(tx2)
+      )
+      // We can't correctly calculate the final l1 securifty fee,
+      // so we increase it by 1.1X to make sure that users have
+      // enough balance to cover it
+      l1SecurityFee = l1SecurityFee.mul('11').div('10')
+      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+    }
+
+    const depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
     console.log("Fast exit cost (ETH):", utils.formatEther(depositCost_BN))
 
     //returns total cost in ETH
@@ -2599,22 +2634,30 @@ async initializeBase( networkGateway ) {
 
     }
 
-    const tx2 = await this.L2LPContract.populateTransaction.clientDepositL2(
-      balance_BN,
-      currencyAddress,
-      currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
-    )
-    //console.log("tx2",tx2)
+    const tx2 = await this.L2LPContract
+      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+        balance_BN,
+        currencyAddress,
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
+      )
 
     let depositGas_BN = await this.L2Provider.estimateGas(tx2)
 
-    //returns 94082, which is too low?
-    //add 40...
-    //BUG BUG BUG - this should not be needed
-    depositGas_BN = depositGas_BN.add('40')
+    let l1SecurityFee = BigNumber.from('0')
+    if (this.networkGateway === 'mainnet') {
+      delete tx2.from
+      l1SecurityFee = await this.gasOracleContract.getL1Fee(
+        utils.serializeTransaction(tx2)
+      )
+      // We can't correctly calculate the final l1 securifty fee,
+      // so we increase it by 1.1X to make sure that users have
+      // enough balance to cover it
+      l1SecurityFee = l1SecurityFee.mul('11').div('10')
+      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+    }
 
     console.log("Deposit gas", depositGas_BN.toString())
-    let depositCost_BN = depositGas_BN.mul(gasPrice)
+    let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
     console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
 
     if(currencyAddress === allAddresses.L2_ETH_Address) {
@@ -2636,7 +2679,7 @@ async initializeBase( networkGateway ) {
       .connect(this.provider.getSigner()).clientDepositL2(
         balance_BN,
         currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN } : {}
+        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
       )
 
     //at this point the tx has been submitted, and we are waiting...
@@ -3209,10 +3252,12 @@ async initializeBase( networkGateway ) {
         this.provider.getSigner()
       )
 
-      let allowance_BN = await this.BobaContract.allowance(
-        this.account,
-        allAddresses.BobaFixedSavings
-      )
+      let allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
       console.log("Allowance",allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)

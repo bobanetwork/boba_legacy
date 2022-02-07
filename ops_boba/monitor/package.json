@@ -9,7 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "@boba/contracts": "0.0.1",
-    "@eth-optimism/contracts": "^0.2.4",
+    "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.3.2",
     "@eth-optimism/watcher": "^0.0.1-alpha.9",
     "@ethersproject/providers": "5.4.5",

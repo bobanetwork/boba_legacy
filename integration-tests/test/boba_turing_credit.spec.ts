@@ -9,6 +9,8 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
+import TuringTestJson from '../artifacts/contracts/TuringTest.sol/TuringTest.json'
+
 import { OptimismEnv } from './shared/env'
 
 describe('Boba Turing Credit Test', async () => {
@@ -21,6 +23,9 @@ describe('Boba Turing Credit Test', async () => {
 
   let TuringHelper: Contract
   let Factory__TuringHelper: ContractFactory
+
+  let TuringTest: Contract
+  let Factory__TuringTest: ContractFactory
 
   let env: OptimismEnv
 
@@ -55,6 +60,14 @@ describe('Boba Turing Credit Test', async () => {
     )
     TuringHelper = await Factory__TuringHelper.deploy()
     await TuringHelper.deployTransaction.wait()
+
+    Factory__TuringTest = new ContractFactory(
+      TuringTestJson.abi,
+      TuringTestJson.bytecode,
+      env.l2Wallet
+    )
+    TuringTest = await Factory__TuringTest.deploy()
+    await TuringTest.deployTransaction.wait()
 
     const L1StandardBridgeAddress = await env.addressManager.getAddress(
       'Proxy__L1StandardBridge'
@@ -133,7 +146,7 @@ describe('Boba Turing Credit Test', async () => {
     const TuringHelperAddress = TuringHelper.address
 
     const preBalance = await BobaTuringCredit.prepaidBalance(
-      env.l2Wallet_2.address
+      TuringHelperAddress
     )
 
     const approveTx = await L2BOBAToken.approve(
@@ -178,5 +191,50 @@ describe('Boba Turing Credit Test', async () => {
     const credit = await BobaTuringCredit.getCreditAmount(env.l2Wallet.address)
 
     expect(calculatedCredit).to.be.deep.eq(credit)
+  })
+
+  it('Should increase balance for a non-specified test contract that has the TuringTx selector', async () => {
+    const depositAmount = utils.parseEther('100')
+    const TuringTestAddress = TuringTest.address
+
+    const preBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
+
+    const approveTx = await L2BOBAToken.approve(
+      BobaTuringCredit.address,
+      depositAmount
+    )
+    await approveTx.wait()
+
+    const depositTx = await BobaTuringCredit.addBalanceTo(
+      depositAmount,
+      TuringTestAddress
+    )
+    await depositTx.wait()
+
+    const postBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
+
+    expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
+  })
+
+  it('Should not charge credit when calling the non-specified test contract', async () => {
+    const TuringTestAddress = TuringTest.address
+
+    const preBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
+
+    const payloadTime = utils.formatBytes32String(
+      new Date().getTime().toString()
+    )
+    const payloadStr = 'TEST'
+    const tx = await TuringTest.TuringTx(payloadStr, payloadTime)
+    await tx.wait()
+
+    const returnStr = await TuringTest.url()
+    const returnTime = await TuringTest.payload()
+
+    const postBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
+
+    expect(postBalance).to.be.deep.eq(preBalance)
+    expect(returnStr).to.be.deep.eq(payloadStr)
+    expect(returnTime).to.be.deep.eq(payloadTime)
   })
 })
