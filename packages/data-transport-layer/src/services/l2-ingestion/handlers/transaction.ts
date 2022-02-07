@@ -33,7 +33,6 @@ export const handleSequencerBlock = {
       blockNumber: BigNumber.from(transaction.l1BlockNumber).toNumber(),
       timestamp: BigNumber.from(transaction.l1Timestamp).toNumber(),
       queueOrigin: transaction.queueOrigin,
-      turing: transaction.l1Turing,
       confirmed: false,
     }
 

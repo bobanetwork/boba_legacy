@@ -74,7 +74,7 @@ const main = async () => {
     path.resolve(__dirname, `../deployments/rinkeby`)
   )
     .children.filter((child) => {
-      return child.name.endsWith('.json')
+      return child.extension === '.json'
     })
     .reduce((contractsAccumulator, child) => {
       const contractName = child.name.replace('.json', '')
@@ -83,11 +83,11 @@ const main = async () => {
         __dirname,
         `../deployments/rinkeby/${child.name}`
       ))
-
       contractsAccumulator[nicknames[contractName] || contractName] =
         artifact.address
       return contractsAccumulator
     }, {})
+
   contracts.OVM_Sequencer = await sequencer.getAddress()
   contracts.Deployer = await deployer.getAddress()
 
@@ -96,7 +96,6 @@ const main = async () => {
   if (!fs.existsSync(dumpsPath)) {
     fs.mkdirSync(dumpsPath)
   }
-
   const addrsPath = path.resolve(dumpsPath, 'addresses.json')
   fs.writeFileSync(addrsPath, addresses)
 }

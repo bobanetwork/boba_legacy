@@ -492,7 +492,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	isGetRand2 := false
 
 	// Geth test sometimes calls this with length zero input; this check is needed for tests to complete
-	if len(input) >= 4 {
+	if len(input) > 0 {
 		//methodID for GetResponse is 7d93616c -> [125 147 97 108]
 		isTuring2 = bytes.Equal(input[:4], []byte{125, 147, 97, 108})
 
