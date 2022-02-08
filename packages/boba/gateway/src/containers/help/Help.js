@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Grid, Link, Typography } from '@material-ui/core'
+import { Grid, Link, Typography } from '@mui/material'
 import PageHeader from 'components/pageHeader/PageHeader'
 
 class Help extends React.Component {

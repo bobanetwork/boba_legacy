@@ -7,7 +7,7 @@ import * as S from './GasSwitcher.styles.js'
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
 
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 import networkService from 'services/networkService.js'
 import { getMaxHealthBlockLag } from 'util/masterConfig'

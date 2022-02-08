@@ -13,10 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTheme } from '@emotion/react'
 
-import { Typography, useMediaQuery } from '@material-ui/core'
-import { Box } from '@material-ui/system'
+import { Box, Typography, useMediaQuery } from '@mui/material'
+
 import { depositL1LPBatch, approveFastDepositBatch } from 'actions/networkAction'
 import { utils } from 'ethers'
 
@@ -27,9 +29,6 @@ import Input from 'components/input/Input'
 import CounterButton from 'components/counterButton/CounterButton'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
-
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector'

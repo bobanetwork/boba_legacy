@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/core/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 function _Alert ({ children, open, onClose, type = 'success', duration = 3000, position = 0 }) {
 
