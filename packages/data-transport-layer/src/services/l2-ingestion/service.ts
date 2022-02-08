@@ -8,10 +8,10 @@ import bfj from 'bfj'
 import { Gauge } from 'prom-client'
 
 /* Imports: Internal */
+import { handleSequencerBlock } from './handlers/transaction'
 import { TransportDB } from '../../db/transport-db'
 import { sleep, toRpcHexString, validators } from '../../utils'
 import { L1DataTransportServiceOptions } from '../main/service'
-import { handleSequencerBlock } from './handlers/transaction'
 
 interface L2IngestionMetrics {
   highestSyncedL2Block: Gauge<string>
@@ -84,11 +84,16 @@ export class L2IngestionService extends BaseService<L2IngestionServiceOptions> {
 
     this.l2IngestionMetrics = registerMetrics(this.metrics)
 
-    this.state.db = new TransportDB(this.options.db)
+    this.state.db = new TransportDB(this.options.db, {
+      bssHardfork1Index: this.options.bssHardfork1Index,
+    })
 
     this.state.l2RpcProvider =
       typeof this.options.l2RpcProvider === 'string'
-        ? new StaticJsonRpcProvider(this.options.l2RpcProvider)
+        ? new StaticJsonRpcProvider({
+            url: this.options.l2RpcProvider,
+            headers: { 'User-Agent': 'data-transport-layer' },
+          })
         : this.options.l2RpcProvider
   }
 
@@ -118,7 +123,7 @@ export class L2IngestionService extends BaseService<L2IngestionServiceOptions> {
         }
 
         this.logger.info(
-          'Synchronizing unconfirmed transactions from Layer 2 (Optimistic Ethereum)',
+          'Synchronizing unconfirmed transactions from Layer 2 (Optimism)',
           {
             fromBlock: highestSyncedL2BlockNumber,
             toBlock: targetL2Block,

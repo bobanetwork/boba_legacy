@@ -25,7 +25,6 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import ListSave from 'components/listSave/listSave'
 
 import AlertIcon from 'components/icons/AlertIcon'
-import networkService from 'services/networkService'
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
@@ -33,10 +32,11 @@ import Button from 'components/button/Button'
 import * as S from './Save.styles'
 import * as styles from './Save.module.scss'
 
-import { Box, Typography, Grid } from '@material-ui/core'
+import { Box, Typography, Grid } from '@mui/material'
 
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
 class Save extends React.Component {
 
@@ -48,8 +48,15 @@ class Save extends React.Component {
       stakeInfo,
     } = this.props.fixed
 
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
+
     this.state = {
       stakeInfo,
+      accountEnabled,
+      netLayer, 
       loading: false,
     }
 
@@ -66,14 +73,28 @@ class Save extends React.Component {
       stakeInfo
     } = this.props.fixed
 
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
+
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
       this.setState({ stakeInfo })
+    }
+
+    if (!isEqual(prevState.setup.accountEnabled, accountEnabled)) {
+      this.setState({ accountEnabled })
+    }
+
+    if (!isEqual(prevState.setup.netLayer, netLayer)) {
+      this.setState({ netLayer })
     }
 
   }
 
   async handleAddSave() {
-    this.props.dispatch(openModal('saveDepositModal'))
+    if(this.state.accountEnabled)
+      this.props.dispatch(openModal('saveDepositModal'))
   }
 
   render() {
@@ -81,14 +102,15 @@ class Save extends React.Component {
     const {
       stakeInfo,
       loading,
+      accountEnabled,
+      netLayer
     } = this.state
 
     const { isMobile } = this.props
-    const networkLayer = networkService.L1orL2
 
-    if(networkLayer === 'L1') {
+    if(netLayer === 'L1') {
         return <div className={styles.container}>
-            <PageHeader title="Fixed Rate Staking" />
+            <PageHeader title="Staking" />
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -96,55 +118,73 @@ class Save extends React.Component {
                   variant="body2"
                   component="p"
                 >
-                  You are on Ethereum Mainnet. This function is only available on Boba. SWITCH to Boba
+                  You are on Ethereum Mainnet. Staking@5% is only available on Boba. SWITCH to Boba
                 </S.AlertText>
               </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
+              <LayerSwitcher isButton={true}/>
             </S.LayerAlert>
         </div>
     }
 
+
+    if(!netLayer) {
+      return <div className={styles.container}>
+          <PageHeader title="Staking" />
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To stake on BOBA, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+      </div>
+    }
+
     return (
       <>
-        <PageHeader title="Fixed Rate Staking" />
+        <PageHeader title="Staking" />
 
         <S.Wrapper>
-
           <Grid 
             container 
             spacing={2} 
           >
-
             <S.GridItemTag 
               item 
               xs={10} 
               md={10}
+              style={{padding: 0, paddingLeft: '20px'}}
             >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS/APR:</span> You will earn an APR of 5%. 
+                <span style={{fontWeight: '700'}}>EARNINGS/APR</span>: You will earn an APR of 5%. 
                 <br/>
-                <span style={{fontWeight: '700'}}>STAKING PERIOD:</span> Each staking period lasts 2 weeks.  
+                <span style={{fontWeight: '700'}}>STAKING PERIOD</span>: Each staking period lasts 2 weeks.  
                 Your stake will be automatically renewed until you unstake.
                 <br/>
-                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW:</span> You can 
+                <span style={{fontWeight: '700'}}>UNSTAKING WINDOW</span>: You can 
                 unstake in the two days after each staking window.
               </Typography>
             </S.GridItemTag>
-
           </Grid>
-
         </S.Wrapper>
 
         <Box sx={{ my: 3, width: '100%' }}>
 
-          <Button
-            variant="contained"
-            onClick={()=>{this.handleAddSave()}}
-            disabled={loading}
-            sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
-          >
-            {loading ? 'Depositing...' : 'Deposit BOBA'}
-          </Button>
+          {accountEnabled &&
+            <Button
+              variant="contained"
+              onClick={()=>{this.handleAddSave()}}
+              disabled={loading}
+              sx={{flex: 1, marginTop: '20px', marginBottom: '20px'}}
+            >
+              {loading ? 'Staking...' : 'Stake BOBA'}
+            </Button>
+          }
 
           {!isMobile ? (
             <S.TableHeading>
@@ -182,6 +222,7 @@ class Save extends React.Component {
 
 const mapStateToProps = state => ({
   fixed: state.fixed,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Save)

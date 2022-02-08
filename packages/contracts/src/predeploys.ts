@@ -23,4 +23,9 @@ export const predeploys = {
 
   // We're also putting WETH9 at the old OVM_ETH address.
   WETH9: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+
+  // Proxy contract for BobaTuringCredit
+  Lib_ResolvedDelegateBobaProxy: "0x4200000000000000000000000000000000000020",
+  BobaTuringCredit: "0x4200000000000000000000000000000000000021",
+  BobaTuringHelper: "0x4200000000000000000000000000000000000022",
 }

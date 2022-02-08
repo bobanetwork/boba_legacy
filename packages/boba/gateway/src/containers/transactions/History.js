@@ -20,8 +20,8 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import {useMediaQuery, useTheme} from '@material-ui/core'
-import moment from 'moment';
+import {useMediaQuery, useTheme} from '@mui/material'
+import moment from 'moment'
 
 import Input from 'components/input/Input'
 
@@ -30,6 +30,7 @@ import { selectActiveHistoryTab } from 'selectors/uiSelector'
 
 import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
+import { selectLayer } from 'selectors/setupSelector'
 
 import Tabs from 'components/tabs/Tabs'
 
@@ -42,6 +43,8 @@ import * as styles from './Transactions.module.scss'
 
 import useInterval from 'util/useInterval'
 import PageHeader from 'components/pageHeader/PageHeader'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+import AlertIcon from 'components/icons/AlertIcon'
 
 import { POLL_INTERVAL } from 'util/constant'
 
@@ -57,6 +60,7 @@ function History() {
 
   const [startDate, setStartDate] = useState(last_week)
   const [endDate, setEndDate] = useState(now)
+  const layer = useSelector(selectLayer())
 
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
@@ -75,26 +79,27 @@ function History() {
     batch(()=>{
       dispatch(fetchTransactions())
     })
-  }, POLL_INTERVAL);
-
-/*
-<S.Header>
-        <div className={styles.searchInput}>
-          <Input
-            size='small'
-            placeholder='Search by hash'
-            value={searchData}
-            onChange={i=>{setSearchData(i.target.value)}}
-            className={styles.searchBar}
-          />
-        </div>
-      </S.Header>
-      */
+  }, POLL_INTERVAL)
 
   return (
     <>
-      <PageHeader title="Transaction History" />
+      <PageHeader title="History" />
 
+      {!layer &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You have not connected your wallet. To see your history, connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
+      {layer && <> 
       <S.Header>
         <div className={styles.searchInput}>
           <Input
@@ -166,6 +171,7 @@ function History() {
           }
         </div>
       </div>
+    </>}
     </>
   );
 }

@@ -28,22 +28,12 @@ export function fetchL2LPBalance(address) {
     return createAction('FETCH/L2LP/BALANCE', () => networkService.L2LPBalance(address))
 }
 
-export function fetchL2LPETHBalance() {
-  const allAddresses = networkService.getAllAddresses()
-  return createAction('FETCH/L2LP/BALANCE/ETH', () => networkService.L2LPBalance(allAddresses.L1_ETH_Address))
-}
-
 export function fetchL1LPPending(address) {
     return createAction('FETCH/L1LP/PENDING', () => networkService.L1LPPending(address))
 }
 
 export function fetchL2LPPending(address) {
     return createAction('FETCH/L2LP/PENDING', () => networkService.L2LPPending(address))
-}
-
-export function fetchL2LPETHPending() {
-  const allAddresses = networkService.getAllAddresses()
-  return createAction('FETCH/L2LP/PENDING/ETH', () => networkService.L2LPPending(allAddresses.L1_ETH_Address))
 }
 
 export function fetchL1LPLiquidity(address) {
@@ -54,20 +44,11 @@ export function fetchL2LPLiquidity(address) {
     return createAction('FETCH/L2LP/LIQUIDITY', () => networkService.L2LPLiquidity(address))
 }
 
-export function fetchL2LPETHLiquidity() {
-  const allAddresses = networkService.getAllAddresses()
-  return createAction('FETCH/L2LP/LIQUIDITY/ETH', () => networkService.L2LPLiquidity(allAddresses.L2_ETH_Address))
-}
-
 export function fetchL1TotalFeeRate() { return createAction('FETCH/L1TOTALFEERATE', ()=>{return networkService.getL1TotalFeeRate()}) }
 export function fetchL2TotalFeeRate() { return createAction('FETCH/L2TOTALFEERATE', ()=>{return networkService.getL2TotalFeeRate()}) }
 
 export function fetchL1FeeRateN(tokenAddress) { return createAction('FETCH/L1FEERATE', ()=>{return networkService.getL1UserRewardFeeRate(tokenAddress)}) }
 export function fetchL2FeeRateN(tokenAddress) { return createAction('FETCH/L2FEERATE', ()=>{return networkService.getL2UserRewardFeeRate(tokenAddress)}) }
-export function fetchL2ETHFeeRateN() {
-  const allAddresses = networkService.getAllAddresses()
-  return createAction('FETCH/L2FEERATE/ETH', () => networkService.getL2UserRewardFeeRate(allAddresses.L2_ETH_Address))
-}
 
 export function fetchFastExitCost(address) {
     return createAction('FETCH/FASTEXIT/COST', () => networkService.getFastExitCost(address))
@@ -81,8 +62,8 @@ export function fetchFastDepositCost(address) {
     return createAction('FETCH/FASTDEPOSIT/COST', () => networkService.getFastDepositCost(address))
 }
 
-export function fetchFastDepositBatchCost(address) {
-  return createAction('FETCH/FASTDEPOSIT/BATCH/COST', () => networkService.getFastDepositBatchCost(address))
+export function fetchFastDepositBatchCost(tokenList) {
+  return createAction('FETCH/FASTDEPOSIT/BATCH/COST', () => networkService.getFastDepositBatchCost(tokenList))
 }
 
 export function fetchL1FeeBalance() {
@@ -91,4 +72,8 @@ export function fetchL1FeeBalance() {
 
 export function fetchL2FeeBalance() {
     return createAction('FETCH/L2FEE/BALANCE', () => networkService.getL2FeeBalance())
+}
+
+export function fetchUserAndL2LPBalanceBatch(tokenList) {
+    return createAction('FETCH/USER/L2LP/BALANCE/BATCH', () => networkService.getL2UserAndLPBalanceBatch(tokenList))
 }

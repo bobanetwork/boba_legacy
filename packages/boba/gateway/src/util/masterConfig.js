@@ -15,10 +15,10 @@ limitations under the License. */
 
 require('dotenv').config()
 
-let NETWORKS
+let NETWORK
 
 if (process.env.REACT_APP_CHAIN === 'rinkeby') {
-  NETWORKS = {
+  NETWORK = {
     rinkeby: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
@@ -39,11 +39,25 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         rpcUrl: `https://rinkeby.boba.network`,
         blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
         transaction: `https://blockexplorer.rinkeby.boba.network/tx/`
+      },
+      payloadForL1SecurityFee: {
+        from: '0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA',
+        to: '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A',
+        value: '0x174876e800',
+        data:
+          '0x7ff36ab500000000000000000000000000000000000000000000000003939808cc6852cc0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000122816e7a7aeb40601d0ac0dcaa8402f7aa4cdfa0000000000000000000000000000000000000000000000000000008c14b4a17a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000deaddeaddeaddeaddeaddeaddeaddeaddead00000000000000000000000000004204a0af0991b2066d2d617854d5995714a79132',
+      },
+      payloadForFastDepositBatchCost: {
+        from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
+        to: '0x12F8d1cD442cf1CF94417cE6309c6D2461Bd91a3',
+        value: '0x038d7ea4c68000',
+        data:
+          '0xa44c80e3000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000006a6676813d3d4317442cf84667425c13553f4a760000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000038d7ea4c68000'
       }
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'mainnet') {
-  NETWORKS = {
+  NETWORK = {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
@@ -64,11 +78,25 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         rpcUrl: `https://mainnet.boba.network`,
         blockExplorer: `https://blockexplorer.boba.network/`,
         transaction: `https://blockexplorer.boba.network/tx/`,
+      },
+      payloadForL1SecurityFee: {
+        from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
+        to: '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514',
+        value: '0x38d7ea4c68000',
+        data:
+          '0x7ff36ab5000000000000000000000000000000000000000000000000132cc41aecbfbace00000000000000000000000000000000000000000000000000000000000000800000000000000000000000005e7a06025892d8eef0b5fa263fa0d4d2e5c3b54900000000000000000000000000000000000000000000000000000001c73d14500000000000000000000000000000000000000000000000000000000000000002000000000000000000000000deaddeaddeaddeaddeaddeaddeaddeaddead00000000000000000000000000005008f837883ea9a07271a1b5eb0658404f5a9610',
+      },
+      payloadForFastDepositBatchCost: {
+        from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
+        to: '0x1A26ef6575B7BBB864d984D9255C069F6c361a14',
+        value: '0x038d7ea4c68000',
+        data:
+          '0xa44c80e30000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000200000000000000000000000042bbfa2e77757c645eeaad1655e0911a7553efbc0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000038d7ea4c68000'
       }
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
-  NETWORKS = {
+  NETWORK = {
     local: {
       OMGX_WATCHER_URL: null, //Does not exist on local
       MM_Label:         `Local`,
@@ -103,8 +131,8 @@ const BaseServices = {
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
 }
 
-export function getAllNetworks () {
-  return NETWORKS
+export function getNetwork () {
+  return NETWORK
 }
 
 export function getBaseServices () {

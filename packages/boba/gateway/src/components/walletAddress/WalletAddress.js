@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import networkService from 'services/networkService';
 import truncate from 'truncate-middle';
 import * as S from './WalletAddress.styles';
@@ -8,6 +8,7 @@ import Copy from 'components/copy/Copy';
 
 const WalletAddress = () => {
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : '';
+  console.log("wAddress:",wAddress)
   return (
     <S.WalletPill>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -17,6 +18,6 @@ const WalletAddress = () => {
       </Box>
     </S.WalletPill>
   )
-};
+}
 
-export default WalletAddress;
+export default WalletAddress

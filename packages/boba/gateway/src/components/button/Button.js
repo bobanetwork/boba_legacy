@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import { CircularProgress, Tooltip } from '@material-ui/core'
-import { Button as ButtonMUI } from '@material-ui/core'
+import { CircularProgress, Tooltip } from '@mui/material'
+import { Button as ButtonMUI } from '@mui/material'
 
 function Button ({
   children,
@@ -35,27 +35,26 @@ function Button ({
 }) {
 
   if(disabled || loading)
-    pulsate = false;
+    pulsate = false
 
-  let timeDefined = false;
-
+  let timeDefined = false
   if(typeof triggerTime !== 'undefined') {
-    timeDefined = true;
+    timeDefined = true
   }
 
   // Save the current date to be able to trigger an update
-  const [now, setTime] = React.useState(new Date());
+  const [now, setTime] = React.useState(new Date())
 
   React.useEffect(() => {
     if (loading) {
-      const timer = setInterval(()=>{setTime(new Date())}, 1000);
+      const timer = setInterval(()=>{setTime(new Date())}, 1000)
       return () => {clearInterval(timer)}
     }
   }, [loading]);
 
-  let waitTime = (now-triggerTime) / 1000;
-  if(waitTime < 0) waitTime = 0;
-  waitTime = Math.round(waitTime);
+  let waitTime = (now-triggerTime) / 1000
+  if(waitTime < 0) waitTime = 0
+  waitTime = Math.round(waitTime)
 
   const muiProps = {
     color,
@@ -68,7 +67,7 @@ function Button ({
   }
 
   return (
-  <Tooltip title={tooltip}>
+    <Tooltip title={tooltip}>
       <span>
         <ButtonMUI {...muiProps} style={{ minWidth: loading ? '200px' : 'none', borderRadius: '4px'}}>
           {children}
@@ -88,4 +87,4 @@ function Button ({
   )
 }
 
-export default React.memo(Button);
+export default React.memo(Button)

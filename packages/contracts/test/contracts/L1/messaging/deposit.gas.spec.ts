@@ -1,6 +1,6 @@
 /* External Imports */
 import { ethers } from 'hardhat'
-import { Signer, ContractFactory, Contract, constants } from 'ethers'
+import { Signer, ContractFactory, Contract } from 'ethers'
 import { smoddit } from '@eth-optimism/smock'
 import { expectApprox } from '@eth-optimism/core-utils'
 
@@ -21,12 +21,11 @@ const MAX_GAS_LIMIT = 8_000_000
 const INITIAL_TOTAL_L1_SUPPLY = 5000
 const FINALIZATION_GAS = 1_200_000
 
-describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
+describe('[GAS BENCHMARK] Depositing via the standard bridge [ @skip-on-coverage ]', () => {
   let sequencer: Signer
   let alice: Signer
   before(async () => {
-    ;[sequencer] = await ethers.getSigners()
-    ;[alice] = await ethers.getSigners()
+    ;[sequencer, alice] = await ethers.getSigners()
   })
 
   let AddressManager: Contract
@@ -57,7 +56,7 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
       AddressManager.address,
       'CanonicalTransactionChain'
     )
-    const queue = await Factory__ChainStorageContainer.deploy(
+    await Factory__ChainStorageContainer.deploy(
       AddressManager.address,
       'CanonicalTransactionChain'
     )
@@ -65,11 +64,6 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
     await AddressManager.setAddress(
       'ChainStorageContainer-CTC-batches',
       batches.address
-    )
-
-    await AddressManager.setAddress(
-      'ChainStorageContainer-CTC-queue',
-      queue.address
     )
 
     await AddressManager.setAddress(
@@ -122,7 +116,7 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
     })
   })
 
-  describe('[GAS BENCHMARK] L1 to L2 Deposit costs', async () => {
+  describe('[GAS BENCHMARK] L1 to L2 Deposit costs [ @skip-on-coverage ]', async () => {
     const depositAmount = 1_000
     before(async () => {
       // Load a transaction into the queue first to 'dirty' the buffer's length slot
@@ -139,7 +133,6 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
         NON_NULL_BYTES32,
         {
           value: depositAmount,
-          gasPrice: 0,
         }
       )
 
@@ -169,11 +162,10 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge', () => {
         FINALIZATION_GAS,
         NON_NULL_BYTES32
       )
-
       const receipt = await res.wait()
       const gasUsed = receipt.gasUsed.toNumber()
       console.log('    - Gas used:', gasUsed)
-      expectApprox(gasUsed, 197_558, {
+      expectApprox(gasUsed, 197_258, {
         absoluteUpperDeviation: 500,
         // Assert a lower bound of 1% reduction on gas cost. If your tests are breaking because your
         // contracts are too efficient, consider updating the target value!

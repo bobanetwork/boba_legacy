@@ -80,7 +80,7 @@ class stateRootMonitorService extends OptimismEnv {
     const latestL2Block = await this.L2Provider.getBlockNumber()
 
     const endBlock = Math.min(latestL1Block, this.endBlock)
-    if (this.startBlock > endBlock) this.startBlock = endBlock
+    if (this.startBlock > endBlock) { this.startBlock = endBlock }
 
     const SCCLog = await this.StateCommitmentChainContract.queryFilter(
       this.StateCommitmentChainContract.filters.StateBatchAppended(),
@@ -126,7 +126,7 @@ class stateRootMonitorService extends OptimismEnv {
         )
 
         let stateRootStartBlock = Number(prevTotalElements) + 1
-        let stateRootendBlock = Number(prevTotalElements) + Number(batchSize)
+        const stateRootendBlock = Number(prevTotalElements) + Number(batchSize)
         while (stateRootStartBlock <= stateRootendBlock) {
           const L2BlockData = await this.L2Provider.getBlockWithTransactions(
             stateRootStartBlock

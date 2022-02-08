@@ -9,14 +9,14 @@ import { getFarmInfo, updateStakeToken, updateWithdrawToken } from 'actions/farm
 
 import Button from 'components/button/Button';
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import RemoveIcon from '@material-ui/icons/Remove';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
 
-import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
+import { Box, Typography, Fade,  CircularProgress } from '@mui/material';
 import * as S from "./ListFarm.styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 
@@ -32,7 +32,8 @@ class ListFarm extends React.Component {
       L1orL2Pool,
       balance,
       showAll,
-      showStakesOnly
+      showStakesOnly,
+      accountEnabled,
     } = this.props;
 
     this.state = {
@@ -48,6 +49,8 @@ class ListFarm extends React.Component {
       dropDownBoxInit: true,
       // loading
       loading: false,
+      // provider status
+      accountEnabled,
     }
 
   }
@@ -58,7 +61,7 @@ class ListFarm extends React.Component {
 
   componentDidUpdate(prevState) {
 
-    const { poolInfo, userInfo, balance, showAll, showStakesOnly } = this.props
+    const { poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props
 
     if (!isEqual(prevState.poolInfo, poolInfo)) {
       this.setState({ poolInfo });
@@ -80,6 +83,9 @@ class ListFarm extends React.Component {
       this.setState({ showStakesOnly });
     }
 
+    if (prevState.accountEnabled !== accountEnabled) {
+      this.setState({ accountEnabled });
+    }
   }
 
   async handleStakeToken() {
@@ -152,7 +158,7 @@ class ListFarm extends React.Component {
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool
+      loading, L1orL2Pool, accountEnabled
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
@@ -161,7 +167,7 @@ class ListFarm extends React.Component {
 
     let userReward = 0;
 
-    if (Object.keys(userInfo).length && Object.keys(poolInfo).length) {
+    if (Object.keys(userInfo).length && Object.keys(poolInfo).length && accountEnabled) {
       userReward = BigNumber.from(userInfo.pendingReward).add(
         BigNumber.from(userInfo.amount)
         .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
@@ -278,9 +284,7 @@ class ListFarm extends React.Component {
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>APR %</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userInfo.amount ?
-                  `${logAmount(poolInfo.APR, 0, 2)}` : `0`
-                }
+                {`${logAmount(poolInfo.APR, 0, 2)}`}
               </Typography>
             </S.GridItemTag>
 
@@ -292,8 +296,9 @@ class ListFarm extends React.Component {
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Your Stake</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userInfo.amount ?
-                  `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                {accountEnabled ?
+                  userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                  : <></>
                 }
               </Typography>
             </S.GridItemTag>
@@ -306,7 +311,10 @@ class ListFarm extends React.Component {
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
               ) : (null)}
               <Typography variant="body1">
-                {userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}
+              {accountEnabled ?
+                userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
+                : <></>
+              }
               </Typography>
             </S.GridItemTag>
 
@@ -319,7 +327,7 @@ class ListFarm extends React.Component {
                 onClick={()=>{this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false })}}
                 sx={{display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : ""}}
               >
-                <ExpandMoreIcon />
+                {accountEnabled ? <ExpandMoreIcon/>: <></>}
               </Box>
             </S.GridItemTag>
           </S.GridContainer>

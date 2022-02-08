@@ -2,7 +2,7 @@ FROM bobanetwork/builder AS builder
 
 FROM node:14-alpine
 
-RUN apk add --no-cache git curl bash jq
+RUN apk add --no-cache git curl python3 bash jq
 
 WORKDIR /opt/optimism/
 
@@ -12,6 +12,9 @@ COPY --from=builder /optimism/node_modules ./node_modules
 # copy deps (would have been nice if docker followed the symlinks required)
 COPY --from=builder /optimism/packages/core-utils/package.json ./packages/core-utils/package.json
 COPY --from=builder /optimism/packages/core-utils/dist ./packages/core-utils/dist
+
+# copy turing
+COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
 
 # get the needed built artifacts
 WORKDIR /opt/optimism/packages/contracts

@@ -14,48 +14,44 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
- import React, { useCallback } from 'react'
+import React, { useCallback } from 'react'
 
-import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
 import * as S from './LayerSwitcher.styles.js'
-import { selectLayer } from 'selectors/setupSelector'
-import { setLayer } from 'actions/setupAction'
-import { Typography } from '@material-ui/core'
-import networkService from 'services/networkService'
+import { selectLayer, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
+
+import { Box, Typography } from '@mui/material'
 import Button from 'components/button/Button'
 
 import LayerIcon from 'components/icons/LayerIcon'
-import { switchChain } from 'actions/networkAction.js'
+import { switchChain } from 'actions/setupAction.js'
 
-function LayerSwitcher({ walletEnabled, isButton = false, size }) {
+function LayerSwitcher({ isButton = false, size }) {
 
   const dispatch = useDispatch()
-
+  const accountEnabled = useSelector(selectAccountEnabled())
+  const justSwitchedChain = useSelector(selectJustSwitchedChain())
   let layer = useSelector(selectLayer())
 
-  if (networkService.L1orL2 !== layer) {
-    //networkService.L1orL2 is always right...
-    layer = networkService.L1orL2
-  }
+  console.log("LS: Layer:", layer)
+  console.log("LS: accountEnabled:", accountEnabled)
+  console.log("LS: justSwitchedChain:", justSwitchedChain)
 
-  let otherLayer = ''
-
-  if(layer === 'L1') {
-    otherLayer = 'L2'
-  } else {
-    otherLayer = 'L1'
-  }
-
-  const dispatchSetLayer = useCallback((layer) => {
-    dispatch(setLayer(layer))
-    dispatch(switchChain(layer))
-  }, [ dispatch ])
+  const dispatchSwitchLayer = useCallback(() => {
+    console.log("LS: switchLayer accountEnabled:", accountEnabled)
+    if(!accountEnabled) return
+    //dispatch(setLayer(layer))
+    if(layer === 'L1')
+      dispatch(switchChain('L2'))
+    else if (layer === 'L2')
+      dispatch(switchChain('L1'))
+  }, [ dispatch, accountEnabled, layer ])
 
   if (!!isButton) {
-    return (<>
+    return (
+    <>
       <Button
-        onClick={() => { dispatchSetLayer(otherLayer) }}
+        onClick={() => { dispatchSwitchLayer() }}
         size={size}
         variant="contained"
         >
@@ -64,23 +60,38 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
     </>)
   }
 
+  // we are not connected to MM so Layer is not defined
+  if (accountEnabled !== true) {
+    return (
+    <S.WalletPickerContainer>
+      <S.WalletPickerWrapper>
+        <Box sx={{display: 'flex', width: '100%', alignItems: 'center'}}>
+          <LayerIcon />
+          <S.Label variant="body2">Layer</S.Label>
+          <Typography
+            className={'active'}
+            variant="body2"
+            component="span"
+            color="white"
+            style={{paddingLeft: '30px', fontSize: '0.7em', lineHeight: '0.9em'}}
+          >
+            Wallet not<br/>connected
+          </Typography>
+        </Box>
+      </S.WalletPickerWrapper>
+    </S.WalletPickerContainer>)
+  }
+
   return (
     <S.WalletPickerContainer>
       <S.WalletPickerWrapper>
-        <Box
-          sx={{
-            display: 'flex',
-            width: '100%',
-            alignItems: 'center'
-          }}
-        >
+        <Box sx={{display: 'flex', width: '100%', alignItems: 'center'}}>
           <LayerIcon />
           <S.Label variant="body2">Layer</S.Label>
-          <S.LayerSwitch
-            onClick={()=>{dispatchSetLayer(otherLayer)}}
-          >
+          <S.LayerSwitch>
             <Typography
               className={layer === 'L1' ? 'active': ''}
+              onClick={()=>{if(layer === 'L2'){dispatchSwitchLayer()}}}
               variant="body2"
               component="span"
               color="white">
@@ -88,6 +99,7 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
             </Typography>
             <Typography
               className={layer === 'L2' ? 'active': ''}
+              onClick={()=>{if(layer === 'L1'){dispatchSwitchLayer()}}}
               variant="body2"
               component="span"
               color="white">
@@ -98,6 +110,6 @@ function LayerSwitcher({ walletEnabled, isButton = false, size }) {
       </S.WalletPickerWrapper>
     </S.WalletPickerContainer>
   )
-};
+}
 
-export default LayerSwitcher;
+export default LayerSwitcher

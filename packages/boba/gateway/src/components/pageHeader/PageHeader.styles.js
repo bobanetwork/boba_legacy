@@ -1,11 +1,11 @@
-import { styled } from '@material-ui/core/styles';
-import { Box } from "@material-ui/core";
+import { styled } from '@mui/material/styles';
+import { Box } from "@mui/material";
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  margin: '40px 0',
+  margin: '20px 0',
   [theme.breakpoints.down('md')]: {
     marginTop: 0,
   },

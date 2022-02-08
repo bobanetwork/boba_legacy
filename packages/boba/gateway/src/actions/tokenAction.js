@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { ethers } from 'ethers';
-import erc20abi from 'human-standard-token-abi';
-import networkService from 'services/networkService';
-import store from 'store';
+import { ethers } from 'ethers'
+import erc20abi from 'human-standard-token-abi'
+import networkService from 'services/networkService'
+import store from 'store'
 
 /* 
 Returns Token info
@@ -89,6 +89,20 @@ export async function addToken ( tokenContractAddressL1 ) {
         erc20abi,
         networkService.L2Provider,
       )
+    } else if (_tokenContractAddressL1 === 'wagmiv0') {
+      if(tA['WAGMIv0'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv0'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+    } else if (_tokenContractAddressL1 === 'olo') {
+      if(tA['OLO'].L2 !== null) _tokenContractAddressL2 = tA['OLO'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
     } else {
       Object.keys(tA).forEach((token, i) => {
         //let's see if we know about this Token
@@ -121,7 +135,7 @@ export async function addToken ( tokenContractAddressL1 ) {
     }
     
     const tokenInfo = {
-      currency: _symbolL1 === 'xBOBA' ? _tokenContractAddressL2 : _tokenContractAddressL1,
+      currency: (_symbolL1 === 'xBOBA' || _symbolL1 === 'WAGMIv0') ? _tokenContractAddressL2 : _tokenContractAddressL1,
       addressL1: _tokenContractAddressL1,
       addressL2: _tokenContractAddressL2,
       symbolL1,

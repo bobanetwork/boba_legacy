@@ -15,15 +15,15 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 
-import { Typography, Fade, useMediaQuery } from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { Typography, Fade, useMediaQuery } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import * as S from "./ListFarm.styles"
 
 import { useTheme } from '@emotion/react'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 import truncate from 'truncate-middle'
 
 function Transaction({
@@ -50,7 +50,7 @@ function Transaction({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const currentNetwork = useSelector(selectNetwork())
-  const nw = getAllNetworks()
+  const nw = getNetwork()
 
   const chainLink = ({chain,hash}) => {
     let network = nw[currentNetwork]

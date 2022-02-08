@@ -1504,9 +1504,13 @@ describe('Liquidity Pool Test', async () => {
       const depositAmount = utils.parseEther('10')
 
       await expect(
-        L1LiquidityPool.clientDepositL1(depositAmount, ethers.constants.AddressZero, {
-          value: 0,
-        })
+        L1LiquidityPool.clientDepositL1(
+          depositAmount,
+          ethers.constants.AddressZero,
+          {
+            value: 0,
+          }
+        )
       ).to.be.revertedWith('Either Amount Incorrect or Token Address Incorrect')
 
       await expect(
@@ -1514,7 +1518,6 @@ describe('Liquidity Pool Test', async () => {
           value: depositAmount,
         })
       ).to.be.revertedWith('Either Amount Incorrect or Token Address Incorrect')
-
     })
 
     it('should fast onramp', async () => {
@@ -1526,9 +1529,13 @@ describe('Liquidity Pool Test', async () => {
       )
 
       const depositTx = await env.waitForXDomainTransaction(
-        L1LiquidityPool.clientDepositL1(depositAmount, ethers.constants.AddressZero, {
-          value: depositAmount,
-        }),
+        L1LiquidityPool.clientDepositL1(
+          depositAmount,
+          ethers.constants.AddressZero,
+          {
+            value: depositAmount,
+          }
+        ),
         Direction.L1ToL2
       )
 
@@ -2474,7 +2481,8 @@ describe('Liquidity Pool Test', async () => {
       const remainingETHPercent = await getRemainingPercent(userRewardFeeRate)
       const userRewardERC20_1FeeRate =
         await L2LiquidityPool.getUserRewardFeeRate(L2ERC20_1.address)
-      const userRewardERC20_2FeeRate = await L1LiquidityPool.getUserRewardFeeRate(L1ERC20_2.address)
+      const userRewardERC20_2FeeRate =
+        await L1LiquidityPool.getUserRewardFeeRate(L1ERC20_2.address)
       const remainingERC20_2Percent = await getRemainingPercent(
         userRewardERC20_2FeeRate
       )

@@ -15,15 +15,14 @@ limitations under the License. */
 
 import { useTheme } from '@emotion/react'
 
-import { Typography, useMediaQuery } from '@material-ui/core'
-import { Box } from '@material-ui/system'
+import { Box, Typography, useMediaQuery } from '@mui/material'
+
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
 import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-import InputStepFastETH from 'containers/modals/deposit/steps/InputStepFastETH'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
@@ -52,12 +51,9 @@ import {
  } from 'actions/balanceAction'
 
 import {
-  selectL1ETHBalance,
   selectL2FeeRate,
   selectL2FeeRateN,
-  selectL2ETHFeeRateN,
   selectFastDepositCost,
-  selectFastDepositBatchCost,
   selectL2LPBalanceString,
   selectL2LPPendingString,
   selectL1FeeBalance,
@@ -69,29 +65,21 @@ function InputStepFast({ handleClose, token }) {
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
-  const [ ETHValue, setETHValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
-  const [ ETH_Value_Wei_String, setETH_Value_Wei_String ] = useState('')
 
   const [ LPRatio, setLPRatio ] = useState(0)
-
-  const ETHToken = useSelector(selectL1ETHBalance)
 
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
   const feeRate = useSelector(selectL2FeeRate)
   const feeRateN = useSelector(selectL2FeeRateN)
-  const ETHFeeRateN = useSelector(selectL2ETHFeeRateN)
 
   const cost = useSelector(selectFastDepositCost)
-  const batchCost = useSelector(selectFastDepositBatchCost)
 
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const [ validValue, setValidValue ] = useState(false)
-  const [ ETHValidValue, setETHValidValue ] = useState(true)
-  const [ ETHTransactionMessage, setETHTransactionMessage ] = useState(<></>)
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
   const approvalLoading = useSelector(selectLoading(['APPROVE/CREATE']))
@@ -158,14 +146,9 @@ function InputStepFast({ handleClose, token }) {
     return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
 
-  const receivableETHAmount = (value) => {
-    return (Number(ETHValue) * ((100 - Number(ETHFeeRateN)) / 100)).toFixed(3)
-  }
-
   async function doDeposit() {
 
     console.log(`${token.symbol} Amount to bridge to L2: ${value_Wei_String}`)
-    console.log(`ETH Amount to bridge to L2: ${ETH_Value_Wei_String}`)
 
     let res
 
@@ -173,7 +156,7 @@ function InputStepFast({ handleClose, token }) {
 
       console.log("ETH Fast Bridge")
 
-      res = await dispatch(depositL1LP(token.address, value_Wei_String, ETH_Value_Wei_String))
+      res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
       if (res) {
         dispatch(setActiveHistoryTab('Bridge to L2'))
@@ -208,7 +191,7 @@ function InputStepFast({ handleClose, token }) {
     }
 
     res = await dispatch(
-      depositL1LP(token.address, value_Wei_String, ETH_Value_Wei_String)
+      depositL1LP(token.address, value_Wei_String)
     )
 
     if (res) {
@@ -258,7 +241,7 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current ${token.symbol} fee is ${feeRateN}% and ETH fee is ${ETHFeeRateN}%.`
+  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
@@ -292,8 +275,7 @@ function InputStepFast({ handleClose, token }) {
         <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
       }
       else {
-        ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br>Estimated gas of bridging ETH and ${token.symbol} (approval + bridge): ${Number(batchCost).toFixed(4)} ETH. You can save ${(Number(cost) * 2 - Number(batchCost)).toFixed(4)} ETH by bridging together.`
+        ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
@@ -376,33 +358,12 @@ function InputStepFast({ handleClose, token }) {
 
         <br />
 
-        {token.symbol !== 'ETH' &&
-          <InputStepFastETH
-            batchTokenValue={value}
-            batchToken={token}
-            setETHValue={setETHValue}
-            setETH_Value_Wei_String={setETH_Value_Wei_String}
-            setETHValidValue={setETHValidValue}
-            setETHTransactionMessage={setETHTransactionMessage}
-          />
-        }
-
         {/* Only ERC20 tokens */}
-        {validValue && token && !ETHValue &&(
+        {validValue && token &&(
           <Typography variant="body2" sx={{mt: 2}}>
             {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
           </Typography>
         )}
-
-        {/* ERC20 and ETH */}
-        {validValue && token && ETHValue &&(
-          <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, ETHToken).toFixed(2)})`: ''} and ${receivableETHAmount(ETHValue)} ETH ${!!amountToUsd(ETHValue, lookupPrice, ETHToken) ?  `($${amountToUsd(ETHValue, lookupPrice, ETHToken).toFixed(2)})`: ''} on L2.`}
-          </Typography>
-        )}
-
-        {/* ETH */}
-        {ETHValue ? ETHTransactionMessage : <></>}
 
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
@@ -444,7 +405,7 @@ function InputStepFast({ handleClose, token }) {
           variant="contained"
           loading={depositLoading || approvalLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
-          disabled={!validValue || !ETHValidValue || !Number(value)}
+          disabled={!validValue || !Number(value)}
           triggerTime={new Date()}
           size="large"
           fullWidth={isMobile}

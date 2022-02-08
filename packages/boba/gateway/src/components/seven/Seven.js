@@ -15,12 +15,12 @@ limitations under the License. */
 
 import React from 'react'
 
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 import * as S from './Transaction.styles'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useSelector } from 'react-redux'
-import { getAllNetworks } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
 
 function Seven({
   link,
@@ -34,7 +34,7 @@ function Seven({
 }) {
 
   const currentNetwork = useSelector(selectNetwork())
-  const nw = getAllNetworks()
+  const nw = getNetwork()
 
   const chainLink = ({hash}) => {
     let network = nw[currentNetwork]

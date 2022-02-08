@@ -15,11 +15,13 @@ limitations under the License. */
 
 import React from 'react'
 import BN from 'bignumber.js'
+import Select from 'react-select'
 import * as S from './Input.styles'
+import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
 
-import { Box, Typography } from '@material-ui/core'
+import { Box, Typography } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { getCoinImage } from 'util/coinImage'
 
@@ -28,11 +30,13 @@ function Input({
   label,
   type = 'text',
   disabled,
+  disabledExitAll,
   icon,
   unit,
   value,
   onChange,
   onUseMax,
+  onSelect,
   sx,
   paste,
   maxValue,
@@ -45,6 +49,10 @@ function Input({
   onExitAll,
   loading,
   maxLength,
+  selectOptions,
+  defaultSelect,
+  selectValue,
+  style
 }) {
 
   async function handlePaste() {
@@ -63,17 +71,31 @@ function Input({
     onUseMax()
   }
 
-  const underZero = new BN(value).lt(new BN(0)) 
+  const underZero = new BN(value).lt(new BN(0))
   const overMax = new BN(value).gt(new BN(maxValue))
   const theme = useTheme()
 
-  //since ETH is the fee token, harder to use all b/c need to take 
-  //operation-specific fees into account 
+  function tokenImageElement(unit) {
+    return (
+      <>
+        <Typography variant="body2" component="div">{unit}</Typography>
+        <img src={getCoinImage(unit)} alt="logo" width={50} height={50} />
+      </>
+    )
+  }
+
+  const options =  selectOptions ? selectOptions.reduce((acc, cur) => {
+    acc.push({ value: cur, label: tokenImageElement(cur) })
+    return acc
+  }, []): null
+
+  //since ETH is the fee token, harder to use all b/c need to take
+  //operation-specific fees into account
   allowUseAll = (unit === 'ETH') ? false : allowUseAll
 
   return (
-    <>
-      <S.Wrapper newstyle={newStyle ? 1 : 0}>
+    <div style={{width: '100%'}}>
+      <S.Wrapper newstyle={newStyle ? 1 : 0} style={style}>
 
         {!unit &&
           <S.InputWrapperFull>
@@ -100,12 +122,20 @@ function Input({
 
         {unit && (
           <>
-            <S.UnitContent>
-              <div>
-                <Typography variant="body2" component="div">{unit}</Typography>
-                <img src={getCoinImage(unit)} alt="logo" width={50} height={50} />
-              </div>
-            </S.UnitContent>
+            {selectOptions ?
+              <Select
+                options={options}
+                styles={selectCustomStyles(newStyle, theme)}
+                isSearchable={false}
+                onChange={onSelect}
+                value={selectValue ? { value: selectValue, label: tokenImageElement(selectValue) } : null}
+              />:
+              <S.UnitContent>
+                <div>
+                  {tokenImageElement(unit)}
+                </div>
+              </S.UnitContent>
+            }
             <S.InputWrapper>
               {label && (
                 <Typography variant="body2" component="div" sx={{opacity: 0.7, mb: 1}}>
@@ -144,14 +174,15 @@ function Input({
             )}
             {allowExitAll && (
               <Box>
-                <Button 
+                <Button
                   onClick={onExitAll}
-                  variant="small" 
+                  variant="small"
                   size="small"
                   sx={{margin: '10px 0px'}}
                   loading={loading}
                   triggerTime={new Date()}
                   tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+                  disabled={disabledExitAll}
                 >
                   Bridge All
                 </Button>
@@ -161,8 +192,8 @@ function Input({
         )}
 
         {paste && (
-          <Box 
-            onClick={handlePaste} 
+          <Box
+            onClick={handlePaste}
             sx={{color: theme.palette.secondary.main, opacity: 0.9, cursor: 'pointer', position: 'relative', right: '70px', fontSize: '14px', zIndex: '100'}}
           >
             PASTE
@@ -180,7 +211,7 @@ function Input({
           Value too large: the value must be smaller than {Number(maxValue).toFixed(3)}
         </Typography>
         : null}
-    </>
+    </div>
   )
 }
 

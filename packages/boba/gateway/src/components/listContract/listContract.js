@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import Button from 'components/button/Button'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import * as S from "./ListContract.styles"
-import { removeNFTContract } from 'actions/nftAction'
+import { removeNFT } from 'actions/nftAction'
 
 class ListContract extends React.Component {
 
@@ -13,33 +13,53 @@ class ListContract extends React.Component {
     super(props)
 
     const {
-      contract,
+      address,
+      UUID,
+      symbol,
+      tokenID,
     } = this.props
 
     this.state = {
-      contract
+      address,
+      UUID,
+      symbol,
+      tokenID,
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { contract } = this.props
+    const { symbol, address, UUID, tokenID } = this.props
 
-    if (!isEqual(prevState.contract, contract)) {
-      this.setState({ contract })
+    if (!isEqual(prevState.UUID, UUID)) {
+      this.setState({ UUID })
+    }
+
+    if (!isEqual(prevState.address, address)) {
+      this.setState({ address })
+    }
+
+    if (!isEqual(prevState.symbol, symbol)) {
+      this.setState({ symbol })
+    }
+
+    if (!isEqual(prevState.tokenID, tokenID)) {
+      this.setState({ tokenID })
     }
 
   }
 
   async handleRemove() {
-    this.props.dispatch(removeNFTContract(this.state.contract.address))
+    this.props.dispatch(removeNFT(this.state.UUID))
   }
 
   render() {
 
     const {
-      contract
+      address,
+      symbol,
+      tokenID
     } = this.state
 
     return (
@@ -63,8 +83,8 @@ class ListContract extends React.Component {
               >
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
                   <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
-                    <Typography variant="overline" style={{lineHeight: '1em'}}>{contract.name}</Typography>
-                    <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{contract.address}</Typography>
+                    <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol} TokenID: {tokenID}</Typography>
+                    <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{address}</Typography>
                   </div>
                 </div>
               </S.GridItemTag>

@@ -19,8 +19,8 @@ package vm
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 )
 
 // StateDB is an EVM database for full state querying.
@@ -30,6 +30,9 @@ type StateDB interface {
 	SubBalance(common.Address, *big.Int)
 	AddBalance(common.Address, *big.Int)
 	GetBalance(common.Address) *big.Int
+
+	TuringCharge(userID common.Address) error
+	TuringCheck(userID common.Address) error
 
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)

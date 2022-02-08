@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { Grid, Box } from '@material-ui/core'
+import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 
@@ -41,9 +41,20 @@ function Deposits({ searchHistory, transactions }) {
     setPage(1)
   }, [searchHistory])
 
-  const _deposits = transactions.filter(i => {
-    return i.hash.includes(searchHistory) && i.to !== null && i.depositL2 
+  let _deposits = transactions.filter(i => {
+    return i.hash.includes(searchHistory) && i.to !== null && i.depositL2
   })
+  // combine the batch onramp
+  _deposits = _deposits.reduce((acc, cur) => {
+    const index = acc.findIndex(i => i.blockNumber === cur.blockNumber)
+    if (index !== -1) {
+      acc[index].action = [...acc[index].action, cur.action]
+    } else {
+      cur.action = [cur.action]
+      acc.push(cur)
+    }
+    return acc
+  }, [])
 
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
   const endingIndex = page * PER_PAGE;
@@ -74,11 +85,10 @@ function Deposits({ searchHistory, transactions }) {
                 <S.Disclaimer>Loading...</S.Disclaimer>
               )}
               {paginatedDeposits.map((i, index) => {
-                                
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
                 let details = null
-                let amountTx = null
+                let amountTx = ''
 
                 let metaData = ''
 
@@ -88,12 +98,14 @@ function Deposits({ searchHistory, transactions }) {
                   metaData = 'Classic Bridge'
                 }
 
-                if (i.action && i.action.token) {
-                  const token = tokenList[i.action.token.toLowerCase()];
-                  if (!!token) {
-                    let amount = logAmount(i.action.amount, token.decimals, 3);
-                    let symbol = token[`symbol${chain}`];
-                    amountTx = `${amount} ${symbol}`;
+                for (const payload of i.action) {
+                  if (payload.token) {
+                    const token = tokenList[payload.token.toLowerCase()];
+                    if (!!token) {
+                      let amount = logAmount(payload.amount, token.decimals, 3);
+                      let symbol = token[`symbol${chain}`];
+                      amountTx += `${amount} ${symbol} `;
+                    }
                   }
                 }
 
@@ -113,7 +125,7 @@ function Deposits({ searchHistory, transactions }) {
                     title={`Hash: ${i.hash}`}
                     time={moment.unix(i.timeStamp).format('lll')}
                     blockNumber={`Block ${i.blockNumber}`}
-                    chain={`Bridge to L2`}
+                    chain={`Bridge to L2 ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}
                     detail={details}
                     oriChain={chain}

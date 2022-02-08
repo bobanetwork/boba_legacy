@@ -24,15 +24,15 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/rollup/dump"
-	"github.com/ethereum/go-ethereum/rollup/rcfg"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
+	"github.com/ethereum-optimism/optimism/l2geth/metrics"
+	"github.com/ethereum-optimism/optimism/l2geth/rlp"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
+	"github.com/ethereum-optimism/optimism/l2geth/trie"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -64,6 +64,15 @@ func GetOVMBalanceKey(addr common.Address) common.Hash {
 	position := common.Big0
 	hasher := sha3.NewLegacyKeccak256()
 	hasher.Write(common.LeftPadBytes(addr.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
+func GetTuringPrepayKey(userID common.Address) common.Hash {
+	position := common.Big1
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(userID.Bytes(), 32))
 	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
 	digest := hasher.Sum(nil)
 	return common.BytesToHash(digest)
@@ -365,6 +374,65 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
  * SETTERS
  */
 
+// TuringCharge moves Turing credits from a credit wallet to the operator
+func (s *StateDB) TuringCharge(userID common.Address) error {
+	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
+	// userID is the address of that user's Turing Helper contract
+
+	keyUser := GetTuringPrepayKey(userID)
+	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
+	balUser := valueUser.Big()
+
+	keyPrice := common.BigToHash(big.NewInt(3))
+	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
+	price := value.Big()
+
+	keyOwner := common.BigToHash(big.NewInt(4))
+	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
+	balOwner := valueOwner.Big()
+
+	log.Debug("TURING-CREDIT:Before", "balUser", balUser, "price", price)
+
+	if balUser.Cmp(price) < 0 {
+		log.Warn("TURING-CREDIT:Insufficient credit", "balUser", balUser, "price", price)
+		return errors.New("Insufficient Turing credit")
+	}
+
+	// perform the transfer
+	balUser = balUser.Sub(balUser, price)
+	balOwner = balOwner.Add(balOwner, price)
+
+	//set the states
+	s.SetState(rcfg.OvmTuringCreditAddress, keyUser, common.BigToHash(balUser))
+	s.SetState(rcfg.OvmTuringCreditAddress, keyOwner, common.BigToHash(balOwner))
+
+	log.Debug("TURING-CREDIT:Payment completed", "balUser", balUser, "balOwner", balOwner, "price", price)
+
+	return nil
+}
+
+// TuringCharge moves Turing credits from a credit wallet to the operator
+func (s *StateDB) TuringCheck(userID common.Address) error {
+	// userID is the address of that user's Turing Helper contract
+	// checks for sufficient credit
+	keyUser := GetTuringPrepayKey(userID)
+	valueUser := s.GetState(rcfg.OvmTuringCreditAddress, keyUser)
+	balUser := valueUser.Big()
+
+	keyPrice := common.BigToHash(big.NewInt(3))
+	value := s.GetState(rcfg.OvmTuringCreditAddress, keyPrice)
+	price := value.Big()
+
+	if balUser.Cmp(price) < 0 {
+		log.Warn("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
+		return errors.New("Insufficient Turing credit")
+	}
+
+	log.Debug("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
+
+	return nil
+}
+
 // AddBalance adds amount to the account associated with addr.
 func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	if rcfg.UsingOVM {
@@ -633,7 +701,7 @@ func (s *StateDB) Copy() *StateDB {
 	}
 	// Copy the dirty states, logs, and preimages
 	for addr := range s.journal.dirties {
-		// As documented [here](https://github.com/ethereum/go-ethereum/pull/16485#issuecomment-380438527),
+		// As documented [here](https://github.com/ethereum-optimism/optimism/l2geth/pull/16485#issuecomment-380438527),
 		// and in the Finalise-method, there is a case where an object is in the journal but not
 		// in the stateObjects: OOG after touch on ripeMD prior to Byzantium. Thus, we need to check for
 		// nil
