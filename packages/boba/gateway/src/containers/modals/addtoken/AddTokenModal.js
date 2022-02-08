@@ -23,7 +23,7 @@ import Modal from 'components/modal/Modal';
 import Input from 'components/input/Input';
 
 import * as styles from './AddTokenModal.module.scss';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { WrapperActionsModal } from 'components/modal/Modal.styles';
 
 function AddTokenModal ({ open }) {

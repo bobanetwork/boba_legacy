@@ -1,6 +1,6 @@
-import { Box, IconButton } from '@material-ui/core';
-import { styled } from '@material-ui/system';
-import ModalUnstyled from '@material-ui/unstyled/ModalUnstyled';
+import { Box, IconButton } from '@mui/material'
+import { styled } from '@mui/system'
+import { ModalUnstyled } from '@mui/base'
 
 export const StyledModal = styled(ModalUnstyled)`
   position: fixed;
@@ -14,7 +14,6 @@ export const StyledModal = styled(ModalUnstyled)`
   align-items: center;
   justify-content: center;
   backdrop-filter: ${(props) => props.ismobile ? 'blur(20px)' : 'none'};
-
 `;
 
 export const Backdrop = styled('div')`

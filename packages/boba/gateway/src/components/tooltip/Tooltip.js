@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip as MuiTooltip } from '@material-ui/core';
+import { Tooltip as MuiTooltip } from '@mui/material';
 
 import * as styles from './Tooltip.module.scss';
 

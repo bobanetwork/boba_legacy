@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { styled } from '@material-ui/system';
 
 // export const StyleCreateTransactions = styled(Box)`

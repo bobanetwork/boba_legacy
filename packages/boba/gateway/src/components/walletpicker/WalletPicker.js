@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@material-ui/core/styles'
+import { Box, useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { setEnableAccount, setLayer } from 'actions/setupAction'
 import Button from 'components/button/Button'
 import WalletAddress from 'components/walletAddress/WalletAddress'

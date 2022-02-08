@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
+
 import { ReactComponent as Logo } from './../../images/logo-boba.svg'
+import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg'
+
 import * as S from "./MainMenu.styles"
 
 import { Link } from 'react-router-dom'
@@ -7,13 +10,15 @@ import { Link } from 'react-router-dom'
 import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
 import MenuItems from './menuItems/MenuItems'
+
 import { useTheme } from '@emotion/react'
-import { Container, Drawer, IconButton, useMediaQuery } from '@material-ui/core'
+import { Box, Container, Drawer, IconButton, useMediaQuery } from '@mui/material'
+
 import WalletAddress from 'components/walletAddress/WalletAddress'
-import { makeStyles } from '@material-ui/styles'
-import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg'
+
+import { makeStyles } from '@mui/styles'
+
 import NavIcon from '../icons/NavIcon'
-import { Box } from '@material-ui/system'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 
 const useStyles = makeStyles({
