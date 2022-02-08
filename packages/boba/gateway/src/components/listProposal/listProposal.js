@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { Typography, Link, Fade } from '@material-ui/core'
+import { Typography, Link, Fade } from '@mui/material'
 
 import { useDispatch } from 'react-redux';
 import { openAlert, openError } from 'actions/uiAction'
