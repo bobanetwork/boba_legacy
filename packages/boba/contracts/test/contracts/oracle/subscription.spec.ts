@@ -51,9 +51,6 @@ describe('Oracle Subscription', () => {
   })
 
   describe('Payment Parameters', () => {
-    // beforeEach(async () => {
-    //   Subscription = await deploySubscription(bobaToken.address)
-    // })
     it('boba token cannot be zero address', async () => {
       await expect(
         deploySubscription(ethers.constants.AddressZero)
