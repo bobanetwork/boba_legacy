@@ -99,149 +99,17 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     this.state.addressRegistry.use(cors())
     this.state.addressRegistry.use(bodyParser.json())
 
-    // Could refactor this to reduce code duplication. For now the goal is just to
-    // have something which works reliably.
-
-    this.state.addressRegistry['get']("/addresses.json", async (req, res) => {
-      try {
-        let aList
-        try {
-          aList = JSON.parse(await this.state.db.get("address-list"))
-        } catch(e) {
-          if (e.notFound) {
-            this.logger.warn("Address Registry is not yet ready to serve addresses (db notFound)")
-            return res.status(503).json({error: "Address Registry is not yet populated"})
-          } else { throw e }
-        }
-
-        return res.json(aList)
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-    this.state.addressRegistry['get']("/boba-addr.json", async (req, res) => {
-      try {
-        let aList
-        try {
-          aList = JSON.parse(await this.state.db.get("boba-addr"))
-        } catch(e) {
-          if (e.notFound) {
-            this.logger.warn("Address Registry is not yet ready to serve BOBA addresses (db notFound)")
-            return res.status(503).json({error: "Address Registry is not yet populated"})
-          } else { throw e }
-        }
-
-        return res.json(aList)
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-    this.state.addressRegistry['put']("/addresses.json", async (req, res) => {
-      try {
-        const rb = req.body
-
-        this.logger.info("addressRegistry PUT request for base addresses", {rb})
-
-        let addrList = {}
-
-        /* Future - if there's an existing list, compare it with the new one and reject
-           any attempts to change certain critical addresses. For now, only cares about
-           AddressManager since that's used directly by dtl */
-
-        try {
-          const _addrList = await this.state.db.get("address-list")
-          addrList = JSON.parse(_addrList)
-
-          if (rb['AddressManager'] && addrList['AddressManager'] && rb['AddressManager'] !== addrList['AddressManager']) {
-            this.logger.error("Can't overwrite saved addressManager value", { old: addrList['AddressManager'], new:rb['AddressManager']})
-            return res.status(400).json({error:"Can't overwrite saved AddressManager value"})
-          }
-        } catch(e) {
-          if (e.notFound) {
-            this.logger.info("No previous address list was found")
-          } else { throw e; }
-        }
-
-        this.logger.info("Will store new addresses.json", rb)
-        await this.state.db.put("address-list", JSON.stringify(rb))
-        this.logger.info("Stored addresses.json")
-        return res.sendStatus(201).end()
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-    this.state.addressRegistry['put']("/boba-addr.json", async (req, res) => {
-      try {
-        const rb = req.body
-
-        this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
-
-        // As with the base list, we could add future restrictions on changing
-        // certain critical addresses. For now we allow anything.
-
-        this.logger.info("Will store new boba-addr.json", rb)
-        await this.state.db.put("boba-addr", JSON.stringify(rb))
-        this.logger.info("Stored boba-addr.json")
-        return res.sendStatus(201).end()
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-
-    this.state.addressRegistry['get']("/state-dump.latest.json", async (req, res) => {
-      try {
-        // This does not work with a relative path, although the PUT method does.
-        return res.sendFile("/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json")
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-
-    this.state.addressRegistry['put']("/state-dump.latest.json", async (req, res) => {
-      try {
-        this.logger.info("addressRegistry PUT request for state-dump file")
-
-        req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json_TMP"))
-
-        await fs.rename(
-          "./state-dumps/state-dump.latest.json_TMP",
-          "./state-dumps/state-dump.latest.json",
-          (err) => { if (err) { throw err; } }
-        )
-
-        this.logger.info("Saved new state-dump.latest.json")
-        return res.sendStatus(201).end()
-
-      } catch (e) {
-        return res.status(500).json({
-          error: e.toString(),
-        })
-      }
-    })
-
+    await this.listeners()
+    
     this.state.arServer = this.state.addressRegistry.listen(this.options.arPort,this.options.hostname)
     this.logger.info("addressRegistry server listening", {hostname:this.options.hostname, port:this.options.arPort})
-
-    if (this.options.addressManager) {
-      this.logger.warn("Using legacy cfgAddressManager address")
-      this.state.addressManager = this.options.addressManager
-    }
 
     do {
      let addrList
      try {
         addrList = JSON.parse(await this.state.db.get("address-list"))
         this.state.addressManager = addrList['AddressManager']
+        this.options.addressManager = addrList['AddressManager']
       } catch(e) {
         if (! e.notFound) { throw e }
       }
@@ -316,4 +184,138 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
       throw e
     }
   }
+
+  protected async listeners(): Promise<void> {
+       // Could refactor this to reduce code duplication. For now the goal is just to
+       // have something which works reliably.
+       console.log('Starting up DTL HTTP listener')
+       this.state.addressRegistry['get']("/addresses.json", async (req, res) => {
+         try {
+           let aList
+           try {
+             aList = JSON.parse(await this.state.db.get("address-list"))
+           } catch(e) {
+             if (e.notFound) {
+               this.logger.warn("Address Registry is not yet ready to serve addresses (db notFound)")
+               return res.status(503).json({error: "Address Registry is not yet populated"})
+             } else { throw e }
+           }
+
+           return res.json(aList)
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+       this.state.addressRegistry['get']("/boba-addr.json", async (req, res) => {
+         try {
+           let aList
+           try {
+             aList = JSON.parse(await this.state.db.get("boba-addr"))
+           } catch(e) {
+             if (e.notFound) {
+               this.logger.warn("Address Registry is not yet ready to serve BOBA addresses (db notFound)")
+               return res.status(503).json({error: "Address Registry is not yet populated"})
+             } else { throw e }
+           }
+
+           return res.json(aList)
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+       this.state.addressRegistry['put']("/addresses.json", async (req, res) => {
+         try {
+           const rb = req.body
+
+           this.logger.info("addressRegistry PUT request for base addresses", {rb})
+
+           let addrList = {}
+
+           /* Future - if there's an existing list, compare it with the new one and reject
+             any attempts to change certain critical addresses. For now, only cares about
+             AddressManager since that's used directly by dtl */
+
+           try {
+             const _addrList = await this.state.db.get("address-list")
+             addrList = JSON.parse(_addrList)
+
+             if (rb['AddressManager'] && addrList['AddressManager'] && rb['AddressManager'] !== addrList['AddressManager']) {
+               this.logger.error("Can't overwrite saved addressManager value", { old: addrList['AddressManager'], new:rb['AddressManager']})
+               return res.status(400).json({error:"Can't overwrite saved AddressManager value"})
+             }
+           } catch(e) {
+             if (e.notFound) {
+               this.logger.info("No previous address list was found")
+             } else { throw e; }
+           }
+
+           this.logger.info("Will store new addresses.json", rb)
+           await this.state.db.put("address-list", JSON.stringify(rb))
+           this.logger.info("Stored addresses.json")
+           return res.sendStatus(201).end()
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+       this.state.addressRegistry['put']("/boba-addr.json", async (req, res) => {
+         try {
+           const rb = req.body
+
+           this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
+
+           // As with the base list, we could add future restrictions on changing
+           // certain critical addresses. For now we allow anything.
+
+           this.logger.info("Will store new boba-addr.json", rb)
+           await this.state.db.put("boba-addr", JSON.stringify(rb))
+           this.logger.info("Stored boba-addr.json")
+           return res.sendStatus(201).end()
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+
+       this.state.addressRegistry['get']("/state-dump.latest.json", async (req, res) => {
+         try {
+           // This does not work with a relative path, although the PUT method does.
+           return res.sendFile("/opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json")
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+
+       this.state.addressRegistry['put']("/state-dump.latest.json", async (req, res) => {
+         try {
+           this.logger.info("addressRegistry PUT request for state-dump file")
+
+           req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json_TMP"))
+
+           await fs.rename(
+             "./state-dumps/state-dump.latest.json_TMP",
+             "./state-dumps/state-dump.latest.json",
+             (err) => { if (err) { throw err; } }
+           )
+
+           this.logger.info("Saved new state-dump.latest.json")
+           return res.sendStatus(201).end()
+
+         } catch (e) {
+           return res.status(500).json({
+             error: e.toString(),
+           })
+         }
+       })
+
+   }
+
 }
