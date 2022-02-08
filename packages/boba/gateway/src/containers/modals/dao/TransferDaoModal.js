@@ -23,7 +23,7 @@ import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { Box, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 

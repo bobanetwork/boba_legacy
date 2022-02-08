@@ -1,6 +1,6 @@
-import { Box } from '@material-ui/core';
-import Card from '@material-ui/core/Card';
-import { styled } from '@material-ui/core/styles';
+import { Box } from '@mui/material';
+import Card from '@mui/material/Card';
+import { styled } from '@mui/material/styles';
 
 export const TileCard = styled(Card)(({ theme, ...props }) => ({
   borderRadius: '5px',

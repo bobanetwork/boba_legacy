@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 import BgWallet from "../../images/backgrounds/bg-wallet.png";
 
 export const Loading = styled.div`
