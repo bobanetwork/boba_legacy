@@ -126,7 +126,7 @@ describe('submitTransactionWithYNATM', async () => {
     await submitTransactionWithYNATM(tx, signer, config, 0, nullHooks)
   })
 
-  it.only('should immediately reject if a nonce error is encountered', async () => {
+  it('should immediately reject if a nonce error is encountered', async () => {
     const tx = {
       gasPrice: BigNumber.from(1),
       data: 'hello world!',
