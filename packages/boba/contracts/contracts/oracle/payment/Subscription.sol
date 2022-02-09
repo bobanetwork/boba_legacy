@@ -25,7 +25,6 @@ contract Subscription is AccessController {
     uint256 _minSubscriptionPeriod
   ) public {
     require(_bobaTokenAddress != address(0), "zero address not allowed");
-    require(_minSubscriptionPeriod != 0, "min subscription cannot be zero");
     bobaTokenAddress = _bobaTokenAddress;
     _updateSubscriptionCost(
       _paymentPerSecondLocalAccess,
@@ -117,6 +116,7 @@ contract Subscription is AccessController {
     uint256 _paymentPerSecondGlobalAccess,
     uint256 _minSubscriptionPeriod
   ) internal {
+    require(_minSubscriptionPeriod != 0, "min subscription cannot be zero");
     paymentPerSecondLocalAccess = _paymentPerSecondLocalAccess;
     paymentPerSecondGlobalAccess = _paymentPerSecondGlobalAccess;
     minSubscriptionPeriod = _minSubscriptionPeriod;

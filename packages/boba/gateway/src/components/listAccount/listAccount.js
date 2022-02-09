@@ -6,9 +6,9 @@ import { isEqual } from 'lodash'
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import { Box, Typography, Link, Fade } from '@material-ui/core'
+import { Box, Typography, Link, Fade } from '@mui/material'
 import * as S from './ListAccount.styles'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'

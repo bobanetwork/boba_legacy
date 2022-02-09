@@ -13,13 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { transfer } from 'actions/networkAction';
+import { transfer } from 'actions/networkAction'
+import { closeModal, openAlert } from 'actions/uiAction'
+import { selectLoading } from 'selectors/loadingSelector'
+import { selectLookupPrice } from 'selectors/lookupSelector'
 
-import { closeModal, openAlert } from 'actions/uiAction';
-import { selectLoading } from 'selectors/loadingSelector';
+import BN from 'bignumber.js'
+
+import { Box, Typography, useMediaQuery } from '@mui/material'
+import { useTheme } from '@emotion/react'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
@@ -28,13 +33,7 @@ import Input from 'components/input/Input'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'
 
-import { selectLookupPrice } from 'selectors/lookupSelector'
-
-import { Box, Typography, useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
-
-import BN from 'bignumber.js'
 
 function TransferModal ({ open, token, minHeight }) {
 
@@ -110,8 +109,6 @@ function TransferModal ({ open, token, minHeight }) {
     convertToUSD = true
   }
 
-  //if(typeof(token) === 'undefined') return
-
   return (
     <Modal open={open} onClose={handleClose} maxWidth="md" minHeight="500px">
       <Box>
@@ -146,8 +143,8 @@ function TransferModal ({ open, token, minHeight }) {
               setAmount(i.target.value)
               setValue_Wei_String(toWei_String(i.target.value, token.decimals))
             }}
-            onUseMax={(i)=>{//they want to use the maximum
-              setAmount(maxValue) //so the input value updates for the user
+            onUseMax={(i)=>{       // they want to use the maximum
+              setAmount(maxValue)  // so the input value updates for the user
               setValue_Wei_String(token.balance.toString())
             }}
             allowUseAll={true}
@@ -199,4 +196,4 @@ function TransferModal ({ open, token, minHeight }) {
   );
 }
 
-export default React.memo(TransferModal);
+export default React.memo(TransferModal)
