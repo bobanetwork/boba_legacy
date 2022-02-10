@@ -72,7 +72,7 @@ describe('Contract interactions', () => {
       expect(logs[0].args._value).to.deep.equal(BigNumber.from(1000))
     })
 
-    it.only('should support being self destructed', async () => {
+    it('should support being self destructed', async () => {
       const tx = await contract.destroy()
       await tx.wait()
       const code = await env.l2Wallet.provider.getCode(contract.address)
