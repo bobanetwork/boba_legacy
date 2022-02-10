@@ -27,7 +27,6 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@types/chai": "^4.2.17",
     "@types/chai-as-promised": "^7.1.3",
-
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "@uniswap/v3-core": "1.0.0",
