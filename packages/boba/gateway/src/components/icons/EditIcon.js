@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
 function EditIcon() {
     const theme = useTheme();

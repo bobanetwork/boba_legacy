@@ -21,7 +21,7 @@ import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
 
-import { Box, Typography } from '@material-ui/core'
+import { Box, Typography } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { getCoinImage } from 'util/coinImage'
 
@@ -30,6 +30,7 @@ function Input({
   label,
   type = 'text',
   disabled,
+  disabledExitAll,
   icon,
   unit,
   value,
@@ -181,6 +182,7 @@ function Input({
                   loading={loading}
                   triggerTime={new Date()}
                   tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+                  disabled={disabledExitAll}
                 >
                   Bridge All
                 </Button>

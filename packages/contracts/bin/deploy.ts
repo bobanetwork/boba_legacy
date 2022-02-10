@@ -74,7 +74,7 @@ const main = async () => {
     path.resolve(__dirname, `../deployments/rinkeby`)
   )
     .children.filter((child) => {
-      return child.extension === '.json'
+      return child.name.endsWith('.json')
     })
     .reduce((contractsAccumulator, child) => {
       const contractName = child.name.replace('.json', '')

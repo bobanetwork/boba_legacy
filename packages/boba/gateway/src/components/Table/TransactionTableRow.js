@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Box, Button, Collapse,
     Grid, Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 import DownIcon from 'components/icons/DownIcon';
 import L2ToL1Icon from 'components/icons/L2ToL1Icon';

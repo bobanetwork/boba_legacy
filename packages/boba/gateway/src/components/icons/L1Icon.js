@@ -1,5 +1,5 @@
 import * as React from "react";
-// import { useTheme } from "@material-ui/core/styles";
+// import { useTheme } from "@mui/material/styles";
 // TODO: Make use of color base on the provided theme.
 function L1Icon() {
     // const theme = useTheme();

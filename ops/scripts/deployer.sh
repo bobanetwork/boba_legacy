@@ -19,6 +19,7 @@ curl \
 yarn run deploy
 
 if [ -n "$DTL_REGISTRY_URL" ] ; then
+
     echo "Will upload addresses.json to DTL"
     curl \
         --show-error \
@@ -64,3 +65,4 @@ if [ -n "$DTL_STATE_DUMP_REGISTRY_URL" ] ; then
     echo
     echo "Upload done."
 fi
+

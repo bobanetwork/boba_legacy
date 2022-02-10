@@ -33,6 +33,18 @@ const deployFn: DeployFunction = async (hre) => {
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
     },
+    {
+      name: 'OMG',
+      address: (await hre.deployments.getOrNull('TK_L2OMG')).address,
+      minSubmissionValue: 1,
+      maxSubmissionValue: utils.parseUnits('500', 8),
+    },
+    {
+      name: 'WBTC',
+      address: (await hre.deployments.getOrNull('TK_L2WBTC')).address,
+      minSubmissionValue: utils.parseUnits('100', 8),
+      maxSubmissionValue: utils.parseUnits('500000', 8),
+    },
   ]
 
   const quotes = [{ name: 'USD', address: address(840) }]

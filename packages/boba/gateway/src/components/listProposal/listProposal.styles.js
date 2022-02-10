@@ -1,5 +1,5 @@
-import { styled } from '@material-ui/core/styles'
-import { Box, Grid } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Box, Grid } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',

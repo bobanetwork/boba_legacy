@@ -28,11 +28,11 @@ import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 
 import * as S from './Farm.styles'
-import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
+import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@mui/material'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 class Farm extends React.Component {
 
@@ -227,7 +227,7 @@ class Farm extends React.Component {
                 <br />
                 <span style={{fontWeight: '700'}}>YIELD</span>: the historical yield, which
                 reflects the fees people paid to bridge and the previous usage patterns for each pool.
-                There is no fixed yield and yields can wary widely as bridge activity changes.
+                There is no fixed yield and yields can vary widely as bridge activity changes.
                 <br />
                 <span style={{fontWeight: '700'}}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
                 <br />

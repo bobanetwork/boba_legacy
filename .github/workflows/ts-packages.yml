@@ -24,7 +24,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '16.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -43,6 +43,9 @@ jobs:
         # if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
+      - name: Check yarn.lock for changes
+        run: git diff --exit-code
+
       - name: Build
         run: yarn build
 
@@ -54,11 +57,11 @@ jobs:
       - name: Print gas report
         run: cat packages/contracts/gas-report.txt
 
-      # - name: Run codechecks
-      #   working-directory: ./packages/contracts
-      #   run: yarn codechecks
-      #   env:
-      #     CC_SECRET: ${{ secrets.CC_SECRET }}
+      - name: Run codechecks
+        working-directory: ./packages/contracts
+        run: yarn codechecks
+        env:
+          CC_SECRET: ${{ secrets.CC_SECRET }}
 
   test-coverage:
     name: Generate test coverage
@@ -73,7 +76,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '16.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -97,13 +100,11 @@ jobs:
 
       - name: Test Coverage
         run: yarn test:coverage
-        # Tests are quite brittle when instrumented by Solidity Coverage.
-        # If tests pass in the Test job above, tests failing during coverage shouldn't break CI.
-        continue-on-error: true
+
       - uses: codecov/codecov-action@v1
         with:
           files: ./packages/contracts/coverage.json
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           verbose: true
           flags: contracts
       - uses: codecov/codecov-action@v1
@@ -130,16 +131,27 @@ jobs:
           fail_ci_if_error: false
           verbose: true
           flags: message-relayer
-  lint:
-    name: Linting
+      # - uses: codecov/codecov-action@v1
+      #   with:
+      #     files: ./packages/sdk/coverage.json
+      #     fail_ci_if_error: false
+      #     verbose: true
+      #     flags: sdk
+
+  depcheck:
+    name: Check for unused dependencies
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
+
       - name: Fetch history
         run: git fetch
-      - uses: actions/setup-node@v1
+
+      - name: Setup node
+        uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: '16.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -158,9 +170,61 @@ jobs:
         # if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
-      - name: Lint JS and TS
-        run: yarn lint:check
+      - name: Check packages/batch-submitter
+        working-directory: ./packages/batch-submitter
+        run: npx depcheck
 
-      - name: Lint Solidity
+      - name: Check packages/contracts
         working-directory: ./packages/contracts
-        run: yarn lint:contracts:check
+        run: npx depcheck
+
+      - name: Check packages/core-utils
+        working-directory: ./packages/core-utils
+        run: npx depcheck
+
+      - name: Check packages/data-transport-layer
+        working-directory: ./packages/data-transport-layer
+        run: npx depcheck
+
+      - name: Check packages/message-relayer
+        working-directory: ./packages/message-relayer
+        run: npx depcheck
+
+      # - name: Check packages/sdk
+      #   working-directory: ./packages/sdk
+      #   run: npx depcheck
+
+      - name: Check integration-tests
+        working-directory: ./integration-tests
+        run: npx depcheck
+
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch history
+        run: git fetch
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Dependencies
+        # only install dependencies if there was a change in the deps
+        # if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Lint
+        run: yarn lint:check
