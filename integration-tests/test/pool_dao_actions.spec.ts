@@ -468,7 +468,7 @@ describe('Dao Action Test', async () => {
       }
     }).timeout(100000)
 
-    it('should queue the proposal successfully', async () => {
+    it.skip('should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
