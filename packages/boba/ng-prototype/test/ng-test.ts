@@ -47,7 +47,6 @@ const testWallet = new Wallet(testPrivateKey, local_provider)
 
 const testWallet2 = new Wallet(testPrivateKey, l2_provider)
 
-
 const tgt_1 = "0x2546bcd3c84621e976d8185a91a922ae77ecec30" // HH #16
 const src_1 = "0x1cbd3b2770909d4e10f157cabc84c7264073c9ec"
 

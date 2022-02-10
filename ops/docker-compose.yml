@@ -371,6 +371,7 @@ services:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 200
+
   l1-agent:
     depends_on:
      - l1_chain
@@ -381,6 +382,7 @@ services:
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.l1-agent
+      
   l2-agent:
     depends_on:
      - l1_chain
@@ -391,6 +393,7 @@ services:
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.l2-agent
+      
   monitor:
     depends_on:
      - l1_chain
