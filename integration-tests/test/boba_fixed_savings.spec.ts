@@ -364,22 +364,21 @@ describe('Boba Fixed Savings', async () => {
     describe('when in unstaking period after lock', async () => {
       before(async () => {
         // transfer rewards BOBA to contract
-        await L2Boba.transfer(FixedSavings.address, utils.parseEther('10'))
-
-        const blocknum = await env.l2Provider.getBlockNumber()
-        const timeNow = (await env.l2Provider.getBlock(blocknum)).timestamp
-        const stakeId = await FixedSavings.totalStakeCount()
-        const stakeData = await FixedSavings.stakeDataMap(stakeId)
-        const expectedLockEndTime = stakeData.depositTimestamp.add(
-          BigNumber.from(LOCK_TIME)
-        )
-
-        const timeToMove = expectedLockEndTime.sub(BigNumber.from(timeNow))
-        await moveTimeForward(timeToMove.toNumber())
-        preBalanceStaker = await L2Boba.balanceOf(env.l2Wallet.address)
-        preBalanceSavingsContract = await L2Boba.balanceOf(FixedSavings.address)
-        preXBobaBalance = await xGovL2ERC20.balanceOf(env.l2Wallet.address)
-        await FixedSavings.unstake(stakeId)
+        // TODO warp time on l2
+        // await L2Boba.transfer(FixedSavings.address, utils.parseEther('10'))
+        // const blocknum = await env.l2Provider.getBlockNumber()
+        // const timeNow = (await env.l2Provider.getBlock(blocknum)).timestamp
+        // const stakeId = await FixedSavings.totalStakeCount()
+        // const stakeData = await FixedSavings.stakeDataMap(stakeId)
+        // const expectedLockEndTime = stakeData.depositTimestamp.add(
+        //   BigNumber.from(LOCK_TIME)
+        // )
+        // const timeToMove = expectedLockEndTime.sub(BigNumber.from(timeNow))
+        // await moveTimeForward(timeToMove.toNumber())
+        // preBalanceStaker = await L2Boba.balanceOf(env.l2Wallet.address)
+        // preBalanceSavingsContract = await L2Boba.balanceOf(FixedSavings.address)
+        // preXBobaBalance = await xGovL2ERC20.balanceOf(env.l2Wallet.address)
+        // await FixedSavings.unstake(stakeId)
       })
       // TODO warp time on l2
       it.skip('should be able to unstake', async () => {
