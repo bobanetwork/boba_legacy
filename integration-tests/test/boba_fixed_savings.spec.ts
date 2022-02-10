@@ -403,14 +403,14 @@ describe('Boba Fixed Savings', async () => {
           preBalanceSavingsContract.sub(stakeData.depositAmount).sub(rewards)
         )
       })
-
-      it('should update the stake data', async () => {
+      // TODO warp time on l2
+      it.skip('should update the stake data', async () => {
         const stakeId = await FixedSavings.totalStakeCount()
         const stakeData = await FixedSavings.stakeDataMap(stakeId)
         expect(stakeData.isActive).to.be.eq(false)
       })
-
-      it('should burn xBOBA for user', async () => {
+      // TODO warp time on l2
+      it.skip('should burn xBOBA for user', async () => {
         const stakeId = await FixedSavings.totalStakeCount()
         const stakeData = await FixedSavings.stakeDataMap(stakeId)
         const xBOBABalance = await xGovL2ERC20.balanceOf(env.l2Wallet.address)
@@ -418,8 +418,8 @@ describe('Boba Fixed Savings', async () => {
           preXBobaBalance.sub(stakeData.depositAmount)
         )
       })
-
-      it('should not be able to unstake again', async () => {
+      // TODO warp time on l2
+      it.skip('should not be able to unstake again', async () => {
         const stakeId = await FixedSavings.totalStakeCount()
         const stakeData = await FixedSavings.stakeDataMap(stakeId)
         await expect(
