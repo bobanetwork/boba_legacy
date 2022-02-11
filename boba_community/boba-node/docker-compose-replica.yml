@@ -7,18 +7,13 @@ x-l1_rpc_geth: &l1_rpc_geth
 
 version: "3"
 
-networks:
-  default:
-    external: true
-    name: ops_default
-
 services:
   builder:
     image: bobanetwork/builder:latest
     build:
       context: ../..
       dockerfile: ./ops/docker/Dockerfile.monorepo
-      
+
   dtl:
     image: bobanetwork/data-transport-layer:latest
     build:
@@ -29,6 +24,7 @@ services:
     environment:
       << : *l1_rpc_dtl
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://lightning-replica.boba.network
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 288
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
