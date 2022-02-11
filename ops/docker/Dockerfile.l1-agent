@@ -21,4 +21,5 @@ COPY packages/contracts/artifacts/contracts/L2/predeploys/OVM_ETH.sol/OVM_ETH.js
 COPY packages/boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json contracts/L1LiquidityPool.json
 COPY packages/boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json contracts/L2LiquidityPool.json
 
+RUN mkdir ./logs
 CMD [ "python", "-u", "./l1-agent.py", "local-docker" ]
