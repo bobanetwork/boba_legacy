@@ -140,6 +140,7 @@ describe("Stableswap at AWS Lambda", function () {
 
   it("should correctly swap X in for Y out", async () => {
     //testing with 800, y=1200, A=5 - this also sets the k
+    await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
     const tr = await stable.swap_x(urlStr, 12, gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
