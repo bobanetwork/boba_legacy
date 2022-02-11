@@ -100,7 +100,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     this.state.addressRegistry.use(bodyParser.json())
 
     await this.listeners()
-    
+
     this.state.arServer = this.state.addressRegistry.listen(this.options.arPort,this.options.hostname)
     this.logger.info("addressRegistry server listening", {hostname:this.options.hostname, port:this.options.arPort})
 
@@ -118,7 +118,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         this.logger.info("Waiting for initial ADDRESS_MANAGER address")
         await sleep(5000)
       }
-    } while (! this.state.addressManager)
+    } while (! this.state.addressManager && this.options.syncFromL1)
 
     this.logger.info("addressManager set, continuing with startup", {addr:this.state.addressManager})
 
