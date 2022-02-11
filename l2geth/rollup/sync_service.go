@@ -854,6 +854,11 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 
 	select {
 	case err := <-errCh:
+		if err.Error() == "turing retry needed" {
+			log.Debug("TURING sync_service intercepted ErrTuringRetry")
+			tx.GetMeta().Index = nil
+			return err
+		}
 		log.Error("Got error waiting for transaction to be added to chain", "msg", err)
 		s.SetLatestL1Timestamp(ts)
 		s.SetLatestL1BlockNumber(bn)

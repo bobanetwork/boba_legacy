@@ -67,6 +67,15 @@ describe("Basic Math", function () {
           let volume = (4/3) * 3.14159 * Math.pow(parseFloat(args['0']),3)
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
+
+          // Optional mechanism to intentionally delay the off-chain response
+          // long enough to investigate blocking/timeout issues in l2geth
+          const ms_delay = 1000
+          if (ms_delay > 0) {
+            console.log("      (HTTP) Delaying response for:", ms_delay, "ms")
+            await new Promise(resolve => setTimeout(resolve, ms_delay));
+          }
+
           console.log("      (HTTP) SPHERE Returning off-chain response:", args, "->", volume * 100)
 
           let result = abiDecoder.encodeParameters(['uint256','uint256'], [32/*start offset of the bytes*/, Math.round(volume*100)])
@@ -199,6 +208,8 @@ describe("Basic Math", function () {
   })
 
   it("should support floating point volume of sphere", async () => {
+    // This pre-populates the result cache, so that the real transaction can
+    // complete without needing to block the sequencer thread.
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
@@ -209,7 +220,9 @@ describe("Basic Math", function () {
 
   it("should support floating point volume of sphere based on geth-cached result", async () => {
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
+    console.log("---start TX_cache---")
     const res = await tr.wait()
+    console.log("---end TX_cache---")
     expect(res).to.be.ok
     const rawData = res.events[0].data
     const result = parseInt(rawData.slice(-64), 16) / 100 
