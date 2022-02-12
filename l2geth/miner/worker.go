@@ -77,6 +77,16 @@ const (
 	staleThreshold = 7
 )
 
+var (
+	// ErrCannotCommitTxn signals that the transaction execution failed
+	// when attempting to mine a transaction.
+	//
+	// NOTE: This error is not expected to occur in regular operation of
+	// l2geth, rather the actual execution error should be returned to the
+	// user.
+	ErrCannotCommitTxn = errors.New("Cannot commit transaction in miner")
+)
+
 // environment is the worker's current environment and holds all of the current state information.
 type environment struct {
 	signer types.Signer
@@ -469,6 +479,7 @@ func (w *worker) mainLoop() {
 				log.Warn("No transaction sent to miner from syncservice")
 				continue
 			}
+
 			tx := ev.Txs[0]
 			log.Debug("Attempting to commit rollup transaction", "hash", tx.Hash().Hex())
 			// Build the block with the tx and add it to the chain. This will
@@ -504,6 +515,11 @@ func (w *worker) mainLoop() {
 					delete(w.pendingTasks, h)
 				}
 				w.pendingMu.Unlock()
+			} else if err.Error() == "turing retry needed" {
+				// no error message here
+				if ev.ErrCh != nil {
+					ev.ErrCh <- err
+				}
 			} else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
@@ -772,10 +788,10 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 	return receipt.Logs, nil
 }
 
-func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) bool {
+func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coinbase common.Address, interrupt *int32) int {
 	// Short circuit if current is nil
 	if w.current == nil {
-		return true
+		return 1
 	}
 
 	if w.current.gasPool == nil {
@@ -803,7 +819,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 					inc:   true,
 				}
 			}
-			return w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead
+			if w.current.tcount == 0 || atomic.LoadInt32(interrupt) == commitInterruptNewHead {
+				return 1
+			} else {
+				return 0
+			}
 		}
 		// If we don't have enough gas for any further transactions then we're done
 		if w.current.gasPool.Gas() < params.TxGas {
@@ -846,7 +866,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 
 		case core.ErrNonceTooHigh:
 			// Reorg notification data race between the transaction pool and miner, skip account =
-			log.Trace("Skipping account with hight nonce", "sender", from, "nonce", tx.Nonce())
+			log.Trace("Skipping account with high nonce", "sender", from, "nonce", tx.Nonce())
 			txs.Pop()
 
 		case nil:
@@ -855,12 +875,19 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			w.current.tcount++
 			txs.Shift()
 
+		case core.ErrTuringRetry:
+			// Turing transaction needs to be retried after populating the cache. This special
+			// error code rolls back the first attempt as if it had never happened.
+			txs.Shift()
+			return 2
+
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
 			// nonce-too-high clause will prevent us from executing in vain).
 			log.Debug("Transaction failed, account skipped", "hash", tx.Hash(), "err", err)
 			txs.Shift()
 		}
+
 	}
 
 	if !w.isRunning() && len(coalescedLogs) > 0 {
@@ -883,7 +910,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 	if interrupt != nil {
 		w.resubmitAdjustCh <- &intervalAdjust{inc: false}
 	}
-	return w.current.tcount == 0
+	if w.current.tcount == 0 {
+		return 1
+	} else {
+		return 0
+	}
 }
 
 // commitNewTx is an OVM addition that mines a block with a single tx in it.
@@ -945,8 +976,12 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	acc, _ := types.Sender(w.current.signer, tx)
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
-	if w.commitTransactions(txs, w.coinbase, nil) {
+	wCt := w.commitTransactions(txs, w.coinbase, nil)
+	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
+	} else if wCt == 2 {
+		log.Debug("TURING w.commitTransactions returned Turing retry code")
+		return core.ErrTuringRetry
 	}
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
@@ -1049,13 +1084,14 @@ func (w *worker) commitNewWork(interrupt *int32, timestamp int64) {
 	}
 	if len(localTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, localTxs)
-		if w.commitTransactions(txs, w.coinbase, interrupt) {
+
+		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
 		}
 	}
 	if len(remoteTxs) > 0 {
 		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, remoteTxs)
-		if w.commitTransactions(txs, w.coinbase, interrupt) {
+		if w.commitTransactions(txs, w.coinbase, interrupt) != 0 {
 			return
 		}
 	}

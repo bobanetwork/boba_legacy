@@ -133,6 +133,7 @@ describe("Pull Bitcoin - USD quote", function () {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
   it("should get the current Bitcoin - USD price", async () => {
+    await lending.estimateGas.getCurrentQuote(urlStr, "BTC/USD", gasOverride)
     const tr = await lending.getCurrentQuote(urlStr, "BTC/USD", gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
