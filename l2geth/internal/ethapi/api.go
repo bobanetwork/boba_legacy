@@ -1752,7 +1752,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 			Data:     &tdBytes,
 		}
 
-		_, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, vm.Config{}, 0, new(big.Int).SetUint64(8000000))
+		_, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, &vm.Config{}, 0, new(big.Int).SetUint64(8000000))
 		if failed {
 			log.Error("TURING api.go gasEstimate failed", "err", err2)
 			return common.Hash{}, err
