@@ -297,8 +297,8 @@ describe('Oracle Flux Aggregator', async () => {
       )
       await addOracleTx.wait()
     })
-
-    it('rounds with less than min submissions is timedOut', async () => {
+    // TODO warp time on l2
+    it.skip('rounds with less than min submissions is timedOut', async () => {
       // submit first oracle
       const SubmitTx = await FluxAggregator.connect(env.l2Wallet_2).submit(
         4,
@@ -322,8 +322,8 @@ describe('Oracle Flux Aggregator', async () => {
       expect(previousRoundData.answeredInRound).to.be.eq(3)
       expect(previousRoundData.answer).to.be.eq(roundThreeData.answer)
     })
-
-    it('rounds with at least min submissions is not timedOut', async () => {
+    // TODO warp time on l2
+    it.skip('rounds with at least min submissions is not timedOut', async () => {
       // submit second oracle
       const SubmitTx = await FluxAggregator.connect(env.l2Wallet_3).submit(
         5,

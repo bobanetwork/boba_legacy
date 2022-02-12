@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 
@@ -31,6 +32,19 @@ func (q QueueOrigin) String() string {
 		return "l1"
 	default:
 		return ""
+	}
+}
+
+func (q *QueueOrigin) UnmarshalJSON(b []byte) error {
+	switch string(b) {
+	case "\"sequencer\"":
+		*q = QueueOriginSequencer
+		return nil
+	case "\"l1\"":
+		*q = QueueOriginL1ToL2
+		return nil
+	default:
+		return fmt.Errorf("Unknown QueueOrigin: %q", b)
 	}
 }
 

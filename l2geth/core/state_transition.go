@@ -80,6 +80,7 @@ type Message interface {
 	Nonce() uint64
 	CheckNonce() bool
 	Data() []byte
+	AccessList() types.AccessList
 
 	L1Timestamp() uint64
 	L1BlockNumber() *big.Int
@@ -214,14 +215,13 @@ func (st *StateTransition) buyGas() error {
 func (st *StateTransition) preCheck() error {
 	// Make sure this transaction's nonce is correct.
 	if st.msg.CheckNonce() {
+		if rcfg.UsingOVM {
+			if st.msg.QueueOrigin() == types.QueueOriginL1ToL2 {
+				return st.buyGas()
+			}
+		}
 		nonce := st.state.GetNonce(st.msg.From())
 		if nonce < st.msg.Nonce() {
-			if rcfg.UsingOVM {
-				// The nonce never increments for L1ToL2 txs
-				if st.msg.QueueOrigin() == types.QueueOriginL1ToL2 {
-					return st.buyGas()
-				}
-			}
 			return ErrNonceTooHigh
 		} else if nonce > st.msg.Nonce() {
 			return ErrNonceTooLow
@@ -259,6 +259,11 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		// error.
 		vmerr error
 	)
+
+	// The access list gets created here
+	if rules := st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber); rules.IsBerlin {
+		st.state.PrepareAccessList(msg.From(), msg.To(), vm.ActivePrecompiles(rules), msg.AccessList())
+	}
 
 	if contractCreation {
 		ret, _, st.gas, vmerr = evm.Create(sender, st.data, st.gas, st.value)

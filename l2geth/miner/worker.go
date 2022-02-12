@@ -77,6 +77,16 @@ const (
 	staleThreshold = 7
 )
 
+var (
+	// ErrCannotCommitTxn signals that the transaction execution failed
+	// when attempting to mine a transaction.
+	//
+	// NOTE: This error is not expected to occur in regular operation of
+	// l2geth, rather the actual execution error should be returned to the
+	// user.
+	ErrCannotCommitTxn = errors.New("Cannot commit transaction in miner")
+)
+
 // environment is the worker's current environment and holds all of the current state information.
 type environment struct {
 	signer types.Signer
@@ -856,7 +866,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 
 		case core.ErrNonceTooHigh:
 			// Reorg notification data race between the transaction pool and miner, skip account =
-			log.Trace("Skipping account with hight nonce", "sender", from, "nonce", tx.Nonce())
+			log.Trace("Skipping account with high nonce", "sender", from, "nonce", tx.Nonce())
 			txs.Pop()
 
 		case nil:
@@ -877,6 +887,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			log.Debug("Transaction failed, account skipped", "hash", tx.Hash(), "err", err)
 			txs.Shift()
 		}
+
 	}
 
 	if !w.isRunning() && len(coalescedLogs) > 0 {
@@ -965,7 +976,6 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	acc, _ := types.Sender(w.current.signer, tx)
 	transactions[acc] = types.Transactions{tx}
 	txs := types.NewTransactionsByPriceAndNonce(w.current.signer, transactions)
-
 	wCt := w.commitTransactions(txs, w.coinbase, nil)
 	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
