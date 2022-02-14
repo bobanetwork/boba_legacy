@@ -9,7 +9,7 @@
 
 February 13, 2022
 
-Greetings from your engineering team. As noted, we have a transitioned to a 7 day tech update cycle. The main goal is to support a quickly-growing messaging infrastructure, which will take this and other material and make sure that it more broadly distributed compared to what Boba did in the past. 
+Greetings from your engineering team. As noted, we have a transitioned to a 7 day tech update cycle. The main goal is to support a quickly-growing messaging infrastructure, which will take this and other material and make sure that it is more broadly distributed compared to what Boba did in the past. 
 
 ## 1. Roadmap and Whitepaper - update
 
