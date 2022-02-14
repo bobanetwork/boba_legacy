@@ -43,6 +43,7 @@ export interface L1DataTransportServiceOptions {
   l1GasPriceBackend: string
   l1StartHeight?: number
   bssHardfork1Index?: number
+  ctcDeploymentHeight?: number
 }
 
 const optionSettings = {
