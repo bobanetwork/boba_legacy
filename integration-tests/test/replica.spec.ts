@@ -14,21 +14,22 @@ import { OptimismEnv } from './shared/env'
 describe('Syncing a replica', () => {
   let env: OptimismEnv
   let wallet: Wallet
-  let provider: providers.JsonRpcProvider
+  //let provider: providers.JsonRpcProvider
 
   const sequencerProvider = injectL2Context(l2Provider)
+  const repProvider = injectL2Context(replicaProvider)
 
   /* Helper functions */
 
   const syncReplica = async (sequencerBlockNumber: number) => {
     // Wait until replica has caught up to the sequencer
-    let latestReplicaBlock = (await provider.getBlock('latest')) as any
+    let latestReplicaBlock = (await repProvider.getBlock('latest')) as any
     while (latestReplicaBlock.number < sequencerBlockNumber) {
       await sleep(500)
-      latestReplicaBlock = (await provider.getBlock('latest')) as any
+      latestReplicaBlock = (await repProvider.getBlock('latest')) as any
     }
 
-    return provider.getBlock(sequencerBlockNumber)
+    return repProvider.getBlock(sequencerBlockNumber)
   }
 
   before(async () => {
@@ -86,7 +87,9 @@ describe('Syncing a replica', () => {
       const transfer = await ERC20.transfer(other.address, 100)
       await transfer.wait()
 
-      const latestSequencerBlock = (await provider.getBlock('latest')) as any
+      const latestSequencerBlock = (await sequencerProvider.getBlock(
+        'latest'
+      )) as any
 
       const matchingReplicaBlock = (await syncReplica(
         latestSequencerBlock.number
