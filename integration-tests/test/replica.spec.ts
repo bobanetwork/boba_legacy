@@ -8,8 +8,8 @@ import {
   l2Provider,
   replicaProvider,
   waitForL2Geth,
-} from '../test/shared/utils'
-import { OptimismEnv } from '../test/shared/env'
+} from './shared/utils'
+import { OptimismEnv } from './shared/env'
 import { DockerComposeNetwork } from '../test/shared/docker-compose'
 
 describe('Syncing a replica', () => {
