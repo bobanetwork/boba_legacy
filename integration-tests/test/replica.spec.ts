@@ -10,27 +10,15 @@ import {
   waitForL2Geth,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
-import { DockerComposeNetwork } from '../test/shared/docker-compose'
 
 describe('Syncing a replica', () => {
   let env: OptimismEnv
   let wallet: Wallet
-  let replica: DockerComposeNetwork
   let provider: providers.JsonRpcProvider
 
   const sequencerProvider = injectL2Context(l2Provider)
 
   /* Helper functions */
-
-  const startReplica = async () => {
-    // Bring up new replica
-    replica = new DockerComposeNetwork(['replica'])
-    await replica.up({
-      commandOptions: ['--scale', 'replica=1'],
-    })
-
-    provider = await waitForL2Geth(replicaProvider)
-  }
 
   const syncReplica = async (sequencerBlockNumber: number) => {
     // Wait until replica has caught up to the sequencer
@@ -46,11 +34,6 @@ describe('Syncing a replica', () => {
   before(async () => {
     env = await OptimismEnv.new()
     wallet = env.l2Wallet
-  })
-
-  after(async () => {
-    await replica.stop('replica')
-    await replica.rm()
   })
 
   describe('Basic transactions and ERC20s', () => {
@@ -82,8 +65,6 @@ describe('Syncing a replica', () => {
       const latestSequencerBlock = (await sequencerProvider.getBlock(
         'latest'
       )) as any
-
-      await startReplica()
 
       const matchingReplicaBlock = (await syncReplica(
         latestSequencerBlock.number
