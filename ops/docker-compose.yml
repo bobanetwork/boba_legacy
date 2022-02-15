@@ -328,6 +328,8 @@ services:
       dockerfile: ./ops/docker/Dockerfile.integration-tests
     entrypoint: ./integration-tests.sh
     environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
