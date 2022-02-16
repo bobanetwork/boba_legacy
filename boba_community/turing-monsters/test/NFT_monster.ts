@@ -29,7 +29,7 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
 const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-const testPrivateKey = '0x_________'
+const testPrivateKey = '0x______________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
 describe("Turing NFT Random 256", function () {
@@ -52,8 +52,8 @@ describe("Turing NFT Random 256", function () {
       testWallet)
     
     erc721 = await Factory__ERC721.deploy(
-      "RandomERC721",
-      "RER",
+      "TuringMonster",
+      "BOO",
       helper.address, 
       gasOverride)
 
@@ -116,6 +116,21 @@ describe("Turing NFT Random 256", function () {
     let tr = await erc721.mint(testWallet.address, 42, gasOverride)
     let res = await tr.wait()
     expect(res).to.be.ok
+    console.log("    Turing NFT =",res)
+  })
+
+  it("should mint an NFT with random attributes", async () => {
+    let tr = await erc721.mint(testWallet.address, 43, gasOverride)
+    let res = await tr.wait()
+    expect(res).to.be.ok
+    console.log("    Turing NFT =",res)
+  })
+
+  it("should mint an NFT with random attributes", async () => {
+    let tr = await erc721.mint(testWallet.address, 44, gasOverride)
+    let res = await tr.wait()
+    expect(res).to.be.ok
+    console.log("    Turing NFT =",res)
   })
 
   it("should get an svg", async () => {

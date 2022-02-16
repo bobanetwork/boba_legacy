@@ -21,7 +21,9 @@ As for every chain, you need an account with some ETH (to deploy contracts) and 
 
 ```javascript
 
-const testPrivateKey = '0x______________'
+const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+const testPrivateKey = '0x____' // your private key here....
+const testWallet = new Wallet(testPrivateKey, local_provider)
 
 ``` 
 
