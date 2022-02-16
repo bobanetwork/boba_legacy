@@ -88,13 +88,18 @@ class listNFT extends React.Component {
       meta
     } = this.state
 
+    let imgSource = URL
+    if(URL.substring(0,4)==='<svg') {
+      imgSource = `data:image/svg+xml;utf8,${URL}`
+    }
+
     return (
       <div className={styles.ListNFT}>
 
-        <img
-          src={URL}
+        <img 
+          src={imgSource}
           alt="NFT URI"
-          width={'100%'}
+          width={'100%'} 
         />
 
         <div className={styles.topContainer}>
