@@ -92,14 +92,14 @@
 
               # Use fakeSha256 when the dependencies change
               #vendorSha256 = pkgs.lib.fakeSha256;
-              vendorSha256 = "sha256-WWHq7hkCAaLb/lL4nthvO1CxoAstk3ehs/U8a7JjZ9I=";
+              vendorSha256 = "sha256-gHz9A0K2CeqkH+vQ2rV0Um1xp5NrRApB81ASx1iOsp0=";
               outputs = [ "out" "geth" "clef" ];
 
               # Move binaries to separate outputs and symlink them back to $out
               postInstall = pkgs.lib.concatStringsSep "\n" (
                 builtins.map (bin: "mkdir -p \$${bin}/bin && mv $out/bin/${bin} \$${bin}/bin/ && ln -s \$${bin}/bin/${bin} $out/bin/") [ "geth" "clef" ]
               );
-              proxyVend = true;
+              runVend = true;
               subPackages = [
                 "cmd/abigen"
                 "cmd/bootnode"
