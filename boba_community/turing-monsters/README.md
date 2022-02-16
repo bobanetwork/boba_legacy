@@ -19,7 +19,7 @@ const testPrivateKey = '0x______________'
 
 ``` 
 
-You can also do this via a hardware wallet, a mnemoic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
+You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
 
 ```bash
 $ cd boba_community/turing-monsters 
@@ -27,7 +27,7 @@ $ yarn build
 $ yarn test:rinkeby
 ```
 
-Ok, all done. Enjoy. The terminal will give you all the inforation you need to mint and send a turing monster to your friends:
+Ok, all done. Enjoy. The terminal will give you all the information you need to mint and send a Turing monster to your friends:
 
 ```
   Turing NFT Random 256

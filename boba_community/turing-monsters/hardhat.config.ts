@@ -1,6 +1,4 @@
 import { HardhatUserConfig } from 'hardhat/types'
-
-// Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 
 const config: HardhatUserConfig = {
@@ -10,6 +8,9 @@ const config: HardhatUserConfig = {
   networks: {
     boba_local: {
       url: 'http://localhost:8545',
+    },
+    boba_rinkeby: {
+      url: 'https://rinkeby.boba.network',
     },
   },
   solidity: {

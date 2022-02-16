@@ -11,7 +11,7 @@ const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
 
-const gasOverride =  { gasLimit: 3000000 }
+const gasOverride =  { /*gasLimit: 3000000*/ }
 
 import ERC721Json from "../artifacts/contracts/ERC721min.sol/ERC721min.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
@@ -27,7 +27,9 @@ let addressesBOBA
 
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-const testPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+const testPrivateKey = '0x_________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
 describe("Turing NFT Random 256", function () {
@@ -54,6 +56,7 @@ describe("Turing NFT Random 256", function () {
       "RER",
       helper.address, 
       gasOverride)
+
     console.log("    ERC721 contract deployed at", erc721.address)
 
     // white list your ERC721 contract in your helper
@@ -62,20 +65,16 @@ describe("Turing NFT Random 256", function () {
     const res1 = await tr1.wait()
     console.log("    adding your ERC721 as PermittedCaller to TuringHelper", res1.events[0].data)
 
-    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
-    addressesBOBA = JSON.parse(result)
-
     L2BOBAToken = new Contract(
-      addressesBOBA.TOKENS.BOBA.L2,
+      BOBAL2Address,
       L2GovernanceERC20Json.abi,
       testWallet
     )
 
-    // prepare to register/fund your Turing Helper 
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       testWallet
-    ).attach(addressesBOBA.BobaTuringCredit)
+    ).attach(BobaTuringCreditRinkebyAddress)
 
   })
 
@@ -114,13 +113,13 @@ describe("Turing NFT Random 256", function () {
   })
 
   it("should mint an NFT with random attributes", async () => {
-    let tr = await erc721.mint(testWallet.address, 42)
+    let tr = await erc721.mint(testWallet.address, 42, gasOverride)
     let res = await tr.wait()
     expect(res).to.be.ok
   })
 
   it("should get an svg", async () => {
-    let uri = await erc721.tokenURI(42)
+    let uri = await erc721.tokenURI(42, gasOverride)
     console.log("    Turing URI =",uri)
   })
 
