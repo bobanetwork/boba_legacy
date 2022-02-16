@@ -1,6 +1,12 @@
-# Monster Minting
+# Turing Monster Minting
 
-## Mint your monster contract
+- [Turing Monster Minting](#turing-monster-minting)
+  * [Mint your Monster!](#mint-your-monster-)
+  * [Getting Rinkeby ETH and Rinkeby BOBA](#getting-rinkeby-eth-and-rinkeby-boba)
+  * [Deploying the Turing Monster NFT](#deploying-the-turing-monster-nft)
+  * [Solidity Code Walkthrough](#solidity-code-walkthrough)
+
+## Mint your Monster!
 
 Clone the repository, open it, and install packages with `yarn`:
 
@@ -20,6 +26,14 @@ const testPrivateKey = '0x______________'
 ``` 
 
 You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
+
+## Getting Rinkeby ETH and Rinkeby BOBA
+
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed. 
+
+## Deploying the Turing Monster NFT
+
+Run
 
 ```bash
 $ cd boba_community/turing-monsters 
@@ -45,7 +59,9 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 ```
 
-## Code walkthrough
+## Solidity Code Walkthrough
+
+The ERC721 contract is largegy standard., except for needing to provide the address of the `TuringHelper` contract and the `uint256 turingRAND = myHelper.TuringRandom();` of course.
 
 ```javascript
     
