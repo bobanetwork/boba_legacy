@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/turing-hybrid-compute/packages/boba/gateway/src/images/logo-boba.svg" width=280></a>
+  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba-token.svg" width=280></a>
   <br />
   <h1> The Boba Monorepo</h1>
 </div>

@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import {useMediaQuery, useTheme} from '@material-ui/core'
+import {useMediaQuery, useTheme} from '@mui/material'
 import moment from 'moment'
 
 import Input from 'components/input/Input'

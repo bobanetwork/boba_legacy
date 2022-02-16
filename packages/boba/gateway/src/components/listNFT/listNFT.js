@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
@@ -88,13 +88,18 @@ class listNFT extends React.Component {
       meta
     } = this.state
 
+    let imgSource = URL
+    if(URL.substring(0,4)==='<svg') {
+      imgSource = `data:image/svg+xml;utf8,${URL}`
+    }
+
     return (
       <div className={styles.ListNFT}>
 
-        <img
-          src={URL}
+        <img 
+          src={imgSource}
           alt="NFT URI"
-          width={'100%'}
+          width={'100%'} 
         />
 
         <div className={styles.topContainer}>

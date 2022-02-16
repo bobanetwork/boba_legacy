@@ -1,4 +1,6 @@
 /* External Imports */
+import { performance } from 'perf_hooks'
+
 import { Promise as bPromise } from 'bluebird'
 import { Signer, ethers, Contract, providers, BigNumber } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
@@ -21,9 +23,8 @@ import {
   BatchContext,
   AppendSequencerBatchParams,
 } from '../transaction-chain-contract'
-
-import { BlockRange, BatchSubmitter } from '.'
 import { TransactionSubmitter } from '../utils'
+import { BlockRange, BatchSubmitter } from '.'
 
 export interface AutoFixBatchOptions {
   fixDoublePlayedDeposits: boolean
@@ -35,8 +36,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   protected chainContract: CanonicalTransactionChainContract
   protected l2ChainId: number
   protected syncing: boolean
-  private disableQueueBatchAppend: boolean
   private autoFixBatchOptions: AutoFixBatchOptions
+  private validateBatch: boolean
   private transactionSubmitter: TransactionSubmitter
   private gasThresholdInGwei: number
 
@@ -54,9 +55,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     gasThresholdInGwei: number,
     transactionSubmitter: TransactionSubmitter,
     blockOffset: number,
+    validateBatch: boolean,
     logger: Logger,
     metrics: Metrics,
-    disableQueueBatchAppend: boolean,
     autoFixBatchOptions: AutoFixBatchOptions = {
       fixDoublePlayedDeposits: false,
       fixMonotonicity: false,
@@ -79,10 +80,15 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       logger,
       metrics
     )
-    this.disableQueueBatchAppend = disableQueueBatchAppend
+    this.validateBatch = validateBatch
     this.autoFixBatchOptions = autoFixBatchOptions
     this.gasThresholdInGwei = gasThresholdInGwei
     this.transactionSubmitter = transactionSubmitter
+
+    this.logger.info('Batch validation options', {
+      autoFixBatchOptions,
+      validateBatch,
+    })
   }
 
   /*****************************
@@ -138,11 +144,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         'Syncing mode enabled! Skipping batch submission and clearing queue elements',
         { pendingQueueElements }
       )
-
-      if (!this.disableQueueBatchAppend) {
-        return this.submitAppendQueueBatch()
-      }
     }
+
     this.logger.info('Syncing mode enabled but queue is empty. Skipping...')
     return
   }
@@ -202,8 +205,19 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    const [batchParams, wasBatchTruncated] =
-      await this._generateSequencerBatchParams(startBlock, endBlock)
+    const batchTxBuildStart = performance.now()
+
+    const params = await this._generateSequencerBatchParams(
+      startBlock,
+      endBlock
+    )
+    if (!params) {
+      throw new Error(
+        `Cannot create sequencer batch with params start ${startBlock} and end ${endBlock}`
+      )
+    }
+
+    const [batchParams, wasBatchTruncated] = params
     const batchSizeInBytes = encodeAppendSequencerBatch(batchParams).length / 2
     this.logger.debug('Sequencer batch generated', {
       batchSizeInBytes,
@@ -217,21 +231,12 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    if (batchParams.totalElementsToAppend === 0) {
-      this.logger.error('Will not submit tx_chain batch with 0 elements')
-      return
-    }
+    const batchTxBuildEnd = performance.now()
+    this.metrics.batchTxBuildTime.set(batchTxBuildEnd - batchTxBuildStart)
 
-    this.metrics.numTxPerBatch.observe(endBlock - startBlock)
+    this.metrics.numTxPerBatch.observe(batchParams.totalElementsToAppend)
     const l1tipHeight = await this.signer.provider.getBlockNumber()
-    this.logger.info('Submitting tx_chain batch', {
-      startBlock,
-      endBlock,
-      l1tipHeight,
-      batchStart: batchParams.shouldStartAtElement,
-      batchElements: batchParams.totalElementsToAppend,
-    })
-    this.logger.info('Submitting batch.', {
+    this.logger.debug('Submitting batch.', {
       calldata: batchParams,
       l1tipHeight,
     })
@@ -242,20 +247,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   /*********************
    * Private Functions *
    ********************/
-
-  private async submitAppendQueueBatch(): Promise<TransactionReceipt> {
-    const tx = await this.chainContract.populateTransaction.appendQueueBatch(
-      ethers.constants.MaxUint256 // Completely empty the queue by appending (up to) an enormous number of queue elements.
-    )
-    const submitTransaction = (): Promise<TransactionReceipt> => {
-      return this.transactionSubmitter.submitTransaction(
-        tx,
-        this._makeHooks('appendQueueBatch')
-      )
-    }
-    // Empty the queue with a huge `appendQueueBatch(..)` call
-    return this._submitAndLogTx(submitTransaction, 'Cleared queue!')
-  }
 
   private async submitAppendSequencerBatch(
     batchParams: AppendSequencerBatchParams
@@ -290,12 +281,17 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       { concurrency: 100 }
     )
 
-    // Fix our batches if we are configured to. TODO: Remove this.
+    // Fix our batches if we are configured to. This will not
+    // modify the batch unless an autoFixBatchOption is set
     batch = await this._fixBatch(batch)
-    if (!(await this._validateBatch(batch))) {
-      this.metrics.malformedBatches.inc()
-      return
+    if (this.validateBatch) {
+      this.logger.info('Validating batch')
+      if (!(await this._validateBatch(batch))) {
+        this.metrics.malformedBatches.inc()
+        return
+      }
     }
+
     let sequencerBatchParams = await this._getSequencerBatchParams(
       startBlock,
       batch
@@ -354,7 +350,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           idx,
           ele,
         })
-        this._enableAutoFixBatchOptions(1)
         return false
       }
       if (ele.blockNumber < lastBlockNumber) {
@@ -362,7 +357,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           idx,
           ele,
         })
-        this._enableAutoFixBatchOptions(1)
         return false
       }
       lastTimestamp = ele.timestamp
@@ -384,16 +378,16 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     }
 
     let isEqual = true
-    const [queueEleHash, timestamp, blockNumber] =
-      await this.chainContract.getQueueElement(queueIndex)
+    const [, timestamp, blockNumber] = await this.chainContract.getQueueElement(
+      queueIndex
+    )
 
     // TODO: Verify queue element hash equality. The queue element hash can be computed with:
     // keccak256( abi.encode( msg.sender, _target, _gasLimit, _data))
-    this._enableAutoFixBatchOptions(0)
+
     // Check timestamp & blockNumber equality
     if (timestamp !== queueElement.timestamp) {
       isEqual = false
-      this._enableAutoFixBatchOptions(2)
       logEqualityError(
         'Timestamp',
         queueIndex,
@@ -403,7 +397,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     }
     if (blockNumber !== queueElement.blockNumber) {
       isEqual = false
-      this._enableAutoFixBatchOptions(1)
       logEqualityError(
         'Block Number',
         queueIndex,
@@ -461,7 +454,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           if (nextQueueIndex >= totalQueueElements) {
             break
           }
-          const [queueEleHash, timestamp, blockNumber] =
+          const [, timestamp, blockNumber] =
             await this.chainContract.getQueueElement(nextQueueIndex)
 
           if (timestamp < ele.timestamp || blockNumber < ele.blockNumber) {
@@ -486,7 +479,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
             break
           }
         }
-        // fixedBatch.push(ele)
+        fixedBatch.push(ele)
         if (!ele.isSequencerTx) {
           nextQueueIndex++
         }
@@ -522,7 +515,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         const totalQueueElements =
           pendingQueueElements + nextRemoteQueueElements
         if (nextQueueIndex < totalQueueElements) {
-          const [queueEleHash, queueTimestamp, queueBlockNumber] =
+          const [, queueTimestamp, queueBlockNumber] =
             await this.chainContract.getQueueElement(nextQueueIndex)
           latestTimestamp = queueTimestamp
           latestBlockNumber = queueBlockNumber
@@ -589,12 +582,15 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     // NOTE: It is unsafe to combine multiple autoFix options.
     // If you must combine them, manually verify the output before proceeding.
     if (this.autoFixBatchOptions.fixDoublePlayedDeposits) {
+      this.logger.info('Fixing double played deposits')
       batch = await fixDoublePlayedDeposits(batch)
     }
     if (this.autoFixBatchOptions.fixMonotonicity) {
+      this.logger.info('Fixing monotonicity')
       batch = await fixMonotonicity(batch)
     }
     if (this.autoFixBatchOptions.fixSkippedDeposits) {
+      this.logger.info('Fixing skipped deposits')
       batch = await fixSkippedDeposits(batch)
     }
     return batch
@@ -624,8 +620,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     // convert to bytes27
     meta = meta.slice(10)
 
-    const totalElements = meta.slice(-10)
-    const nextQueueIndex = meta.slice(-20, -10)
     const lastTimestamp = parseInt(meta.slice(-30, -20), 16)
     const lastBlockNumber = parseInt(meta.slice(-40, -30), 16)
     this.logger.debug('Retrieved timestamp and block number from CTC', {
@@ -640,8 +634,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     queueIndex: number,
     queueElement: BatchElement
   ): Promise<BatchElement> {
-    const [queueEleHash, timestamp, blockNumber] =
-      await this.chainContract.getQueueElement(queueIndex)
+    const [, timestamp, blockNumber] = await this.chainContract.getQueueElement(
+      queueIndex
+    )
 
     if (
       timestamp > queueElement.timestamp &&
@@ -691,10 +686,18 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       queued: BatchElement[]
     }> = []
     for (const block of blocks) {
+      // Create a new context in certain situations
       if (
-        (lastBlockIsSequencerTx === false && block.isSequencerTx === true) ||
+        // If there are no contexts yet, create a new context.
         groupedBlocks.length === 0 ||
-        (block.timestamp !== lastTimestamp && block.isSequencerTx === true) ||
+        // If the last block was an L1 to L2 transaction, but the next block is a Sequencer
+        // transaction, create a new context.
+        (lastBlockIsSequencerTx === false && block.isSequencerTx === true) ||
+        // If the timestamp of the last block differs from the timestamp of the current block,
+        // create a new context. Applies to both L1 to L2 transactions and Sequencer transactions.
+        block.timestamp !== lastTimestamp ||
+        // If the block number of the last block differs from the block number of the current block,
+        // create a new context. ONLY applies to Sequencer transactions.
         (block.blockNumber !== lastBlockNumber && block.isSequencerTx === true)
       ) {
         groupedBlocks.push({
@@ -702,6 +705,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           queued: [],
         })
       }
+
       const cur = groupedBlocks.length - 1
       block.isSequencerTx
         ? groupedBlocks[cur].sequenced.push(block)
@@ -751,12 +755,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   }
 
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
-    // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode
-    // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encodes total length
-    //
-    // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than
-    // just remove0x(rawTransaction).length / 2
-
     const block = await this._getBlock(blockNumber)
     this.logger.debug('Fetched L2 block', {
       block,
@@ -830,31 +828,5 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
   private _isSequencerTx(block: L2Block): boolean {
     return block.transactions[0].queueOrigin === QueueOrigin.Sequencer
-  }
-
-  private _enableAutoFixBatchOptions(type: number) {
-    if (type === 0) {
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: false,
-        fixSkippedDeposits: false,
-      }
-    }
-    if (type === 1) {
-      this.logger.warn('Enabled autoFixBatchOptions - fixMonotonicity')
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: true,
-        fixSkippedDeposits: false,
-      }
-    }
-    if (type === 2) {
-      this.logger.warn('Enabled autoFixBatchOptions - fixSkippedDeposits')
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: false,
-        fixSkippedDeposits: true,
-      }
-    }
   }
 }

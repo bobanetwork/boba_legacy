@@ -13,17 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import store from 'store';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import store from 'store'
 
 import App from 'layout'
-import './index.scss';
+import './index.scss'
 
 // https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
 if (window.ethereum) {
-  window.ethereum.autoRefreshOnNetworkChange = false;
+  window.ethereum.autoRefreshOnNetworkChange = false
 }
 
 ReactDOM.render(
@@ -31,4 +31,4 @@ ReactDOM.render(
     <App />
   </Provider>,
   document.getElementById('root')
-);
+)
