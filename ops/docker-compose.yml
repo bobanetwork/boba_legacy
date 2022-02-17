@@ -315,7 +315,7 @@ services:
     image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.batch-submitter
+      dockerfile: ./ops/docker/Dockerfile.batch-submitter-service
     entrypoint: ./batch-submitter.sh
     env_file:
       - ./envs/batch-submitter.env
