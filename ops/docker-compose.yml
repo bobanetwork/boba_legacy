@@ -75,6 +75,13 @@ x-sequencer_pk: &sequencer_pk
 x-proposer_pk: &proposer_pk
   PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
 
+x-sequencer_bs_pk: &sequencer_bs_pk
+  BATCH_SUBMITTER_SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
+
+# Account #2
+x-proposer_bs_pk: &proposer_bs_pk
+  BATCH_SUBMITTER_PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
+
 # Account #8
 x-relayer_pk: &relayer_pk
   RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
@@ -305,19 +312,20 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/batch-submitter:latest
+    image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter
-    entrypoint: ./batches.sh
+    entrypoint: ./batch-submitter.sh
     env_file:
-      - ./envs/batches.env
+      - ./envs/batch-submitter.env
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L2_NODE_WEB3_URL: http://l2geth:8545
+      L1_ETH_RPC: http://l1_chain:8545
+      L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      << : *sequencer_pk
-      << : *proposer_pk
+      << : *sequencer_bs_pk
+      << : *proposer_bs_pk
+      RETRIES: 200
 
   integration_tests:
     image: bobanetwork/integration-tests:latest
@@ -356,8 +364,6 @@ services:
       GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       << : *gas-price-oracle_pk #same as the deployer
-      << : *sequencer_pk
-      << : *proposer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
       GAS_PRICE_ORACLE_FLOOR_PRICE: 1
