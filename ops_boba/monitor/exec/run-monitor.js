@@ -29,9 +29,20 @@ const loopLogTx = async () => {
   }
 }
 
+const loopTransferTx = async () => {
+  const {
+    sendTransactionPeriodically,
+  } = require('../services/periodicTransaction')
+
+  while (true) {
+    await sendTransactionPeriodically()
+    await sleep(configs.periodicIntervalInMinute * 60 * 1000)
+  }
+}
+
 const main = async () => {
   if (configs.enableTxResponseTime) {
-    loopLogTx()
+    loopLogTx().catch()
   }
 
   const {
@@ -48,6 +59,8 @@ const main = async () => {
       'Addresses Monitoring: Env variables for monitoring is missing!'
     )
   }
+
+  loopTransferTx().catch()
 
   const BlockMonitorService = require('../services/blockMonitor')
   const stateRootMonitorService = require('../services/stateRootMonitor')
