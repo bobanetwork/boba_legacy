@@ -1,9 +1,10 @@
+import { expect } from '../../../../setup'
+
 /* Imports: External */
 import { BigNumber } from 'ethers'
 import { Block } from '@ethersproject/abstract-provider'
 
 /* Imports: Internal */
-import { expect } from '../../../../setup'
 import { handleEventsStateBatchAppended } from '../../../../../src/services/l1-ingestion/handlers/state-batch-appended'
 import { StateBatchAppendedExtraData } from '../../../../../src/types'
 import { l1StateBatchData } from '../../../examples/l1-data'
@@ -27,7 +28,6 @@ describe('Event Handlers: CanonicalTransactionChain.StateBatchAppended', () => {
         miner: '0xea674fdde714fd979de3edf0f56aa9716b898ec8',
         nonce: '0x40e6174f521a7cd8',
         difficulty: 5990647962682594,
-        _difficulty: BigNumber.from(5990647962682594),
         gasLimit: BigNumber.from(548976),
         gasUsed: BigNumber.from(12495850),
         extraData: '0x65746865726d696e652d6575726f70652d7765737433',

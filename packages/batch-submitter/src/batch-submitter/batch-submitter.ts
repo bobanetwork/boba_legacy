@@ -14,7 +14,6 @@ import { Gauge, Histogram, Counter } from 'prom-client'
 import { RollupInfo, sleep } from '@eth-optimism/core-utils'
 import { Logger, Metrics } from '@eth-optimism/common-ts'
 import { getContractFactory } from 'old-contracts'
-
 /* Internal Imports */
 import { TxSubmissionHooks } from '..'
 
@@ -32,7 +31,6 @@ interface BatchSubmitterMetrics {
   batchesSubmitted: Counter<string>
   failedSubmissions: Counter<string>
   malformedBatches: Counter<string>
-  batchTxBuildTime: Gauge<string>
 }
 
 export abstract class BatchSubmitter {
@@ -246,7 +244,9 @@ export abstract class BatchSubmitter {
     this.logger.info('Received transaction receipt', { receipt })
     this.logger.info(successMessage)
     this.metrics.batchesSubmitted.inc()
-    this.metrics.submissionGasUsed.observe(receipt.gasUsed.toNumber())
+    this.metrics.submissionGasUsed.observe(
+      receipt ? receipt.gasUsed.toNumber() : 0
+    )
     this.metrics.submissionTimestamp.observe(Date.now())
     return receipt
   }
@@ -293,11 +293,6 @@ export abstract class BatchSubmitter {
       malformedBatches: new metrics.client.Counter({
         name: 'malformed_batches',
         help: 'Count of malformed batches',
-        registers: [metrics.registry],
-      }),
-      batchTxBuildTime: new metrics.client.Gauge({
-        name: 'batch_tx_build_time',
-        help: 'Time to construct batch transaction',
         registers: [metrics.registry],
       }),
     }

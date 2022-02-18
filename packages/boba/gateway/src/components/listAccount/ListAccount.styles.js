@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles'
-import { Box, Typography } from '@mui/material';
+import { styled } from '@material-ui/core/styles'
+import { Box, Typography } from '@material-ui/core';
 
 export const Content = styled(Box)`
   display: flex;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box } from '@material-ui/core';
 import networkService from 'services/networkService';
 import truncate from 'truncate-middle';
 import * as S from './WalletAddress.styles';

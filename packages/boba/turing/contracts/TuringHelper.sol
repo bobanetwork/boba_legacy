@@ -63,7 +63,6 @@ contract TuringHelper is ITuringHelper, Ownable {
       if(rType == 17) return "TURING: API Response >322 chars";
       if(rType == 18) return "TURING: API Response >160 bytes";
       if(rType == 19) return "TURING: Insufficient credit";
-      if(rType == 20) return "TURING: Missing cache entry";
   }
 
   /* This is the interface to the off-chain mechanism. Although

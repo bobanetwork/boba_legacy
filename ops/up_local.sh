@@ -42,11 +42,13 @@ if [[ $BUILD == 1 ]]; then
     docker-compose build -- boba_deployer
     docker-compose build -- fraud-detector
     docker-compose build -- monitor
-    docker-compose build -- verifier
-    docker-compose build -- replica
 elif [[ $BUILD == 0 ]]; then
-  docker-compose -f $DIR/$DOCKERFILE pull
-  echo 1
+  if [[ $NO_PULL == 1 ]]; then
+    echo "Using already present images"
+  else
+    docker-compose -f $DIR/$DOCKERFILE pull
+    echo 1
+  fi
 fi
 
 if [[ $DAEMON == 1 ]]; then

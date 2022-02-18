@@ -1,13 +1,12 @@
-/* Imports: External */
-import { BigNumber } from 'ethers'
-import { TransactionEnqueuedEvent } from '@eth-optimism/contracts/dist/types/CanonicalTransactionChain'
+import { EventArgsTransactionEnqueued } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
-import { MissingElementError } from './errors'
+import { BigNumber } from 'ethers'
 import { EnqueueEntry, EventHandlerSet } from '../../../types'
+import { MissingElementError } from './errors'
 
 export const handleEventsTransactionEnqueued: EventHandlerSet<
-  TransactionEnqueuedEvent,
+  EventArgsTransactionEnqueued,
   null,
   EnqueueEntry
 > = {

@@ -79,7 +79,7 @@ import Help from 'containers/help/Help'
 import NFT from 'containers/nft/Nft'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 
-import { Box, Container } from '@mui/material'
+import { Box, Container } from '@material-ui/core'
 
 import MainMenu from 'components/mainMenu/MainMenu'
 import PageFooter from 'components/pageFooter/PageFooter'

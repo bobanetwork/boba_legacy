@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles'
-import { Box, Grid } from '@mui/material'
+import { styled } from '@material-ui/core/styles'
+import { Box, Grid } from '@material-ui/core'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
@@ -22,6 +22,9 @@ export const Entry = styled(Box)(({ theme }) => ({
 }))
 
 export const GridContainer = styled(Grid)(({theme})=>({
+  // [theme.breakpoints.down('md')]:{
+  //   justifyContent: 'flex-start'
+  // }
 }))
 
 export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({

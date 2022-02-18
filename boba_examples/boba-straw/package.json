@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node src/index.js",
-    "submit": "node src/index.js"
+    "deploy": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "^0.5.9",
     "dotenv": "^14.3.2",
     "ethers": "^5.5.3"
   }

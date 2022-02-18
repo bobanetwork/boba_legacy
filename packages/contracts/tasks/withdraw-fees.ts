@@ -4,7 +4,6 @@ import { ethers } from 'ethers'
 import { task } from 'hardhat/config'
 import * as types from 'hardhat/internal/core/params/argumentTypes'
 import { LedgerSigner } from '@ethersproject/hardware-wallets'
-
 import { getContractFactory } from '../src/contract-defs'
 import { predeploys } from '../src/predeploys'
 
@@ -36,7 +35,7 @@ task('withdraw-fees')
     process.env.CONTRACTS_DEPLOYER_KEY,
     types.string
   )
-  .setAction(async (args) => {
+  .setAction(async (args, hre: any) => {
     const provider = new ethers.providers.JsonRpcProvider(args.contractsRpcUrl)
     let signer: ethers.Signer
     if (!args.useLedger) {

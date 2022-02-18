@@ -77,7 +77,6 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.RollupEnforceFeesFlag,
 			utils.RollupFeeThresholdDownFlag,
 			utils.RollupFeeThresholdUpFlag,
-			utils.SequencerClientHttpFlag,
 		},
 	},
 	{

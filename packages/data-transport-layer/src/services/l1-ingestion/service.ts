@@ -1,17 +1,12 @@
 /* Imports: External */
-import { fromHexString, FallbackProvider } from '@eth-optimism/core-utils'
+import { fromHexString } from '@eth-optimism/core-utils'
 import { BaseService, Metrics } from '@eth-optimism/common-ts'
-import { TypedEvent } from '@eth-optimism/contracts/dist/types/common'
-import { BaseProvider } from '@ethersproject/providers'
+import { StaticJsonRpcProvider } from '@ethersproject/providers'
 import { LevelUp } from 'levelup'
-import { constants } from 'ethers'
+import { ethers, constants } from 'ethers'
 import { Gauge, Counter } from 'prom-client'
 
 /* Imports: Internal */
-import { handleEventsTransactionEnqueued } from './handlers/transaction-enqueued'
-import { handleEventsSequencerBatchAppended } from './handlers/sequencer-batch-appended'
-import { handleEventsStateBatchAppended } from './handlers/state-batch-appended'
-import { MissingElementError } from './handlers/errors'
 import { TransportDB } from '../../db/transport-db'
 import {
   OptimismContracts,
@@ -20,8 +15,12 @@ import {
   loadContract,
   validators,
 } from '../../utils'
-import { EventHandlerSet } from '../../types'
+import { TypedEthersEvent, EventHandlerSet } from '../../types'
+import { handleEventsTransactionEnqueued } from './handlers/transaction-enqueued'
+import { handleEventsSequencerBatchAppended } from './handlers/sequencer-batch-appended'
+import { handleEventsStateBatchAppended } from './handlers/state-batch-appended'
 import { L1DataTransportServiceOptions } from '../main/service'
+import { MissingElementError, EventName } from './handlers/errors'
 
 interface L1IngestionMetrics {
   highestSyncedL1Block: Gauge<string>
@@ -54,6 +53,7 @@ export interface L1IngestionServiceOptions
   extends L1DataTransportServiceOptions {
   db: LevelUp
   metrics: Metrics
+  addressManager: string
 }
 
 const optionSettings = {
@@ -81,7 +81,7 @@ const optionSettings = {
   },
   l1RpcProvider: {
     validate: (val: any) => {
-      return validators.isString(val) || validators.isJsonRpcProvider(val)
+      return validators.isUrl(val) || validators.isJsonRpcProvider(val)
     },
   },
   l2ChainId: {
@@ -99,24 +99,19 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
   private state: {
     db: TransportDB
     contracts: OptimismContracts
-    l1RpcProvider: BaseProvider
+    l1RpcProvider: StaticJsonRpcProvider
     startingL1BlockNumber: number
   } = {} as any
 
   protected async _init(): Promise<void> {
-    this.state.db = new TransportDB(this.options.db, {
-      bssHardfork1Index: this.options.bssHardfork1Index,
-    })
+    this.state.db = new TransportDB(this.options.db)
 
     this.l1IngestionMetrics = registerMetrics(this.metrics)
 
-    if (typeof this.options.l1RpcProvider === 'string') {
-      this.state.l1RpcProvider = FallbackProvider(this.options.l1RpcProvider, {
-        'User-Agent': 'data-transport-layer',
-      })
-    } else {
-      this.state.l1RpcProvider = this.options.l1RpcProvider
-    }
+    this.state.l1RpcProvider =
+      typeof this.options.l1RpcProvider === 'string'
+        ? new StaticJsonRpcProvider(this.options.l1RpcProvider)
+        : this.options.l1RpcProvider
 
     this.logger.info('Using AddressManager', {
       addressManager: this.options.addressManager,
@@ -157,34 +152,20 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
       this.options.addressManager
     )
 
-    // Look up in the database for an indexed starting L1 block
-    let startingL1BlockNumber = await this.state.db.getStartingL1Block()
-    // If there isn't an indexed starting L1 block, that means we should pull it
-    // from config and then fallback to discovering it
-    if (startingL1BlockNumber === null || startingL1BlockNumber === undefined) {
-      if (
-        this.options.l1StartHeight !== null &&
-        this.options.l1StartHeight !== undefined
-      ) {
-        startingL1BlockNumber = this.options.l1StartHeight
-      } else {
-        this.logger.info(
-          'Attempting to find an appropriate L1 block height to begin sync. This may take a long time.'
-        )
-        startingL1BlockNumber = await this._findStartingL1BlockNumber()
-      }
+    const startingL1BlockNumber = await this.state.db.getStartingL1Block()
+    if (startingL1BlockNumber) {
+      this.state.startingL1BlockNumber = startingL1BlockNumber
+    } else {
+      this.logger.info(
+        'Attempting to find an appropriate L1 block height to begin sync...'
+      )
+      this.state.startingL1BlockNumber = await this._findStartingL1BlockNumber()
+      this.logger.info('Starting sync', {
+        startingL1BlockNumber: this.state.startingL1BlockNumber,
+      })
+
+      await this.state.db.setStartingL1Block(this.state.startingL1BlockNumber)
     }
-
-    if (!startingL1BlockNumber) {
-      throw new Error('Cannot find starting L1 block number')
-    }
-
-    this.logger.info('Starting sync', {
-      startingL1BlockNumber,
-    })
-
-    this.state.startingL1BlockNumber = startingL1BlockNumber
-    await this.state.db.setStartingL1Block(this.state.startingL1BlockNumber)
 
     // Store the total number of submitted transactions so the server can tell clients if we're
     // done syncing or not
@@ -392,7 +373,9 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
 
     for (const eventRange of eventRanges) {
       // Find all relevant events within the range.
-      const events: TypedEvent[] = await this.state.contracts[contractName]
+      const events: TypedEthersEvent<any>[] = await this.state.contracts[
+        contractName
+      ]
         .attach(eventRange.address)
         .queryFilter(
           this.state.contracts[contractName].filters[eventName](),
@@ -460,18 +443,11 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
       return this.options.ctcDeploymentHeight
     }
 
-    const filter =
-      this.state.contracts.Lib_AddressManager.filters.OwnershipTransferred()
-
-    for (let i = 0; i < currentL1Block; i += 2000) {
-      const start = i
-      const end = Math.min(i + 2000, currentL1Block)
-      this.logger.info(`Searching for ${filter} from ${start} to ${end}`)
-
+    for (let i = 0; i < currentL1Block; i += 1000000) {
       const events = await this.state.contracts.Lib_AddressManager.queryFilter(
-        filter,
-        start,
-        end
+        this.state.contracts.Lib_AddressManager.filters.OwnershipTransferred(),
+        i,
+        Math.min(i + 1000000, currentL1Block)
       )
 
       if (events.length > 0) {

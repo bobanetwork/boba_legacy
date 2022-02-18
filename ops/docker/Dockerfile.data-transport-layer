@@ -34,5 +34,4 @@ RUN mkdir ./state-dumps
 COPY --from=builder /optimism/packages/data-transport-layer/package.json .
 COPY --from=builder /optimism/packages/data-transport-layer/node_modules ./node_modules
 
-COPY ./ops/scripts/dtl.sh .
 ENTRYPOINT ["node", "dist/src/services/run.js"]

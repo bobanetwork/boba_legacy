@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+import { Typography, useMediaQuery } from '@material-ui/core'
 
 import { exitBOBA } from 'actions/networkAction'
 import { openAlert } from 'actions/uiAction'
@@ -33,6 +33,7 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { Box } from '@material-ui/system'
 
 import parse from 'html-react-parser'
 

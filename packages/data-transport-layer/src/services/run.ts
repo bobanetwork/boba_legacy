@@ -27,7 +27,7 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
       hostname: config.str('server-hostname', 'localhost'),
       confirmations: config.uint('confirmations', 35),
       l1RpcProvider: config.str('l1-rpc-endpoint'),
-      addressManager: config.str('address-manager'),
+      cfgAddressManager: config.str('address-manager'), // Legacy option. New method sets this when the deployer registers it
       pollingInterval: config.uint('polling-interval', 5000),
       logsPerPollingInterval: config.uint('logs-per-polling-interval', 2000),
       dangerouslyCatchAllErrors: config.bool(
@@ -48,22 +48,11 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
       ),
       defaultBackend: config.str('default-backend', 'l1'),
       l1GasPriceBackend: config.str('l1-gas-price-backend', 'l1'),
-      l1StartHeight: config.uint('l1-start-height'),
       useSentry: config.bool('use-sentry', false),
       sentryDsn: config.str('sentry-dsn'),
       sentryTraceRate: config.ufloat('sentry-trace-rate', 0.05),
-      bssHardfork1Index: config.uint('bss-hardfork-1-index', null),
       ctcDeploymentHeight: config.uint('eth1-ctc-deployment-height') || 0,
     })
-
-    const stop = async (signal) => {
-      console.log(`"{"msg": "${signal} - Stopping data-transport layer"}"`)
-      await service.stop()
-      process.exit()
-    }
-
-    process.on('SIGTERM', stop)
-    process.on('SIGINT', stop)
 
     await service.start()
   } catch (err) {

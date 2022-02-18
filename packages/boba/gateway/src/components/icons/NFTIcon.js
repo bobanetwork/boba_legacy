@@ -1,5 +1,5 @@
 import * as React from "react";
-// import { useTheme } from "@mui/material/styles";
+// import { useTheme } from "@material-ui/core/styles";
 // TODO: Make use of color base on the provided theme.
 function NFTIcon({ color }) {
     // const theme = useTheme();

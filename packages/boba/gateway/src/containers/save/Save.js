@@ -32,7 +32,7 @@ import Button from 'components/button/Button'
 import * as S from './Save.styles'
 import * as styles from './Save.module.scss'
 
-import { Box, Typography, Grid } from '@mui/material'
+import { Box, Typography, Grid } from '@material-ui/core'
 
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -129,7 +129,7 @@ class Save extends React.Component {
 
     if(!netLayer) {
       return <div className={styles.container}>
-          <PageHeader title="Staking" />
+          <PageHeader title="Airdrop" />
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />

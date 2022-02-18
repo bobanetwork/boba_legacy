@@ -15,8 +15,8 @@ limitations under the License. */
 
 import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-
+import { Typography, useMediaQuery } from '@material-ui/core'
+import { Box } from '@material-ui/system'
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
 import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'

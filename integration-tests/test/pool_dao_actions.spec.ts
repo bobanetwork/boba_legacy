@@ -328,8 +328,8 @@ describe('Dao Action Test', async () => {
         await cancelTx.wait()
       }
     }).timeout(100000)
-    // TODO warp time on l2
-    it.skip('should queue the proposal successfully', async () => {
+
+    it('should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -337,8 +337,8 @@ describe('Dao Action Test', async () => {
       const state = await Governor.state(proposalID)
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
-    // TODO warp time on l2
-    it.skip('should execute the proposal successfully', async () => {
+
+    it('should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()
@@ -467,8 +467,8 @@ describe('Dao Action Test', async () => {
         await cancelTx.wait()
       }
     }).timeout(100000)
-    // TODO warp time on l2
-    it.skip('should queue the proposal successfully', async () => {
+
+    it('should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -476,8 +476,8 @@ describe('Dao Action Test', async () => {
       const state = await Governor.state(proposalID)
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
-    // TODO warp time on l2
-    it.skip('should execute the proposal successfully', async () => {
+
+    it('should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()

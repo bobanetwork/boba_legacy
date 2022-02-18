@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React from 'react'
 
-import { Typography } from '@mui/material'
+import { Typography } from '@material-ui/core'
 
 import * as S from './Transaction.styles'
 import { selectNetwork } from 'selectors/setupSelector'

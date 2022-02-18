@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles'
-import { Box, TextField } from '@mui/material'
+import { styled } from '@material-ui/core/styles'
+import { Box, TextField } from '@material-ui/core'
 
 export const Wrapper = styled(Box)`
   display: flex;

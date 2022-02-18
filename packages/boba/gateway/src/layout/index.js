@@ -13,20 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { Suspense, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { Box, useMediaQuery } from '@mui/material'
-import CssBaseline from '@mui/material/CssBaseline'
-import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles'
-
+import { Box, useMediaQuery } from '@material-ui/core'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import { createTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles'
 import { setTheme } from 'actions/uiAction'
-
 import Home from 'containers/home/Home'
 import Notification from 'containers/notification/Notification'
+import React, { Suspense, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from "react-router-dom";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
+
+import * as styles from './layout.module.scss'
 
 function App () {
 
@@ -198,9 +201,9 @@ function App () {
     }
   });
 
-  MUItheme = responsiveFontSizes(MUItheme)
+  MUItheme = responsiveFontSizes(MUItheme);
 
-  const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'))
+  const isMobile = useMediaQuery(MUItheme.breakpoints.down('md'));
 
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
@@ -210,26 +213,18 @@ function App () {
   return (
     <ThemeProvider theme={MUItheme}>
       <CssBaseline />
-      <BrowserRouter>
+      <Router>
         <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-          <div 
-            style={{
-              display: 'flex',
-              flex: '1 0',
-              flexDirection: 'column',
-              minHeight: `100vh`,
-              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`
-            }}
-          >
+          <div className={styles.App}>
             <Notification/>
             <Suspense fallback={<>Loading...</>}>
-              <Routes>
-                <Route exact path="/" element={<Home />} />
-              </Routes>
+              <Switch>
+                <Route exact path="/" component={() => <Home />} />
+              </Switch>
             </Suspense>
           </div>
         </Box>
-      </BrowserRouter>
+      </Router>
     </ThemeProvider>
   )
 }

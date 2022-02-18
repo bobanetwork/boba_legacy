@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles';
-import { Box } from "@mui/material";
+import { styled } from '@material-ui/core/styles';
+import { Box } from "@material-ui/core";
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",

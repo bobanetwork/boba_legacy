@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { TableCell, TableRow } from '@mui/material';
+import { TableCell, TableRow } from '@material-ui/core';
 
 export const CellTitle = styled.div`
 font-weight: normal;

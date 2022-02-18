@@ -164,7 +164,6 @@ var (
 		utils.RollupEnforceFeesFlag,
 		utils.RollupFeeThresholdDownFlag,
 		utils.RollupFeeThresholdUpFlag,
-		utils.SequencerClientHttpFlag,
 	}
 
 	rpcFlags = []cli.Flag{
@@ -217,7 +216,6 @@ func init() {
 	app.Commands = []cli.Command{
 		// See chaincmd.go:
 		initCommand,
-		dumpChainCfgCommand,
 		importCommand,
 		exportCommand,
 		importPreimagesCommand,

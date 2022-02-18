@@ -5,7 +5,7 @@ import { isEqual } from 'lodash'
 import * as S from './Airdrop.styles'
 import * as styles from './Airdrop.module.scss'
 
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@material-ui/core'
 import Button from 'components/button/Button'
 import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'

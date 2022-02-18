@@ -6,7 +6,7 @@ import { openAlert, openError } from 'actions/uiAction'
 import moment from 'moment'
 
 import Button from 'components/button/Button'
-import { Box, Typography, CircularProgress, Grid } from '@mui/material'
+import { Box, Typography, CircularProgress, Grid } from '@material-ui/core'
 import * as S from "./ListSave.styles"
 
 import { withdrawFS_Savings } from 'actions/fixedAction'

@@ -3,7 +3,7 @@ import {
     Tabs,
     Tab,
     Box,
-} from '@mui/material';
+} from '@material-ui/core';
 import SearchIcon from 'components/icons/SearchIcon';
 
 /**

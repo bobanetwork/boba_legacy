@@ -1,8 +1,9 @@
+import { expect } from '../../../../setup'
+
 /* Imports: External */
 import { ethers, BigNumber } from 'ethers'
 
 /* Imports: Internal */
-import { expect } from '../../../../setup'
 import { handleEventsTransactionEnqueued } from '../../../../../src/services/l1-ingestion/handlers/transaction-enqueued'
 
 const MAX_ITERATIONS = 128

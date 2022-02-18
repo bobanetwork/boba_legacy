@@ -48,6 +48,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 	}
 	if rcfg.UsingOVM {
 		// When using the OVM, we must:
+		// - Set the BlockNumber to be the msg.L1BlockNumber
 		// - Set the Time to be the msg.L1Timestamp
 		// - Set Turing to be msg.L1Turing
 		// - Set initial TuringDepth to 0 for the Sequencer and 1 for the Replica/Verifier - this prevents erroneous Turing calls

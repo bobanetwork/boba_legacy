@@ -19,7 +19,7 @@ The Terms used here and throughout - 'base' refers to the crypto asset/token and
 
 ## For Price Data Recipients
 
-Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point.
+Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point. 
 
 On the FeedRegistry, use the following methods:
 
@@ -81,18 +81,3 @@ With only a single oracle in charge of the price data submissions the 'min no of
 A round started for reporting by an oracle, will have to meet the min number of submissions to have the answer for that round accepted (or) a timeout(s) should have elapsed, after which a subsequent round can be proposed.
 
 ## Supported Token Feeds
-Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call method ***`getFeed(base, quote)`***). The addresses listed here, might be outdated!
-
-Prices returned are in decimals(8) of the underlying quote.
-### Rinkeby
-
-[ETH-USD](https://blockexplorer.rinkeby.boba.network/address/0xcEb40458ad6Dabe9cfC90A2ad062a071809c4E84/transactions) \
-[BOBA-USD](https://blockexplorer.rinkeby.boba.network/address/0xd05AA5531b8e8DaB3BEe675f133dF3e330d9adA8/transactions) \
-[OMG-USD]() \
-[WBTC-USD]()
-### Mainnet
-
-[ETH-USD](https://blockexplorer.boba.network/address/0x50E383121021F4E8060C794d79Ada77195532c7a/transactions) \
-[BOBA-USD](https://blockexplorer.boba.network/address/0x987AEd89f5BDC3eb863282DBB76065bFe398be17/transactions) \
-[OMG-USD]() \
-[WBTC-USD]()

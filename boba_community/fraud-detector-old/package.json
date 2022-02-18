@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@eth-optimism/common-ts": "^0.1.5",
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "^0.4.12",
     "@eth-optimism/core-utils": "^0.5.5",
     "bcfg": "^0.1.6",
     "chalk": "^4.1.2",
@@ -42,7 +42,7 @@
     "@ethersproject/abstract-provider": "^5.0.9",
     "@ethersproject/providers": "^5.0.21",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "chai": "^4.3.6",
+    "chai": "^4.3.0",
     "ethereumjs-util": "^7.0.5",
     "ethers": "^5.0.31",
     "mocha": "^8.3.0"

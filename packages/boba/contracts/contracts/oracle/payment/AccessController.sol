@@ -14,9 +14,9 @@ import "../interfaces/AccessControllerInterface.sol";
 contract AccessController is AccessControllerInterface, Owned {
   bool private s_checkEnabled = true;
   // address to expiryTimestamp
-  mapping(address => uint256) public s_globalAccessList;
+  mapping(address => uint256) internal s_globalAccessList;
   // address to data to expiryTimestamp
-  mapping(address => mapping(bytes => uint256)) public s_localAccessList;
+  mapping(address => mapping(bytes => uint256)) internal s_localAccessList;
 
   event AccessAdded(address user, bytes data, address sender, uint256 updatedExpiryTime);
   event CheckAccessEnabled();

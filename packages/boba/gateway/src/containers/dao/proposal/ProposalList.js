@@ -16,7 +16,7 @@ limitations under the License. */
 import React, {useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Typography } from '@mui/material'
+import { Typography } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 
 import { openError, openModal } from 'actions/uiAction'

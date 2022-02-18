@@ -1,22 +1,22 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import React from 'react';
+import { connect } from 'react-redux';
+import { isEqual } from 'lodash';
+import BN from 'bignumber.js';
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
-import { addLiquidity, getFarmInfo } from 'actions/farmAction'
+import { closeModal, openAlert, openError } from 'actions/uiAction';
+import { addLiquidity, getFarmInfo } from 'actions/farmAction';
 
-import Button from 'components/button/Button'
-import Modal from 'components/modal/Modal'
-import Input from 'components/input/Input'
+import Button from 'components/button/Button';
+import Modal from 'components/modal/Modal';
+import Input from 'components/input/Input';
+import { logAmount, powAmount, toWei_String } from 'util/amountConvert';
 
-import { logAmount, powAmount, toWei_String } from 'util/amountConvert'
-import BN from 'bignumber.js'
 
-import { Box, Typography } from '@mui/material'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
-
-import { farmL1, farmL2 } from 'actions/networkAction'
-import { fetchAllowance } from 'actions/farmAction'
+import { Typography } from '@material-ui/core';
+import { WrapperActionsModal } from 'components/modal/Modal.styles';
+import { Box } from '@material-ui/system';
+import { farmL1, farmL2 } from 'actions/networkAction';
+import {fetchAllowance} from 'actions/farmAction';
 
 class FarmDepositModal extends React.Component {
 

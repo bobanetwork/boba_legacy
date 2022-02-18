@@ -1,7 +1,7 @@
-import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import { Link, Telegram, Twitter } from '@mui/icons-material'
+import Box from '@material-ui/core/Box'
+import IconButton from '@material-ui/core/IconButton'
+import Typography from '@material-ui/core/Typography'
+import { Link, Telegram, Twitter } from '@material-ui/icons'
 import Carousel from 'components/carousel/Carousel'
 import DiscordIcon from 'components/icons/Discord'
 import PageHeader from 'components/pageHeader/PageHeader'
@@ -27,9 +27,10 @@ function ECOSYSTEM() {
       <div className={styles.container}>
         {
           Object.keys(projectByCategory).map((d) => {
-            let projectList = projectByCategory[d]
+
+            let projectList = projectByCategory[ d ]
             return (
-              <div key={d}>
+              <>
               <Box>
                 <Typography variant="h4" style={{paddingTop: '5px', paddingBottom: '0px', textTransform: 'uppercase', opacity: '0.7', fontSize: '1.4em', fontWeight: '700'}}>{d}</Typography>
               </Box>
@@ -38,9 +39,7 @@ function ECOSYSTEM() {
                     {
                       projectList.map((project) => {
                         return (
-                        <S.TileCard
-                          key={project.title}
-                        >
+                        <S.TileCard>
                           <S.TileHeader>
                             <Typography variant="h4" color="text.secondary" alignSelf='center'>
                               {project.title}
@@ -73,7 +72,7 @@ function ECOSYSTEM() {
                     }
                   </Carousel >
               </Box>
-            </div>
+            </>
             )
           })
         }

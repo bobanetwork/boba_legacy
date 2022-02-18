@@ -15,8 +15,8 @@ limitations under the License. */
 
 import React, { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { FileCopyOutlined } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { FileCopyOutlined } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@material-ui/core';
 import { useEffect } from 'react';
 
 function Copy ({ value }) {

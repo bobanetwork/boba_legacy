@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import {Box, Typography, Grid} from '@mui/material'
+import {Box, Typography, Grid} from '@material-ui/core'
 
 export const HistoryContainer = styled.div`
   background: ${props => props.theme.palette.background.secondary};

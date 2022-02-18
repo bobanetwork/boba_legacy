@@ -8,7 +8,6 @@ import {
 } from './test/helpers/constants'
 
 // Hardhat plugins
-// Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
@@ -17,13 +16,9 @@ import '@typechain/hardhat'
 import './tasks/deploy'
 import './tasks/l2-gasprice'
 import './tasks/set-owner'
-import './tasks/validate-address-dictator'
-import './tasks/validate-chugsplash-dictator'
 import './tasks/whitelist'
 import './tasks/withdraw-fees'
 import 'hardhat-gas-reporter'
-//import '@primitivefi/hardhat-dodoc'
-import 'hardhat-output-validator'
 
 // Load environment variables from .env
 dotenv.config()

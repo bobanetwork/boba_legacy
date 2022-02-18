@@ -165,9 +165,6 @@ services:
       NO_COMPILE: 1
       DTL_REGISTRY_URL: http://dtl:8081/addresses.json
       DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
-    ports:
-        # expose the service to the host for getting the contract addrs
-      - ${DEPLOYER_PORT:-8077}:8082
 
   # deploys boba contracts and serves contract addresses
   boba_deployer:
@@ -188,14 +185,13 @@ services:
       << : *deployer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      RETRIES: 200
+      RETRIES: 100
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
 
   dtl:
     depends_on:
       - l1_chain
     image: bobanetwork/data-transport-layer:latest
-    entrypoint: ./dtl.sh
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.data-transport-layer
@@ -205,15 +201,11 @@ services:
     # set the rest of the env vars for the network whcih do not
     # depend on the docker-compose setup
     environment:
-      URL: http://deployer:8082/addresses.json
       # connect to the 2 layers
       DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:8545
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
-      DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
-      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
-      RETRIES: 200
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -237,7 +229,7 @@ services:
       # connecting to the DTL
       ROLLUP_CLIENT_HTTP: http://dtl:7878
       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-      RETRIES: 200
+      RETRIES: 100
       # no need to keep this secret, only used internally to sign blocks
       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
@@ -262,7 +254,7 @@ services:
       URL: http://dtl:8081/addresses.json
       # a funded hardhat account
       << : *relayer_pk
-      RETRIES: 200
+      RETRIES: 100
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
@@ -290,7 +282,7 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
-      RETRIES: 200
+      RETRIES: 100
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
@@ -319,6 +311,86 @@ services:
       << : *sequencer_pk
       << : *proposer_pk
 
+  verifier:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l1'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      RETRIES: 100
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+    ports:
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
+
+  fraud-detector:
+    depends_on:
+     - dtl
+     - verifier
+    image: bobanetwork/fraud-detector:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.fraud-detector
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_CONFIRMATIONS: 8
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+
+  replica:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      RETRIES: 100
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
+
   integration_tests:
     image: bobanetwork/integration-tests:latest
     deploy:
@@ -328,8 +400,6 @@ services:
       dockerfile: ./ops/docker/Dockerfile.integration-tests
     entrypoint: ./integration-tests.sh
     environment:
-      VERIFIER_URL: http://verifier:8545
-      REPLICA_URL: http://replica:8545
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
@@ -364,84 +434,15 @@ services:
       GAS_PRICE_ORACLE_ROOF_PRICE: 5
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
-      RETRIES: 200
+      RETRIES: 100
 
-  replica:
+  monitor:
     depends_on:
-      - dtl
-    image: bobanetwork/l2geth:latest
-    deploy:
-      replicas: 1
+     - l1_chain
+     - l2geth
+    image: bobanetwork/monitor
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.geth
-    entrypoint: sh ./geth.sh
-    env_file:
-      - ./envs/geth.env
-    environment:
-      ETH1_HTTP: http://l1_chain:8545
-      ROLLUP_TIMESTAMP_REFRESH: 5s
-      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-      ROLLUP_CLIENT_HTTP: http://dtl:7878
-      ROLLUP_BACKEND: 'l2'
-      ROLLUP_VERIFIER_ENABLE: 'true'
-      RETRIES: 60
-      # no need to keep this secret, only used internally to sign blocks
-      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      ROLLUP_POLL_INTERVAL_FLAG: "10s"
-      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
-    ports:
-      - ${L2GETH_HTTP_PORT:-8549}:8545
-      - ${L2GETH_WS_PORT:-8550}:8546
-
-  verifier:
-    depends_on:
-      - dtl
-    image: bobanetwork/l2geth:latest
+      dockerfile: ./ops/docker/Dockerfile.monitor
     deploy:
-      replicas: 1
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.geth
-    entrypoint: sh ./geth.sh
-    env_file:
-      - ./envs/geth.env
-    environment:
-        ETH1_HTTP: http://l1_chain:8545
-        ROLLUP_TIMESTAMP_REFRESH: 5s
-        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-        ROLLUP_CLIENT_HTTP: http://dtl:7878
-        ROLLUP_BACKEND: 'l1'
-        ROLLUP_VERIFIER_ENABLE: 'true'
-        RETRIES: 60
-        # no need to keep this secret, only used internally to sign blocks
-        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-        ROLLUP_POLL_INTERVAL_FLAG: "10s"
-        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
-    ports:
-      - ${VERIFIER_HTTP_PORT:-8547}:8545
-      - ${VERIFIER_WS_PORT:-8548}:8546
-
-  fraud-detector:
-    depends_on:
-     - verifier
-     - dtl
-    image: bobanetwork/fraud-detector:latest
-    deploy:
-      replicas: 1
-    build:
-      context: ..
-      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
-    environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L1_CONFIRMATIONS: 8
-      L2_NODE_WEB3_URL: http://l2geth:8545
-      L2_CHECK_INTERVAL: 10
-      VERIFIER_WEB3_URL: http://verifier:8545
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      L1_DEPLOYMENT_BLOCK: 8
-      L2_START_BLOCK: 1
-    ports:
-      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+      replicas: 0

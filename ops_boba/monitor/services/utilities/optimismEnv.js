@@ -2,9 +2,13 @@
 
 const ethers = require('ethers')
 const core_utils_1 = require('@eth-optimism/core-utils')
-const { Logger } = require('@eth-optimism/common-ts')
 const Mutex = require('async-mutex').Mutex
+const {
+  loadContractFromManager,
+  getContractFactory,
+} = require('@eth-optimism/contracts')
 const fetch = require('node-fetch')
+const { Watcher } = require('@eth-optimism/watcher')
 
 const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
@@ -83,7 +87,7 @@ const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 class OptimismEnv {
   constructor() {
-    this.logger = new Logger({ name: this.name })
+    this.logger = new core_utils_1.Logger({ name: this.name })
 
     this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
       L1_NODE_WEB3_URL
@@ -249,7 +253,7 @@ class OptimismEnv {
     )
 
     // watcher
-    this.watcher = new core_utils_1.Watcher({
+    this.watcher = new Watcher({
       l1: {
         provider: this.L1Provider,
         messengerAddress: this.L1CrossDomainMessenger,

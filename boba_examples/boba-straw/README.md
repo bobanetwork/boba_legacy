@@ -32,15 +32,10 @@ PRIV_KEY=
 
 ### Provide data
 
-Adjust the ETH, BOBA, OMG or WBTC prices that you want to provide on Rinkeby
+Adjust the ETH and BOBA prices that you want to provide on Rinkeby
 
 ```bash
 yarn install
-yarn submit
-```
-To submit prices for selective tokens
-```bash
-yarn install
-yarn submit eth boba omg
+yarn deploy
 ```
 

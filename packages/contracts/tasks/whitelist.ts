@@ -1,31 +1,16 @@
 'use strict'
 
-import fs from 'fs'
-
 import { ethers } from 'ethers'
 import { task } from 'hardhat/config'
 import * as types from 'hardhat/internal/core/params/argumentTypes'
 import { LedgerSigner } from '@ethersproject/hardware-wallets'
-
 import { getContractFactory } from '../src/contract-defs'
 import { predeploys } from '../src/predeploys'
 
 // Add accounts the the OVM_DeployerWhitelist
 // npx hardhat whitelist --address 0x..
 task('whitelist')
-  .addOptionalParam('address', 'Address to whitelist', undefined, types.string)
-  .addOptionalParam(
-    'addressFile',
-    'File containing addresses to whitelist separated by a newline',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'whitelistMode',
-    '"enable" if you want to add the address(es) from the whitelist, "disable" if you want remove the address(es) from the whitelist',
-    'enable',
-    types.string
-  )
+  .addParam('address', 'Address to whitelist', undefined, types.string)
   .addOptionalParam('transactionGasPrice', 'tx.gasPrice', undefined, types.int)
   .addOptionalParam(
     'useLedger',
@@ -53,23 +38,11 @@ task('whitelist')
   )
   .addOptionalParam(
     'contractAddress',
-    'Address of DeployerWhitelist contract',
+    'Address of Ownable contract',
     predeploys.OVM_DeployerWhitelist,
     types.string
   )
-  .setAction(async (args) => {
-    if (args.whitelistMode !== 'enable' && args.whitelistMode !== 'disable') {
-      throw new Error(`Whitelist mode must be either "enable" or "disable"`)
-    }
-
-    if (args.address === undefined && args.addressPath === undefined) {
-      throw new Error(`Must provide either address or address-path`)
-    }
-
-    if (args.address !== undefined && args.addressPath !== undefined) {
-      throw new Error(`Cannot provide both address and address-path`)
-    }
-
+  .setAction(async (args, hre: any) => {
     const provider = new ethers.providers.JsonRpcProvider(args.contractsRpcUrl)
     let signer: ethers.Signer
     if (!args.useLedger) {
@@ -99,26 +72,11 @@ task('whitelist')
       throw new Error(`Incorrect key. Owner ${owner}, Signer ${addr}`)
     }
 
-    const addresses = []
-    if (args.address !== undefined) {
-      addresses.push(args.address)
-    } else {
-      const addressFile = fs.readFileSync(args.addressPath, 'utf8')
-      for (const line of addressFile.split('\n')) {
-        if (line !== '') {
-          addresses.push(line)
-        }
-      }
-    }
-
-    for (const address of addresses) {
-      console.log(`Changing whitelist status for address: ${address}`)
-      console.log(`New whitelist status: ${args.whitelistMode}`)
-      const res = await deployerWhitelist.setWhitelistedDeployer(
-        address,
-        args.whitelistMode === 'enable' ? true : false,
-        { gasPrice: args.transactionGasPrice }
-      )
-      await res.wait()
-    }
+    const res = await deployerWhitelist.setWhitelistedDeployer(
+      args.address,
+      true,
+      { gasPrice: args.transactionGasPrice }
+    )
+    await res.wait()
+    console.log(`Whitelisted ${args.address}`)
   })

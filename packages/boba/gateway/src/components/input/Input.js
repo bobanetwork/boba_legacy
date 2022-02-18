@@ -21,7 +21,7 @@ import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
 
-import { Box, Typography } from '@mui/material'
+import { Box, Typography } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 import { getCoinImage } from 'util/coinImage'
 

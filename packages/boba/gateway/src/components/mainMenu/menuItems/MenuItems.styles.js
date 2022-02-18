@@ -1,5 +1,5 @@
-import { Box } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { Box } from '@material-ui/core'
+import { styled } from '@material-ui/core/styles'
 
 export const Nav = styled('nav')(({ theme }) => ({
   width: '400px',

@@ -13,9 +13,10 @@ import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { selectLookupPrice } from 'selectors/lookupSelector'
-import { Box, Typography, useMediaQuery } from '@mui/material'
+import { Typography, useMediaQuery } from '@material-ui/core'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { Box } from '@material-ui/system'
 
 import BN from 'bignumber.js'
 

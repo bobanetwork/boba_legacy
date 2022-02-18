@@ -1,6 +1,6 @@
 # Running a Boba node (replica)
 
-This material has been moved to the main Boba user docs [here](https://docs.boba.network/developer-docs/011_running-replica-node).
+This material has been moved to the main Boba user docs [here](https://docs.boba.network/developer-docs/011_running_replica_node).
 
 ## Minimal Instructions
 
@@ -9,7 +9,6 @@ This repo runs a local replica of the Boba L2geth, which is useful for generatin
 ## Prerequisites
 
 \- docker
-
 \- docker-compose
 
 ## Start Replica service
@@ -23,7 +22,6 @@ $ git clone git@github.com:omgnetwork/optimism-v2.git
 $ cd optimism-v2
 $ yarn install
 $ yarn build
-$ cd boba_community/boba-node
 ```
 
 Then, add your Infura key to `boba_community/boba-node/docker-compose-replica.yaml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
@@ -44,7 +42,7 @@ docker-compose -f docker-compose-replica.yml build
 
 ```
 
-Finally, bring up the services:
+Finally, bring up the services
 
 ```bash
 

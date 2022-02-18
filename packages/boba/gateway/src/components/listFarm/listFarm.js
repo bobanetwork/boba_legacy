@@ -9,14 +9,14 @@ import { getFarmInfo, updateStakeToken, updateWithdrawToken } from 'actions/farm
 
 import Button from 'components/button/Button';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import RemoveIcon from '@mui/icons-material/Remove';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import RemoveIcon from '@material-ui/icons/Remove';
 
 import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
 
-import { Box, Typography, Fade,  CircularProgress } from '@mui/material';
+import { Box, Typography, Fade,  CircularProgress } from '@material-ui/core';
 import * as S from "./ListFarm.styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 

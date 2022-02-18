@@ -63,7 +63,7 @@ def lambda_handler(event, context):
   #64 denotes the number of bytes in the `bytes` dynamic argument
   #since we are sending back 2 32 byte numbers, 2*32 = 64
   res = res + '{0:0{1}x}'.format(int(    price),64) #the price
-  res = res + '{0:0{1}x}'.format(int(timestamp/1000),64) #the timestamp
+  res = res + '{0:0{1}x}'.format(int(timestamp),64) #the timestamp
     
   print("res:", res)
 

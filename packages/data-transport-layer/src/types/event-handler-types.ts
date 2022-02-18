@@ -1,38 +1,37 @@
-import { BaseProvider } from '@ethersproject/providers'
-import { BigNumber } from 'ethers'
-import { TypedEvent } from '@eth-optimism/contracts/dist/types/common'
+import { StaticJsonRpcProvider } from '@ethersproject/providers'
+import { BigNumber, Event } from 'ethers'
 
+import { TransportDB } from '../db/transport-db'
 import {
   TransactionBatchEntry,
   TransactionEntry,
   StateRootBatchEntry,
   StateRootEntry,
 } from './database-types'
-import { TransportDB } from '../db/transport-db'
 
-export type GetExtraDataHandler<TEvent extends TypedEvent, TExtraData> = (
-  event?: TEvent,
-  l1RpcProvider?: BaseProvider
+export type TypedEthersEvent<T> = Event & {
+  args: T
+}
+
+export type GetExtraDataHandler<TEventArgs, TExtraData> = (
+  event?: TypedEthersEvent<TEventArgs>,
+  l1RpcProvider?: StaticJsonRpcProvider
 ) => Promise<TExtraData>
 
-export type ParseEventHandler<
-  TEvent extends TypedEvent,
-  TExtraData,
-  TParsedEvent
-> = (event: TEvent, extraData: TExtraData, l2ChainId: number) => TParsedEvent
+export type ParseEventHandler<TEventArgs, TExtraData, TParsedEvent> = (
+  event: TypedEthersEvent<TEventArgs>,
+  extraData: TExtraData,
+  l2ChainId: number
+) => TParsedEvent
 
 export type StoreEventHandler<TParsedEvent> = (
   parsedEvent: TParsedEvent,
   db: TransportDB
 ) => Promise<void>
 
-export interface EventHandlerSet<
-  TEvent extends TypedEvent,
-  TExtraData,
-  TParsedEvent
-> {
-  getExtraData: GetExtraDataHandler<TEvent, TExtraData>
-  parseEvent: ParseEventHandler<TEvent, TExtraData, TParsedEvent>
+export interface EventHandlerSet<TEventArgs, TExtraData, TParsedEvent> {
+  getExtraData: GetExtraDataHandler<TEventArgs, TExtraData>
+  parseEvent: ParseEventHandler<TEventArgs, TExtraData, TParsedEvent>
   storeEvent: StoreEventHandler<TParsedEvent>
 }
 
@@ -42,6 +41,7 @@ export interface SequencerBatchAppendedExtraData {
   submitter: string
   l1TransactionData: string
   l1TransactionHash: string
+  gasLimit: string
 
   // Stuff from TransactionBatchAppended.
   prevTotalElements: BigNumber

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { Grid, Box } from '@mui/material'
+import { Grid, Box } from '@material-ui/core'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 

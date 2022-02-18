@@ -15,8 +15,8 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 
-import { Typography, Fade, useMediaQuery } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Typography, Fade, useMediaQuery } from '@material-ui/core'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 import * as S from "./ListFarm.styles"
 

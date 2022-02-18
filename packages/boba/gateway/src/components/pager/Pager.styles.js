@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 
 export const PagerContainer = styled.div`
     display: flex;

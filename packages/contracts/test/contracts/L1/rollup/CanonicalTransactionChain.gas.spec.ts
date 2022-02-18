@@ -41,7 +41,7 @@ const appendSequencerBatch = async (
   })
 }
 
-describe('[GAS BENCHMARK] CanonicalTransactionChain [ @skip-on-coverage ]', () => {
+describe('[GAS BENCHMARK] CanonicalTransactionChain', () => {
   let sequencer: Signer
   before(async () => {
     ;[sequencer] = await ethers.getSigners()

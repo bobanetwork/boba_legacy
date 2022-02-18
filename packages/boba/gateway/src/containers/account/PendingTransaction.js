@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react';
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@material-ui/core'
 import * as S from './Account.styles'
 import { useSelector } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'

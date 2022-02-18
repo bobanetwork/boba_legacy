@@ -11,7 +11,7 @@
     "deploy": "ts-node \"./bin/deploy.ts\""
   },
   "dependencies": {
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "^0.4.13",
     "@eth-optimism/core-utils": "^0.6.0",
     "@ethersproject/abstract-provider": "^5.5.1",
     "@ethersproject/abstract-signer": "^5.5.0",
@@ -27,12 +27,12 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@types/jest": "^26.0.22",
     "@types/mocha": "^8.2.2",
-    "chai": "^4.3.6",
+    "chai": "^4.3.3",
     "chai-as-promised": "^7.1.1",
     "directory-tree": "^2.2.7",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.4.5",
-    "hardhat": "^2.3.0",
+    "hardhat": "^2.2.1",
     "hardhat-deploy": "^0.7.10",
     "mocha": "^8.3.1",
     "rimraf": "^3.0.2",

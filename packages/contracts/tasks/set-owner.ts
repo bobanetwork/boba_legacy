@@ -40,7 +40,7 @@ task('set-owner')
     predeploys.OVM_GasPriceOracle,
     types.string
   )
-  .setAction(async (args) => {
+  .setAction(async (args, hre: any, runSuper) => {
     const provider = new ethers.providers.JsonRpcProvider(args.contractsRpcUrl)
     let signer: ethers.Signer
     if (!args.useLedger) {

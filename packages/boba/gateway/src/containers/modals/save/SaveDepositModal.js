@@ -1,5 +1,5 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React from 'react';
+import { connect } from 'react-redux';
 
 import { closeModal, openAlert, openError } from 'actions/uiAction'
 import { addFS_Savings } from 'actions/fixedAction'
@@ -7,11 +7,11 @@ import { addFS_Savings } from 'actions/fixedAction'
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
-
 import { logAmount, toWei_String } from 'util/amountConvert'
 
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@material-ui/core'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { Box } from '@material-ui/system'
 
 class SaveDepositModal extends React.Component {
 

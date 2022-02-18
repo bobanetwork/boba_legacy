@@ -761,11 +761,6 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		gas += params.CallStipend
 	}
 	ret, returnGas, err := interpreter.evm.Call(contract, toAddr, args, gas, value)
-
-	if err == ErrTuringWouldBlock {
-		return nil, err
-	}
-
 	if err != nil {
 		stack.push(interpreter.intPool.getZero())
 	} else {

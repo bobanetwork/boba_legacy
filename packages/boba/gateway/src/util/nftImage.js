@@ -25,32 +25,44 @@ const getIpfsUrl = (url) => {
 }
 
 export const getNftImageUrl = async (url) => {
-
-    console.log("URL1:", url)
-
     try {
 
-        if(url.substring(0,29) === 'data:application/json;base64,') { // we have an svg
-            const json = Buffer.from(url.substring(29), "base64").toString()
-            const resultSVG = JSON.parse(json)
-            console.log("We have a svg:", resultSVG)
-            return { 
-                url: resultSVG.image_data,
-                meta: { 
-                    attributes: [],
-                    traits: [],
-                    collection: resultSVG.description,
-                    rank: '',
-                    id: '',
-                    rarity_score: '',
-                    name: resultSVG.name,  
-                }
-            }
-        }
-
         let URL = !!isIpfsUrl(url) ? getIpfsUrl(url) : url
+
         let res = await axios.get(URL)
 
+/*
+{
+   "collection":"BobaPunks",
+   "rank":"8970",
+   "id":3491,
+   "image":"https://ipfs.io/ipfs/QmTqPtJ893q9mTHzvjB1nYs2FNyYzXJr2sg4CHrndF5EJC/3491.png",
+   "traits":[
+      {
+         "trait_type":"Gender",
+         "trait_value":"Male"
+      },
+      {
+         "trait_type":"background",
+         "trait_value":"Data Stream"
+      },
+      {
+         "trait_type":"eyes",
+         "trait_value":"regular shades"
+      },
+      {
+         "trait_type":"head",
+         "trait_value":"messy hair"
+      },
+      {
+         "trait_type":"type",
+         "trait_value":"human dark"
+      }
+   ],
+   "rarity_score":28.57,
+   "name":"Bobapunk #3491"
+}
+*/
         if (res.headers && res.headers['content-type'].includes('application/json')) {
 
             const { 
@@ -64,6 +76,9 @@ export const getNftImageUrl = async (url) => {
                 name = '' 
             } = res.data
 
+            //console.log("image:",image)
+            //console.log("attributes:",attributes)
+            //console.log("traits:",traits)
             return { 
                 url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image,
                 meta: { 
@@ -76,7 +91,6 @@ export const getNftImageUrl = async (url) => {
                     name 
                 }
             }
-
         } else {
             return { url }
         }

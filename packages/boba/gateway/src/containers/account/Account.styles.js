@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles'
-import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
+import { styled } from '@material-ui/core/styles'
+import { Box, Card, CardContent, Typography, Grid } from "@material-ui/core";
 
 export const WrapperHeading = styled(Box)`
   display: flex;

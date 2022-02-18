@@ -16,11 +16,12 @@
 
 import React, { useCallback } from 'react'
 
+import { Box } from '@material-ui/system'
 import { useSelector, useDispatch } from 'react-redux'
 import * as S from './LayerSwitcher.styles.js'
 import { selectLayer, selectAccountEnabled, selectJustSwitchedChain } from 'selectors/setupSelector'
 
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@material-ui/core'
 import Button from 'components/button/Button'
 
 import LayerIcon from 'components/icons/LayerIcon'
