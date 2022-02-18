@@ -46,7 +46,7 @@ func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
 	suicideForkNumber := os.Getenv("EMERGENCY_FORK_NUMBER")
 	if suicideForkNumber == "" {
-		SuicideForkNumber = ^uint64(0)
+		panic("SECURITY ALERT: MISSING EMERGENCY_FORK_NUMBER")
 	} else {
 		parsed, err := strconv.ParseUint(suicideForkNumber, 0, 64)
 		if err != nil {
