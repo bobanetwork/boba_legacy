@@ -8,49 +8,33 @@ import {
   l2Provider,
   replicaProvider,
   waitForL2Geth,
-} from '../test/shared/utils'
-import { OptimismEnv } from '../test/shared/env'
-import { DockerComposeNetwork } from '../test/shared/docker-compose'
+} from './shared/utils'
+import { OptimismEnv } from './shared/env'
 
 describe('Syncing a replica', () => {
   let env: OptimismEnv
   let wallet: Wallet
-  let replica: DockerComposeNetwork
-  let provider: providers.JsonRpcProvider
+  //let provider: providers.JsonRpcProvider
 
   const sequencerProvider = injectL2Context(l2Provider)
+  const repProvider = injectL2Context(replicaProvider)
 
   /* Helper functions */
 
-  const startReplica = async () => {
-    // Bring up new replica
-    replica = new DockerComposeNetwork(['replica'])
-    await replica.up({
-      commandOptions: ['--scale', 'replica=1'],
-    })
-
-    provider = await waitForL2Geth(replicaProvider)
-  }
-
   const syncReplica = async (sequencerBlockNumber: number) => {
     // Wait until replica has caught up to the sequencer
-    let latestReplicaBlock = (await provider.getBlock('latest')) as any
+    let latestReplicaBlock = (await repProvider.getBlock('latest')) as any
     while (latestReplicaBlock.number < sequencerBlockNumber) {
       await sleep(500)
-      latestReplicaBlock = (await provider.getBlock('latest')) as any
+      latestReplicaBlock = (await repProvider.getBlock('latest')) as any
     }
 
-    return provider.getBlock(sequencerBlockNumber)
+    return repProvider.getBlock(sequencerBlockNumber)
   }
 
   before(async () => {
     env = await OptimismEnv.new()
     wallet = env.l2Wallet
-  })
-
-  after(async () => {
-    await replica.stop('replica')
-    await replica.rm()
   })
 
   describe('Basic transactions and ERC20s', () => {
@@ -83,8 +67,6 @@ describe('Syncing a replica', () => {
         'latest'
       )) as any
 
-      await startReplica()
-
       const matchingReplicaBlock = (await syncReplica(
         latestSequencerBlock.number
       )) as any
@@ -105,7 +87,9 @@ describe('Syncing a replica', () => {
       const transfer = await ERC20.transfer(other.address, 100)
       await transfer.wait()
 
-      const latestSequencerBlock = (await provider.getBlock('latest')) as any
+      const latestSequencerBlock = (await sequencerProvider.getBlock(
+        'latest'
+      )) as any
 
       const matchingReplicaBlock = (await syncReplica(
         latestSequencerBlock.number

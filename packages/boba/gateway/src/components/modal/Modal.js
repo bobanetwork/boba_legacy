@@ -13,7 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
+import React from 'react'
+
 import {
   Fade,
   Typography,
@@ -21,11 +22,12 @@ import {
   Container,
   Box,
   useMediaQuery
-} from '@material-ui/core';
+} from '@mui/material'
+
 import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg';
-// import CloseIcon  from '../icons/CloseIcon.js';
+
 import * as S from "./Modal.styles"
-import { useTheme } from '@emotion/react';
+import { useTheme } from '@emotion/react'
 
 function _Modal ({
   children,

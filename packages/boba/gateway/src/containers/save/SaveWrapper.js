@@ -1,6 +1,6 @@
 
 import { useTheme } from '@emotion/react';
-import { useMediaQuery } from '@material-ui/core';
+import { useMediaQuery } from '@mui/material';
 import React from 'react';
 import Save from './Save';
 

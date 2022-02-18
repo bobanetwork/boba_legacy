@@ -29,4 +29,6 @@ var (
 	ErrNoCompatibleInterpreter  = errors.New("no compatible interpreter")
 	ErrTuringDepth              = errors.New("turing call depth exceeded")
 	ErrTuringEmpty              = errors.New("turing replay data not found")
+	ErrGasUintOverflow          = errors.New("gas uint64 overflow")
+	ErrTuringWouldBlock         = errors.New("turing missing cache entry")
 )

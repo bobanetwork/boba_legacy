@@ -68,4 +68,4 @@ The updated [blockexplorer](https://blockexplorer.rinkeby.boba.network/) was lau
 
 ## 8. NFT Bridging is live on Mainnet
 
-NFTs minted on Boba and now be bridged to Ethereum Mainnet for use/sale there. See [NFT Bridges](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/bridges/README.md) for the technical details. **NOTE** - this functionality needs to be enabled/supported by the NFT minters and exchanges.
+NFTs minted on Boba can now be bridged to Ethereum Mainnet for use/sale there. See [NFT Bridges](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/bridges/README.md) for the technical details. **NOTE** - this functionality needs to be enabled/supported by the NFT minters and exchanges.

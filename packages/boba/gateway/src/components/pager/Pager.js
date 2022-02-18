@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { NavigateNext, NavigateBefore } from '@material-ui/icons';
+import { NavigateNext, NavigateBefore } from '@mui/icons-material';
 
 import * as styles from './Pager.module.scss';
 import * as S from './Pager.styles';

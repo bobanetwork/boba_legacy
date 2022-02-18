@@ -1,0 +1,39 @@
+{
+  "name": "@boba/turing-monsters",
+  "version": "0.1.0",
+  "description": "Monster Maker",
+  "main": "index.js",
+  "repository": "git@github.com:omgnetwork/optimism-v2/packages/boba/turing",
+  "license": "Internal use only",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf ./artifacts ./cache",
+    "build": "yarn build:contracts",
+    "build:contracts": "hardhat compile",
+    "test:boba": "hardhat --network boba_local test",
+    "test:rinkeby": "hardhat --network boba_rinkeby test"
+  },
+  "devDependencies": {
+    "@ethersproject/address": "^5.0.11",
+    "@ethersproject/contracts": "^5.0.11",
+    "@ethersproject/networks": "^5.0.11",
+    "@ethersproject/providers": "^5.0.24",
+    "@ethersproject/solidity": "^5.0.11",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "4.3.2",
+    "@openzeppelin/contracts-upgradeable": "4.3.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.6",
+    "ethers": "^5.0.32",
+    "hardhat": "^2.3.0",
+    "mocha": "^8.3.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "ip": "^1.1.5",
+    "web3": "^1.6.1",
+    "web3-eth-abi": "^1.6.1"
+  }
+}

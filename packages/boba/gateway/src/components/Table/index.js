@@ -4,7 +4,7 @@ import {
     TableBody,
     TableContainer,
     TableHead
-} from '@material-ui/core';
+} from '@mui/material';
 import SortIcon from 'components/icons/SortIcon';
 import React from 'react';
 import {

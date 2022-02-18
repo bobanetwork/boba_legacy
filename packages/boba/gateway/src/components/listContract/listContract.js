@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import Button from 'components/button/Button'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import * as S from "./ListContract.styles"
 import { removeNFT } from 'actions/nftAction'
 

@@ -16,3 +16,18 @@ module.exports.OMGXNetwork = {
 
 module.exports.enableTxResponseTime =
   process.env.ENABLE_TX_RESPONSE_TIME === 'true'
+
+module.exports.bobaContractL2Address = process.env.BOBA_CONTRACT_L2_ADDRESS
+module.exports.periodicL2Web3Url = process.env.PERIODIC_L2_WEB3_URL
+
+module.exports.periodicTransactionPrivateKey =
+  process.env.PERIODIC_TRANSACTION_PRIVATE_KEY
+
+module.exports.periodicIntervalInMinute =
+  parseFloat(process.env.PERIODIC_INTERVAL_IN_MINUTE) || 15
+
+module.exports.periodicBobaAmount =
+  parseFloat(process.env.PERIODIC_BOBA_AMOUNT) || 5
+
+// module.exports.periodicEthAmount =
+//   parseFloat(process.env.PERIODIC_ETH_AMOUNT) || 0.01

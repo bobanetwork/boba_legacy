@@ -16,7 +16,7 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import "react-datepicker/dist/react-datepicker.css";
-import { Grid, Box } from '@material-ui/core';
+import { Grid, Box } from '@mui/material';
 
 import moment from 'moment';
 
