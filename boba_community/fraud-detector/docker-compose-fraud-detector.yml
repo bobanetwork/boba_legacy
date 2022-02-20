@@ -1,49 +1,38 @@
 version: "3"
 
-# An "--env-file" must be supplied to docker-compose. Example:
-#   docker-compose
-#     -f docker-compose-fraud-detector.yml \
-#     --env-file deployments/local/env \
-#     build
-# For non-local targets, INFURA_API_KEY must also be set
-networks:
-  default:
-    external: true
-    name: ops_default
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+
+x-l1_node_web3_url: &l1_node_web3_url
+  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 
 services:
   verifier_dtl:
-    image: bobanetwork/verifier_dtl:${TARGET_NAME}
+    image: bobanetwork/verifier_dtl:latest
     build:
       context: ../..
       dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.verifier_dtl
-      args:
-        TARGET_NAME: ${TARGET_NAME}
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
-        DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: ${L1_RPC_ENDPOINT}
+        <<: *l1_rpc_dtl
         DATA_TRANSPORT_LAYER__CONFIRMATIONS: 8
+        DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'true'
         DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'false'
-        DATA_TRANSPORT_LAYER__L2_CHAIN_ID: ${L2_CHAIN_ID}
-        DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: ${ADDRESS_MANAGER}
+        DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 288
+        DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
         DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
-        DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: ${ETH1_CTC_DEPLOYMENT_HEIGHT}
-#    ports:
-#      - ${DTL_PORT:-7878}:7878
-#      - ${REGISTRY_PORT:-8080}:8081
-#    volumes:
-#      - /var/tmp/verifier/dtl_db:/db
+        DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
+    ports:
+      - ${DTL_PORT:-7878}:7878
+      - ${REGISTRY_PORT:-8080}:8081
 
   verifier_l2geth:
     depends_on:
       - verifier_dtl
-    image: bobanetwork/l2geth:${TARGET_NAME}
+    image: bobanetwork/l2geth:release
     deploy:
       replicas: 1
-    build:
-      context: ../..
-      dockerfile: ./ops/docker/Dockerfile.geth
     entrypoint: sh ./geth.sh
     env_file:
       - ../../ops/envs/geth.env
@@ -58,31 +47,31 @@ services:
         BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
         ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        ROLLUP_ENFORCE_FEES: 'true'
+        EMERGENCY_FORK_NUMBER: 310215
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
-#    volumes:
-#      - /var/tmp/verifier/l2geth_vol:/root/.ethereum
 
   fraud-detector:
     depends_on:
      - verifier_dtl
      - verifier_l2geth
-    image: bobanetwork/fraud-detector:${TARGET_NAME}
+    image: bobanetwork/fraud-detector:latest
     deploy:
       replicas: 1
     build:
       context: ../..
       dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
-      L1_NODE_WEB3_URL: ${L1_RPC_ENDPOINT}
+      <<: *l1_node_web3_url
       L1_CONFIRMATIONS: 8
-      L2_NODE_WEB3_URL: ${L2_RPC_ENDPOINT}
+      L2_NODE_WEB3_URL: https://lightning-replica.boba.network
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier_l2geth:8545
-      ADDRESS_MANAGER_ADDRESS: ${ADDRESS_MANAGER}
-      L1_DEPLOYMENT_BLOCK: ${ETH1_CTC_DEPLOYMENT_HEIGHT}
+      ADDRESS_MANAGER_ADDRESS: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
+      L1_DEPLOYMENT_BLOCK: 13502893
       L2_START_BLOCK: 1
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
- 
+
