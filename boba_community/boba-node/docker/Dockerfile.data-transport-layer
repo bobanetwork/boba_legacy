@@ -1,4 +1,4 @@
-FROM bobanetwork/data-transport-layer
+FROM bobanetwork/data-transport-layer:release
 
 COPY boba-node/docker/state-dump.latest.json /opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json
 
