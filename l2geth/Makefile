@@ -11,7 +11,7 @@
 GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
-GOTESTRUN = env GO111MODULE=on EMERGENCY_FORK_NUMBER=0 go run
+GOTESTRUN = env GO111MODULE=on go run
 
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth

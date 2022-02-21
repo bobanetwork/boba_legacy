@@ -889,7 +889,7 @@ func opSuicide(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 	interpreter.evm.StateDB.AddBalance(common.BigToAddress(stack.pop()), balance)
 
 	interpreter.evm.StateDB.Suicide(contract.Address())
-	if rcfg.UsingOVM && interpreter.evm.BlockNumber.Uint64() > rcfg.SuicideForkNumber {
+	if rcfg.UsingOVM && interpreter.evm.chainConfig.IsSDUpdate(interpreter.evm.BlockNumber) {
 		interpreter.evm.StateDB.SubBalance(contract.Address(), balance)
 	}
 	return nil, nil
