@@ -36,7 +36,7 @@ export class L1DataTransportClient {
     return this._get(`/transaction/index/${index}`)
   }
 
-  public async getLatestTransacton(): Promise<TransactionResponse> {
+  public async getLatestTransaction(): Promise<TransactionResponse> {
     return this._get(`/transaction/latest`)
   }
 

@@ -109,9 +109,9 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
 
-	if err == vm.ErrTuringWouldBlock {
-		return nil, ErrTuringRetry // this is in "core", not "core/vm"
-	}
+	// if err == vm.ErrTuringWouldBlock {
+	// 	return nil, ErrTuringRetry // this is in "core", not "core/vm"
+	// }
 
 	// TURING Update the tx metadata, if a Turing call took place...
 	if len(vmenv.Context.Turing) > 1 {

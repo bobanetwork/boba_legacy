@@ -38,6 +38,7 @@ Adjust the ETH, BOBA, OMG or WBTC prices that you want to provide on Rinkeby
 yarn install
 yarn submit
 ```
+
 To submit prices for selective tokens
 ```bash
 yarn install

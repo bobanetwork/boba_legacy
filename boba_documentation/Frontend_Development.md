@@ -84,8 +84,4 @@ rpcUrl: `http://localhost:8545`
 
 **The default for all development is a local chain that you spin up on your local machine through Docker.**
 
-However, in very rare circumstances, such as testing timelock logic for the DAO, it may be useful to work with a live chain. 
-
-To develop on non-local other chains, you will need to obtain either Rinkeby ETH (e.g. from https://faucet.rinkeby.io) or for work on Mainnet, ETH. Once you have some ETH, then your first step will be to bridge some to the L2, since otherwise you will not be able to do anything on the L2 and all your function calls will fail. 
-
-One you have obtained some eth, then simply select the chain you want to work on from the top left dropdown, such as Rinkeby. Note that Rinkeby is used for active development, and therefore, may be down, have undocumented features, or otherwise require steps that are not part of this standard writeup. 
+However, in very rare circumstances, such as testing timelock logic for the DAO, it may be useful to work with a live chain. To develop on other chains, you will need to obtain either Rinkeby ETH (e.g. from https://faucet.rinkeby.io) or for work on Mainnet, ETH. Once you have some ETH, then your first step will be to bridge some to the L2, since otherwise you will not be able to do anything on the L2 and all your function calls will fail. Once you have obtained some ETH, then set the chain you want to work on in the .env. Note that Rinkeby is used for active development, and therefore, may be down, have undocumented features, or otherwise require steps that are not part of this writeup. 

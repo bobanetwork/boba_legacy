@@ -515,11 +515,6 @@ func (w *worker) mainLoop() {
 					delete(w.pendingTasks, h)
 				}
 				w.pendingMu.Unlock()
-			} else if err.Error() == "turing retry needed" {
-				// no error message here
-				if ev.ErrCh != nil {
-					ev.ErrCh <- err
-				}
 			} else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
@@ -875,11 +870,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			w.current.tcount++
 			txs.Shift()
 
-		case core.ErrTuringRetry:
-			// Turing transaction needs to be retried after populating the cache. This special
-			// error code rolls back the first attempt as if it had never happened.
-			txs.Shift()
-			return 2
+		// case core.ErrTuringRetry:
+		// 	// Turing transaction needs to be retried after populating the cache. This special
+		// 	// error code rolls back the first attempt as if it had never happened.
+		// 	txs.Shift()
+		// 	return 2
 
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
@@ -968,9 +963,6 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	wCt := w.commitTransactions(txs, w.coinbase, nil)
 	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
-	} else if wCt == 2 {
-		log.Debug("TURING w.commitTransactions returned Turing retry code")
-		return core.ErrTuringRetry
 	}
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
