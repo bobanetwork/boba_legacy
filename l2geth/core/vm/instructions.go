@@ -763,9 +763,9 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 	}
 	ret, returnGas, err := interpreter.evm.Call(contract, toAddr, args, gas, value)
 
-	if err == ErrTuringWouldBlock {
-		return nil, err
-	}
+	// if err == ErrTuringWouldBlock {
+	// 	return nil, err
+	// }
 
 	if err != nil {
 		stack.push(interpreter.intPool.getZero())
@@ -889,7 +889,7 @@ func opSuicide(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 	interpreter.evm.StateDB.AddBalance(common.BigToAddress(stack.pop()), balance)
 
 	interpreter.evm.StateDB.Suicide(contract.Address())
-	if rcfg.UsingOVM && interpreter.evm.BlockNumber.Uint64() > rcfg.SuicideForkNumber {
+	if rcfg.UsingOVM && interpreter.evm.chainConfig.IsSDUpdate(interpreter.evm.BlockNumber) {
 		interpreter.evm.StateDB.SubBalance(contract.Address(), balance)
 	}
 	return nil, nil

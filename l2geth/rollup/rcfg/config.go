@@ -3,15 +3,13 @@ package rcfg
 import (
 	"math/big"
 	"os"
-	"strconv"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 )
 
 // UsingOVM is used to enable or disable functionality necessary for the OVM.
 var (
-	UsingOVM          bool
-	SuicideForkNumber uint64
+	UsingOVM bool
 )
 var OvmTuringCreditAddress common.Address
 
@@ -44,15 +42,5 @@ var (
 
 func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
-	suicideForkNumber := os.Getenv("EMERGENCY_FORK_NUMBER")
-	if suicideForkNumber == "" {
-		panic("SECURITY ALERT: MISSING EMERGENCY_FORK_NUMBER")
-	} else {
-		parsed, err := strconv.ParseUint(suicideForkNumber, 0, 64)
-		if err != nil {
-			panic(err)
-		}
-		SuicideForkNumber = parsed
-	}
 	OvmTuringCreditAddress = common.HexToAddress(os.Getenv("TURING_CREDIT_ADDRESS"))
 }

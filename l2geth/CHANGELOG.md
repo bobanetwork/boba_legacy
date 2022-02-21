@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.11
+
+### Patch Changes
+
+- 9ef215b8: Various small changes to reduce our upstream Geth diff
+
+## 0.5.10
+
+### Patch Changes
+
+- 2e7f6a55: Fixes incorrect timestamp handling for L1 syncing verifiers
+- 81d90563: Bring back RPC methods that were previously blocked
+
 ## 0.5.9
 
 ### Patch Changes

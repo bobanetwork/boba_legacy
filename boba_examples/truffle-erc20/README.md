@@ -1,4 +1,4 @@
-# Getting Started with Boba and Optimistic Ethereum v2: Simple ERC20 Token Truffle Tutorial
+# Getting Started with Boba: Simple ERC20 Token Truffle Tutorial
 
 Hi there! Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
 

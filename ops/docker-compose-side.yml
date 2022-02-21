@@ -154,6 +154,7 @@ services:
     depends_on:
       - l1_chain
       - dtl
+      - l2geth
     image: bobanetwork/l2geth:latest
     deploy:
       replicas: 1
@@ -167,6 +168,7 @@ services:
       ETH1_HTTP: http://l1_chain:8545
       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
       ROLLUP_CLIENT_HTTP: http://dtl:7878
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
       ROLLUP_BACKEND: 'l2'
       ROLLUP_VERIFIER_ENABLE: 'true'
       ETH1_CTC_DEPLOYMENT_HEIGHT: 8

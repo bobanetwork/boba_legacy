@@ -12,7 +12,7 @@ Docker scripts and python source code for running a *Verifier*, a *DTL* (data tr
 
 ## 0. Concepts
 
-This repo allows you to: 
+This repo allows you to:
 
 1. Run your own Boba geth L2 on your computer. In this case, the geth L2 will run in its `Verifier` mode. In `Verifier` mode, the geth will sync from L1 and use the transaction data from the L1 contracts to compute what the state roots should be, *if the operator is honest*.
 
@@ -22,17 +22,17 @@ The central idea is that if two (or more) systems look at the same transactions,
 
 ## 1. Errors and State Root Mismatches in the Boba Mainnet
 
-* For the first 10 blocks, the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by setting the L1_MAINNET_DEPLOYMENT_BLOCK to 10 blocks past the zero block. 
+* For the first 10 blocks, the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by setting the L1_MAINNET_DEPLOYMENT_BLOCK to 10 blocks past the zero block.
 
-* There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased to 4. The 2 second block 155 timestamp discrepancy has been addressed in a custom docker image (`omgx/data-transport-layer:rc1.0-surgery`). 
+* There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased to 4. The 2 second block 155 timestamp discrepancy has been addressed in a custom docker image (`omgx/data-transport-layer:rc1.0-surgery`).
 
 ## 2. What do when you discover a state root mismatch
 
-Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.  
+Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response / clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of the Boba L2.
 
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
-**Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*. 
+**Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*.
 
 **Open a terminal window**. First, clone the project and install needed dependencies:
 
@@ -43,38 +43,27 @@ $ yarn install
 $ yarn build
 ```
 
-Then, add your Infura key to `boba_community/fraud-detector/deployments/mainnet/env`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
+Then, add your Infura key to `boba_community/fraud-detector/docker-compose-fraud-detector.yml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io).
 
 ```bash
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 
-#boba_community/fraud-detector/deployments/mainnet/env
-
-TARGET_NAME="mainnet"
-L1_RPC_ENDPOINT="https://mainnet.infura.io/v3/YOUR_INFURA_KEY_HERE"
-L2_RPC_ENDPOINT="https://mainnet.boba.network"
-ETH1_CTC_DEPLOYMENT_HEIGHT=13502893
-ADDRESS_MANAGER="0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
-L2_CHAIN_ID=288
-
+x-l1_node_web3_url: &l1_node_web3_url
+  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 ```
 
 Next, navigate to `boba_community/fraud-detector` and build the needed Docker images:
 
 ```
 $ cd boba_community/fraud-detector
-$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/local/env build
-```
-
-You may need to create the default docker network:
-
-```
-$ docker network create ops_default
+$ docker-compose -f docker-compose-fraud-detector.yml build
 ```
 
 Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
 ```
-$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
+$ docker-compose -f docker-compose-fraud-detector.yml up
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 1/2 hour to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
@@ -107,7 +96,7 @@ verifier_dtl_1     | {"level":30,"time":1636133786230,"method":"GET","url":"/bat
 verifier_dtl_1     | {"level":30,"time":1636133786232,"method":"GET","url":"/batch/transaction/latest","elapsed":1,"msg":"Served HTTP Request"}
 verifier_l2geth_1  | DEBUG[11-05|17:36:26.243] Served eth_blockNumber                   conn=172.18.0.4:44544 reqid=147 t=24.086µs
 verifier_l2geth_1  | DEBUG[11-05|17:36:26.244] Served eth_getBlockByNumber              conn=172.18.0.4:44544 reqid=148 t=177.276µs
-fraud-detector_1   | INFO 20211105T173626 74 13508337 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 
+fraud-detector_1   | INFO 20211105T173626 74 13508337 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007 0xd05bfa4e2269e584b95348b070673d2f64a5ee8dbb198f7fa78ee7deac338007
 
 ```
 
@@ -115,7 +104,7 @@ At that point, the `Fraud Detector` can compare the public state roots (deposite
 
 ```bash
 
-fraud-detector_1   | INFO 20211105T173626 79 13508337 
+fraud-detector_1   | INFO 20211105T173626 79 13508337
   0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the SCC-STATEROOT, written into Ethereum Mainnet by Boba Mainnet
   0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the L2-STATEROOT, as reported by Boba Mainnet
   0x4809dde56bb792a27ea26b16b75790705edcaf67c2f7db33bb95417277897c0d #the VERIFIER-STATEROOT you just calculated
@@ -127,10 +116,10 @@ If all three of these roots agree, then Boba Mainnet has been operating truthful
 ```bash
 
 ...
-fraud-detector_1   | INFO 20211105T175039 7788 13557689 
-  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
-  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
-  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c 
+fraud-detector_1   | INFO 20211105T175039 7788 13557689
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c
+  0x0b40758bc7b6c2f9a95dc4af995a3c514a3b217d58e426c4f12bc94a0d6c8a0c
 fraud-detector_1   | DEBUG 20211105T175040 Caught up to L1 tip. Waiting for new events from startBlock 13557996
 verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":13558055,"targetL1Block":13558056,"msg":"Synchronizing events from Layer 1 (Ethereum)"}
 ...

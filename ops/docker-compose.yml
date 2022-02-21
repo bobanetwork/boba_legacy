@@ -370,6 +370,7 @@ services:
   replica:
     depends_on:
       - dtl
+      - l2geth
     image: bobanetwork/l2geth:latest
     deploy:
       replicas: 1
@@ -392,6 +393,7 @@ services:
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
       ROLLUP_POLL_INTERVAL_FLAG: "10s"
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
       EMERGENCY_FORK_NUMBER: 0
     ports:
       - ${L2GETH_HTTP_PORT:-8549}:8545

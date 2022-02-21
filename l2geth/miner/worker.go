@@ -515,11 +515,6 @@ func (w *worker) mainLoop() {
 					delete(w.pendingTasks, h)
 				}
 				w.pendingMu.Unlock()
-			} else if err.Error() == "turing retry needed" {
-				// no error message here
-				if ev.ErrCh != nil {
-					ev.ErrCh <- err
-				}
 			} else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
@@ -875,11 +870,11 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			w.current.tcount++
 			txs.Shift()
 
-		case core.ErrTuringRetry:
-			// Turing transaction needs to be retried after populating the cache. This special
-			// error code rolls back the first attempt as if it had never happened.
-			txs.Shift()
-			return 2
+		// case core.ErrTuringRetry:
+		// 	// Turing transaction needs to be retried after populating the cache. This special
+		// 	// error code rolls back the first attempt as if it had never happened.
+		// 	txs.Shift()
+		// 	return 2
 
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
@@ -932,18 +927,7 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	// Preserve liveliness as best as possible. Must panic on L1 to L2
 	// transactions as the timestamp cannot be malleated
 	if parent.Time() > tx.L1Timestamp() {
-		log.Error("Monotonicity violation", "index", num)
-		if tx.QueueOrigin() == types.QueueOriginSequencer {
-			tx.SetL1Timestamp(parent.Time())
-			prev := parent.Transactions()
-			if len(prev) == 1 {
-				tx.SetL1BlockNumber(prev[0].L1BlockNumber().Uint64())
-			} else {
-				log.Error("Cannot recover L1 Blocknumber")
-			}
-		} else {
-			log.Error("Cannot recover from monotonicity violation")
-		}
+		log.Error("Monotonicity violation", "index", num, "parent", parent.Time(), "tx", tx.L1Timestamp())
 	}
 
 	// Fill in the index field in the tx meta if it is `nil`.
@@ -979,9 +963,6 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	wCt := w.commitTransactions(txs, w.coinbase, nil)
 	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
-	} else if wCt == 2 {
-		log.Debug("TURING w.commitTransactions returned Turing retry code")
-		return core.ErrTuringRetry
 	}
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
