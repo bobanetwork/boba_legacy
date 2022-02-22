@@ -35,7 +35,7 @@
                     pkgs.nodePackages.lerna
                   ];
                   buildInputs = old: old ++ [
-                    hardhat
+                    hardhat.packages.${system}.hardhat
                   ];
                 };
               };
