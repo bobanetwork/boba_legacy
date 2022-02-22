@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { selectModalState } from 'selectors/uiSelector'
-
+import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
 import {
@@ -76,17 +76,18 @@ import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
-import NFT from 'containers/nft/Nft'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
+import Wallet from 'containers/wallet/Wallet'
 
 import { Box, Container } from '@mui/material'
 
-import MainMenu from 'components/mainMenu/MainMenu'
 import PageFooter from 'components/pageFooter/PageFooter'
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+
+
 
 function Home() {
 
@@ -235,7 +236,7 @@ function Home() {
       </Alert>
 
       <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
-        <MainMenu />
+        <PageHeader />
         <Container maxWidth={false} sx={{
           height: 'calc(100% - 150px)',
           minHeight: '500px',
@@ -252,8 +253,8 @@ function Home() {
           {pageDisplay === "BobaScope" &&
             <BobaScope />
           }
-          {pageDisplay === "NFT" &&
-            <NFT />
+          {pageDisplay === "Wallet" &&
+            <Wallet />
           }
           {pageDisplay === "Farm" &&
             <FarmWrapper />

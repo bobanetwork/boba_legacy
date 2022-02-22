@@ -7,7 +7,6 @@ import * as styles from './Airdrop.module.scss'
 
 import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
-import PageHeader from 'components/pageHeader/PageHeader'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
@@ -175,7 +174,7 @@ class Airdrop extends React.Component {
 
     if(netLayer === 'L1') {
         return <div className={styles.container}>
-            <PageHeader title="Airdrop" />
+            {/* <PageTitle title="Airdrop" /> */}
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -193,7 +192,7 @@ class Airdrop extends React.Component {
 
     if(!netLayer) {
       return <div className={styles.container}>
-          <PageHeader title="Airdrop" />
+          {/* <PageTitle title="Airdrop" /> */}
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />
@@ -211,7 +210,7 @@ class Airdrop extends React.Component {
 
     return (
   <>
-    <PageHeader title="Airdrop" />
+    {/* <PageTitle title="Airdrop" /> */}
 
       <Grid item xs={12}>
 

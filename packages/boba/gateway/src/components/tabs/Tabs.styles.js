@@ -7,6 +7,7 @@ export const Tabs = styled(Box)(({theme})=>({
    justifyContent: 'flex-start',
    flex: 1,
    marginBottom: '20px',
+   borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
    [theme.breakpoints.down('md')]:{
       width: '100%'
    }
@@ -24,7 +25,7 @@ export const TabItem = styled(Box)(({ theme }) => ({
    '&.active': {
       color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main}`,
       opacity: 1,
-      borderBottom: `2px solid ${theme.palette.neutral.contrastText}`,
+      borderBottom: `2px solid #BAE21A`,
       marginBottom: '-2px',
       zIndex: 1,
    },
@@ -33,5 +34,3 @@ export const TabItem = styled(Box)(({ theme }) => ({
       textAlign: 'center'
    }
 }))
-
-

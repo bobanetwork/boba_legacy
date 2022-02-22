@@ -6,10 +6,13 @@ import { openAlert, openError } from 'actions/uiAction'
 import moment from 'moment'
 
 import Button from 'components/button/Button'
-import { Box, Typography, CircularProgress, Grid } from '@mui/material'
+// eslint-disable-next-line no-unused-vars
+import { Box, Typography, LinearProgress } from '@mui/material'
 import * as S from "./ListSave.styles"
 
 import { withdrawFS_Savings } from 'actions/fixedAction'
+import BobaIcon from 'components/icons/BobaIcon'
+import { Circle } from '@mui/icons-material'
 
 class ListSave extends React.Component {
 
@@ -61,10 +64,7 @@ class ListSave extends React.Component {
 
     const {
       stakeInfo,
-      isMobile
     } = this.state
-
-    const pageLoading = Object.keys(stakeInfo).length === 0
 
     const timeDeposit_S = stakeInfo.depositTimestamp
     const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
@@ -74,17 +74,69 @@ class ListSave extends React.Component {
     const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
 
     const twoWeeks = 14 * 24 * 60 * 60
-    const twoDays  =  2 * 24 * 60 * 60
+    const twoDays = 2 * 24 * 60 * 60
 
     const residual_S = duration_S % (twoWeeks + twoDays)
     const timeZero_S = timeNow_S - residual_S
     const unlocktimeNextBegin = moment.unix(timeZero_S + twoWeeks).format('MM/DD/YYYY hh:mm a')
     const unlocktimeNextEnd = moment.unix(timeZero_S + twoWeeks + twoDays).format('MM/DD/YYYY hh:mm a')
-    
+
     let locked = true
-    if(residual_S > twoWeeks) locked = false
-    
+    if (residual_S > twoWeeks) locked = false
+
+
     return (
+      <S.StakeListItemContainer>
+        <S.StakeItemDetails>
+          <Box>
+            <Typography variant="body2" sx={{ opacity: 0.65 }}>
+              Staked Boba
+            </Typography>
+            <Typography variant="body2">
+              {stakeInfo.depositAmount ? `${stakeInfo.depositAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`}
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ opacity: 0.65 }}>
+              Earned
+            </Typography>
+            <Typography variant="body2">
+              <BobaIcon dark={true} /> {' '} {earned.toFixed(3)}
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ opacity: 0.65 }}>
+              <Circle sx={{ height: "8px", color: '#fff', mr: '5px', opacity: `${stakeInfo.isActive ? 1 : 0.4}`, width: "8px" }} />
+              {stakeInfo.isActive ? 'Active' : 'Not Active'}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.6 }}>
+              {timeDeposit}
+            </Typography>
+          </Box>
+        </S.StakeItemDetails>
+        <S.StakeItemContent>
+          <Box sx={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
+            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', opacity: '0.65' }}>Next unstake window</Typography>
+            <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', opacity: '0.65' }}>{unlocktimeNextBegin} - {unlocktimeNextEnd}</Typography>
+          </Box>
+          {/* <Box sx={{ width: '100%', my: 2 }}>
+            <LinearProgress color='warning' value={70} variant="determinate" />
+          </Box> */}
+        </S.StakeItemContent>
+        <S.StakeItemAction>
+          <Button variant="contained"
+            onClick={() => { this.handleUnstake() }}
+            disabled={locked}
+          >Unstake</Button>
+        </S.StakeItemAction>
+      </S.StakeListItemContainer>
+    );
+
+    /* return (
       <S.Wrapper>
         {pageLoading ? (
           <Box sx={{textAlign: 'center'}}>
@@ -176,12 +228,12 @@ class ListSave extends React.Component {
         </S.Entry>
         )}
       </S.Wrapper>
-    )
+    ) */
   }
 }
 
 const mapStateToProps = state => ({
-    fixed: state.fixed,
+  fixed: state.fixed,
 })
 
 export default connect(mapStateToProps)(ListSave)
