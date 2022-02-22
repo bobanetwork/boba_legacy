@@ -29,7 +29,7 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
 const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-const testPrivateKey = '0x______________'
+const testPrivateKey = '0x___________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
 describe("Turing NFT Random 256", function () {
