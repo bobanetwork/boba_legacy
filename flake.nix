@@ -2,21 +2,18 @@
   description = "Boba stack with Optimism";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
-  #inputs.nixpkgs.url = "path:/home/tgunnoe/src/nixpkgs";
   inputs.dream2nix.url = "github:nix-community/dream2nix";
-  #inputs.dream2nix.url = "path:/home/tgunnoe/src/boba/dream2nix";
   inputs.dream2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.flake-utils.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.hardhat-src.url = "github:nomiclabs/hardhat";
-  inputs.hardhat-src.flake = false;
-  outputs = { self, nixpkgs, flake-utils, dream2nix, hardhat-src }@inp:
+  inputs.hardhat.url = "github:tgunnoe/hardhat-wrapper";
+  inputs.hardhat.inputs.dream2nix.follows = "dream2nix";
+  outputs = { self, nixpkgs, flake-utils, dream2nix, hardhat }@inp:
     flake-utils.lib.eachDefaultSystem (system:
       let
         version = builtins.substring 0 8 self.lastModifiedDate;
         pkgs = nixpkgs.legacyPackages.${system};
         dream2nix = inp.dream2nix.lib.init {
-          #systems = system;
           pkgs = pkgs;
           config = {
             projectRoot = ./. ;
@@ -26,22 +23,8 @@
           };
         };
         packages = flake-utils.lib.flattenTree {
-          # hardhat = (dream2nix.makeFlakeOutputs {
-          #   source = hardhat-src;
-          #   pname = "hardhat";
-          #   packageOverrides = {
-          #     root = {
-          #       add-inputs = {
-          #         nativeBuildInputs = old: old ++ [
-          #           pkgs.nodePackages.yarn
-          #         ];
-          #       };
-          #     };
-          #   };
-          # }).defaultPackage.${system};
           optimism = (dream2nix.makeFlakeOutputs {
             source = ./.;
-            pname = "optimism";
             packageOverrides = {
               optimism = {
                 add-inputs = {
@@ -52,6 +35,7 @@
                     pkgs.nodePackages.lerna
                   ];
                   buildInputs = old: old ++ [
+                    hardhat
                   ];
                 };
               };

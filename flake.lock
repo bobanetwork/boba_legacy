@@ -4,7 +4,6 @@
       "inputs": {
         "gomod2nix": "gomod2nix",
         "mach-nix": "mach-nix",
-        "nix-parsec": "nix-parsec",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -12,11 +11,11 @@
         "poetry2nix": "poetry2nix"
       },
       "locked": {
-        "lastModified": 1645539474,
-        "narHash": "sha256-3hCdA7w9m2WnaubstpCFYgLMLp+bRPwMwkFGbpa/RwU=",
+        "lastModified": 1645621165,
+        "narHash": "sha256-rEyBejehwv5j5k/FySkcgcTuTq6qIu6Lr3fTx3v76y0=",
         "owner": "nix-community",
         "repo": "dream2nix",
-        "rev": "a40142359a052ad2efff36c99ba8c65f5d4ec309",
+        "rev": "afcf7158aed7fba0c4d7337d7ddf18ae1898f836",
         "type": "github"
       },
       "original": {
@@ -56,19 +55,23 @@
         "type": "github"
       }
     },
-    "hardhat-src": {
-      "flake": false,
+    "hardhat": {
+      "inputs": {
+        "dream2nix": [
+          "dream2nix"
+        ]
+      },
       "locked": {
-        "lastModified": 1645625035,
-        "narHash": "sha256-hS4pTJrugUbCHOCWenXUYVVcwEgzj8T+HrqP2gUi+NQ=",
-        "owner": "nomiclabs",
-        "repo": "hardhat",
-        "rev": "40519d17d24227449a1bdbcc8e8df4b68c0dcae5",
+        "lastModified": 1645673318,
+        "narHash": "sha256-Nsh7MCtrKapZEWjKDoijApCKAVGr615BRs3OsFGJyGM=",
+        "owner": "tgunnoe",
+        "repo": "hardhat-wrapper",
+        "rev": "5161ae42af691419848f70eba5f9993f8aa02799",
         "type": "github"
       },
       "original": {
-        "owner": "nomiclabs",
-        "repo": "hardhat",
+        "owner": "tgunnoe",
+        "repo": "hardhat-wrapper",
         "type": "github"
       }
     },
@@ -85,22 +88,6 @@
       "original": {
         "id": "mach-nix",
         "type": "indirect"
-      }
-    },
-    "nix-parsec": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1635533376,
-        "narHash": "sha256-/HrG0UPGnI5VdkhrNrpDiM2+nhdL6lD/bqyGtYv0QDE=",
-        "owner": "nprindle",
-        "repo": "nix-parsec",
-        "rev": "1bf25dd9c5de1257a1c67de3c81c96d05e8beb5e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nprindle",
-        "repo": "nix-parsec",
-        "type": "github"
       }
     },
     "nixpkgs": {
@@ -156,7 +143,7 @@
       "inputs": {
         "dream2nix": "dream2nix",
         "flake-utils": "flake-utils",
-        "hardhat-src": "hardhat-src",
+        "hardhat": "hardhat",
         "nixpkgs": "nixpkgs"
       }
     }
