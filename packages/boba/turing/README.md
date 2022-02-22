@@ -2,7 +2,7 @@
 
 - [Basic Architecture of Turing and L2TGeth](#basic-architecture-of-turing-and-l2tgeth)
   * [TLDR](#tldr)
-  * [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
+  * [Turing status as of February 21 2022 - Release countdown](#turing-status-as-of-february-21-2022---release-countdown)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
 - [Important Properties of Turing](#important-properties-of-turing)
@@ -56,7 +56,7 @@ rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
 ## Turing status as of February 21 2022 - Release countdown
 
-With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of March 1for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
+With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of March 1 for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
 
 # Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
