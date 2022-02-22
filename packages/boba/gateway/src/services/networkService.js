@@ -1332,7 +1332,9 @@ async initializeBase( networkGateway ) {
       } else {
         //any ERC20 json will do....
         tx = await this.L2_TEST_Contract
-          .connect(this.provider.getSigner()).attach(currency).transfer(
+          .connect(this.provider.getSigner())
+          .attach(currency)
+          .transfer(
             address,
             value_Wei_String
           )
@@ -1391,7 +1393,9 @@ async initializeBase( networkGateway ) {
 
       //we could use any L2 ERC contract here - just getting generic parts of the abi
       //but we know we alaways have the TEST contract, so will use that
-      const L2ERC20Contract = this.L2_TEST_Contract.attach(currencyAddress)
+      const L2ERC20Contract = this.L2_TEST_Contract
+        .connect(this.provider.getSigner())
+        .attach(currencyAddress)
 
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,
