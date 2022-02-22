@@ -1,44 +1,30 @@
 @import 'index.scss';
 
-.ListNFT {
-
-  box-shadow: 0px 4px 4px rgb(255 255 255 / 5%);
-  border-radius: 4px;
-  width: 250px;
-  margin-top: 10px;
-  margin-left: 10px;
-  border: 1px solid $gray6;
-  background: $background400;
-  overflow: hidden;
-
-  .topContainer {
-
-    cursor: pointer;
+.topContainer {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0px 5px;
+  text-align: center;
+  .Table2 {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 10px;
-    padding-top: 0px;
-
-    .Table2 {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-    }
+    align-items: flex-start;
   }
+}
 
-  .BasicText {
-    font-size: 1em;
-    font-weight: 700;
-    color: $gray3;
-  }
+.BasicText {
+  font-size: 1em;
+  font-weight: 700;
+  color: $gray3;
+}
 
-  .BasicTextLight {
-    font-size: 0.7em;
-    font-weight: 500;
-    color: $gray3;
-  }
+.BasicTextLight {
+  font-size: 0.7em;
+  font-weight: 500;
+  color: $gray3;
 }
 
 .muted {

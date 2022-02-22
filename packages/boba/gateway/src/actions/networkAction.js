@@ -179,6 +179,12 @@ export function transfer(recipient, value, currency) {
   )
 }
 
+export function settle_v0() {
+  return createAction('SETTLE_v0/CREATE', () =>
+    networkService.settle_v0()
+  )
+}
+
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))

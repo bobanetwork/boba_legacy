@@ -64,6 +64,6 @@ export function amountToUsd(amount, lookupPrice, token) {
   } else if (!!lookupPrice[token.symbol.toLowerCase()]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {
-    return false
+    return 0
   }
 }

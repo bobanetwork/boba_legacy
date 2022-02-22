@@ -20,7 +20,9 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import {useMediaQuery, useTheme} from '@mui/material'
+import { Grid, Typography, Box, useMediaQuery, useTheme } from '@mui/material'
+import { Circle } from '@mui/icons-material'
+
 import moment from 'moment'
 
 import Input from 'components/input/Input'
@@ -42,7 +44,7 @@ import * as S from './History.styles'
 import * as styles from './Transactions.module.scss'
 
 import useInterval from 'util/useInterval'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
 
@@ -51,14 +53,15 @@ import { POLL_INTERVAL } from 'util/constant'
 function History() {
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const netLayer = useSelector(selectLayer())
 
   const dispatch = useDispatch()
 
   const now = new Date()
-  const last_week = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
+  const last_6months = new Date(now.getFullYear(), now.getMonth()-6, now.getDate())
 
-  const [startDate, setStartDate] = useState(last_week)
+  const [startDate, setStartDate] = useState(last_6months)
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
 
@@ -70,9 +73,9 @@ function History() {
 
   const transactions = orderedTransactions.filter((i) => {
     if (startDate && endDate) {
-      return (moment.unix(i.timeStamp).isSameOrAfter(startDate) && moment.unix(i.timeStamp).isSameOrBefore(endDate));
+      return (moment.unix(i.timeStamp).isSameOrAfter(startDate) && moment.unix(i.timeStamp).isSameOrBefore(endDate))
     }
-    return true;
+    return true
   })
 
   useInterval(() => {
@@ -82,8 +85,12 @@ function History() {
   }, POLL_INTERVAL)
 
   return (
-    <>
-      <PageHeader title="History" />
+
+    <S.HistoryPageContainer>
+
+      <Box sx={{ my: 1 }}>
+        <PageTitle title="History" />
+      </Box>
 
       {!layer &&
         <S.LayerAlert>
@@ -93,12 +100,13 @@ function History() {
               variant="body2"
               component="p"
             >
-              You have not connected your wallet. To see your history, connect to MetaMask
+              To see your history, connect to MetaMask
             </S.AlertText>
           </S.AlertInfo>
           <WalletPicker />
         </S.LayerAlert>
       }
+
       {layer && <> 
       <S.Header>
         <div className={styles.searchInput}>
@@ -172,7 +180,7 @@ function History() {
         </div>
       </div>
     </>}
-    </>
+    </S.HistoryPageContainer>
   );
 }
 

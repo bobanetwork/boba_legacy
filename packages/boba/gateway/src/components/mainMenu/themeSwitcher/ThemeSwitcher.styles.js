@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
 
 export const ThemeSwitcherTag = styled.div`
-  margin-left: -15px;
-  margin-top: 100px;
   display: flex;
   position: relative;
 `;

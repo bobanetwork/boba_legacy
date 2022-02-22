@@ -1,5 +1,69 @@
 import { styled } from '@mui/material/styles'
-import { Box, Typography, Grid } from "@mui/material"
+import { Box, Typography, Grid, Divider } from "@mui/material"
+
+export const NFTPageContainer = styled(Box)(({ theme }) => ({
+  margin: '20px auto',
+  display: 'flex',
+  justifyContent: 'space-around',
+  width: '100%',
+  gap: '10px',
+  // [theme.breakpoints.between('md', 'lg')]: {
+  //   width: '90%',
+  //   padding: '0px',
+  // },
+  // [theme.breakpoints.between('sm', 'md')]: {
+  //   width: '90%',
+  //   padding: '0px',
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   width: '100%',
+  //   padding: '0px',
+  //   flexDirection: 'column',
+  // },
+}));
+
+export const NFTActionContent = styled(Box)(({ theme }) => ({
+  width: '35%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  gap: '10px',
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
+}));
+
+export const NFTFormContent = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  padding: '10px',
+  borderRadius: '20px',
+  gap: '10px',
+  height: 'fit-content',
+  background: theme.palette.background.secondary,
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
+}));
+
+export const NFTListContainer = styled(Grid)(({ theme, dataempty }) => ({
+  width: '63%',
+  background: !!dataempty ? theme.palette.background.secondary : 'none',
+  padding: !!dataempty ? '10px' : 0,
+  borderRadius: !!dataempty ? '20px' : 0,
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+  },
+}));
+
+
+export const NFTPageContent = styled(Grid)(({theme}) => ({
+  marginTop: '20px',
+  padding: '10px',
+  borderRadius: '20px',
+  background: theme.palette.background.secondary,
+}))
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
@@ -14,17 +78,21 @@ export const TableHeading = styled(Box)(({ theme }) => ({
 }))
 
 export const LayerAlert = styled(Box)(({ theme }) => ({
-  width: "100%",
+  width: "50%",
+  margin: '20px auto',
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: '30px',
-  borderRadius: '8px',
-  margin: '20px 0px',
+  borderRadius: '12px',
   padding: '25px',
   background: theme.palette.background.secondary,
-  [theme.breakpoints.up('md')]: {
-    padding: '25px 50px',
+  [ theme.breakpoints.up('md') ]: {
+    width: '100%',
+  },
+  [ theme.breakpoints.down('md') ]: {
+    width: '100%',
   },
 
 }));
@@ -138,4 +206,12 @@ export const BpIcon = styled('span')(({ theme }) => ({
     background:
       theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
   },
+}))
+
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
 }))

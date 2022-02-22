@@ -3,13 +3,14 @@ import { Box, Grid } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
-  borderRadius: '0',
+  borderRadius: '12px',
   background: theme.palette.background.secondary,
+  marginBottom: '20px',
   [theme.breakpoints.down('md')]: {
     padding: '30px 10px',
   },
   [theme.breakpoints.up('md')]: {
-    padding: '10px',
+    padding: '20px',
   },
 }));
 
@@ -71,4 +72,3 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
     gap: '16px',
   },
 }));
-
