@@ -5,14 +5,12 @@ x-l1_rpc_dtl: &l1_rpc_dtl
 x-l1_rpc_geth: &l1_rpc_geth
   ETH1_HTTP: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 
-version: "3"
+version: "3.9"
 
 services:
   dtl:
-    image: bobanetwork/data-transport-layer:latest
-    build:
-      context: ..
-      dockerfile: ./boba-node/docker/Dockerfile.data-transport-layer
+    container_name: dtl
+    image: bobanetwork/data-transport-layer:release
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
@@ -24,11 +22,14 @@ services:
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
       DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
       DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
+    volumes:
+      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
 
   replica:
+    container_name: replica
     depends_on:
       - dtl
     image: bobanetwork/l2geth:release
@@ -37,6 +38,8 @@ services:
     entrypoint: sh ./geth.sh
     env_file:
       - ../../ops/envs/geth.env
+    #volumes:
+    #  - ./<YOUR PERSISTED STORAGE>:/root/.ethereum/
     environment:
       << : *l1_rpc_geth
       ROLLUP_TIMESTAMP_REFRESH: 5s
