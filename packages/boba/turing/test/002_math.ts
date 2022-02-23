@@ -210,6 +210,8 @@ describe("Basic Math", function () {
   it("should support floating point volume of sphere", async () => {
     // This pre-populates the result cache, so that the real transaction can
     // complete without needing to block the sequencer thread.
+    await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
+
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
@@ -218,16 +220,18 @@ describe("Basic Math", function () {
     expect(result.toFixed(5)).to.equal('33.51000')
   })
 
-  it("should support floating point volume of sphere based on geth-cached result", async () => {
-    let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
-    console.log("---start TX_cache---")
-    const res = await tr.wait()
-    console.log("---end TX_cache---")
-    expect(res).to.be.ok
-    const rawData = res.events[0].data
-    const result = parseInt(rawData.slice(-64), 16) / 100 
-    expect(result.toFixed(5)).to.equal('33.51000')
+  it("should revert on a cache miss", async () => {
+    let tr = await hello.multFloatNumbers(urlStr, '3.123', gasOverride)
+    await expect(tr.wait()).to.be.reverted
   })
 
+  it("should not overwrite a non-Turing revert message", async () => {
+    try {
+      await hello.estimateGas.multFloatNumbers(urlStr, '0', gasOverride)
+      expect(1).to.equal(0)
+    } catch (err) {
+      expect(err.message).to.contain("Multiply by zero error")
+    }
+  })
 })
 
