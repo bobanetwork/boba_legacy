@@ -155,7 +155,12 @@ describe("Stableswap at AWS Lambda", function () {
     //testing with 800, y=1200, A=5 - this also sets the k
     const gas = await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
     console.log("    Stableswap gas estimate:", gas.toString())
+    
     const tr = await stable.swap_x(urlStr, 12, { gasLimit: gas })
+
+    //await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
+    //const tr = await stable.swap_x(urlStr, 12, gasOverride)
+
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[2].data //the event returns 

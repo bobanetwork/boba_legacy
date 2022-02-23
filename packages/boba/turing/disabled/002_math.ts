@@ -240,5 +240,18 @@ describe("Basic Math", function () {
     expect(result.toFixed(5)).to.equal('33.51000')
   })
 
+  it("should revert on a cache miss", async () => {
+    let tr = await hello.multFloatNumbers(urlStr, '3.123', gasOverride)
+    await expect(tr.wait()).to.be.reverted
+  })
+
+  it("should not overwrite a non-Turing revert message", async () => {
+    try {
+      await hello.estimateGas.multFloatNumbers(urlStr, '0', gasOverride)
+      expect(1).to.equal(0)
+    } catch (err) {
+      expect(err.message).to.contain("Multiply by zero error")
+    }
+  })
 })
 
