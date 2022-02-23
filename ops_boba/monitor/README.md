@@ -70,3 +70,4 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `PERIODIC_BOBA_AMOUNT`                  | No        | 5                                               | Boba amount to make transfer periodically                                        |
 | `BOBA_CONTRACT_L2_ADDRESS`              | Yes       | N/A                                             | Boba token contract address in L2                                                |
 | `PERIODIC_L2_WEB3_URL`                  | Yes       | N/A                                             | L2 Web3 Url for send transaction                                                 |
+| `ORACLE_ADDRESSES`                      | Yes       | N/A                                             | Oracle contract address keys, eg: BobaStraw_ETHUSD,BobaStraw_BOBAUSD             |

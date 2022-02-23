@@ -2,7 +2,11 @@ require('dotenv').config()
 
 module.exports.l1WsUrl = process.env.L1_NODE_WEB3_WS
 module.exports.l2WsUrl = process.env.L2_NODE_WEB3_WS
+module.exports.l1Url = process.env.L1_NODE_WEB3_URL
+module.exports.l2Url = process.env.L2_NODE_WEB3_URL
 
+module.exports.oracleAddresses = (process.env.ORACLE_ADDRESSES || '').split(',')
+module.exports.addressManagerAddress = process.env.ADDRESS_MANAGER_ADDRESS
 module.exports.l1PoolAddress = process.env.L1_LIQUIDITY_POOL_ADDRESS
 module.exports.l2PoolAddress = process.env.L2_LIQUIDITY_POOL_ADDRESS
 
