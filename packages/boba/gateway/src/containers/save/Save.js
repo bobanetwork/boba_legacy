@@ -20,11 +20,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
-import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
+import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 
 import AlertIcon from 'components/icons/AlertIcon'
 
-import { openModal } from 'actions/uiAction'
+import { openAlert, openError, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 
 import * as S from './Save.styles'
@@ -37,9 +37,9 @@ import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
-import ListSave from 'components/listSave/ListSave'
+import ListSave from 'components/listSave/listSave'
 
-import { logAmount } from 'util/amountConvert'
+import { logAmount, toWei_String } from 'util/amountConvert'
 
 class Save extends React.Component {
 
@@ -66,6 +66,9 @@ class Save extends React.Component {
       netLayer,
       loading: false,
       layer2,
+      stakeValue: '',
+      stakeValueValid: false,
+      value_Wei_String: ''
     }
 
   }
@@ -111,6 +114,56 @@ class Save extends React.Component {
       this.props.dispatch(openModal('saveDepositModal'))
   }
 
+
+  getMaxTransferValue () {
+    const { layer2 } = this.state
+    const bobaBalance = Object.keys(layer2).reduce((acc, cur) => {
+      if (layer2[cur]['symbolL2'] === 'BOBA') {
+        const bal = layer2[cur]['balance']
+        acc = logAmount(bal, 18)
+      }
+      return acc
+    }, 0)
+    return bobaBalance
+  }
+
+  handleStakeValue(value) {
+    if( value &&
+      (Number(value) > 0.0) &&
+      (Number(value) <= Number(this.getMaxTransferValue()))
+      ) {
+        this.setState({
+          stakeValue: value,
+          stakeValueValid: true,
+          value_Wei_String: toWei_String(value, 18)
+        })
+    } else {
+      this.setState({
+        stakeValue: value,
+        stakeValueValid: false,
+        value_Wei_String: ''
+      })
+    }
+  }
+
+  async handleConfirm() {
+
+    const { value_Wei_String } = this.state
+
+    this.setState({ loading: true })
+
+    const addTX = await this.props.dispatch(addFS_Savings(value_Wei_String))
+
+    if (addTX) {
+      this.props.dispatch(openAlert("Your BOBA was staked"))
+      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
+    } else {
+      this.props.dispatch(openError("Failed to stake BOBA"))
+      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
+    }
+  }
+
+
   render() {
 
     const {
@@ -118,6 +171,9 @@ class Save extends React.Component {
       accountEnabled,
       netLayer,
       layer2,
+      stakeValue,
+      loading
+
     } = this.state
 
 
@@ -128,56 +184,17 @@ class Save extends React.Component {
 
     let bobaWeiString = '0'
     if (typeof (bobaBalance[ 0 ]) !== 'undefined') {
-      console.log("bobaBalance:", bobaBalance[ 0 ])
       bobaWeiString = bobaBalance[ 0 ].balance.toString()
     }
 
-    //console.log("omgWeiString:",omgWeiString)
 
     let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
 
     let totalBOBAstaked = 0
     Object.keys(stakeInfo).forEach((v, i) => {
       totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)
-      console.log(Number(stakeInfo[ i ].depositAmount))
     })
 
-
-    /*
-        if (netLayer === 'L1') {
-          return <div className={styles.container}>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                >
-                  You are on Ethereum Mainnet. Staking@5% is only available on Boba. SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </S.LayerAlert>
-          </div>
-        }
-
-
-        if (!netLayer) {
-          return <div className={styles.container}>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                >
-                  You have not connected your wallet. To stake on BOBA, connect to MetaMask
-                </S.AlertText>
-              </S.AlertInfo>
-              <WalletPicker />
-            </S.LayerAlert>
-          </div>
-        } */
 
     return (
       <S.StakePageContainer>
@@ -228,11 +245,16 @@ class Save extends React.Component {
                 <Typography variant="body2"> {l2BalanceBOBA} </Typography>
               </Box>
               <Input
-                value={0}
+                placeholder={`Amount to stake`}
+                value={stakeValue}
                 type="number"
-                onChange={(i) => { console.log([ 'i.target.value', i.target.value ]) }}
-                variant="standard"
+                // unit={'BOBA'}
+                maxValue={this.getMaxTransferValue()}
+                onChange={i=>{this.handleStakeValue(i.target.value)}}
+                onUseMax={i=>{this.handleStakeValue(this.getMaxTransferValue())}}
                 newStyle
+                disabled={netLayer !== 'L2'}
+                variant="standard"
               />
               {!netLayer ?
                 <WalletPicker fullWidth={true} label="Connect wallet" /> :
@@ -240,7 +262,8 @@ class Save extends React.Component {
                   <Button
                     color="primary"
                     variant="outlined"
-                    onClick={() => {}}
+                    onClick={() => {this.handleConfirm()}}
+                    loading={loading}
                     disabled={!accountEnabled}
                     fullWidth={true}
                   >

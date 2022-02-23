@@ -86,17 +86,14 @@ function TokenPage({
     return (
       <S.TokenPageContainer>
         <S.TokenPageContent>
-          <S.TableHeading sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: !isMobile ? 'space-between' : 'flex-start'
-          }}>
+          <S.TableHeading>
             {tokenTableHeads.map((item) => {
               return (
                 <S.TableHeadingItem
                   sx={{
                     width: item.size,
                     flex: item.flex,
+                    ...item.sx
                   }}
                   key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
               )

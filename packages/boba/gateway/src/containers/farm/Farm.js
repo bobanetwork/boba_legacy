@@ -238,7 +238,7 @@ class Farm extends React.Component {
               item xs={10}
               md={10}
             >
-              <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
+              <Typography variant="body2" sx={{ mt: 2 }}>
                 When someone uses the bridge you invested, the bridge charges a fee, which will be immediately distributed to the stakeholders.
               </Typography>
               {/* <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
@@ -330,16 +330,14 @@ class Farm extends React.Component {
                 className={poolTab === 'Ethereum Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Ethereum Pool')}
                 variant="body2"
-                component="span"
-                color="white">
+                component="span">
                 Ethereum Pool
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Boba L2 Pool')}
                 variant="body2"
-                component="span"
-                color="white">
+                component="span">
                 Boba L2 Pool
               </Typography>
             </S.PageSwitcher>
@@ -426,7 +424,7 @@ class Farm extends React.Component {
                   }} whiteSpace="nowrap">Available Balance
                   </Typography>
                   <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
-                    <HelpOutline sx={{ opacity: 0.65 }} />
+                    <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
                   </Tooltip>
                 </S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}>
@@ -435,7 +433,7 @@ class Farm extends React.Component {
                   }} whiteSpace="nowrap">Total Staked
                   </Typography>
                   <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
-                    <HelpOutline sx={{ opacity: 0.65 }} />
+                    <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
                   </Tooltip>
                 </S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}>
@@ -444,7 +442,7 @@ class Farm extends React.Component {
                   }} whiteSpace="nowrap">Past APR %
                   </Typography>
                   <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
-                    <HelpOutline sx={{ opacity: 0.65 }} />
+                    <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
                   </Tooltip>
                 </S.GridItemTag>
                 <S.GridItemTag item xs={3} md={2}>

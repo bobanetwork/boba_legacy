@@ -22,5 +22,8 @@ export const tokenTableHeads = [
         isSort: false,
         size: '40%',
         flex: 2,
+        sx: {
+           textAlign: 'center'
+        }
     }
 ]

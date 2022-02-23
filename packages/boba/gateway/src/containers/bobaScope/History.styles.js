@@ -43,3 +43,26 @@ export const Header = styled(Box)(({ theme }) => ({
     gap: '20px',
   },
 }));
+
+
+export const ScopePageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [ theme.breakpoints.between('md', 'lg') ]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [ theme.breakpoints.between('sm', 'md') ]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
+  },
+}));

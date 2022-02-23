@@ -1,5 +1,8 @@
 const _ = require('lodash')
 const web3 = require('web3')
+const ethers = require('ethers')
+const fluxAggregatorJson = require('@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json')
+const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const { WebSocketProvider } = require('@ethersproject/providers')
 const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
@@ -10,6 +13,15 @@ let l1GasPrice
 let l2PoolBalance
 let l2BlockNumber
 let l2GasPrice
+const oracleAddresses = []
+const l1Provider = new ethers.providers.StaticJsonRpcProvider(configs.l1Url)
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(configs.l2Url)
+const addressManager = new ethers.Contract(
+  configs.addressManagerAddress,
+  addressManagerJSON.abi,
+  l1Provider
+)
+const bobaDecimal = (1e18).toString()
 
 const convertWeiToEther = (wei) => {
   return parseFloat(web3.utils.fromWei(wei.toString(), 'ether'))
@@ -23,6 +35,16 @@ const logError = (message, key, extra = {}) => {
       error: err.message,
     })
   }
+}
+
+const getOracleAmouts = () => {
+  const result = {}
+  for (const address of oracleAddresses) {
+    if (address.amount > -1) {
+      result[address.key] = address.amount
+    }
+  }
+  return result
 }
 
 const logBalance = (provider, blockNumber, networkName) => {
@@ -40,7 +62,7 @@ const logBalance = (provider, blockNumber, networkName) => {
         ]
 
   return Promise.all(promiseData)
-    .then((values) => {
+    .then(async (values) => {
       if (values[2] === configs.OMGXNetwork.L1) {
         l1PoolBalance = convertWeiToEther(values[0])
         l1GasPrice = parseFloat(values[1].toString())
@@ -49,6 +71,20 @@ const logBalance = (provider, blockNumber, networkName) => {
         l2PoolBalance = convertWeiToEther(values[0])
         l2GasPrice = parseFloat(values[1].toString())
         l2BlockNumber = blockNumber
+        try {
+          const amounts = await Promise.all(
+            oracleAddresses.map((address) => {
+              return address.contract.availableFunds()
+            })
+          )
+          for (let i = 0; i < amounts.length; i++) {
+            oracleAddresses[i].amount = ethers.BigNumber.from(amounts[i])
+              .div(bobaDecimal)
+              .toNumber()
+          }
+        } catch (e) {
+          logError(e.message, 'oracleAddressesFunds')
+        }
       }
     })
     .then(() => {
@@ -73,6 +109,7 @@ const logBalance = (provider, blockNumber, networkName) => {
             poolBalance: l2PoolBalance,
             gasPrice: l2GasPrice,
             blockNumber: l2BlockNumber,
+            ...getOracleAmouts(),
           },
         })
       }
@@ -193,7 +230,7 @@ module.exports.validateMonitoring = () => {
   )
 }
 
-const setupProvider = (networkName, url) => {
+const setupProvider = async (networkName, url) => {
   const provider = new WebSocketProvider(url)
   if (networkName === configs.OMGXNetwork.L1) {
     provider.on('debug', (info) => {
@@ -201,7 +238,28 @@ const setupProvider = (networkName, url) => {
         logger.info('ethers', info.request)
       }
     })
+  } else {
+    for (const addressKey of configs.oracleAddresses) {
+      try {
+        const address = await addressManager.getAddress(addressKey)
+        oracleAddresses.push({
+          address,
+          key: addressKey,
+          amount: -1,
+          contract: new ethers.Contract(
+            address,
+            fluxAggregatorJson.abi,
+            l2Provider
+          ),
+        })
+      } catch (e) {
+        logError(e.message, 'AddressManager', {
+          address: addressKey,
+        })
+      }
+    }
   }
+
   provider._websocket.addEventListener('open', onConnected(networkName))
   provider._websocket.addEventListener('error', onError(networkName, provider))
   provider
@@ -212,7 +270,7 @@ const setupProvider = (networkName, url) => {
       logData(provider, result.number, networkName)
 
       // log balances
-      logBalance(provider, blockNumber, networkName)
+      logBalance(provider, blockNumber, networkName).catch()
     })
     .catch()
 }

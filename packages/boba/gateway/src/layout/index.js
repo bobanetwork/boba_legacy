@@ -46,7 +46,7 @@ function App () {
         main: light ? '#1CD6D1' : '#CCFF00',
       },
       background: {
-        default: light ? "#F5F6F6" : "#111315",
+        default: light ? "#FFFFFF" : "#111315",
         secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.02)',
         secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
@@ -221,7 +221,7 @@ function App () {
       <CssBaseline />
       <BrowserRouter>
         <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-          <div 
+          <div
             style={{
               display: 'flex',
               flex: '1 0',
