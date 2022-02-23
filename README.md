@@ -54,7 +54,7 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
   * [`core-utils`](./packages/core-utils): Low-level utilities and encoding packages
   * [`common-ts`](./packages/common-ts): Common tools for TypeScript code that runs in Node
   * [`data-transport-layer`](./packages/data-transport-layer): Event indexer, allowing the `l2geth` node to access L1 data
-  * [`batch-submitter`](./packages/batch-submitter): Daemon for submitting L2 transaction and state root batches to L1
+  * [`batch-submitter`](./go/batch-submitter): Daemon for submitting L2 transaction and state root batches to L1
   * [`message-relayer`](./packages/message-relayer): Service for relaying L2 messages to L1
   * [`replica-healthcheck`](./packages/replica-healthcheck): Service to monitor the health of different replica deployments
 * [`l2geth`](./l2geth): Fork of [go-ethereum v1.9.10](https://github.com/ethereum/go-ethereum/tree/v1.9.10) implementing the [OVM](https://research.paradigm.xyz/optimism#optimistic-geth).
@@ -94,7 +94,7 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**. 
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
@@ -152,7 +152,7 @@ Make sure you are in the `ops` folder and then run
 docker-compose run integration_tests
 ```
 
-Expect the full test suite with more than 110 tests including load tests to complete in between *30 minutes* to *two hours* depending on your computer hardware. 
+Expect the full test suite with more than 110 tests including load tests to complete in between *30 minutes* to *two hours* depending on your computer hardware.
 
 ### Viewing docker container logs
 
