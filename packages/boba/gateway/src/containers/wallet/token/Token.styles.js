@@ -63,10 +63,15 @@ export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "10px",
   display: "flex",
   alignItems: "center",
+  flexDirection: 'row',
   justifyContent: "space-between",
   borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
   [ theme.breakpoints.down('md') ]: {
+    justifyContent: 'flex-start',
     marginBottom: "5px",
+    'div:last-child': {
+      display: 'none'
+     }
   },
   [ theme.breakpoints.up('md') ]: {
     marginBottom: "20px",

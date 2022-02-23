@@ -206,9 +206,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
       </IconButton>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography component='p' variant="body4" sx={{
-          color: 'rgba(255, 255, 255, 0.3)'
-        }} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
@@ -219,9 +217,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
       </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-        <Typography variant="body4" sx={{
-          color: 'rgba(255, 255, 255, 0.3)'
-        }} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
       </S.LayerContent> : null}
     </S.LayerSwitcherWrapper>)
 }

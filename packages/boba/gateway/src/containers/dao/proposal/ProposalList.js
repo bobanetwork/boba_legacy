@@ -33,13 +33,11 @@ const PER_PAGE = 8
 
 function ProposalList() {
 
-    // const [ page, setPage ] = useState(1)
-
     const [selectedState, setSelectedState] = useState('All')
-    
+
     const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
     const proposals = useSelector(selectProposals)
-    // TODO: make use of this to filter the proposals
+
     const options = [
         {value: 'All', title: 'All'},
         {value: 'Pending', title: 'Pending'},
@@ -49,20 +47,22 @@ function ProposalList() {
         {value: 'Succeeded', title: 'Succeeded'},
         {value: 'Queued', title: 'Queued'},
         {value: 'Expired', title: 'Expired'},
-        {value: 'Executed', title: 'Executed'} 
+        {value: 'Executed', title: 'Executed'}
       ]
 
-      
+
     const onActionChange = (e) => {
         setSelectedState(e.target.value);
     }
-    
+
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
     // const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
     // const endingIndex = page * PER_PAGE
     // const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex)
     const paginatedProposals = orderedProposals;
+
+    console.log(['paginatedProposals',paginatedProposals])
 
     let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE)
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
@@ -73,14 +73,22 @@ function ProposalList() {
             <Select
                 options={options}
                 onSelect={onActionChange}
-                sx={{ marginBottom: '20px' }} 
+                sx={{ marginBottom: '20px' }}
                 value={selectedState}
             ></Select>
         </S.DaoProposalHead>
         <S.DividerLine />
         <S.DaoProposalListContainer>
             {!!loading && !proposals.length ? <div className={styles.loadingContainer}> Loading... </div> : null}
-            {paginatedProposals.map((p, index) => {
+            {paginatedProposals
+                // eslint-disable-next-line array-callback-return
+                .filter((p) => {
+                    if (selectedState === 'All') {
+                        return true;
+                    }
+                    return selectedState === p.state;
+                })
+                .map((p, index) => {
                 return <React.Fragment key={index}>
                     <Proposal proposal={p} />
                 </React.Fragment>

@@ -72,8 +72,7 @@ function Wallet() {
             }
           }}
           variant="body2"
-          component="span"
-          color="white">
+          component="span">
           Ethereum Wallet
         </Typography>
         <Typography
@@ -84,8 +83,7 @@ function Wallet() {
             }
           }}
           variant="body2"
-          component="span"
-          color="white">
+          component="span">
           Boba Wallet
         </Typography>
       </S.PageSwitcher>

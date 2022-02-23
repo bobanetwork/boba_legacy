@@ -37,7 +37,7 @@ export const WalletTitleContainer = styled(Box)(({ theme }) => ({
 export const PageSwitcher = styled(Box)(({ theme }) => ({
   width: 'fit-content',
   padding: '3px',
-  background: 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)': 'rgba(255, 255, 255, 0.04)',
   cursor: 'pointer',
   display: 'flex',
   borderRadius: '12px',
