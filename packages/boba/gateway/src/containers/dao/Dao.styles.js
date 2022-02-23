@@ -1,5 +1,91 @@
 import { styled } from '@mui/material/styles'
-import { Box, Typography, Grid } from "@mui/material"
+import { Box, Typography, Grid, Divider } from "@mui/material"
+
+export const DaoPageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [theme.breakpoints.between('md', 'lg')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.between('sm', 'md')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+  },
+  
+}));
+
+export const DaoPageContent = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'flex-start',
+  paddingTop: '0px',
+  gap: '10px',
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column'
+  },
+}));
+
+export const DaoWalletContainer = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.secondary,
+  margin: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '0px 20px',
+  minHeight: '700px',
+  borderRadius: '20px',
+  width: '30%',
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
+}));
+
+export const DaoWalletHead = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignSelf: 'flex-start',
+  justifySelf: 'flex-start',
+  alignItems: 'center'
+}));
+
+export const DaoWalletPickerContainer = styled(Box)(({theme}) => ({
+  width: '100%',
+  margin: '10px auto',
+  'button' : {
+    width: '100%'
+  }
+}));
+
+export const DaoWalletAction = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-around',
+  width: '100%',
+  margin: '10px auto',
+}));
+
+export const DaoProposalContainer = styled(Box)(({ theme }) => ({
+  width: '70%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  padding: '0 32px',
+  minHeight: '500px',
+  borderRadius: '20px',
+  background: theme.palette.background.secondary,
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0 20px',
+  },
+}));
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
@@ -16,17 +102,13 @@ export const TableHeading = styled(Box)(({ theme }) => ({
 export const LayerAlert = styled(Box)(({ theme }) => ({
   width: "100%",
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: '30px',
-  borderRadius: '8px',
   margin: '20px 0px',
-  padding: '25px',
-  background: theme.palette.background.secondary,
-  [theme.breakpoints.up('md')]: {
-    padding: '25px 50px',
-  },
-
+  'Button': {
+    width: '100%'
+  }
 }));
 
 export const AlertText = styled(Typography)(({ theme }) => ({
@@ -138,4 +220,11 @@ export const BpIcon = styled('span')(({ theme }) => ({
     background:
       theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
   },
+}))
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
 }))

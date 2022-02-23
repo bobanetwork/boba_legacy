@@ -578,13 +578,24 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         return undefined
       }
       // query the new SCC event. event.args._extraData in eventCache might be wrong
-      const SCCEvent: ethers.Event[] =
+      const SCCEvents: ethers.Event[] =
         await this.state.StateCommitmentChain.queryFilter(
           this.state.StateCommitmentChain.filters.StateBatchAppended(),
           selectedEvent.blockNumber,
           selectedEvent.blockNumber
         )
-      return SCCEvent[0]
+      // cover a special case that multiple transactions are in one block
+      for (const SCCEvent of SCCEvents) {
+        const prevTotalElements = SCCEvent.args._prevTotalElements.toNumber()
+        const batchSize = SCCEvent.args._batchSize.toNumber()
+        if (
+          txIndex >= prevTotalElements &&
+          txIndex < prevTotalElements + batchSize
+        ) {
+          return SCCEvent
+        }
+      }
+      return SCCEvents[0]
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1

@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+  min-width: 110px;
 
   .label {
     margin-bottom: 10px;
@@ -11,11 +12,13 @@
 
   .field {
     position: relative;
-    border: 2px solid $gray4;
+    border: 2px solid rgba(255, 255, 255, 0.15);
     transition: all 200ms ease-in-out;
     display: flex;
     flex-direction: row;
     align-items: center;
+    border-radius: 12px;
+    
   }
 
   .select {
@@ -32,6 +35,7 @@
     top: 0;
     bottom: 0;
     opacity: 0;
+    min-width: 110px;
   }
 
   .selected {
@@ -39,7 +43,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 50px;
+    height: 40px;
     margin-left: 10px;
 
     .details {

@@ -446,11 +446,6 @@ async initializeBase( networkGateway ) {
       //fire up the base providers
       const Web3 = require("web3")
 
-      // let web3_L1 = new Web3(
-      //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
-      //   new Web3.providers.WebsocketProvider("wss://mainnet.infura.io/ws/v3/YOUR-PROJECT-ID")
-      // )
-
       this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
       this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
 
@@ -1307,6 +1302,53 @@ async initializeBase( networkGateway ) {
     }
   }
 
+
+
+async settle_v0() {
+
+    console.log("NS: settle_v0")
+
+    let tx = null
+
+    try {
+
+      // get current WAGMI_v0 balance
+      
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+
+      // if(currency === allAddresses.L2_ETH_Address) {
+      //   //we are sending ETH
+
+      //   let wei = BigNumber.from(value_Wei_String)
+
+      //   tx = await this.provider.send('eth_sendTransaction',
+      //     [
+      //       {
+      //         from: this.account,
+      //         to: address,
+      //         value: ethers.utils.hexlify(wei)
+      //       }
+      //     ]
+      //   )
+
+      // } else {
+      //   //any ERC20 json will do....
+      //   tx = await this.L2_TEST_Contract
+      //     .connect(this.provider.getSigner()).attach(currency).transfer(
+      //       address,
+      //       value_Wei_String
+      //     )
+      //   await tx.wait()
+      // }
+
+      return tx
+    } catch (error) {
+      console.log("NS: settle_v0 error:", error)
+      return error
+    }
+  }
+
   //Transfer funds from one account to another, on the L2
   async transfer(address, value_Wei_String, currency) {
 
@@ -1332,7 +1374,9 @@ async initializeBase( networkGateway ) {
       } else {
         //any ERC20 json will do....
         tx = await this.L2_TEST_Contract
-          .connect(this.provider.getSigner()).attach(currency).transfer(
+          .connect(this.provider.getSigner())
+          .attach(currency)
+          .transfer(
             address,
             value_Wei_String
           )
@@ -1391,7 +1435,9 @@ async initializeBase( networkGateway ) {
 
       //we could use any L2 ERC contract here - just getting generic parts of the abi
       //but we know we alaways have the TEST contract, so will use that
-      const L2ERC20Contract = this.L2_TEST_Contract.attach(currencyAddress)
+      const L2ERC20Contract = this.L2_TEST_Contract
+        .connect(this.provider.getSigner())
+        .attach(currencyAddress)
 
       let allowance_BN = await L2ERC20Contract.allowance(
         this.account,

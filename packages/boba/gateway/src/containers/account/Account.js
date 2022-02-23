@@ -29,8 +29,8 @@ import ListAccountBatch from 'components/listAccount/listAccountBatch'
 
 import * as S from './Account.styles'
 
-import PageHeader from 'components/pageHeader/PageHeader'
 import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@mui/material'
+
 import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'
@@ -44,6 +44,9 @@ import PendingTransaction from './PendingTransaction'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
+
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
 function Account ({ enabled }) {
 
@@ -232,7 +235,22 @@ function Account ({ enabled }) {
 
   return (
     <>
-      <PageHeader title="Bridge"/>
+      {/*<PageTitle title="Wallet"/>*/}
+
+      {!accountEnabled &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You have not connected your wallet. To see your balances, bridge, and transfer, connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
 
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>
