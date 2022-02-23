@@ -2,47 +2,70 @@
   description = "Boba stack with Optimism";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
-  inputs.dream2nix.url = "github:nix-community/dream2nix";
+  #inputs.dream2nix.url = "path:/home/tgunnoe/src/boba/dream2nix";
+  inputs.dream2nix.url = "github:nix-community/dream2nix?rev=ff01488c422f0bbcda508424f55a39c05122ce18";
   inputs.dream2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.flake-utils.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.hardhat.url = "github:tgunnoe/hardhat-wrapper";
-  inputs.hardhat.inputs.dream2nix.follows = "dream2nix";
+  inputs.hardhat.url = "path:/home/tgunnoe/src/boba/hardhat-wrapper";
+  #inputs.hardhat.inputs.dream2nix.follows = "dream2nix";
   outputs = { self, nixpkgs, flake-utils, dream2nix, hardhat }@inp:
     flake-utils.lib.eachDefaultSystem (system:
       let
         version = builtins.substring 0 8 self.lastModifiedDate;
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+        };
         dream2nix = inp.dream2nix.lib.init {
           pkgs = pkgs;
           config = {
             projectRoot = ./. ;
+
             repoName = "optimism";
-            packagesDir = "./packages";
+            #packagesDir = "./packages";
             # overridesDirs = [ "${inputs.dream2nix}/overrides" ];
           };
         };
         packages = flake-utils.lib.flattenTree {
           optimism = (dream2nix.makeFlakeOutputs {
+            pname = "optimism";
             source = ./.;
             packageOverrides = {
               optimism = {
                 add-inputs = {
                   nativeBuildInputs = old: old ++ [
                     pkgs.yarn
-                    #packages.hardhat
-                    # pkgs.nodePackages_latest.yarn
-                    pkgs.nodePackages.lerna
+                    hardhat.packages.${system}.hardhat
+                    hardhat.packages.${system}.solc
                   ];
                   buildInputs = old: old ++ [
+                    #hardhat.packages.${system}.hardhat
+                  ];
+                };
+                add-node-deps = {
+                  nodeDeps = old: old ++ [
                     hardhat.packages.${system}.hardhat
+                    hardhat.packages.${system}."@nomiclabs/hardhat-ethers"
+                    hardhat.packages.${system}."@ethersproject/providers"
+                    hardhat.packages.${system}."@sentry/node"
+                    hardhat.packages.${system}.ethers
+                    hardhat.packages.${system}.chai
+                    hardhat.packages.${system}.pino
+                    hardhat.packages.${system}."@types/pino"
+                    hardhat.packages.${system}."@types/pino-multi-stream"
+                    hardhat.packages.${system}.pino-multi-stream
+                    hardhat.packages.${system}.pino-sentry
+                    hardhat.packages.${system}.prom-client
+                    hardhat.packages.${system}.express
+                    hardhat.packages.${system}."@openzeppelin/contracts"
+                    hardhat.packages.${system}.solc
                   ];
                 };
               };
             };
           }).defaultPackage.${system};
 
-          # dtl = (dream2nix.riseAndShine {
+          # dtl = (dream2nix.makeFlakeOutputs {
           #   source = ./packages/data-transport-layer;
           # }).defaultPackage.${system};
 
