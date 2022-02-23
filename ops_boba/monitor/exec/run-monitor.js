@@ -52,8 +52,8 @@ const main = async () => {
 
   if (validateMonitoring()) {
     logger.info('Start addresses monitoring service!')
-    setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl)
-    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl)
+    setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl).catch()
+    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl).catch()
   } else {
     logger.error(
       'Addresses Monitoring: Env variables for monitoring is missing!'
@@ -72,38 +72,38 @@ const main = async () => {
   const messageService = new messageMonitorService()
   await messageService.initConnection()
 
-  loop(() => messageService.startMessageMonitor())
+  loop(() => messageService.startMessageMonitor()).catch()
 
   // l1 bridge monitor
   const l1BridgeService = new l1BridgeMonitorService()
   await l1BridgeService.initConnection()
 
-  loop(() => l1BridgeService.startL1BridgeMonitor())
-  loop(() => l1BridgeService.startCrossDomainMessageMonitor())
+  loop(() => l1BridgeService.startL1BridgeMonitor()).catch()
+  loop(() => l1BridgeService.startCrossDomainMessageMonitor()).catch()
 
   // liquidity pool
   const exitService = new exitMonitorService()
   await exitService.initConnection()
 
-  loop(() => exitService.startExitMonitor())
+  loop(() => exitService.startExitMonitor()).catch()
 
   // state root
   const stateRootService = new stateRootMonitorService()
   await stateRootService.initConnection()
 
-  loop(() => stateRootService.startStateRootMonitor())
+  loop(() => stateRootService.startStateRootMonitor()).catch()
 
   // block
   const blockService = new BlockMonitorService()
   await blockService.initConnection()
   await blockService.initScan()
 
-  loop(() => blockService.startTransactionMonitor())
-  loop(() => blockService.startCrossDomainMessageMonitor())
+  loop(() => blockService.startTransactionMonitor()).catch()
+  loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 }
 
 ;(async () => {
-  main()
+  main().catch()
 })().catch((err) => {
   console.log(err)
   process.exit(1)
