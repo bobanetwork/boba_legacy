@@ -46,7 +46,7 @@ function Proposal({
             if (proposal.totalVotes > 0) {
                 setVotePercent(Math.round((100 * proposal.forVotes) / proposal.totalVotes))
             } else {
-                setVotePercent("NA")
+                setVotePercent(0)
             }
         };
         init()
@@ -117,13 +117,13 @@ function Proposal({
                                 Voting Time
                             </Typography>
                             <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
-                                <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
                                     {startTime}
-                                </span>
+                                </Typography >
                                 &nbsp; - &nbsp;
-                                <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
                                     {endTime}
-                                </span>
+                                </Typography >
                             </Typography>
                         </Box>
                         <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
@@ -173,7 +173,7 @@ function Proposal({
                         {votePercent !== 'NA' &&
                             <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
                         }
-                        <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)' }}>Total: {proposal.totalVotes}</Typography>
+                        <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', opacity: 0.3 }}>Total: {proposal.totalVotes}</Typography>
                     </Box>
                     <Box sx={{ width: '100%', my: 2 }}>
                         <LinearProgress

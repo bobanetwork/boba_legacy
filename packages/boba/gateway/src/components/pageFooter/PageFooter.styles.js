@@ -11,7 +11,7 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   bottom: 0,
   width: '100%',
   height: '184px',
-  background: `${theme.palette.mode === 'dark' ? '#1A1D1F' : '#FFFFFF'}`,
+  background: theme.background,
   [ theme.breakpoints.down('md') ]: {
     marginTop: 0,
     height: '450px',
@@ -25,9 +25,16 @@ export const Wrapper = styled(Box)(({ theme }) => ({
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
-  justifyContent: 'space-around',
-  width: '100%',
+  justifyContent: 'space-between',
+  width: '70%',
   margin: '30px 0',
+  [ theme.breakpoints.between('sm', 'md') ]: {
+    width: '90%',
+    margin: '20px 0',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '20px'
+  },
   [ theme.breakpoints.down('md') ]: {
     margin: '20px 0',
     width: '100%',
@@ -69,18 +76,20 @@ export const FooterDivierMobile = styled(Divider)(({ theme }) => ({
     background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
     boxSizing: 'border-box',
     boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
-    width: '100%' 
+    width: '100%'
   }
 }))
 
 export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignSelf: 'flex-start',
-  justifyContent: 'space-around',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  width: '100%',
-  margin: '20px 0',
+  width: '70%',
+  margin: '20px auto',
   [ theme.breakpoints.down('md') ]: {
+    width: '100%',
+    justifyContent: 'space-around',
     flexDirection: 'column',
     margin: '0',
     alignItems: 'flex-start',

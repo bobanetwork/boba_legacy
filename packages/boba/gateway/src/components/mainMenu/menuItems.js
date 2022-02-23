@@ -1,4 +1,4 @@
-export const menuItems = [  
+export const menuItems = [
   {
     key: 'Ecosystem',
     icon: "SafeIcon",
@@ -59,14 +59,14 @@ export const menuItems = [
   //       title: "Analytics",
   //       url: "/bobascope"
   //     },
-      
+
   //     {
   //       key: 'NFT',
   //       icon: "NFTIcon",
   //       title: "NFT",
   //       url: "/nft"
   //     },
-      
+
   //     {
   //       key: 'Airdrop',
   //       icon: "SwapIcon",
@@ -87,5 +87,5 @@ export const menuItems = [
   //     },
   //   ]
   // },
-  
+
 ]
