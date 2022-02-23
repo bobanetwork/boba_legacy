@@ -15,22 +15,29 @@ if [[ $BUILD == 1 ]]; then
   docker-compose build
 fi
 
+# Deploy the basics - L1 and DTL
 docker-compose up -d l1_chain dtl
 sleep 5
-echo "Starting Optimism deployer"
 
+# Deploy the L2, batch_submitter, and the relayer
+echo "Starting Optimism deployer"
 docker-compose up deployer
 docker-compose up -d l2geth batch_submitter relayer
 sleep 5
+
+# Deploy the fast message relayer and the gas oracle
 echo "Starting Boba deployer (slow)"
 docker-compose up boba_deployer
 docker-compose up -d boba_message-relayer-fast gas_oracle
 sleep 5
+
 echo "Base system is up"
 (cd ../packages/boba/ng-prototype ; yarn deploy)
 echo "Activated contracts, starting agents"
+
 docker-compose up -d l1-agent l2-agent
 echo "All containers started"
 sleep 5
+
 # Remove the "--tail 1" if you need to see logs from the setup process
 docker-compose logs --tail 1 --follow

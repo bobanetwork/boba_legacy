@@ -81,7 +81,7 @@ contract L1_BobaPortal {
   // This is expensive but may be necessary to protect against 51% attacks on the fast-bridge system.
   // Each FastBatchIn must provide a hash value which was previously sent down from L1 to L2. There is
   // presently no way to prune old hashes which are no longer needed, however there is also no way to 
-  // contorl how many messages are in flight L1->L2->L1. 
+  // control how many messages are in flight L1->L2->L1. 
   mapping (bytes32 => uint256) sentHashes;
 
   event SysPaid(address, uint);

@@ -73,7 +73,7 @@ contract L2_EthPool {
 
   /* This is triggered from L1 when a user wishes to withdraw liquidity.
      It is deducted from "available" right away, but the actual funds will
-     not be released until the response message has gone thorugh the Slow
+     not be released until the response message has gone through the Slow
      channel. L2 ETH is burned if necessary to satisfy this request.
   */
   function RemoveLiquidity(address source, uint256 amount) public
