@@ -500,56 +500,16 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         earliestBlockNumber,
       })
 
-      // The latest allowed timestamp/blockNumber is the next queue element!
-      let nextQueueIndex = await this.chainContract.getNextQueueIndex()
-      let latestTimestamp: number
-      let latestBlockNumber: number
-
-      // updateLatestTimestampAndBlockNumber is a helper which updates
-      // the latest timestamp and block number based on the pending queue elements.
-      const updateLatestTimestampAndBlockNumber = async () => {
-        const pendingQueueElements =
-          await this.chainContract.getNumPendingQueueElements()
-        const nextRemoteQueueElements =
-          await this.chainContract.getNextQueueIndex()
-        const totalQueueElements =
-          pendingQueueElements + nextRemoteQueueElements
-        if (nextQueueIndex < totalQueueElements) {
-          const [, queueTimestamp, queueBlockNumber] =
-            await this.chainContract.getQueueElement(nextQueueIndex)
-          latestTimestamp = queueTimestamp
-          latestBlockNumber = queueBlockNumber
-        } else {
-          // If there are no queue elements left then just allow any timestamp/blocknumber
-          latestTimestamp = Number.MAX_SAFE_INTEGER
-          latestBlockNumber = Number.MAX_SAFE_INTEGER
-        }
-      }
-      // Actually update the latest timestamp and block number
-      await updateLatestTimestampAndBlockNumber()
-      this.logger.debug('Determined latest timestamp and blockNumber', {
-        latestTimestamp,
-        latestBlockNumber,
-      })
-
       // Now go through our batch and fix the timestamps and block numbers
       // to automatically enforce monotonicity.
       const fixedBatch: Batch = []
       for (const ele of b) {
-        if (!ele.isSequencerTx) {
-          // Set the earliest allowed timestamp to the old latest and set the new latest
-          // to the next queue element's timestamp / blockNumber
-          earliestTimestamp = latestTimestamp
-          earliestBlockNumber = latestBlockNumber
-          nextQueueIndex++
-          await updateLatestTimestampAndBlockNumber()
-        }
         // Fix the element if its timestammp/blockNumber is too small
         if (
           ele.timestamp < earliestTimestamp ||
           ele.blockNumber < earliestBlockNumber
         ) {
-          this.logger.warn('Fixing timestamp/blockNumber too small', {
+          this.logger.info('Fixing timestamp/blockNumber too small', {
             oldTimestamp: ele.timestamp,
             newTimestamp: earliestTimestamp,
             oldBlockNumber: ele.blockNumber,
@@ -557,20 +517,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           })
           ele.timestamp = earliestTimestamp
           ele.blockNumber = earliestBlockNumber
-        }
-        // Fix the element if its timestammp/blockNumber is too large
-        if (
-          ele.timestamp > latestTimestamp ||
-          ele.blockNumber > latestBlockNumber
-        ) {
-          this.logger.warn('Fixing timestamp/blockNumber too large.', {
-            oldTimestamp: ele.timestamp,
-            newTimestamp: latestTimestamp,
-            oldBlockNumber: ele.blockNumber,
-            newBlockNumber: latestBlockNumber,
-          })
-          ele.timestamp = latestTimestamp
-          ele.blockNumber = latestBlockNumber
         }
         earliestTimestamp = ele.timestamp
         earliestBlockNumber = ele.blockNumber
@@ -775,9 +721,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       //will be undefined for legacy Geth
       if (typeof turing !== 'undefined') {
         const turingVersion = '01'
-        console.log('TURING: Turing candidate:', turing)
+        this.logger.info('TURING: Turing candidate:', { turing })
         if (turing.length > 4) {
-          console.log('TURING: Turing string:', turing)
+          this.logger.info('TURING: Turing string:', { turing })
           // We sometimes use a 1 byte Turing string for debug purposes
           // This is a hex string so will have length 4 ('0x00') - 'real' Turing strings will be > 4
           // Chop those off at this stage
@@ -788,14 +734,13 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           ).padStart(4, '0')
           if (headerTuringLengthField.length > 4) {
             // paranoia check
-            console.log(
-              'Turing length error:',
+            this.logger.info('Turing length error:', {
               turing,
-              remove0x(turing).length / 2,
-              BigNumber.from(remove0x(turing).length / 2).toHexString(),
-              headerTuringLengthField,
-              headerTuringLengthField.length
-            )
+              turingLength: remove0x(turing).length / 2,
+              turingHexString: BigNumber.from(remove0x(turing).length / 2).toHexString(),
+              turingHeaderLengthField: headerTuringLengthField,
+              turingHeaderLength: headerTuringLengthField.length,
+            })
             throw new Error('Turing length error!')
           }
           rawTransaction =
@@ -805,14 +750,14 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
             remove0x(rawTransaction) +
             remove0x(turing)
         } else {
-          console.log('TURING: Normal tx:', turing)
+          this.logger.info('TURING: Normal tx:', { turing })
           // this was a normal transaction without a Turing call
           rawTransaction =
             '0x' + turingVersion + '0000' + remove0x(rawTransaction)
         }
       } else {
         // typeof(turing) === "undefined"
-        console.log('TURING: Legacy Transaction:', turing)
+        this.logger.info('TURING: Legacy Transaction:', { turing })
       }
       // this also handles the legacy case (old transactions without a Turing header)
       batchElement.rawTransaction = rawTransaction
