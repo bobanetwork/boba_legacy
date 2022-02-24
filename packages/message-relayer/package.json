@@ -26,6 +26,7 @@
     "ethereum",
     "relayer"
   ],
+  "homepage": "https://github.com/ethereum-optimism/optimism-monorepo/tree/master/packages/batch-submitter#readme",
   "license": "MIT",
   "author": "Optimism PBC",
   "repository": {
