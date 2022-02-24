@@ -974,9 +974,10 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo  uint64 = params.TxGas - 1
-		hi  uint64
-		cap uint64
+		lo          uint64 = params.TxGas - 1
+		hi          uint64
+		cap         uint64
+		isGasUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
@@ -1043,6 +1044,16 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 			}
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
+	}
+
+	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
+	if err == nil {
+		blockNr := block.Number()
+		isGasUpdate = b.ChainConfig().IsGasUpdate(big.NewInt(blockNr.Int64()))
+	}
+
+	if !isGasUpdate {
+		return hexutil.Uint64(hi), nil
 	}
 
 	nonce, _ := b.GetPoolNonce(ctx, *args.From)
