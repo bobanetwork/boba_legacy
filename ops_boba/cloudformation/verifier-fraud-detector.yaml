@@ -114,6 +114,10 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Volumes:
+        - Name: fraud_detector
+          Host:
+            SourcePath: "/mnt/efs/verifier_fraud_detector"
       ContainerDefinitions:
         - Image: !Sub "${DockerPrefix}/${FraudDetectorImage}:${ImageTag}"
           Name: verifier_fraud_detector
@@ -126,6 +130,9 @@ Resources:
               - S3BucketV2:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
+          MountPoints:
+            - ContainerPath: "/db"
+              SourceVolume: fraud_detector
           DockerLabels:
             com.datadoghq.ad.check_names: '["verifier_fraud_detector"]'
             com.datadoghq.ad.init_configs: '[{}]'
