@@ -13,14 +13,18 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 var urlStr
 
-const gasOverride =  { gasLimit: 3000000 }
+const gasOverride = { gasLimit: 3000000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+
+var BOBAL2Address
+var BobaTuringCreditAddress
 
 let Factory__Stable: ContractFactory
 let stable: Contract
+
 let Factory__Helper: ContractFactory
 let helper: Contract
 let turingCredit: Contract
@@ -49,12 +53,15 @@ describe("Stableswap at AWS Lambda", function () {
     urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/swapy'
     console.log("    URL set to", urlStr)
     
+    const balance = await local_provider.getBalance(deployerWallet.address)
+    console.log("    ETH balance in your account", balance.toString())
+
     Factory__Helper = new ContractFactory(
       (TuringHelperJson.abi),
       (TuringHelperJson.bytecode),
       deployerWallet)
     
-    helper = await Factory__Helper.deploy()
+    helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed as", helper.address)
 
     Factory__Stable = new ContractFactory(
@@ -74,15 +81,22 @@ describe("Stableswap at AWS Lambda", function () {
     console.log("    Stableswap contract deployed as", stable.address)
 
     // whitelist the 'stable' contract in the helper
-    const tr1 = await helper.addPermittedCaller(stable.address)
+    const tr1 = await helper.addPermittedCaller(stable.address, gasOverride)
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
 
-    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
-    addressesBOBA = JSON.parse(result)
+    if(hre.network.name === 'boba_rinkeby') {
+      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    } else {
+      const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+      addressesBOBA = JSON.parse(result)
+      BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
+      BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+    }
 
     L2BOBAToken = new Contract(
-      addressesBOBA.TOKENS.BOBA.L2,
+      BOBAL2Address,
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
@@ -91,7 +105,7 @@ describe("Stableswap at AWS Lambda", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet
-    ).attach(addressesBOBA.BobaTuringCredit)
+    ).attach(BobaTuringCreditAddress)
 
   })
 
@@ -104,12 +118,11 @@ describe("Stableswap at AWS Lambda", function () {
     console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
   })
 
-  it('Should register and fund your Turing helper contract in turingCredit', async () => {
+  it('Should fund your Turing helper contract in turingCredit', async () => {
 
-    const depositAmount = utils.parseEther('10')
+    const depositAmount = utils.parseEther('0.1') //enough for 10 Turing Transactions - should ocver the entire test suite
 
     const preBalance = await turingCredit.prepaidBalance(helper.address)
-    console.log("    Credit Prebalance", preBalance.toString())
 
     const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
     console.log("    BOBA Balance in your account", bobaBalance.toString())
@@ -133,15 +146,21 @@ describe("Stableswap at AWS Lambda", function () {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it("should return the helper address", async () => {
+  it("should return the stableswap helper address", async () => {
     let helperAddress = await stable.helperAddr()
     expect(helperAddress).to.equal(helper.address)
   })
 
   it("should correctly swap X in for Y out", async () => {
     //testing with 800, y=1200, A=5 - this also sets the k
-    await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
-    const tr = await stable.swap_x(urlStr, 12, gasOverride)
+    const gas = await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
+    console.log("    Stableswap gas estimate:", gas.toString())
+    
+    const tr = await stable.swap_x(urlStr, 12, { gasLimit: gas })
+
+    //await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
+    //const tr = await stable.swap_x(urlStr, 12, gasOverride)
+
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[2].data //the event returns 
