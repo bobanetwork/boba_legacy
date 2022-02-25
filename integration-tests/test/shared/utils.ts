@@ -128,14 +128,14 @@ export const getAddressManager = (provider: any) => {
 if (!process.env.BOBA_URL) {
   console.log(`!!You did not set process.env.BOBA_URL!!`)
   console.log(
-    `Setting to default value of http://127.0.0.1:8078/addresses.json`
+    `Setting to default value of http://127.0.0.1:8080/boba-addr.json`
   )
 } else {
   console.log(`process.env.BOBA_URL set to:`, process.env.BOBA_URL)
 }
 
 export const BOBA_URL =
-  process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
+  process.env.BOBA_URL || 'http://127.0.0.1:8080/boba-addr.json'
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, AddressManager: Contract) => {

@@ -102,7 +102,7 @@ describe('Hard forks', () => {
 
   // Optimism includes EIP-3529 as part of its Berlin hardfork. It is part
   // of the London hardfork on L1. Since it is coupled to the Berlin
-  // hardfork, some of its functionality cannot be directly tests via
+  // hardfork, some of its functionality cannot be directly tested via
   // integration tests since we can currently only turn on all of the Berlin
   // EIPs or none of the Berlin EIPs
   describe('Berlin Additional (L1 London)', () => {
