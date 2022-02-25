@@ -974,9 +974,10 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo  uint64 = params.TxGas - 1
-		hi  uint64
-		cap uint64
+		lo          uint64 = params.TxGas - 1
+		hi          uint64
+		cap         uint64
+		isGasUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
@@ -1043,6 +1044,16 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 			}
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
+	}
+
+	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
+	if err == nil {
+		blockNr := block.Number()
+		isGasUpdate = b.ChainConfig().IsGasUpdate(big.NewInt(blockNr.Int64()))
+	}
+
+	if !isGasUpdate {
+		return hexutil.Uint64(hi), nil
 	}
 
 	nonce, _ := b.GetPoolNonce(ctx, *args.From)
@@ -1738,36 +1749,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
 
-	ret, err := SubmitTransaction(ctx, s.b, tx)
-
-	// if err != nil && err.Error() == "turing retry needed" {
-	// 	blockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
-	// 	tdBytes := hexutil.Bytes(tx.Data())
-
-	// 	signer := types.MakeSigner(s.b.ChainConfig(), s.b.CurrentBlock().Number())
-	// 	from, err := types.Sender(signer, tx)
-
-	// 	callArgs := CallArgs{
-	// 		From:     &from,
-	// 		To:       tx.To(),
-	// 		GasPrice: (*hexutil.Big)(tx.GasPrice()),
-	// 		Value:    (*hexutil.Big)(tx.Value()),
-	// 		Data:     &tdBytes,
-	// 	}
-
-	// 	_, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, &vm.Config{}, 0, new(big.Int).SetUint64(8000000))
-	// 	if failed {
-	// 		log.Error("TURING api.go gasEstimate failed", "err", err2)
-	// 		return common.Hash{}, err
-	// 	}
-
-	// 	log.Debug("TURING ethapi/api.go calling again after gasEstimate")
-	// 	ret, err = SubmitTransaction(ctx, s.b, tx)
-
-	// 	log.Debug("TURING ethapi/api.go second call is done", "ret", ret, "err", err)
-	// }
-
-	return ret, err
+	return SubmitTransaction(ctx, s.b, tx)
 }
 
 // Sign calculates an ECDSA signature for:

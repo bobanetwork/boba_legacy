@@ -66,7 +66,7 @@ def status(*args):
   return status
 
 try:
-  with open("./checkpoint.dat", "r") as f:
+  with open("./db/checkpoint.dat", "r") as f:
     start_at = json.loads(f.read())
     element_start = start_at[0]
     l1_base = start_at[1]
@@ -198,7 +198,7 @@ def do_checkpoint():
   global last_saved
   global Matched
   if Matched['is_ok'] and last_saved != checkpoint[1]:
-    with open("./checkpoint.dat", "w") as f:
+    with open("./db/checkpoint.dat", "w") as f:
       f.write(json.dumps(checkpoint))
     last_saved = checkpoint[1]
 

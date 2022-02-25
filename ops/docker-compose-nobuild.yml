@@ -122,9 +122,9 @@ services:
  #   build:
  #     context: ..
  #     dockerfile: ./ops/docker/Dockerfile.batch-submitter
-    entrypoint: ./batch-submitter.sh
+    entrypoint: ./batches.sh
     env_file:
-      - ./envs/batch-submitter.env
+      - ./envs/batches.env
     environment:
         L1_NODE_WEB3_URL: http://l1_chain:8545
         L2_NODE_WEB3_URL: http://l2geth:8545
