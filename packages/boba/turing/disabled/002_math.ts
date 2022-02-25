@@ -16,8 +16,11 @@ var urlStr
 const gasOverride =  { gasLimit: 3000000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+
+var BOBAL2Address
+var BobaTuringCreditAddress
 
 let Factory__Hello: ContractFactory
 let hello: Contract
@@ -148,11 +151,18 @@ describe("Basic Math", function () {
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
 
-    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
-    addressesBOBA = JSON.parse(result)
+    if(hre.network.name === 'boba_rinkeby') {
+      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    } else {
+      const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+      addressesBOBA = JSON.parse(result)
+      BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
+      BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+    }
 
     L2BOBAToken = new Contract(
-      addressesBOBA.TOKENS.BOBA.L2,
+      BOBAL2Address,
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
@@ -161,7 +171,7 @@ describe("Basic Math", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet
-    ).attach(addressesBOBA.BobaTuringCredit)
+    ).attach(BobaTuringCreditAddress)
 
   })
 
@@ -180,12 +190,11 @@ describe("Basic Math", function () {
     expect(helperAddress).to.equal(helper.address)
   })
 
-  it('Should register and fund your Turing helper contract in turingCredit', async () => {
+  it('Should fund your Turing helper contract in turingCredit', async () => {
 
-    const depositAmount = utils.parseEther('10')
+    const depositAmount = utils.parseEther('0.1') //enough for 10 Turing Transactions - should ocver the entire test suite
 
     const preBalance = await turingCredit.prepaidBalance(helper.address)
-    console.log("    Credit Prebalance", preBalance.toString())
 
     const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
     console.log("    BOBA Balance in your account", bobaBalance.toString())
@@ -234,9 +243,20 @@ describe("Basic Math", function () {
     // This pre-populates the result cache, so that the real transaction can
     // complete without needing to block the sequencer thread.
     await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
-
     let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
     const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const result = parseInt(rawData.slice(-64), 16) / 100 
+    expect(result.toFixed(5)).to.equal('33.51000')
+  })
+
+  it("should support floating point volume of sphere based on geth-cached result", async () => {
+    await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
+    let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
+    console.log("---start TX_cache---")
+    const res = await tr.wait()
+    console.log("---end TX_cache---")
     expect(res).to.be.ok
     const rawData = res.events[0].data
     const result = parseInt(rawData.slice(-64), 16) / 100 

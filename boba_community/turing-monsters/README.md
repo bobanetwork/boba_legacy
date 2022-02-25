@@ -1,17 +1,31 @@
 # Turing Monster Minting
 
 - [Turing Monster Minting](#turing-monster-minting)
-  * [Mint your Monster!](#mint-your-monster-)
+  * [Basics](#basics)
+  * [Mint your Monster!](#mint-your-monster)
   * [Getting Rinkeby ETH and Rinkeby BOBA](#getting-rinkeby-eth-and-rinkeby-boba)
   * [Deploying the Turing Monster NFT](#deploying-the-turing-monster-nft)
   * [Solidity Code Walkthrough](#solidity-code-walkthrough)
+
+## Basics
+
+This readme assumes you have certain widely used packages installed on your computer. For example, for Ubuntu Desktop 20.04 the steps would be the following. Open a terminal, and then:
+
+```bash
+$ sudo apt update
+$ sudo apt full-upgrade
+$ sudo apt install git
+$ sudo apt install curl
+$ sudo apt install nodejs
+$ npm install --global yarn
+```
 
 ## Mint your Monster!
 
 Clone the repository, open it, and install packages with `yarn`:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ git clone https://github.com/omgnetwork/optimism-v2.git
 $ cd optimism-v2
 $ yarn
 $ yarn build

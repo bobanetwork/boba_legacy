@@ -13,11 +13,16 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 var urlStr
 
-const gasOverride =  { gasLimit: 3000000 }
+const gasOverride = { gasLimit: 3000000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+
+//console.log("network:",hre.network.name === 'boba_rinkeby')
+
+var BOBAL2Address
+var BobaTuringCreditAddress
 
 let Factory__Lending: ContractFactory
 let lending: Contract
@@ -54,7 +59,7 @@ describe("Pull Bitcoin - USD quote", function () {
       (TuringHelperJson.bytecode),
       deployerWallet)
     
-    helper = await Factory__Helper.deploy()
+    helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed as", helper.address)
 
     Factory__Lending = new ContractFactory(
@@ -74,11 +79,18 @@ describe("Pull Bitcoin - USD quote", function () {
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
 
-    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
-    addressesBOBA = JSON.parse(result)
+    if(hre.network.name === 'boba_rinkeby') {
+      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    } else {
+      const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+      addressesBOBA = JSON.parse(result)
+      BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
+      BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+    }
 
     L2BOBAToken = new Contract(
-      addressesBOBA.TOKENS.BOBA.L2,
+      BOBAL2Address,
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
@@ -87,7 +99,7 @@ describe("Pull Bitcoin - USD quote", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet
-    ).attach(addressesBOBA.BobaTuringCredit)
+    ).attach(BobaTuringCreditAddress)
   })
 
   it("contract should be whitelisted", async () => {
@@ -99,20 +111,9 @@ describe("Pull Bitcoin - USD quote", function () {
     console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
   })
 
-  it("should return the helper address", async () => {
-    let helperAddress = await lending.helperAddr()
-    expect(helperAddress).to.equal(helper.address)
-  })
-
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
 
-    const depositAmount = utils.parseEther('10')
-
-    const preBalance = await turingCredit.prepaidBalance(helper.address)
-    console.log("    Credit Prebalance", preBalance.toString())
-
-    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
-    console.log("    BOBA Balance in your account", bobaBalance.toString())
+    const depositAmount = utils.parseEther('0.20')
 
     const approveTx = await L2BOBAToken.approve(
       turingCredit.address,
@@ -125,13 +126,13 @@ describe("Pull Bitcoin - USD quote", function () {
       helper.address
     )
     await depositTx.wait()
-
-    const postBalance = await turingCredit.prepaidBalance(
-      helper.address
-    )
-
-    expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
+
+  it("should return the helper address", async () => {
+    let helperAddress = await lending.helperAddr()
+    expect(helperAddress).to.equal(helper.address)
+  })
+
   it("should get the current Bitcoin - USD price", async () => {
     await lending.estimateGas.getCurrentQuote(urlStr, "BTC/USD", gasOverride)
     const tr = await lending.getCurrentQuote(urlStr, "BTC/USD", gasOverride)
