@@ -10,6 +10,7 @@ export interface DecodedSequencerBatchTransaction {
   nonce: string
   target: string
   data: string
+  turing: string
 }
 
 export interface EnqueueEntry {
