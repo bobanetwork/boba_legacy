@@ -1,10 +1,10 @@
 # Running a Boba node (replica)
 
-This material has been moved to the main Boba user docs [here](https://docs.boba.network/developer-docs/011_running-replica-node).
+User-facing instructions are [here](https://docs.boba.network/developer-docs/011_running-replica-node).
 
 ## Minimal Instructions
 
-This repo runs a local replica of the Boba L2geth, which is useful for generating analyics for blockexplorers.
+This repo runs a local replica of the Boba L2geth, which is useful for generating analytics for blockexplorers.
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ This repo runs a local replica of the Boba L2geth, which is useful for generatin
 **Open a terminal window**. Clone the project and install needed dependencies:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ git clone https://github.com/omgnetwork/optimism-v2.git
 $ cd boba_community/boba-node
 $ docker compose pull
 ```
@@ -42,8 +42,10 @@ docker-compose up
 
 ```
 
-There will be occasional updates to both services. You can update them to execute:
+There will be occasional updates to both services. You can update them by running:
+
 ```bash
 docker compose pull
 ```
-and bring the services up again. We suggest you keep the storage volume of the replica mounted to the host. Replica stores it's data in `/root/.ethereum/`.
+
+and bringing the services up again. We suggest you keep the storage volume of the replica mounted on the host. The replica stores its data in `/root/.ethereum/`.
