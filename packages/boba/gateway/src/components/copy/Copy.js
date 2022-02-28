@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React, { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { FileCopyOutlined } from '@mui/icons-material';
+import { ContentCopyOutlined } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -36,8 +36,8 @@ function Copy ({ value }) {
       onCopy={() => setOpen(true)}
     >
       <Tooltip open={open} title="Copied to clipboard!">
-        <IconButton>
-          <FileCopyOutlined sx={{ fontSize: 16 }} />
+        <IconButton size='medium'>
+          <ContentCopyOutlined sx={{ fontSize: 16 }} />
         </IconButton>
       </Tooltip>
     </CopyToClipboard>

@@ -62,8 +62,8 @@ function GasSwitcher({ isMobile }) {
         <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">Verified to</S.Label>
-        <S.Value component="p" variant="body2">{verifierStatus.matchedBlock} {`(${healthStatus})`}</S.Value>
+        <S.Label component="p" variant="body2">Verification state</S.Label>
+        <S.Value component="p" variant="body2">{healthStatus}</S.Value>
       </S.MenuItem>
     </S.Menu>
   )

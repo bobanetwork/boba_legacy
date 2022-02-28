@@ -540,7 +540,7 @@ async initializeBase( networkGateway ) {
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM', 'WAGMIv0',
-                               'OLO'
+                               'OLO', 'WAGMIv1'
                               ]
 
       //not all tokens are on Rinkeby
@@ -566,10 +566,17 @@ async initializeBase( networkGateway ) {
               'L2': L2a
             }
           }
-        } else if(key === 'WAGMIv0') {
+        } 
+        else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
             'L2': '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672'
+          }
+        }
+        else if(key === 'WAGMIv1') {
+          allTokens[key] = {
+            'L1': 'WAGMIv1',
+            'L2': '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197'
           }
         }
         else if(key === 'OLO') {
@@ -1182,8 +1189,12 @@ async initializeBase( networkGateway ) {
           //there is no L1 WAGMIv0
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
+        else if (token.symbolL1 === 'WAGMIv1') {
+          //there is no L1 WAGMIv1
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
         else if (token.symbolL1 === 'OLO') {
-          //there is no L1 WAGMIv0
+          //there is no L1 OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else {
@@ -1198,7 +1209,8 @@ async initializeBase( networkGateway ) {
         if (token.layer === 'L1' &&
             token.balance.gt(new BN(0)) &&
             token.symbol !== 'xBOBA' &&
-            token.symbol !== 'WAGMIv0'
+            token.symbol !== 'WAGMIv0' &&
+            token.symbol !== 'WAGMIv1'
           ) {
           layer1Balances.push(token)
         } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
@@ -1206,6 +1218,8 @@ async initializeBase( networkGateway ) {
         } else if (token.layer === 'L2' && token.symbol === 'xBOBA') {
           layer2Balances.push(token)
         } else if (token.layer === 'L2' && token.symbol === 'WAGMIv0' ) {
+          layer2Balances.push(token)
+        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv1' ) {
           layer2Balances.push(token)
         }
       })
@@ -1304,7 +1318,7 @@ async initializeBase( networkGateway ) {
 
 
 
-async settle_v0() {
+  async settle_v0() {
 
     console.log("NS: settle_v0")
 
@@ -1345,6 +1359,51 @@ async settle_v0() {
       return tx
     } catch (error) {
       console.log("NS: settle_v0 error:", error)
+      return error
+    }
+  }
+
+  async settle_v1() {
+
+    console.log("NS: settle_v1")
+
+    let tx = null
+
+    try {
+
+      // get current WAGMI_v0 balance
+      
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+
+      // if(currency === allAddresses.L2_ETH_Address) {
+      //   //we are sending ETH
+
+      //   let wei = BigNumber.from(value_Wei_String)
+
+      //   tx = await this.provider.send('eth_sendTransaction',
+      //     [
+      //       {
+      //         from: this.account,
+      //         to: address,
+      //         value: ethers.utils.hexlify(wei)
+      //       }
+      //     ]
+      //   )
+
+      // } else {
+      //   //any ERC20 json will do....
+      //   tx = await this.L2_TEST_Contract
+      //     .connect(this.provider.getSigner()).attach(currency).transfer(
+      //       address,
+      //       value_Wei_String
+      //     )
+      //   await tx.wait()
+      // }
+
+      return tx
+    } catch (error) {
+      console.log("NS: settle_v1 error:", error)
       return error
     }
   }
@@ -1956,7 +2015,7 @@ async settle_v0() {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'OLO') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'WAGMIv1' && cur !== 'OLO') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -2038,7 +2097,7 @@ async settle_v0() {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'OLO') {
+      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'WAGMIv1' && cur !== 'OLO') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()

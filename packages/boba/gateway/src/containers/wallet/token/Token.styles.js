@@ -51,7 +51,7 @@ export const LoaderContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: '20px',
-  height: '400px',
+  height: '200px',
   background: theme.palette.background.secondary,
   [ theme.breakpoints.down('sm') ]: {
     height: '200px',

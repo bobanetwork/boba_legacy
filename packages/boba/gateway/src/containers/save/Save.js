@@ -25,7 +25,7 @@ import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 import AlertIcon from 'components/icons/AlertIcon'
 
 import { openAlert, openError, openModal } from 'actions/uiAction'
-import Button from 'components/button/Button'
+
 
 import * as S from './Save.styles'
 
@@ -37,6 +37,7 @@ import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
+import Button from 'components/button/Button'
 import ListSave from 'components/listSave/listSave'
 
 import { logAmount, toWei_String } from 'util/amountConvert'
@@ -257,7 +258,7 @@ class Save extends React.Component {
                 variant="standard"
               />
               {!netLayer ?
-                <WalletPicker fullWidth={true} label="Connect wallet" /> :
+                <WalletPicker fullWidth={true} label="Connect" /> :
                 netLayer === 'L2' ?
                   <Button
                     color="primary"
@@ -277,17 +278,14 @@ class Save extends React.Component {
                         variant="body3"
                         component="p"
                       >
-                        You are on Mainnet. To stake, SWITCH to Boba
+                        You are on Ethereum. To stake, SWITCH to Boba
                       </S.AlertText>
                     </S.AlertInfo>
                     <LayerSwitcher fullWidth={true} isButton={true} />
                   </S.LayerAlert>
               }
             </S.StakeInputContainer>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }}>
-              <Typography variant="body2">
-                Notes:
-              </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }} style={{lineHeight: '1.0em'}}>
               <Box>
                 <Typography variant="body2">
                   <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> STAKING PERIOD
