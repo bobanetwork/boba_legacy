@@ -115,7 +115,7 @@ Then, register and fund your Turing Credit account:
 
 **Note - Boba does not provide trading data (except for deliberately delayed data for test and debugging purposes).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
-Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. See `/AWS_code/turing_oracle.py` for an example for querying trading data APIs:
+Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. **Note - You will have to write your own wrapper logic inside your API.** See `/AWS_code/turing_oracle.py` for a copy-paste example for querying trading data APIs via a wrapper at AWS Lambda:
 
 ```python
 /AWS_code/turing_oracle.py
