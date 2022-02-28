@@ -185,6 +185,13 @@ export function settle_v0() {
   )
 }
 
+export function settle_v1() {
+  return createAction('SETTLE_v1/CREATE', () =>
+    networkService.settle_v1()
+  )
+}
+
+
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))

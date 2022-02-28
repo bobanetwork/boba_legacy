@@ -4,5 +4,6 @@ COPY boba_community/fraud-detector/fraud-detector.py /
 COPY boba_community/fraud-detector/packages/jsonrpclib /jsonrpclib
 COPY /packages/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json /contracts/StateCommitmentChain.json
 COPY /packages/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json /contracts/Lib_AddressManager.json
+RUN [ "mkdir", "-p", "db" ]
 
 CMD [ "python", "-u", "./fraud-detector.py" ]

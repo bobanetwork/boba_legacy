@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { Box, Divider } from "@mui/material"
+import { unset } from 'lodash';
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -50,6 +51,7 @@ export const FooterLink = styled(Box)(({ theme }) => ({
   fontSize: '14px',
   textDecoration: 'none',
   cursor: 'pointer',
+  color: 'unset',
   '&:hover': {
     color: theme.palette.secondary.main,
   },

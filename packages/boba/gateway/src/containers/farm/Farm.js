@@ -223,7 +223,7 @@ class Farm extends React.Component {
                 variant="body2"
                 component="p"
               >
-                To see your balances and contribute to the liquidity pool, connect to MetaMask
+                Connect to MetaMask to see your balances and contribute to the liquidity pool 
               </S.AlertText>
             </S.AlertInfo>
             <WalletPicker />
@@ -239,21 +239,9 @@ class Farm extends React.Component {
               md={10}
             >
               <Typography variant="body2" sx={{ mt: 2 }}>
-                When someone uses the bridge you invested, the bridge charges a fee, which will be immediately distributed to the stakeholders.
-              </Typography>
-              {/* <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{ fontWeight: '700' }}>EARNINGS</span>: The bridges collect fees and then immediately distribute
-                them to stakers. The bridges are not farms. Your earnings only increase when someone uses the
+                Bridging fees are proportionally distributed to stakers. The bridges are not farms. Your earnings only increase when someone uses the
                 bridge you have staked into.
-                <br />
-                <span style={{ fontWeight: '700' }}>YIELD</span>: the historical yield, which
-                reflects the fees people paid to bridge and the previous usage patterns for each pool.
-                There is no fixed yield and yields can vary widely as bridge activity changes.
-                <br />
-                <span style={{ fontWeight: '700' }}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
-                <br />
-                <span style={{ fontWeight: '700' }}>AVAILABLE BALANCE</span>: the amount of funds currently in each pool.
-              </Typography> */}
+              </Typography>
             </S.GridItemTag>
 
             <Tooltip
@@ -263,16 +251,17 @@ class Farm extends React.Component {
                   <br /><br />
                   <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
                   they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
-                  Note that bridge operations do not change the pool's liquidity, but only its current balance.
+                  Note that bridge operations do not change the pool's liquidity, but only its balance.
                   The difference between what was deposited into the L1 pool (10 OMG) and what was sent
-                  to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by liquidity providers.
+                  to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by stakers.
                   <br /><br />
                   <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
                   bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
-                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another.
+                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the 
+                  7 day fraud proof window, which also applies to the operator.
                   <br /><br />
-                  <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees.
-                  When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool, and vice-versa.
+                  <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an automatic supply-and-demand approach to setting the fees.
+                  When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool and vice-versa.
                 </Typography>
               }
 
@@ -285,41 +274,9 @@ class Farm extends React.Component {
                 sx={{ color: "#0ebf9a" }}
               >
                 Learn More
-                <Box sx={{ display: 'flex', cursor: 'pointer', transform: "rotate(-90deg)"}}>
-                  <ExpandMoreIcon />
-                </Box>
               </S.GridItemTag>
             </Tooltip>
           </S.GridItemTagContainer>
-
-          {/*********************************************/
-            /**************  Drop Down Box ****************/
-            /**********************************************/
-          }
-          {/* {dropDownBox ? (
-            <Fade in={dropDownBox}>
-              <S.DropdownContent>
-                <S.DropdownWrapper>
-                  <Typography variant="body2" sx={{ mt: 1, fontSize: '0.7em' }}>
-                    <span style={{ fontWeight: '700' }}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG.
-                    <br /><br />
-                    <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
-                    they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
-                    Note that bridge operations do not change the pool's liquidity, but only its current balance.
-                    The difference between what was deposited into the L1 pool (10 OMG) and what was sent
-                    to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by liquidity providers.
-                    <br /><br />
-                    <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
-                    rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another.
-                    <br /><br />
-                    <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an 'automatic' supply-and-demand approach to setting the fees.
-                    When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool, and vice-versa.
-                  </Typography>
-                </S.DropdownWrapper>
-              </S.DropdownContent>
-            </Fade>
-          ) : null} */}
 
         </S.Wrapper>
 
@@ -331,14 +288,14 @@ class Farm extends React.Component {
                 onClick={() => this.handleChange(null, 'Ethereum Pool')}
                 variant="body2"
                 component="span">
-                Ethereum Pool
+                Ethereum Pools
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Boba L2 Pool')}
                 variant="body2"
                 component="span">
-                Boba L2 Pool
+                Boba Pools
               </Typography>
             </S.PageSwitcher>
 

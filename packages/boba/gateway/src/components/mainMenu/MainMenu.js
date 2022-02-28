@@ -66,7 +66,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
         </Container>
       ) : (
         <S.Menu>
-          <BobaLogo style={{maxWidth: '160px'}}/>
+          <BobaLogo style={{maxWidth: '140px'}}/>
           <MenuItems setOpen={setOpen} />
         </S.Menu>
       )}
