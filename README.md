@@ -34,7 +34,7 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
   * providing a community fraud-detector that allows transactions to be independently verified by anyone
   * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
   * being organized as a [DAO](./packages/boba/contracts/contracts/DAO)
-  * (coming on Dec. 20) native [NFT bridging](./packages/boba/contracts/contracts/bridges)
+  * native [NFT bridging](./packages/boba/contracts/contracts/bridges)
   * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
 ## Documentation
