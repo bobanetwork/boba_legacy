@@ -176,7 +176,7 @@ class Airdrop extends React.Component {
     if (netLayer === 'L1') {
       return <S.AirDropPageContainer>
         <div className={styles.container}>
-          {/* <PageTitle title="Airdrop" /> */}
+          <PageTitle title="Airdrop" />
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />
@@ -196,7 +196,7 @@ class Airdrop extends React.Component {
     if (!netLayer) {
       return <S.AirDropPageContainer>
         <div className={styles.container}>
-          {/* <PageTitle title="Airdrop" /> */}
+          <PageTitle title="Airdrop" />
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />
@@ -204,7 +204,7 @@ class Airdrop extends React.Component {
                 variant="body2"
                 component="p"
               >
-                You have not connected your wallet. To claim your BOBA, connect to MetaMask
+                Connect to MetaMask to claim your BOBA
               </S.AlertText>
             </S.AlertInfo>
             <WalletPicker />

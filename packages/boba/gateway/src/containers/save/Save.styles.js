@@ -62,7 +62,7 @@ export const StakeContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   background: theme.palette.mode === 'light' ? '#F5F6F6' : 'rgba(255, 255, 255, 0.04)',
-  backdropFilter: 'blur(10px)',
+  //backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '24px',
   minHeight: '400px',
@@ -74,7 +74,7 @@ export const StakeItemContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  backdropFilter: 'blur(10px)',
+  //backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   width: '100%'
 }))
@@ -88,7 +88,7 @@ export const StakeItem = styled(Box)(({ theme }) => ({
 export const DividerLine = styled(Divider)(({ theme }) => ({
   background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
   boxSizing: 'border-box',
-  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  //boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 

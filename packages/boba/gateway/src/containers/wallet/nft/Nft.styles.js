@@ -15,11 +15,11 @@ export const NFTPageContainer = styled(Box)(({ theme }) => ({
   //   width: '90%',
   //   padding: '0px',
   // },
-  // [theme.breakpoints.down('sm')]: {
-  //   width: '100%',
-  //   padding: '0px',
-  //   flexDirection: 'column',
-  // },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+    flexDirection: 'column',
+  },
 }));
 
 export const NFTActionContent = styled(Box)(({ theme }) => ({
@@ -214,4 +214,48 @@ export const DividerLine = styled(Divider)(({ theme }) => ({
   boxSizing: 'border-box',
   boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
+}))
+
+export const TokenPageContentEmpty = styled(Box)(({ theme }) => ({
+  width: '100%',
+  minHeight: '400px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '10px',
+  borderRadius: '20px',
+  gap: '10px',
+  height: 'fit-content',
+  background: theme.palette.background.secondary,
+}))
+
+export const TokenPageContent = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '10px',
+  borderRadius: '20px',
+  gap: '10px',
+  height: 'fit-content',
+  background: theme.palette.background.secondary,
+  [ theme.breakpoints.down('sm') ]: {
+    width: 'fit-content',
+    minWidth: '100%'
+  },
+}))
+
+export const TokenPageContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-around',
+  margin: '20px auto',
+  width: '100%',
+  gap: '10px',
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
+    overflowX: 'scroll',
+    display: 'block'
+  },
 }))

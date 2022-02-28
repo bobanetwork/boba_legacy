@@ -17,7 +17,6 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
-import { Circle } from '@mui/icons-material'
 
 import moment from 'moment'
 
@@ -27,10 +26,6 @@ import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
-
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import WalletPicker from 'components/walletpicker/WalletPicker'
-import PageTitle from 'components/pageTitle/PageTitle'
 
 import * as S from './History.styles'
 

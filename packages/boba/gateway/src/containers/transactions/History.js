@@ -20,8 +20,7 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import { Grid, Typography, Box, useMediaQuery, useTheme } from '@mui/material'
-import { Circle } from '@mui/icons-material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 
 import moment from 'moment'
 
@@ -54,7 +53,6 @@ function History() {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const netLayer = useSelector(selectLayer())
 
   const dispatch = useDispatch()
 
@@ -100,7 +98,7 @@ function History() {
               variant="body2"
               component="p"
             >
-              To see your history, connect to MetaMask
+              Connect to MetaMask to see your history
             </S.AlertText>
           </S.AlertInfo>
           <WalletPicker />
