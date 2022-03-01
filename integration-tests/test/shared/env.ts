@@ -10,6 +10,8 @@ import {
   getAddressManager,
   l1Provider,
   l2Provider,
+  replicaProvider,
+  verifierProvider,
   l1Wallet,
   l2Wallet,
   l1Wallet_2,
@@ -42,6 +44,7 @@ export class OptimismEnv {
   addressesBOBA
   l1Bridge: Contract
   l1Messenger: Contract
+  l1BlockNumber: Contract
   ctc: Contract
   scc: Contract
 
@@ -69,12 +72,15 @@ export class OptimismEnv {
   // The providers
   l1Provider: providers.JsonRpcProvider
   l2Provider: providers.JsonRpcProvider
+  verifierProvider: providers.JsonRpcProvider
+  replicaProvider: providers.JsonRpcProvider
 
   constructor(args: any) {
     this.addressManager = args.addressManager
     this.addressesBOBA = args.addressesBOBA
     this.l1Bridge = args.l1Bridge
     this.l1Messenger = args.l1Messenger
+    this.l1BlockNumber = args.l1BlockNumber
     this.ovmEth = args.ovmEth
     this.l2Bridge = args.l2Bridge
     this.l2Messenger = args.l2Messenger
@@ -92,6 +98,8 @@ export class OptimismEnv {
     this.l2Wallet_4 = args.l2Wallet_4
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
+    this.verifierProvider = args.verifierProvider
+    this.replicaProvider = args.replicaProvider
     this.ctc = args.ctc
     this.scc = args.scc
   }
@@ -144,6 +152,10 @@ export class OptimismEnv {
       .connect(l2Wallet)
       .attach(predeploys.OVM_SequencerFeeVault)
 
+    const l1BlockNumber = getContractFactory('iOVM_L1BlockNumber')
+      .connect(l2Wallet)
+      .attach(predeploys.OVM_L1BlockNumber)
+
     return new OptimismEnv({
       addressManager,
       addressesBOBA,
@@ -151,6 +163,7 @@ export class OptimismEnv {
       ctc,
       scc,
       l1Messenger,
+      l1BlockNumber,
       l1MessengerFast,
       ovmEth,
       gasPriceOracle,
@@ -169,6 +182,8 @@ export class OptimismEnv {
       l2Wallet_4,
       l1Provider,
       l2Provider,
+      verifierProvider,
+      replicaProvider,
     })
   }
 

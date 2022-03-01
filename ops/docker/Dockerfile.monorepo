@@ -5,7 +5,7 @@
 # We do not use Alpine because there's a regression causing it to be very slow
 # when used with typescript/hardhat: https://github.com/nomiclabs/hardhat/issues/1219
 FROM node:14-buster-slim as node
-RUN apt-get update -y && apt-get install -y git
+RUN apt-get update -y && apt-get install -y git && apt-get install -y python3 && apt-get install -y build-essential
 
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
@@ -27,7 +27,6 @@ COPY packages/core-utils/package.json ./packages/core-utils/package.json
 COPY packages/common-ts/package.json ./packages/common-ts/package.json
 COPY packages/contracts/package.json ./packages/contracts/package.json
 COPY packages/data-transport-layer/package.json ./packages/data-transport-layer/package.json
-COPY packages/batch-submitter/package.json ./packages/batch-submitter/package.json
 COPY packages/message-relayer/package.json ./packages/message-relayer/package.json
 COPY packages/replica-healthcheck/package.json ./packages/replica-healthcheck/package.json
 COPY integration-tests/package.json ./integration-tests/package.json

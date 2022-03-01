@@ -21,6 +21,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -59,6 +60,9 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 		}
 		if evm.chainRules.IsIstanbul {
 			precompiles = PrecompiledContractsIstanbul
+		}
+		if evm.chainRules.IsBerlin {
+			precompiles = PrecompiledContractsBerlin
 		}
 		if p := precompiles[*contract.CodeAddr]; p != nil {
 			return RunPrecompiledContract(p, input, contract)
@@ -202,7 +206,7 @@ func (evm *EVM) Interpreter() Interpreter {
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
-func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
+func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 
 	var ret hexutil.Bytes
 
@@ -270,12 +274,77 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 	return ret
 }
 
+const turingCacheExpire = 5 * time.Second
+const turingCacheClean = 60 * time.Second
+
+type turingCacheEntry struct {
+	expires time.Time
+	value   []byte
+}
+
+type turingCache struct {
+	lock      sync.RWMutex
+	entries   map[common.Hash]*turingCacheEntry
+	nextClean time.Time
+}
+
+func (cache *turingCache) Init() {
+	log.Debug("TURING Cache init")
+	cache.entries = make(map[common.Hash]*turingCacheEntry)
+	cache.nextClean = time.Now().Add(turingCacheClean)
+}
+
+func (cache *turingCache) Get(key common.Hash) []byte {
+	ret := []byte{}
+
+	cache.lock.Lock()
+	if tCache.entries == nil {
+		tCache.Init()
+	}
+	if ent, hit := cache.entries[key]; hit {
+		if time.Now().Before(ent.expires) {
+			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
+			ret = ent.value
+		} else {
+			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
+			delete(cache.entries, key)
+		}
+	}
+	cache.lock.Unlock()
+	return ret
+}
+
+func (cache *turingCache) Put(key common.Hash, value []byte) {
+	cache.lock.Lock()
+	newEnt := &turingCacheEntry{value: value, expires: time.Now().Add(turingCacheExpire)}
+	cache.entries[key] = newEnt
+	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
+	cache.lock.Unlock()
+}
+
+func (cache *turingCache) Trim() {
+	cache.lock.Lock()
+	if time.Now().After(cache.nextClean) {
+		log.Debug("TURING scanning cache for expired entries")
+
+		for key, element := range cache.entries {
+			if time.Now().After(element.expires) {
+				delete(cache.entries, key)
+			}
+		}
+		cache.nextClean = time.Now().Add(turingCacheClean)
+	}
+	cache.lock.Unlock()
+}
+
+var tCache turingCache
+
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 // caller is the address of the TuringHelper contract
-func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
+func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil.Bytes, int) {
 
-	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String())
+	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String(), "origin", evm.Context.Origin)
 
 	var responseStringEnc string
 	var responseString []byte
@@ -310,14 +379,47 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	if rType != 1 {
 		log.Error("TURING bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
-		return retError
+		return retError, 10
 	}
 
 	rlen := len(rest)
 	if rlen < 7*32 {
 		log.Error("TURING bobaTuringCall:Calldata too short", "len < 7*32", rlen)
 		retError[35] = 11 // Calldata too short
-		return retError
+		return retError, 11
+	}
+
+	// Now check for a cached result
+
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(caller.Bytes())
+	hasher.Write(evm.Context.Origin.Bytes())
+	nonce := new(big.Int).SetUint64(evm.StateDB.GetNonce(evm.Context.Origin))
+	hasher.Write(nonce.Bytes())
+	hasher.Write(input)
+	key := common.BytesToHash(hasher.Sum(nil))
+
+	log.Debug("TURING Cache key", "key", key, "mayBlock", mayBlock)
+
+	ret := tCache.Get(key)
+
+	if len(ret) != 0 {
+		return ret, 0
+	}
+
+	if len(ret) == 0 {
+		log.Debug("TURING Missing cache entry", "mayBlock", mayBlock)
+		if mayBlock {
+			// Since no Boba credit is consumed in an estimateGas call, we put a
+			// "failed" entry into the cache here so that a failed offchain call
+			// can't be called repeatedly as a DoS attack.
+			//errVal := make([]byte, len(retError))
+			//copy(errVal, retError)
+			tCache.Put(key, retError)
+		} else {
+			retError[35] = 20 // Missing cache entry
+			return retError, 20
+		}
 	}
 
 	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
@@ -345,7 +447,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	if lengthURL > 64 {
 		log.Error("TURING bobaTuringCall:URL > 64", "urlLength", lengthURL)
 		retError[35] = 12 // URL string > 64 bytes
-		return retError
+		return retError, 12
 	}
 
 	// The URL we are going to query
@@ -369,18 +471,18 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		if err != nil {
 			log.Error("TURING bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
-			return retError
+			return retError, 13
 		}
 		if len(responseStringEnc) > 322 {
 			log.Error("TURING bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
 			retError[35] = 17 // Raw Response too long
-			return retError
+			return retError, 17
 		}
 		responseString, err = hexutil.Decode(responseStringEnc)
 		if err != nil {
 			log.Error("TURING bobaTuringCall:Error decoding responseString", "err", err)
 			retError[35] = 14 // Client Response Decode Error
-			return retError
+			return retError, 14
 		}
 		// if we get back, for example,
 		// 0x
@@ -401,7 +503,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		if len(responseString) > 160 {
 			log.Error("TURING bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
 			retError[35] = 18 // Response too big
-			return retError
+			return retError, 18
 		}
 		t := time.Now()
 		elapsed := t.Sub(startT)
@@ -409,7 +511,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	} else {
 		log.Error("TURING bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		retError[35] = 15 // Could not create client
-		return retError
+		return retError, 15
 	}
 
 	log.Debug("TURING bobaTuringCall:Have valid response from offchain API",
@@ -419,7 +521,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 		"ResponseString", responseString)
 
 	// build the modified calldata
-	ret := make([]byte, startIDXpayload+4)
+	ret = make([]byte, startIDXpayload+4)
 	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
 	ret = append(ret, responseString...)         // and tack on the payload
@@ -427,7 +529,12 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
 
-	return ret
+	tCache.Put(key, ret)
+	if mayBlock {
+		tCache.Trim()
+	}
+
+	return ret, 0
 }
 
 // Call executes the contract associated with the addr with the given input as
@@ -459,6 +566,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}
 		if evm.chainRules.IsIstanbul {
 			precompiles = PrecompiledContractsIstanbul
+		}
+		if evm.chainRules.IsBerlin {
+			precompiles = PrecompiledContractsBerlin
 		}
 		if precompiles[addr] == nil && evm.chainRules.IsEIP158 && value.Sign() == 0 {
 			// Calling a non existing account, don't do anything, but ping the tracer
@@ -527,9 +637,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
 			if isTuring2 {
-				updated_input = bobaTuringCall(input, caller.Address())
+				// If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
+				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
+				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
+				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
+				updated_input, _ = evm.bobaTuringCall(input, caller.Address(), mayBlock)
 			} else if isGetRand2 {
-				updated_input = bobaTuringRandom(input, caller.Address())
+				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
@@ -553,11 +667,12 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 
 	log.Debug("TURING evm.go run",
+		"depth", evm.depth,
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
 		"err", err,
 		"updated_input", updated_input,
-		"evm.Context.Turing", evm.Context.Turing,
+		"evm.Context.Turing", hexutil.Bytes(evm.Context.Turing),
 		"length Turing", len(evm.Context.Turing))
 
 	// When an error was returned by the EVM or when setting the creation code
@@ -724,7 +839,11 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	}
 	nonce := evm.StateDB.GetNonce(caller.Address())
 	evm.StateDB.SetNonce(caller.Address(), nonce+1)
-
+	// We add this to the access list _before_ taking a snapshot. Even if the creation fails,
+	// the access-list change should not be rolled back
+	if evm.chainRules.IsBerlin {
+		evm.StateDB.AddAddressToAccessList(address)
+	}
 	// Ensure there's no existing contract already at the designated address
 	contractHash := evm.StateDB.GetCodeHash(address)
 	if evm.StateDB.GetNonce(address) != 0 || (contractHash != (common.Hash{}) && contractHash != emptyCodeHash) {

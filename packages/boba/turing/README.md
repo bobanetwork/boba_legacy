@@ -2,7 +2,7 @@
 
 - [Basic Architecture of Turing and L2TGeth](#basic-architecture-of-turing-and-l2tgeth)
   * [TLDR](#tldr)
-  * [Turing status as of January 25 2022 - Release countdown](#turing-status-as-of-january-25-2022---release-countdown)
+  * [Turing status as of February 21 2022 - Release countdown](#turing-status-as-of-february-21-2022---release-countdown)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
 - [Important Properties of Turing](#important-properties-of-turing)
@@ -54,9 +54,9 @@ rate = lending.getCurrentQuote(urlStr, "BTC/USD")
 
 **Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.   
 
-## Turing status as of January 25 2022 - Release countdown
+## Turing status as of February 21 2022 - Release countdown
 
-With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of January 31, 00:00 UTC for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
+With this release, we have a working version of Turing and the associated modified `core-utils`, `batch-submitter`, and `data-translation-layer`. Turing is now active on Rinkeby. The next steps are to fix two security vulnerabilities and perform load- and stack-compatibility testing. We are targeting a release time of March 1 for Turing across our stack (Rinkeby and Mainnet). **Note - Turing is not yet available on Mainnet.**
 
 # Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
@@ -115,7 +115,7 @@ Then, register and fund your Turing Credit account:
 
 **Note - Boba does not provide trading data (except for deliberately delayed data for test and debugging purposes).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
-Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. See `/AWS_code/turing_oracle.py` for an example for querying trading data APIs:
+Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. **Note - You will have to write your own wrapper logic inside your API.** See `/AWS_code/turing_oracle.py` for a copy-paste example for querying trading data APIs via a wrapper at AWS Lambda:
 
 ```python
 /AWS_code/turing_oracle.py
@@ -136,6 +136,7 @@ You can lock-down your off-chain endpoint to only accept queries from your smart
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
+* There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistant failure of your first call to your endpoint.
 
 ## String length limit
 
@@ -196,31 +197,29 @@ $ cd packages/boba/turing
 $ yarn test:boba
 ```
 
+**Note: Testing on Rinkeby**
+
+To test on Rinkeby, you need a private key with both ETH and BOBA on the Boba L2; the private key needs to be provided in `hardhat.config.js` - just replace all the zeros with your key:
+
+```javascript
+    boba_rinkeby: {
+      url: 'https://rinkeby.boba.network',
+      accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
+    },
+```
+
+Then, run:
+
+```bash
+$ cd packages/boba/turing
+$ yarn test:rinkeby
+```
+
 The tests will perform some basic floating point math, provide some random numbers, and get the latest BTC-USD exchange rate: 
 
 ```bash
 yarn run v1.22.15
 $ hardhat --network boba_local test
-
-
-  Basic Math
-    Created local HTTP server at http://192.168.1.246:1235
-    Helper contract deployed as 0x942ED2fa862887Dc698682cc6a86355324F0f01e
-    Test contract deployed as 0x8D81A3DCd17030cD5F23Ac7370e4Efb10D2b3cA4
-    addingPermittedCaller to TuringHelper 0x0000000000000000000000008d81a3dcd17030cd5f23ac7370e4efb10d2b3ca4
-    Test contract whitelisted in TuringHelper (1 = yes)? 1
-    ✓ contract should be whitelisted (54ms)
-    Helper at 0x942ED2fa862887Dc698682cc6a86355324F0f01e
-    ✓ should return the helper address
-    Credit Prebalance 0
-    BOBA Balance in your account 310000000000000000000
-    ✓ Should register and fund your Turing helper contract in turingCredit (177ms)
-    ✓ test of local compute endpoint: should do basic math via direct server query
-      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
-      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
-    ✓ should support floating point volume of sphere (57ms)
-      (HTTP) SPHERE Returning off-chain response: 2.123 -> 3351.029333333333
-    ✓ should support floating point volume of sphere based on geth-cached result (58ms)
 
   Stableswap at AWS Lambda
     URL set to https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/swapy

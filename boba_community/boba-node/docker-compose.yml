@@ -1,0 +1,59 @@
+
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+
+x-l1_rpc_geth: &l1_rpc_geth
+  ETH1_HTTP: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+
+version: "3.9"
+
+services:
+  dtl:
+    container_name: dtl
+    image: bobanetwork/data-transport-layer:release
+    env_file:
+      -  ../../ops/envs/dtl.env
+    environment:
+      << : *l1_rpc_dtl
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://lightning-replica.boba.network
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 288
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
+      DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
+      DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
+    volumes:
+      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+    ports:
+      - ${DTL_PORT:-7878}:7878
+      - ${REGISTRY_PORT:-8080}:8081
+
+  replica:
+    container_name: replica
+    depends_on:
+      - dtl
+    image: bobanetwork/l2geth:release
+    deploy:
+      replicas: 1
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ../../ops/envs/geth.env
+    #volumes:
+    #  - ./<YOUR PERSISTED STORAGE>:/root/.ethereum/
+    environment:
+      << : *l1_rpc_geth
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      ROLLUP_ENFORCE_FEES: 'true'
+      EMERGENCY_FORK_NUMBER: 310215
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546

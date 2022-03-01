@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/common/math"
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -761,6 +762,7 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		gas += params.CallStipend
 	}
 	ret, returnGas, err := interpreter.evm.Call(contract, toAddr, args, gas, value)
+
 	if err != nil {
 		stack.push(interpreter.intPool.getZero())
 	} else {
@@ -883,6 +885,9 @@ func opSuicide(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 	interpreter.evm.StateDB.AddBalance(common.BigToAddress(stack.pop()), balance)
 
 	interpreter.evm.StateDB.Suicide(contract.Address())
+	if rcfg.UsingOVM && interpreter.evm.chainConfig.IsSDUpdate(interpreter.evm.BlockNumber) {
+		interpreter.evm.StateDB.SubBalance(contract.Address(), balance)
+	}
 	return nil, nil
 }
 

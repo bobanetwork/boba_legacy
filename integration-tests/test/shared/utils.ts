@@ -17,7 +17,7 @@ import {
   predeploys,
 } from '@eth-optimism/contracts'
 import { injectL2Context, remove0x, Watcher } from '@eth-optimism/core-utils'
-import { cleanEnv, str, num, bool } from 'envalid'
+import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
 /* Imports: Internal */
@@ -29,7 +29,23 @@ if (process.env.IS_LIVE_NETWORK === 'true') {
   dotenv.config()
 }
 
+export const HARDHAT_CHAIN_ID = 31337
+export const DEFAULT_TEST_GAS_L1 = 330_000
+export const DEFAULT_TEST_GAS_L2 = 1_300_000
+export const ON_CHAIN_GAS_PRICE = 'onchain'
+
+const gasPriceValidator = makeValidator((gasPrice) => {
+  if (gasPrice === 'onchain') {
+    return gasPrice
+  }
+
+  return num()._parse(gasPrice).toString()
+})
+
 const env = cleanEnv(process.env, {
+  L1_GAS_PRICE: gasPriceValidator({
+    default: '0',
+  }),
   L1_URL: str({ default: 'http://localhost:9545' }),
   L2_URL: str({ default: 'http://localhost:8545' }),
   VERIFIER_URL: str({ default: 'http://localhost:8547' }),
@@ -59,7 +75,15 @@ const env = cleanEnv(process.env, {
   }),
   L2_CHAINID: num({ default: 31338 }),
   IS_LIVE_NETWORK: bool({ default: false }),
+  MOCHA_TIMEOUT: num({
+    default: 120_000,
+  }),
+  RUN_STRESS_TESTS: bool({
+    default: true,
+  }),
 })
+
+export const envConfig = env
 
 // The hardhat instance
 export const l1Provider = new providers.JsonRpcProvider(env.L1_URL)
@@ -104,14 +128,14 @@ export const getAddressManager = (provider: any) => {
 if (!process.env.BOBA_URL) {
   console.log(`!!You did not set process.env.BOBA_URL!!`)
   console.log(
-    `Setting to default value of http://127.0.0.1:8078/addresses.json`
+    `Setting to default value of http://127.0.0.1:8080/boba-addr.json`
   )
 } else {
   console.log(`process.env.BOBA_URL set to:`, process.env.BOBA_URL)
 }
 
 export const BOBA_URL =
-  process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
+  process.env.BOBA_URL || 'http://127.0.0.1:8080/boba-addr.json'
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, AddressManager: Contract) => {
@@ -270,4 +294,17 @@ export const expectLogs = async (
 export const isMainnet = async () => {
   const chainId = await l1Wallet.getChainId()
   return chainId === 1
+}
+
+export const gasPriceForL1 = async () => {
+  if (env.L1_GAS_PRICE === ON_CHAIN_GAS_PRICE) {
+    return l1Wallet.getGasPrice()
+  }
+
+  return utils.parseUnits(env.L1_GAS_PRICE, 'wei')
+}
+
+export const isHardhat = async () => {
+  const chainId = await l1Wallet.getChainId()
+  return chainId === HARDHAT_CHAIN_ID
 }

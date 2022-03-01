@@ -13,26 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, useMediaQuery } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import { setEnableAccount, setLayer } from 'actions/setupAction'
 import Button from 'components/button/Button'
-import WalletAddress from 'components/walletAddress/WalletAddress'
+
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectJustSwitchedChain, selectNetwork } from 'selectors/setupSelector'
+import { 
+  selectAccountEnabled, 
+  selectJustSwitchedChain, 
+  selectNetwork 
+} from 'selectors/setupSelector'
 import networkService from 'services/networkService'
 
-function WalletPicker() {
+import { 
+  fetchTransactions, 
+  fetchBalances 
+} from 'actions/networkAction'
+
+function WalletPicker({
+  label = 'Connect',
+  fullWidth = false,
+  size = 'small'
+}) {
 
   const dispatch = useDispatch()
 
   const network = useSelector(selectNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
   const justSwitchedChain = useSelector(selectJustSwitchedChain())
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -42,6 +50,7 @@ function WalletPicker() {
 
     async function initializeAccount() {
 
+      console.log(['network',network])
       const initialized = await networkService.initializeAccount(network)
 
       if (initialized === false) {
@@ -49,11 +58,13 @@ function WalletPicker() {
         dispatch(setEnableAccount(false))
         return false
       }
-
+      
       if (initialized === 'L1' || initialized === 'L2') {
         console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
+        dispatch(fetchTransactions())
+        dispatch(fetchBalances())
         return true
       }
     }
@@ -71,17 +82,13 @@ function WalletPicker() {
       <Button
         type="primary"
         variant="contained"
-        size='small'
+        size={size}
         disabled={accountEnabled}
+        fullWidth={fullWidth}
         onClick={() => dispatchBootAccount()}
       >
-        Connect To Metamask
+        {label}
       </Button>
-    }
-    {accountEnabled &&
-      <Box sx={{display: isMobile ? "none" : "flex"}}>
-        <WalletAddress/>
-      </Box>
     }
     </>
   )

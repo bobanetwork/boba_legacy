@@ -16,11 +16,9 @@ limitations under the License. */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box, Typography } from '@mui/material'
 
 import { closeModal, openAlert, openError } from 'actions/uiAction';
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -30,6 +28,11 @@ import { delegateVotesX } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
 
+import BobaGlassIcon from 'components/icons/BobaGlassIcon';
+
+import * as S from './daoModal.styles';
+
+
 function DelegateDaoXModal({ open }) {
 
     const [recipient, setRecipient] = useState('');
@@ -38,9 +41,6 @@ function DelegateDaoXModal({ open }) {
     const disabled = !recipient;
 
     const loading = false //ToDo useSelector(selectLoading([ 'DELEGATE_DAO/CREATE' ]))
-
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
     const wAddress = networkService.account ? networkService.account : ''
 
@@ -75,75 +75,85 @@ function DelegateDaoXModal({ open }) {
         <Modal
             open={open}
             onClose={handleClose}
-            maxWidth="md"
+            maxWidth="sm"
         >
-            <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-                Delegate my xBOBA
-            </Typography>
-            <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
+            <Box sx={{mb: 2}}>
+                <Box sx={{mb: 2, display: 'flex', alignItems: 'center'}}>
+                    <BobaGlassIcon />
+                    <Typography variant="body1" >
+                        Delegate my BOBA votes 
+                    </Typography>
+                </Box>
+                <S.DividerLine />
+            </Box>
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                 <Typography variant="h3" sx={{mb: 1}}>
-                    Delegate my xBOBA votes to myself
+                    To someone else
                 </Typography>
-                <Typography variant="body3" style={{fontSize: '0.8em', lineHeight: '1.0em'}}>
-                    My address:&nbsp;
-                    <span
-                      style={{ color: 'rgba(255, 255, 255, 0.3)', fontFamily: 'MessinaSB', fontSize: '0.9em'}}
+                <Typography variant="body3" component="p"
+                    style={{ opacity: 0.65}}>
+                    My address:
+                </Typography>
+                <Typography variant="body3" component="p"
+                      style={{fontSize: '13px',mb:2}}
                     >
                       {wAddress}
-                    </span>
-                  </Typography>
-                <WrapperActionsModal>
-                    <Button
-                        onClick={()=>{submitMe()}}
-                        color='primary'
-                        variant="contained"
-                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
-                        loading={loading}
-                        triggerTime={new Date()}
-                        fullWidth={isMobile}
-                        size="large"
-                    >
-                        Delegate to me
-                    </Button>
-                </WrapperActionsModal>
-            </Box>
-            <Box style={{border: '1px solid #5E6170', padding: '10px', margin: '10px', borderRadius: '4px', background: theme.palette.background.secondary}}>
-                <Typography variant="h3" sx={{mb: 1}}>
-                    Or, delegate my xBOBA votes to someone else
                 </Typography>
-                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Button
+                    sx={{mb: 2}}
+                    onClick={()=>{submitMe()}}
+                    color='primary'
+                    variant="outlined"
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
+                    loading={loading}
+                    triggerTime={new Date()}
+                    fullWidth={true}
+                    size="large"
+                >
+                    Delegate to me
+                </Button>
+            </Box>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                overflow: 'hidden',
+                gap: '10px',
+                alignItems: 'center'
+            }}>
+                <S.DividerLine />
+                <Typography variant="body3" >OR</Typography>
+                <S.DividerLine />
+            </Box>
+            <Box sx={{
+                gap: '10px',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Typography variant="h3" sx={{mb: 1}}>
+                    To someone else
+                </Typography>
+                <Box sx={{display: 'flex', flexDirection: 'column',mb: 1}}>
                     <Input
-                        label='Delegate to:'
+                        label='Receiving address:'
                         placeholder='Address (0x...)'
                         value={recipient}
                         onChange={i => setRecipient(i.target.value)}
                     />
                 </Box>
-                <WrapperActionsModal>
-                    <Button
-                        onClick={()=>{submit()}}
-                        color='primary'
-                        variant="contained"
-                        tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
-                        loading={loading}
-                        disabled={disabled}
-                        triggerTime={new Date()}
-                        fullWidth={isMobile}
-                        size="large"
-                    >
-                        Delegate to other
-                    </Button>
-                </WrapperActionsModal>
-            </Box>
-            <WrapperActionsModal>
                 <Button
-                    onClick={handleClose}
-                    color='neutral'
+                    onClick={()=>{submit()}}
+                    color='primary'
+                    variant="outlined"
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
+                    loading={loading}
+                    disabled={disabled}
+                    triggerTime={new Date()}
+                    fullWidth={true}
                     size="large"
                 >
-                    Cancel
+                    Delegate to other
                 </Button>
-                </WrapperActionsModal>
+            </Box>
         </Modal>
     )
 }

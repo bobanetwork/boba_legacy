@@ -11,6 +11,7 @@ import {
   L2_CHAINID,
   isLiveNetwork,
   gasPriceForL2,
+  replicaProvider,
 } from './shared/utils'
 import chaiAsPromised from 'chai-as-promised'
 import { OptimismEnv } from './shared/env'
@@ -27,8 +28,10 @@ chai.use(solidity)
 describe('Basic RPC tests', () => {
   let env: OptimismEnv
   let wallet: Wallet
+  let replicaWallet: Wallet
 
   const provider = injectL2Context(l2Provider)
+  const l2ReplicaProvider = injectL2Context(replicaProvider)
 
   let Reverter: Contract
   let revertMessage: string
@@ -38,6 +41,8 @@ describe('Basic RPC tests', () => {
   before(async () => {
     env = await OptimismEnv.new()
     wallet = env.l2Wallet
+    replicaWallet = env.l2Wallet_2.connect(env.replicaProvider)
+
     const Factory__Reverter = await ethers.getContractFactory(
       'Reverter',
       wallet
@@ -435,6 +440,96 @@ describe('Basic RPC tests', () => {
 
       expect(BigNumber.from(result.l1GasPrice)).to.deep.eq(l1GasPrice)
       expect(BigNumber.from(result.l2GasPrice)).to.deep.eq(l2GasPrice)
+    })
+  })
+
+  describe('Replica RPC forward test', () => {
+    it('should correctly process a valid transaction', async () => {
+      const tx = defaultTransactionFactory()
+      tx.gasPrice = await gasPriceForL2()
+      const nonce = await replicaWallet.getTransactionCount()
+      const result = await replicaWallet.sendTransaction(tx)
+      await result.wait()
+
+      expect(result.from).to.equal(replicaWallet.address)
+      expect(result.nonce).to.equal(nonce)
+      expect(result.gasLimit.toNumber()).to.equal(tx.gasLimit)
+      expect(result.gasPrice.toNumber()).to.equal(tx.gasPrice)
+      expect(result.data).to.equal(tx.data)
+    })
+
+    it('should not accept a transaction with the wrong chain ID', async () => {
+      const tx = {
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
+        chainId: (await replicaWallet.getChainId()) + 1,
+      }
+
+      await expect(
+        l2ReplicaProvider.sendTransaction(
+          await replicaWallet.signTransaction(tx)
+        )
+      ).to.be.rejectedWith('invalid transaction: invalid sender')
+    })
+
+    it('should accept a transaction without a chain ID', async () => {
+      const tx = {
+        ...defaultTransactionFactory(),
+        nonce: await replicaWallet.getTransactionCount(),
+        gasPrice: await gasPriceForL2(),
+        chainId: null, // Disables EIP155 transaction signing.
+      }
+      const signed = await replicaWallet.signTransaction(tx)
+      const response = await l2ReplicaProvider.sendTransaction(signed)
+      await response.wait()
+
+      expect(response.chainId).to.equal(0)
+      const v = response.v
+      expect(v === 27 || v === 28).to.be.true
+    })
+
+    it('should accept a transaction with a value', async () => {
+      const tx = {
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
+        chainId: await replicaWallet.getChainId(),
+        data: '0x',
+        value: ethers.utils.parseEther('0.1'),
+      }
+
+      const balanceBefore = await l2ReplicaProvider.getBalance(
+        replicaWallet.address
+      )
+      const result = await replicaWallet.sendTransaction(tx)
+      const receipt = await result.wait()
+      expect(receipt.status).to.deep.equal(1)
+
+      const balAfter = await l2ReplicaProvider.getBalance(replicaWallet.address)
+      expect(balAfter.lte(balanceBefore.sub(ethers.utils.parseEther('0.1')))).to
+        .be.true
+    })
+
+    it('should reject a transaction with higher value than user balance', async () => {
+      const balance = await replicaWallet.getBalance()
+      const tx = {
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
+        chainId: await replicaWallet.getChainId(),
+        data: '0x',
+        value: balance.add(ethers.utils.parseEther('1')),
+      }
+
+      await expect(replicaWallet.sendTransaction(tx)).to.be.rejectedWith(
+        'invalid transaction: insufficient funds for gas * price + value'
+      )
+    })
+
+    it('should correctly report OOG for contract creations', async () => {
+      const factory = await ethers.getContractFactory('TestOOGInConstructor')
+
+      await expect(factory.connect(replicaWallet).deploy()).to.be.rejectedWith(
+        'gas required exceeds allowance'
+      )
     })
   })
 })

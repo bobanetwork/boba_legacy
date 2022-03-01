@@ -157,6 +157,13 @@ func (t *Transaction) SetL1Turing(turing []byte) {
 	t.meta.L1Turing = common.CopyBytes(turing)
 }
 
+func (t *Transaction) SetData(data []byte) {
+	if &t.data == nil {
+		return
+	}
+	t.data.Payload = common.CopyBytes(data)
+}
+
 // ChainId returns which chain id this transaction was signed for (if at all)
 func (tx *Transaction) ChainId() *big.Int {
 	return deriveChainId(tx.data.V)
@@ -286,7 +293,7 @@ func (tx *Transaction) Hash() common.Hash {
 }
 
 // Size returns the true RLP encoded storage size of the transaction, either by
-// encoding and returning it, or returning a previsouly cached value.
+// encoding and returning it, or returning a previously cached value.
 func (tx *Transaction) Size() common.StorageSize {
 	if size := tx.size.Load(); size != nil {
 		return size.(common.StorageSize)
@@ -496,10 +503,11 @@ type Message struct {
 	gasPrice   *big.Int
 	data       []byte
 	checkNonce bool
+	accessList AccessList
 
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
-	// l1Turing is needed for data flow into the EWVM: transaction.meta->msg->evm.context
+	// l1Turing is needed for data flow into the EVM: transaction.meta->msg->evm.context
 	l1Turing    []byte
 	queueOrigin QueueOrigin
 }
@@ -514,6 +522,7 @@ func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *b
 		gasPrice:   gasPrice,
 		data:       data,
 		checkNonce: checkNonce,
+		accessList: AccessList{},
 
 		l1Timestamp:   l1Timestamp,
 		l1BlockNumber: l1BlockNumber,
@@ -522,14 +531,15 @@ func NewMessage(from common.Address, to *common.Address, nonce uint64, amount *b
 	}
 }
 
-func (m Message) From() common.Address { return m.from }
-func (m Message) To() *common.Address  { return m.to }
-func (m Message) GasPrice() *big.Int   { return m.gasPrice }
-func (m Message) Value() *big.Int      { return m.amount }
-func (m Message) Gas() uint64          { return m.gasLimit }
-func (m Message) Nonce() uint64        { return m.nonce }
-func (m Message) Data() []byte         { return m.data }
-func (m Message) CheckNonce() bool     { return m.checkNonce }
+func (m Message) From() common.Address   { return m.from }
+func (m Message) To() *common.Address    { return m.to }
+func (m Message) GasPrice() *big.Int     { return m.gasPrice }
+func (m Message) Value() *big.Int        { return m.amount }
+func (m Message) Gas() uint64            { return m.gasLimit }
+func (m Message) Nonce() uint64          { return m.nonce }
+func (m Message) Data() []byte           { return m.data }
+func (m Message) CheckNonce() bool       { return m.checkNonce }
+func (m Message) AccessList() AccessList { return m.accessList }
 
 func (m Message) L1Timestamp() uint64      { return m.l1Timestamp }
 func (m Message) L1BlockNumber() *big.Int  { return m.l1BlockNumber }

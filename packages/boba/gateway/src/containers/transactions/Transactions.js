@@ -13,16 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import "react-datepicker/dist/react-datepicker.css";
-import { Grid, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import "react-datepicker/dist/react-datepicker.css"
+import { Grid, Box } from '@mui/material'
 
-import moment from 'moment';
+import moment from 'moment'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
-
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
@@ -30,7 +29,7 @@ import Pager from 'components/pager/Pager'
 
 import * as S from './History.styles'
 
-const PER_PAGE = 8;
+const PER_PAGE = 8
 
 function Transactions({ searchHistory, transactions }) {
 

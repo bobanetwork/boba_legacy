@@ -69,7 +69,7 @@ function Button ({
   return (
     <Tooltip title={tooltip}>
       <span>
-        <ButtonMUI {...muiProps} style={{ minWidth: loading ? '200px' : 'none', borderRadius: '4px'}}>
+        <ButtonMUI {...muiProps} style={{ minWidth: loading ? '200px' : '103px', borderRadius: '12px'}}>
           {children}
           {(disabled || loading) && timeDefined && (waitTime > 3) &&
             <div style={{ marginLeft: '10px' }}>

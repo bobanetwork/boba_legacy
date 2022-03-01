@@ -2,19 +2,17 @@
 
 ## Setup
 
-Follow installation + build instructions in the [primary README](../README.md).
-Then, run:
+Follow installation + build instructions in the [primary README](../README.md). Then, run:
 
 ```bash
-yarn build:integration
+yarn build
 ```
 
 ## Running tests
 
 ### Testing a live network
 
-Create an `.env` file and fill it out.
-Look at `.env.example` to know which variables to include.
+Create an `.env` file and fill it out. Look at `.env.example` to know which variables to include.
 
 Once you have your environment set up, run:
 

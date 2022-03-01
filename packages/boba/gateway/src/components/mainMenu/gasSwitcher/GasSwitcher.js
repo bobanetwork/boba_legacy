@@ -7,8 +7,6 @@ import * as S from './GasSwitcher.styles.js'
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
 
-import { Typography } from '@mui/material'
-
 import networkService from 'services/networkService.js'
 import { getMaxHealthBlockLag } from 'util/masterConfig'
 
@@ -44,23 +42,28 @@ function GasSwitcher({ isMobile }) {
   return (
     <S.Menu>
       <S.MenuItem>
-        <S.Label variant="body2">Ethereum Gas</S.Label>
-        <Typography variant="body2">{gas.gasL1} Gwei</Typography>
+        <S.Label component="p" variant="body2">Ethereum Gas</S.Label>
+        <S.Value component="p" variant="body2">{gas.gasL1} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">Boba Gas</S.Label><Typography variant="body2">{gas.gasL2} Gwei</Typography>
+        <S.Label component="p" variant="body2">Boba Gas</S.Label>
+        <S.Value component="p" variant="body2">{gas.gasL2} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">Savings</S.Label><Typography variant="body2">{savings.toFixed(0)}x</Typography>
+        <S.Label component="p" variant="body2">Savings</S.Label>
+        <S.Value component="p" variant="body2">{savings.toFixed(0)}x</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">L1 Block</S.Label><Typography variant="body2">{gas.blockL1}</Typography>
+        <S.Label component="p" variant="body2">L1 Block</S.Label>
+        <S.Value component="p" variant="body2">{gas.blockL1}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">L2 Block</S.Label><Typography variant="body2">{gas.blockL2}</Typography>
+        <S.Label component="p" variant="body2">L2 Block</S.Label>
+        <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">Verified to</S.Label><Typography variant="body2">{verifierStatus.matchedBlock} {`(${healthStatus})`}</Typography>
+        <S.Label component="p" variant="body2">Verification state</S.Label>
+        <S.Value component="p" variant="body2">{healthStatus}</S.Value>
       </S.MenuItem>
     </S.Menu>
   )

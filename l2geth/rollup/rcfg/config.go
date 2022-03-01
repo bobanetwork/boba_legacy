@@ -8,7 +8,9 @@ import (
 )
 
 // UsingOVM is used to enable or disable functionality necessary for the OVM.
-var UsingOVM bool
+var (
+	UsingOVM bool
+)
 var OvmTuringCreditAddress common.Address
 
 var (

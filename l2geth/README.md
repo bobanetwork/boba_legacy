@@ -4,9 +4,9 @@ Official Golang implementation of the Ethereum protocol.
 
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
-)](https://godoc.org/github.com/ethereum-optimism/optimism/l2geth)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ethereum-optimism/optimism/l2geth)](https://goreportcard.com/report/github.com/ethereum-optimism/optimism/l2geth)
-[![Travis](https://travis-ci.org/ethereum-optimism/optimism/l2geth.svg?branch=master)](https://travis-ci.org/ethereum-optimism/optimism/l2geth)
+)](https://godoc.org/github.com/ethereum/go-ethereum)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ethereum/go-ethereum)](https://goreportcard.com/report/github.com/ethereum/go-ethereum)
+[![Travis](https://travis-ci.org/ethereum/go-ethereum.svg?branch=master)](https://travis-ci.org/ethereum/go-ethereum)
 [![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/nthXNEv)
 
 ## Optimism
@@ -16,7 +16,7 @@ configuration will determine the mode of operation. The configuration flags
 can be configured using either environment variables or passed at runtime as
 flags.
 
-A prebuilt Docker image is available at `ethereumoptimism-optimism/optimism/l2geth`.
+A prebuilt Docker image is available at `bobanetwork/l2geth`.
 
 To compile the code, run:
 ```
@@ -25,46 +25,39 @@ $ make geth
 
 ### Running a Sequencer
 
-Running a sequencer requires the [Data Transport Layer](https://github.com/ethereum-optimism/data-transport-layer)
-to be synced. The data transport layer is responsible for indexing transactions
-from Layer One concurrently. The sequencer pulls in transactions from the data
-transport layer and executes them. The URL of the data transport layer should be
+Running a sequencer that ingests L1 to L2 transactions requires running the
+[Data Transport Layer](https://github.com/ethereum-optimism/data-transport-layer).
+The data transport layer is responsible for indexing transactions
+from layer one Ethereum. It is possible to run a local development sequencer
+without the data transport layer by turning off the sync service. To turn on
+the sync service, use the config flag `--eth1.syncservice` or
+`ETH1_SYNC_SERVICE_ENABLE`. The URL of the data transport layer should be
 used for the sequencer config option `--rollup.clienthttp`.
 
-See the script `scripts/start.sh`. It sets many of the config options
-and accepts CLI flags. For usage, run the command:
+The `scripts` directory contains some scripts that make it easy to run a
+local sequencer for development purposes.
+
+First, the genesis block must be initialized. This is because there are
+predeployed contracts in the L2 state. The scripts to generate the genesis
+block can be found in the `contracts` package. Be sure to run those first.
 
 ```bash
-$ ./scripts/start.sh -h
+$ ./scripts/init.sh
 ```
 
-This may be suitable for simple usecases, users that need more flexibility
-with their configuration can run the command:
+This script can be ran with the `DEVELOPMENT` env var set which will add
+a prefunded account to the genesis state that can be used for development.
+
+The `start.sh` script is used to start `geth`. It hardcodes a bunch of
+common config values for when running `geth`.
 
 ```bash
-$ USING_OVM=true ./build/bin/geth \
-    --rollup.clienthttp $ROLLUP_CLIENT_HTTP \
-    --rollup.pollinterval 3s \
-    --eth1.ctcdeploymentheight $CTC_DEPLOY_HEIGHT \
-    --eth1.syncservice \
-    --rpc \
-    --dev \
-    --rpcaddr "0.0.0.0" \
-    --rpccorsdomain '*' \
-    --wsaddr "0.0.0.0" \
-    --wsport 8546 \
-    --wsorigins '*' \
-    --rpcapi 'eth,net,rollup,web3' \
-    --gasprice '0' \
-    --targetgaslimit '8000000' \
-    --nousb \
-    --gcmode=archive \
-    --ipcdisable
+$ ./scripts/start.sh
 ```
 
-To persist the database, pass the `--datadir` with a path to the directory for
-the database to be persisted in. Without this flag, an in memory database will
-be used. To tune the log level, use the `--verbosity` flag with an integer.
+This script can be modified to work with `dlv` by prefixing the `$cmd`
+with `dlv exec` and being sure to prefix the `geth` arguments with `--`
+so they are interpreted as arguments to `geth` instead of `dlv`.
 
 ### Running a Verifier
 
@@ -72,7 +65,7 @@ Add the flag `--rollup.verifier`
 
 ## Building the source
 
-For prerequisites and detailed build instructions please read the [Installation Instructions](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Building-Ethereum) on the wiki.
+For prerequisites and detailed build instructions please read the [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum) on the wiki.
 
 Building `geth` requires both a Go (version 1.10 or later) and a C compiler. You can install
 them using your favourite package manager. Once the dependencies are installed, run
@@ -94,8 +87,8 @@ directory.
 
 |    Command    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | :-----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|  **`geth`**   | Our main Ethereum CLI client. It is the entry point into the Ethereum network (main-, test- or private net), capable of running as a full node (default), archive node (retaining all historical state) or a light node (retrieving data live). It can be used by other processes as a gateway into the Ethereum network via JSON RPC endpoints exposed on top of HTTP, WebSocket and/or IPC transports. `geth --help` and the [CLI Wiki page](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Command-Line-Options) for command line options.          |
-|   `abigen`    | Source code generator to convert Ethereum contract definitions into easy to use, compile-time type-safe Go packages. It operates on plain [Ethereum contract ABIs](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) with expanded functionality if the contract bytecode is also available. However, it also accepts Solidity source files, making development much more streamlined. Please see our [Native DApps](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Native-DApps:-Go-bindings-to-Ethereum-contracts) wiki page for details. |
+|  **`geth`**   | Our main Ethereum CLI client. It is the entry point into the Ethereum network (main-, test- or private net), capable of running as a full node (default), archive node (retaining all historical state) or a light node (retrieving data live). It can be used by other processes as a gateway into the Ethereum network via JSON RPC endpoints exposed on top of HTTP, WebSocket and/or IPC transports. `geth --help` and the [CLI Wiki page](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options) for command line options.          |
+|   `abigen`    | Source code generator to convert Ethereum contract definitions into easy to use, compile-time type-safe Go packages. It operates on plain [Ethereum contract ABIs](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) with expanded functionality if the contract bytecode is also available. However, it also accepts Solidity source files, making development much more streamlined. Please see our [Native DApps](https://github.com/ethereum/go-ethereum/wiki/Native-DApps:-Go-bindings-to-Ethereum-contracts) wiki page for details. |
 |  `bootnode`   | Stripped down version of our Ethereum client implementation that only takes part in the network node discovery protocol, but does not run any of the higher level application protocols. It can be used as a lightweight bootstrap node to aid in finding peers in private networks.                                                                                                                                                                                                                                                                 |
 |     `evm`     | Developer utility version of the EVM (Ethereum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode. Its purpose is to allow isolated, fine-grained debugging of EVM opcodes (e.g. `evm --code 60ff60ff --debug`).                                                                                                                                                                                                                                                                     |
 | `gethrpctest` | Developer utility tool to support our [ethereum/rpc-test](https://github.com/ethereum/rpc-tests) test suite which validates baseline conformity to the [Ethereum JSON RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/ethereum/rpc-tests/blob/master/README.md) for details.                                                                                                                                                                                                     |
@@ -105,7 +98,7 @@ directory.
 ## Running `geth`
 
 Going through all the possible command line flags is out of scope here (please consult our
-[CLI Wiki page](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Command-Line-Options)),
+[CLI Wiki page](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)),
 but we've enumerated a few common parameter combos to get you up to speed quickly
 on how you can run your own `geth` instance.
 
@@ -124,9 +117,9 @@ This command will:
  * Start `geth` in fast sync mode (default, can be changed with the `--syncmode` flag),
    causing it to download more data in exchange for avoiding processing the entire history
    of the Ethereum network, which is very CPU intensive.
- * Start up `geth`'s built-in interactive [JavaScript console](https://github.com/ethereum-optimism/optimism/l2geth/wiki/JavaScript-Console),
+ * Start up `geth`'s built-in interactive [JavaScript console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console),
    (via the trailing `console` subcommand) through which you can invoke all official [`web3` methods](https://github.com/ethereum/wiki/wiki/JavaScript-API)
-   as well as `geth`'s own [management APIs](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Management-APIs).
+   as well as `geth`'s own [management APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs).
    This tool is optional and if you leave it out you can always attach to an already running
    `geth` instance with `geth attach`.
 
@@ -219,7 +212,7 @@ accessible from the outside.
 As a developer, sooner rather than later you'll want to start interacting with `geth` and the
 Ethereum network via your own programs and not manually through the console. To aid
 this, `geth` has built-in support for a JSON-RPC based APIs ([standard APIs](https://github.com/ethereum/wiki/wiki/JSON-RPC)
-and [`geth` specific APIs](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Management-APIs)).
+and [`geth` specific APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs)).
 These can be exposed via HTTP, WebSockets and IPC (UNIX sockets on UNIX based
 platforms, and named pipes on Windows).
 
@@ -376,7 +369,7 @@ from anyone on the internet, and are grateful for even the smallest of fixes!
 
 If you'd like to contribute to go-ethereum, please fork, fix, commit and send a pull request
 for the maintainers to review and merge into the main code base. If you wish to submit
-more complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethereum-optimism/optimism/l2geth)
+more complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethereum/go-ethereum)
 to ensure those changes are in line with the general philosophy of the project and/or get
 some early feedback which can make both your efforts much lighter as well as our review
 and merge procedures quick and simple.
@@ -391,7 +384,7 @@ Please make sure your contributions adhere to our coding guidelines:
  * Commit messages should be prefixed with the package(s) they modify.
    * E.g. "eth, rpc: make trace configs optional"
 
-Please see the [Developers' Guide](https://github.com/ethereum-optimism/optimism/l2geth/wiki/Developers'-Guide)
+Please see the [Developers' Guide](https://github.com/ethereum/go-ethereum/wiki/Developers'-Guide)
 for more details on configuring your environment, managing project dependencies, and
 testing procedures.
 

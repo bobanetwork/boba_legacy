@@ -32,6 +32,9 @@ contract HelloTuring {
 
     uint256 product = abi.decode(encResponse,(uint256));
 
+    // Test case to ensure revert string is reported to client
+    require (product != 0, "Multiply by zero error");
+
     emit MultFloatNumbers(product);
 
     return product;

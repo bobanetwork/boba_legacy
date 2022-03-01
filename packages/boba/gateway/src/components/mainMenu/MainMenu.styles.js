@@ -23,7 +23,7 @@ export const MobileNavTag = styled(Box)`
 `;
 
 export const StyleDrawer = styled(Box)`
-  background-color: ${(props) => props.theme.palette.mode === 'light' ? 'white' : '#061122' };
+  background-color: ${(props) => props.theme.palette.mode === 'light' ? 'white' : '#061122'};
   height: 100%;
 `;
 
@@ -39,3 +39,13 @@ export const WrapperCloseIcon = styled(Box)`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const MenuWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  flexDirection: 'column',
+  borderRight: 'solid white',
+  borderWidth: '1px',
+  paddingRight: '10px',
+}))

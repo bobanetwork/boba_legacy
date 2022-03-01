@@ -11,6 +11,7 @@
 GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
+GOTESTRUN = env GO111MODULE=on go run
 
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth
@@ -31,7 +32,7 @@ ios:
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
 test: all
-	$(GORUN) build/ci.go test
+	$(GOTESTRUN) build/ci.go test
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint

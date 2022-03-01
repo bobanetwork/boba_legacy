@@ -36,9 +36,9 @@ import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 import useInterval from 'util/useInterval'
-import PageHeader from 'components/pageHeader/PageHeader'
 
 import { POLL_INTERVAL } from 'util/constant'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 function BobaScope() {
 
@@ -64,8 +64,8 @@ function BobaScope() {
   }, POLL_INTERVAL)
 
   return (
-    <>
-      <PageHeader title="BobaScope" />
+    <S.ScopePageContainer>
+      <PageTitle title="Boba Scope" />
 
       <S.Header>
         <div className={styles.searchInput}>
@@ -100,7 +100,7 @@ function BobaScope() {
           )}
         </div>
       </div>
-    </>
+    </S.ScopePageContainer>
   );
 }
 

@@ -14,8 +14,15 @@ export const WalletPickerContainer = styled.div`
 `;
 
 export const Label = styled(Typography)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
-  color: theme.palette.text.disabled,
+  marginLeft: theme.spacing(2),
+  opacity: '0.65',
+  [ theme.breakpoints.down('md') ]: {
+    marginLeft: theme.spacing(0),
+  }
+}));
+
+export const Value = styled(Typography)(({ theme }) => ({
+  opacity: '0.85'
 }));
 
 export const WalletPickerWrapper = styled.div`
@@ -41,21 +48,26 @@ export const Menu = styled(Box)(({ theme }) => ({
   'a': {
     cursor: 'pointer',
   },
-  [ theme.breakpoints.down('sm') ]: {
+  [ theme.breakpoints.down('md') ]: {
     width: '100%',
     flexDirection: 'column'
   }
 }))
 
-export const MenuItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 1rem;
-  p {
-    white-space: nowrap;
+
+export const MenuItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  width: '100%',
+  gap: '5px',
+  'p': {
+    whiteSpace: 'nowrap',
+  },
+  [ theme.breakpoints.down('md') ]: {
+    width: '100%',
+    justifyContent: 'flex-start',
   }
-`;
+}))
 
 export const Chevron = styled.img`
   transform: ${props => props.open ? 'rotate(-90deg)' : 'rotate(90deg)'};

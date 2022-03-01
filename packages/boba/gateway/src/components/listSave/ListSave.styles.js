@@ -32,3 +32,26 @@ export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
   alignItems: 'center',
 }))
 
+export const StakeListItemContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: '10px',
+  width: '100%',
+  padding: '10px 20px'
+}));
+export const StakeItemDetails = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+}));
+export const StakeItemContent = styled(Box)(({ theme }) => ({
+  width: '100%',
+}));
+export const StakeItemAction = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'flex-start',
+}));

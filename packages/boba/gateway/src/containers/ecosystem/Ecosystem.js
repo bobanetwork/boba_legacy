@@ -3,12 +3,12 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import { Link, Telegram, Twitter } from '@mui/icons-material'
 import Carousel from 'components/carousel/Carousel'
-import DiscordIcon from 'components/icons/Discord'
-import PageHeader from 'components/pageHeader/PageHeader'
+import DiscordIcon from 'components/icons/DiscordIcon'
 import React, { useEffect, useState } from 'react'
 import * as styles from './Ecosystem.module.scss'
 import * as S from './Ecosystem.styles'
 import { loadProjectByCategory } from './project.list'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 function ECOSYSTEM() {
 
@@ -23,7 +23,7 @@ function ECOSYSTEM() {
 
   return (
     <>
-      <PageHeader title="Ecosystem" />
+      <PageTitle title="Ecosystem" />
       <div className={styles.container}>
         {
           Object.keys(projectByCategory).map((d) => {
@@ -67,7 +67,7 @@ function ECOSYSTEM() {
                               </IconButton> : null
                               }
                           </S.TileFooter>
-                        </S.TileCard> 
+                        </S.TileCard>
                         )
                       })
                     }

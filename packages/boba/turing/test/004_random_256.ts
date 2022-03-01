@@ -16,8 +16,11 @@ var urlStr
 const gasOverride =  { gasLimit: 3000000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
-const deployerPK = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+
+var BOBAL2Address
+var BobaTuringCreditAddress
 
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
@@ -40,7 +43,7 @@ describe("Turing 256 Bit Random Number", function () {
       (TuringHelperJson.bytecode),
       deployerWallet)
     
-    helper = await Factory__Helper.deploy()
+    helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed at", helper.address)
 
     Factory__Random = new ContractFactory(
@@ -56,11 +59,18 @@ describe("Turing 256 Bit Random Number", function () {
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
 
-    const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
-    addressesBOBA = JSON.parse(result)
+    if(hre.network.name === 'boba_rinkeby') {
+      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    } else {
+      const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
+      addressesBOBA = JSON.parse(result)
+      BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
+      BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+    }
 
     L2BOBAToken = new Contract(
-      addressesBOBA.TOKENS.BOBA.L2,
+      BOBAL2Address,
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
@@ -69,7 +79,7 @@ describe("Turing 256 Bit Random Number", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet
-    ).attach(addressesBOBA.BobaTuringCredit)
+    ).attach(BobaTuringCreditAddress)
 
   })
 
@@ -84,13 +94,7 @@ describe("Turing 256 Bit Random Number", function () {
 
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
 
-    const depositAmount = utils.parseEther('10')
-
-    const preBalance = await turingCredit.prepaidBalance(helper.address)
-    console.log("    Credit Prebalance", preBalance.toString())
-
-    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
-    console.log("    BOBA Balance in your account", bobaBalance.toString())
+    const depositAmount = utils.parseEther('0.20')
 
     const approveTx = await L2BOBAToken.approve(
       turingCredit.address,
@@ -103,16 +107,10 @@ describe("Turing 256 Bit Random Number", function () {
       helper.address
     )
     await depositTx.wait()
-
-    const postBalance = await turingCredit.prepaidBalance(
-      helper.address
-    )
-
-    expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
   it("should get the number 42", async () => {
-    let tr = await random.get42()
+    let tr = await random.get42(gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
@@ -122,7 +120,7 @@ describe("Turing 256 Bit Random Number", function () {
   })
 
   it("should get a 256 bit random number", async () => {
-    let tr = await random.getRandom()
+    let tr = await random.getRandom(gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
@@ -132,7 +130,7 @@ describe("Turing 256 Bit Random Number", function () {
   })
 
   it("should get a 256 bit random number", async () => {
-    let tr = await random.getRandom()
+    let tr = await random.getRandom(gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data

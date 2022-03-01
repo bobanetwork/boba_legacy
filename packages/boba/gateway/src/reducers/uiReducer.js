@@ -23,7 +23,7 @@ if (activePage) {
 
 const initialState = {
   theme: 'dark',
-  page: activePage ? activePage : 'AccountNow',
+  page: activePage ? activePage : 'Wallet',
   depositModal: false,
   depositBatchModal: false,
   transferModal: false,

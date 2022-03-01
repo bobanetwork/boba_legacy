@@ -1,7 +1,5 @@
 # Engineering Update #8
 
-**DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT**
-
 - [Engineering update #8](#engineering-update--8)
   * [1. Roadmap and Whitepaper](#1-roadmap-and-whitepaper)
   * [2. Blockchain Trends - the L2 space and where we fit](#2-blockchain-trends---the-l2-space-and-where-we-fit)
