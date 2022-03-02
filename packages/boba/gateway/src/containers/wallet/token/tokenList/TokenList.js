@@ -1,6 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { settle_v0, settle_v1 } from 'actions/networkAction'
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
@@ -232,7 +231,7 @@ function TokenList({
                   gap: '10px',
                 }}>
                   <Typography variant="body3" component="p" >
-                    At a TVL of {TVL_v1.toFixed(0)}M each WAGMIv1 will settle for {WAGMI_v1.toFixed(1)} BOBA
+                    At a TVL of {TVL_v1.toFixed(0)}k ETH each WAGMIv1 will settle for {WAGMI_v1.toFixed(1)} BOBA
                   </Typography>
                   <Slider
                     min={0}
@@ -409,7 +408,7 @@ function TokenList({
                 gap: '10px',
               }}>
                 <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  At a TVL of {TVL_v1.toFixed(0)}M each option<br/> will settle for {WAGMI_v1.toFixed(1)} BOBA
+                  At a TVL of {TVL_v1.toFixed(0)}k ETH each WAGMIv1 will settle for {WAGMI_v1.toFixed(1)} BOBA
                 </Typography>
                 <Button
                   onClick={() => { settle_v1() }}

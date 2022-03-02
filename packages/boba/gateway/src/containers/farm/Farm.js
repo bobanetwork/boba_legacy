@@ -16,9 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import React from 'react';
-import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import React from 'react'
+import { connect } from 'react-redux'
+import { isEqual } from 'lodash'
 
 import { getFarmInfo } from 'actions/farmAction'
 
@@ -32,7 +32,6 @@ import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PageTitle from 'components/pageTitle/PageTitle'
 import { Circle, HelpOutline } from '@mui/icons-material'
 
