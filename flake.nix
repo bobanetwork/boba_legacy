@@ -72,6 +72,7 @@
               ];
               installPhase = ''
               ln -s ${l2geth}/bin $out/bin
+              rm -rf $out/lib
               '';
             };
           };
