@@ -60,7 +60,7 @@ jobs:
         working-directory: ./ops
         run: |
            ./scripts/build-ci.sh
-
+           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
       - name: Rename and retag the optimism images
         working-directory: ./ops
         run: |

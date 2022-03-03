@@ -30,12 +30,12 @@ describe('Contract interactions', () => {
       Factory__ERC20 = await ethers.getContractFactory('ERC20', env.l2Wallet)
     })
 
-    it('should successfully deploy the contract', async () => {
+    it('{tag:other} should successfully deploy the contract', async () => {
       contract = await Factory__ERC20.deploy(100000000, 'OVM Test', 8, 'OVM')
       await contract.deployed()
     })
 
-    it('should support approvals', async () => {
+    it('{tag:other} should support approvals', async () => {
       const spender = '0x' + '22'.repeat(20)
       const tx = await contract.approve(spender, 1000)
       await tx.wait()
@@ -54,7 +54,7 @@ describe('Contract interactions', () => {
       expect(logs[0].args._value).to.deep.equal(BigNumber.from(1000))
     })
 
-    it('should support transferring balances', async () => {
+    it('{tag:other} should support transferring balances', async () => {
       const tx = await contract.transfer(otherWallet.address, 1000)
       await tx.wait()
       const balFrom = await contract.balanceOf(env.l2Wallet.address)
@@ -72,7 +72,7 @@ describe('Contract interactions', () => {
       expect(logs[0].args._value).to.deep.equal(BigNumber.from(1000))
     })
 
-    it('should support being self destructed', async () => {
+    it('{tag:other} should support being self destructed', async () => {
       const tx = await contract.destroy()
       await tx.wait()
       const code = await env.l2Wallet.provider.getCode(contract.address)
