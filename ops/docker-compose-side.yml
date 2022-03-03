@@ -1,5 +1,18 @@
 version: "3"
 
+# Account #19
+x-gas-price-oracle_pk: &gas-price-oracle_pk
+  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
+
+# Account #8
+x-relayer_pk: &relayer_pk
+  RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
+
+# Account #18
+x-fast-relayer_pk: &fast-relayer_pk
+  FAST_RELAYER_PRIVATE_KEY: '0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0'
+
+
 services:
   gas_oracle:
     depends_on:
