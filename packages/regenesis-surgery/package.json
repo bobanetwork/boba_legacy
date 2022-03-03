@@ -10,9 +10,9 @@
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",
     "pre-commit": "lint-staged",
-    "surgery:v1-to-v2": "ts-node scripts/v1-to-v2-surgery.ts",
-    "surgery:v1-to-v2:boba": "ts-node scripts/boba-contracts-verifier.ts",
-    "surgery:v1-to-v2:core": "ts-node scripts/core-contracts-verifier.ts"
+    "surgery:boba": "ts-node scripts/boba-regenesis.ts",
+    "surgery:verify:boba": "ts-node scripts/boba-contracts-verifier.ts",
+    "surgery:verify:core": "ts-node scripts/core-contracts-verifier.ts"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
