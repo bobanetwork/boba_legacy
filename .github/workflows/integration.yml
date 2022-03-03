@@ -19,6 +19,10 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -41,7 +45,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -53,8 +57,6 @@ jobs:
           test-grep-filter: 'tag:mrf'
         - id: 4
           test-grep-filter: 'tag:other'
-        - id: 5
-          test-grep-filter: '^((?!tag:).)*$'
     outputs:
       label: ${{ steps.executioner.outputs.label }}
       ec2-instance-id: ${{ steps.executioner.outputs.ec2-instance-id }}
@@ -72,7 +74,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-00b46fa1102c70ff2
-          ec2-instance-type: m4.4xlarge
+          ec2-instance-type: t2.2xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
       - name: Output the runner meta
@@ -150,7 +152,7 @@ jobs:
       #   ports:
       #     - 5000:5000
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -162,8 +164,6 @@ jobs:
           test-grep-filter: 'tag:mrf'
         - id: 4
           test-grep-filter: 'tag:other'
-        - id: 5
-          test-grep-filter: '^((?!tag:).)*$'
     steps:
       - uses: actions/download-artifact@v2
         id: download
@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -237,7 +237,6 @@ jobs:
         - id: 2
         - id: 3
         - id: 4
-        - id: 5
     steps:
       - uses: actions/download-artifact@v2
         with:
