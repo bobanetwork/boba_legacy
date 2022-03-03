@@ -218,3 +218,37 @@ jobs:
 
       - name: Lint
         run: yarn lint:check
+
+  tagging:
+    name: Integration tests tagging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Grep
+        working-directory: ./integration-tests
+        run: |
+          export SHELL=/bin/bash
+          set +eo pipefail
+          grep -rv "it('{tag:" --include \*.spec.ts  . | grep "it('"
+          if [[ $? -eq 1 ]]
+          then
+            echo "You're OK."
+            exit 0
+          else
+            echo "What did you do?"
+            exit 1
+          fi
+      - name: Grep
+        working-directory: ./integration-tests
+        run: |
+          export SHELL=/bin/bash
+          set +eo pipefail
+          grep -rv 'it("{tag:' --include \*.spec.ts  . | grep 'it("'
+          if [[ $? -eq 1 ]]
+          then
+            echo "You're OK."
+            exit 0
+          else
+            echo "What did you do?"
+            exit 1
+          fi
