@@ -1,5 +1,8 @@
-FROM python:3.8
-RUN pip install web3
+FROM python:3.8-slim
+RUN apt-get update \
+  && apt-get install gcc -y \
+  && apt-get clean
+RUN pip3 install --no-cache-dir web3
 COPY boba_community/fraud-detector/fraud-detector.py /
 COPY boba_community/fraud-detector/packages/jsonrpclib /jsonrpclib
 COPY /packages/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json /contracts/StateCommitmentChain.json

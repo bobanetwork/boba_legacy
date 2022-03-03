@@ -158,27 +158,27 @@ describe('Boba Fixed Savings', async () => {
   })
 
   describe('Initialization', async () => {
-    it('should have correct L2BOBA address set', async () => {
+    it('{tag:boba} should have correct L2BOBA address set', async () => {
       const l2Boba = await FixedSavings.l2Boba()
       expect(l2Boba).to.eq(L2Boba.address)
     })
 
-    it('should have correct xBOBA address set', async () => {
+    it('{tag:boba} should have correct xBOBA address set', async () => {
       const xBoba = await FixedSavings.xBoba()
       expect(xBoba).to.eq(xGovL2ERC20.address)
     })
 
-    it('should have correct owner address set', async () => {
+    it('{tag:boba} should have correct owner address set', async () => {
       const owner = await FixedSavings.owner()
       expect(owner).to.eq(env.l2Wallet.address)
     })
 
-    it('totalStakeCount should be zero', async () => {
+    it('{tag:boba} totalStakeCount should be zero', async () => {
       const totalStakeCount = await FixedSavings.totalStakeCount()
       expect(totalStakeCount).to.eq(0)
     })
 
-    it('should not be able to initialize again', async () => {
+    it('{tag:boba} should not be able to initialize again', async () => {
       await expect(
         FixedSavings.initialize(L2Boba.address, xGovL2ERC20.address)
       ).to.be.revertedWith('Contract has been initialized')
@@ -186,26 +186,26 @@ describe('Boba Fixed Savings', async () => {
   })
 
   describe('Staking', async () => {
-    it('should fail staking zero amount', async () => {
+    it('{tag:boba} should fail staking zero amount', async () => {
       await expect(FixedSavings.stake(0)).to.be.revertedWith(
         'Amount to stake cannot be zero'
       )
     })
 
-    it('should fail staking without enough BOBA balance', async () => {
+    it('{tag:boba} should fail staking without enough BOBA balance', async () => {
       await expect(
         FixedSavings.connect(l2Wallet_2.address).stake(100)
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     })
 
-    it('should fail staking with incorrect staking amount', async () => {
+    it('{tag:boba} should fail staking with incorrect staking amount', async () => {
       const bobaBalance = await L2Boba.balanceOf(env.l2Wallet_2.address)
       await expect(
         FixedSavings.connect(env.l2Wallet_2.address).stake(bobaBalance.add(1))
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     })
 
-    it('should fail staking with incorrect amount approved', async () => {
+    it('{tag:boba} should fail staking with incorrect amount approved', async () => {
       await L2Boba.connect(env.l2Wallet_2).approve(FixedSavings.address, 100)
       await expect(
         FixedSavings.connect(env.l2Wallet_2.address).stake(101)
@@ -233,7 +233,7 @@ describe('Boba Fixed Savings', async () => {
         stakeBlock = receipt.blockNumber
       })
 
-      it('should successfully stake amount with correct parameters', async () => {
+      it('{tag:boba} should successfully stake amount with correct parameters', async () => {
         const postBalanceStaker = await L2Boba.balanceOf(env.l2Wallet.address)
         const postBalanceSavingsContract = await L2Boba.balanceOf(
           FixedSavings.address
@@ -245,12 +245,12 @@ describe('Boba Fixed Savings', async () => {
         )
       })
 
-      it('should increase total stake count', async () => {
+      it('{tag:boba} should increase total stake count', async () => {
         const stakeCountNow = await FixedSavings.totalStakeCount()
         expect(stakeCountNow).to.be.eq(preStakeCount.add(1))
       })
 
-      it('should store the correct stake data', async () => {
+      it('{tag:boba} should store the correct stake data', async () => {
         const stakePos = await FixedSavings.totalStakeCount()
         const stakeData = await FixedSavings.stakeDataMap(stakePos)
 
@@ -275,12 +275,12 @@ describe('Boba Fixed Savings', async () => {
         expect(latestStakeId).to.be.eq(stakeData.stakeId)
       })
 
-      it('should mint xBOBA for user', async () => {
+      it('{tag:boba} should mint xBOBA for user', async () => {
         const xBOBABalance = await xGovL2ERC20.balanceOf(env.l2Wallet.address)
         expect(xBOBABalance).to.be.eq(preXBobaBalance.add(stakeAmount))
       })
 
-      it('should increment stakeId for next stakes', async () => {
+      it('{tag:boba} should increment stakeId for next stakes', async () => {
         const preStakePos = await FixedSavings.totalStakeCount()
 
         // new stake
@@ -311,7 +311,7 @@ describe('Boba Fixed Savings', async () => {
   })
 
   describe('Unstaking', async () => {
-    it('should not be able to unstake non owned stake', async () => {
+    it('{tag:boba} should not be able to unstake non owned stake', async () => {
       const personalStakeCount = await FixedSavings.personalStakeCount(
         env.l2Wallet.address
       )
@@ -326,7 +326,7 @@ describe('Boba Fixed Savings', async () => {
       ).to.be.revertedWith('Sender not owner of the funds')
     })
 
-    it('should not be able to unstake stake before lock', async () => {
+    it('{tag:boba} should not be able to unstake stake before lock', async () => {
       const personalStakeCount = await FixedSavings.personalStakeCount(
         env.l2Wallet.address
       )
@@ -429,7 +429,7 @@ describe('Boba Fixed Savings', async () => {
 
     // check for two period
     describe('when unstaking after multiple periods', async () => {
-      it('should not allow unstaking at lock periods', async () => {
+      it('{tag:boba} should not allow unstaking at lock periods', async () => {
         const personalStakeCount = await FixedSavings.personalStakeCount(
           env.l2Wallet.address
         )
@@ -526,13 +526,13 @@ describe('Boba Fixed Savings', async () => {
 
     // check for stopped period
     describe('when unstaking after contract interest is closed', async () => {
-      it('should not allow non owner to stop the interest bearing contract', async () => {
+      it('{tag:boba} should not allow non owner to stop the interest bearing contract', async () => {
         await expect(
           FixedSavings.connect(env.l2Wallet_2).stopStakingContract()
         ).to.be.revertedWith('Caller is not the owner')
       })
 
-      it('should allow owner to stop the interest bearing contract', async () => {
+      it('{tag:boba} should allow owner to stop the interest bearing contract', async () => {
         // move time to account for one more period first
         const personalStakeCount = await FixedSavings.personalStakeCount(
           env.l2Wallet_2.address
@@ -573,13 +573,13 @@ describe('Boba Fixed Savings', async () => {
         expect(stopTime).to.be.eq(timeNowAfterStop)
       }).timeout(100000)
 
-      it('should not allow to restop interest bearing contract', async () => {
+      it('{tag:boba} should not allow to restop interest bearing contract', async () => {
         await expect(
           FixedSavings.connect(env.l2Wallet).stopStakingContract()
         ).to.be.revertedWith('Already closed')
       })
 
-      it('should not allow new stakes after stopping contract', async () => {
+      it('{tag:boba} should not allow new stakes after stopping contract', async () => {
         await L2Boba.connect(env.l2Wallet).approve(FixedSavings.address, 100)
         await expect(
           FixedSavings.connect(env.l2Wallet).stake(100)

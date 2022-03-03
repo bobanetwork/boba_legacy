@@ -27,7 +27,7 @@ until $(curl --silent --fail \
     --output /dev/null \
     -H "Content-Type: application/json" \
     --data "$JSON" "$L2_NODE_WEB3_URL"); do
-  sleep 1
+  sleep 2
   echo "Will wait $((RETRIES--)) more times for $L2_NODE_WEB3_URL to be up..."
 
   if [ "$RETRIES" -lt 0 ]; then
