@@ -21,6 +21,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "@boba/register": "0.0.1",
     "@discoveryjs/json-ext": "^0.5.3",
     "@eth-optimism/contracts": "^0.5.11",
     "@uniswap/v3-core-optimism": "^1.0.0-rc.0",
