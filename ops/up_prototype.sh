@@ -25,10 +25,10 @@ docker-compose up deployer
 docker-compose up -d l2geth batch_submitter relayer
 sleep 5
 
-# Deploy the fast message relayer and the gas oracle
+# Deploy the fast message relayer
 echo "Starting Boba deployer (slow)"
 docker-compose up boba_deployer
-docker-compose up -d boba_message-relayer-fast gas_oracle
+docker-compose up -d boba_message-relayer-fast
 sleep 5
 
 echo "Base system is up"
