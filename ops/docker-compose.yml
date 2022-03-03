@@ -197,6 +197,9 @@ services:
       << : *fast-relayer_pk
       RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
 
   dtl:
     depends_on:
@@ -287,7 +290,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/boba_message-relayer-fast
+    image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
@@ -349,29 +352,6 @@ services:
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
-
-  gas_oracle:
-    depends_on:
-      - l1_chain
-      - l2geth
-    image: bobanetwork/boba_gas-price-oracle
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_gas-price-oracle
-    environment:
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L2_NODE_WEB3_URL: http://l2geth:8545
-      GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : *gas-price-oracle_pk #same as the deployer
-      << : *relayer_pk
-      << : *fast-relayer_pk
-      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
-      GAS_PRICE_ORACLE_ROOF_PRICE: 5
-      GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
-      POLLING_INTERVAL:
-      RETRIES: 200
 
   replica:
     depends_on:

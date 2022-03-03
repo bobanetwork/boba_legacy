@@ -191,13 +191,13 @@ describe('Oracle Flux Aggregator', async () => {
       await FluxAggregator.connect(env.l2Wallet_2).submit(2, 1010)
     })
 
-    it('should not allow submissions when funds depleted and voluntary submissions stopped', async () => {
+    it('{tag:other} should not allow submissions when funds depleted and voluntary submissions stopped', async () => {
       await expect(
         FluxAggregator.connect(env.l2Wallet_2).submit(3, 1030)
       ).to.be.revertedWith('available funds depleted')
     })
 
-    it('should allow submissions when funds depleted and voluntary submissions allowed', async () => {
+    it('{tag:other} should allow submissions when funds depleted and voluntary submissions allowed', async () => {
       const currentStatus = await FluxAggregator.voluntarySubmissionsAllowed()
       expect(currentStatus).to.be.eq(false)
 
@@ -230,7 +230,7 @@ describe('Oracle Flux Aggregator', async () => {
   })
 
   describe('Aggregator available funds status', async () => {
-    it('should update available funds data on using method', async () => {
+    it('{tag:other} should update available funds data on using method', async () => {
       const depositL2ERC20Amount = utils.parseEther('100')
       const approveTx = await L2ERC20.approve(
         FluxAggregator.address,
@@ -251,7 +251,7 @@ describe('Oracle Flux Aggregator', async () => {
       )
     })
 
-    it('should be able to withdraw directly transferred funds', async () => {
+    it('{tag:other} should be able to withdraw directly transferred funds', async () => {
       const transferAmount = utils.parseEther('10')
       const preAvailableFunds = await FluxAggregator.availableFunds()
 
@@ -276,7 +276,8 @@ describe('Oracle Flux Aggregator', async () => {
     })
   })
 
-  describe('Allow rounds between min-max submissions', async () => {
+  // TODO warp time on l2
+  describe.skip('Allow rounds between min-max submissions', async () => {
     before(async () => {
       const paymentAmount = await FluxAggregator.paymentAmount()
       const approveTx = await L2ERC20.approve(

@@ -85,7 +85,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should deposit NFT to L2', async () => {
+    it('{tag:boba} should deposit NFT to L2', async () => {
       // mint nft
       const mintTx = await L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
@@ -110,7 +110,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
-    it('should be able to transfer NFT on L2', async () => {
+    it('{tag:boba} should be able to transfer NFT on L2', async () => {
       const transferTx = await L2ERC721.transferFrom(
         env.l2Wallet.address,
         env.l2Wallet_2.address,
@@ -122,7 +122,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet_2.address)
     })
 
-    it('should not be able to withdraw non-owned NFT', async () => {
+    it('{tag:boba} should not be able to withdraw non-owned NFT', async () => {
       await expect(
         L2Bridge.connect(env.l2Wallet).withdraw(
           L2ERC721.address,
@@ -133,7 +133,7 @@ describe('NFT Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should withdraw NFT', async () => {
+    it('{tag:boba} should withdraw NFT', async () => {
       const approveTX = await L2ERC721.connect(env.l2Wallet_2).approve(
         L2Bridge.address,
         DUMMY_TOKEN_ID
@@ -155,7 +155,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL1).to.be.deep.eq(env.l2Wallet_2.address)
     })
 
-    it('should deposit NFT to another L2 wallet', async () => {
+    it('{tag:boba} should deposit NFT to another L2 wallet', async () => {
       const approveTx = await L1ERC721.connect(env.l1Wallet_2).approve(
         L1Bridge.address,
         DUMMY_TOKEN_ID
@@ -180,7 +180,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
-    it('should withdraw NFT to another L1 wallet', async () => {
+    it('{tag:boba} should withdraw NFT to another L1 wallet', async () => {
       const approveTX = await L2ERC721.connect(env.l2Wallet).approve(
         L2Bridge.address,
         DUMMY_TOKEN_ID
@@ -203,7 +203,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL1).to.be.deep.eq(env.l1Wallet_2.address)
     })
 
-    it('should not be able to deposit unregistered NFT ', async () => {
+    it('{tag:boba} should not be able to deposit unregistered NFT ', async () => {
       const L1ERC721Test = await Factory__L1ERC721.deploy('Test', 'TST')
       await L1ERC721Test.deployTransaction.wait()
 
@@ -237,13 +237,13 @@ describe('NFT Bridge Test', async () => {
       ).to.be.revertedWith("Can't Find L2 NFT Contract")
     })
 
-    it('should not be able to mint NFT on L2', async () => {
+    it('{tag:boba} should not be able to mint NFT on L2', async () => {
       await expect(
         L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID + 1)
       ).to.be.revertedWith('Only L2 Bridge can mint and burn')
     })
 
-    it('should not be able to burn NFT on L2', async () => {
+    it('{tag:boba} should not be able to burn NFT on L2', async () => {
       await expect(L2ERC721.burn(DUMMY_TOKEN_ID + 1)).to.be.revertedWith(
         'Only L2 Bridge can mint and burn'
       )
@@ -294,7 +294,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should exit NFT from L2', async () => {
+    it('{tag:boba} should exit NFT from L2', async () => {
       // mint nft
       const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
@@ -319,7 +319,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(L2Bridge.address)
     })
 
-    it('should be able to transfer NFT on L1', async () => {
+    it('{tag:boba} should be able to transfer NFT on L1', async () => {
       const transferTx = await L1ERC721.transferFrom(
         env.l1Wallet.address,
         env.l1Wallet_2.address,
@@ -343,7 +343,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL1Back).to.deep.eq(env.l1Wallet.address)
     })
 
-    it('should not be able to deposit non-owned NFT to L2', async () => {
+    it('{tag:boba} should not be able to deposit non-owned NFT to L2', async () => {
       await expect(
         L1Bridge.connect(env.l1Wallet_2).depositNFT(
           L1ERC721.address,
@@ -354,7 +354,7 @@ describe('NFT Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should deposit NFT to L2', async () => {
+    it('{tag:boba} should deposit NFT to L2', async () => {
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
@@ -376,7 +376,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
-    it('should exit NFT to another L1 wallet', async () => {
+    it('{tag:boba} should exit NFT to another L1 wallet', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
@@ -398,7 +398,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(L2Bridge.address)
     })
 
-    it('should deposit NFT to another L2 wallet', async () => {
+    it('{tag:boba} should deposit NFT to another L2 wallet', async () => {
       const approveTx = await L1ERC721.connect(env.l1Wallet_2).approve(
         L1Bridge.address,
         DUMMY_TOKEN_ID
@@ -424,7 +424,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
-    it('should not be able to withdraw unregistered NFT ', async () => {
+    it('{tag:boba} should not be able to withdraw unregistered NFT ', async () => {
       const L2ERC721Test = await Factory__L2ERC721.deploy('Test', 'TST')
       await L2ERC721Test.deployTransaction.wait()
 
@@ -458,13 +458,13 @@ describe('NFT Bridge Test', async () => {
       ).to.be.revertedWith("Can't Find L1 NFT Contract")
     })
 
-    it('should not be able to mint NFT on L1', async () => {
+    it('{tag:boba} should not be able to mint NFT on L1', async () => {
       await expect(
         L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID + 1)
       ).to.be.revertedWith('Only L1 Bridge can mint and burn')
     })
 
-    it('should not be able to burn NFT on L1', async () => {
+    it('{tag:boba} should not be able to burn NFT on L1', async () => {
       await expect(L1ERC721.burn(DUMMY_TOKEN_ID + 1)).to.be.revertedWith(
         'Only L1 Bridge can mint and burn'
       )
@@ -515,7 +515,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should pause and unpause L1 bridge', async () => {
+    it('{tag:boba} should pause and unpause L1 bridge', async () => {
       const mintTx = await L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
@@ -563,7 +563,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
-    it('should pause and unpause L2 bridge', async () => {
+    it('{tag:boba} should pause and unpause L2 bridge', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
@@ -608,7 +608,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL1).to.be.deep.eq(env.l2Wallet.address)
     })
 
-    it('should not allow to pause bridges for non-owner', async () => {
+    it('{tag:boba} should not allow to pause bridges for non-owner', async () => {
       await expect(L1Bridge.connect(env.l1Wallet_2).pause()).to.be.revertedWith(
         'Caller is not the owner'
       )
@@ -617,7 +617,7 @@ describe('NFT Bridge Test', async () => {
       )
     })
 
-    it('should not allow to unpause bridges for non-owner', async () => {
+    it('{tag:boba} should not allow to unpause bridges for non-owner', async () => {
       await expect(
         L1Bridge.connect(env.l1Wallet_2).unpause()
       ).to.be.revertedWith('Caller is not the owner')
@@ -671,7 +671,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should not allow updating extraGasRelay for non-owner', async () => {
+    it('{tag:boba} should not allow updating extraGasRelay for non-owner', async () => {
       const newExtraGasRelay = 500000
       await expect(
         L2Bridge.connect(env.l2Wallet_2).configureExtraGasRelay(
@@ -680,7 +680,7 @@ describe('NFT Bridge Test', async () => {
       ).to.be.revertedWith('Caller is not the gasPriceOracle owner')
     })
 
-    it('should allow updating extraGasRelay for owner', async () => {
+    it('{tag:boba} should allow updating extraGasRelay for owner', async () => {
       const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
@@ -703,7 +703,7 @@ describe('NFT Bridge Test', async () => {
       expect(updatedExtraGasRelay).to.eq(newExtraGasRelay)
     })
 
-    it('should be able to exit with the correct added gas', async () => {
+    it('{tag:boba} should be able to exit with the correct added gas', async () => {
       const extraGas = 1000000
 
       const resetGasTx = await L2Bridge.connect(

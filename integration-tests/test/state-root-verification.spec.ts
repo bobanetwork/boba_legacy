@@ -24,7 +24,7 @@ describe('Verify State Roots', async () => {
     ).attach(StateCommitmentChainAddress)
   })
 
-  it('State roots should match', async () => {
+  it('{tag:other} State roots should match', async () => {
     // get latest state root from SCC contract
     const blockInterval = 5000
     const l1BlockNumber = await env.l1Provider.getBlockNumber()

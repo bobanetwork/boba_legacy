@@ -64,7 +64,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_sendRawTransaction', () => {
-    it('should correctly process a valid transaction', async () => {
+    it('{tag:rpc} should correctly process a valid transaction', async () => {
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
       const nonce = await wallet.getTransactionCount()
@@ -77,7 +77,7 @@ describe('Basic RPC tests', () => {
       expect(result.data).to.equal(tx.data)
     })
 
-    it('should not accept a transaction with the wrong chain ID', async () => {
+    it('{tag:rpc} should not accept a transaction with the wrong chain ID', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         gasPrice: await gasPriceForL2(),
@@ -89,7 +89,7 @@ describe('Basic RPC tests', () => {
       ).to.be.rejectedWith('invalid transaction: invalid sender')
     })
 
-    it('should accept a transaction without a chain ID', async () => {
+    it('{tag:rpc} should accept a transaction without a chain ID', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         nonce: await wallet.getTransactionCount(),
@@ -104,7 +104,7 @@ describe('Basic RPC tests', () => {
       expect(v === 27 || v === 28).to.be.true
     })
 
-    it('should accept a transaction with a value', async () => {
+    it('{tag:rpc} should accept a transaction with a value', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         gasPrice: await gasPriceForL2(),
@@ -123,7 +123,7 @@ describe('Basic RPC tests', () => {
         .be.true
     })
 
-    it('should reject a transaction with higher value than user balance', async () => {
+    it('{tag:rpc} should reject a transaction with higher value than user balance', async () => {
       const balance = await env.l2Wallet.getBalance()
       const tx = {
         ...defaultTransactionFactory(),
@@ -138,7 +138,7 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('should correctly report OOG for contract creations', async () => {
+    it('{tag:rpc} should correctly report OOG for contract creations', async () => {
       const factory = await ethers.getContractFactory('TestOOGInConstructor')
 
       await expect(factory.connect(wallet).deploy()).to.be.rejectedWith(
@@ -148,7 +148,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_call', () => {
-    it('should correctly identify call out-of-gas', async () => {
+    it('{tag:rpc} should correctly identify call out-of-gas', async () => {
       await expect(
         provider.call({
           ...revertingTx,
@@ -157,21 +157,21 @@ describe('Basic RPC tests', () => {
       ).to.be.rejectedWith('out of gas')
     })
 
-    it('should correctly return solidity revert data from a call', async () => {
+    it('{tag:rpc} should correctly return solidity revert data from a call', async () => {
       await expect(provider.call(revertingTx)).to.be.revertedWith(revertMessage)
     })
 
-    it('should produce error when called from ethers', async () => {
+    it('{tag:rpc} should produce error when called from ethers', async () => {
       await expect(Reverter.doRevert()).to.be.revertedWith(revertMessage)
     })
 
-    it('should correctly return revert data from contract creation', async () => {
+    it('{tag:rpc} should correctly return revert data from contract creation', async () => {
       await expect(provider.call(revertingDeployTx)).to.be.revertedWith(
         revertMessage
       )
     })
 
-    it('should correctly identify contract creation out of gas', async () => {
+    it('{tag:rpc} should correctly identify contract creation out of gas', async () => {
       await expect(
         provider.call({
           ...revertingDeployTx,
@@ -180,7 +180,7 @@ describe('Basic RPC tests', () => {
       ).to.be.rejectedWith('out of gas')
     })
 
-    it('should allow eth_calls with nonzero value', async () => {
+    it('{tag:rpc} should allow eth_calls with nonzero value', async () => {
       // Deploy a contract to check msg.value of the call
       const Factory__ValueContext: ContractFactory =
         await ethers.getContractFactory('ValueContext', wallet)
@@ -206,7 +206,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_getTransactionReceipt', () => {
-    it('correctly exposes revert data for contract calls', async () => {
+    it('{tag:rpc} correctly exposes revert data for contract calls', async () => {
       const req: TransactionRequest = {
         ...revertingTx,
         gasLimit: 8_000_000, // override gas estimation
@@ -229,7 +229,7 @@ describe('Basic RPC tests', () => {
       expect(receipt.status).to.eq(0)
     })
 
-    it('correctly exposes revert data for contract creations', async () => {
+    it('{tag:rpc} correctly exposes revert data for contract creations', async () => {
       const req: TransactionRequest = {
         ...revertingDeployTx,
         gasLimit: 8_000_000, // override gas estimation
@@ -253,10 +253,10 @@ describe('Basic RPC tests', () => {
     })
 
     // Optimistic Ethereum special fields on the receipt
-    it('includes L1 gas price and L1 gas used', async () => {
+    it('{tag:rpc} includes L1 gas price and L1 gas used', async () => {
       const tx = await env.l2Wallet.populateTransaction({
         to: env.l2Wallet.address,
-        gasPrice: isLiveNetwork() ? 10000 : 1,
+        gasPrice: await gasPriceForL2(),
       })
 
       const raw = serialize({
@@ -279,7 +279,9 @@ describe('Basic RPC tests', () => {
       const res = await env.l2Wallet.sendTransaction(tx)
       await res.wait()
 
-      const json = await provider.send('eth_getTransactionReceipt', [res.hash])
+      const json = await env.l2Provider.send('eth_getTransactionReceipt', [
+        res.hash,
+      ])
 
       expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
       expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
@@ -289,7 +291,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_getTransactionByHash', () => {
-    it('should be able to get all relevant l1/l2 transaction data', async () => {
+    it('{tag:rpc} should be able to get all relevant l1/l2 transaction data', async () => {
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
       const result = await wallet.sendTransaction(tx)
@@ -303,7 +305,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_getBlockByHash', () => {
-    it('should return the block and all included transactions', async () => {
+    it('{tag:rpc} should return the block and all included transactions', async () => {
       // Send a transaction and wait for it to be mined.
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
@@ -332,7 +334,7 @@ describe('Basic RPC tests', () => {
     // Needs to be skipped on Prod networks because this test doesn't work when
     // other people are sending transactions to the Sequencer at the same time
     // as this test is running.
-    it('should return the same result when new transactions are not applied', async function () {
+    it('{tag:rpc} should return the same result when new transactions are not applied', async function () {
       if (isLiveNetwork()) {
         this.skip()
       }
@@ -361,7 +363,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_getBalance', () => {
-    it('should get the OVM_ETH balance', async () => {
+    it('{tag:rpc} should get the OVM_ETH balance', async () => {
       const rpcBalance = await provider.getBalance(env.l2Wallet.address)
       const contractBalance = await env.ovmEth.balanceOf(env.l2Wallet.address)
       expect(rpcBalance).to.be.deep.eq(contractBalance)
@@ -369,14 +371,14 @@ describe('Basic RPC tests', () => {
   })
 
   describe('eth_chainId', () => {
-    it('should get the correct chainid', async () => {
+    it('{tag:rpc} should get the correct chainid', async () => {
       const { chainId } = await provider.getNetwork()
       expect(chainId).to.be.eq(L2_CHAINID)
     })
   })
 
   describe('eth_estimateGas', () => {
-    it('gas estimation is deterministic', async () => {
+    it('{tag:rpc} gas estimation is deterministic', async () => {
       let lastEstimate: BigNumber
       for (let i = 0; i < 10; i++) {
         const estimate = await l2Provider.estimateGas({
@@ -392,7 +394,7 @@ describe('Basic RPC tests', () => {
       }
     })
 
-    it('should return a gas estimate for txs with empty data', async () => {
+    it('{tag:rpc} should return a gas estimate for txs with empty data', async () => {
       const estimate = await l2Provider.estimateGas({
         to: defaultTransactionFactory().to,
         value: 0,
@@ -401,19 +403,19 @@ describe('Basic RPC tests', () => {
       expectApprox(estimate, 21000, { percentUpperDeviation: 1 })
     })
 
-    it('should fail for a reverting call transaction', async () => {
+    it('{tag:rpc} should fail for a reverting call transaction', async () => {
       await expect(provider.send('eth_estimateGas', [revertingTx])).to.be
         .reverted
     })
 
-    it('should fail for a reverting deploy transaction', async () => {
+    it('{tag:rpc} should fail for a reverting deploy transaction', async () => {
       await expect(provider.send('eth_estimateGas', [revertingDeployTx])).to.be
         .reverted
     })
   })
 
   describe('debug_traceTransaction', () => {
-    it('should match debug_traceBlock', async () => {
+    it('{tag:rpc} should match debug_traceBlock', async () => {
       const storage = new ContractFactory(
         simpleStorageJson.abi,
         simpleStorageJson.bytecode,
@@ -433,7 +435,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('rollup_gasPrices', () => {
-    it('should return the L1 and L2 gas prices', async () => {
+    it('{tag:rpc} should return the L1 and L2 gas prices', async () => {
       const result = await provider.send('rollup_gasPrices', [])
       const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
       const l2GasPrice = await env.gasPriceOracle.gasPrice()
@@ -444,7 +446,7 @@ describe('Basic RPC tests', () => {
   })
 
   describe('Replica RPC forward test', () => {
-    it('should correctly process a valid transaction', async () => {
+    it('{tag:rpc} should correctly process a valid transaction', async () => {
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
       const nonce = await replicaWallet.getTransactionCount()
@@ -458,7 +460,7 @@ describe('Basic RPC tests', () => {
       expect(result.data).to.equal(tx.data)
     })
 
-    it('should not accept a transaction with the wrong chain ID', async () => {
+    it('{tag:rpc} should not accept a transaction with the wrong chain ID', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         gasPrice: await gasPriceForL2(),
@@ -472,7 +474,7 @@ describe('Basic RPC tests', () => {
       ).to.be.rejectedWith('invalid transaction: invalid sender')
     })
 
-    it('should accept a transaction without a chain ID', async () => {
+    it('{tag:rpc} should accept a transaction without a chain ID', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         nonce: await replicaWallet.getTransactionCount(),
@@ -488,7 +490,7 @@ describe('Basic RPC tests', () => {
       expect(v === 27 || v === 28).to.be.true
     })
 
-    it('should accept a transaction with a value', async () => {
+    it('{tag:rpc} should accept a transaction with a value', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         gasPrice: await gasPriceForL2(),
@@ -509,7 +511,7 @@ describe('Basic RPC tests', () => {
         .be.true
     })
 
-    it('should reject a transaction with higher value than user balance', async () => {
+    it('{tag:rpc} should reject a transaction with higher value than user balance', async () => {
       const balance = await replicaWallet.getBalance()
       const tx = {
         ...defaultTransactionFactory(),
@@ -524,7 +526,7 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('should correctly report OOG for contract creations', async () => {
+    it('{tag:rpc} should correctly report OOG for contract creations', async () => {
       const factory = await ethers.getContractFactory('TestOOGInConstructor')
 
       await expect(factory.connect(replicaWallet).deploy()).to.be.rejectedWith(
