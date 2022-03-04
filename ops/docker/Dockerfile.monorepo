@@ -15,7 +15,6 @@ ARG SOLC_PREFIX=https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/so
 ADD ${SOLC_PREFIX}-v0.4.11+commit.68ef5810 ./solc-v0.4.11+commit.68ef5810
 ADD ${SOLC_PREFIX}-v0.5.17+commit.d19bba13 ./solc-v0.5.17+commit.d19bba13
 ADD ${SOLC_PREFIX}-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.6c089d02
-ADD ${SOLC_PREFIX}-v0.8.8+commit.dddeac2f  ./solc-v0.8.8+commit.dddeac2f
 ADD ${SOLC_PREFIX}-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
 
 FROM node as builder
@@ -64,7 +63,6 @@ COPY ./integration-tests ./integration-tests
 COPY --from=downloader solc-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
 COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
 COPY --from=downloader solc-v0.6.6+commit.6c089d02  /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02
-COPY --from=downloader solc-v0.8.8+commit.dddeac2f  /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.8.8+commit.dddeac2f
 COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a
 
 # build it!
