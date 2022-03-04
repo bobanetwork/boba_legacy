@@ -42,7 +42,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
 
   const numTxs = 5
 
-  it('{tag:boba} enqueue: L1 contextual values are correctly set in L2', async () => {
+  it('{tag:other} enqueue: L1 contextual values are correctly set in L2', async () => {
     for (let i = 0; i < numTxs; i++) {
       // Send a transaction from L1 to L2. This will automatically update the L1 contextual
       // information like the L1 block number and L1 timestamp.
@@ -89,7 +89,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     }
   }).timeout(150000) // this specific test takes a while because it involves L1 to L2 txs
 
-  it('{tag:boba} should set correct OVM Context for `eth_call`', async () => {
+  it('{tag:other} should set correct OVM Context for `eth_call`', async () => {
     for (let i = 0; i < numTxs; i++) {
       // Make an empty transaction to bump the latest block number.
       const dummyTx = await env.l2Wallet.sendTransaction({
@@ -138,7 +138,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
    * OVM context.
    */
 
-  it('{tag:boba} should return same timestamp and blocknumbers between `eth_call` and `rollup_getInfo`', async () => {
+  it('{tag:other} should return same timestamp and blocknumbers between `eth_call` and `rollup_getInfo`', async () => {
     // As atomically as possible, call `rollup_getInfo` and OVMMulticall for the
     // blocknumber and timestamp. If this is not atomic, then the sequencer can
     // happend to update the timestamp between the `eth_call` and the `rollup_getInfo`

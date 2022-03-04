@@ -32,7 +32,7 @@ describe('Fee Payment Integration Tests', async () => {
     env = await OptimismEnv.new()
   })
 
-  it('{tag:boba} should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice', async () => {
+  it('{tag:other} should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice', async () => {
     const assertGasPrice = async () => {
       const gasPrice = await env.l2Wallet.getGasPrice()
       const oracleGasPrice = await env.gasPriceOracle.gasPrice()
@@ -47,7 +47,7 @@ describe('Fee Payment Integration Tests', async () => {
     assertGasPrice()
   })
 
-  it('{tag:boba} Paying a nonzero but acceptable gasPrice fee', async () => {
+  it('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -91,7 +91,7 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:boba} should compute correct fee', async () => {
+  it('{tag:other} should compute correct fee', async () => {
     await setPrices(env, 1000)
 
     const preBalance = await env.l2Wallet.getBalance()
@@ -136,11 +136,11 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:boba} should not be able to withdraw fees before the minimum is met', async () => {
+  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
     await expect(env.sequencerFeeVault.withdraw()).to.be.rejected
   })
 
-  it('{tag:boba} should be able to withdraw fees back to L1 once the minimum is met', async function () {
+  it('{tag:other} should be able to withdraw fees back to L1 once the minimum is met', async function () {
     const l1FeeWallet = await env.sequencerFeeVault.l1FeeWallet()
     const balanceBefore = await env.l1Wallet.provider.getBalance(l1FeeWallet)
     const withdrawalAmount = await env.sequencerFeeVault.MIN_WITHDRAWAL_AMOUNT()

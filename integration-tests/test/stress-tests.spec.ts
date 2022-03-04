@@ -74,7 +74,7 @@ describe('stress tests', () => {
   })
 
   describe('L1 => L2 stress tests', () => {
-    it(`{tag:boba} ${numTransactions} L1 => L2 transactions (serial)`, async () => {
+    it(`{tag:other} ${numTransactions} L1 => L2 transactions (serial)`, async () => {
       await executeRepeatedL1ToL2Transactions(env, wallets, {
         contract: L2SimpleStorage,
         functionName: 'setValue',
@@ -86,7 +86,7 @@ describe('stress tests', () => {
       )
     }).timeout(STRESS_TEST_TIMEOUT)
 
-    it(`{tag:boba} ${numTransactions} L1 => L2 transactions (parallel)`, async () => {
+    it(`{tag:other} ${numTransactions} L1 => L2 transactions (parallel)`, async () => {
       await executeL1ToL2TransactionsParallel(env, wallets, {
         contract: L2SimpleStorage,
         functionName: 'setValue',
@@ -100,7 +100,7 @@ describe('stress tests', () => {
   })
 
   describe('L2 => L1 stress tests', () => {
-    it(`{tag:boba} ${numTransactions} L2 => L1 transactions (serial)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 => L1 transactions (serial)`, async () => {
       await executeRepeatedL2ToL1Transactions(env, wallets, {
         contract: L1SimpleStorage,
         functionName: 'setValue',
@@ -112,7 +112,7 @@ describe('stress tests', () => {
       )
     }).timeout(STRESS_TEST_TIMEOUT)
 
-    it(`{tag:boba} ${numTransactions} L2 => L1 transactions (parallel)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 => L1 transactions (parallel)`, async () => {
       await executeL2ToL1TransactionsParallel(env, wallets, {
         contract: L1SimpleStorage,
         functionName: 'setValue',
@@ -126,7 +126,7 @@ describe('stress tests', () => {
   })
 
   describe('L2 transaction stress tests', () => {
-    it(`{tag:boba} ${numTransactions} L2 transactions (serial)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 transactions (serial)`, async () => {
       await executeRepeatedL2Transactions(env, wallets, {
         contract: L2SimpleStorage,
         functionName: 'setValueNotXDomain',
@@ -138,7 +138,7 @@ describe('stress tests', () => {
       )
     }).timeout(STRESS_TEST_TIMEOUT)
 
-    it(`{tag:boba} ${numTransactions} L2 transactions (parallel)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 transactions (parallel)`, async () => {
       await executeL2TransactionsParallel(env, wallets, {
         contract: L2SimpleStorage,
         functionName: 'setValueNotXDomain',
@@ -152,7 +152,7 @@ describe('stress tests', () => {
   })
 
   describe('C-C-C-Combo breakers', () => {
-    it(`{tag:boba} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (txs serial, suites parallel)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (txs serial, suites parallel)`, async () => {
       await Promise.all([
         executeRepeatedL1ToL2Transactions(env, wallets, {
           contract: L2SimpleStorage,
@@ -180,7 +180,7 @@ describe('stress tests', () => {
       )
     }).timeout(STRESS_TEST_TIMEOUT)
 
-    it(`{tag:boba} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`, async () => {
+    it(`{tag:other} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`, async () => {
       await Promise.all([
         executeL1ToL2TransactionsParallel(env, wallets, {
           contract: L2SimpleStorage,
@@ -211,7 +211,7 @@ describe('stress tests', () => {
 
   // These tests depend on an archive node due to the historical `eth_call`s
   describe('Monotonicity Checks', () => {
-    it('{tag:boba} should have monotonic timestamps and l1 blocknumbers', async () => {
+    it('{tag:other} should have monotonic timestamps and l1 blocknumbers', async () => {
       const tip = await env.l2Provider.getBlock('latest')
       const prev = {
         block: await env.l2Provider.getBlock(0),
