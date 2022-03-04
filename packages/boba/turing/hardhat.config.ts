@@ -17,7 +17,7 @@ const config: HardhatUserConfig = {
       accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
     boba_mainnet: {
-      url: 'http://3.238.204.142:8545',
+      url: 'http://mainnet.boba.network',
       accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
   },
