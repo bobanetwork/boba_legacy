@@ -100,6 +100,7 @@ contract BobaTuringCredit {
     public
     onlyOwner
   {
+    require(_newOwner != address(0));
     owner = _newOwner;
     emit TransferOwnership(msg.sender, _newOwner);
   }
