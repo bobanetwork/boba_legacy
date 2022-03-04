@@ -57,7 +57,7 @@ describe('Self Destruct Tests', async () => {
       })
     })
 
-    it('{tag:other} should send funds to the contract', async () => {
+    it('{tag:boba} should send funds to the contract', async () => {
       balanceSelfDestructContractPre = await env.l2Provider.getBalance(
         SelfDestructTest.address
       )
@@ -72,7 +72,7 @@ describe('Self Destruct Tests', async () => {
         await SelfDestructTest.suicideMethod(env.l2Wallet_2.address)
       })
 
-      it('{tag:other} should send all contract funds to receiver', async () => {
+      it('{tag:boba} should send all contract funds to receiver', async () => {
         balanceSelfDestructContractPost = await env.l2Provider.getBalance(
           SelfDestructTest.address
         )
@@ -91,7 +91,7 @@ describe('Self Destruct Tests', async () => {
           await Create2Deployer.deploy()
         })
 
-        it('{tag:other} should not have funds to send', async () => {
+        it('{tag:boba} should not have funds to send', async () => {
           const SelfDestructTestAddressReCreated = await Create2Deployer.t()
           expect(SelfDestructTestAddressReCreated).to.be.eq(
             SelfDestructTestAddress

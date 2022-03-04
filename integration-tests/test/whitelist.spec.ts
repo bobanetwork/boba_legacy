@@ -25,7 +25,7 @@ describe('Whitelist', async () => {
   })
 
   describe('when the whitelist is disabled', () => {
-    it('{tag:other} should be able to deploy a contract', async () => {
+    it('{tag:boba} should be able to deploy a contract', async () => {
       await expect(
         l2Provider.send('eth_call', [
           Factory__ERC20.getDeployTransaction(
@@ -51,7 +51,7 @@ describe('Whitelist', async () => {
   describe('when the whitelist is enabled', () => {
     const sender = '0x' + '22'.repeat(20)
 
-    it('{tag:other} should fail if the user is not whitelisted', async () => {
+    it('{tag:boba} should fail if the user is not whitelisted', async () => {
       await expect(
         l2Provider.send('eth_call', [
           {
@@ -78,7 +78,7 @@ describe('Whitelist', async () => {
       ).to.be.revertedWith(`deployer address not whitelisted: ${sender}`)
     })
 
-    it('{tag:other} should succeed if the user is whitelisted', async () => {
+    it('{tag:boba} should succeed if the user is whitelisted', async () => {
       await expect(
         l2Provider.send('eth_call', [
           {

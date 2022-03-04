@@ -53,7 +53,7 @@ describe('Native ETH Integration Tests', async () => {
   })
 
   describe('estimateGas', () => {
-    it('{tag:other} Should estimate gas for ETH withdraw', async () => {
+    it('{tag:boba} Should estimate gas for ETH withdraw', async () => {
       const amount = utils.parseEther('0.0000001')
       const gas = await env.l2Bridge.estimateGas.withdraw(
         predeploys.OVM_ETH,
@@ -66,7 +66,7 @@ describe('Native ETH Integration Tests', async () => {
     })
   })
 
-  it('{tag:other} receive', async () => {
+  it('{tag:boba} receive', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     const { tx, receipt } = await env.waitForXDomainTransaction(
@@ -92,7 +92,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositETH', async () => {
+  it('{tag:boba} depositETH', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     const { tx, receipt } = await env.waitForXDomainTransaction(
@@ -117,7 +117,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositETHTo', async () => {
+  it('{tag:boba} depositETHTo', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     const depositReceipts = await env.waitForXDomainTransaction(
@@ -143,7 +143,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} deposit passes with a large data argument', async () => {
+  it('{tag:boba} deposit passes with a large data argument', async () => {
     const ASSUMED_L2_GAS_LIMIT = 8_000_000
     const depositAmount = 10
     const preBalances = await getBalances(env)
@@ -172,7 +172,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositETH fails with a TOO large data argument', async () => {
+  it('{tag:boba} depositETH fails with a TOO large data argument', async () => {
     const depositAmount = 10
 
     const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE + 1)
@@ -183,7 +183,7 @@ describe('Native ETH Integration Tests', async () => {
     ).to.be.reverted
   })
 
-  it('{tag:other} withdraw', async function () {
+  it('{tag:boba} withdraw', async function () {
     await useDynamicTimeoutForWithdrawals(this, env)
 
     const withdrawAmount = BigNumber.from(3)
@@ -227,7 +227,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} withdrawTo', async function () {
+  it('{tag:boba} withdrawTo', async function () {
     await useDynamicTimeoutForWithdrawals(this, env)
 
     const withdrawAmount = BigNumber.from(3)
@@ -284,7 +284,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} deposit, transfer, withdraw', async function () {
+  it('{tag:boba} deposit, transfer, withdraw', async function () {
     await useDynamicTimeoutForWithdrawals(this, env)
 
     // 1. deposit

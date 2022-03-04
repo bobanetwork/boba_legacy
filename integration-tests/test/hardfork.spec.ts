@@ -46,7 +46,7 @@ describe('Hard forks', () => {
   describe('Berlin', () => {
     // https://eips.ethereum.org/EIPS/eip-2929
     describe('EIP-2929', () => {
-      it('{tag:other} should update the gas schedule', async () => {
+      it('{tag:boba} should update the gas schedule', async () => {
         // Get the tip height
         const tip = await env.l2Provider.getBlock('latest')
 
@@ -81,7 +81,7 @@ describe('Hard forks', () => {
 
     // https://eips.ethereum.org/EIPS/eip-2565
     describe('EIP-2565', async () => {
-      it('{tag:other} should become cheaper', async () => {
+      it('{tag:boba} should become cheaper', async () => {
         const tip = await env.l2Provider.getBlock('latest')
 
         const tx = await Precompiles.expmod(64, 1, 64, { gasLimit: 5_000_000 })
@@ -111,7 +111,7 @@ describe('Hard forks', () => {
       const bytes32Zero = '0x' + '00'.repeat(32)
       const bytes32NonZero = '0x' + 'ff'.repeat(32)
 
-      it('{tag:other} should lower the refund for storage clear', async () => {
+      it('{tag:boba} should lower the refund for storage clear', async () => {
         const tip = await env.l2Provider.getBlock('latest')
 
         const value = await SelfDestruction.callStatic.data()
@@ -183,7 +183,7 @@ describe('Hard forks', () => {
         }
       })
 
-      it('{tag:other} should remove the refund for selfdestruct', async () => {
+      it('{tag:boba} should remove the refund for selfdestruct', async () => {
         const tip = await env.l2Provider.getBlock('latest')
 
         // Send transaction with a large gas limit
