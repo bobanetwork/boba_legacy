@@ -109,7 +109,7 @@ function TokenList({
               {enabled && chain === 'L1' &&
                 <>
                   <Button
-                    onClick={() => { this.handleModalClick('depositModal', token, false) }}
+                    onClick={() => { handleModalClick('depositModal', token, false) }}
                     color='neutral'
                     variant="outlined"
                     disabled={disabled}
@@ -120,7 +120,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('depositModal', token, true) }}
+                    onClick={() => { handleModalClick('depositModal', token, true) }}
                     color='primary'
                     disabled={disabled}
                     variant="contained"
@@ -135,7 +135,7 @@ function TokenList({
               {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
                 <>
                   <Button
-                    onClick={() => { this.handleModalClick('exitModal', token, false) }}
+                    onClick={() => { handleModalClick('exitModal', token, false) }}
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
@@ -145,7 +145,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('exitModal', token, true) }}
+                    onClick={() => { handleModalClick('exitModal', token, true) }}
                     variant="outlined"
                     disabled={disabled}
                     tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
@@ -155,7 +155,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('transferModal', token, false) }}
+                    onClick={() => { handleModalClick('transferModal', token, false) }}
                     variant="contained"
                     color="primary"
                     disabled={disabled}
@@ -179,7 +179,7 @@ function TokenList({
                     CELER BRIDGE
                   </Link>
                   <Button
-                    onClick={() => { this.handleModalClick('transferModal', token, false) }}
+                    onClick={() => { handleModalClick('transferModal', token, false) }}
                     variant="contained"
                     color="primary"
                     disabled={disabled}
