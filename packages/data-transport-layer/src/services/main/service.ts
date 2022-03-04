@@ -44,6 +44,8 @@ export interface L1DataTransportServiceOptions {
   l1StartHeight?: number
   bssHardfork1Index?: number
   ctcDeploymentHeight?: number
+  turing_v0_height?: number
+  turing_v1_height?: number
 }
 
 const optionSettings = {

@@ -412,7 +412,9 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
           const parsedEvent = await handlers.parseEvent(
             event,
             extraData,
-            this.options.l2ChainId
+            this.options.l2ChainId,
+            this.options.turing_v0_height,
+            this.options.turing_v1_height
           )
           await handlers.storeEvent(parsedEvent, this.state.db)
         }

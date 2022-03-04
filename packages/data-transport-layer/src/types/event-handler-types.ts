@@ -19,7 +19,13 @@ export type ParseEventHandler<
   TEvent extends TypedEvent,
   TExtraData,
   TParsedEvent
-> = (event: TEvent, extraData: TExtraData, l2ChainId: number) => TParsedEvent
+> = (
+  event: TEvent,
+  extraData: TExtraData,
+  l2ChainId: number,
+  turing_v0_height: number,
+  turing_v1_height: number
+) => TParsedEvent
 
 export type StoreEventHandler<TParsedEvent> = (
   parsedEvent: TParsedEvent,

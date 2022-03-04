@@ -220,6 +220,9 @@ services:
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
       RETRIES: 200
+      # if no need to support Turing v0 set height of v0 = v1
+      DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
+      DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081

@@ -54,6 +54,8 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
       sentryTraceRate: config.ufloat('sentry-trace-rate', 0.05),
       bssHardfork1Index: config.uint('bss-hardfork-1-index', null),
       ctcDeploymentHeight: config.uint('eth1-ctc-deployment-height') || 0,
+      turing_v0_height: config.uint('turing-v0-height') || 0,
+      turing_v1_height: config.uint('turing-v1-height') || 0,
     })
 
     const stop = async (signal) => {

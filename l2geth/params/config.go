@@ -240,7 +240,7 @@ var (
 	OpRinkebySDUpdateForkNum = big.NewInt(0)
 
 	// BobaMainnetGasUpdatedForkNum is the height at which the gas update fork activates on Mainnet.
-	BobaMainnetGasUpdatedForkNum = big.NewInt(385000)
+	BobaMainnetGasUpdatedForkNum = big.NewInt(400000)
 
 	// BobaRinkebyGasUpdatedForkNum is the height at which the gas update fork activates on Rinkeby.
 	BobaRinkebyGasUpdatedForkNum = big.NewInt(0)
