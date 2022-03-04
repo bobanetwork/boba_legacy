@@ -48,7 +48,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L2 => L1', () => {
-    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async function () {
+    it('{tag:boba} should be able to perform a withdrawal from L2 -> L1', async function () {
       await useDynamicTimeoutForWithdrawals(this, env)
 
       const value = `0x${'77'.repeat(32)}`
@@ -75,7 +75,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L1 => L2', () => {
-    it('{tag:other} should deposit from L1 -> L2', async () => {
+    it('{tag:boba} should deposit from L1 -> L2', async () => {
       const value = `0x${'42'.repeat(32)}`
 
       // Send L1 -> L2 message.
@@ -97,7 +97,7 @@ describe('Basic L1<>L2 Communication', async () => {
       expect((await L2SimpleStorage.totalCount()).toNumber()).to.equal(1)
     })
 
-    it('{tag:other} should have a receipt with a status of 1 for a successful message', async () => {
+    it('{tag:boba} should have a receipt with a status of 1 for a successful message', async () => {
       const value = `0x${'42'.repeat(32)}`
 
       // Send L1 -> L2 message.

@@ -209,65 +209,80 @@ const deployFn: DeployFunction = async (hre) => {
     [[]]
   )
 
-  const initiateTx = await Timelock.queueTransaction(
-    GovernorBravoDelegator.address,
-    0,
-    '_initiate()',
-    initiateData,
-    eta2
-  )
+  // currently fails with
+  // "error": "ERROR processing /opt/optimism/packages/boba/contracts/deploy/013-BobaDao.deploy.ts:\n
+  // Error: transaction failed (transactionHash=\"0xc34a9170256522952a71549aea8f1d642e9c39f05b35d3ec6959f00b359a5067\", 
+  // transaction={\"nonce\":63,\"gasPrice\":{\"type\":\"BigNumber\",\"hex\":\"0x3b9aca00\"},\"gasLimit\":
+  // {\"type\":\"BigNumber\",\"hex\":\"0xda50\"},\"to\":\"0xFD471836031dc5108809D173A067e8486B9047A3\",\"value\":{\"type\":\"
+  // BigNumber\",\"hex\":\"0x00\"},\"
+  // data\":\"0x3a66f9010000000000000000000000001429859428c0abc9c2c47c8ee9fbaf82cfa0f20f000000000000000000000000000000000000000000000000000000000000000000000000000000
+  // 000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000
+  // 00000000062217180000000000000000000000000000000000000000000000000000000000000000b5f696e69746961746528290000000000000000000000000000000000000000000000000000000000
+  //000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000
+  // 00000000000000\",\"chainId\":31338,\"v\":62711,\"r\":\"0x02d0abd9819598fd9c92fab284a4868860b81ba1fa2703e25049dc74a635d045\",\"s\":\"0x619490b70938c47195a48af2cfd
+  // 79c27265914c4e97cc69e90329e0b3b8d56d5\",\"from\":\"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\",\"hash\":\"0xc34a9170256522952a71549aea8f1d642e9c39f05b35d3ec6959
+  // f00b359a5067\",\"type\":null,\"confirmations\":0}, receipt={\"to\":\"0xFD471836031dc5108809D173A067e8486B9047A3\",\"from\":\"0xf39Fd6e51aad88F6F4ce6aB8827279cffF
+  // b92266\",\"contractAddress\":null,\"transactionIndex\":0,\"gasUsed\":
 
-  await initiateTx.wait()
+  // const initiateTx = await Timelock.queueTransaction(
+  //   GovernorBravoDelegator.address,
+  //   0,
+  //   '_initiate()',
+  //   initiateData,
+  //   eta2
+  // )
 
-  console.log('Queued Initiate!')
-  console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
-  console.log(`Time at which transaction can be executed: ${eta2}`)
+  // await initiateTx.wait()
 
-  // if it's local/rinkeby attempt to execute transactions
-  if (process.env.NETWORK !== 'mainnet') {
-    console.log('Execute setPendingAdmin...')
-    // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
-    await Timelock.executeTransaction(
-      Timelock.address,
-      0,
-      'setPendingAdmin(address)', // the function to be called
-      setPendingAdminData,
-      eta1
-    )
-    console.log('Executed setPendingAdmin!')
+  // console.log('Queued Initiate!')
+  // console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
+  // console.log(`Time at which transaction can be executed: ${eta2}`)
 
-    console.log('Execute initiate...')
+  // // if it's local/rinkeby attempt to execute transactions
+  // if (process.env.NETWORK !== 'mainnet') {
+  //   console.log('Execute setPendingAdmin...')
+  //   // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
+  //   await Timelock.executeTransaction(
+  //     Timelock.address,
+  //     0,
+  //     'setPendingAdmin(address)', // the function to be called
+  //     setPendingAdminData,
+  //     eta1
+  //   )
+  //   console.log('Executed setPendingAdmin!')
 
-    await Timelock.executeTransaction(
-      GovernorBravoDelegator.address,
-      0,
-      '_initiate()',
-      initiateData,
-      eta2
-    )
-    console.log('Executed initiate, acceptAdmin() completed')
-  } else {
-    // TODO - replace with a script that can be called on ETA instead
-    console.log(
-      '\nPlease copy these values and call executeTransaction() on Timelock twice'
-    )
-    console.log(
-      'from the deployer account in the following sequence with the below parameters'
-    )
-    console.log('when the ETA is reached')
-    console.log('---------------------------')
-    console.log('target :', Timelock.address)
-    console.log('value :', 0)
-    console.log('signature : setPendingAdmin(address)')
-    console.log('data :', setPendingAdminData)
-    console.log('eta :', eta1)
-    console.log('---------------------------')
-    console.log('target :', GovernorBravoDelegator.address)
-    console.log('value :', 0)
-    console.log('signature : _initiate()')
-    console.log('data :', initiateData)
-    console.log('eta :', eta2)
-  }
+  //   console.log('Execute initiate...')
+
+  //   await Timelock.executeTransaction(
+  //     GovernorBravoDelegator.address,
+  //     0,
+  //     '_initiate()',
+  //     initiateData,
+  //     eta2
+  //   )
+  //   console.log('Executed initiate, acceptAdmin() completed')
+  // } else {
+  //   // TODO - replace with a script that can be called on ETA instead
+  //   console.log(
+  //     '\nPlease copy these values and call executeTransaction() on Timelock twice'
+  //   )
+  //   console.log(
+  //     'from the deployer account in the following sequence with the below parameters'
+  //   )
+  //   console.log('when the ETA is reached')
+  //   console.log('---------------------------')
+  //   console.log('target :', Timelock.address)
+  //   console.log('value :', 0)
+  //   console.log('signature : setPendingAdmin(address)')
+  //   console.log('data :', setPendingAdminData)
+  //   console.log('eta :', eta1)
+  //   console.log('---------------------------')
+  //   console.log('target :', GovernorBravoDelegator.address)
+  //   console.log('value :', 0)
+  //   console.log('signature : _initiate()')
+  //   console.log('data :', initiateData)
+  //   console.log('eta :', eta2)
+  // }
 }
 
 deployFn.tags = ['DAO', 'BOBA']
