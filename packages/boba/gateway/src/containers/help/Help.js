@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Grid, Link, Typography } from '@mui/material'
 import * as S from './Help.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
+
 class Help extends React.Component {
 
   render() {

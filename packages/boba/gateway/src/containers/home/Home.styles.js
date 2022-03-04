@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { styled } from '@mui/material/styles'
 
-export const HelpPageContainer = styled(Box)(({ theme }) => ({
+export const HomePageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
   display: 'flex',
   flexDirection: 'column',
@@ -21,4 +21,4 @@ export const HelpPageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
-}))
+}));
