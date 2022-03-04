@@ -62,7 +62,10 @@ contract BobaTuringCredit {
   }
 
   modifier onlyOwner() {
-    require(msg.sender == owner || owner == address(0), 'caller is not the owner');
+    require(
+      msg.sender == owner || owner == address(0),
+      'caller is not the owner'
+    );
     _;
   }
 
@@ -96,10 +99,7 @@ contract BobaTuringCredit {
    *
    * @param _newOwner new owner address
    */
-  function transferOwnership(address _newOwner)
-    public
-    onlyOwner
-  {
+  function transferOwnership(address _newOwner) public onlyOwner {
     require(_newOwner != address(0));
     owner = _newOwner;
     emit TransferOwnership(msg.sender, _newOwner);
