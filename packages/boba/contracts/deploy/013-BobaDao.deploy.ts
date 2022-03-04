@@ -159,18 +159,18 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   // set Dao in L2LP
-  const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
-    'Proxy__L2LiquidityPool'
-  )
+  // const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
+  //   'Proxy__L2LiquidityPool'
+  // )
 
-  Proxy__L2LiquidityPool = new Contract(
-    Proxy__L2LiquidityPoolDeployment.address,
-    L2LiquidityPoolJson.abi,
-    (hre as any).deployConfig.deployer_l2
-  )
+  // Proxy__L2LiquidityPool = new Contract(
+  //   Proxy__L2LiquidityPoolDeployment.address,
+  //   L2LiquidityPoolJson.abi,
+  //   (hre as any).deployConfig.deployer_l2
+  // )
 
-  await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
-  console.log(`LP Dao role transferred to Timelock`)
+  // await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
+  // console.log(`LP Dao role transferred to Timelock`)
 
   // set admin Timelock
   console.log('Queue setPendingAdmin...')

@@ -1156,7 +1156,7 @@ describe('Liquidity Pool Test', async () => {
       await env.waitForXDomainTransactionFast(
         L2LiquidityPool.configureFeeExits(
           initialUserRewardMinFeeRate.add(10),
-          initialUserRewardMaxFeeRate.add(10),
+          initialUserRewardMaxFeeRate,
           initialOwnerRewardFeeRate.add(10)
         ),
         Direction.L2ToL1
@@ -1173,7 +1173,7 @@ describe('Liquidity Pool Test', async () => {
         initialUserRewardMinFeeRate.add(10)
       )
       expect(updatedUserRewardMaxFeeRate).to.deep.eq(
-        initialUserRewardMaxFeeRate.add(10)
+        initialUserRewardMaxFeeRate
       )
       expect(updatedOwnerRewardFeeRate).to.deep.eq(
         initialOwnerRewardFeeRate.add(10)
