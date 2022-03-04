@@ -31,7 +31,7 @@ $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFT_monster.ts`), specify your private key:
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFT_monster.ts.bak`), specify your private key:
 
 ```javascript
 
@@ -39,20 +39,20 @@ const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC16
 const testPrivateKey = '0x____' // your private key here....
 const testWallet = new Wallet(testPrivateKey, local_provider)
 
-``` 
+```
 
 You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed. 
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed.
 
 ## Deploying the Turing Monster NFT
 
 Run
 
 ```bash
-$ cd boba_community/turing-monsters 
+$ cd boba_community/turing-monsters
 $ yarn build
 $ yarn test:rinkeby
 ```
@@ -80,7 +80,7 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract and the `uint256 turingRAND = myHelper.TuringRandom();` of course.
 
 ```javascript
-    
+
     function mint(address to, uint256 tokenId) public {
       uint256 turingRAND = myHelper.TuringRandom(); // Get the random number
       _mint(to, tokenId);
@@ -106,7 +106,7 @@ The ERC721 contract is largely standard, except for needing to provide the addre
           colorEye = "54B948";
         }
   ...
-      
+
         part[0] = "<svg x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'><style type='text/css'>.st0{fill:#";
   ...
         return string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], part[3]));

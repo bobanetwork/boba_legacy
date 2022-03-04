@@ -1,59 +1,26 @@
-//SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol";
+import "./ITuringHelper.sol";
 
-interface Helper {
-    function TuringRandom() external returns (uint256);
-}
+/// @author 1001.digital
+/// @title Handle NFT Metadata stored on IPFS
+abstract contract WithOnChainMetaData is ERC721 {
 
-/**
- * @title ERC721Mock
- * This mock just provides basic functions for test purposes
- */
-contract ERC721min is ERC721 {
-
-    event MintedRandom(uint256);
-    //event ColorCreate(uint8, uint8, uint8);
+    ITuringHelper public turingHelper;
 
     // Optional mapping for token URIs
     mapping(uint256 => uint256) private _tokenURIs;
 
-    address public helperAddr;
-    Helper myHelper;
-
-    constructor(
-        string memory name,
-        string memory symbol,
-        address _helper) ERC721(name, symbol) {
-        helperAddr = _helper;
-        myHelper = Helper(helperAddr);
-    }
-
-    function baseURI() public view returns (string memory) {
-        return _baseURI();
-    }
-
-    function exists(uint256 tokenId) public view returns (bool) {
-        return _exists(tokenId);
-    }
-
-    function mint(address to, uint256 tokenId) public {
-        uint256 turingRAND = myHelper.TuringRandom();
-        emit MintedRandom(turingRAND);
-        _mint(to, tokenId);
-        _setTokenURI(tokenId, turingRAND);
-    }
-
-    function _setTokenURI(uint256 tokenId, uint256 _tokenURI) internal virtual {
-        require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
-        _tokenURIs[tokenId] = _tokenURI;
+    constructor(address _turingHelperAddress) {
+        turingHelper = ITuringHelper(_turingHelperAddress);
     }
 
     function getSVG(uint tokenId) private view returns (string memory) {
-
         require(_exists(tokenId), "ERC721getSVG: URI get of nonexistent token");
 
         uint256 genome = _tokenURIs[tokenId];
@@ -97,22 +64,22 @@ contract ERC721min is ERC721 {
         return string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4]));
     }
 
-    function tokenURI(uint256 tokenId) override public view returns (string memory) {
-        string memory svgData = getSVG(tokenId);
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        string memory svgData = getSVG(tokenId); // non-existent token check integrated
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "TuringMonster", "description": "BooooHoooo", "image_data": "', bytes(svgData), '"}'))));
         return string(abi.encodePacked('data:application/json;base64,', json));
     }
 
-    function safeMint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
+    function baseURI() public view returns (string memory) {
+        return _baseURI();
     }
 
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
-        _safeMint(to, tokenId, _data);
+    function exists(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
     }
 
+    function _setTokenURI(uint256 tokenId_, uint256 tokenURI_) internal virtual {
+        require(_exists(tokenId_), "ERC721URIStorage: URI set of nonexistent token");
+        _tokenURIs[tokenId_] = tokenURI_;
+    }
 }

@@ -5,7 +5,6 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 const abiDecoder = require('web3-eth-abi')
-import * as request from 'request-promise-native'
 
 const fetch = require('node-fetch')
 import hre from 'hardhat'
@@ -35,13 +34,13 @@ const testWallet = new Wallet(testPrivateKey, local_provider)
 describe("Turing NFT Random 256", function () {
 
   before(async () => {
-    
+
     // Deploy your Turing Helper
     Factory__Helper = new ContractFactory(
       (TuringHelperJson.abi),
       (TuringHelperJson.bytecode),
       testWallet)
-    
+
     helper = await Factory__Helper.deploy()
     console.log("    Turing Helper contract deployed at", helper.address)
 
@@ -50,11 +49,11 @@ describe("Turing NFT Random 256", function () {
       (ERC721Json.abi),
       (ERC721Json.bytecode),
       testWallet)
-    
+
     erc721 = await Factory__ERC721.deploy(
       "TuringMonster",
       "BOO",
-      helper.address, 
+      helper.address,
       gasOverride)
 
     console.log("    ERC721 contract deployed at", erc721.address)
