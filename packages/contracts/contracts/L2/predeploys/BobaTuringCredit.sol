@@ -19,10 +19,10 @@ contract BobaTuringCredit {
   /**********************
    * Contract Variables *
    **********************/
+  address public owner;
 
   mapping(address => uint256) public prepaidBalance;
 
-  address public owner;
   address public turingToken;
   uint256 public turingPrice;
   uint256 public ownerRevenue;
