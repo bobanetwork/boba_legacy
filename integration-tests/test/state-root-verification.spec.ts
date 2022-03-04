@@ -86,8 +86,8 @@ export const pullForBlock = async (env, l2BlockNumber) => {
       [utils.hexValue(l2BlockNumber), true]
     )
     if (
-      l2VerifierBlockReceipt.stateRoot !== null &&
-      l2ReplicaBlockReceipt.stateRoot !== null
+      l2VerifierBlockReceipt !== null &&
+      l2ReplicaBlockReceipt !== null
     ) {
       return [l2VerifierBlockReceipt, l2ReplicaBlockReceipt]
     }
