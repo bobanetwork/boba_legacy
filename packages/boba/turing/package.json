@@ -12,7 +12,8 @@
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
     "test:boba": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test"
+    "test:rinkeby": "hardhat --network boba_rinkeby test",
+    "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {
     "@ethersproject/address": "^5.0.11",
