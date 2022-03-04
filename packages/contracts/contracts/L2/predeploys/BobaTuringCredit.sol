@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
 
 /* Interface */
@@ -13,13 +12,14 @@ import '@boba/turing-hybrid-compute/contracts/ITuringHelper.sol';
  * @title BobaTuringCredit
  * @dev The credit system for Boba Turing
  */
-contract BobaTuringCredit is Ownable {
+contract BobaTuringCredit {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
   /**********************
    * Contract Variables *
    **********************/
+  address public owner;
 
   mapping(address => uint256) public prepaidBalance;
 
@@ -30,6 +30,8 @@ contract BobaTuringCredit is Ownable {
   /********************
    *      Events      *
    ********************/
+
+  event TransferOwnership(address oldOwner, address newOwner);
 
   event AddBalanceTo(
     address sender,
@@ -59,6 +61,11 @@ contract BobaTuringCredit is Ownable {
     _;
   }
 
+  modifier onlyOwner() {
+    require(msg.sender == owner || owner == address(0), 'caller is not the owner');
+    _;
+  }
+
   /********************
    *    Constructor   *
    ********************/
@@ -82,6 +89,20 @@ contract BobaTuringCredit is Ownable {
     onlyNotInitialized
   {
     turingToken = _turingToken;
+  }
+
+  /**
+   * @dev transfer ownership
+   *
+   * @param _newOwner new owner address
+   */
+  function transferOwnership(address _newOwner)
+    public
+    onlyOwner
+  {
+    require(_newOwner != address(0));
+    owner = _newOwner;
+    emit TransferOwnership(msg.sender, _newOwner);
   }
 
   /**
@@ -150,6 +171,6 @@ contract BobaTuringCredit is Ownable {
 
     emit WithdrawRevenue(msg.sender, _withdrawAmount);
 
-    IERC20(turingToken).safeTransfer(owner(), _withdrawAmount);
+    IERC20(turingToken).safeTransfer(owner, _withdrawAmount);
   }
 }
