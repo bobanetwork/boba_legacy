@@ -8,10 +8,53 @@ import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 
-const PageFooter = () => {
+const PageFooter = ({maintenance}) => {
   
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   
+  if(maintenance) {
+    return (
+    <S.Wrapper>
+      <S.ContentWrapper>
+        <S.FooterLogoWrapper>
+          <img
+            src={BobaLogo}
+            alt="boba logo"
+          />
+        </S.FooterLogoWrapper>
+      </S.ContentWrapper>
+      <S.FooterDivider />
+      <S.FooterLinkWrapper>
+        <S.LinkWrapper>
+          <S.FooterLink
+            href="https://docs.boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap'}}
+          >Boba Docs</S.FooterLink>
+        </S.LinkWrapper>
+        <S.FooterDividerMobile />
+        <S.SocialWrapper>
+          <IconButton href="https://boba.eco/twitter" target='_blank' aria-label="twitter">
+            <Twitter sx={{opacity: 0.65}} />
+          </IconButton>
+          <IconButton href="https://boba.eco/discord" target='_blank' aria-label="discord">
+            <DiscordIcon />
+          </IconButton>
+          <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
+            <Telegram sx={{opacity: 0.65}} />
+          </IconButton>
+          <S.FooterLink
+            href="https://boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap'}}
+          >Boba Websites</S.FooterLink>
+        </S.SocialWrapper>
+      </S.FooterLinkWrapper>
+    </S.Wrapper>
+    )
+  }
   return (
     <S.Wrapper>
       <S.ContentWrapper>
@@ -23,7 +66,7 @@ const PageFooter = () => {
         </S.FooterLogoWrapper>
         <GasSwitcher />
       </S.ContentWrapper>
-      <S.FooterDivier />
+      <S.FooterDivider />
       <S.FooterLinkWrapper>
         <S.LinkWrapper>
           <S.FooterLink
@@ -54,7 +97,7 @@ const PageFooter = () => {
             sx={{ whiteSpace: 'nowrap'}}
           >Boba Docs</S.FooterLink>
         </S.LinkWrapper>
-        <S.FooterDivierMobile />
+        <S.FooterDividerMobile />
         <S.SocialWrapper>
           <IconButton href="https://boba.eco/twitter" target='_blank' aria-label="twitter">
             <Twitter sx={{opacity: 0.65}} />
