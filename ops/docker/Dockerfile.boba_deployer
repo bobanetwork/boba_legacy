@@ -43,6 +43,7 @@ COPY --from=builder /optimism/packages/boba/contracts/artifacts ./artifacts
 COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/
 COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/
 COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a /root/.cache/hardhat-nodejs/compilers/linux-amd64/
+COPY --from=builder /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 /root/.cache/hardhat-nodejs/compilers/linux-amd64/
 
 # get static artifacts from the host
 COPY packages/boba/contracts/bin ./bin
