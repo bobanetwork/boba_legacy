@@ -299,7 +299,7 @@ describe('Dao Action Test', async () => {
       expect(prexBobaAmount).to.deep.equal(postBobaAmount.sub(depositAmount))
     })
 
-    it('{tag:boba} should delegate voting rights', async () => {
+    it('{tag:other} should delegate voting rights', async () => {
       const delegateTx = await xBoba.delegate(env.l2Wallet.address)
       await delegateTx.wait()
       const updatedDelegate = await xBoba.delegates(env.l2Wallet.address)
@@ -320,7 +320,7 @@ describe('Dao Action Test', async () => {
       initialL2LPOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
     })
 
-    it('{tag:boba} should delegate voting rights', async () => {
+    it('{tag:other} should delegate voting rights', async () => {
       const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
       await delegateTx.wait()
       const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
@@ -330,7 +330,7 @@ describe('Dao Action Test', async () => {
       expect(currentVotes).to.eq(L2BobaBalance)
     })
 
-    it('{tag:boba} should create a new proposal to configure fee', async () => {
+    it('{tag:other} should create a new proposal to configure fee', async () => {
       try {
         const priorProposalID = (await Governor.proposalCount())._hex
         console.log(priorProposalID.toString())
@@ -395,7 +395,7 @@ describe('Dao Action Test', async () => {
       }
     })
 
-    it('{tag:boba} should cast vote to the proposal and wait for voting period to end', async () => {
+    it('{tag:other} should cast vote to the proposal and wait for voting period to end', async () => {
       try {
         // get current voting delay from contract
         const votingDelay = (await Governor.votingDelay()).toNumber()
@@ -432,7 +432,7 @@ describe('Dao Action Test', async () => {
       }
     })
 
-    it('{tag:boba} should queue the proposal successfully', async () => {
+    it('{tag:other} should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -441,7 +441,7 @@ describe('Dao Action Test', async () => {
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
 
-    it('{tag:boba} should execute the proposal successfully', async () => {
+    it('{tag:other} should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()
@@ -475,7 +475,7 @@ describe('Dao Action Test', async () => {
       initialL1LPOwnerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
     })
 
-    it('{tag:boba} should create a new proposal to configure fee', async () => {
+    it('{tag:other} should create a new proposal to configure fee', async () => {
       try {
         const priorProposalID = (await Governor.proposalCount())._hex
         if (priorProposalID !== '0x00') {
@@ -537,7 +537,7 @@ describe('Dao Action Test', async () => {
       }
     })
 
-    it('{tag:boba} should cast vote to the proposal and wait for voting period to end', async () => {
+    it('{tag:other} should cast vote to the proposal and wait for voting period to end', async () => {
       try {
         // get current voting delay from contract
         const votingDelay = (await Governor.votingDelay()).toNumber()
@@ -573,7 +573,7 @@ describe('Dao Action Test', async () => {
       }
     })
 
-    it('{tag:boba} should queue the proposal successfully', async () => {
+    it('{tag:other} should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -582,7 +582,7 @@ describe('Dao Action Test', async () => {
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
 
-    it('{tag:boba} should execute the proposal successfully', async () => {
+    it('{tag:other} should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()

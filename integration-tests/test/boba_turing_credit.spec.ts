@@ -12,6 +12,7 @@ import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/Tu
 import TuringTestJson from '../artifacts/contracts/TuringTest.sol/TuringTest.json'
 
 import { OptimismEnv } from './shared/env'
+import { verifyStateRoots } from './shared/state-root-verification'
 
 describe('Boba Turing Credit Test', async () => {
   let BobaTuringHelper: Contract
@@ -77,6 +78,11 @@ describe('Boba Turing Credit Test', async () => {
       'L1StandardBridge',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
+  })
+
+  after(async () => {
+    expect(await verifyStateRoots()).to.equal(true)
+    console.log('Verified state roots.')
   })
 
   it('{tag:boba} Should transfer BOBA to L2', async () => {
