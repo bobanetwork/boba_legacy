@@ -28,7 +28,7 @@
 This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md). 
 
   <a href="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing">
-    <img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=400>
+    <img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
   </a>
 
  Boba that is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
@@ -44,7 +44,7 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 ## Documentation
 
-User focused documentation is available [on the boba docs website](http://docs.boba.network/). Developer-focused documention lives in [this folder] (https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation) and within all the sub-folders. 
+User focused documentation is available [on the boba docs website](http://docs.boba.network/). Developer-focused documention lives in [this folder](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation) and within the service and contract directories. 
 
 ## Community and DAO
 
