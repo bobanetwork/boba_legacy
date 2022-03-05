@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
- chai.use(chaiAsPromised)
+chai.use(chaiAsPromised)
 import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 
@@ -61,9 +61,18 @@ export const verifyStateRoots = async () => {
       const l2VerifierStateRoot = l2VerifierBlockReceipt.stateRoot
       const l2ReplicaStateRoot = l2ReplicaBlockReceipt.stateRoot
       const SCCStateRoot = stateRoots[l2BlockNumber - _prevTotalElements - 1]
-      expect(l2StateRoot).to.be.deep.eq(l2VerifierStateRoot, 'l2StateRoot does not match l2VerifierStateRoot')
-      expect(l2StateRoot).to.be.deep.eq(l2ReplicaStateRoot, 'l2StateRoot does not match l2ReplicaStateRoot')
-      expect(l2StateRoot).to.be.deep.eq(SCCStateRoot, 'l2StateRoot does not match SCCStateRoot')
+      expect(l2StateRoot).to.be.deep.eq(
+        l2VerifierStateRoot,
+        'l2StateRoot does not match l2VerifierStateRoot'
+      )
+      expect(l2StateRoot).to.be.deep.eq(
+        l2ReplicaStateRoot,
+        'l2StateRoot does not match l2ReplicaStateRoot'
+      )
+      expect(l2StateRoot).to.be.deep.eq(
+        SCCStateRoot,
+        'l2StateRoot does not match SCCStateRoot'
+      )
       l2BlockNumber += 1
     }
   }
