@@ -107,7 +107,7 @@ export const makeL2GenesisFile = async (
       proxyTarget: predeploys.BobaTuringCredit
     },
     BobaTuringCredit: {
-      _owner: cfg.deployer,
+      owner: cfg.deployer,
       turingPrice: cfg.bobaTuringPrice
     },
     BobaTuringHelper: {
