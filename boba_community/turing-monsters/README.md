@@ -31,7 +31,7 @@ $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFT_monster.ts.bak`), specify your private key:
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFT_monster.ts.bak.bak`), specify your private key:
 
 ```javascript
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
@@ -9,9 +10,10 @@ import "./WithRecover.sol";
 import "./WithOnChainMetaData.sol";
 
 
-contract NFTMonsterV2 is ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithRecover, WithOnChainMetaData {
+contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithRecover, WithOnChainMetaData {
 
     uint256 public constant PRICE = 0.0000000001 ether;
+    uint256 public constant ROYALTY_PERCENTAGE = 5; // 5 %
     uint256 public constant MAX_MINT_IN_PUBLIC = 3;
     address[] public projectOwners;
 
@@ -35,6 +37,22 @@ contract NFTMonsterV2 is ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithR
             require(!paused(), "Pausable: paused");
         }
         _;
+    }
+
+    /// @notice Called with the sale price to determine how much royalty
+    //          is owed and to whom.
+    /// @param _tokenId - the NFT asset queried for royalty information
+    /// @param _salePrice - the sale price of the NFT asset specified by _tokenId
+    /// @return receiver - address of who should be sent the royalty payment
+    /// @return royaltyAmount - the royalty payment amount for _salePrice
+    function royaltyInfo(
+        uint256 _tokenId,
+        uint256 _salePrice
+    ) external override view returns (
+        address receiver,
+        uint256 royaltyAmount
+    ) {
+        return (address(this), (_salePrice * ROYALTY_PERCENTAGE)/100);
     }
 
     /**
