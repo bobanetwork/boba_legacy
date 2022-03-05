@@ -12,7 +12,7 @@ const cfg = hre.network.config
 
 const gasOverride =  { /*gasLimit: 3000000*/ }
 
-import ERC721Json from "../artifacts/contracts/ERC721min.sol/ERC721min.json"
+import ERC721Json from "../artifacts/contracts/NFTMonsterV2.sol/NFTMonsterV2.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
@@ -30,6 +30,7 @@ const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
 const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
 const testPrivateKey = process.env.PRIVATE_KEY ?? '0x___________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
+const mintingPrice = ethers.utils.parseEther("0.0000000001")
 
 describe("Turing NFT Random 256", function () {
 
@@ -53,8 +54,12 @@ describe("Turing NFT Random 256", function () {
     erc721 = await Factory__ERC721.deploy(
       "TuringMonster",
       "BOO",
+      100,
+      ['0x4B45C30b8c4fAEC1c8eAaD5398F8b8e91BFbac15'],
       helper.address,
       gasOverride)
+
+    await erc721.startTrading(); // make NFT tradeable
 
     console.log("    ERC721 contract deployed at", erc721.address)
 
@@ -112,28 +117,35 @@ describe("Turing NFT Random 256", function () {
   })
 
   it("should mint an NFT with random attributes", async () => {
-    let tr = await erc721.mint(testWallet.address, 42, gasOverride)
+    //let tr = await erc721.mint(testWallet.address, 42, gasOverride)
+    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
     let res = await tr.wait()
     expect(res).to.be.ok
     console.log("    Turing NFT =",res)
   })
 
   it("should mint an NFT with random attributes", async () => {
-    let tr = await erc721.mint(testWallet.address, 43, gasOverride)
+    //let tr = await erc721.mint(testWallet.address, 43, gasOverride)
+    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
     let res = await tr.wait()
     expect(res).to.be.ok
     console.log("    Turing NFT =",res)
   })
 
   it("should mint an NFT with random attributes", async () => {
-    let tr = await erc721.mint(testWallet.address, 44, gasOverride)
+    //let tr = await erc721.mint(testWallet.address, 44, gasOverride)
+    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
     let res = await tr.wait()
     expect(res).to.be.ok
     console.log("    Turing NFT =",res)
   })
 
   it("should get an svg", async () => {
-    let uri = await erc721.tokenURI(42, gasOverride)
+    const event = (await erc721.queryFilter(erc721.filters.MintedNFT()))[0]
+    const tokenId = event.args[0]
+    console.log("TokenId: ", tokenId)
+
+    let uri = await erc721.tokenURI(tokenId, gasOverride)
     console.log("    Turing URI =",uri)
   })
 

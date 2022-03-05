@@ -11,7 +11,7 @@ import "./WithOnChainMetaData.sol";
 
 contract NFTMonsterV2 is ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithRecover, WithOnChainMetaData {
 
-    uint256 public constant PRICE = 0.05 ether;
+    uint256 public constant PRICE = 0.0000000001 ether;
     uint256 public constant MAX_MINT_IN_PUBLIC = 3;
     address[] public projectOwners;
 
@@ -25,7 +25,7 @@ contract NFTMonsterV2 is ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithR
     WithOnChainMetaData(turingHelperAddress_)
     RandomlyAssigned(maxNFTs_, 0, turingHelperAddress_) // Max. x NFTs available; Start counting from 0
     {
-        pause(true);
+        _pause();
         projectOwners = creatorAddresses_;
     }
 
@@ -68,11 +68,7 @@ contract NFTMonsterV2 is ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithR
         return PRICE * _count;
     }
 
-    function pause(bool val) public onlyOwner {
-        if (val == true) {
-            _pause();
-            return;
-        }
+    function startTrading() external onlyOwner {
         _unpause();
     }
 
