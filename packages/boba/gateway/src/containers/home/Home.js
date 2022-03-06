@@ -79,7 +79,7 @@ import { fetchVerifierStatus } from 'actions/verifierAction'
 
 import Airdrop from 'containers/airdrop/Airdrop'
 import Account from 'containers/account/Account'
-import Transactions from 'containers/transactions/History'
+import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'

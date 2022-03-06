@@ -50,7 +50,10 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
     console.log("LS: targetLayer:", targetLayer)
     //if (!accountEnabled) return
     //dispatch(setLayer(layer))
-    if (!layer) {
+    if (!layer && targetLayer === 'L1') {
+      dispatch(switchChain('L1'))
+    }
+    else if (!layer && targetLayer === 'L2') {
       dispatch(switchChain('L2'))
     }
     else if (layer === 'L1' && targetLayer === 'L2') {

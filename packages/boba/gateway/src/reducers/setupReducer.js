@@ -59,8 +59,15 @@ function setupReducer (state = initialState, action) {
         ...state, 
         network: action.payload
       }
+    case 'SETUP/SWITCH/REQUEST':
+      console.log("SR:REQUEST - setting just changed to true")
+      localStorage.setItem("justSwitchedChain", JSON.stringify(true))
+      return { 
+        ...state, 
+        justSwitchedChain: true
+      }
     case 'SETUP/SWITCH/SUCCESS':
-      console.log("SR - setting just changed to true")
+      console.log("SR:SUCCESS - setting just changed to true")
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))
       return { 
         ...state, 

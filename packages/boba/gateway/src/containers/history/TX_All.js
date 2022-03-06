@@ -31,11 +31,11 @@ import * as S from './History.styles'
 
 const PER_PAGE = 8
 
-function Transactions({ searchHistory, transactions }) {
+function TX_All({ searchHistory, transactions }) {
 
   const [page, setPage] = useState(1)
 
-  const loading = useSelector(selectLoading(['EXIT/GETALL']))
+  const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
 
   useEffect(() => {
@@ -158,4 +158,4 @@ function Transactions({ searchHistory, transactions }) {
   )
 }
 
-export default React.memo(Transactions)
+export default React.memo(TX_All)
