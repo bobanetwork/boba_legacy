@@ -32,7 +32,7 @@ import * as S from './History.styles'
 
 const PER_PAGE = 8
 
-function Exits({ searchHistory, transactions, chainLink }) {
+function TX_Exits({ searchHistory, transactions, chainLink }) {
 
   const [page, setPage] = useState(1)
   const loading = useSelector(selectLoading(['EXIT/GETALL']))
@@ -120,14 +120,14 @@ function Exits({ searchHistory, transactions, chainLink }) {
     )
   })
 
-  const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
-  const endingIndex = page * PER_PAGE;
-  const paginatedExits = renderExits.slice(startingIndex, endingIndex);
+  const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
+  const endingIndex = page * PER_PAGE
+  const paginatedExits = renderExits.slice(startingIndex, endingIndex)
 
-  let totalNumberOfPages = Math.ceil(renderExits.length / PER_PAGE);
+  let totalNumberOfPages = Math.ceil(renderExits.length / PER_PAGE)
 
   //if totalNumberOfPages === 0, set to one so we don't get the strange "Page 1 of 0" display
-  if (totalNumberOfPages === 0) totalNumberOfPages = 1;
+  if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
     <S.HistoryContainer>
@@ -156,4 +156,4 @@ function Exits({ searchHistory, transactions, chainLink }) {
   );
 }
 
-export default React.memo(Exits)
+export default React.memo(TX_Exits)

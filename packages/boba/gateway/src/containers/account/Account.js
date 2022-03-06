@@ -15,12 +15,11 @@ limitations under the License. */
 
 import React,{useState,useEffect,useCallback} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import { isEqual } from 'lodash'
 
 //Selectors
 import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
@@ -40,7 +39,6 @@ import TabPanel from 'components/tabs/TabPanel'
 
 import NetworkSwitcherIcon from 'components/icons/NetworkSwitcherIcon'
 
-import PendingTransaction from './PendingTransaction'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
@@ -88,38 +86,46 @@ function Account ({ enabled }) {
     dispatch(fetchLookUpPrice(symbolList))
   },[ tokenList, dispatch, accountEnabled ])
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
+  // const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+  // const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
-  const pendingL1 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const pendingL1 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
 
-  const pendingL2 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L2' &&
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const pendingL2 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L2' &&
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
 
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
+  // const pending = [
+  //   ...pendingL1,
+  //   ...pendingL2
+  // ]
+
+      // {pending.length > 0 &&
+      //   <Grid sx={{margin: '10px 0px'}}>
+      //     <Grid item xs={12}>
+      //       <PendingTransaction />
+      //     </Grid>
+      //   </Grid>
+      // }
 
   useEffect(()=>{
     if (!accountEnabled) return
@@ -265,13 +271,7 @@ function Account ({ enabled }) {
         </S.LayerAlert>
       }
 
-      {pending.length > 0 &&
-        <Grid sx={{margin: '10px 0px'}}>
-          <Grid item xs={12}>
-            <PendingTransaction />
-          </Grid>
-        </Grid>
-      }
+
       {isMobile ? (
         <>
           <Tabs value={activeTab} onChange={handleChange} sx={{color: '#fff', fontWeight: 700, my: 2}}>

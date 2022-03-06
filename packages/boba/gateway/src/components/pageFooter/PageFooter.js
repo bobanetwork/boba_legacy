@@ -7,10 +7,13 @@ import { useDispatch } from 'react-redux'
 import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
+import { useMediaQuery, useTheme } from '@mui/material'
 
 const PageFooter = ({maintenance}) => {
   
   const dispatch = useDispatch()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   
   if(maintenance) {
     return (
@@ -57,17 +60,10 @@ const PageFooter = ({maintenance}) => {
   }
   return (
     <S.Wrapper>
-      <S.ContentWrapper>
-        <S.FooterLogoWrapper>
-          <img
-            src={BobaLogo}
-            alt="boba logo"
-          />
-        </S.FooterLogoWrapper>
-        <GasSwitcher />
-      </S.ContentWrapper>
       <S.FooterDivider />
       <S.FooterLinkWrapper>
+        <S.FooterLinkWrapperLeft>
+        {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
             onClick={() => {
@@ -83,7 +79,7 @@ const PageFooter = ({maintenance}) => {
             onClick={() => {
               dispatch(setPage('BobaScope'))
             }}
-          >System Analytics</S.FooterLink>
+          >BobaScope</S.FooterLink>
           <S.FooterLink
             href="https://blockexplorer.boba.network"
             component="a"
@@ -97,6 +93,7 @@ const PageFooter = ({maintenance}) => {
             sx={{ whiteSpace: 'nowrap'}}
           >Boba Docs</S.FooterLink>
         </S.LinkWrapper>
+        </S.FooterLinkWrapperLeft>
         <S.FooterDividerMobile />
         <S.SocialWrapper>
           <IconButton href="https://boba.eco/twitter" target='_blank' aria-label="twitter">
@@ -113,7 +110,8 @@ const PageFooter = ({maintenance}) => {
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Websites</S.FooterLink>
+          >Boba Websites
+          </S.FooterLink>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>

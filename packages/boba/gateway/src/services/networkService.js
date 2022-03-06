@@ -834,11 +834,13 @@ async initializeBase( networkGateway ) {
 
   }
 
-  async switchChain( layer ) {
-    this.correctChain( layer )
-  }
+  async switchChain( targetLayer ) {
+  //  this.correctChain( layer )
+  //}
 
-  async correctChain( targetLayer ) {
+  //async correctChain( targetLayer ) {
+
+    // this needds to trigger justSwitchedChain
 
     const nw = getNetwork()
     const network = store.getState().setup.network
@@ -967,11 +969,14 @@ async initializeBase( networkGateway ) {
       toRange: 1000,
     })
 
+    //console.log("getExits",response)
+
     if (response.status === 201) {
       const transactions = response.data
       const filteredTransactions = transactions.filter(
         (i) => i.exitL2 && i.crossDomainMessage
       )
+      console.log("filteredTransactions",filteredTransactions)
       return { exited: filteredTransactions }
     }
 

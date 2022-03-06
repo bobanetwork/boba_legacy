@@ -41,7 +41,8 @@ function Transaction({
   detail,
   oriChain,
   oriHash,
-  amountTx
+  amountTx,
+  completion = '',
 }) {
 
   const [dropDownBox, setDropDownBox] = useState(false)
@@ -126,6 +127,12 @@ function Transaction({
           <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start', paddingLeft: '3px' }}>
             <Typography variant="overline" style={{lineHeight: '1.1em'}}>{chain}</Typography>
             <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{time}</Typography>
+            {completion === '' && 
+              <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>&nbsp;</Typography>
+            }
+            {completion !== '' && 
+              <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{completion}</Typography>
+            }
             <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
               {oriChain}&nbsp;Hash:&nbsp;
               <a

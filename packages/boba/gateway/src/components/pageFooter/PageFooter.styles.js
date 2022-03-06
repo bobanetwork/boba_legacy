@@ -4,13 +4,13 @@ import { Box, Divider } from '@mui/material'
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  margin: '0',
-  padding: '0 20px',
-  bottom: 0,
-  width: '100%',
-  height: '184px',
+  //margin: '0',
+  //padding: '0 20px',
+  //bottom: 0,
+  //width: '100%',
+  //height: '184px',
   background: theme.background,
   [ theme.breakpoints.down('md') ]: {
     marginTop: 0,
@@ -44,7 +44,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const FooterLink = styled(Box)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
+  //marginLeft: theme.spacing(1),
   marginTop: theme.spacing(1),
   fontSize: '14px',
   textDecoration: 'none',
@@ -80,6 +80,9 @@ export const FooterDividerMobile = styled(Divider)(({ theme }) => ({
   }
 }))
 
+export const FooterLinkWrapperLeft = styled(Box)(({ theme }) => ({
+}))
+
 export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignSelf: 'flex-start',
@@ -100,6 +103,7 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: '40%',
   justifyContent: 'flex-start',
+  gap: '10px',
   [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column',
     alignItems: 'flex-start',

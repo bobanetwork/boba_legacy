@@ -18,16 +18,16 @@ import Button from 'components/button/Button'
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-  selectAccountEnabled, 
-  selectJustSwitchedChain, 
-  selectNetwork 
+import {
+  selectAccountEnabled,
+  selectJustSwitchedChain,
+  selectNetwork
 } from 'selectors/setupSelector'
 import networkService from 'services/networkService'
 
-import { 
-  fetchTransactions, 
-  fetchBalances 
+import {
+  fetchTransactions,
+  fetchBalances
 } from 'actions/networkAction'
 
 function WalletPicker({
@@ -50,7 +50,6 @@ function WalletPicker({
 
     async function initializeAccount() {
 
-      console.log(['network',network])
       const initialized = await networkService.initializeAccount(network)
 
       if (initialized === false) {
@@ -58,7 +57,7 @@ function WalletPicker({
         dispatch(setEnableAccount(false))
         return false
       }
-      
+
       if (initialized === 'L1' || initialized === 'L2') {
         console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))

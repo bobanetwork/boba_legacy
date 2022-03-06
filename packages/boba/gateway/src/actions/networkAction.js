@@ -197,9 +197,9 @@ export function fetchLookUpPrice(params) {
     networkService.fetchLookUpPrice(params))
 }
 
-export function correctChain(layer) {
-  return createAction('CORRECT/NETWORK', () => networkService.correctChain(layer))
-}
+// export function correctChain(layer) {
+//   return createAction('CORRECT/NETWORK', () => networkService.correctChain(layer))
+// }
 
 export function enableBrowserWallet(network) {
   return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
