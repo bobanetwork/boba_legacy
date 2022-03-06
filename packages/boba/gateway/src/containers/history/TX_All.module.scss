@@ -5,7 +5,7 @@
   flex-direction: column;
   padding: 10px;
   padding-top: 0px;
-  background: $background; //white;
+  background: $background;
 }
 
 .searchInput {
@@ -54,11 +54,8 @@
 }
 
 .transactions {
-  /*height: 100%;*/
   overflow: auto;
-  background: $background400; //white;
-  // border-bottom: 1px solid rgb(233, 234, 235);
-  // box-shadow: rgb(100 100 111 / 20%) 0px 7px 10px 0px;
+  background: $background400;
   border-radius: 8px;
   margin-top: 10px;
   min-height: 100px;
@@ -108,49 +105,37 @@
 }
 
 .datePickerInput {
-  background: rgba(9, 22, 43, 0.5);
-  box-shadow: -13px 15px 19px rgba(0, 0, 0, 0.15),
-    inset 53px 36px 120px rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  width: 130px;
-  margin: 0px 15px;
-  position: relative;
-  @include mobile {
-    width: 100%;
-    margin: 0px;
-  }
-
-  &:hover {
-    outline: #fff auto 1px;
-  }
-
-  &::after {
-    content: '';
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 7px solid $white700;
-    position: absolute;
-    right: 10px;
-    font-size: 25px;
-    bottom: 15px;
-  }
-
-  input {
-    background-color: transparent;
-    height: 40px;
+    border-radius: 8px;
     width: 130px;
-    padding: 0px 15px;
-    line-height: 40px;
-    border: 0;
-    color: #f0a000;
-    font-size: 16px;
-    text-align: left;
+    margin: 0px 15px;
+    position: relative;
     @include mobile {
       width: 100%;
+      margin: 0px;
     }
-  }
+
+    &::after {
+      content: '';
+      width: 0;
+      height: 0;
+      position: absolute;
+      right: 10px;
+      font-size: 25px;
+      bottom: 15px;
+    }
+
+    input {
+      height: 40px;
+      width: 130px;
+      padding: 0px 15px;
+      line-height: 40px;
+      border: 0;
+      font-size: 16px;
+      text-align: left;
+      @include mobile {
+        width: 100%;
+      }
+    }
 }
 
 .popperStyle {

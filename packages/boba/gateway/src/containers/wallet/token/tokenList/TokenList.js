@@ -135,7 +135,7 @@ function TokenList({
                 </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
                 <>
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -319,7 +319,7 @@ function TokenList({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}

@@ -62,8 +62,6 @@ function ProposalList() {
     // const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex)
     const paginatedProposals = orderedProposals;
 
-    console.log(['paginatedProposals',paginatedProposals])
-
     let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE)
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 

@@ -35,12 +35,13 @@ import { selectLayer } from 'selectors/setupSelector'
 
 import Tabs from 'components/tabs/Tabs'
 
-import Exits from './Exits'
-import Deposits from './Deposits'
-import Transactions from './Transactions'
+import Exits from './TX_Exits'
+import Deposits from './TX_Deposits'
+import All from './TX_All'
+import Pending from './TX_Pending'
 
 import * as S from './History.styles'
-import * as styles from './Transactions.module.scss'
+import * as styles from './TX_All.module.scss'
 
 import useInterval from 'util/useInterval'
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -152,11 +153,11 @@ function History() {
           <Tabs
             onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
             activeTab={activeTab}
-            tabs={['All', 'Bridge to L2', 'Bridge to L1']}
+            tabs={['All', 'Bridge to L2', 'Bridge to L1', 'Pending']}
           />
 
           {activeTab === 'All' && (
-            <Transactions
+            <All
               searchHistory={searchHistory}
               transactions={transactions}
             />
@@ -171,6 +172,13 @@ function History() {
 
           {activeTab === 'Bridge to L1' &&
             <Exits
+              searchHistory={searchHistory}
+              transactions={transactions}
+            />
+          }
+
+          {activeTab === 'Pending' &&
+            <Pending
               searchHistory={searchHistory}
               transactions={transactions}
             />
