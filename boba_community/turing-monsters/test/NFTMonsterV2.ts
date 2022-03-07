@@ -1,12 +1,9 @@
-import { BigNumber, Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
+import { Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers, artifacts } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
-const abiDecoder = require('web3-eth-abi')
-
-const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
 
@@ -14,9 +11,11 @@ const gasOverride =  { /*gasLimit: 3000000*/ }
 
 import L1StandardERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
 import ERC721Json from "../artifacts/contracts/NFTMonsterV2.sol/NFTMonsterV2.json"
+import L2BridgeMockJson from "../artifacts/contracts/L2BridgeMock.sol/L2BridgeMock.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L2BridgeMock from "../artifacts/contracts/L2BridgeMock.sol/L2BridgeMock.json";
 
 let Factory__ERC721: ContractFactory
 let Factory__Helper: ContractFactory
@@ -110,8 +109,21 @@ describe("Turing bridgeable NFT Random 256", function () {
     /*L2NFTBridgeContract = await upgrades.deployProxy(Factory__L2NFTBridge, []);
     await L2NFTBridgeContract.deployed();*/
 
+
+    const Factory__L2BridgeMock = new ContractFactory(
+      L2BridgeMockJson.abi,
+      L2BridgeMockJson.bytecode,
+      testWallet,
+    )
+
+    const L2BridgeMockContract = await Factory__L2BridgeMock.deploy()
+
     L2NFTBridgeContract = await Factory__L2NFTBridge.deploy(
       gasOverride,
+    )
+
+    L2NFTBridgeContract.initialize(
+      L2BridgeMockContract.address, L2NFTBridgeContract.address, // NOTE: Using the wrong bridge address as just for testing
     )
 
     console.log('Deployed L2 NFT bridge')

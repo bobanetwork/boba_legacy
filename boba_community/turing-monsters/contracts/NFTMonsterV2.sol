@@ -79,6 +79,9 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
     function _mintSingle(address _to) private {
         uint id = nextToken();
         _safeMint(_to, id);
+
+        uint256 turingRAND = turingHelper.TuringRandom();
+        _setTokenURI(id, turingRAND); // calculate random properties
         emit MintedNFT(id);
     }
 

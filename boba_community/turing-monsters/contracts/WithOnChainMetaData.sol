@@ -63,8 +63,8 @@ abstract contract WithOnChainMetaData is ERC721 {
 
         string memory svgData = string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4]));
         string memory attributes = string(abi.encodePacked(
-                '[{"trait_type": "Eye", "value": "', colorEye, '"}',
-                '{"trait_type": "Body", "value": "', colorBody, '"}',
+                '[{"trait_type": "Eye", "value": "', colorEye, '"},',
+                '{"trait_type": "Body", "value": "', colorBody, '"},',
                 '{"trait_type": "Extra", "value": "', colorExtra, '"}]'));
         string memory json = Base64.encode(bytes(string(
                 abi.encodePacked('{"name": "TuringMonster", "description": "BooooHoooo", "attributes":', attributes, ', "image_data": "', bytes(svgData), '"}')
