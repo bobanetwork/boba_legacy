@@ -78,7 +78,7 @@ describe('Dao Action Test', async () => {
 
   const deployDAO = async (timeLockAddress: string = '') => {
     const delay_before_execute_s = 0
-    const eta_delay_s = 0
+    const eta_delay_s = 5
     const governor_voting_period = 259200 // 3 days in seconds
     const governor_voting_delay = 172800 // 2 days in seconds
     const governor_proposal_threshold = utils.parseEther('50000')
@@ -171,6 +171,7 @@ describe('Dao Action Test', async () => {
 
     await initiateTx.wait()
     // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
+    await moveTimeForward(5000)
     await Timelock.executeTransaction(
       Timelock.address,
       0,
