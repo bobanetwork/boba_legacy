@@ -57,13 +57,19 @@ Next, navigate to `boba_community/fraud-detector` and build the needed Docker im
 
 ```
 $ cd boba_community/fraud-detector
-$ docker-compose -f docker-compose-fraud-detector.yml build
 ```
 
-Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
+Next, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
 ```
-$ docker-compose -f docker-compose-fraud-detector.yml up
+$ docker-compose up
+```
+
+Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service. 
+
+```bash
+$ cd optimism-v2/boba_community/fraud-detector
+$ curl -H "Content-Type: application/json" -T ./addresses.json http://localhost:8080/addresses.json
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take several hours to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
