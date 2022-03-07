@@ -1,4 +1,4 @@
-import { Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
+import {Contract, ContractFactory, providers, Wallet, utils, Signer} from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers, artifacts } from 'hardhat'
 import chai, { expect } from 'chai'
@@ -10,12 +10,21 @@ const cfg = hre.network.config
 const gasOverride =  { /*gasLimit: 3000000*/ }
 
 import L1StandardERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
+//@eth-optimism\contracts\artifacts\contracts\L2\messaging\L2CrossDomainMessenger.sol\L2CrossDomainMessenger.json"
+import L2CrossDomainMessenger from '@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2CrossDomainMessenger.sol/L2CrossDomainMessenger.json'
 import ERC721Json from "../artifacts/contracts/NFTMonsterV2.sol/NFTMonsterV2.json"
-import L2BridgeMockJson from "../artifacts/contracts/L2BridgeMock.sol/L2BridgeMock.json"
+import L2BridgeMessengerMockJson from "../artifacts/contracts/L2BridgeMockMessenger.sol/L2BridgeMockMessenger.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
-import L2BridgeMock from "../artifacts/contracts/L2BridgeMock.sol/L2BridgeMock.json";
+import * as assert from "assert";
+
+import {
+  smockit,
+  MockContract,
+  smoddit,
+  ModifiableContract,
+} from '@eth-optimism/smock'
 
 let Factory__ERC721: ContractFactory
 let Factory__Helper: ContractFactory
@@ -111,19 +120,34 @@ describe("Turing bridgeable NFT Random 256", function () {
 
 
     const Factory__L2BridgeMock = new ContractFactory(
-      L2BridgeMockJson.abi,
-      L2BridgeMockJson.bytecode,
+      L2BridgeMessengerMockJson.abi,
+      L2BridgeMessengerMockJson.bytecode,
       testWallet,
     )
 
     const L2BridgeMockContract = await Factory__L2BridgeMock.deploy()
+
+    /*let l2MessengerImpersonator:Signer,alice,bob;
+    ;[alice, bob, l2MessengerImpersonator] = await ethers.getSigners()*/
+
+    /*const Factory__L2CrossDomainMessenger = new ContractFactory(
+      L2CrossDomainMessenger.abi,
+      L2CrossDomainMessenger.bytecode,
+      testWallet,
+    )*/
+
+    /*const Mock__L2CrossDomainMessenger = await smockit(
+      Factory__L2CrossDomainMessenger,
+      // This allows us to use an ethers override {from: Mock__L2CrossDomainMessenger.address} to mock calls
+      { address: L2BridgeMockContract.address /*await l2MessengerImpersonator.getAddress()* }
+    )*/
 
     L2NFTBridgeContract = await Factory__L2NFTBridge.deploy(
       gasOverride,
     )
 
     L2NFTBridgeContract.initialize(
-      L2BridgeMockContract.address, L2NFTBridgeContract.address, // NOTE: Using the wrong bridge address as just for testing
+      L2BridgeMockContract.address, '0x1234123412341234123412341234123412341234', // NOTE: Using a dummy L1 bridge address for testing
     )
 
     console.log('Deployed L2 NFT bridge')
@@ -210,13 +234,21 @@ describe("Turing bridgeable NFT Random 256", function () {
     console.log("Turing NFT =",res)
   })
 
-  it("should get an svg", async () => {
+  it("should get onchain metadata", async () => {
     const event = (await erc721.queryFilter(erc721.filters.MintedNFT()))[0]
     const tokenId = event.args[0]
     console.log("TokenId: ", tokenId)
 
     let uri = await erc721.tokenURI(tokenId, gasOverride)
-    console.log("Turing URI = ",uri)
+    const decodedMetadata = JSON.parse(Buffer.from(uri.substring(uri.indexOf(',')+1), 'base64').toString())
+    console.log("Decoded metadata = ", decodedMetadata)
+
+    expect(decodedMetadata['name']).to.be.not.null;
+    expect(decodedMetadata['description']).to.be.not.null;
+    expect(decodedMetadata['attributes']).to.be.not.null;
+    expect(decodedMetadata['attributes']?.length).to.greaterThan(0)
+    expect(decodedMetadata['image_data']).to.be.not.null;
+    expect(decodedMetadata['image_data']).to.contain('svg');
   })
 
   it("bridge NFT to L1", async () => {
@@ -231,8 +263,8 @@ describe("Turing bridgeable NFT Random 256", function () {
     const tx = await L2NFTBridgeContract.withdraw(
       erc721.address,
       tokenId,
-      9999999, // l2 gas
-      ethers.utils.formatBytes32String(new Date().getTime().toString()),
+      0, //9999999, // l2 gas
+      '0x1111111111111111111111111111111111111111111111111111111111111111', //ethers.utils.formatBytes32String(new Date().getTime().toString()),
     )
     await tx.wait();
 
