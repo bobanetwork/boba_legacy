@@ -20,7 +20,7 @@ abstract contract WithOnChainMetaData is ERC721 {
         turingHelper = ITuringHelper(_turingHelperAddress);
     }
 
-    function getSVG(uint tokenId) private view returns (string memory) {
+    function getMetadata(uint tokenId) private view returns (string memory) {
         require(_exists(tokenId), "ERC721getSVG: URI get of nonexistent token");
 
         uint256 genome = _tokenURIs[tokenId];
@@ -33,8 +33,8 @@ abstract contract WithOnChainMetaData is ERC721 {
 
         string[5] memory part;
 
-        string memory colorEye   = string(abi.encodePacked(Strings.toString(attribute_a), ",", Strings.toString(attribute_b), ",", Strings.toString(attribute_c)));
-        string memory colorBody  = string(abi.encodePacked(Strings.toString(attribute_b), ",", Strings.toString(attribute_c), ",", Strings.toString(attribute_a)));
+        string memory colorEye = string(abi.encodePacked(Strings.toString(attribute_a), ",", Strings.toString(attribute_b), ",", Strings.toString(attribute_c)));
+        string memory colorBody = string(abi.encodePacked(Strings.toString(attribute_b), ",", Strings.toString(attribute_c), ",", Strings.toString(attribute_a)));
         string memory colorExtra = string(abi.encodePacked(Strings.toString(attribute_c), ",", Strings.toString(attribute_a), ",", Strings.toString(attribute_b)));
 
         // Alternative approach
@@ -61,12 +61,21 @@ abstract contract WithOnChainMetaData is ERC721 {
         "<path class='st3' d='M100.8,193c7.9,5.6,16.8,9.9,26.1,12.9c10.9,3.5,22.3,5.1,33.7,4.3c4.8-0.4,9.8-1.2,13.8-4c3.1-2.1,13.4-16.6,16.3-20.7'/>"
         "</svg>";
 
-        return string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4]));
+        string memory svgData = string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4]));
+        string memory attributes = string(abi.encodePacked(
+                '[{"trait_type": "Eye", "value": "', colorEye, '"}',
+                '{"trait_type": "Body", "value": "', colorBody, '"}',
+                '{"trait_type": "Extra", "value": "', colorExtra, '"}]'));
+        string memory json = Base64.encode(bytes(string(
+                abi.encodePacked('{"name": "TuringMonster", "description": "BooooHoooo", "attributes":', attributes, ', "image_data": "', bytes(svgData), '"}')
+            )));
+
+        return json;
     }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        string memory svgData = getSVG(tokenId); // non-existent token check integrated
-        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "TuringMonster", "description": "BooooHoooo", "image_data": "', bytes(svgData), '"}'))));
+        string memory json = getMetadata(tokenId);
+        // non-existent token check integrated
         return string(abi.encodePacked('data:application/json;base64,', json));
     }
 
