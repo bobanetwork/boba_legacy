@@ -27,6 +27,11 @@ services:
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 381145
     volumes:
       - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -57,6 +62,12 @@ services:
       ROLLUP_POLL_INTERVAL_FLAG: "10s"
       ROLLUP_ENFORCE_FEES: 'true'
       TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
+      SEQUENCER_CLIENT_HTTP: https://mainnet.boba.network
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - ${L2GETH_HTTP_PORT:-8549}:8545
       - ${L2GETH_WS_PORT:-8550}:8546
