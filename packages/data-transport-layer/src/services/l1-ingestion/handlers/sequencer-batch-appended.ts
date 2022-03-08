@@ -48,7 +48,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       )
     ).find((foundEvent: ethers.Event) => {
       // We might have more than one event in this block, so we specifically want to find a
-      // "TransactonBatchAppended" event emitted immediately before the event in question.
+      // "TransactionBatchAppended" event emitted immediately before the event in question.
       return (
         foundEvent.transactionHash === event.transactionHash &&
         foundEvent.logIndex === event.logIndex - 1
@@ -108,10 +108,16 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           nextTxPointer
         )
 
+        const indexL2 = extraData.prevTotalElements
+          .add(BigNumber.from(transactionIndex))
+          .toNumber()
+
+        console.log('L2 block number for this TX is:', indexL2 + 1)
+
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
           l2ChainId,
-          context.blockNumber,
+          indexL2 + 1,
           turing_v0_height,
           turing_v1_height
         )
