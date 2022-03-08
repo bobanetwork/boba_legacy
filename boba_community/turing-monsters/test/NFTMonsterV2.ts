@@ -1,30 +1,21 @@
-import {Contract, ContractFactory, providers, Wallet, utils, Signer} from 'ethers'
+import {Contract, ContractFactory, providers, Wallet, utils} from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { ethers, artifacts } from 'hardhat'
+import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 import hre from 'hardhat'
-const cfg = hre.network.config
-
-const gasOverride =  { /*gasLimit: 3000000*/ }
-
 import L1StandardERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
-//@eth-optimism\contracts\artifacts\contracts\L2\messaging\L2CrossDomainMessenger.sol\L2CrossDomainMessenger.json"
-import L2CrossDomainMessenger from '@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2CrossDomainMessenger.sol/L2CrossDomainMessenger.json'
 import ERC721Json from "../artifacts/contracts/NFTMonsterV2.sol/NFTMonsterV2.json"
 import L2BridgeMessengerMockJson from "../artifacts/contracts/L2BridgeMockMessenger.sol/L2BridgeMockMessenger.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
-import * as assert from "assert";
 
-import {
-  smockit,
-  MockContract,
-  smoddit,
-  ModifiableContract,
-} from '@eth-optimism/smock'
+const cfg = hre.network.config
+
+const gasOverride =  { /*gasLimit: 3000000*/ }
+
 
 let Factory__ERC721: ContractFactory
 let Factory__Helper: ContractFactory
@@ -47,8 +38,6 @@ const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC16
 const testPrivateKey = process.env.PRIVATE_KEY ?? '0x___________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
 const testWalletCounterPart = new Wallet(testPrivateKey, counterPartProvider)
-
-const mintingPrice = ethers.utils.parseEther("0.0000000001")
 
 // convenience method for readability
 const oldConsole = console.log
@@ -186,27 +175,23 @@ describe("Turing bridgeable NFT Random 256", function () {
     console.log("ERC721 contract whitelisted in TuringHelper (1 = yes)?", result)
   })
 
-  it("should mint an NFT with random attributes", async () => {
+  it("should mint 3 NFTs with random attributes", async () => {
     //let tr = await erc721.mint(testWallet.address, 42, gasOverride)
-    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
+    const mintingPrice = await erc721.PRICE();
+    const amountNFTsToMint: number = 3
+    console.log(`Trying to mint ${amountNFTsToMint} NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each.`)
+    let tr = await erc721.mint(amountNFTsToMint, {...gasOverride, value: mintingPrice * amountNFTsToMint})
     let res = await tr.wait()
     expect(res).to.be.ok
-    console.log("Turing NFT =",res)
-  })
 
-  it("should mint an NFT with random attributes", async () => {
-    //let tr = await erc721.mint(testWallet.address, 43, gasOverride)
-    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
-    let res = await tr.wait()
-    expect(res).to.be.ok
-    console.log("Turing NFT =",res)
-  })
+    const mintedEvents = await erc721.queryFilter(erc721.filters.MintedNFT())
+    expect(mintedEvents.length >= 3, "Expected at least 3 minting events.")
+    const tokenIDs = [mintedEvents[0].args[0], mintedEvents[1].args[0], mintedEvents[2].args[0]]
+    // very very low probability that all three combinations are linearly assigned when using random tokenIDs
+    expect(Math.abs(tokenIDs[0] - tokenIDs[1]) > 1
+      || Math.abs(tokenIDs[1] - tokenIDs[2]) > 1
+      || Math.abs(tokenIDs[2] - tokenIDs[0]) > 1, "TokenIDs don't seem to be assigned randomly.")
 
-  it("should mint an NFT with random attributes", async () => {
-    //let tr = await erc721.mint(testWallet.address, 44, gasOverride)
-    let tr = await erc721.mint(1, {...gasOverride, value: mintingPrice})
-    let res = await tr.wait()
-    expect(res).to.be.ok
     console.log("Turing NFT =",res)
   })
 
@@ -248,8 +233,6 @@ describe("Turing bridgeable NFT Random 256", function () {
 
     // 7 days waiting period bc. of optimistic roll-up
   })
-
-
 
 })
 
