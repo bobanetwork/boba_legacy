@@ -104,20 +104,10 @@ describe("Turing bridgeable NFT Random 256", function () {
 
 
     Factory__L2NFTBridge = new ContractFactory(
-      L2NFTBridgeJson.abi,
-      L2NFTBridgeJson.bytecode,
+      L2NFTBridgeJson.abi, // L2NFTBridgeJson.abi,
+      L2NFTBridgeJson.bytecode, // L2NFTBridgeJson.bytecode,
       testWallet,
     )
-
-    /*L2NFTBridgeContract = new Contract(
-      L2_BRIDGE_PROXY,
-      L2NFTBridgeJson.abi,
-      testWallet,
-    )*/
-
-    /*L2NFTBridgeContract = await upgrades.deployProxy(Factory__L2NFTBridge, []);
-    await L2NFTBridgeContract.deployed();*/
-
 
     const Factory__L2BridgeMock = new ContractFactory(
       L2BridgeMessengerMockJson.abi,
@@ -127,28 +117,14 @@ describe("Turing bridgeable NFT Random 256", function () {
 
     const L2BridgeMockContract = await Factory__L2BridgeMock.deploy()
 
-    /*let l2MessengerImpersonator:Signer,alice,bob;
-    ;[alice, bob, l2MessengerImpersonator] = await ethers.getSigners()*/
-
-    /*const Factory__L2CrossDomainMessenger = new ContractFactory(
-      L2CrossDomainMessenger.abi,
-      L2CrossDomainMessenger.bytecode,
-      testWallet,
-    )*/
-
-    /*const Mock__L2CrossDomainMessenger = await smockit(
-      Factory__L2CrossDomainMessenger,
-      // This allows us to use an ethers override {from: Mock__L2CrossDomainMessenger.address} to mock calls
-      { address: L2BridgeMockContract.address /*await l2MessengerImpersonator.getAddress()* }
-    )*/
-
     L2NFTBridgeContract = await Factory__L2NFTBridge.deploy(
       gasOverride,
     )
 
-    L2NFTBridgeContract.initialize(
+    const txInit = await L2NFTBridgeContract.initialize(
       L2BridgeMockContract.address, '0x1234123412341234123412341234123412341234', // NOTE: Using a dummy L1 bridge address for testing
     )
+    await txInit.wait()
 
     console.log('Deployed L2 NFT bridge')
 
