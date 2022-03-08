@@ -47,7 +47,7 @@ await L2StandardERC721.deployTransaction.wait()
 Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
 ```js
-const Factory__L2StandardERC721 = new ethers.ContractFactory(
+const Factory__L1StandardERC721 = new ethers.ContractFactory(
   L1StandardERC721.abi,
   L1StandardERC721.bytecode,
   L1Wallet
