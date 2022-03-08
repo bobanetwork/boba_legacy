@@ -448,7 +448,7 @@ function destroy_dev_services {
       local force="${1:-}"
       CLUSTERS_LIST=( `aws ecs list-clusters --region ${REGION}|grep ${ENV_PREFIX}|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'` )
       if [[ "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
-        SERVICE_NAME="blockscout"
+        SERVICE_NAME="blockexplorer-blockscout"
       fi
       for ecs in "${!CLUSTERS_LIST[@]}"; do
         ECS_CLUSTER=`echo ${CLUSTERS_LIST[ecs]}`
@@ -480,7 +480,7 @@ function destroy_dev_services {
         local force="${1:-}"
         CLUSTERS_LIST=( `aws ecs list-clusters --region ${REGION}|grep ${ENV_PREFIX}|cut -d/ -f2|sed 's#,##g'|sed 's#"##g'` )
         if [[ "${SERVICE_NAME}" == "blockexplorer-blockscout" ]]; then
-          SERVICE_NAME="blockscout"
+          SERVICE_NAME="blockexplorer-blockscout"
         fi
         for ecs in "${!CLUSTERS_LIST[@]}"; do
           ECS_CLUSTER=`echo ${CLUSTERS_LIST[ecs]}`
