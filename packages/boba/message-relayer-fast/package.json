@@ -35,7 +35,7 @@
     "@ethersproject/providers": "^5.0.24",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@openzeppelin/test-helpers": "0.5.4",
-    "@types/jest": "^26.0.22",
+
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
