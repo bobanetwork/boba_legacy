@@ -12,6 +12,9 @@ const config: HardhatUserConfig = {
     boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
     },
+    boba_mainnet: {
+      url: 'http://mainnet.boba.network',
+    },
   },
   solidity: {
     compilers: [

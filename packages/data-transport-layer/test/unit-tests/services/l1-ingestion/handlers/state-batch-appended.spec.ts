@@ -74,11 +74,8 @@ describe('Event Handlers: CanonicalTransactionChain.StateBatchAppended', () => {
         l1TransactionHash:
           '0x4ca72484e93cdb50fe1089984db152258c2bbffc2534dcafbfe032b596bd5b49',
       }
-      const input1: [any, StateBatchAppendedExtraData, number] = [
-        event,
-        extraData,
-        0,
-      ]
+      const input1: [any, StateBatchAppendedExtraData, number, number, number] =
+        [event, extraData, 0, 0, 0]
 
       const output1 = handleEventsStateBatchAppended.parseEvent(...input1)
 

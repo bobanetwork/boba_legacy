@@ -23,6 +23,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
+import { verifyStateRoots } from './shared/state-root-verification'
 
 describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
@@ -101,7 +102,12 @@ describe('Turing 256 Bit Random Number Test', async () => {
     ).attach(L1StandardBridgeAddress)
   })
 
-  it('Should transfer BOBA to L2', async () => {
+  after(async () => {
+    expect(await verifyStateRoots()).to.equal(true)
+    console.log('Verified state roots.')
+  })
+
+  it('{tag:boba} Should transfer BOBA to L2', async () => {
     const depositBOBAAmount = utils.parseEther('10')
 
     const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
@@ -136,7 +142,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
   })
 
-  it('contract should be whitelisted', async () => {
+  it('{tag:boba} contract should be whitelisted', async () => {
     const tr2 = await TuringHelper.checkPermittedCaller(random.address)
     const res2 = await tr2.wait()
     const rawData = res2.events[0].data
@@ -148,7 +154,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
   })
 
-  it('Should register and fund your Turing helper contract in turingCredit', async () => {
+  it('{tag:boba} Should register and fund your Turing helper contract in turingCredit', async () => {
     env = await OptimismEnv.new()
 
     const depositAmount = utils.parseEther('0.1')
@@ -180,7 +186,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it('should get a 256 bit random number', async () => {
+  it('{tag:boba} should get a 256 bit random number', async () => {
     const tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok

@@ -32,14 +32,14 @@ describe('Fast Messenge Relayer Test', async () => {
     )
   })
 
-  it('should send message from L1 to L2', async () => {
+  it('{tag:mrf} should send message from L1 to L2', async () => {
     await env.waitForXDomainTransaction(
       L1Message.sendMessageL1ToL2(),
       Direction.L1ToL2
     )
   })
 
-  it('should QUICKLY send message from L2 to L1 using the fast relayer', async () => {
+  it('{tag:mrf} should QUICKLY send message from L2 to L1 using the fast relayer', async () => {
     await env.waitForXDomainTransactionFast(
       L2Message.sendMessageL2ToL1({ gasLimit: 800000, gasPrice: 0 }),
       Direction.L2ToL1

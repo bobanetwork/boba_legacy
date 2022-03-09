@@ -1,16 +1,16 @@
 import { styled } from '@mui/material/styles'
-import { Box, Divider } from "@mui/material"
+import { Box, Divider } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  margin: '0',
-  padding: '0 20px',
-  bottom: 0,
-  width: '100%',
-  height: '184px',
+  //margin: '0',
+  //padding: '0 20px',
+  //bottom: 0,
+  //width: '100%',
+  //height: '184px',
   background: theme.background,
   [ theme.breakpoints.down('md') ]: {
     marginTop: 0,
@@ -44,7 +44,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const FooterLink = styled(Box)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
+  //marginLeft: theme.spacing(1),
   marginTop: theme.spacing(1),
   fontSize: '14px',
   textDecoration: 'none',
@@ -62,14 +62,14 @@ export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center'
 }))
 
-export const FooterDivier = styled(Divider)(({ theme }) => ({
+export const FooterDivider = styled(Divider)(({ theme }) => ({
   background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
   boxSizing: 'border-box',
   boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 
-export const FooterDivierMobile = styled(Divider)(({ theme }) => ({
+export const FooterDividerMobile = styled(Divider)(({ theme }) => ({
   display: 'none',
   [ theme.breakpoints.down('md') ]: {
     display: 'block',
@@ -78,6 +78,9 @@ export const FooterDivierMobile = styled(Divider)(({ theme }) => ({
     boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
     width: '100%'
   }
+}))
+
+export const FooterLinkWrapperLeft = styled(Box)(({ theme }) => ({
 }))
 
 export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
@@ -100,6 +103,7 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: '40%',
   justifyContent: 'flex-start',
+  gap: '10px',
   [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column',
     alignItems: 'flex-start',

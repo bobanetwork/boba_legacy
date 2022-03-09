@@ -57,7 +57,7 @@ describe('System setup', async () => {
     )
   })
 
-  it('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
+  it('{tag:other} should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -89,7 +89,7 @@ describe('System setup', async () => {
     )
   })
 
-  it('should transfer ERC20 TEST token to Kate', async () => {
+  it('{tag:other} should transfer ERC20 TEST token to Kate', async () => {
     const transferL2ERC20Amount = utils.parseEther('9')
     await depositERC20ToL2(env.l2Wallet)
     const preKateL2ERC20Balance = await L2ERC20.balanceOf(

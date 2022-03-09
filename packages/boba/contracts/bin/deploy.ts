@@ -92,6 +92,7 @@ const main = async () => {
     BobaTuringCreditAddress,
     BobaTuringHelperAddress,
     watcher,
+    noCompile: process.env.NO_COMPILE ? true : false,
   })
 }
 

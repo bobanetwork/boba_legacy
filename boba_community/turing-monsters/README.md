@@ -35,9 +35,20 @@ As for every chain, you need an account with some ETH (to deploy contracts) and 
 
 ```javascript
 
-const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-const testPrivateKey = '0x____' // your private key here....
-const testWallet = new Wallet(testPrivateKey, local_provider)
+// uncomment the correct addresses
+
+// Rinkeby
+// const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+// const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+
+// for example if you are on Mainnet-Test, uncomment these
+
+// Mainnet-Test
+const BOBAL2Address = '0x58597818d1B85EF96383884951E846e9D6D03956'
+const BobaTuringCreditRinkebyAddress = '0xE654ba86Ea0B59a6836f86Ec806bfC9449D0aD0A'
+
+// provide your PK here
+const testPrivateKey = '0x____' 
 
 ``` 
 
@@ -54,7 +65,9 @@ Run
 ```bash
 $ cd boba_community/turing-monsters 
 $ yarn build
-$ yarn test:rinkeby
+$ yarn test:rinkeby # for testing on rinkeby, for example
+
+# other choces are local and mainnet
 ```
 
 Ok, all done. Enjoy. The terminal will give you all the information you need to mint and send a Turing monster to your friends:

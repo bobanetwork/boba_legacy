@@ -8,7 +8,7 @@ api_key = 'YOUR_API_KEY'
 
 authorized_contract = None # for open access
 # or...
-authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
+# authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
   
 def lambda_handler(event, context):
   

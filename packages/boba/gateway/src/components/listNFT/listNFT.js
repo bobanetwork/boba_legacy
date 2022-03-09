@@ -21,6 +21,8 @@ import { connect } from 'react-redux'
 import ReactCardFlip from 'react-card-flip'
 import * as styles from './listNFT.module.scss'
 import * as S from './listNFT.styles'
+import { removeNFT } from 'actions/nftAction'
+import Button from 'components/button/Button'
 
 
 class listNFT extends React.Component {
@@ -54,6 +56,11 @@ class listNFT extends React.Component {
     e.preventDefault();
     this.setState(prevState => ({ isFlipped: !prevState.isFlipped }));
   }
+
+  async handleRemove() {
+    this.props.dispatch(removeNFT(this.state.UUID))
+  }
+
 
   componentDidUpdate(prevState) {
 
@@ -163,6 +170,17 @@ class listNFT extends React.Component {
                 </Typography>)
               })}
             </div>
+            <S.DividerLine />
+            <Button
+              variant="outlined"
+              onClick={(e) => {
+                e.stopPropagation();
+                this.handleRemove();
+              }}
+              size="small"
+            >
+              Remove
+            </Button>
           </div>
         </S.ListNFTItem>
       </ReactCardFlip>

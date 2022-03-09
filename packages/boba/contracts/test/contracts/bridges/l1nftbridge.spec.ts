@@ -25,132 +25,133 @@ const deployL1CrossDomainMessenger = async (): Promise<Contract> => {
   ).deploy()
 }
 
-describe('L1NFTBridge ownership', () => {
-  beforeEach(async () => {
-    L1NFTBridge = await deployL1NFTBridge()
-    L2NFTBridge = await deployL2NFTBridge()
-    L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
-  })
-  it('should NOT be able to change the owner', async () => {
-    const oldOwner = '0x0000000000000000000000000000000000000000'
-    const newOwner = '0x0000000000000000000000000000000000000001'
-    expect(await L1NFTBridge.owner()).to.be.equal(oldOwner)
-    await expect(L1NFTBridge.transferOwnership(newOwner)).to.be.revertedWith(
-      'Caller is not the owner'
-    )
-  })
-  it('changing gas reverts on not initialized', async () => {
-    const newGas = 1
-    await expect(L1NFTBridge.configureGas(newGas)).to.be.revertedWith(
-      'Caller is not the owner'
-    )
-  })
-})
-
-describe('L1NFTBridge tests initialized', () => {
-  beforeEach(async () => {
-    L1NFTBridge = await deployL1NFTBridge()
-    L2NFTBridge = await deployL2NFTBridge()
-    L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+describe('L1NFTBridge Tests', () => {
+  describe('L1NFTBridge ownership', () => {
+    beforeEach(async () => {
+      L1NFTBridge = await deployL1NFTBridge()
+      L2NFTBridge = await deployL2NFTBridge()
+      L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+    })
+    it('should NOT be able to change the owner', async () => {
+      const oldOwner = '0x0000000000000000000000000000000000000000'
+      const newOwner = '0x0000000000000000000000000000000000000001'
+      expect(await L1NFTBridge.owner()).to.be.equal(oldOwner)
+      await expect(L1NFTBridge.transferOwnership(newOwner)).to.be.revertedWith(
+        'Caller is not the owner'
+      )
+    })
+    it('changing gas reverts on not initialized', async () => {
+      const newGas = 1
+      await expect(L1NFTBridge.configureGas(newGas)).to.be.revertedWith(
+        'Caller is not the owner'
+      )
+    })
   })
 
-  it('should be able to initialize and change the gas', async () => {
-    const magicGas = 1400000
-    await L1NFTBridge.initialize(
-      L1CrossDomainMessenger.address,
-      L2NFTBridge.address
-    )
-    expect(await L1NFTBridge.l2NFTBridge()).to.be.equal(L2NFTBridge.address)
-    expect(await L1NFTBridge.messenger()).to.be.equal(
-      L1CrossDomainMessenger.address
-    )
-    const signer: Signer = (await ethers.getSigners())[0]
-    expect(await L1NFTBridge.owner()).to.be.equal(await signer.getAddress())
-    expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas)
-    // now test gas change
-    expect(await L1NFTBridge.configureGas(magicGas + 1))
-    expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas + 1)
-  })
+  describe('L1NFTBridge tests initialized', () => {
+    beforeEach(async () => {
+      L1NFTBridge = await deployL1NFTBridge()
+      L2NFTBridge = await deployL2NFTBridge()
+      L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+    })
 
-  it('should not be able to init twice', async () => {
-    const signer: Signer = (await ethers.getSigners())[1]
-    await expect(
-      L1NFTBridge.initialize(
-        L2NFTBridge.address,
+    it('should be able to initialize and change the gas', async () => {
+      const magicGas = 1400000
+      await L1NFTBridge.initialize(
+        L1CrossDomainMessenger.address,
+        L2NFTBridge.address
+      )
+      expect(await L1NFTBridge.l2NFTBridge()).to.be.equal(L2NFTBridge.address)
+      expect(await L1NFTBridge.messenger()).to.be.equal(
         L1CrossDomainMessenger.address
       )
-    )
-    await expect(
-      L1NFTBridge.connect(signer).initialize(
-        L2NFTBridge.address,
+      const signer: Signer = (await ethers.getSigners())[0]
+      expect(await L1NFTBridge.owner()).to.be.equal(await signer.getAddress())
+      expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas)
+      // now test gas change
+      expect(await L1NFTBridge.configureGas(magicGas + 1))
+      expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas + 1)
+    })
+
+    it('should not be able to init twice', async () => {
+      const signer: Signer = (await ethers.getSigners())[1]
+      await expect(
+        L1NFTBridge.initialize(
+          L2NFTBridge.address,
+          L1CrossDomainMessenger.address
+        )
+      )
+      await expect(
+        L1NFTBridge.connect(signer).initialize(
+          L2NFTBridge.address,
+          L1CrossDomainMessenger.address,
+          { from: await signer.getAddress() }
+        )
+      ).to.be.revertedWith('Initializable: contract is already initialized')
+    })
+
+    it('should not be able to init with zero address messenger', async () => {
+      await expect(
+        L1NFTBridge.initialize(
+          '0x0000000000000000000000000000000000000000',
+          '0x0000000000000000000000000000000000000001'
+        )
+      ).to.be.revertedWith('zero address not allowed')
+    })
+    it('should not be able to init with zero address l2NFTbridge', async () => {
+      await expect(
+        L1NFTBridge.initialize(
+          '0x0000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000'
+        )
+      ).to.be.revertedWith('zero address not allowed')
+    })
+  })
+
+  describe('cover registerNFTPair', () => {
+    beforeEach(async () => {
+      L1NFTBridge = await deployL1NFTBridge()
+      L2NFTBridge = await deployL2NFTBridge()
+      L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+      ERC721 = await deployNFT('name', 'symbol')
+      await L1NFTBridge.initialize(
         L1CrossDomainMessenger.address,
-        { from: await signer.getAddress() }
+        L2NFTBridge.address
       )
-    ).to.be.revertedWith('Initializable: contract is already initialized')
-  })
-
-  it('should not be able to init with zero address messenger', async () => {
-    await expect(
-      L1NFTBridge.initialize(
-        '0x0000000000000000000000000000000000000000',
-        '0x0000000000000000000000000000000000000001'
-      )
-    ).to.be.revertedWith('zero address not allowed')
-  })
-  it('should not be able to init with zero address l2NFTbridge', async () => {
-    await expect(
-      L1NFTBridge.initialize(
-        '0x0000000000000000000000000000000000000001',
-        '0x0000000000000000000000000000000000000000'
-      )
-    ).to.be.revertedWith('zero address not allowed')
+    })
+    it('can register a NFT with L1 creation', async () => {
+      const l1 = 0
+      await L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L1')
+      const pairNFTInfo = await L1NFTBridge.pairNFTInfo(ERC721.address)
+      expect(pairNFTInfo.l1Contract).eq(ERC721.address)
+      expect(pairNFTInfo.l2Contract).eq(ERC721.address)
+      expect(pairNFTInfo.baseNetwork).eq(l1)
+    })
+    it('can register a NFT with L2 creation', async () => {
+      const l2 = 1
+      await L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L2')
+      const pairNFTInfo = await L1NFTBridge.pairNFTInfo(ERC721.address)
+      expect(pairNFTInfo.l1Contract).eq(ERC721.address)
+      expect(pairNFTInfo.l2Contract).eq(ERC721.address)
+      expect(pairNFTInfo.baseNetwork).eq(l2)
+    })
+    it('cant register a NFT with faulty base network', async () => {
+      await expect(
+        L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L211')
+      ).to.be.revertedWith('Invalid Network')
+    })
+    it('cant register if not owner', async () => {
+      const signer: Signer = (await ethers.getSigners())[1]
+      await expect(
+        L1NFTBridge.connect(signer).registerNFTPair(
+          ERC721.address,
+          ERC721.address,
+          'L2',
+          {
+            from: await signer.getAddress(),
+          }
+        )
+      ).to.be.revertedWith('Caller is not the owner')
+    })
   })
 })
-
-describe('cover registerNFTPair', () => {
-  beforeEach(async () => {
-    L1NFTBridge = await deployL1NFTBridge()
-    L2NFTBridge = await deployL2NFTBridge()
-    L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
-    ERC721 = await deployNFT('name', 'symbol')
-    await L1NFTBridge.initialize(
-      L1CrossDomainMessenger.address,
-      L2NFTBridge.address
-    )
-  })
-  it('can register a NFT with L1 creation', async () => {
-    const l1 = 0
-    await L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L1')
-    const pairNFTInfo = await L1NFTBridge.pairNFTInfo(ERC721.address)
-    expect(pairNFTInfo.l1Contract).eq(ERC721.address)
-    expect(pairNFTInfo.l2Contract).eq(ERC721.address)
-    expect(pairNFTInfo.baseNetwork).eq(l1)
-  })
-  it('can register a NFT with L2 creation', async () => {
-    const l2 = 1
-    await L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L2')
-    const pairNFTInfo = await L1NFTBridge.pairNFTInfo(ERC721.address)
-    expect(pairNFTInfo.l1Contract).eq(ERC721.address)
-    expect(pairNFTInfo.l2Contract).eq(ERC721.address)
-    expect(pairNFTInfo.baseNetwork).eq(l2)
-  })
-  it('cant register a NFT with faulty base network', async () => {
-    await expect(
-      L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L211')
-    ).to.be.revertedWith('Invalid Network')
-  })
-  it('cant register if not owner', async () => {
-    const signer: Signer = (await ethers.getSigners())[1]
-    await expect(
-      L1NFTBridge.connect(signer).registerNFTPair(
-        ERC721.address,
-        ERC721.address,
-        'L2',
-        {
-          from: await signer.getAddress(),
-        }
-      )
-    ).to.be.revertedWith('Caller is not the owner')
-  })
-})
-

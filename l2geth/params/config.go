@@ -237,13 +237,13 @@ var (
 	OpMainnetSDUpdateForkNum = big.NewInt(310215)
 
 	// OpRinkebySDUpdateForkNum is the height at which the SD update fork activates on Rinkeby.
-	OpRinkebySDUpdateForkNum = big.NewInt(147805)
+	OpRinkebySDUpdateForkNum = big.NewInt(0)
 
 	// BobaMainnetGasUpdatedForkNum is the height at which the gas update fork activates on Mainnet.
-	BobaMainnetGasUpdatedForkNum = big.NewInt(380000)
+	BobaMainnetGasUpdatedForkNum = big.NewInt(400000)
 
 	// BobaRinkebyGasUpdatedForkNum is the height at which the gas update fork activates on Rinkeby.
-	BobaRinkebyGasUpdatedForkNum = big.NewInt(106134)
+	BobaRinkebyGasUpdatedForkNum = big.NewInt(0)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and

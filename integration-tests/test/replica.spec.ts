@@ -52,7 +52,7 @@ describe('Syncing a replica', () => {
       Factory__ERC20 = await ethers.getContractFactory('ERC20', wallet)
     })
 
-    it('should sync dummy transaction', async () => {
+    it('{tag:other} should sync dummy transaction', async () => {
       const tx = {
         to: '0x' + '1234'.repeat(10),
         gasLimit: 4000000,
@@ -76,7 +76,7 @@ describe('Syncing a replica', () => {
       )
     })
 
-    it('should sync ERC20 deployment and transfer', async () => {
+    it('{tag:other} should sync ERC20 deployment and transfer', async () => {
       ERC20 = await Factory__ERC20.deploy(
         initialAmount,
         tokenName,

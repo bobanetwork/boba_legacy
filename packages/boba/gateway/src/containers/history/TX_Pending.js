@@ -13,33 +13,41 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react';
-import { Box, Grid, Typography } from '@mui/material'
-import * as S from './Account.styles'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
-import { selectTransactions } from 'selectors/transactionSelector'
-import { selectNetwork } from 'selectors/setupSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import "react-datepicker/dist/react-datepicker.css"
+import { Grid, Box } from '@mui/material'
 
-import { logAmount } from 'util/amountConvert'
+import { orderBy } from 'lodash'
+import { selectNetwork } from 'selectors/setupSelector'
+import { useTheme } from '@emotion/react'
 import { getNetwork } from 'util/masterConfig'
 
-import AlertIcon from 'components/icons/AlertIcon'
 import moment from 'moment'
+
+import { selectLoading } from 'selectors/loadingSelector'
+import { selectTokens } from 'selectors/tokenSelector'
+import { logAmount } from 'util/amountConvert'
+
+import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
-import { useTheme } from '@emotion/react'
 
-const PER_PAGE = 3
+import * as S from './History.styles'
 
-function PendingTransaction() {
+const PER_PAGE = 8
+
+function TX_Pending({ searchHistory, transactions }) {
 
     const [page, setPage] = useState(1)
-    const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
+    const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
     const tokenList = useSelector(selectTokens)
 
-    const pending = unorderedTransactions.filter((i) => {
+    useEffect(() => {
+      setPage(1)
+    }, [searchHistory])
+
+    const pending = transactions.filter((i) => {
         if (i.crossDomainMessage &&
             i.crossDomainMessage.crossDomainMessage === 1 &&
             i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
@@ -139,18 +147,18 @@ function PendingTransaction() {
     }, [])
 
     const orderedTransactions = orderBy(pendingTransactions, i => i.timeStamp, 'desc')
-    const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
-    const endingIndex = page * PER_PAGE;
-    const paginatedTransactions = orderedTransactions.slice(startingIndex, endingIndex);
 
-    let totalNumberOfPages = Math.ceil(orderedTransactions.length / PER_PAGE);
+    const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
+    const endingIndex = page * PER_PAGE
+    const paginatedTransactions = orderedTransactions.slice(startingIndex, endingIndex)
+
+    let totalNumberOfPages = Math.ceil(orderedTransactions.length / PER_PAGE)
 
     //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
     const currentNetwork = useSelector(selectNetwork())
     const nw = getNetwork()
-    const theme = useTheme()
 
     const chainLink = (item) => {
         let network = nw[currentNetwork]
@@ -161,54 +169,32 @@ function PendingTransaction() {
         return '';
     }
 
-    return <S.AccountWrapper >
+    console.log("PendingToShow:", paginatedTransactions)
 
-        <S.WrapperHeading>
-            <Typography variant="h3" sx={{ opacity: "1.0", fontWeight: "700" }}>Pending Transactions</Typography>
+  return (
+      <S.HistoryContainer>
             <Pager
-                currentPage={page}
-                isLastPage={paginatedTransactions.length < PER_PAGE}
-                totalPages={totalNumberOfPages}
-                onClickNext={()=>setPage(page + 1)}
-                onClickBack={()=>setPage(page - 1)}
-            />
-        </S.WrapperHeading>
-
-        {
-            pendingTransactions &&
-            !pendingTransactions.length &&
-            <Box
-                sx={{
-                    background: theme.palette.background.secondary,
-                    borderRadius: '12px',
-                    margin: '5px',
-                    padding: '10px 20px',
-                    display: 'flex',
-                    justifyContent: 'flex-start'
-                }}
-            >
-                <AlertIcon />
-                <Typography
-                    sx={{ wordBreak: 'break-all', marginLeft: '10px' }}
-                    variant="body2"
-                    component="p"
-                >
-                    No Pending Transactions
-                </Typography>
-            </Box>
-        }
-
-        {
-            paginatedTransactions &&
-            paginatedTransactions.length > 0 &&
-            paginatedTransactions.map((i) => {
+        currentPage={page}
+        isLastPage={paginatedTransactions.length < PER_PAGE}
+        totalPages={totalNumberOfPages}
+        onClickNext={() => setPage(page + 1)}
+        onClickBack={() => setPage(page - 1)}
+      />
+      <Grid item xs={12}>
+        <Box>
+          <S.Content>
+            {!paginatedTransactions.length && !loading && (
+              <S.Disclaimer>Scanning for pending transactions...</S.Disclaimer>
+            )}
+            {!paginatedTransactions.length && loading && (
+              <S.Disclaimer>Loading...</S.Disclaimer>
+            )}
+            {paginatedTransactions.map((i, index) => {
 
                 let completionTime = 'Not available'
 
                 if(i.completion)
                     completionTime = moment.unix(i.completion).format('lll')
-
-                let link = chainLink(i)
 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
@@ -227,68 +213,44 @@ function PendingTransaction() {
                     }
                   }
                 }
+              
+                let annotation = ''
+                if(typeof(i.label) === 'undefined') {
+                  //annotation = 'No Idea'
+                } else {
+                  annotation = i.label
+                }
 
-                return <S.Wrapper key={i.hash}>
-                <S.GridContainer
-                    container
-                    key={i.hash}
-                    spacing={2}
-                    direction="row"
-                    justifyContent="flex-start"
-                    alignItems="center"
-                >
-                    <Grid item xs={4}>
-                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
-                            <Typography variant="overline" style={{fontSize: '1.0em', lineHeight: '1.0em'}}>{i.label}</Typography>
-                            <Typography variant="overline" style={{fontSize: '0.8em', lineHeight: '0.8em', color: 'rgba(255, 255, 255, 0.3)'}}>{amountTx}</Typography>
-                        </div>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
-                            <Typography
-                                variant="overline"
-                                sx={{fontSize: '0.8em', lineHeight: '1.0em', color: 'rgba(255, 255, 255, 0.3)'}}
-                            >
-                                {'Started: '}{moment.unix(i.timeStamp).format('lll')}
-                            </Typography>
-                            <Typography
-                                variant="overline"
-                                sx={{fontSize: '0.8em', lineHeight: '0.8em', color: 'rgba(255, 255, 255, 0.3)'}}
-                            >
-                                {'Completion after: '}{completionTime}
-                            </Typography>
-                        </div>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
-                            <Typography
-                                variant="overline"
-                                sx={{fontSize: '0.8em', lineHeight: '1.0em'}}
-                            >
-                                {i.labelStatus}
-                            </Typography>
-                            <Typography
-                                sx={{ wordBreak: 'break-all', fontSize: '0.8em', lineHeight: '0.8em' }}
-                                variant="body2"
-                                component="p"
-                            >
-                                <a style={{color: 'white'}}
-                                    href={link}
-                                    target={'_blank'}
-                                    rel='noopener noreferrer'
-                                >
-                                    Details
-                                </a>
-                            </Typography>
-                        </div>
-                    </Grid>
-                </S.GridContainer>
-            </S.Wrapper>
-            })
-        }
+                let completion = ''
+                if(typeof(i.labelStatus) === 'undefined') {
+                  //status = 'No Idea'
+                } else {
+                  completion = i.labelStatus + ' - Completion time: ' + completionTime
+                }
 
+                const time = moment.unix(i.timeStamp).format('lll')
 
-    </S.AccountWrapper>
+                return (
+                    <Transaction
+                      key={index}
+                      title={`${chain} Hash: ${i.hash}`}
+                      time={time}
+                      blockNumber={`Block ${i.blockNumber}`}
+                      chain={`${chain} Chain`}
+                      typeTX={annotation === '' ? `` : `TX Type: ${annotation}`}
+                      oriChain={chain}
+                      oriHash={i.hash}
+                      amountTx={amountTx}
+                      completion={completion}
+                    />
+                )
+            })}
+          </S.Content>
+        </Box>
+      </Grid>
+    </S.HistoryContainer>
+
+  )
 }
 
-export default PendingTransaction
+export default React.memo(TX_Pending)
