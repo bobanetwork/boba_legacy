@@ -28,9 +28,9 @@ import Transaction from 'components/transaction/Transaction'
 
 import * as S from './History.styles';
 
-const PER_PAGE = 10;
+const PER_PAGE = 10
 
-function Deposits({ searchHistory, transactions }) {
+function TX_Deposits({ searchHistory, transactions }) {
 
   const [page, setPage] = useState(1)
 
@@ -141,4 +141,4 @@ function Deposits({ searchHistory, transactions }) {
   );
 }
 
-export default React.memo(Deposits);
+export default React.memo(TX_Deposits)

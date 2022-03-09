@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
 import { Direction } from './shared/watcher-utils'
 import { getContractFactory } from '@eth-optimism/contracts'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+
 import L1BobaJson from '@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
 import L2BobaJson from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import xBobaJson from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
@@ -12,18 +12,26 @@ import xBobaJson from '@boba/contracts/artifacts/contracts/standards/xL2Governan
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
-import GovernorBravoDelegateJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json'
+// use a mock contract only to adjust time params freely
+import GovernorBravoDelegateJson from '../artifacts/contracts/MockGovernorBravoDelegate.sol/MockGovernorBravoDelegate.json'
+import TimelockJson from '../artifacts/contracts/MockTimelock.sol/MockTimelock.json'
+
+import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 
 import { OptimismEnv } from './shared/env'
 
 describe('Dao Action Test', async () => {
-  let Factory__L1ERC20: ContractFactory
-  let Factory__L2ERC20: ContractFactory
+  let Factory__GovernorBravoDelegate: ContractFactory
+  let GovernorBravoDelegate: Contract
+
+  let Factory__GovernorBravoDelegator: ContractFactory
+  let GovernorBravoDelegator: Contract
+
+  let Factory__Timelock: ContractFactory
+  let Timelock: Contract
 
   let L1LiquidityPool: Contract
   let L2LiquidityPool: Contract
-  let L1ERC20: Contract
-  let L2ERC20: Contract
   let L1Boba: Contract
   let L2Boba: Contract
   let xBoba: Contract
@@ -31,7 +39,6 @@ describe('Dao Action Test', async () => {
 
   let Governor: Contract
 
-  let L2StandardBridgeAddress
   let quorumVotesPlus
 
   let initialL1LPUserRewardMinFeeRate
@@ -55,49 +62,130 @@ describe('Dao Action Test', async () => {
   ]
 
   const moveTimeForward = async (time = 0) => {
-    Factory__L1ERC20 = new ContractFactory(
-      L1ERC20Json.abi,
-      L1ERC20Json.bytecode,
-      env.l1Wallet
+    await new Promise((resolve) => setTimeout(resolve, time))
+    // submit random tx
+    await env.l2Wallet.sendTransaction({
+      to: env.l2Wallet_2.address,
+      value: utils.parseEther('0.01'),
+    })
+  }
+
+  const getTimestamp = async () => {
+    const blockNumber = await env.l2Provider.getBlockNumber()
+    const block = await env.l2Provider.getBlock(blockNumber)
+    return block.timestamp
+  }
+
+  const deployDAO = async (timeLockAddress: string = '') => {
+    const delay_before_execute_s = 0
+    const eta_delay_s = 5
+    const governor_voting_period = 259200 // 3 days in seconds
+    const governor_voting_delay = 172800 // 2 days in seconds
+    const governor_proposal_threshold = utils.parseEther('50000')
+
+    const BobaL2 = env.addressesBOBA.TOKENS.BOBA.L2
+    const xBobaL2 = env.addressesBOBA.TOKENS.xBOBA.L2
+
+    Factory__Timelock = new ContractFactory(
+      TimelockJson.abi,
+      TimelockJson.bytecode,
+      env.l2Wallet
     )
 
-    L1ERC20 = await Factory__L1ERC20.deploy(
-      utils.parseEther('10000000000'),
-      'JLKN',
-      'JLKN',
-      18
+    // if timeLock exists use the contract
+    if (timeLockAddress !== '') {
+      Timelock = new Contract(timeLockAddress, TimelockJson.abi, env.l2Wallet)
+      await Timelock.setAdminMock(env.l2Wallet.address)
+    } else {
+      Timelock = await Factory__Timelock.deploy(
+        env.l2Wallet.address,
+        delay_before_execute_s
+      )
+      await Timelock.deployTransaction.wait()
+    }
+
+    Factory__GovernorBravoDelegate = new ContractFactory(
+      GovernorBravoDelegateJson.abi,
+      GovernorBravoDelegateJson.bytecode,
+      env.l2Wallet
     )
-    await L1ERC20.deployTransaction.wait()
 
-    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
+    GovernorBravoDelegate = await Factory__GovernorBravoDelegate.deploy()
+    await GovernorBravoDelegate.deployTransaction.wait()
 
-    L2ERC20 = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress,
-      L1ERC20.address,
-      'JLKN',
-      'JLKN',
-      18
+    // deploy GovernorBravoDelegator
+    Factory__GovernorBravoDelegator = new ContractFactory(
+      GovernorBravoDelegatorJson.abi,
+      GovernorBravoDelegatorJson.bytecode,
+      env.l2Wallet
     )
-    await L2ERC20.deployTransaction.wait()
 
-    // increase l1 time and in turn change the l2 timestamp
-    await env.l1Provider.send('evm_increaseTime', [time])
-
-    const approveL1ERC20TX = await L1ERC20.approve(
-      L1StandardBridge.address,
-      utils.parseEther('100')
+    GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
+      Timelock.address,
+      BobaL2,
+      xBobaL2,
+      Timelock.address,
+      GovernorBravoDelegate.address,
+      governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
+      governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
+      governor_proposal_threshold // the votes necessary to propose
     )
-    await approveL1ERC20TX.wait()
+    await GovernorBravoDelegator.deployTransaction.wait()
 
-    await env.waitForXDomainTransaction(
-      L1StandardBridge.depositERC20(
-        L1ERC20.address,
-        L2ERC20.address,
-        utils.parseEther('100'),
-        9999999,
-        ethers.utils.formatBytes32String(new Date().getTime().toString())
-      ),
-      Direction.L1ToL2
+    // set admin Timelock
+    // set eta to be the current timestamp for local and rinkeby
+    const eta1 = (await getTimestamp()) + eta_delay_s
+
+    const setPendingAdminData = utils.defaultAbiCoder.encode(
+      // the parameters for the setPendingAdmin function
+      ['address'],
+      [GovernorBravoDelegator.address]
+    )
+
+    const setPendingAdminTx = await Timelock.queueTransaction(
+      Timelock.address,
+      0, //is the amount of ETH you want to send with an execution to the Timelock
+      'setPendingAdmin(address)', // the function to be called
+      setPendingAdminData,
+      eta1 // end of timelock in unix time
+    )
+
+    await setPendingAdminTx.wait()
+    // call initiate() to complete setAdmin
+    // set eta to be the current timestamp for local and rinkeby
+    const eta2 = (await getTimestamp()) + eta_delay_s
+
+    const initiateData = utils.defaultAbiCoder.encode(
+      // parameters to initate the GovernorBravoDelegate contract
+      ['bytes'],
+      [[]]
+    )
+
+    const initiateTx = await Timelock.queueTransaction(
+      GovernorBravoDelegator.address,
+      0,
+      '_initiate()',
+      initiateData,
+      eta2
+    )
+
+    await initiateTx.wait()
+    // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
+    await moveTimeForward(5000)
+    await Timelock.executeTransaction(
+      Timelock.address,
+      0,
+      'setPendingAdmin(address)', // the function to be called
+      setPendingAdminData,
+      eta1
+    )
+
+    await Timelock.executeTransaction(
+      GovernorBravoDelegator.address,
+      0,
+      '_initiate()',
+      initiateData,
+      eta2
     )
   }
 
@@ -118,8 +206,6 @@ describe('Dao Action Test', async () => {
       'L1StandardBridge',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
-
-    L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
 
     L2Boba = new Contract(
       env.addressesBOBA.TOKENS.BOBA.L2,
@@ -145,11 +231,26 @@ describe('Dao Action Test', async () => {
       env.l2Wallet
     )
 
+    if ((await L2LiquidityPool.DAO()) !== env.l2Wallet.address) {
+      // do not deploy Timelock
+      const timeLockAddress = await L2LiquidityPool.DAO()
+      await deployDAO(timeLockAddress)
+    } else {
+      // this is the first time - deploy Timelock
+      await deployDAO()
+      // and set Dao in L2LP
+      await L2LiquidityPool.transferDAORole(Timelock.address)
+    }
+
     Governor = new Contract(
-      env.addressesBOBA.GovernorBravoDelegator,
+      GovernorBravoDelegator.address,
       GovernorBravoDelegateJson.abi,
       env.l2Wallet
     )
+
+    // mock the voting period and voting delay time
+    await Timelock.setVotingDelayMock(Governor.address, 15)
+    await Timelock.setVotingPeriodMock(Governor.address, 15)
 
     const L2Balance = await L2Boba.balanceOf(env.l2Wallet.address)
 
@@ -299,8 +400,10 @@ describe('Dao Action Test', async () => {
       try {
         // get current voting delay from contract
         const votingDelay = (await Governor.votingDelay()).toNumber()
+        console.log('\twaiting for voting period to start...')
         // mock timestmap
-        await moveTimeForward(votingDelay)
+        // convert to milliseconds
+        await moveTimeForward((votingDelay + 1) * 1000)
 
         const proposalID = (await Governor.proposalCount())._hex
 
@@ -317,19 +420,20 @@ describe('Dao Action Test', async () => {
 
         const votingPeriod = (await Governor.votingPeriod()).toNumber()
         // mock timestamp
-        await moveTimeForward(votingPeriod)
+        await moveTimeForward((votingPeriod + 1) * 1000)
 
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
       } catch (error) {
+        console.log(error)
         // cancel the current proposal if there's a problem to avoid errors on rerun
         const proposalID = (await Governor.proposalCount())._hex
         const cancelTx = await Governor.cancel(proposalID)
         await cancelTx.wait()
       }
-    }).timeout(100000)
-    // TODO warp time on l2
-    it.skip('should queue the proposal successfully', async () => {
+    })
+
+    it('{tag:other} should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -337,8 +441,8 @@ describe('Dao Action Test', async () => {
       const state = await Governor.state(proposalID)
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
-    // TODO warp time on l2
-    it.skip('should execute the proposal successfully', async () => {
+
+    it('{tag:other} should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()
@@ -438,8 +542,9 @@ describe('Dao Action Test', async () => {
       try {
         // get current voting delay from contract
         const votingDelay = (await Governor.votingDelay()).toNumber()
+        console.log('\twaiting for voting period to start...')
         // mock timestamp
-        await moveTimeForward(votingDelay)
+        await moveTimeForward((votingDelay + 1) * 1000)
 
         const proposalID = (await Governor.proposalCount())._hex
 
@@ -456,19 +561,20 @@ describe('Dao Action Test', async () => {
 
         const votingPeriod = (await Governor.votingPeriod()).toNumber()
         // mock timestamp
-        await moveTimeForward(votingPeriod)
+        await moveTimeForward((votingPeriod + 1) * 1000)
 
         const stateAfterVotingPeriod = await Governor.state(proposalID)
         expect(proposalStates[stateAfterVotingPeriod]).to.deep.eq('Succeeded')
       } catch (error) {
+        console.log(error)
         // cancel the current proposal if there's a problem to avoid errors on rerun
         const proposalID = (await Governor.proposalCount())._hex
         const cancelTx = await Governor.cancel(proposalID)
         await cancelTx.wait()
       }
-    }).timeout(100000)
-    // TODO warp time on l2
-    it.skip('should queue the proposal successfully', async () => {
+    })
+
+    it('{tag:other} should queue the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const queueTx = await Governor.queue(proposalID)
       await queueTx.wait()
@@ -476,8 +582,8 @@ describe('Dao Action Test', async () => {
       const state = await Governor.state(proposalID)
       expect(proposalStates[state]).to.deep.eq('Queued')
     })
-    // TODO warp time on l2
-    it.skip('should execute the proposal successfully', async () => {
+
+    it('{tag:other} should execute the proposal successfully', async () => {
       const proposalID = (await Governor.proposalCount())._hex
       const executeTx = await Governor.execute(proposalID)
       await executeTx.wait()
@@ -498,6 +604,6 @@ describe('Dao Action Test', async () => {
       expect(ownerRewardFeeRate).to.deep.eq(
         initialL1LPOwnerRewardFeeRate.add(1)
       )
-    }).timeout(100000)
+    })
   })
 })

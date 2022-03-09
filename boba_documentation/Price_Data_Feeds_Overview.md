@@ -156,7 +156,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 ## 2. Witnet Price Feeds
 
-Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. Learn more about Witnet protocol [here]( https://docs.witnet.io/)
+Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. Learn more about Witnet protocol [here](https://docs.witnet.io/)
 
 #### Feeds supported:
 
@@ -171,8 +171,6 @@ Witnet is a decentralized oracle network, with multiple price feeds currently li
 It's just as easy to make your contracts listen to Witnet's price feed. Please refer to Witnet's official guide [here](https://docs.witnet.io/ethereum/price-feeds/)
 
 ## 3. Turing
-
-*Note: Turing is currently in testing on Boba Rinkeby*
 
 Turing is Boba's off-chain compute system, and among many other things - you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data
 

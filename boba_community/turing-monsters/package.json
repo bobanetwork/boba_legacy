@@ -12,8 +12,9 @@
     "build:contracts": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
     "flatten": "npx hardhat flatten ./contracts/NFTMonsterV2.sol >> contracts/TuringMonsters-flat.sol",
-    "test:boba": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test"
+    "test:local": "hardhat --network boba_local test",
+    "test:rinkeby": "hardhat --network boba_rinkeby test",
+    "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.15",

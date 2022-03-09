@@ -70,7 +70,12 @@ describe("Turing NFT Random 256", function () {
     if(hre.network.name === 'boba_rinkeby') {
       BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
       BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-    } else {
+    }
+    else if(hre.network.name === 'boba_mainnet') {
+      BOBAL2Address = '0x________________'
+      BobaTuringCreditAddress = '0x________________'
+    } 
+    else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
       addressesBOBA = JSON.parse(result)
       BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2

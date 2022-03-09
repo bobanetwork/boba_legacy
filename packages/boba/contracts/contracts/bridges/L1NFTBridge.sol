@@ -286,7 +286,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             address NFTOwner = IL1StandardERC721(_l1Contract).ownerOf(_tokenId);
             require(
                 msg.sender == NFTOwner || IL1StandardERC721(_l1Contract).getApproved(_tokenId) == msg.sender ||
-                IL1StandardERC721(pairNFT.l2Contract).isApprovedForAll(NFTOwner, msg.sender)
+                IL1StandardERC721(_l1Contract).isApprovedForAll(NFTOwner, msg.sender)
             );
 
             IL1StandardERC721(_l1Contract).burn(_tokenId);

@@ -8,10 +8,7 @@ x-l1_node_web3_url: &l1_node_web3_url
 
 services:
   verifier_dtl:
-    image: bobanetwork/verifier_dtl:latest
-    build:
-      context: ../..
-      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.verifier_dtl
+    image: bobanetwork/data-transport-layer:release
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
@@ -23,6 +20,16 @@ services:
         DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
         DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
         DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
+        DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 381145
+        DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 381145
+        DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 381145
+    volumes:
+      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -48,7 +55,13 @@ services:
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
         ROLLUP_POLL_INTERVAL_FLAG: "10s"
         ROLLUP_ENFORCE_FEES: 'true'
-        EMERGENCY_FORK_NUMBER: 310215
+        # turing credit contract
+        TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
@@ -57,12 +70,9 @@ services:
     depends_on:
      - verifier_dtl
      - verifier_l2geth
-    image: bobanetwork/fraud-detector:latest
+    image: bobanetwork/fraud-detector:release
     deploy:
       replicas: 1
-    build:
-      context: ../..
-      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
       <<: *l1_node_web3_url
       L1_CONFIRMATIONS: 8
@@ -72,6 +82,11 @@ services:
       ADDRESS_MANAGER_ADDRESS: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
       L1_DEPLOYMENT_BLOCK: 13502893
       L2_START_BLOCK: 1
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
 

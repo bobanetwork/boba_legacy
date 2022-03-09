@@ -5,6 +5,7 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "composite": true,
+    "resolveJsonModule": true,
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -13,8 +14,7 @@
     "experimentalDecorators": true,
     "typeRoots": [
       "node_modules/@types"
-    ],
-    "types": [ "node" ]
+    ]
   },
   "exclude": [
     "node_modules",

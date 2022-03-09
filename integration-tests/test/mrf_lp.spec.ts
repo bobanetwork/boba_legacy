@@ -1156,7 +1156,7 @@ describe('Liquidity Pool Test', async () => {
       await env.waitForXDomainTransactionFast(
         L2LiquidityPool.configureFeeExits(
           initialUserRewardMinFeeRate.add(10),
-          initialUserRewardMaxFeeRate.add(10),
+          initialUserRewardMaxFeeRate,
           initialOwnerRewardFeeRate.add(10)
         ),
         Direction.L2ToL1
@@ -1173,7 +1173,7 @@ describe('Liquidity Pool Test', async () => {
         initialUserRewardMinFeeRate.add(10)
       )
       expect(updatedUserRewardMaxFeeRate).to.deep.eq(
-        initialUserRewardMaxFeeRate.add(10)
+        initialUserRewardMaxFeeRate
       )
       expect(updatedOwnerRewardFeeRate).to.deep.eq(
         initialOwnerRewardFeeRate.add(10)
@@ -1890,7 +1890,6 @@ describe('Liquidity Pool Test', async () => {
     })
 
     it('{tag:mrf} should deposit ERC20', async () => {
-
       const depositAmount = utils.parseEther('10')
 
       const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
