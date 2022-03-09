@@ -1,4 +1,4 @@
-const { Contract, providers, Wallet, utils, ContractFactory } = require('ethers')
+const { Contract, providers, Wallet, ContractFactory } = require('ethers')
 const { getContractFactory } = require('@eth-optimism/contracts')
 const { Watcher } = require('../../../packages/core-utils/dist/watcher')
 const chalk = require('chalk')
@@ -66,12 +66,20 @@ const main = async () => {
   await L2ERC721.mint(l2Wallet.address, 2)
   console.log('And, Minted some NFTs to address')
   console.log('*********************************')
-  console.log('Now, we will allow all L2 NFTs from this contract to be bridgeable to L1')
-  console.log('To enable that, we need to deploy a bridge-compliant L1ERC721 representation...')
+  console.log(
+    'Now, we will allow all L2 NFTs from this contract to be bridgeable to L1'
+  )
+  console.log(
+    'To enable that, we need to deploy a bridge-compliant L1ERC721 representation...'
+  )
   console.log('*********************************')
 
-  const L1NFTBridgeAddress = await addressManager.getAddress('Proxy__L1NFTBridge')
-  const L2NFTBridgeAddress = await addressManager.getAddress('Proxy__L2NFTBridge')
+  const L1NFTBridgeAddress = await addressManager.getAddress(
+    'Proxy__L1NFTBridge'
+  )
+  const L2NFTBridgeAddress = await addressManager.getAddress(
+    'Proxy__L2NFTBridge'
+  )
 
   const Factory__L1StandardERC721 = new ContractFactory(
     L1StandardERC721Json.abi,
@@ -86,7 +94,10 @@ const main = async () => {
     'NFTR'
   )
   await L1StandardERC721.deployTransaction.wait()
-  console.log('Deployed the L1 NFT Representaton contract at:', L1StandardERC721.address)
+  console.log(
+    'Deployed the L1 NFT Representaton contract at:',
+    L1StandardERC721.address
+  )
 
   const L1NFTBridge = new Contract(
     L1NFTBridgeAddress,
@@ -112,7 +123,9 @@ const main = async () => {
     'L2' // base network
   )
 
-  console.log('And registered the L2ERC721 and L1ERC721 to the NFTBridges! \n \n ')
+  console.log(
+    'And registered the L2ERC721 and L1ERC721 to the NFTBridges! \n \n '
+  )
 
   console.log(chalk.yellow('Attempting to Bridge NFT#1 to L1'))
 
