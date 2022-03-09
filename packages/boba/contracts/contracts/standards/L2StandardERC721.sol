@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "./IL2StandardERC721.sol";
 
-contract L2StandardERC721 is IL2StandardERC721, ERC721URIStorage {
+contract L2StandardERC721 is IL2StandardERC721, ERC721 {
     address public override l1Contract;
     address public l2Bridge;
+    string private baseTokenURI;
 
     /**
      * @param _l2Bridge Address of the L2 standard bridge.
@@ -19,11 +20,13 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721URIStorage {
         address _l2Bridge,
         address _l1Contract,
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+        string memory _baseTokenURI
     )
         ERC721(_name, _symbol) {
         l1Contract = _l1Contract;
         l2Bridge = _l2Bridge;
+        baseTokenURI = _baseTokenURI;
     }
 
     modifier onlyL2Bridge {
@@ -50,5 +53,9 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721URIStorage {
         _burn(_tokenId);
 
         emit Burn(_tokenId);
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseTokenURI;
     }
 }
