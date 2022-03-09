@@ -64,7 +64,8 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.address,
         L1ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L2ERC721.deployTransaction.wait()
@@ -273,7 +274,8 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.address,
         L2ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L1ERC721.deployTransaction.wait()
@@ -494,7 +496,8 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.address,
         L1ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L2ERC721.deployTransaction.wait()
@@ -578,7 +581,8 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.address,
         L2ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L1ERC721.deployTransaction.wait()
@@ -660,7 +664,8 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.address,
         L1ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L2ERC721.deployTransaction.wait()
@@ -816,7 +821,8 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.address,
         L2ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L1ERC721.deployTransaction.wait()
