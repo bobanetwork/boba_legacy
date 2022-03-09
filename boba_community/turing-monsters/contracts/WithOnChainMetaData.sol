@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol";
 import "./ITuringHelper.sol";
 
-/// @author 1001.digital
-/// @title Handle NFT Metadata stored on IPFS
 abstract contract WithOnChainMetaData is ERC721 {
 
     ITuringHelper public turingHelper;
@@ -20,6 +18,7 @@ abstract contract WithOnChainMetaData is ERC721 {
         turingHelper = ITuringHelper(_turingHelperAddress);
     }
 
+    /// @dev Calculate randomized onchain metadata for specific tokenId.
     function getMetadata(uint tokenId) private view returns (string memory) {
         require(_exists(tokenId), "ERC721getSVG: URI get of nonexistent token");
 

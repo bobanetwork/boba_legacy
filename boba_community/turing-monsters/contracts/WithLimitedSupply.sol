@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-/// @author 1001.digital
 /// @title A token tracker that limits the token supply and increments token IDs on each new mint.
 abstract contract WithLimitedSupply {
     using Counters for Counters.Counter;

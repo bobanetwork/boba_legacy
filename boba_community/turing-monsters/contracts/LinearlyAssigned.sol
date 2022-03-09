@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./WithLimitedSupply.sol";
 
-/// @author 1001.digital
 /// @title A token tracker that increments token IDs on each new mint.
 abstract contract LinearlyAssigned is WithLimitedSupply {
     // The initial token ID

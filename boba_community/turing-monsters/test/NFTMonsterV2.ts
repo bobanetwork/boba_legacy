@@ -180,13 +180,13 @@ describe("Turing bridgeable NFT Random 256", function () {
     const mintingPrice = await erc721.PRICE();
     const amountNFTsToMint: number = 3
     console.log(`Trying to mint ${amountNFTsToMint} NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each.`)
-    let tr = await erc721.mint(amountNFTsToMint, {...gasOverride, value: mintingPrice * amountNFTsToMint})
+    let tr = await erc721.mint(amountNFTsToMint, {gasLimit: 1000000, value: mintingPrice * amountNFTsToMint})
     let res = await tr.wait()
     expect(res).to.be.ok
 
     const mintedEvents = await erc721.queryFilter(erc721.filters.MintedNFT())
     expect(mintedEvents.length >= 3, "Expected at least 3 minting events.")
-    const tokenIDs = [mintedEvents[0].args[0], mintedEvents[1].args[0], mintedEvents[2].args[0]]
+    const tokenIDs = [mintedEvents[0]?.args[0], mintedEvents[1]?.args[0], mintedEvents[2]?.args[0]]
     // very very low probability that all three combinations are linearly assigned when using random tokenIDs
     expect(Math.abs(tokenIDs[0] - tokenIDs[1]) > 1
       || Math.abs(tokenIDs[1] - tokenIDs[2]) > 1

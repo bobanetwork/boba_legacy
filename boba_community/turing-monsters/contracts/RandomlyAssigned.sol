@@ -7,7 +7,6 @@ interface TuringHelper {
     function TuringRandom() external returns (uint256);
 }
 
-/// @author 1001.digital
 /// @title Randomly assign tokenIDs from a given set of tokens.
 abstract contract RandomlyAssigned is WithLimitedSupply {
     // Used for random index assignment
