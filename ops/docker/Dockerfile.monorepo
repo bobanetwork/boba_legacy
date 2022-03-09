@@ -5,8 +5,11 @@
 # We do not use Alpine because there's a regression causing it to be very slow
 # when used with typescript/hardhat: https://github.com/nomiclabs/hardhat/issues/1219
 FROM node:16-buster-slim as node
-RUN apt-get update -y && apt-get install -y git
-
+RUN if echo "\"`uname -a`\"" | grep -q "arm64" ; then \
+    apt-get update -y && apt-get install -y git python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+  else \
+    apt-get update -y && apt-get install -y git; \
+  fi
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
 FROM alpine as downloader
