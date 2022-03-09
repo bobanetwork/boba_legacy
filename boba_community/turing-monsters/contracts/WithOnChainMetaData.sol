@@ -42,7 +42,7 @@ abstract contract WithOnChainMetaData is ERC721 {
         //   colorBody = "rgb(64,224,99)";
         // }
 
-        part[0] = "<svg xmlns='http://www.w3.org/2000/svg' version='1.2' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'>"
+        part[0] = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.2' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'>"
         "<style type='text/css'>.st0{fill:rgb(";
         part[1] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:rgb(";
         part[2] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:rgb(";
