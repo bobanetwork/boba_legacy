@@ -3,8 +3,10 @@
   #inputs.dream2nix.url = "path:/home/tgunnoe/src/boba/dream2nix";
   inputs.dream2nix.url = "github:nix-community/dream2nix";
   inputs.dream2nix.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.solc-bin.url = "github:tgunnoe/solc-bin-test";
+  inputs.solc-bin.flake = false;
 
-  outputs = { self, nixpkgs, dream2nix }@inputs:
+  outputs = { self, nixpkgs, dream2nix, solc-bin }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -18,7 +20,23 @@
       dream2nix.makeFlakeOutputs {
         pname = "test";
         source = ./. ;
-        packageOverrides = {
+        packageOverrides =
+          # let
+          #   # Ideally, these should be built and cached from source
+          #   solc-cache = pkgs.stdenv.mkDerivation {
+          #     pname = "solc-cache";
+          #     version = "0.8.9";
+          #     src = builtins.fetchurl {
+          #       url = "https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a";
+          #       sha256 = "156b53bpy3aqmd8s7dyx9xsxk83w0mfcpmpqpam6nj9pmlgz2lgq";
+          #     };
+          #     nativeBuildInputs = [
+          #       pkgs.cmake
+          #     ];
+          #   };
+
+          # in
+          {
           "@eth-optimism/l2geth" = {
             build = let
               l2geth = pkgs.buildGoModule {
@@ -64,7 +82,7 @@
 
               };
             in {
-              buildInputs = [
+              buildInputs = old: old ++ [
                 pkgs.python3
                 pkgs.jq
                 pkgs.nodejs
@@ -76,10 +94,40 @@
               '';
             };
           };
-          "@boba/turing-hybrid-compute" = {
+          "@boba/turing-hybrid-compute" =
+            # let
+            #   cacheDir = " ${placeholder "out"}";
+            #   compilersDir = "${cacheDir}/cache/hardhat-nodejs/compilers";
+            # in
+            {
+            add-solc =
+              # let
+              #   solc-baseurl = "https://github.com/ethereum/solc-bin/raw/gh-pages";
+              #   solc-version = "0.8.9+commit.e5eed63a";
+              #   solc-bin = builtins.fetchurl {
+              #     url = "${solc-baseurl}/linux-amd64/solc-linux-amd64-v${solc-version}";
+              #     sha256 = "156b53bpy3aqmd8s7dyx9xsxk83w0mfcpmpqpam6nj9pmlgz2lgq";
+              #   };
+              #   solc-list = builtins.fetchurl {
+              #     url = "${solc-baseurl}/linux-amd64/list.json";
+              #     sha256 = "1jz29yy4fhavwjpk362gs9aczgjsf4jpgd92pr5afvzdgj1qr0ki";
+              #   };
+              # in
+              {
+                # preBuild = ''
+                #   mkdir -p ${compilersDir}/linux-amd64
+                #   ln -s ${solc-bin} ${compilersDir}/linux-amd64/solc-linux-amd64-v${solc-version}
+                #   ln -s ${solc-list} ${compilersDir}/linux-amd64/list.json
+                #   export XDG_CACHE_HOME=$out/cache
+                # '';
+                # Hardhat relies on env-paths and uses this env var if available
+                XDG_CACHE_HOME = "${solc-bin}";
+
+            };
             add-inputs = {
               buildInputs = old: old ++ [
                 pkgs.yarn
+                #solc-cache
               ];
             };
           };

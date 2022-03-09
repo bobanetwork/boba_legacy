@@ -205,7 +205,24 @@
     "root": {
       "inputs": {
         "dream2nix": "dream2nix",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "solc-bin": "solc-bin"
+      }
+    },
+    "solc-bin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1646792577,
+        "narHash": "sha256-YFo/Uwa7kzkOP2avABAzvz7ITKNLuK3sazGcfHmY3Xc=",
+        "owner": "tgunnoe",
+        "repo": "solc-bin-test",
+        "rev": "c47ceeb1360ab9bd766b873877fabd943ce0e108",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tgunnoe",
+        "repo": "solc-bin-test",
+        "type": "github"
       }
     }
   },
