@@ -91,7 +91,8 @@ const main = async () => {
     L1NFTBridgeAddress,
     L2ERC721.address,
     'NFT Representation',
-    'NFTR'
+    'NFTR',
+    '' // base-uri
   )
   await L1StandardERC721.deployTransaction.wait()
   console.log(
