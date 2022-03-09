@@ -46,7 +46,8 @@ const deployFn: DeployFunction = async (hre) => {
         L2NFTBridge.address,
         tokenAddress,
         token.name,
-        token.symbol
+        token.symbol,
+        token.baseURI //base-uri
       )
       await L2ERC721.deployTransaction.wait()
 
