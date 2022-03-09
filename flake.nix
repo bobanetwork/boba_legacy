@@ -94,35 +94,9 @@
               '';
             };
           };
-          "@boba/turing-hybrid-compute" =
-            # let
-            #   cacheDir = " ${placeholder "out"}";
-            #   compilersDir = "${cacheDir}/cache/hardhat-nodejs/compilers";
-            # in
-            {
-            add-solc =
-              # let
-              #   solc-baseurl = "https://github.com/ethereum/solc-bin/raw/gh-pages";
-              #   solc-version = "0.8.9+commit.e5eed63a";
-              #   solc-bin = builtins.fetchurl {
-              #     url = "${solc-baseurl}/linux-amd64/solc-linux-amd64-v${solc-version}";
-              #     sha256 = "156b53bpy3aqmd8s7dyx9xsxk83w0mfcpmpqpam6nj9pmlgz2lgq";
-              #   };
-              #   solc-list = builtins.fetchurl {
-              #     url = "${solc-baseurl}/linux-amd64/list.json";
-              #     sha256 = "1jz29yy4fhavwjpk362gs9aczgjsf4jpgd92pr5afvzdgj1qr0ki";
-              #   };
-              # in
-              {
-                # preBuild = ''
-                #   mkdir -p ${compilersDir}/linux-amd64
-                #   ln -s ${solc-bin} ${compilersDir}/linux-amd64/solc-linux-amd64-v${solc-version}
-                #   ln -s ${solc-list} ${compilersDir}/linux-amd64/list.json
-                #   export XDG_CACHE_HOME=$out/cache
-                # '';
-                # Hardhat relies on env-paths and uses this env var if available
+          "@boba/turing-hybrid-compute" = {
+            add-solc = {
                 XDG_CACHE_HOME = "${solc-bin}";
-
             };
             add-inputs = {
               buildInputs = old: old ++ [
@@ -130,6 +104,50 @@
                 #solc-cache
               ];
             };
+          };
+          "@boba/contracts" = {
+            add-solc = {
+                XDG_CACHE_HOME = "${solc-bin}";
+            };
+            add-inputs = {
+              buildInputs = old: old ++ [
+                #pkgs.yarn
+                #solc-cache
+              ];
+              nativeBuildInputs = old: old ++ [
+                pkgs.udev
+              ];
+
+            };
+          };
+          "@eth-optimism/contracts" = {
+            add-solc = {
+                XDG_CACHE_HOME = "${solc-bin}";
+            };
+            add-inputs = {
+              buildInputs = old: old ++ [
+                #pkgs.yarn
+                #solc-cache
+              ];
+              nativeBuildInputs = old: old ++ [
+                pkgs.nodePackages.node-pre-gyp
+              ];
+            };
+          };
+          "@boba/register" = {
+            add-solc = {
+                XDG_CACHE_HOME = "${solc-bin}";
+            };
+            add-inputs = {
+              buildInputs = old: old ++ [
+                #pkgs.yarn
+                #solc-cache
+              ];
+            };
+          };
+          usb.build = {
+            buildInputs = with pkgs; [ udev python3 ];
+            nativeBuildInputs = with pkgs; [ jq nodePackages.npm nodejs ];
           };
         };
       };
