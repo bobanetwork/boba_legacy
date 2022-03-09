@@ -114,7 +114,7 @@ const main = async () => {
 
   console.log('And registered the L2ERC721 and L1ERC721 to the NFTBridges! \n \n ')
 
-  console.log('Attempting to Bridge NFT#1 to L1')
+  console.log(chalk.yellow('Attempting to Bridge NFT#1 to L1'))
 
   const withdrawTxHash = await bridgeToL1(L2ERC721, L2NFTBridge, 1)
 
@@ -130,7 +130,7 @@ const main = async () => {
   console.log(chalk.green('NFT bridged to L1 successfully!'))
   console.log('#################################')
 
-  console.log('\n \nAttempting to bridge NFT back to L2')
+  console.log(chalk.yellow('\n \nAttempting to bridge NFT#1 back to L2'))
   const depositTxHash = await bridgeBackToL2(L1StandardERC721, L1NFTBridge, 1)
   console.log('Waiting for deposit to be relayed to L2...')
   const [msgHash2] = await watcher.getMessageHashesFromL1Tx(depositTxHash)

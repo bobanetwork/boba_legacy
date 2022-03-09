@@ -2,7 +2,7 @@ const { utils, ethers } = require('ethers')
 
 const bridgeBackToL2 = async (L1StandardERC721, L1NFTBridge, tokenId) => {
   // check if NFT is base L2
-  // check if L1StandardERC721 contract exists for the pair
+  // check if L1StandardERC721 is registered for the pair
   const L1NFT = await L1NFTBridge.pairNFTInfo(L1StandardERC721.address)
   if (
     L1NFT.l1Contract !== ethers.constants.AddressZero &&
