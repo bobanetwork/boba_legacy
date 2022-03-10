@@ -28,7 +28,7 @@ The central idea is that if two (or more) geths injects the same transactions, t
 
 ## 2. What do when you discover a state root mismatch
 
-Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
+Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/bobanetwork/boba/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
 
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
@@ -37,7 +37,7 @@ Congratulations! The security of the L2 depends on community monitoring of the o
 **Open a terminal window**. First, clone the project and install needed dependencies:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ git clone git@github.com:bobanetwork/boba.git
 $ cd optimism-v2
 $ yarn install
 $ yarn build
@@ -65,7 +65,7 @@ Next, spin up the `Fraud Detector` and other neccessary services (the `Verifier 
 $ docker-compose up
 ```
 
-Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service. 
+Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service.
 
 ```bash
 $ cd optimism-v2/boba_community/fraud-detector

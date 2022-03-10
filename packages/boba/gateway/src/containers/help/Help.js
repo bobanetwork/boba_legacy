@@ -75,7 +75,7 @@ function Help() {
         </Typography>
         <Typography variant="body2" component="p" sx={{ mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7' }}>
           Please use your browser's developer console to see the error message and then please check the project's{' '}
-          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/omgnetwork/optimism-v2/issues'>GitHub issues list</Link>{' '}
+          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/bobanetwork/boba/issues'>GitHub issues list</Link>{' '}
           to see if other people have had the same problem. If not, please file a new GitHub issue.
         </Typography>
 
@@ -85,7 +85,7 @@ function Help() {
         <Typography variant="body2" component="p" sx={{ mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7' }}>
           We love hearing about new features that you would like. Please file suggestions,
           prefaced with `Gateway Feature`, in our{' '}
-          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/omgnetwork/optimism-v2/issues'>GitHub issues list</Link>.
+          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/bobanetwork/boba/issues'>GitHub issues list</Link>.
           Expect a turnaround time of several days for us to be able to consider new UI/GateWay features.
           Keep in mind that this is an opensource project, so help out, $ git clone, $ yarn, $ yarn start, and then open a PR.
         </Typography>

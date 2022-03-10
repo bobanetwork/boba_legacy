@@ -25,7 +25,7 @@ $ npm install --global yarn
 Clone the repository, open it, and install packages with `yarn`:
 
 ```bash
-$ git clone https://github.com/omgnetwork/optimism-v2.git
+$ git clone https://github.com/bobanetwork/boba.git
 $ cd optimism-v2
 $ yarn
 $ yarn build
@@ -48,22 +48,22 @@ const BOBAL2Address = '0x58597818d1B85EF96383884951E846e9D6D03956'
 const BobaTuringCreditRinkebyAddress = '0xE654ba86Ea0B59a6836f86Ec806bfC9449D0aD0A'
 
 // provide your PK here
-const testPrivateKey = '0x____' 
+const testPrivateKey = '0x____'
 
-``` 
+```
 
 You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed. 
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed.
 
 ## Deploying the Turing Monster NFT
 
 Run
 
 ```bash
-$ cd boba_community/turing-monsters 
+$ cd boba_community/turing-monsters
 $ yarn build
 $ yarn test:rinkeby # for testing on rinkeby, for example
 
@@ -93,7 +93,7 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract and the `uint256 turingRAND = myHelper.TuringRandom();` of course.
 
 ```javascript
-    
+
     function mint(address to, uint256 tokenId) public {
       uint256 turingRAND = myHelper.TuringRandom(); // Get the random number
       _mint(to, tokenId);
@@ -119,7 +119,7 @@ The ERC721 contract is largely standard, except for needing to provide the addre
           colorEye = "54B948";
         }
   ...
-      
+
         part[0] = "<svg x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'><style type='text/css'>.st0{fill:#";
   ...
         return string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], part[3]));
