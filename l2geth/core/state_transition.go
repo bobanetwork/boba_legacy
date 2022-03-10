@@ -130,9 +130,10 @@ func IntrinsicGas(data []byte, contractCreation, isHomestead bool, isEIP2028 boo
 func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition {
 	l1Fee := new(big.Int)
 	l2ExtraGas := new(big.Int)
-	isFeeUpdate := evm.ChainConfig().IsFeeUpdate(evm.BlockNumber)
-	isGasUpdate := evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
+	isGasUpdate := true
 	if rcfg.UsingOVM {
+		isFeeUpdate := evm.ChainConfig().IsFeeUpdate(evm.BlockNumber)
+		isGasUpdate = evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
 		if msg.GasPrice().Cmp(common.Big0) != 0 {
 			// Compute the L1 fee before the state transition
 			// so it only has to be read from state one time.
