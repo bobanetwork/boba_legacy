@@ -54,11 +54,6 @@ function Account ({ enabled }) {
   const baseEnabled = useSelector(selectBaseEnabled())
   const networkLayer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
-  
-  console.log("Account - network:", network)
-  console.log("Account - layer:", networkLayer)
-  console.log("Account - baseEnabled:", baseEnabled)
-  console.log("Account - accountEnabled:", accountEnabled)
 
   const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
@@ -72,19 +67,23 @@ function Account ({ enabled }) {
 
   const disabled = depositLoading || exitLoading
 
-  const getLookupPrice = useCallback(()=>{
+  const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
-    const symbolList = Object.values(tokenList).map((i)=> {
-      if(i.symbolL1 === 'ETH') {
+    const symbolList = Object.values(tokenList).map((i) => {
+      if (i.symbolL1 === 'ETH') {
         return 'ethereum'
-      } else if(i.symbolL1 === 'OMG') {
+      } else if (i.symbolL1 === 'OMG') {
         return 'omg'
-      } else {
+      } else if(i.symbolL1 === 'BOBA') {
+        return 'boba-network'
+      }
+      else {
         return i.symbolL1.toLowerCase()
       }
     })
     dispatch(fetchLookUpPrice(symbolList))
-  },[ tokenList, dispatch, accountEnabled ])
+  }, [ tokenList, dispatch, accountEnabled ])
+
 
   // const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
