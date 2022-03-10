@@ -1,7 +1,7 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
-  #inputs.dream2nix.url = "path:/home/tgunnoe/src/boba/dream2nix";
-  inputs.dream2nix.url = "github:nix-community/dream2nix";
+  #inputs.dream2nix.url = "github:nix-community/dream2nix";
+  inputs.dream2nix.url = "github:tgunnoe/dream2nix/git-plus-resolved";
   inputs.dream2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.solc-bin.url = "github:tgunnoe/solc-bin-test";
   inputs.solc-bin.flake = false;
@@ -16,9 +16,29 @@
         pkgs = pkgs;
         config.projectRoot = ./. ;
       };
+
+      # some override required for multiple packages
+      correct-tsconfig-path = {
+        postPatch = ''
+            if [ -f "./tsconfig.build.json" ];
+            then
+            substituteInPlace ./tsconfig.build.json --replace \
+              '"extends": "../../tsconfig.build.json"' \
+              '"extends": "./tsconfig.build-copy.json"'
+            fi
+            substituteInPlace ./tsconfig.json --replace \
+              '"extends": "../../tsconfig.json"' \
+              '"extends": "./tsconfig-copy.json"'
+            cp ${./.}/tsconfig.build.json \
+              ./tsconfig.build-copy.json
+            cp ${./.}/tsconfig.json \
+              ./tsconfig-copy.json
+
+          '';
+      };
     in
       dream2nix.makeFlakeOutputs {
-        pname = "test";
+        pname = "boba";
         source = ./. ;
         packageOverrides =
           # let
@@ -106,12 +126,22 @@
             };
           };
           "@boba/contracts" = {
+            #inherit correct-tsconfig-path;
+            correct-tsconfig-path = {
+              postPatch = ''
+                substituteInPlace ./tsconfig.json --replace \
+                  '"extends": "../../../tsconfig.json"' \
+                  '"extends": "./tsconfig.build-copy.json"'
+                cp ${./.}/tsconfig.build.json \
+                  ./tsconfig.build-copy.json
+              '';
+            };
             add-solc = {
                 XDG_CACHE_HOME = "${solc-bin}";
             };
             add-inputs = {
               buildInputs = old: old ++ [
-                #pkgs.yarn
+                pkgs.yarn
                 #solc-cache
               ];
               nativeBuildInputs = old: old ++ [
@@ -120,7 +150,59 @@
 
             };
           };
+          "@eth-optimism/common-ts" = { inherit correct-tsconfig-path; };
+          "@eth-optimism/message-relayer" = {
+            inherit correct-tsconfig-path;
+          };
           "@eth-optimism/contracts" = {
+            inherit correct-tsconfig-path;
+            add-solc = {
+                XDG_CACHE_HOME = "${solc-bin}";
+            };
+            add-inputs = {
+              buildInputs = old: old ++ [
+
+                #solc-cache
+              ];
+              nativeBuildInputs = old: old ++ [
+                pkgs.yarn
+                pkgs.nodePackages.node-pre-gyp
+              ];
+            };
+          };
+          "@eth-optimism/core-utils" = {
+
+            #_condition = pkg: inputs.dream2nix.lib."x86_64-linux".utils.satisfiesSemver "^0.6.0" pkg;
+            #_condition = pkg: pkg.version == "0.6.0";
+            inherit correct-tsconfig-path;
+            add-inputs = {
+              buildInputs = old: old ++ [
+                #solc-cache
+              ];
+              nativeBuildInputs = old: old ++ [
+                pkgs.yarn
+                pkgs.nodePackages.node-pre-gyp
+              ];
+            };
+          };
+          "@eth-optimism/data-transport-layer" = {
+            inherit correct-tsconfig-path;
+            add-solc = {
+                XDG_CACHE_HOME = "${solc-bin}";
+            };
+            add-inputs = {
+              buildInputs = old: old ++ [
+
+                #solc-cache
+              ];
+              nativeBuildInputs = old: old ++ [
+                #pkgs.yarn
+                #pkgs.nodePackages.node-pre-gyp
+              ];
+            };
+          };
+
+          "@boba/register" = {
             add-solc = {
                 XDG_CACHE_HOME = "${solc-bin}";
             };
@@ -129,18 +211,13 @@
                 #pkgs.yarn
                 #solc-cache
               ];
-              nativeBuildInputs = old: old ++ [
-                pkgs.nodePackages.node-pre-gyp
-              ];
             };
           };
-          "@boba/register" = {
-            add-solc = {
-                XDG_CACHE_HOME = "${solc-bin}";
-            };
+          optimism = {
             add-inputs = {
               buildInputs = old: old ++ [
                 #pkgs.yarn
+                #pkgs.nodePackages.lerna
                 #solc-cache
               ];
             };
