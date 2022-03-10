@@ -1,13 +1,13 @@
 <div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
+  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
   <br />
   <h1> The Boba Monorepo</h1>
 </div>
 
 <p align="center">
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
 </p>
 
 - [TL;DR](#tl-dr)
@@ -25,10 +25,10 @@
 
 ## TL;DR
 
-This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md). 
+This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
-<a href="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing">
-  <img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
+<a href="https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing">
+  <img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
 </a>
 
  Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
@@ -44,7 +44,7 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 ## Documentation
 
-User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation) and within the service and contract directories. 
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories.
 
 ## Community and DAO
 
@@ -102,7 +102,7 @@ You'll need the following:
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ git clone git@github.com:bobanetwork/boba.git
 $ cd optimism-v2
 $ yarn clean # only needed / will only work if you had it installed previously
 $ yarn
@@ -155,7 +155,7 @@ Make sure you are in the `ops` folder and then run
 docker-compose run integration_tests
 ```
 
-Expect the full test suite with more than 110 tests including load tests to complete in 
+Expect the full test suite with more than 110 tests including load tests to complete in
 between *30 minutes* to *two hours* depending on your computer hardware.
 
 ### Viewing docker container logs
@@ -171,4 +171,4 @@ docker-compose logs --follow <service name>
 
 Code forked from [`go-ethereum`](https://github.com/ethereum/go-ethereum) under the name [`l2geth`](https://github.com/ethereum-optimism/optimism/tree/master/l2geth) is licensed under the [GNU GPLv3](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60) in accordance with the [original license](https://github.com/ethereum/go-ethereum/blob/master/COPYING).
 
-All other files within this repository are licensed under the [MIT License](https://github.com/omgnetwork/optimism-v2/blob/develop/LICENSE) unless stated otherwise.
+All other files within this repository are licensed under the [MIT License](https://github.com/bobanetwork/boba/blob/develop/LICENSE) unless stated otherwise.
