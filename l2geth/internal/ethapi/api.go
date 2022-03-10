@@ -1079,7 +1079,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	l2ExtraGas := new(big.Int)
 	if rcfg.UsingOVM {
 		if msg.GasPrice().Cmp(common.Big0) != 0 {
-			l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, state, nil)
+			l2ExtraGas, _ = fees.CalculateL1GasFromState(data, state, nil)
 		}
 	}
 
