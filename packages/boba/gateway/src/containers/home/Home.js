@@ -282,7 +282,7 @@ function Home() {
                   You can{' '}
                   <Link variant="body2" 
                     style={{lineHeight: '1.0em', fontWeight: '700'}} 
-                    href='https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md'
+                    href='https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md'
                   >learn more about Turing here
                   </Link>. 
                 </Typography>
