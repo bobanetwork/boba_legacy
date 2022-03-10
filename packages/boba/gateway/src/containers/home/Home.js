@@ -336,7 +336,7 @@ function Home() {
               <Help />
             }
             {pageDisplay === "Ecosystem" &&
-              <Ecosystem/>
+              <Ecosystem />
             }
           </Container>
           <PageFooter/>

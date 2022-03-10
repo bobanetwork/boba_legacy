@@ -50,6 +50,7 @@ function setupReducer (state = initialState, action) {
         baseEnabled: action.payload,
       }
     case 'SETUP/LAYER/SET':
+      console.log("SR: Setting layer to:", action.payload)
       return { 
         ...state, 
         netLayer: action.payload
