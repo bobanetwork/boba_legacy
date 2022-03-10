@@ -84,6 +84,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import Bridge from 'containers/bridge/Bridge'
 
 import { Box, Container } from '@mui/material'
 
@@ -337,6 +338,9 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Bridge" &&
+              <Bridge/>
             }
           </Container>
           <PageFooter/>
