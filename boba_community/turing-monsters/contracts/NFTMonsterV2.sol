@@ -24,7 +24,6 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
     constructor(string memory name_, string memory symbol_, uint256 maxNFTs_,
         address[] memory creatorAddresses_, address turingHelperAddress_)
     ERC721(name_, symbol_)
-    WithOnChainMetaData(turingHelperAddress_)
     RandomlyAssigned(maxNFTs_, 0, turingHelperAddress_) // Max. x NFTs available; Start counting from 0
     {
         _pause();
@@ -99,11 +98,11 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
 
         uint creatorCount = projectOwners.length;
         for (uint i = 0; i < projectOwners.length; i++) {
-            _widthdraw(projectOwners[i], balance / creatorCount);
+            _withdraw(projectOwners[i], balance / creatorCount);
         }
     }
 
-    function _widthdraw(address _address, uint256 _amount) private {
+    function _withdraw(address _address, uint256 _amount) private {
         (bool success,) = _address.call{value : _amount}("");
         require(success, "Transfer failed.");
     }

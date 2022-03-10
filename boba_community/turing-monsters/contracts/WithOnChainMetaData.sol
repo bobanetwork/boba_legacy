@@ -5,18 +5,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol";
-import "./ITuringHelper.sol";
 
 abstract contract WithOnChainMetaData is ERC721 {
 
-    ITuringHelper public turingHelper;
 
     // Optional mapping for token URIs
     mapping(uint256 => uint256) private _tokenURIs;
-
-    constructor(address _turingHelperAddress) {
-        turingHelper = ITuringHelper(_turingHelperAddress);
-    }
 
     /// @dev Calculate randomized onchain metadata for specific tokenId.
     function getMetadata(uint tokenId) private view returns (string memory) {
@@ -77,10 +71,6 @@ abstract contract WithOnChainMetaData is ERC721 {
         string memory json = getMetadata(tokenId);
         // non-existent token check integrated
         return string(abi.encodePacked('data:application/json;base64,', json));
-    }
-
-    function baseURI() public view returns (string memory) {
-        return _baseURI();
     }
 
     function exists(uint256 tokenId) public view returns (bool) {

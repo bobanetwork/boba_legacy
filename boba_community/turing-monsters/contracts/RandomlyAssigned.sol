@@ -14,7 +14,7 @@ abstract contract RandomlyAssigned is WithLimitedSupply {
 
     // The initial token ID
     uint256 private startFrom;
-    TuringHelper private turingHelper;
+    TuringHelper internal turingHelper;
 
     /// Instanciate the contract
     /// @param _totalSupply how many tokens this collection should hold
