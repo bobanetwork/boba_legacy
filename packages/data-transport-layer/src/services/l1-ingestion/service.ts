@@ -111,9 +111,7 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     this.l1IngestionMetrics = registerMetrics(this.metrics)
 
     if (typeof this.options.l1RpcProvider === 'string') {
-      this.state.l1RpcProvider = FallbackProvider(this.options.l1RpcProvider, {
-        'User-Agent': 'data-transport-layer',
-      })
+      this.state.l1RpcProvider = FallbackProvider(this.options.l1RpcProvider)
     } else {
       this.state.l1RpcProvider = this.options.l1RpcProvider
     }
