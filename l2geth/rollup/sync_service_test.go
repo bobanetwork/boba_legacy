@@ -742,7 +742,7 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 }
 
 // Should reject the tx if the gas limit is not enough
-// to cover the l1 secuirty fee
+// to cover the l1 security fee
 func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 	service, _, _, err := newTestSyncService(true, nil)
 	if err != nil {

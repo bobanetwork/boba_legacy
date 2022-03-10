@@ -68,10 +68,6 @@ type PublicEthereumAPI struct {
 	b Backend
 }
 
-type callmsg struct {
-	types.Message
-}
-
 // NewPublicEthereumAPI creates a new Ethereum protocol API.
 func NewPublicEthereumAPI(b Backend) *PublicEthereumAPI {
 	return &PublicEthereumAPI{b}
