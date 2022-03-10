@@ -248,11 +248,11 @@ function Home() {
       </Alert>
 
       {!!maintenance &&
-        <Box sx={{ 
+        <Box sx={{
           display: 'flex',
-          height: '100%', 
-          flexDirection: 'column', 
-          width: '100%' 
+          height: '100%',
+          flexDirection: 'column',
+          width: '100%'
         }}>
           <PageHeader maintenance={maintenance}/>
           <Container maxWidth={false} sx={{
@@ -266,25 +266,25 @@ function Home() {
             <S.HomePageContainer>
               <PageTitle title="Boba March 4 Maintenance Mode"/>
               <Grid item xs={12}>
-                <Typography 
-                  variant="body1" 
+                <Typography
+                  variant="body1"
                   component="p" sx={{mt: 2, mb: 0, fontWeight: '700', paddingBottom: '20px'}}
                 >
                   We are upgrading our Sequencer to support Turing Hybrid Compute
                 </Typography>
                 <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
-                  As announced on Twitter and Telegram, Boba network is currently being upgraded to support Turing. 
+                  As announced on Twitter and Telegram, Boba network is currently being upgraded to support Turing.
                 </Typography>
                 <Typography variant="body2" component="p" sx={{
                   mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7',
                   paddingTop: '20px', paddingBottom: '20px'}}
                 >
                   You can{' '}
-                  <Link variant="body2" 
-                    style={{lineHeight: '1.0em', fontWeight: '700'}} 
-                    href='https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md'
+                  <Link variant="body2"
+                    style={{lineHeight: '1.0em', fontWeight: '700'}}
+                    href='https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md'
                   >learn more about Turing here
-                  </Link>. 
+                  </Link>.
                 </Typography>
                 <img
                   src={turing}
@@ -298,7 +298,7 @@ function Home() {
         </Box>
       }
 
-      {! maintenance && 
+      {! maintenance &&
         <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
           <Container maxWidth={false} sx={{
