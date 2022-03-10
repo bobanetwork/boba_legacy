@@ -1056,16 +1056,14 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		return hexutil.Uint64(hi), nil
 	}
 
-	nonce, _ := b.GetPoolNonce(ctx, *args.From)
-
-	value := new(big.Int)
-	if args.Value != nil {
-		value = args.Value.ToInt()
-	}
-
 	gasPrice := new(big.Int)
 	if args.GasPrice != nil {
 		gasPrice = args.GasPrice.ToInt()
+	} else {
+		price, err := b.SuggestPrice(ctx)
+		if err == nil {
+			gasPrice = price
+		}
 	}
 
 	var data []byte
@@ -1073,12 +1071,10 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		data = []byte(*args.Data)
 	}
 
-	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
-
 	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	l2ExtraGas := new(big.Int)
 	if rcfg.UsingOVM {
-		if msg.GasPrice().Cmp(common.Big0) != 0 {
+		if gasPrice.Cmp(common.Big0) != 0 {
 			l2ExtraGas, _ = fees.CalculateL1GasFromState(data, state, nil)
 		}
 	}
