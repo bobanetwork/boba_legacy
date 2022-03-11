@@ -6,6 +6,28 @@ If you are a NFT marketplace, willing to support the bridge feature - please ref
 
 Please note - this example is towards bridging in/out a Layer-2 native ERC721 (meaning a NFT originally deployed to L2 Boba). However, the bridge can support the same features with Layer-1 NFTs as well, for which please refer to the [more elaborate documentation - here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/bridges/README.md)
 
+## Quickstart - Rinkeby
+If you don't have much time and are looking to quickly run through the example, just keep looking at this section. However, If you want a more enhanced understanding, which is encouraged, skip forward to the [next section](#getting-started-with-the-example)
+
+Alright, if you are still here, we don't have much time, so we will try running through the example on Boba-Rinkeby
+
+- Step 1: set up your env according to the .env.example
+you would need a rinkeby infura endpoint, and an account with some Rinkeby Eth (> 0.01 ETH)
+
+- Step 2: You are all set!
+Since, we are on Boba Rinkeby we will use the Boba NFT Bridges on Rinkeby, but in order to use your own ERC721s with the bridge, the Boba Team would need to register your contracts on the bridges
+So, for the sake of this tutorial, we have set you up with a pre-deployed contract that is registered on the bridge!
+
+To quickly run the example, do a:
+
+```bash
+$ yarn
+$ yarn compile
+$ yarn start:rinkeby
+```
+When the script has finished running, you would have minted -> and initiated a NFT withdraw to L1!
+Your bridged NFT will arrive on L1 after the fraud-proof-window
+
 ## Getting-Started with the Example
 
 ### Setup
@@ -24,7 +46,8 @@ $ cd ops
 $ docker-compose build && docker-compose up -V
 ```
 
-For local, use the same .env as .env.example
+**For local, use the same .env as .env.example**
+this includes the priv_key of the account which can register the ERC721 on the NFTBridges
 
 ## Running through the Example
 Once the local Boba stack is running, switch to:
@@ -36,6 +59,7 @@ $ cd ../boba_examples/nft_bridging/
 To quickly run the example, run:
 
 ```bash
+$ yarn
 $ yarn compile
 $ yarn start
 ```
@@ -80,7 +104,8 @@ Additionally, to enable the L1 representation NFTs to represent the metadat corr
 
 #### Registering pair on NFT Bridges
 Finally, to enable your contracts to be used on the NFT Bridge contracts - register the L1ERC721/L2ERC721 pair on both the L1/L2NFTBridge contracts. For the sake of this tutorial - you should be able to complete this step on the local stack (with the priv key on env.example)
-However, doing this on prod environments - would need help from the operators of the NFT Briges
+However, *doing this on prod environments - would need help from the operators of the NFT Briges*
+Please Reach out to the team in order to register your ERC721 pair on the official Boba NFT Bridges on Mainnet/Rinkeby
 
 ```
 And registered the L2ERC721 and L1ERC721 to the NFTBridges!
