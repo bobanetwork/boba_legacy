@@ -12,11 +12,6 @@ contract WithRecover is Ownable {
         IERC20(tokenAddress).transfer(owner(), tokenAmount);
     }
 
-    /// @dev Recovers ETH accidentally sent to the contract.
-    function recoverGas() external onlyOwner {
-        (payable(owner())).transfer(address(this).balance);
-    }
-
     /// @dev Recovers ERC721 tokens accidentally sent to the contract.
     function recoverERC721(address tokenAddress, uint256 tokenId_) external onlyOwner {
         IERC721(tokenAddress).transferFrom(address(this), owner(), tokenId_);

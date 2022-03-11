@@ -54,13 +54,6 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
         return (address(this), (_salePrice * ROYALTY_PERCENTAGE)/100);
     }
 
-    /**
-    * For DApp UX to determine how many NFTs can be minted.
-    */
-    function allowedMintAmount(address account_) view external returns (uint256) {
-        return MAX_MINT_IN_PUBLIC - amountMintedInPublicSale[account_];
-    }
-
     function mint(uint256 _count) external payable saleIsOpen {
         uint256 total = tokenCount();
         require(_count > 0, "Mint more than 0");
