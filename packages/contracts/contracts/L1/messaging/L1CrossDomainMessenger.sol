@@ -33,7 +33,6 @@ import {
  * from L2 onto L1. In the event that a message sent from L1 to L2 is rejected for exceeding the L2
  * epoch gas limit, it can be resubmitted via this contract's replay function.
  *
- * Runtime target: EVM
  */
 contract L1CrossDomainMessenger is
     IL1CrossDomainMessenger,
@@ -57,7 +56,6 @@ contract L1CrossDomainMessenger is
     mapping(bytes32 => bool) public blockedMessages;
     mapping(bytes32 => bool) public relayedMessages;
     mapping(bytes32 => bool) public successfulMessages;
-    mapping(bytes32 => bool) public failedMessages;
 
     address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
@@ -79,6 +77,7 @@ contract L1CrossDomainMessenger is
     /**
      * @param _libAddressManager Address of the Address Manager.
      */
+    // slither-disable-next-line external-function
     function initialize(address _libAddressManager) public initializer {
         require(
             address(libAddressManager) == address(0),
@@ -119,6 +118,7 @@ contract L1CrossDomainMessenger is
         emit MessageAllowed(_xDomainCalldataHash);
     }
 
+    // slither-disable-next-line external-function
     function xDomainMessageSender() public view returns (address) {
         require(
             xDomainMsgSender != Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER,
@@ -133,6 +133,7 @@ contract L1CrossDomainMessenger is
      * @param _message Message to send to the target.
      * @param _gasLimit Gas limit for the provided message.
      */
+    // slither-disable-next-line external-function
     function sendMessage(
         address _target,
         bytes memory _message,
@@ -149,8 +150,10 @@ contract L1CrossDomainMessenger is
             nonce
         );
 
+        // slither-disable-next-line reentrancy-events
         _sendXDomainMessage(ovmCanonicalTransactionChain, xDomainCalldata, _gasLimit);
 
+        // slither-disable-next-line reentrancy-events
         emit SentMessage(_target, msg.sender, _message, nonce, _gasLimit);
     }
 
@@ -158,6 +161,7 @@ contract L1CrossDomainMessenger is
      * Relays a cross domain message to a contract.
      * @inheritdoc IL1CrossDomainMessenger
      */
+    // slither-disable-next-line external-function
     function relayMessage(
         address _target,
         address _sender,
@@ -195,22 +199,27 @@ contract L1CrossDomainMessenger is
         );
 
         xDomainMsgSender = _sender;
+        // slither-disable-next-line reentrancy-no-eth, reentrancy-events, reentrancy-benign
         (bool success, ) = _target.call(_message);
+        // slither-disable-next-line reentrancy-benign
         xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
 
         // Mark the message as received if the call was successful. Ensures that a message can be
         // relayed multiple times in the case that the call reverted.
         if (success == true) {
+            // slither-disable-next-line reentrancy-no-eth
             successfulMessages[xDomainCalldataHash] = true;
+            // slither-disable-next-line reentrancy-events
             emit RelayedMessage(xDomainCalldataHash);
         } else {
-            failedMessages[xDomainCalldataHash] = true;
+            // slither-disable-next-line reentrancy-events
             emit FailedRelayedMessage(xDomainCalldataHash);
         }
 
         // Store an identifier that can be used to prove that the given message was relayed by some
         // user. Gives us an easy way to pay relayers for their work.
         bytes32 relayId = keccak256(abi.encodePacked(xDomainCalldata, msg.sender, block.number));
+        // slither-disable-next-line reentrancy-benign
         relayedMessages[relayId] = true;
     }
 
@@ -218,6 +227,7 @@ contract L1CrossDomainMessenger is
      * Replays a cross domain message to the target messenger.
      * @inheritdoc IL1CrossDomainMessenger
      */
+    // slither-disable-next-line external-function
     function replayMessage(
         address _target,
         address _sender,
@@ -357,6 +367,7 @@ contract L1CrossDomainMessenger is
         bytes memory _message,
         uint256 _gasLimit
     ) internal {
+        // slither-disable-next-line reentrancy-events
         ICanonicalTransactionChain(_canonicalTransactionChain).enqueue(
             Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
             _gasLimit,

@@ -74,13 +74,13 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
     }
 
     /**
-     * @dev Performs the logic for deposits by storing the token and informing the L2 token Gateway
-     * of the deposit.
-     * @param _l2Token Address of L2 token where withdrawal was initiated.
-     * @param _from Account to pull the deposit from on L2.
+     * @dev Performs the logic for withdrawals by burning the token and informing
+     *      the L1 token Gateway of the withdrawal.
+     * @param _l2Token Address of L2 token where withdrawal is initiated.
+     * @param _from Account to pull the withdrawal from on L2.
      * @param _to Account to give the withdrawal to on L1.
      * @param _amount Amount of the token to withdraw.
-     * param _l1Gas Unused, but included for potential forward compatibility considerations.
+     * @param _l1Gas Unused, but included for potential forward compatibility considerations.
      * @param _data Optional data to forward to L1. This data is provided
      *        solely as a convenience for external contracts. Aside from enforcing a maximum
      *        length, these contracts provide no guarantees about its content.
@@ -95,9 +95,11 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
     ) internal {
         // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
         // usage
+        // slither-disable-next-line reentrancy-events
         IL2StandardERC20(_l2Token).burn(msg.sender, _amount);
 
         // Construct calldata for l1TokenBridge.finalizeERC20Withdrawal(_to, _amount)
+        // slither-disable-next-line reentrancy-events
         address l1Token = IL2StandardERC20(_l2Token).l1Token();
         bytes memory message;
 
@@ -122,8 +124,10 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
         }
 
         // Send message up to L1 bridge
+        // slither-disable-next-line reentrancy-events
         sendCrossDomainMessage(l1TokenBridge, _l1Gas, message);
 
+        // slither-disable-next-line reentrancy-events
         emit WithdrawalInitiated(l1Token, _l2Token, msg.sender, _to, _amount, _data);
     }
 
@@ -145,12 +149,15 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
         // Check the target token is compliant and
         // verify the deposited token on L1 matches the L2 deposited token representation here
         if (
+            // slither-disable-next-line reentrancy-events
             ERC165Checker.supportsInterface(_l2Token, 0x1d1d8b63) &&
             _l1Token == IL2StandardERC20(_l2Token).l1Token()
         ) {
             // When a deposit is finalized, we credit the account on L2 with the same amount of
             // tokens.
+            // slither-disable-next-line reentrancy-events
             IL2StandardERC20(_l2Token).mint(_to, _amount);
+            // slither-disable-next-line reentrancy-events
             emit DepositFinalized(_l1Token, _l2Token, _from, _to, _amount, _data);
         } else {
             // Either the L2 token which is being deposited-into disagrees about the correct address
@@ -172,7 +179,9 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
             );
 
             // Send message up to L1 bridge
+            // slither-disable-next-line reentrancy-events
             sendCrossDomainMessage(l1TokenBridge, 0, message);
+            // slither-disable-next-line reentrancy-events
             emit DepositFailed(_l1Token, _l2Token, _from, _to, _amount, _data);
         }
     }

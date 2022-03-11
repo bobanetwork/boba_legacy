@@ -19,7 +19,6 @@ import { IChainStorageContainer } from "./IChainStorageContainer.sol";
  * 2. Stores queued transactions for the Canonical Transaction Chain
  * 3. Stores chain state batches for the State Commitment Chain
  *
- * Runtime target: EVM
  */
 contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /*************
@@ -68,6 +67,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function setGlobalMetadata(bytes27 _globalMetadata) public onlyOwner {
         return buffer.setExtraData(_globalMetadata);
     }
@@ -75,6 +75,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function getGlobalMetadata() public view returns (bytes27) {
         return buffer.getExtraData();
     }
@@ -82,6 +83,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function length() public view returns (uint256) {
         return uint256(buffer.getLength());
     }
@@ -89,6 +91,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function push(bytes32 _object) public onlyOwner {
         buffer.push(_object);
     }
@@ -96,6 +99,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function push(bytes32 _object, bytes27 _globalMetadata) public onlyOwner {
         buffer.push(_object, _globalMetadata);
     }
@@ -103,6 +107,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function get(uint256 _index) public view returns (bytes32) {
         return buffer.get(uint40(_index));
     }
@@ -110,6 +115,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function deleteElementsAfterInclusive(uint256 _index) public onlyOwner {
         buffer.deleteElementsAfterInclusive(uint40(_index));
     }
@@ -117,6 +123,7 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
+    // slither-disable-next-line external-function
     function deleteElementsAfterInclusive(uint256 _index, bytes27 _globalMetadata)
         public
         onlyOwner

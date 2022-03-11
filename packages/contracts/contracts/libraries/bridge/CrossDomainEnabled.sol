@@ -9,7 +9,6 @@ import { ICrossDomainMessenger } from "./ICrossDomainMessenger.sol";
  * @dev Helper contract for contracts performing cross-domain communications
  *
  * Compiler used: defined by inheriting contract
- * Runtime target: defined by inheriting contract
  */
 contract CrossDomainEnabled {
     /*************
@@ -78,6 +77,7 @@ contract CrossDomainEnabled {
         uint32 _gasLimit,
         bytes memory _message
     ) internal {
+        // slither-disable-next-line reentrancy-events, reentrancy-benign
         getCrossDomainMessenger().sendMessage(_crossDomainTarget, _message, _gasLimit);
     }
 }

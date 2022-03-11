@@ -55,13 +55,14 @@ contract OVM_DeployerWhitelist {
      * Updates the owner of this contract.
      * @param _owner Address of the new owner.
      */
+    // slither-disable-next-line external-function
     function setOwner(address _owner) public onlyOwner {
         // Prevent users from setting the whitelist owner to address(0) except via
-        // enableArbitraryContractDeployment. If you want to burn the whitelist owner, send it to any
-        // other address that doesn't have a corresponding knowable private key.
+        // enableArbitraryContractDeployment. If you want to burn the whitelist owner, send it to
+        // any other address that doesn't have a corresponding knowable private key.
         require(
             _owner != address(0),
-            "OVM_DeployerWhitelist: whitelist can only be disabled via enableArbitraryContractDeployment"
+            "OVM_DeployerWhitelist: can only be disabled via enableArbitraryContractDeployment"
         );
 
         emit OwnerChanged(owner, _owner);
