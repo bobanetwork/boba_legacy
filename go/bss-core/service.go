@@ -17,7 +17,8 @@ import (
 
 var (
 	// weiToEth is the conversion rate from wei to ether.
-	weiToEth = new(big.Float).SetFloat64(1e-18)
+	weiToEth                = new(big.Float).SetFloat64(1e-18)
+	lastBatchSubmissionTime time.Time
 )
 
 // Driver is an interface for creating and submitting batch transactions for a
@@ -52,7 +53,7 @@ type Driver interface {
 	CraftBatchTx(
 		ctx context.Context,
 		start, end, nonce *big.Int,
-	) (*types.Transaction, error)
+	) (*types.Transaction, uint64, error)
 
 	// SubmitBatchTx using the passed transaction as a template, signs and
 	// publishes the transaction unmodified apart from sampling the current gas
@@ -64,12 +65,14 @@ type Driver interface {
 }
 
 type ServiceConfig struct {
-	Context         context.Context
-	Driver          Driver
-	PollInterval    time.Duration
-	ClearPendingTx  bool
-	L1Client        *ethclient.Client
-	TxManagerConfig txmgr.Config
+	Context                context.Context
+	Driver                 Driver
+	PollInterval           time.Duration
+	ClearPendingTx         bool
+	L1Client               *ethclient.Client
+	TxManagerConfig        txmgr.Config
+	MinTxSize              uint64
+	MaxBatchSubmissionTime time.Duration
 }
 
 type Service struct {
@@ -172,7 +175,7 @@ func (s *Service) eventLoop() {
 			nonce := new(big.Int).SetUint64(nonce64)
 
 			batchTxBuildStart := time.Now()
-			tx, err := s.cfg.Driver.CraftBatchTx(
+			tx, batchSize, err := s.cfg.Driver.CraftBatchTx(
 				s.ctx, start, end, nonce,
 			)
 			if err != nil {
@@ -180,8 +183,29 @@ func (s *Service) eventLoop() {
 					"err", err)
 				continue
 			}
+			log.Info(name+" batch tx size", "size", batchSize)
 			batchTxBuildTime := time.Since(batchTxBuildStart) / time.Millisecond
 			s.metrics.BatchTxBuildTime.Set(float64(batchTxBuildTime))
+
+			// Check the batch size
+			// Submit the tx batch if batchSize > MinTxSize or timeDuration > MaxBatchSubmissionTime
+			timeSinceLastSubmission := time.Since(lastBatchSubmissionTime)
+			if batchSize < s.cfg.MinTxSize && timeSinceLastSubmission < s.cfg.MaxBatchSubmissionTime {
+				log.Info(name+" skip bacth submission. Batch too small or max submission timeout not reached.",
+					"batchSize", batchSize,
+					"MinTxSize", s.cfg.MinTxSize,
+					"timeSinceLastSubmission", timeSinceLastSubmission,
+					"MaxBatchSubmissionTime", s.cfg.MaxBatchSubmissionTime,
+				)
+				continue
+			} else {
+				log.Info(name+" proceeding with bacth submission.",
+					"batchSize", batchSize,
+					"MinTxSize", s.cfg.MinTxSize,
+					"timeSinceLastSubmission", timeSinceLastSubmission,
+					"MaxBatchSubmissionTime", s.cfg.MaxBatchSubmissionTime,
+				)
+			}
 
 			// Record the size of the batch transaction.
 			var txBuf bytes.Buffer
@@ -227,6 +251,7 @@ func (s *Service) eventLoop() {
 			// The transaction was successfully submitted.
 			log.Info(name+" batch tx successfully published",
 				"tx_hash", receipt.TxHash)
+			lastBatchSubmissionTime = time.Now()
 			batchConfirmationTime := time.Since(batchConfirmationStart) /
 				time.Millisecond
 			s.metrics.BatchConfirmationTime.Set(float64(batchConfirmationTime))

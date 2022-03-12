@@ -130,12 +130,14 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			}
 
 			services = append(services, bsscore.NewService(bsscore.ServiceConfig{
-				Context:         ctx,
-				Driver:          batchTxDriver,
-				PollInterval:    cfg.PollInterval,
-				ClearPendingTx:  cfg.ClearPendingTxs,
-				L1Client:        l1Client,
-				TxManagerConfig: txManagerConfig,
+				Context:                ctx,
+				Driver:                 batchTxDriver,
+				PollInterval:           cfg.PollInterval,
+				ClearPendingTx:         cfg.ClearPendingTxs,
+				L1Client:               l1Client,
+				TxManagerConfig:        txManagerConfig,
+				MinTxSize:              cfg.MinL1TxSize,
+				MaxBatchSubmissionTime: cfg.MaxBatchSubmissionTime,
 			}))
 		}
 
@@ -156,12 +158,14 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			}
 
 			services = append(services, bsscore.NewService(bsscore.ServiceConfig{
-				Context:         ctx,
-				Driver:          batchStateDriver,
-				PollInterval:    cfg.PollInterval,
-				ClearPendingTx:  cfg.ClearPendingTxs,
-				L1Client:        l1Client,
-				TxManagerConfig: txManagerConfig,
+				Context:                ctx,
+				Driver:                 batchStateDriver,
+				PollInterval:           cfg.PollInterval,
+				ClearPendingTx:         cfg.ClearPendingTxs,
+				L1Client:               l1Client,
+				TxManagerConfig:        txManagerConfig,
+				MinTxSize:              cfg.MinL1TxSize,
+				MaxBatchSubmissionTime: cfg.MaxBatchSubmissionTime,
 			}))
 		}
 
