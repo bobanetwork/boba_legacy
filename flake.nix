@@ -216,8 +216,8 @@
           optimism = {
             add-inputs = {
               buildInputs = old: old ++ [
-                #pkgs.yarn
-                #pkgs.nodePackages.lerna
+                pkgs.yarn
+                pkgs.nodePackages.lerna
                 #solc-cache
               ];
             };
