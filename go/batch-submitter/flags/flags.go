@@ -231,7 +231,6 @@ var requiredFlags = []cli.Flag{
 	L2EthRpcFlag,
 	CTCAddressFlag,
 	SCCAddressFlag,
-	MaxL1GasPriceFlag,
 	MinL1TxSizeFlag,
 	MaxL1TxSizeFlag,
 	MaxBatchSubmissionTimeFlag,
@@ -246,6 +245,7 @@ var requiredFlags = []cli.Flag{
 }
 
 var optionalFlags = []cli.Flag{
+	MaxL1GasPriceFlag,
 	LogLevelFlag,
 	LogTerminalFlag,
 	SentryEnableFlag,
