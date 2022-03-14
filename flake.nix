@@ -1,7 +1,8 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
   #inputs.dream2nix.url = "github:nix-community/dream2nix";
-  inputs.dream2nix.url = "github:tgunnoe/dream2nix/git-plus-resolved";
+  inputs.dream2nix.url = "github:tgunnoe/dream2nix/workspace-name-fix";
+  #inputs.dream2nix.url = "path:/home/tgunnoe/src/boba/dream2nix";
   inputs.dream2nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.solc-bin.url = "github:tgunnoe/solc-bin-test";
   inputs.solc-bin.flake = false;
@@ -37,9 +38,15 @@
           '';
       };
     in
-      dream2nix.makeFlakeOutputs {
+      pkgs.lib.recursiveUpdate
+      (dream2nix.makeFlakeOutputs rec {
         pname = "boba";
         source = ./. ;
+        inject = {
+          express-prom-bundle."6.4.1" = [
+            ["prom-client" "13.0.0"]
+          ];
+        };
         packageOverrides =
           # let
           #   # Ideally, these should be built and cached from source
@@ -206,15 +213,13 @@
             add-solc = {
                 XDG_CACHE_HOME = "${solc-bin}";
             };
-            add-inputs = {
-              buildInputs = old: old ++ [
+            install-symlinks = {
 
-                #solc-cache
-              ];
-              nativeBuildInputs = old: old ++ [
-                #pkgs.yarn
-                #pkgs.nodePackages.node-pre-gyp
-              ];
+              installPhase = ''
+                ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
+                ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/node_modules $out/node_modules
+                ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/package.json $out/package.json
+              '';
             };
           };
 
@@ -243,5 +248,27 @@
             nativeBuildInputs = with pkgs; [ jq nodePackages.npm nodejs ];
           };
         };
+      })
+      # Non dream2nix-derived pkgs
+      {
+        packages."x86_64-linux" = {
+          l2geth-image = pkgs.dockerTools.buildImage {
+            name = "l2geth";
+            contents = [
+            ];
+            config = {
+              Cmd = [ "${self.packages."x86_64-linux"."@eth-optimism/data-transport-layer"}/bin/" ];
+            };
+          };
+          dtl-image = pkgs.dockerTools.buildImage {
+            name = "dtl";
+            contents = [
+            ];
+            config = {
+              Cmd = [ "${self.packages."x86_64-linux"."@eth-optimism/l2geth"}/bin/geth" ];
+            };
+          };
+        };
+        defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
       };
 }

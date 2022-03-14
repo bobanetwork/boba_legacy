@@ -53,16 +53,16 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1647059216,
-        "narHash": "sha256-B6PVZkhW3c712sQbJ5XZJVazKMYLqN1j8yApaBtm3Sc=",
+        "lastModified": 1647369474,
+        "narHash": "sha256-P5vpZlea+TryVRZcTYinV6JtjZB0Ixr1aIG+0cE8Z+g=",
         "owner": "tgunnoe",
         "repo": "dream2nix",
-        "rev": "9b1ca860f0121a373490359f02911033a1840702",
+        "rev": "72adb4dde3303ec3025eb1880339b79cf88495e4",
         "type": "github"
       },
       "original": {
         "owner": "tgunnoe",
-        "ref": "git-plus-resolved",
+        "ref": "workspace-name-fix",
         "repo": "dream2nix",
         "type": "github"
       }
@@ -131,11 +131,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1646933238,
-        "narHash": "sha256-RZJnLN0o4B35eTnUc2tEAD12X5TNeeJhhvH3Fd6Pmdo=",
+        "lastModified": 1647282937,
+        "narHash": "sha256-K8Oo6QyFCfiEWTRpQVfzcwI3YNMKlz6Tu8rr+o3rzRQ=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "bacbfd713b4781a4a82c1f390f8fe21ae3b8b95b",
+        "rev": "64fc73bd74f04d3e10cb4e70e1c65b92337e76db",
         "type": "github"
       },
       "original": {
