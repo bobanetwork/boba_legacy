@@ -138,6 +138,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				TxManagerConfig:        txManagerConfig,
 				MinTxSize:              cfg.MinL1TxSize,
 				MaxBatchSubmissionTime: cfg.MaxBatchSubmissionTime,
+				MaxL1GasPrice:          cfg.MaxL1GasPrice,
 			}))
 		}
 
@@ -166,6 +167,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				TxManagerConfig:        txManagerConfig,
 				MinTxSize:              cfg.MinL1TxSize,
 				MaxBatchSubmissionTime: cfg.MaxBatchSubmissionTime,
+				MaxL1GasPrice:          cfg.MaxL1GasPrice,
 			}))
 		}
 

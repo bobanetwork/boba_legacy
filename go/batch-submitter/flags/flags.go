@@ -130,6 +130,13 @@ var (
 
 	/* Optional Flags */
 
+	MaxL1GasPriceFlag = cli.Uint64Flag{
+		Name:   "max-l1-gas-price",
+		Usage:  "Maximum L1 gas price that the batch submitter can accept",
+		Value:  0,
+		EnvVar: prefixEnvVar("MAX_L1_GAS_PRICE"),
+	}
+
 	LogLevelFlag = cli.StringFlag{
 		Name:   "log-level",
 		Usage:  "The lowest log level that will be output",
@@ -224,6 +231,7 @@ var requiredFlags = []cli.Flag{
 	L2EthRpcFlag,
 	CTCAddressFlag,
 	SCCAddressFlag,
+	MaxL1GasPriceFlag,
 	MinL1TxSizeFlag,
 	MaxL1TxSizeFlag,
 	MaxBatchSubmissionTimeFlag,

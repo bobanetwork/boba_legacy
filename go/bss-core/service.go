@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 var (
@@ -73,6 +74,7 @@ type ServiceConfig struct {
 	TxManagerConfig        txmgr.Config
 	MinTxSize              uint64
 	MaxBatchSubmissionTime time.Duration
+	MaxL1GasPrice          uint64
 }
 
 type Service struct {
@@ -186,6 +188,21 @@ func (s *Service) eventLoop() {
 			log.Info(name+" batch tx size", "size", batchSize)
 			batchTxBuildTime := time.Since(batchTxBuildStart) / time.Millisecond
 			s.metrics.BatchTxBuildTime.Set(float64(batchTxBuildTime))
+
+			// Check L1 Gas Price
+			L1GasPrice, err := s.cfg.L1Client.SuggestGasPrice(s.ctx)
+			if err == nil {
+				MaxL1GasPriceWei := new(big.Int).SetUint64(s.cfg.MaxL1GasPrice)
+				MaxL1GasPrice := new(big.Int).Mul(MaxL1GasPriceWei, big.NewInt(params.GWei))
+				if MaxL1GasPrice.Cmp(big.NewInt(0)) > 0 && MaxL1GasPrice.Cmp(L1GasPrice) < 0 {
+					log.Info(
+						name+" gas price is higher than gas price threshold; aborting batch submission",
+						"MaxL1GasPrice", MaxL1GasPrice,
+						"L1GasPrice", L1GasPrice,
+					)
+					continue
+				}
+			}
 
 			// Check the batch size
 			// Submit the tx batch if batchSize > MinTxSize or timeDuration > MaxBatchSubmissionTime
