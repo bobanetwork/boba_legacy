@@ -18,7 +18,7 @@ contract OVM_ETH is L2StandardERC20 {
      ***************/
 
     constructor()
-        L2StandardERC20(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, address(0), "Ether", "ETH")
+        L2StandardERC20(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, address(0), "Ether", "ETH", 18)
     {}
 
     // ETH ERC20 features are disabled until further notice.

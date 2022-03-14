@@ -18,11 +18,13 @@ contract L2StandardTokenFactory {
      * @param _l1Token Address of the corresponding L1 token.
      * @param _name ERC20 name.
      * @param _symbol ERC20 symbol.
+     * @param _decimals ERC20 decimals.
      */
     function createStandardL2Token(
         address _l1Token,
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+        uint8 _decimals
     ) external {
         require(_l1Token != address(0), "Must provide L1 token address");
 
@@ -30,7 +32,8 @@ contract L2StandardTokenFactory {
             Lib_PredeployAddresses.L2_STANDARD_BRIDGE,
             _l1Token,
             _name,
-            _symbol
+            _symbol,
+            _decimals
         );
 
         emit StandardL2TokenCreated(_l1Token, address(l2Token));
