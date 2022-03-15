@@ -38,7 +38,7 @@ Congratulations! The security of the L2 depends on community monitoring of the o
 
 ```bash
 $ git clone git@github.com:bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn install
 $ yarn build
 ```
@@ -68,7 +68,7 @@ $ docker-compose up
 Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service.
 
 ```bash
-$ cd optimism-v2/boba_community/fraud-detector
+$ cd boba/boba_community/fraud-detector
 $ curl -H "Content-Type: application/json" -T ./addresses.json http://localhost:8080/addresses.json
 ```
 

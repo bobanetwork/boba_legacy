@@ -26,7 +26,7 @@ Clone the repository, open it, and install packages with `yarn`:
 
 ```bash
 $ git clone https://github.com/bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn
 $ yarn build
 ```

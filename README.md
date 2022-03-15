@@ -103,7 +103,7 @@ Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
 $ git clone git@github.com:bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn clean # only needed / will only work if you had it installed previously
 $ yarn
 $ yarn build
