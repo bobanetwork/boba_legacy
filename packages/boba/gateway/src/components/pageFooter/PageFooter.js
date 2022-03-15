@@ -10,11 +10,11 @@ import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
 
 const PageFooter = ({maintenance}) => {
-  
+
   const dispatch = useDispatch()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  
+
   if(maintenance) {
     return (
     <S.Wrapper>
@@ -52,7 +52,7 @@ const PageFooter = ({maintenance}) => {
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Websites</S.FooterLink>
+          >Boba Website</S.FooterLink>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>
@@ -110,7 +110,7 @@ const PageFooter = ({maintenance}) => {
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Websites
+          >Boba Website
           </S.FooterLink>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>

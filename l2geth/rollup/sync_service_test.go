@@ -741,6 +741,64 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 	}
 }
 
+// Should reject the tx if the gas limit is not enough
+// to cover the l1 security fee
+func TestInsufficientGasForL1SecurityFee(t *testing.T) {
+	service, _, _, err := newTestSyncService(true, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Create a mock transaction
+	tx := mockNoneZeroGasLimiteTx(100)
+	// Create oracle
+	service.RollupGpo = gasprice.NewRollupOracle()
+	// Get state
+	state, err := service.bc.State()
+	if err != nil {
+		t.Fatal("Cannot get state db")
+	}
+	// Type 1 -- fee / l2GasPrice > tx.Gas
+	l2GasPrice := big.NewInt(1)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceSlot, common.BigToHash(l2GasPrice))
+	overhead := big.NewInt(1000)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.OverheadSlot, common.BigToHash(overhead))
+	l1GasPrice := big.NewInt(1)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L1GasPriceSlot, common.BigToHash(l1GasPrice))
+	scalar := big.NewInt(1)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.ScalarSlot, common.BigToHash(scalar))
+	_, _ = state.Commit(false)
+
+	service.updateL2GasPrice(state)
+	service.updateOverhead(state)
+	service.updateL1GasPrice(state)
+	service.updateScalar(state)
+
+	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err == nil {
+		t.Fatal("err is nil")
+	}
+	// Type 2 -- fee / l2GasPrice <= tx.Gas
+	tx = mockNoneZeroGasLimiteTx(30000)
+	overhead = big.NewInt(1)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.OverheadSlot, common.BigToHash(overhead))
+	_, _ = state.Commit(false)
+
+	service.updateOverhead(state)
+
+	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err != nil {
+		t.Fatal(err)
+	}
+	// Type 3 l2GasPrice = 0
+	l2GasPrice = big.NewInt(0)
+	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceSlot, common.BigToHash(l2GasPrice))
+	_, _ = state.Commit(false)
+
+	service.updateL2GasPrice(state)
+
+	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // Pass true to set as a verifier
 func TestSyncServiceSync(t *testing.T) {
 	service, txCh, sub, err := newTestSyncService(true, nil)
@@ -1110,6 +1168,34 @@ func mockTx() *types.Transaction {
 	l1TxOrigin := common.BytesToAddress(address)
 
 	gasLimit := uint64(0)
+	data := []byte{0x00, 0x00}
+	l1BlockNumber := big.NewInt(0)
+
+	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, big.NewInt(0), data)
+	meta := types.NewTransactionMeta(
+		l1BlockNumber,
+		timestamp,
+		[]byte{0},
+		&l1TxOrigin,
+		types.QueueOriginSequencer,
+		nil,
+		nil,
+		nil,
+	)
+	tx.SetTransactionMeta(meta)
+	return tx
+}
+
+func mockNoneZeroGasLimiteTx(gasLimit uint64) *types.Transaction {
+	address := make([]byte, 20)
+	rand.Read(address)
+
+	target := common.BytesToAddress(address)
+	timestamp := uint64(0)
+
+	rand.Read(address)
+	l1TxOrigin := common.BytesToAddress(address)
+
 	data := []byte{0x00, 0x00}
 	l1BlockNumber := big.NewInt(0)
 

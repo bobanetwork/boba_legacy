@@ -45,6 +45,9 @@ type L1ClientConfig struct {
 	// TransactionReceipt returns the receipt of a transaction by transaction
 	// hash. Note that the receipt is not available for pending transactions.
 	TransactionReceipt func(context.Context, common.Hash) (*types.Receipt, error)
+
+	// SuggestGasPrice returns the estimated gas price
+	SuggestGasPrice func(context.Context) (*big.Int, error)
 }
 
 // L1Client represents a mock L1Client.
@@ -191,4 +194,11 @@ func (c *L1Client) SetTransactionReceiptFunc(
 	defer c.mu.Unlock()
 
 	c.cfg.TransactionReceipt = f
+}
+
+func (c *L1Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return c.cfg.SuggestGasPrice(ctx)
 }

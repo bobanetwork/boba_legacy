@@ -12,7 +12,6 @@ import * as S from "./ListSave.styles"
 
 import { withdrawFS_Savings } from 'actions/fixedAction'
 import BobaIcon from 'components/icons/BobaIcon'
-import { Circle } from '@mui/icons-material'
 
 class ListSave extends React.Component {
 
@@ -84,7 +83,6 @@ class ListSave extends React.Component {
     let locked = true
     if (residual_S > twoWeeks) locked = false
 
-
     return (
       <S.StakeListItemContainer>
         <S.StakeItemDetails>
@@ -96,7 +94,7 @@ class ListSave extends React.Component {
               {stakeInfo.depositAmount ? `${stakeInfo.depositAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`}
             </Typography>
           </Box>
-          <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ textAlign: 'left' }}>
             <Typography variant="body2" sx={{ opacity: 0.65 }}>
               Earned
             </Typography>
@@ -104,12 +102,11 @@ class ListSave extends React.Component {
               <BobaIcon dark={true} /> {' '} {earned.toFixed(3)}
             </Typography>
           </Box>
-          <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ textAlign: 'left' }}>
             <Typography variant="body2" sx={{ opacity: 0.65 }}>
-              <Circle sx={{ height: "8px", color: '#fff', mr: '5px', opacity: `${stakeInfo.isActive ? 1 : 0.4}`, width: "8px" }} />
-              {stakeInfo.isActive ? 'Active' : 'Not Active'}
+              Staked on
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.6 }}>
+            <Typography variant="body2">
               {timeDeposit}
             </Typography>
           </Box>
@@ -118,14 +115,16 @@ class ListSave extends React.Component {
           <Box sx={{
             width: '100%',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
           }}>
-            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', opacity: '0.65' }}>Next unstake window</Typography>
-            <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', opacity: '0.65' }}>{unlocktimeNextBegin} - {unlocktimeNextEnd}</Typography>
+            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', opacity: '0.65', paddingRight: '6px'}}>Next unstake window:</Typography>
+            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em' }}>{unlocktimeNextBegin} - {unlocktimeNextEnd}</Typography>
           </Box>
-          {/* <Box sx={{ width: '100%', my: 2 }}>
+          {/* 
+          <Box sx={{ width: '100%', my: 2 }}>
             <LinearProgress color='warning' value={70} variant="determinate" />
-          </Box> */}
+          </Box> 
+          */}
         </S.StakeItemContent>
         <S.StakeItemAction>
           <Button variant="contained"
@@ -136,99 +135,6 @@ class ListSave extends React.Component {
       </S.StakeListItemContainer>
     );
 
-    /* return (
-      <S.Wrapper>
-        {pageLoading ? (
-          <Box sx={{textAlign: 'center'}}>
-            <CircularProgress color="secondary" />
-          </Box>
-        ) : (
-        <S.Entry>
-          <Grid 
-            container
-            spacing={2}
-          >
-
-            <S.GridItemTag 
-              item
-              xs={5}
-              md={1}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Amount</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-                {stakeInfo.depositAmount ?
-                  `${stakeInfo.depositAmount.toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
-                }
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={5}
-              md={1}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-                {earned.toFixed(3)}
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={2}
-              md={1}
-              >
-              <Typography variant="body1">
-                {stakeInfo.isActive ? 'Active' : 'Not Active'}
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag 
-              item
-              xs={12}
-              md={3}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Deposited On</Typography>
-              ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
-                {timeDeposit}
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={12}
-              md={4}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Next Unstake Window</Typography>
-              ) : (null)}
-              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
-                <Typography variant="overline" style={{lineHeight: '1em'}}>Begin: {unlocktimeNextBegin}</Typography>
-                <Typography variant="overline" style={{lineHeight: '1em'}}>End: {unlocktimeNextEnd}</Typography>
-              </div>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={12}
-              md={2}
-            >
-              <Button
-                variant="contained"
-                onClick={()=>{this.handleUnstake()}}
-                disabled={locked}
-              >
-                Unstake
-              </Button>
-            </S.GridItemTag>
-
-          </Grid>
-        </S.Entry>
-        )}
-      </S.Wrapper>
-    ) */
   }
 }
 
