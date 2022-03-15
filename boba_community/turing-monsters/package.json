@@ -10,11 +10,14 @@
     "clean": "rm -rf ./artifacts ./cache",
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "flatten": "npx hardhat flatten ./contracts/NFTMonsterV2.sol >> contracts/TuringMonsters-flat.sol",
     "test:local": "hardhat --network boba_local test",
     "test:rinkeby": "hardhat --network boba_rinkeby test",
     "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {
+    "@eth-optimism/contracts": "^0.5.15",
     "@ethersproject/address": "^5.0.11",
     "@ethersproject/contracts": "^5.0.11",
     "@ethersproject/networks": "^5.0.11",
@@ -25,6 +28,7 @@
     "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.0",
     "ethers": "^5.0.32",
     "hardhat": "^2.8.4",
     "mocha": "^8.3.1",
@@ -33,6 +37,8 @@
   },
   "dependencies": {
     "@uniswap/sdk": "^3.0.3",
+    "base64-sol": "^1.1.0",
+    "dotenv": "^16.0.0",
     "ip": "^1.1.5",
     "web3": "^1.6.1",
     "web3-eth-abi": "^1.6.1"
