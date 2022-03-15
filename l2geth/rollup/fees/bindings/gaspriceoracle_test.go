@@ -129,6 +129,17 @@ func TestCalculateFee(t *testing.T) {
 			if msgFee.Cmp(txFee) != 0 {
 				t.Fatal("msg fee and tx fee mismatch")
 			}
+			l1GasGPO, err := fees.CalculateL1GasFromGPO(tx.Data(), l2GasPrice, gasOracle)
+			if err != nil {
+				t.Fatal("cannot calculate l1 Gas from GPO")
+			}
+			l1GasState, err := fees.CalculateL1GasFromState(msg.Data(), state, &addr)
+			if err != nil {
+				t.Fatal("cannot calculate l1 Gas from state")
+			}
+			if l1GasGPO.Cmp(l1GasState) != 0 {
+				t.Fatal("l1 gas from GPO and state mismatch")
+			}
 		})
 	}
 }
