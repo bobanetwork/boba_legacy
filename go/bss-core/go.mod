@@ -13,3 +13,4 @@ require (
 )
 
 replace github.com/ethereum-optimism/optimism/l2geth => ../../l2geth
+replace github.com/ethereum-optimism/optimism/go/bss-core/boba => ./boba

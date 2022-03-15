@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum-optimism/optimism/go/bss-core/boba"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum/common"
@@ -52,7 +53,7 @@ type Driver interface {
 	CraftBatchTx(
 		ctx context.Context,
 		start, end, nonce *big.Int,
-	) (*types.Transaction, error)
+	) (*types.Transaction, uint64, error)
 
 	// SubmitBatchTx using the passed transaction as a template, signs and
 	// publishes the transaction unmodified apart from sampling the current gas
@@ -64,12 +65,15 @@ type Driver interface {
 }
 
 type ServiceConfig struct {
-	Context         context.Context
-	Driver          Driver
-	PollInterval    time.Duration
-	ClearPendingTx  bool
-	L1Client        *ethclient.Client
-	TxManagerConfig txmgr.Config
+	Context                context.Context
+	Driver                 Driver
+	PollInterval           time.Duration
+	ClearPendingTx         bool
+	L1Client               *ethclient.Client
+	TxManagerConfig        txmgr.Config
+	MinTxSize              uint64
+	MaxBatchSubmissionTime time.Duration
+	MaxL1GasPrice          uint64
 }
 
 type Service struct {
@@ -77,8 +81,9 @@ type Service struct {
 	ctx    context.Context
 	cancel func()
 
-	txMgr   txmgr.TxManager
-	metrics *metrics.Metrics
+	bobaService boba.BobaServiceManager
+	txMgr       txmgr.TxManager
+	metrics     *metrics.Metrics
 
 	wg sync.WaitGroup
 }
@@ -90,12 +95,18 @@ func NewService(cfg ServiceConfig) *Service {
 		cfg.Driver.Name(), cfg.TxManagerConfig, cfg.L1Client,
 	)
 
+	bobaService := boba.NewBobaService(
+		cfg.Driver.Name(), cfg.Context, cfg.MinTxSize, cfg.MaxL1GasPrice,
+		cfg.MaxBatchSubmissionTime, cfg.L1Client,
+	)
+
 	return &Service{
-		cfg:     cfg,
-		ctx:     ctx,
-		cancel:  cancel,
-		txMgr:   txMgr,
-		metrics: cfg.Driver.Metrics(),
+		cfg:         cfg,
+		ctx:         ctx,
+		cancel:      cancel,
+		txMgr:       txMgr,
+		metrics:     cfg.Driver.Metrics(),
+		bobaService: bobaService,
 	}
 }
 
@@ -172,7 +183,7 @@ func (s *Service) eventLoop() {
 			nonce := new(big.Int).SetUint64(nonce64)
 
 			batchTxBuildStart := time.Now()
-			tx, err := s.cfg.Driver.CraftBatchTx(
+			tx, batchSize, err := s.cfg.Driver.CraftBatchTx(
 				s.ctx, start, end, nonce,
 			)
 			if err != nil {
@@ -180,8 +191,13 @@ func (s *Service) eventLoop() {
 					"err", err)
 				continue
 			}
+			log.Info(name+" batch tx size", "size", batchSize)
 			batchTxBuildTime := time.Since(batchTxBuildStart) / time.Millisecond
 			s.metrics.BatchTxBuildTime.Set(float64(batchTxBuildTime))
+
+			if err := s.bobaService.VerifyCondition(batchSize); err != nil {
+				continue
+			}
 
 			// Record the size of the batch transaction.
 			var txBuf bytes.Buffer
@@ -227,6 +243,7 @@ func (s *Service) eventLoop() {
 			// The transaction was successfully submitted.
 			log.Info(name+" batch tx successfully published",
 				"tx_hash", receipt.TxHash)
+			s.bobaService.SetLastBatchSubmissionTime()
 			batchConfirmationTime := time.Since(batchConfirmationStart) /
 				time.Millisecond
 			s.metrics.BatchConfirmationTime.Set(float64(batchConfirmationTime))
