@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	lastBatchSubmissionTime time.Time
-	errGasPriceTooHigh      = errors.New("Gas price is higher than gas price")
-	errBatchSizeTooSmall    = errors.New("Batch size too small or max submission timeout not reached")
+	errGasPriceTooHigh   = errors.New("Gas price is higher than gas price")
+	errBatchSizeTooSmall = errors.New("Batch size too small or max submission timeout not reached")
 )
 
 // Config houses parameters for altering the behavior of a BobaService.

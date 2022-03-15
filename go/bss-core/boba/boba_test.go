@@ -45,11 +45,9 @@ func TestVerifyCondition(t *testing.T) {
 	require.Equal(t, err, errBatchSizeTooSmall)
 
 	// Wait for a while
-	select {
-	case <-time.After(time.Duration(5) * time.Millisecond):
-		err := s.bobaService.VerifyCondition(10)
-		require.Equal(t, err, nil)
-	}
+	time.Sleep(time.Duration(5) * time.Millisecond)
+	err = s.bobaService.VerifyCondition(10)
+	require.Equal(t, err, nil)
 
 	// Increase L1 gas price to 10 GWei
 	testGasPrice = big.NewInt(10000000000)
@@ -74,8 +72,4 @@ func MockL1Client() *mock.L1Client {
 		},
 	})
 	return l1Client
-}
-
-func SetL1GasPrice(L1GasPrice *big.Int) {
-	testGasPrice = L1GasPrice
 }

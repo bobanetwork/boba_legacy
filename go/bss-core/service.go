@@ -3,7 +3,6 @@ package bsscore
 import (
 	"bytes"
 	"context"
-	"errors"
 	"math/big"
 	"sync"
 	"time"
@@ -19,10 +18,7 @@ import (
 
 var (
 	// weiToEth is the conversion rate from wei to ether.
-	weiToEth                = new(big.Float).SetFloat64(1e-18)
-	lastBatchSubmissionTime time.Time
-	errGasPriceTooHigh      = errors.New("Gas price is higher than gas price")
-	errBatchSizeTooSmall    = errors.New("Batch size too small or max submission timeout not reached")
+	weiToEth = new(big.Float).SetFloat64(1e-18)
 )
 
 // Driver is an interface for creating and submitting batch transactions for a
