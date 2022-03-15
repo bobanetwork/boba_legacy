@@ -158,7 +158,7 @@ func (d *Driver) GetBatchBlockRange(
 func (d *Driver) CraftBatchTx(
 	ctx context.Context,
 	start, end, nonce *big.Int,
-) (*types.Transaction, error) {
+) (*types.Transaction, uint64, error) {
 
 	name := d.cfg.Name
 
@@ -177,7 +177,7 @@ func (d *Driver) CraftBatchTx(
 
 		block, err := d.cfg.L2Client.BlockByNumber(ctx, i)
 		if err != nil {
-			return nil, err
+			return nil, totalStateRootSize, err
 		}
 
 		totalStateRootSize += stateRootSize
@@ -192,7 +192,7 @@ func (d *Driver) CraftBatchTx(
 		d.cfg.PrivKey, d.cfg.ChainID,
 	)
 	if err != nil {
-		return nil, err
+		return nil, totalStateRootSize, err
 	}
 	opts.Context = ctx
 	opts.Nonce = nonce
@@ -206,7 +206,7 @@ func (d *Driver) CraftBatchTx(
 	)
 	switch {
 	case err == nil:
-		return tx, nil
+		return tx, totalStateRootSize, nil
 
 	// If the transaction failed because the backend does not support
 	// eth_maxPriorityFeePerGas, fallback to using the default constant.
@@ -218,12 +218,13 @@ func (d *Driver) CraftBatchTx(
 		log.Warn(d.cfg.Name + " eth_maxPriorityFeePerGas is unsupported " +
 			"by current backend, using fallback gasTipCap")
 		opts.GasTipCap = drivers.FallbackGasTipCap
-		return d.sccContract.AppendStateBatch(
+		tx, err := d.sccContract.AppendStateBatch(
 			opts, stateRoots, offsetStartsAtIndex,
 		)
+		return tx, totalStateRootSize, err
 
 	default:
-		return nil, err
+		return nil, totalStateRootSize, err
 	}
 }
 

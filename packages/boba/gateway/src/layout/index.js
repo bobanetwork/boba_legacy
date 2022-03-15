@@ -38,7 +38,7 @@ function App () {
     palette: {
       mode: theme === 'light' ? 'light' : 'dark',
       primary: {
-        main: '#506DFA',
+        main: '#BAE21A',
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
       },
@@ -56,7 +56,7 @@ function App () {
       },
       neutral: {
         main: '#fff',
-        contrastText: '#506DFA',
+        contrastText: '#BAE21A',
       },
     },
     typography: {

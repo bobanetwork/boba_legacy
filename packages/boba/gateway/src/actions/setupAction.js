@@ -38,6 +38,7 @@ export function setNetwork(network) {
 }
 
 export function setLayer(layer) {
+  console.log("SA: Setting layer to:", layer)
   return function (dispatch) {
     return dispatch({ type: 'SETUP/LAYER/SET', payload: layer })
   }

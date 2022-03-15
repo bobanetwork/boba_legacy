@@ -26,6 +26,9 @@ function TokenList({
   const enabled = (networkLayer === chain) ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
+  const amountInNumber = token.symbol === 'ETH' ?
+  Number(logAmount(token.balance, token.decimals, 3)):
+  Number(logAmount(token.balance, token.decimals, 2))
 
   const amount = token.symbol === 'ETH' ?
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
@@ -86,7 +89,7 @@ function TokenList({
               component="div"
               sx={{ fontWeight: '700' }}
             >
-              {`$${amountToUsd(amount, lookupPrice, token).toFixed(2)}`}
+              {`$${amountToUsd(amountInNumber, lookupPrice, token).toFixed(2)}`}
             </S.TextTableCell>
           </S.TableCell>
           <S.TableCell
@@ -285,7 +288,7 @@ function TokenList({
             component="div"
             sx={{ fontWeight: '700' }}
           >
-            {`$${amountToUsd(amount, lookupPrice, token).toFixed(2)}`}
+            {`$${amountToUsd(amountInNumber, lookupPrice, token).toFixed(2)}`}
           </S.TextTableCell>
         </S.TableCell>
         <S.TableCell
@@ -349,7 +352,32 @@ function TokenList({
                 fullWidth
               >
                 Transfer
-              </Button> </>}
+              </Button>
+            </>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+            <>
+              <Link
+                color="inherit"
+                variant="body2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={'https://cbridge.celer.network/#/transfer'}
+              >
+                CELER BRIDGE
+              </Link>
+              <Button
+                onClick={() => { handleModalClick('transferModal', token, false) }}
+                variant="contained"
+                color="primary"
+                disabled={disabled}
+                tooltip="Transfer funds from one L2 account to another L2 account."
+                fullWidth
+              >
+                Transfer
+              </Button>
+            </>
+          }
           {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
             <div style={{
               display: 'flex',

@@ -26,7 +26,6 @@ import AlertIcon from 'components/icons/AlertIcon'
 
 import { openAlert, openError, openModal } from 'actions/uiAction'
 
-
 import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
@@ -188,14 +187,16 @@ class Save extends React.Component {
       bobaWeiString = bobaBalance[ 0 ].balance.toString()
     }
 
-
     let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
 
     let totalBOBAstaked = 0
     Object.keys(stakeInfo).forEach((v, i) => {
-      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)
+      // console.log("Stakeinfo:",stakeInfo[i])
+      // only count active stakes
+      if(stakeInfo[i].isActive) {
+        totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)
+      }
     })
-
 
     return (
       <S.StakePageContainer>
@@ -214,8 +215,8 @@ class Save extends React.Component {
                 <Typography variant="h1"
                   sx={{
                     background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
-                    '-webkit-background-clip': 'text',
-                    '-webkit-text-fill-color': 'transparent'
+                    'WebkitBackgroundClip': 'text',
+                    'WebkitTextFillColor': 'transparent'
                   }}
                 > 5% Fixed APY </Typography>
                 <S.DividerLine sx={{ width: '60%' }} />
@@ -223,7 +224,7 @@ class Save extends React.Component {
               <S.StakeItem sx={{ my: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', flexDirection: 'column' }}>
                   <Typography variant="body2" sx={{ opacity: 0.65 }}>
-                    Total staked
+                    Active stakes
                   </Typography>
                   <Typography variant="h3" >
                     {totalBOBAstaked} Boba
@@ -341,11 +342,14 @@ class Save extends React.Component {
                 gap: '10px'
               }}>
                 {Object.keys(stakeInfo).map((v, i) => {
-                  return (
-                    <S.StakeItemContainer key={i}>
-                      <ListSave stakeInfo={stakeInfo[ i ]} />
-                    </S.StakeItemContainer>
-                  )
+                  if(stakeInfo[i].isActive) {
+                    return (
+                      <S.StakeItemContainer key={i}>
+                        <ListSave stakeInfo={stakeInfo[i]} />
+                      </S.StakeItemContainer>
+                    )
+                  }
+                  return null;
                 })}
               </Box>
             }
