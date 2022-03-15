@@ -4,7 +4,7 @@
   * [TLDR](#tldr)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-  * [ASW Example Wrappers and Floating Point Math](#asw-example-wrappers-and-floating-point-math)
+- [AWS and Google Cloud Function Examples](#aws-and-google-cloud-function-examples)
 - [Important Properties of Turing](#important-properties-of-turing)
   * [String length limit](#string-length-limit)
   * [One Turing call per Transaction](#one-turing-call-per-transaction)
