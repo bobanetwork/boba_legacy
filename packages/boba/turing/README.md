@@ -4,7 +4,7 @@
   * [TLDR](#tldr)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-  * [ASW Example Wrappers and Floating Point Math](#asw-example-wrappers-and-floating-point-math)
+- [AWS and Google Cloud Function Examples](#aws-and-google-cloud-function-examples)
 - [Important Properties of Turing](#important-properties-of-turing)
   * [String length limit](#string-length-limit)
   * [One Turing call per Transaction](#one-turing-call-per-transaction)
@@ -22,7 +22,7 @@
 
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
-**The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
+Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
 
@@ -140,15 +140,15 @@ You can lock-down your off-chain endpoint to only accept queries from your smart
 
 ```
 
-## ASW Example Wrappers and Floating Point Math
+# AWS and Google Cloud Function Examples
 
-You external API will need to accepts calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing/AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
+Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing/AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
 # Important Properties of Turing
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
-* There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistant failure of your first call to your endpoint.
+* There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistent failure of your first call to your endpoint.
 
 ## String length limit
 
@@ -189,7 +189,7 @@ At present, you can only have one Turing call per transaction, i.e. a Turing cal
 
 The modified Turing L2Geth, `L2TGeth`, monitors calldata for particular Keccak methodIDs of functions such as `GetRandom(uint32 rType, uint256 _random)` and `GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs in the execution flow, at any level, L2TGeth parses the calldata for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then runs the function with updated inputs, such that the new information flows back to the caller (via overloaded variables and a system for conditionally bypassing `requires`). Put simply, L2TGeth intercepts function calls, adds new information to the inputs, and then runs the function with the updated inputs.
 
-In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data field is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter into a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum.
+In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data field is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum.
 
 ## Quickstart for Turing Developers
 

@@ -4,7 +4,8 @@
   * [Basics](#basics)
   * [Mint your Monster!](#mint-your-monster)
   * [Getting Rinkeby ETH and Rinkeby BOBA](#getting-rinkeby-eth-and-rinkeby-boba)
-  * [Deploying the Turing Monster NFT](#deploying-the-turing-monster-nft)
+  * [Testing the Turing Monster NFT](#testing-the-turing-monster-nft)
+  * [Deploy the Turing Monster NFT without running the tests](#deploy-the-turing-monster-nft-without-running-the-tests)
   * [Solidity Code Walkthrough](#solidity-code-walkthrough)
 
 ## Basics
@@ -26,12 +27,12 @@ Clone the repository, open it, and install packages with `yarn`:
 
 ```bash
 $ git clone https://github.com/bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFT_monster.ts`), specify your private key:
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
 
 ```javascript
 
@@ -48,7 +49,7 @@ const BOBAL2Address = '0x58597818d1B85EF96383884951E846e9D6D03956'
 const BobaTuringCreditRinkebyAddress = '0xE654ba86Ea0B59a6836f86Ec806bfC9449D0aD0A'
 
 // provide your PK here
-const testPrivateKey = '0x____'
+const testPrivateKey = process.env.PRIVATE_KEY ?? '0x____'
 
 ```
 
@@ -56,19 +57,20 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed.
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed but also requires a minimal fee for the Turing call as well.
 
-## Deploying the Turing Monster NFT
+## Testing the Turing Monster NFT
 
-Run
+To run the tests you will also need some Rinkeby ETH (not the Boba rinkeby, but the regular ETH Rinkeby) as the tests also test the NFT bridging functionality.
 
 ```bash
 $ cd boba_community/turing-monsters
 $ yarn build
-$ yarn test:rinkeby # for testing on rinkeby, for example
+$ PRIVATE_KEY=0x... yarn test:rinkeby # for testing on rinkeby, for example
 
-# other choces are local and mainnet
+# other choices are local and mainnet
 ```
+
 
 Ok, all done. Enjoy. The terminal will give you all the information you need to mint and send a Turing monster to your friends:
 
@@ -88,17 +90,45 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 ```
 
+## Deploy the Turing Monster NFT without running the tests
+
+To deploy run:
+
+```bash
+$ cd boba_community/turing-monsters
+$ yarn build
+$ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
+```
+
 ## Solidity Code Walkthrough
 
-The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract and the `uint256 turingRAND = myHelper.TuringRandom();` of course.
+The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract.
+Nevertheless, the contract has been distributed into several smaller contracts to make them easily reusable for your own project.
+
+Core features:
+- You'll mint a random tokenID issued by Turing; `@ref RandomlyAssigned.sol:nextToken()`
+- MetaData is onChain and also is randomized via Turing; `@ref WithOnChainMetaData.sol:getMetadata()`
+- Recover functions for tokens when someone accidentally sends funds to the contract; `@ref WithRecover.sol`
+- Max Mint per wallet is limited and minting a NFT costs an additional fee (see the PRICE constant); `@ref NFTMonsterV2.sol:mint()`
+- NFT implements the `IERC2981` standard for royalty fees; `@ref NFTMonsterV2.sol:royaltyInfo()`
+- Minting revenue will be split across project owners via claim function; `@ref NFTMonsterV2.sol:withdraw()`
+- NFT not tradeable until project owner calls `startTrading()`; `@ref NFTMonsterV2.sol:saleIsOpen[modifier]`
 
 ```javascript
 
-    function mint(address to, uint256 tokenId) public {
-      uint256 turingRAND = myHelper.TuringRandom(); // Get the random number
-      _mint(to, tokenId);
-      _setTokenURI(tokenId, Strings.toString(turingRAND));
+  function mint(uint256 _count) external payable saleIsOpen {
+    uint256 total = tokenCount();
+    require(_count > 0, "Mint more than 0");
+    require(total + _count <= totalSupply(), "Max limit");
+    require(msg.value >= price(_count), "Value below price");
+
+    amountMintedInPublicSale[_msgSender()] = amountMintedInPublicSale[_msgSender()] + _count;
+    require(amountMintedInPublicSale[_msgSender()] <= MAX_MINT_IN_PUBLIC);
+
+    for (uint256 i = 0; i < _count; i++) {
+      _mintSingle(_msgSender());
     }
+  }
 
     function getSVG(uint tokenId) private view returns (string memory) {
 
