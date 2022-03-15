@@ -3,23 +3,26 @@ package bsscore
 import (
 	"bytes"
 	"context"
+	"errors"
 	"math/big"
 	"sync"
 	"time"
 
+	"github.com/ethereum-optimism/optimism/go/bss-core/boba"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 var (
 	// weiToEth is the conversion rate from wei to ether.
 	weiToEth                = new(big.Float).SetFloat64(1e-18)
 	lastBatchSubmissionTime time.Time
+	errGasPriceTooHigh      = errors.New("Gas price is higher than gas price")
+	errBatchSizeTooSmall    = errors.New("Batch size too small or max submission timeout not reached")
 )
 
 // Driver is an interface for creating and submitting batch transactions for a
@@ -82,8 +85,9 @@ type Service struct {
 	ctx    context.Context
 	cancel func()
 
-	txMgr   txmgr.TxManager
-	metrics *metrics.Metrics
+	bobaService boba.BobaServiceManager
+	txMgr       txmgr.TxManager
+	metrics     *metrics.Metrics
 
 	wg sync.WaitGroup
 }
@@ -95,12 +99,18 @@ func NewService(cfg ServiceConfig) *Service {
 		cfg.Driver.Name(), cfg.TxManagerConfig, cfg.L1Client,
 	)
 
+	bobaService := boba.NewBobaService(
+		cfg.Driver.Name(), cfg.Context, cfg.MinTxSize, cfg.MaxL1GasPrice,
+		cfg.MaxBatchSubmissionTime, cfg.L1Client,
+	)
+
 	return &Service{
-		cfg:     cfg,
-		ctx:     ctx,
-		cancel:  cancel,
-		txMgr:   txMgr,
-		metrics: cfg.Driver.Metrics(),
+		cfg:         cfg,
+		ctx:         ctx,
+		cancel:      cancel,
+		txMgr:       txMgr,
+		metrics:     cfg.Driver.Metrics(),
+		bobaService: bobaService,
 	}
 }
 
@@ -189,39 +199,8 @@ func (s *Service) eventLoop() {
 			batchTxBuildTime := time.Since(batchTxBuildStart) / time.Millisecond
 			s.metrics.BatchTxBuildTime.Set(float64(batchTxBuildTime))
 
-			// Check L1 Gas Price
-			L1GasPrice, err := s.cfg.L1Client.SuggestGasPrice(s.ctx)
-			if err == nil {
-				MaxL1GasPriceWei := new(big.Int).SetUint64(s.cfg.MaxL1GasPrice)
-				MaxL1GasPrice := new(big.Int).Mul(MaxL1GasPriceWei, big.NewInt(params.GWei))
-				if MaxL1GasPrice.Cmp(big.NewInt(0)) > 0 && MaxL1GasPrice.Cmp(L1GasPrice) < 0 {
-					log.Info(
-						name+" gas price is higher than gas price threshold; aborting batch submission",
-						"MaxL1GasPrice", MaxL1GasPrice,
-						"L1GasPrice", L1GasPrice,
-					)
-					continue
-				}
-			}
-
-			// Check the batch size
-			// Submit the tx batch if batchSize > MinTxSize or timeDuration > MaxBatchSubmissionTime
-			timeSinceLastSubmission := time.Since(lastBatchSubmissionTime)
-			if batchSize < s.cfg.MinTxSize && timeSinceLastSubmission < s.cfg.MaxBatchSubmissionTime {
-				log.Info(name+" skip bacth submission. Batch too small or max submission timeout not reached.",
-					"batchSize", batchSize,
-					"MinTxSize", s.cfg.MinTxSize,
-					"timeSinceLastSubmission", timeSinceLastSubmission,
-					"MaxBatchSubmissionTime", s.cfg.MaxBatchSubmissionTime,
-				)
+			if err := s.bobaService.VerifyCondition(batchSize); err != nil {
 				continue
-			} else {
-				log.Info(name+" proceeding with bacth submission.",
-					"batchSize", batchSize,
-					"MinTxSize", s.cfg.MinTxSize,
-					"timeSinceLastSubmission", timeSinceLastSubmission,
-					"MaxBatchSubmissionTime", s.cfg.MaxBatchSubmissionTime,
-				)
 			}
 
 			// Record the size of the batch transaction.
@@ -268,7 +247,7 @@ func (s *Service) eventLoop() {
 			// The transaction was successfully submitted.
 			log.Info(name+" batch tx successfully published",
 				"tx_hash", receipt.TxHash)
-			lastBatchSubmissionTime = time.Now()
+			s.bobaService.SetLastBatchSubmissionTime()
 			batchConfirmationTime := time.Since(batchConfirmationStart) /
 				time.Millisecond
 			s.metrics.BatchConfirmationTime.Set(float64(batchConfirmationTime))
