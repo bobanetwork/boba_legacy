@@ -17,7 +17,9 @@ var (
 	errBatchSizeTooSmall    = errors.New("Batch size too small or max submission timeout not reached")
 )
 
+// Config houses parameters for altering the behavior of a BobaService.
 type Config struct {
+	// Name is an identifier used to prefix logs for a particular service.
 	Name                   string
 	Context                context.Context
 	L1Client               drivers.L1Client
@@ -26,9 +28,18 @@ type Config struct {
 	MaxL1GasPrice          uint64
 }
 
+// BobaServiceManager is an interface that allows callers to save gas if
+// the batch doesn't meet multiple conditions
 type BobaServiceManager interface {
+	// VerifyCondition verifies the batch size and l1 gas price.
+	// If l1 gas price is larger than MaxL1GasPrice, it returns the errGasPriceTooHigh
+	// as the error message
+	// If batch size is under MinTxSize and waiting time is below MaxBatchSubmissionTime,
+	// it return errBatchSizeTooSmall as the error message
 	VerifyCondition(batchSize uint64) error
+	// Set the last bacth submission time outside boba service
 	SetLastBatchSubmissionTime()
+	// Get the last batch submission time
 	GetLastBatchSubmissionTime() time.Time
 }
 
