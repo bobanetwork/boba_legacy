@@ -15,7 +15,7 @@ async function main() {
   const helper = await Factory__Helper.deploy()
   console.log("Turing Helper contract deployed at", helper.address)
 
-  const NFTMonsterV2 = await ethers.getContractFactory("NFTMonsterV2");
+  const NFTMonsterV2 = await ethers.getContractFactory("NFTMonsterV2Flat");
   const nftMonster = await NFTMonsterV2.deploy(
     "TuringMonster",
     "BOO",

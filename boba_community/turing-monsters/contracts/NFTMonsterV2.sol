@@ -61,7 +61,7 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
         require(msg.value >= price(_count), "Value below price");
 
         amountMintedInPublicSale[_msgSender()] = amountMintedInPublicSale[_msgSender()] + _count;
-        require(amountMintedInPublicSale[_msgSender()] <= MAX_MINT_IN_PUBLIC);
+        require(amountMintedInPublicSale[_msgSender()] <= MAX_MINT_IN_PUBLIC, "Wallet limit reached");
 
         for (uint256 i = 0; i < _count; i++) {
             _mintSingle(_msgSender());

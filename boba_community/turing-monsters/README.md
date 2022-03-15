@@ -100,6 +100,9 @@ $ yarn build
 $ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
 ```
 
+Add the ERC721 as permitted caller to the deployed TuringHelper.
+Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
+
 ## Solidity Code Walkthrough
 
 The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract.
