@@ -18,26 +18,19 @@ interface DeploymentInfo {
 const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
   {
     folder: 'mainnet',
-    name: 'Optimism (mainnet)',
-    chainid: 10,
-    rpc: 'https://mainnet.optimism.io',
+    name: 'Boba (mainnet)',
+    chainid: 288,
+    rpc: 'https://mainnet.boba.network',
     l1Explorer: 'https://etherscan.io',
-    l2Explorer: 'https://optimistic.etherscan.io',
+    l2Explorer: 'https://blockexplorer.boba.network',
   },
   {
-    folder: 'kovan',
-    name: 'Optimism Kovan (public testnet)',
-    chainid: 69,
-    rpc: 'https://kovan.optimism.io',
-    l1Explorer: 'https://kovan.etherscan.io',
-    l2Explorer: 'https://kovan-optimistic.etherscan.io',
-  },
-  {
-    folder: 'goerli',
-    name: 'Optimism Goerli (internal devnet)',
-    chainid: 420,
-    notice: `Optimism Goerli is an internal Optimism development network. You're probably looking for [Optimism Kovan](../kovan#readme), the public Optimism testnet.`,
-    l1Explorer: 'https://goerli.etherscan.io',
+    folder: 'Rinkeby',
+    name: 'Boba Rinkeby (public testnet)',
+    chainid: 28,
+    rpc: 'https://rinkeby.boba.netwokr',
+    l1Explorer: 'https://rinkeby.etherscan.io',
+    l2Explorer: 'https://blockexplorer.rinkeby.boba.network',
   },
 ]
 
