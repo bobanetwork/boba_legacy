@@ -115,6 +115,10 @@ type Config struct {
 
 	/* Optional Params */
 
+	// MaxL1GasPrice is the maximum L1 gas price that the
+	// batch submitter can accept
+	MaxL1GasPrice uint64
+
 	// LogLevel is the lowest log level that will be output.
 	LogLevel string
 
@@ -184,6 +188,7 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		L2EthRpc:                ctx.GlobalString(flags.L2EthRpcFlag.Name),
 		CTCAddress:              ctx.GlobalString(flags.CTCAddressFlag.Name),
 		SCCAddress:              ctx.GlobalString(flags.SCCAddressFlag.Name),
+		MinL1TxSize:             ctx.GlobalUint64(flags.MinL1TxSizeFlag.Name),
 		MaxL1TxSize:             ctx.GlobalUint64(flags.MaxL1TxSizeFlag.Name),
 		MaxBatchSubmissionTime:  ctx.GlobalDuration(flags.MaxBatchSubmissionTimeFlag.Name),
 		PollInterval:            ctx.GlobalDuration(flags.PollIntervalFlag.Name),
@@ -195,6 +200,7 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		SafeMinimumEtherBalance: ctx.GlobalUint64(flags.SafeMinimumEtherBalanceFlag.Name),
 		ClearPendingTxs:         ctx.GlobalBool(flags.ClearPendingTxsFlag.Name),
 		/* Optional Flags */
+		MaxL1GasPrice:       ctx.GlobalUint64(flags.MaxL1GasPriceFlag.Name),
 		LogLevel:            ctx.GlobalString(flags.LogLevelFlag.Name),
 		LogTerminal:         ctx.GlobalBool(flags.LogTerminalFlag.Name),
 		SentryEnable:        ctx.GlobalBool(flags.SentryEnableFlag.Name),
