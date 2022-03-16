@@ -52,8 +52,8 @@ const main = async () => {
 
   if (validateMonitoring()) {
     logger.info('Start addresses monitoring service!')
-    setupProvider(configs.OMGXNetwork.L1, configs.l1WsUrl).catch()
-    setupProvider(configs.OMGXNetwork.L2, configs.l2WsUrl).catch()
+    setupProvider(configs.OMGXNetwork.L1, configs.l1Url, 5).catch()
+    setupProvider(configs.OMGXNetwork.L2, configs.l2Url, 15).catch()
   } else {
     logger.error(
       'Addresses Monitoring: Env variables for monitoring is missing!'

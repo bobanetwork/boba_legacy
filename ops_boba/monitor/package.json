@@ -9,15 +9,18 @@
   "license": "MIT",
   "dependencies": {
     "@boba/contracts": "0.0.1",
+    "@boba/register": "0.0.1",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.6.0",
     "@eth-optimism/common-ts": "0.1.5",
     "@ethersproject/providers": "5.4.5",
+    "axios": "0.26.0",
     "async-mutex": "^0.3.1",
     "dotenv": "^9.0.0",
     "ethers": "^5.1.4",
     "lodash": "4.17.21",
     "mysql": "^2.18.1",
+    "node-fetch": "3.2.3",
     "web3": "1.6.0",
     "winston": "3.3.3"
   },
