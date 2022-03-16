@@ -93,6 +93,8 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
+import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 
 require('dotenv').config()
 
@@ -110,6 +112,8 @@ function Home() {
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
   const transferModalState = useSelector(selectModalState('transferModal'))
   const exitModalState = useSelector(selectModalState('exitModal'))
+  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
+  const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -227,6 +231,8 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
+      {!!tokenPickerModalState && <TokenPickerModal open={tokenPickerModalState} />}
 
       <Alert
         type='error'

@@ -28,6 +28,8 @@ const initialState = {
   depositBatchModal: false,
   transferModal: false,
   exitModal: false,
+  bridgeTypeSwitch: false,
+  tokenPicker: false,
   mergeModal: false,
   confirmationModal: false,
   wrongNetworkModal: false,

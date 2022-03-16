@@ -13,35 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-// are we connected to an account - e.g. metamask?
-export function selectAccountEnabled () {
+export function selectTokens() {
   return function (state) {
-    return state.setup['accountEnabled']
+    return state.bridge.tokens
   }
 }
 
-// do we have basic providers?
-export function selectBaseEnabled () {
+export function selectBridgeType() {
   return function (state) {
-    return state.setup['baseEnabled']
-  }
-}
-
-// local, rinkeby, mainnet...
-export function selectNetwork () {
-  return function (state) {
-    return state.setup['network']
-  }
-}
-
-export function selectLayer () {
-  return function (state) {
-    return state.setup['netLayer']
-  }
-}
-
-export function selectJustSwitchedChain () {
-  return function (state) {
-    return state.setup['justSwitchedChain']
+    return state.bridge.bridgeType
   }
 }
