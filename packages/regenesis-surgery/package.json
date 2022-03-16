@@ -10,9 +10,9 @@
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",
     "pre-commit": "lint-staged",
-    "surgery:v1-to-v2": "ts-node scripts/v1-to-v2-surgery.ts",
-    "surgery:v1-to-v2:boba": "ts-node scripts/boba-contracts-verifier.ts",
-    "surgery:v1-to-v2:core": "ts-node scripts/core-contracts-verifier.ts"
+    "surgery:boba": "ts-node scripts/boba-regenesis.ts",
+    "surgery:verify:boba": "ts-node scripts/boba-contracts-verifier.ts",
+    "surgery:verify:core": "ts-node scripts/core-contracts-verifier.ts"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
@@ -21,6 +21,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "@boba/register": "0.0.1",
     "@discoveryjs/json-ext": "^0.5.3",
     "@eth-optimism/contracts": "^0.5.11",
     "@uniswap/v3-core-optimism": "^1.0.0-rc.0",
