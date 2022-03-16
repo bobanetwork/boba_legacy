@@ -935,13 +935,13 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	}
 
 	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
-	isFeeUpdate := s.bc.Config().IsFeeUpdate(nextBlockNumber)
+	isFeeTokenUpdate := s.bc.Config().IsFeeTokenUpdate(nextBlockNumber)
 
 	// Prevent transactions without enough balance from
 	// being accepted by the chain but allow through 0
 	// gas price transactions
 	cost := tx.Value()
-	if !isFeeUpdate && tx.GasPrice().Cmp(common.Big0) != 0 {
+	if !isFeeTokenUpdate && tx.GasPrice().Cmp(common.Big0) != 0 {
 		cost = cost.Add(cost, fee)
 	}
 	state, err := s.bc.State()
@@ -979,7 +979,7 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return err
 	}
 
-	if isFeeUpdate {
+	if isFeeTokenUpdate {
 		// Ensure that the user approved enough gas to do the transaction
 		estimateGas, err := s.validateGasLimit(tx, l2GasPrice, s.RollupGpo, nextBlockNumber)
 		if err != nil {

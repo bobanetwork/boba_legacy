@@ -461,7 +461,7 @@ func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
 	return true
 }
 
-func (c *ChainConfig) IsFeeUpdate(num *big.Int) bool {
+func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetFeeUpdatedForkNum, num)
 	}
