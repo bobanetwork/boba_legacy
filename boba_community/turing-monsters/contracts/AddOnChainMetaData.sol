@@ -84,10 +84,6 @@ abstract contract AddOnChainMetaData is ERC721 {
         require(_exists(tokenId_), "ERC721URIStorage: URI set of nonexistent token");
 
         uint256 rand = turingHelper.TuringRandom();
-    unchecked {
-        // overflow desired + or operator to get the same length for all attributes
-        _tokenURIs[tokenId_] = (rand ** (tokenId_ + 1) | rand);
-        // +1 to avoid **0
-    }
+        _tokenURIs[tokenId_] = uint256(keccak256(abi.encode(rand, tokenId_)));
     }
 }
