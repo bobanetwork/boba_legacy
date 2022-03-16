@@ -44,7 +44,7 @@
         source = ./. ;
         inject = {
           express-prom-bundle."6.4.1" = [
-            ["prom-client" "13.0.0"]
+            ["prom-client" "13.2.0"]
           ];
         };
         packageOverrides =
