@@ -67,7 +67,7 @@ describe("Turing bridgeable NFT Random 256", function () {
     erc721 = await Factory__ERC721.deploy(
       "TuringMonster",
       "BOO",
-      100,
+      5,
       ['0x4B45C30b8c4fAEC1c8eAaD5398F8b8e91BFbac15'],
       helper.address,
       gasOverride)
@@ -197,7 +197,7 @@ describe("Turing bridgeable NFT Random 256", function () {
     console.log("Turing NFT =",res)
 
 
-    console.log(`Trying to mint 1 NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each.`)
+    console.log(`Trying to mint 1 NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each, should fail as max mint per wallet reached.`)
     let trFail = await erc721.mint(1, {gasLimit: 1000000, value: mintingPrice})
     let resFail = trFail.wait()
     expect(resFail, "Max mint should be 3 NFTs per wallet").to.be.reverted
@@ -209,6 +209,11 @@ describe("Turing bridgeable NFT Random 256", function () {
     let trDif = await erc721DifferentSigner.mint(difWalletAmount, {gasLimit: 1000000, value: mintingPrice * difWalletAmount})
     let resDif = await trDif.wait()
     expect(resDif).to.be.ok
+
+    console.log(`Trying to mint 1 NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each, should fail as max supply reached.`)
+    let trFail2 = await erc721DifferentSigner.mint(1, {gasLimit: 1000000, value: mintingPrice})
+    let resFail2 = trFail2.wait()
+    expect(resFail2, "Max supply overflow").to.be.reverted
 
     const bobaBalance = await L2BOBAToken.balanceOf(testWallet.address)
     console.log("BOBA Balance in your account", bobaBalance.toString())
