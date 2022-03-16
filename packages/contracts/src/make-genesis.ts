@@ -45,6 +45,8 @@ export interface RollupDeployConfig {
   bobaTuringPrice: string
   // Turing helper json
   TuringHelperJson: any
+  // L1 Boba Token address
+  l1BobaTokenAddress: any
   // Block height to activate berlin hardfork
   berlinBlock: number
 }
@@ -112,6 +114,17 @@ export const makeL2GenesisFile = async (
     },
     BobaTuringHelper: {
       Self: predeploys.BobaTuringHelper
+    },
+    // Token decimal is 0 for BOBA Token
+    L2GovernanceERC20: {
+      _name: 'Boba Network',
+      _symbol: 'BOBA',
+      l1Token: cfg.l1BobaTokenAddress,
+      l2Bridge:predeploys.L2StandardBridge,
+    },
+    Boba_SequencerFeeVault: {
+      l1FeeWallet: cfg.l1FeeWalletAddress,
+      l2BobaAddress: predeploys.L2GovernanceERC20,
     }
   }
 
@@ -143,7 +156,7 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
-        break
+        continue
       }
       const storageLayout = await getStorageLayout(predeployName)
       // Calculate the mapping keys

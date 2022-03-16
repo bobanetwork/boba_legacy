@@ -78,6 +78,15 @@ func GetTuringPrepayKey(userID common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
+func GetBobaBalanceKey(addr common.Address) common.Hash {
+	position := common.Big0
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(addr.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -263,6 +272,14 @@ func (s *StateDB) GetBalance(addr common.Address) *big.Int {
 		}
 		return common.Big0
 	}
+}
+
+// Retrieve the Boba balance from the given address or 0 if object not found
+func (s *StateDB) GetBobaBalance(addr common.Address) *big.Int {
+	// Get balance from the BOBA contract.
+	key := GetBobaBalanceKey(addr)
+	bal := s.GetState(rcfg.OvmL2BobaToken, key)
+	return bal.Big()
 }
 
 func (s *StateDB) GetNonce(addr common.Address) uint64 {
@@ -458,6 +475,16 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	}
 }
 
+// AddBobaBalance add boba from the account associated with addr
+func (s *StateDB) AddBobaBalance(addr common.Address, amount *big.Int) {
+	// Get balance from the BOBA contract.
+	key := GetBobaBalanceKey(addr)
+	value := s.GetState(rcfg.OvmL2BobaToken, key)
+	bal := value.Big()
+	bal = bal.Add(bal, amount)
+	s.SetState(rcfg.OvmL2BobaToken, key, common.BigToHash(bal))
+}
+
 // SubBalance subtracts amount from the account associated with addr.
 func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 	if rcfg.UsingOVM {
@@ -476,6 +503,16 @@ func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 			stateObject.SubBalance(amount)
 		}
 	}
+}
+
+// SubBobaBalance subtracts boba from the account associated with addr
+func (s *StateDB) SubBobaBalance(addr common.Address, amount *big.Int) {
+	// Get balance from the BOBA contract.
+	key := GetBobaBalanceKey(addr)
+	value := s.GetState(rcfg.OvmL2BobaToken, key)
+	bal := value.Big()
+	bal = bal.Sub(bal, amount)
+	s.SetState(rcfg.OvmL2BobaToken, key, common.BigToHash(bal))
 }
 
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {

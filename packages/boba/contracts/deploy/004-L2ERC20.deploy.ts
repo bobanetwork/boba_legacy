@@ -6,8 +6,6 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import L1BobaJson from '../artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
-import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import xL2GovernanceERC20Json from '../artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -158,59 +156,31 @@ const deployFn: DeployFunction = async (hre) => {
 
     //Set up things on L2 for these tokens
 
-    if (token.symbol !== 'BOBA') {
-      L2ERC20 = await Factory__L2ERC20.deploy(
-        (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddressL1,
-        token.name,
-        token.symbol,
-        tokenDecimals
-      )
-      await L2ERC20.deployTransaction.wait()
+    L2ERC20 = await Factory__L2ERC20.deploy(
+      (hre as any).deployConfig.L2StandardBridgeAddress,
+      tokenAddressL1,
+      token.name,
+      token.symbol,
+      tokenDecimals
+    )
+    await L2ERC20.deployTransaction.wait()
 
-      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
-        ...L2ERC20,
-        receipt: L2ERC20.receipt,
-        address: L2ERC20.address,
-        abi: L2ERC20.abi,
-      }
-      await hre.deployments.save(
-        'TK_L2' + token.symbol,
-        L2ERC20DeploymentSubmission
-      )
-      await registerBobaAddress(
-        addressManager,
-        'TK_L2' + token.symbol,
-        L2ERC20.address
-      )
-      console.log(`TK_L2${token.symbol} was deployed to ${L2ERC20.address}`)
-    } else {
-      L2ERC20 = await Factory__L2Boba.deploy(
-        (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddressL1,
-        token.name,
-        token.symbol,
-        tokenDecimals
-      )
-      await L2ERC20.deployTransaction.wait()
-
-      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
-        ...L2ERC20,
-        receipt: L2ERC20.receipt,
-        address: L2ERC20.address,
-        abi: L2GovernanceERC20Json.abi,
-      }
-      await hre.deployments.save(
-        'TK_L2' + token.symbol,
-        L2ERC20DeploymentSubmission
-      )
-      await registerBobaAddress(
-        addressManager,
-        'TK_L2' + token.symbol,
-        L2ERC20.address
-      )
-      console.log(`TK_L2${token.name} was deployed to ${L2ERC20.address}`)
+    const L2ERC20DeploymentSubmission: DeploymentSubmission = {
+      ...L2ERC20,
+      receipt: L2ERC20.receipt,
+      address: L2ERC20.address,
+      abi: L2ERC20.abi,
     }
+    await hre.deployments.save(
+      'TK_L2' + token.symbol,
+      L2ERC20DeploymentSubmission
+    )
+    await registerBobaAddress(
+      addressManager,
+      'TK_L2' + token.symbol,
+      L2ERC20.address
+    )
+    console.log(`TK_L2${token.symbol} was deployed to ${L2ERC20.address}`)
 
     // Register tokens in LPs
     const Proxy__L1LiquidityPoolDeployment = await hre.deployments.getOrNull(

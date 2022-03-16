@@ -66,6 +66,7 @@ type StateTransition struct {
 	l1Fee       *big.Int
 	l2ExtraGas  *big.Int
 	isGasUpdate bool
+	isFeeUpdate bool
 }
 
 // Message represents a message sent to a contract.
@@ -130,7 +131,9 @@ func IntrinsicGas(data []byte, contractCreation, isHomestead bool, isEIP2028 boo
 func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition {
 	l1Fee := new(big.Int)
 	l2ExtraGas := new(big.Int)
+	gasPrice := msg.GasPrice()
 	isGasUpdate := true
+	isFeeUpdate := true
 	if rcfg.UsingOVM {
 		isFeeUpdate := evm.ChainConfig().IsFeeUpdate(evm.BlockNumber)
 		isGasUpdate = evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
@@ -144,19 +147,25 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 				l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, evm.StateDB, nil)
 			}
 		}
+		// Override gas price to 0, so we don't charge anything for the standard gas fee,
+		// but focus on charging boba as the l1 security fee
+		if isFeeUpdate {
+			gasPrice = big.NewInt(0)
+		}
 	}
 
 	return &StateTransition{
 		gp:          gp,
 		evm:         evm,
 		msg:         msg,
-		gasPrice:    msg.GasPrice(),
+		gasPrice:    gasPrice,
 		value:       msg.Value(),
 		data:        msg.Data(),
 		state:       evm.StateDB,
 		l1Fee:       l1Fee,
 		l2ExtraGas:  l2ExtraGas,
 		isGasUpdate: isGasUpdate,
+		isFeeUpdate: isFeeUpdate,
 	}
 }
 
@@ -226,6 +235,27 @@ func (st *StateTransition) buyGas() error {
 	return nil
 }
 
+func (st *StateTransition) buyBobaGas() error {
+	mgval := new(big.Int).Mul(st.l2ExtraGas, st.msg.GasPrice())
+	if rcfg.UsingOVM {
+		if st.msg.CheckNonce() {
+			log.Debug("Total fee", "total-fee", mgval)
+		}
+	}
+	if st.state.GetBobaBalance(st.msg.From()).Cmp(mgval) < 0 {
+		return errInsufficientBalanceForGas
+	}
+	if err := st.gp.SubGas(st.msg.Gas()); err != nil {
+		return err
+	}
+
+	st.gas += st.msg.Gas()
+
+	st.initialGas = st.msg.Gas()
+	st.state.SubBobaBalance(st.msg.From(), mgval)
+	return nil
+}
+
 func (st *StateTransition) preCheck() error {
 	// Make sure this transaction's nonce is correct.
 	if st.msg.CheckNonce() {
@@ -240,6 +270,9 @@ func (st *StateTransition) preCheck() error {
 		} else if nonce > st.msg.Nonce() {
 			return ErrNonceTooLow
 		}
+	}
+	if st.isFeeUpdate {
+		return st.buyBobaGas()
 	}
 	return st.buyGas()
 }
@@ -298,7 +331,12 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	}
 	st.refundGas()
 
+	if st.isFeeUpdate {
+		st.state.AddBobaBalance(rcfg.OvmBobaFeeVault, new(big.Int).Mul(st.l2ExtraGas, st.msg.GasPrice()))
+	}
+
 	if st.isGasUpdate {
+		// st.gasPrice is 0 if isFeeUpdate == true
 		st.state.AddBalance(evm.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
 	} else {
 		// The L2 Fee is the same as the fee that is charged in the normal geth
@@ -317,7 +355,9 @@ func (st *StateTransition) refundGas() {
 	// Only refund a partial gas
 	var refund uint64
 	if st.isGasUpdate {
-		refund = (st.gasUsed() - st.l2ExtraGas.Uint64()) / 2
+		if !st.isFeeUpdate {
+			refund = (st.gasUsed() - st.l2ExtraGas.Uint64()) / 2
+		}
 	} else {
 		refund = st.gasUsed() / 2
 	}
@@ -327,8 +367,10 @@ func (st *StateTransition) refundGas() {
 	st.gas += refund
 
 	// Return ETH for remaining gas, exchanged at the original rate.
-	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
-	st.state.AddBalance(st.msg.From(), remaining)
+	if !st.isFeeUpdate {
+		remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
+		st.state.AddBalance(st.msg.From(), remaining)
+	}
 
 	// Also return remaining gas to the block gas counter so it is
 	// available for the next transaction.
@@ -339,6 +381,9 @@ func (st *StateTransition) refundGas() {
 func (st *StateTransition) gasUsed() uint64 {
 	if rcfg.UsingOVM {
 		if st.isGasUpdate {
+			if st.isFeeUpdate {
+				return st.l2ExtraGas.Uint64()
+			}
 			return st.initialGas - st.gas + st.l2ExtraGas.Uint64()
 		}
 		return st.initialGas - st.gas
