@@ -46,10 +46,6 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories.
 
-## Community and DAO
-
-* [Discuss and propose](https://forum.boba.network)
-
 ## Directory Structure
 
 **Base Layer (generally similar to Optimistic Ethereum)**
@@ -63,7 +59,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`message-relayer`](./packages/message-relayer): Service for relaying L2 messages to L1
   * [`replica-healthcheck`](./packages/replica-healthcheck): Service to monitor the health of different replica deployments
 * [`l2geth`](./l2geth): Fork of [go-ethereum v1.9.10](https://github.com/ethereum/go-ethereum/tree/v1.9.10) implementing the [OVM](https://research.paradigm.xyz/optimism#optimistic-geth).
-* [`integration-tests`](./integration-tests): Integration tests between a L1 testnet, `l2geth`,
+* [`integration-tests`](./integration-tests): Integration tests between a L1 testnet and the `l2geth`
 * [`ops`](./ops): Contains Dockerfiles for containerizing each service involved in the protocol,
 as well as a docker-compose file for bringing up local testnets easily
 
@@ -103,7 +99,7 @@ Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
 $ git clone git@github.com:bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn clean # only needed / will only work if you had it installed previously
 $ yarn
 $ yarn build

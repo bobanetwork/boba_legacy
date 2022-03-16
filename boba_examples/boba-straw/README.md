@@ -13,7 +13,6 @@ Install the following:
 Install npm packages and build package in the root directory:
 
 ```bash
-cd optimism-v2
 yarn install
 yarn build
 ```
