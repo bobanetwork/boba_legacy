@@ -5,12 +5,17 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "base64-sol/base64.sol";
+import "./TuringHelper.sol";
 
-abstract contract WithOnChainMetaData is ERC721 {
+abstract contract AddOnChainMetaData is ERC721 {
 
+    TuringHelper private turingHelper;
 
-    // Optional mapping for token URIs
     mapping(uint256 => uint256) private _tokenURIs;
+
+    constructor(address turingHelperAddress_) {
+        turingHelper = TuringHelper(turingHelperAddress_);
+    }
 
     /// @dev Calculate randomized onchain metadata for specific tokenId.
     function getMetadata(uint tokenId) private view returns (string memory) {
@@ -19,16 +24,14 @@ abstract contract WithOnChainMetaData is ERC721 {
         uint256 genome = _tokenURIs[tokenId];
         bytes memory i_bytes = abi.encodePacked(genome);
 
-        uint8 attribute_a = uint8(i_bytes[0]);
-        uint8 attribute_b = uint8(i_bytes[1]);
-        uint8 attribute_c = uint8(i_bytes[2]);
+
         // ... all the way to uint8(i_bytes[31])
 
         string[5] memory part;
 
-        string memory colorEye = string(abi.encodePacked(Strings.toString(attribute_a), ",", Strings.toString(attribute_b), ",", Strings.toString(attribute_c)));
-        string memory colorBody = string(abi.encodePacked(Strings.toString(attribute_b), ",", Strings.toString(attribute_c), ",", Strings.toString(attribute_a)));
-        string memory colorExtra = string(abi.encodePacked(Strings.toString(attribute_c), ",", Strings.toString(attribute_a), ",", Strings.toString(attribute_b)));
+        string memory colorEye = string(abi.encodePacked(Strings.toString(uint8(i_bytes[0])), ",", Strings.toString(uint8(i_bytes[4])), ",", Strings.toString(uint8(i_bytes[7]))));
+        string memory colorBody = string(abi.encodePacked(Strings.toString(uint8(i_bytes[1])), ",", Strings.toString(uint8(i_bytes[3])), ",", Strings.toString(uint8(i_bytes[8]))));
+        string memory colorExtra = string(abi.encodePacked(Strings.toString(uint8(i_bytes[2])), ",", Strings.toString(uint8(i_bytes[5])), ",", Strings.toString(uint8(i_bytes[6]))));
 
         // Alternative approach
         // string memory colorBody = "rgb(128,224,255)";
@@ -61,7 +64,7 @@ abstract contract WithOnChainMetaData is ERC721 {
                 '{"trait_type": "Extra", "value": "', colorExtra, '"}]'));
         string memory json = Base64.encode(bytes(string(
                 abi.encodePacked('{"name": "TuringMonster", "description": "Little Monsters everywhere.", "attributes":',
-                    attributes, ', "image_data": "', bytes(svgData), '"}')
+                attributes, ', "image_data": "', bytes(svgData), '"}')
             )));
 
         return json;
@@ -77,8 +80,14 @@ abstract contract WithOnChainMetaData is ERC721 {
         return _exists(tokenId);
     }
 
-    function _setTokenURI(uint256 tokenId_, uint256 tokenURI_) internal virtual {
+    function _setTokenURI(uint256 tokenId_) internal virtual {
         require(_exists(tokenId_), "ERC721URIStorage: URI set of nonexistent token");
-        _tokenURIs[tokenId_] = tokenURI_;
+
+        uint256 rand = turingHelper.TuringRandom();
+    unchecked {
+        // overflow desired + or operator to get the same length for all attributes
+        _tokenURIs[tokenId_] = (rand ** (tokenId_ + 1) | rand);
+        // +1 to avoid **0
+    }
     }
 }

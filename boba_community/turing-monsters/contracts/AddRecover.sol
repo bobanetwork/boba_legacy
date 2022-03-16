@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract WithRecover is Ownable {
+contract AddRecover is Ownable {
 
     /// @dev Recovers ERC20 tokens accidentally sent to the contract.
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {

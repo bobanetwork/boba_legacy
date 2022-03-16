@@ -1218,7 +1218,7 @@ library Counters {
 }
 
 
-// File contracts/WithLimitedSupply.sol
+// File contracts/AddLimitedSupply.sol
 
 
 pragma solidity 0.8.9;
@@ -1499,7 +1499,7 @@ abstract contract Ownable is Context {
 }
 
 
-// File contracts/WithRecover.sol
+// File contracts/AddRecover.sol
 
 
 pragma solidity 0.8.9;
@@ -1651,7 +1651,7 @@ library Base64 {
 }
 
 
-// File contracts/WithOnChainMetaData.sol
+// File contracts/AddOnChainMetaData.sol
 
 
 pragma solidity 0.8.9;
