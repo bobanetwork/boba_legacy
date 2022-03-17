@@ -43,7 +43,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
         return _interfaceId == firstSupportedInterface || _interfaceId == secondSupportedInterface;
     }
 
-    function mint(address _to, uint256 _tokenId) public virtual override onlyL1Bridge {
+    function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
         _mint(_to, _tokenId);
 
         emit Mint(_to, _tokenId);

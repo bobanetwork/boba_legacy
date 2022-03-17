@@ -38,8 +38,7 @@ interface iL2NFTBridge {
     function withdraw(
         address _l2Contract,
         uint256 _tokenId,
-        uint32 _l1Gas,
-        bytes calldata _data
+        uint32 _l1Gas
     )
         external;
 
@@ -47,8 +46,22 @@ interface iL2NFTBridge {
         address _l2Contract,
         address _to,
         uint256 _tokenId,
-        uint32 _l1Gas,
-        bytes calldata _data
+        uint32 _l1Gas
+    )
+        external;
+
+    function withdrawWithExtraData(
+        address _l2Contract,
+        uint256 _tokenId,
+        uint32 _l1Gas
+    )
+        external;
+
+    function withdrawWithExtraDataTo(
+        address _l2Contract,
+        address _to,
+        uint256 _tokenId,
+        uint32 _l1Gas
     )
         external;
 
