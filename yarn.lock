@@ -1724,17 +1724,7 @@
     pino-sentry "^0.7.0"
     prom-client "^13.1.0"
 
-"@eth-optimism/contracts@0.5.17":
-  version "0.5.17"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.17.tgz#7a14618797c354486f2263a1d5dfab6c28a46458"
-  integrity sha512-mkey2YjRQ2O+85qeDhkiicAiukWfKixw/vktFO1KqLQ9K2phozJu/79dgBCABjyJfhE5kqJDSn5fBrtgIfc3hQ==
-  dependencies:
-    "@eth-optimism/core-utils" "0.8.1"
-    "@ethersproject/abstract-provider" "^5.5.1"
-    "@ethersproject/abstract-signer" "^5.5.0"
-    "@ethersproject/hardware-wallets" "^5.5.0"
-
-"@eth-optimism/core-utils@0.7.7", "@eth-optimism/core-utils@^0.7.5":
+"@eth-optimism/core-utils@0.7.7", "@eth-optimism/core-utils@^0.7.7":
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.7.7.tgz#c993d45d2be7a1956284621ad18129a88880c658"
   integrity sha512-JO3UvrlnOpeCKzDd/9mCd47n1FFjTOJtfG1JxUx24OfC/0yjZv6sKXDoMlZoDJArTQtCyyZ9QB7vulSFjOC6rA==
