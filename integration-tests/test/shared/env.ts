@@ -4,6 +4,7 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import { Watcher } from '@eth-optimism/core-utils'
 import { getMessagesAndProofsForL2Transaction } from '@eth-optimism/message-relayer'
+import { CrossChainMessenger } from '@eth-optimism/sdk'
 
 /* Imports: Internal */
 import {
@@ -70,6 +71,7 @@ export class OptimismEnv {
   l2Wallet_4: Wallet
 
   // The providers
+  messenger: CrossChainMessenger
   l1Provider: providers.JsonRpcProvider
   l2Provider: providers.JsonRpcProvider
   verifierProvider: providers.JsonRpcProvider
@@ -90,6 +92,7 @@ export class OptimismEnv {
     this.watcherFast = args.watcherFast
     this.l1Wallet = args.l1Wallet
     this.l2Wallet = args.l2Wallet
+    this.messenger = args.messenger
     this.l1Wallet_2 = args.l1Wallet_2
     this.l2Wallet_2 = args.l2Wallet_2
     this.l1Wallet_3 = args.l1Wallet_3
@@ -156,6 +159,13 @@ export class OptimismEnv {
       .connect(l2Wallet)
       .attach(predeploys.OVM_L1BlockNumber)
 
+    const network = await l1Provider.getNetwork()
+     const messenger = new CrossChainMessenger({
+       l1SignerOrProvider: l1Wallet,
+       l2SignerOrProvider: l2Wallet,
+       l1ChainId: network.chainId,
+     })
+
     return new OptimismEnv({
       addressManager,
       addressesBOBA,
@@ -180,6 +190,7 @@ export class OptimismEnv {
       l2Wallet_3,
       l1Wallet_4,
       l2Wallet_4,
+      messenger,
       l1Provider,
       l2Provider,
       verifierProvider,

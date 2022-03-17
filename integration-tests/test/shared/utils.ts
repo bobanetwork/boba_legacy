@@ -78,6 +78,9 @@ const env = cleanEnv(process.env, {
   MOCHA_TIMEOUT: num({
     default: 120_000,
   }),
+  DTL_ENQUEUE_CONFIRMATIONS: num({
+    default: 0,
+  }),
   RUN_STRESS_TESTS: bool({
     default: true,
   }),
@@ -193,6 +196,15 @@ export const fundUser = async (
 
   await waitForXDomainTransaction(watcher, tx, Direction.L1ToL2)
 }
+
+export const withdrawalTest = (name, fn, timeout?: number) =>
+  conditionalTest(
+    () => Promise.resolve(procEnv.RUN_WITHDRAWAL_TESTS),
+    name,
+    fn,
+    `Skipping withdrawal test.`,
+    timeout
+  )
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
