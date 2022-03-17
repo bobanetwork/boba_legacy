@@ -28,6 +28,7 @@ import {
   IS_LIVE_NETWORK,
   getBOBADeployerAddresses,
   sleep,
+  envConfig
 } from './utils'
 import {
   initWatcher,
@@ -109,11 +110,6 @@ export class OptimismEnv {
 
   static async new(): Promise<OptimismEnv> {
     const network = await l1Provider.getNetwork()
-    const messenger = new CrossChainMessenger({
-      l1SignerOrProvider: l1Wallet,
-      l2SignerOrProvider: l2Wallet,
-      l1ChainId: network.chainId,
-    })
 
     const addressManager = getAddressManager(l1Wallet)
     const addressesBOBA = await getBOBADeployerAddresses()
@@ -124,12 +120,6 @@ export class OptimismEnv {
       addressManager
     )
     const l1Bridge = await getL1Bridge(l1Wallet, addressManager)
-
-    // fund the user if needed
-    const balance = await l2Wallet.getBalance()
-    if (balance.isZero()) {
-      await fundUser(messenger, utils.parseEther('20'))
-    }
 
     const l1Messenger = getContractFactory('L1CrossDomainMessenger')
       .connect(l1Wallet)
@@ -166,6 +156,30 @@ export class OptimismEnv {
     const l1BlockNumber = getContractFactory('iOVM_L1BlockNumber')
       .connect(l2Wallet)
       .attach(predeploys.OVM_L1BlockNumber)
+
+    const messenger = new CrossChainMessenger({
+       l1SignerOrProvider: l1Wallet,
+       l2SignerOrProvider: l2Wallet,
+       l1ChainId: network.chainId,
+       contracts: {
+         l1: {
+           AddressManager: envConfig.ADDRESS_MANAGER,
+           L1CrossDomainMessenger: l1Messenger.address,
+           L1StandardBridge: l1Bridge.address,
+           StateCommitmentChain: sccAddress,
+           CanonicalTransactionChain: ctcAddress,
+           BondManager: await addressManager.getAddress('BondManager'),
+         },
+       },
+     })
+
+     // fund the user if needed
+     const balance = await l2Wallet.getBalance()
+     const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
+     const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
+     if (balance.lt(utils.parseEther(min))) {
+       await fundUser(messenger, utils.parseEther(topUp))
+     }
 
     return new OptimismEnv({
       addressManager,

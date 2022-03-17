@@ -49,13 +49,24 @@ const env = cleanEnv(process.env, {
     default: '0',
   }),
   L1_URL: str({ default: 'http://localhost:9545' }),
-  L2_URL: str({ default: 'http://localhost:8545' }),
-  VERIFIER_URL: str({ default: 'http://localhost:8547' }),
-  REPLICA_URL: str({ default: 'http://localhost:8549' }),
   L1_POLLING_INTERVAL: num({ default: 10 }),
+  
+  L2_URL: str({ default: 'http://localhost:8545' }),
   L2_POLLING_INTERVAL: num({ default: 10 }),
-  VERIFIER_POLLING_INTERVAL: num({ default: 10 }),
+  L2_CHAINID: num({ default: 31338 }),
+  L2_WALLET_MIN_BALANCE_ETH: num({
+    default: 2,
+  }),
+  L2_WALLET_TOP_UP_AMOUNT_ETH: num({
+    default: 3,
+  }),
+
+  REPLICA_URL: str({ default: 'http://localhost:8549' }),
   REPLICA_POLLING_INTERVAL: num({ default: 10 }),
+  
+  VERIFIER_URL: str({ default: 'http://localhost:8547' }),
+  VERIFIER_POLLING_INTERVAL: num({ default: 10 }),
+
   PRIVATE_KEY: str({
     default:
       '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
@@ -75,7 +86,7 @@ const env = cleanEnv(process.env, {
   ADDRESS_MANAGER: str({
     default: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   }),
-  L2_CHAINID: num({ default: 31338 }),
+
   IS_LIVE_NETWORK: bool({ default: false }),
   MOCHA_TIMEOUT: num({
     default: 120_000,
