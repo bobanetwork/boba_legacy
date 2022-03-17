@@ -225,7 +225,7 @@ describe('NFT Bridge Test', async () => {
 
     it('{tag:boba} should not be able to mint NFT on L2', async () => {
       await expect(
-        L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID + 1, '')
+        L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID + 1, '0x')
       ).to.be.revertedWith('Only L2 Bridge can mint and burn')
     })
 
@@ -428,7 +428,7 @@ describe('NFT Bridge Test', async () => {
 
     it('{tag:boba} should not be able to mint NFT on L1', async () => {
       await expect(
-        L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID + 1, '')
+        L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID + 1, '0x')
       ).to.be.revertedWith('Only L1 Bridge can mint and burn')
     })
 
