@@ -14,7 +14,7 @@ const nonBuilders = new Set([
   'gas-oracle',
 ])
 
-builder = true //false
+builder = false
 for (const i of data) {
   const name = i.name.replace("@eth-optimism/", "")
   if (!nonBuilders.has(name)) {
