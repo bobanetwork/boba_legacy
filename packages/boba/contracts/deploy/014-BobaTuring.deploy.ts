@@ -63,15 +63,15 @@ const deployFn: DeployFunction = async (hre) => {
   )
   await depositTx.wait()
 
-  // const [msgHash] = await (
-  //   hre as any
-  // ).deployConfig.watcher.getMessageHashesFromL1Tx(depositTx.hash)
+  const [msgHash] = await (
+    hre as any
+  ).deployConfig.watcher.getMessageHashesFromL1Tx(depositTx.hash)
 
-  // const receipt = await (
-  //   hre as any
-  // ).deployConfig.watcher.getL2TransactionReceipt(msgHash)
+  const receipt = await (
+    hre as any
+  ).deployConfig.watcher.getL2TransactionReceipt(msgHash)
 
-  // console.log(`Deposited Boba from L1 to L2 ${receipt.transactionHash}`)
+  console.log(`Deposited Boba from L1 to L2 ${receipt.transactionHash}`)
 
   // Set turing token
   const setToken = await BobaTuringCredit.updateTuringToken(L2Boba.address)
