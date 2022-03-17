@@ -1,14 +1,9 @@
 import chai, { expect } from 'chai'
 import { Wallet, Contract, ContractFactory, providers } from 'ethers'
 import { ethers } from 'hardhat'
-import { injectL2Context } from '@eth-optimism/core-utils'
+import { injectL2Context, sleep } from '@eth-optimism/core-utils'
 
-import {
-  sleep,
-  l2Provider,
-  replicaProvider,
-  waitForL2Geth,
-} from './shared/utils'
+import { l2Provider, replicaProvider, waitForL2Geth } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
 describe('Syncing a replica', () => {

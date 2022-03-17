@@ -50,7 +50,7 @@ const env = cleanEnv(process.env, {
   }),
   L1_URL: str({ default: 'http://localhost:9545' }),
   L1_POLLING_INTERVAL: num({ default: 10 }),
-  
+
   L2_URL: str({ default: 'http://localhost:8545' }),
   L2_POLLING_INTERVAL: num({ default: 10 }),
   L2_CHAINID: num({ default: 31338 }),
@@ -63,7 +63,7 @@ const env = cleanEnv(process.env, {
 
   REPLICA_URL: str({ default: 'http://localhost:8549' }),
   REPLICA_POLLING_INTERVAL: num({ default: 10 }),
-  
+
   VERIFIER_URL: str({ default: 'http://localhost:8547' }),
   VERIFIER_POLLING_INTERVAL: num({ default: 10 }),
 
@@ -260,8 +260,6 @@ export const hardhatTest = (name, fn) =>
     fn,
     'Skipping test on non-Hardhat environment.'
   )
-
-export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 const abiCoder = new utils.AbiCoder()
 export const encodeSolidityRevertMessage = (_reason: string): string => {

@@ -2,7 +2,7 @@
 import { Contract, utils, Wallet, providers } from 'ethers'
 import { TransactionResponse } from '@ethersproject/providers'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
-import { Watcher } from '@eth-optimism/core-utils'
+import { Watcher, sleep } from '@eth-optimism/core-utils'
 import { getMessagesAndProofsForL2Transaction } from '@eth-optimism/message-relayer'
 import { CrossChainMessenger } from '@eth-optimism/sdk'
 
@@ -27,8 +27,7 @@ import {
   getL2Bridge,
   IS_LIVE_NETWORK,
   getBOBADeployerAddresses,
-  sleep,
-  envConfig
+  envConfig,
 } from './utils'
 import {
   initWatcher,
@@ -158,28 +157,28 @@ export class OptimismEnv {
       .attach(predeploys.OVM_L1BlockNumber)
 
     const messenger = new CrossChainMessenger({
-       l1SignerOrProvider: l1Wallet,
-       l2SignerOrProvider: l2Wallet,
-       l1ChainId: network.chainId,
-       contracts: {
-         l1: {
-           AddressManager: envConfig.ADDRESS_MANAGER,
-           L1CrossDomainMessenger: l1Messenger.address,
-           L1StandardBridge: l1Bridge.address,
-           StateCommitmentChain: sccAddress,
-           CanonicalTransactionChain: ctcAddress,
-           BondManager: await addressManager.getAddress('BondManager'),
-         },
-       },
-     })
+      l1SignerOrProvider: l1Wallet,
+      l2SignerOrProvider: l2Wallet,
+      l1ChainId: network.chainId,
+      contracts: {
+        l1: {
+          AddressManager: envConfig.ADDRESS_MANAGER,
+          L1CrossDomainMessenger: l1Messenger.address,
+          L1StandardBridge: l1Bridge.address,
+          StateCommitmentChain: sccAddress,
+          CanonicalTransactionChain: ctcAddress,
+          BondManager: await addressManager.getAddress('BondManager'),
+        },
+      },
+    })
 
-     // fund the user if needed
-     const balance = await l2Wallet.getBalance()
-     const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
-     const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
-     if (balance.lt(utils.parseEther(min))) {
-       await fundUser(messenger, utils.parseEther(topUp))
-     }
+    // fund the user if needed
+    const balance = await l2Wallet.getBalance()
+    const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
+    const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
+    if (balance.lt(utils.parseEther(min))) {
+      await fundUser(messenger, utils.parseEther(topUp))
+    }
 
     return new OptimismEnv({
       addressManager,

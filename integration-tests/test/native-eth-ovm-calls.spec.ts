@@ -4,7 +4,7 @@ import chai, { expect } from 'chai'
 import { GWEI, fundUser, encodeSolidityRevertMessage } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { solidity } from 'ethereum-waffle'
-import { sleep } from '../../packages/core-utils/dist'
+import { sleep } from '@eth-optimism/core-utils'
 import {
   getContractFactory,
   getContractInterface,
