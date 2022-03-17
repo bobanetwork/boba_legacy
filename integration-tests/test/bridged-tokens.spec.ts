@@ -26,26 +26,29 @@ describe('Bridged tokens', () => {
       value: utils.parseEther('0.01'),
     })
     const l1_tx = await tx1.wait()
-    console.log("    Setup\n     ETH sent to other L1 wallet:", l1_tx.transactionHash)
+    console.log(
+      '    Setup\n     ETH sent to other L1 wallet:',
+      l1_tx.transactionHash
+    )
     const tx2 = await env.l2Wallet.sendTransaction({
       to: otherWalletL2.address,
       value: utils.parseEther('0.01'),
     })
     const l2_tx = await tx2.wait()
-    console.log("     ETH sent to other L2 wallet:", l2_tx.transactionHash)
+    console.log('     ETH sent to other L2 wallet:', l2_tx.transactionHash)
 
-    const l1UserBalance  = await env.l1Wallet.getBalance()
-    const l2UserBalance  = await env.l2Wallet.getBalance()
+    const l1UserBalance = await env.l1Wallet.getBalance()
+    const l2UserBalance = await env.l2Wallet.getBalance()
     const l1OtherBalance = await otherWalletL1.getBalance()
     const l2OtherBalance = await otherWalletL2.getBalance()
 
-    console.log("     Balances:", 
-      l1UserBalance.toString(), 
-      l2UserBalance.toString(), 
-      l1OtherBalance.toString(), 
+    console.log(
+      '     Balances:',
+      l1UserBalance.toString(),
+      l2UserBalance.toString(),
+      l1OtherBalance.toString(),
       l2OtherBalance.toString()
     )
-    
   })
 
   let L1Factory__ERC20: ContractFactory
@@ -65,15 +68,10 @@ describe('Bridged tokens', () => {
     // Deploy the L1 ERC20
     L1__ERC20 = await L1Factory__ERC20.deploy(1000000, 'OVM Test', 8, 'OVM')
     const l1_tx = await L1__ERC20.deployed()
-    console.log("     L1 OVM test token deployed:", l1_tx.deployTransaction.hash)
-
-/*
-  address _l2Bridge,
-  address _l1Token,
-  string memory _name,
-  string memory _symbol,
-  uint8 decimals_
-*/
+    console.log(
+      '     L1 OVM test token deployed:',
+      l1_tx.deployTransaction.hash
+    )
 
     // Deploy the L2 ERC20
     L2__ERC20 = await L2Factory__ERC20.deploy(
@@ -83,17 +81,20 @@ describe('Bridged tokens', () => {
       'OVM',
       18 // decimals; Boba-specific
     )
-    
+
     const l2_tx = await L2__ERC20.deployed()
-    console.log("     L2 OVM test token deployed:", l2_tx.deployTransaction.hash)
+    console.log(
+      '     L2 OVM test token deployed:',
+      l2_tx.deployTransaction.hash
+    )
 
     // Approve the L1 ERC20 to spend our money
     const tx = await L1__ERC20.approve(env.l1Bridge.address, 1000000)
     const completion = await tx.wait()
-    console.log("     Completion TX hash:", completion.transactionHash)
+    console.log('     Completion TX hash:', completion.transactionHash)
   })
 
-  it('should deposit tokens from L1 into L2', async () => {
+  it('{tag:other} should deposit tokens from L1 into L2', async () => {
     await env.messenger.waitForMessageReceipt(
       await env.messenger.depositERC20(
         L1__ERC20.address,
@@ -110,7 +111,7 @@ describe('Bridged tokens', () => {
     )
   })
 
-  it('should transfer tokens on L2', async () => {
+  it('{tag:other} should transfer tokens on L2', async () => {
     const tx = await L2__ERC20.transfer(otherWalletL1.address, 500)
     await tx.wait()
 

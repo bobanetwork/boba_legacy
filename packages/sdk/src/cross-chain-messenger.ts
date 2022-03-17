@@ -850,9 +850,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       overrides?: Overrides
     }
   ): Promise<TransactionResponse> {
-    console.log("SDK: sendMessage:", message, opts)
+    console.log('SDK: sendMessage:', message, opts)
     const tx = await this.populateTransaction.sendMessage(message, opts)
-    console.log("SDK: sendMessage - TX:", tx)
+    console.log('SDK: sendMessage - TX:', tx)
     if (message.direction === MessageDirection.L1_TO_L2) {
       return (opts?.signer || this.l1Signer).sendTransaction(tx)
     } else {

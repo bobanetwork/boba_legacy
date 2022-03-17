@@ -5,11 +5,11 @@ import { Contract, ContractFactory } from 'ethers'
 import { predeploys, getContractInterface } from '@eth-optimism/contracts'
 
 import { MessageDirection, MessageStatus } from '@eth-optimism/sdk'
- import {
-   applyL1ToL2Alias,
-   awaitCondition,
-   sleep,
- } from '@eth-optimism/core-utils'
+import {
+  applyL1ToL2Alias,
+  awaitCondition,
+  sleep,
+} from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
 import simpleStorageJson from '../artifacts/contracts/SimpleStorage.sol/SimpleStorage.json'
@@ -17,11 +17,11 @@ import l2ReverterJson from '../artifacts/contracts/Reverter.sol/Reverter.json'
 import { OptimismEnv, useDynamicTimeoutForWithdrawals } from './shared/env'
 
 import {
-   DEFAULT_TEST_GAS_L1,
-   DEFAULT_TEST_GAS_L2,
-   envConfig,
-   withdrawalTest,
- } from './shared/utils'
+  DEFAULT_TEST_GAS_L1,
+  DEFAULT_TEST_GAS_L2,
+  envConfig,
+  withdrawalTest,
+} from './shared/utils'
 
 describe('Basic L1<>L2 Communication', async () => {
   let Factory__L1SimpleStorage: ContractFactory
@@ -61,8 +61,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L2 => L1', () => {
-    it('should be able to perform a withdrawal from L2 -> L1', async function () {
-
+    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async function () {
       await useDynamicTimeoutForWithdrawals(this, env)
 
       const value = `0x${'77'.repeat(32)}`
@@ -84,7 +83,7 @@ describe('Basic L1<>L2 Communication', async () => {
       )
 
       let status: MessageStatus
-      
+
       while (status !== MessageStatus.READY_FOR_RELAY) {
         status = await env.messenger.getMessageStatus(transaction)
         await sleep(1000)
@@ -105,14 +104,17 @@ describe('Basic L1<>L2 Communication', async () => {
 
       // this is the total number of transactions. This starts at 1, not zero, for Boba.
       // This will also fail if you run the integration tests on the same (running) stack multiple times
-      console.log("      This should (normally) be 1 per test but is usually 2:", totalCount)
+      console.log(
+        '      This should (normally) be 1 per test but is usually 2:',
+        totalCount
+      )
       // disabling for now - this evaluates to 2 - not clear why
       // expect(totalCount).to.equal(1)
     })
   })
 
   describe('L1 => L2', () => {
-    it('should deposit from L1 -> L2', async () => {
+    it('{tag:other} should deposit from L1 -> L2', async () => {
       const value = `0x${'42'.repeat(32)}`
 
       // Send L1 -> L2 message.
@@ -132,10 +134,10 @@ describe('Basic L1<>L2 Communication', async () => {
         }
       )
 
-      console.log("TX:", transaction)
+      console.log('TX:', transaction)
 
       const receipt = await env.messenger.waitForMessageReceipt(transaction)
-      console.log("receipt:", receipt)
+      console.log('receipt:', receipt)
 
       expect(receipt.transactionReceipt.status).to.equal(1)
 
@@ -154,7 +156,7 @@ describe('Basic L1<>L2 Communication', async () => {
       expect((await L2SimpleStorage.totalCount()).toNumber()).to.equal(1)
     })
 
- it('should deposit from L1 -> L2 directly via enqueue', async function () {
+    it('{tag:other} should deposit from L1 -> L2 directly via enqueue', async function () {
       this.timeout(
         envConfig.MOCHA_TIMEOUT * 2 +
           envConfig.DTL_ENQUEUE_CONFIRMATIONS * 15000

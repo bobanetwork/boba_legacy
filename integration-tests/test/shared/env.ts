@@ -160,11 +160,11 @@ export class OptimismEnv {
       .attach(predeploys.OVM_L1BlockNumber)
 
     const network = await l1Provider.getNetwork()
-     const messenger = new CrossChainMessenger({
-       l1SignerOrProvider: l1Wallet,
-       l2SignerOrProvider: l2Wallet,
-       l1ChainId: network.chainId,
-     })
+    const messenger = new CrossChainMessenger({
+      l1SignerOrProvider: l1Wallet,
+      l2SignerOrProvider: l2Wallet,
+      l1ChainId: network.chainId,
+    })
 
     return new OptimismEnv({
       addressManager,
