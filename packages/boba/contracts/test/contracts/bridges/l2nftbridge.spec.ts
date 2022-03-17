@@ -7,6 +7,7 @@ import { expect } from '../../setup'
 let L1NFTBridge: Contract
 let L2NFTBridge: Contract
 let L1CrossDomainMessenger: Contract
+let L2CrossDomainMessenger: Contract
 let L1StandardERC721: Contract
 let L2StandardERC721: Contract
 let ERC721: Contract
@@ -35,67 +36,85 @@ const deployL1CrossDomainMessenger = async (): Promise<Contract> => {
     await getContractFactory('L1CrossDomainMessenger').connect(signer)
   ).deploy()
 }
+const deployL2CrossDomainMessenger = async (
+  l1CrossDomainMessenger
+): Promise<Contract> => {
+  const signer: Signer = (await ethers.getSigners())[0]
+  return (
+    await getContractFactory('L2CrossDomainMessenger').connect(signer)
+  ).deploy(l1CrossDomainMessenger)
+}
 
-describe('L1NFTBridge Tests', () => {
-  describe('L1NFTBridge ownership', () => {
+describe('L2NFTBridge Tests', () => {
+  describe('L2NFTBridge ownership', () => {
     beforeEach(async () => {
       L1NFTBridge = await deployL1NFTBridge()
       L2NFTBridge = await deployL2NFTBridge()
       L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+      L2CrossDomainMessenger = await deployL2CrossDomainMessenger(
+        L1CrossDomainMessenger.address
+      )
+      await L2NFTBridge.initialize(
+        L2CrossDomainMessenger.address,
+        L2NFTBridge.address
+      )
     })
     it('should NOT be able to change the owner', async () => {
-      const oldOwner = '0x0000000000000000000000000000000000000000'
-      const newOwner = '0x0000000000000000000000000000000000000001'
-      expect(await L1NFTBridge.owner()).to.be.equal(oldOwner)
-      await expect(L1NFTBridge.transferOwnership(newOwner)).to.be.revertedWith(
-        'Caller is not the owner'
-      )
+      const oldOwner = (await ethers.getSigners())[0]
+      const newOwner = (await ethers.getSigners())[1]
+      expect(await L2NFTBridge.owner()).to.be.equal(oldOwner.address)
+      await expect(
+        L2NFTBridge.connect(newOwner).transferOwnership(newOwner.address)
+      ).to.be.revertedWith('Caller is not the owner')
     })
     it('changing gas reverts on not initialized', async () => {
       const newGas = 1
-      await expect(L1NFTBridge.configureGas(newGas)).to.be.revertedWith(
-        'Caller is not the owner'
-      )
+      await expect(
+        L2NFTBridge.connect((await ethers.getSigners())[1]).configureGas(newGas)
+      ).to.be.revertedWith('Caller is not the owner')
     })
   })
 
-  describe('L1NFTBridge tests initialized', () => {
+  describe('L2NFTBridge tests initialized', () => {
     beforeEach(async () => {
       L1NFTBridge = await deployL1NFTBridge()
       L2NFTBridge = await deployL2NFTBridge()
       L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+      L2CrossDomainMessenger = await deployL2CrossDomainMessenger(
+        L1CrossDomainMessenger.address
+      )
     })
 
     it('should be able to initialize and change the gas', async () => {
-      const magicGas = 1400000
-      await L1NFTBridge.initialize(
-        L1CrossDomainMessenger.address,
-        L2NFTBridge.address
+      const magicGas = 100000
+      await L2NFTBridge.initialize(
+        L2CrossDomainMessenger.address,
+        L1NFTBridge.address
       )
-      expect(await L1NFTBridge.l2NFTBridge()).to.be.equal(L2NFTBridge.address)
-      expect(await L1NFTBridge.messenger()).to.be.equal(
-        L1CrossDomainMessenger.address
+      expect(await L2NFTBridge.l1NFTBridge()).to.be.equal(L1NFTBridge.address)
+      expect(await L2NFTBridge.messenger()).to.be.equal(
+        L2CrossDomainMessenger.address
       )
       const signer: Signer = (await ethers.getSigners())[0]
-      expect(await L1NFTBridge.owner()).to.be.equal(await signer.getAddress())
-      expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas)
+      expect(await L2NFTBridge.owner()).to.be.equal(await signer.getAddress())
+      expect(await L2NFTBridge.exitL1Gas()).to.be.equal(magicGas)
       // now test gas change
-      expect(await L1NFTBridge.configureGas(magicGas + 1))
-      expect(await L1NFTBridge.depositL2Gas()).to.be.equal(magicGas + 1)
+      expect(await L2NFTBridge.configureGas(magicGas + 1))
+      expect(await L2NFTBridge.exitL1Gas()).to.be.equal(magicGas + 1)
     })
 
     it('should not be able to init twice', async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       await expect(
-        L1NFTBridge.initialize(
-          L2NFTBridge.address,
-          L1CrossDomainMessenger.address
+        L2NFTBridge.initialize(
+          L2CrossDomainMessenger.address,
+          L2NFTBridge.address
         )
       )
       await expect(
-        L1NFTBridge.connect(signer).initialize(
+        L2NFTBridge.connect(signer).initialize(
+          L2CrossDomainMessenger.address,
           L2NFTBridge.address,
-          L1CrossDomainMessenger.address,
           { from: await signer.getAddress() }
         )
       ).to.be.revertedWith('Initializable: contract is already initialized')
@@ -103,7 +122,7 @@ describe('L1NFTBridge Tests', () => {
 
     it('should not be able to init with zero address messenger', async () => {
       await expect(
-        L1NFTBridge.initialize(
+        L2NFTBridge.initialize(
           '0x0000000000000000000000000000000000000000',
           '0x0000000000000000000000000000000000000001'
         )
@@ -111,7 +130,7 @@ describe('L1NFTBridge Tests', () => {
     })
     it('should not be able to init with zero address l2NFTbridge', async () => {
       await expect(
-        L1NFTBridge.initialize(
+        L2NFTBridge.initialize(
           '0x0000000000000000000000000000000000000001',
           '0x0000000000000000000000000000000000000000'
         )
@@ -124,6 +143,9 @@ describe('L1NFTBridge Tests', () => {
       L1NFTBridge = await deployL1NFTBridge()
       L2NFTBridge = await deployL2NFTBridge()
       L1CrossDomainMessenger = await deployL1CrossDomainMessenger()
+      L2CrossDomainMessenger = await deployL2CrossDomainMessenger(
+        L1CrossDomainMessenger.address
+      )
       ERC721 = await deployNFT('name', 'symbol')
       L2StandardERC721 = await deployL2StandardERC721(
         L2NFTBridge.address,
@@ -139,8 +161,8 @@ describe('L1NFTBridge Tests', () => {
         'symbol',
         'baseTokenUri'
       )
-      await L1NFTBridge.initialize(
-        L1CrossDomainMessenger.address,
+      await L2NFTBridge.initialize(
+        L2CrossDomainMessenger.address,
         L2NFTBridge.address
       )
     })
