@@ -15,7 +15,7 @@ import {
   getContractInterface,
   predeploys,
 } from '@eth-optimism/contracts'
-import { remove0x, Watcher } from '@eth-optimism/core-utils'
+import { remove0x, Watcher, sleep } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
   NumberLike,
