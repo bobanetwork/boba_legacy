@@ -23,6 +23,8 @@ import { expectEvent } from '@openzeppelin/test-helpers'
 /* Imports: Internal */
 import { Direction, waitForXDomainTransaction } from './watcher-utils'
 
+import { OptimismEnv } from './env'
+
 export const GWEI = BigNumber.from(1e9)
 
 if (process.env.IS_LIVE_NETWORK === 'true') {
@@ -80,6 +82,9 @@ const env = cleanEnv(process.env, {
   }),
   DTL_ENQUEUE_CONFIRMATIONS: num({
     default: 0,
+  }),
+  RUN_WITHDRAWAL_TESTS: bool({
+    default: true,
   }),
   RUN_STRESS_TESTS: bool({
     default: true,
@@ -197,9 +202,28 @@ export const fundUser = async (
   await waitForXDomainTransaction(watcher, tx, Direction.L1ToL2)
 }
 
+export const conditionalTest = (
+  condition: (env?: OptimismEnv) => Promise<boolean>,
+  name,
+  fn,
+  message?: string,
+  timeout?: number
+) => {
+  it(name, async function () {
+    const shouldRun = await condition()
+    if (!shouldRun) {
+      console.log(message)
+      this.skip()
+      return
+    }
+
+    await fn()
+  }).timeout(timeout || envConfig.MOCHA_TIMEOUT * 2)
+}
+
 export const withdrawalTest = (name, fn, timeout?: number) =>
   conditionalTest(
-    () => Promise.resolve(procEnv.RUN_WITHDRAWAL_TESTS),
+    () => Promise.resolve(env.RUN_WITHDRAWAL_TESTS),
     name,
     fn,
     `Skipping withdrawal test.`,
