@@ -108,6 +108,13 @@ export class OptimismEnv {
   }
 
   static async new(): Promise<OptimismEnv> {
+    const network = await l1Provider.getNetwork()
+    const messenger = new CrossChainMessenger({
+      l1SignerOrProvider: l1Wallet,
+      l2SignerOrProvider: l2Wallet,
+      l1ChainId: network.chainId,
+    })
+
     const addressManager = getAddressManager(l1Wallet)
     const addressesBOBA = await getBOBADeployerAddresses()
     const watcher = await initWatcher(l1Provider, l2Provider, addressManager)
@@ -121,8 +128,9 @@ export class OptimismEnv {
     // fund the user if needed
     const balance = await l2Wallet.getBalance()
     if (balance.isZero()) {
-      await fundUser(watcher, l1Bridge, utils.parseEther('20'))
+      await fundUser(messenger, utils.parseEther('20'))
     }
+
     const l1Messenger = getContractFactory('L1CrossDomainMessenger')
       .connect(l1Wallet)
       .attach(watcher.l1.messengerAddress)
@@ -158,13 +166,6 @@ export class OptimismEnv {
     const l1BlockNumber = getContractFactory('iOVM_L1BlockNumber')
       .connect(l2Wallet)
       .attach(predeploys.OVM_L1BlockNumber)
-
-    const network = await l1Provider.getNetwork()
-    const messenger = new CrossChainMessenger({
-      l1SignerOrProvider: l1Wallet,
-      l2SignerOrProvider: l2Wallet,
-      l1ChainId: network.chainId,
-    })
 
     return new OptimismEnv({
       addressManager,

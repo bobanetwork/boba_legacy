@@ -7,7 +7,6 @@ import {
   Wallet,
   constants,
   providers,
-  BigNumberish,
   BigNumber,
   utils,
 } from 'ethers'
@@ -17,6 +16,7 @@ import {
   predeploys,
 } from '@eth-optimism/contracts'
 import { injectL2Context, remove0x, Watcher } from '@eth-optimism/core-utils'
+import { CrossChainMessenger, NumberLike } from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
@@ -84,6 +84,9 @@ const env = cleanEnv(process.env, {
     default: 0,
   }),
   RUN_WITHDRAWAL_TESTS: bool({
+    default: true,
+  }),
+  RUN_DEBUG_TRACE_TESTS: bool({
     default: true,
   }),
   RUN_STRESS_TESTS: bool({
@@ -189,17 +192,26 @@ export const getOvmEth = (wallet: Wallet) => {
 }
 
 export const fundUser = async (
-  watcher: Watcher,
-  bridge: Contract,
-  amount: BigNumberish,
+  messenger: CrossChainMessenger,
+  amount: NumberLike,
   recipient?: string
 ) => {
-  const value = BigNumber.from(amount)
-  const tx = recipient
-    ? bridge.depositETHTo(recipient, 1_300_000, '0x', { value })
-    : bridge.depositETH(1_300_000, '0x', { value })
+  await messenger.waitForMessageReceipt(
+    await messenger.depositETH(amount, {
+      l2GasLimit: DEFAULT_TEST_GAS_L2,
+      overrides: {
+        gasPrice: DEFAULT_TEST_GAS_L1,
+      },
+    })
+  )
 
-  await waitForXDomainTransaction(watcher, tx, Direction.L1ToL2)
+  if (recipient !== undefined) {
+    const tx = await messenger.l2Signer.sendTransaction({
+      to: recipient,
+      value: amount,
+    })
+    await tx.wait()
+  }
 }
 
 export const conditionalTest = (
@@ -228,6 +240,14 @@ export const withdrawalTest = (name, fn, timeout?: number) =>
     fn,
     `Skipping withdrawal test.`,
     timeout
+  )
+
+export const hardhatTest = (name, fn) =>
+  conditionalTest(
+    isHardhat,
+    name,
+    fn,
+    'Skipping test on non-Hardhat environment.'
   )
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
