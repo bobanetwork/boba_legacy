@@ -15,8 +15,12 @@ import {
   getContractInterface,
   predeploys,
 } from '@eth-optimism/contracts'
-import { injectL2Context, remove0x, Watcher } from '@eth-optimism/core-utils'
-import { CrossChainMessenger, NumberLike } from '@eth-optimism/sdk'
+import { remove0x, Watcher } from '@eth-optimism/core-utils'
+import { 
+  CrossChainMessenger, 
+  NumberLike,
+  asL2Provider, 
+} from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
@@ -111,14 +115,20 @@ export const envConfig = env
 export const l1Provider = new providers.JsonRpcProvider(env.L1_URL)
 l1Provider.pollingInterval = env.L1_POLLING_INTERVAL
 
-export const l2Provider = new providers.JsonRpcProvider(env.L2_URL)
+export const l2Provider = asL2Provider(
+   new providers.JsonRpcProvider(env.L2_URL)
+ )
 l2Provider.pollingInterval = env.L2_POLLING_INTERVAL
 
-export const verifierProvider = new providers.JsonRpcProvider(env.VERIFIER_URL)
-verifierProvider.pollingInterval = env.VERIFIER_POLLING_INTERVAL
-
-export const replicaProvider = new providers.JsonRpcProvider(env.REPLICA_URL)
+export const replicaProvider = asL2Provider(
+   new providers.JsonRpcProvider(env.REPLICA_URL)
+ )
 replicaProvider.pollingInterval = env.REPLICA_POLLING_INTERVAL
+
+export const verifierProvider = asL2Provider(
+   new providers.JsonRpcProvider(env.VERIFIER_URL)
+ )
+verifierProvider.pollingInterval = env.L2_POLLING_INTERVAL
 
 // The sequencer private key which is funded on L1
 export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
@@ -305,7 +315,7 @@ export const waitForL2Geth = async (
       await sleep(1000)
     }
   }
-  return injectL2Context(provider)
+  return asL2Provider(provider)
 }
 
 export const getBOBADeployerAddresses = async () => {

@@ -1,7 +1,8 @@
 import chai, { expect } from 'chai'
 import { Wallet, Contract, ContractFactory, providers } from 'ethers'
 import { ethers } from 'hardhat'
-import { injectL2Context, sleep } from '@eth-optimism/core-utils'
+import { sleep } from '@eth-optimism/core-utils'
+import { asL2Provider } from '@eth-optimism/sdk'
 
 import { l2Provider, replicaProvider, waitForL2Geth } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -11,8 +12,8 @@ describe('Syncing a replica', () => {
   let wallet: Wallet
   //let provider: providers.JsonRpcProvider
 
-  const sequencerProvider = injectL2Context(l2Provider)
-  const repProvider = injectL2Context(replicaProvider)
+  const sequencerProvider = asL2Provider(l2Provider)
+  const repProvider = asL2Provider(replicaProvider)
 
   /* Helper functions */
 
