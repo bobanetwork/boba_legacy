@@ -3,8 +3,10 @@ pragma solidity >0.7.5;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import { ERC20Votes } from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesRegenesis.sol";
-import { ERC20VotesComp } from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesCompRegenesis.sol";
+// prettier-ignore
+import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesRegenesis.sol";
+// prettier-ignore
+import {ERC20VotesComp} from "@openzeppelin/contracts/token/ERC20/extensions/regenesis/ERC20VotesCompRegenesis.sol";
 import { IL2StandardERC20 } from "./IL2StandardERC20.sol";
 
 contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, ERC20VotesComp {
@@ -24,15 +26,14 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
         address _l1Token,
         string memory _name,
         string memory _symbol,
-         uint8 decimals_
-    )
-        ERC20(_name, _symbol) ERC20Permit(_name) {
+        uint8 decimals_
+    ) ERC20(_name, _symbol) ERC20Permit(_name) {
         l1Token = _l1Token;
         l2Bridge = _l2Bridge;
         _decimals = decimals_;
     }
 
-    modifier onlyL2Bridge {
+    modifier onlyL2Bridge() {
         require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
         _;
     }
@@ -43,9 +44,9 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
 
     function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
-        bytes4 secondSupportedInterface = IL2StandardERC20.l1Token.selector
-            ^ IL2StandardERC20.mint.selector
-            ^ IL2StandardERC20.burn.selector;
+        bytes4 secondSupportedInterface = IL2StandardERC20.l1Token.selector ^
+            IL2StandardERC20.mint.selector ^
+            IL2StandardERC20.burn.selector;
         return _interfaceId == firstSupportedInterface || _interfaceId == secondSupportedInterface;
     }
 
@@ -62,11 +63,11 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
     }
 
     // Overrides required by Solidity
-    function _mint(address _to, uint256 _amount) internal override (ERC20, ERC20Votes) {
+    function _mint(address _to, uint256 _amount) internal override(ERC20, ERC20Votes) {
         super._mint(_to, _amount);
     }
 
-    function _burn(address _account, uint256 _amount) internal override (ERC20, ERC20Votes) {
+    function _burn(address _account, uint256 _amount) internal override(ERC20, ERC20Votes) {
         super._burn(_account, _amount);
     }
 
@@ -74,11 +75,11 @@ contract L2GovernanceERC20 is IL2StandardERC20, ERC20, ERC20Permit, ERC20Votes, 
         address from,
         address to,
         uint256 amount
-    ) internal override (ERC20, ERC20Votes) {
+    ) internal override(ERC20, ERC20Votes) {
         super._afterTokenTransfer(from, to, amount);
     }
 
-    function _maxSupply() internal pure override (ERC20Votes, ERC20VotesComp) returns (uint224) {
+    function _maxSupply() internal pure override(ERC20Votes, ERC20VotesComp) returns (uint224) {
         return maxSupply;
     }
 }

@@ -11,6 +11,7 @@ import { OVM_GasPriceOracle } from "./OVM_GasPriceOracle.sol";
 
 /* Contract Imports */
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 /**
  * @title Boba_GasPriceOracle
@@ -48,6 +49,18 @@ contract Boba_GasPriceOracle is Ownable {
     // Record the wallet address that wants to use boba as fee token
     mapping(address => bool) public bobaFeeTokenUsers;
 
+    /*************
+     *  Events   *
+     *************/
+
+    event UseBobaAsFeeToken(address);
+    event UseETHAsFeeToken(address);
+    event UpdatePriceRatio(address, uint256);
+    event UpdateMaxPriceRatio(address, uint256);
+    event UpdateMinPriceRatio(address, uint256);
+    event UpdateGasPriceOracleAddress(address, address);
+    event Withdraw(address, address);
+
     /***************
      * Constructor *
      ***************/
@@ -56,10 +69,8 @@ contract Boba_GasPriceOracle is Ownable {
      * @param _l1FeeWallet Initial address for the L1 wallet that will hold fees once withdrawn.
      * @param _l2BobaAddress L2 Boba Token address
      */
-    constructor(
-        address _l1FeeWallet,
-        address _l2BobaAddress
-    ) {
+    constructor(address _l1FeeWallet, address _l2BobaAddress) {
+        require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
         l1FeeWallet = _l1FeeWallet;
         l2BobaAddress = _l2BobaAddress;
     }
@@ -72,14 +83,18 @@ contract Boba_GasPriceOracle is Ownable {
      * Add the users that want to use BOBA as the fee token
      */
     function useBobaAsFeeToken() public {
+        require(!Address.isContract(msg.sender), "Account not EOA");
         bobaFeeTokenUsers[msg.sender] = true;
+        emit UseBobaAsFeeToken(msg.sender);
     }
 
     /**
      * Add the users that want to use ETH as the fee token
      */
     function useETHAsFeeToken() public {
+        require(!Address.isContract(msg.sender), "Account not EOA");
         bobaFeeTokenUsers[msg.sender] = false;
+        emit UseETHAsFeeToken(msg.sender);
     }
 
     /**
@@ -89,6 +104,7 @@ contract Boba_GasPriceOracle is Ownable {
     function updatePriceRatio(uint256 _priceRatio) public onlyOwner {
         require(_priceRatio <= maxPriceRatio && _priceRatio >= minPriceRatio);
         priceRatio = _priceRatio;
+        emit UpdatePriceRatio(owner(), _priceRatio);
     }
 
     /**
@@ -98,6 +114,7 @@ contract Boba_GasPriceOracle is Ownable {
     function updateMaxPriceRatio(uint256 _maxPriceRatio) public onlyOwner {
         require(_maxPriceRatio >= minPriceRatio && _maxPriceRatio > 0);
         maxPriceRatio = _maxPriceRatio;
+        emit UpdateMaxPriceRatio(owner(), _maxPriceRatio);
     }
 
     /**
@@ -107,6 +124,14 @@ contract Boba_GasPriceOracle is Ownable {
     function updateMinPriceRatio(uint256 _minPriceRatio) public onlyOwner {
         require(_minPriceRatio <= maxPriceRatio && _minPriceRatio > 0);
         minPriceRatio = _minPriceRatio;
+        emit UpdateMinPriceRatio(owner(), _minPriceRatio);
+    }
+
+    function updateGasPriceOracleAddress(address _gasPriceOracleAddress) public onlyOwner {
+        require(Address.isContract(_gasPriceOracleAddress), "Account is EOA");
+        require(_gasPriceOracleAddress != address(0));
+        gasPriceOracleAddress = _gasPriceOracleAddress;
+        emit UpdateGasPriceOracleAddress(owner(), _gasPriceOracleAddress);
     }
 
     /**
@@ -135,5 +160,6 @@ contract Boba_GasPriceOracle is Ownable {
             0,
             bytes("")
         );
+        emit Withdraw(owner(), l1FeeWallet);
     }
 }

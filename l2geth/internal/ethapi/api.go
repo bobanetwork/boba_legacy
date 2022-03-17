@@ -1077,7 +1077,9 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	// The minimum gas is intrGas + l1SecurityFee. If hi value is larger than intrGas + l2ExtraGas
 	// we don't have to add another l2ExtraGas again
 	intrGas, err := core.IntrinsicGas(data, args.To == nil, true, b.ChainConfig().IsIstanbul(blockNr))
-
+	if err != nil {
+		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	}
 	if hi >= intrGas+l2ExtraGas.Uint64() {
 		return hexutil.Uint64(hi), nil
 	} else {

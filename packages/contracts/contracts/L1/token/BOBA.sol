@@ -25,7 +25,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
  */
 
 contract BOBA is Context, ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, ERC20VotesComp {
-
     /// @notice Maximum possible number of tokens
     uint224 public constant maxSupply = 500000000e18; // 500 million BOBA
 
@@ -38,7 +37,7 @@ contract BOBA is Context, ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, ERC20Vo
     }
 
     constructor() ERC20("Boba Token", "BOBA") ERC20Permit("Boba Token") {
-         //mint maxSupply at genesis, allocated to deployer
+        //mint maxSupply at genesis, allocated to deployer
         _mint(_msgSender(), maxSupply);
     }
 
@@ -60,5 +59,4 @@ contract BOBA is Context, ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, ERC20Vo
     ) internal override(ERC20, ERC20Votes) {
         super._afterTokenTransfer(from, to, amount);
     }
-
 }
