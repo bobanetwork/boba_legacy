@@ -122,9 +122,14 @@ export const makeL2GenesisFile = async (
       l1Token: cfg.l1BobaTokenAddress,
       l2Bridge:predeploys.L2StandardBridge,
     },
-    Boba_SequencerFeeVault: {
+    Boba_GasPriceOracle: {
+      _owner: cfg.gasPriceOracleOwner,
       l1FeeWallet: cfg.l1FeeWalletAddress,
       l2BobaAddress: predeploys.L2GovernanceERC20,
+      minPriceRatio: 500,
+      maxPriceRatio: 5000,
+      priceRatio: 2000,
+      gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
     }
   }
 

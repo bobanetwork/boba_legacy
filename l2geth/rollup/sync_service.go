@@ -937,13 +937,6 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
 	isFeeTokenUpdate := s.bc.Config().IsFeeTokenUpdate(nextBlockNumber)
 
-	// Prevent transactions without enough balance from
-	// being accepted by the chain but allow through 0
-	// gas price transactions
-	cost := tx.Value()
-	if !isFeeTokenUpdate && tx.GasPrice().Cmp(common.Big0) != 0 {
-		cost = cost.Add(cost, fee)
-	}
 	state, err := s.bc.State()
 	if err != nil {
 		return err
@@ -951,6 +944,18 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	from, err := types.Sender(s.signer, tx)
 	if err != nil {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInvalidSender)
+	}
+
+	// Check if the wallet address picks BOBA as the fee token
+	feeTokenSelection := state.GetFeeTokenSelection(from)
+	isBobaFeeTokenSelect := feeTokenSelection.Cmp(common.Big1) == 0 && isFeeTokenUpdate
+
+	// Prevent transactions without enough balance from
+	// being accepted by the chain but allow through 0
+	// gas price transactions
+	cost := tx.Value()
+	if !isBobaFeeTokenSelect && tx.GasPrice().Cmp(common.Big0) != 0 {
+		cost = cost.Add(cost, fee)
 	}
 	if state.GetBalance(from).Cmp(cost) < 0 {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
@@ -985,9 +990,16 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		if err != nil {
 			return fmt.Errorf("invalid transaction: %w", err)
 		}
-		// Ensure that the balance is enough for the l1 security fee
-		if state.GetBobaBalance(from).Cmp(estimateGas.Mul(estimateGas, tx.GasPrice())) < 0 {
-			return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
+		// Ensure that the BOBA balance is enough for the l1 security fee
+		if isBobaFeeTokenSelect {
+			bobaPriceRatio := state.GetBobaPriceRatio()
+			bobaCost := new(big.Int).Mul(bobaPriceRatio, estimateGas.Mul(estimateGas, tx.GasPrice()))
+			log.Debug("Verify Boba fee cost", "bobaCost", bobaCost, "bobaPriceRatio", bobaPriceRatio)
+			bobaBalance := state.GetBobaBalance(from)
+			log.Debug("Boba Balance", "bobaBalance", bobaBalance)
+			if state.GetBobaBalance(from).Cmp(bobaCost) < 0 {
+				return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
+			}
 		}
 	}
 

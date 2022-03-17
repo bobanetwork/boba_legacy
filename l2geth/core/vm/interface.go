@@ -38,6 +38,9 @@ type StateDB interface {
 	AddBobaBalance(common.Address, *big.Int)
 	GetBobaBalance(common.Address) *big.Int
 
+	GetFeeTokenSelection(common.Address) *big.Int
+	GetBobaPriceRatio() *big.Int
+
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)
 

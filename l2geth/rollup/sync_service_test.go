@@ -773,7 +773,8 @@ func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 	service.updateL1GasPrice(state)
 	service.updateScalar(state)
 
-	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err == nil {
+	_, err = service.validateGasLimit(tx, l2GasPrice, service.RollupGpo, big.NewInt(0))
+	if err == nil {
 		t.Fatal("err is nil")
 	}
 	// Type 2 -- fee / l2GasPrice <= tx.Gas
@@ -784,7 +785,8 @@ func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 
 	service.updateOverhead(state)
 
-	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err != nil {
+	_, err = service.validateGasLimit(tx, l2GasPrice, service.RollupGpo, big.NewInt(0))
+	if err != nil {
 		t.Fatal(err)
 	}
 	// Type 3 l2GasPrice = 0
@@ -794,7 +796,8 @@ func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 
 	service.updateL2GasPrice(state)
 
-	if err := service.validateGasLimit(tx, l2GasPrice, service.RollupGpo); err != nil {
+	_, err = service.validateGasLimit(tx, l2GasPrice, service.RollupGpo, big.NewInt(0))
+	if err != nil {
 		t.Fatal(err)
 	}
 }

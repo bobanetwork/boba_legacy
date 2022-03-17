@@ -32,6 +32,6 @@ export const predeploys = {
   // L2 BOBA Token Address
   L2GovernanceERC20: "0x4200000000000000000000000000000000000023",
 
-  // Boba fee vault
-  Boba_SequencerFeeVault: "0x4200000000000000000000000000000000000024"
+  // Boba gas price oracle
+  Boba_GasPriceOracle: "0x4200000000000000000000000000000000000024"
 }

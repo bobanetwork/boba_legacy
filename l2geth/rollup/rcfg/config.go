@@ -12,8 +12,8 @@ var (
 	UsingOVM bool
 	// OvmTuringCreditAddress is turing credit contract address
 	OvmTuringCreditAddress common.Address
-	// OvmBobaFeeVault is boba fee vault
-	OvmBobaFeeVault common.Address
+	// OvmBobaGasPricOracle is boba gas price oracle
+	OvmBobaGasPricOracle common.Address
 	// OvmL2BobaToken is boba token address
 	OvmL2BobaToken common.Address
 )
@@ -48,6 +48,6 @@ var (
 func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
 	OvmTuringCreditAddress = common.HexToAddress(os.Getenv("TURING_CREDIT_ADDRESS"))
-	OvmBobaFeeVault = common.HexToAddress(os.Getenv("BOBA_FEE_VAULT_ADDRESS"))
+	OvmBobaGasPricOracle = common.HexToAddress(os.Getenv("BOBA_GAS_PRICE_ORACLE_ADDRESS"))
 	OvmL2BobaToken = common.HexToAddress(os.Getenv("L2_BOBA_TOKEN_ADDRESS"))
 }

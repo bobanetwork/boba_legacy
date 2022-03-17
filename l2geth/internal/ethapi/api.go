@@ -973,6 +973,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		lo          uint64 = params.TxGas - 1
 		hi          uint64
 		cap         uint64
+		blockNr     *big.Int
 		isGasUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
@@ -1044,7 +1045,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 
 	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
 	if err == nil {
-		blockNr := block.Number()
+		blockNr = block.Number()
 		isGasUpdate = b.ChainConfig().IsGasUpdate(big.NewInt(blockNr.Int64()))
 	}
 
@@ -1053,13 +1054,9 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	}
 
 	gasPrice := new(big.Int)
-	if args.GasPrice != nil {
-		gasPrice = args.GasPrice.ToInt()
-	} else {
-		price, err := b.SuggestPrice(ctx)
-		if err == nil {
-			gasPrice = price
-		}
+	price, err := b.SuggestPrice(ctx)
+	if err == nil {
+		gasPrice = price
 	}
 
 	var data []byte
@@ -1075,7 +1072,17 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
-	return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	// To solve the problem that l1BaseFee / l2GasPrice is too large issue and add l1SecurityFee twice
+	// if you add st.gas in the payload, we don't add another l2ExtraGas if hi is large enough
+	// The minimum gas is intrGas + l1SecurityFee. If hi value is larger than intrGas + l2ExtraGas
+	// we don't have to add another l2ExtraGas again
+	intrGas, err := core.IntrinsicGas(data, args.To == nil, true, b.ChainConfig().IsIstanbul(blockNr))
+
+	if hi >= intrGas+l2ExtraGas.Uint64() {
+		return hexutil.Uint64(hi), nil
+	} else {
+		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	}
 }
 
 // EstimateGas returns an estimate of the amount of gas needed to execute the

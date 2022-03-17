@@ -1,5 +1,5 @@
 import { expectApprox, injectL2Context } from '@eth-optimism/core-utils'
-import { Wallet, BigNumber, Contract, ContractFactory } from 'ethers'
+import { Wallet, BigNumber, Contract, ContractFactory, utils } from 'ethers'
 import { serialize } from '@ethersproject/transactions'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
@@ -146,8 +146,7 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('{tag:rpc} should reject a transaction with a low gas limit', async () => {
-      const balance = await env.l2Wallet.getBalance()
+    it('{tag:rpc} should reject a transaction with a too low gas limit', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         gasPrice: await gasPriceForL2(),
@@ -157,7 +156,7 @@ describe('Basic RPC tests', () => {
       }
 
       const gasLimit = await env.l2Wallet.estimateGas(tx)
-      tx.gasLimit = gasLimit.toNumber() - 10
+      tx.gasLimit = gasLimit.toNumber() - 6000
 
       await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
         'invalid transaction: intrinsic gas too low'
@@ -417,8 +416,13 @@ describe('Basic RPC tests', () => {
         to: defaultTransactionFactory().to,
         value: 0,
       })
+      const l2ExtraFee = await env.gasPriceOracle.getL1Fee(utils.hexlify('0x'))
+      const l2GasPrice = await env.gasPriceOracle.gasPrice()
+      const l2ExtraGas = l2ExtraFee.div(l2GasPrice)
       // Expect gas to be less than or equal to the target plus 1%
-      expectApprox(estimate, 21000, { percentUpperDeviation: 1 })
+      expectApprox(estimate, 21000 + l2ExtraGas.toNumber(), {
+        percentUpperDeviation: 1,
+      })
     })
 
     it('{tag:rpc} should fail for a reverting call transaction', async () => {

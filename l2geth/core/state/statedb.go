@@ -87,6 +87,15 @@ func GetBobaBalanceKey(addr common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
+func GetFeeTokenSelectionKey(addr common.Address) common.Hash {
+	position := common.Big7
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(addr.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -280,6 +289,20 @@ func (s *StateDB) GetBobaBalance(addr common.Address) *big.Int {
 	key := GetBobaBalanceKey(addr)
 	bal := s.GetState(rcfg.OvmL2BobaToken, key)
 	return bal.Big()
+}
+
+// Retrieve the fee token selection
+func (s *StateDB) GetFeeTokenSelection(addr common.Address) *big.Int {
+	key := GetFeeTokenSelectionKey(addr)
+	bal := s.GetState(rcfg.OvmBobaGasPricOracle, key)
+	return bal.Big()
+}
+
+// Retrieve the price ratio of BOBA and ETH
+func (s *StateDB) GetBobaPriceRatio() *big.Int {
+	keyPriceRatio := common.BigToHash(big.NewInt(5))
+	value := s.GetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio)
+	return value.Big()
 }
 
 func (s *StateDB) GetNonce(addr common.Address) uint64 {
@@ -511,7 +534,9 @@ func (s *StateDB) SubBobaBalance(addr common.Address, amount *big.Int) {
 	key := GetBobaBalanceKey(addr)
 	value := s.GetState(rcfg.OvmL2BobaToken, key)
 	bal := value.Big()
+	log.Info("Balance", "balance", "bal")
 	bal = bal.Sub(bal, amount)
+	log.Info("result", "balance", "bal")
 	s.SetState(rcfg.OvmL2BobaToken, key, common.BigToHash(bal))
 }
 
