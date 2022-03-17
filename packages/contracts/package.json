@@ -59,7 +59,7 @@
     "url": "https://github.com/ethereum-optimism/optimism.git"
   },
   "dependencies": {
-    "@eth-optimism/core-utils": "0.7.5",
+    "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/abstract-provider": "^5.5.1",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/hardware-wallets": "^5.5.0"

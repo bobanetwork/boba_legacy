@@ -38,7 +38,7 @@
   "dependencies": {
     "@eth-optimism/common-ts": "0.2.1",
     "@eth-optimism/contracts": "0.5.11",
-    "@eth-optimism/core-utils": "0.7.5",
+    "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/providers": "^5.4.5",
     "@ethersproject/transactions": "^5.4.0",
     "@sentry/node": "^6.3.1",
