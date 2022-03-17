@@ -81,7 +81,7 @@ abstract contract AddOnChainMetaData is ERC721 {
     }
 
     function bridgeExtraData(uint256 tokenId) public view virtual returns(bytes memory) {
-        return abi.enocde(_tokenURIs[tokenId]);
+        return abi.encode(_tokenURIs[tokenId]);
     }
 
     function _setTokenURI(uint256 tokenId_) internal virtual {
