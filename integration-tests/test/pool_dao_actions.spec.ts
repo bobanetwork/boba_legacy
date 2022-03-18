@@ -2,7 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
-import { Direction } from './shared/watcher-utils'
+import { DirectionOld } from './shared/watcher-utils-old'
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import L1BobaJson from '@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
@@ -272,8 +272,7 @@ describe('Dao Action Test', async () => {
           quorumVotesPlus,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L1ToL2
+        )
       )
     }
   })
@@ -592,7 +591,7 @@ describe('Dao Action Test', async () => {
       expect(proposalStates[state]).to.deep.eq('Executed')
 
       // involves xDomain message, wait for xdomain relay
-      await env.waitForXDomainTransactionFast(executeTx, Direction.L2ToL1)
+      await env.waitForXDomainTransactionFastOld(executeTx, DirectionOld.L2ToL1)
 
       const userRewardMinFeeRate = await L1LiquidityPool.userRewardMinFeeRate()
       const userRewardMaxFeeRate = await L1LiquidityPool.userRewardMaxFeeRate()

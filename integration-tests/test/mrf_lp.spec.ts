@@ -2,7 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
-import { Direction } from './shared/watcher-utils'
+import { DirectionOld } from './shared/watcher-utils-old'
 import { expectLogs } from './shared/utils'
 import { getContractFactory } from '@eth-optimism/contracts'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
@@ -160,8 +160,7 @@ describe('Liquidity Pool Test', async () => {
         depositL2ERC20Amount,
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
-      ),
-      Direction.L1ToL2
+      )
     )
 
     const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -410,13 +409,13 @@ describe('Liquidity Pool Test', async () => {
     )
 
     await approveKateL2TX.wait()
-    const depositTx = await env.waitForXDomainTransactionFast(
+    const depositTx = await env.waitForXDomainTransactionFastOld(
       L2LiquidityPool.connect(env.l2Wallet_3).clientDepositL2(
         fastExitAmount,
         L2ERC20.address,
         { gasLimit: 7000000 }
       ),
-      Direction.L2ToL1
+      DirectionOld.L2ToL1
     )
 
     const poolInfo = await L1LiquidityPool.poolInfo(L1ERC20.address)
@@ -644,8 +643,7 @@ describe('Liquidity Pool Test', async () => {
     const depositTx = await env.waitForXDomainTransaction(
       L1LiquidityPool.clientDepositL1(depositAmount, L1ERC20.address, {
         gasLimit: 9000000,
-      }),
-      Direction.L1ToL2
+      })
     )
 
     const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -724,13 +722,13 @@ describe('Liquidity Pool Test', async () => {
     )
     await approveBobL2TX.wait()
 
-    await env.waitForRevertXDomainTransactionFast(
+    await env.waitForRevertXDomainTransactionFastOld(
       L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
         fastExitAmount,
         L2ERC20.address,
         { gasLimit: 7000000 }
       ),
-      Direction.L2ToL1
+      DirectionOld.L2ToL1
     )
 
     const postBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -767,9 +765,9 @@ describe('Liquidity Pool Test', async () => {
     )
     await approveBobL1TX.wait()
 
-    await env.waitForRevertXDomainTransaction(
+    await env.waitForRevertXDomainTransactionOld(
       L1LiquidityPool.clientDepositL1(swapOnAmount, L1ERC20.address),
-      Direction.L1ToL2
+      DirectionOld.L1ToL2
     )
 
     const postBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -791,8 +789,7 @@ describe('Liquidity Pool Test', async () => {
     const preLPL2ERC20Balance = await L2ERC20.balanceOf(L2LiquidityPool.address)
 
     await env.waitForXDomainTransaction(
-      L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address),
-      Direction.L1ToL2
+      L1LiquidityPool.rebalanceLP(balanceERC20Amount, L1ERC20.address)
     )
 
     const postLPL1ERC20Balance = await L1ERC20.balanceOf(
@@ -817,8 +814,7 @@ describe('Liquidity Pool Test', async () => {
     const preLPL2ERC20Balance = await L2ERC20.balanceOf(L2LiquidityPool.address)
 
     await env.waitForXDomainTransaction(
-      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2ERC20.address),
-      Direction.L2ToL1
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2ERC20.address)
     )
 
     const postLPL1ERC20Balance = await L1ERC20.balanceOf(
@@ -905,8 +901,7 @@ describe('Liquidity Pool Test', async () => {
         addLiquidityAmount,
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
-      ),
-      Direction.L1ToL2
+      )
     )
 
     const approveL2TX = await L2OMGLikeToken.approve(
@@ -935,8 +930,7 @@ describe('Liquidity Pool Test', async () => {
     )
 
     await env.waitForXDomainTransaction(
-      L1LiquidityPool.rebalanceLP(balanceERC20Amount, OMGLIkeToken.address),
-      Direction.L1ToL2
+      L1LiquidityPool.rebalanceLP(balanceERC20Amount, OMGLIkeToken.address)
     )
 
     const postLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
@@ -972,8 +966,7 @@ describe('Liquidity Pool Test', async () => {
     )
 
     await env.waitForXDomainTransaction(
-      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2OMGLikeToken.address),
-      Direction.L2ToL1
+      L2LiquidityPool.rebalanceLP(balanceERC20Amount, L2OMGLikeToken.address)
     )
 
     const postLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
@@ -1153,13 +1146,13 @@ describe('Liquidity Pool Test', async () => {
         await L1LiquidityPool.ownerRewardFeeRate()
 
       // update fee rate
-      await env.waitForXDomainTransactionFast(
+      await env.waitForXDomainTransactionFastOld(
         L2LiquidityPool.configureFeeExits(
           initialUserRewardMinFeeRate.add(10),
           initialUserRewardMaxFeeRate,
           initialOwnerRewardFeeRate.add(10)
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const updatedUserRewardMinFeeRate =
@@ -1180,13 +1173,13 @@ describe('Liquidity Pool Test', async () => {
       )
 
       // change to fee back to default
-      await env.waitForXDomainTransactionFast(
+      await env.waitForXDomainTransactionFastOld(
         L2LiquidityPool.configureFeeExits(
           initialUserRewardMinFeeRate,
           initialUserRewardMaxFeeRate,
           initialOwnerRewardFeeRate
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
     } else {
       this.skip()
@@ -1236,7 +1229,7 @@ describe('Liquidity Pool Test', async () => {
         utils.formatBytes32String(new Date().getTime().toString()),
         { value: utils.parseEther('100') }
       )
-      await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+      await env.waitForXDomainTransaction(deposit)
 
       const preBobPoolAmount = await L2LiquidityPool.userInfo(
         env.ovmEth.address,
@@ -1305,13 +1298,13 @@ describe('Liquidity Pool Test', async () => {
         ethers.constants.AddressZero
       )
 
-      const depositTx = await env.waitForXDomainTransactionFast(
+      const depositTx = await env.waitForXDomainTransactionFastOld(
         L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
           fastExitAmount,
           env.ovmEth.address,
           { value: fastExitAmount }
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const postBobL1EthBalance = await env.l1Wallet.getBalance()
@@ -1372,8 +1365,7 @@ describe('Liquidity Pool Test', async () => {
         L1LiquidityPool.rebalanceLP(
           balanceETHAmount,
           '0x0000000000000000000000000000000000000000'
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const postL1LPETH = await env.l1Provider.getBalance(
@@ -1401,8 +1393,7 @@ describe('Liquidity Pool Test', async () => {
         L2LiquidityPool.rebalanceLP(
           balanceETHAmount,
           '0x4200000000000000000000000000000000000006'
-        ),
-        Direction.L2ToL1
+        )
       )
 
       const postL1LPETH = await env.l1Provider.getBalance(
@@ -1535,8 +1526,7 @@ describe('Liquidity Pool Test', async () => {
           {
             value: depositAmount,
           }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
@@ -1592,13 +1582,13 @@ describe('Liquidity Pool Test', async () => {
       ).add(10)
       const fastExitAmount = requestedLiquidity.mul(1000).div(remainingPercent)
 
-      await env.waitForRevertXDomainTransactionFast(
+      await env.waitForRevertXDomainTransactionFastOld(
         L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
           fastExitAmount,
           env.ovmEth.address,
           { value: fastExitAmount }
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const postBobL1EthBalance = await env.l1Wallet.getBalance()
@@ -1621,7 +1611,7 @@ describe('Liquidity Pool Test', async () => {
       ).add(ethers.utils.parseEther('10'))
       const swapOnAmount = requestedLiquidity.mul(1000).div(remainingPercent)
 
-      await env.waitForRevertXDomainTransaction(
+      await env.waitForRevertXDomainTransactionOld(
         L1LiquidityPool.clientDepositL1(
           swapOnAmount,
           ethers.constants.AddressZero,
@@ -1629,7 +1619,7 @@ describe('Liquidity Pool Test', async () => {
             value: swapOnAmount,
           }
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const postBobL2EthBalance = await env.l2Wallet.getBalance()
@@ -1684,9 +1674,9 @@ describe('Liquidity Pool Test', async () => {
       )
       await approveBobL2TX.wait()
 
-      const depositTx = await env.waitForXDomainTransactionFast(
+      const depositTx = await env.waitForXDomainTransactionFastOld(
         L2LiquidityPool.clientDepositL2(fastExitAmount, L2ERC20.address),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const ownerRewardFeeRate = await L1LiquidityPool.ownerRewardFeeRate()
@@ -1734,8 +1724,7 @@ describe('Liquidity Pool Test', async () => {
           depositBOBAAmount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const postL1BOBABalance = await L1BOBAToken.balanceOf(
@@ -1833,8 +1822,7 @@ describe('Liquidity Pool Test', async () => {
           depositL2ERC20Amount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -1913,8 +1901,7 @@ describe('Liquidity Pool Test', async () => {
             },
           ],
           { gasLimit: 9000000 }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const remainingPercent = await getRemainingPercent(userRewardFeeRate)
@@ -1976,8 +1963,7 @@ describe('Liquidity Pool Test', async () => {
             },
           ],
           { value: depositAmount, gasLimit: 9000000 }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const remainingPercent = await getRemainingPercent(userRewardFeeRate)
@@ -2035,8 +2021,7 @@ describe('Liquidity Pool Test', async () => {
             { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
           ],
           { value: depositAmount, gasLimit: 9000000 }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const remainingETHPercent = await getRemainingPercent(
@@ -2188,8 +2173,7 @@ describe('Liquidity Pool Test', async () => {
             { amount: depositAmount, l1TokenAddress: L1ERC20_3.address },
           ],
           { value: depositAmount, gasLimit: 9000000 }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const remainingETHPercent = await getRemainingPercent(
@@ -2309,8 +2293,7 @@ describe('Liquidity Pool Test', async () => {
         L1LiquidityPool.clientDepositL1Batch([
           { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
           { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
-        ]),
-        Direction.L1ToL2
+        ])
       )
 
       const remainingERC20Percent = await getRemainingPercent(
@@ -2351,8 +2334,7 @@ describe('Liquidity Pool Test', async () => {
             },
           ],
           { value: depositAmount.mul(2) }
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const remainingETHPercent = await getRemainingPercent(
@@ -2380,7 +2362,7 @@ describe('Liquidity Pool Test', async () => {
       ).add(ethers.utils.parseEther('10'))
       const swapOnAmount = requestedLiquidity.mul(1000).div(remainingPercent)
 
-      await env.waitForRevertXDomainTransaction(
+      await env.waitForRevertXDomainTransactionOld(
         L1LiquidityPool.clientDepositL1Batch(
           [
             {
@@ -2390,7 +2372,7 @@ describe('Liquidity Pool Test', async () => {
           ],
           { value: swapOnAmount, gasLimit: 9000000 }
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const postBobL2EthBalance = await env.l2Wallet.getBalance()
@@ -2423,7 +2405,7 @@ describe('Liquidity Pool Test', async () => {
       ).add(ethers.utils.parseEther('10'))
       const swapOnAmount = requestedLiquidity.mul(1000).div(remainingETHPercent)
 
-      await env.waitForRevertXDomainTransaction(
+      await env.waitForRevertXDomainTransactionOld(
         L1LiquidityPool.clientDepositL1Batch(
           [
             {
@@ -2434,7 +2416,7 @@ describe('Liquidity Pool Test', async () => {
           ],
           { value: swapOnAmount, gasLimit: 9000000 }
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const remainingERC20Percent = await getRemainingPercent(
@@ -2508,7 +2490,7 @@ describe('Liquidity Pool Test', async () => {
         swapOnERC20Amount
       )
 
-      await env.waitForRevertXDomainTransaction(
+      await env.waitForRevertXDomainTransactionOld(
         L1LiquidityPool.clientDepositL1Batch(
           [
             {
@@ -2520,7 +2502,7 @@ describe('Liquidity Pool Test', async () => {
           ],
           { value: swapOnETHAmount, gasLimit: 9000000 }
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const remainingERC20_1Percent = await getRemainingPercent(

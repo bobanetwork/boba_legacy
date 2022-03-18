@@ -4,8 +4,9 @@ chai.use(chaiAsPromised)
 import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 
+import { sleep } from '@eth-optimism/core-utils'
+
 import { OptimismEnv } from './env'
-import { sleep } from './utils'
 
 export const verifyStateRoots = async () => {
   const env: OptimismEnv = await OptimismEnv.new()

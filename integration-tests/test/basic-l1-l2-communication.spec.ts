@@ -3,7 +3,6 @@ import { expect } from 'chai'
 /* Imports: External */
 import { Contract, ContractFactory } from 'ethers'
 import { predeploys, getContractInterface } from '@eth-optimism/contracts'
-
 import { MessageDirection, MessageStatus } from '@eth-optimism/sdk'
 import {
   applyL1ToL2Alias,

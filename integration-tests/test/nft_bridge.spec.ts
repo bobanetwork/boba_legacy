@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
-import { Direction } from './shared/watcher-utils'
+import { DirectionOld } from './shared/watcher-utils-old'
 
 import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
@@ -94,14 +94,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -140,14 +140,14 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -163,7 +163,7 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.connect(env.l1Wallet_2).depositNFTTo(
           L1ERC721.address,
           env.l1Wallet.address,
@@ -171,7 +171,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -187,7 +187,7 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.connect(env.l2Wallet).withdrawTo(
           L2ERC721.address,
           env.l2Wallet_2.address,
@@ -195,7 +195,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -304,14 +304,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -360,14 +360,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -382,7 +382,7 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.withdrawTo(
           L2ERC721.address,
           env.l2Wallet_2.address,
@@ -390,7 +390,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -407,7 +407,7 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.connect(env.l1Wallet_2).depositNFTTo(
           L1ERC721.address,
           env.l2Wallet.address,
@@ -415,7 +415,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -524,14 +524,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
     })
 
@@ -541,14 +541,14 @@ describe('NFT Bridge Test', async () => {
         true
       )
       await approveTX.wait()
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -609,27 +609,27 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
     })
 
     it('{tag:boba} should deposit NFT to L2 when approved for all', async () => {
       await L1ERC721.setApprovalForAll(env.l1Wallet_2.address, true)
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.connect(env.l1Wallet_2).depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -717,14 +717,14 @@ describe('NFT Bridge Test', async () => {
       const unpauseL1Tx = await L1Bridge.unpause()
       await unpauseL1Tx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L1ToL2
+        DirectionOld.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -763,14 +763,14 @@ describe('NFT Bridge Test', async () => {
       const unpauseL2Tx = await L2Bridge.unpause()
       await unpauseL2Tx.wait()
 
-      await env.waitForXDomainTransaction(
+      await env.waitForXDomainTransactionOld(
         L2Bridge.withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
         ),
-        Direction.L2ToL1
+        DirectionOld.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted

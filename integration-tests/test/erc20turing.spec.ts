@@ -12,10 +12,7 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 
-import { Direction } from './shared/watcher-utils'
-
-// import hre from 'hardhat'
-// const cfg = hre.network.config
+import { DirectionOld } from './shared/watcher-utils-old'
 
 import HelloTuringJson from '@boba/turing-hybrid-compute/artifacts/contracts/HelloTuring.sol/HelloTuring.json'
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
@@ -119,7 +116,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
     await approveL1BOBATX.wait()
 
-    await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransactionOld(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
         L2BOBAToken.address,
@@ -127,7 +124,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
       ),
-      Direction.L1ToL2
+      DirectionOld.L1ToL2
     )
 
     const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)

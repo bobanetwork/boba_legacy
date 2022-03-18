@@ -124,7 +124,7 @@ describe('Bridged tokens', () => {
   })
 
   withdrawalTest(
-    'should withdraw tokens from L2 to the depositor',
+    '{tag:other} should withdraw tokens from L2 to the depositor',
     async () => {
       const tx = await env.messenger.withdrawERC20(
         L1__ERC20.address,
@@ -152,7 +152,7 @@ describe('Bridged tokens', () => {
   )
 
   withdrawalTest(
-    'should withdraw tokens from L2 to the transfer recipient',
+    '{tag:other} should withdraw tokens from L2 to the transfer recipient',
     async () => {
       const tx = await env.messenger.withdrawERC20(
         L1__ERC20.address,
@@ -186,7 +186,7 @@ describe('Bridged tokens', () => {
   // Specifically, the L2 bridge does not check that the L2 token being burned corresponds
   // with the L1 token which is specified for the withdrawal.
   withdrawalTest(
-    'should not allow an arbitrary L2 token to be withdrawn in exchange for a legitimate L1 token',
+    '{tag:other} should not allow an arbitrary L2 token to be withdrawn in exchange for a legitimate L1 token',
     async () => {
       // First deposit some of the L1 token to L2, so that there is something which could be stolen.
       await env.messenger.waitForMessageReceipt(

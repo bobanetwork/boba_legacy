@@ -2,7 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, BigNumber, utils, ethers, ContractFactory } from 'ethers'
-import { Direction } from './shared/watcher-utils'
+import { DirectionOld } from './shared/watcher-utils-old'
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
@@ -97,7 +97,7 @@ describe('Boba Turing Credit Test', async () => {
     )
     await approveL1BOBATX.wait()
 
-    await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransactionOld(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
         L2BOBAToken.address,
@@ -105,7 +105,7 @@ describe('Boba Turing Credit Test', async () => {
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
       ),
-      Direction.L1ToL2
+      DirectionOld.L1ToL2
     )
 
     const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
