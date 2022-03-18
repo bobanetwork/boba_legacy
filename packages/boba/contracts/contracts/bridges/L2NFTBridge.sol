@@ -171,8 +171,9 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
+        require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
-        require(ERC165Checker.supportsInterface(_l2Contract, erc721) && ERC165Checker.supportsInterface(_l1Contract, erc721), "NFTs are not ERC721 compatible");
+        require(ERC165Checker.supportsInterface(_l2Contract, erc721), "L2 NFT is not ERC721 compatible");
         bytes32 bn = keccak256(abi.encodePacked(_baseNetwork));
         bytes32 l1 = keccak256(abi.encodePacked("L1"));
         bytes32 l2 = keccak256(abi.encodePacked("L2"));
@@ -188,11 +189,10 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             baseNetwork = Network.L1;
         }
         else {
-            require(ERC165Checker.supportsInterface(_l1Contract, 0x3899b238), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
 
-        pairNFTInfo[_l1Contract] =
+        pairNFTInfo[_l2Contract] =
             PairNFTInfo({
                 l1Contract: _l1Contract,
                 l2Contract: _l2Contract,
