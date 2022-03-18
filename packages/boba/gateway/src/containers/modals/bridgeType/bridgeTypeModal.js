@@ -15,14 +15,12 @@ limitations under the License. */
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Box, Typography, useMediaQuery } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { setBridgeType } from 'actions/bridgeAction';
 import { closeModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import * as LayoutS from 'components/common/common.styles';
 
 import * as S from './bridgeTypeModal.styles';
 
@@ -45,6 +43,7 @@ function BridgeTypeModal({ open, toBridgeType }) {
       maxWidth="xs"
       minHeight="fit-content"
       title="Switch bridge mode"
+      newStyle={true}
     >
       <Typography variant="body2">
         The classic bridge only supports the transfer of one token. Are you sure you want to switch?

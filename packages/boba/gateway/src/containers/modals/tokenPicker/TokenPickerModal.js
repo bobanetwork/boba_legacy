@@ -49,6 +49,7 @@ function TokenPickerModal({ open,tokenIndex }) {
       maxWidth="xs"
       minHeight="450px"
       title="Select a token"
+      newStyle={true}
   >
       <Input
         size='small'

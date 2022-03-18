@@ -21,13 +21,15 @@ import {
   Typography,
   Container,
   Box,
-  useMediaQuery
+  useMediaQuery,
+  Grid
 } from '@mui/material'
 
 import * as S from "./Modal.styles"
 import * as LayoutS from 'components/common/common.styles';
 import { useTheme } from '@emotion/react'
 import { HighlightOffOutlined } from '@mui/icons-material';
+import CloseIcon from 'components/icons/CloseIcon';
 
 function _Modal({
   children,
@@ -37,7 +39,8 @@ function _Modal({
   title,
   transparent,
   maxWidth,
-  minHeight
+  minHeight,
+  newStyle = false
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -54,25 +57,51 @@ function _Modal({
       disableAutoFocus={true}
     >
       <Fade in={open}>
-        <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
-          <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={transparent || isMobile}>
-            <Box display="flex" flexDirection="column" gap="10px">
-              <S.ModalHead>
-                <Box display="flex" alignItems="center" gap="10px">
-                  <BobaGlassIcon />
-                  <Typography variant="body1" sx={{ fontWeight: "700" }}>{title}</Typography>
+
+        {
+          !!newStyle ?
+            <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
+              <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={transparent || isMobile}>
+                <Box display="flex" flexDirection="column" gap="10px">
+                  <S.ModalHead>
+                    <Box display="flex" alignItems="center" gap="10px">
+                      <BobaGlassIcon />
+                      <Typography variant="body1" sx={{ fontWeight: "700" }}>{title}</Typography>
+                    </Box>
+                    <S.IconButtonTag onClick={onClose}>
+                      <HighlightOffOutlined sx={{ opacity: 0.5 }} />
+                    </S.IconButtonTag>
+                  </S.ModalHead>
+                  <LayoutS.DividerLine sx={{ my: 1 }} />
+                  <S.Content>
+                    {children}
+                  </S.Content>
                 </Box>
-                <S.IconButtonTag onClick={onClose}>
-                  <HighlightOffOutlined sx={{opacity: 0.5}} />
-                </S.IconButtonTag>
-              </S.ModalHead>
-              <LayoutS.DividerLine sx={{my: 1}} />
-              <S.Content>
-                {children}
-              </S.Content>
-            </Box>
-          </S.Style>
-        </Container>
+              </S.Style>
+            </Container>
+            : <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
+              <Grid container>
+                <Grid item xs={12} md={title ? 2 : 1}>
+                  <Box sx={{ mr: 8 }}>
+                    <Typography variant="h2" component="h3" sx={{ fontWeight: "700" }}>{title}</Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={title ? 10 : 9}>
+                  <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={transparent || isMobile}>
+                    {children}
+                  </S.Style>
+                </Grid>
+
+                <Grid item xs={12} md={1}>
+                  <S.IconButtonTag onClick={onClose}>
+                    <CloseIcon />
+                  </S.IconButtonTag>
+                </Grid>
+
+              </Grid>
+            </Container>
+        }
       </Fade>
     </S.StyledModal>
   );

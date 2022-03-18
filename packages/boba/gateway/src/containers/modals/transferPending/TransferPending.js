@@ -19,6 +19,7 @@ function TransferPendingModal({open}) {
       maxWidth="xs"
       minHeight="300px"
       title="Transaction Pending"
+      newStyle={true}
     >
       <Box display="flex" alignItems="center" flexDirection="column" justifyContent="space-around" gap={2}>
         <CircularProgress size="100px" color="primary" />
