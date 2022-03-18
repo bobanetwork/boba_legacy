@@ -1,16 +1,20 @@
-import Button from 'components/button/Button';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectClassicExitCost, selectFastDepositCost, selectFastExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
+
+import BN from 'bignumber.js';
+
+import Button from 'components/button/Button';
+
+import { exitBOBA } from 'actions/networkAction';
+import { closeModal, openAlert, openModal } from 'actions/uiAction';
+
+import { selectClassicExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
 import { selectBridgeType } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
+
 import { logAmount } from 'util/amountConvert';
 import { BRIDGE_TYPE } from 'util/constant';
 
-import BN from 'bignumber.js'
-import { exitBOBA } from 'actions/networkAction';
-import { closeModal, openAlert, openModal } from 'actions/uiAction';
-import { selectLoading } from 'selectors/loadingSelector';
 
 function BridgeTransferAction({
   tokens
@@ -26,8 +30,6 @@ function BridgeTransferAction({
 
   const feeBalance = useSelector(selectL2FeeBalance)
   
-  const loading = useSelector(selectLoading(['EXIT/CREATE']))
-
   useEffect(() => {
     tokens.forEach((token) => {
       const maxValue = logAmount(token.balance, token.decimals);
@@ -106,8 +108,7 @@ function BridgeTransferAction({
   return <Button
     color="primary"
     variant="contained"
-    loading={loading}
-    tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+    tooltip={layer === 'L1' ? "Click here to bridge your funds to L2" : "Click here to bridge your funds to L1"}
     triggerTime={new Date()}
     onClick={onSubmit}
     disabled={!validValue}
