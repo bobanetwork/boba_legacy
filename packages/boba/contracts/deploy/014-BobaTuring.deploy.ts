@@ -30,20 +30,15 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  const L1BobaDeployment = await hre.deployments.getOrNull('TK_L1BOBA')
-  const L2BobaDeployment = await hre.deployments.getOrNull('TK_L2BOBA')
+  const L1BobaAddress = await addressManager.getAddress('TK_L1BOBA')
+  const L2BobaAddress = await addressManager.getAddress('TK_L2BOBA')
 
-  L1Boba = new Contract(
-    L1BobaDeployment.address,
-    L1BobaDeployment.abi,
-    (hre as any).deployConfig.deployer_l1
-  )
-
-  L2Boba = new Contract(
-    L2BobaDeployment.address,
-    L2BobaDeployment.abi,
-    (hre as any).deployConfig.deployer_l2
-  )
+  L1Boba = getContractFactory('BOBA')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(L1BobaAddress) as any
+  L2Boba = getContractFactory('L2GovernanceERC20')
+    .connect((hre as any).deployConfig.deployer_l2)
+    .attach(L2BobaAddress) as any
 
   // Deposit Boba from L1 to L2
   const depositBobaAmount = utils.parseEther('1000')

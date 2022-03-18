@@ -1,7 +1,7 @@
 /* Imports: External */
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import path from 'path'
-import dirtree from 'directory-tree'
+import { getContractFactory } from '@eth-optimism/contracts'
 import fs from 'fs'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -11,6 +11,10 @@ const deployFn: DeployFunction = async (hre) => {
   contracts['NFTs'] = {}
 
   const deployments = await hre.deployments.all()
+
+  const addressManager = getContractFactory('Lib_AddressManager')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
   for (const key in deployments) {
     if (deployments.hasOwnProperty(key)) {
