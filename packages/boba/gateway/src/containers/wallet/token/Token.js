@@ -83,6 +83,7 @@ function TokenPage() {
 
   } else {
 
+    console.log([ 'childBalance', childBalance ]);
     return (
       <S.TokenPageContainer>
         <S.TokenPageContent>

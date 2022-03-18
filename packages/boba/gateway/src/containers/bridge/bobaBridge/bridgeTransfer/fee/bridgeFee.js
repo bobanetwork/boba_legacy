@@ -51,7 +51,7 @@ function BridgeFee({
           (Approval+Bridge)
         </Typography>
         {tokens.map((t) => {
-          return <Typography variant="body2" >
+          return <Typography key={t.symbol} variant="body2" >
             {
               t.symbol === 'ETH' ?
                 `${(Number(t.amount) + Number(cost)).toFixed(4)}`
@@ -66,7 +66,7 @@ function BridgeFee({
         </Typography>
         {
           tokens.map((t) => {
-            return <Typography variant="body2" >
+            return <Typography key={t.symbol} variant="body2" >
               0.00019780 {t.symbol} (0.1%)
             </Typography>
           })
@@ -77,7 +77,7 @@ function BridgeFee({
           Est. recieve
         </Typography>
         {tokens.map((t) => {
-          return <Typography variant="body2" >
+          return <Typography key={t.symbol} variant="body2" >
             {`${Number(t.amount).toFixed(3)} ${t.symbol}`}
           </Typography>
         })}

@@ -1,12 +1,13 @@
 import { Box, Typography } from '@mui/material';
-import { removeToken, setBridgeType, setToken } from 'actions/bridgeAction';
+import { setBridgeType, setToken } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
 import * as LayoutS from 'components/common/common.styles';
 import { isEqual } from 'lodash';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectlayer1Balance } from 'selectors/balanceSelector';
+import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector';
 import { selectBridgeType, selectTokens } from 'selectors/bridgeSelector';
+import { selectLayer } from 'selectors/setupSelector';
 import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './bridgeTransfer.styles';
 import BridgeFee from './fee/bridgeFee';
@@ -16,30 +17,38 @@ import BridgeTransferButton from './transfer';
 
 function BridgeTransfer() {
 
+  const layer = useSelector(selectLayer());
   const bridgeType = useSelector(selectBridgeType());
   const dispatch = useDispatch()
   const tokens = useSelector(selectTokens());
 
-  const rootBalance = useSelector(selectlayer1Balance, isEqual);
+  const l1Balance = useSelector(selectlayer1Balance, isEqual)
+  const l2Balance = useSelector(selectlayer2Balance, isEqual)
+
+  let balances = l1Balance;
+
+  if (layer === 'L2') {
+    balances = l2Balance
+  }
 
   useEffect(() => {
-    if (rootBalance.length > 0 && !tokens.length) {
-      dispatch(setToken(rootBalance[ 1 ]));
+    if (balances.length > 0 && !tokens.length) {
+      dispatch(setToken(balances[ 0 ]));
     }
-  }, [ rootBalance, dispatch, tokens ])
+  }, [ balances, dispatch, tokens, layer ])
 
   useEffect(() => {
     dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
   }, [ dispatch ])
 
   const addNewToken = () => {
-    dispatch(setToken(rootBalance[ 1 ]));
+    dispatch(setToken(balances[ 0 ]));
   }
 
   const switchBridgeType = () => {
     dispatch(openModal('bridgeTypeSwitch'))
   }
-  
+
   return (
     <S.BridgeTransferContainer>
       {
@@ -72,7 +81,7 @@ function BridgeTransfer() {
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />
-      <BridgeTransferButton tokens={tokens}/>
+      <BridgeTransferButton tokens={tokens} />
     </S.BridgeTransferContainer>
   )
 }

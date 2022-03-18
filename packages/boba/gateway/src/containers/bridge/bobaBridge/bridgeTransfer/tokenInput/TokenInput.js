@@ -21,7 +21,7 @@ import { openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectBridgeType, selectTokenAmounts } from 'selectors/bridgeSelector';
+import { selectBridgeType } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
 import { logAmount, toWei_String } from 'util/amountConvert';
 import { getCoinImage } from 'util/coinImage';
@@ -38,7 +38,6 @@ function TokenInput({
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
-  const tokenAmounts = useSelector(selectTokenAmounts());
   const layer = useSelector(selectLayer());
 
   const dispatch = useDispatch();
@@ -109,7 +108,7 @@ function TokenInput({
           <S.TextFieldTag
             placeholder="enter amount"
             type="number"
-            value={tokenAmounts[ token.symbol ]}
+            value={token.amount}
             onChange={(e) => {
               onInputChange(e.target.value);
             }}
