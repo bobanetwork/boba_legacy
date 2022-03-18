@@ -4,13 +4,12 @@ chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils } from 'ethers'
 import chalk from 'chalk'
 
-import { DirectionOld } from './shared/watcher-utils-old'
-
 import L1MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
 import L2MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
 import { OptimismEnv } from './shared/env'
 
 describe('Fast Messenge Relayer Test', async () => {
+  
   let L1Message: Contract
   let L2Message: Contract
 
@@ -37,9 +36,8 @@ describe('Fast Messenge Relayer Test', async () => {
   })
 
   it('{tag:mrf} should QUICKLY send message from L2 to L1 using the fast relayer', async () => {
-    await env.waitForXDomainTransactionFastOld(
-      L2Message.sendMessageL2ToL1({ gasLimit: 800000, gasPrice: 0 }),
-      DirectionOld.L2ToL1
+    await env.waitForXDomainTransactionFast(
+      L2Message.sendMessageL2ToL1({ gasLimit: 800000, gasPrice: 0 })
     )
   })
 })
