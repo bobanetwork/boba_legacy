@@ -28,7 +28,7 @@ describe('Fee Payment Integration Tests', async () => {
   })
 
   hardhatTest(
-    `should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice`,
+    `{tag:other} should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice`,
     async () => {
       const assertGasPrice = async () => {
         const gasPrice = await env.l2Wallet.getGasPrice()
@@ -50,7 +50,7 @@ describe('Fee Payment Integration Tests', async () => {
     }
   )
 
-  hardhatTest('Paying a nonzero but acceptable gasPrice fee', async () => {
+  hardhatTest('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -104,7 +104,7 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  hardhatTest('should compute correct fee', async () => {
+  hardhatTest('{tag:other} should compute correct fee', async () => {
     await setPrices(env, 1000)
 
     const preBalance = await env.l2Wallet.getBalance()
@@ -154,13 +154,13 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('should not be able to withdraw fees before the minimum is met', async () => {
+  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
     await expect(env.messenger.contracts.l2.OVM_SequencerFeeVault.withdraw()).to
       .be.rejected
   })
 
   hardhatTest(
-    'should be able to withdraw fees back to L1 once the minimum is met',
+    '{tag:other} should be able to withdraw fees back to L1 once the minimum is met',
     async () => {
       const l1FeeWallet =
         await env.messenger.contracts.l2.OVM_SequencerFeeVault.l1FeeWallet()
