@@ -12,7 +12,10 @@ import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './bridgeTransfer.styles';
 import BridgeFee from './fee/bridgeFee';
 import TokenInput from './tokenInput/TokenInput';
-import BridgeTransferButton from './transfer';
+import TransferExit from './transferExit';
+import TransferFastExit from './transferFastExit';
+import TransferDeposit from './transferDeposit';
+import TransferFastDeposit from './transferFastDeposit';
 
 
 function BridgeTransfer() {
@@ -81,7 +84,18 @@ function BridgeTransfer() {
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />
-      <BridgeTransferButton tokens={tokens} />
+      {
+        layer === 'L1' && tokens.length > 0
+          ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
+            ? <TransferDeposit token={tokens[0]} />
+            : <TransferFastDeposit tokens={tokens} /> : null
+      }
+      {
+        layer === 'L2' && tokens.length > 0
+          ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
+            ? <TransferExit token={tokens[0]} />
+            : <TransferFastExit token={tokens[0]} /> : null
+      }
     </S.BridgeTransferContainer>
   )
 }

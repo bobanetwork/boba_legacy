@@ -119,13 +119,14 @@ function TokenInput({
         </S.TextFieldWrapper>
         <S.TokenPickerAction>
           <IconButton size="small" aria-label="add token"
-            onClick={() => {
+            disabled
+            /* onClick={() => {
               if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
                 switchBridgeType()
               } else {
                 addNewToken()
               }
-            }}
+            }} */
           >
             <AddCircleOutline fontSize="small" />
           </IconButton>
