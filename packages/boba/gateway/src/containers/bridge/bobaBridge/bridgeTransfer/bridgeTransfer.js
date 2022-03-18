@@ -88,7 +88,7 @@ function BridgeTransfer() {
         layer === 'L1' && tokens.length > 0
           ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
             ? <TransferDeposit token={tokens[0]} />
-            : <TransferFastDeposit tokens={tokens} /> : null
+            : <TransferFastDeposit token={tokens[0]} /> : null
       }
       {
         layer === 'L2' && tokens.length > 0
