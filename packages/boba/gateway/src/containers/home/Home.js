@@ -117,6 +117,7 @@ function Home() {
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
+  const tokenIndex = useSelector(selectModalState('tokenIndex'));
 
   const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
   const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
@@ -232,7 +233,7 @@ function Home() {
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
       {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
-      {!!tokenPickerModalState && <TokenPickerModal open={tokenPickerModalState} />}
+      {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
 
       <Alert
         type='error'

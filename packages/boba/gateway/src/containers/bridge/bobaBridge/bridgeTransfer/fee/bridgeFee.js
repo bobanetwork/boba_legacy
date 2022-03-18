@@ -9,7 +9,7 @@ function BridgeFee({
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
-  console.log([ 'bridgeType', bridgeType ])
+  
 
   return <>
     <Box display="flex" justifyContent="space-between">

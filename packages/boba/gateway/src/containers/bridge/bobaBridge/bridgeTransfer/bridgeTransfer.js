@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { setBridgeType, setToken } from 'actions/bridgeAction';
+import { removeToken, setBridgeType, setToken } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import * as LayoutS from 'components/common/common.styles';
@@ -15,7 +15,7 @@ import TokenInput from './tokenInput/TokenInput';
 
 
 function BridgeTransfer() {
-  
+
   const bridgeType = useSelector(selectBridgeType());
   const dispatch = useDispatch()
   const tokens = useSelector(selectTokens());
@@ -32,28 +32,31 @@ function BridgeTransfer() {
     dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
   }, [ dispatch ])
 
-
-  console.log([ 'tokens', tokens ]);
-  
   const addNewToken = () => {
     dispatch(setToken(rootBalance[ 1 ]));
   }
-  
+
+  const deleteToken = (tokenIndex) => {
+    dispatch(removeToken(tokenIndex));
+  }
+
   const switchBridgeType = () => {
     dispatch(openModal('bridgeTypeSwitch'))
   }
-  
-  const openTokenPicker = () => {
-    dispatch(openModal('tokenPicker'))
+
+  const openTokenPicker = (tokenIndex) => {
+    dispatch(openModal('tokenPicker', null, null, tokenIndex))
   }
-  
+
   return (
     <S.BridgeTransferContainer>
       {
-        tokens.map((token) => <TokenInput
-          key={token.symbol}
+        tokens.map((token, index) => <TokenInput
+          index={index}
+          key={`${token.symbol}-${index}`}
           token={token}
           addNewToken={addNewToken}
+          deleteToken={deleteToken}
           openTokenPicker={openTokenPicker}
           tokenLen={tokens.length}
           switchBridgeType={switchBridgeType}
@@ -74,7 +77,8 @@ function BridgeTransfer() {
             textDecoration: 'underline',
             opacity: 0.6,
             cursor: 'pointer'
-          }}>To {bridgeType !== BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
+          }}
+        >To {bridgeType !== BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />
@@ -82,6 +86,7 @@ function BridgeTransfer() {
         color="primary"
         variant="contained"
         fullWidth={true}
+        disabled
       >Transfer</Button>
     </S.BridgeTransferContainer>
   )

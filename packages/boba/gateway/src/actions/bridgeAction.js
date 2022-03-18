@@ -19,6 +19,18 @@ export function setToken(token) {
   }
 }
 
+export function removeToken(tokenIndex) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/TOKEN/REMOVE', payload: tokenIndex });
+  }
+}
+
+export function updateToken(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/TOKEN/UPDATE', payload });
+  }
+}
+
 export function setBridgeType(type) {
   return function (dispatch) {
     return dispatch({ type: 'BRIDGE/TYPE/SELECT', payload: type });

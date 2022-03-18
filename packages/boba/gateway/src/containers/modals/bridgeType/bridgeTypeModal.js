@@ -21,6 +21,7 @@ import { setBridgeType } from 'actions/bridgeAction';
 import { closeModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
+import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import * as LayoutS from 'components/common/common.styles';
 
 import * as S from './bridgeTypeModal.styles';
@@ -38,21 +39,21 @@ function BridgeTypeModal({ open, toBridgeType }) {
 
 
   return (
-    <Modal open={open} onClose={handleClose} maxWidth="sm" minHeight="400px">
-      <Box>
-        <Typography variant="h2" sx={{ fontWeight: 700, mb: 2 }}>
-          Switch bridge mode
-        </Typography>
-        <LayoutS.DividerLine sx={{ my: 1 }} />
-        <Typography variant="body2">
-          The classic bridge only supports the transfer of one token. Are you sure you want to switch?
-        </Typography>
-      </Box>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      maxWidth="xs"
+      minHeight="fit-content"
+      title="Switch bridge mode"
+    >
+      <Typography variant="body2">
+        The classic bridge only supports the transfer of one token. Are you sure you want to switch?
+      </Typography>
       <S.WrapperActionsModal>
         <Button
           onClick={handleClose}
           color='primary'
-          variant="outlined"
+          variant="contained"
           fullWidth={isMobile}
           size="large"
         >
@@ -64,7 +65,7 @@ function BridgeTypeModal({ open, toBridgeType }) {
             handleClose();
           }}
           color='primary'
-          variant="contained"
+          variant="outlined"
           fullWidth={isMobile}
           size="large"
         >

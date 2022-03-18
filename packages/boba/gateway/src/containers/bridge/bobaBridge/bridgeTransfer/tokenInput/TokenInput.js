@@ -11,21 +11,22 @@ import * as S from './TokenInput.styles';
 
 function TokenInput({
   token,
+  index,
   isFastBridge,
   tokenLen,
   switchBridgeType,
   addNewToken,
+  deleteToken,
   openTokenPicker
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
   const underZero = new BN(token.amount).lt(new BN(0))
   const overMax = new BN(token.amount).gt(new BN(token.balance))
-  
-  
-  const amount = token.symbol === 'ETH' ? 
-      Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, {minimumFractionDigits: 3,maximumFractionDigits:3}) :
-      Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits:2})
+
+  const amount = token.symbol === 'ETH' ?
+    Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
+    Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   return (
     <S.TokenInputWrapper>
@@ -46,7 +47,7 @@ function TokenInput({
         sx={{ gap: '5px' }}
       >
         <S.TokenPicker
-          onClick={openTokenPicker}
+          onClick={() => { openTokenPicker(index) }}
         >
           <img src={getCoinImage(token.symbol)} alt="logo" width={25} height={25} /> {token.symbol} <ArrowDropDown fontSize="medium" />
         </S.TokenPicker>
@@ -66,7 +67,7 @@ function TokenInput({
         <S.TokenPickerAction>
           <IconButton size="small" aria-label="add token"
             onClick={() => {
-              if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE)  {
+              if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
                 switchBridgeType()
               } else {
                 addNewToken()
@@ -75,7 +76,11 @@ function TokenInput({
           >
             <AddCircleOutline fontSize="small" />
           </IconButton>
-          <IconButton  disabled={!isFastBridge || tokenLen > 1} size="small" aria-label="remove token">
+          <IconButton disabled={!isFastBridge && index === tokenLen - 1} size="small" aria-label="remove token"
+            onClick={() => {
+              deleteToken(index);
+            }}
+          >
             <RemoveCircleOutline fontSize="small" />
           </IconButton>
         </S.TokenPickerAction>
