@@ -237,6 +237,28 @@ describe("Turing bridgeable NFT Random 256", function () {
     expect(decodedMetadata['image_data']).to.contain('svg');
   })
 
+  it("should return bridgeExtraData", async () => {
+    const events = (await erc721.queryFilter(erc721.filters.MintedNFT()))
+    const tokenId_1 = events[0].args[0]
+    const tokenId_2 = events[1].args[0]
+
+    const bridgeExtraData_1 = await erc721.bridgeExtraData(tokenId_1)
+    console.log("Bridge Extra Data 1: ", bridgeExtraData_1)
+    const bridgeExtraData_2 = await erc721.bridgeExtraData(tokenId_2)
+    console.log("Bridge Extra Data 2: ", bridgeExtraData_2)
+
+    const decoded_1 = utils.defaultAbiCoder.decode(['uint256'], bridgeExtraData_1)
+    const decoded_2 = utils.defaultAbiCoder.decode(['uint256'], bridgeExtraData_2)
+
+    expect(bridgeExtraData_2).to.be.not.equal(bridgeExtraData_1)
+    expect(decoded_1).to.be.not.equal(decoded_2)
+  })
+
+  it("should support bridgeExtraData interface", async () => {
+    const extraDataInterface = '0x9b9284f9'
+    expect(await erc721.supportsInterface(extraDataInterface)).to.equal(true)
+  })
+
   it("should have different metadata", async () => {
 
     // DebugURI

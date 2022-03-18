@@ -105,6 +105,10 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
         return AddOnChainMetaData.tokenURI(tokenId);
     }
 
+    function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721, AddOnChainMetaData) returns (bool) {
+        return AddOnChainMetaData.supportsInterface(_interfaceId);
+    }
+
     function _beforeTokenTransfer(
         address from,
         address to,

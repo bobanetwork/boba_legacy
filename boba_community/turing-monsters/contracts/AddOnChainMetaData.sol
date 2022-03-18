@@ -84,6 +84,10 @@ abstract contract AddOnChainMetaData is ERC721 {
         return abi.encode(_tokenURIs[tokenId]);
     }
 
+    function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
+        return _interfaceId == this.bridgeExtraData.selector || super.supportsInterface(_interfaceId);
+    }
+
     function _setTokenURI(uint256 tokenId_) internal virtual {
         require(_exists(tokenId_), "ERC721URIStorage: URI set of nonexistent token");
 
