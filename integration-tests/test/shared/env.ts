@@ -78,6 +78,7 @@ export class OptimismEnv {
 
   // The providers
   messenger: CrossChainMessenger
+  messengerFast: CrossChainMessenger
   l1Provider: providers.JsonRpcProvider
   l2Provider: providers.JsonRpcProvider
   verifierProvider: providers.JsonRpcProvider
@@ -99,6 +100,7 @@ export class OptimismEnv {
     this.l1Wallet = args.l1Wallet
     this.l2Wallet = args.l2Wallet
     this.messenger = args.messenger
+    this.messengerFast = args.messengerFast
     //this.l1Wallet_2 = args.l1Wallet_2
     this.l2Wallet_2 = args.l2Wallet_2
     //this.l1Wallet_3 = args.l1Wallet_3
@@ -124,6 +126,14 @@ export class OptimismEnv {
       l1SignerOrProvider: l1Wallet,
       l2SignerOrProvider: l2Wallet,
       l1ChainId: network.chainId,
+      fastRelayer: false,
+    })
+
+    const messengerFast = new CrossChainMessenger({
+      l1SignerOrProvider: l1Wallet,
+      l2SignerOrProvider: l2Wallet,
+      l1ChainId: network.chainId,
+      fastRelayer: true,
     })
 
     // fund the user if needed
@@ -140,6 +150,7 @@ export class OptimismEnv {
       l1Wallet,
       l2Wallet,
       messenger,
+      messengerFast,
       l2Wallet_2,
       l2Wallet_3,
       l1Provider,
@@ -301,6 +312,37 @@ export class OptimismEnv {
     }
   }
 
+  async waitForXDomainTransactionFast(
+    tx: Promise<TransactionResponse> | TransactionResponse
+  ): Promise<CrossDomainMessagePair> {
+    // await it if needed
+    tx = await tx
+
+    const receipt = await tx.wait()
+    const resolved = await this.messengerFast.toCrossChainMessage(tx)
+    const messageReceipt = await this.messengerFast.waitForMessageReceipt(tx)
+    let fullTx: any
+    let remoteTx: any
+    if (resolved.direction === MessageDirection.L1_TO_L2) {
+      fullTx = await this.messengerFast.l1Provider.getTransaction(tx.hash)
+      remoteTx = await this.messengerFast.l2Provider.getTransaction(
+        messageReceipt.transactionReceipt.transactionHash
+      )
+    } else {
+      fullTx = await this.messengerFast.l2Provider.getTransaction(tx.hash)
+      remoteTx = await this.messengerFast.l1Provider.getTransaction(
+        messageReceipt.transactionReceipt.transactionHash
+      )
+    }
+
+    return {
+      tx: fullTx,
+      receipt,
+      remoteTx,
+      remoteReceipt: messageReceipt.transactionReceipt,
+    }
+  }
+
   /**
    * Relays all L2 => L1 messages found in a given L2 transaction.
    *
@@ -350,6 +392,58 @@ export class OptimismEnv {
       }
 
       await this.messenger.waitForMessageReceipt(message)
+    }
+  }
+
+  /**
+   * Relays all L2 => L1 messages found in a given L2 transaction.
+   *
+   * @param tx Transaction to find messages in.
+   */
+  async relayXDomainMessagesFast(
+    tx: Promise<TransactionResponse> | TransactionResponse
+  ): Promise<void> {
+    tx = await tx
+    await tx.wait()
+
+    const messages = await this.messengerFast.getMessagesByTransaction(tx)
+    if (messages.length === 0) {
+      return
+    }
+
+    for (const message of messages) {
+      await this.messengerFast.waitForMessageStatus(
+        message,
+        MessageStatus.READY_FOR_RELAY
+      )
+
+      let relayed = false
+      while (!relayed) {
+        try {
+          await this.messengerFast.finalizeMessage(message)
+          relayed = true
+        } catch (err) {
+          if (
+            err.message.includes('Nonce too low') ||
+            err.message.includes('transaction was replaced') ||
+            err.message.includes(
+              'another transaction with same nonce in the queue'
+            )
+          ) {
+            // Sometimes happens when we run tests in parallel.
+            await sleep(5000)
+          } else if (
+            err.message.includes('message has already been received')
+          ) {
+            // Message already relayed, this is fine.
+            relayed = true
+          } else {
+            throw err
+          }
+        }
+      }
+
+      await this.messengerFast.waitForMessageReceipt(message)
     }
   }
 }

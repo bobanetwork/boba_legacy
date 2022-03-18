@@ -58,6 +58,7 @@ export const CONTRACT_ADDRESSES: {
     l1: {
       AddressManager: '0xdE1FCfB0851916CA5101820A69b13a4E276bd81F',
       L1CrossDomainMessenger: '0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1',
+      L1CrossDomainMessengerFast: '0x0000000000000000000000000000000000000000',
       L1StandardBridge: '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1',
       StateCommitmentChain: '0xBe5dAb4A2e9cd0F27300dB4aB94BeE3A233AEB19',
       CanonicalTransactionChain: '0x5E4e65926BA27467555EB562121fac00D24E9dD2',
@@ -65,15 +66,16 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
-  // Kovan
-  42: {
+  // Rinkeby
+  4: {
     l1: {
-      AddressManager: '0x100Dd3b414Df5BbA2B542864fF94aF8024aFdf3a',
-      L1CrossDomainMessenger: '0x4361d0F75A0186C05f971c566dC6bEa5957483fD',
-      L1StandardBridge: '0x22F24361D548e5FaAfb36d1437839f080363982B',
-      StateCommitmentChain: '0xD7754711773489F31A0602635f3F167826ce53C5',
-      CanonicalTransactionChain: '0xf7B88A133202d41Fe5E2Ab22e6309a1A4D50AF74',
-      BondManager: '0xc5a603d273E28185c18Ba4d26A0024B2d2F42740',
+      AddressManager: '0x0000000000000000000000000000000000000000',
+      L1CrossDomainMessenger: '0x0000000000000000000000000000000000000000',
+      L1CrossDomainMessengerFast: '0x0000000000000000000000000000000000000000',
+      L1StandardBridge: '0x0000000000000000000000000000000000000000',
+      StateCommitmentChain: '0x0000000000000000000000000000000000000000',
+      CanonicalTransactionChain: '0x0000000000000000000000000000000000000000',
+      BondManager: '0x0000000000000000000000000000000000000000',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -82,6 +84,7 @@ export const CONTRACT_ADDRESSES: {
     l1: {
       AddressManager: '0x2F7E3cAC91b5148d336BbffB224B4dC79F09f01D',
       L1CrossDomainMessenger: '0xEcC89b9EDD804850C4F343A278Be902be11AaF42',
+      L1CrossDomainMessengerFast: '0x0000000000000000000000000000000000000000',
       L1StandardBridge: '0x73298186A143a54c20ae98EEE5a025bD5979De02',
       StateCommitmentChain: '0x1afcA918eff169eE20fF8AB6Be75f3E872eE1C1A',
       CanonicalTransactionChain: '0x2ebA8c4EfDB39A8Cd8f9eD65c50ec079f7CEBD81',
@@ -89,11 +92,25 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Kovan
+  42: {
+    l1: {
+      AddressManager: '0x100Dd3b414Df5BbA2B542864fF94aF8024aFdf3a',
+      L1CrossDomainMessenger: '0x4361d0F75A0186C05f971c566dC6bEa5957483fD',
+      L1CrossDomainMessengerFast: '0x0000000000000000000000000000000000000000',
+      L1StandardBridge: '0x22F24361D548e5FaAfb36d1437839f080363982B',
+      StateCommitmentChain: '0xD7754711773489F31A0602635f3F167826ce53C5',
+      CanonicalTransactionChain: '0xf7B88A133202d41Fe5E2Ab22e6309a1A4D50AF74',
+      BondManager: '0xc5a603d273E28185c18Ba4d26A0024B2d2F42740',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
   // Hardhat local
   31337: {
     l1: {
       AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1',
+      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1',     // this is the Proxy__L1CrossDomainMessenger
+      L1CrossDomainMessengerFast: '0xf5059a5D33d5853360D16C683c16e67980206f36', // this is the Proxy__L1CrossDomainMessengerFast
       L1StandardBridge: '0x4A679253410272dd5232B3Ff7cF5dbB88f295319',
       StateCommitmentChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
       CanonicalTransactionChain: '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82',
@@ -133,6 +150,30 @@ export const BRIDGE_ADAPTER_DATA: {
       l2Bridge: '0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65',
     },
   },
+  4: { // Rinkeby
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: CONTRACT_ADDRESSES[4].l1.L1StandardBridge,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: CONTRACT_ADDRESSES[4].l1.L1StandardBridge,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  5: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: CONTRACT_ADDRESSES[5].l1.L1StandardBridge,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: CONTRACT_ADDRESSES[5].l1.L1StandardBridge,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
   42: {
     Standard: {
       Adapter: StandardBridgeAdapter,
@@ -158,18 +199,6 @@ export const BRIDGE_ADAPTER_DATA: {
       Adapter: DAIBridgeAdapter,
       l1Bridge: '0xb415e822C4983ecD6B1c1596e8a5f976cf6CD9e3',
       l2Bridge: '0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65',
-    },
-  },
-  5: {
-    Standard: {
-      Adapter: StandardBridgeAdapter,
-      l1Bridge: CONTRACT_ADDRESSES[5].l1.L1StandardBridge,
-      l2Bridge: predeploys.L2StandardBridge,
-    },
-    ETH: {
-      Adapter: ETHBridgeAdapter,
-      l1Bridge: CONTRACT_ADDRESSES[5].l1.L1StandardBridge,
-      l2Bridge: predeploys.L2StandardBridge,
     },
   },
   31337: {

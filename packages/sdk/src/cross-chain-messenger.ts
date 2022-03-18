@@ -58,6 +58,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   public bridges: BridgeAdapters
   public depositConfirmationBlocks: number
   public l1BlockTimeSeconds: number
+  public fastRelayer: boolean
 
   /**
    * Creates a new CrossChainProvider instance.
@@ -79,6 +80,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     l1BlockTimeSeconds?: NumberLike
     contracts?: DeepPartial<OEContractsLike>
     bridges?: BridgeAdapterData
+    fastRelayer?: boolean
   }) {
     this.l1SignerOrProvider = toSignerOrProvider(opts.l1SignerOrProvider)
     this.l2SignerOrProvider = toSignerOrProvider(opts.l2SignerOrProvider)
@@ -141,6 +143,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     transaction: TransactionLike,
     opts: {
       direction?: MessageDirection
+      fastRelayer?: boolean
     } = {}
   ): Promise<CrossChainMessage[]> {
     // Wait for the transaction receipt if the input is waitable.
@@ -176,10 +179,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
 
     // By this point opts.direction will always be defined.
-    const messenger =
+    // opts.direction === MessageDirection.L1_TO_L2
+    let messenger = 
       opts.direction === MessageDirection.L1_TO_L2
         ? this.contracts.l1.L1CrossDomainMessenger
         : this.contracts.l2.L2CrossDomainMessenger
+
+    if (opts.direction === MessageDirection.L1_TO_L2 && opts.fastRelayer) {
+      messenger = this.contracts.l1.L1CrossDomainMessengerFast
+      console.log("SDK - using l1.L1CrossDomainMessengerFast:", messenger)
+    }
 
     return receipt.logs
       .filter((log) => {
@@ -394,10 +403,15 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     const messageHash = hashCrossChainMessage(resolved)
 
     // Here we want the messenger that will receive the message, not the one that sent it.
-    const messenger =
+    let messenger =
       resolved.direction === MessageDirection.L1_TO_L2
         ? this.contracts.l2.L2CrossDomainMessenger
         : this.contracts.l1.L1CrossDomainMessenger
+
+    if (resolved.direction === MessageDirection.L2_TO_L1 && resolved.fastRelayer) {
+      messenger = this.contracts.l1.L1CrossDomainMessengerFast
+      console.log("SDK - using l1.L1CrossDomainMessengerFast:", messenger)
+    }
 
     const relayedMessageEvents = await messenger.queryFilter(
       messenger.filters.RelayedMessage(messageHash)

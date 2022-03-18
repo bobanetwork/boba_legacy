@@ -15,6 +15,7 @@ import { IBridgeAdapter } from './bridge-adapter'
 export interface OEL1Contracts {
   AddressManager: Contract
   L1CrossDomainMessenger: Contract
+  L1CrossDomainMessengerFast: Contract
   L1StandardBridge: Contract
   StateCommitmentChain: Contract
   CanonicalTransactionChain: Contract
@@ -144,6 +145,7 @@ export interface CrossChainMessageRequest {
   direction: MessageDirection
   target: string
   message: string
+  fastRelayer: boolean
 }
 
 /**
@@ -166,6 +168,7 @@ export interface CrossChainMessage extends CoreCrossChainMessage {
   logIndex: number
   blockNumber: number
   transactionHash: string
+  fastRelayer: boolean
 }
 
 /**
@@ -183,6 +186,7 @@ export interface TokenBridgeMessage {
   logIndex: number
   blockNumber: number
   transactionHash: string
+  fastRelayer: boolean
 }
 
 /**

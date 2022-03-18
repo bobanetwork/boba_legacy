@@ -87,6 +87,11 @@ export interface ICrossChainMessenger {
   l1BlockTimeSeconds: number
 
   /**
+   * Use the fast message relayer?
+   */
+  fastRelayer: boolean
+
+  /**
    * Retrieves all cross chain messages sent within a given transaction.
    *
    * @param transaction Transaction hash or receipt to find messages from.
@@ -100,6 +105,7 @@ export interface ICrossChainMessenger {
     transaction: TransactionLike,
     opts?: {
       direction?: MessageDirection
+      fastRelayer?: boolean
     }
   ): Promise<CrossChainMessage[]>
 
