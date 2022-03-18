@@ -1,11 +1,5 @@
 export const menuItems = [
   {
-    key: 'AccountNow',
-    icon: "WalletIcon",
-    title: "Account",
-    url: "/Bridge"
-  },
-  {
     key: 'Bridge',
     icon: "WalletIcon",
     title: "Bridge",
@@ -22,6 +16,12 @@ export const menuItems = [
     icon: "WalletIcon",
     title: "Wallet",
     url: "/"
+  },
+  {
+    key: 'History',
+    icon: "HistoryIcon",
+    title: "History",
+    url: "/history"
   },
   {
     key: 'Farm',
