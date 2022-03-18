@@ -84,7 +84,7 @@ abstract contract AddOnChainMetaData is ERC721 {
         return abi.encode(_tokenURIs[tokenId]);
     }
 
-    function supportsInterface(bytes4 _interfaceId) public view override returns (bool) {
+    function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
         return _interfaceId == this.bridgeExtraData.selector || super.supportsInterface(_interfaceId);
     }
 
