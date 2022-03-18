@@ -1,8 +1,6 @@
-import { expect } from 'chai'
-
 /* Imports: External */
 import { Contract, ContractFactory } from 'ethers'
-import { predeploys, getContractInterface } from '@eth-optimism/contracts'
+import { ethers } from 'hardhat'
 import { MessageDirection, MessageStatus } from '@eth-optimism/sdk'
 import {
   applyL1ToL2Alias,
@@ -11,10 +9,8 @@ import {
 } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
-import simpleStorageJson from '../artifacts/contracts/SimpleStorage.sol/SimpleStorage.json'
-import l2ReverterJson from '../artifacts/contracts/Reverter.sol/Reverter.json'
-import { OptimismEnv, useDynamicTimeoutForWithdrawals } from './shared/env'
-
+import { expect } from './shared/setup'
+import { OptimismEnv } from './shared/env'
 import {
   DEFAULT_TEST_GAS_L1,
   DEFAULT_TEST_GAS_L2,
@@ -33,19 +29,16 @@ describe('Basic L1<>L2 Communication', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    Factory__L1SimpleStorage = new ContractFactory(
-      simpleStorageJson.abi,
-      simpleStorageJson.bytecode,
+    Factory__L1SimpleStorage = await ethers.getContractFactory(
+      'SimpleStorage',
       env.l1Wallet
     )
-    Factory__L2SimpleStorage = new ContractFactory(
-      simpleStorageJson.abi,
-      simpleStorageJson.bytecode,
+    Factory__L2SimpleStorage = await ethers.getContractFactory(
+      'SimpleStorage',
       env.l2Wallet
     )
-    Factory__L2Reverter = new ContractFactory(
-      l2ReverterJson.abi,
-      l2ReverterJson.bytecode,
+    Factory__L2Reverter = await ethers.getContractFactory(
+      'Reverter',
       env.l2Wallet
     )
   })
@@ -60,8 +53,8 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L2 => L1', () => {
-    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async function () {
-      await useDynamicTimeoutForWithdrawals(this, env)
+    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', 
+      async function () {
 
       const value = `0x${'77'.repeat(32)}`
 
@@ -81,12 +74,10 @@ describe('Basic L1<>L2 Communication', async () => {
         }
       )
 
-      let status: MessageStatus
-
-      while (status !== MessageStatus.READY_FOR_RELAY) {
-        status = await env.messenger.getMessageStatus(transaction)
-        await sleep(1000)
-      }
+      await env.messenger.waitForMessageStatus(
+        transaction,
+        MessageStatus.READY_FOR_RELAY
+      )
 
       await env.messenger.finalizeMessage(transaction)
       await env.messenger.waitForMessageReceipt(transaction)
@@ -100,15 +91,7 @@ describe('Basic L1<>L2 Communication', async () => {
       expect(await L1SimpleStorage.value()).to.equal(value)
 
       const totalCount = (await L1SimpleStorage.totalCount()).toNumber()
-
-      // this is the total number of transactions. This starts at 1, not zero, for Boba.
-      // This will also fail if you run the integration tests on the same (running) stack multiple times
-      console.log(
-        '      This should (normally) be 1 per test but is usually 2:',
-        totalCount
-      )
-      // disabling for now - this evaluates to 2 - not clear why
-      // expect(totalCount).to.equal(1)
+      expect(totalCount).to.equal(1)
     })
   })
 

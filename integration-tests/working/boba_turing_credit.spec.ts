@@ -2,7 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, BigNumber, utils, ethers, ContractFactory } from 'ethers'
-import { DirectionOld } from './shared/watcher-utils-old'
+
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
@@ -33,14 +33,10 @@ describe('Boba Turing Credit Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    const BobaTuringCreditAddress = await env.addressManager.getAddress(
-      'Proxy__BobaTuringCredit'
-    )
-
     BobaTuringCredit = getContractFactory(
       'BobaTuringCredit',
       env.l2Wallet
-    ).attach(BobaTuringCreditAddress)
+    ).attach(env.addressesBOBA.BobaTuringCredit)
 
     L1BOBAToken = new Contract(
       env.addressesBOBA.TOKENS.BOBA.L1,
@@ -70,9 +66,7 @@ describe('Boba Turing Credit Test', async () => {
     TuringTest = await Factory__TuringTest.deploy()
     await TuringTest.deployTransaction.wait()
 
-    const L1StandardBridgeAddress = await env.addressManager.getAddress(
-      'Proxy__L1StandardBridge'
-    )
+    const L1StandardBridgeAddress = await env.addressesBASE.Proxy__L1StandardBridge
 
     L1StandardBridge = getContractFactory(
       'L1StandardBridge',
@@ -97,15 +91,14 @@ describe('Boba Turing Credit Test', async () => {
     )
     await approveL1BOBATX.wait()
 
-    await env.waitForXDomainTransactionOld(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
         L2BOBAToken.address,
         depositBOBAAmount,
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
-      ),
-      DirectionOld.L1ToL2
+      )
     )
 
     const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)

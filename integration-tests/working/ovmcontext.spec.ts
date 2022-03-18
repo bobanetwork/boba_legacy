@@ -1,14 +1,12 @@
-import { expect } from 'chai'
-
 /* Imports: External */
 import { ethers } from 'hardhat'
 import { expectApprox } from '@eth-optimism/core-utils'
-import { asL2Provider } from '@eth-optimism/sdk'
 import { predeploys } from '@eth-optimism/contracts'
 import { Contract, BigNumber } from 'ethers'
 
 /* Imports: Internal */
-import { l2Provider, l1Provider, DEFAULT_TEST_GAS_L1 } from './shared/utils'
+import { expect } from './shared/setup'
+import { envConfig, DEFAULT_TEST_GAS_L1 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
 /**
@@ -17,7 +15,7 @@ import { OptimismEnv } from './shared/env'
  * must be equal to the blocknumber/timestamp of the L1 transaction.
  */
 describe('OVM Context: Layer 2 EVM Context', () => {
-  const L2Provider = asL2Provider(l2Provider)
+
   let env: OptimismEnv
   before(async () => {
     env = await OptimismEnv.new()
@@ -47,14 +45,16 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     for (let i = 0; i < numTxs; i++) {
       // Send a transaction from L1 to L2. This will automatically update the L1 contextual
       // information like the L1 block number and L1 timestamp.
-      const tx = await env.l1Messenger.sendMessage(
-        OVMContextStorage.address,
-        '0x',
-        2_000_000,
-        {
-          gasLimit: DEFAULT_TEST_GAS_L1,
-        }
-      )
+
+      const tx =
+        await env.messenger.contracts.l1.L1CrossDomainMessenger.sendMessage(
+          OVMContextStorage.address,
+          '0x',
+          2_000_000,
+          {
+            gasLimit: DEFAULT_TEST_GAS_L1,
+          }
+        )
 
       // Wait for the transaction to be sent over to L2.
       await tx.wait()
@@ -62,8 +62,8 @@ describe('OVM Context: Layer 2 EVM Context', () => {
 
       // Get the L1 block that the enqueue transaction was in so that
       // the timestamp can be compared against the layer two contract
-      const l1Block = await l1Provider.getBlock(pair.receipt.blockNumber)
-      const l2Block = await l2Provider.getBlock(pair.remoteReceipt.blockNumber)
+      const l1Block = await env.l1Provider.getBlock(pair.receipt.blockNumber)
+      const l2Block = await env.l2Provider.getBlock(pair.remoteReceipt.blockNumber)
 
       // block.number should return the value of the L2 block number.
       const l2BlockNumber = await OVMContextStorage.blockNumbers(i)
@@ -88,7 +88,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
       const coinbase = await OVMContextStorage.coinbases(i)
       expect(coinbase).to.equal(predeploys.OVM_SequencerFeeVault)
     }
-  }).timeout(150000) // this specific test takes a while because it involves L1 to L2 txs
+  })
 
   it('{tag:other} should set correct OVM Context for `eth_call`', async () => {
     for (let i = 0; i < numTxs; i++) {
@@ -99,7 +99,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
       })
       await dummyTx.wait()
 
-      const block = await L2Provider.getBlockWithTransactions('latest')
+      const block = await env.l2Provider.getBlockWithTransactions('latest')
       const [, returnData] = await OVMMulticall.callStatic.aggregate(
         [
           [
@@ -144,7 +144,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     // blocknumber and timestamp. If this is not atomic, then the sequencer can
     // happend to update the timestamp between the `eth_call` and the `rollup_getInfo`
     const [info, [, returnData]] = await Promise.all([
-      L2Provider.send('rollup_getInfo', []),
+      env.l2Provider.send('rollup_getInfo', []),
       OVMMulticall.callStatic.aggregate([
         [
           OVMMulticall.address,

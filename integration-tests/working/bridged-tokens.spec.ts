@@ -89,7 +89,10 @@ describe('Bridged tokens', () => {
     )
 
     // Approve the L1 ERC20 to spend our money
-    const tx = await L1__ERC20.approve(env.l1Bridge.address, 1000000)
+    const tx = await L1__ERC20.approve(
+      env.messenger.contracts.l1.L1StandardBridge.address, 
+      1000000
+    )
     const completion = await tx.wait()
     console.log('     Completion TX hash:', completion.transactionHash)
   })
@@ -163,12 +166,10 @@ describe('Bridged tokens', () => {
         }
       )
 
-      // TODO: Maybe this should be built into the SDK
-      let status: MessageStatus
-      while (status !== MessageStatus.READY_FOR_RELAY) {
-        status = await env.messenger.getMessageStatus(tx)
-        await sleep(1000)
-      }
+      await env.messenger.waitForMessageStatus(
+        tx,
+        MessageStatus.READY_FOR_RELAY
+      )
 
       await env.messenger.finalizeMessage(tx)
       await env.messenger.waitForMessageReceipt(tx)
