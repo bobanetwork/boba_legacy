@@ -216,7 +216,6 @@ export class CrossChainMessenger implements ICrossChainMessenger {
           logIndex: log.logIndex,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
-          fastRelayer: this.fastRelayer,
         }
       })
   }

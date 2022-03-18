@@ -32,6 +32,7 @@ describe('CrossChainMessenger', () => {
           l1SignerOrProvider: ethers.provider,
           l2SignerOrProvider: ethers.provider,
           l1ChainId: 1,
+          fastRelayer: false,
         })
 
         expect(messenger.l1Provider).to.equal(ethers.provider)
@@ -44,6 +45,7 @@ describe('CrossChainMessenger', () => {
           l1SignerOrProvider: ethers.provider,
           l2SignerOrProvider: ethers.provider,
           l1ChainId: 1,
+          fastRelayer: false,
         })
 
         expect(messenger.l2Provider).to.equal(ethers.provider)
@@ -56,6 +58,7 @@ describe('CrossChainMessenger', () => {
           l1SignerOrProvider: 'https://localhost:8545',
           l2SignerOrProvider: ethers.provider,
           l1ChainId: 1,
+          fastRelayer: false,
         })
 
         expect(Provider.isProvider(messenger.l1Provider)).to.be.true
@@ -68,6 +71,7 @@ describe('CrossChainMessenger', () => {
           l1SignerOrProvider: ethers.provider,
           l2SignerOrProvider: 'https://localhost:8545',
           l1ChainId: 1,
+          fastRelayer: false,
         })
 
         expect(Provider.isProvider(messenger.l2Provider)).to.be.true
@@ -81,6 +85,7 @@ describe('CrossChainMessenger', () => {
             l1SignerOrProvider: ethers.provider,
             l2SignerOrProvider: 'https://localhost:8545',
             l1ChainId: 1,
+            fastRelayer: false,
           })
 
           const addresses = CONTRACT_ADDRESSES[1]
@@ -106,6 +111,7 @@ describe('CrossChainMessenger', () => {
               l1SignerOrProvider: ethers.provider,
               l2SignerOrProvider: 'https://localhost:8545',
               l1ChainId: 1234,
+              fastRelayer: false,
             })
           }).to.throw()
         })
@@ -128,6 +134,7 @@ describe('CrossChainMessenger', () => {
             l2SignerOrProvider: 'https://localhost:8545',
             l1ChainId: 1,
             contracts: overrides,
+            fastRelayer: false,
           })
 
           const addresses = CONTRACT_ADDRESSES[1]
@@ -163,6 +170,7 @@ describe('CrossChainMessenger', () => {
               l1: {
                 AddressManager: '0x' + '11'.repeat(20),
                 L1CrossDomainMessenger: '0x' + '12'.repeat(20),
+                L1CrossDomainMessengerFast: '0x' + '12'.repeat(20),
                 L1StandardBridge: '0x' + '13'.repeat(20),
                 StateCommitmentChain: '0x' + '14'.repeat(20),
                 CanonicalTransactionChain: '0x' + '15'.repeat(20),
@@ -177,6 +185,7 @@ describe('CrossChainMessenger', () => {
               l2SignerOrProvider: 'https://localhost:8545',
               l1ChainId: 1234,
               contracts: overrides,
+              fastRelayer: false,
             })
 
             const addresses = CONTRACT_ADDRESSES[1]
@@ -212,6 +221,7 @@ describe('CrossChainMessenger', () => {
                 l1SignerOrProvider: ethers.provider,
                 l2SignerOrProvider: 'https://localhost:8545',
                 l1ChainId: 1234,
+                fastRelayer: false,
                 contracts: {
                   l1: {
                     // Missing some required L1 addresses
@@ -247,6 +257,7 @@ describe('CrossChainMessenger', () => {
         l1SignerOrProvider: ethers.provider,
         l2SignerOrProvider: ethers.provider,
         l1ChainId: 31337,
+        fastRelayer: false,
         contracts: {
           l1: {
             L1CrossDomainMessenger: l1Messenger.address,
@@ -434,6 +445,7 @@ describe('CrossChainMessenger', () => {
         l1SignerOrProvider: ethers.provider,
         l2SignerOrProvider: ethers.provider,
         l1ChainId: 31337,
+        fastRelayer: false,
         contracts: {
           l1: {
             L1CrossDomainMessenger: l1Messenger.address,
@@ -558,6 +570,7 @@ describe('CrossChainMessenger', () => {
         l1SignerOrProvider: ethers.provider,
         l2SignerOrProvider: ethers.provider,
         l1ChainId: 31337,
+        fastRelayer: false,
         contracts: {
           l1: {
             L1CrossDomainMessenger: l1Messenger.address,
