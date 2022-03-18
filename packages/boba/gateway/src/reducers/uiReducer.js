@@ -30,6 +30,7 @@ const initialState = {
   exitModal: false,
   bridgeTypeSwitch: false,
   tokenPicker: false,
+  transferPending: false,
   mergeModal: false,
   confirmationModal: false,
   wrongNetworkModal: false,

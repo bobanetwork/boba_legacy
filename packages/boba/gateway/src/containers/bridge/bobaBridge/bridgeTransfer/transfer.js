@@ -9,13 +9,13 @@ import { BRIDGE_TYPE } from 'util/constant';
 
 import BN from 'bignumber.js'
 import { exitBOBA } from 'actions/networkAction';
-import { openAlert } from 'actions/uiAction';
+import { closeModal, openAlert, openModal } from 'actions/uiAction';
 import { selectLoading } from 'selectors/loadingSelector';
 
 function BridgeTransferAction({
   tokens
 }) {
-  const [ validValue, setValidValue ] = useState();
+  const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
   const bridgeType = useSelector(selectBridgeType());
   const layer = useSelector(selectLayer());
@@ -33,6 +33,7 @@ function BridgeTransferAction({
       const maxValue = logAmount(token.balance, token.decimals);
       const tooSmall = new BN(token.amount).lte(new BN(0.0))
       const tooBig = new BN(token.amount).gt(new BN(maxValue))
+      
       if (tooSmall || tooBig) {
         setValidValue(false)
       } else if (token.symbol === 'ETH' && (Number(cExitCost) + Number(token.amount)) > Number(feeBalance)) {
@@ -45,10 +46,18 @@ function BridgeTransferAction({
         //Whew, finally!
         setValidValue(true)
       }
-
     })
   }, [ tokens, setValidValue, cExitCost, feeBalance ])
 
+  
+  const onTxStart = () => {
+    dispatch(openModal('transferPending'));
+  }
+  
+  const onTxStop = () => {
+    dispatch(closeModal('transferPending'));
+  }
+  
   const doDeposit = () => {
 
   }
@@ -62,7 +71,10 @@ function BridgeTransferAction({
   }
 
   const doExit = async () => {
+    onTxStart();
     let res = await dispatch(exitBOBA(tokens[ 0 ].address, tokens[ 0 ].toWei_String))
+    onTxStop();
+    
     if (res) {
       dispatch(
         openAlert(
@@ -76,7 +88,6 @@ function BridgeTransferAction({
 
 
   const onSubmit = () => {
-    debugger;
     if (layer === 'L1') {
       if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
         doDeposit()

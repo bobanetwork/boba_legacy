@@ -49,7 +49,7 @@ function TokenPickerModal({ open,tokenIndex }) {
       maxWidth="xs"
       minHeight="450px"
       title="Select a token"
-    >
+  >
       <Input
         size='small'
         placeholder='Search name or paste address'

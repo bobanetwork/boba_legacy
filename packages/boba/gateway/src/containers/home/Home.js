@@ -63,6 +63,10 @@ import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
+import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
+import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
+
 
 import {
   fetchDaoBalance,
@@ -93,8 +97,6 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
-import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
-import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 
 require('dotenv').config()
 
@@ -114,6 +116,7 @@ function Home() {
   const exitModalState = useSelector(selectModalState('exitModal'))
   const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
+  const transferPendingModalState = useSelector(selectModalState('transferPending'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -234,6 +237,7 @@ function Home() {
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
       {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
+      {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
 
       <Alert
         type='error'
