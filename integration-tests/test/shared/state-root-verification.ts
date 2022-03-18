@@ -11,7 +11,8 @@ import { OptimismEnv } from './env'
 export const verifyStateRoots = async () => {
   const env: OptimismEnv = await OptimismEnv.new()
 
-  const StateCommitmentChainAddress = await env.addressesBASE.StateCommitmentChain
+  const StateCommitmentChainAddress = await env.addressesBASE
+    .StateCommitmentChain
 
   const StateCommitmentChain: Contract = getContractFactory(
     'StateCommitmentChain',

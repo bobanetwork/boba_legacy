@@ -66,7 +66,8 @@ describe('Boba Turing Credit Test', async () => {
     TuringTest = await Factory__TuringTest.deploy()
     await TuringTest.deployTransaction.wait()
 
-    const L1StandardBridgeAddress = await env.addressesBASE.Proxy__L1StandardBridge
+    const L1StandardBridgeAddress = await env.addressesBASE
+      .Proxy__L1StandardBridge
 
     L1StandardBridge = getContractFactory(
       'L1StandardBridge',

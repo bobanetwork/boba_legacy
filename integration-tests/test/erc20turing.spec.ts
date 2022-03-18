@@ -12,8 +12,6 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 
-import { DirectionOld } from './shared/watcher-utils-old'
-
 import HelloTuringJson from '@boba/turing-hybrid-compute/artifacts/contracts/HelloTuring.sol/HelloTuring.json'
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
@@ -43,9 +41,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    const BobaTuringCreditAddress = await env.addressManager.getAddress(
-      'Proxy__BobaTuringCredit'
-    )
+    const BobaTuringCreditAddress = await env.addressesBOBA.BobaTuringCredit
 
     BobaTuringCredit = getContractFactory(
       'BobaTuringCredit',
@@ -89,9 +85,8 @@ describe('Turing 256 Bit Random Number Test', async () => {
       res1.events[0].data
     )
 
-    const L1StandardBridgeAddress = await env.addressManager.getAddress(
-      'Proxy__L1StandardBridge'
-    )
+    const L1StandardBridgeAddress = await env.addressesBASE
+      .Proxy__L1StandardBridge
 
     L1StandardBridge = getContractFactory(
       'L1StandardBridge',
@@ -116,15 +111,14 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
     await approveL1BOBATX.wait()
 
-    await env.waitForXDomainTransactionOld(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
         L2BOBAToken.address,
         depositBOBAAmount,
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
-      ),
-      DirectionOld.L1ToL2
+      )
     )
 
     const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)

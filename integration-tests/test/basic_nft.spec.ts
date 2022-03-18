@@ -58,7 +58,6 @@ describe('NFT Test\n', async () => {
 
     const genesis = await ERC721.getGenesis()
     //console.log('NFT Genesis:', genesis)
-
   })
 
   it('{tag:boba} should have a name', async () => {
@@ -76,7 +75,7 @@ describe('NFT Test\n', async () => {
     //mint one NFT for Alice
     let nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
-    let TID_1 = await ERC721.getLastTID()
+    const TID_1 = await ERC721.getLastTID()
 
     //Get the URL
     const nftURL = await ERC721.tokenURI(TID_1.sub(1))
@@ -86,13 +85,13 @@ describe('NFT Test\n', async () => {
     meta = 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6190'
     nft = await ERC721.mintNFT(a3a, meta)
     await nft.wait()
-    let TID_2 = await ERC721.getLastTID()
+    const TID_2 = await ERC721.getLastTID()
 
     //mint a third NFT, this time for a2a
     meta = 'https://boredapeyachtclub.com/api/mutants/121'
     nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
-    let TID_3 = await ERC721.getLastTID()
+    const TID_3 = await ERC721.getLastTID()
 
     expect(await ERC721.balanceOf(a1a)).to.deep.eq(BigNumber.from(String(0)))
 

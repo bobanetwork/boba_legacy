@@ -90,7 +90,7 @@ describe('Bridged tokens', () => {
 
     // Approve the L1 ERC20 to spend our money
     const tx = await L1__ERC20.approve(
-      env.messenger.contracts.l1.L1StandardBridge.address, 
+      env.messenger.contracts.l1.L1StandardBridge.address,
       1000000
     )
     const completion = await tx.wait()

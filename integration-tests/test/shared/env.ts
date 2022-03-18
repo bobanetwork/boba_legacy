@@ -1,5 +1,5 @@
 /* Imports: External */
-import { utils, Wallet, providers, Transaction } from 'ethers'
+import { utils, Wallet, providers, Transaction, Contract } from 'ethers'
 import {
   TransactionResponse,
   TransactionReceipt,
@@ -11,6 +11,8 @@ import {
   MessageDirection,
 } from '@eth-optimism/sdk'
 
+import { getContractFactory } from '@eth-optimism/contracts'
+
 /* Imports: Internal */
 import {
   //getAddressManager,
@@ -20,15 +22,15 @@ import {
   verifierProvider,
   l1Wallet,
   l2Wallet,
-  //l1Wallet_2,
+  l1Wallet_2,
   l2Wallet_2,
-  //l1Wallet_3,
+  l1Wallet_3,
   l2Wallet_3,
-  //l1Wallet_4,
-  //l2Wallet_4,
+  l1Wallet_4,
+  l2Wallet_4,
   fundUser,
-  //getOvmEth,
-  //getL1Bridge,
+  getOvmEth,
+  getL1Bridge,
   //getL2Bridge,
   //IS_LIVE_NETWORK,
   getBASEDeployerAddresses,
@@ -49,14 +51,14 @@ export class OptimismEnv {
   //addressManager: Contract
   addressesBASE
   addressesBOBA
-  //l1Bridge: Contract
+  l1Bridge: Contract
   //l1Messenger: Contract
   //l1BlockNumber: Contract
   //ctc: Contract
   //scc: Contract
 
   // L2 Contracts
-  //ovmEth: Contract
+  ovmEth: Contract
   //l2Bridge: Contract
   //l2Messenger: Contract
   //gasPriceOracle: Contract
@@ -69,12 +71,12 @@ export class OptimismEnv {
   // The wallets
   l1Wallet: Wallet
   l2Wallet: Wallet
-  //l1Wallet_2: Wallet
+  l1Wallet_2: Wallet
   l2Wallet_2: Wallet
-  //l1Wallet_3: Wallet
+  l1Wallet_3: Wallet
   l2Wallet_3: Wallet
-  //l1Wallet_4: Wallet
-  //l2Wallet_4: Wallet
+  l1Wallet_4: Wallet
+  l2Wallet_4: Wallet
 
   // The providers
   messenger: CrossChainMessenger
@@ -87,10 +89,10 @@ export class OptimismEnv {
   constructor(args: any) {
     this.addressesBASE = args.addressesBASE
     this.addressesBOBA = args.addressesBOBA
-    //this.l1Bridge = args.l1Bridge
+    this.l1Bridge = args.l1Bridge
     //this.l1Messenger = args.l1Messenger
     //this.l1BlockNumber = args.l1BlockNumber
-    //this.ovmEth = args.ovmEth
+    this.ovmEth = args.ovmEth
     //this.l2Bridge = args.l2Bridge
     //this.l2Messenger = args.l2Messenger
     //this.gasPriceOracle = args.gasPriceOracle
@@ -101,12 +103,12 @@ export class OptimismEnv {
     this.l2Wallet = args.l2Wallet
     this.messenger = args.messenger
     this.messengerFast = args.messengerFast
-    //this.l1Wallet_2 = args.l1Wallet_2
+    this.l1Wallet_2 = args.l1Wallet_2
     this.l2Wallet_2 = args.l2Wallet_2
-    //this.l1Wallet_3 = args.l1Wallet_3
+    this.l1Wallet_3 = args.l1Wallet_3
     this.l2Wallet_3 = args.l2Wallet_3
-    //this.l1Wallet_4 = args.l1Wallet_4
-    //this.l2Wallet_4 = args.l2Wallet_4
+    this.l1Wallet_4 = args.l1Wallet_4
+    this.l2Wallet_4 = args.l2Wallet_4
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
     this.verifierProvider = args.verifierProvider
@@ -116,11 +118,17 @@ export class OptimismEnv {
   }
 
   static async new(): Promise<OptimismEnv> {
-
     const addressesBASE = await getBASEDeployerAddresses()
     const addressesBOBA = await getBOBADeployerAddresses()
-    
+
+    const l1Bridge = await getL1Bridge(
+      l1Wallet,
+      addressesBASE.Proxy__L1StandardBridge
+    )
+
     const network = await l1Provider.getNetwork()
+
+    const ovmEth = getOvmEth(l2Wallet)
 
     const messenger = new CrossChainMessenger({
       l1SignerOrProvider: l1Wallet,
@@ -147,16 +155,22 @@ export class OptimismEnv {
     return new OptimismEnv({
       addressesBASE,
       addressesBOBA,
-      l1Wallet,
-      l2Wallet,
       messenger,
       messengerFast,
+      ovmEth,
+      l1Wallet,
+      l2Wallet,
+      l1Wallet_2,
       l2Wallet_2,
+      l1Wallet_3,
       l2Wallet_3,
+      l1Wallet_4,
+      l2Wallet_4,
       l1Provider,
       l2Provider,
       verifierProvider,
       replicaProvider,
+      l1Bridge,
     })
   }
   //   //const addressManager = getAddressManager(l1Wallet)
@@ -317,10 +331,20 @@ export class OptimismEnv {
   ): Promise<CrossDomainMessagePair> {
     // await it if needed
     tx = await tx
+    console.log('XDF - done waiting for tx:', tx.hash)
 
     const receipt = await tx.wait()
+    console.log('XDF - receipt:', receipt.transactionHash)
+
     const resolved = await this.messengerFast.toCrossChainMessage(tx)
+    console.log('XDF - resolved:', resolved.transactionHash)
+
     const messageReceipt = await this.messengerFast.waitForMessageReceipt(tx)
+    console.log(
+      'XDF - messageReceipt:',
+      messageReceipt.transactionReceipt.transactionHash
+    )
+
     let fullTx: any
     let remoteTx: any
     if (resolved.direction === MessageDirection.L1_TO_L2) {
@@ -446,6 +470,26 @@ export class OptimismEnv {
       await this.messengerFast.waitForMessageReceipt(message)
     }
   }
+
+  // async waitForRevertXDomainTransaction(
+  //   tx: Promise<TransactionResponse> | TransactionResponse
+  // ) {
+  //   const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
+  //   const [xDomainMsgHash] = await this.messenger.getMessageHashesFromL2Tx(
+  //     remoteReceipt.transactionHash
+  //   )
+  //   await this.messenger.getL1TransactionReceipt(xDomainMsgHash)
+  // }
+
+  // async waitForRevertXDomainTransactionFast(
+  //   tx: Promise<TransactionResponse> | TransactionResponse
+  // ) {
+  //   const { remoteReceipt } = await this.waitForXDomainTransactionFast(tx)
+  //   const [xDomainMsgHash] = await this.messengerFast.getMessageHashesFromL1Tx(
+  //     remoteReceipt.transactionHash
+  //   )
+  //   await this.messengerFast.getL2TransactionReceipt(xDomainMsgHash)
+  // }
 }
 
 //   async waitForXDomainTransaction(

@@ -105,7 +105,6 @@ export interface ICrossChainMessenger {
     transaction: TransactionLike,
     opts?: {
       direction?: MessageDirection
-      fastRelayer?: boolean
     }
   ): Promise<CrossChainMessage[]>
 

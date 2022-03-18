@@ -9,7 +9,6 @@ import L2MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Mess
 import { OptimismEnv } from './shared/env'
 
 describe('Fast Messenge Relayer Test', async () => {
-  
   let L1Message: Contract
   let L2Message: Contract
 

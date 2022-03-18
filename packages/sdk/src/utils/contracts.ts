@@ -109,7 +109,7 @@ export const CONTRACT_ADDRESSES: {
   31337: {
     l1: {
       AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1',     // this is the Proxy__L1CrossDomainMessenger
+      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1', // this is the Proxy__L1CrossDomainMessenger
       L1CrossDomainMessengerFast: '0xf5059a5D33d5853360D16C683c16e67980206f36', // this is the Proxy__L1CrossDomainMessengerFast
       L1StandardBridge: '0x4A679253410272dd5232B3Ff7cF5dbB88f295319',
       StateCommitmentChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
@@ -150,7 +150,8 @@ export const BRIDGE_ADAPTER_DATA: {
       l2Bridge: '0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65',
     },
   },
-  4: { // Rinkeby
+  4: {
+    // Rinkeby
     Standard: {
       Adapter: StandardBridgeAdapter,
       l1Bridge: CONTRACT_ADDRESSES[4].l1.L1StandardBridge,
@@ -253,6 +254,7 @@ export const getOEContract = (
   } = {}
 ): Contract => {
   const addresses = CONTRACT_ADDRESSES[l1ChainId]
+  // console.log("getOEContract: looking for:",contractName)
   if (addresses === undefined && opts.address === undefined) {
     throw new Error(
       `cannot get contract ${contractName} for unknown L1 chain ID ${l1ChainId}, you must provide an address`
@@ -294,6 +296,7 @@ export const getAllOEContracts = (
     l1: {
       AddressManager: undefined,
       L1CrossDomainMessenger: undefined,
+      L1CrossDomainMessengerFast: undefined,
       L1StandardBridge: undefined,
       StateCommitmentChain: undefined,
       CanonicalTransactionChain: undefined,

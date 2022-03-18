@@ -85,6 +85,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     this.l1SignerOrProvider = toSignerOrProvider(opts.l1SignerOrProvider)
     this.l2SignerOrProvider = toSignerOrProvider(opts.l2SignerOrProvider)
     this.l1ChainId = toNumber(opts.l1ChainId)
+    this.fastRelayer = opts.fastRelayer
+
+    // console.log("SDK - setting fastRelayer to", this.fastRelayer)
 
     this.depositConfirmationBlocks =
       opts?.depositConfirmationBlocks !== undefined
@@ -143,7 +146,6 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     transaction: TransactionLike,
     opts: {
       direction?: MessageDirection
-      fastRelayer?: boolean
     } = {}
   ): Promise<CrossChainMessage[]> {
     // Wait for the transaction receipt if the input is waitable.
@@ -178,16 +180,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       throw new Error(`unable to find transaction receipt for ${txHash}`)
     }
 
+    // console.log("SDK - opts.fastRelayer:", this.fastRelayer)
     // By this point opts.direction will always be defined.
     // opts.direction === MessageDirection.L1_TO_L2
-    let messenger = 
+    let messenger =
       opts.direction === MessageDirection.L1_TO_L2
         ? this.contracts.l1.L1CrossDomainMessenger
         : this.contracts.l2.L2CrossDomainMessenger
 
-    if (opts.direction === MessageDirection.L1_TO_L2 && opts.fastRelayer) {
+    if (opts.direction === MessageDirection.L1_TO_L2 && this.fastRelayer) {
       messenger = this.contracts.l1.L1CrossDomainMessengerFast
-      console.log("SDK - using l1.L1CrossDomainMessengerFast:", messenger)
+      console.log('SDK - using l1.L1CrossDomainMessengerFast')
     }
 
     return receipt.logs
@@ -213,6 +216,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
           logIndex: log.logIndex,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
+          fastRelayer: this.fastRelayer,
         }
       })
   }
@@ -408,9 +412,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         ? this.contracts.l2.L2CrossDomainMessenger
         : this.contracts.l1.L1CrossDomainMessenger
 
-    if (resolved.direction === MessageDirection.L2_TO_L1 && resolved.fastRelayer) {
+    if (resolved.direction === MessageDirection.L2_TO_L1 && this.fastRelayer) {
       messenger = this.contracts.l1.L1CrossDomainMessengerFast
-      console.log("SDK - using l1.L1CrossDomainMessengerFast:", messenger)
+      console.log('SDK-fast: waiting for MessageReceipt...')
     }
 
     const relayedMessageEvents = await messenger.queryFilter(
@@ -864,9 +868,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       overrides?: Overrides
     }
   ): Promise<TransactionResponse> {
-    console.log('SDK: sendMessage:', message, opts)
     const tx = await this.populateTransaction.sendMessage(message, opts)
-    console.log('SDK: sendMessage - TX:', tx)
     if (message.direction === MessageDirection.L1_TO_L2) {
       return (opts?.signer || this.l1Signer).sendTransaction(tx)
     } else {
@@ -1009,7 +1011,14 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         overrides?: Overrides
       }
     ): Promise<TransactionRequest> => {
-      if (message.direction === MessageDirection.L1_TO_L2) {
+      if (message.direction === MessageDirection.L1_TO_L2 && this.fastRelayer) {
+        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction.sendMessage(
+          message.target,
+          message.message,
+          opts?.l2GasLimit || (await this.estimateL2MessageGasLimit(message)),
+          opts?.overrides || {}
+        )
+      } else if (message.direction === MessageDirection.L1_TO_L2) {
         return this.contracts.l1.L1CrossDomainMessenger.populateTransaction.sendMessage(
           message.target,
           message.message,
@@ -1034,19 +1043,32 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     ): Promise<TransactionRequest> => {
       const resolved = await this.toCrossChainMessage(message)
+
       if (resolved.direction === MessageDirection.L2_TO_L1) {
         throw new Error(`cannot resend L2 to L1 message`)
       }
 
-      return this.contracts.l1.L1CrossDomainMessenger.populateTransaction.replayMessage(
-        resolved.target,
-        resolved.sender,
-        resolved.message,
-        resolved.messageNonce,
-        resolved.gasLimit,
-        messageGasLimit,
-        opts?.overrides || {}
-      )
+      if (this.fastRelayer) {
+        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction.replayMessage(
+          resolved.target,
+          resolved.sender,
+          resolved.message,
+          resolved.messageNonce,
+          resolved.gasLimit,
+          messageGasLimit,
+          opts?.overrides || {}
+        )
+      } else {
+        return this.contracts.l1.L1CrossDomainMessenger.populateTransaction.replayMessage(
+          resolved.target,
+          resolved.sender,
+          resolved.message,
+          resolved.messageNonce,
+          resolved.gasLimit,
+          messageGasLimit,
+          opts?.overrides || {}
+        )
+      }
     },
 
     finalizeMessage: async (
@@ -1056,19 +1078,32 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     ): Promise<TransactionRequest> => {
       const resolved = await this.toCrossChainMessage(message)
+
       if (resolved.direction === MessageDirection.L1_TO_L2) {
         throw new Error(`cannot finalize L1 to L2 message`)
       }
 
       const proof = await this.getMessageProof(resolved)
-      return this.contracts.l1.L1CrossDomainMessenger.populateTransaction.relayMessage(
-        resolved.target,
-        resolved.sender,
-        resolved.message,
-        resolved.messageNonce,
-        proof,
-        opts?.overrides || {}
-      )
+
+      if (this.fastRelayer) {
+        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction.relayMessage(
+          resolved.target,
+          resolved.sender,
+          resolved.message,
+          resolved.messageNonce,
+          proof,
+          opts?.overrides || {}
+        )
+      } else {
+        return this.contracts.l1.L1CrossDomainMessenger.populateTransaction.relayMessage(
+          resolved.target,
+          resolved.sender,
+          resolved.message,
+          resolved.messageNonce,
+          proof,
+          opts?.overrides || {}
+        )
+      }
     },
 
     depositETH: async (
