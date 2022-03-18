@@ -1,9 +1,12 @@
 import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
 import { Box, IconButton, Typography } from '@mui/material';
+import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost, fetchL2FeeBalance } from 'actions/balanceAction';
+import { setTokenAmount } from 'actions/bridgeAction';
 import BN from 'bignumber.js';
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { selectBridgeType } from 'selectors/bridgeSelector';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectBridgeType, selectTokenAmounts } from 'selectors/bridgeSelector';
+import { selectLayer } from 'selectors/setupSelector';
 import { logAmount } from 'util/amountConvert';
 import { getCoinImage } from 'util/coinImage';
 import { BRIDGE_TYPE } from 'util/constant';
@@ -21,12 +24,37 @@ function TokenInput({
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
+  const tokenAmounts = useSelector(selectTokenAmounts());
+  const layer = useSelector(selectLayer());
+
+  const dispatch = useDispatch();
+
   const underZero = new BN(token.amount).lt(new BN(0))
   const overMax = new BN(token.amount).gt(new BN(token.balance))
 
   const amount = token.symbol === 'ETH' ?
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  const onInputChange = (amount) => {
+    dispatch(setTokenAmount({ symbol: token.symbol, amount }))
+  }
+
+  useEffect(() => {
+    if (layer === 'L2') {
+      if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
+        dispatch(fetchClassicExitCost(token.address));
+      } else {
+        dispatch(fetchFastExitCost(token.address));
+      }
+      dispatch(fetchL2FeeBalance())
+    } else {
+      if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
+        dispatch(fetchFastDepositCost(token.address))
+      }
+    }
+
+  }, [ dispatch, layer, token, bridgeType ]);
 
   return (
     <S.TokenInputWrapper>
@@ -55,9 +83,10 @@ function TokenInput({
           <S.TextFieldTag
             placeholder="enter amount"
             type="number"
-            value={"0"}
+            value={tokenAmounts[ token.symbol ]}
             onChange={(e) => {
               console.log([ `On value change ${token.symbol}`, e.target.value ]);
+              onInputChange(e.target.value);
             }}
             fullWidth={true}
             variant="standard"

@@ -15,7 +15,7 @@ import * as S from './TokenPickerModal.styles'
 
 function TokenPickerModal({ open,tokenIndex }) {
 
-  const layer = useSelector(selectLayer)
+  const layer = useSelector(selectLayer())
   const dispatch = useDispatch()
   const [ search, setSearch ] = useState('')
 

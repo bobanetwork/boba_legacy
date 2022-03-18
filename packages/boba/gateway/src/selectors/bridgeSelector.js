@@ -24,3 +24,9 @@ export function selectBridgeType() {
     return state.bridge.bridgeType
   }
 }
+
+export function selectTokenAmounts() {
+  return function (state) {
+    return state.bridge.tokenAmounts
+  }
+}

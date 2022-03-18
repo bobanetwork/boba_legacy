@@ -16,25 +16,53 @@ limitations under the License. */
 
 const initialState = {
   tokens: [],
+  tokenAmounts: {},
   bridgeType: null
 };
 
 function bridgeReducer(state = initialState, action) {
   switch (action.type) {
+    case 'BRIDGE/TYPE/SELECT':
+      return { ...state, bridgeType: action.payload }
+
     case 'BRIDGE/TOKEN/SELECT':
-      return { ...state, tokens: [ ...state.tokens, action.payload ] }
+      {
+        let amount = state.tokenAmounts;
+        if (!amount.hasOwnProperty(action.payload.symbol)) {
+          amount = { ...amount, [ action.payload.symbol ]: 0 }
+        }
+
+        return {
+          ...state,
+          tokens: [ ...state.tokens, action.payload ],
+          tokenAmounts: amount
+        }
+      }
+    case 'BRIDGE/TOKEN/UPDATE': {
+      let newTokens = [ ...state.tokens ];
+      let amount = state.tokenAmounts;
+      const { token, tokenIndex } = action.payload;
+      
+      newTokens[ tokenIndex ] = token;
+      
+      if (!amount.hasOwnProperty(token.symbol)) {
+        amount = { ...amount, [ token.symbol ]: 0 }
+      }
+
+      return { ...state, tokens: newTokens, tokenAmounts: amount }
+    }
+
     case 'BRIDGE/TOKEN/REMOVE':
       let tokens = [ ...state.tokens ];
       tokens.splice(action.payload, 1)
       return { ...state, tokens: tokens }
-    case 'BRIDGE/TOKEN/UPDATE': {
-      let newTokens = [ ...state.tokens ];
-      const { token, tokenIndex } = action.payload;
-      newTokens[ tokenIndex ] = token;
-      return { ...state, tokens: newTokens }
-    }
-    case 'BRIDGE/TYPE/SELECT':
-      return { ...state, bridgeType: action.payload }
+
+    case 'BRIDGE/TOKEN/AMOUNT/CHANGE':
+      let tokenAmounts = { ...state.tokenAmounts };
+      let { symbol, amount } = action.payload;
+      tokenAmounts[ symbol ] = amount;
+      return { ...state, tokenAmounts: tokenAmounts }
+
     default:
       return state;
   }

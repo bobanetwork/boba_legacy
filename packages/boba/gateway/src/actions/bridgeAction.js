@@ -25,6 +25,12 @@ export function removeToken(tokenIndex) {
   }
 }
 
+export function setTokenAmount(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/TOKEN/AMOUNT/CHANGE', payload });
+  }
+}
+
 export function updateToken(payload) {
   return function (dispatch) {
     return dispatch({ type: 'BRIDGE/TOKEN/UPDATE', payload });
