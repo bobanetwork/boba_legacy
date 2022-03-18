@@ -25,6 +25,19 @@ const initialSupply_8 = utils.parseUnits('10000', 8)
 const initialSupply_18 = utils.parseEther('10000000000')
 
 const deployFn: DeployFunction = async (hre) => {
+  const registerLPToken = async (L1TokenAddress, L2TokenAddress) => {
+    const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
+      L1TokenAddress,
+      L2TokenAddress
+    )
+    await registerL1LP.wait()
+
+    const registerL2LP = await Proxy__L2LiquidityPool.registerPool(
+      L1TokenAddress,
+      L2TokenAddress
+    )
+    await registerL2LP.wait()
+  }
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -185,17 +198,7 @@ const deployFn: DeployFunction = async (hre) => {
       (hre as any).deployConfig.deployer_l2
     )
 
-    const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
-      tokenAddressL1,
-      L2ERC20.address
-    )
-    await registerL1LP.wait()
-
-    const registerL2LP = await Proxy__L2LiquidityPool.registerPool(
-      tokenAddressL1,
-      L2ERC20.address
-    )
-    await registerL2LP.wait()
+    await registerLPToken(tokenAddressL1, L2ERC20.address)
     console.log(`${token.name} was registered in LPs`)
   }
 
@@ -225,6 +228,9 @@ const deployFn: DeployFunction = async (hre) => {
 
   await hre.deployments.save('TK_L1BOBA', L1BobaDeploymentSubmission)
   await hre.deployments.save('TK_L2BOBA', L2BobaDeploymentSubmission)
+
+  await registerLPToken(L1BobaAddress, L2BobaAddress)
+  console.log(`BOBA was registered in LPs`)
 
   // Deploy xBoba
   L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)
