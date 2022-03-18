@@ -44,14 +44,6 @@ function BridgeFee({
 
   return <>
     <Box display="flex" justifyContent="space-between">
-      <Typography variant="body2">
-        <Typography component="span" sx={{ opacity: 0.65 }}>
-          Est Time: &nbsp;
-        </Typography>
-        20mins
-      </Typography>
-    </Box>
-    <Box display="flex" justifyContent="space-between">
       <Box display="flex" alignItems="flex-start" justifyContent="flex-start" flexDirection="column">
         <Typography variant="body2" sx={{
           opacity: 0.65

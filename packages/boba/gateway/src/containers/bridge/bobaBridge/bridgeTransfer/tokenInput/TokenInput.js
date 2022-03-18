@@ -1,13 +1,29 @@
+/*
+Copyright 2019-present OmiseGO Pte Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
+
 import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
 import { Box, IconButton, Typography } from '@mui/material';
 import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost, fetchL2FeeBalance } from 'actions/balanceAction';
 import { setTokenAmount } from 'actions/bridgeAction';
+import { openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectBridgeType, selectTokenAmounts } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
-import { logAmount } from 'util/amountConvert';
+import { logAmount, toWei_String } from 'util/amountConvert';
 import { getCoinImage } from 'util/coinImage';
 import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './TokenInput.styles';
@@ -19,8 +35,7 @@ function TokenInput({
   tokenLen,
   switchBridgeType,
   addNewToken,
-  deleteToken,
-  openTokenPicker
+  deleteToken
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
@@ -37,7 +52,15 @@ function TokenInput({
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   const onInputChange = (amount) => {
-    dispatch(setTokenAmount({ symbol: token.symbol, amount }))
+    dispatch(setTokenAmount({
+      symbol: token.symbol,
+      amount,
+      toWei_String: toWei_String(amount, token.decimals)
+    }))
+  }
+
+  const openTokenPicker = () => {
+    dispatch(openModal('tokenPicker', null, null, index))
   }
 
   useEffect(() => {
@@ -85,7 +108,6 @@ function TokenInput({
             type="number"
             value={tokenAmounts[ token.symbol ]}
             onChange={(e) => {
-              console.log([ `On value change ${token.symbol}`, e.target.value ]);
               onInputChange(e.target.value);
             }}
             fullWidth={true}

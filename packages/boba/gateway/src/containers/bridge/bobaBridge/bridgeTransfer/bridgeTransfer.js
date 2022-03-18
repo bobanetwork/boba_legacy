@@ -43,11 +43,7 @@ function BridgeTransfer() {
   const switchBridgeType = () => {
     dispatch(openModal('bridgeTypeSwitch'))
   }
-
-  const openTokenPicker = (tokenIndex) => {
-    dispatch(openModal('tokenPicker', null, null, tokenIndex))
-  }
-
+  
   return (
     <S.BridgeTransferContainer>
       {
@@ -57,7 +53,6 @@ function BridgeTransfer() {
           token={token}
           addNewToken={addNewToken}
           deleteToken={deleteToken}
-          openTokenPicker={openTokenPicker}
           tokenLen={tokens.length}
           switchBridgeType={switchBridgeType}
           isFastBridge={bridgeType === BRIDGE_TYPE.FAST_BRIDGE} />)
