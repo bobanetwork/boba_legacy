@@ -16,7 +16,7 @@ limitations under the License. */
 import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
 import { Box, IconButton, Typography } from '@mui/material';
 import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost, fetchL2FeeBalance } from 'actions/balanceAction';
-import { setTokenAmount } from 'actions/bridgeAction';
+import { removeToken, setTokenAmount } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
 import React, { useEffect } from 'react';
@@ -34,8 +34,7 @@ function TokenInput({
   isFastBridge,
   tokenLen,
   switchBridgeType,
-  addNewToken,
-  deleteToken
+  addNewToken
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
@@ -53,12 +52,16 @@ function TokenInput({
 
   const onInputChange = (amount) => {
     dispatch(setTokenAmount({
-      symbol: token.symbol,
+      index,
       amount,
       toWei_String: toWei_String(amount, token.decimals)
     }))
   }
 
+  const deleteToken = (tokenIndex) => {
+    dispatch(removeToken(tokenIndex));
+  }
+  
   const openTokenPicker = () => {
     dispatch(openModal('tokenPicker', null, null, index))
   }
@@ -127,7 +130,7 @@ function TokenInput({
           >
             <AddCircleOutline fontSize="small" />
           </IconButton>
-          <IconButton disabled={!isFastBridge && index === tokenLen - 1} size="small" aria-label="remove token"
+          <IconButton disabled={!isFastBridge && tokenLen <= 1} size="small" aria-label="remove token"
             onClick={() => {
               deleteToken(index);
             }}

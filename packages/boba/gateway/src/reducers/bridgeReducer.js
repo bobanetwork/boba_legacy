@@ -16,7 +16,6 @@ limitations under the License. */
 
 const initialState = {
   tokens: [],
-  tokenAmounts: {},
   bridgeType: null
 };
 
@@ -26,43 +25,49 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, bridgeType: action.payload }
 
     case 'BRIDGE/TOKEN/SELECT':
-      {
-        let amount = state.tokenAmounts;
-        if (!amount.hasOwnProperty(action.payload.symbol)) {
-          amount = { ...amount, [ action.payload.symbol ]: 0 }
-        }
-
-        return {
-          ...state,
-          tokens: [ ...state.tokens, action.payload ],
-          tokenAmounts: amount
-        }
+      return {
+        ...state,
+        tokens: [
+          ...state.tokens,
+          {
+            ...action.payload,
+            amount: 0,
+            toWei_String: 0,
+          }
+        ],
       }
+    
     case 'BRIDGE/TOKEN/UPDATE': {
       let newTokens = [ ...state.tokens ];
-      let amount = state.tokenAmounts;
       const { token, tokenIndex } = action.payload;
-      
-      newTokens[ tokenIndex ] = token;
-      
-      if (!amount.hasOwnProperty(token.symbol)) {
-        amount = { ...amount, [ token.symbol ]: 0 }
-      }
+      newTokens[ tokenIndex ] = {
+        ...token,
+        amount: 0,
+        toWei_String: 0,
+      };
 
-      return { ...state, tokens: newTokens, tokenAmounts: amount }
+      return { ...state, tokens: newTokens }
     }
 
-    case 'BRIDGE/TOKEN/REMOVE':
-      let tokens = [ ...state.tokens ];
-      tokens.splice(action.payload, 1)
-      return { ...state, tokens: tokens }
+    case 'BRIDGE/TOKEN/REMOVE': {
+        let tokens = [ ...state.tokens ];
+        tokens.splice(action.payload, 1)
 
-    case 'BRIDGE/TOKEN/AMOUNT/CHANGE':
-      let tokenAmounts = { ...state.tokenAmounts };
-      let { symbol, amount } = action.payload;
-      tokenAmounts[ symbol ] = amount;
-      return { ...state, tokenAmounts: tokenAmounts }
+        return { ...state, tokens: tokens }
+      }
 
+    case 'BRIDGE/TOKEN/AMOUNT/CHANGE': {
+        let newTokens = [...state.tokens];
+        let { index, amount, toWei_String } = action.payload;
+        newTokens[ index ] = {
+          ...newTokens[ index ],
+          amount,
+          toWei_String
+        };
+      console.log(['newTokens',newTokens])
+
+        return { ...state, tokens: newTokens }
+      }
     default:
       return state;
   }

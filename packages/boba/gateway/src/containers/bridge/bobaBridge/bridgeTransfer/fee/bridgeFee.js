@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectClassicExitCost, selectFastDepositCost, selectFastExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
-import { selectBridgeType, selectTokenAmounts } from 'selectors/bridgeSelector';
+import { selectBridgeType } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
 import { BRIDGE_TYPE } from 'util/constant';
 
@@ -11,7 +11,6 @@ function BridgeFee({
   tokens
 }) {
 
-  const tokenAmounts = useSelector(selectTokenAmounts());
   const bridgeType = useSelector(selectBridgeType());
   const layer = useSelector(selectLayer());
 
@@ -48,14 +47,14 @@ function BridgeFee({
         <Typography variant="body2" sx={{
           opacity: 0.65
         }}>
-          Est. Fee <br/>
+          Est. Fee <br />
           (Approval+Bridge)
         </Typography>
-        {Object.keys(tokenAmounts).map((t) => {
+        {tokens.map((t) => {
           return <Typography variant="body2" >
             {
-              t === 'ETH' ?
-                `${(Number(tokenAmounts[ t ]) + Number(cost)).toFixed(4)}`
+              t.symbol === 'ETH' ?
+                `${(Number(t.amount) + Number(cost)).toFixed(4)}`
                 : `${Number(cost).toFixed(4)}`
             } ETH
           </Typography>
@@ -65,17 +64,21 @@ function BridgeFee({
         <Typography variant="body2" sx={{ opacity: 0.65 }}>
           Est. bridge fee
         </Typography>
-        <Typography variant="body2" >
-          0.00019780 BTC (0.1%)
-        </Typography>
+        {
+          tokens.map((t) => {
+            return <Typography variant="body2" >
+              0.00019780 {t.symbol} (0.1%)
+            </Typography>
+          })
+        }
       </Box>
       <Box display="flex" alignItems="flex-start" justifyContent="flex-start" flexDirection="column">
         <Typography variant="body2" sx={{ opacity: 0.65 }}>
           Est. recieve
         </Typography>
-        {Object.keys(tokenAmounts).map((t) => {
+        {tokens.map((t) => {
           return <Typography variant="body2" >
-            {`${Number(tokenAmounts[ t ]).toFixed(3)} ${t}`}
+            {`${Number(t.amount).toFixed(3)} ${t.symbol}`}
           </Typography>
         })}
       </Box>

@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { removeToken, setBridgeType, setToken } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
-import Button from 'components/button/Button';
 import * as LayoutS from 'components/common/common.styles';
 import { isEqual } from 'lodash';
 import React, { useEffect } from 'react';
@@ -12,6 +11,7 @@ import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './bridgeTransfer.styles';
 import BridgeFee from './fee/bridgeFee';
 import TokenInput from './tokenInput/TokenInput';
+import BridgeTransferButton from './transfer';
 
 
 function BridgeTransfer() {
@@ -36,10 +36,6 @@ function BridgeTransfer() {
     dispatch(setToken(rootBalance[ 1 ]));
   }
 
-  const deleteToken = (tokenIndex) => {
-    dispatch(removeToken(tokenIndex));
-  }
-
   const switchBridgeType = () => {
     dispatch(openModal('bridgeTypeSwitch'))
   }
@@ -52,7 +48,6 @@ function BridgeTransfer() {
           key={`${token.symbol}-${index}`}
           token={token}
           addNewToken={addNewToken}
-          deleteToken={deleteToken}
           tokenLen={tokens.length}
           switchBridgeType={switchBridgeType}
           isFastBridge={bridgeType === BRIDGE_TYPE.FAST_BRIDGE} />)
@@ -77,12 +72,7 @@ function BridgeTransfer() {
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />
-      <Button
-        color="primary"
-        variant="contained"
-        fullWidth={true}
-        disabled
-      >Transfer</Button>
+      <BridgeTransferButton tokens={tokens}/>
     </S.BridgeTransferContainer>
   )
 }
