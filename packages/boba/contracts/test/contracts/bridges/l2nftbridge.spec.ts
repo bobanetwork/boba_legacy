@@ -104,7 +104,6 @@ describe('L2NFTBridge Tests', () => {
     })
 
     it('should not be able to init twice', async () => {
-      const signer: Signer = (await ethers.getSigners())[1]
       await expect(
         L2NFTBridge.initialize(
           L2CrossDomainMessenger.address,
@@ -112,10 +111,9 @@ describe('L2NFTBridge Tests', () => {
         )
       )
       await expect(
-        L2NFTBridge.connect(signer).initialize(
+        L2NFTBridge.initialize(
           L2CrossDomainMessenger.address,
-          L2NFTBridge.address,
-          { from: await signer.getAddress() }
+          L2NFTBridge.address
         )
       ).to.be.revertedWith('Initializable: contract is already initialized')
     })
@@ -168,24 +166,24 @@ describe('L2NFTBridge Tests', () => {
     })
     it('can register a NFT with L1 creation', async () => {
       const l1 = 0
-      await L1NFTBridge.registerNFTPair(
+      await L2NFTBridge.registerNFTPair(
         ERC721.address,
         L2StandardERC721.address,
         'L1'
       )
-      const pairNFTInfo = await L1NFTBridge.pairNFTInfo(ERC721.address)
+      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(ERC721.address)
       expect(pairNFTInfo.l1Contract).eq(ERC721.address)
       expect(pairNFTInfo.l2Contract).eq(L2StandardERC721.address)
       expect(pairNFTInfo.baseNetwork).eq(l1)
     })
     it('can register a NFT with L2 creation', async () => {
       const l2 = 1
-      await L1NFTBridge.registerNFTPair(
+      await L2NFTBridge.registerNFTPair(
         L1StandardERC721.address,
         ERC721.address,
         'L2'
       )
-      const pairNFTInfo = await L1NFTBridge.pairNFTInfo(
+      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(
         L1StandardERC721.address
       )
       expect(pairNFTInfo.l1Contract).eq(L1StandardERC721.address)
@@ -194,13 +192,13 @@ describe('L2NFTBridge Tests', () => {
     })
     it('cant register a NFT with faulty base network', async () => {
       await expect(
-        L1NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L211')
+        L2NFTBridge.registerNFTPair(ERC721.address, ERC721.address, 'L211')
       ).to.be.revertedWith('Invalid Network')
     })
     it('cant register if not owner', async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       await expect(
-        L1NFTBridge.connect(signer).registerNFTPair(
+        L2NFTBridge.connect(signer).registerNFTPair(
           ERC721.address,
           ERC721.address,
           'L2',
