@@ -36,6 +36,7 @@ export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
 export const GWEI = BigNumber.from(1e9)
+export const OVM_ETH_ADDRESS = predeploys.OVM_ETH
 
 const gasPriceValidator = makeValidator((gasPrice) => {
   if (gasPrice === 'onchain') {
@@ -131,6 +132,8 @@ const env = cleanEnv(process.env, {
 
 export const envConfig = env
 
+export const L2_CHAINID = env.L2_CHAINID
+
 // The hardhat instance
 export const l1Provider = new providers.JsonRpcProvider(env.L1_URL)
 l1Provider.pollingInterval = env.L1_POLLING_INTERVAL
@@ -168,19 +171,6 @@ export const gasPriceOracleWallet = new Wallet(
   env.GAS_PRICE_ORACLE_PRIVATE_KEY,
   l2Provider
 )
-
-// Predeploys
-export const OVM_ETH_ADDRESS = predeploys.OVM_ETH
-
-export const L2_CHAINID = env.L2_CHAINID
-
-// // Predeploys
-// export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =
-//   '0x4200000000000000000000000000000000000004'
-// export const OVM_ETH_ADDRESS = predeploys.OVM_ETH
-
-// export const L2_CHAINID = env.L2_CHAINID
-// export const IS_LIVE_NETWORK = env.IS_LIVE_NETWORK
 
 if (!process.env.BOBA_URL) {
   console.log(`!!You did not set process.env.BOBA_URL!!`)
@@ -225,17 +215,6 @@ export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   )
   return L1StandardBridge
 }
-
-// export const getL2Bridge = async (wallet: Wallet) => {
-//   const L2BridgeInterface = getContractInterface('L2StandardBridge')
-
-//   const L2StandardBridge = new Contract(
-//     predeploys.L2StandardBridge,
-//     L2BridgeInterface,
-//     wallet
-//   )
-//   return L2StandardBridge
-// }
 
 export const getOvmEth = (wallet: Wallet) => {
   const OVM_ETH = new Contract(
@@ -351,33 +330,6 @@ export const logStderr = (msg: string) => {
   process.stderr.write(`${msg}\n`)
 }
 
-// export const gasPriceForL2 = async () => {
-//   if (await isMainnet()) {
-//     return l2Wallet.getGasPrice()
-//   }
-
-//   if (isLiveNetwork()) {
-//     return Promise.resolve(BigNumber.from(10000))
-//   }
-
-//   return Promise.resolve(BigNumber.from(0))
-// }
-
-// export const waitForL2Geth = async (
-//   provider: providers.JsonRpcProvider
-// ): Promise<providers.JsonRpcProvider> => {
-//   let ready: boolean = false
-//   while (!ready) {
-//     try {
-//       await provider.getNetwork()
-//       ready = true
-//     } catch (error) {
-//       await sleep(1000)
-//     }
-//   }
-//   return asL2Provider(provider)
-// }
-
 export const getBASEDeployerAddresses = async () => {
   const options = {
     uri: BASE_URL,
@@ -432,61 +384,3 @@ export const expectLogs = async (
 
   return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
 }
-
-// export const expectLogs = async (
-//   receipt,
-//   emitterAbi,
-//   emitterAddress,
-//   eventName,
-//   eventArgs = {}
-// ) => {
-//   let eventABI = emitterAbi.filter(
-//     (x) => x.type === 'event' && x.name === eventName
-//   )
-//   if (eventABI.length === 0) {
-//     throw new Error(`No ABI entry for event '${eventName}'`)
-//   } else if (eventABI.length > 1) {
-//     throw new Error(
-//       `Multiple ABI entries for event '${eventName}', only uniquely named events are supported`
-//     )
-//   }
-
-//   eventABI = eventABI[0]
-//   const eventSignature = `${eventName}(${eventABI.inputs
-//     .map((input) => input.type)
-//     .join(',')})`
-//   const eventTopic = utils.keccak256(utils.toUtf8Bytes(eventSignature))
-//   const logs = receipt.logs
-//   const filteredLogs = logs
-//     .filter(
-//       (log) =>
-//         log.topics.length > 0 &&
-//         log.topics[0] === eventTopic &&
-//         (!emitterAddress || log.address === emitterAddress)
-//     )
-//     .map((log) =>
-//       abiCoder.decode(eventABI.inputs, log.data, log.topics.slice(1))
-//     )
-//     .map((decoded) => ({ event: eventName, args: decoded }))
-
-//   return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
-// }
-
-// // eslint-disable-next-line @typescript-eslint/no-shadow
-// export const isMainnet = async () => {
-//   const chainId = await l1Wallet.getChainId()
-//   return chainId === 1
-// }
-
-// export const gasPriceForL1 = async () => {
-//   if (env.L1_GAS_PRICE === ON_CHAIN_GAS_PRICE) {
-//     return l1Wallet.getGasPrice()
-//   }
-
-//   return utils.parseUnits(env.L1_GAS_PRICE, 'wei')
-// }
-
-// export const isHardhat = async () => {
-//   const chainId = await l1Wallet.getChainId()
-//   return chainId === HARDHAT_CHAIN_ID
-// }
