@@ -334,40 +334,4 @@ describe('Boba_GasPriceOracle', () => {
       })
     }
   })
-
-  describe('useBobaAsFeeToken', () => {
-    it('should succeed if called is EOA', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken()).to
-        .not.be.reverted
-      const signerAddress = await signer1.getAddress()
-      expect(
-        await Boba_GasPriceOracle.bobaFeeTokenUsers(signerAddress)
-      ).to.be.deep.eq(true)
-    })
-
-    it('should emit event', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken())
-        .to.emit(Boba_GasPriceOracle, 'UseBobaAsFeeToken')
-        .withArgs(await signer1.getAddress())
-    })
-  })
-
-  describe('useETHAsFeeToken', () => {
-    it('should succeed if called is EOA', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken()).to
-        .not.be.reverted
-      await expect(Boba_GasPriceOracle.connect(signer1).useETHAsFeeToken()).to
-        .not.be.reverted
-      const signerAddress = await signer1.getAddress()
-      expect(
-        await Boba_GasPriceOracle.bobaFeeTokenUsers(signerAddress)
-      ).to.be.deep.eq(false)
-    })
-
-    it('should emit event', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer1).useETHAsFeeToken())
-        .to.emit(Boba_GasPriceOracle, 'UseETHAsFeeToken')
-        .withArgs(await signer1.getAddress())
-    })
-  })
 })
