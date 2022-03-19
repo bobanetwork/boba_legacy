@@ -23,7 +23,6 @@ import { IL1StandardERC721 } from "../standards/IL1StandardERC721.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "hardhat/console.sol";
 /**
  * @title L1NFTBridge
  * @dev The L1 NFT Bridge is a contract which stores deposited L1 ERC721
@@ -155,7 +154,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
-        require(_l1Contract != _l2Contract, "Contracts should not be the same");
+        //create2 would prevent this check
+        //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
         require(ERC165Checker.supportsInterface(_l1Contract, erc721), "L1 NFT is not ERC721 compatible");
         bytes32 bn = keccak256(abi.encodePacked(_baseNetwork));

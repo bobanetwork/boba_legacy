@@ -171,7 +171,9 @@ describe('L2NFTBridge Tests', () => {
         L2StandardERC721.address,
         'L1'
       )
-      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(ERC721.address)
+      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(
+        L2StandardERC721.address
+      )
       expect(pairNFTInfo.l1Contract).eq(ERC721.address)
       expect(pairNFTInfo.l2Contract).eq(L2StandardERC721.address)
       expect(pairNFTInfo.baseNetwork).eq(l1)
@@ -183,9 +185,7 @@ describe('L2NFTBridge Tests', () => {
         ERC721.address,
         'L2'
       )
-      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(
-        L1StandardERC721.address
-      )
+      const pairNFTInfo = await L2NFTBridge.pairNFTInfo(ERC721.address)
       expect(pairNFTInfo.l1Contract).eq(L1StandardERC721.address)
       expect(pairNFTInfo.l2Contract).eq(ERC721.address)
       expect(pairNFTInfo.baseNetwork).eq(l2)

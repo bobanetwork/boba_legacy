@@ -171,7 +171,8 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
-        require(_l1Contract != _l2Contract, "Contracts should not be the same");
+        //create2 would prevent this check
+        //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
         require(ERC165Checker.supportsInterface(_l2Contract, erc721), "L2 NFT is not ERC721 compatible");
         bytes32 bn = keccak256(abi.encodePacked(_baseNetwork));
