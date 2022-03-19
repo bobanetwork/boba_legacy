@@ -1,0 +1,403 @@
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+chai.use(chaiAsPromised)
+
+/* Imports: External */
+import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
+import { sleep } from '@eth-optimism/core-utils'
+import { serialize } from '@ethersproject/transactions'
+import {
+  predeploys,
+  getContractInterface,
+  getContractFactory,
+} from '@eth-optimism/contracts'
+
+/* Imports: Internal */
+import { IS_LIVE_NETWORK } from './shared/utils'
+import { OptimismEnv } from './shared/env'
+import { Direction } from './shared/watcher-utils'
+
+const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
+  const gasPrice = await env.gasPriceOracle.setGasPrice(value)
+  await gasPrice.wait()
+  const baseFee = await env.gasPriceOracle.setL1BaseFee(value)
+  await baseFee.wait()
+}
+
+describe('Boba Fee Payment Integration Tests', async () => {
+  let env: OptimismEnv
+  let L2Boba: Contract
+  let Boba_GasPriceOracle: Contract
+
+  const other = '0x1234123412341234123412341234123412341234'
+
+  before(async () => {
+    env = await OptimismEnv.new()
+
+    L2Boba = getContractFactory('L2GovernanceERC20')
+      .attach(predeploys.L2GovernanceERC20)
+      .connect(env.l2Wallet)
+    Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
+      .attach(predeploys.Boba_GasPriceOracle)
+      .connect(env.l2Wallet)
+  })
+
+  it('{tag:other} should register to use boba as the fee token', async () => {
+    // Register l1wallet for using boba as the fee token
+    const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
+    await registerTx.wait()
+
+    expect(
+      await Boba_GasPriceOracle.bobaFeeTokenUsers(env.l2Wallet.address)
+    ).to.be.deep.eq(true)
+  })
+
+  it('{tag:other} Paying a nonzero but acceptable boba gasPrice fee for transferring ETH', async () => {
+    await setPrices(env, 1000)
+
+    const amount = utils.parseEther('0.0000001')
+    const ETHBalanceBefore = await env.l2Wallet.getBalance()
+    const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    expect(ETHBalanceBefore.gt(amount))
+
+    const unsigned = await env.l2Wallet.populateTransaction({
+      to: other,
+      value: amount,
+      gasLimit: 500000,
+    })
+
+    const tx = await env.l2Wallet.sendTransaction(unsigned)
+    const receipt = await tx.wait()
+    expect(receipt.status).to.eq(1)
+
+    const ETHBalanceAfter = await env.l2Wallet.getBalance()
+    const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+    const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+
+    // Make sure that user only pay transferred ETH
+    expect(ETHBalanceBefore.sub(ETHBalanceAfter)).to.deep.equal(amount)
+
+    // Make sure that the ETH Fee Vault doesn't change
+    expect(ETHFeeVaultBalanceAfter).to.deep.equal(ETHFeeVaultBalanceBefore)
+
+    // Make sure that we deduct boba from user's account
+    expect(BobaBalanceBefore.sub(BobaBalanceAfter)).to.deep.equal(txBobaFee)
+
+    // Make sure that the boba fee vault receives the tx fee
+    expect(
+      BobaFeeVaultBalanceAfter.sub(BobaFeeVaultBalanceBefore)
+    ).to.deep.equal(txBobaFee)
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:other} Paying a nonzero but acceptable boba gasPrice fee for transferring BOBA', async () => {
+    await setPrices(env, 1000)
+
+    const amount = utils.parseEther('0.0000001')
+    const ETHBalanceBefore = await env.l2Wallet.getBalance()
+    const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    expect(BobaBalanceBefore.gt(amount))
+
+    const tx = await L2Boba.transfer(other, amount)
+    const receipt = await tx.wait()
+    expect(receipt.status).to.eq(1)
+
+    const ETHBalanceAfter = await env.l2Wallet.getBalance()
+    const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+    const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+
+    // Make sure that ETH balance doesn't change
+    expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+
+    // Make sure that the ETH Fee Vault doesn't change
+    expect(ETHFeeVaultBalanceAfter).to.deep.equal(ETHFeeVaultBalanceBefore)
+
+    // Make sure that we deduct boba from user's account
+    expect(BobaBalanceBefore.sub(BobaBalanceAfter)).to.deep.equal(
+      txBobaFee.add(amount)
+    )
+
+    // Make sure that the boba fee vault receives the tx fee
+    expect(
+      BobaFeeVaultBalanceAfter.sub(BobaFeeVaultBalanceBefore)
+    ).to.deep.equal(txBobaFee)
+
+    await setPrices(env, 1)
+  })
+
+  it("{tag:other} Should revert if users don't have enough Boba tokens", async () => {
+    await setPrices(env, 1000)
+
+    const ETHBalanceBefore = await env.l2Wallet.getBalance()
+    const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    await expect(L2Boba.transfer(other, BobaBalanceBefore)).to.be.revertedWith(
+      'execution reverted: ERC20: transfer amount exceeds balance'
+    )
+    const ETHBalanceAfter = await env.l2Wallet.getBalance()
+    const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+
+    // Make sure that ETH balance doesn't change
+    expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+
+    // Make sure that the ETH Fee Vault doesn't change
+    expect(ETHFeeVaultBalanceAfter).to.deep.equal(ETHFeeVaultBalanceBefore)
+
+    // Make sure that we don't deduct boba from user's account
+    expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
+
+    // Make sure that the boba fee vault doesn't change
+    expect(BobaFeeVaultBalanceAfter).to.deep.equal(BobaFeeVaultBalanceBefore)
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:other} should compute correct boba fee for transferring ETH', async () => {
+    await setPrices(env, 1000)
+
+    const ETHBalanceBefore = await env.l2Wallet.getBalance()
+    const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    const unsigned = await env.l2Wallet.populateTransaction({
+      to: env.l2Wallet.address,
+      value: 0,
+    })
+
+    const tx = await env.l2Wallet.sendTransaction(unsigned)
+    const receipt = await tx.wait()
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+    const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+    const ETHBalanceAfter = await env.l2Wallet.getBalance()
+    const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    const bobaBalanceDiff = BobaBalanceBefore.sub(BobaBalanceAfter)
+    const bobaFeeReceived = BobaFeeVaultBalanceAfter.sub(
+      BobaFeeVaultBalanceBefore
+    )
+    expect(bobaBalanceDiff).to.deep.equal(txBobaFee)
+    // There is no inflation
+    expect(bobaFeeReceived).to.deep.equal(bobaBalanceDiff)
+
+    expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+    expect(ETHFeeVaultBalanceBefore).to.deep.equal(ETHFeeVaultBalanceAfter)
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:other} should compute correct boba fee for transferring BOBA', async () => {
+    await setPrices(env, 1000)
+
+    const ETHBalanceBefore = await env.l2Wallet.getBalance()
+    const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+
+    const tx = await L2Boba.transfer(env.l2Wallet.address, 0)
+    const receipt = await tx.wait()
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+    const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+    const ETHBalanceAfter = await env.l2Wallet.getBalance()
+    const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+    const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+      env.sequencerFeeVault.address
+    )
+    const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+      Boba_GasPriceOracle.address
+    )
+    const bobaBalanceDiff = BobaBalanceBefore.sub(BobaBalanceAfter)
+    const bobaFeeReceived = BobaFeeVaultBalanceAfter.sub(
+      BobaFeeVaultBalanceBefore
+    )
+    expect(bobaBalanceDiff).to.deep.equal(txBobaFee)
+    // There is no inflation
+    expect(bobaFeeReceived).to.deep.equal(bobaBalanceDiff)
+
+    expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+    expect(ETHFeeVaultBalanceBefore).to.deep.equal(ETHFeeVaultBalanceAfter)
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:other} should compute correct fee with different gas limit for transferring ETH', async () => {
+    await setPrices(env, 1000)
+
+    const estimatedGas = await env.l2Wallet.estimateGas({
+      to: env.l2Wallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+    let gasLimit = estimatedGas.toNumber()
+
+    while (gasLimit < estimatedGas.toNumber() + 1000) {
+      const ETHBalanceBefore = await env.l2Wallet.getBalance()
+      const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+      const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+        env.sequencerFeeVault.address
+      )
+      const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+        Boba_GasPriceOracle.address
+      )
+      const tx = await env.l2Wallet.sendTransaction({
+        to: env.l2Wallet.address,
+        value: ethers.utils.parseEther('1'),
+        gasLimit,
+      })
+      const receipt = await tx.wait()
+      const priceRatio = await Boba_GasPriceOracle.priceRatio()
+      const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+      const ETHBalanceAfter = await env.l2Wallet.getBalance()
+      const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+      const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+        env.sequencerFeeVault.address
+      )
+      const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+        Boba_GasPriceOracle.address
+      )
+      const bobaBalanceDiff = BobaBalanceBefore.sub(BobaBalanceAfter)
+      const bobaFeeReceived = BobaFeeVaultBalanceAfter.sub(
+        BobaFeeVaultBalanceBefore
+      )
+
+      expect(bobaBalanceDiff).to.deep.equal(txBobaFee)
+      // There is no inflation
+      expect(bobaFeeReceived).to.deep.equal(bobaBalanceDiff)
+
+      expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+      expect(ETHFeeVaultBalanceBefore).to.deep.equal(ETHFeeVaultBalanceAfter)
+
+      gasLimit += 100
+    }
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:other} should compute correct fee with different gas limit for transferring Boba', async () => {
+    await setPrices(env, 1000)
+
+    const estimatedGas = await L2Boba.estimateGas.transfer(
+      env.l2Wallet.address,
+      ethers.utils.parseEther('1')
+    )
+    let gasLimit = estimatedGas.toNumber()
+
+    while (gasLimit < estimatedGas.toNumber() + 1000) {
+      const ETHBalanceBefore = await env.l2Wallet.getBalance()
+      const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
+      const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
+        env.sequencerFeeVault.address
+      )
+      const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
+        Boba_GasPriceOracle.address
+      )
+      const tx = await L2Boba.transfer(
+        env.l2Wallet.address,
+        ethers.utils.parseEther('1'),
+        { gasLimit }
+      )
+      const receipt = await tx.wait()
+      const priceRatio = await Boba_GasPriceOracle.priceRatio()
+      const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+      const ETHBalanceAfter = await env.l2Wallet.getBalance()
+      const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
+      const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
+        env.sequencerFeeVault.address
+      )
+      const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
+        Boba_GasPriceOracle.address
+      )
+      const bobaBalanceDiff = BobaBalanceBefore.sub(BobaBalanceAfter)
+      const bobaFeeReceived = BobaFeeVaultBalanceAfter.sub(
+        BobaFeeVaultBalanceBefore
+      )
+
+      expect(bobaBalanceDiff).to.deep.equal(txBobaFee)
+      // There is no inflation
+      expect(bobaFeeReceived).to.deep.equal(bobaBalanceDiff)
+
+      expect(ETHBalanceBefore).to.deep.equal(ETHBalanceAfter)
+      expect(ETHFeeVaultBalanceBefore).to.deep.equal(ETHFeeVaultBalanceAfter)
+
+      gasLimit += 100
+    }
+
+    await setPrices(env, 1)
+  })
+
+  it('{tag:rpc} should reject a transaction with a too low gas limit', async () => {
+    const tx = {
+      to: env.l2Wallet.address,
+      value: ethers.utils.parseEther('1'),
+      gasLimit: 1100000,
+    }
+
+    const gasLimit = await env.l2Wallet.estimateGas(tx)
+    tx.gasLimit = gasLimit.toNumber() - 10
+
+    await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
+      'invalid transaction: intrinsic gas too low'
+    )
+  })
+
+  it('{tag:other} should register to use ETH as the fee token', async () => {
+    // Register l1wallet for using ETH as the fee token
+    const registerTx = await Boba_GasPriceOracle.useETHAsFeeToken()
+    await registerTx.wait()
+
+    expect(
+      await Boba_GasPriceOracle.bobaFeeTokenUsers(env.l2Wallet.address)
+    ).to.be.deep.eq(false)
+  })
+})

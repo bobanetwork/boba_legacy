@@ -970,11 +970,12 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo          uint64 = params.TxGas - 1
-		hi          uint64
-		cap         uint64
-		blockNr     *big.Int
-		isGasUpdate bool = true
+		lo               uint64 = params.TxGas - 1
+		hi               uint64
+		cap              uint64
+		blockNr          *big.Int
+		isGasUpdate      bool = true
+		isFeeTokenUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
@@ -1005,6 +1006,31 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	// Use zero-address if none other is available
 	if args.From == nil {
 		args.From = &common.Address{}
+	}
+	// Get hard fork status
+	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
+	if err == nil {
+		blockNr = block.Number()
+		isGasUpdate = b.ChainConfig().IsGasUpdate(blockNr)
+		isFeeTokenUpdate = b.ChainConfig().IsFeeTokenUpdate(blockNr)
+	}
+	// Get state
+	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	// Use non-zero gas price for the l1 security fee if gas price is not nil
+	// In production, users have to pay the gas fee. In the local testing system,
+	// gas price can be zero. If their balance is really low for using zero gas price,
+	// they can't bypass this estimateGas
+	// In production, the gas price oracle owner can use gar price = 0
+	gasPrice := new(big.Int)
+	price, err := b.SuggestPrice(ctx)
+	gasPriceOracleOwner := fees.ReadGasPriceOraclerOwner(state)
+	if err == nil && isFeeTokenUpdate {
+		// gasPrice is used to calculate the l2ExtraFee
+		gasPrice = price
+		// Override gas price
+		if args.GasPrice == nil && gasPriceOracleOwner != *args.From {
+			args.GasPrice = (*hexutil.Big)(price)
+		}
 	}
 	// Create a helper to check if a gas allowance results in an executable transaction
 	executable := func(gas uint64) (bool, []byte) {
@@ -1043,20 +1069,8 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
-	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
-	if err == nil {
-		blockNr = block.Number()
-		isGasUpdate = b.ChainConfig().IsGasUpdate(big.NewInt(blockNr.Int64()))
-	}
-
 	if !isGasUpdate {
 		return hexutil.Uint64(hi), nil
-	}
-
-	gasPrice := new(big.Int)
-	price, err := b.SuggestPrice(ctx)
-	if err == nil {
-		gasPrice = price
 	}
 
 	var data []byte
@@ -1064,7 +1078,6 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		data = []byte(*args.Data)
 	}
 
-	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	l2ExtraGas := new(big.Int)
 	if rcfg.UsingOVM {
 		if gasPrice.Cmp(common.Big0) != 0 {

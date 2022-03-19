@@ -534,9 +534,7 @@ func (s *StateDB) SubBobaBalance(addr common.Address, amount *big.Int) {
 	key := GetBobaBalanceKey(addr)
 	value := s.GetState(rcfg.OvmL2BobaToken, key)
 	bal := value.Big()
-	log.Info("Balance", "balance", "bal")
 	bal = bal.Sub(bal, amount)
-	log.Info("result", "balance", "bal")
 	s.SetState(rcfg.OvmL2BobaToken, key, common.BigToHash(bal))
 }
 

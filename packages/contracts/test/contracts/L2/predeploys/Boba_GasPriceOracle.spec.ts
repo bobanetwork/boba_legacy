@@ -46,7 +46,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('owner', () => {
-    it.only('should have an owner', async () => {
+    it('should have an owner', async () => {
       expect(await Boba_GasPriceOracle.owner()).to.equal(
         await signer1.getAddress()
       )
@@ -54,17 +54,17 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('updatePriceRatio', () => {
-    it.only('should revert if called by someone other than the owner', async () => {
+    it('should revert if called by someone other than the owner', async () => {
       await expect(Boba_GasPriceOracle.connect(signer2).updatePriceRatio(1234))
         .to.be.reverted
     })
 
-    it.only('should succeed if called by the owner and is equal to `1234`', async () => {
+    it('should succeed if called by the owner and is equal to `1234`', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).updatePriceRatio(1234))
         .to.not.be.reverted
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).updatePriceRatio(1234))
         .to.emit(Boba_GasPriceOracle, 'UpdatePriceRatio')
         .withArgs(await signer1.getAddress(), 1234)
@@ -72,11 +72,11 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get priceRatio', () => {
-    it.only('should return zero at first', async () => {
+    it('should return zero at first', async () => {
       expect(await Boba_GasPriceOracle.priceRatio()).to.equal(initialGasPrice)
     })
 
-    it.only('should change when priceRatio is called', async () => {
+    it('should change when priceRatio is called', async () => {
       const priceRatio = 1234
 
       await Boba_GasPriceOracle.connect(signer1).updatePriceRatio(priceRatio)
@@ -84,7 +84,7 @@ describe('Boba_GasPriceOracle', () => {
       expect(await Boba_GasPriceOracle.priceRatio()).to.equal(priceRatio)
     })
 
-    it.only('is the 5st storage slot', async () => {
+    it('is the 5st storage slot', async () => {
       const priceRatio = 2222
       const slot = 5
 
@@ -103,13 +103,13 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('maxPriceRatio', () => {
-    it.only('should revert if called by someone other than the owner', async () => {
+    it('should revert if called by someone other than the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateMaxPriceRatio(6000)
       ).to.be.reverted
     })
 
-    it.only('should revert if maxPriceRatio is smaller than minPriceRatio', async () => {
+    it('should revert if maxPriceRatio is smaller than minPriceRatio', async () => {
       const minPriceRatio = await Boba_GasPriceOracle.minPriceRatio()
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMaxPriceRatio(
@@ -118,13 +118,13 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.reverted
     })
 
-    it.only('should succeed if called by the owner', async () => {
+    it('should succeed if called by the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMaxPriceRatio(6500)
       ).to.not.be.reverted
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMaxPriceRatio(6000)
       )
@@ -134,7 +134,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get maxPriceRatio', () => {
-    it.only('should change when maxPriceRatio is called', async () => {
+    it('should change when maxPriceRatio is called', async () => {
       const maxPriceRatio = 6000
       await Boba_GasPriceOracle.connect(signer1).updateMaxPriceRatio(
         maxPriceRatio
@@ -142,7 +142,7 @@ describe('Boba_GasPriceOracle', () => {
       expect(await Boba_GasPriceOracle.maxPriceRatio()).to.equal(maxPriceRatio)
     })
 
-    it.only('is the 3rd storage slot', async () => {
+    it('is the 3rd storage slot', async () => {
       const maxPriceRatio = 12345
       const slot = 3
 
@@ -163,13 +163,13 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('minPriceRatio', () => {
-    it.only('should revert if called by someone other than the owner', async () => {
+    it('should revert if called by someone other than the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateMinPriceRatio(600)
       ).to.be.reverted
     })
 
-    it.only('should revert if minPriceRatio is larger than maxPriceRatio', async () => {
+    it('should revert if minPriceRatio is larger than maxPriceRatio', async () => {
       const minPriceRatio = await Boba_GasPriceOracle.maxPriceRatio()
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMinPriceRatio(
@@ -178,13 +178,13 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.reverted
     })
 
-    it.only('should succeed if called by the owner', async () => {
+    it('should succeed if called by the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMinPriceRatio(650)
       ).to.not.be.reverted
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateMinPriceRatio(600)
       )
@@ -194,7 +194,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get minPriceRatio', () => {
-    it.only('should change when minPriceRatio is called', async () => {
+    it('should change when minPriceRatio is called', async () => {
       const minPriceRatio = 600
       await Boba_GasPriceOracle.connect(signer1).updateMinPriceRatio(
         minPriceRatio
@@ -202,7 +202,7 @@ describe('Boba_GasPriceOracle', () => {
       expect(await Boba_GasPriceOracle.minPriceRatio()).to.equal(minPriceRatio)
     })
 
-    it.only('is the 4th storage slot', async () => {
+    it('is the 4th storage slot', async () => {
       const minPriceRatio = 650
       const slot = 4
 
@@ -223,7 +223,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('gasPriceOracleAddress', () => {
-    it.only('should revert if called by someone other than the owner', async () => {
+    it('should revert if called by someone other than the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateGasPriceOracleAddress(
           address1
@@ -231,7 +231,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.reverted
     })
 
-    it.only('should revert if the new address is address(0)', async () => {
+    it('should revert if the new address is address(0)', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateGasPriceOracleAddress(
           ethers.constants.AddressZero
@@ -239,7 +239,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.reverted
     })
 
-    it.only('should succeed if called by the owner', async () => {
+    it('should succeed if called by the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateGasPriceOracleAddress(
           OVM_GasPriceOracle.address
@@ -247,7 +247,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.not.be.reverted
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateGasPriceOracleAddress(
           OVM_GasPriceOracle.address
@@ -259,14 +259,14 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get gasPriceOracleAddress', () => {
-    it.only('should revert if gasPriceOracleAddress is not EOA', async () => {
+    it('should revert if gasPriceOracleAddress is not EOA', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateGasPriceOracleAddress(
           address1
         )
       ).to.be.reverted
     })
-    it.only('should change when gasPriceOracleAddress is called', async () => {
+    it('should change when gasPriceOracleAddress is called', async () => {
       await Boba_GasPriceOracle.connect(signer1).updateGasPriceOracleAddress(
         OVM_GasPriceOracle.address
       )
@@ -275,7 +275,7 @@ describe('Boba_GasPriceOracle', () => {
       )
     })
 
-    it.only('is the 6th storage slot', async () => {
+    it('is the 6th storage slot', async () => {
       const gasPriceOracleAddress = OVM_GasPriceOracle.address
       const slot = 6
 
@@ -308,7 +308,7 @@ describe('Boba_GasPriceOracle', () => {
 
   describe('getBobaCost', async () => {
     for (const input of inputs) {
-      it.only(`case: ${input}`, async () => {
+      it(`case: ${input}`, async () => {
         await OVM_GasPriceOracle.setGasPrice(1)
         await OVM_GasPriceOracle.setL1BaseFee(1)
         const decimals = await OVM_GasPriceOracle.decimals()
@@ -336,7 +336,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('useBobaAsFeeToken', () => {
-    it.only('should succeed if called is EOA', async () => {
+    it('should succeed if called is EOA', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken()).to
         .not.be.reverted
       const signerAddress = await signer1.getAddress()
@@ -345,7 +345,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.deep.eq(true)
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken())
         .to.emit(Boba_GasPriceOracle, 'UseBobaAsFeeToken')
         .withArgs(await signer1.getAddress())
@@ -353,7 +353,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('useETHAsFeeToken', () => {
-    it.only('should succeed if called is EOA', async () => {
+    it('should succeed if called is EOA', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).useBobaAsFeeToken()).to
         .not.be.reverted
       await expect(Boba_GasPriceOracle.connect(signer1).useETHAsFeeToken()).to
@@ -364,7 +364,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.be.deep.eq(false)
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       await expect(Boba_GasPriceOracle.connect(signer1).useETHAsFeeToken())
         .to.emit(Boba_GasPriceOracle, 'UseETHAsFeeToken')
         .withArgs(await signer1.getAddress())
