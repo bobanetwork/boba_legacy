@@ -185,7 +185,7 @@ describe('Native ETH value integration tests', () => {
       // give an initial balance which the ovmCALLVALUE should be added to when calculating ovmSELFBALANCE
       const initialBalance = 10
 
-      await fundUser(env.messenger, initialBalance, ValueCalls0.address)
+      await fundUser(env.messenger, initialBalance, ValueCalls1.address)
 
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(

@@ -257,7 +257,7 @@ describe('Native ETH Integration Tests', async () => {
     await env.relayXDomainMessages(transaction)
     const receipts = await env.waitForXDomainTransaction(transaction)
 
-    const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+    const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
     // Calculate the L1 portion of the fee
     const raw = serialize({
@@ -269,10 +269,10 @@ describe('Native ETH Integration Tests', async () => {
       data: transaction.data,
     })
 
-    const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-      gasPriceOracleWallet
-    ).getL1Fee(raw)
-    const fee = l2Fee.add(l1Fee)
+    // const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+    //   gasPriceOracleWallet
+    // ).getL1Fee(raw)
+    // const fee = l2Fee.add(l1Fee)
 
     const postBalances = await getBalances(env)
 
@@ -321,11 +321,11 @@ describe('Native ETH Integration Tests', async () => {
         .getBalance()
 
       // 3. do withdrawal
-      const withdrawnAmount = utils.parseEther('0.95')
+      const withdrawnAmount = utils.parseEther('0.5')
       const transaction =
-        await env.messenger.contracts.l2.L2StandardBridge.connect(
-          other
-        ).withdraw(
+        await env.messenger.contracts.l2.L2StandardBridge
+        .connect(other)
+        .withdraw(
           predeploys.OVM_ETH,
           withdrawnAmount,
           DEFAULT_TEST_GAS_L1,
@@ -335,31 +335,41 @@ describe('Native ETH Integration Tests', async () => {
       await env.relayXDomainMessages(transaction)
       const receipts = await env.waitForXDomainTransaction(transaction)
 
-      // Compute the L1 portion of the fee
-      const l1Fee =
-        await await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-          gasPriceOracleWallet
-        ).getL1Fee(
-          serialize({
-            nonce: transaction.nonce,
-            value: transaction.value,
-            gasPrice: transaction.gasPrice,
-            gasLimit: transaction.gasLimit,
-            to: transaction.to,
-            data: transaction.data,
-          })
-        )
+    // check that correct amount was withdrawn and that fee was charged
+    const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
-      // check that correct amount was withdrawn and that fee was charged
-      const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+    const l1BalanceAfter = await other
+      .connect(env.l1Wallet.provider)
+      .getBalance()
+    const l2BalanceAfter = await other.getBalance()
+    expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
+    expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
+    
+      // // Compute the L1 portion of the fee
+      // const l1Fee =
+      //   await await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+      //     gasPriceOracleWallet
+      //   ).getL1Fee(
+      //     serialize({
+      //       nonce: transaction.nonce,
+      //       value: transaction.value,
+      //       gasPrice: transaction.gasPrice,
+      //       gasLimit: transaction.gasLimit,
+      //       to: transaction.to,
+      //       data: transaction.data,
+      //     })
+      //   )
 
-      const fee = l1Fee.add(l2Fee)
-      const l1BalanceAfter = await other
-        .connect(env.l1Wallet.provider)
-        .getBalance()
-      const l2BalanceAfter = await other.getBalance()
-      expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
-      expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
+      // // check that correct amount was withdrawn and that fee was charged
+      // const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+
+      // const fee = l1Fee.add(l2Fee)
+      // const l1BalanceAfter = await other
+      //   .connect(env.l1Wallet.provider)
+      //   .getBalance()
+      // const l2BalanceAfter = await other.getBalance()
+      // expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
+      // expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
     },
     envConfig.MOCHA_TIMEOUT * 3
   )
