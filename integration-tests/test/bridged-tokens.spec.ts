@@ -135,12 +135,10 @@ describe('Bridged tokens', () => {
         500
       )
 
-      // TODO: Maybe this should be built into the SDK
-      let status: MessageStatus
-      while (status !== MessageStatus.READY_FOR_RELAY) {
-        status = await env.messenger.getMessageStatus(tx)
-        await sleep(1000)
-      }
+      await env.messenger.waitForMessageStatus(
+        tx,
+        MessageStatus.READY_FOR_RELAY
+      )
 
       await env.messenger.finalizeMessage(tx)
       await env.messenger.waitForMessageReceipt(tx)
@@ -226,12 +224,10 @@ describe('Bridged tokens', () => {
         }
       )
 
-      // TODO: Maybe this should be built into the SDK
-      let status: MessageStatus
-      while (status !== MessageStatus.READY_FOR_RELAY) {
-        status = await env.messenger.getMessageStatus(withdrawalTx)
-        await sleep(1000)
-      }
+      await env.messenger.waitForMessageStatus(
+        withdrawalTx,
+        MessageStatus.READY_FOR_RELAY
+      )
 
       await env.messenger.finalizeMessage(withdrawalTx)
       await env.messenger.waitForMessageReceipt(withdrawalTx)
