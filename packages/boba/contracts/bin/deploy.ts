@@ -1,12 +1,5 @@
 import { Wallet, providers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-//import { Watcher } from '@eth-optimism/core-utils'
-
-import {
-  CrossChainMessenger,
-  MessageStatus,
-  MessageDirection,
-} from '@eth-optimism/sdk'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -20,8 +13,6 @@ const main = async () => {
 
   const l1Provider = new providers.JsonRpcProvider(process.env.L1_NODE_WEB3_URL)
   const l2Provider = new providers.JsonRpcProvider(process.env.L2_NODE_WEB3_URL)
-
-  const networkFromProvider = await l1Provider.getNetwork()
 
   const deployer_l1 = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, l1Provider)
   const deployer_l2 = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, l2Provider)
@@ -73,24 +64,6 @@ const main = async () => {
     'BobaTuringHelper'
   )
 
-  const watcher = new CrossChainMessenger({
-    l1SignerOrProvider: deployer_l1,
-    l2SignerOrProvider: deployer_l2,
-    l1ChainId: networkFromProvider.chainId,
-    fastRelayer: false,
-  })
-
-  // const watcher = new Watcher({
-  //   l1: {
-  //     provider: l1Provider,
-  //     messengerAddress: l1MessengerAddress,
-  //   },
-  //   l2: {
-  //     provider: l2Provider,
-  //     messengerAddress: l2MessengerAddress,
-  //   },
-  // })
-
   await hre.run('deploy', {
     l1MessengerAddress,
     l2MessengerAddress,
@@ -106,7 +79,6 @@ const main = async () => {
     fastRelayerAddress,
     BobaTuringCreditAddress,
     BobaTuringHelperAddress,
-    watcher,
     noCompile: process.env.NO_COMPILE ? true : false,
   })
 }

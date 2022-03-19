@@ -71,6 +71,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
    * @param opts.l1BlockTimeSeconds Optional estimated block time in seconds for the L1 chain.
    * @param opts.contracts Optional contract address overrides.
    * @param opts.bridges Optional bridge address list.
+   * @param opts.fastRelayer Optional flag to use message-relayer-fast.
    */
   constructor(opts: {
     l1SignerOrProvider: SignerOrProviderLike
