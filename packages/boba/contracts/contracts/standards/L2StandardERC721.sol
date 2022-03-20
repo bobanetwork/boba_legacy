@@ -36,11 +36,11 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
     }
 
     function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
-        bytes4 secondSupportedInterface = IL2StandardERC721.l1Contract.selector
+        bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
             ^ IL2StandardERC721.mint.selector
             ^ IL2StandardERC721.burn.selector;
 
-        return _interfaceId == secondSupportedInterface || super.supportsInterface(_interfaceId);
+        return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
     }
 
     function mint(address _to, uint256 _tokenId) public virtual override onlyL2Bridge {

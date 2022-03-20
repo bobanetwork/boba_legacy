@@ -178,6 +178,20 @@ describe('L2NFTBridge Tests', () => {
       expect(pairNFTInfo.l2Contract).eq(L2StandardERC721.address)
       expect(pairNFTInfo.baseNetwork).eq(l1)
     })
+    it('can not register a NFT twice', async () => {
+      await L2NFTBridge.registerNFTPair(
+        ERC721.address,
+        L2StandardERC721.address,
+        'L1'
+      )
+      await expect(
+        L2NFTBridge.registerNFTPair(
+          ERC721.address,
+          L2StandardERC721.address,
+          'L1'
+        )
+      ).to.be.revertedWith('L1 NFT address already registered')
+    })
     it('can register a NFT with L2 creation', async () => {
       const l2 = 1
       await L2NFTBridge.registerNFTPair(

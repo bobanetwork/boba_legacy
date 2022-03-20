@@ -178,10 +178,10 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         bytes32 bn = keccak256(abi.encodePacked(_baseNetwork));
         bytes32 l1 = keccak256(abi.encodePacked("L1"));
         bytes32 l2 = keccak256(abi.encodePacked("L2"));
-        // l2 NFT address equal to zero, then pair is not registered.
+        // l1 NFT address equal to zero, then pair is not registered yet.
         // use with caution, can register only once
-        PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
-        require(pairNFT.l2Contract == address(0), "L2 NFT Address Already Registered");
+        PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
+        require(pairNFT.l1Contract == address(0), "L1 NFT address already registered");
         // _baseNetwork can only be L1 or L2
         require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
