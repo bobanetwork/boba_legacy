@@ -39,7 +39,7 @@
     "@ethersproject/web": "^5.5.1",
     "bufio": "^1.0.7",
     "chai": "^4.3.4",
-    "ethers": "^5.6.1"
+    "ethers": "^5.5.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.18",
