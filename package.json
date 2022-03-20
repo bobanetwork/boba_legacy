@@ -58,7 +58,7 @@
     "release": "yarn build && yarn changeset publish"
   },
   "dependencies": {
-    "@changesets/cli": "^2.16.0",
+    "@changesets/cli": "^2.21.1",
     "@codechecks/client": "^0.1.11"
   }
 }

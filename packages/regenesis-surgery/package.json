@@ -22,11 +22,11 @@
   },
   "dependencies": {
     "@boba/register": "0.0.1",
-    "@discoveryjs/json-ext": "^0.5.3",
+    "@discoveryjs/json-ext": "^0.5.7",
     "@eth-optimism/contracts": "^0.5.11",
     "@uniswap/v3-core-optimism": "^1.0.0-rc.0",
-    "chalk": "^4.1.2",
-    "dotenv": "^10.0.0",
-    "ethers": "^5.4.5"
+    "chalk": "^5.0.1",
+    "dotenv": "^16.0.0",
+    "ethers": "^5.6.1"
   }
 }
