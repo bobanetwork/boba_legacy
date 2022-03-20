@@ -1712,32 +1712,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@eth-optimism/common-ts@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/common-ts/-/common-ts-0.2.1.tgz#274497f668ac5a9e8717bf6a31b037f6c080e626"
-  integrity sha512-YALS43zZ4Hiz7+aG6LzmzVDZ+OlLyAzcBcqmAHF3qTXQFFbUaFZsXyno+zqxz/5XGqKctuTHl2sKY0SxCOJUVg==
+"@eth-optimism/common-ts@^0.1.0":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/common-ts/-/common-ts-0.1.6.tgz#2745366faa9db77aba970d1039eb8367c0e05b72"
+  integrity sha512-+sFW2eMvJEXoJpdq5MD2bO8hJDHlXxcNyJe23QEKjCounOnoA94ly0+YTVGdDvBM5MuqOk6WFNQ2muIv7sS2cQ==
   dependencies:
     "@sentry/node" "^6.3.1"
     express "^4.17.1"
-    pino "^6.11.3"
-    pino-multi-stream "^5.3.0"
-    pino-sentry "^0.7.0"
-    prom-client "^13.1.0"
-
-"@eth-optimism/common-ts@0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/common-ts/-/common-ts-0.2.2.tgz#5389905dec8a97809548112b342a48b655369f2e"
-  integrity sha512-ZTL/+XiSIkrP7LkfkZ+Ab+qXWI3cMrhnnmYEh+i3T6ou5+2J57gkPtA/C5jeDk18zEjDdskASSihWjskA54/XA==
-  dependencies:
-    "@eth-optimism/core-utils" "0.8.1"
-    "@sentry/node" "^6.3.1"
-    bcfg "^0.1.7"
-    commander "^9.0.0"
-    dotenv "^16.0.0"
-    envalid "^7.2.2"
-    ethers "^5.5.4"
-    express "^4.17.1"
-    lodash "^4.17.21"
     pino "^6.11.3"
     pino-multi-stream "^5.3.0"
     pino-sentry "^0.7.0"
