@@ -9,7 +9,7 @@
   "author": "Optimism PBC",
   "license": "MIT",
   "scripts": {
-    "all": "yarn clean && yarn build && yarn test && yarn lint:fix && yarn lint",
+   "all": "yarn clean && yarn build && yarn test && yarn lint:fix && yarn lint",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist/ ./tsconfig.build.tsbuildinfo",
     "lint:check": "eslint . --max-warnings=0",
@@ -19,7 +19,7 @@
     "test": "ts-mocha test/*.spec.ts"
   },
   "dependencies": {
-    "@sentry/node": "^6.18.2",
+    "@sentry/node": "^6.3.1",
     "express": "^4.17.1",
     "pino": "^6.11.3",
     "pino-multi-stream": "^5.3.0",
