@@ -3,14 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 
 /* Imports: External */
-import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
-import { sleep } from '@eth-optimism/core-utils'
-import { serialize } from '@ethersproject/transactions'
-import {
-  predeploys,
-  getContractInterface,
-  getContractFactory,
-} from '@eth-optimism/contracts'
+import { ethers, BigNumber, Contract, utils } from 'ethers'
+import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 
 /* Imports: Internal */
 import { IS_LIVE_NETWORK } from './shared/utils'
@@ -26,6 +20,7 @@ const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
 
 describe('Boba Fee Payment Integration Tests', async () => {
   let env: OptimismEnv
+  let L1Boba: Contract
   let L2Boba: Contract
   let Boba_GasPriceOracle: Contract
 
@@ -34,6 +29,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
+    L1Boba = getContractFactory('BOBA')
+      .attach(env.addressesBOBA.TOKENS.BOBA.L1)
+      .connect(env.l1Wallet)
     L2Boba = getContractFactory('L2GovernanceERC20')
       .attach(predeploys.L2GovernanceERC20)
       .connect(env.l2Wallet)
@@ -376,7 +374,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:rpc} should reject a transaction with a too low gas limit', async () => {
+  it('{tag:other} should reject a transaction with a too low gas limit', async () => {
     const tx = {
       to: env.l2Wallet.address,
       value: ethers.utils.parseEther('1'),
@@ -388,6 +386,49 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
       'invalid transaction: intrinsic gas too low'
+    )
+  })
+
+  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
+    await expect(Boba_GasPriceOracle.withdraw()).to.be.rejected
+  })
+
+  it('{tag:other} should be able to withdraw fees back to L1 once the minimum is met', async function () {
+    const l1FeeWallet = await Boba_GasPriceOracle.l1FeeWallet()
+    const balanceBefore = await L1Boba.balanceOf(l1FeeWallet)
+    const withdrawalAmount = await Boba_GasPriceOracle.MIN_WITHDRAWAL_AMOUNT()
+
+    const l2WalletBalance = await L2Boba.balanceOf(env.l2Wallet.address)
+    if (IS_LIVE_NETWORK && l2WalletBalance.lt(withdrawalAmount)) {
+      console.log(
+        `NOTICE: must have at least ${ethers.utils.formatEther(
+          withdrawalAmount
+        )} BOBA on L2 to execute this test, skipping`
+      )
+      this.skip()
+    }
+
+    // Transfer the minimum required to withdraw.
+    const tx = await L2Boba.transfer(
+      Boba_GasPriceOracle.address,
+      withdrawalAmount
+    )
+    await tx.wait()
+
+    const vaultBalance = await L2Boba.balanceOf(Boba_GasPriceOracle.address)
+
+    // Submit the withdrawal.
+    const withdrawTx = await Boba_GasPriceOracle.withdraw({
+      gasPrice: 0,
+    })
+
+    // Wait for the withdrawal to be relayed to L1.
+    await env.waitForXDomainTransaction(withdrawTx, Direction.L2ToL1)
+
+    // Balance difference should be equal to old L2 balance.
+    const balanceAfter = await L1Boba.balanceOf(l1FeeWallet)
+    expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
+      BigNumber.from(vaultBalance)
     )
   })
 
