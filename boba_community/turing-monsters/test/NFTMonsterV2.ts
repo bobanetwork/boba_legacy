@@ -196,7 +196,6 @@ describe("Turing bridgeable NFT Random 256", function () {
 
     console.log("Turing NFT =",res)
 
-
     console.log(`Trying to mint 1 NFTs for ${ethers.utils.formatEther(mintingPrice)} ETH each, should fail as max mint per wallet reached.`)
     let trFail = await erc721.mint(1, {gasLimit: 1000000, value: mintingPrice})
     let resFail = trFail.wait()

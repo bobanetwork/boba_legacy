@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "Hybrid Compute for Ethereum prototype",
   "main": "index.js",
-  "repository": "git@github.com:omgnetwork/optimism-v2/packages/boba/turing",
+  "repository": "git@github.com:bobanetwork/boba/packages/boba/turing",
   "author": "Michael Montour <mmontour@enya.ai>",
   "license": "Internal use only",
   "private": true,

@@ -20,7 +20,7 @@ import { Grid, Box } from '@mui/material'
 
 import { orderBy } from 'lodash'
 import { selectNetwork } from 'selectors/setupSelector'
-import { useTheme } from '@emotion/react'
+
 import { getNetwork } from 'util/masterConfig'
 
 import moment from 'moment'
@@ -213,7 +213,7 @@ function TX_Pending({ searchHistory, transactions }) {
                     }
                   }
                 }
-              
+
                 let annotation = ''
                 if(typeof(i.label) === 'undefined') {
                   //annotation = 'No Idea'

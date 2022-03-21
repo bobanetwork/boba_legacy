@@ -155,7 +155,7 @@ func (d *Driver) GetBatchBlockRange(
 func (d *Driver) CraftBatchTx(
 	ctx context.Context,
 	start, end, nonce *big.Int,
-) (*types.Transaction, error) {
+) (*types.Transaction, uint64, error) {
 
 	name := d.cfg.Name
 
@@ -169,7 +169,7 @@ func (d *Driver) CraftBatchTx(
 	for i := new(big.Int).Set(start); i.Cmp(end) < 0; i.Add(i, bigOne) {
 		block, err := d.cfg.L2Client.BlockByNumber(ctx, i)
 		if err != nil {
-			return nil, err
+			return nil, totalTxSize, err
 		}
 
 		// For each sequencer transaction, update our running total with the
@@ -198,12 +198,12 @@ func (d *Driver) CraftBatchTx(
 			shouldStartAt, d.cfg.BlockOffset, batchElements,
 		)
 		if err != nil {
-			return nil, err
+			return nil, totalTxSize, err
 		}
 
 		batchArguments, err := batchParams.Serialize()
 		if err != nil {
-			return nil, err
+			return nil, totalTxSize, err
 		}
 
 		appendSequencerBatchID := d.ctcABI.Methods[appendSequencerBatchMethodName].ID
@@ -228,7 +228,7 @@ func (d *Driver) CraftBatchTx(
 			d.cfg.PrivKey, d.cfg.ChainID,
 		)
 		if err != nil {
-			return nil, err
+			return nil, totalTxSize, err
 		}
 		opts.Context = ctx
 		opts.Nonce = nonce
@@ -237,7 +237,7 @@ func (d *Driver) CraftBatchTx(
 		tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
 		switch {
 		case err == nil:
-			return tx, nil
+			return tx, totalTxSize, nil
 
 		// If the transaction failed because the backend does not support
 		// eth_maxPriorityFeePerGas, fallback to using the default constant.
@@ -249,10 +249,11 @@ func (d *Driver) CraftBatchTx(
 			log.Warn(d.cfg.Name + " eth_maxPriorityFeePerGas is unsupported " +
 				"by current backend, using fallback gasTipCap")
 			opts.GasTipCap = drivers.FallbackGasTipCap
-			return d.rawCtcContract.RawTransact(opts, batchCallData)
+			tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
+			return tx, totalTxSize, err
 
 		default:
-			return nil, err
+			return nil, totalTxSize, err
 		}
 	}
 }

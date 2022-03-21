@@ -2,12 +2,12 @@
   "name": "@boba/Truffle-ERC20-Example",
   "version": "1.0.0",
   "description": "Example of using Truffle to deploy an ERC20 to Boba Rinkeby",
-  "homepage": "https://github.com/omgnetwork/optimism-v2/develop/boba_examples/truffle-erc20#readme",
+  "homepage": "https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20#readme",
   "license": "MIT",
   "author": "OMG",
   "repository": {
     "type": "git",
-    "url": "https://github.com/omgnetwork/optimism-v2/develop/boba_examples/truffle-erc20.git"
+    "url": "https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20.git"
   },
   "scripts": {
     "clean": "rimraf build",

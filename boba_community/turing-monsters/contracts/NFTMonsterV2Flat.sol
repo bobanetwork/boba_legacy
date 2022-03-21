@@ -1839,6 +1839,7 @@ contract NFTMonsterV2Flat is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyA
         super._beforeTokenTransfer(from, to, tokenId);
     }
 }
+
 // Sources flattened with hardhat v2.8.4 https://hardhat.org
 
 // File @openzeppelin/contracts/utils/introspection/IERC165.sol@v4.3.2

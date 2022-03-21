@@ -6,16 +6,16 @@
     + [Helpful commands](#helpful-commands)
     + [Running unit tests](#running-unit-tests)
     + [Running integration tests](#running-integration-tests)
-    
+
 ## Basics
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
-$ cd optimism-v2
+$ git clone git@github.com:bobanetwork/boba.git
+$ cd boba
 $ yarn clean
 $ yarn
 $ yarn build
