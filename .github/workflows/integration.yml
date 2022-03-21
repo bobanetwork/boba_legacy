@@ -280,6 +280,7 @@ jobs:
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
       - name: Sleep for 5 seconds
+        if: steps.stop-ec2-runner.outcome == 'failure'
         run: sleep 5s
         shell: bash
       - name: Stop EC2 runner
@@ -338,6 +339,7 @@ jobs:
           label: ${{ steps.runner_info.outputs.label }}
           ec2-instance-id: ${{ steps.runner_info.outputs.ec2-instance-id }}
       - name: Sleep for 5 seconds
+        if: steps.stop-ec2-executioner.outcome == 'failure'
         run: sleep 5s
         shell: bash
       - name: Stop EC2 executioner
