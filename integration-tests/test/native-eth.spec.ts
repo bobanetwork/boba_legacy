@@ -323,9 +323,9 @@ describe('Native ETH Integration Tests', async () => {
       // 3. do withdrawal
       const withdrawnAmount = utils.parseEther('0.5')
       const transaction =
-        await env.messenger.contracts.l2.L2StandardBridge
-        .connect(other)
-        .withdraw(
+        await env.messenger.contracts.l2.L2StandardBridge.connect(
+          other
+        ).withdraw(
           predeploys.OVM_ETH,
           withdrawnAmount,
           DEFAULT_TEST_GAS_L1,
@@ -335,16 +335,16 @@ describe('Native ETH Integration Tests', async () => {
       await env.relayXDomainMessages(transaction)
       const receipts = await env.waitForXDomainTransaction(transaction)
 
-    // check that correct amount was withdrawn and that fee was charged
-    const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
+      // check that correct amount was withdrawn and that fee was charged
+      const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
-    const l1BalanceAfter = await other
-      .connect(env.l1Wallet.provider)
-      .getBalance()
-    const l2BalanceAfter = await other.getBalance()
-    expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
-    expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
-    
+      const l1BalanceAfter = await other
+        .connect(env.l1Wallet.provider)
+        .getBalance()
+      const l2BalanceAfter = await other.getBalance()
+      expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
+      expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
+
       // // Compute the L1 portion of the fee
       // const l1Fee =
       //   await await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(

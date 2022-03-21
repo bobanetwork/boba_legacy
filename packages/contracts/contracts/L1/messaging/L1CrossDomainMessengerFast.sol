@@ -34,9 +34,9 @@ import { IL1DepositHash } from "./IL1DepositHash.sol";
  * @dev The L1 Cross Domain Messenger contract sends messages from L1 to L2, and relays messages from L2 onto L1.
  * In the event that a message sent from L1 to L2 is rejected for exceeding the L2 epoch gas limit, it can be resubmitted
  * via this contract's replay function.
- * This 'fast' CDM (CDMF) only relays messages from L2 onto L1 and cannot send or replay messages. Those functions have been 
+ * This 'fast' CDM (CDMF) only relays messages from L2 onto L1 and cannot send or replay messages. Those functions have been
  * disabled. The overall goal of the 'fast' messenger is to relay messages to L1 without being subject to the 7 day delay,
- * which is normally implemented by blocking messages that are less than 7 days old. 
+ * which is normally implemented by blocking messages that are less than 7 days old.
  *
  * Compiler used: solc
  * Runtime target: EVM

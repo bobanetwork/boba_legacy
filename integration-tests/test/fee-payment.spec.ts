@@ -50,7 +50,7 @@ describe('Fee Payment Integration Tests', async () => {
     }
   )
 
-it('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
+  it('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')

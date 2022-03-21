@@ -700,7 +700,7 @@ describe('Liquidity Pool Test', async () => {
   /* In this test, we provide liquidity X to a pool, 
      but then trigger a X + 1000 liquidity request. 
      If the system is working correctly, this should trigger a revert 
-  */ 
+  */
 
   // it('{tag:mrf} 1 should revert unfulfillable swap-offs', async () => {
   //   const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -759,7 +759,6 @@ describe('Liquidity Pool Test', async () => {
   // })
 
   it('{tag:mrf} should revert unfulfillable swap-offs', async () => {
-
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -776,7 +775,7 @@ describe('Liquidity Pool Test', async () => {
     const remainingPercent = BigNumber.from(1000).sub(totalFeeRate)
 
     const balanceOfPool = await L1ERC20.balanceOf(L1LiquidityPool.address)
-    const requestedLiquidity = (balanceOfPool).add(1000)
+    const requestedLiquidity = balanceOfPool.add(1000)
     const fastExitAmount = requestedLiquidity.mul(1000).div(remainingPercent)
 
     const approveBobL2TX = await L2ERC20.connect(env.l2Wallet).approve(
@@ -818,7 +817,6 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('{tag:mrf} should revert unfulfillable swap-ons', async () => {
-
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
