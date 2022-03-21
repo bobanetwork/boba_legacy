@@ -239,6 +239,15 @@ func DeriveL1GasInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, 
 	return l1Fee, l1GasPrice, l1GasUsed, scalar, nil
 }
 
+// DeriveL1GasDataInfo reads L1 gas related information to be included
+// on the receipt
+func DeriveL1GasDataInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, *big.Float, error) {
+	l1GasPrice, overhead, scalar, _ := readGPOStorageSlots(rcfg.L2GasPriceOracleAddress, state)
+	l1GasUsed := CalculateL1GasUsed(msg.Data(), overhead)
+	l1Fee := CalculateL1Fee(msg.Data(), overhead, l1GasPrice, scalar)
+	return l1Fee, l1GasPrice, l1GasUsed, scalar, nil
+}
+
 func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int, *big.Float, *big.Int) {
 	l2GasPrice := state.GetState(addr, rcfg.L2GasPriceSlot)
 	l1GasPrice := state.GetState(addr, rcfg.L1GasPriceSlot)

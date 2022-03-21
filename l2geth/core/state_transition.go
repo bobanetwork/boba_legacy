@@ -140,14 +140,12 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 	bobaPriceRatio := new(big.Int)
 	gasPrice := msg.GasPrice()
 	// The gasUsed hard fork
-	isGasUpdate := true
+	isGasUpdate := evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
 	// The fee token hard fork
-	isFeeTokenUpdate := true
+	isFeeTokenUpdate := evm.ChainConfig().IsFeeTokenUpdate(evm.BlockNumber)
 	// The default fee token is ETH
 	isBobaFeeTokenSelect := false
 	if rcfg.UsingOVM {
-		isFeeTokenUpdate = evm.ChainConfig().IsFeeTokenUpdate(evm.BlockNumber)
-		isGasUpdate = evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
 		if msg.GasPrice().Cmp(common.Big0) != 0 {
 			// Compute the L1 fee before the state transition
 			// so it only has to be read from state one time.

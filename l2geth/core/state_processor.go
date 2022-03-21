@@ -103,9 +103,17 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	// Compute the fee related information that is to be included
 	// on the receipt. This must happen before the state transition
 	// to ensure that the correct information is used.
-	l1Fee, l1GasPrice, l1GasUsed, scalar, err := fees.DeriveL1GasInfo(msg, statedb)
-	if err != nil {
-		return nil, err
+	l1Fee, l1GasPrice, l1GasUsed, scalar := new(big.Int), new(big.Int), new(big.Int), new(big.Float)
+	if config.IsFeeTokenUpdate(header.Number) {
+		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasDataInfo(msg, statedb)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasInfo(msg, statedb)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Apply the transaction to the current state (included in the env)

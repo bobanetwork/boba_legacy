@@ -452,6 +452,9 @@ func (c *ChainConfig) IsSDUpdate(num *big.Int) bool {
 }
 
 func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetGasUpdatedForkNum, num)
 	}
@@ -462,6 +465,9 @@ func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
 }
 
 func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetFeeUpdatedForkNum, num)
 	}

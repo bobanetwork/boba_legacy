@@ -432,6 +432,35 @@ describe('Boba Fee Payment Integration Tests', async () => {
     )
   })
 
+  // Boba Ethereum special fields on the receipt
+  it('{tag:other} includes L2 Boba fee', async () => {
+    const l2GasPrice = await env.gasPriceOracle.gasPrice()
+    const l1Fee = await env.gasPriceOracle.getL1Fee('0x')
+    const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
+    const l1GasUsed = await env.gasPriceOracle.getL1GasUsed('0x')
+    const scalar = await env.gasPriceOracle.scalar()
+    const decimals = await env.gasPriceOracle.decimals()
+
+    const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
+
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+
+    const tx = await env.l2Wallet.sendTransaction({
+      to: env.l2Wallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+    const receipt = await tx.wait()
+    const txBobaFee = receipt.gasUsed.mul(tx.gasPrice).mul(priceRatio)
+    const json = await env.l2Provider.send('eth_getTransactionReceipt', [
+      tx.hash,
+    ])
+    expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
+    expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
+    expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
+    expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
+    expect(json.l2BobaFee).to.deep.equal(txBobaFee)
+  })
+
   it('{tag:other} should register to use ETH as the fee token', async () => {
     // Register l1wallet for using ETH as the fee token
     const registerTx = await Boba_GasPriceOracle.useETHAsFeeToken()

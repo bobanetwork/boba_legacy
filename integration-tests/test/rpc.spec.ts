@@ -285,9 +285,9 @@ describe('Basic RPC tests', () => {
         data: tx.data,
       })
 
-      const l1Fee = await env.gasPriceOracle.getL1Fee(raw)
+      const l1Fee = await env.gasPriceOracle.getL1Fee('0x')
       const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-      const l1GasUsed = await env.gasPriceOracle.getL1GasUsed(raw)
+      const l1GasUsed = await env.gasPriceOracle.getL1GasUsed('0x')
       const scalar = await env.gasPriceOracle.scalar()
       const decimals = await env.gasPriceOracle.decimals()
 
@@ -304,6 +304,7 @@ describe('Basic RPC tests', () => {
       expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
       expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
       expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
+      expect(json.l2BobaFee).to.deep.equal(BigNumber.from(0))
     })
   })
 
