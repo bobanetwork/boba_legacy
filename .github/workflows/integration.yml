@@ -279,6 +279,9 @@ jobs:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+      - name: Sleep for 5 seconds
+        run: sleep 5s
+        shell: bash
       - name: Stop EC2 runner
         if: steps.stop-ec2-runner.outcome == 'failure'
         uses: machulav/ec2-github-runner@v2
@@ -334,6 +337,9 @@ jobs:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           label: ${{ steps.runner_info.outputs.label }}
           ec2-instance-id: ${{ steps.runner_info.outputs.ec2-instance-id }}
+      - name: Sleep for 5 seconds
+        run: sleep 5s
+        shell: bash
       - name: Stop EC2 executioner
         if: steps.stop-ec2-executioner.outcome == 'failure'
         uses: machulav/ec2-github-runner@v2
