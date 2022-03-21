@@ -11,7 +11,7 @@
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
-    "flatten": "npx hardhat flatten ./contracts/NFTMonsterV2.sol >> contracts/TuringMonsters-flat.sol",
+    "flatten": "npx hardhat flatten ./contracts/NFTMonsterV2.sol >> contracts/NFTMonsterV2Flat.sol",
     "test:local": "hardhat --network boba_local test",
     "test:rinkeby": "hardhat --network boba_rinkeby test",
     "test:mainnet": "hardhat --network boba_mainnet test"
