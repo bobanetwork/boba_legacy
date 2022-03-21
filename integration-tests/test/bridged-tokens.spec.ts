@@ -140,7 +140,10 @@ describe('Bridged tokens', () => {
         MessageStatus.READY_FOR_RELAY
       )
 
-      await env.messenger.finalizeMessage(tx)
+      // messengers are always running in the standard Boba stack
+      // do not need to do this twice
+      // they will (should) handle this automatically
+      // await env.messenger.finalizeMessage(tx)
       await env.messenger.waitForMessageReceipt(tx)
 
       expect(await L1__ERC20.balanceOf(env.l1Wallet.address)).to.deep.equal(
@@ -169,7 +172,10 @@ describe('Bridged tokens', () => {
         MessageStatus.READY_FOR_RELAY
       )
 
-      await env.messenger.finalizeMessage(tx)
+      // messengers are always running in the standard Boba stack
+      // do not need to do this twice
+      // they will (should) handle this automatically
+      // await env.messenger.finalizeMessage(tx)
       await env.messenger.waitForMessageReceipt(tx)
 
       expect(await L1__ERC20.balanceOf(otherWalletL1.address)).to.deep.equal(
@@ -229,7 +235,10 @@ describe('Bridged tokens', () => {
         MessageStatus.READY_FOR_RELAY
       )
 
-      await env.messenger.finalizeMessage(withdrawalTx)
+      // messengers are always running in the standard Boba stack
+      // do not need to do this twice
+      // they will (should) handle this automatically
+      // await env.messenger.finalizeMessage(withdrawalTx)
       await env.messenger.waitForMessageReceipt(withdrawalTx)
 
       // Ensure that the L1 recipient address has not received any additional L1 token balance.

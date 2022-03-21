@@ -34,6 +34,9 @@ import { IL1DepositHash } from "./IL1DepositHash.sol";
  * @dev The L1 Cross Domain Messenger contract sends messages from L1 to L2, and relays messages from L2 onto L1.
  * In the event that a message sent from L1 to L2 is rejected for exceeding the L2 epoch gas limit, it can be resubmitted
  * via this contract's replay function.
+ * This 'fast' CDM (CDMF) only relays messages from L2 onto L1 and cannot send or replay messages. Those functions have been 
+ * disabled. The overall goal of the 'fast' messenger is to relay messages to L1 without being subject to the 7 day delay,
+ * which is normally implemented by blocking messages that are less than 7 days old. 
  *
  * Compiler used: solc
  * Runtime target: EVM
@@ -104,7 +107,7 @@ contract L1CrossDomainMessengerFast is
     function initialize(address _libAddressManager) public initializer {
         require(
             address(libAddressManager) == address(0),
-            "L1CrossDomainMessenger already intialized."
+            "L1CrossDomainMessengerFast already intialized."
         );
         libAddressManager = Lib_AddressManager(_libAddressManager);
         xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
@@ -151,7 +154,7 @@ contract L1CrossDomainMessengerFast is
     function xDomainMessageSender() public view override returns (address) {
         require(
             xDomainMsgSender != Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER,
-            "xDomainMessageSender is not set"
+            "CDMF: xDomainMessageSender is not set"
         );
         return xDomainMsgSender;
     }
@@ -167,7 +170,7 @@ contract L1CrossDomainMessengerFast is
         bytes memory _message,
         uint32 _gasLimit
     ) public override {
-        revert("Sending via this messenger is disabled");
+        revert("sendMessage via L1CrossDomainMessengerFast is disabled");
     }
 
     /********************
@@ -194,24 +197,24 @@ contract L1CrossDomainMessengerFast is
 
         require(
             _verifyXDomainMessage(xDomainCalldata, _proof) == true,
-            "Provided message could not be verified."
+            "CDMF: Provided message could not be verified."
         );
 
         bytes32 xDomainCalldataHash = keccak256(xDomainCalldata);
 
         require(
             successfulMessages[xDomainCalldataHash] == false,
-            "Provided message has already been received."
+            "CDMF: Provided message has already been received."
         );
 
         require(
             blockedMessages[xDomainCalldataHash] == false,
-            "Provided message has been blocked."
+            "CDMF: Provided message has been blocked."
         );
 
         require(
             _target != resolve("CanonicalTransactionChain"),
-            "Cannot send L2->L1 messages to L1 system contracts."
+            "CDMF: Cannot send L2->L1 messages to L1 system contracts."
         );
 
         xDomainMsgSender = _sender;
@@ -261,7 +264,7 @@ contract L1CrossDomainMessengerFast is
         uint32 _oldGasLimit,
         uint32 _newGasLimit
     ) public override {
-        revert("Sending via this messenger is disabled");
+        revert("replayMessage via L1CrossDomainMessengerFast is disabled");
     }
 
     /**********************
@@ -334,7 +337,7 @@ contract L1CrossDomainMessengerFast is
 
         require(
             exists == true,
-            "Message passing predeploy has not been initialized or invalid proof provided."
+            "CDMF: Message passing predeploy has not been initialized or invalid proof provided."
         );
 
         Lib_OVMCodec.EVMAccount memory account = Lib_OVMCodec.decodeEVMAccount(

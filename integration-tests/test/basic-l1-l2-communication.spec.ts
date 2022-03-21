@@ -77,7 +77,10 @@ describe('Basic L1<>L2 Communication', async () => {
         MessageStatus.READY_FOR_RELAY
       )
 
-      await env.messenger.finalizeMessage(transaction)
+      // messengers are always running in the standard Boba stack
+      // do not need to do this twice
+      // they will (should) handle this automatically
+      // await env.messenger.finalizeMessage(transaction)
       await env.messenger.waitForMessageReceipt(transaction)
 
       expect(await L1SimpleStorage.msgSender()).to.equal(
