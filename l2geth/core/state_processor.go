@@ -17,6 +17,8 @@
 package core
 
 import (
+	"math/big"
+
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/consensus"
 	"github.com/ethereum-optimism/optimism/l2geth/consensus/misc"
@@ -117,6 +119,14 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		return nil, err
 	}
 
+	// Get the l2 boba fee if users use Boba token as the fee token
+	L2BobaFee := new(big.Int)
+	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
+	if feeTokenSelection.Cmp(common.Big1) == 0 {
+		bobaPriceRatio := statedb.GetBobaPriceRatio()
+		L2BobaFee = new(big.Int).Mul(big.NewInt(int64(gas)), new(big.Int).Mul(msg.GasPrice(), bobaPriceRatio))
+	}
+
 	// Update the state with pending changes
 	var root []byte
 	if config.IsByzantium(header.Number) {
@@ -146,6 +156,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
 	receipt.Turing = vmenv.Context.Turing
+	receipt.L2BobaFee = L2BobaFee
 
 	return receipt, err
 }
