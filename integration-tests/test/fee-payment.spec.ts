@@ -226,4 +226,67 @@ describe('Fee Payment Integration Tests', async () => {
       BigNumber.from(vaultBalance)
     )
   })
+
+  // The configuration of allowing the different gas price shouldn't go into the production
+  it('{tag:other} should compute correct fee with different gas price', async () => {
+    await setPrices(env, 1)
+
+    const WETH = getContractFactory('OVM_ETH')
+      .attach(predeploys.OVM_ETH)
+      .connect(env.l2Wallet)
+
+    let gasPrice = 1
+
+    while (gasPrice < 10) {
+      const preBalance = await env.l2Wallet.getBalance()
+
+      const feeVaultBefore = await WETH.balanceOf(
+        predeploys.OVM_SequencerFeeVault
+      )
+
+      const unsigned = await env.l2Wallet.populateTransaction({
+        to: env.l2Wallet.address,
+        value: 0,
+        gasPrice,
+      })
+
+      const tx = await env.l2Wallet.sendTransaction(unsigned)
+      const receipt = await tx.wait()
+      const fee = receipt.gasUsed.mul(tx.gasPrice)
+      const postBalance = await env.l2Wallet.getBalance()
+      const feeVaultAfter = await WETH.balanceOf(
+        predeploys.OVM_SequencerFeeVault
+      )
+      const balanceDiff = preBalance.sub(postBalance)
+      const feeReceived = feeVaultAfter.sub(feeVaultBefore)
+      expect(balanceDiff).to.deep.equal(fee)
+      // There is no inflation
+      expect(feeReceived).to.deep.equal(balanceDiff)
+
+      gasPrice += 1
+    }
+  })
+
+  // https://github.com/bobanetwork/boba/pull/22
+  it('{tag:other} should be able to configure l1 gas price in a rare situation', async () => {
+    // This blocks all txs, because the gas usage for the l1 security fee is too large
+    const gasPrice = await env.gasPriceOracle.setGasPrice(1)
+    await gasPrice.wait()
+    const baseFee = await env.gasPriceOracle.setL1BaseFee(11_000_000)
+    await baseFee.wait()
+
+    // Can't transfer ETH
+    await expect(
+      env.l2Wallet.sendTransaction({
+        to: env.l2Wallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+    ).to.be.rejected
+
+    // Reset L1 base fee
+    const resetBaseFee = await env.gasPriceOracle
+      .connect(env.l2Wallet_4)
+      .setL1BaseFee(1, { gasPrice: 0, gasLimit: 11000000 })
+    await resetBaseFee.wait()
+  })
 })

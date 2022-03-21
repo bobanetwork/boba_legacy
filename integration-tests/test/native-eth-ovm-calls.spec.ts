@@ -44,7 +44,7 @@ describe('Native ETH value integration tests', () => {
     // In l2geth, we override the gas price in api.go if the gas price is nil or zero
     // gasPrice := new(big.Int)
     // price, err := b.SuggestPrice(ctx)
-    // if err == nil && args.GasPrice == nil && isFeeTokenUpdate && gasPriceOracleOwner != *args.From {
+    // if err == nil && args.GasPrice == nil && isFeeTokenUpdate {
     //   gasPrice = price
     //   args.GasPrice = (*hexutil.Big)(price)
     // }
@@ -52,8 +52,8 @@ describe('Native ETH value integration tests', () => {
     // from state_transition.go, because the calculation for the l1 security fee is based on
     // the gas price.
     // This requires users to have enough balance to pypass the estimateGas checks and they
-    // can't transfer all ETH balance, because all balance + l1securityfee is larger than the total
-    // balance
+    // can't transfer all ETH balance without providing the gas limit,
+    // because all balance + l1securityfee is larger than the total balance
     // In the production environment, this problem doesn't exist, because
     // users can't use zero gas price and they have to have enough balance to
     // cover the cost
@@ -76,15 +76,14 @@ describe('Native ETH value integration tests', () => {
 
     const backAgain = await other.sendTransaction({
       to: wallet.address,
-      value: value.div(BigNumber.from('2')),
+      value,
       gasPrice: 0,
+      // Provide the gas limit to ingore the eth_estimateGas
+      gasLimit: 1100000,
     })
     await backAgain.wait()
 
-    await checkBalances([
-      initialBalances[0].sub(value.div(BigNumber.from('2'))),
-      initialBalances[1].add(value.div(BigNumber.from('2'))),
-    ])
+    await checkBalances([initialBalances[0], initialBalances[1]])
   })
 
   describe(`calls between OVM contracts with native ETH value and relevant opcodes`, async () => {

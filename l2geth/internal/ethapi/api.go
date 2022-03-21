@@ -1023,13 +1023,16 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	// In production, the gas price oracle owner can use gar price = 0
 	gasPrice := new(big.Int)
 	price, err := b.SuggestPrice(ctx)
-	gasPriceOracleOwner := fees.ReadGasPriceOraclerOwner(state)
 	if err == nil && isFeeTokenUpdate {
-		// gasPrice is used to calculate the l2ExtraFee
-		gasPrice = price
 		// Override gas price
-		if args.GasPrice == nil && gasPriceOracleOwner != *args.From {
+		if args.GasPrice == nil {
+			// args.GasPrice is used to estimate gas limit
 			args.GasPrice = (*hexutil.Big)(price)
+			// gasPrice is used to calculate the l2ExtraFee
+			gasPrice = price
+		} else {
+			// Set gasPrice to the gas price from input
+			gasPrice = (*big.Int)(args.GasPrice)
 		}
 	}
 	// Create a helper to check if a gas allowance results in an executable transaction
