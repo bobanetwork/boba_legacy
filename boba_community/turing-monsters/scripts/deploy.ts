@@ -20,9 +20,9 @@ async function main() {
   const NFTMonsterV2 = await ethers.getContractFactory("NFTMonsterV2");
   const nftMonster = await NFTMonsterV2.deploy(
     "TuringMonster",
-    "BOO",
-    100,
-    ['0x4B45C30b8c4fAEC1c8eAaD5398F8b8e91BFbac15'],
+    "TUMO",
+    1000,
+    ['0xC98469Fd959d96722723dbC7Dba58b36E7854386'],
     helper.address,
     {});
   await nftMonster.deployed();
@@ -37,20 +37,28 @@ async function main() {
   const res1 = await tr1.wait()
   console.log("adding your ERC721 as PermittedCaller to TuringHelper", res1.events[0].data)
 
-  const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+  /*const helper = new ContractFactory(
+    TuringHelperJson.abi,
+    TuringHelperJson.bytecode,
+    testWallet
+  ).attach('0x1EC9BA5f9695E7Bcb5d0a170a3D40D6b9039AfC9')*/
+
+
+  // use proxy address
+  const BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf' // testnet: '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
   const turingCredit = getContractFactory(
     'BobaTuringCredit',
     testWallet
-  ).attach(BobaTuringCreditRinkebyAddress)
+  ).attach(BobaTuringCreditAddress)
 
-  const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+  const BOBAL2Address = '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7' // testnet: '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
   const L2BOBAToken = new Contract(
     BOBAL2Address,
     L2GovernanceERC20Json.abi,
     testWallet
   )
 
-  const depositAmount = utils.parseEther('1')
+  const depositAmount = utils.parseEther('21')
 
   const bobaBalance = await L2BOBAToken.balanceOf(testWallet.address)
   console.log("BOBA Balance in your account", bobaBalance.toString())

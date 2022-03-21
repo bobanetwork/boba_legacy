@@ -12,7 +12,7 @@ import "./AddOnChainMetaData.sol";
 
 contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, AddRecover, AddOnChainMetaData {
 
-    uint256 public constant PRICE = 0.0000000001 ether;
+    uint256 public constant PRICE = 0; // 0.0000000001 ether;
     uint256 public constant ROYALTY_PERCENTAGE = 5; // 5 %
     uint256 public constant MAX_MINT_IN_PUBLIC = 3;
     address[] public projectOwners;
