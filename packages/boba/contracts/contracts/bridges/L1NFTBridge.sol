@@ -154,22 +154,28 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
+        //create2 would prevent this check
+        //require(_l1Contract != _l2Contract, "Contracts should not be the same");
+        bytes4 erc721 = 0x80ac58cd;
+        require(ERC165Checker.supportsInterface(_l1Contract, erc721), "L1 NFT is not ERC721 compatible");
+        bytes32 bn = keccak256(abi.encodePacked(_baseNetwork));
+        bytes32 l1 = keccak256(abi.encodePacked("L1"));
+        bytes32 l2 = keccak256(abi.encodePacked("L2"));
+        // l2 NFT address equal to zero, then pair is not registered yet.
         // use with caution, can register only once
         PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
-        // l2 NFT address equal to zero, then pair is not registered.
-        require(pairNFT.l2Contract == address(0), "L2 NFT Address Already Registered");
+        require(pairNFT.l2Contract == address(0), "L2 NFT address already registered");
         // _baseNetwork can only be L1 or L2
-        require(
-            keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L1"))) ||
-            keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L2"))),
-            "Invalid Network"
-        );
+        require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
-        if (keccak256(abi.encodePacked((_baseNetwork))) == keccak256(abi.encodePacked(("L1")))) {
+        if (bn == l1) {
             baseNetwork = Network.L1;
-        } else {
+        }
+        else {
+            require(ERC165Checker.supportsInterface(_l1Contract, 0x3899b238), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
+
         pairNFTInfo[_l1Contract] =
             PairNFTInfo({
                 l1Contract: _l1Contract,

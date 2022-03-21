@@ -1,26 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./WithLimitedSupply.sol";
-
-interface TuringHelper {
-    function TuringRandom() external returns (uint256);
-}
+import "./AddLimitedSupply.sol";
+import "./TuringHelper.sol";
 
 /// @title Randomly assign tokenIDs from a given set of tokens.
-abstract contract RandomlyAssigned is WithLimitedSupply {
+abstract contract RandomlyAssigned is AddLimitedSupply {
     // Used for random index assignment
     mapping(uint256 => uint256) private tokenMatrix;
 
     // The initial token ID
     uint256 private startFrom;
-    TuringHelper internal turingHelper;
+    TuringHelper private turingHelper;
 
     /// Instanciate the contract
     /// @param _totalSupply how many tokens this collection should hold
     /// @param _startFrom the tokenID with which to start counting
     constructor (uint256 _totalSupply, uint256 _startFrom, address turingHelperAddress)
-    WithLimitedSupply(_totalSupply)
+    AddLimitedSupply(_totalSupply)
     {
         startFrom = _startFrom;
         turingHelper = TuringHelper(turingHelperAddress);
@@ -31,7 +28,8 @@ abstract contract RandomlyAssigned is WithLimitedSupply {
     /// @return the next token ID
     function nextToken() internal override ensureAvailability returns (uint256) {
         uint256 maxIndex = totalSupply() - tokenCount();
-        uint256 random = turingHelper.TuringRandom() % maxIndex;
+        uint256 initialRandom = turingHelper.TuringRandom() + block.number + tokenCount();
+        uint256 random = initialRandom % maxIndex;
 
         uint256 value = 0;
         if (tokenMatrix[random] == 0) {
