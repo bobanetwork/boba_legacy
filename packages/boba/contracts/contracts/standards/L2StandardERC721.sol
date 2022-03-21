@@ -15,6 +15,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
      * @param _l1Contract Address of the corresponding L1 NFT contract.
      * @param _name ERC721 name.
      * @param _symbol ERC721 symbol.
+     * @param _baseTokenURI ERC721 token uri.
      */
     constructor(
         address _l2Bridge,
@@ -34,13 +35,12 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
         _;
     }
 
-    // ERC165 check interface
-    function supportsInterface(bytes4 _interfaceId) public override(IERC165, ERC721) pure returns (bool) {
-        bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)")); // ERC165
-        bytes4 secondSupportedInterface = IL2StandardERC721.l1Contract.selector
+    function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
+        bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
             ^ IL2StandardERC721.mint.selector
             ^ IL2StandardERC721.burn.selector;
-        return _interfaceId == firstSupportedInterface || _interfaceId == secondSupportedInterface;
+
+        return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
     }
 
     function mint(address _to, uint256 _tokenId) public virtual override onlyL2Bridge {
