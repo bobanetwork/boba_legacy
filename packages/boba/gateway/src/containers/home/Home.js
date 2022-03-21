@@ -20,6 +20,12 @@ import { selectModalState } from 'selectors/uiSelector'
 import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
+import { Grid, Link, Typography } from '@mui/material'
+import * as S from './Home.styles'
+import PageTitle from 'components/pageTitle/PageTitle'
+
+import turing from '../../images/boba2/turing.png'
+
 import {
   fetchBalances,
   fetchGas,
@@ -73,7 +79,7 @@ import { fetchVerifierStatus } from 'actions/verifierAction'
 
 import Airdrop from 'containers/airdrop/Airdrop'
 import Account from 'containers/account/Account'
-import Transactions from 'containers/transactions/History'
+import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
@@ -87,7 +93,7 @@ import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
 
-
+require('dotenv').config()
 
 function Home() {
 
@@ -126,18 +132,22 @@ function Home() {
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
 
+  const maintenance = process.env.REACT_APP_STATUS === 'maintenance' ? true : false
+
   useEffect(() => {
-    const body = document.getElementsByTagName('body')[ 0 ];
+    const body = document.getElementsByTagName('body')[ 0 ]
     mobileMenuOpen
       ? body.style.overflow = 'hidden'
-      : body.style.overflow = 'auto';
-  }, [ mobileMenuOpen ]);
+      : body.style.overflow = 'auto'
+  }, [ mobileMenuOpen ])
 
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)
 
-    if(!baseEnabled) initializeBase()
+    if (maintenance) return
+
+    if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
       console.log("Calling initializeBase for", network)
@@ -156,7 +166,7 @@ function Home() {
       }
     }
 
-  }, [ dispatch, network, baseEnabled ])
+  }, [ dispatch, network, baseEnabled, maintenance ])
 
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
@@ -180,18 +190,20 @@ function Home() {
   }, POLL_INTERVAL)
 
   useEffect(() => {
+    if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
     dispatch(fetchGas())
     dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
-  }, [dispatch])
+  }, [dispatch, maintenance])
 
   useEffect(() => {
+    if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
     }
-  }, [ dispatch, accountEnabled ])
+  }, [ dispatch, accountEnabled, maintenance ])
 
   console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
 
@@ -235,48 +247,101 @@ function Home() {
         {alertMessage}
       </Alert>
 
-      <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
-        <PageHeader />
-        <Container maxWidth={false} sx={{
-          height: 'calc(100% - 150px)',
-          minHeight: '500px',
-          marginLeft: 'unset',
-          width: '100vw',
-          marginRight: 'unset'
+      {!!maintenance &&
+        <Box sx={{
+          display: 'flex',
+          height: '100%',
+          flexDirection: 'column',
+          width: '100%'
         }}>
-          {pageDisplay === "AccountNow" &&
-            <Account />
-          }
-          {pageDisplay === "History" &&
-            <Transactions />
-          }
-          {pageDisplay === "BobaScope" &&
-            <BobaScope />
-          }
-          {pageDisplay === "Wallet" &&
-            <Wallet />
-          }
-          {pageDisplay === "Farm" &&
-            <FarmWrapper />
-          }
-          {pageDisplay === "Save" &&
-            <SaveWrapper />
-          }
-          {pageDisplay === "DAO" &&
-            <DAO />
-          }
-          {pageDisplay === "Airdrop" &&
-            <Airdrop />
-          }
-          {pageDisplay === "Help" &&
-            <Help />
-          }
-          {pageDisplay === "Ecosystem" &&
-            <Ecosystem/>
-          }
-        </Container>
-        <PageFooter/>
-      </Box>
+          <PageHeader maintenance={maintenance}/>
+          <Container maxWidth={false} sx={{
+            height: 'calc(100% - 150px)',
+            minHeight: '500px',
+            marginLeft: 'unset',
+            width: '100vw',
+            marginRight: 'unset',
+            paddingTop: '50px'
+          }}>
+            <S.HomePageContainer>
+              <PageTitle title="Boba March 4 Maintenance Mode"/>
+              <Grid item xs={12}>
+                <Typography
+                  variant="body1"
+                  component="p" sx={{mt: 2, mb: 0, fontWeight: '700', paddingBottom: '20px'}}
+                >
+                  We are upgrading our Sequencer to support Turing Hybrid Compute
+                </Typography>
+                <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
+                  As announced on Twitter and Telegram, Boba network is currently being upgraded to support Turing.
+                </Typography>
+                <Typography variant="body2" component="p" sx={{
+                  mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7',
+                  paddingTop: '20px', paddingBottom: '20px'}}
+                >
+                  You can{' '}
+                  <Link variant="body2"
+                    style={{lineHeight: '1.0em', fontWeight: '700'}}
+                    href='https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md'
+                  >learn more about Turing here
+                  </Link>.
+                </Typography>
+                <img
+                  src={turing}
+                  alt="NFT URI"
+                  width={'80%'}
+                />
+              </Grid>
+            </S.HomePageContainer>
+          </Container>
+          <PageFooter maintenance={maintenance}/>
+        </Box>
+      }
+
+      {! maintenance &&
+        <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
+          <PageHeader />
+          <Container maxWidth={false} sx={{
+            height: 'calc(100% - 150px)',
+            minHeight: '500px',
+            marginLeft: 'unset',
+            width: '100vw',
+            marginRight: 'unset'
+          }}>
+            {pageDisplay === "AccountNow" &&
+              <Account />
+            }
+            {pageDisplay === "History" &&
+              <Transactions />
+            }
+            {pageDisplay === "BobaScope" &&
+              <BobaScope />
+            }
+            {pageDisplay === "Wallet" &&
+              <Wallet />
+            }
+            {pageDisplay === "Farm" &&
+              <FarmWrapper />
+            }
+            {pageDisplay === "Save" &&
+              <SaveWrapper />
+            }
+            {pageDisplay === "DAO" &&
+              <DAO />
+            }
+            {pageDisplay === "Airdrop" &&
+              <Airdrop />
+            }
+            {pageDisplay === "Help" &&
+              <Help />
+            }
+            {pageDisplay === "Ecosystem" &&
+              <Ecosystem />
+            }
+          </Container>
+          <PageFooter/>
+        </Box>
+      }
     </>
   )
 }

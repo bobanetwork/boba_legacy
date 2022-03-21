@@ -1,6 +1,5 @@
-import { Box } from "@mui/material";
-import { styled } from '@mui/material/styles';
-
+import { Box, Typography } from "@mui/material"
+import { styled } from '@mui/material/styles'
 
 export const HelpPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
@@ -22,4 +21,33 @@ export const HelpPageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
+}))
+
+
+export const LayerAlert = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: '30px',
+  borderRadius: '8px',
+  margin: '20px 0px',
+  padding: '25px',
+  background: theme.palette.background.secondary,
+  [ theme.breakpoints.up('md') ]: {
+    padding: '25px 50px',
+  },
+
 }));
+
+export const AlertText = styled(Typography)(({ theme }) => ({
+  marginLeft: '10px',
+  flex: 4,
+}));
+
+export const AlertInfo = styled(Box)`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex: 1;
+`;

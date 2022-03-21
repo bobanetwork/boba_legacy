@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   },
 })
 
-const PageHeader = () => {
+const PageHeader = ({ maintenance }) => {
 
   const classes = useStyles()
   // eslint-disable-next-line no-unused-vars
@@ -32,13 +32,22 @@ const PageHeader = () => {
   const accountEnabled = useSelector(selectAccountEnabled())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  if (maintenance) {
+    return (
+      <S.HeaderWrapper>
+        <BobaLogo style={{ maxWidth: '140px', paddingTop: '20px' }} />
+        <ThemeSwitcher />
+      </S.HeaderWrapper>
+    )
+  }
+
   return (
     <>
       {
         isMobile ? (
           <Container>
             <S.HeaderWrapper>
-              <BobaLogo style={{ maxWidth: '100px' }} />
+              <BobaLogo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
               <S.HeaderActionButton>
                 <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
@@ -77,7 +86,7 @@ const PageHeader = () => {
             </S.HeaderWrapper>
           </Container>
         ) : (<S.HeaderWrapper>
-          <BobaLogo style={{ maxWidth: '140px', paddingTop: '20px' }} />
+          <BobaLogo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px'}} />
           <MenuItems setOpen={setOpen} />
           <LayerSwitcher />
           {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}

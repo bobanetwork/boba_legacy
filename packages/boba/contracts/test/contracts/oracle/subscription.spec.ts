@@ -45,7 +45,7 @@ const getSampleData = async (base: string, quote: string): Promise<string> => {
   return (await FeedRegistry.populateTransaction.latestAnswer(base, quote)).data
 }
 
-describe('Oracle Subscription', () => {
+describe('Oracle Subscription Tests', () => {
   beforeEach(async () => {
     bobaToken = await deployBoba()
   })

@@ -17,7 +17,7 @@ limitations under the License. */
 import BigNumber from 'bignumber.js';
 
 export function logAmount (amount, power, truncate = 0) {
-  
+
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
 
@@ -25,14 +25,14 @@ export function logAmount (amount, power, truncate = 0) {
 
   if(truncate > 0)
   	return calculated.toFixed(truncate);
-  else 
+  else
   	return calculated.toFixed();
 }
 
 /*Takes a value such as 3.92 and converts it into
 a BigNumber in wei
 
-Duplicates 
+Duplicates
 
 ethers.utils.parseUnits( valueString , decimalsOrUnitName )   =>   BigNumber
 */
@@ -59,9 +59,11 @@ export function toWei_String(amount, decimals) {
 export function amountToUsd(amount, lookupPrice, token) {
   if (token.symbol === 'ETH' && !!lookupPrice['ethereum']) {
     return amount * lookupPrice['ethereum'].usd
-  } else if (token.symbol === 'OMG' && !!lookupPrice['omisego']) {
+  } else if (token.symbol === 'BOBA' && !!lookupPrice[ 'boba-network' ]) {
+    return amount * lookupPrice['boba-network'].usd
+  } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
     return amount * lookupPrice['omisego'].usd
-  } else if (!!lookupPrice[token.symbol.toLowerCase()]) {
+  } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {
     return 0

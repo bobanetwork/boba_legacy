@@ -23,6 +23,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
+import { verifyStateRoots } from './shared/state-root-verification'
 
 describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
@@ -99,6 +100,11 @@ describe('Turing 256 Bit Random Number Test', async () => {
       'L1StandardBridge',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
+  })
+
+  after(async () => {
+    expect(await verifyStateRoots()).to.equal(true)
+    console.log('Verified state roots.')
   })
 
   it('{tag:boba} Should transfer BOBA to L2', async () => {

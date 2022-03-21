@@ -1,0 +1,143 @@
+@import 'index.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  padding-top: 0px;
+  background: $background;
+}
+
+.searchInput {
+  width: 250px !important;
+  @include mobile {
+    width: 100% !important;
+  }
+}
+
+.data {
+  display: flex;
+  flex-direction: row;
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.section {
+  flex: 1;
+  &:first-child {
+    margin-right: 20px;
+    @include mobile {
+      margin-right: 0;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.transactionSection {
+  margin-bottom: 20px;
+}
+
+.disclaimer {
+  color: $gray3;
+  margin: 5px 10px;
+  margin-top: 20px;
+}
+
+.searchBar {
+  flex: 1;
+  margin-bottom: 0;
+  min-width: 250px;
+  & > div {
+    border: none !important;
+  }
+}
+
+.transactions {
+  overflow: auto;
+  background: $background400;
+  border-radius: 8px;
+  margin-top: 10px;
+  min-height: 100px;
+  .transaction {
+    padding: 20px 0;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.subTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 32px;
+  span {
+    margin-right: 20px;
+  }
+}
+
+.processExitButton {
+  color: $blue;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  .datePicker {
+    flex: 1;
+    margin-bottom: 0;
+    min-width: 250px;
+  }
+  @include mobile {
+    width: 100%;
+    > div:first-child {
+      margin-right: 5px;
+    }
+    > div:last-child {
+      margin-left: 5px;
+    }
+  }
+}
+
+.datePickerInput {
+    border-radius: 8px;
+    width: 130px;
+    margin: 0px 15px;
+    position: relative;
+    @include mobile {
+      width: 100%;
+      margin: 0px;
+    }
+
+    &::after {
+      content: '';
+      width: 0;
+      height: 0;
+      position: absolute;
+      right: 10px;
+      font-size: 25px;
+      bottom: 15px;
+    }
+
+    input {
+      height: 40px;
+      width: 130px;
+      padding: 0px 15px;
+      line-height: 40px;
+      border: 0;
+      font-size: 16px;
+      text-align: left;
+      @include mobile {
+        width: 100%;
+      }
+    }
+}
+
+.popperStyle {
+  z-index: 3;
+}

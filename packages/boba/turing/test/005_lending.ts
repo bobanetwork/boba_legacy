@@ -19,8 +19,6 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
 
-//console.log("network:",hre.network.name === 'boba_rinkeby')
-
 var BOBAL2Address
 var BobaTuringCreditAddress
 
@@ -82,7 +80,12 @@ describe("Pull Bitcoin - USD quote", function () {
     if(hre.network.name === 'boba_rinkeby') {
       BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
       BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-    } else {
+    } 
+    else if(hre.network.name === 'boba_mainnet') {
+      BOBAL2Address = '0x_________________'
+      BobaTuringCreditAddress = '0x___________________'
+    } 
+    else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
       addressesBOBA = JSON.parse(result)
       BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Box, Typography} from "@mui/material"
+import { Box, Typography } from "@mui/material"
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
@@ -34,15 +34,26 @@ export const WalletTitleContainer = styled(Box)(({ theme }) => ({
   }
 }));
 
+export const WalletActionContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: '20px',
+  marginBottom: '20px',
+  [ theme.breakpoints.down('sm') ]: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+}));
+
 export const PageSwitcher = styled(Box)(({ theme }) => ({
   width: 'fit-content',
   padding: '3px',
-  background: theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)': 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
   cursor: 'pointer',
   display: 'flex',
   borderRadius: '12px',
   height: '48px',
-  marginBottom: '20px',
   'span': {
     padding: '2px 15px',
     fontWeight: 'bold',
@@ -65,6 +76,17 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
 
 }));
 
+export const PendingIndicator = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: '20px',
+  [ theme.breakpoints.down('sm') ]: {
+    alignItems: 'flex-start',
+    margin: '10px 0px'
+  },
+}))
+
 export const LayerAlert = styled(Box)(({ theme }) => ({
   width: "100%",
   display: 'flex',
@@ -75,7 +97,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   margin: '20px 0px',
   padding: '25px',
   background: theme.palette.background.secondary,
-  [theme.breakpoints.up('md')]: {
+  [ theme.breakpoints.up('md') ]: {
     padding: '25px 50px',
   },
 
@@ -84,7 +106,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
-  [theme.breakpoints.up('md')]: {
+  [ theme.breakpoints.up('md') ]: {
   },
 }));
 

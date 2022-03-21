@@ -64,7 +64,8 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.address,
         L1ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L2ERC721.deployTransaction.wait()
@@ -273,7 +274,8 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.address,
         L2ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L1ERC721.deployTransaction.wait()
@@ -471,6 +473,174 @@ describe('NFT Bridge Test', async () => {
     })
   })
 
+  describe('Approved NFT withdrawals - L1 NFT', async () => {
+    before(async () => {
+      Factory__L1ERC721 = new ContractFactory(
+        ERC721Json.abi,
+        ERC721Json.bytecode,
+        env.l1Wallet
+      )
+
+      Factory__L2ERC721 = new ContractFactory(
+        L2ERC721Json.abi,
+        L2ERC721Json.bytecode,
+        env.l2Wallet
+      )
+
+      // deploy a L1 native NFT token each time if existing contracts are used for tests
+      L1ERC721 = await Factory__L1ERC721.deploy('Test', 'TST')
+
+      await L1ERC721.deployTransaction.wait()
+
+      L2ERC721 = await Factory__L2ERC721.deploy(
+        L2Bridge.address,
+        L1ERC721.address,
+        'Test',
+        'TST',
+        '' // base-uri
+      )
+
+      await L2ERC721.deployTransaction.wait()
+
+      // register NFT
+      const registerL1BridgeTx = await L1Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L1'
+      )
+      await registerL1BridgeTx.wait()
+
+      const registerL2BridgeTx = await L2Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L1'
+      )
+      await registerL2BridgeTx.wait()
+
+      // mint nft
+      const mintTx = await L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
+      await mintTx.wait()
+
+      const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
+      await approveTx.wait()
+
+      await env.waitForXDomainTransaction(
+        L1Bridge.depositNFT(
+          L1ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L1ToL2
+      )
+    })
+
+    it('{tag:boba} should withdraw NFT when approved for all', async () => {
+      const approveTX = await L2ERC721.setApprovalForAll(
+        env.l2Wallet_2.address,
+        true
+      )
+      await approveTX.wait()
+      await env.waitForXDomainTransaction(
+        L2Bridge.connect(env.l2Wallet_2).withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L2ToL1
+      )
+
+      await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
+
+      const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
+      expect(ownerL1).to.be.deep.eq(env.l2Wallet_2.address)
+    })
+  })
+
+  describe('Approved NFT withdrawals - L2 NFT', async () => {
+    before(async () => {
+      Factory__L2ERC721 = new ContractFactory(
+        ERC721Json.abi,
+        ERC721Json.bytecode,
+        env.l2Wallet
+      )
+
+      Factory__L1ERC721 = new ContractFactory(
+        L1ERC721Json.abi,
+        L1ERC721Json.bytecode,
+        env.l1Wallet
+      )
+
+      // deploy a L2 native NFT token each time if existing contracts are used for tests
+      L2ERC721 = await Factory__L2ERC721.deploy('Test', 'TST')
+
+      await L2ERC721.deployTransaction.wait()
+
+      L1ERC721 = await Factory__L1ERC721.deploy(
+        L1Bridge.address,
+        L2ERC721.address,
+        'Test',
+        'TST',
+        '' // base-uri
+      )
+
+      await L1ERC721.deployTransaction.wait()
+
+      // register NFT
+      const registerL1BridgeTx = await L1Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L2'
+      )
+      await registerL1BridgeTx.wait()
+
+      const registerL2BridgeTx = await L2Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L2'
+      )
+      await registerL2BridgeTx.wait()
+
+      // mint nft
+      const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
+      await mintTx.wait()
+
+      const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
+      await approveTx.wait()
+
+      await env.waitForXDomainTransaction(
+        L2Bridge.withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L2ToL1
+      )
+    })
+
+    it('{tag:boba} should deposit NFT to L2 when approved for all', async () => {
+      await L1ERC721.setApprovalForAll(env.l1Wallet_2.address, true)
+      await env.waitForXDomainTransaction(
+        L1Bridge.connect(env.l1Wallet_2).depositNFT(
+          L1ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        ),
+        Direction.L1ToL2
+      )
+
+      await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      )
+
+      const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
+      expect(ownerL2).to.deep.eq(env.l2Wallet_2.address)
+    })
+  })
+
   describe('Bridges pause tests', async () => {
     before(async () => {
       Factory__L1ERC721 = new ContractFactory(
@@ -494,7 +664,8 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.address,
         L1ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L2ERC721.deployTransaction.wait()
@@ -650,7 +821,8 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.address,
         L2ERC721.address,
         'Test',
-        'TST'
+        'TST',
+        '' // base-uri
       )
 
       await L1ERC721.deployTransaction.wait()

@@ -1,13 +1,13 @@
 <div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
+  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
   <br />
   <h1> The Boba Monorepo</h1>
 </div>
 
 <p align="center">
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
+  <a href="https://github.com/bobanetwork/boba/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
 </p>
 
 - [TL;DR](#tl-dr)
@@ -15,7 +15,6 @@
 - [Community and DAO](#community-and-dao)
 - [Directory Structure](#directory-structure)
 - [Contributing](#contributing)
-- [Development Quick Start](#development-quick-start)
   * [Dependencies](#dependencies)
 - [Spinning up the stack](#spinning-up-the-stack)
   * [Helpful commands](#helpful-commands)
@@ -26,7 +25,13 @@
 
 ## TL;DR
 
-This is the primary place where [Boba](https://boba.network) works on the Boba L2. Boba is based on the amazing work done by [Optimism](https://optimism.io) and uses the same base contracts, but differs from Optimism by:
+This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
+
+<a href="https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing">
+  <img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
+</a>
+
+ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -39,15 +44,11 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 ## Documentation
 
-Documentation is available [here](http://docs.boba.network/) or in this repo (see `boba_documention`).
-
-## Community and DAO
-
-* [Discuss and propose](https://forum.boba.network)
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories.
 
 ## Directory Structure
 
-**Base Layer (generally similar or identical to Optimistic Ethereum)**
+**Base Layer (generally similar to Optimistic Ethereum)**
 
 * [`packages`](./packages): Contains all the typescript packages and contracts
   * [`contracts`](./packages/contracts): Solidity smart contracts implementing the OVM
@@ -58,12 +59,13 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
   * [`message-relayer`](./packages/message-relayer): Service for relaying L2 messages to L1
   * [`replica-healthcheck`](./packages/replica-healthcheck): Service to monitor the health of different replica deployments
 * [`l2geth`](./l2geth): Fork of [go-ethereum v1.9.10](https://github.com/ethereum/go-ethereum/tree/v1.9.10) implementing the [OVM](https://research.paradigm.xyz/optimism#optimistic-geth).
-* [`integration-tests`](./integration-tests): Integration tests between a L1 testnet, `l2geth`,
+* [`integration-tests`](./integration-tests): Integration tests between a L1 testnet and the `l2geth`
 * [`ops`](./ops): Contains Dockerfiles for containerizing each service involved in the protocol,
 as well as a docker-compose file for bringing up local testnets easily
 
 **Boba Layer**
 
+* [`packages/boba/turing`](./packages/boba/turing): System for hybrid compute
 * [`boba_community`](./boba_community): Code for running your own Boba node/replica and the fraud detector
 * [`boba_documentation`](./boba_documentation): Boba-specific documentation
 * [`boba_examples`](./boba_examples): Basic examples of deploying contracts on Boba
@@ -76,13 +78,10 @@ as well as a docker-compose file for bringing up local testnets easily
   * [`message-relayer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
   * [`register`](./packages/boba/register): Code for registering addresses in the AddressManager
   * [`subgraph`](./packages/boba/subgraph): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
-  * [`turing`](./packages/boba/turing): Experimental branch only - system for hybrid compute
 
 ## Contributing
 
-Follow the [Development Quick Start](#development-quick-start) to set up your local development environment.
-
-## Development Quick Start
+Follow these instructions to set up your local development environment.
 
 ### Dependencies
 
@@ -99,8 +98,8 @@ You'll need the following:
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
-$ cd optimism-v2
+$ git clone git@github.com:bobanetwork/boba.git
+$ cd boba
 $ yarn clean # only needed / will only work if you had it installed previously
 $ yarn
 $ yarn build
@@ -133,7 +132,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
-* _To (re)build individual Boba services_: `docker-compose -f "docker-compose.yml" build -- boba_message-relayer-fast` Note: You may have to first comment out various dependencies in `docker-compose.yml`.
+* _To (re)build individual Boba ts services_: `docker-compose build -- builder` then `docker-compose build -- dtl`, for example
 
 ### Running unit tests
 
@@ -152,7 +151,8 @@ Make sure you are in the `ops` folder and then run
 docker-compose run integration_tests
 ```
 
-Expect the full test suite with more than 110 tests including load tests to complete in between *30 minutes* to *two hours* depending on your computer hardware.
+Expect the full test suite with more than 110 tests including load tests to complete in
+between *30 minutes* to *two hours* depending on your computer hardware.
 
 ### Viewing docker container logs
 
@@ -167,4 +167,4 @@ docker-compose logs --follow <service name>
 
 Code forked from [`go-ethereum`](https://github.com/ethereum/go-ethereum) under the name [`l2geth`](https://github.com/ethereum-optimism/optimism/tree/master/l2geth) is licensed under the [GNU GPLv3](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60) in accordance with the [original license](https://github.com/ethereum/go-ethereum/blob/master/COPYING).
 
-All other files within this repository are licensed under the [MIT License](https://github.com/omgnetwork/optimism-v2/blob/develop/LICENSE) unless stated otherwise.
+All other files within this repository are licensed under the [MIT License](https://github.com/bobanetwork/boba/blob/develop/LICENSE) unless stated otherwise.

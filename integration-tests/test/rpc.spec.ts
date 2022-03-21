@@ -145,6 +145,24 @@ describe('Basic RPC tests', () => {
         'gas required exceeds allowance'
       )
     })
+
+    it('{tag:rpc} should reject a transaction with a low gas limit', async () => {
+      const balance = await env.l2Wallet.getBalance()
+      const tx = {
+        ...defaultTransactionFactory(),
+        gasPrice: await gasPriceForL2(),
+        chainId: await env.l2Wallet.getChainId(),
+        data: ethers.utils.hexlify(123123123123123),
+        value: ethers.utils.parseEther('1'),
+      }
+
+      const gasLimit = await env.l2Wallet.estimateGas(tx)
+      tx.gasLimit = gasLimit.toNumber() - 10
+
+      await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
+        'invalid transaction: intrinsic gas too low'
+      )
+    })
   })
 
   describe('eth_call', () => {

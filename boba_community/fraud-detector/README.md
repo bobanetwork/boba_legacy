@@ -28,7 +28,7 @@ The central idea is that if two (or more) geths injects the same transactions, t
 
 ## 2. What do when you discover a state root mismatch
 
-Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/omgnetwork/optimism-v2/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
+Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/bobanetwork/boba/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
 
 ## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
@@ -37,8 +37,8 @@ Congratulations! The security of the L2 depends on community monitoring of the o
 **Open a terminal window**. First, clone the project and install needed dependencies:
 
 ```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
-$ cd optimism-v2
+$ git clone git@github.com:bobanetwork/boba.git
+$ cd boba
 $ yarn install
 $ yarn build
 ```
@@ -57,13 +57,19 @@ Next, navigate to `boba_community/fraud-detector` and build the needed Docker im
 
 ```
 $ cd boba_community/fraud-detector
-$ docker-compose -f docker-compose-fraud-detector.yml build
 ```
 
-Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
+Next, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
 ```
-$ docker-compose -f docker-compose-fraud-detector.yml up
+$ docker-compose up
+```
+
+Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service.
+
+```bash
+$ cd boba/boba_community/fraud-detector
+$ curl -H "Content-Type: application/json" -T ./addresses.json http://localhost:8080/addresses.json
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take several hours to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:

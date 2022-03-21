@@ -5,17 +5,20 @@
 # We do not use Alpine because there's a regression causing it to be very slow
 # when used with typescript/hardhat: https://github.com/nomiclabs/hardhat/issues/1219
 FROM node:16-buster-slim as node
-RUN apt-get update -y && apt-get install -y git
-
+RUN if echo "\"`uname -a`\"" | grep -q "arm64" ; then \
+    apt-get update -y && apt-get install -y git python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+  else \
+    apt-get update -y && apt-get install -y git; \
+  fi
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
 FROM alpine as downloader
-ARG VERSION=v0.8.8
-ARG SOLC_VERSION=${VERSION}+commit.dddeac2f
-ARG SOLC_UPSTREAM=https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/solc-linux-amd64-${SOLC_VERSION}
+ARG SOLC_PREFIX=https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/solc-linux-amd64
 
-ADD $SOLC_UPSTREAM ./solc
-ADD https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 ./solc
+ADD ${SOLC_PREFIX}-v0.4.11+commit.68ef5810 ./solc-v0.4.11+commit.68ef5810
+ADD ${SOLC_PREFIX}-v0.5.17+commit.d19bba13 ./solc-v0.5.17+commit.d19bba13
+ADD ${SOLC_PREFIX}-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.6c089d02
+ADD ${SOLC_PREFIX}-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
 
 FROM node as builder
 # copy over the needed configs to run the dep installation
@@ -60,8 +63,10 @@ COPY *.json yarn.lock ./
 COPY ./packages ./packages
 COPY ./integration-tests ./integration-tests
 # copy over solc to save time building (35+ seconds vs not doing this step)
-COPY --from=downloader solc /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-${SOLC_VERSION}
-COPY --from=downloader solc /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
+COPY --from=downloader solc-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
+COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
+COPY --from=downloader solc-v0.6.6+commit.6c089d02  /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02
+COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a
 
 # build it!
 RUN yarn build

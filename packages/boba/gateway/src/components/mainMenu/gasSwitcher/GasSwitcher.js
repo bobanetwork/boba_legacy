@@ -33,20 +33,20 @@ function GasSwitcher({ isMobile }) {
   }, [ gas ])
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'healthy'
+  let healthStatus = 'Healthy'
 
   if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
-    healthStatus = 'unhealthy'
+    healthStatus = 'Unhealthy'
   }
 
   return (
     <S.Menu>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">Ethereum Gas</S.Label>
+        <S.Label component="p" variant="body2">Ethereum</S.Label>
         <S.Value component="p" variant="body2">{gas.gasL1} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">Boba Gas</S.Label>
+        <S.Label component="p" variant="body2">Boba</S.Label>
         <S.Value component="p" variant="body2">{gas.gasL2} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
@@ -54,15 +54,15 @@ function GasSwitcher({ isMobile }) {
         <S.Value component="p" variant="body2">{savings.toFixed(0)}x</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">L1 Block</S.Label>
+        <S.Label component="p" variant="body2">L1</S.Label>
         <S.Value component="p" variant="body2">{gas.blockL1}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">L2 Block</S.Label>
+        <S.Label component="p" variant="body2">L2</S.Label>
         <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">Verification state</S.Label>
+        <S.Label component="p" variant="body2">Verification</S.Label>
         <S.Value component="p" variant="body2">{healthStatus}</S.Value>
       </S.MenuItem>
     </S.Menu>

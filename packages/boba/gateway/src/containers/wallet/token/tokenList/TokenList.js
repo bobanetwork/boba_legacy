@@ -26,6 +26,9 @@ function TokenList({
   const enabled = (networkLayer === chain) ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
+  const amountInNumber = token.symbol === 'ETH' ?
+  Number(logAmount(token.balance, token.decimals, 3)):
+  Number(logAmount(token.balance, token.decimals, 2))
 
   const amount = token.symbol === 'ETH' ?
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
@@ -34,8 +37,11 @@ function TokenList({
   const WAGMI_v0 = 1 + (sliderValue_v0 / 100)
   const TVL_v0 = Number(300 + (sliderValue_v0 / 100) * 700)
 
-  const WAGMI_v1 = 1 + (sliderValue_v1 / 11.1)
-  const TVL_v1 = Number(70 + (sliderValue_v1 / 100) * 305)
+  let WAGMI_v1 = 1 + (sliderValue_v1 / 11.1)
+  if(sliderValue_v1 === 0) {
+    WAGMI_v1 = 0.5
+  }
+  const TVL_v1 = Number(69 + (sliderValue_v1 / 100) * 305)
 
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
@@ -83,7 +89,7 @@ function TokenList({
               component="div"
               sx={{ fontWeight: '700' }}
             >
-              {`$${amountToUsd(amount, lookupPrice, token).toFixed(2)}`}
+              {`$${amountToUsd(amountInNumber, lookupPrice, token).toFixed(2)}`}
             </S.TextTableCell>
           </S.TableCell>
           <S.TableCell
@@ -109,7 +115,7 @@ function TokenList({
               {enabled && chain === 'L1' &&
                 <>
                   <Button
-                    onClick={() => { this.handleModalClick('depositModal', token, false) }}
+                    onClick={() => { handleModalClick('depositModal', token, false) }}
                     color='neutral'
                     variant="outlined"
                     disabled={disabled}
@@ -120,7 +126,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('depositModal', token, true) }}
+                    onClick={() => { handleModalClick('depositModal', token, true) }}
                     color='primary'
                     disabled={disabled}
                     variant="contained"
@@ -132,10 +138,10 @@ function TokenList({
                 </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
                 <>
                   <Button
-                    onClick={() => { this.handleModalClick('exitModal', token, false) }}
+                    onClick={() => { handleModalClick('exitModal', token, false) }}
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
@@ -145,7 +151,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('exitModal', token, true) }}
+                    onClick={() => { handleModalClick('exitModal', token, true) }}
                     variant="outlined"
                     disabled={disabled}
                     tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
@@ -155,7 +161,7 @@ function TokenList({
                   </Button>
 
                   <Button
-                    onClick={() => { this.handleModalClick('transferModal', token, false) }}
+                    onClick={() => { handleModalClick('transferModal', token, false) }}
                     variant="contained"
                     color="primary"
                     disabled={disabled}
@@ -179,7 +185,7 @@ function TokenList({
                     CELER BRIDGE
                   </Link>
                   <Button
-                    onClick={() => { this.handleModalClick('transferModal', token, false) }}
+                    onClick={() => { handleModalClick('transferModal', token, false) }}
                     variant="contained"
                     color="primary"
                     disabled={disabled}
@@ -200,7 +206,7 @@ function TokenList({
                   gap: '10px',
                 }}>
                   <Typography variant="body3" component="p" >
-                    At a TVL of {TVL_v0.toFixed(0)}M each WAGMIv0 will settle for {WAGMI_v0.toFixed(1)} BOBA
+                    If TVL = {TVL_v0.toFixed(0)}M, each option settles for {WAGMI_v0.toFixed(1)} BOBA
                   </Typography>
                   <Slider
                     min={0}
@@ -231,7 +237,7 @@ function TokenList({
                   gap: '10px',
                 }}>
                   <Typography variant="body3" component="p" >
-                    At a TVL of {TVL_v1.toFixed(0)}k ETH each WAGMIv1 will settle for {WAGMI_v1.toFixed(1)} BOBA
+                    If TVL = {TVL_v1.toFixed(0)}k ETH, each option settles for {WAGMI_v1.toFixed(1)} BOBA
                   </Typography>
                   <Slider
                     min={0}
@@ -282,7 +288,7 @@ function TokenList({
             component="div"
             sx={{ fontWeight: '700' }}
           >
-            {`$${amountToUsd(amount, lookupPrice, token).toFixed(2)}`}
+            {`$${amountToUsd(amountInNumber, lookupPrice, token).toFixed(2)}`}
           </S.TextTableCell>
         </S.TableCell>
         <S.TableCell
@@ -316,7 +322,7 @@ function TokenList({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -346,7 +352,32 @@ function TokenList({
                 fullWidth
               >
                 Transfer
-              </Button> </>}
+              </Button>
+            </>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+            <>
+              <Link
+                color="inherit"
+                variant="body2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={'https://cbridge.celer.network/#/transfer'}
+              >
+                CELER BRIDGE
+              </Link>
+              <Button
+                onClick={() => { handleModalClick('transferModal', token, false) }}
+                variant="contained"
+                color="primary"
+                disabled={disabled}
+                tooltip="Transfer funds from one L2 account to another L2 account."
+                fullWidth
+              >
+                Transfer
+              </Button>
+            </>
+          }
           {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
             <div style={{
               display: 'flex',
@@ -370,7 +401,7 @@ function TokenList({
                 gap: '10px',
               }}>
                 <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  At a TVL of {TVL_v0.toFixed(0)}M each option<br/> will settle for {WAGMI_v0.toFixed(1)} BOBA
+                  If TVL = {TVL_v0.toFixed(0)}M each option<br/> settles for {WAGMI_v0.toFixed(1)} BOBA
                 </Typography>
                 <Button
                   onClick={() => { settle_v0() }}
@@ -408,7 +439,7 @@ function TokenList({
                 gap: '10px',
               }}>
                 <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  At a TVL of {TVL_v1.toFixed(0)}k ETH each WAGMIv1 will settle for {WAGMI_v1.toFixed(1)} BOBA
+                  If TVL = {TVL_v1.toFixed(0)}k ETH each option<br/> settles for {WAGMI_v1.toFixed(1)} BOBA
                 </Typography>
                 <Button
                   onClick={() => { settle_v1() }}
