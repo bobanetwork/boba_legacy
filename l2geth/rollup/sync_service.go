@@ -976,6 +976,11 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return err
 	}
 
+	// Ensure that the user approved enough gas to do the transaction
+	if err := s.validateGasLimit(tx, l2GasPrice, s.RollupGpo); err != nil {
+		return fmt.Errorf("invalid transaction: %w", err)
+	}
+
 	// Reject user transactions that do not have large enough of a gas price.
 	// Allow for a buffer in case the gas price changes in between the user
 	// calling `eth_gasPrice` and submitting the transaction.
@@ -997,6 +1002,29 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 				fees.ErrGasPriceTooHigh, tx.GasPrice(), l2GasPrice)
 		}
 		return err
+	}
+	return nil
+}
+
+// Validate that gas limit approved by the user is larger than the actual usage
+func (s *SyncService) validateGasLimit(tx *types.Transaction, l2GasPrice *big.Int, gpo *gasprice.RollupOracle) error {
+	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
+	isFeeUpdate := s.bc.Config().IsFeeUpdate(nextBlockNumber)
+	if isFeeUpdate {
+		intrGas, err := core.IntrinsicGas(tx.Data(), tx.To() == nil, true, s.bc.Config().IsIstanbul(nextBlockNumber))
+		if err != nil {
+			return err
+		}
+		// Ensure that tx.Gas() is larger than l1SecurityFee / l2GasPrice + intrGas
+		l2ExtraGas, err := fees.CalculateL1GasFromGPO(tx.Data(), l2GasPrice, gpo)
+		if err != nil {
+			return err
+		}
+		estimateGas := new(big.Int).Add(l2ExtraGas, big.NewInt(int64(intrGas)))
+		log.Debug("Validate gas limit", "estimateGas", estimateGas, "l2GasPrice", l2GasPrice, "gasLimit", tx.Gas(), "intrGas", intrGas, "l2ExtraGas", l2ExtraGas)
+		if big.NewInt(int64(tx.Gas())).Cmp(estimateGas) < 0 {
+			return core.ErrIntrinsicGas
+		}
 	}
 	return nil
 }

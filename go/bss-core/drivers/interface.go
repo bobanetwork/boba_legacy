@@ -41,4 +41,7 @@ type L1Client interface {
 	// TransactionReceipt returns the receipt of a transaction by transaction
 	// hash. Note that the receipt is not available for pending transactions.
 	TransactionReceipt(context.Context, common.Hash) (*types.Receipt, error)
+
+	// SuggestGasPrice returns the estimated gas price
+	SuggestGasPrice(context.Context) (*big.Int, error)
 }

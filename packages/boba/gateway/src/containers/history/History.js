@@ -106,7 +106,7 @@ function History() {
         </S.LayerAlert>
       }
 
-      {layer && <> 
+      {layer && <>
       <S.Header>
         <div className={styles.searchInput}>
           <Input

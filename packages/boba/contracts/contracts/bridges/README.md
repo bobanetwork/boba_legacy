@@ -23,7 +23,7 @@ Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to 
 
 ## Native L1 NFT - Developer Requirements
 
-Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please deploy [L2StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
+Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
 
 ```js
 const Factory__L2StandardERC721 = new ethers.ContractFactory(
@@ -45,7 +45,7 @@ await L2StandardERC721.deployTransaction.wait()
 
 ## Native L2 NFT - Developer Requirements
 
-Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
+Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
 ```js
 const Factory__L1StandardERC721 = new ethers.ContractFactory(

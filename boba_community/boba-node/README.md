@@ -19,7 +19,7 @@ This repo runs a local replica of the Boba L2geth, which is useful for generatin
 **Open a terminal window**. Clone the project and install needed dependencies:
 
 ```bash
-$ git clone https://github.com/omgnetwork/optimism-v2.git
+$ git clone https://github.com/bobanetwork/boba.git
 $ cd boba_community/boba-node
 $ docker compose pull
 ```

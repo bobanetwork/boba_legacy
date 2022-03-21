@@ -35,12 +35,17 @@ function TokenPage() {
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
+    // only run once all the tokens have been added to the tokenList
+    if (Object.keys(tokenList).length < 27) return
     const symbolList = Object.values(tokenList).map((i) => {
       if (i.symbolL1 === 'ETH') {
         return 'ethereum'
       } else if (i.symbolL1 === 'OMG') {
         return 'omg'
-      } else {
+      } else if(i.symbolL1 === 'BOBA') {
+        return 'boba-network'
+      }
+      else {
         return i.symbolL1.toLowerCase()
       }
     })

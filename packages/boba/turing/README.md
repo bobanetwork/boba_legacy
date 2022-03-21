@@ -4,7 +4,7 @@
   * [TLDR](#tldr)
 - [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 - [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-  * [ASW Example Wrappers and Floating Point Math](#asw-example-wrappers-and-floating-point-math)
+- [AWS and Google Cloud Function Examples](#aws-and-google-cloud-function-examples)
 - [Important Properties of Turing](#important-properties-of-turing)
   * [String length limit](#string-length-limit)
   * [One Turing call per Transaction](#one-turing-call-per-transaction)
@@ -17,15 +17,15 @@
   * [Step 4: Writing to the CTC](#step-4--writing-to-the-ctc)
   * [Step 5: DTL Turing data extraction; Reading from the CTC](#step-5--dtl-turing-data-extraction--reading-from-the-ctc)
   * [Step 6: Verifier data ingestion](#step-6--verifier-data-ingestion)
-  
+
 ## TLDR
 
-Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block. 
+Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
-**The information given in this technical deep-dive is not needed to use Turing.** Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
+Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
-  
+
   // ERC721.sol
   random_number = turing.getRandom()
 
@@ -52,7 +52,7 @@ To obtain the latest BTC-USD exchange rate, call:
 
 ```
 
-**Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.   
+**Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
 
 # Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
@@ -88,7 +88,7 @@ To use this functionality, deploy your `TuringHelper` contract, provide its addr
   // deploy your Turing helper
   myTuringHelper = await Factory__Helper.deploy()
 
-  // deploy your ERC721 contract with the 
+  // deploy your ERC721 contract with the
   erc721 = await Factory__ERC721.deploy("RandomERC721", "RER", myTuringHelper.address)
 
   // restrict your myHelper to accept only requests from your ERC721
@@ -105,7 +105,7 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/test/006_NFT_random.ts). 
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/test/006_NFT_random.ts).
 
 # Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
@@ -124,7 +124,7 @@ Once you have an API key from your chosen data vendor, insert that key into your
   authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
 ...
 
-``` 
+```
 
 You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`. You can then call this API in your smart contract:
 
@@ -140,15 +140,15 @@ You can lock-down your off-chain endpoint to only accept queries from your smart
 
 ```
 
-## ASW Example Wrappers and Floating Point Math
+# AWS and Google Cloud Function Examples
 
-You external API will need to accepts calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/turing/AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
+Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing/AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
 # Important Properties of Turing
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
-* There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistant failure of your first call to your endpoint.
+* There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistent failure of your first call to your endpoint.
 
 ## String length limit
 
@@ -161,12 +161,12 @@ The string length cap of 322 is large enough to return, for example, four `uint2
   // 0000000000000000000000000000000000000000000000000000000000000080 ** length of the dynamic bytes
   // 0000000000000000000000000000000000000000000000000000000000418b95 ** first uint256
   // 0000000000000000000000000000000000000000000000000000017e60d3b45f **
-  // 0000000000000000000000000000000000000000000000000000000000eb7ca3 ** 
+  // 0000000000000000000000000000000000000000000000000000000000eb7ca3 **
   // 00000000000000000000000000000000000000000000000000000000004c788f ** fourth unit265
 
-``` 
+```
 
-You can return anything you want - e.g. numbers, strings, ... - and this information will then later be decoded per your `abi.decode`. For example, if the external API sends two `unit256`: 
+You can return anything you want - e.g. numbers, strings, ... - and this information will then later be decoded per your `abi.decode`. For example, if the external API sends two `unit256`:
 
 ```javascript
 
@@ -179,17 +179,17 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
   // decoding of those data within the smart contract
   (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
 
-```  
+```
 
 ## One Turing call per Transaction
 
-At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert. 
+At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert.
 
 # Turing Architecture
 
 The modified Turing L2Geth, `L2TGeth`, monitors calldata for particular Keccak methodIDs of functions such as `GetRandom(uint32 rType, uint256 _random)` and `GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs in the execution flow, at any level, L2TGeth parses the calldata for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then runs the function with updated inputs, such that the new information flows back to the caller (via overloaded variables and a system for conditionally bypassing `requires`). Put simply, L2TGeth intercepts function calls, adds new information to the inputs, and then runs the function with the updated inputs.
 
-In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data field is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter into a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum. 
+In general, this system would lead to disagreement about the correct state of the underlying blockchain. For example, if replicas and verifiers simply ingested the transactions and re-executed them, then every blockchain would differ, destroying the entire system. Thus, a new data field called `Turing` (aka `turing`, `l1Turing` or `L1Turing` depending on context) has been added to the L2Geth `transactions`,`messages`, `receipts`, `blocks`, `evm.contexts`, and various `codecs` and `encoders/decoders`. This new data field is understood by `core-utils` as well as the `data-translation-layer` and the `batch-submitter`, and allows Turing data to be pushed into, and recovered from, the `CanonicalTransactionChain` (CTC). This extra information allows all verifiers and replicas to enter a new **replay** mode, where instead of generating new random numbers (or calling off-chain for new data), they use the Turing data stored in the CTC (or in the L2 blocks as part of the transaction metadata) to generate a faithful copy of the main Boba L2 blockchain. Thus, the overall system works as before, with all the information needed for restoring the Boba L2 and, just as critically, for public fraud detection, being publicly deposited into Ethereum.
 
 ## Quickstart for Turing Developers
 
@@ -227,7 +227,7 @@ $ cd packages/boba/turing
 $ yarn test:rinkeby
 ```
 
-The tests will perform some basic floating point math, provide some random numbers, and get the latest BTC-USD exchange rate: 
+The tests will perform some basic floating point math, provide some random numbers, and get the latest BTC-USD exchange rate:
 
 ```bash
 yarn run v1.22.15
@@ -560,7 +560,7 @@ l2geth/miner/worker.go:
 // commit runs any post-transaction state modifications, assembles the final block
 // and commits new work if consensus engine is running.
 func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time) error {
-... 
+...
  1110   s := w.current.state.Copy()
  1111   // log.Debug("TURING worker.go final block", "depositing_txs", w.current.txs)
  1112:  block, err := w.engine.FinalizeAndAssemble(w.chain, w.current.header, s, w.current.txs, uncles, w.current.receipts)
@@ -573,17 +573,17 @@ At this point, the data are circulated to various places throughout the system a
 
 ## Step 3: Batch submitter Turing data injection
 
-The batch submitter receives an new block/transaction from `L2TGeth`, obtains the raw call string (`rawTransaction`) and the Turing data (`l1Turing`), and if there was a Turing event (as judged from the length of the Turing string), the modified `batch-submitter` appends those data to the `rawTransaction` string. From the perspective of the CTC, it is receiving its normal batch payload.   
+The batch submitter receives an new block/transaction from `L2TGeth`, obtains the raw call string (`rawTransaction`) and the Turing data (`l1Turing`), and if there was a Turing event (as judged from the length of the Turing string), the modified `batch-submitter` appends those data to the `rawTransaction` string. From the perspective of the CTC, it is receiving its normal batch payload.
 
 ```javascript
-// batch-submitter tx-batch-submitter.ts 
+// batch-submitter tx-batch-submitter.ts
 
 private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
 
-  // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode 
+  // Idea - manipulate the rawTransaction as early as possible, so we do not have to change even more of the encode/decode
   // logic - note that this is basically adding a second encoder/decoder before the 'normal' one, which encodes total length
   //
-  // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than 
+  // The 'normal' one will now specify the TOTAL length (new_turing_header + rawTransaction + turing (if != 0)) rather than
   // just remove0x(rawTransaction).length / 2
 
 ...
@@ -672,7 +672,7 @@ The Verifier receives all the usual data from the DTL, but, if there was a Turin
    66       L1MessageSender: l1MessageSender,
    ..
   145   }
-  146  
+  146
   147:  turing, err := common.ReadVarBytes(b, 0, 2048, "Turing")
   148   if err != nil {
   149       return nil, err
@@ -729,4 +729,4 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 ```
 
-The Turing data flow from out from the `evm.context` through the rest of the system as before, so the data are incorporated into verifier and replica blocks, resulting in correct/consistent state roots and replica and verifier blocks. 
+The Turing data flow from out from the `evm.context` through the rest of the system as before, so the data are incorporated into verifier and replica blocks, resulting in correct/consistent state roots and replica and verifier blocks.

@@ -26,8 +26,8 @@ $ npm install --global yarn
 Clone the repository, open it, and install packages with `yarn`:
 
 ```bash
-$ git clone https://github.com/omgnetwork/optimism-v2.git
-$ cd optimism-v2
+$ git clone https://github.com/bobanetwork/boba.git
+$ cd boba
 $ yarn
 $ yarn build
 ```
