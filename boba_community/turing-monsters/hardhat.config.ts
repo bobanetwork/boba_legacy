@@ -18,7 +18,8 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     } as any,
     boba_mainnet: {
-      url: 'http://mainnet.boba.network',
+      url: 'https://mainnet.boba.network',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
   solidity: {
