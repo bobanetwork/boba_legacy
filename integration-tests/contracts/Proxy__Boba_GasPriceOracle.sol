@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@eth-optimism/contracts/contracts/L2/predeploys/Boba_GasPriceOracle.sol";
-
 contract Proxy__Boba_GasPriceOracle {
     address public gasPriceOracleAddress;
 
@@ -23,4 +21,10 @@ contract Proxy__Boba_GasPriceOracle {
     function useETHAsFeeToken() public {
         Boba_GasPriceOracle(gasPriceOracleAddress).useETHAsFeeToken();
     }
+}
+
+
+interface Boba_GasPriceOracle {
+  function useBobaAsFeeToken() external;
+  function useETHAsFeeToken() external;
 }
