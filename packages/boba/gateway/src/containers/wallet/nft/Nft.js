@@ -15,6 +15,8 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
+import { monsterMint } from 'actions/networkAction'
+
 class Nft extends React.Component {
 
   constructor(props) {
@@ -25,11 +27,18 @@ class Nft extends React.Component {
       list
     } = this.props.nft
 
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
+
     this.state = {
       list,
       contractAddress: '',
       tokenID: '',
-      loading: this.props.loading[ 'NFT/ADD' ]
+      loading: this.props.loading[ 'NFT/ADD' ],
+      accountEnabled,
+      netLayer,
     }
 
   }
@@ -37,6 +46,11 @@ class Nft extends React.Component {
   componentDidUpdate(prevState) {
 
     const { list } = this.props.nft
+
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
 
     if (!isEqual(prevState.nft.list, list)) {
       this.setState({ list })
@@ -47,6 +61,14 @@ class Nft extends React.Component {
       if (this.props.loading[ 'NFT/ADD' ]) {
         this.setState({ contractAddress: '' })
       }
+    }
+
+    if (!isEqual(prevState.setup.accountEnabled, accountEnabled)) {
+      this.setState({ accountEnabled })
+    }
+
+    if (!isEqual(prevState.setup.netLayer, netLayer)) {
+      this.setState({ netLayer })
     }
 
   }
@@ -63,18 +85,25 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
+  async doMonsterMint() {
+    console.log("dispatch Monster mint")
+    if (this.state.accountEnabled) {
+      console.log("dispatch Monster mint")
+      this.props.dispatch(monsterMint())
+    }
+  }
+
   render() {
 
     const {
       list,
       contractAddress,
       tokenID,
-      loading
+      loading,
+      netLayer,
     } = this.state
 
-    const layer = networkService.L1orL2
-
-    if (!layer) {
+    if (!netLayer) {
 
       return (
         <S.TokenPageContainer>
@@ -97,7 +126,7 @@ class Nft extends React.Component {
         </S.TokenPageContainer>
       )
 
-    } else if (layer === 'L1') {
+    } else if (netLayer === 'L1') {
 
       return (
         <S.TokenPageContainer>
@@ -125,6 +154,27 @@ class Nft extends React.Component {
     return (
         <S.NFTPageContainer>
           <S.NFTActionContent>
+          <S.NFTFormContent>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <BobaGlassIcon />
+                  <Typography variant="body1" >
+                    Monster Mint
+                  </Typography>
+                </Box>
+                <S.DividerLine />
+                <Button
+                  type="primary"
+                  variant="contained"
+                  fullWidth={true}
+                  onClick={(i) => { this.doMonsterMint() }}
+                  disabled={loading}
+                  sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
+                >
+                  Mint my monster
+                </Button>
+              </Box>
+            </S.NFTFormContent>
             <S.NFTFormContent>
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -223,7 +273,8 @@ class Nft extends React.Component {
 
 const mapStateToProps = state => ({
   nft: state.nft,
-  loading: state.loading
+  loading: state.loading,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Nft)

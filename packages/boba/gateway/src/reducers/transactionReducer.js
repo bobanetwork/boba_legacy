@@ -34,6 +34,10 @@ function transactionReducer (state = initialState, action) {
       return {
         ...state
       }
+    case 'MONSTER/CREATE/SUCCESS':
+      return {
+        ...state
+      }
     default:
       return state;
   }

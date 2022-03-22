@@ -58,6 +58,7 @@ import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
+import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
@@ -1320,6 +1321,45 @@ class NetworkService {
     }
   }
 
+  async monsterMint() {
+
+    console.log("NS: monsterMint")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contract = new ethers.Contract(
+        '0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA',
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      const TX = await contract
+        .connect(this.provider.getSigner())
+        .mint(1)
+
+      await TX.wait()
+
+      // this TX contains the transaction hash we need to look up the 
+      // TokenID
+
+      console.log("NS: monsterMint TX:", TX)
+      const block = await this.L2Provider.getTransaction(TX.hash)
+      console.log(' block:', block)
+
+      return TX
+    } catch (error) {
+      console.log("NS: monsterMint error:", error)
+      return error
+    }
+
+  }
+
   async settle_v0() {
 
     console.log("NS: settle_v0")
@@ -1391,11 +1431,11 @@ class NetworkService {
       console.log("You have WAGMIv1:", balance.toString())
 
       const TX = await contractLSP
-      .connect(this.provider.getSigner())
-      .settle(
-        balance,
-        ethers.utils.parseEther("0")
-      )
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
       await TX.wait()
       return TX
     } catch (error) {
