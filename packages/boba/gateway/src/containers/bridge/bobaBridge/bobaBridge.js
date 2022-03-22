@@ -61,18 +61,26 @@ function BobaBridge() {
             </Box>
             <S.ChainInput
             >
-              {layer === 'L1' ?
+              {!layer ?
                 <S.ChainLabel
                   component="p"
                   variant="body"
                 >
-                  <EthereumIcon /> Ethereum
-                </S.ChainLabel> : <S.ChainLabel
-                  component="p"
-                  variant="body"
-                >
-                  <BobaIcon /> Boba Network
+
                 </S.ChainLabel>
+                : layer === 'L1'
+                  ? <S.ChainLabel
+                    component="p"
+                    variant="body"
+                  >
+                    <EthereumIcon /> Ethereum
+                  </S.ChainLabel> :
+                  <S.ChainLabel
+                    component="p"
+                    variant="body"
+                  >
+                    <BobaIcon /> Boba Network
+                  </S.ChainLabel>
               }
             </S.ChainInput>
           </Box>
@@ -90,18 +98,23 @@ function BobaBridge() {
               </Typography>
             </Box>
             <S.ChainInput>
-              {layer === 'L2' ?
+              {!layer ?
                 <S.ChainLabel
                   component="p"
                   variant="body"
-                >
-                  <EthereumIcon /> Ethereum
-                </S.ChainLabel> : <S.ChainLabel
-                  component="p"
-                  variant="body"
-                >
-                  <BobaIcon /> Boba Network
-                </S.ChainLabel>
+                > </S.ChainLabel>
+                : layer === 'L2' ?
+                  <S.ChainLabel
+                    component="p"
+                    variant="body"
+                  >
+                    <EthereumIcon /> Ethereum
+                  </S.ChainLabel> : <S.ChainLabel
+                    component="p"
+                    variant="body"
+                  >
+                    <BobaIcon /> Boba Network
+                  </S.ChainLabel>
               }
             </S.ChainInput>
           </Box>

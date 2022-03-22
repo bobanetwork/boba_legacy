@@ -566,7 +566,7 @@ async initializeBase( networkGateway ) {
               'L2': L2a
             }
           }
-        } 
+        }
         else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
@@ -1332,7 +1332,7 @@ async initializeBase( networkGateway ) {
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
 
@@ -1377,7 +1377,7 @@ async initializeBase( networkGateway ) {
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
 

@@ -58,7 +58,8 @@ export const LayerSwitcherIconWrapper = styled(Box)(({ theme }) => ({
   width: '40px',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  cursor: 'pointer'
 }))
 
 export const LayerSwitcherIcon = styled(Box)(({ theme }) => ({

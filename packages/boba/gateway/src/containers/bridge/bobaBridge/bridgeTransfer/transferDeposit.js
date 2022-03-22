@@ -11,14 +11,14 @@ import { logAmount } from 'util/amountConvert';
 function TransferDeposit({
   token
 }) {
-  console.log(['TRANSFER DEPOSIT'])
+
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
-  
+
   useEffect(() => {
     const maxValue = logAmount(token.balance, token.decimals)
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
@@ -30,7 +30,7 @@ function TransferDeposit({
       setValidValue(true)
     }
 
-    
+
   }, [ token, setValidValue ])
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function TransferDeposit({
       dispatch(closeModal('transferPending'));
     }
   }, [ signatureStatus, depositLoading, dispatch])
-  
+
   const doDeposit = async () => {
     dispatch(openModal('transferPending'));
     let res;
@@ -53,8 +53,8 @@ function TransferDeposit({
         depositErc20(token.toWei_String, token.address, token.addressL2)
       )
     }
+    console.log(['Depositing Modal', res]);
     dispatch(closeModal('transferPending'));
-    console.log(res);
   }
 
   return <Button
