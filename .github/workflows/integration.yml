@@ -273,6 +273,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Stop EC2 runner
         uses: machulav/ec2-github-runner@v2
+        continue-on-error: true
         id: stop-ec2-runner
         with:
           mode: stop
@@ -332,6 +333,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Stop EC2 executioner
         uses: machulav/ec2-github-runner@v2
+        continue-on-error: true
         id: stop-ec2-executioner
         with:
           mode: stop
