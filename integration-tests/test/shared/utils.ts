@@ -290,6 +290,39 @@ export const expectLogs = async (
   return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
 }
 
+export const getFilteredLogIndex = async (
+  receipt,
+  emitterAbi,
+  emitterAddress,
+  eventName
+) => {
+  let eventABI = emitterAbi.filter(
+    (x) => x.type === 'event' && x.name === eventName
+  )
+  if (eventABI.length === 0) {
+    throw new Error(`No ABI entry for event '${eventName}'`)
+  } else if (eventABI.length > 1) {
+    throw new Error(
+      `Multiple ABI entries for event '${eventName}', only uniquely named events are supported`
+    )
+  }
+
+  eventABI = eventABI[0]
+  const eventSignature = `${eventName}(${eventABI.inputs
+    .map((input) => input.type)
+    .join(',')})`
+  const eventTopic = utils.keccak256(utils.toUtf8Bytes(eventSignature))
+  const logs = receipt.logs
+  const filteredLogs = logs.filter(
+    (log) =>
+      log.topics.length > 0 &&
+      log.topics[0] === eventTopic &&
+      (!emitterAddress || log.address === emitterAddress)
+  )
+
+  return filteredLogs[0].logIndex
+}
+
 // eslint-disable-next-line @typescript-eslint/no-shadow
 export const isMainnet = async () => {
   const chainId = await l1Wallet.getChainId()
