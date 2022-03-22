@@ -1054,7 +1054,6 @@ class NetworkService {
         meta
       }
 
-      console.log("NFT:",NFT)
       await addNFT( NFT )
 
     } catch (error) {
@@ -1331,28 +1330,29 @@ class NetworkService {
     // ONLY SUPPORTED on MAINNET
     if (this.networkGateway !== 'mainnet') return
 
+    const monsterAddress = '0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'
+
     try {
 
       const contract = new ethers.Contract(
-        '0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA',
+        monsterAddress,
         TuringMonsterJson.abi,
         this.L2Provider
       )
 
-      const TX = await contract
+      const tx = await contract
         .connect(this.provider.getSigner())
         .mint(1)
 
-      await TX.wait()
+      const receipt = await tx.wait()
+      console.log("NS: monsterMint TX:", receipt.logs)
 
-      // this TX contains the transaction hash we need to look up the 
-      // TokenID
+      const rawData = receipt.logs[3].topics[1]
+      const numberHexString = rawData.slice(-64)
+      let tokenID = parseInt(numberHexString, 16)
+      await this.addNFT( monsterAddress, tokenID )
 
-      console.log("NS: monsterMint TX:", TX)
-      const block = await this.L2Provider.getTransaction(TX.hash)
-      console.log(' block:', block)
-
-      return TX
+      return tx
     } catch (error) {
       console.log("NS: monsterMint error:", error)
       return error
@@ -3525,7 +3525,7 @@ class NetworkService {
     )
     const l1SecurityFee = await this.gasOracleContract.getL1Fee(
       ethers.utils.serializeTransaction(deepCopyPayload)
-    );
+    )
     return l1SecurityFee.toNumber()
   }
 
@@ -3533,8 +3533,8 @@ class NetworkService {
   /*****                L2 Fee              *****/
   /***********************************************/
   async estimateL2Fee(payload=this.payloadForL1SecurityFee) {
-    const l2GasPrice = await this.L2Provider.getGasPrice();
-    const l2GasEstimate = await this.L2Provider.estimateGas(payload);
+    const l2GasPrice = await this.L2Provider.getGasPrice()
+    const l2GasEstimate = await this.L2Provider.estimateGas(payload)
     return l2GasPrice.mul(l2GasEstimate).toNumber()
   }
 
