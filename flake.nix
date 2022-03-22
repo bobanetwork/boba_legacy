@@ -12,13 +12,9 @@
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    solc-bin = {
-      url = "github:tgunnoe/solc-bin-test";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, dream2nix, solc-bin }@inputs:
+  outputs = { self, nixpkgs, flake-utils, dream2nix }@inputs:
     let
       lib = nixpkgs.lib;
 
