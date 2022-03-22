@@ -59,6 +59,10 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 
+//WAGMI ABIs
+import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
+import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
+
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
@@ -142,7 +146,8 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts
+    this.L1GasLimit = 9999999 
+    // setting of this value not important since it's not connected to anything in the contracts
     // "param _l1Gas Unused, but included for potential forward compatibility considerations"
     this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
@@ -429,7 +434,7 @@ class NetworkService {
      return allAddresses
   }
 
-async initializeBase( networkGateway ) {
+  async initializeBase( networkGateway ) {
 
     console.log('NS: initializeBase() for', networkGateway)
 
@@ -835,12 +840,6 @@ async initializeBase( networkGateway ) {
   }
 
   async switchChain( targetLayer ) {
-  //  this.correctChain( layer )
-  //}
-
-  //async correctChain( targetLayer ) {
-
-    // this needds to trigger justSwitchedChain
 
     const nw = getNetwork()
     const network = store.getState().setup.network
@@ -1321,96 +1320,89 @@ async initializeBase( networkGateway ) {
     }
   }
 
-
-
   async settle_v0() {
 
     console.log("NS: settle_v0")
 
-    let tx = null
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
 
     try {
 
-      // get current WAGMI_v0 balance
+      const contractLSP = new ethers.Contract(
+        '0x7F969E3F19355C47f6bc957E502c79C75b373BF3',
+        WAGMIv0Json.abi,
+        this.L2Provider
+      )
+
+      const contractWAGMIv0 = new ethers.Contract(
+        '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
       
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const balance = await contractWAGMIv0.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv0:", balance.toString())
 
-      // if(currency === allAddresses.L2_ETH_Address) {
-      //   //we are sending ETH
-
-      //   let wei = BigNumber.from(value_Wei_String)
-
-      //   tx = await this.provider.send('eth_sendTransaction',
-      //     [
-      //       {
-      //         from: this.account,
-      //         to: address,
-      //         value: ethers.utils.hexlify(wei)
-      //       }
-      //     ]
-      //   )
-
-      // } else {
-      //   //any ERC20 json will do....
-      //   tx = await this.L2_TEST_Contract
-      //     .connect(this.provider.getSigner()).attach(currency).transfer(
-      //       address,
-      //       value_Wei_String
-      //     )
-      //   await tx.wait()
-      // }
-
-      return tx
+      const TX = await contractLSP
+      .connect(this.provider.getSigner())
+      .settle(
+        balance,
+        ethers.utils.parseEther("0")
+      )
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: settle_v0 error:", error)
       return error
     }
+
   }
 
   async settle_v1() {
 
     console.log("NS: settle_v1")
 
-    let tx = null
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
 
     try {
 
-      // get current WAGMI_v0 balance
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
+        WAGMIv1Json.abi,
+        this.L2Provider
+      )
+
+      const contractWAGMIv1 = new ethers.Contract(
+        '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
       
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const balance = await contractWAGMIv1.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv1:", balance.toString())
 
-      // if(currency === allAddresses.L2_ETH_Address) {
-      //   //we are sending ETH
-
-      //   let wei = BigNumber.from(value_Wei_String)
-
-      //   tx = await this.provider.send('eth_sendTransaction',
-      //     [
-      //       {
-      //         from: this.account,
-      //         to: address,
-      //         value: ethers.utils.hexlify(wei)
-      //       }
-      //     ]
-      //   )
-
-      // } else {
-      //   //any ERC20 json will do....
-      //   tx = await this.L2_TEST_Contract
-      //     .connect(this.provider.getSigner()).attach(currency).transfer(
-      //       address,
-      //       value_Wei_String
-      //     )
-      //   await tx.wait()
-      // }
-
-      return tx
+      const TX = await contractLSP
+      .connect(this.provider.getSigner())
+      .settle(
+        balance,
+        ethers.utils.parseEther("0")
+      )
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: settle_v1 error:", error)
       return error
     }
+
   }
 
   //Transfer funds from one account to another, on the L2
