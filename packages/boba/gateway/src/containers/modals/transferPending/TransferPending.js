@@ -5,17 +5,17 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 
 function TransferPendingModal({open}) {
- 
+
   const dispatch = useDispatch();
-  
+
   function handleClose () {
     dispatch(closeModal('transferPending'));
   }
-  
+
   return (
     <Modal
       open={open}
-      handleClose={handleClose}
+      onClose={handleClose}
       maxWidth="xs"
       minHeight="300px"
       title="Transaction Pending"
@@ -23,7 +23,7 @@ function TransferPendingModal({open}) {
     >
       <Box display="flex" alignItems="center" flexDirection="column" justifyContent="space-around" gap={2}>
         <CircularProgress size="100px" color="primary" />
-        <Typography variant='body2'>Waiting for confirmation from MetaMask</Typography>    
+        <Typography variant='body2'>Waiting for confirmation from MetaMask</Typography>
       </Box>
     </Modal>
   )

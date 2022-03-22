@@ -66,7 +66,7 @@ import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
-
+import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 
 import {
   fetchDaoBalance,
@@ -117,6 +117,7 @@ function Home() {
   const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
+  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -238,6 +239,7 @@ function Home() {
       {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
+      {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
 
       <Alert
         type='error'
