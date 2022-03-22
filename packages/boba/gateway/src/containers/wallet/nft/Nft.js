@@ -103,6 +103,8 @@ class Nft extends React.Component {
       netLayer,
     } = this.state
 
+    console.log("list:",list)
+
     if (!netLayer) {
 
       return (
@@ -151,7 +153,7 @@ class Nft extends React.Component {
 
     else {
 
-    return (
+      return (
         <S.NFTPageContainer>
           <S.NFTActionContent>
           <S.NFTFormContent>
@@ -202,10 +204,10 @@ class Nft extends React.Component {
                 />
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Token Id
+                  Token ID
                 </Typography>
                 <Input
-                  placeholder='tokenID - e.g. 3'
+                  placeholder='TokenID - e.g. 3'
                   value={tokenID}
                   onChange={this.handleInputID}
                 // paste
@@ -222,26 +224,15 @@ class Nft extends React.Component {
                 {loading ? 'Adding NFT...' : 'Add NFT'}
               </Button>
             </S.NFTFormContent>
-            {/* <S.NFTFormContent>
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="body1" >
-                    Guess you need
-                  </Typography>
-                </Box>
-                <S.DividerLine />
-              </Box>
-            </S.NFTFormContent> */}
           </S.NFTActionContent>
           <S.NFTListContainer dataempty={Object.keys(list).length === 0}>
             {Object.keys(list).length === 0 ?
               <Box>
-                  <Typography variant="body2"  sx={{opacity: 0.65}} >
-                    Please enter the contract address and tokenID to add NFT for display. 
-                  </Typography>  
-                  <Typography variant="body2"  sx={{opacity: 0.65}} >
-                    If you don't know your tokenID, you can look it up in blockexplorer. It's shown for mint or transfer events.
-                  </Typography>  
+                <Typography variant="body2"  sx={{opacity: 0.65}} >
+                  Please enter the contract address and tokenID to add NFT for display.<br/>
+                  If you don't know your TokenID, you can look it up in the blockexplorer.<br/>
+                  It's shown for mint or transfer events. 
+                </Typography>   
               </Box>
               : <Grid
                 container
@@ -254,13 +245,13 @@ class Nft extends React.Component {
                   return (
                     <ListNFT
                       key={key_UUID}
-                      name={list[ v ].name}
-                      symbol={list[ v ].symbol}
-                      address={list[ v ].address}
-                      UUID={list[ v ].UUID}
-                      URL={list[ v ].url}
-                      meta={list[ v ].meta}
-                      tokenID={list[ v ].tokenID}
+                      name={list[v].name}
+                      symbol={list[v].symbol}
+                      address={list[v].address}
+                      UUID={list[v].UUID}
+                      URL={list[v].url}
+                      meta={list[v].meta}
+                      tokenID={list[v].tokenID}
                     />)
                 })
                 }

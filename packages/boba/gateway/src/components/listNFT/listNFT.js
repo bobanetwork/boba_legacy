@@ -29,7 +29,7 @@ class listNFT extends React.Component {
 
   constructor(props) {
 
-    super(props);
+    super(props)
 
     const {
       name,
@@ -37,7 +37,8 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      meta
+      meta,
+      tokenID
     } = this.props
 
     this.state = {
@@ -47,6 +48,7 @@ class listNFT extends React.Component {
       UUID,
       URL,
       meta,
+      tokenID,
       isFlipped: false,
     }
     this.handleClick = this.handleClick.bind(this);
@@ -66,8 +68,8 @@ class listNFT extends React.Component {
 
     const {
       name, symbol, address,
-      UUID, URL, meta
-    } = this.props;
+      UUID, URL, meta, tokenID
+    } = this.props
 
     if (!isEqual(prevState.name, name)) {
       this.setState({ name })
@@ -93,16 +95,21 @@ class listNFT extends React.Component {
       this.setState({ meta })
     }
 
+    if (!isEqual(prevState.tokenID, tokenID)) {
+      this.setState({ tokenID })
+    }
+
   }
 
   render() {
 
     const {
-      // name,
-      // symbol,
+      name,
+      symbol,
       URL,
       isFlipped,
-      meta
+      meta,
+      tokenID
     } = this.state
 
     let imgSource = URL
@@ -112,8 +119,10 @@ class listNFT extends React.Component {
 
     return (
       <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical" >
-        <S.ListNFTItem item onClick={this.handleClick}>
-
+        <S.ListNFTItem 
+          item 
+          onClick={this.handleClick}
+        >
           <img
             src={imgSource}
             alt="NFT URI"
@@ -125,52 +134,50 @@ class listNFT extends React.Component {
             }}
             className={styles.topContainer}>
             <Typography variant="body1">
-              {/* {name} ({symbol}) */}
               {meta.name}
             </Typography>
           </div>
         </S.ListNFTItem>
-        <S.ListNFTItem active={'true'} item onClick={this.handleClick}>
-          <div className={styles.topContainer}>
+        <S.ListNFTItem 
+          active={'true'} 
+          item 
+          onClick={this.handleClick}
+        >
             <Typography variant="body1">
-            {meta.name}
+              {meta.name}<br/>({symbol})
             </Typography>
-            <S.DividerLine />
-          </div>
-
-          <div className={styles.topContainer}>
-            <div className={styles.Table2}>
-              {meta.collection !== '' &&
-                <Typography variant="body3">
-                  Collection:
-                    {meta.collection}
+            <Typography variant="body1">
+              TokenID:{' '}{tokenID}
+            </Typography>
+            {meta.collection !== '' &&
+              <Typography variant="body3">
+                Collection:{' '}{meta.collection}
+              </Typography>
+            }
+            {meta.rank !== '' &&
+              <Typography variant="body3">
+                Rank:{' '}{meta.rank}
+              </Typography>
+            }
+            {meta.rarity_score !== '' &&
+              <Typography variant="body3">
+                Rarity:{' '}{meta.rarity_score}
+              </Typography>
+            }
+            {(meta.attributes || []).map((attr, index) => {
+              return (
+                <Typography variant="body3" key={index}>
+                  {attr.trait_type}:{' '}{attr.value}
                 </Typography>
-              }
-              {meta.rank !== '' &&
-                <Typography variant="body3">
-                  Rank:
-                    {meta.rank}
+              )
+            })}
+            {(meta.traits || []).map((attr, index) => {
+              return (
+                <Typography variant="body3" key={index}>
+                  {attr.trait_type}:{' '}{attr.trait_value}
                 </Typography>
-              }
-              {meta.rarity_score !== '' &&
-                <Typography variant="body3">
-                  Rarity:
-                    {meta.rarity_score}
-                </Typography>
-              }
-              {(meta.attributes || []).map((attr, index) => {
-                return (<Typography variant="body3" key={index}>{attr.trait_type}:
-                    {attr.value}
-                </Typography>)
-              })}
-              {(meta.traits || []).map((attr, index) => {
-                return (<Typography variant="body3" key={index}>
-                  {attr.trait_type}:
-                    {attr.trait_value}
-                </Typography>)
-              })}
-            </div>
-            <S.DividerLine />
+              )
+            })}
             <Button
               variant="outlined"
               onClick={(e) => {
@@ -181,10 +188,8 @@ class listNFT extends React.Component {
             >
               Remove
             </Button>
-          </div>
         </S.ListNFTItem>
       </ReactCardFlip>
-
     )
   }
 }
