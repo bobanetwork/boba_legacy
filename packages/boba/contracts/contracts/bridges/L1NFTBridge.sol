@@ -174,7 +174,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             baseNetwork = Network.L1;
         }
         else {
-            require(ERC165Checker.supportsInterface(_l1Contract, 0x3899b238), "L1 contract is not bridgable");
+            require(ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
 

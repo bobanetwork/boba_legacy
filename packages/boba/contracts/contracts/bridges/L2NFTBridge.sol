@@ -188,7 +188,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
         if (bn == l1) {
-            require(ERC165Checker.supportsInterface(_l2Contract, 0x646dd6ec), "L2 contract is not bridgable");
+            require(ERC165Checker.supportsInterface(_l2Contract, 0xb07cd11a), "L2 contract is not bridgable");
             baseNetwork = Network.L1;
         }
         else {
