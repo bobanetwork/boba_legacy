@@ -104,10 +104,10 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	// on the receipt. This must happen before the state transition
 	// to ensure that the correct information is used.
 	var (
-		l1Fee      = new(big.Int)
-		l1GasPrice = new(big.Int)
-		l1GasUsed  = new(big.Int)
-		scalar     = new(big.Float)
+		l1Fee      *big.Int
+		l1GasPrice *big.Int
+		l1GasUsed  *big.Int
+		scalar     *big.Float
 	)
 	if config.IsFeeTokenUpdate(header.Number) {
 		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasDataInfo(msg, statedb)
