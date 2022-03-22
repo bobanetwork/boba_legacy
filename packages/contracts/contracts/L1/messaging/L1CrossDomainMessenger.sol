@@ -52,7 +52,7 @@ contract L1CrossDomainMessenger is
     event MessageBlocked(bytes32 indexed _xDomainCalldataHash);
 
     event MessageAllowed(bytes32 indexed _xDomainCalldataHash);
-    
+
     event SentL1TunnelMessage(
         address indexed target,
         address sender,

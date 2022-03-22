@@ -55,7 +55,7 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
     /********************
      * Public Functions *
      ********************/
-     
+
     function SetPortal(address _portal) public {
       portalAddr = _portal;
       portal = L2_BobaPortal(_portal);
