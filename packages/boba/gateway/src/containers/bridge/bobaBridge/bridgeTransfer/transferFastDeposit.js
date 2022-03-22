@@ -15,36 +15,37 @@ import networkService from 'services/networkService';
 import { fetchFastDepositCost, fetchL1FeeBalance, fetchL2FeeRateN, fetchL2LPBalance, fetchL2LPLiquidity, fetchL2LPPending, fetchL2TotalFeeRate } from 'actions/balanceAction';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { selectLoading } from 'selectors/loadingSelector';
+import { resetToken } from 'actions/bridgeAction';
 
-/* 
+/*
 Transfer Fast Deposit supports multiple tokens
 */
 
 function TransferFastDeposit({
   token
 }) {
-  
+
   console.log(['TRANSFER FAST DEPOSIT'])
   const [ validValue, setValidValue ] = useState(false);
   const [ LPRatio, setLPRatio ] = useState(0)
   const dispatch = useDispatch();
 
   const allAddresses = networkService.getAllAddresses()
-  
+
   const cost = useSelector(selectFastDepositCost)
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
   const feeRate = useSelector(selectL2FeeRate)
   const feeRateN = useSelector(selectL2FeeRateN)
-  
+
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const approvalLoading = useSelector(selectLoading([ 'APPROVE/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
-  
+
   const feeBalance = useSelector(selectL2FeeBalance)
   const lpUnits = logAmount(LPBalance, token.decimals)
-  
+
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   //ok, we are on L1, but the funds will be paid out on l2
@@ -73,13 +74,13 @@ function TransferFastDeposit({
     }
   }, [ LPLiquidity, LPBalance, token.decimals ])
 
-  
-  
+
+
   useEffect(() => {
     const maxValue = logAmount(token.balance, token.decimals);
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(maxValue))
-    
+
     if (tooSmall || tooBig) {
       setValidValue(false)
     } else if (token.symbol === 'ETH' && (Number(cost) + Number(token.amount)) > Number(feeBalance)) {
@@ -103,7 +104,7 @@ function TransferFastDeposit({
       //Whew, finally!
       setValidValue(true)
     }
-    
+
   }, [ token, setValidValue, cost, LPRatio, balanceSubPending, feeBalance, ])
 
   const receivableAmount = (value) => {
@@ -114,10 +115,11 @@ function TransferFastDeposit({
       //we are all set - can close the window
       //transaction has been sent and signed
       dispatch(closeModal('transferPending'));
+      dispatch(resetToken());
     }
   }, [ signatureStatus, depositLoading, dispatch ])
-  
-  
+
+
   const doFastDeposit = async () => {
     dispatch(openModal('transferPending'));
     let res;
@@ -134,6 +136,7 @@ function TransferFastDeposit({
           )
         )
         dispatch(closeModal('transferPending'));
+        dispatch(resetToken());
         return
       }
 
@@ -152,6 +155,7 @@ function TransferFastDeposit({
       if(res === false) {
         dispatch(openError('Failed to approve amount or user rejected signature'))
         dispatch(closeModal('transferPending'));
+        dispatch(resetToken());
         return
       }
 
@@ -167,6 +171,7 @@ function TransferFastDeposit({
           )
         )
         dispatch(closeModal('transferPending'));
+        dispatch(resetToken());
         return
       }
     }

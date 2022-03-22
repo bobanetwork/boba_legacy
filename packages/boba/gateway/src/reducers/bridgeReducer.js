@@ -24,6 +24,9 @@ function bridgeReducer(state = initialState, action) {
     case 'BRIDGE/TYPE/SELECT':
       return { ...state, bridgeType: action.payload }
 
+    case 'BRIDGE/TOKEN/RESET':
+      return { ...state, tokens: [] }
+
     case 'BRIDGE/TOKEN/SELECT':
       return {
         ...state,
@@ -36,7 +39,7 @@ function bridgeReducer(state = initialState, action) {
           }
         ],
       }
-    
+
     case 'BRIDGE/TOKEN/UPDATE': {
       let newTokens = [ ...state.tokens ];
       const { token, tokenIndex } = action.payload;

@@ -1,3 +1,4 @@
+import { resetToken } from 'actions/bridgeAction';
 import { depositErc20, depositETHL2 } from 'actions/networkAction';
 import { closeModal, openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
@@ -38,6 +39,7 @@ function TransferDeposit({
       //we are all set - can close the window
       //transaction has been sent and signed
       dispatch(closeModal('transferPending'));
+      dispatch(resetToken());
     }
   }, [ signatureStatus, depositLoading, dispatch])
 
@@ -53,8 +55,9 @@ function TransferDeposit({
         depositErc20(token.toWei_String, token.address, token.addressL2)
       )
     }
-    console.log(['Depositing Modal', res]);
+    console.log([ 'Depositing Modal', res ]);
     dispatch(closeModal('transferPending'));
+    dispatch(resetToken());
   }
 
   return <Button

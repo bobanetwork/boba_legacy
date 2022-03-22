@@ -45,9 +45,12 @@ function TokenInput({
   const underZero = new BN(token.amount).lt(new BN(0))
   const overMax = new BN(token.amount).gt(new BN(token.balance))
 
-  const amount = token.symbol === 'ETH' ?
-    Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
-    Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  let amount = 0;
+  if (token.symbol) {
+    amount = token.symbol === 'ETH' ?
+      Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
+      Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
 
   const onInputChange = (amount) => {
     dispatch(setTokenAmount({
@@ -60,7 +63,7 @@ function TokenInput({
   const deleteToken = (tokenIndex) => {
     dispatch(removeToken(tokenIndex));
   }
-  
+
   const openTokenPicker = () => {
     dispatch(openModal('tokenPicker', null, null, index))
   }
@@ -99,34 +102,55 @@ function TokenInput({
         alignItems="center"
         sx={{ gap: '5px' }}
       >
-        <S.TokenPicker
-          onClick={() => { openTokenPicker(index) }}
-        >
-          <img src={getCoinImage(token.symbol)} alt="logo" width={25} height={25} /> {token.symbol} <ArrowDropDown fontSize="medium" />
-        </S.TokenPicker>
+        {
+          !token.symbol ?
+            <S.TokenPicker
+              sx={{
+                background: '#BAE21A',
+                color: '#031313',
+              }}
+              onClick={() => { openTokenPicker(index) }}
+            >
+              <Typography whiteSpace="nowrap" variant="body2">Select Token</Typography>
+              <ArrowDropDown fontSize="medium" />
+            </S.TokenPicker> :
+            <S.TokenPicker
+              onClick={() => { openTokenPicker(index) }}
+            >
+              <img src={getCoinImage(token.symbol)} alt="logo" width={25} height={25} /> {token.symbol}
+              <ArrowDropDown fontSize="medium" />
+            </S.TokenPicker>
+        }
         <S.TextFieldWrapper>
-          <S.TextFieldTag
-            placeholder="enter amount"
-            type="number"
-            value={token.amount}
-            onChange={(e) => {
-              onInputChange(e.target.value);
-            }}
-            fullWidth={true}
-            variant="standard"
-            error={underZero || overMax}
-          />
+          {!token.symbol ?
+            <S.TextFieldTag
+              placeholder="enter amount"
+              type="number"
+              value={0}
+              fullWidth={true}
+              variant="standard"
+            /> : <S.TextFieldTag
+              placeholder="enter amount"
+              type="number"
+              value={token.amount}
+              onChange={(e) => {
+                onInputChange(e.target.value);
+              }}
+              fullWidth={true}
+              variant="standard"
+              error={underZero || overMax}
+            />}
         </S.TextFieldWrapper>
         <S.TokenPickerAction>
           <IconButton size="small" aria-label="add token"
-            disabled
-            /* onClick={() => {
+            disabled={true} // as we are going to enable it only for the L1 layer + fast Fast Deposit
+            onClick={() => {
               if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
                 switchBridgeType()
               } else {
                 addNewToken()
               }
-            }} */
+            }}
           >
             <AddCircleOutline fontSize="small" />
           </IconButton>

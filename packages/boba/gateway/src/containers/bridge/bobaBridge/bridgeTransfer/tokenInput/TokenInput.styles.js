@@ -17,7 +17,7 @@ export const TokenPicker = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '2px',
-  pl: 1,
+  padding: '5px 10px',
   width: '30%',
   cursor: 'pointer',
   'img': {

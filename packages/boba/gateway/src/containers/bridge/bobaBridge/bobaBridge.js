@@ -48,7 +48,7 @@ function BobaBridge() {
       flex: 1,
     }}>
       <S.BobaBridgeWrapper width={'100%'}>
-        <S.BobaContentWrapper flexDirection="row" width={"full"} alignItems="center">
+        <S.BobaContentWrapper flexDirection="row" fullWidth={true} gap="5px" alignItems="center">
           <Box>
             <Box>
               <Typography

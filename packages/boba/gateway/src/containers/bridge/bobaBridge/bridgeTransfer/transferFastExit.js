@@ -14,6 +14,7 @@ import { fetchFastExitCost, fetchL1FeeRateN, fetchL1LPBalance, fetchL1LPLiquidit
 import { depositL2LP } from 'actions/networkAction';
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector';
 import { selectLoading } from 'selectors/loadingSelector';
+import { resetToken } from 'actions/bridgeAction';
 
 
 function TransferFastExit({
@@ -105,6 +106,7 @@ function TransferFastExit({
       //we are all set - can close the window
       //transaction has been sent and signed
       dispatch(closeModal('transferPending'));
+      dispatch(resetToken());
 
     }
   }, [ signatureStatus, loading, dispatch ])
@@ -124,7 +126,8 @@ function TransferFastExit({
           `${token.symbol} was bridged. You will receive approximately
             ${receivableAmount(token.amount)} ${token.symbol} on L1.`
         )
-      )
+      );
+      dispatch(resetToken());
     }
   }
 

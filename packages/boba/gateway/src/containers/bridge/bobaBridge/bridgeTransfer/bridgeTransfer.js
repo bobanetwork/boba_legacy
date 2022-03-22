@@ -35,12 +35,6 @@ function BridgeTransfer() {
   }
 
   useEffect(() => {
-    if (balances.length > 0 && !tokens.length) {
-      dispatch(setToken(balances[ 0 ]));
-    }
-  }, [ balances, dispatch, tokens, layer ])
-
-  useEffect(() => {
     dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
   }, [ dispatch ])
 
@@ -54,8 +48,17 @@ function BridgeTransfer() {
 
   return (
     <S.BridgeTransferContainer>
-      {
-        tokens.map((token, index) => <TokenInput
+      {!tokens.length ?
+        <TokenInput
+          index="0"
+          key="empty"
+          token={{amount: '', symbol: null, balance: 0}}
+          addNewToken={addNewToken}
+          tokenLen={1}
+          switchBridgeType={switchBridgeType}
+          isFastBridge={bridgeType === BRIDGE_TYPE.FAST_BRIDGE}
+        />
+        : tokens.map((token, index) => <TokenInput
           index={index}
           key={`${token.symbol}-${index}`}
           token={token}
@@ -87,14 +90,14 @@ function BridgeTransfer() {
       {
         layer === 'L1' && tokens.length > 0
           ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
-            ? <TransferDeposit token={tokens[0]} />
-            : <TransferFastDeposit token={tokens[0]} /> : null
+            ? <TransferDeposit token={tokens[ 0 ]} />
+            : <TransferFastDeposit token={tokens[ 0 ]} /> : null
       }
       {
         layer === 'L2' && tokens.length > 0
           ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
-            ? <TransferExit token={tokens[0]} />
-            : <TransferFastExit token={tokens[0]} /> : null
+            ? <TransferExit token={tokens[ 0 ]} />
+            : <TransferFastExit token={tokens[ 0 ]} /> : null
       }
     </S.BridgeTransferContainer>
   )
