@@ -6,13 +6,13 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "./RandomlyAssigned.sol";
-import "./WithRecover.sol";
-import "./WithOnChainMetaData.sol";
+import "./AddRecover.sol";
+import "./AddOnChainMetaData.sol";
 
 
-contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, WithRecover, WithOnChainMetaData {
+contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, AddRecover, AddOnChainMetaData {
 
-    uint256 public constant PRICE = 0.0000000001 ether;
+    uint256 public constant PRICE = 0; // 0.0000000001 ether;
     uint256 public constant ROYALTY_PERCENTAGE = 5; // 5 %
     uint256 public constant MAX_MINT_IN_PUBLIC = 3;
     address[] public projectOwners;
@@ -25,6 +25,7 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
         address[] memory creatorAddresses_, address turingHelperAddress_)
     ERC721(name_, symbol_)
     RandomlyAssigned(maxNFTs_, 0, turingHelperAddress_) // Max. x NFTs available; Start counting from 0
+    AddOnChainMetaData(turingHelperAddress_)
     {
         _pause();
         projectOwners = creatorAddresses_;
@@ -55,13 +56,14 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
     }
 
     function mint(uint256 _count) external payable saleIsOpen {
+        require(_count > 0 && _count <= MAX_MINT_IN_PUBLIC, "Mint not within boundaries");
+
         uint256 total = tokenCount();
-        require(_count > 0, "Mint more than 0");
         require(total + _count <= totalSupply(), "Max limit");
         require(msg.value >= price(_count), "Value below price");
 
         amountMintedInPublicSale[_msgSender()] = amountMintedInPublicSale[_msgSender()] + _count;
-        require(amountMintedInPublicSale[_msgSender()] <= MAX_MINT_IN_PUBLIC);
+        require(amountMintedInPublicSale[_msgSender()] <= MAX_MINT_IN_PUBLIC, "Wallet limit reached");
 
         for (uint256 i = 0; i < _count; i++) {
             _mintSingle(_msgSender());
@@ -69,11 +71,10 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
     }
 
     function _mintSingle(address _to) private {
-        uint id = nextToken();
+        uint256 id = nextToken();
         _safeMint(_to, id);
 
-        uint256 turingRAND = turingHelper.TuringRandom();
-        _setTokenURI(id, turingRAND); // calculate random properties
+        _setTokenURI(id); // calculate random properties
         emit MintedNFT(id);
     }
 
@@ -100,8 +101,12 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
         require(success, "Transfer failed.");
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, WithOnChainMetaData) returns (string memory) {
-        return WithOnChainMetaData.tokenURI(tokenId);
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, AddOnChainMetaData) returns (string memory) {
+        return AddOnChainMetaData.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721, AddOnChainMetaData) returns (bool) {
+        return AddOnChainMetaData.supportsInterface(_interfaceId);
     }
 
     function _beforeTokenTransfer(

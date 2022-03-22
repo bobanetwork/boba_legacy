@@ -125,6 +125,12 @@ jobs:
           fail_ci_if_error: false
           verbose: true
           flags: message-relayer
+      - uses: codecov/codecov-action@v1
+        with:
+          files: ./packages/boba/contracts/coverage.json
+          fail_ci_if_error: false
+          verbose: true
+          flags: boba-contracts
       # - uses: codecov/codecov-action@v1
       #   with:
       #     files: ./packages/sdk/coverage.json
