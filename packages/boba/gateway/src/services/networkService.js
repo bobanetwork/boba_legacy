@@ -3235,12 +3235,16 @@ class NetworkService {
       const proposalCounts = await delegateCheck.proposalCount()
       const totalProposals = await proposalCounts.toNumber()
 
+      /// @notice An event emitted when a new proposal is created
+      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
+
       const filter = delegateCheck.filters.ProposalCreated(
         null, null, null, null, null,
         null, null, null, null
       )
 
-      const descriptionList = await delegateCheck.queryFilter(filter)
+      // temporary fix to avoid eth_getLogs(zero, latest)
+      const descriptionList = await delegateCheck.queryFilter(filter, -4000)
 
       for (let i = 0; i < totalProposals; i++) {
 
