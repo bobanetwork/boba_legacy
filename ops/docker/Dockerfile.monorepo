@@ -7,14 +7,20 @@
 
 FROM node:16-buster-slim as node
 
-ARG TARGETPLATFORM
-RUN echo "Platform: $TARGETPLATFORM"
+ARG BUILDPLATFORM
+RUN echo "Build Platform: $BUILDPLATFORM"
 
-RUN if [[ "$TARGETPLATFORM" == "linux/amd64" ]] ; then \
+ARG TARGETPLATFORM
+RUN echo "Target Platform: $TARGETPLATFORM"
+
+RUN if [[ "$BUILDPLATFORM" == "linux/amd64" ]] ; then \
           echo "Building for x86_64" ; \
           apt-get update -y && apt-get install -y git ; \
+     # elif [[ "$BUILDPLATFORM" == "linux/amd64" ]] ; then \
+     #      echo "Building for Debian" ; \
+     #     apt-get update -y && apt-get install -y git ; \
      else \
-          echo "Building for Mac ($TARGETPLATFORM)" ; \
+          echo "Building for Mac ($BUILDPLATFORM)" ; \
           apt-get update -y && apt-get install -y git python3 build-essential ; \
      fi
 
