@@ -35,7 +35,6 @@
     "@ethersproject/providers": "^5.0.24",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@openzeppelin/test-helpers": "0.5.4",
-
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
@@ -55,8 +54,8 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@eth-optimism/common-ts": "^0.1.5",
-    "@eth-optimism/core-utils": "^0.6.0",
+    "@eth-optimism/common-ts": "^0.2.2",
+    "@eth-optimism/core-utils": "0.8.1",
     "@eth-optimism/ynatm": "^0.2.2",
     "@openzeppelin/contracts": "3.4.1",
     "bcfg": "^0.1.6",
