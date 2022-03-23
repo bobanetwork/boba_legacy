@@ -1,40 +1,76 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >0.7.5;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@boba/contracts/contracts/standards/L1StandardERC721.sol";
 import "base64-sol/base64.sol";
 
-abstract contract WithOnChainMetaData is ERC721 {
+/**
+* L1 representation of NFTMonsterV2 which works with NFT Bridges
+*/
+contract L1NFTMonsterV2 is L1StandardERC721 {
 
-
-    // Optional mapping for token URIs
     mapping(uint256 => uint256) private _tokenURIs;
 
-    /// @dev Calculate randomized onchain metadata for specific tokenId.
-    function getMetadata(uint tokenId) private view returns (string memory) {
-        require(_exists(tokenId), "ERC721getSVG: URI get of nonexistent token");
+    /**
+     * @param _l1Bridge Address of the L1 standard NFT bridge.
+     * @param _l2Contract Address of the corresponding L2 NFT contract.
+     * @param _name ERC721 name.
+     * @param _symbol ERC721 symbol.
+     */
+    constructor(
+        address _l1Bridge,
+        address _l2Contract,
+        string memory _name,
+        string memory _symbol
+    ) L1StandardERC721(_l1Bridge, _l2Contract, _name, _symbol, '') {}
 
+    function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
+        super.mint(_to, _tokenId, _data);
+
+        // if data is passed from other layer, store it
+        if(_data.length != 0) {
+            _setTokenURI(_tokenId, abi.decode(_data, (uint256)));
+        }
+    }
+
+    /**
+    * @dev Override the tokenURI method to return onChain metadata.
+    */
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
+        if (_tokenURIs[tokenId] != 0) {
+            string memory json = getMetadata(tokenId);
+            return string(abi.encodePacked('data:application/json;base64,', json));
+        } else {
+            return "";
+        }
+    }
+
+    function _setTokenURI(uint256 tokenId, uint256 genome) internal virtual {
+        require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
+        _tokenURIs[tokenId] = genome;
+    }
+
+    function _burn(uint256 tokenId) internal virtual override {
+        super._burn(tokenId);
+
+        if (_tokenURIs[tokenId] != 0) {
+            delete _tokenURIs[tokenId];
+        }
+    }
+
+    function getMetadata(uint256 tokenId) private view returns (string memory) {
         uint256 genome = _tokenURIs[tokenId];
         bytes memory i_bytes = abi.encodePacked(genome);
 
-        uint8 attribute_a = uint8(i_bytes[0]);
-        uint8 attribute_b = uint8(i_bytes[1]);
-        uint8 attribute_c = uint8(i_bytes[2]);
+
         // ... all the way to uint8(i_bytes[31])
 
         string[5] memory part;
 
-        string memory colorEye = string(abi.encodePacked(Strings.toString(attribute_a), ",", Strings.toString(attribute_b), ",", Strings.toString(attribute_c)));
-        string memory colorBody = string(abi.encodePacked(Strings.toString(attribute_b), ",", Strings.toString(attribute_c), ",", Strings.toString(attribute_a)));
-        string memory colorExtra = string(abi.encodePacked(Strings.toString(attribute_c), ",", Strings.toString(attribute_a), ",", Strings.toString(attribute_b)));
-
-        // Alternative approach
-        // string memory colorBody = "rgb(128,224,255)";
-        // if(attribute_b > 128){
-        //   colorBody = "rgb(64,224,99)";
-        // }
+        string memory colorEye = string(abi.encodePacked(Strings.toString(uint8(i_bytes[0])), ",", Strings.toString(uint8(i_bytes[4])), ",", Strings.toString(uint8(i_bytes[7]))));
+        string memory colorBody = string(abi.encodePacked(Strings.toString(uint8(i_bytes[1])), ",", Strings.toString(uint8(i_bytes[3])), ",", Strings.toString(uint8(i_bytes[8]))));
+        string memory colorExtra = string(abi.encodePacked(Strings.toString(uint8(i_bytes[2])), ",", Strings.toString(uint8(i_bytes[5])), ",", Strings.toString(uint8(i_bytes[6]))));
 
         part[0] = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.2' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'>"
         "<style type='text/css'>.st0{fill:rgb(";
@@ -61,24 +97,9 @@ abstract contract WithOnChainMetaData is ERC721 {
                 '{"trait_type": "Extra", "value": "', colorExtra, '"}]'));
         string memory json = Base64.encode(bytes(string(
                 abi.encodePacked('{"name": "TuringMonster", "description": "Little Monsters everywhere.", "attributes":',
-                    attributes, ', "image_data": "', bytes(svgData), '"}')
+                attributes, ', "image_data": "', bytes(svgData), '"}')
             )));
 
         return json;
-    }
-
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        string memory json = getMetadata(tokenId);
-        // non-existent token check integrated
-        return string(abi.encodePacked('data:application/json;base64,', json));
-    }
-
-    function exists(uint256 tokenId) public view returns (bool) {
-        return _exists(tokenId);
-    }
-
-    function _setTokenURI(uint256 tokenId_, uint256 tokenURI_) internal virtual {
-        require(_exists(tokenId_), "ERC721URIStorage: URI set of nonexistent token");
-        _tokenURIs[tokenId_] = tokenURI_;
     }
 }
