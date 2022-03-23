@@ -7,12 +7,11 @@
 FROM node:16-buster-slim as node
 
 # fix for mac silicon
-# the echo "\"`uname -a`\"" | grep -q "arm64" is not working as intended
-#RUN if echo "\"`uname -a`\"" | grep -q "arm64" ; then \
-     apt-get update -y && apt-get install -y git python3 build-essential ; \
-#  else \
-#    apt-get update -y && apt-get install -y git; \
-#  fi
+RUN if echo `uname -a` | grep -i "arm64" ; then \
+          apt-get update -y && apt-get install -y git python3 build-essential ; \
+     else \
+          apt-get update -y && apt-get install -y git ; \
+     fi
 
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
@@ -74,6 +73,7 @@ COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/
 
 # build it!
 RUN yarn build
+
 # build integration tests' contracts
 RUN yarn workspace @eth-optimism/integration-tests build
 
