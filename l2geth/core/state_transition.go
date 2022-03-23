@@ -161,8 +161,7 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 		}
 		// Check if the wallet address picks BOBA as the fee token
 		// Override gas price to 0 if the wallet address picks BOBA as the fee token,
-		// so we don't charge anything for the standard gas fee,
-		// but focus on charging boba as the l1 security fee
+		// so we don't charge ETH fee
 		feeTokenSelection := evm.StateDB.GetFeeTokenSelection(msg.From())
 		isBobaFeeTokenSelect = feeTokenSelection.Cmp(common.Big1) == 0 && isFeeTokenUpdate
 		if isBobaFeeTokenSelect {

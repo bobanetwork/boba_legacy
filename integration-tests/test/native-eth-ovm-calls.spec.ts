@@ -78,12 +78,12 @@ describe('Native ETH value integration tests', () => {
       to: wallet.address,
       value,
       gasPrice: 0,
-      // Provide the gas limit to ingore the eth_estimateGas
+      // Provide the gas limit to ignore the eth_estimateGas
       gasLimit: 1100000,
     })
     await backAgain.wait()
 
-    await checkBalances([initialBalances[0], initialBalances[1]])
+    await checkBalances(initialBalances)
   })
 
   describe(`calls between OVM contracts with native ETH value and relevant opcodes`, async () => {

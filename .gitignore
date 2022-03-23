@@ -29,6 +29,8 @@ packages/boba/gas-price-oracle/data
 
 # boba_examples
 boba_examples/init-fund-l2/yarn.lock
+boba_examples/boba-fee/yarn.lock
+boba_examples/boba-straw/yarn.lock
 
 # regenesis
 packages/regenesis-surgery/deployment

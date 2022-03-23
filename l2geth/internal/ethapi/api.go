@@ -1020,7 +1020,6 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	// In production, users have to pay the gas fee. In the local testing system,
 	// gas price can be zero. If their balance is really low for using zero gas price,
 	// they can't bypass this estimateGas
-	// In production, the gas price oracle owner can use gar price = 0
 	gasPrice := new(big.Int)
 	price, err := b.SuggestPrice(ctx)
 	if err == nil && isFeeTokenUpdate {
@@ -1092,10 +1091,8 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
-	// To solve the problem that l1BaseFee / l2GasPrice is too large issue and add l1SecurityFee twice
-	// if you add st.gas in the payload, we don't add another l2ExtraGas if hi is large enough
-	// The minimum gas is intrGas + l1SecurityFee. If hi value is larger than intrGas + l2ExtraGas
-	// we don't have to add another l2ExtraGas again
+	// The l1SecurityFee should have already been added. To secure that the gas limit is enough,
+	// we add an extra check for it.
 	intrGas, err := core.IntrinsicGas(data, args.To == nil, true, b.ChainConfig().IsIstanbul(blockNr))
 	if err != nil {
 		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil

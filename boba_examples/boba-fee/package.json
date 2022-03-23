@@ -1,0 +1,14 @@
+{
+  "name": "@boba/boba-fee",
+  "version": "1.0.0",
+  "scripts": {
+    "use:boba": "FEE_TOKEN=BOBA node ./src/index.js",
+    "use:eth": "FEE_TOKEN=ETH node ./src/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@eth-optimism/contracts": "^0.5.18",
+    "dotenv": "^16.0.0",
+    "ethers": "^5.6.1"
+  }
+}

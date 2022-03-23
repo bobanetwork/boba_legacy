@@ -63,6 +63,12 @@ const deployFn: DeployFunction = async (hre) => {
     name: 'TK_L2BOBA',
     address: predeploys.L2GovernanceERC20,
   })
+
+  await registerAddress({
+    hre,
+    name: 'Boba_GasPriceOracle',
+    address: predeploys.Boba_GasPriceOracle,
+  })
 }
 
 deployFn.tags = ['Lib_AddressManager']
