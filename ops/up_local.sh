@@ -25,14 +25,8 @@ if [[ $DAEMON == 0 ]]; then
   echo 'You set DAEMON to 0, which means that your local L1/L2 will run in the front and you will see all the debug log information'
 fi
 
-# support Mac silicon
-# docker build --platform linux/amd64
-
-PLATFORM=""
-
 if [[ $(uname -m) == 'arm64' ]]; then
-  echo 'Building for Mac silicon'
-  PLATFORM="--platform linux/amd64"
+  echo 'Building for Mac silicon using linux/arm64'
 fi
 
 #Build dependencies, if needed
@@ -45,15 +39,15 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 DOCKERFILE="docker-compose.yml"
 
 if [[ $BUILD == 1 ]]; then
-    docker-compose build PLATFORM --parallel -- builder l2geth l1_chain
-    docker-compose build PLATFORM --parallel -- deployer dtl batch_submitter relayer integration_tests
-    docker-compose build PLATFORM -- boba_message-relayer-fast
-    docker-compose build PLATFORM -- gas_oracle
-    docker-compose build PLATFORM -- boba_deployer
-    docker-compose build PLATFORM -- fraud-detector
-    docker-compose build PLATFORM -- monitor
-    docker-compose build PLATFORM -- verifier
-    docker-compose build PLATFORM -- replica
+    docker-compose build --parallel -- builder l2geth l1_chain
+    docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
+    docker-compose build -- boba_message-relayer-fast
+    docker-compose build -- gas_oracle
+    docker-compose build -- boba_deployer
+    docker-compose build -- fraud-detector
+    docker-compose build -- monitor
+    docker-compose build -- verifier
+    docker-compose build -- replica
 elif [[ $BUILD == 0 ]]; then
   docker-compose -f $DIR/$DOCKERFILE pull
   echo 1
