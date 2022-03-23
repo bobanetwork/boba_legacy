@@ -10,18 +10,15 @@ FROM node:16-buster-slim as node
 ARG BUILDPLATFORM
 RUN echo "Build Platform: $BUILDPLATFORM"
 
-ARG TARGETPLATFORM
-RUN echo "Target Platform: $TARGETPLATFORM"
-
-RUN if [[ "$BUILDPLATFORM" == "linux/amd64" ]] ; then \
+RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
           echo "Building for x86_64" ; \
           apt-get update -y && apt-get install -y git ; \
-     # elif [[ "$BUILDPLATFORM" == "linux/amd64" ]] ; then \
-     #      echo "Building for Debian" ; \
-     #     apt-get update -y && apt-get install -y git ; \
-     else \
+     elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
           echo "Building for Mac ($BUILDPLATFORM)" ; \
           apt-get update -y && apt-get install -y git python3 build-essential ; \
+     else \
+          echo "Building for something else ($BUILDPLATFORM)" ; \
+          apt-get update -y && apt-get install -y git ; \
      fi
 
 # Pre-download the compilers so that they do not need to be downloaded inside
