@@ -6,6 +6,9 @@
     },
     "OVM_L2StandardBridge": {
       "address": "0x4200000000000000000000000000000000000010"
+    },
+    "GovernorBravoDelegate": {
+      "address": "0xBdD8Cb5D75F7375A9A45F40779e055596af7F581"
     }
   }
 }
