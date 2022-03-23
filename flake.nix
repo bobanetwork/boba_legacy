@@ -12,18 +12,39 @@
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    openzeppelin-contracts = {
+      url = "github:openzeppelin/openzeppelin-contracts";
+      flake = false;
+    };
+    hardhat = {
+      url = "github:nomiclabs/hardhat";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, dream2nix }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    dream2nix,
+    hardhat,
+    openzeppelin-contracts
+  } @inputs:
     let
       lib = nixpkgs.lib;
 
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
 
-      dream2nix = inputs.dream2nix.lib2.init {
+      boba-monorepo = inputs.dream2nix.lib2.init {
         systems = supportedSystems;
         #pkgs = pkgs;
         config.projectRoot = ./. ;
+        config.overridesDirs = [ ./overrides ];
+      };
+      hardhat = inputs.dream2nix.lib2.init {
+        systems = supportedSystems;
+        #pkgs = pkgs;
+        config.projectRoot = ./.;
         config.overridesDirs = [ ./overrides ];
       };
 
@@ -44,7 +65,7 @@
                   Cmd = [  ];
                 };
               };
-              l2geth-image = pkgs.dockerTools.buildImage {
+              l2geth-image = pkgs.dockerTools.buildLayeredImage {
                 name = "l2geth";
                 contents = [
                 ];
@@ -53,14 +74,37 @@
                 };
               };
             };
-            defaultPackage = packages.hello;
-            apps.hello = flake-utils.lib.mkApp { drv = packages.hello; };
-            defaultApp = apps.hello;
+            defaultPackage = packages.l2geth;
+            apps.boba = flake-utils.lib.mkApp { drv = packages.l2geth; };
+            defaultApp = apps.boba;
           }
         );
     in
       lib.recursiveUpdate
-        (dream2nix.makeFlakeOutputs {
+        (hardhat.makeFlakeOutputs {
+          pname = "hardhat";
+          source = inputs.hardhat;
+          packageOverrides = {
+            hardhat = {
+              correct-tsconfig-path = {
+                postPatch = ''
+                  substituteInPlace ./tsconfig.json --replace \
+                    '"extends": "../../config/typescript/tsconfig.json"' \
+                    '"extends": "./config/typescript/tsconfig.json"'
+                  substituteInPlace ./src/tsconfig.json --replace \
+                    '"extends": "../../../config/typescript/tsconfig.json"' \
+                    '"extends": "../config/typescript/tsconfig.json"'
+
+                  cp -r ${inputs.hardhat}/config/ \
+                    ./
+
+                  '';
+                };
+              };
+          };
+        })
+        ( lib.recursiveUpdate
+          (boba-monorepo.makeFlakeOutputs {
           pname = "boba";
           source = ./. ;
           inject = {
@@ -75,6 +119,15 @@
             #   ["@eth-optimism/core-utils" "0.6.0"]
             # ];
           };
+          packageOverrides = {
+            "@openzeppelin/contracts" = {
+              add-regenesis-patch = {
+                patches = [
+                  "./patches/@openzeppelin+contracts+4.3.2.patch"
+                ];
+              };
+            };
+          };
 
         })
         {
@@ -82,5 +135,5 @@
           apps = boba.apps;
 
           #defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
-        };
+        });
 }

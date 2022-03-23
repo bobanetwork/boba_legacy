@@ -129,6 +129,22 @@
         "type": "github"
       }
     },
+    "hardhat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1647642101,
+        "narHash": "sha256-/FckDI2QVx1y2DMH5CUlpu96/vgnsn1F+tDPepV5xLM=",
+        "owner": "nomiclabs",
+        "repo": "hardhat",
+        "rev": "806c70e1a5d02f598916a4b18af6f37984a12e1d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nomiclabs",
+        "repo": "hardhat",
+        "type": "github"
+      }
+    },
     "mach-nix": {
       "flake": false,
       "locked": {
@@ -173,6 +189,22 @@
       "original": {
         "owner": "svanderburg",
         "repo": "node2nix",
+        "type": "github"
+      }
+    },
+    "openzeppelin-contracts": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1648045885,
+        "narHash": "sha256-Z1RLxUj51uYN9wI+FsHazuHDu3viVHwQfLKzBFQ7cVc=",
+        "owner": "openzeppelin",
+        "repo": "openzeppelin-contracts",
+        "rev": "74c9130a5916904ba397a903db446cd049a3d22d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openzeppelin",
+        "repo": "openzeppelin-contracts",
         "type": "github"
       }
     },
@@ -222,7 +254,9 @@
       "inputs": {
         "dream2nix": "dream2nix",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "hardhat": "hardhat",
+        "nixpkgs": "nixpkgs",
+        "openzeppelin-contracts": "openzeppelin-contracts"
       }
     }
   },

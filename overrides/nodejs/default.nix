@@ -153,6 +153,15 @@ in
       ];
     };
   };
+  # doesn't apply currently
+  "@openzeppelin/contracts" = {
+    # _condition = satisfiesSemver "^4.3.2";
+    add-regenesis-patch = {
+      patches = [
+        "${./../..}/patches/@openzeppelin+contracts+4.3.2.patch"
+      ];
+    };
+  };
   "@boba/contracts" = {
     #inherit correct-tsconfig-path;
     correct-tsconfig-path = {
