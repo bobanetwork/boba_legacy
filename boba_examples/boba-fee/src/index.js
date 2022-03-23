@@ -44,10 +44,10 @@ const main = async () => {
     await setEthAsFeeTokenTx.wait()
 
     // verify it
-    const isEthAsFeeToken = await Boba_GasPriceOracle.bobaFeeTokenUsers(
+    const isBobaAsFeeToken = await Boba_GasPriceOracle.bobaFeeTokenUsers(
       l2Wallet.address
     )
-    console.log(`isEthAsFeeToken: ${isEthAsFeeToken}`)
+    console.log(`isEthAsFeeToken: ${!isBobaAsFeeToken}`)
   } else if (FEE_TOKEN.toLocaleUpperCase() === 'BOBA') {
     // use boba as fee token
     const setBobaAsFeeTokenTx = await Boba_GasPriceOracle.useBobaAsFeeToken()

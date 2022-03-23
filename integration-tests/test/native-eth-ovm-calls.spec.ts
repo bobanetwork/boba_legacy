@@ -40,7 +40,6 @@ describe('Native ETH value integration tests', () => {
       expect(realBalances[1]).to.deep.eq(expectedBalances[1])
     }
 
-<<<<<<< boba-fee
     // In the local test environment, test acounts can use zero gas price.
     // In l2geth, we override the gas price in api.go if the gas price is nil or zero
     // gasPrice := new(big.Int)
@@ -59,11 +58,7 @@ describe('Native ETH value integration tests', () => {
     // users can't use zero gas price and they have to have enough balance to
     // cover the cost
     const value = ethers.utils.parseEther('1')
-    await fundUser(env.watcher, env.l1Bridge, value, wallet.address)
-=======
-    const value = 10
     await fundUser(env.messenger, value, wallet.address)
->>>>>>> develop
 
     const initialBalances = await getBalances()
 

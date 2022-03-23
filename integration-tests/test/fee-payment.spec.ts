@@ -1,10 +1,6 @@
 /* Imports: External */
-<<<<<<< boba-fee
 import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
 import { sleep } from '@eth-optimism/core-utils'
-=======
-import { BigNumber, utils } from 'ethers'
->>>>>>> develop
 import { serialize } from '@ethersproject/transactions'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 
@@ -225,21 +221,13 @@ describe('Fee Payment Integration Tests', async () => {
       await env.relayXDomainMessages(withdrawTx)
       await env.waitForXDomainTransaction(withdrawTx)
 
-<<<<<<< boba-fee
-    // Submit the withdrawal.
-    const withdrawTx = await env.sequencerFeeVault.withdraw({
-      gasPrice: 0, // Need a gasprice of 0 or the balances will include the fee paid during this tx.
-    })
-
-    // Wait for the withdrawal to be relayed to L1.
-    await env.waitForXDomainTransaction(withdrawTx, Direction.L2ToL1)
-
-    // Balance difference should be equal to old L2 balance.
-    const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
-    expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
-      BigNumber.from(vaultBalance)
-    )
-  })
+      // Balance difference should be equal to old L2 balance.
+      const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
+      expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
+        BigNumber.from(vaultBalance)
+      )
+    }
+  )
 
   // The configuration of allowing the different gas price shouldn't go into the production
   it('{tag:other} should compute correct fee with different gas price', async () => {
@@ -284,9 +272,12 @@ describe('Fee Payment Integration Tests', async () => {
   // https://github.com/bobanetwork/boba/pull/22
   it('{tag:other} should be able to configure l1 gas price in a rare situation', async () => {
     // This blocks all txs, because the gas usage for the l1 security fee is too large
-    const gasPrice = await env.gasPriceOracle.setGasPrice(1)
+    const gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.setGasPrice(1)
     await gasPrice.wait()
-    const baseFee = await env.gasPriceOracle.setL1BaseFee(11_000_000)
+    const baseFee =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.setL1BaseFee(
+        11_000_000
+      )
     await baseFee.wait()
 
     // Can't transfer ETH
@@ -298,18 +289,10 @@ describe('Fee Payment Integration Tests', async () => {
     ).to.be.rejected
 
     // Reset L1 base fee
-    const resetBaseFee = await env.gasPriceOracle
-      .connect(env.l2Wallet_4)
-      .setL1BaseFee(1, { gasPrice: 0, gasLimit: 11000000 })
+    const resetBaseFee =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+        env.l2Wallet_4
+      ).setL1BaseFee(1, { gasPrice: 0, gasLimit: 11000000 })
     await resetBaseFee.wait()
   })
-=======
-      // Balance difference should be equal to old L2 balance.
-      const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
-      expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
-        BigNumber.from(vaultBalance)
-      )
-    }
-  )
->>>>>>> develop
 })

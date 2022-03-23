@@ -280,30 +280,6 @@ describe('Basic RPC tests', () => {
           res = next
         }
       })
-<<<<<<< boba-fee
-
-      const l1Fee = await env.gasPriceOracle.getL1Fee('0x')
-      const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-      const l1GasUsed = await env.gasPriceOracle.getL1GasUsed('0x')
-      const scalar = await env.gasPriceOracle.scalar()
-      const decimals = await env.gasPriceOracle.decimals()
-
-      const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
-
-      const res = await env.l2Wallet.sendTransaction(tx)
-      await res.wait()
-
-      const json = await env.l2Provider.send('eth_getTransactionReceipt', [
-        res.hash,
-      ])
-
-      expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
-      expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
-      expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
-      expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
-      expect(json.l2BobaFee).to.deep.equal(BigNumber.from(0))
-=======
->>>>>>> develop
     })
 
     describe('eth_getTransactionReceipt', () => {
@@ -401,6 +377,7 @@ describe('Basic RPC tests', () => {
         expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
         expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
         expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
+        expect(json.l2BobaFee).to.deep.equal(BigNumber.from(0))
       })
     })
 
@@ -418,16 +395,6 @@ describe('Basic RPC tests', () => {
         expect(transaction.transactionIndex).to.be.eq(0)
         expect(transaction.gasLimit).to.be.deep.eq(BigNumber.from(tx.gasLimit))
       })
-<<<<<<< boba-fee
-      const l2ExtraFee = await env.gasPriceOracle.getL1Fee(utils.hexlify('0x'))
-      const l2GasPrice = await env.gasPriceOracle.gasPrice()
-      const l2ExtraGas = l2ExtraFee.div(l2GasPrice)
-      // Expect gas to be less than or equal to the target plus 1%
-      expectApprox(estimate, 21000 + l2ExtraGas.toNumber(), {
-        percentUpperDeviation: 1,
-      })
-=======
->>>>>>> develop
     })
 
     describe('eth_getBlockByHash', () => {
