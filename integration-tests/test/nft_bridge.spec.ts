@@ -963,8 +963,7 @@ describe('NFT Bridge Test', async () => {
           env.l2Wallet.address,
           DUMMY_TOKEN_ID,
           9999999
-        ),
-        Direction.L2ToL1
+        )
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -1112,8 +1111,7 @@ describe('NFT Bridge Test', async () => {
           L1ERC721.address,
           DUMMY_TOKEN_ID,
           9999999
-        ),
-        Direction.L1ToL2
+        )
       )
 
       const returnedlogIndex = await getFilteredLogIndex(
@@ -1169,8 +1167,7 @@ describe('NFT Bridge Test', async () => {
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999
-        ),
-        Direction.L2ToL1
+        )
       )
 
       // check event WithdrawalInitiated is emitted with empty data
