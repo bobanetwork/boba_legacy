@@ -132,17 +132,51 @@ Resources:
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
-  GnosisLBTargetGroup4:
+  GnosisLBHTTPTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Port: 3000
-      Protocol: TCP
+      Port: 80
+      Protocol: HTTP
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
-          Value: 60
-      HealthCheckProtocol: TCP
+          Value: 30
+      Matcher:
+        HttpCode: 200-499
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  GnosisLBHTTPTargetGroup2:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 8000
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      Matcher:
+        HttpCode: 200-499
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "traffic-port"
+      TargetType: "ip"
+
+  GnosisLBHTTPTargetGroup3:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 3666
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+      Matcher:
+        HttpCode: 200-499
+      HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
       TargetType: "ip"
 
@@ -159,6 +193,20 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup
 
+  GnosisListenerHTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosis:ARN"
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
+      Certificates:
+        - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBHTTPTargetGroup
+
   GnosisListener2:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -171,6 +219,20 @@ Resources:
       DefaultActions:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup2
+
+  GnosisListener2HTTPS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosisTransaction:ARN"
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
+      Certificates:
+        - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref GnosisLBHTTPTargetGroup2
 
   GnosisListener3:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -185,18 +247,19 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref GnosisLBTargetGroup3
 
-  GnosisListener4:
+  GnosisListener3HTTPS:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisReact:ARN"
+        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosisGateway:ARN"
       Port: 443
-      Protocol: TLS
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
       Certificates:
-      - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+        - CertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref GnosisLBTargetGroup4
+        TargetGroupArn: !Ref GnosisLBHTTPTargetGroup3
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -266,6 +329,14 @@ Resources:
           Cpu: "10"
         - Image: !Sub "${DockerPrefix}/nginx-safe-transaction-service:latest"
           Name: nginx-safe-transaction-service
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - test -S /nginx/gunicorn.socket
+            Interval: 30
+            Retries: 3
+            StartPeriod: 60
+            Timeout: 5
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -289,14 +360,18 @@ Resources:
           Essential: false
           Memory: "1024"
           DependsOn:
-            - Condition: START
+            - Condition: HEALTHY
               ContainerName: safe-transaction-service
-            - Condition: START
-              ContainerName: worker
-            - Condition: START
-              ContainerName: scheduler
         - Image: !Sub "${DockerPrefix}/nginx-safe-config-service:latest"
           Name: nginx-safe-config-service
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - test -S /nginx/gunicorn.socket
+            Interval: 30
+            Retries: 3
+            StartPeriod: 60
+            Timeout: 5
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -340,7 +415,7 @@ Resources:
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           DependsOn:
-            - Condition: START
+            - Condition: HEALTHY
               ContainerName: safe-config-service
           DockerLabels:
             com.datadoghq.ad.check_names: '["nginx-safe-config-service"]'
@@ -350,6 +425,14 @@ Resources:
           Memory: "1024"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - test -S /nginx/gunicorn.socket
+            Interval: 30
+            Retries: 3
+            StartPeriod: 60
+            Timeout: 5
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -418,6 +501,14 @@ Resources:
           Memory: "2000"
         - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
           Name: safe-transaction-service
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - test -S /nginx/gunicorn.socket
+            Interval: 30
+            Retries: 3
+            StartPeriod: 60
+            Timeout: 5
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -678,48 +769,6 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
           Essential: false
           Memory: "4000"
-        - Image: !Sub "${DockerPrefix}/safe-react:${ImageTag}"
-          Name: safe-react
-          Ulimits:
-            - Name: nofile
-              SoftLimit: 65536
-              HardLimit: 65536
-            - Name: nproc
-              SoftLimit: 65536
-              HardLimit: 65536
-            - Name: core
-              SoftLimit: 0
-              HardLimit: 0
-          PortMappings:
-            - ContainerPort: 3000
-              HostPort: 3000
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
-          Environment:
-            - Name: REACT_APP_APP_VERSION
-              Value: $npm_package_version
-            - Name: REACT_APP_ENV
-              Value: production
-            - Name: REACT_APP_NETWORK
-              Value: BOBA_RINKEBY
-            - Name: NODE_ENV
-              Value: production
-            - Name: REACT_APP_GATEWAY_URL
-              Value: !Sub
-                - "https://safe-client.${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["safe-react"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "safe-react", "service": "safe-react"}]'
-          Essential: false
-          Memory: "4000"
-          Cpu: 2
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
       ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
@@ -732,16 +781,13 @@ Resources:
       LoadBalancers:
         - ContainerName: nginx-safe-config-service
           ContainerPort: 80
-          TargetGroupArn: !Ref GnosisLBTargetGroup
+          TargetGroupArn: !Ref GnosisLBHTTPTargetGroup
         - ContainerName: nginx-safe-transaction-service
           ContainerPort: 8000
-          TargetGroupArn: !Ref GnosisLBTargetGroup2
+          TargetGroupArn: !Ref GnosisLBHTTPTargetGroup2
         - ContainerName: safe-client-gateway
           ContainerPort: 3666
-          TargetGroupArn: !Ref GnosisLBTargetGroup3
-        - ContainerName: safe-react
-          ContainerPort: 3000
-          TargetGroupArn: !Ref GnosisLBTargetGroup4
+          TargetGroupArn: !Ref GnosisLBHTTPTargetGroup3
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -750,9 +796,118 @@ Resources:
           Subnets:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
-      HealthCheckGracePeriodSeconds: 300
+      HealthCheckGracePeriodSeconds: 900
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      ServiceName: "gnosis-safe"
+      ServiceName: gnosis-safe
       TaskDefinition: !Ref TaskDefinition
+
+  SafeReactBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+  SafeReactBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SafeReactBucket
+      PolicyDocument:
+        Statement:
+          - Sid: CloudFrontAccess
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontIdentity.S3CanonicalUserId
+            Action: s3:GetObject
+            Resource: !Sub arn:aws:s3:::${SafeReactBucket}/*
+
+  CloudFrontIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Ref AWS::StackName
+
+  CloudfrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - multisig.boba.network
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        Origins:
+          - Id: StaticAssets
+            DomainName: !GetAtt SafeReactBucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontIdentity}
+        Enabled: true
+        HttpVersion: http2
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: StaticAssets
+          AllowedMethods:
+            - GET
+            - OPTIONS
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          Compress: true
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:942431445534:certificate/22629c84-0c7b-449a-9a5c-f2ccbc4afa99
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+
+  ResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Ref AWS::StackName
+        CorsConfig:
+          AccessControlAllowCredentials: false
+          AccessControlAllowHeaders:
+            Items:
+              - "*"
+          AccessControlAllowMethods:
+            Items:
+              - ALL
+          AccessControlAllowOrigins:
+            Items:
+              - https://multisig.boba.network
+          OriginOverride: false
+        CustomHeadersConfig:
+          Items:
+            - Header: X-Robots-Tag
+              Override: true
+              Value: noindex
+        SecurityHeadersConfig:
+          ContentTypeOptions:
+            Override: false
+          FrameOptions:
+            FrameOption: DENY
+            Override: false
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin
+            Override: false
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Preload: true
+            Override: false
+          XSSProtection:
+            ModeBlock: true
+            Protection: true
+            Override: false
