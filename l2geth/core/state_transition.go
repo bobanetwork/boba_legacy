@@ -32,7 +32,8 @@ import (
 )
 
 var (
-	errInsufficientBalanceForGas = errors.New("insufficient balance to pay for gas")
+	errInsufficientBalanceForGas     = errors.New("insufficient balance to pay for gas")
+	errInsufficientBobaBalanceForGas = errors.New("insufficient boba balance to pay for gas")
 )
 
 /*
@@ -255,7 +256,7 @@ func (st *StateTransition) buyGas() error {
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.msg.Gas()), st.msg.GasPrice())
 		bobaval = new(big.Int).Mul(ethval, st.bobaPriceRatio)
 		if st.state.GetBobaBalance(st.msg.From()).Cmp(bobaval) < 0 {
-			return errInsufficientBalanceForGas
+			return errInsufficientBobaBalanceForGas
 		}
 	}
 

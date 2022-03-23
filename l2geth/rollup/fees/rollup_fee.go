@@ -22,6 +22,9 @@ var (
 	// ErrInsufficientFunds represents the error case of when the user doesn't
 	// have enough funds to cover the transaction
 	ErrInsufficientFunds = errors.New("insufficient funds for l1Fee + l2Fee + value")
+	// ErrInsufficientBobaFunds represents the error case of when the user doesn't
+	// have enough funds to cover the transaction
+	ErrInsufficientBobaFunds = errors.New("insufficient boba funds for l1Fee + l2Fee + value")
 	// errMissingInput represents the error case of missing required input to
 	// PaysEnough
 	errMissingInput = errors.New("missing input")

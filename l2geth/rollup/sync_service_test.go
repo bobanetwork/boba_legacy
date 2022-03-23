@@ -741,6 +741,59 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 	}
 }
 
+func TestZeroGasPriceTransactionsUsingBobaAsFeeToken(t *testing.T) {
+	service, _, _, err := newTestSyncService(false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signer := types.NewEIP155Signer(big.NewInt(420))
+
+	// Fees must be enforced for this test
+	service.enforceFees = true
+	// Generate a key
+	key, _ := crypto.GenerateKey()
+	owner := crypto.PubkeyToAddress(key.PublicKey)
+	// Set as the owner on the SyncService
+	service.gasPriceOracleOwnerAddress = owner
+	if owner != *service.GasPriceOracleOwnerAddress() {
+		t.Fatal("owner mismatch")
+	}
+	// Create a mock transaction
+	tx := mockTx()
+	signedTx, err := types.SignTx(tx, signer, key)
+	if err != nil {
+		t.Fatal("Cannot sign tx")
+	}
+	from, err := types.Sender(signer, signedTx)
+	if err != nil {
+		t.Fatal("Cannot decode from")
+	}
+
+	// Get state
+	state, err := service.bc.State()
+	if err != nil {
+		t.Fatal("Cannot get state db")
+	}
+
+	// Pick Boba as the fee token
+	rcfg.OvmBobaGasPricOracle = common.HexToAddress("0x4200000000000000000000000000000000000024")
+	isFeeTokenSelected := state.GetFeeTokenSelection(from)
+	if isFeeTokenSelected.Cmp(big.NewInt(0)) != 0 {
+		t.Fatal("Cannot get fee token selection")
+	}
+	// Calculate fee token selection key
+	state.SetBobaAsFeeToken(from)
+
+	// Check the token selection result
+	isFeeTokenSelected = state.GetFeeTokenSelection(from)
+	if isFeeTokenSelected.Cmp(big.NewInt(1)) != 0 {
+		t.Fatal("Cannot update fee token selection")
+	}
+	if err := service.verifyFee(signedTx); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // Should reject the tx if the gas limit is not enough
 // to cover the l1 security fee
 func TestInsufficientGasForL1SecurityFee(t *testing.T) {

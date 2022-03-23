@@ -538,6 +538,16 @@ func (s *StateDB) SubBobaBalance(addr common.Address, amount *big.Int) {
 	s.SetState(rcfg.OvmL2BobaToken, key, common.BigToHash(bal))
 }
 
+func (s *StateDB) SetBobaAsFeeToken(addr common.Address) {
+	key := GetFeeTokenSelectionKey(addr)
+	s.SetState(rcfg.OvmBobaGasPricOracle, key, common.BigToHash(common.Big1))
+}
+
+func (s *StateDB) SetBobaPriceRatio(priceRation *big.Int) {
+	keyPriceRatio := common.BigToHash(big.NewInt(5))
+	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio, common.BigToHash(priceRation))
+}
+
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
 	if rcfg.UsingOVM {
 		// Mutate the storage slot inside of OVM_ETH to change balances.
