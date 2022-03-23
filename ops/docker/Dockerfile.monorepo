@@ -10,29 +10,13 @@ FROM node:16-buster-slim as node
 ARG TARGETPLATFORM
 RUN echo "Platform: $TARGETPLATFORM"
 
-RUN if [[ $TARGETPLATFORM == "linux/amd64" ]] ; then \
+RUN if [[ "$TARGETPLATFORM" == "linux/amd64" ]] ; then \
           echo "Building for x86_64" ; \
           apt-get update -y && apt-get install -y git ; \
      else \
           echo "Building for Mac ($TARGETPLATFORM)" ; \
           apt-get update -y && apt-get install -y git python3 build-essential ; \
      fi
-
-#if [[ $DAEMON == 0 ]]; then
-#  echo 'You set DAEMON to 0, which means that your local L1/L2 will run in the front and you will see all the debug log information'
-#fi
-
-# FROM node:16-buster as node
-
-# fix for mac silicon
-# x86_64
-# arm64 
-#RUN if echo `uname -a` | grep -i "x86_64" ; then \
-#          apt-get update -y && apt-get install -y git ; \
-          # apt-get update -y && apt-get install -y git python3 build-essential ; \
-#     else \
-#          apt-get update -y && apt-get install -y git ; \
-#     fi
 
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
