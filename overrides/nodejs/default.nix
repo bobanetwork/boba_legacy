@@ -7,23 +7,23 @@
 }:
 let
   l = lib // builtins;
-  correct-tsconfig-path = {
-    #_condition = satisfiesSemver "^0.6.0";
-    postPatch = ''
-      if [ -f "./tsconfig.build.json" ];
-      then
-        substituteInPlace ./tsconfig.build.json --replace \
+  postPatch = ''
+    if [ -f "./tsconfig.build.json" ];
+    then
+      substituteInPlace ./tsconfig.build.json --replace \
         '"extends": "../../tsconfig.build.json"' \
         '"extends": "./tsconfig.build-copy.json"'
-      fi
-      substituteInPlace ./tsconfig.json --replace \
+    fi
+    substituteInPlace ./tsconfig.json --replace \
       '"extends": "../../tsconfig.json"' \
       '"extends": "./tsconfig-copy.json"'
-      cp ${./../..}/tsconfig.build.json \
+    cp ${./../..}/tsconfig.build.json \
       ./tsconfig.build-copy.json
-      cp ${./../..}/tsconfig.json \
+    cp ${./../..}/tsconfig.json \
       ./tsconfig-copy.json
-    '';
+  '';
+  correct-tsconfig-path = {
+    inherit postPatch;
   };
   # Create a solidity binaries cache. Compile these from source eventually
   amd64-list = builtins.fetchurl {
@@ -226,7 +226,10 @@ in
     };
   };
   "@eth-optimism/core-utils" = {
-    inherit correct-tsconfig-path;
+    correct-tsconfig-path = {
+      _condition = satisfiesSemver "^0.6.0";
+      inherit postPatch;
+    };
     add-inputs = {
       buildInputs = old: old ++ [
       ];
