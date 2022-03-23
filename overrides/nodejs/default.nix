@@ -25,6 +25,7 @@ let
       ./tsconfig-copy.json
     '';
   };
+  # Create a solidity binaries cache. Compile these from source eventually
   amd64-list = builtins.fetchurl {
     url = "https://raw.githubusercontent.com/tgunnoe/solc-bin-test/master/hardhat-nodejs/compilers/linux-amd64/list.json";
     sha256 = "1jz29yy4fhavwjpk362gs9aczgjsf4jpgd92pr5afvzdgj1qr0ki";
@@ -89,7 +90,7 @@ in
       l2geth = pkgs.buildGoModule {
         pname = "l2geth";
         version = "0.0.1";
-        src = ./l2geth;
+        src = ./../../l2geth;
         doCheck = false;
 
         # Use fakeSha256 when the dependencies change
@@ -136,9 +137,9 @@ in
 
       ];
       installPhase = ''
-              ln -s ${l2geth}/bin $out/bin
-              rm -rf $out/lib
-              '';
+        ln -s ${l2geth.geth}/bin $out/bin
+        rm -rf $out/lib
+      '';
     };
   };
   "@boba/turing-hybrid-compute" = {
@@ -156,12 +157,12 @@ in
     #inherit correct-tsconfig-path;
     correct-tsconfig-path = {
       postPatch = ''
-                substituteInPlace ./tsconfig.json --replace \
-                  '"extends": "../../../tsconfig.json"' \
-                  '"extends": "./tsconfig.build-copy.json"'
-                cp ${./../..}/tsconfig.build.json \
-                  ./tsconfig.build-copy.json
-              '';
+        substituteInPlace ./tsconfig.json --replace \
+          '"extends": "../../../tsconfig.json"' \
+          '"extends": "./tsconfig.build-copy.json"'
+        cp ${./../..}/tsconfig.build.json \
+          ./tsconfig.build-copy.json
+      '';
     };
     add-solc = {
       XDG_CACHE_HOME = "${solc-cache}";
@@ -177,7 +178,7 @@ in
 
     };
   };
-  "@boba/gas-price-oracle" = {};# inherit correct-tsconfig-path; };
+  "@boba/gas-price-oracle" = { inherit correct-tsconfig-path; };
   "@boba/message-relayer-fast" = {
     #inherit correct-tsconfig-path;
     correct-tsconfig-path = {
@@ -195,16 +196,27 @@ in
       '';
     };
   };
-  "@eth-optimism/common-ts" = { inherit correct-tsconfig-path; };
+  "@eth-optimism/common-ts" = {
+    inherit correct-tsconfig-path;
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/common-ts/ | grep -v "package.json\|dist\|node_modules"`
+      '';
+    };
+  };
   "@eth-optimism/message-relayer" = { inherit correct-tsconfig-path; };
   "@eth-optimism/contracts" = {
     inherit correct-tsconfig-path;
     add-solc = {
       XDG_CACHE_HOME = "${solc-cache}";
     };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules"`
+      '';
+    };
     add-inputs = {
       buildInputs = old: old ++ [
-
         #solc-cache
       ];
       nativeBuildInputs = old: old ++ [
@@ -214,31 +226,34 @@ in
     };
   };
   "@eth-optimism/core-utils" = {
-    #_condition = pkg: inputs.dream2nix.lib."x86_64-linux".utils.satisfiesSemver "^0.6.0" pkg;
-    # _condition = pkg:
-    #       satisfiesSemver "^0.6.0" pkg;
     inherit correct-tsconfig-path;
     add-inputs = {
-      TEST = "TEST TEST";
       buildInputs = old: old ++ [
-        #solc-cache
       ];
       nativeBuildInputs = old: old ++ [
         pkgs.yarn
         pkgs.nodePackages.node-pre-gyp
       ];
     };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/core-utils/ | grep -v "package.json\|dist\|node_modules"`
+      '';
+    };
   };
   "@eth-optimism/data-transport-layer" = {
-    #inherit correct-tsconfig-path;
+    inherit correct-tsconfig-path;
     add-solc = {
       XDG_CACHE_HOME = "${solc-cache}";
     };
     install-symlinks = {
       installPhase = ''
         ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
-        ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/node_modules $out/node_modules
-        ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/package.json $out/package.json
+      '';
+    };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/data-transport-layer/ | grep -v "package.json\|dist\|node_modules"`
       '';
     };
   };

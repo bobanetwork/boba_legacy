@@ -27,6 +27,37 @@
         config.overridesDirs = [ ./overrides ];
       };
 
+      boba =
+        flake-utils.lib.eachDefaultSystem (system:
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+          in
+          rec {
+            packages = flake-utils.lib.flattenTree {
+              dtl-image = pkgs.dockerTools.buildLayeredImage {
+                maxLayers = 125;
+                name = "dtl";
+                contents = [
+                  self.packages.${system}."@eth-optimism/data-transport-layer"
+                ];
+                config = {
+                  Cmd = [  ];
+                };
+              };
+              l2geth-image = pkgs.dockerTools.buildImage {
+                name = "l2geth";
+                contents = [
+                ];
+                config = {
+                  Cmd = [ "${self.packages.${system}."@eth-optimism/l2geth"}/bin/geth" ];
+                };
+              };
+            };
+            defaultPackage = packages.hello;
+            apps.hello = flake-utils.lib.mkApp { drv = packages.hello; };
+            defaultApp = apps.hello;
+          }
+        );
     in
       lib.recursiveUpdate
         (dream2nix.makeFlakeOutputs {
@@ -40,8 +71,8 @@
 
         })
         {
-          #packages = boba.packages;
-          #apps = boba.apps;
+          packages = boba.packages;
+          apps = boba.apps;
 
           #defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
         };
