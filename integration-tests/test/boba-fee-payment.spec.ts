@@ -7,17 +7,20 @@ import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 
 /* Imports: Internal */
-import { IS_LIVE_NETWORK } from './shared/utils'
 import { OptimismEnv } from './shared/env'
-import { Direction } from './shared/watcher-utils'
+import { gasPriceOracleWallet } from './shared/utils'
 
 /* Imports: ABI */
 import Proxy__Boba_GasPriceOracleJson from '../artifacts/contracts/Proxy__Boba_GasPriceOracle.sol/Proxy__Boba_GasPriceOracle.json'
 
 const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
-  const gasPrice = await env.gasPriceOracle.setGasPrice(value)
+  const gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+    gasPriceOracleWallet
+  ).setGasPrice(value)
   await gasPrice.wait()
-  const baseFee = await env.gasPriceOracle.setL1BaseFee(value)
+  const baseFee = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+    gasPriceOracleWallet
+  ).setL1BaseFee(value)
   await baseFee.wait()
 }
 
@@ -80,7 +83,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -100,7 +103,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -133,7 +136,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -147,7 +150,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -181,7 +184,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -192,7 +195,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -219,7 +222,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -236,7 +239,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -261,7 +264,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -274,7 +277,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -306,7 +309,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -322,7 +325,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceAfter = await env.l2Wallet.getBalance()
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -358,7 +361,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -374,7 +377,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceAfter = await env.l2Wallet.getBalance()
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -422,7 +425,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const withdrawalAmount = await Boba_GasPriceOracle.MIN_WITHDRAWAL_AMOUNT()
 
     const l2WalletBalance = await L2Boba.balanceOf(env.l2Wallet.address)
-    if (IS_LIVE_NETWORK && l2WalletBalance.lt(withdrawalAmount)) {
+    if (l2WalletBalance.lt(withdrawalAmount)) {
       console.log(
         `NOTICE: must have at least ${ethers.utils.formatEther(
           withdrawalAmount
@@ -446,7 +449,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
 
     // Wait for the withdrawal to be relayed to L1.
-    await env.waitForXDomainTransaction(withdrawTx, Direction.L2ToL1)
+    await withdrawTx.wait()
+    await env.relayXDomainMessages(withdrawTx)
+    await env.waitForXDomainTransaction(withdrawTx)
 
     // Balance difference should be equal to old L2 balance.
     const balanceAfter = await L1Boba.balanceOf(l1FeeWallet)
@@ -457,12 +462,16 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
   // Boba Ethereum special fields on the receipt
   it('{tag:other} includes L2 Boba fee', async () => {
-    const l2GasPrice = await env.gasPriceOracle.gasPrice()
-    const l1Fee = await env.gasPriceOracle.getL1Fee('0x')
-    const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-    const l1GasUsed = await env.gasPriceOracle.getL1GasUsed('0x')
-    const scalar = await env.gasPriceOracle.scalar()
-    const decimals = await env.gasPriceOracle.decimals()
+    const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1Fee(
+      '0x'
+    )
+    const l1GasPrice =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.l1BaseFee()
+    const l1GasUsed =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1GasUsed('0x')
+    const scalar = await env.messenger.contracts.l2.OVM_GasPriceOracle.scalar()
+    const decimals =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.decimals()
 
     const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
 
@@ -486,11 +495,16 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
   // Boba Ethereum special fields on the receipt
   it('{tag:other} includes L2 Boba fee with different gas price', async () => {
-    const l1Fee = await env.gasPriceOracle.getL1Fee('0x')
-    const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-    const l1GasUsed = await env.gasPriceOracle.getL1GasUsed('0x')
-    const scalar = await env.gasPriceOracle.scalar()
-    const decimals = await env.gasPriceOracle.decimals()
+    const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1Fee(
+      '0x'
+    )
+    const l1GasPrice =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.l1BaseFee()
+    const l1GasUsed =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1GasUsed('0x')
+    const scalar = await env.messenger.contracts.l2.OVM_GasPriceOracle.scalar()
+    const decimals =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.decimals()
 
     const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
 
@@ -530,7 +544,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -545,7 +559,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceAfter = await env.l2Wallet.getBalance()
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -576,7 +590,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -588,7 +602,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceAfter = await env.l2Wallet.getBalance()
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -614,7 +628,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
     const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -629,7 +643,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const ETHBalanceAfter = await env.l2Wallet.getBalance()
     const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
     const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-      env.sequencerFeeVault.address
+      predeploys.OVM_SequencerFeeVault
     )
     const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
       Boba_GasPriceOracle.address
@@ -661,7 +675,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceBefore = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address
@@ -678,7 +692,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const ETHBalanceAfter = await env.l2Wallet.getBalance()
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet.address)
       const ETHFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
-        env.sequencerFeeVault.address
+        predeploys.OVM_SequencerFeeVault
       )
       const BobaFeeVaultBalanceAfter = await L2Boba.balanceOf(
         Boba_GasPriceOracle.address

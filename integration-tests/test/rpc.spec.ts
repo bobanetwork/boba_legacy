@@ -146,14 +146,32 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('{tag:rpc} should reject a transaction with a too low gas limit', async () => {
+    it('{tag:rpc} should reject a transaction with a too low gas limit or too low', async () => {
+      const isHH = await isHardhat()
+      let gasPrice
+      if (isHH) {
+        gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+          gasPriceOracleWallet
+        ).gasPrice()
+        await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+          gasPriceOracleWallet
+        ).setGasPrice(1000)
+      }
+
       const tx = {
         ...defaultTransactionFactory(),
-        gasPrice: 1,
+        gasPrice: 1000,
       }
 
       const gasLimit = await env.l2Wallet.estimateGas(tx)
       tx.gasLimit = gasLimit.toNumber() - 6000
+
+      await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
+        'invalid transaction: intrinsic gas too low'
+      )
+
+      tx.gasPrice = 1
+      tx.gasLimit = gasLimit.toNumber()
 
       await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
         /gas price too low: 1 wei, use at least tx\.gasPrice = \d+ wei/
@@ -346,7 +364,7 @@ describe('Basic RPC tests', () => {
         const l1Fee =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
-          ).getL1Fee(raw)
+          ).getL1Fee('0x')
         const l1GasPrice =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
@@ -354,7 +372,7 @@ describe('Basic RPC tests', () => {
         const l1GasUsed =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
-          ).getL1GasUsed(raw)
+          ).getL1GasUsed('0x')
         const scalar =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet

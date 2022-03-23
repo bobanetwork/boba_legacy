@@ -272,12 +272,14 @@ describe('Fee Payment Integration Tests', async () => {
   // https://github.com/bobanetwork/boba/pull/22
   it('{tag:other} should be able to configure l1 gas price in a rare situation', async () => {
     // This blocks all txs, because the gas usage for the l1 security fee is too large
-    const gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.setGasPrice(1)
+    const gasPrice =
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+        gasPriceOracleWallet
+      ).setGasPrice(1)
     await gasPrice.wait()
-    const baseFee =
-      await env.messenger.contracts.l2.OVM_GasPriceOracle.setL1BaseFee(
-        11_000_000
-      )
+    const baseFee = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+      gasPriceOracleWallet
+    ).setL1BaseFee(11_000_000)
     await baseFee.wait()
 
     // Can't transfer ETH
@@ -291,7 +293,7 @@ describe('Fee Payment Integration Tests', async () => {
     // Reset L1 base fee
     const resetBaseFee =
       await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-        env.l2Wallet_4
+        gasPriceOracleWallet
       ).setL1BaseFee(1, { gasPrice: 0, gasLimit: 11000000 })
     await resetBaseFee.wait()
   })
