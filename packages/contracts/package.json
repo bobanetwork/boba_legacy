@@ -26,7 +26,7 @@
     "autogen:artifacts": "ts-node scripts/generate-artifacts.ts && ts-node scripts/generate-deployed-artifacts.ts",
     "test": "yarn test:contracts",
     "test:contracts": "hardhat test --show-stack-traces",
-    "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage && istanbul check-coverage --statements 88 --branches 72 --functions 81 --lines 88",
+    "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage && istanbul check-coverage --statements 82 --branches 66 --functions 76 --lines 83",
     "test:slither": "slither .",
     "pretest:slither": "rm -f @openzeppelin && rm -f @ens && rm -f hardhat && ln -s ../../node_modules/@openzeppelin @openzeppelin && ln -s ../../node_modules/@ens @ens && ln -s ../../node_modules/hardhat hardhat",
     "posttest:slither": "rm -f @openzeppelin && rm -f @ens && rm -f hardhat",
@@ -59,7 +59,7 @@
     "url": "https://github.com/ethereum-optimism/optimism.git"
   },
   "dependencies": {
-    "@eth-optimism/core-utils": "0.7.5",
+    "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/abstract-provider": "^5.5.1",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/hardware-wallets": "^5.5.0"

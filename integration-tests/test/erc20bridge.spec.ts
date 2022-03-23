@@ -6,13 +6,12 @@ const expect = chai.expect
 import { Contract, ContractFactory, utils, Wallet } from 'ethers'
 import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { Direction } from './shared/watcher-utils'
 
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 import { OptimismEnv } from './shared/env'
 
-describe('System setup', async () => {
+describe('ERC20 Bridge', async () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
   let Factory__L2ERC20: ContractFactory
@@ -36,7 +35,7 @@ describe('System setup', async () => {
       9999999,
       utils.formatBytes32String(new Date().getTime().toString())
     )
-    await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+    await env.waitForXDomainTransaction(deposit)
   }
 
   before(async () => {
@@ -76,7 +75,7 @@ describe('System setup', async () => {
       9999999,
       utils.formatBytes32String(new Date().getTime().toString())
     )
-    await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+    await env.waitForXDomainTransaction(deposit)
     const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 

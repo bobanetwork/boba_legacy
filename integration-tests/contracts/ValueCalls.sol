@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 contract ValueContext {
     function getSelfBalance() external payable returns(uint256) {
@@ -22,6 +22,10 @@ contract ValueContext {
 
     function getCallValue() public payable returns(uint256) {
         return msg.value;
+    }
+
+    function getCaller() external view returns (address){
+        return msg.sender;
     }
 }
 
