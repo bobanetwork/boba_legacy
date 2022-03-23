@@ -3,6 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
+import { Direction } from './shared/watcher-utils'
+
 import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
 import L1ERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
@@ -98,7 +100,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -143,7 +146,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -166,7 +170,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -189,7 +194,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -304,7 +310,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -359,7 +366,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -381,7 +389,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -405,7 +414,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -520,7 +530,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
     })
 
@@ -536,7 +547,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -603,7 +615,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
     })
 
@@ -615,7 +628,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -709,7 +723,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L1ToL2
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -754,7 +769,8 @@ describe('NFT Bridge Test', async () => {
           DUMMY_TOKEN_ID,
           9999999,
           utils.formatBytes32String(new Date().getTime().toString())
-        )
+        ),
+        Direction.L2ToL1
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted

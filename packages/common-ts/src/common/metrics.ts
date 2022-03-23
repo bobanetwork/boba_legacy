@@ -1,11 +1,10 @@
-import { Server } from 'net'
-
 import prometheus, {
   collectDefaultMetrics,
   DefaultMetricsCollectorConfiguration,
   Registry,
 } from 'prom-client'
 import express from 'express'
+import { Server } from 'net'
 
 import { Logger } from './logger'
 

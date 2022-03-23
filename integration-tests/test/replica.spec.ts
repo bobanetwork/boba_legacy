@@ -1,105 +1,103 @@
-/* Imports: External */
-import { TransactionReceipt } from '@ethersproject/abstract-provider'
-import { sleep } from '@eth-optimism/core-utils'
+import chai, { expect } from 'chai'
+import { Wallet, Contract, ContractFactory, providers } from 'ethers'
+import { ethers } from 'hardhat'
+import { injectL2Context } from '@eth-optimism/core-utils'
 
-/* Imports: Internal */
-import { expect } from './shared/setup'
-import { OptimismEnv } from './shared/env'
 import {
-  defaultTransactionFactory,
-  gasPriceForL2,
-  envConfig,
+  sleep,
+  l2Provider,
+  replicaProvider,
+  waitForL2Geth,
 } from './shared/utils'
+import { OptimismEnv } from './shared/env'
 
-describe('Replica Tests', () => {
+describe('Syncing a replica', () => {
   let env: OptimismEnv
+  let wallet: Wallet
+  //let provider: providers.JsonRpcProvider
 
-  before(async function () {
-    if (!envConfig.RUN_REPLICA_TESTS) {
-      this.skip()
-      return
+  const sequencerProvider = injectL2Context(l2Provider)
+  const repProvider = injectL2Context(replicaProvider)
+
+  /* Helper functions */
+
+  const syncReplica = async (sequencerBlockNumber: number) => {
+    // Wait until replica has caught up to the sequencer
+    let latestReplicaBlock = (await repProvider.getBlock('latest')) as any
+    while (latestReplicaBlock.number < sequencerBlockNumber) {
+      await sleep(500)
+      latestReplicaBlock = (await repProvider.getBlock('latest')) as any
     }
 
+    return repProvider.getBlock(sequencerBlockNumber)
+  }
+
+  before(async () => {
     env = await OptimismEnv.new()
+    wallet = env.l2Wallet
   })
 
-  describe('Matching blocks', () => {
-    it('{tag:other} should sync a transaction', async () => {
-      const tx = defaultTransactionFactory()
-      tx.gasPrice = await gasPriceForL2()
-      const result = await env.l2Wallet.sendTransaction(tx)
+  describe('Basic transactions and ERC20s', () => {
+    const initialAmount = 1000
+    const tokenName = 'OVM Test'
+    const tokenDecimals = 8
+    const TokenSymbol = 'OVM'
 
-      let receipt: TransactionReceipt
-      while (!receipt) {
-        receipt = await env.replicaProvider.getTransactionReceipt(result.hash)
-        await sleep(200)
-      }
+    let other: Wallet
+    let Factory__ERC20: ContractFactory
+    let ERC20: Contract
 
-      const sequencerBlock = (await env.l2Provider.getBlock(
-        result.blockNumber
-      )) as any
-
-      const replicaBlock = (await env.replicaProvider.getBlock(
-        result.blockNumber
-      )) as any
-
-      expect(sequencerBlock.stateRoot).to.deep.eq(replicaBlock.stateRoot)
-      expect(sequencerBlock.hash).to.deep.eq(replicaBlock.hash)
+    before(async () => {
+      other = Wallet.createRandom().connect(ethers.provider)
+      Factory__ERC20 = await ethers.getContractFactory('ERC20', wallet)
     })
 
-    it('{tag:other} sync an unprotected tx (eip155)', async () => {
+    it('{tag:other} should sync dummy transaction', async () => {
       const tx = {
-        ...defaultTransactionFactory(),
-        nonce: await env.l2Wallet.getTransactionCount(),
-        gasPrice: await gasPriceForL2(),
-        chainId: null, // Disables EIP155 transaction signing.
+        to: '0x' + '1234'.repeat(10),
+        gasLimit: 4000000,
+        gasPrice: 0,
+        data: '0x',
+        value: 0,
       }
-      const signed = await env.l2Wallet.signTransaction(tx)
-      const result = await env.l2Provider.sendTransaction(signed)
+      const result = await wallet.sendTransaction(tx)
+      await result.wait()
 
-      let receipt: TransactionReceipt
-      while (!receipt) {
-        receipt = await env.replicaProvider.getTransactionReceipt(result.hash)
-        await sleep(200)
-      }
-
-      const sequencerBlock = (await env.l2Provider.getBlock(
-        result.blockNumber
+      const latestSequencerBlock = (await sequencerProvider.getBlock(
+        'latest'
       )) as any
 
-      const replicaBlock = (await env.replicaProvider.getBlock(
-        result.blockNumber
+      const matchingReplicaBlock = (await syncReplica(
+        latestSequencerBlock.number
       )) as any
 
-      expect(sequencerBlock.stateRoot).to.deep.eq(replicaBlock.stateRoot)
-      expect(sequencerBlock.hash).to.deep.eq(replicaBlock.hash)
+      expect(matchingReplicaBlock.stateRoot).to.eq(
+        latestSequencerBlock.stateRoot
+      )
     })
 
-    it('{tag:other} should forward tx to sequencer', async () => {
-      const tx = {
-        ...defaultTransactionFactory(),
-        nonce: await env.l2Wallet.getTransactionCount(),
-        gasPrice: await gasPriceForL2(),
-      }
-      const signed = await env.l2Wallet.signTransaction(tx)
-      const result = await env.replicaProvider.sendTransaction(signed)
+    it('{tag:other} should sync ERC20 deployment and transfer', async () => {
+      ERC20 = await Factory__ERC20.deploy(
+        initialAmount,
+        tokenName,
+        tokenDecimals,
+        TokenSymbol
+      )
 
-      let receipt: TransactionReceipt
-      while (!receipt) {
-        receipt = await env.replicaProvider.getTransactionReceipt(result.hash)
-        await sleep(200)
-      }
+      const transfer = await ERC20.transfer(other.address, 100)
+      await transfer.wait()
 
-      const sequencerBlock = (await env.l2Provider.getBlock(
-        result.blockNumber
+      const latestSequencerBlock = (await sequencerProvider.getBlock(
+        'latest'
       )) as any
 
-      const replicaBlock = (await env.replicaProvider.getBlock(
-        result.blockNumber
+      const matchingReplicaBlock = (await syncReplica(
+        latestSequencerBlock.number
       )) as any
 
-      expect(sequencerBlock.stateRoot).to.deep.eq(replicaBlock.stateRoot)
-      expect(sequencerBlock.hash).to.deep.eq(replicaBlock.hash)
+      expect(matchingReplicaBlock.stateRoot).to.eq(
+        latestSequencerBlock.stateRoot
+      )
     })
   })
 })

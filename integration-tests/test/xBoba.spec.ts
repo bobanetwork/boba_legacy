@@ -3,6 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, BigNumber, constants } from 'ethers'
 
+import { Direction } from './shared/watcher-utils'
+
 import xL2GovernanceERC20 from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 import xL2GovernanceERC20Helper from '@boba/contracts/artifacts/contracts/test-helpers/xL2GovernanceERC20Helper.sol/xL2GovernanceERC20Helper.json'
 

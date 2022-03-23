@@ -6,7 +6,6 @@ Follow installation + build instructions in the [primary README](../README.md). 
 
 ```bash
 yarn build
-yarn test:integration
 ```
 
 ## Running tests
