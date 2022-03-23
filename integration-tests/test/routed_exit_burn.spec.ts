@@ -2,7 +2,6 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
-import { Direction } from './shared/watcher-utils'
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
@@ -45,9 +44,8 @@ describe('Standard Exit burn', async () => {
       env.l1Wallet
     )
 
-    const L1StandardBridgeAddress = await env.addressManager.getAddress(
-      'Proxy__L1StandardBridge'
-    )
+    const L1StandardBridgeAddress = await env.addressesBASE
+      .Proxy__L1StandardBridge
 
     L1StandardBridge = getContractFactory(
       'L1StandardBridge',
@@ -114,8 +112,7 @@ describe('Standard Exit burn', async () => {
           depositL2ERC20Amount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L1ToL2
+        )
       )
     })
 
@@ -171,8 +168,7 @@ describe('Standard Exit burn', async () => {
           depositL2ERC20Amount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L1ToL2
+        )
       )
     })
 
@@ -195,8 +191,7 @@ describe('Standard Exit burn', async () => {
           exitAmount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString())
-        ),
-        Direction.L2ToL1
+        )
       )
 
       const postBalanceExitorL1 = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -235,7 +230,7 @@ describe('Standard Exit burn', async () => {
         utils.formatBytes32String(new Date().getTime().toString()),
         { value: addLiquidityAmount }
       )
-      await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+      await env.waitForXDomainTransaction(deposit)
     })
 
     it('{tag:other} should burn and withdraw ovm_eth', async () => {
@@ -252,8 +247,7 @@ describe('Standard Exit burn', async () => {
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString()),
           { value: exitAmount }
-        ),
-        Direction.L2ToL1
+        )
       )
 
       const postBalanceExitorL1 = await env.l1Wallet.getBalance()

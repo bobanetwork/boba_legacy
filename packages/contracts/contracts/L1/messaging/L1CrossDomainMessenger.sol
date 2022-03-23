@@ -112,7 +112,7 @@ contract L1CrossDomainMessenger is
 
     /**
      * Allow a message.
-     * @param _xDomainCalldataHash Hash of the message to block.
+     * @param _xDomainCalldataHash Hash of the message to allow.
      */
     function allowMessage(bytes32 _xDomainCalldataHash) external onlyOwner {
         blockedMessages[_xDomainCalldataHash] = false;

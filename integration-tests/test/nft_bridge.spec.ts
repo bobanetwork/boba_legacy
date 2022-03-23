@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
-import { Direction } from './shared/watcher-utils'
 import { getFilteredLogIndex } from './shared/utils'
 
 import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
@@ -106,8 +105,12 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999),
-        Direction.L1ToL2
+        L1Bridge.depositNFT(
+          L1ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -149,9 +152,9 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L2ToL1
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -172,9 +175,9 @@ describe('NFT Bridge Test', async () => {
           L1ERC721.address,
           env.l1Wallet.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L1ToL2
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -196,8 +199,7 @@ describe('NFT Bridge Test', async () => {
           env.l2Wallet_2.address,
           DUMMY_TOKEN_ID,
           9999999
-        ),
-        Direction.L2ToL1
+        )
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -255,9 +257,9 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraData(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L2ToL1
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       // check event WithdrawalInitiated is emitted with empty data
@@ -375,8 +377,12 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999),
-        Direction.L2ToL1
+        L2Bridge.withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -425,8 +431,12 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999),
-        Direction.L1ToL2
+        L1Bridge.depositNFT(
+          L1ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -446,9 +456,9 @@ describe('NFT Bridge Test', async () => {
           L2ERC721.address,
           env.l2Wallet_2.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L2ToL1
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -471,8 +481,7 @@ describe('NFT Bridge Test', async () => {
           env.l2Wallet.address,
           DUMMY_TOKEN_ID,
           9999999
-        ),
-        Direction.L1ToL2
+        )
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -530,9 +539,9 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.connect(env.l1Wallet).depositNFTWithExtraData(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L1ToL2
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       // check event NFTDepositInitiated is emitted with empty data
@@ -650,8 +659,12 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999),
-        Direction.L1ToL2
+        L1Bridge.depositNFT(
+          L1ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
     })
 
@@ -665,9 +678,9 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L2ToL1
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.reverted
@@ -729,8 +742,12 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999),
-        Direction.L2ToL1
+        L2Bridge.withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
     })
 
@@ -740,9 +757,9 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.connect(env.l1Wallet_2).depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L1ToL2
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -901,9 +918,9 @@ describe('NFT Bridge Test', async () => {
           L1ERC721.address,
           env.l1Wallet_2.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L1ToL2
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       const returnedlogIndex = await getFilteredLogIndex(
@@ -1009,9 +1026,9 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet).withdrawWithExtraData(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999
-        ),
-        Direction.L2ToL1
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
       )
 
       // check event WithdrawalInitiated is emitted with empty data
