@@ -4,7 +4,7 @@ import chai, { expect } from 'chai'
 import { GWEI, fundUser, encodeSolidityRevertMessage } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { solidity } from 'ethereum-waffle'
-import { sleep } from '../../packages/core-utils/dist'
+import { sleep } from '@eth-optimism/core-utils'
 import {
   getContractFactory,
   getContractInterface,
@@ -40,6 +40,7 @@ describe('Native ETH value integration tests', () => {
       expect(realBalances[1]).to.deep.eq(expectedBalances[1])
     }
 
+<<<<<<< boba-fee
     // In the local test environment, test acounts can use zero gas price.
     // In l2geth, we override the gas price in api.go if the gas price is nil or zero
     // gasPrice := new(big.Int)
@@ -59,6 +60,10 @@ describe('Native ETH value integration tests', () => {
     // cover the cost
     const value = ethers.utils.parseEther('1')
     await fundUser(env.watcher, env.l1Bridge, value, wallet.address)
+=======
+    const value = 10
+    await fundUser(env.messenger, value, wallet.address)
+>>>>>>> develop
 
     const initialBalances = await getBalances()
 
@@ -161,13 +166,8 @@ describe('Native ETH value integration tests', () => {
     beforeEach(async () => {
       ValueCalls0 = await Factory__ValueCalls.deploy()
       ValueCalls1 = await Factory__ValueCalls.deploy()
-      await fundUser(
-        env.watcher,
-        env.l1Bridge,
-        initialBalance0,
-        ValueCalls0.address
-      )
-      // These tests ass assume ValueCalls0 starts with a balance, but ValueCalls1 does not.
+      await fundUser(env.messenger, initialBalance0, ValueCalls0.address)
+      // These tests assume ValueCalls0 starts with a balance, but ValueCalls1 does not.
       await checkBalances([initialBalance0, 0])
     })
 
@@ -208,12 +208,8 @@ describe('Native ETH value integration tests', () => {
     it('{tag:other} should have the correct ovmSELFBALANCE which includes the msg.value', async () => {
       // give an initial balance which the ovmCALLVALUE should be added to when calculating ovmSELFBALANCE
       const initialBalance = 10
-      await fundUser(
-        env.watcher,
-        env.l1Bridge,
-        initialBalance,
-        ValueCalls1.address
-      )
+
+      await fundUser(env.messenger, initialBalance, ValueCalls1.address)
 
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(

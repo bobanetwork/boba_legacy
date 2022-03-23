@@ -24,7 +24,8 @@
     "@boba/turing-hybrid-compute": "0.2.0",
     "@chainlink/contracts": "0.3.1",
     "@eth-optimism/contracts": "^0.5.11",
-    "@eth-optimism/core-utils": "^0.6.0",
+    "@eth-optimism/core-utils": "0.8.1",
+    "@eth-optimism/sdk": "^1.0.1",
     "@ethersproject/abstract-provider": "^5.5.1",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
@@ -39,7 +40,6 @@
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
-
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
@@ -49,9 +49,9 @@
     "hardhat": "^2.3.0",
     "hardhat-deploy": "^0.9.3",
     "mocha": "^8.3.1",
-    "solidity-coverage": "^0.7.17",
     "rimraf": "^3.0.2",
     "shx": "^0.3.3",
+    "solidity-coverage": "^0.7.17",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
   }
