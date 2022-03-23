@@ -67,6 +67,7 @@ import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import { sortRawTokens } from 'util/common'
+import GraphQLService from "./graphQLService";
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -566,7 +567,7 @@ async initializeBase( networkGateway ) {
               'L2': L2a
             }
           }
-        } 
+        }
         else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
@@ -1332,7 +1333,7 @@ async initializeBase( networkGateway ) {
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
 
@@ -1377,7 +1378,7 @@ async initializeBase( networkGateway ) {
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
 
@@ -3212,7 +3213,8 @@ async initializeBase( networkGateway ) {
       )
 
       // temporary fix to avoid eth_getLogs(zero, latest)
-      const descriptionList = await delegateCheck.queryFilter(filter, -4000)
+      const descriptionList = await GraphQLService.queryBridgeProposalCreated('') // TODO load all
+      // const descriptionList = await delegateCheck.queryFilter(filter, -4000)
 
       for (let i = 0; i < totalProposals; i++) {
 
