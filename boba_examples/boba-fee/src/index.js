@@ -1,5 +1,4 @@
 const { Contract, providers, Wallet, utils } = require('ethers')
-const { getContractFactory } = require('@eth-optimism/contracts')
 require('dotenv').config()
 
 const main = async () => {
@@ -18,18 +17,28 @@ const main = async () => {
   const l2Wallet = new Wallet(PRIV_KEY).connect(l2Provider)
 
   // load contract
-  const addressManager = getContractFactory('Lib_AddressManager')
-    .connect(l1Wallet)
-    .attach(ADDRESS_MANAGER_ADDRESS)
+  const addressManagerInterface = new utils.Interface([
+    'function getAddress(string _name) view returns (address address)',
+  ])
+  const addressManager = new Contract(
+    ADDRESS_MANAGER_ADDRESS,
+    addressManagerInterface,
+    l1Wallet
+  )
 
   // get address
   const BobaGasPriceOracleAddress = await addressManager.getAddress(
     'Boba_GasPriceOracle'
   )
 
+  const BobaGasPriceOracleInterface = new utils.Interface([
+    'function useBobaAsFeeToken()',
+    'function useETHAsFeeToken()',
+    'function bobaFeeTokenUsers(address) view returns (bool)',
+  ])
   const Boba_GasPriceOracle = new Contract(
     BobaGasPriceOracleAddress,
-    ABI,
+    BobaGasPriceOracleInterface,
     l2Wallet
   )
 
@@ -68,37 +77,3 @@ try {
 } catch (error) {
   console.log(error)
 }
-
-const ABI = [
-  {
-    name: 'useBobaAsFeeToken',
-    inputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    name: 'useETHAsFeeToken',
-    inputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'bobaFeeTokenUsers',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-]

@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@eth-optimism/contracts": "^0.5.18",
     "dotenv": "^16.0.0",
     "ethers": "^5.6.1"
   }
