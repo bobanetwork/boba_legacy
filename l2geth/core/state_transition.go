@@ -172,9 +172,9 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 	}
 
 	return &StateTransition{
-		gp:          gp,
-		evm:         evm,
-		msg:         msg,
+		gp:  gp,
+		evm: evm,
+		msg: msg,
 		// gasPrice is normally set via msg.GasPrice() but we override
 		// gasPrice to pass information about the fee choice
 		gasPrice:    gasPrice,
@@ -186,9 +186,9 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 		isGasUpdate: isGasUpdate,
 		// Fee token hardfork
 		isFeeTokenUpdate: isFeeTokenUpdate,
-		// Boba fee token selection flag
+		// BOBA fee token selection flag
 		isBobaFeeTokenSelect: isBobaFeeTokenSelect,
-		// Boba fee cost
+		// BOBA price relative to ETH
 		bobaPriceRatio: bobaPriceRatio,
 	}
 }
@@ -255,7 +255,7 @@ func (st *StateTransition) buyGas() error {
 	}
 	// BOBA is used to pay for the gas fee
 	if st.isBobaFeeTokenSelect {
-		// note that in this case, st.gasPrice = 0 but st.msg.GasPrice() is NOT zero 
+		// note that in this case, st.gasPrice = 0 but st.msg.GasPrice() is NOT zero
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.msg.Gas()), st.msg.GasPrice())
 		bobaval = new(big.Int).Mul(ethval, st.bobaPriceRatio)
 		if st.state.GetBobaBalance(st.msg.From()).Cmp(bobaval) < 0 {

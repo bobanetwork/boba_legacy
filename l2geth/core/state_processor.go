@@ -110,7 +110,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		scalar     *big.Float
 	)
 
-	// Use updated L1GasData calculation once fee choice logic has 
+	// Use updated L1GasData calculation once fee choice logic has
 	// been enabled
 	if config.IsFeeTokenUpdate(header.Number) {
 		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasDataInfo(msg, statedb)
