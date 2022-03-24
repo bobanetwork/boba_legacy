@@ -68,7 +68,8 @@ Instead, to keep following through the tutorial keep reading..
 
 ### Deploying your NFT contract
 The first step is to deploy your ERC721 contract on Boba! There is no limitation as to what you can deploy as long as it is ERC721 compliant.
-For this example, we have preset a sample ERC721 contract for you to use here `/contracts/SampleERC721.sol` - feel free to select your own ERC721 that you fancy
+For this example, we have preset a sample ERC721 contract for you to use here `/contracts/SampleERC721.sol` - feel free to select your own ERC721 that you fancy.
+(For super-special ERC721s which might not be cost-effective to transport with the complete metadata - we offer some gas effective solutions with the bridges. Do not worry about this now - follow this section for reference later)
 
 Once, you have settled on the contract to use,
 compile the contract using -
@@ -93,6 +94,7 @@ So, nothing out of the ordinary up until this point, but now we will actually ge
 Now, with your ERC721 deployed on Boba, we want to make all the NFTs of this contract bridge-able to L1(Ethereum). To enforce this - we only need to deploy a representation contract on L1 which can accept messages from the NFT Bridges and generate a L1 representation for your L2 NFT.
 
 Simply put, any arbitrary ERC721 contract deployed on Boba needs a single and potentially unmodified deployment of L1StandardERC721 on Ethereum to make it bridgeable!
+(the bridge also allows to transport custom data if your ERC721 demands it, in which case you would have to accordingly handle it on the L1StandardERC721. Since this is a common ERC721 we do not need to worry about this - refer to this section for reference later )
 
 #### Deploying a standard L1ERC721 representation
 Following the script - you should see your L1 represntation contract being deployed
@@ -149,3 +151,61 @@ L2NFT owner:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 NFT bridged back to L2 successfully!
 #################################
 ```
+
+Thanks for making it to the end of the tutorial! And, as promised - to clear the air about what super-special NFTs mean in terms of the bridge and how your bridging can be gas effective for them
+## More advanced options for special NFTs
+
+Attempting to categorize ERC721s on the basis of metadata, we have:
+1. ERC721 with derivable metaData (more common)
+
+The general ERC721(like the one in the example) has the tokenURI in the form = 'baseURI' + 'tokenId'
+or is completely derivable on-chain from the tokenId
+
+In this case, you don't really need to worry about transporting metadata between layers and hence you are already at best.
+
+2. ERC721 with no metadata (non- ERC721Metadata)
+
+Some ERC721 do not have metadata associated, in which case you surely do not need to worry about transporting metadata
+
+3. ERC721 with non-derivable metaData (unrecoverable context)
+
+These are the "special NFTs" that require some form of transportation of metadata between layers
+
+The NFT Bridge provides with a special method 'withdrawWithExtraData' in comparision to 'withdraw' for the usual bridging to allow transporting the metadata when bridging the NFT to the other layer
+
+*What metadata is actually bridged?*
+When you chose to withdraw through the aforementioned method - the 'tokenURI()' data will be encoded and passed on to the L1StandardERC721 for it to receive and handle it
+
+##### Optimisations
+bridging the tokenURI data as a whole might not be ecnomical always and depends on the size of the tokenURI. For example, bridging the tokenURI data for on-chain NFTs will be very costly
+
+The NFTBridge, asks for a special method for this - 'bridgeExtraData', if this method is implemented on your native ERC721 contracts and returns some data that you would need to bridge to the other layer, the bridge will prioritize this over 'tokenURI' potentially allowing to bridge seed data for generation on the L1 side
+
+##### Making your ERC721 bridge extra Data
+To enable the bridge to pickup the exposed extra data that you would want to bridge
+1. expose the method 'bridgeExtraData()' on your contract. This can encode one/many unique seed data to be transported over to the other layer while bridging
+for example, an on-chain contract that requires three unique integers to be transported for each tokenId can expose the data in a way similar to:
+```
+    function bridgeExtraData(uint256 tokenId) public view returns(bytes memory) {
+        return abi.encode(data_1[tokenId], data_2[tokenId], data_3[tokenId]);
+    }
+}
+```
+2. Modify ERC165 supportsInterface to return the bridgeExtraData(uint256) selector
+
+for example,
+```
+    function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
+        return _interfaceId == this.bridgeExtraData.selector || super.supportsInterface(_interfaceId);
+    }
+```
+
+##### Tl;dr
+To sum up,
+calling `withdrawWithExtraData` to bridge an NFT to L1, would mean, on this order of priority:
+1. check if the contract exposes Extra Data by implementing a `bridgeExtraData()` method, if it does transport the return of this method as data
+2. If it doesn't, transport the return value of `tokenURI()`
+
+If you want your NFTs to transport the return value of its `tokenURI()` along with each token while bridging, your contract does not need to implement any extra method!
+If you want your NFTs to transport other generative(shorter) data along with each token instead, implement the `bridgeExtraData(uint256 tokenId)` and expose the extraData for each token
+
