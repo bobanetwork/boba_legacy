@@ -122,6 +122,12 @@
           packageOverrides = {
             "@openzeppelin/contracts" = {
               add-regenesis-patch = {
+                prePatch = ''
+                  cp -r ${./.}/patches .
+                  substituteInPlace ./patches/@openzeppelin+contracts+4.3.2.patch --replace \
+                    '/node_modules/@openzeppelin/contracts/' \
+                    '/'
+                '';
                 patches = [
                   "./patches/@openzeppelin+contracts+4.3.2.patch"
                 ];
