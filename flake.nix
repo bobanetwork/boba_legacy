@@ -111,7 +111,7 @@
             express-prom-bundle."6.4.1" = [
               ["prom-client" "13.2.0"]
             ];
-            "@eth-optimism/core-utils"."0.6.0"  = [
+            "@eth-optimism/core-utils"."0.8.1"  = [
               [ "@types/node" "15.14.9" ]
             ];
 

@@ -237,7 +237,11 @@ in
   "@eth-optimism/core-utils" = {
     correct-tsconfig-path = {
       _condition = satisfiesSemver "^0.6.0";
-      inherit postPatch;
+      postPatch = lib.concatStrings [ postPatch '' \
+        substituteInPlace ./tsconfig.build-copy.json --replace \
+          '"src/@types"' \
+          '"src/@types/external"'
+      ''];
     };
     add-inputs = {
       buildInputs = old: old ++ [
@@ -250,6 +254,14 @@ in
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/core-utils/ | grep -v "package.json\|dist\|node_modules"`
+      '';
+    };
+  };
+  "@eth-optimism/sdk" = {
+    inherit correct-tsconfig-path;
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/sdk/ | grep -v "package.json\|dist\|node_modules"`
       '';
     };
   };
