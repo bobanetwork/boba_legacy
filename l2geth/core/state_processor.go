@@ -109,6 +109,9 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		l1GasUsed  *big.Int
 		scalar     *big.Float
 	)
+
+	// Use updated L1GasData calculation once fee choice logic has
+	// been enabled
 	if config.IsFeeTokenUpdate(header.Number) {
 		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasDataInfo(msg, statedb)
 		if err != nil {
@@ -132,7 +135,8 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		return nil, err
 	}
 
-	// Get the l2 boba fee if users use Boba token as the fee token
+	// Determine the L2 Boba fee if users chose BOBA as the fee token
+	// Otherwise, L2BobaFee = 0
 	L2BobaFee := new(big.Int)
 	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
 	if feeTokenSelection.Cmp(common.Big1) == 0 {

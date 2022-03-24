@@ -147,7 +147,8 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 	// The default fee token is ETH
 	isBobaFeeTokenSelect := false
 	if rcfg.UsingOVM {
-		if msg.GasPrice().Cmp(common.Big0) != 0 {
+		// if msg.GasPrice > 0, then...
+		if msg.GasPrice().Cmp(common.Big0) == 1 {
 			// Compute the L1 fee before the state transition
 			// so it only has to be read from state one time.
 			l1Fee, _ = fees.CalculateL1MsgFee(msg, evm.StateDB, nil)
@@ -159,9 +160,9 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 				l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, evm.StateDB, nil)
 			}
 		}
-		// Check if the wallet address picks BOBA as the fee token
-		// Override gas price to 0 if the wallet address picks BOBA as the fee token,
-		// so we don't charge ETH fee
+		// Check if this wallet has set BOBA as the fee token
+		// If yes, set gasPrice to 0. This change is what will
+		// zero the ETH fee for this transaction.
 		feeTokenSelection := evm.StateDB.GetFeeTokenSelection(msg.From())
 		isBobaFeeTokenSelect = feeTokenSelection.Cmp(common.Big1) == 0 && isFeeTokenUpdate
 		if isBobaFeeTokenSelect {
@@ -171,9 +172,11 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 	}
 
 	return &StateTransition{
-		gp:          gp,
-		evm:         evm,
-		msg:         msg,
+		gp:  gp,
+		evm: evm,
+		msg: msg,
+		// gasPrice is normally set via msg.GasPrice() but we override
+		// gasPrice to pass information about the fee choice
 		gasPrice:    gasPrice,
 		value:       msg.Value(),
 		data:        msg.Data(),
@@ -183,9 +186,9 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 		isGasUpdate: isGasUpdate,
 		// Fee token hardfork
 		isFeeTokenUpdate: isFeeTokenUpdate,
-		// Boba fee token selection flag
+		// BOBA fee token selection flag
 		isBobaFeeTokenSelect: isBobaFeeTokenSelect,
-		// Boba fee cost
+		// BOBA price relative to ETH
 		bobaPriceRatio: bobaPriceRatio,
 	}
 }
@@ -227,7 +230,7 @@ func (st *StateTransition) buyGas() error {
 			// L2 extra gas has already included in tx.Gas()
 			if st.isGasUpdate && !st.isFeeTokenUpdate {
 				// st.gasPrice is 0 if st.isBobaFeeTokenSelect is true
-				// so mgval is 0
+				// so mgval is also 0 when using BOBA as the fee token
 				extraL2Fee := new(big.Int).Mul(st.l2ExtraGas, st.gasPrice)
 				log.Debug("Adding extra L2 fee", "extra-l2-fee", extraL2Fee)
 				mgval = mgval.Add(mgval, extraL2Fee)
@@ -250,8 +253,9 @@ func (st *StateTransition) buyGas() error {
 			return errInsufficientBalanceForGas
 		}
 	}
-	// Boba token is used to pay for the gas fee
+	// BOBA is used to pay for the gas fee
 	if st.isBobaFeeTokenSelect {
+		// note that in this case, st.gasPrice = 0 but st.msg.GasPrice() is NOT zero
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.msg.Gas()), st.msg.GasPrice())
 		bobaval = new(big.Int).Mul(ethval, st.bobaPriceRatio)
 		if st.state.GetBobaBalance(st.msg.From()).Cmp(bobaval) < 0 {
@@ -265,12 +269,13 @@ func (st *StateTransition) buyGas() error {
 	st.gas += st.msg.Gas()
 
 	st.initialGas = st.msg.Gas()
-	// Charge Boba token first so contracts can revert if Boba balance is insufficient
+	// Charge BOBA first so contracts can revert if BOBA balance is insufficient
 	if st.isBobaFeeTokenSelect {
 		st.state.SubBobaBalance(st.msg.From(), bobaval)
 	}
-	// ETH is used to pay for the gas fee
-	// If st.gasPrice is zero and isBobaFeeTokenSelect is true, mgval is zero
+	// else, charge ETH as normal (mgval is not zero)
+	// Or, charge zero ETH, since if(isBobaFeeTokenSelect),
+	// then st.gasPrice == 0 and therefore mgval is also zero
 	st.state.SubBalance(st.msg.From(), mgval)
 
 	return nil
@@ -353,7 +358,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	}
 	st.refundGas()
 
-	// Boba Token is used to pay for the gas fee
+	// BOBA is used to pay for the gas fee
 	if st.isBobaFeeTokenSelect {
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
 		bobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
@@ -362,7 +367,9 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 
 	// GasUsed hard fork
 	if st.isGasUpdate {
-		// st.gasPrice is 0 if users use Boba token as the fee token
+		// st.gasPrice is 0 if users chose BOBA as the fee token.
+		// this 'automatically' takes care of adding the
+		// right amount of ETH
 		st.state.AddBalance(evm.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
 	} else {
 		// The L2 Fee is the same as the fee that is charged in the normal geth
@@ -379,7 +386,8 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 func (st *StateTransition) refundGas() {
 	// Apply refund counter, capped to half of the used gas.
 	// Only refund a partial gas
-	// st.gasPrice is 0, so remainnig is 0 no matter what st.gas is
+	// st.gasPrice is 0 if fee token is BOBA, so remaining gas
+	// is 0 no matter what st.gas is
 	var refund uint64
 	if st.isGasUpdate {
 		refund = (st.gasUsed() - st.l2ExtraGas.Uint64()) / 2
@@ -391,15 +399,15 @@ func (st *StateTransition) refundGas() {
 	}
 	st.gas += refund
 
-	// Return ETH for remaining gas, exchanged at the original rate.
-	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
-	st.state.AddBalance(st.msg.From(), remaining)
-
-	// Return BOBA for remainng gas, exchanged at the original rate.
+	// Return BOBA for remaining gas, exchanged at the original rate.
+	// Else, return ETH for remaining gas
 	if st.isBobaFeeTokenSelect {
 		remainingETH := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.msg.GasPrice())
 		remainingBoba := new(big.Int).Mul(remainingETH, st.bobaPriceRatio)
 		st.state.AddBobaBalance(st.msg.From(), remainingBoba)
+	} else {
+		remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
+		st.state.AddBalance(st.msg.From(), remaining)
 	}
 
 	// Also return remaining gas to the block gas counter so it is

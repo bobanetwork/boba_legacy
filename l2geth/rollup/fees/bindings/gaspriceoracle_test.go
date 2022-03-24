@@ -40,7 +40,7 @@ func TestCalculateFee(t *testing.T) {
 
 	// Set the L1 base fee
 	if _, err := gpo.SetL1BaseFee(opts, big.NewInt(1)); err != nil {
-		t.Fatal("cannot set 1l base fee")
+		t.Fatal("cannot set l1 base fee")
 	}
 	sim.Commit()
 
@@ -164,9 +164,9 @@ func TestCalculateFee(t *testing.T) {
 			state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceOracleOwnerSlot, addr.Hash())
 			_, _ = state.Commit(false)
 
-			gasPriceOralceAddress := fees.ReadGasPriceOraclerOwner(state)
-			if gasPriceOralceAddress != addr {
-				t.Fatal("gas price oracle owner addresses mismatch")
+			gasPriceOracleAddress := fees.ReadGasPriceOracleOwner(state)
+			if gasPriceOracleAddress != addr {
+				t.Fatal("gas price oracle owner address mismatch")
 			}
 		})
 	}
