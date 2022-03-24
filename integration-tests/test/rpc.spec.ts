@@ -1,39 +1,33 @@
-import { expectApprox, injectL2Context } from '@eth-optimism/core-utils'
-import { Wallet, BigNumber, Contract, ContractFactory } from 'ethers'
+/* Imports: External */
+import { expectApprox, sleep } from '@eth-optimism/core-utils'
+import { Wallet, BigNumber, Contract, ContractFactory, constants } from 'ethers'
 import { serialize } from '@ethersproject/transactions'
 import { ethers } from 'hardhat'
-import chai, { expect } from 'chai'
-import {
-  sleep,
-  l2Provider,
-  defaultTransactionFactory,
-  fundUser,
-  L2_CHAINID,
-  isLiveNetwork,
-  gasPriceForL2,
-  replicaProvider,
-} from './shared/utils'
-import chaiAsPromised from 'chai-as-promised'
-import { OptimismEnv } from './shared/env'
 import {
   TransactionReceipt,
   TransactionRequest,
 } from '@ethersproject/providers'
-import { solidity } from 'ethereum-waffle'
-import simpleStorageJson from '../artifacts/contracts/SimpleStorage.sol/SimpleStorage.json'
 
-chai.use(chaiAsPromised)
-chai.use(solidity)
+/* Imports: Internal */
+import { expect } from './shared/setup'
+import {
+  defaultTransactionFactory,
+  fundUser,
+  L2_CHAINID,
+  gasPriceForL2,
+  isHardhat,
+  hardhatTest,
+  envConfig,
+  gasPriceOracleWallet,
+} from './shared/utils'
+import { OptimismEnv } from './shared/env'
 
 describe('Basic RPC tests', () => {
   let env: OptimismEnv
   let wallet: Wallet
-  let replicaWallet: Wallet
-
-  const provider = injectL2Context(l2Provider)
-  const l2ReplicaProvider = injectL2Context(replicaProvider)
 
   let Reverter: Contract
+  let ValueContext: Contract
   let revertMessage: string
   let revertingTx: TransactionRequest
   let revertingDeployTx: TransactionRequest
@@ -41,8 +35,6 @@ describe('Basic RPC tests', () => {
   before(async () => {
     env = await OptimismEnv.new()
     wallet = env.l2Wallet
-    replicaWallet = env.l2Wallet_2.connect(env.replicaProvider)
-
     const Factory__Reverter = await ethers.getContractFactory(
       'Reverter',
       wallet
@@ -61,6 +53,12 @@ describe('Basic RPC tests', () => {
     revertingDeployTx = {
       data: Factory__ConstructorReverter.bytecode,
     }
+
+    // Deploy a contract to check msg.value of the call
+    const Factory__ValueContext: ContractFactory =
+      await ethers.getContractFactory('ValueContext', wallet)
+    ValueContext = await Factory__ValueContext.deploy()
+    await ValueContext.deployTransaction.wait()
   })
 
   describe('eth_sendRawTransaction', () => {
@@ -85,7 +83,7 @@ describe('Basic RPC tests', () => {
       }
 
       await expect(
-        provider.sendTransaction(await wallet.signTransaction(tx))
+        env.l2Provider.sendTransaction(await wallet.signTransaction(tx))
       ).to.be.rejectedWith('invalid transaction: invalid sender')
     })
 
@@ -97,7 +95,7 @@ describe('Basic RPC tests', () => {
         chainId: null, // Disables EIP155 transaction signing.
       }
       const signed = await wallet.signTransaction(tx)
-      const response = await provider.sendTransaction(signed)
+      const response = await env.l2Provider.sendTransaction(signed)
 
       expect(response.chainId).to.equal(0)
       const v = response.v
@@ -113,12 +111,14 @@ describe('Basic RPC tests', () => {
         value: ethers.utils.parseEther('0.1'),
       }
 
-      const balanceBefore = await provider.getBalance(env.l2Wallet.address)
+      const balanceBefore = await env.l2Provider.getBalance(
+        env.l2Wallet.address
+      )
       const result = await env.l2Wallet.sendTransaction(tx)
       const receipt = await result.wait()
       expect(receipt.status).to.deep.equal(1)
 
-      const balAfter = await provider.getBalance(env.l2Wallet.address)
+      const balAfter = await env.l2Provider.getBalance(env.l2Wallet.address)
       expect(balAfter.lte(balanceBefore.sub(ethers.utils.parseEther('0.1')))).to
         .be.true
     })
@@ -146,410 +146,428 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('{tag:rpc} should reject a transaction with a low gas limit', async () => {
-      const balance = await env.l2Wallet.getBalance()
+    it('{tag:rpc} should reject a transaction with too low of a fee', async () => {
+      const isHH = await isHardhat()
+      let gasPrice
+      if (isHH) {
+        gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+          gasPriceOracleWallet
+        ).gasPrice()
+        await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+          gasPriceOracleWallet
+        ).setGasPrice(1000)
+      }
+
       const tx = {
         ...defaultTransactionFactory(),
-        gasPrice: await gasPriceForL2(),
-        chainId: await env.l2Wallet.getChainId(),
-        data: ethers.utils.hexlify(123123123123123),
-        value: ethers.utils.parseEther('1'),
+        gasPrice: 1,
       }
-
-      const gasLimit = await env.l2Wallet.estimateGas(tx)
-      tx.gasLimit = gasLimit.toNumber() - 10
 
       await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
-        'invalid transaction: intrinsic gas too low'
+        /gas price too low: 1 wei, use at least tx\.gasPrice = \d+ wei/
       )
-    })
-  })
 
-  describe('eth_call', () => {
-    it('{tag:rpc} should correctly identify call out-of-gas', async () => {
-      await expect(
-        provider.call({
-          ...revertingTx,
-          gasLimit: 1,
+      if (isHH) {
+        // Reset the gas price to its original price
+        await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+          gasPriceOracleWallet
+        ).setGasPrice(gasPrice)
+      }
+    })
+
+    //   it('{tag:rpc} should reject a transaction with too high of a fee', async () => {
+    //     const gasPrice =
+    //       await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+    //         gasPriceOracleWallet
+    //       ).gasPrice()
+    //     const largeGasPrice = gasPrice.mul(10)
+    //     const tx = {
+    //       ...defaultTransactionFactory(),
+    //       gasPrice: largeGasPrice,
+    //     }
+    //     await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
+    //       `gas price too high: ${largeGasPrice.toString()} wei, use at most ` +
+    //         `tx.gasPrice = ${gasPrice.toString()} wei`
+    //     )
+    //   })
+    // })
+
+    describe('eth_call', () => {
+      it('{tag:rpc} should correctly identify call out-of-gas', async () => {
+        await expect(
+          env.l2Provider.call({
+            ...revertingTx,
+            gasLimit: 1,
+          })
+        ).to.be.rejectedWith('out of gas')
+      })
+
+      it('{tag:rpc} should correctly return solidity revert data from a call', async () => {
+        await expect(env.l2Provider.call(revertingTx)).to.be.revertedWith(
+          revertMessage
+        )
+      })
+
+      it('{tag:rpc} should produce error when called from ethers', async () => {
+        await expect(Reverter.doRevert()).to.be.revertedWith(revertMessage)
+      })
+
+      it('{tag:rpc} should correctly return revert data from contract creation', async () => {
+        await expect(env.l2Provider.call(revertingDeployTx)).to.be.revertedWith(
+          revertMessage
+        )
+      })
+
+      it('{tag:rpc} should correctly identify contract creation out of gas', async () => {
+        await expect(
+          env.l2Provider.call({
+            ...revertingDeployTx,
+            gasLimit: 1,
+          })
+        ).to.be.rejectedWith('out of gas')
+      })
+
+      it('{tag:rpc} should allow eth_calls with nonzero value', async () => {
+        // Fund account to call from
+        const from = wallet.address
+        const value = 15
+        await fundUser(env.messenger, value, from)
+
+        // Do the call and check msg.value
+        const data = ValueContext.interface.encodeFunctionData('getCallValue')
+        const res = await env.l2Provider.call({
+          to: ValueContext.address,
+          from,
+          data,
+          value,
         })
-      ).to.be.rejectedWith('out of gas')
-    })
 
-    it('{tag:rpc} should correctly return solidity revert data from a call', async () => {
-      await expect(provider.call(revertingTx)).to.be.revertedWith(revertMessage)
-    })
+        expect(res).to.eq(BigNumber.from(value))
+      })
 
-    it('{tag:rpc} should produce error when called from ethers', async () => {
-      await expect(Reverter.doRevert()).to.be.revertedWith(revertMessage)
-    })
-
-    it('{tag:rpc} should correctly return revert data from contract creation', async () => {
-      await expect(provider.call(revertingDeployTx)).to.be.revertedWith(
-        revertMessage
-      )
-    })
-
-    it('{tag:rpc} should correctly identify contract creation out of gas', async () => {
-      await expect(
-        provider.call({
-          ...revertingDeployTx,
-          gasLimit: 1,
+      // https://github.com/ethereum-optimism/optimism/issues/1998
+      it('{tag:rpc} should use address(0) as the default "from" value', async () => {
+        // Do the call and check msg.sender
+        const data = ValueContext.interface.encodeFunctionData('getCaller')
+        const res = await env.l2Provider.call({
+          to: ValueContext.address,
+          data,
         })
-      ).to.be.rejectedWith('out of gas')
-    })
 
-    it('{tag:rpc} should allow eth_calls with nonzero value', async () => {
-      // Deploy a contract to check msg.value of the call
-      const Factory__ValueContext: ContractFactory =
-        await ethers.getContractFactory('ValueContext', wallet)
-      const ValueContext: Contract = await Factory__ValueContext.deploy()
-      await ValueContext.deployTransaction.wait()
+        const [paddedRes] = ValueContext.interface.decodeFunctionResult(
+          'getCaller',
+          res
+        )
 
-      // Fund account to call from
-      const from = wallet.address
-      const value = 15
-      await fundUser(env.watcher, env.l1Bridge, value, from)
-
-      // Do the call and check msg.value
-      const data = ValueContext.interface.encodeFunctionData('getCallValue')
-      const res = await provider.call({
-        to: ValueContext.address,
-        from,
-        data,
-        value,
+        expect(paddedRes).to.eq(constants.AddressZero)
       })
 
-      expect(res).to.eq(BigNumber.from(value))
-    })
-  })
+      it('{tag:rpc} should correctly use the "from" value', async () => {
+        const from = wallet.address
 
-  describe('eth_getTransactionReceipt', () => {
-    it('{tag:rpc} correctly exposes revert data for contract calls', async () => {
-      const req: TransactionRequest = {
-        ...revertingTx,
-        gasLimit: 8_000_000, // override gas estimation
-      }
+        // Do the call and check msg.sender
+        const data = ValueContext.interface.encodeFunctionData('getCaller')
+        const res = await env.l2Provider.call({
+          to: ValueContext.address,
+          from,
+          data,
+        })
 
-      const tx = await wallet.sendTransaction(req)
-
-      let errored = false
-      try {
-        await tx.wait()
-      } catch (e) {
-        errored = true
-      }
-      expect(errored).to.be.true
-
-      const receipt: TransactionReceipt = await provider.getTransactionReceipt(
-        tx.hash
-      )
-
-      expect(receipt.status).to.eq(0)
-    })
-
-    it('{tag:rpc} correctly exposes revert data for contract creations', async () => {
-      const req: TransactionRequest = {
-        ...revertingDeployTx,
-        gasLimit: 8_000_000, // override gas estimation
-      }
-
-      const tx = await wallet.sendTransaction(req)
-
-      let errored = false
-      try {
-        await tx.wait()
-      } catch (e) {
-        errored = true
-      }
-      expect(errored).to.be.true
-
-      const receipt: TransactionReceipt = await provider.getTransactionReceipt(
-        tx.hash
-      )
-
-      expect(receipt.status).to.eq(0)
-    })
-
-    // Optimistic Ethereum special fields on the receipt
-    it('{tag:rpc} includes L1 gas price and L1 gas used', async () => {
-      const tx = await env.l2Wallet.populateTransaction({
-        to: env.l2Wallet.address,
-        gasPrice: await gasPriceForL2(),
+        const [paddedRes] = ValueContext.interface.decodeFunctionResult(
+          'getCaller',
+          res
+        )
+        expect(paddedRes).to.eq(from)
       })
 
-      const raw = serialize({
-        nonce: parseInt(tx.nonce.toString(), 10),
-        to: tx.to,
-        gasLimit: tx.gasLimit,
-        gasPrice: tx.gasPrice,
-        type: tx.type,
-        data: tx.data,
-      })
-
-      const l1Fee = await env.gasPriceOracle.getL1Fee(raw)
-      const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-      const l1GasUsed = await env.gasPriceOracle.getL1GasUsed(raw)
-      const scalar = await env.gasPriceOracle.scalar()
-      const decimals = await env.gasPriceOracle.decimals()
-
-      const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
-
-      const res = await env.l2Wallet.sendTransaction(tx)
-      await res.wait()
-
-      const json = await env.l2Provider.send('eth_getTransactionReceipt', [
-        res.hash,
-      ])
-
-      expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
-      expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
-      expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
-      expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
-    })
-  })
-
-  describe('eth_getTransactionByHash', () => {
-    it('{tag:rpc} should be able to get all relevant l1/l2 transaction data', async () => {
-      const tx = defaultTransactionFactory()
-      tx.gasPrice = await gasPriceForL2()
-      const result = await wallet.sendTransaction(tx)
-      await result.wait()
-
-      const transaction = (await provider.getTransaction(result.hash)) as any
-      expect(transaction.queueOrigin).to.equal('sequencer')
-      expect(transaction.transactionIndex).to.be.eq(0)
-      expect(transaction.gasLimit).to.be.deep.eq(BigNumber.from(tx.gasLimit))
-    })
-  })
-
-  describe('eth_getBlockByHash', () => {
-    it('{tag:rpc} should return the block and all included transactions', async () => {
-      // Send a transaction and wait for it to be mined.
-      const tx = defaultTransactionFactory()
-      tx.gasPrice = await gasPriceForL2()
-      const result = await wallet.sendTransaction(tx)
-      const receipt = await result.wait()
-
-      const block = (await provider.getBlockWithTransactions(
-        receipt.blockHash
-      )) as any
-
-      expect(block.number).to.not.equal(0)
-      expect(typeof block.stateRoot).to.equal('string')
-      expect(block.transactions.length).to.equal(1)
-      expect(block.transactions[0].queueOrigin).to.equal('sequencer')
-      expect(block.transactions[0].l1TxOrigin).to.equal(null)
-    })
-  })
-
-  describe('eth_getBlockByNumber', () => {
-    // There was a bug that causes transactions to be reingested over
-    // and over again only when a single transaction was in the
-    // canonical transaction chain. This test catches this by
-    // querying for the latest block and then waits and then queries
-    // the latest block again and then asserts that they are the same.
-    //
-    // Needs to be skipped on Prod networks because this test doesn't work when
-    // other people are sending transactions to the Sequencer at the same time
-    // as this test is running.
-    it('{tag:rpc} should return the same result when new transactions are not applied', async function () {
-      if (isLiveNetwork()) {
-        this.skip()
-      }
-
-      // Get latest block once to start.
-      const prev = await provider.getBlockWithTransactions('latest')
-      // set wait to null to allow a deep object comparison
-      prev.transactions[0].wait = null
-
-      // Over ten seconds, repeatedly check the latest block to make sure nothing has changed.
-      for (let i = 0; i < 5; i++) {
-        const latest = await provider.getBlockWithTransactions('latest')
-        latest.transactions[0].wait = null
-        // Check each key of the transaction individually
-        // for easy debugging if one field changes
-        for (const [key, value] of Object.entries(latest.transactions[0])) {
-          expect(value).to.deep.equal(
-            prev.transactions[0][key],
-            `mismatch ${key}`
-          )
+      it('{tag:rpc} should be deterministic', async () => {
+        let res = await ValueContext.callStatic.getSelfBalance()
+        for (let i = 0; i < 10; i++) {
+          const next = await ValueContext.callStatic.getSelfBalance()
+          expect(res.toNumber()).to.deep.eq(next.toNumber())
+          res = next
         }
-        expect(latest).to.deep.equal(prev)
-        await sleep(2000)
-      }
+      })
     })
-  })
 
-  describe('eth_getBalance', () => {
-    it('{tag:rpc} should get the OVM_ETH balance', async () => {
-      const rpcBalance = await provider.getBalance(env.l2Wallet.address)
-      const contractBalance = await env.ovmEth.balanceOf(env.l2Wallet.address)
-      expect(rpcBalance).to.be.deep.eq(contractBalance)
+    describe('eth_getTransactionReceipt', () => {
+      it('{tag:rpc} correctly exposes revert data for contract calls', async () => {
+        const req: TransactionRequest = {
+          ...revertingTx,
+          gasLimit: 8_000_000, // override gas estimation
+        }
+
+        const tx = await wallet.sendTransaction(req)
+
+        let errored = false
+        try {
+          await tx.wait()
+        } catch (e) {
+          errored = true
+        }
+        expect(errored).to.be.true
+
+        const receipt: TransactionReceipt =
+          await env.l2Provider.getTransactionReceipt(tx.hash)
+
+        expect(receipt.status).to.eq(0)
+      })
+
+      it('{tag:rpc} correctly exposes revert data for contract creations', async () => {
+        const req: TransactionRequest = {
+          ...revertingDeployTx,
+          gasLimit: 8_000_000, // override gas estimation
+        }
+
+        const tx = await wallet.sendTransaction(req)
+
+        let errored = false
+        try {
+          await tx.wait()
+        } catch (e) {
+          errored = true
+        }
+        expect(errored).to.be.true
+
+        const receipt: TransactionReceipt =
+          await env.l2Provider.getTransactionReceipt(tx.hash)
+
+        expect(receipt.status).to.eq(0)
+      })
+
+      // Optimism special fields on the receipt
+      it('{tag:rpc} includes L1 gas price and L1 gas used', async () => {
+        const tx = await env.l2Wallet.populateTransaction({
+          to: env.l2Wallet.address,
+          gasPrice: await gasPriceForL2(),
+        })
+
+        const raw = serialize({
+          nonce: parseInt(tx.nonce.toString(), 10),
+          to: tx.to,
+          gasLimit: tx.gasLimit,
+          gasPrice: tx.gasPrice,
+          type: tx.type,
+          data: tx.data,
+        })
+
+        const l1Fee =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).getL1Fee(raw)
+        const l1GasPrice =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).l1BaseFee()
+        const l1GasUsed =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).getL1GasUsed(raw)
+        const scalar =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).scalar()
+        const decimals =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).decimals()
+
+        const scaled = scalar.toNumber() / 10 ** decimals.toNumber()
+
+        const res = await env.l2Wallet.sendTransaction(tx)
+        await res.wait()
+
+        const json = await env.l2Provider.send('eth_getTransactionReceipt', [
+          res.hash,
+        ])
+
+        expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
+        expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
+        expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
+        expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
+      })
     })
-  })
 
-  describe('eth_chainId', () => {
-    it('{tag:rpc} should get the correct chainid', async () => {
-      const { chainId } = await provider.getNetwork()
-      expect(chainId).to.be.eq(L2_CHAINID)
+    describe('eth_getTransactionByHash', () => {
+      it('{tag:rpc} should be able to get all relevant l1/l2 transaction data', async () => {
+        const tx = defaultTransactionFactory()
+        tx.gasPrice = await gasPriceForL2()
+        const result = await wallet.sendTransaction(tx)
+        await result.wait()
+
+        const transaction = (await env.l2Provider.getTransaction(
+          result.hash
+        )) as any
+        expect(transaction.queueOrigin).to.equal('sequencer')
+        expect(transaction.transactionIndex).to.be.eq(0)
+        expect(transaction.gasLimit).to.be.deep.eq(BigNumber.from(tx.gasLimit))
+      })
     })
-  })
 
-  describe('eth_estimateGas', () => {
-    it('{tag:rpc} gas estimation is deterministic', async () => {
-      let lastEstimate: BigNumber
-      for (let i = 0; i < 10; i++) {
-        const estimate = await l2Provider.estimateGas({
+    describe('eth_getBlockByHash', () => {
+      it('{tag:rpc} should return the block and all included transactions', async () => {
+        // Send a transaction and wait for it to be mined.
+        const tx = defaultTransactionFactory()
+        tx.gasPrice = await gasPriceForL2()
+        const result = await wallet.sendTransaction(tx)
+        const receipt = await result.wait()
+
+        const block = (await env.l2Provider.getBlockWithTransactions(
+          receipt.blockHash
+        )) as any
+
+        expect(block.number).to.not.equal(0)
+        expect(typeof block.stateRoot).to.equal('string')
+        expect(block.transactions.length).to.equal(1)
+        expect(block.transactions[0].queueOrigin).to.equal('sequencer')
+        expect(block.transactions[0].l1TxOrigin).to.equal(null)
+      })
+    })
+
+    describe('eth_getBlockByNumber', () => {
+      // There was a bug that causes transactions to be reingested over
+      // and over again only when a single transaction was in the
+      // canonical transaction chain. This test catches this by
+      // querying for the latest block and then waits and then queries
+      // the latest block again and then asserts that they are the same.
+      //
+      // Needs to be skipped on Prod networks because this test doesn't work when
+      // other people are sending transactions to the Sequencer at the same time
+      // as this test is running.
+      hardhatTest(
+        '{tag:rpc} should return the same result when new transactions are not applied',
+        async () => {
+          // Get latest block once to start.
+          const prev = await env.l2Provider.getBlockWithTransactions('latest')
+          // set wait to null to allow a deep object comparison
+          prev.transactions[0].wait = null
+
+          // Over ten seconds, repeatedly check the latest block to make sure nothing has changed.
+          for (let i = 0; i < 5; i++) {
+            const latest = await env.l2Provider.getBlockWithTransactions(
+              'latest'
+            )
+            latest.transactions[0].wait = null
+            // Check each key of the transaction individually
+            // for easy debugging if one field changes
+            for (const [key, value] of Object.entries(latest.transactions[0])) {
+              expect(value).to.deep.equal(
+                prev.transactions[0][key],
+                `mismatch ${key}`
+              )
+            }
+            expect(latest).to.deep.equal(prev)
+            await sleep(2000)
+          }
+        }
+      )
+    })
+
+    describe('eth_getBalance', () => {
+      it('{tag:rpc} should get the OVM_ETH balance', async () => {
+        const rpcBalance = await env.l2Provider.getBalance(env.l2Wallet.address)
+        const contractBalance =
+          await env.messenger.contracts.l2.OVM_ETH.balanceOf(
+            env.l2Wallet.address
+          )
+        expect(rpcBalance).to.be.deep.eq(contractBalance)
+      })
+    })
+
+    describe('eth_chainId', () => {
+      it('{tag:rpc} should get the correct chainid', async () => {
+        const { chainId } = await env.l2Provider.getNetwork()
+        expect(chainId).to.be.eq(L2_CHAINID)
+      })
+    })
+
+    describe('eth_estimateGas', () => {
+      it('{tag:rpc} simple send gas estimation is deterministic', async () => {
+        let lastEstimate: BigNumber
+        for (let i = 0; i < 10; i++) {
+          const estimate = await env.l2Provider.estimateGas({
+            to: defaultTransactionFactory().to,
+            value: 0,
+          })
+
+          if (i > 0) {
+            expect(lastEstimate).to.be.eq(estimate)
+          }
+
+          lastEstimate = estimate
+        }
+      })
+
+      it('{tag:rpc} deterministic gas estimation for evm execution', async () => {
+        let res = await ValueContext.estimateGas.getSelfBalance()
+        for (let i = 0; i < 10; i++) {
+          const next = await ValueContext.estimateGas.getSelfBalance()
+          expect(res.toNumber()).to.deep.eq(next.toNumber())
+          res = next
+        }
+      })
+
+      it('{tag:rpc} should return a gas estimate for txs with empty data', async () => {
+        const estimate = await env.l2Provider.estimateGas({
           to: defaultTransactionFactory().to,
           value: 0,
         })
-
-        if (i > 0) {
-          expect(lastEstimate).to.be.eq(estimate)
-        }
-
-        lastEstimate = estimate
-      }
-    })
-
-    it('{tag:rpc} should return a gas estimate for txs with empty data', async () => {
-      const estimate = await l2Provider.estimateGas({
-        to: defaultTransactionFactory().to,
-        value: 0,
+        // Expect gas to be less than or equal to the target plus 1%
+        // Normal setting is 21000
+        expectApprox(estimate, 26757, { percentUpperDeviation: 1 })
       })
-      // Expect gas to be less than or equal to the target plus 1%
-      expectApprox(estimate, 21000, { percentUpperDeviation: 1 })
+
+      it('{tag:rpc} should fail for a reverting call transaction', async () => {
+        await expect(env.l2Provider.send('eth_estimateGas', [revertingTx])).to
+          .be.reverted
+      })
+
+      it('{tag:rpc} should fail for a reverting deploy transaction', async () => {
+        await expect(
+          env.l2Provider.send('eth_estimateGas', [revertingDeployTx])
+        ).to.be.reverted
+      })
     })
 
-    it('{tag:rpc} should fail for a reverting call transaction', async () => {
-      await expect(provider.send('eth_estimateGas', [revertingTx])).to.be
-        .reverted
-    })
+    describe('debug_traceTransaction', () => {
+      before(async function () {
+        if (!envConfig.RUN_DEBUG_TRACE_TESTS) {
+          this.skip()
+        }
+      })
 
-    it('{tag:rpc} should fail for a reverting deploy transaction', async () => {
-      await expect(provider.send('eth_estimateGas', [revertingDeployTx])).to.be
-        .reverted
-    })
-  })
-
-  describe('debug_traceTransaction', () => {
-    it('{tag:rpc} should match debug_traceBlock', async () => {
-      const storage = new ContractFactory(
-        simpleStorageJson.abi,
-        simpleStorageJson.bytecode,
-        env.l2Wallet
-      )
-      const tx = (await storage.deploy()).deployTransaction
-      const receipt = await tx.wait()
-
-      const txTrace = await provider.send('debug_traceTransaction', [
-        receipt.transactionHash,
-      ])
-      const blockTrace = await provider.send('debug_traceBlockByHash', [
-        receipt.blockHash,
-      ])
-      expect(txTrace).to.deep.equal(blockTrace[0].result)
-    })
-  })
-
-  describe('rollup_gasPrices', () => {
-    it('{tag:rpc} should return the L1 and L2 gas prices', async () => {
-      const result = await provider.send('rollup_gasPrices', [])
-      const l1GasPrice = await env.gasPriceOracle.l1BaseFee()
-      const l2GasPrice = await env.gasPriceOracle.gasPrice()
-
-      expect(BigNumber.from(result.l1GasPrice)).to.deep.eq(l1GasPrice)
-      expect(BigNumber.from(result.l2GasPrice)).to.deep.eq(l2GasPrice)
-    })
-  })
-
-  describe('Replica RPC forward test', () => {
-    it('{tag:rpc} should correctly process a valid transaction', async () => {
-      const tx = defaultTransactionFactory()
-      tx.gasPrice = await gasPriceForL2()
-      const nonce = await replicaWallet.getTransactionCount()
-      const result = await replicaWallet.sendTransaction(tx)
-      await result.wait()
-
-      expect(result.from).to.equal(replicaWallet.address)
-      expect(result.nonce).to.equal(nonce)
-      expect(result.gasLimit.toNumber()).to.equal(tx.gasLimit)
-      expect(result.gasPrice.toNumber()).to.equal(tx.gasPrice)
-      expect(result.data).to.equal(tx.data)
-    })
-
-    it('{tag:rpc} should not accept a transaction with the wrong chain ID', async () => {
-      const tx = {
-        ...defaultTransactionFactory(),
-        gasPrice: await gasPriceForL2(),
-        chainId: (await replicaWallet.getChainId()) + 1,
-      }
-
-      await expect(
-        l2ReplicaProvider.sendTransaction(
-          await replicaWallet.signTransaction(tx)
+      it('{tag:rpc} should match debug_traceBlock', async () => {
+        const storage = await ethers.getContractFactory(
+          'SimpleStorage',
+          env.l2Wallet
         )
-      ).to.be.rejectedWith('invalid transaction: invalid sender')
+        const tx = (await storage.deploy()).deployTransaction
+        const receipt = await tx.wait()
+
+        const txTrace = await env.l2Provider.send('debug_traceTransaction', [
+          receipt.transactionHash,
+        ])
+        const blockTrace = await env.l2Provider.send('debug_traceBlockByHash', [
+          receipt.blockHash,
+        ])
+        expect(txTrace).to.deep.equal(blockTrace[0].result)
+      })
     })
 
-    it('{tag:rpc} should accept a transaction without a chain ID', async () => {
-      const tx = {
-        ...defaultTransactionFactory(),
-        nonce: await replicaWallet.getTransactionCount(),
-        gasPrice: await gasPriceForL2(),
-        chainId: null, // Disables EIP155 transaction signing.
-      }
-      const signed = await replicaWallet.signTransaction(tx)
-      const response = await l2ReplicaProvider.sendTransaction(signed)
-      await response.wait()
-
-      expect(response.chainId).to.equal(0)
-      const v = response.v
-      expect(v === 27 || v === 28).to.be.true
-    })
-
-    it('{tag:rpc} should accept a transaction with a value', async () => {
-      const tx = {
-        ...defaultTransactionFactory(),
-        gasPrice: await gasPriceForL2(),
-        chainId: await replicaWallet.getChainId(),
-        data: '0x',
-        value: ethers.utils.parseEther('0.1'),
-      }
-
-      const balanceBefore = await l2ReplicaProvider.getBalance(
-        replicaWallet.address
-      )
-      const result = await replicaWallet.sendTransaction(tx)
-      const receipt = await result.wait()
-      expect(receipt.status).to.deep.equal(1)
-
-      const balAfter = await l2ReplicaProvider.getBalance(replicaWallet.address)
-      expect(balAfter.lte(balanceBefore.sub(ethers.utils.parseEther('0.1')))).to
-        .be.true
-    })
-
-    it('{tag:rpc} should reject a transaction with higher value than user balance', async () => {
-      const balance = await replicaWallet.getBalance()
-      const tx = {
-        ...defaultTransactionFactory(),
-        gasPrice: await gasPriceForL2(),
-        chainId: await replicaWallet.getChainId(),
-        data: '0x',
-        value: balance.add(ethers.utils.parseEther('1')),
-      }
-
-      await expect(replicaWallet.sendTransaction(tx)).to.be.rejectedWith(
-        'invalid transaction: insufficient funds for gas * price + value'
-      )
-    })
-
-    it('{tag:rpc} should correctly report OOG for contract creations', async () => {
-      const factory = await ethers.getContractFactory('TestOOGInConstructor')
-
-      await expect(factory.connect(replicaWallet).deploy()).to.be.rejectedWith(
-        'gas required exceeds allowance'
-      )
+    describe('rollup_gasPrices', () => {
+      it('{tag:rpc} should return the L1 and L2 gas prices', async () => {
+        const result = await env.l2Provider.send('rollup_gasPrices', [])
+        const l1GasPrice =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).l1BaseFee()
+        const l2GasPrice =
+          await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+            gasPriceOracleWallet
+          ).gasPrice()
+        expect(BigNumber.from(result.l1GasPrice)).to.deep.eq(l1GasPrice)
+        expect(BigNumber.from(result.l2GasPrice)).to.deep.eq(l2GasPrice)
+      })
     })
   })
 })
