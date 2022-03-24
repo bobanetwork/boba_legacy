@@ -1,5 +1,5 @@
 {
-  "name": "@bobanetwork/contracts",
+  "name": "@bobanetwork/boba",
   "version": "0.0.1",
   "description": "Smart contracts dedicated to Boba",
   "files": [
@@ -8,7 +8,7 @@
     "!/mocks/**/*"
   ],
   "repository": {
-    "url": "git://github.com/bobanetwork/contracts.git",
+    "url": "git://github.com/bobanetwork/boba.git",
     "type": "git"
   },
   "license": "MIT",
