@@ -261,8 +261,8 @@ func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int
 	return l1GasPrice.Big(), overhead.Big(), scaled, l2GasPrice.Big()
 }
 
-// ReadGasPriceOraclerOwner reads gas oracle owner address
-func ReadGasPriceOraclerOwner(state StateDB) common.Address {
+// ReadGasPriceOracleOwner reads gas oracle owner address
+func ReadGasPriceOracleOwner(state StateDB) common.Address {
 	gasPriceOracleOwner := state.GetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceOracleOwnerSlot)
 	return common.BigToAddress(gasPriceOracleOwner.Big())
 }
