@@ -1,0 +1,12 @@
+.idea/
+node_modules/
+.npmrc
+artificats/
+build/
+dist/
+*.log
+.vs/
+.vscode/
+.aws-sam/
+cache/
+.env

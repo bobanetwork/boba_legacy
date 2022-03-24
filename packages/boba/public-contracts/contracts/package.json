@@ -1,0 +1,31 @@
+{
+  "name": "@bobanetwork/contracts",
+  "version": "0.0.1",
+  "description": "Smart contracts dedicated to Boba",
+  "files": [
+    "**/*.sol",
+    "/build/contracts/*.json",
+    "!/mocks/**/*"
+  ],
+  "repository": {
+    "url": "git://github.com/bobanetwork/contracts.git",
+    "type": "git"
+  },
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "homepage": "http://boba.network/",
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "boba",
+    "turing"
+  ]
+}
