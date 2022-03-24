@@ -12,6 +12,11 @@ To enable the withdraw option, simply -
 
 To withdraw to L1-
 - Allow the owner to approve the L2NFTBridge for the token
-- call withdraw() on L2NFTBridge with the params - ERC721Address and tokenId
+- call withdraw() on L2NFTBridge with the params - ERC721Address and tokenId (see below note below)
 
 For exact representation of the following please refer to - `src/bridgeToL1.js`
+
+*Note: some special NFTs require the call of `withdrawWithExtraData()` instead, to transport underivable metadata to the other layer along with the bridging.*
+*In such case, the recommendation is to check for the metadata form of the ERC721 once, and if it is of the general form (tokenURI = baseURI + tokenId), call the withdraw() method for all instance of the contract*
+*otherwise, the marketplace can default to calling `withdrawWithExtraData()` for every bridging instead (which covers all tokens) but will not be gas-efficient*
+

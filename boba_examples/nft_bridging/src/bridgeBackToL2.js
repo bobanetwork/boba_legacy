@@ -12,8 +12,7 @@ const bridgeBackToL2 = async (L1StandardERC721, L1NFTBridge, tokenId) => {
     const depositTx = await L1NFTBridge.depositNFT(
       L1StandardERC721.address, // L1NFT address
       tokenId, // tokenId
-      9999999, // sample l1 gas for the xDomain tx
-      utils.formatBytes32String('') // data
+      9999999 // sample l1 gas for the xDomain tx
     )
     await depositTx.wait()
     return depositTx.hash
