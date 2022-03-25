@@ -1,6 +1,7 @@
 /* Imports: External */
 import { Wallet } from 'ethers'
 import { sleep } from '@eth-optimism/core-utils'
+import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
 import {
   CrossChainMessenger,
@@ -49,6 +50,11 @@ interface MessageRelayerOptions {
    * Metrics object to use. Defaults to no metrics.
    */
   metrics?: Metrics
+
+  // filter
+  filterEndpoint?: string
+
+  filterPollingInterval?: number
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -66,12 +72,18 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       getLogsInterval: {
         default: 2000,
       },
+      filterPollingInterval: {
+        default: 60000,
+      },
     })
   }
 
   private state: {
     messenger: CrossChainMessenger
     highestCheckedL2Tx: number
+    //filter
+    filter: Array<any>
+    lastFilterPollingTimestamp: number
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -79,6 +91,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       relayGasLimit: this.options.relayGasLimit,
       fromL2TransactionIndex: this.options.fromL2TransactionIndex,
       pollingInterval: this.options.pollingInterval,
+      filterPollingInterval: this.options.filterPollingInterval,
       getLogsInterval: this.options.getLogsInterval,
     })
 
@@ -91,11 +104,17 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     })
 
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
+
+    // filter
+    this.state.filter = []
+    this.state.lastFilterPollingTimestamp = 0
   }
 
   protected async _start(): Promise<void> {
     while (this.running) {
       await sleep(this.options.pollingInterval)
+
+      await this._getFilter()
 
       try {
         // Loop strategy is as follows:
@@ -162,6 +181,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           // each message to L1.
           for (const message of messages) {
             try {
+              console.log(message)
+              // filter out messages not meant for this relayer
+              if (this.state.filter.includes(message.target)) {
+                this.logger.info('Message not intended for target, skipping.')
+                continue
+              }
+
               const tx = await this.state.messenger.finalizeMessage(message)
               this.logger.info(`relayer sent tx: ${tx.hash}`)
             } catch (err) {
@@ -184,6 +210,33 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           code: err.code,
         })
       }
+    }
+  }
+
+  private async _getFilter(): Promise<void> {
+    try {
+      if (this.options.filterEndpoint) {
+        if (
+          this.state.lastFilterPollingTimestamp === 0 ||
+          new Date().getTime() >
+            this.state.lastFilterPollingTimestamp +
+              this.options.filterPollingInterval
+        ) {
+          const response = await fetch(this.options.filterEndpoint)
+          const filter: any = await response.json()
+
+          // export L1LIQPOOL=$(echo $ADDRESSES | jq -r '.L1LiquidityPool')
+          // export L1M=$(echo $ADDRESSES | jq -r '.L1Message')
+          // echo '["'$L1LIQPOOL'", "'$L1M'"]' > dist/dumps/whitelist.json
+          const filterSelect = [filter.Proxy__L1LiquidityPool, filter.L1Message]
+
+          this.state.lastFilterPollingTimestamp = new Date().getTime()
+          this.state.filter = filterSelect
+          this.logger.info('Found the filter', { filterSelect })
+        }
+      }
+    } catch {
+      this.logger.error('CRITICAL ERROR: Failed to fetch the Filter')
     }
   }
 }

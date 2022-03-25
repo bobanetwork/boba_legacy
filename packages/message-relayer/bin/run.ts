@@ -63,6 +63,12 @@ const main = async () => {
     'from-l2-transaction-index',
     parseInt(env.FROM_L2_TRANSACTION_INDEX, 10) || 0
   )
+  const FILTER_ENDPOINT =
+    config.str('filter-endpoint', env.FILTER_ENDPOINT) || ''
+  const FILTER_POLLING_INTERVAL = config.uint(
+    'filter-polling-interval',
+    parseInt(env.FILTER_POLLING_INTERVAL, 10) || 60000
+  )
 
   if (!ADDRESS_MANAGER_ADDRESS) {
     throw new Error('Must pass ADDRESS_MANAGER_ADDRESS')
@@ -101,6 +107,8 @@ const main = async () => {
     pollingInterval: POLLING_INTERVAL,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
+    filterEndpoint: FILTER_ENDPOINT,
+    filterPollingInterval: FILTER_POLLING_INTERVAL,
   })
 
   await service.start()
