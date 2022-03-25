@@ -1,25 +1,52 @@
+/*
+Copyright 2019-present OmiseGO Pte Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import BN from 'bignumber.js';
 
-import Button from 'components/button/Button';
-
-import { approveERC20, depositL1LP } from 'actions/networkAction';
 import { closeModal, openAlert, openError, openModal } from 'actions/uiAction';
-
-import { selectFastDepositCost, selectL2FeeBalance, selectL2FeeRate, selectL2FeeRateN, selectL2LPBalanceString, selectL2LPLiquidity, selectL2LPPendingString } from 'selectors/balanceSelector';
-
-import { logAmount } from 'util/amountConvert';
-import networkService from 'services/networkService';
-import { fetchFastDepositCost, fetchL1FeeBalance, fetchL2FeeRateN, fetchL2LPBalance, fetchL2LPLiquidity, fetchL2LPPending, fetchL2TotalFeeRate } from 'actions/balanceAction';
-import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
-import { selectLoading } from 'selectors/loadingSelector';
+import { approveERC20, depositL1LP } from 'actions/networkAction';
+import {
+  fetchFastDepositCost,
+  fetchL1FeeBalance,
+  fetchL2FeeRateN,
+  fetchL2LPBalance,
+  fetchL2LPLiquidity,
+  fetchL2LPPending,
+  fetchL2TotalFeeRate
+} from 'actions/balanceAction';
 import { resetToken } from 'actions/bridgeAction';
 
-/*
-Transfer Fast Deposit supports multiple tokens
-*/
+import {
+  selectFastDepositCost,
+  selectL1FeeBalance,
+  selectL2FeeBalance,
+  selectL2FeeRateN,
+  selectL2LPBalanceString,
+  selectL2LPLiquidity,
+  selectL2LPPendingString
+} from 'selectors/balanceSelector';
+import { selectLoading } from 'selectors/loadingSelector';
+import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
+
+import Button from 'components/button/Button';
+
+import networkService from 'services/networkService';
+
+import { logAmount } from 'util/amountConvert';
 
 function TransferFastDeposit({
   token
@@ -36,18 +63,18 @@ function TransferFastDeposit({
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
-  const feeRate = useSelector(selectL2FeeRate)
   const feeRateN = useSelector(selectL2FeeRateN)
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
-  const approvalLoading = useSelector(selectLoading([ 'APPROVE/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
-  const feeBalance = useSelector(selectL2FeeBalance)
+  const feeBalance = useSelector(selectL1FeeBalance)
   const lpUnits = logAmount(LPBalance, token.decimals)
 
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
+  console.log(['DEPOSIT COST',cost])
+  console.log(['DEPOSIT FEEBALANCE',feeBalance])
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
   useEffect(() => {
@@ -80,20 +107,25 @@ function TransferFastDeposit({
     const maxValue = logAmount(token.balance, token.decimals);
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(maxValue))
-
+    console.group(['VALIDATE'])
     if (tooSmall || tooBig) {
+      console.log(`SMALL & BIG`)
       setValidValue(false)
     } else if (token.symbol === 'ETH' && (Number(cost) + Number(token.amount)) > Number(feeBalance)) {
       //insufficient ETH to cover the ETH amount plus gas
+      console.log(`INSUF ETH for amount + gas`)
       setValidValue(false)
     } else if ((Number(cost) > Number(feeBalance))) {
+      console.log(`INSUF ETH for gas`)
       //insufficient ETH to pay gas
       setValidValue(false)
     } else if (Number(LPRatio) < 0.1) {
       //not enough balance/liquidity ratio
       //we always want some balance for unstaking
       setValidValue(false)
+      console.log(`B/L ratio is less`);
     } else if (Number(token.amount) > Number(balanceSubPending) * 0.9) {
+      console.log(`NOT enough absolute balance`);
       //not enough absolute balance
       //we don't want one large bridge to wipe out the entire balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
@@ -104,6 +136,7 @@ function TransferFastDeposit({
       //Whew, finally!
       setValidValue(true)
     }
+    console.groupEnd(['VALIDATE'])
 
   }, [ token, setValidValue, cost, LPRatio, balanceSubPending, feeBalance, ])
 

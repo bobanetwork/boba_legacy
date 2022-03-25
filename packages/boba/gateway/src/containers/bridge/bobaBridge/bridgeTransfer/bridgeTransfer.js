@@ -1,3 +1,17 @@
+/*
+Copyright 2019-present OmiseGO Pte Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
 import { Box, Typography } from '@mui/material';
 import { setBridgeType, setToken } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
@@ -6,16 +20,14 @@ import { isEqual } from 'lodash';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector';
-import { selectBridgeType, selectTokens } from 'selectors/bridgeSelector';
+import { selectBridgeTokens, selectBridgeType } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
 import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './bridgeTransfer.styles';
+import Deposit from './deposit/Deposit';
+import Exit from './exit/Exit';
 import BridgeFee from './fee/bridgeFee';
 import TokenInput from './tokenInput/TokenInput';
-import TransferExit from './transferExit';
-import TransferFastExit from './transferFastExit';
-import TransferDeposit from './transferDeposit';
-import TransferFastDeposit from './transferFastDeposit';
 
 
 function BridgeTransfer() {
@@ -23,7 +35,7 @@ function BridgeTransfer() {
   const layer = useSelector(selectLayer());
   const bridgeType = useSelector(selectBridgeType());
   const dispatch = useDispatch()
-  const tokens = useSelector(selectTokens());
+  const tokens = useSelector(selectBridgeTokens());
 
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
@@ -52,7 +64,7 @@ function BridgeTransfer() {
         <TokenInput
           index="0"
           key="empty"
-          token={{amount: '', symbol: null, balance: 0}}
+          token={{ amount: '', symbol: null, balance: 0 }}
           addNewToken={addNewToken}
           tokenLen={1}
           switchBridgeType={switchBridgeType}
@@ -87,17 +99,9 @@ function BridgeTransfer() {
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />
-      {
-        layer === 'L1' && tokens.length > 0
-          ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
-            ? <TransferDeposit token={tokens[ 0 ]} />
-            : <TransferFastDeposit token={tokens[ 0 ]} /> : null
-      }
-      {
-        layer === 'L2' && tokens.length > 0
-          ? bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE
-            ? <TransferExit token={tokens[ 0 ]} />
-            : <TransferFastExit token={tokens[ 0 ]} /> : null
+      {tokens.length ?
+        layer === 'L1' ? <Deposit /> : <Exit />
+        : null
       }
     </S.BridgeTransferContainer>
   )

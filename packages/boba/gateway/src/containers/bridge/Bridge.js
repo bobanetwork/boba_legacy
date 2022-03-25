@@ -20,8 +20,8 @@ function BridgeContainer() {
               component="span"
               sx={{
                 background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
-                '-webkit-background-clip': 'text',
-                '-webkit-text-fill-color': 'transparent'
+                'WebkitBackgroundClip': 'text',
+                'WebkitTextFillColor': 'transparent'
               }}
             >
               Boba network!

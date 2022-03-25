@@ -12,6 +12,7 @@ import { logAmount } from 'util/amountConvert';
 function TransferDeposit({
   token
 }) {
+  console.log(['TRANSFER DEPOSIT'])
 
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();

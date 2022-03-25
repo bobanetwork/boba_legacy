@@ -69,6 +69,9 @@ function TokenInput({
   }
 
   const isAddTokenDisabled = () => {
+    if (layer === 'L2') {
+      return true;
+    }
     if (tokenLen > 3) {
       return true;
     } else {
