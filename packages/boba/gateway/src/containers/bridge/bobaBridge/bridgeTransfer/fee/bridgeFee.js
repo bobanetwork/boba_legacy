@@ -10,7 +10,6 @@ import { BRIDGE_TYPE } from 'util/constant';
 function BridgeFee({
   tokens
 }) {
-
   const bridgeType = useSelector(selectBridgeType());
   const layer = useSelector(selectLayer());
 
@@ -18,16 +17,11 @@ function BridgeFee({
   const fExitCost = useSelector(selectFastExitCost);
   const fDepositCost = useSelector(selectFastDepositCost);
 
-  const feeBalance = useSelector(selectL2FeeBalance)
+  // const feeBalance = useSelector(selectL2FeeBalance)
   // TODO: Use feebalance to show the cover gas
   // FIXME: show the appropriate message base on gas fee
 
   let cost = 0;
-
-  console.log([ 'cExitCost', cExitCost ])
-  console.log([ 'fExitCost', fExitCost ])
-  console.log([ 'fDepositCost', fDepositCost ])
-  console.log([ 'feeBalance', feeBalance ])
 
   if (layer === 'L2') {
     if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
@@ -50,40 +44,36 @@ function BridgeFee({
           Est. Fee <br />
           (Approval+Bridge)
         </Typography>
-        {tokens.map((t) => {
-          return <Typography key={t.symbol} variant="body2" >
-            {
-              t.symbol === 'ETH' ?
-                `${(Number(t.amount) + Number(cost)).toFixed(4)}`
-                : `${Number(cost).toFixed(4)}`
-            } ETH
-          </Typography>
-        })}
-      </Box>
-      <Box display="flex" alignItems="flex-start" justifyContent="flex-start" flexDirection="column">
-        <Typography variant="body2" sx={{ opacity: 0.65 }}>
-          Est. bridge fee
-        </Typography>
         {
-          tokens.map((t) => {
-            return <Typography key={t.symbol} variant="body2" >
-              0.00019780 {t.symbol} (0.1%)
+          tokens.map((token) => {
+            return <Typography variant="body2" >
+              {
+                token.symbol === 'ETH' ?
+                  `${(Number(token.amount) + Number(cost)).toFixed(4)}`
+                  : `${Number(cost).toFixed(4)}`
+              } ETH
             </Typography>
           })
         }
       </Box>
       <Box display="flex" alignItems="flex-start" justifyContent="flex-start" flexDirection="column">
         <Typography variant="body2" sx={{ opacity: 0.65 }}>
+          Est. bridge fee
+        </Typography>
+         {tokens.map((token) => <Typography variant="body2" >
+              0.000 {token.symbol} (0.1%)
+        </Typography>)}
+      </Box>
+      <Box display="flex" alignItems="flex-start" justifyContent="flex-start" flexDirection="column">
+        <Typography variant="body2" sx={{ opacity: 0.65 }}>
           Est. recieve
         </Typography>
-        {tokens.map((t) => {
-          return <Typography key={t.symbol} variant="body2" >
-            {`${Number(t.amount).toFixed(3)} ${t.symbol}`}
-          </Typography>
-        })}
+        {tokens.map((token)=> <Typography variant="body2" >
+          {`${Number(token.amount).toFixed(3)} ${token.symbol}`}
+        </Typography>)}
       </Box>
     </Box>
   </>
 }
 
-export default React.memo(BridgeFee);
+export default BridgeFee;

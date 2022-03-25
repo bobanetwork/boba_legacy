@@ -68,6 +68,14 @@ function TokenInput({
     dispatch(openModal('tokenPicker', null, null, index))
   }
 
+  const isAddTokenDisabled = () => {
+    if (tokenLen > 3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   useEffect(() => {
     if (layer === 'L2') {
       if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
@@ -143,7 +151,7 @@ function TokenInput({
         </S.TextFieldWrapper>
         <S.TokenPickerAction>
           <IconButton size="small" aria-label="add token"
-            disabled={true} // as we are going to enable it only for the L1 layer + fast Fast Deposit
+            disabled={isAddTokenDisabled()} // as we are going to enable it only for the L1 layer + fast Fast Deposit
             onClick={() => {
               if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
                 switchBridgeType()
