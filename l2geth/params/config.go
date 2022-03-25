@@ -251,7 +251,7 @@ var (
 
 	// BobaRinkebyFeeUpdatedForkNum is the height at which the fee update fork activates on Rinkeby.
 	// In progress
-	BobaRinkebyFeeUpdatedForkNum = big.NewInt(100)
+	BobaRinkebyFeeUpdatedForkNum = big.NewInt(40000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and

@@ -61,7 +61,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await Proxy__Boba_GasPriceOracle.deployTransaction.wait()
   })
 
-  it('{tag:other} should register to use boba as the fee token', async () => {
+  it('{tag:boba} should register to use boba as the fee token', async () => {
     // Register l1wallet for using boba as the fee token
     const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
     await registerTx.wait()
@@ -71,12 +71,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
     ).to.be.deep.eq(true)
   })
 
-  it('{tag:other} should not register the fee tokens for non EOA accounts', async () => {
+  it('{tag:boba} should not register the fee tokens for non EOA accounts', async () => {
     await expect(Proxy__Boba_GasPriceOracle.useBobaAsFeeToken()).to.be.reverted
     await expect(Proxy__Boba_GasPriceOracle.useETHAsFeeToken()).to.be.reverted
   })
 
-  it('{tag:other} Paying a nonzero but acceptable boba gasPrice fee for transferring ETH', async () => {
+  it('{tag:boba} Paying a nonzero but acceptable boba gasPrice fee for transferring ETH', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -129,7 +129,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} Paying a nonzero but acceptable boba gasPrice fee for transferring BOBA', async () => {
+  it('{tag:boba} Paying a nonzero but acceptable boba gasPrice fee for transferring BOBA', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -178,7 +178,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it("{tag:other} Should revert if users don't have enough Boba tokens", async () => {
+  it("{tag:boba} Should revert if users don't have enough Boba tokens", async () => {
     await setPrices(env, 1000)
 
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -216,7 +216,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct boba fee for transferring ETH', async () => {
+  it('{tag:boba} should compute correct boba fee for transferring ETH', async () => {
     await setPrices(env, 1000)
 
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -258,7 +258,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct boba fee for transferring BOBA', async () => {
+  it('{tag:boba} should compute correct boba fee for transferring BOBA', async () => {
     await setPrices(env, 1000)
 
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -296,7 +296,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct fee with different gas limit for transferring ETH', async () => {
+  it('{tag:boba} should compute correct fee with different gas limit for transferring ETH', async () => {
     await setPrices(env, 1000)
 
     const estimatedGas = await env.l2Wallet.estimateGas({
@@ -348,7 +348,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct fee with different gas limit for transferring Boba', async () => {
+  it('{tag:boba} should compute correct fee with different gas limit for transferring Boba', async () => {
     await setPrices(env, 1000)
 
     const estimatedGas = await L2Boba.estimateGas.transfer(
@@ -400,7 +400,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should reject a transaction with a too low gas limit', async () => {
+  it('{tag:boba} should reject a transaction with a too low gas limit', async () => {
     const tx = {
       to: env.l2Wallet.address,
       value: ethers.utils.parseEther('1'),
@@ -415,11 +415,11 @@ describe('Boba Fee Payment Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
+  it('{tag:boba} should not be able to withdraw fees before the minimum is met', async () => {
     await expect(Boba_GasPriceOracle.withdraw()).to.be.rejected
   })
 
-  it('{tag:other} should be able to withdraw fees back to L1 once the minimum is met', async function () {
+  it('{tag:boba} should be able to withdraw fees back to L1 once the minimum is met', async function () {
     const l1FeeWallet = await Boba_GasPriceOracle.l1FeeWallet()
     const balanceBefore = await L1Boba.balanceOf(l1FeeWallet)
     const withdrawalAmount = await Boba_GasPriceOracle.MIN_WITHDRAWAL_AMOUNT()
@@ -461,7 +461,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   // Boba Ethereum special fields on the receipt
-  it('{tag:other} includes L2 Boba fee', async () => {
+  it('{tag:boba} includes L2 Boba fee', async () => {
     const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1Fee(
       '0x'
     )
@@ -494,7 +494,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   // Boba Ethereum special fields on the receipt
-  it('{tag:other} includes L2 Boba fee with different gas price', async () => {
+  it('{tag:boba} includes L2 Boba fee with different gas price', async () => {
     const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.getL1Fee(
       '0x'
     )
@@ -533,7 +533,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     }
   })
 
-  it('{tag:other} should compute correct fee with different price ratio for transferring ETH', async () => {
+  it('{tag:boba} should compute correct fee with different price ratio for transferring ETH', async () => {
     let priceRatio = 2000
     while (priceRatio < 3000) {
       const setPriceRatio = await Boba_GasPriceOracle.connect(
@@ -579,7 +579,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     }
   })
 
-  it('{tag:other} should compute correct fee with different price ratio for transferring BOBA', async () => {
+  it('{tag:boba} should compute correct fee with different price ratio for transferring BOBA', async () => {
     let priceRatio = 2000
     while (priceRatio < 3000) {
       const setPriceRatio = await Boba_GasPriceOracle.connect(
@@ -622,7 +622,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     }
   })
 
-  it('{tag:other} should pay BOBA to deploy contracts', async () => {
+  it('{tag:boba} should pay BOBA to deploy contracts', async () => {
     await setPrices(env, 1000)
 
     const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -662,7 +662,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should pay BOBA to deploy contracts for different gas limit', async () => {
+  it('{tag:boba} should pay BOBA to deploy contracts for different gas limit', async () => {
     await setPrices(env, 1000)
 
     const data = Factory__Proxy__Boba_GasPriceOracle.getDeployTransaction(
@@ -714,7 +714,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should register to use ETH as the fee token', async () => {
+  it('{tag:boba} should register to use ETH as the fee token', async () => {
     // Register l1wallet for using ETH as the fee token
     const registerTx = await Boba_GasPriceOracle.useETHAsFeeToken()
     await registerTx.wait()
@@ -724,7 +724,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     ).to.be.deep.eq(false)
   })
 
-  it('{tag:other} should pay boba fee with 0 ETH in the wallet', async () => {
+  it('{tag:boba} should pay boba fee with 0 ETH in the wallet', async () => {
     const wallet = ethers.Wallet.createRandom().connect(env.l2Provider)
 
     const fundTx = await env.l2Wallet.sendTransaction({
@@ -768,7 +768,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     expect(ETHBalanceAfter).to.deep.eq(BigNumber.from('0'))
   })
 
-  it("{tag:other} should revert tx if users don't have enough Boba", async () => {
+  it("{tag:boba} should revert tx if users don't have enough Boba", async () => {
     const wallet = ethers.Wallet.createRandom().connect(env.l2Provider)
 
     const fundTx = await env.l2Wallet.sendTransaction({
