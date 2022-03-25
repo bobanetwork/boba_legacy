@@ -404,7 +404,7 @@ class l1BridgeMonitorService extends OptimismEnv {
 
   async getL1ToL2TransactionReceipt(l1ToL2msgHash) {
     const blockNumber = await this.L2Provider.getBlockNumber()
-    const startBlock = Math.max(blockNumber - 50000, 0)
+    const startBlock = Math.max(blockNumber - 5000, 0)
 
     const filter = {
       address: this.OVM_L2CrossDomainMessenger,

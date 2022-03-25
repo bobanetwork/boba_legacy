@@ -1,6 +1,6 @@
-FROM --platform=linux/amd64 node:14-alpine
+FROM --platform=linux/amd64 node:14-buster
 
-RUN apk add --no-cache git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y bash git python build-essential
 
 WORKDIR /
 
