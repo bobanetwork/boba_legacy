@@ -183,7 +183,7 @@ class Nft extends React.Component {
               </Box>
             </S.NFTFormContent> */}
           </S.NFTActionContent>
-          <S.NFTListContainer dataempty={Object.keys(list).length === 0}>
+          <S.NFTListContainer data-empty={Object.keys(list).length === 0}>
             {Object.keys(list).length === 0 ?
               <Box>
                   <Typography variant="body2"  sx={{opacity: 0.65}} >
