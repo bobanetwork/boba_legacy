@@ -370,7 +370,7 @@ Resources:
               - test -S /nginx/gunicorn.socket
             Interval: 30
             Retries: 3
-            StartPeriod: 60
+            StartPeriod: 180
             Timeout: 5
           Ulimits:
             - Name: nofile
@@ -431,7 +431,7 @@ Resources:
               - test -S /nginx/gunicorn.socket
             Interval: 30
             Retries: 3
-            StartPeriod: 60
+            StartPeriod: 180
             Timeout: 5
           Ulimits:
             - Name: nofile
@@ -456,7 +456,7 @@ Resources:
             # in django 4 you need to include scheme
             - Name: CSRF_TRUSTED_ORIGINS
               Value: !Sub
-                - "https://safe-config.${EndpointAddress},http://safe-config.${EndpointAddress}"
+                - "https://safe-config.${EndpointAddress},http://safe-config.${EndpointAddress}, http://localhost"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
             - Name: PYTHONDONTWRITEBYTECODE
@@ -724,10 +724,7 @@ Resources:
               Type: "s3"
           Environment:
             - Name: CONFIG_SERVICE_URI
-              Value: !Sub
-                - "https://safe-config.${EndpointAddress}"
-                - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+              Value: http://localhost:80
             - Name: FEATURE_FLAG_NESTED_DECODING
               Value: true
             - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
