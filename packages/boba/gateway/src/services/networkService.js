@@ -15,7 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
-import { Watcher } from '@eth-optimism/core-utils'
+
+import {
+  CrossChainMessenger,
+} from '@eth-optimism/sdk'
+
 import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
@@ -76,6 +80,13 @@ import { sortRawTokens } from 'util/common'
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+
+// interface CrossDomainMessagePair {
+//   tx: Transaction
+//   receipt: TransactionReceipt
+//   remoteTx: Transaction
+//   remoteReceipt: TransactionReceipt
+// }
 
 require('dotenv').config()
 
@@ -667,27 +678,23 @@ class NetworkService {
         this.L2Provider
       )
 
-      this.watcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1MessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
-
-      this.fastWatcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1FastMessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
+      if(networkGateway === 'mainnet') {
+        this.watcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 1,
+          fastRelayer: false,
+        })
+        this.fastWatcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 1,
+          fastRelayer: true,
+        })
+      } else {
+        this.watcher = null
+        this.fastWatcher = null
+      }
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
@@ -1263,7 +1270,7 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract
+      const depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositETH(
           this.L2GasLimit,
           utils.formatBytes32String(new Date().getTime().toString()),
@@ -1273,22 +1280,18 @@ class NetworkService {
       )
 
       //at this point the tx has been submitted, and we are waiting...
-      await depositTx.wait()
+      await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTx.hash)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
       console.log(' block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
-      const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-        depositTx.hash
-      )
-      console.log(' got L1->L2 message hash', msgHash)
-
-      const receipt = await this.watcher.getL2TransactionReceipt(
-        msgHash
-      )
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
 
       const time_stop = new Date().getTime()
@@ -1296,7 +1299,7 @@ class NetworkService {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTx.hash,
+        "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
         "endTime": time_stop,
@@ -1488,8 +1491,6 @@ class NetworkService {
 
   //Transfer funds from one account to another, on the L2
   async transferNFT(recipient, token) {
-
-    let tx = null
 
     console.log("Transferring NFT:", token.address)
     console.log("tokenID:", token.tokenID)
@@ -1738,7 +1739,7 @@ class NetworkService {
           value_Wei_String
         )
         await approveStatus.wait()
-        console.log("ERC 20 L1 SWAP ops approved:",approveStatus)
+        console.log("ERC20 L1 SWAP ops approved:",approveStatus)
       }
 
       return true
@@ -1813,13 +1814,13 @@ class NetworkService {
             value_Wei_String
           )
         await approveStatus.wait()
-        console.log("ERC 20 L1 ops approved:",approveStatus)
+        console.log("ERC20 L1 ops approved:",approveStatus)
       }
 
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract
+      const depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositERC20(
           currency,
           currencyL2,
@@ -1828,25 +1829,21 @@ class NetworkService {
           utils.formatBytes32String(new Date().getTime().toString())
         )
 
-      console.log("depositTxStatus:",depositTx)
+      console.log("depositTxStatus:",depositTX)
 
       //at this point the tx has been submitted, and we are waiting...
-      await depositTx.wait()
+      await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTx.hash)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
       console.log(' block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
-      const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-        depositTx.hash
-      )
-      console.log(' got L1->L2 message hash', msgHash)
-
-      const receipt = await this.watcher.getL2TransactionReceipt(
-        msgHash
-      )
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
 
       const time_stop = new Date().getTime()
@@ -1854,7 +1851,7 @@ class NetworkService {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTx.hash,
+        "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
         "endTime": time_stop,
@@ -1926,8 +1923,11 @@ class NetworkService {
       //can close window now
       updateSignatureStatus_exitTRAD(true)
 
-      const [L2ToL1msgHash] = await this.watcher.getMessageHashesFromL2Tx(tx.hash)
-      console.log(' got L2->L1 message hash', L2ToL1msgHash)
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(tx, opts)
+      console.log(' got L2->L1 receipt', receipt)
 
       return tx
     } catch (error) {
@@ -2344,10 +2344,9 @@ class NetworkService {
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
-
-    let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract
+
+    let depositTX = await this.L1LPContract
       .connect(this.provider.getSigner()).clientDepositL1(
         value_Wei_String,
         currency,
@@ -2364,13 +2363,10 @@ class NetworkService {
 
     updateSignatureStatus_depositLP(true)
 
-    // Waiting the response from L2
-    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-      depositTX.hash
-    )
-    console.log(' got L1->L2 message hash', msgHash)
-
-    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2438,13 +2434,10 @@ class NetworkService {
 
     updateSignatureStatus_depositLP(true)
 
-    // Waiting the response from L2
-    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-      depositTX.hash
-    )
-    console.log(' got L1->L2 message hash', msgHash)
-
-    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2870,15 +2863,10 @@ class NetworkService {
     //closes the modal
     updateSignatureStatus_exitLP(true)
 
-    // Waiting for the response from L1
-    const [msgHash] = await this.fastWatcher.getMessageHashesFromL2Tx(
-      depositTX.hash
-    )
-    console.log(' got L2->L1 message hash', msgHash)
-
-    const receipt = await this.fastWatcher.getL1TransactionReceipt(
-      msgHash
-    )
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2959,15 +2947,10 @@ class NetworkService {
     //closes the modal
     updateSignatureStatus_exitLP(true)
 
-    // Waiting for the response from L1
-    const [msgHash] = await this.fastWatcher.getMessageHashesFromL2Tx(
-      depositTX.hash
-    )
-    console.log(' got L2->L1 message hash', msgHash)
-
-    const receipt = await this.fastWatcher.getL1TransactionReceipt(
-      msgHash
-    )
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()

@@ -27,8 +27,6 @@ import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
-import networkService from 'services/networkService'
-
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 function TransferNFTModal ({ open, token, minHeight }) {

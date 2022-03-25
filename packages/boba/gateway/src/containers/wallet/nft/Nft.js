@@ -105,8 +105,6 @@ class Nft extends React.Component {
       netLayer,
     } = this.state
 
-    console.log("list:",list)
-
     if (!netLayer) {
 
       return (
