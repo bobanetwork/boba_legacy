@@ -23,7 +23,7 @@ import * as styles from './listNFT.module.scss'
 import * as S from './listNFT.styles'
 import { removeNFT } from 'actions/nftAction'
 import Button from 'components/button/Button'
-
+import { openModal } from 'actions/uiAction'
 
 class listNFT extends React.Component {
 
@@ -57,6 +57,18 @@ class listNFT extends React.Component {
   handleClick(e) {
     e.preventDefault();
     this.setState(prevState => ({ isFlipped: !prevState.isFlipped }));
+  }
+
+  async handleTransfer() {
+
+    const token ={
+      address: this.state.address,
+      tokenID: this.state.tokenID,
+    }
+
+    console.log("setting nft details:", token)
+
+    this.props.dispatch(openModal('transferNFTModal', token))
   }
 
   async handleRemove() {
@@ -178,6 +190,13 @@ class listNFT extends React.Component {
                 </Typography>
               )
             })}
+            <Button
+              variant="outlined"
+              onClick={(e) => {this.handleTransfer()}}
+              size="small"
+            >
+              Transfer to another wallet
+            </Button>
             <Button
               variant="outlined"
               onClick={(e) => {

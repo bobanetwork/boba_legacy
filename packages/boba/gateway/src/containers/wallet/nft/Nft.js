@@ -17,6 +17,8 @@ import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 import { monsterMint } from 'actions/networkAction'
 
+import Copy from 'components/copy/Copy'
+
 class Nft extends React.Component {
 
   constructor(props) {
@@ -186,6 +188,12 @@ class Nft extends React.Component {
                   </Typography>
                 </Box>
                 <S.DividerLine />
+                <Typography variant="body1" >
+                  <br/>Useful addresses
+                </Typography>
+                <Typography variant="body2" >
+                  Turing monsters: 0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA <Copy value={'0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'} light={false} />
+                </Typography>
               </Box>
               <Box sx={{
                 display: 'flex',

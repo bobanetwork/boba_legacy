@@ -1486,6 +1486,43 @@ class NetworkService {
     }
   }
 
+  //Transfer funds from one account to another, on the L2
+  async transferNFT(recipient, token) {
+
+    let tx = null
+
+    console.log("Transferring NFT:", token.address)
+    console.log("tokenID:", token.tokenID)
+    console.log("Transferring to:", recipient)
+
+    try {
+
+      const contract = new ethers.Contract(
+        token.address,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      console.log("contract:",contract)
+
+      const tx = await contract
+        .connect(this.provider.getSigner())
+        .transferFrom(
+            this.account,  // address from,
+            recipient,     // address to,
+            token.tokenID
+          )
+
+      const receipt = await tx.wait()
+      console.log("NS: NFT transfer TX:", receipt.logs)
+
+      return tx
+    } catch (error) {
+      console.log("NS: NFT transfer error:", error)
+      return error
+    }
+  }
+
   //figure out which layer we are on right now
   confirmLayer = (layerToConfirm) => async (dispatch) => {
     if (layerToConfirm === this.L1orL2) {

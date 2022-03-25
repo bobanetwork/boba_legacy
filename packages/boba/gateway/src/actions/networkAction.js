@@ -179,6 +179,12 @@ export function transfer(recipient, value, currency) {
   )
 }
 
+export function transferNFT(recipient, nft) {
+  return createAction('TRANSFER_NFT/CREATE', () =>
+    networkService.transferNFT(recipient, nft)
+  )
+}
+
 export function settle_v0() {
   return createAction('SETTLE_v0/CREATE', () =>
     networkService.settle_v0()
