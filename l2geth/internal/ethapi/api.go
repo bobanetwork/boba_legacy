@@ -1016,17 +1016,12 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	}
 	// Get state
 	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-	// Use non-zero gas price for the l1 security fee if gas price is not nil
-	// In production, users have to pay the gas fee. In the local testing system,
-	// gas price can be zero. If their balance is really low for using zero gas price,
-	// they can't bypass this estimateGas
+	// If gas price is 0 or nil, the returned gas limit doesn't include the
+	// l1 security fee
 	gasPrice := new(big.Int)
 	price, err := b.SuggestPrice(ctx)
 	if err == nil && isFeeTokenUpdate {
-		// Override gas price
 		if args.GasPrice == nil {
-			// args.GasPrice is used to estimate gas limit
-			args.GasPrice = (*hexutil.Big)(price)
 			// gasPrice is used to calculate the l2ExtraFee
 			gasPrice = price
 		} else {
@@ -1091,13 +1086,13 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
-	// The l1SecurityFee should have already been added. To secure that the gas limit is enough,
-	// we add an extra check for it.
+	// Get gas usage for l1 security fee
 	intrGas, err := core.IntrinsicGas(data, args.To == nil, true, b.ChainConfig().IsIstanbul(blockNr))
 	if err != nil {
 		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
 	}
-	if hi >= intrGas+l2ExtraGas.Uint64() {
+	// Add l1 security fee if it hasn't been calculated into gas limit
+	if hi >= intrGas+l2ExtraGas.Uint64() && args.GasPrice != nil {
 		return hexutil.Uint64(hi), nil
 	} else {
 		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
