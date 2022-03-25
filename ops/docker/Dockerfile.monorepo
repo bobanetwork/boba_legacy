@@ -16,9 +16,12 @@ RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
      elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
           echo "Building for Mac ($BUILDPLATFORM)" ; \
           apt-get update -y && apt-get install -y git python3 build-essential ; \
+     elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
+          apt-get update -y && apt-get install -y git python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+          echo "Building for aarch64 GNU/Linux" ; \
      else \
-          echo "Building for something else ($BUILDPLATFORM)" ; \
-          apt-get update -y && apt-get install -y git ; \
+         echo "Building for something else" ; \
+         apt-get update -y && apt-get install -y git ; \
      fi
 
 # Pre-download the compilers so that they do not need to be downloaded inside
