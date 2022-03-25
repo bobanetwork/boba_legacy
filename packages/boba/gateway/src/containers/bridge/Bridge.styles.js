@@ -29,6 +29,11 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
   width: '100%',
   alignItems: 'flex-start',
   gap: '20px',
+  [ theme.breakpoints.down('sm') ]: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  }
 }))
 
 export const TitleContainer = styled(Box)(({ theme }) => ({
@@ -37,11 +42,24 @@ export const TitleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '30px'
+  padding: '30px',
+  [ theme.breakpoints.down('sm') ]: {
+    padding: '0',
+    width: '100%'
+  }
 }))
 
 export const Content = styled(Box)(({ theme }) => ({
-
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: '10px',
+  width: '60%',
+  padding: '30px 20px',
+  flex: 1,
+  [ theme.breakpoints.down('sm') ]: {
+    padding: '0',
+    width: '100%'
+  }
 }))
-
-

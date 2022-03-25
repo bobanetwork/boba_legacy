@@ -8,6 +8,25 @@ export const TokenInputWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start'
 }))
 
+export const TokenInputTitle = styled(Box)(({ theme }) => ({
+  textAlign: "right",
+  [ theme.breakpoints.down('sm') ]: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
+}))
+
+export const TokenInputContent = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  gap: '5px',
+  [ theme.breakpoints.down('sm') ] : {
+    gap: 0
+  }
+}));
+
 export const TokenPicker = styled(Box)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.04)',
   border: '1px solid rgba(255, 255, 255, 0.06)',
@@ -22,6 +41,10 @@ export const TokenPicker = styled(Box)(({ theme }) => ({
   cursor: 'pointer',
   'img': {
     marginRight: '5px'
+  },
+  [ theme.breakpoints.down('sm') ] : {
+    borderRadius: '12px 0 0 12px',
+    width: '40%',
   }
 }));
 
@@ -34,6 +57,9 @@ export const TextFieldWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'flex-start',
   alignItems: 'center',
+  [ theme.breakpoints.down('sm') ] : {
+    borderRadius: '0 12px 12px 0'
+  }
 }))
 
 export const TextFieldTag = styled(TextField)(({ ...props }) => ({
@@ -72,7 +98,7 @@ export const TextFieldTag = styled(TextField)(({ ...props }) => ({
 export const TokenPickerAction = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: '20%',
-  'button' : {
+  'button': {
     '&:hover': {
       'svg': {
         color: theme.palette.secondary.main

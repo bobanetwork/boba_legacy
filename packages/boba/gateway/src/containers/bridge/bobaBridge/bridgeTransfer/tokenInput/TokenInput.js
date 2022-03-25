@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
-import { Box, IconButton, Typography } from '@mui/material';
+import { IconButton, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost, fetchL2FeeBalance } from 'actions/balanceAction';
 import { removeToken, setTokenAmount } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
@@ -41,6 +41,9 @@ function TokenInput({
   const layer = useSelector(selectLayer());
 
   const dispatch = useDispatch();
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const underZero = new BN(token.amount).lt(new BN(0))
   const overMax = new BN(token.amount).gt(new BN(token.balance))
@@ -95,24 +98,46 @@ function TokenInput({
 
   }, [ dispatch, layer, token, bridgeType ]);
 
+
+  const Action = () => {
+    return <S.TokenPickerAction>
+    <IconButton size="small" aria-label="add token"
+      disabled={isAddTokenDisabled()} // as we are going to enable it only for the L1 layer + fast Fast Deposit
+      onClick={() => {
+        if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
+          switchBridgeType()
+        } else {
+          addNewToken()
+        }
+      }}
+    >
+      <AddCircleOutline fontSize="small" />
+    </IconButton>
+    <IconButton disabled={!isFastBridge && tokenLen <= 1} size="small" aria-label="remove token"
+      onClick={() => {
+        deleteToken(index);
+      }}
+    >
+      <RemoveCircleOutline fontSize="small" />
+    </IconButton>
+  </S.TokenPickerAction>
+  }
+
   return (
     <S.TokenInputWrapper>
-      <Box
-        textAlign="right"
+      <S.TokenInputTitle
       >
         <Typography variant="body2">
           <Typography component="span" sx={{ opacity: 0.65 }}>
             Available Balance : &nbsp;
           </Typography>
-          {amount}
+          <Typography component="span" sx={{textDecoration: 'underline'}}>
+            {amount}
+          </Typography>
         </Typography>
-      </Box>
-      <Box
-        display="flex"
-        justifyContent="space-around"
-        alignItems="center"
-        sx={{ gap: '5px' }}
-      >
+        {isMobile ? <Action /> : null}
+      </S.TokenInputTitle>
+      <S.TokenInputContent>
         {
           !token.symbol ?
             <S.TokenPicker
@@ -152,28 +177,8 @@ function TokenInput({
               error={underZero || overMax}
             />}
         </S.TextFieldWrapper>
-        <S.TokenPickerAction>
-          <IconButton size="small" aria-label="add token"
-            disabled={isAddTokenDisabled()} // as we are going to enable it only for the L1 layer + fast Fast Deposit
-            onClick={() => {
-              if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
-                switchBridgeType()
-              } else {
-                addNewToken()
-              }
-            }}
-          >
-            <AddCircleOutline fontSize="small" />
-          </IconButton>
-          <IconButton disabled={!isFastBridge && tokenLen <= 1} size="small" aria-label="remove token"
-            onClick={() => {
-              deleteToken(index);
-            }}
-          >
-            <RemoveCircleOutline fontSize="small" />
-          </IconButton>
-        </S.TokenPickerAction>
-      </Box>
+        {!isMobile ? <Action /> : null}
+      </S.TokenInputContent>
       {token.amount !== '' && underZero ?
         <Typography variant="body3" sx={{ mt: 1 }}>
           Value too small: the value must be greater than 0

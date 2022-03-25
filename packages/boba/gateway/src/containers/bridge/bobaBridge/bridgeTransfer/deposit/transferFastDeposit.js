@@ -33,7 +33,6 @@ import { resetToken } from 'actions/bridgeAction';
 import {
   selectFastDepositCost,
   selectL1FeeBalance,
-  selectL2FeeBalance,
   selectL2FeeRateN,
   selectL2LPBalanceString,
   selectL2LPLiquidity,

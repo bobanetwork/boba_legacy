@@ -44,6 +44,7 @@ function BridgeTypeModal({ open, toBridgeType }) {
       minHeight="fit-content"
       title="Switch bridge mode"
       newStyle={true}
+      transparent={false}
     >
       <Typography variant="body2">
         The classic bridge only supports the transfer of one token. Are you sure you want to switch?

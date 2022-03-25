@@ -12,7 +12,12 @@ export const NoContent = styled(Box)(({ theme }) => ({
 export const TokenList = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: '10px'
+  gap: '10px',
+  height: '350px',
+  overflow: 'scroll',
+  [ theme.breakpoints.down('sm') ]: {
+    height: '400px',
+  }
 }));
 
 export const TokenListItem = styled(Box)(({ theme }) => ({

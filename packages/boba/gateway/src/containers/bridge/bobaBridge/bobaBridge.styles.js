@@ -5,10 +5,10 @@ export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   backdropFilter: 'blur(100px)',
   borderRadius: '20px',
-  width: width || '50%',
   flex: 1,
   minHeight: 'fit-content',
-  padding: '20px'
+  padding: '20px',
+  width: '100%',
 }));
 
 
@@ -38,7 +38,13 @@ export const ChainInput = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: '10px',
-  minWidth: '180px'
+  minWidth: '180px',
+  [ theme.breakpoints.down('sm') ]: {
+    justifyContent: 'center',
+    gap: '5px',
+    padding: '5px',
+    minWidth: '134px'
+  }
 }))
 
 export const ChainLabel = styled(Typography)(({ theme }) => ({
@@ -46,6 +52,9 @@ export const ChainLabel = styled(Typography)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '10px',
+  [ theme.breakpoints.down('sm') ]: {
+    fontSize: '14px',
+  }
 }))
 
 export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({

@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material'
+
+import { Box, Typography, useTheme , useMediaQuery} from '@mui/material'
 import { updateToken } from 'actions/bridgeAction'
 import { closeModal } from 'actions/uiAction'
 import * as LayoutS from 'components/common/common.styles'
@@ -17,8 +18,12 @@ function TokenPickerModal({ open,tokenIndex }) {
 
   const layer = useSelector(selectLayer())
   const dispatch = useDispatch()
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [ search, setSearch ] = useState('')
 
+  
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
 
@@ -47,8 +52,8 @@ function TokenPickerModal({ open,tokenIndex }) {
       open={open}
       onClose={handleClose}
       maxWidth="xs"
-      minHeight="450px"
-      title="Select a token"
+      minHeight={isMobile? "100%": "450px"}
+      title={isMobile ? "Bridge-Select a token": "Select a token"}
       newStyle={true}
   >
       <Input

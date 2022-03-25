@@ -76,7 +76,7 @@ function BobaBridge() {
                 component="p"
                 variant="body"
               >
-                <BobaIcon /> Boba Network
+                <BobaIcon  dark={true} /> Boba Network
               </S.ChainLabel>
             </S.ChainInput>
           </Box>
@@ -86,17 +86,8 @@ function BobaBridge() {
   }
 
   return (
-    <Box sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      gap: '10px',
-      width: '60%',
-      padding: '30px 20px',
-      flex: 1,
-    }}>
-      <S.BobaBridgeWrapper width={'100%'}>
+    <>
+      <S.BobaBridgeWrapper>
         <S.BobaContentWrapper flexDirection="row" fullWidth={true} gap="5px" alignItems="center">
           <Box>
             <Box>
@@ -128,7 +119,7 @@ function BobaBridge() {
                     component="p"
                     variant="body"
                   >
-                    <BobaIcon /> Boba Network
+                    <BobaIcon dark={true} /> Boba Network
                   </S.ChainLabel>
               }
             </S.ChainInput>
@@ -162,17 +153,17 @@ function BobaBridge() {
                     component="p"
                     variant="body"
                   >
-                    <BobaIcon /> Boba Network
+                    <BobaIcon dark={true} /> Boba Network
                   </S.ChainLabel>
               }
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>
       </S.BobaBridgeWrapper>
-      <S.BobaBridgeWrapper width={'100%'}>
+      <S.BobaBridgeWrapper>
         <BridgeTransfer />
       </S.BobaBridgeWrapper>
-      <S.HistoryLink width={'100%'}
+      <S.HistoryLink
         onClick={() => {
           dispatch(setPage('History'))
         }}
@@ -184,7 +175,7 @@ function BobaBridge() {
           {"Transaction History >"}
         </Typography>
       </S.HistoryLink>
-    </Box>
+    </>
   )
 }
 
