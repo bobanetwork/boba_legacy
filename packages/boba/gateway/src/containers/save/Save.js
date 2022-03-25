@@ -201,10 +201,10 @@ class Save extends React.Component {
     return (
       <S.StakePageContainer>
         <Box sx={{ my: 1 }}>
-          <PageTitle title="Stake" />
+          <PageTitle title="Boba Stake" />
           {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2</Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
+            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnect </Typography>
+            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connecting </Typography>
           }
         </Box>
         <Grid container spacing={1} sx={{ my: 2 }}>
@@ -258,9 +258,8 @@ class Save extends React.Component {
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
-              {!netLayer ?
-                <WalletPicker fullWidth={true} label="Connect" /> :
-                netLayer === 'L2' ?
+              {!accountEnabled ? <WalletPicker fullWidth={true} label="Connect to Boba" /> : null }
+              { netLayer === 'L2' ?
                   <Button
                     color="primary"
                     variant="outlined"
@@ -271,7 +270,7 @@ class Save extends React.Component {
                   >
                     Stake
                   </Button>
-                  :
+                  : netLayer === 'L1' ?
                   <S.LayerAlert>
                     <S.AlertInfo>
                       <AlertIcon />
@@ -284,6 +283,7 @@ class Save extends React.Component {
                     </S.AlertInfo>
                     <LayerSwitcher fullWidth={true} isButton={true} />
                   </S.LayerAlert>
+                  : null
               }
             </S.StakeInputContainer>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }} style={{lineHeight: '1.0em'}}>
