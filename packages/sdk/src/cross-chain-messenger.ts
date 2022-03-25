@@ -366,9 +366,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       toBlock?: BlockTag
     } = {}
   ): Promise<MessageStatus> {
-
     const resolved = await this.toCrossChainMessage(message)
-    
+
     const receipt = await this.getMessageReceipt(resolved, opts)
 
     if (resolved.direction === MessageDirection.L1_TO_L2) {
