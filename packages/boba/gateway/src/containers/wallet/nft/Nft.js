@@ -192,8 +192,15 @@ class Nft extends React.Component {
                   <br/>Useful addresses
                 </Typography>
                 <Typography variant="body2" >
-                  Turing monsters: 0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA <Copy value={'0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'} light={false} />
+                  Turing monsters:
                 </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body3" >
+                    0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA
+                  </Typography>
+                  <Copy value={'0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'} light={false} />
+                </Box>
+
               </Box>
               <Box sx={{
                 display: 'flex',
@@ -239,8 +246,8 @@ class Nft extends React.Component {
                 <Typography variant="body2"  sx={{opacity: 0.65}} >
                   Please enter the contract address and tokenID to add NFT for display.<br/>
                   If you don't know your TokenID, you can look it up in the blockexplorer.<br/>
-                  It's shown for mint or transfer events. 
-                </Typography>   
+                  It's shown for mint or transfer events.
+                </Typography>
               </Box>
               : <Grid
                 container
