@@ -58,8 +58,6 @@ describe('NFT Test\n', async () => {
 
     const genesis = await ERC721.getGenesis()
     //console.log('NFT Genesis:', genesis)
-
-    //console.log(` 🔒 ${chalk.red('ERC721 owner:')} ${chalk.green(a1a)}`)
   })
 
   it('{tag:boba} should have a name', async () => {
@@ -67,55 +65,43 @@ describe('NFT Test\n', async () => {
     expect(tokenName).to.equal('TestNFT')
   })
 
-  it('{tag:boba} should generate a new ERC721 and transfer it from Bob (a1a) to Alice (a2a)', async () => {
+  it('{tag:boba} should generate a new ERC721 for Alice (a2a)', async () => {
     let meta = 'https://boredapeyachtclub.com/api/mutants/111'
 
-    //console.log(`meta: ${meta}`)
-    //console.log('Alice (a1a):', a2a)
+    const balanceAliceBefore = await ERC721.balanceOf(a2a)
+    //console.log('Alice (a2a):', a2a)
+    //console.log(`balanceAlice before: ${balanceAliceBefore.toString()}`)
 
-    //mint one NFT
+    //mint one NFT for Alice
     let nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
-
-    const balanceBob = await ERC721.balanceOf(a1a)
-    const balanceAlice = await ERC721.balanceOf(a2a)
-
-    //console.log(`balanceOwner: ${balanceBob.toString()}`)
-    //console.log(`balanceAlice: ${balanceAlice.toString()}`)
+    const TID_1 = await ERC721.getLastTID()
 
     //Get the URL
-    const nftURL = await ERC721.tokenURI(BigNumber.from(String(0)))
+    const nftURL = await ERC721.tokenURI(TID_1.sub(1))
     //console.log(`nftURL: ${nftURL}`)
 
-    //Should be 1
-    let TID = await ERC721.getLastTID()
-    //console.log(`TID:${TID.toString()}`)
-
-    //mint a second NFT for account3 aka recipient2
+    //mint a second NFT, this time for a3a
     meta = 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6190'
     nft = await ERC721.mintNFT(a3a, meta)
     await nft.wait()
+    const TID_2 = await ERC721.getLastTID()
 
-    //mint a third NFT, this time for account2 aka recipient
+    //mint a third NFT, this time for a2a
     meta = 'https://boredapeyachtclub.com/api/mutants/121'
     nft = await ERC721.mintNFT(a2a, meta)
     await nft.wait()
-
-    //Should be 3
-    TID = await ERC721.getLastTID()
-    //console.log(`TID:${TID.toString()}`)
+    const TID_3 = await ERC721.getLastTID()
 
     expect(await ERC721.balanceOf(a1a)).to.deep.eq(BigNumber.from(String(0)))
 
-    // Alice (a1a) should have two NFTs, and the tokenID of the first one should be zero, and the second one
-    // should be 2
-    expect(await ERC721.ownerOf(BigNumber.from(String(0)))).to.deep.eq(a2a)
-    expect(await ERC721.ownerOf(BigNumber.from(String(1)))).to.deep.eq(a3a)
-    expect(await ERC721.ownerOf(BigNumber.from(String(2)))).to.deep.eq(a2a)
+    expect(await ERC721.ownerOf(TID_1.sub(1))).to.deep.eq(a2a)
+    expect(await ERC721.ownerOf(TID_2.sub(1))).to.deep.eq(a3a)
+    expect(await ERC721.ownerOf(TID_3.sub(1))).to.deep.eq(a2a)
 
-    // Token 50 should not exist (at this point)
+    // Token 100 should not exist (at this point)
     expect(
-      ERC721.ownerOf(BigNumber.from(String(50)))
+      ERC721.ownerOf(BigNumber.from(String(100)))
     ).to.be.eventually.rejectedWith('ERC721: owner query for nonexistent token')
   })
 
@@ -129,8 +115,6 @@ describe('NFT Test\n', async () => {
       tokenID.toString() +
       '_' +
       a2a.substring(1, 6)
-
-    //console.log(`Alice's UUID: ${UUID}`)
 
     Factory__ERC721 = new ContractFactory(
       L2ERC721Json.abi,
@@ -147,12 +131,6 @@ describe('NFT Test\n', async () => {
       'BOBA_Rinkeby_28'
     )
     await ERC721_D.deployTransaction.wait()
-    // console.log(
-    //   ` 🌕 ${chalk.red('NFT ERC721_D deployed to:')} ${chalk.green(
-    //     ERC721_D.address
-    //   )}`
-    // )
-    // console.log(`Derived NFT deployed to: ${ERC721_D.address}`)
 
     const meta =
       'http://blogs.bodleian.ox.ac.uk/wp-content/uploads/sites/163/2015/10/AdaByron-1850-1000x1200-e1444805848856.jpg'
@@ -166,11 +144,5 @@ describe('NFT Test\n', async () => {
     //but, a3a should have two flavors of NFT...
     await ERC721Reg.registerAddress(a3a, ERC721.address)
     await ERC721Reg.registerAddress(a3a, ERC721_D.address)
-
-    // const addresses_a2a = await ERC721Reg.lookupAddress(a2a)
-    // const addresses_a3a = await ERC721Reg.lookupAddress(a3a)
-
-    // console.log(`Addresses a2a: ${addresses_a2a}`)
-    // console.log(`Addresses a3a: ${addresses_a3a}`)
   })
 })

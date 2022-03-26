@@ -16,8 +16,7 @@ const bridgeToL1 = async (L2ERC721, L2NFTBridge, tokenId) => {
     const withdrawTx = await L2NFTBridge.withdraw(
       L2ERC721.address, // L2 NFT Contract
       tokenId, // tokenId
-      9999999, // sample l1 gas for the xDomain tx
-      utils.formatBytes32String('') // data
+      9999999 // sample l1 gas for the xDomain tx
     )
 
     await withdrawTx.wait()
