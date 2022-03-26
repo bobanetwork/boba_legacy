@@ -108,8 +108,7 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -152,8 +151,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -175,8 +173,7 @@ describe('NFT Bridge Test', async () => {
           L1ERC721.address,
           env.l1Wallet.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -256,8 +253,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraData(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -379,8 +375,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -433,8 +428,7 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -455,8 +449,7 @@ describe('NFT Bridge Test', async () => {
           L2ERC721.address,
           env.l2Wallet_2.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -537,8 +530,7 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.connect(env.l1Wallet).depositNFTWithExtraData(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -660,8 +652,7 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
     })
@@ -676,8 +667,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -743,8 +733,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.withdraw(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
     })
@@ -755,8 +744,7 @@ describe('NFT Bridge Test', async () => {
         L1Bridge.connect(env.l1Wallet_2).depositNFT(
           L1ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -914,8 +902,7 @@ describe('NFT Bridge Test', async () => {
           L1ERC721.address,
           env.l1Wallet_2.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
@@ -1020,8 +1007,7 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.connect(env.l2Wallet).withdrawWithExtraData(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          utils.formatBytes32String(new Date().getTime().toString())
+          9999999
         )
       )
 
