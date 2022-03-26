@@ -9,11 +9,11 @@ dataSources:
     network: boba
     source:
 
-      address: '0x3A92cA39476fF84Dc579C868D4D7dE125513B034'
+      address: '0x8d3866a79aA780BA3DC1a300a1567635F3754a0e'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - L2LiquidityPool
@@ -43,7 +43,7 @@ dataSources:
       abi: OVM_L2StandardBridge
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - OVM_L2StandardBridge
@@ -63,11 +63,11 @@ dataSources:
     name: GovernorBravoDelegate
     network: boba
     source:
-      address: '0xD3071443DdB9f98Ec11BD420c3a7df0C64e5030e'
+      address: '0xBdD8Cb5D75F7375A9A45F40779e055596af7F581'
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - GovernorBravoDelegate
