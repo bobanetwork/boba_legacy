@@ -18,7 +18,7 @@
     "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {
-    "@eth-optimism/contracts": "^0.5.15",
+    "@eth-optimism/contracts": "^0.5.11",
     "@ethersproject/address": "^5.0.11",
     "@ethersproject/contracts": "^5.0.11",
     "@ethersproject/networks": "^5.0.11",
@@ -37,7 +37,6 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "@bobanetwork/contracts": "^0.0.1",
     "@uniswap/sdk": "^3.0.3",
     "base64-sol": "^1.1.0",
     "dotenv": "^16.0.0",

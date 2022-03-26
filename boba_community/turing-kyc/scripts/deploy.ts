@@ -1,6 +1,6 @@
-import hre, {artifacts, ethers} from "hardhat";
-import {ContractFactory, providers, Wallet} from "ethers";
-import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json";
+import hre, {artifacts, ethers} from "hardhat"
+import {ContractFactory, providers, Wallet} from "ethers"
+import TuringHelperJson from "../artifacts/contracts/common/TuringHelper.sol/TuringHelper.json"
 const cfg = hre.network.config
 
 async function main() {
@@ -14,11 +14,9 @@ async function main() {
 
   const helper = await Factory__Helper.deploy()
   console.log("Turing Helper contract deployed at", helper.address)
-
-
 }
 
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
-});
+})

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@bobanetwork/contracts/common/interfaces/ITuringHelper.sol";
-import "@bobanetwork/contracts/access/KYCWrapper.sol";
+import "./common/interfaces/ITuringHelper.sol";
+import "./access/KYCWrapper.sol";
 
 contract KYCExample is KYCWrapper {
 
