@@ -11,7 +11,9 @@ authorized_contract = None  # for open access
 
 # NOTE: When taking the data payload from the original event for debugging then remove the first 64 bits!
 def lambda_handler(event, context):
-    # print("DEBUG: ", event)
+
+    print("DEBUG: ", event)
+    
     input = json.loads(event["body"])
     print("DEBUG: from Geth:", input)
 
@@ -23,7 +25,7 @@ def lambda_handler(event, context):
             print('return payload:', returnPayload)
             return returnPayload
 
-            # get calling parameters
+    # get calling parameters
     paramsHexString = input['params'][0]
     paramsHexString = paramsHexString.removeprefix("0x")
     params = textwrap.wrap(paramsHexString, 64)

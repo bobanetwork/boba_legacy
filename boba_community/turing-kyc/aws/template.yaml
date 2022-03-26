@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Resources:
-  spotify:
+  HelloKYC:
     Type: AWS::Lambda::Function
     Properties:
-      Handler: spotify.lambda_handler
+      Handler: kyc.lambda_handler
       Runtime: python3.9
       Events:
         HttpGet:
