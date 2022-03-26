@@ -1,5 +1,5 @@
 {
-  "name": "@bobanetwork/contracts",
+  "name": "@boba/turing-hybrid-compute",
   "version": "0.0.1",
   "description": "Smart contracts dedicated to Boba",
   "files": [
