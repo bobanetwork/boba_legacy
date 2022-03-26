@@ -4,12 +4,26 @@
 # ### BASE: Install deps
 # We do not use Alpine because there's a regression causing it to be very slow
 # when used with typescript/hardhat: https://github.com/nomiclabs/hardhat/issues/1219
+
 FROM node:16-buster-slim as node
-RUN if echo "\"`uname -a`\"" | grep -q "arm64" ; then \
-    apt-get update -y && apt-get install -y git python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
-  else \
-    apt-get update -y && apt-get install -y git; \
-  fi
+
+ARG BUILDPLATFORM
+RUN echo "Build Platform: $BUILDPLATFORM"
+
+RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
+          echo "Building for x86_64" ; \
+          apt-get update -y && apt-get install -y git ; \
+     elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
+          echo "Building for Mac ($BUILDPLATFORM)" ; \
+          apt-get update -y && apt-get install -y git python3 build-essential ; \
+     elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
+          apt-get update -y && apt-get install -y git python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+          echo "Building for aarch64 GNU/Linux" ; \
+     else \
+         echo "Building for something else" ; \
+         apt-get update -y && apt-get install -y git ; \
+     fi
+
 # Pre-download the compilers so that they do not need to be downloaded inside
 # the image when building
 FROM alpine as downloader
@@ -71,6 +85,7 @@ COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/
 
 # build it!
 RUN yarn build
+
 # build integration tests' contracts
 RUN yarn workspace @eth-optimism/integration-tests build
 
