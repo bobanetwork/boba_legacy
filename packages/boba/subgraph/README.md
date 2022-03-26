@@ -1,25 +1,28 @@
-# Boba Network Bridges Subgraphs
+# Boba Network Subgraphs
 
-These subgraphs index the **StandardBridge** contracts and **LiquidityPool** contracts.
+These subgraphs index the **StandardBridge**, the **LiquidityPool**, and the **Boba DAO** contracts.
 
 ## Requirements
 
-The global graph is required to deploy to **The Graph Node**.
+The global graph is required to deploy to **The Graph Node**. Make sure that you have various packages installed.
 
 ```bash
-npm install -g @graphprotocol/graph-cli
+yarn global add @graphprotocol/graph-cli
+yarn global add --dev @graphprotocol/graph-ts
 ```
 
 ## Building & Running
+
+First, `cd` to either the **L1** or the **L2** folders, depending on where you will be deploying your subgraphs to. 
 
 ### L1 Subgraphs
 
 The deploy key is required to deploy subgraphs to **The Graph Node**. 
 
 ```bash
-graph auth  --studio $DEPLOY_KEY
+graph auth --studio $DEPLOY_KEY
 yarn install
-yarn prepare:mainet # yarn prepare:rinkeby
+yarn prepare:mainnet # yarn prepare:rinkeby
 yarn codegen
 yarn build
 graph deploy --studio boba-network # graph deploy --studio boba-network-rinkeby
@@ -31,7 +34,7 @@ The admin port is not public.
 
 ```bash
 yarn install
-yarn prepare:mainet
+yarn prepare:mainnet
 yarn codegen
 yarn build
 yarn create:subgraph:mainnet
