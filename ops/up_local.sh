@@ -25,6 +25,10 @@ if [[ $DAEMON == 0 ]]; then
   echo 'You set DAEMON to 0, which means that your local L1/L2 will run in the front and you will see all the debug log information'
 fi
 
+if [[ $(uname -m) == 'arm64' ]]; then
+  echo 'Building for Mac silicon using linux/arm64'
+fi
+
 #Build dependencies, if needed
 if [[ $BUILD == 1 ]]; then
   yarn

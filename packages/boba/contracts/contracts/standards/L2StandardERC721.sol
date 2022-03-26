@@ -43,7 +43,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
         return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
     }
 
-    function mint(address _to, uint256 _tokenId) public virtual override onlyL2Bridge {
+    function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
         _mint(_to, _tokenId);
 
         emit Mint(_to, _tokenId);
