@@ -538,6 +538,28 @@ describe('Basic RPC tests', () => {
           env.l2Provider.send('eth_estimateGas', [revertingDeployTx])
         ).to.be.reverted
       })
+
+      it('{tag:rpc} should return a constant gas estimate', async () => {
+        let gasPrice = 1
+        const standardGas = await env.l2Provider.estimateGas({
+          from: env.l2Wallet.address,
+          to: defaultTransactionFactory().to,
+          value: 1,
+          gasPrice: 0,
+          data: ethers.utils.hexlify(1234),
+        })
+        while (gasPrice < 10) {
+          const estimateGas = await env.l2Provider.estimateGas({
+            from: env.l2Wallet.address,
+            to: defaultTransactionFactory().to,
+            value: 1,
+            gasPrice,
+            data: ethers.utils.hexlify(1234),
+          })
+          expect(standardGas).to.deep.eq(estimateGas)
+          gasPrice += 1
+        }
+      })
     })
 
     describe('debug_traceTransaction', () => {
