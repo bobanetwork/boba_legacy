@@ -7,6 +7,7 @@ pragma experimental ABIEncoderV2;
 import { iL1NFTBridge } from "./interfaces/iL1NFTBridge.sol";
 import { iL2NFTBridge } from "./interfaces/iL2NFTBridge.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 /* Library Imports */
 import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
@@ -18,6 +19,7 @@ import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC16
 
 /* Contract Imports */
 import { IL1StandardERC721 } from "../standards/IL1StandardERC721.sol";
+import { iSupportBridgeExtraData } from "./interfaces/iSupportBridgeExtraData.sol";
 
 /* External Imports */
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -172,7 +174,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             baseNetwork = Network.L1;
         }
         else {
-            require(ERC165Checker.supportsInterface(_l1Contract, 0x3899b238), "L1 contract is not bridgable");
+            require(ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
 
@@ -194,8 +196,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     function depositNFT(
         address _l1Contract,
         uint256 _tokenId,
-        uint32 _l2Gas,
-        bytes calldata _data
+        uint32 _l2Gas
     )
         external
         virtual
@@ -203,7 +204,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         nonReentrant()
         whenNotPaused()
     {
-        _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, _data);
+        _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, "");
     }
 
     //  /**
@@ -213,8 +214,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _l1Contract,
         address _to,
         uint256 _tokenId,
-        uint32 _l2Gas,
-        bytes calldata _data
+        uint32 _l2Gas
     )
         external
         virtual
@@ -222,7 +222,68 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         nonReentrant()
         whenNotPaused()
     {
-        _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, _data);
+        _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, "");
+    }
+
+    //  /**
+    //  * @inheritdoc iL1NFTBridge
+    //  */
+    function depositNFTWithExtraData(
+        address _l1Contract,
+        uint256 _tokenId,
+        uint32 _l2Gas
+    )
+        external
+        virtual
+        override
+        nonReentrant()
+        whenNotPaused()
+    {
+        bytes memory extraData;
+        // if token has base on this layer
+        if (pairNFTInfo[_l1Contract].baseNetwork == Network.L1) {
+            // check the existence of bridgeExtraData(uint256) on l1Contract
+            if (ERC165Checker.supportsInterface(_l1Contract, 0x9b9284f9)) {
+                extraData = iSupportBridgeExtraData(_l1Contract).bridgeExtraData(_tokenId);
+            } else {
+                // otherwise send tokenURI return (encoded in bytes)
+                // allow to fail if the call fails
+                extraData = abi.encode(IERC721Metadata(_l1Contract).tokenURI(_tokenId));
+            }
+        }
+        // size limits unchecked
+        _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, extraData);
+    }
+
+    //  /**
+    //  * @inheritdoc iL1NFTBridge
+    //  */
+    function depositNFTWithExtraDataTo(
+        address _l1Contract,
+        address _to,
+        uint256 _tokenId,
+        uint32 _l2Gas
+    )
+        external
+        virtual
+        override
+        nonReentrant()
+        whenNotPaused()
+    {
+        bytes memory extraData;
+        // if token has base on this layer
+        if (pairNFTInfo[_l1Contract].baseNetwork == Network.L1) {
+            // check the existence of bridgeExtraData(uint256) on l1Contract
+            if (ERC165Checker.supportsInterface(_l1Contract, 0x9b9284f9)) {
+                extraData = iSupportBridgeExtraData(_l1Contract).bridgeExtraData(_tokenId);
+            } else {
+                // otherwise send tokenURI return (encoded in bytes)
+                // allow to fail if the call fails
+                extraData = abi.encode(IERC721Metadata(_l1Contract).tokenURI(_tokenId));
+            }
+        }
+        // size limits unchecked
+        _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, extraData);
     }
 
     /**
@@ -234,9 +295,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
      * @param _to Account to give the deposit to on L2
      * @param _tokenId NFT token Id to deposit.
      * @param _l2Gas Gas limit required to complete the deposit on L2.
-     * @param _data Optional data to forward to L2. This data is provided
-     *        solely as a convenience for external contracts. Aside from enforcing a maximum
-     *        length, these contracts provide no guarantees about its content.
+     * @param _data Data/metadata to forward to L2. This data is either extraBridgeData,
+     * or encoded tokenURI, in this order of priority if user choses to send, is empty otherwise
      */
     function _initiateNFTDeposit(
         address _l1Contract,
@@ -244,7 +304,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _to,
         uint256 _tokenId,
         uint32 _l2Gas,
-        bytes calldata _data
+        bytes memory _data
     )
         internal
     {
@@ -330,7 +390,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _from,
         address _to,
         uint256 _tokenId,
-        bytes calldata _data
+        bytes memory _data
     )
         external
         override
@@ -351,12 +411,12 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             // verify the deposited token on L2 matches the L1 deposited token representation here
             if (
                 // check with interface of IL1StandardERC721
-                ERC165Checker.supportsInterface(_l1Contract, 0x3899b238) &&
+                ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce) &&
                 _l2Contract == IL1StandardERC721(_l1Contract).l2Contract()
             ) {
                 // When a deposit is finalized, we credit the account on L2 with the same amount of
                 // tokens.
-                IL1StandardERC721(_l1Contract).mint(_to, _tokenId);
+                IL1StandardERC721(_l1Contract).mint(_to, _tokenId, _data);
                 emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
             } else {
                 bytes memory message = abi.encodeWithSelector(

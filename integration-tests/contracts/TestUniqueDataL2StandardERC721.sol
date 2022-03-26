@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "./L2StandardERC721.sol";
+import "@boba/contracts/contracts/standards/L2StandardERC721.sol";
 
 /**
-* Custom L2 ERC721, add your custom logic which you also need on the other chain.
+* Sample L2 representation of TestUniqueDataERC721
 */
-contract L2CustomERC721 is L2StandardERC721 {
+contract TestUniqueDataL2StandardERC721 is L2StandardERC721 {
+
+    mapping(uint256 => string) private _tokenURIs;
 
     /**
      * @param _l2Bridge Address of the L2 standard bridge.
@@ -27,6 +29,9 @@ contract L2CustomERC721 is L2StandardERC721 {
         super.mint(_to, _tokenId, _data);
 
         // do something with _data
+        if(_data.length != 0) {
+            _setTokenURI(_tokenId, abi.decode(_data, (string)));
+        }
     }
 
     /**
@@ -34,6 +39,20 @@ contract L2CustomERC721 is L2StandardERC721 {
     * You basically can just copy the same logic from your original ERC721 contract.
     */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        revert("Not implemented");
+        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
+        return _tokenURIs[tokenId];
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+        require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
+        _tokenURIs[tokenId] = _tokenURI;
+    }
+
+    function _burn(uint256 tokenId) internal virtual override {
+        super._burn(tokenId);
+
+        if (bytes(_tokenURIs[tokenId]).length != 0) {
+            delete _tokenURIs[tokenId];
+        }
     }
 }
