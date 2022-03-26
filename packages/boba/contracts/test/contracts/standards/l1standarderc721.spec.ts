@@ -33,7 +33,7 @@ describe('L1 Standard ERC721 Tests', () => {
     expect(await l1StandardERC721.supportsInterface(erc165)).to.equal(true)
     const erc721 = '0x80ac58cd'
     expect(await l1StandardERC721.supportsInterface(erc721)).to.equal(true)
-    const erc721bridgable = '0x3899b238'
+    const erc721bridgable = '0xec88b5ce'
     expect(await l1StandardERC721.supportsInterface(erc721bridgable)).to.equal(
       true
     )

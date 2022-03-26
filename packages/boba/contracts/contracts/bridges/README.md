@@ -82,8 +82,7 @@ Users then call the `depositNFT` or `depositNFTTo` function to deposit NFT to L2
 const tx = await L1NFTBrige.depositNFT(
   L1_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -103,8 +102,7 @@ Then, users call the `withdraw` or `withdrawTo` function to exit the NFT from Bo
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -124,8 +122,7 @@ Users then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -145,8 +142,7 @@ Users then call the `depositNFT` or `depositNFTTo` function to deposit NFT to L2
 const tx = await L1NFTBrige.depositNFT(
   L1_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
