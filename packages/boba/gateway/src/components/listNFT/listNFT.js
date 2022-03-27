@@ -123,6 +123,27 @@ class listNFT extends React.Component {
       tokenID
     } = this.state
 
+    //console.log("meta:", meta)
+    //console.log("URL:", URL)
+
+    let rarity = ''
+    if(meta && meta.hasOwnProperty("attributes")) {
+      if(meta.attributes.length === 5){
+        if(meta.attributes[3].trait_type === 'Top') {
+          rarity = 'Basic'
+          console.log(meta.attributes[3].value)
+          console.log(meta.attributes[4].value)
+          if(meta.attributes[3].value === 'crown' && meta.attributes[4].value === 'wizzard') {
+            rarity = 'Rarest (2/1000)' // 1000 * 5/256 * 20/256
+          } else if (meta.attributes[3].value === 'crown') {
+            rarity = 'Very rare (20/1000)' // 1000 * 5/256
+          } else if (meta.attributes[4].value === 'wizzard') {
+            rarity = 'Rare (78/1000)' // 1000 * 20/256
+          }
+        }
+      }
+    }
+
     let imgSource = URL
     if (URL.substring(0, 4) === '<svg') {
       imgSource = `data:image/svg+xml;utf8,${URL}`
@@ -140,13 +161,12 @@ class listNFT extends React.Component {
             width={'100%'}
           />
           <div
-            style={{
-              padding: '10px 5px'
-            }}
+            style={{padding: '10px 5px'}}
             className={styles.topContainer}>
             <Typography variant="body1">
-              {meta.name}
+              {meta.name}{' '}({symbol})
             </Typography>
+            <Typography variant="body3">TokenID:{' '}{tokenID}</Typography>
           </div>
         </S.ListNFTItem>
         <S.ListNFTItem 
@@ -154,58 +174,44 @@ class listNFT extends React.Component {
           item 
           onClick={this.handleClick}
         >
-            <Typography variant="body1">
-              {meta.name}<br/>({symbol})
-            </Typography>
-            <Typography variant="body1">
-              TokenID:{' '}{tokenID}
-            </Typography>
-            {meta.collection !== '' &&
-              <Typography variant="body3">
-                Collection:{' '}{meta.collection}
+          {meta.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta.collection}</Typography>}
+          {meta.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta.rank}</Typography>}
+          {meta.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta.rarity_score}</Typography>}
+          {rarity !== ''            && <Typography variant="body3">Rarity:{' '}{rarity}</Typography>}
+          {(meta.attributes || []).map((attr, index) => {
+            return (
+              <Typography variant="body3" key={index}>
+                {attr.trait_type}:{' '}{attr.value}
               </Typography>
-            }
-            {meta.rank !== '' &&
-              <Typography variant="body3">
-                Rank:{' '}{meta.rank}
+            )
+          })}
+          {(meta.traits || []).map((attr, index) => {
+            return (
+              <Typography variant="body3" key={index}>
+                {attr.trait_type}:{' '}{attr.trait_value}
               </Typography>
-            }
-            {meta.rarity_score !== '' &&
-              <Typography variant="body3">
-                Rarity:{' '}{meta.rarity_score}
-              </Typography>
-            }
-            {(meta.attributes || []).map((attr, index) => {
-              return (
-                <Typography variant="body3" key={index}>
-                  {attr.trait_type}:{' '}{attr.value}
-                </Typography>
-              )
-            })}
-            {(meta.traits || []).map((attr, index) => {
-              return (
-                <Typography variant="body3" key={index}>
-                  {attr.trait_type}:{' '}{attr.trait_value}
-                </Typography>
-              )
-            })}
-            <Button
-              variant="outlined"
-              onClick={(e) => {this.handleTransfer()}}
-              size="small"
-            >
-              Transfer to another wallet
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={(e) => {
-                e.stopPropagation();
-                this.handleRemove();
-              }}
-              size="small"
-            >
-              Remove
-            </Button>
+            )
+          })}
+          <Button
+            type="primary"
+            variant="contained"
+            style={{marginTop: '10px', marginBottom: '10px'}}
+            onClick={(e) => {this.handleTransfer()}}
+            size="small"
+          >
+            Transfer
+          </Button>
+          <Button
+            type="primary"
+            variant="contained"
+            onClick={(e) => {
+              e.stopPropagation();
+              this.handleRemove();
+            }}
+            size="small"
+          >
+            Remove
+          </Button>
         </S.ListNFTItem>
       </ReactCardFlip>
     )

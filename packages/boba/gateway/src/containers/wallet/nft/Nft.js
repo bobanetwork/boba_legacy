@@ -190,13 +190,22 @@ class Nft extends React.Component {
                   <br/>Useful addresses
                 </Typography>
                 <Typography variant="body2" >
-                  Turing monsters:
+                  Turing monsters (Mainnet):
                 </Typography>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography variant="body3" >
-                    0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA
+                    0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793
                   </Typography>
-                  <Copy value={'0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'} light={false} />
+                  <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
+                </Box>
+                <Typography variant="body2" >
+                  Turing monsters (Rinkeby):
+                </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body3" >
+                    0x02C92e7420Ba673ebf0080A6F3ce76D5cd4c854e
+                  </Typography>
+                  <Copy value={'0x02C92e7420Ba673ebf0080A6F3ce76D5cd4c854e'} light={false} />
                 </Box>
 
               </Box>
@@ -238,11 +247,11 @@ class Nft extends React.Component {
               </Button>
             </S.NFTFormContent>
           </S.NFTActionContent>
-          <S.NFTListContainer dataempty={Object.keys(list).length === 0}>
+          <S.NFTListContainer  data-empty={Object.keys(list).length === 0}>
             {Object.keys(list).length === 0 ?
               <Box>
                 <Typography variant="body2"  sx={{opacity: 0.65}} >
-                  Please enter the contract address and tokenID to add NFT for display.<br/>
+                  Please enter the contract address and TokenID to display an NFT.<br/>
                   If you don't know your TokenID, you can look it up in the blockexplorer.<br/>
                   It's shown for mint or transfer events.
                 </Typography>

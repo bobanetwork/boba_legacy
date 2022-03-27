@@ -81,13 +81,6 @@ import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
 
-// interface CrossDomainMessagePair {
-//   tx: Transaction
-//   receipt: TransactionReceipt
-//   remoteTx: Transaction
-//   remoteReceipt: TransactionReceipt
-// }
-
 require('dotenv').config()
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -620,8 +613,10 @@ class NetworkService {
       console.log("tokens:",allTokens)
       this.tokenAddresses = allTokens
 
+      if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
+
       if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return        
 
       if(allAddresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
@@ -1047,9 +1042,12 @@ class NetworkService {
       const nftName = await contract.name()
       const nftSymbol = await contract.symbol()
       const nftMeta = await contract.tokenURI(tokenID)
+      console.log("nftMeta RAW:", nftMeta)
       const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
       const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+
+      console.log("meta:", meta)
 
       const NFT = {
         UUID,
@@ -1330,15 +1328,13 @@ class NetworkService {
     // ONLY SUPPORTED on L2
     if( this.L1orL2 !== 'L2' ) return
 
-    // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
-
-    const monsterAddress = '0x2b503dd5B4A6fc491A1f9Eb1e7b67b679b9d95BA'
+    // ONLY SUPPORTED on Rinkeby and Mainnet
+    if (this.networkGateway === 'local') return
 
     try {
 
       const contract = new ethers.Contract(
-        monsterAddress,
+        allAddresses.BobaMonsters,
         TuringMonsterJson.abi,
         this.L2Provider
       )
@@ -1353,7 +1349,7 @@ class NetworkService {
       const rawData = receipt.logs[3].topics[1]
       const numberHexString = rawData.slice(-64)
       let tokenID = parseInt(numberHexString, 16)
-      await this.addNFT( monsterAddress, tokenID )
+      await this.addNFT( allAddresses.BobaMonsters, tokenID )
 
       return tx
     } catch (error) {

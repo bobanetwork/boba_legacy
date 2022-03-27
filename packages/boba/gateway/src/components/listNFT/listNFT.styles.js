@@ -3,17 +3,16 @@ import { styled } from '@mui/material/styles';
 
 
 export const ListNFTItem = styled(Grid)(({ theme, active }) => ({
-  borderRadius: '20px',
-  maxWidth: '180px',
-  minWidth: '180px',
-  margin: '10px',
+  borderRadius: '10px',
+  maxWidth: '200px',
+  minWidth: '200px',
   background: theme.palette.background.secondary,
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '30px',
+  justifyContent: 'space-around',
+  alignItems: 'flex-start',
+  //gap: '30px',
   border: '1px solid transparent',
   padding: active ? '10px' : '0px',
   minHeight: '250px',
