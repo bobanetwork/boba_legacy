@@ -19,9 +19,9 @@ import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 
 import { orderBy } from 'lodash'
-import { selectNetwork } from 'selectors/setupSelector'
+// import { selectNetwork } from 'selectors/setupSelector'
 
-import { getNetwork } from 'util/masterConfig'
+// import { getNetwork } from 'util/masterConfig'
 
 import moment from 'moment'
 
@@ -157,17 +157,17 @@ function TX_Pending({ searchHistory, transactions }) {
     //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
-    const currentNetwork = useSelector(selectNetwork())
-    const nw = getNetwork()
+    // const currentNetwork = useSelector(selectNetwork())
+    // const nw = getNetwork()
 
-    const chainLink = (item) => {
-        let network = nw[currentNetwork]
-        let chain = item.chain === 'L1pending' ? 'L1' : item.chain;
-        if (!!network && !!network[chain]) {
-            return `${network[chain].transaction}${item.hash}`;
-        }
-        return '';
-    }
+    // const chainLink = (item) => {
+    //     let network = nw[currentNetwork]
+    //     let chain = item.chain === 'L1pending' ? 'L1' : item.chain;
+    //     if (!!network && !!network[chain]) {
+    //         return `${network[chain].transaction}${item.hash}`;
+    //     }
+    //     return '';
+    // }
 
     console.log("PendingToShow:", paginatedTransactions)
 
