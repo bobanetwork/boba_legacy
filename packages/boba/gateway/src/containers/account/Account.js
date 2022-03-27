@@ -18,7 +18,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { isEqual } from 'lodash'
 
 //Selectors
-import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
@@ -51,7 +51,7 @@ function Account ({ enabled }) {
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
-  const baseEnabled = useSelector(selectBaseEnabled())
+  //const baseEnabled = useSelector(selectBaseEnabled())
   const networkLayer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
 

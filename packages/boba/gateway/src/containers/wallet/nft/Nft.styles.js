@@ -47,16 +47,15 @@ export const NFTFormContent = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const NFTListContainer = styled(Grid)(({ theme, dataempty }) => ({
+export const NFTListContainer = styled(Grid)((props) => ({
   width: '63%',
-  background: !!dataempty ? theme.palette.background.secondary : 'none',
-  padding: !!dataempty ? '10px' : 0,
-  borderRadius: !!dataempty ? '20px' : 0,
-  [ theme.breakpoints.down('sm') ]: {
+  background: !props['data-empty'] ? props.theme.palette.background.secondary : 'none',
+  padding: !props['data-empty'] ? '10px' : 0,
+  borderRadius: !props['data-empty'] ? '20px' : 0,
+  [ props.theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
-}));
-
+}))
 
 export const NFTPageContent = styled(Grid)(({theme}) => ({
   marginTop: '20px',

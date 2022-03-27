@@ -34,11 +34,13 @@ function App () {
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
 
+  const radioGreen = '#BAE21A'
+
   let MUItheme = createTheme({
     palette: {
       mode: theme === 'light' ? 'light' : 'dark',
       primary: {
-        main: '#BAE21A',
+        main: radioGreen,
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
       },
@@ -56,7 +58,7 @@ function App () {
       },
       neutral: {
         main: '#fff',
-        contrastText: '#BAE21A',
+        contrastText: radioGreen,
       },
     },
     typography: {
@@ -120,25 +122,25 @@ function App () {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: '#BAE21A',
+              background: radioGreen,
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: "#BAE21A",
+                backgroundColor: radioGreen,
               }
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: '#BAE21A' , //light ? '#000' : '#fff',
+              color: radioGreen, //light ? '#000' : '#fff',
               borderWidth: '1.4px',
-              borderColor: '#BAE21A',
+              borderColor: radioGreen,
               filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
               "&:hover": {
                 color: '#000',
-                borderColor: '#BAE21A',
-                backgroundColor: "#BAE21A",
+                borderColor: radioGreen,
+                backgroundColor: radioGreen,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }
