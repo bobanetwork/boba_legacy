@@ -1,4 +1,4 @@
-// Sources flattened with hardhat v2.9.2 https://hardhat.org
+// Sources flattened with hardhat v2.8.4 https://hardhat.org
 
 // File @openzeppelin/contracts/utils/introspection/IERC165.sol@v4.3.2
 
@@ -30,14 +30,14 @@ interface IERC165 {
 
 // File @openzeppelin/contracts/interfaces/IERC165.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
 
 // File @openzeppelin/contracts/interfaces/IERC2981.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -61,7 +61,7 @@ interface IERC2981 is IERC165 {
 
 // File @openzeppelin/contracts/token/ERC721/IERC721.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -205,7 +205,7 @@ interface IERC721 is IERC165 {
 
 // File @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -235,7 +235,7 @@ interface IERC721Receiver {
 
 // File @openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -263,7 +263,7 @@ interface IERC721Metadata is IERC721 {
 
 // File @openzeppelin/contracts/utils/Address.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -483,7 +483,7 @@ library Address {
 
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -510,7 +510,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/utils/Strings.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -580,7 +580,7 @@ library Strings {
 
 // File @openzeppelin/contracts/utils/introspection/ERC165.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -610,7 +610,7 @@ abstract contract ERC165 is IERC165 {
 
 // File @openzeppelin/contracts/token/ERC721/ERC721.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1023,7 +1023,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
 
 // File @openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1050,7 +1050,7 @@ abstract contract ERC721Burnable is Context, ERC721 {
 
 // File @openzeppelin/contracts/security/Pausable.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1142,7 +1142,7 @@ abstract contract Pausable is Context {
 
 // File @openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1176,7 +1176,7 @@ abstract contract ERC721Pausable is ERC721, Pausable {
 
 // File @openzeppelin/contracts/utils/Counters.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1222,9 +1222,8 @@ library Counters {
 
 // File contracts/AddLimitedSupply.sol
 
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
 
+pragma solidity ^0.8.9;
 /// @title A token tracker that limits the token supply and increments token IDs on each new mint.
 abstract contract AddLimitedSupply {
     using Counters for Counters.Counter;
@@ -1286,7 +1285,7 @@ abstract contract AddLimitedSupply {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1359,7 +1358,7 @@ abstract contract Ownable is Context {
 
 // File contracts/ITuringHelper.sol
 
-//SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
 
 interface ITuringHelper {
@@ -1385,10 +1384,8 @@ interface ITuringHelper {
 
 // File contracts/TuringHelper.sol
 
-//SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
-
-
 contract TuringHelper is ITuringHelper, Ownable {
 
   TuringHelper Self;
@@ -1521,10 +1518,8 @@ contract TuringHelper is ITuringHelper, Ownable {
 
 // File contracts/RandomlyAssigned.sol
 
-// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
-
-
 /// @title Randomly assign tokenIDs from a given set of tokens.
 abstract contract RandomlyAssigned is AddLimitedSupply {
     // Used for random index assignment
@@ -1580,7 +1575,7 @@ abstract contract RandomlyAssigned is AddLimitedSupply {
 
 // File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.3.2
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity ^0.8.0;
 
@@ -1665,11 +1660,8 @@ interface IERC20 {
 
 // File contracts/AddRecover.sol
 
-// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
-
-
-
 contract AddRecover is Ownable {
 
     /// @dev Recovers ERC20 tokens accidentally sent to the contract.
@@ -1686,7 +1678,7 @@ contract AddRecover is Ownable {
 
 // File base64-sol/base64.sol@v1.1.0
 
-// SPDX-License-Identifier: MIT
+
 
 pragma solidity >=0.6.0;
 
@@ -1820,7 +1812,7 @@ library Base64 {
 
 // File contracts/AddOnChainMetaData.sol
 
-// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
 
 
@@ -1855,7 +1847,7 @@ abstract contract AddOnChainMetaData is ERC721 {
         "<style type='text/css'>.st0{fill:rgb(";
         part[1] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:rgb(";
         part[2] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:rgb(";
-        
+
         string memory top = "plain";
         if(uint8(i_bytes[9]) > 250) {
             // wow
@@ -1880,7 +1872,7 @@ abstract contract AddOnChainMetaData is ERC721 {
         "<path class='st2' d='M78.9,120.4c-3.2,4.1-3.4,24.3-1.1,28.4c3.8,6.8,28.5,11.8,32.6,10.6c5.4-1.7,9.2-6.6,11.2-11.9c2.8-7.4,2.7-15.5,2.5-23.4c-0.2-8.7,1.8-15.9,10-20.8c4.6-2.7,10-3.9,15.4-4.2c7.6-0.5,21.7,12.5,22.1,14.9c2.2,15-2.7,30.9-12.9,42c-1,1.1-26.9,2-32-5.1c-3.6-5,0-39.3-10.8-46.3C108.4,99.6,80.3,118.6,78.9,120.4z'/>"
         "<path class='st2' d='M178.9,149.6c0.7,1.2,21.3,4.9,28.4,3.3c5.7-1.3,11.8-3.8,14.4-9.1c1.5-3,1.6-6.4,1.6-9.8c0.2-8.4,0-17.8-5.6-24.1c-5-5.6-13-7.2-20.4-7.7c-5.6-0.4-11.7-0.3-16.3,2.9C167.4,114.5,172.1,137.6,178.9,149.6z'/>"
         "<path class='st3' d='M100.8,193c7.9,5.6,16.8,9.9,26.1,12.9c10.9,3.5,22.3,5.1,33.7,4.3c4.8-0.4,9.8-1.2,13.8-4c3.1-2.1,13.4-16.6,16.3-20.7'/>";
-        
+
         string memory magic = "scarless";
         if(uint8(i_bytes[10]) > 235) {
             // nice!
@@ -1895,8 +1887,8 @@ abstract contract AddOnChainMetaData is ERC721 {
         string memory attributes = string(abi.encodePacked(
                 '[{"trait_type": "Eye", "value": "', colorEye, '"},',
                 '{"trait_type": "Body", "value": "', colorBody, '"},',
-                '{"trait_type": "Extra", "value": "', colorExtra, '"}',
-                '{"trait_type": "Top", "value": "', top, '"}',
+                '{"trait_type": "Extra", "value": "', colorExtra, '"},',
+                '{"trait_type": "Top", "value": "', top, '"},',
                 '{"trait_type": "Magic", "value": "', magic, '"}]'));
         string memory json = Base64.encode(bytes(string(
                 abi.encodePacked('{"name": "TuringMonster", "description": "Little Monsters everywhere.", "attributes":',
@@ -1935,16 +1927,9 @@ abstract contract AddOnChainMetaData is ERC721 {
 
 // File contracts/NFTMonsterV2.sol
 
-// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.9;
-
-
-
-
-
-
-
-contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, AddRecover, AddOnChainMetaData {
+contract NFTMonsterV2Flat is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssigned, AddRecover, AddOnChainMetaData {
 
     uint256 public constant PRICE = 0; // 0.0000000001 ether;
     uint256 public constant ROYALTY_PERCENTAGE = 5; // 5 %

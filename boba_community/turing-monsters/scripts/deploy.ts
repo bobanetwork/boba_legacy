@@ -14,10 +14,13 @@ async function main() {
     TuringHelperJson.abi,
     TuringHelperJson.bytecode, testWallet)
 
+  const isMainnet: boolean = true
+  const useFlattened: boolean = false
+
   const helper = await Factory__Helper.deploy()
   console.log("Turing Helper contract deployed at", helper.address)
 
-  const NFTMonsterV2 = await ethers.getContractFactory("NFTMonsterV2");
+  const NFTMonsterV2 = await ethers.getContractFactory(useFlattened ? "NFTMonsterV2Flat" : "NFTMonsterV2");
   const nftMonster = await NFTMonsterV2.deploy(
     "TuringMonster",
     "TUMO",
@@ -25,11 +28,12 @@ async function main() {
     ['0xC98469Fd959d96722723dbC7Dba58b36E7854386'],
     helper.address,
     {});
+
   await nftMonster.deployed();
 
   console.log("TuringMonsters deployed at", nftMonster.address)
 
-  await nftMonster.startTrading(); // make NFT tradeable
+  // await nftMonster.startTrading(); // make NFT tradeable --> don't automatically
 
   // white list your ERC721 contract in your helper
   // this is for your own security, so that only your contract can call your helper
@@ -45,13 +49,13 @@ async function main() {
 
 
   // use proxy address
-  const BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf' // testnet: '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+  const BobaTuringCreditAddress = isMainnet ? '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf' : '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
   const turingCredit = getContractFactory(
     'BobaTuringCredit',
     testWallet
   ).attach(BobaTuringCreditAddress)
 
-  const BOBAL2Address = '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7' // testnet: '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+  const BOBAL2Address = isMainnet ? '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7' : '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
   const L2BOBAToken = new Contract(
     BOBAL2Address,
     L2GovernanceERC20Json.abi,

@@ -225,6 +225,7 @@ describe("Turing bridgeable NFT Random 256", function () {
 
     let uri = await erc721.tokenURI(tokenId, gasOverride)
     const jsonStr = Buffer.from(uri.substring(uri.indexOf(',')+1), 'base64').toString()
+    console.error(jsonStr)
     const decodedMetadata = JSON.parse(jsonStr)
     console.log("Decoded metadata = ", jsonStr)
 
