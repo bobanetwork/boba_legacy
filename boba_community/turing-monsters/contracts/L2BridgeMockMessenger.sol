@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 /** Contract mock for testing the bridging functionality */
 contract L2BridgeMockMessenger  {

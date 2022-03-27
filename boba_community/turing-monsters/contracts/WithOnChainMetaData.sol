@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -20,7 +20,7 @@ abstract contract WithOnChainMetaData is ERC721 {
         bytes memory i_bytes = abi.encodePacked(genome);
         // ... all the way to uint8(i_bytes[31])
 
-        string[7] memory part;
+        string[6] memory part;
 
         string memory colorEye = string(abi.encodePacked(Strings.toString(uint8(i_bytes[0])), ",", Strings.toString(uint8(i_bytes[3])), ",", Strings.toString(uint8(i_bytes[6]))));
         string memory colorBody = string(abi.encodePacked(Strings.toString(uint8(i_bytes[1])), ",", Strings.toString(uint8(i_bytes[4])), ",", Strings.toString(uint8(i_bytes[7]))));
@@ -30,21 +30,24 @@ abstract contract WithOnChainMetaData is ERC721 {
         "<style type='text/css'>.st0{fill:rgb(";
         part[1] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:rgb(";
         part[2] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:rgb(";
-        part[3] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st3{fill:none;stroke:black;stroke-width:10;stroke-miterlimit:10;}</style>";
-        part[4] = "<path class='st0' d='M57.6,152.6c-1.5,13.8-22.2,27.3-25.5,30.4c-3.3,3.1-3.7,9.7-0.5,16.4c4.3,5.5,8.1,15.7,21.1,10c4-1.6,12.9-10,15.9-11.4'/>"
-        "<path class='st0' d='M236.8,172.2c2.1,1.8,8.7,7.2,11.4,8.3s5.9,1.3,8.4-0.1c1.7-1,14.6-18.2,15.4-21.6c1-4.3-0.4-9.2-3.6-12.3c-3.3-3.2-22.3-11.8-30.8-10.9'/>"
-
+        
         string memory top = "plain";
         if(uint8(i_bytes[9]) > 250) {
             // wow
             top = "crown";
-            part[5] = "<path class='st0' d='M199.3,78.3c1.3-13,7.8-25,14.9-36.7c-3.8,1.9-21.9,19.8-26.2,17.7c-2.7-5.1-2.2-12-2.9-19.7c-0.5-5.9-0.7-9.9-1.3-15.8C177.2,34.5,162.4,54,162,54.1c-3.9,0.3-9.7-30.2-13.3-44.2c-3.9,13.6-9,45.1-13.5,44.2c-3.2-2.6-17.7-24.2-21.5-30.5c-2.6,11.1-1.8,35.6-5.2,36c-8.2-2.6-18.3-13.8-25.8-19.2c0.5,0.3,8.3,16.9,9.7,20c0.8,1.9,3.8,9.1,5.6,17.9'/>";
+            part[3] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st3{fill:none;stroke:black;stroke-width:10;stroke-miterlimit:10;}</style>"
+            "<path class='st0' d='M57.6,152.6c-1.5,13.8-22.2,27.3-25.5,30.4c-3.3,3.1-3.7,9.7-0.5,16.4c4.3,5.5,8.1,15.7,21.1,10c4-1.6,12.9-10,15.9-11.4'/>"
+            "<path class='st0' d='M236.8,172.2c2.1,1.8,8.7,7.2,11.4,8.3s5.9,1.3,8.4-0.1c1.7-1,14.6-18.2,15.4-21.6c1-4.3-0.4-9.2-3.6-12.3c-3.3-3.2-22.3-11.8-30.8-10.9'/>"
+            "<path class='st0' d='M199.3,78.3c1.3-13,7.8-25,14.9-36.7c-3.8,1.9-21.9,19.8-26.2,17.7c-2.7-5.1-2.2-12-2.9-19.7c-0.5-5.9-0.7-9.9-1.3-15.8C177.2,34.5,162.4,54,162,54.1c-3.9,0.3-9.7-30.2-13.3-44.2c-3.9,13.6-9,45.1-13.5,44.2c-3.2-2.6-17.7-24.2-21.5-30.5c-2.6,11.1-1.8,35.6-5.2,36c-8.2-2.6-18.3-13.8-25.8-19.2c0.5,0.3,8.3,16.9,9.7,20c0.8,1.9,3.8,9.1,5.6,17.9'/>";
         } else {
             // sorry :-(
-            part[5] = "<path class='st0' d='M123.1,67.1c-2.8-6-14.4-20.7-4-24c7.7-2.8,13,14,21.5,13.1c9.4-0.4-14.6-35.3,6.9-36.8c3.3-0.2,10.3,0,12.8,9.5c1.3,9-6.3,12-0.7,15.1c9,3.7,17.4-11.2,23.9-3.1c5.9,10-4.7,17.6-10.1,24.1'/>";
+            part[3] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st3{fill:none;stroke:black;stroke-width:10;stroke-miterlimit:10;}</style>"
+            "<path class='st0' d='M57.6,152.6c-1.5,13.8-22.2,27.3-25.5,30.4c-3.3,3.1-3.7,9.7-0.5,16.4c4.3,5.5,8.1,15.7,21.1,10c4-1.6,12.9-10,15.9-11.4'/>"
+            "<path class='st0' d='M236.8,172.2c2.1,1.8,8.7,7.2,11.4,8.3s5.9,1.3,8.4-0.1c1.7-1,14.6-18.2,15.4-21.6c1-4.3-0.4-9.2-3.6-12.3c-3.3-3.2-22.3-11.8-30.8-10.9'/>"
+            "<path class='st0' d='M123.1,67.1c-2.8-6-14.4-20.7-4-24c7.7-2.8,13,14,21.5,13.1c9.4-0.4-14.6-35.3,6.9-36.8c3.3-0.2,10.3,0,12.8,9.5c1.3,9-6.3,12-0.7,15.1c9,3.7,17.4-11.2,23.9-3.1c5.9,10-4.7,17.6-10.1,24.1'/>";
         }
 
-        part[6] = "<circle class='st1' cx='148.5' cy='154.4' r='90.9'/>"
+        part[4] = "<circle class='st1' cx='148.5' cy='154.4' r='90.9'/>"
         "<path class='st0' d='M204.5,243.7c0.4,4.7,1.8,9.7,5.6,12.6c2.9,2.2,6.7,2.8,10.3,3.2c6.4,0.8,12.8,1.5,19.1,0.7s12.7-3.4,16.9-8.2c0.7-0.8,1.4-1.7,1.7-2.7c0.8-2.2,0-4.7-1.3-6.7c-3.9-6.4-11.4-9.5-18.4-12.2c-4.1-1.6-8.3-3.2-12.4-4.8c-5.2-2-13.5-6.8-18-1.5C204.2,228.6,204,238.2,204.5,243.7z'/>"
         "<path class='st0' d='M76,240.7c-4.6,2.4-8.4,6.2-11.8,10.2c-3.9,4.6-7.5,9.8-8.5,15.8s1.2,12.8,6.4,15.8c3.2,1.8,7.1,2,10.8,2c5,0,10-0.2,15-0.5c5.3-0.4,10.9-1.1,15.3-4c3.2-2.1,5.7-5.3,7.9-8.4c4.1-5.7,7.9-11.8,8.9-18.7c0.2-1.7,0.3-3.6-0.4-5.2c-0.6-1.4-1.6-2.5-2.6-3.5C107,234.6,87.9,234.5,76,240.7z'/>"
         "<path class='st0' d='M178.8,200.7c2.2,6,5.6,16.9,7.7,22.9c3.8-6.8,5-15,3.5-22.6c-0.4-1.9-3.6-7.7-5.3-8.6'/>"
@@ -57,13 +60,13 @@ abstract contract WithOnChainMetaData is ERC721 {
         if(uint8(i_bytes[10]) > 235) {
             // nice!
             magic = "wizzard";
-            part[7] = "<path class='st3' d='M246.1,202.5c10.8-44.5,12.3-59.3,24.7-118.6'/><circle class='st1' cx='272.3' cy='73.7' r='10.2'/></svg>";
+            part[5] = "<path class='st3' d='M246.1,202.5c10.8-44.5,12.3-59.3,24.7-118.6'/><circle class='st1' cx='272.3' cy='73.7' r='10.2'/></svg>";
         } else {
             // sorry :-(
-            part[7] = "</svg>";
+            part[5] = "</svg>";
         }
 
-        string memory svgData = string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4], part[5], part[6], part[7]));
+        string memory svgData = string(abi.encodePacked(part[0], colorEye, part[1], colorBody, part[2], colorExtra, part[3], part[4], part[5]));
         string memory attributes = string(abi.encodePacked(
                 '[{"trait_type": "Eye", "value": "', colorEye, '"},',
                 '{"trait_type": "Body", "value": "', colorBody, '"},',
