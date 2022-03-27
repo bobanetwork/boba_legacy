@@ -1,6 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
+import { settle_v0, settle_v1 } from 'actions/networkAction'
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -55,12 +56,12 @@ function TokenList({
     setSliderValue_v1(e.target.value)
   }
 
-  const settle_v0 = () => {
-    dispatch(settle_v0())
+  async function doSettle_v0 () {
+    await dispatch(settle_v0())
   }
 
-  const settle_v1 = () => {
-    dispatch(settle_v1())
+  async function doSettle_v1 () {
+    await dispatch(settle_v1())
   }
 
   if (isMobile) {
@@ -216,7 +217,7 @@ function TokenList({
                     aria-label="WAGMIv0"
                   />
                   <Button
-                    onClick={() => { settle_v0() }}
+                    onClick={() => { doSettle_v0() }}
                     variant="contained"
                     color="primary"
                     disabled={true}
@@ -247,7 +248,7 @@ function TokenList({
                     aria-label="WAGMIv1"
                   />
                   <Button
-                    onClick={() => { settle_v1() }}
+                    onClick={() => { doSettle_v1() }}
                     variant="contained"
                     disabled={true}
                     tooltip="Settle your WAGMv1 long options."
@@ -404,7 +405,7 @@ function TokenList({
                   If TVL = {TVL_v0.toFixed(0)}M each option<br/> settles for {WAGMI_v0.toFixed(1)} BOBA
                 </Typography>
                 <Button
-                  onClick={() => { settle_v0() }}
+                  onClick={() => { doSettle_v0() }}
                   variant="contained"
                   color="primary"
                   disabled={true}
@@ -442,7 +443,7 @@ function TokenList({
                   If TVL = {TVL_v1.toFixed(0)}k ETH each option<br/> settles for {WAGMI_v1.toFixed(1)} BOBA
                 </Typography>
                 <Button
-                  onClick={() => { settle_v1() }}
+                  onClick={() => { doSettle_v1() }}
                   variant="contained"
                   color="primary"
                   disabled={true}

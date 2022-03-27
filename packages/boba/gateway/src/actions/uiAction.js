@@ -27,7 +27,7 @@ export function setTheme (theme) {
 
 export function openModal (modal, token, fast) {
   return function (dispatch) {
-    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast });
+    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast })
   }
 }
 
