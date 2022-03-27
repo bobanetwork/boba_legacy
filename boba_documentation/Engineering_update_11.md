@@ -2,7 +2,7 @@
 
 March 9, 2022
 
-Greetings from your engineering team. Last week saw the deployment of the final version of Turing (on Rinkeby), a regenesis of Rinkeby, and the deployment of Turing on Mainnet. This is a major milestone, since it marks our first big step towards the Boba we envision. As you know, Boba is not an L2 scaling solution, but a hybrid computer which allows a distributed computer, namely Ethereum, to interact seamlessly with all non-distributed computers (the Web 2 world). As part of this milestone, the online presence of Boba network will become more differentiated and more focused on the needs of Web2 and Metaverse developers looking to build compelling Web3 experiences. 
+Greetings from your engineering team. Last week saw the deployment of the final version of Turing (on Rinkeby), a regenesis of Rinkeby, and the deployment of Turing on Mainnet. This is a major milestone, since it marks our first big step towards the Boba we envision. As you know, Boba is not just an L2 scaling solution, but a hybrid computer which allows a distributed computer, namely Ethereum, to interact seamlessly with all non-distributed computers (the Web 2 world). As part of this milestone, the online presence of Boba network will become more differentiated and more focused on the needs of Web2 and Metaverse developers looking to build compelling Web3 experiences. 
 
 ## 1. Boba Development will move to github.com/bobanetwork; Hackathons 
 
