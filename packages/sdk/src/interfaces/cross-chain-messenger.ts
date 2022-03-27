@@ -208,10 +208,18 @@ export interface ICrossChainMessenger {
    * Finds the receipt of the transaction that executed a particular cross chain message.
    *
    * @param message Message to find the receipt of.
+   * @param opts.fromBlock Block to start looking from - constrains eth_getLogs.
+   * @param opts.toBlock End Block to stop looking - constrains eth_getLogs.
    * @returns CrossChainMessage receipt including receipt of the transaction that relayed the
    * given message.
    */
-  getMessageReceipt(message: MessageLike): Promise<MessageReceipt>
+  getMessageReceipt(
+    message: MessageLike,
+    opts?: {
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
+    }
+  ): Promise<MessageReceipt>
 
   /**
    * Waits for a message to be executed and returns the receipt of the transaction that executed
@@ -222,6 +230,8 @@ export interface ICrossChainMessenger {
    * @param opts.confirmations Number of transaction confirmations to wait for before returning.
    * @param opts.pollIntervalMs Number of milliseconds to wait between polling for the receipt.
    * @param opts.timeoutMs Milliseconds to wait before timing out.
+   * @param opts.fromBlock Block to start looking from - constrains eth_getLogs.
+   * @param opts.toBlock End Block to stop looking - constrains eth_getLogs.
    * @returns CrossChainMessage receipt including receipt of the transaction that relayed the
    * given message.
    */
@@ -231,6 +241,8 @@ export interface ICrossChainMessenger {
       confirmations?: number
       pollIntervalMs?: number
       timeoutMs?: number
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
     }
   ): Promise<MessageReceipt>
 

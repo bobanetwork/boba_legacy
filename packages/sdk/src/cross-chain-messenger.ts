@@ -359,9 +359,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
   }
 
-  public async getMessageStatus(message: MessageLike): Promise<MessageStatus> {
+  public async getMessageStatus(
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
+    } = {}
+  ): Promise<MessageStatus> {
     const resolved = await this.toCrossChainMessage(message)
-    const receipt = await this.getMessageReceipt(resolved)
+
+    const receipt = await this.getMessageReceipt(resolved, opts)
 
     if (resolved.direction === MessageDirection.L1_TO_L2) {
       if (receipt === null) {
@@ -401,7 +408,11 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getMessageReceipt(
-    message: MessageLike
+    message: MessageLike,
+    opts?: {
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
+    }
   ): Promise<MessageReceipt> {
     const resolved = await this.toCrossChainMessage(message)
     const messageHash = hashCrossChainMessage(resolved)
@@ -418,7 +429,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
 
     const relayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.RelayedMessage(messageHash)
+      messenger.filters.RelayedMessage(messageHash),
+      opts?.fromBlock,
+      opts?.toBlock
     )
 
     // Great, we found the message. Convert it into a transaction receipt.
@@ -436,7 +449,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     // We didn't find a transaction that relayed the message. We now attempt to find
     // FailedRelayedMessage events instead.
     const failedRelayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.FailedRelayedMessage(messageHash)
+      messenger.filters.FailedRelayedMessage(messageHash),
+      opts?.fromBlock,
+      opts?.toBlock
     )
 
     // A transaction can fail to be relayed multiple times. We'll always return the last
@@ -469,6 +484,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       confirmations?: number
       pollIntervalMs?: number
       timeoutMs?: number
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
     } = {}
   ): Promise<MessageReceipt> {
     // Resolving once up-front is slightly more efficient.
@@ -477,7 +494,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let totalTimeMs = 0
     while (totalTimeMs < (opts.timeoutMs || Infinity)) {
       const tick = Date.now()
-      const receipt = await this.getMessageReceipt(resolved)
+      const receipt = await this.getMessageReceipt(resolved, opts)
       if (receipt !== null) {
         return receipt
       } else {
@@ -495,6 +512,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     opts: {
       pollIntervalMs?: number
       timeoutMs?: number
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
     } = {}
   ): Promise<void> {
     // Resolving once up-front is slightly more efficient.
@@ -503,7 +522,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let totalTimeMs = 0
     while (totalTimeMs < (opts.timeoutMs || Infinity)) {
       const tick = Date.now()
-      const currentStatus = await this.getMessageStatus(resolved)
+      const currentStatus = await this.getMessageStatus(resolved, opts)
 
       // Handle special cases for L1 to L2 messages.
       if (resolved.direction === MessageDirection.L1_TO_L2) {

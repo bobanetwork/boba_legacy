@@ -46,7 +46,10 @@ import { selectAlert, selectError } from 'selectors/uiSelector'
 
 import DepositModal from 'containers/modals/deposit/DepositModal'
 import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
+
 import TransferModal from 'containers/modals/transfer/TransferModal'
+import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
+
 import ExitModal from 'containers/modals/exit/ExitModal'
 
 import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
@@ -105,9 +108,13 @@ function Home() {
   const [ mobileMenuOpen ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
+
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
+  
   const transferModalState = useSelector(selectModalState('transferModal'))
+  const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
+  
   const exitModalState = useSelector(selectModalState('exitModal'))
 
   const fast = useSelector(selectModalState('fast'))
@@ -210,9 +217,11 @@ function Home() {
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!depositBatchModalState && <DepositBatchModal  open={depositBatchModalState} />}
+      {!!depositBatchModalState && <DepositBatchModal open={depositBatchModalState} />}
 
-      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
+      {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
+      {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
+
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
       {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}

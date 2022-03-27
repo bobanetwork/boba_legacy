@@ -50,7 +50,7 @@ function Button ({
       const timer = setInterval(()=>{setTime(new Date())}, 1000)
       return () => {clearInterval(timer)}
     }
-  }, [loading]);
+  }, [loading])
 
   let waitTime = (now-triggerTime) / 1000
   if(waitTime < 0) waitTime = 0
@@ -66,10 +66,16 @@ function Button ({
     sx,
   }
 
+  const styleCombo = {
+    ...style, 
+    minWidth: loading ? '200px' : '103px', 
+    borderRadius: '12px'
+  }
+
   return (
     <Tooltip title={tooltip}>
       <span>
-        <ButtonMUI {...muiProps} style={{ minWidth: loading ? '200px' : '103px', borderRadius: '12px'}}>
+        <ButtonMUI {...muiProps} style={styleCombo}>
           {children}
           {(disabled || loading) && timeDefined && (waitTime > 3) &&
             <div style={{ marginLeft: '10px' }}>
