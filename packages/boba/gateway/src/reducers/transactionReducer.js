@@ -26,6 +26,18 @@ function transactionReducer (state = initialState, action) {
       return {
         ...state
       }
+    case 'SETTLE_v0/CREATE/SUCCESS':
+      return {
+        ...state
+      }
+    case 'SETTLE_v1/CREATE/SUCCESS':
+      return {
+        ...state
+      }
+    case 'MONSTER/CREATE/SUCCESS':
+      return {
+        ...state
+      }
     default:
       return state;
   }

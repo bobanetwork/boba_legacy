@@ -55,8 +55,7 @@ export const NFTListContainer = styled(Grid)((props) => ({
   [ props.theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
-}));
-
+}))
 
 export const NFTPageContent = styled(Grid)(({ theme }) => ({
   marginTop: '20px',

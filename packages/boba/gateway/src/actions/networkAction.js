@@ -178,6 +178,12 @@ export function transfer(recipient, value, currency) {
   )
 }
 
+export function transferNFT(recipient, nft) {
+  return createAction('TRANSFER_NFT/CREATE', () =>
+    networkService.transferNFT(recipient, nft)
+  )
+}
+
 export function settle_v0() {
   return createAction('SETTLE_v0/CREATE', () =>
     networkService.settle_v0()
@@ -190,15 +196,16 @@ export function settle_v1() {
   )
 }
 
+export function monsterMint() {
+  return createAction('MONSTER/CREATE', () =>
+    networkService.monsterMint()
+  )
+}
 
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))
 }
-
-// export function correctChain(layer) {
-//   return createAction('CORRECT/NETWORK', () => networkService.correctChain(layer))
-// }
 
 export function enableBrowserWallet(network) {
   return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))

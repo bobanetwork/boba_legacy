@@ -173,7 +173,6 @@ class Save extends React.Component {
       layer2,
       stakeValue,
       loading
-
     } = this.state
 
 
