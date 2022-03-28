@@ -2,6 +2,10 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 
+// import { fromRpcSig } from 'ethereumjs-util';
+// import ethSigUtil from '@metamask/eth-sig-util'
+// import Wallet from 'ethereumjs-wallet';
+
 /* Imports: External */
 import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
@@ -790,4 +794,53 @@ describe('Boba Fee Payment Integration Tests', async () => {
       })
     ).to.be.rejectedWith('insufficient boba balance to pay for gas')
   })
+
+  // it("{tag:boba} should revert if users don't have enough balance for the meta transaction", async () => {
+  //   const EIP712Domain = [
+  //     { name: 'name', type: 'string' },
+  //     { name: 'version', type: 'string' },
+  //     { name: 'chainId', type: 'uint256' },
+  //     { name: 'verifyingContract', type: 'address' },
+  //   ]
+  //   const Permit = [
+  //     { name: 'owner', type: 'address' },
+  //     { name: 'spender', type: 'address' },
+  //     { name: 'value', type: 'uint256' },
+  //     { name: 'nonce', type: 'uint256' },
+  //     { name: 'deadline', type: 'uint256' },
+  //   ]
+
+  //   const name = await L2Boba.name()
+  //   console.log({ name })
+  //   const version = '1'
+  //   const { chainId } = await env.l2Provider.getNetwork()
+
+  //   const owner = env.l2Wallet_2.address
+  //   const spender = Boba_GasPriceOracle.address
+  //   const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+  //   const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+  //   const deadline = Math.floor(Date.now() / 1000) + 90
+  //   const verifyingContract = L2Boba.address
+
+  //   const data: any = {
+  //     primaryType: 'Permit',
+  //     types: { EIP712Domain, Permit },
+  //     domain: { name, version, chainId, verifyingContract },
+  //     message: { owner, spender, value, nonce, deadline },
+  //   }
+
+  //   console.log(data)
+
+  //   const signature = ethSigUtil.signTypedData(
+  //     {privateKey: Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+  //     data,
+  //     version: ethSigUtil.SignTypedDataVersion['V4'],
+  //   })
+
+  //   const { v, r, s } = fromRpcSig(signature)
+  //   console.log(owner, spender, value, deadline, v, r, s)
+
+  //   // console.log(ethSigUtil.recoverTypedSignature({ data, sig: signature }))
+  //   // await L2Boba.permit(owner, spender, value, deadline, v, r, s)
+  // })
 })

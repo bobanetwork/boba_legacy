@@ -8,6 +8,7 @@ import { Lib_PredeployAddresses } from "../../libraries/constants/Lib_PredeployA
 import { L2StandardBridge } from "../messaging/L2StandardBridge.sol";
 import { L2GovernanceERC20 } from "../../standards/L2GovernanceERC20.sol";
 import { OVM_GasPriceOracle } from "./OVM_GasPriceOracle.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /* Contract Imports */
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,6 +18,8 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
  * @title Boba_GasPriceOracle
  */
 contract Boba_GasPriceOracle is Ownable {
+    using SafeERC20 for IERC20;
+
     /*************
      * Constants *
      *************/
@@ -49,16 +52,21 @@ contract Boba_GasPriceOracle is Ownable {
     // Record the wallet address that wants to use boba as fee token
     mapping(address => bool) public bobaFeeTokenUsers;
 
+    // Boba fee for the meta transaction
+    uint256 public metaTransactionFee = 3e18;
+
     /*************
      *  Events   *
      *************/
 
     event UseBobaAsFeeToken(address);
+    event UseBobaAsFeeTokenMetaTransaction(address);
     event UseETHAsFeeToken(address);
     event UpdatePriceRatio(address, uint256);
     event UpdateMaxPriceRatio(address, uint256);
     event UpdateMinPriceRatio(address, uint256);
     event UpdateGasPriceOracleAddress(address, address);
+    event UpdateMetaTransactionFee(address, uint256);
     event Withdraw(address, address);
 
     /***************
@@ -86,6 +94,29 @@ contract Boba_GasPriceOracle is Ownable {
         require(!Address.isContract(msg.sender), "Account not EOA");
         bobaFeeTokenUsers[msg.sender] = true;
         emit UseBobaAsFeeToken(msg.sender);
+    }
+
+    /**
+     * Add the users that want to use BOBA as the fee token
+     * using the Meta Transaction
+     */
+    function useBobaAsFeeTokenMetaTransaction(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        require(!Address.isContract(owner), "Account not EOA");
+        require(spender == address(this), "Spender is not this contract");
+        require(value >= metaTransactionFee, "Value is not enough");
+        L2GovernanceERC20 bobaToken = L2GovernanceERC20(l2BobaAddress);
+        bobaToken.permit(owner, spender, value, deadline, v, r, s);
+        IERC20(l2BobaAddress).safeTransferFrom(owner, address(this), metaTransactionFee);
+        bobaFeeTokenUsers[owner] = true;
+        emit UseBobaAsFeeTokenMetaTransaction(owner);
     }
 
     /**
@@ -127,11 +158,25 @@ contract Boba_GasPriceOracle is Ownable {
         emit UpdateMinPriceRatio(owner(), _minPriceRatio);
     }
 
+    /**
+     * Update the gas oracle address
+     * @param _gasPriceOracleAddress gas oracle address
+     */
     function updateGasPriceOracleAddress(address _gasPriceOracleAddress) public onlyOwner {
         require(Address.isContract(_gasPriceOracleAddress), "Account is EOA");
         require(_gasPriceOracleAddress != address(0));
         gasPriceOracleAddress = _gasPriceOracleAddress;
         emit UpdateGasPriceOracleAddress(owner(), _gasPriceOracleAddress);
+    }
+
+    /**
+     * Update the fee for the meta transaction
+     * @param _metaTransactionFee the fee for the meta transaction
+     */
+    function updateMetaTransactionFee(uint256 _metaTransactionFee) public onlyOwner {
+        require(_metaTransactionFee > 0);
+        metaTransactionFee = _metaTransactionFee;
+        emit UpdateMetaTransactionFee(owner(), _metaTransactionFee);
     }
 
     /**
