@@ -306,7 +306,7 @@ describe('Boba_GasPriceOracle', () => {
     '0x00ff00ff00ff00ff00ff00ff',
   ]
 
-  describe('getBobaCost', async () => {
+  describe('getL1BobaFee', async () => {
     for (const input of inputs) {
       it(`case: ${input}`, async () => {
         await OVM_GasPriceOracle.setGasPrice(1)
@@ -321,7 +321,7 @@ describe('Boba_GasPriceOracle', () => {
         )
         await tx.wait()
         const priceRatio = await Boba_GasPriceOracle.priceRatio()
-        const bobaFee = await Boba_GasPriceOracle.getBobaCost(input)
+        const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
         const expected = calculateL1Fee(
           input,

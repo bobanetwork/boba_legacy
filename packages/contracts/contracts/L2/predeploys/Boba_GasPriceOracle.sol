@@ -135,10 +135,10 @@ contract Boba_GasPriceOracle is Ownable {
     }
 
     /**
-     * Get Boba cost for cost estimation
+     * Get L1 Boba fee for fee estimation
      * @param _txData the data payload
      */
-    function getBobaCost(bytes memory _txData) public view returns (uint256) {
+    function getL1BobaFee(bytes memory _txData) public view returns (uint256) {
         OVM_GasPriceOracle gasPriceOracleContract = OVM_GasPriceOracle(gasPriceOracleAddress);
         return gasPriceOracleContract.getL1Fee(_txData) * priceRatio;
     }
