@@ -103,6 +103,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       l1ChainId,
     })
 
+    // console.log(this.state.messenger.contracts.l1.L1MultiMessageRelayer)
+
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
 
     // filter
@@ -181,7 +183,16 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           // each message to L1.
           for (const message of messages) {
             try {
-              console.log(message)
+              // console.log(message)
+
+              const status = await this.state.messenger.getMessageStatus(
+                message
+              )
+              if (status === MessageStatus.RELAYED) {
+                this.logger.info('Message has already been relayed, skipping.')
+                continue
+              }
+
               // filter out messages not meant for this relayer
               if (this.state.filter.includes(message.target)) {
                 this.logger.info('Message not intended for target, skipping.')

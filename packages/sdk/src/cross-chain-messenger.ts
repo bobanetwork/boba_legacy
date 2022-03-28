@@ -905,6 +905,18 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     )
   }
 
+  public async finalizeBatchMessage(
+    messages: Array<MessageLike>,
+    opts?: {
+      signer?: Signer
+      overrides?: Overrides
+    }
+  ): Promise<TransactionResponse> {
+    return (opts?.signer || this.l1Signer).sendTransaction(
+      await this.populateTransaction.finalizeBatchMessage(messages, opts)
+    )
+  }
+
   public async depositETH(
     amount: NumberLike,
     opts?: {
@@ -1106,6 +1118,35 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     },
 
+    finalizeBatchMessage: async (
+      messages: Array<MessageLike>,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<TransactionRequest> => {
+      const batchMessage = []
+      for (const message of messages) {
+        const resolved = await this.toCrossChainMessage(message)
+
+        if (resolved.direction === MessageDirection.L1_TO_L2) {
+          throw new Error(`cannot finalize L1 to L2 message`)
+        }
+        const proof = await this.getMessageProof(resolved)
+        batchMessage.push({
+          target: resolved.target,
+          sender: resolved.sender,
+          message: resolved.message,
+          messageNonce: resolved.messageNonce,
+          proof,
+        })
+      }
+
+      return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
+        batchMessage,
+        opts?.overrides || {}
+      )
+    },
+
     depositETH: async (
       amount: NumberLike,
       opts?: {
@@ -1217,6 +1258,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<BigNumber> => {
       return this.l1Provider.estimateGas(
         await this.populateTransaction.finalizeMessage(message, opts)
+      )
+    },
+
+    finalizeBatchMessage: async (
+      messages: Array<MessageLike>,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<BigNumber> => {
+      return this.l1Provider.estimateGas(
+        await this.populateTransaction.finalizeBatchMessage(messages, opts)
       )
     },
 
