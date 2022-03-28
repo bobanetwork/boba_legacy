@@ -11,6 +11,7 @@ import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
 import defiyieldLogo from '../../images/ecosystem/defiyield.webp'
 import dodoLogo from '../../images/ecosystem/dodo.webp'
+import domFiLogo from '../../images/ecosystem/dominationFinance.svg'
 import fraxLogo from '../../images/ecosystem/frax.webp'
 import l2ChartsLogo from '../../images/ecosystem/l2Charts.webp'
 import layerSwapLogo from '../../images/ecosystem/layerswap.webp'
@@ -88,6 +89,16 @@ export const projectList = [
     "type": "bridge",
     "image": synLogo,
     "description": "The most widely used cross-chain liquidity network connecting all blockchains"
+  },
+  {
+    "title": "Domination Finance",
+    "canLaunch": true,
+    "link": "https://domination.finance/",
+    "twitter": "https://twitter.com/dominationfi",
+    "discord": "https://discord.domination.finance/",
+    "type": "defi",
+    "image": domFiLogo,
+    "description": "The world’s first DEX for dominance trading."
   },
   {
     "title": "SwapperChan",
