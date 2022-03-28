@@ -1,5 +1,5 @@
-const urql = require('urql')
-const { gql } = require("urql");
+const apollo = require('@apollo/client')
+const fetch = require('cross-fetch')
 
 require('dotenv').config()
 
@@ -10,13 +10,19 @@ class GraphQLService {
   }
 
   async queryBridgeProposalCreated() {
-    const query = gql(`{ governorProposalCreateds { proposalId values description proposer }`)
+    const query = apollo.gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
-    const client = urql.createClient({url: this.getBridgeEndpoint()})
-    return await client.query(query).toPromise()
+    console.log(query)
+
+    const client = new apollo.ApolloClient({uri: this.getBridgeEndpoint(),
+      link: new apollo.HttpLink({ uri: this.getBridgeEndpoint(), fetch }),
+      cache: new apollo.InMemoryCache()})
+    return await client.query({ query })
   }
 }
 
 const graphQLService = new GraphQLService();
 export default graphQLService;
+
+// graphQLService.queryBridgeProposalCreated().then(r => console.log(r)).catch(console.error)
 
