@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
@@ -22,6 +22,8 @@ import { closeModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 
+import { selectLayer } from 'selectors/setupSelector'
+
 import * as S from './bridgeTypeModal.styles';
 
 function BridgeTypeModal({ open, toBridgeType }) {
@@ -29,7 +31,7 @@ function BridgeTypeModal({ open, toBridgeType }) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
+  const layer = useSelector(selectLayer());
 
   function handleClose() {
     dispatch(closeModal('bridgeTypeSwitch'))
@@ -47,7 +49,8 @@ function BridgeTypeModal({ open, toBridgeType }) {
       transparent={false}
     >
       <Typography variant="body2">
-        The classic bridge only supports the transfer of one token. Are you sure you want to switch?
+        {layer === 'L1' ? 'The classic bridge only supports the transfer of one token ':  null}
+        Are you sure you want to switch?
       </Typography>
       <S.WrapperActionsModal>
         <Button
