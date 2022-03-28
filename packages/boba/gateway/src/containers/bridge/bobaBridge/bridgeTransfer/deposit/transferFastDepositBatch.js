@@ -24,6 +24,7 @@ import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanc
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
+import BridgeFee from '../fee/bridgeFee';
 
 /*
 Transfer Fast Deposit Batch
@@ -82,10 +83,10 @@ function TransferFastDepositBatch({
         setValidValue(false);
       }
       else if ((Number(ethToken.value) + Number(batchCost)) > Number(feeBalance) * 0.96) {
-      setValidValue(true);
-      // CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
-      // THIS TRANSACTION MIGHT FAIL.`
-    }
+        setValidValue(true);
+        // CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        // THIS TRANSACTION MIGHT FAIL.`
+      }
     } else if (ethTokens.length > 1) {
       // diable the transfer incase of multiple tokens
       setValidValue(false);
@@ -93,7 +94,7 @@ function TransferFastDepositBatch({
       if (Number(batchCost) > Number(feeBalance)) {
         // L1 ETH balance is not sufficient to cover tx will fail.
         setValidValue(true);
-      } else if (Number(batchCost) > Number(feeBalance)* 0.96 ) {
+      } else if (Number(batchCost) > Number(feeBalance) * 0.96) {
         // your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
         // tx might fail  It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
         setValidValue(true);
@@ -129,7 +130,7 @@ function TransferFastDepositBatch({
     dispatch(openModal('transferPending'));
     let res;
     const payload = tokens.map(i => ({ ...i, value: i.amount }));
-    console.log([`[FAST DEPOSIT BATCH] > APPROVING..` ])
+    console.log([ `[FAST DEPOSIT BATCH] > APPROVING..` ])
     res = await dispatch(approveFastDepositBatch(payload));
 
     if (res === false) {
@@ -139,7 +140,7 @@ function TransferFastDepositBatch({
       return
     }
 
-    console.log([`[FAST DEPOSIT BATCH] > DEPOSITING..` ])
+    console.log([ `[FAST DEPOSIT BATCH] > DEPOSITING..` ])
     res = await dispatch(depositL1LPBatch(payload));
 
     if (res) {
@@ -155,15 +156,18 @@ function TransferFastDepositBatch({
 
   }
 
-  return <Button
-    color="primary"
-    variant="contained"
-    tooltip={"Click here to bridge your funds to L2"}
-    triggerTime={new Date()}
-    onClick={doFastDeposit}
-    disabled={!validValue}
-    fullWidth={true}
-  >Multi Bridge</Button>
+  return <>
+    <BridgeFee />
+    <Button
+      color="primary"
+      variant="contained"
+      tooltip={"Click here to bridge your funds to L2"}
+      triggerTime={new Date()}
+      onClick={doFastDeposit}
+      disabled={!validValue}
+      fullWidth={true}
+    >Multi Bridge</Button>
+  </>
 };
 
 export default React.memo(TransferFastDepositBatch);

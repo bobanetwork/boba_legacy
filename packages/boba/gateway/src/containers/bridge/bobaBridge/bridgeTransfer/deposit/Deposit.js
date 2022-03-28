@@ -4,7 +4,6 @@ import { selectBridgeTokens, selectBridgeType } from 'selectors/bridgeSelector'
 import { BRIDGE_TYPE } from 'util/constant'
 import TransferDeposit from './transferDeposit'
 import TransferFastDeposit from './transferFastDeposit'
-import TransferFastDepositBatch from './transferFastDepositBatch'
 
 function Deposit() {
 

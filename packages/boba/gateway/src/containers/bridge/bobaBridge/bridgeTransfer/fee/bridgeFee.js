@@ -1,84 +1,77 @@
-import { Box, Typography } from '@mui/material'
+/*
+Copyright 2019-present OmiseGO Pte Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { selectClassicExitCost, selectFastDepositCost, selectFastExitCost } from 'selectors/balanceSelector'
-import { selectBridgeType } from 'selectors/bridgeSelector'
-import { selectLayer } from 'selectors/setupSelector'
-import { BRIDGE_TYPE } from 'util/constant'
+
+import { HelpOutline } from '@mui/icons-material'
+import { Box } from '@mui/material'
+
+import Tooltip from 'components/tooltip/Tooltip'
+
 import * as S from './bridgeFee.styles'
 
 function BridgeFee({
-  tokens
+  time,
+  timeLabel,
+  estFee,
+  estFeeLabel,
+  estBridgeFee,
+  estBridgeFeeLabel,
+  estRecieve,
+  estRecieveLabel
 }) {
-  const bridgeType = useSelector(selectBridgeType())
-  const layer = useSelector(selectLayer())
 
-  const cExitCost = useSelector(selectClassicExitCost)
-  const fExitCost = useSelector(selectFastExitCost)
-  const fDepositCost = useSelector(selectFastDepositCost)
-
-  // const feeBalance = useSelector(selectL2FeeBalance)
-  // TODO: Use feebalance to show the cover gas
-  // FIXME: show the appropriate message base on gas fee
-
-  let cost = 0
-
-  if (layer === 'L2') {
-    if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
-      cost = fExitCost
-    } else {
-      cost = cExitCost
-    }
-  } else {
-    if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
-      cost = fDepositCost
-    }
+  const ItemLabel = ({label, title}) => {
+    console.log([ `Item label`, label ]);
+    console.log([ `Item title`, title ]);
+    return <S.BridgeFeeItemLabel>
+      {label}
+      {title ? <Tooltip title={title}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+      </Tooltip> : null}
+    </S.BridgeFeeItemLabel>
   }
 
-  return <S.BrigeFeeWrapper>
-    <S.BridgeFeeItem>
-      <Typography variant="body2" sx={{
-        opacity: 0.65
-      }}>
-        Est. Fee <br />
-        (Approval+Bridge)
-      </Typography>
+  return <>
+    {time ? <S.BridgeFeeItem>
+      <ItemLabel label="Est. time" title={timeLabel} />
       <Box>
-        {
-          tokens.map((token, i) => {
-            return <Typography key={i} variant="body2" >
-              {
-                token.symbol === 'ETH' ?
-                  `${(Number(token.amount) + Number(cost)).toFixed(4)}`
-                  : `${Number(cost).toFixed(4)}`
-              } ETH
-            </Typography>
-          })
-        }
+        {time}
       </Box>
-    </S.BridgeFeeItem>
-    <S.BridgeFeeItem>
-      <Typography variant="body2" sx={{ opacity: 0.65 }}>
-        Est. bridge fee
-      </Typography>
-      <Box>
-        {tokens.map((token, i) => <Typography key={i} variant="body2" >
-          0.000 {token.symbol} (0.1%)
-        </Typography>)}
-      </Box>
-    </S.BridgeFeeItem>
-    <S.BridgeFeeItem>
-      <Typography variant="body2" sx={{ opacity: 0.65 }}>
-        Est. recieve
-      </Typography>
-      <Box>
-        {tokens.map((token, i) => <Typography key={i} variant="body2" >
-          {`${Number(token.amount).toFixed(3)} ${token.symbol}`}
-        </Typography>)}
-      </Box>
-    </S.BridgeFeeItem>
-  </S.BrigeFeeWrapper>
+    </S.BridgeFeeItem> : null}
 
+    <S.BrigeFeeWrapper>
+      <S.BridgeFeeItem>
+        <ItemLabel label="Est. Fee (Approval+Bridge)" title={estFeeLabel} />
+        <Box>
+          {estFee}
+        </Box>
+      </S.BridgeFeeItem>
+      <S.BridgeFeeItem>
+        <ItemLabel label="Est. bridge fee" title={estBridgeFeeLabel} />
+        <Box>
+          {estBridgeFee}
+        </Box>
+      </S.BridgeFeeItem>
+      <S.BridgeFeeItem>
+        <ItemLabel label="Est. recieve" title={estRecieveLabel} />
+        <Box>
+          {estRecieve}
+        </Box>
+      </S.BridgeFeeItem>
+    </S.BrigeFeeWrapper>
+  </>
 }
 
 export default BridgeFee;

@@ -33,6 +33,7 @@ import { resetToken } from 'actions/bridgeAction';
 import {
   selectFastDepositCost,
   selectL1FeeBalance,
+  selectL2FeeRate,
   selectL2FeeRateN,
   selectL2LPBalanceString,
   selectL2LPLiquidity,
@@ -45,13 +46,15 @@ import Button from 'components/button/Button';
 
 import networkService from 'services/networkService';
 
-import { logAmount } from 'util/amountConvert';
+import { amountToUsd, logAmount } from 'util/amountConvert';
+import BridgeFee from '../fee/bridgeFee';
+import { selectLookupPrice } from 'selectors/lookupSelector';
 
 function TransferFastDeposit({
   token
 }) {
 
-  console.log(['TRANSFER FAST DEPOSIT'])
+  console.log([ 'TRANSFER FAST DEPOSIT' ])
   const [ validValue, setValidValue ] = useState(false);
   const [ LPRatio, setLPRatio ] = useState(0)
   const dispatch = useDispatch();
@@ -62,7 +65,9 @@ function TransferFastDeposit({
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
+  const feeRate = useSelector(selectL2FeeRate)
   const feeRateN = useSelector(selectL2FeeRateN)
+  const lookupPrice = useSelector(selectLookupPrice)
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
@@ -72,12 +77,17 @@ function TransferFastDeposit({
 
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
-  console.log(['DEPOSIT COST',cost])
-  console.log(['DEPOSIT FEEBALANCE',feeBalance])
+
+  const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
+
+  const estFee =  token.symbol === 'ETH' ?
+      `${(Number(token.amount) + Number(cost)).toFixed(4)}`
+      : `${Number(cost).toFixed(4)}`
+
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
   useEffect(() => {
-    if (typeof(token) !== 'undefined') {
+    if (typeof (token) !== 'undefined') {
       dispatch(fetchL2LPBalance(token.addressL2))
       dispatch(fetchL2LPLiquidity(token.addressL2))
       dispatch(fetchL2LPPending(token.addressL1)) //lookup is, confusingly, via L1 token address
@@ -85,15 +95,15 @@ function TransferFastDeposit({
       dispatch(fetchL2FeeRateN(token.addressL2))
       dispatch(fetchFastDepositCost(token.address))
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
-      return ()=>{
-        dispatch({type: 'BALANCE/L2/RESET'})
+      return () => {
+        dispatch({ type: 'BALANCE/L2/RESET' })
       }
     }
   }, [ token, dispatch ])
 
   useEffect(() => {
     const lbl = Number(logAmount(LPLiquidity, token.decimals))
-    if(lbl > 0){
+    if (lbl > 0) {
       const lbp = Number(logAmount(LPBalance, token.decimals))
       const LPR = lbp / lbl
       setLPRatio(Number(LPR).toFixed(3))
@@ -101,12 +111,11 @@ function TransferFastDeposit({
   }, [ LPLiquidity, LPBalance, token.decimals ])
 
 
-
   useEffect(() => {
     const maxValue = logAmount(token.balance, token.decimals);
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(maxValue))
-    console.group(['VALIDATE'])
+    console.group([ 'VALIDATE' ])
     if (tooSmall || tooBig) {
       console.log(`SMALL & BIG`)
       setValidValue(false)
@@ -135,13 +144,16 @@ function TransferFastDeposit({
       //Whew, finally!
       setValidValue(true)
     }
-    console.groupEnd(['VALIDATE'])
+    console.groupEnd([ 'VALIDATE' ])
 
   }, [ token, setValidValue, cost, LPRatio, balanceSubPending, feeBalance, ])
 
   const receivableAmount = (value) => {
     return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
+
+  const estRecieveLabel = `You will receive approximately ${receivableAmount(token.amount)} ${token.symbol} ${!!amountToUsd(token.amount, lookupPrice, token) ? `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})` : ''} on L2.`;
+
   useEffect(() => {
     if (signatureStatus && depositLoading) {
       //we are all set - can close the window
@@ -155,15 +167,15 @@ function TransferFastDeposit({
   const doFastDeposit = async () => {
     dispatch(openModal('transferPending'));
     let res;
-    if(token.symbol === 'ETH') {
-      console.log(["ETH Fast Bridge"])
+    if (token.symbol === 'ETH') {
+      console.log([ "ETH Fast Bridge" ])
       res = await dispatch(depositL1LP(token.address, token.toWei_String))
 
       if (res) {
         dispatch(
           openAlert(
             `ETH was bridged. You will receive approximately
-            ${((Number(token.amount) * (100 - Number(feeRateN)))/100).toFixed(3)}
+            ${((Number(token.amount) * (100 - Number(feeRateN))) / 100).toFixed(3)}
             ETH on L2`
           )
         )
@@ -184,7 +196,7 @@ function TransferFastDeposit({
         )
       )
 
-      if(res === false) {
+      if (res === false) {
         dispatch(openError('Failed to approve amount or user rejected signature'))
         dispatch(closeModal('transferPending'));
         dispatch(resetToken());
@@ -209,15 +221,26 @@ function TransferFastDeposit({
     }
   }
 
-  return <Button
-    color="primary"
-    variant="contained"
-    tooltip={"Click here to bridge your funds to L2"}
-    triggerTime={new Date()}
-    onClick={doFastDeposit}
-    disabled={!validValue}
-    fullWidth={true}
-  >Fast Bridge</Button>
+  return <>
+    <BridgeFee
+      time="20mins - 3hrs"
+      timeLabel="In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours."
+      estBridgeFee={`${feeRateN}%`}
+      estBridgeFeeLabel={bridgeFeeLabel}
+      estFee={`${estFee} ETH`}
+      estRecieve={`${receivableAmount(token.amount)}  ${token.symbol}`}
+      estRecieveLabel={estRecieveLabel}
+      />
+    <Button
+      color="primary"
+      variant="contained"
+      tooltip={"Click here to bridge your funds to L2"}
+      triggerTime={new Date()}
+      onClick={doFastDeposit}
+      disabled={!validValue}
+      fullWidth={true}
+    >Fast Bridge</Button>
+  </>
 };
 
 export default React.memo(TransferFastDeposit);

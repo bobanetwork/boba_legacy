@@ -27,7 +27,6 @@ import * as S from './bridgeTransfer.styles';
 import Deposit from './deposit/Deposit';
 import TransferFastDepositBatch from './deposit/transferFastDepositBatch';
 import Exit from './exit/Exit';
-import BridgeFee from './fee/bridgeFee';
 import TokenInput from './tokenInput/TokenInput';
 
 
@@ -99,7 +98,6 @@ function BridgeTransfer() {
           </Typography>
         </Box> : null
       }
-      <BridgeFee tokens={tokens} />
       { multibridgeMode ? <TransferFastDepositBatch tokens={tokens} /> : null }
 
       {tokens.length && !multibridgeMode ?

@@ -12,12 +12,13 @@ import { selectClassicExitCost, selectL2FeeBalance } from 'selectors/balanceSele
 
 import { logAmount } from 'util/amountConvert';
 import { resetToken } from 'actions/bridgeAction';
+import BridgeFee from '../fee/bridgeFee';
 
 
 function TransferExit({
   token
 }) {
-  console.log(['TRANSFER EXIT'])
+  console.log([ 'TRANSFER EXIT' ])
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
 
@@ -26,22 +27,22 @@ function TransferExit({
 
   useEffect(() => {
 
-      const maxValue = logAmount(token.balance, token.decimals);
-      const tooSmall = new BN(token.amount).lte(new BN(0.0))
-      const tooBig = new BN(token.amount).gt(new BN(maxValue))
+    const maxValue = logAmount(token.balance, token.decimals);
+    const tooSmall = new BN(token.amount).lte(new BN(0.0))
+    const tooBig = new BN(token.amount).gt(new BN(maxValue))
 
-      if (tooSmall || tooBig) {
-        setValidValue(false)
-      } else if (token.symbol === 'ETH' && (Number(cExitCost) + Number(token.amount)) > Number(feeBalance)) {
-        //insufficient ETH to cover the ETH amount plus gas
-        setValidValue(false)
-      } else if ((Number(cExitCost) > Number(feeBalance))) {
-        //insufficient ETH to pay exit fees
-        setValidValue(false)
-      } else {
-        //Whew, finally!
-        setValidValue(true)
-      }
+    if (tooSmall || tooBig) {
+      setValidValue(false)
+    } else if (token.symbol === 'ETH' && (Number(cExitCost) + Number(token.amount)) > Number(feeBalance)) {
+      //insufficient ETH to cover the ETH amount plus gas
+      setValidValue(false)
+    } else if ((Number(cExitCost) > Number(feeBalance))) {
+      //insufficient ETH to pay exit fees
+      setValidValue(false)
+    } else {
+      //Whew, finally!
+      setValidValue(true)
+    }
 
   }, [ token, setValidValue, cExitCost, feeBalance ])
 
@@ -65,15 +66,17 @@ function TransferExit({
     }
   }
 
-  return <Button
-    color="primary"
-    variant="contained"
-    tooltip={"Click here to bridge your funds to L1"}
-    triggerTime={new Date()}
-    onClick={doExit}
-    disabled={!validValue}
-    fullWidth={true}
-  >Classic Bridge</Button>
+  return <>
+    <BridgeFee />
+    <Button
+      color="primary"
+      variant="contained"
+      tooltip={"Click here to bridge your funds to L1"}
+      triggerTime={new Date()}
+      onClick={doExit}
+      disabled={!validValue}
+      fullWidth={true}
+    >Classic Bridge</Button></>
 };
 
 export default React.memo(TransferExit);

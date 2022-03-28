@@ -8,23 +8,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
+import BridgeFee from '../fee/bridgeFee';
 
 function TransferDeposit({
   token
 }) {
-  console.log(['TRANSFER DEPOSIT'])
+  console.log([ 'TRANSFER DEPOSIT' ])
 
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
 
-  const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
+  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
 
   useEffect(() => {
     const maxValue = logAmount(token.balance, token.decimals)
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
-    const tooBig   = new BN(token.amount).gt(new BN(maxValue))
+    const tooBig = new BN(token.amount).gt(new BN(maxValue))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -42,12 +43,12 @@ function TransferDeposit({
       dispatch(closeModal('transferPending'));
       dispatch(resetToken());
     }
-  }, [ signatureStatus, depositLoading, dispatch])
+  }, [ signatureStatus, depositLoading, dispatch ])
 
   const doDeposit = async () => {
     dispatch(openModal('transferPending'));
     let res;
-    if(token.symbol === 'ETH') {
+    if (token.symbol === 'ETH') {
       res = await dispatch(
         depositETHL2(token.toWei_String)
       )
@@ -61,15 +62,18 @@ function TransferDeposit({
     dispatch(resetToken());
   }
 
-  return <Button
-    color="primary"
-    variant="contained"
-    tooltip={"Click here to bridge your funds to L2"}
-    triggerTime={new Date()}
-    onClick={doDeposit}
-    disabled={!validValue}
-    fullWidth={true}
-  >Classic Bridge</Button>
+  return <>
+    {/* <BridgeFee /> */}
+    <Button
+      color="primary"
+      variant="contained"
+      tooltip={"Click here to bridge your funds to L2"}
+      triggerTime={new Date()}
+      onClick={doDeposit}
+      disabled={!validValue}
+      fullWidth={true}
+    >Classic Bridge</Button>
+  </>
 };
 
 export default React.memo(TransferDeposit);

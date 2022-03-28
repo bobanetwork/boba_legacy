@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export const BrigeFeeWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -19,5 +19,12 @@ export const BridgeFeeItem = styled(Box)(({ theme }) => ({
     flexDirection: 'row',
     justifyContent: 'space-between'
   }
+}));
 
+export const BridgeFeeItemLabel = styled(Typography)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '5px',
+  opacity: '0.65'
 }));

@@ -15,6 +15,7 @@ import { depositL2LP } from 'actions/networkAction';
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector';
 import { selectLoading } from 'selectors/loadingSelector';
 import { resetToken } from 'actions/bridgeAction';
+import BridgeFee from '../fee/bridgeFee';
 
 
 function TransferFastExit({
@@ -131,15 +132,18 @@ function TransferFastExit({
     }
   }
 
-  return <Button
-    color="primary"
-    variant="contained"
-    tooltip={"Click here to bridge your funds to L1"}
-    triggerTime={new Date()}
-    onClick={doFastExit}
-    disabled={!validValue}
-    fullWidth={true}
-  >Fast Bridge</Button>
+  return <>
+    <BridgeFee />
+    <Button
+      color="primary"
+      variant="contained"
+      tooltip={"Click here to bridge your funds to L1"}
+      triggerTime={new Date()}
+      onClick={doFastExit}
+      disabled={!validValue}
+      fullWidth={true}
+    >Fast Bridge</Button>
+  </>
 };
 
 export default React.memo(TransferFastExit);
