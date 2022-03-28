@@ -8,13 +8,16 @@ class GraphQLService {
     return `https://graph.${process.env.REACT_APP_CHAIN ?? 'rinkeby'}.boba.network/subgraphs/name/boba/Bridges/graphql`
   }
 
-  async queryBridgeProposalCreated(id, subgraphError = 'allow') {
+  async queryBridgeProposalCreated() {
 
     const query = `
-          query DescriptionList($id:ID!,$subgraphError:_SubgraphErrorPolicy_!) {
-              governorProposalCreated(id:$id, subgraphError:$subgraphError) {
-                  id,
-              }
+          {
+            governorProposalCreateds {
+              proposalId
+              values
+              description
+              proposer
+            }
           }
       `
 
@@ -23,8 +26,7 @@ class GraphQLService {
       method: 'post',
       data: {
         query,
-        variables: {id, subgraphError}
-      }
+      },
     })
   }
 }
