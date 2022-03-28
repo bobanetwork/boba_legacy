@@ -13,7 +13,7 @@ dataSources:
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - L2LiquidityPool
@@ -43,7 +43,7 @@ dataSources:
       abi: OVM_L2StandardBridge
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - OVM_L2StandardBridge
@@ -67,7 +67,7 @@ dataSources:
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - GovernorBravoDelegate
