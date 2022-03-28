@@ -1,4 +1,5 @@
-const axios = require('axios')
+const urql = require('urql')
+const { gql } = require("urql");
 
 require('dotenv').config()
 
@@ -9,18 +10,10 @@ class GraphQLService {
   }
 
   async queryBridgeProposalCreated() {
-    const query = {
-      // operationName: 'proposalCreated',
-      query: `query proposalCreated { governorProposalCreateds { proposalId values description proposer } }`,
-      variables: {},
-    }
+    const query = gql(`{ governorProposalCreateds { proposalId values description proposer }`)
 
-    return axios({
-      url: this.getBridgeEndpoint(),
-      method: 'post',
-      headers: {"Content-Type": "application/json", "Accept": "application/json"},
-      data: JSON.stringify(query),
-    })
+    const client = urql.createClient({url: this.getBridgeEndpoint()})
+    return await client.query(query).toPromise()
   }
 }
 
