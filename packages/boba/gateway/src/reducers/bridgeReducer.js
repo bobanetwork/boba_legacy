@@ -16,7 +16,8 @@ limitations under the License. */
 
 const initialState = {
   tokens: [],
-  bridgeType: null
+  bridgeType: null,
+  multiBridgeMode: false,
 };
 
 function bridgeReducer(state = initialState, action) {
@@ -60,6 +61,9 @@ function bridgeReducer(state = initialState, action) {
 
         return { ...state, tokens: tokens }
       }
+
+    case 'BRIDGE/MODE/CHANGE':
+        return { ...state, multiBridgeMode: action.payload }
 
     case 'BRIDGE/TOKEN/AMOUNT/CHANGE': {
         let newTokens = [...state.tokens];

@@ -24,3 +24,9 @@ export function selectBridgeType() {
     return state.bridge.bridgeType
   }
 }
+
+export function selectMultiBridgeMode() {
+  return function (state) {
+    return state.bridge.multiBridgeMode
+  }
+}

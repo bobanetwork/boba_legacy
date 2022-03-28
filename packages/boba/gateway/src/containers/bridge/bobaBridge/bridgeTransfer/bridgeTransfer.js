@@ -20,11 +20,12 @@ import { isEqual } from 'lodash';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector';
-import { selectBridgeTokens, selectBridgeType } from 'selectors/bridgeSelector';
+import { selectBridgeTokens, selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
 import { BRIDGE_TYPE } from 'util/constant';
 import * as S from './bridgeTransfer.styles';
 import Deposit from './deposit/Deposit';
+import TransferFastDepositBatch from './deposit/transferFastDepositBatch';
 import Exit from './exit/Exit';
 import BridgeFee from './fee/bridgeFee';
 import TokenInput from './tokenInput/TokenInput';
@@ -34,6 +35,8 @@ function BridgeTransfer() {
 
   const layer = useSelector(selectLayer());
   const bridgeType = useSelector(selectBridgeType());
+  const multibridgeMode = useSelector(selectMultiBridgeMode());
+
   const dispatch = useDispatch()
   const tokens = useSelector(selectBridgeTokens());
 
@@ -67,8 +70,6 @@ function BridgeTransfer() {
           token={{ amount: '', symbol: null, balance: 0 }}
           addNewToken={addNewToken}
           tokenLen={1}
-          switchBridgeType={switchBridgeType}
-          isFastBridge={bridgeType === BRIDGE_TYPE.FAST_BRIDGE}
         />
         : tokens.map((token, index) => <TokenInput
           index={index}
@@ -76,30 +77,34 @@ function BridgeTransfer() {
           token={token}
           addNewToken={addNewToken}
           tokenLen={tokens.length}
-          switchBridgeType={switchBridgeType}
-          isFastBridge={bridgeType === BRIDGE_TYPE.FAST_BRIDGE} />)
+        />)
       }
       <LayoutS.DividerLine sx={{ my: 1 }} />
-
-      <Box display="flex" justifyContent="space-between">
-        <Typography variant="body2">
-          <Typography component="span" color="secondary">
-            Recommendations: &nbsp;
+      {!multibridgeMode ?
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2">
+            <Typography component="span" color="secondary">
+              Recommendations: &nbsp;
+            </Typography>
+            {bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
           </Typography>
-          {bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
-        </Typography>
-        <Typography variant="body2"
-          onClick={switchBridgeType}
-          sx={{
-            textDecoration: 'underline',
-            opacity: 0.6,
-            cursor: 'pointer'
-          }}
-        >To {BRIDGE_TYPE.CLASSIC_BRIDGE !== bridgeType ? 'Classic bridge' : 'Fast Bridge'}
-        </Typography>
-      </Box>
+          <Typography variant="body2"
+            onClick={switchBridgeType}
+            sx={{
+              textDecoration: 'underline',
+              opacity: 0.6,
+              cursor: 'pointer'
+            }}
+          >To {BRIDGE_TYPE.CLASSIC_BRIDGE !== bridgeType ? 'Classic bridge' : 'Fast Bridge'}
+          </Typography>
+        </Box> : null
+      }
       <BridgeFee tokens={tokens} />
-      {tokens.length ?
+      {
+        multibridgeMode ? <TransferFastDepositBatch tokens={tokens} /> : null
+      }
+
+      {tokens.length && !multibridgeMode ?
         layer === 'L1' ? <Deposit /> : <Exit />
         : null
       }

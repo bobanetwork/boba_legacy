@@ -15,11 +15,6 @@ function Deposit() {
     return <TransferDeposit token={tokens[ 0 ]} />
   }
 
-  // FIXME: based on the logic for the multi bridge token at top level
-  if (bridgeType === BRIDGE_TYPE.MULTI_BRIDGE ) {
-    return <TransferFastDepositBatch tokens={tokens} />
-  }
-
   return <TransferFastDeposit token={tokens[ 0 ]} />
 }
 

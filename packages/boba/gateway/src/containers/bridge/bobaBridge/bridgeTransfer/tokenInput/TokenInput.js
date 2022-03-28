@@ -21,7 +21,7 @@ import { openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectBridgeType } from 'selectors/bridgeSelector';
+import { selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector';
 import { selectLayer } from 'selectors/setupSelector';
 import { logAmount, toWei_String } from 'util/amountConvert';
 import { getCoinImage } from 'util/coinImage';
@@ -31,19 +31,19 @@ import * as S from './TokenInput.styles';
 function TokenInput({
   token,
   index,
-  isFastBridge,
   tokenLen,
-  switchBridgeType,
   addNewToken
 }) {
 
   const bridgeType = useSelector(selectBridgeType());
   const layer = useSelector(selectLayer());
+  const multibridgeMode = useSelector(selectMultiBridgeMode());
 
   const dispatch = useDispatch();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
 
   const underZero = new BN(token.amount).lt(new BN(0))
   const overMax = new BN(token.amount).gt(new BN(token.balance))
@@ -109,7 +109,7 @@ function TokenInput({
     >
       <AddCircleOutline fontSize="small" />
     </IconButton>
-    <IconButton disabled={bridgeType !== BRIDGE_TYPE.MULTI_BRIDGE || tokenLen < 2} size="small" aria-label="remove token"
+    <IconButton disabled={tokenLen < 2} size="small" aria-label="remove token"
       onClick={() => {
         deleteToken(index);
       }}
@@ -131,7 +131,7 @@ function TokenInput({
             {amount}
           </Typography>
         </Typography>
-        {isMobile ? <Action /> : null}
+        {isMobile && multibridgeMode ? <Action /> : null}
       </S.TokenInputTitle>
       <S.TokenInputContent>
         {
@@ -143,7 +143,7 @@ function TokenInput({
               }}
               onClick={() => { openTokenPicker(index) }}
             >
-              <Typography whiteSpace="nowrap" variant="body2">Select Token</Typography>
+              <Typography whiteSpace="nowrap" variant="body2">Select {multibridgeMode ? 'Tokens' : 'Token'}</Typography>
               <ArrowDropDown fontSize="medium" />
             </S.TokenPicker> :
             <S.TokenPicker
@@ -173,8 +173,7 @@ function TokenInput({
               error={underZero || overMax}
             />}
         </S.TextFieldWrapper>
-        {/* TODO: FIXME: Only show in case of multi bridge */}
-        {!isMobile ? <Action /> : null}
+        {!isMobile && multibridgeMode ? <Action /> : null}
       </S.TokenInputContent>
       {token.amount !== '' && underZero ?
         <Typography variant="body3" sx={{ mt: 1 }}>

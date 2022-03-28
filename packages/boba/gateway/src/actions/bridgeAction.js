@@ -48,3 +48,9 @@ export function setBridgeType(type) {
     return dispatch({ type: 'BRIDGE/TYPE/SELECT', payload: type });
   }
 }
+
+export function setMultiBridgeMode(mode) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/MODE/CHANGE', payload: mode });
+  }
+}
