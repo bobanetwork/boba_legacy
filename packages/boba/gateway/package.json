@@ -16,6 +16,7 @@
     "deploy:rinkeby": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=rinkeby react-scripts build && aws s3 rm s3://boba-gateway-rinkeby --recursive && aws s3 sync build s3://boba-gateway-rinkeby && aws s3 cp s3://boba-gateway-rinkeby/index.html s3://boba-gateway-rinkeby/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.10",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@eth-optimism/contracts": "^0.5.11",
@@ -33,6 +34,7 @@
     "dotenv": "^8.2.0",
     "eslint-config-react-app": "^7.0.0",
     "ethers": "^5.0.32",
+    "graphql": "^16.3.0",
     "html-react-parser": "^1.4.0",
     "human-standard-token-abi": "^2.0.0",
     "lodash": "^4.17.20",
