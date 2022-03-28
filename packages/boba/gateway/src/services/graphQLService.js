@@ -14,9 +14,6 @@ class GraphQLService {
           query DescriptionList($id:ID!,$subgraphError:_SubgraphErrorPolicy_!) {
               governorProposalCreated(id:$id, subgraphError:$subgraphError) {
                   id,
-                  l1Token, l2Token,
-                  from, to,
-                  amount, data
               }
           }
       `
