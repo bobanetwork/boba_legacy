@@ -76,7 +76,7 @@ function BobaBridge() {
                 component="p"
                 variant="body"
               >
-                <BobaIcon  dark={true} /> Boba Network
+                <BobaIcon  /> Boba Network
               </S.ChainLabel>
             </S.ChainInput>
           </Box>
@@ -119,7 +119,7 @@ function BobaBridge() {
                     component="p"
                     variant="body"
                   >
-                    <BobaIcon dark={true} /> Boba Network
+                    <BobaIcon /> Boba Network
                   </S.ChainLabel>
               }
             </S.ChainInput>
@@ -153,7 +153,7 @@ function BobaBridge() {
                     component="p"
                     variant="body"
                   >
-                    <BobaIcon dark={true} /> Boba Network
+                    <BobaIcon /> Boba Network
                   </S.ChainLabel>
               }
             </S.ChainInput>
