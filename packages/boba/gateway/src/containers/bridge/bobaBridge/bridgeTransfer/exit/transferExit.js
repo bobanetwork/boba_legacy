@@ -9,8 +9,10 @@ import { exitBOBA } from 'actions/networkAction';
 import { closeModal, openAlert, openModal } from 'actions/uiAction';
 
 import { selectClassicExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
+import { selectLookupPrice } from 'selectors/lookupSelector'
 
-import { logAmount } from 'util/amountConvert';
+
+import { amountToUsd, logAmount } from 'util/amountConvert';
 import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
 
@@ -22,8 +24,53 @@ function TransferExit({
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
 
-  const cExitCost = useSelector(selectClassicExitCost);
+  const cost = useSelector(selectClassicExitCost);
   const feeBalance = useSelector(selectL2FeeBalance)
+  const lookupPrice = useSelector(selectLookupPrice)
+
+  let estFee = `${Number(cost).toFixed(4)} ETH`;
+
+  let estFeeLabel = '';
+  let estRecieveLabel = `You will receive ${Number(token.amount).toFixed(3)} ${token.symbol}
+  ${!!amountToUsd(token.amount, lookupPrice, token) ? `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})`: ''}
+  on L1`
+
+  if(cost && Number(cost) > 0) {
+
+    if (token.symbol !== 'ETH') {
+      if(Number(cost) > Number(feeBalance)) {
+        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
+        <br/>TRANSACTION WILL FAIL.`
+      }
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
+        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
+      }
+      else {
+        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH`
+      }
+    }
+
+    if (token.symbol === 'ETH') {
+      estFee = `${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`;
+
+      if((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
+        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>TRANSACTION WILL FAIL.`
+      }
+      else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
+        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        <br/>TRANSACTION MIGHT FAIL.`
+      } else {
+        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
+      }
+    }
+  }
+
 
   useEffect(() => {
 
@@ -33,10 +80,10 @@ function TransferExit({
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } else if (token.symbol === 'ETH' && (Number(cExitCost) + Number(token.amount)) > Number(feeBalance)) {
+    } else if (token.symbol === 'ETH' && (Number(cost) + Number(token.amount)) > Number(feeBalance)) {
       //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
-    } else if ((Number(cExitCost) > Number(feeBalance))) {
+    } else if ((Number(cost) > Number(feeBalance))) {
       //insufficient ETH to pay exit fees
       setValidValue(false)
     } else {
@@ -44,7 +91,7 @@ function TransferExit({
       setValidValue(true)
     }
 
-  }, [ token, setValidValue, cExitCost, feeBalance ])
+  }, [ token, setValidValue, cost, feeBalance ])
 
 
   const doExit = async () => {
@@ -67,7 +114,15 @@ function TransferExit({
   }
 
   return <>
-    <BridgeFee />
+    <BridgeFee
+      time="7 Days"
+      timeLabel="Your funds will be available on L1 in 7 days"
+      estBridgeFee={`0%`}
+      estFee={estFee}
+      estFeeLabel={estFeeLabel}
+      estRecieve={`${Number(token.amount).toFixed(3)} ${token.symbol}`}
+      estRecieveLabel={estRecieveLabel}
+      />
     <Button
       color="primary"
       variant="contained"
