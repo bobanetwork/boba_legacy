@@ -9,13 +9,14 @@ import { closeModal, openAlert, openModal } from 'actions/uiAction';
 
 import { selectFastExitCost, selectL1FeeRate, selectL1FeeRateN, selectL1LPBalanceString, selectL1LPLiquidity, selectL1LPPendingString, selectL2FeeBalance } from 'selectors/balanceSelector';
 
-import { logAmount } from 'util/amountConvert';
+import { amountToUsd, logAmount } from 'util/amountConvert';
 import { fetchFastExitCost, fetchL1FeeRateN, fetchL1LPBalance, fetchL1LPLiquidity, fetchL1LPPending, fetchL1TotalFeeRate, fetchL2FeeBalance } from 'actions/balanceAction';
 import { depositL2LP } from 'actions/networkAction';
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector';
 import { selectLoading } from 'selectors/loadingSelector';
 import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
+import { selectLookupPrice } from 'selectors/lookupSelector';
 
 
 function TransferFastExit({
@@ -32,12 +33,57 @@ function TransferFastExit({
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
   const feeBalance = useSelector(selectL2FeeBalance)
+  const lookupPrice = useSelector(selectLookupPrice)
   // eslint-disable-next-line no-unused-vars
   const feeRate = useSelector(selectL1FeeRate)
   const feeRateN = useSelector(selectL1FeeRateN)
 
   const loading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_exitLP)
+
+  const bridgeFee = `${feeRateN}%`;
+  const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
+
+  let estRecieveLabel = ''
+  let estFee = `${Number(cost).toFixed(4)} ETH`;
+  let estFeeLabel = null;
+
+
+  if(cost && Number(cost) > 0) {
+
+    if (token.symbol !== 'ETH') {
+      if(Number(cost) > Number(feeBalance)) {
+        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
+        <br/>TRANSACTION WILL FAIL.`
+      }
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
+        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
+      }
+      else {
+        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
+      }
+    }
+
+    if (token.symbol === 'ETH') {
+      estFee = `${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`;
+      if((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
+        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>TRANSACTION WILL FAIL.`
+      }
+      else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
+        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        <br/>TRANSACTION MIGHT FAIL.`
+      } else {
+        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
+      }
+    }
+  }
+
 
   useEffect(() => {
     const lbl = Number(logAmount(LPLiquidity, token.decimals))
@@ -98,8 +144,18 @@ function TransferFastExit({
   }, [ token, setValidValue, cost, feeBalance, LPBalance, LPPending, LPRatio ])
 
   const receivableAmount = (value) => {
-    return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
+    return (Number(token.amount) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
+
+
+  if (token.amount) {
+    estRecieveLabel = `You will receive approximately
+    ${receivableAmount(token.amount)}
+    ${token.symbol}
+    ${!!amountToUsd(token.amount, lookupPrice, token) ?  `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})`: ''}
+    on L1.`
+  }
+
 
   useEffect(() => {
     if (signatureStatus && loading) {
@@ -133,7 +189,16 @@ function TransferFastExit({
   }
 
   return <>
-    <BridgeFee />
+    <BridgeFee
+      time="20mins - 3hrs"
+      timeLabel="In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours."
+      estBridgeFee={bridgeFee}
+      estBridgeFeeLabel={bridgeFeeLabel}
+      estFee={estFee}
+      estFeeLabel={estFeeLabel}
+      estRecieve={`${receivableAmount(token.amount)}  ${token.symbol}`}
+      estRecieveLabel={estRecieveLabel}
+      />
     <Button
       color="primary"
       variant="contained"

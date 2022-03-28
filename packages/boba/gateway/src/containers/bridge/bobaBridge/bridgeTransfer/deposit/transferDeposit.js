@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
-import BridgeFee from '../fee/bridgeFee';
 
 function TransferDeposit({
   token
