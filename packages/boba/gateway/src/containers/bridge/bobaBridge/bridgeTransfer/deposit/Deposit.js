@@ -15,7 +15,7 @@ function Deposit() {
     return <TransferDeposit token={tokens[ 0 ]} />
   }
 
-  if (tokens.length > 1) {
+  if (bridgeType === BRIDGE_TYPE.MULTI_BRIDGE ) {
     return <TransferFastDepositBatch tokens={tokens} />
   }
 

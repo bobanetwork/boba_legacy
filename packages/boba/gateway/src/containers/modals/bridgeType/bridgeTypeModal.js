@@ -12,31 +12,58 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
-import React from 'react';
+import { Checkbox, FormControlLabel, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/styles';
+
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Typography, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/styles';
 import { setBridgeType } from 'actions/bridgeAction';
 import { closeModal } from 'actions/uiAction';
+
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 
-import { selectLayer } from 'selectors/setupSelector'
+import { selectBridgeType } from 'selectors/bridgeSelector';
+import { selectLayer } from 'selectors/setupSelector';
+
+import { BRIDGE_TYPE } from 'util/constant';
 
 import * as S from './bridgeTypeModal.styles';
 
-function BridgeTypeModal({ open, toBridgeType }) {
 
+function BridgeTypeModal({ open }) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const layer = useSelector(selectLayer());
 
-  function handleClose() {
+  const [ isMulti, setIsMulti ] = useState(false);
+
+  const layer = useSelector(selectLayer());
+  const bridgeType = useSelector(selectBridgeType());
+
+  const handleCheck = (event) => {
+    console.log(event.target);
+    setIsMulti(event.target.checked);
+  }
+
+  const handleClose = () => {
     dispatch(closeModal('bridgeTypeSwitch'))
   }
 
+  const switchBridge = () => {
+    if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
+      // check wether user want's to navigate to multi type bridge before switch to fast.
+      if (isMulti) {
+        dispatch(setBridgeType(BRIDGE_TYPE.MULTI_BRIDGE))
+      } else {
+        dispatch(setBridgeType(BRIDGE_TYPE.FAST_BRIDGE))
+      }
+    } else {
+      dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
+    }
+    handleClose();
+  }
 
   return (
     <Modal
@@ -49,9 +76,17 @@ function BridgeTypeModal({ open, toBridgeType }) {
       transparent={false}
     >
       <Typography variant="body2">
-        {layer === 'L1' ? 'The classic bridge only supports the transfer of one token ':  null}
+        {layer === 'L1' ? 'The classic bridge only supports the transfer of one token ' : null}
         Are you sure you want to switch?
       </Typography>
+
+      {layer === 'L1' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ?
+        <FormControlLabel
+          label={<Typography variant='body2'>Is multi bridge</Typography>}
+          control={<Checkbox color="primary" checked={isMulti} onChange={handleCheck} />}
+        /> : null
+      }
+
       <S.WrapperActionsModal>
         <Button
           onClick={handleClose}
@@ -63,10 +98,7 @@ function BridgeTypeModal({ open, toBridgeType }) {
           Cancel
         </Button>
         <Button
-          onClick={() => {
-            dispatch(setBridgeType(toBridgeType))
-            handleClose();
-          }}
+          onClick={switchBridge}
           color='primary'
           variant="outlined"
           fullWidth={isMobile}

@@ -95,7 +95,7 @@ function BridgeTransfer() {
             opacity: 0.6,
             cursor: 'pointer'
           }}
-        >To {bridgeType !== BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
+        >To {BRIDGE_TYPE.CLASSIC_BRIDGE !== bridgeType ? 'Classic bridge' : 'Fast Bridge'}
         </Typography>
       </Box>
       <BridgeFee tokens={tokens} />

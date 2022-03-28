@@ -41,7 +41,7 @@ function TokenInput({
   const layer = useSelector(selectLayer());
 
   const dispatch = useDispatch();
-  
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -75,7 +75,7 @@ function TokenInput({
     if (layer === 'L2') {
       return true;
     }
-    if (tokenLen > 3) {
+    if (bridgeType !== BRIDGE_TYPE.MULTI_BRIDGE || tokenLen > 3) {
       return true;
     } else {
       return false;
@@ -104,16 +104,12 @@ function TokenInput({
     <IconButton size="small" aria-label="add token"
       disabled={isAddTokenDisabled()} // as we are going to enable it only for the L1 layer + fast Fast Deposit
       onClick={() => {
-        if (tokenLen === 1 && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
-          switchBridgeType()
-        } else {
           addNewToken()
-        }
       }}
     >
       <AddCircleOutline fontSize="small" />
     </IconButton>
-    <IconButton disabled={!isFastBridge && tokenLen <= 1} size="small" aria-label="remove token"
+    <IconButton disabled={bridgeType !== BRIDGE_TYPE.MULTI_BRIDGE || tokenLen < 2} size="small" aria-label="remove token"
       onClick={() => {
         deleteToken(index);
       }}
