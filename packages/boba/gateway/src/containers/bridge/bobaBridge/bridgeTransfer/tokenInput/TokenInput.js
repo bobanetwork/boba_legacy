@@ -75,7 +75,7 @@ function TokenInput({
     if (layer === 'L2') {
       return true;
     }
-    if (bridgeType !== BRIDGE_TYPE.MULTI_BRIDGE || tokenLen > 3) {
+    if (tokenLen > 3) {
       return true;
     } else {
       return false;
@@ -173,6 +173,7 @@ function TokenInput({
               error={underZero || overMax}
             />}
         </S.TextFieldWrapper>
+        {/* TODO: FIXME: Only show in case of multi bridge */}
         {!isMobile ? <Action /> : null}
       </S.TokenInputContent>
       {token.amount !== '' && underZero ?
