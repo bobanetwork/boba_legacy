@@ -100,9 +100,7 @@ function BridgeTransfer() {
         </Box> : null
       }
       <BridgeFee tokens={tokens} />
-      {
-        multibridgeMode ? <TransferFastDepositBatch tokens={tokens} /> : null
-      }
+      { multibridgeMode ? <TransferFastDepositBatch tokens={tokens} /> : null }
 
       {tokens.length && !multibridgeMode ?
         layer === 'L1' ? <Deposit /> : <Exit />
