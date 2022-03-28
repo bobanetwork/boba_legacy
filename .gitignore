@@ -6,6 +6,8 @@ temp
 coverage.json
 *.tsbuildinfo
 
+.idea/
+
 dist
 artifacts
 cache
