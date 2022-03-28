@@ -16,7 +16,7 @@ function TransferDeposit({
 
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
-  
+
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
@@ -69,7 +69,7 @@ function TransferDeposit({
     onClick={doDeposit}
     disabled={!validValue}
     fullWidth={true}
-  >Transfer</Button>
+  >Classic Bridge</Button>
 };
 
 export default React.memo(TransferDeposit);

@@ -139,7 +139,7 @@ function TransferFastExit({
     onClick={doFastExit}
     disabled={!validValue}
     fullWidth={true}
-  >Transfer</Button>
+  >Fast Bridge</Button>
 };
 
 export default React.memo(TransferFastExit);

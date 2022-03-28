@@ -73,7 +73,7 @@ function TransferExit({
     onClick={doExit}
     disabled={!validValue}
     fullWidth={true}
-  >Transfer</Button>
+  >Classic Bridge</Button>
 };
 
 export default React.memo(TransferExit);

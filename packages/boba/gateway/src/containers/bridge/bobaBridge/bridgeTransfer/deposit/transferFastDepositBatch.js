@@ -99,8 +99,8 @@ function TransferFastDepositBatch({
         setValidValue(true);
       }
     }
-    
-    
+
+
     tokens.forEach((token) => {
       const maxValue = logAmount(token.balance, token.decimals);
       const tooSmall = new BN(token.amount).lte(new BN(0.0))
@@ -131,17 +131,17 @@ function TransferFastDepositBatch({
     const payload = tokens.map(i => ({ ...i, value: i.amount }));
     console.log([`[FAST DEPOSIT BATCH] > APPROVING..` ])
     res = await dispatch(approveFastDepositBatch(payload));
-    
+
     if (res === false) {
       dispatch(openError('Failed to approve amount or user rejected signature'))
       dispatch(closeModal('transferPending'));
       dispatch(resetToken());
       return
     }
-    
+
     console.log([`[FAST DEPOSIT BATCH] > DEPOSITING..` ])
     res = await dispatch(depositL1LPBatch(payload));
-    
+
     if (res) {
       dispatch(
         openAlert(
@@ -152,7 +152,7 @@ function TransferFastDepositBatch({
       dispatch(resetToken());
       return
     }
-    
+
   }
 
   return <Button
@@ -163,7 +163,7 @@ function TransferFastDepositBatch({
     onClick={doFastDeposit}
     disabled={!validValue}
     fullWidth={true}
-  >Transfer</Button>
+  >Multi Bridge</Button>
 };
 
 export default React.memo(TransferFastDepositBatch);
