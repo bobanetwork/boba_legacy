@@ -51,24 +51,14 @@ function DelegateDaoXModal({ open }) {
 
     const submit = async () => {
         let res = await dispatch(delegateVotesX({ recipient }));
-        if (res) {
-            dispatch(openAlert(`Votes delegated successfully!`));
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`));
-            handleClose();
-        }
+        if (res) dispatch(openAlert(`Votes delegated successfully!`))
+        handleClose()
     }
 
     const submitMe = async () => {
         let res = await dispatch(delegateVotesX({ recipient: wAddress }))
-        if (res) {
-            dispatch(openAlert(`Vote self-delegation successfull!`))
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`))
-            handleClose();
-        }
+        if (res) dispatch(openAlert(`Vote self-delegation successfull!`))
+        handleClose()
     }
 
     return (
