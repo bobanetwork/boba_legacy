@@ -1724,16 +1724,6 @@
     pino-sentry "^0.7.0"
     prom-client "^13.1.0"
 
-"@eth-optimism/contracts@0.5.17":
-  version "0.5.17"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.17.tgz#7a14618797c354486f2263a1d5dfab6c28a46458"
-  integrity sha512-mkey2YjRQ2O+85qeDhkiicAiukWfKixw/vktFO1KqLQ9K2phozJu/79dgBCABjyJfhE5kqJDSn5fBrtgIfc3hQ==
-  dependencies:
-    "@eth-optimism/core-utils" "0.8.1"
-    "@ethersproject/abstract-provider" "^5.5.1"
-    "@ethersproject/abstract-signer" "^5.5.0"
-    "@ethersproject/hardware-wallets" "^5.5.0"
-
 "@eth-optimism/core-utils@^0.5.1":
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.5.5.tgz#0e2bb95b23965fb51adfb8ba6841c3afd26a6411"
@@ -1742,17 +1732,6 @@
     "@ethersproject/abstract-provider" "^5.4.1"
     ethers "^5.4.5"
     lodash "^4.17.21"
-
-"@eth-optimism/sdk@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/sdk/-/sdk-1.0.1.tgz#4e9c3bfb4ef05cae4b4959918461455a43c85dd6"
-  integrity sha512-inWOwJpqGtlZu/amE4JsmN9YgwnKuCWSsSiCYVrF2CWHK7MYKXbc61dW7EMwITTDqPzJNd2LD6jk7Y1Ps0b6oQ==
-  dependencies:
-    "@eth-optimism/contracts" "0.5.17"
-    "@eth-optimism/core-utils" "0.8.1"
-    lodash "^4.17.21"
-    merkletreejs "^0.2.27"
-    rlp "^2.2.7"
 
 "@eth-optimism/smock@1.1.10":
   version "1.1.10"
