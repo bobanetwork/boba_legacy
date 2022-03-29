@@ -76,6 +76,11 @@ contract Boba_GasPriceOracle {
      * Function Modifiers *
      **********************/
 
+    modifier onlyNotInitialized() {
+        require(address(l1FeeWallet) == address(0), "Contract has been initialized");
+        _;
+    }
+
     modifier onlyOwner() {
         require(msg.sender == _owner || _owner == address(0), "caller is not the owner");
         _;
@@ -116,6 +121,19 @@ contract Boba_GasPriceOracle {
      */
     function owner() public view returns (address) {
         return _owner;
+    }
+
+    /**
+     * Initialize l1FeeWallet and l2BobaAddress.
+     */
+    function initialize(address _l1FeeWallet, address _l2BobaAddress)
+        public
+        onlyOwner
+        onlyNotInitialized
+    {
+        require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
+        l1FeeWallet = _l1FeeWallet;
+        l2BobaAddress = _l2BobaAddress;
     }
 
     /**

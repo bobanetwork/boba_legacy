@@ -79,6 +79,18 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
+  describe('initialize', () => {
+    it('should revert if contract has been initialized', async () => {
+      const signer1Address = await signer1.getAddress()
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).initialize(
+          signer1Address,
+          signer1Address
+        )
+      ).to.be.reverted
+    })
+  })
+
   describe('updatePriceRatio', () => {
     it('should revert if called by someone other than the owner', async () => {
       await expect(Boba_GasPriceOracle.connect(signer2).updatePriceRatio(1234))
