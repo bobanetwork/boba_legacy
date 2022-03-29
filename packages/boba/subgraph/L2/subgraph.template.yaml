@@ -8,11 +8,12 @@ dataSources:
     name: L2LiquidityPool
     network: {{network}}
     source:
+
       address: '{{contracts.L2LiquidityPool.address}}'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - L2LiquidityPool
@@ -42,7 +43,7 @@ dataSources:
       abi: OVM_L2StandardBridge
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - OVM_L2StandardBridge
@@ -57,3 +58,43 @@ dataSources:
         - event: DepositFailed(indexed address,indexed address,indexed address,address,uint256,bytes)
           handler: handleStandardBridgeDepositFailed
       file: ./src/OVM_L2StandardBridgeMapping.ts
+
+  - kind: ethereum/contract
+    name: GovernorBravoDelegate
+    network: {{network}}
+    source:
+      address: '{{contracts.GovernorBravoDelegate.address}}'
+      abi: GovernorBravoDelegate
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - GovernorBravoDelegate
+      abis:
+        - name: GovernorBravoDelegate
+          file: ./abis/GovernorBravoDelegate.json
+      eventHandlers:
+        - event: NewAdmin(address,address)
+          handler: handleGovernorNewAdmin
+        - event: NewImplementation(address,address)
+          handler: handleGovernorNewImplementation
+        - event: NewPendingAdmin(address,address)
+          handler: handleGovernorNewPendingAdmin
+        - event: ProposalCanceled(uint256)
+          handler: handleGovernorProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleGovernorProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleGovernorProposalExecuted
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleGovernorProposalQueued
+        - event: ProposalThresholdSet(uint256,uint256)
+          handler: handleGovernorProposalThresholdSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleGovernorVoteCast
+        - event: VotingDelaySet(uint256,uint256)
+          handler: handleGovernorVotingDelaySet
+        - event: VotingPeriodSet(uint256,uint256)
+          handler: handleGovernorVotingPeriodSet
+      file: ./src/GovernorBravoDelegateMapping.ts
