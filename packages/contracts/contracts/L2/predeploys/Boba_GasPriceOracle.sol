@@ -22,12 +22,14 @@ contract Boba_GasPriceOracle {
     /*************
      * Constants *
      *************/
+
     // Minimum BOBA balance that can be withdrawn in a single withdrawal.
     uint256 public constant MIN_WITHDRAWAL_AMOUNT = 150e18;
 
     /*************
      * Variables *
      *************/
+
     // Owner address
     address private _owner;
 
