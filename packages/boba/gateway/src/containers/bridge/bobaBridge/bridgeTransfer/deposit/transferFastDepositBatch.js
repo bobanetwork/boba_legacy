@@ -20,11 +20,12 @@ import BN from 'bignumber.js';
 import Button from 'components/button/Button';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanceBatch } from 'selectors/balanceSelector';
+import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanceBatch,selectL2FeeRate } from 'selectors/balanceSelector';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
 import BridgeFee from '../fee/bridgeFee';
+import { Typography } from '@mui/material';
 
 /*
 Transfer Fast Deposit Batch
@@ -34,7 +35,7 @@ function TransferFastDepositBatch({
   tokens
 }) {
 
-  console.log([ 'TRANSFER FAST DEPOSIT BATCH' ])
+
   const dispatch = useDispatch();
 
   const [ validValue, setValidValue ] = useState(false);
@@ -42,10 +43,37 @@ function TransferFastDepositBatch({
   const feeBalance = useSelector(selectL2FeeBalance)
   const batchInfo = useSelector(selectUserAndL2LPBalanceBatch)
   const batchCost = useSelector(selectFastDepositBatchCost)
+  const feeRate = useSelector(selectL2FeeRate)
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   // const approvalLoading = useSelector(selectLoading([ 'APPROVE/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
+
+  const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%.`
+
+  let bridgeFee = '';
+
+  let estRecieve = '';
+
+  if (tokens.length) {
+    bridgeFee = tokens.map((t) => {
+      let l2LPFeeRate = 0.1;
+      if (t.symbol && batchInfo[ t.symbol ]) {
+        l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
+        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * l2LPFeeRate / 100).toFixed(3)} {t.symbol} ({l2LPFeeRate}%) </Typography>
+      }
+      return <></>
+    })
+
+    estRecieve = tokens.map((t) => {
+      let l2LPFeeRate = 0.1;
+      if (t.symbol && batchInfo[ t.symbol ]) {
+        l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
+        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * (1 - l2LPFeeRate / 100)).toFixed(3)} {t.symbol} ({l2LPFeeRate}%) </Typography>
+      }
+      return <></>
+    })
+  }
 
   useEffect(() => {
     dispatch(fetchL2TotalFeeRate())
@@ -157,7 +185,14 @@ function TransferFastDepositBatch({
   }
 
   return <>
-    <BridgeFee />
+    <BridgeFee
+        time="10mins - 3hrs"
+        timeLabel="In most cases, a fast bridge takes less than 10 minutes. However, if Ethereum is congested, it can take as long as 3 hours"
+        estBridgeFee={bridgeFee}
+        estBridgeFeeLabel={bridgeFeeLabel}
+        estFee={batchCost ? `${Number(batchCost).toFixed(5)} ETH` : 0}
+        estRecieve={estRecieve}
+      />
     <Button
       color="primary"
       variant="contained"

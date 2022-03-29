@@ -15,7 +15,7 @@ limitations under the License. */
 import React from 'react'
 
 import { HelpOutline } from '@mui/icons-material'
-import { Box } from '@mui/material'
+import { Typography } from '@mui/material'
 
 import Tooltip from 'components/tooltip/Tooltip'
 
@@ -33,9 +33,7 @@ function BridgeFee({
 }) {
 
   const ItemLabel = ({label, title}) => {
-    console.log([ `Item label`, label ]);
-    console.log([ `Item title`, title ]);
-    return <S.BridgeFeeItemLabel>
+    return <S.BridgeFeeItemLabel variant='body2'>
       {label}
       {title ? <Tooltip title={title}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
@@ -46,29 +44,29 @@ function BridgeFee({
   return <>
     {time ? <S.BridgeFeeItem>
       <ItemLabel label="Est. time" title={timeLabel} />
-      <Box>
+      <Typography variant='body2'>
         {time}
-      </Box>
+      </Typography>
     </S.BridgeFeeItem> : null}
 
     <S.BrigeFeeWrapper>
       <S.BridgeFeeItem>
         <ItemLabel label="Est. Fee (Approval+Bridge)" title={estFeeLabel} />
-        <Box>
+        <Typography variant='body2'>
           {estFee}
-        </Box>
+        </Typography>
       </S.BridgeFeeItem>
       <S.BridgeFeeItem>
         <ItemLabel label="Est. bridge fee" title={estBridgeFeeLabel} />
-        <Box>
+        <Typography variant='body2'>
           {estBridgeFee}
-        </Box>
+        </Typography>
       </S.BridgeFeeItem>
       <S.BridgeFeeItem>
         <ItemLabel label="Est. recieve" title={estRecieveLabel} />
-        <Box>
+        <Typography variant='body2'>
           {estRecieve}
-        </Box>
+        </Typography>
       </S.BridgeFeeItem>
     </S.BrigeFeeWrapper>
   </>

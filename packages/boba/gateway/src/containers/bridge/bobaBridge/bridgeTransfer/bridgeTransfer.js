@@ -61,7 +61,7 @@ function BridgeTransfer() {
   }
 
   return (
-    <S.BridgeTransferContainer>
+    <S.BridgeTransferContainer my={1}>
       {!tokens.length ?
         <TokenInput
           index="0"
@@ -82,7 +82,7 @@ function BridgeTransfer() {
       {!multibridgeMode ?
         <Box display="flex" justifyContent="space-between">
           <Typography variant="body2">
-            <Typography component="span" color="secondary">
+            <Typography variant="body2" component="span" color="secondary">
               Recommendations: &nbsp;
             </Typography>
             {bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}

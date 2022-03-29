@@ -124,10 +124,10 @@ function TokenInput({
       <S.TokenInputTitle
       >
         <Typography variant="body2">
-          <Typography component="span" sx={{ opacity: 0.65 }}>
+          <Typography variant="body2" component="span" sx={{ opacity: 0.65 }}>
             Available Balance : &nbsp;
           </Typography>
-          <Typography component="span" sx={{textDecoration: 'underline'}}>
+          <Typography variant="body2" component="span" sx={{textDecoration: 'underline'}}>
             {amount}
           </Typography>
         </Typography>
