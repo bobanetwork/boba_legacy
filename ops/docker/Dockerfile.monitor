@@ -22,4 +22,6 @@ RUN rm -rf /usr/local/share/.cache
 
 WORKDIR /ops_boba/monitor
 
+RUN yarn add node-fetch@2
+
 ENTRYPOINT yarn start
