@@ -75,3 +75,77 @@ type StandardBridgeDepositFailed @entity {
   amount: String
   data: Bytes
 }
+
+type GovernorNewAdmin @entity {
+  id: ID!
+  oldAdmin: Bytes
+  newAdmin: Bytes
+}
+
+type GovernorNewImplementation @entity {
+  id: ID!
+  oldImplementation: Bytes
+  newImplementation: Bytes
+}
+
+type GovernorNewPendingAdmin @entity {
+  id: ID!
+  oldPendingAdmin: Bytes
+  newPendingAdmin: Bytes
+}
+
+type GovernorProposalCanceled @entity {
+  id: ID!
+  proposalId: String
+}
+
+type GovernorProposalCreated @entity {
+  id: ID!
+  proposalId: String
+  proposer: Bytes
+  targets: [Bytes!]
+  values: [String!]
+  signatures: [String!]
+  calldatas: [Bytes!]
+  startTimestamp: String
+  endTimestamp: String
+  description: String
+}
+
+type GovernorProposalExecuted @entity {
+  id: ID!
+  proposalId: String
+}
+
+type GovernorProposalQueued @entity {
+  id: ID!
+  proposalId: String
+  eta: String
+}
+
+type GovernorProposalThresholdSet @entity {
+  id: ID!
+  oldProposalThreshold: String
+  newProposalThreshold: String
+}
+
+type GovernorVoteCast @entity {
+  id: ID!
+  voter: Bytes
+  proposalId: String
+  support: String
+  votes: String
+  reason: String
+}
+
+type GovernorVotingDelaySet @entity {
+  id: ID!
+  oldVotingDelay: String
+  newVotingDelay: String
+}
+
+type GovernorVotingPeriodSet @entity {
+  id: ID!
+  oldVotingPeriod: String
+  newVotingPeriod: String
+}

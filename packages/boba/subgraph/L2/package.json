@@ -12,8 +12,8 @@
     "deploy:subgraph:mainnet": "graph deploy boba/Bridges --ipfs https://graph.mainnet.boba.network:5001 --node https://graph.mainnet.boba.network:8020"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.20.1",
-    "@graphprotocol/graph-ts": "^0.20.0"
+    "@graphprotocol/graph-cli": "^0.29.0",
+    "@graphprotocol/graph-ts": "^0.26.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "3.4.1",
