@@ -33,7 +33,7 @@ export function createAction (key, asyncAction) {
 
         console.log("Error keys:", Object.keys(response))
         console.log("Error code:", response.code)
-        console.log("Error reason:", response.reason)
+        if(response.hasOwnProperty('reason')) console.log("Error reason:", response.reason)
 
         // the basic error message
         let errorMessage = response.message
@@ -41,27 +41,28 @@ export function createAction (key, asyncAction) {
         // provide more information in special cases
         // MetaMask user rejected sig - throw up a banner
         if (response.code === 4001) { 
+          console.log("MetaMask: user denied signature")
           errorMessage = 'MetaMask: Transaction was rejected by user - signature denied'
         }
         // No internet case - throw up a banner
-        if(response.hasOwnProperty('reason') && response.reason.includes('could not detect network')) {
+        else if(response.hasOwnProperty('reason') && response.reason.includes('could not detect network')) {
           console.log("Gateway error: No network")
           errorMessage = 'Gateway: No internet'
         }
         // ethers error
-        if(response.hasOwnProperty('reason') && response.reason.includes('missing revert data in call exception')) {
+        else if(response.hasOwnProperty('reason') && response.reason.includes('missing revert data in call exception')) {
           console.log("Slow network or rate throttling - code 1")
           // intercept error
           return false
         }
         // ethers error
-        if(response.hasOwnProperty('reason') && response.reason.includes('resolver or addr is not configured for ENS name')) {
+        else if(response.hasOwnProperty('reason') && response.reason.includes('resolver or addr is not configured for ENS name')) {
           console.log("Slow network or rate throttling - code 2")
           // intercept error
           return false
         }
         // ethers error
-        if(response.hasOwnProperty('reason') && response.reason.includes('missing response')) {
+        else if(response.hasOwnProperty('reason') && response.reason.includes('missing response')) {
           console.log("Slow network or rate throttling - code 3")
           // intercept error
           return false

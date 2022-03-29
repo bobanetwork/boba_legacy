@@ -47,7 +47,7 @@ function _Alert ({ children, open, onClose, type = 'success', duration = 3000, p
       onClose={onClose}
       anchorOrigin={{
         vertical: 'top',
-        horizontal: `${isMobile ? 'center' : 'right'}`
+        horizontal: 'center'
       }}
       style={alertStyle}
     >
@@ -63,7 +63,7 @@ function _Alert ({ children, open, onClose, type = 'success', duration = 3000, p
         sx={{
           maxWidth: `${isMobile ? '90%' : '600px'}`,
           wordWrap: 'break-word',
-          background: '#272B30',
+          //background: '#272B30',
           borderRadius: '10px'
         }}
       >
