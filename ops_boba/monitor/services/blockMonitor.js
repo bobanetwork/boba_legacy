@@ -82,7 +82,7 @@ class BlockMonitorService extends OptimismEnv {
     this.logger.info('Fetching the block data...')
     const [blocksData, receiptsData] = await this.getChainData(
       latestSQLBlock,
-      this.latestBlock
+      Math.min(this.latestBlock, latestSQLBlock + 1000)
     )
 
     const receipts = {}
@@ -143,7 +143,7 @@ class BlockMonitorService extends OptimismEnv {
       this.logger.info('Fetching the block data...')
       const [blocksData, receiptsData] = await this.getChainData(
         this.scannedLastBlock,
-        this.latestBlock
+        Math.min(latestBlock, this.latestBlock + 1000)
       )
 
       const receipts = {}

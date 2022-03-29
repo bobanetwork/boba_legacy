@@ -41,27 +41,6 @@ const loopTransferTx = async () => {
 }
 
 const main = async () => {
-  if (configs.enableTxResponseTime) {
-    loopLogTx().catch()
-  }
-
-  const {
-    setupProvider,
-    validateMonitoring,
-  } = require('../services/monitoring')
-
-  if (validateMonitoring()) {
-    logger.info('Start addresses monitoring service!')
-    setupProvider(configs.OMGXNetwork.L1, configs.l1Url, 5).catch()
-    setupProvider(configs.OMGXNetwork.L2, configs.l2Url, 15).catch()
-  } else {
-    logger.error(
-      'Addresses Monitoring: Env variables for monitoring is missing!'
-    )
-  }
-
-  loopTransferTx().catch()
-
   const BlockMonitorService = require('../services/blockMonitor')
   const stateRootMonitorService = require('../services/stateRootMonitor')
   const exitMonitorService = require('../services/exitMonitor')
@@ -100,6 +79,27 @@ const main = async () => {
 
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
+
+  if (configs.enableTxResponseTime) {
+    loop(() => loopLogTx()).catch()
+  }
+
+  const {
+    setupProvider,
+    validateMonitoring,
+  } = require('../services/monitoring')
+
+  if (validateMonitoring()) {
+    logger.info('Start addresses monitoring service!')
+    setupProvider(configs.OMGXNetwork.L1, configs.l1Url, 5).catch()
+    setupProvider(configs.OMGXNetwork.L2, configs.l2Url, 15).catch()
+  } else {
+    logger.error(
+      'Addresses Monitoring: Env variables for monitoring is missing!'
+    )
+  }
+
+  loop(() => loopTransferTx()).catch()
 }
 
 ;(async () => {
