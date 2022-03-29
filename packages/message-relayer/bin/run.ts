@@ -47,6 +47,19 @@ const main = async () => {
   const L1_WALLET_KEY = config.str('l1-wallet-key', env.L1_WALLET_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
+  //batch system
+  const MIN_BATCH_SIZE = config.uint(
+    'min-batch-size',
+    parseInt(env.MIN_BATCH_SIZE, 10) || 2
+  )
+  const MAX_WAIT_TIME_S = config.uint(
+    'max-wait-time-s',
+    parseInt(env.MAX_WAIT_TIME_S, 10) || 60
+  )
+  const MAX_WAIT_TX_TIME_S = config.uint(
+    'max-wait-tx-time-s',
+    parseInt(env.MAX_WAIT_TX_TIME_S, 10) || 180
+  )
   const RELAY_GAS_LIMIT = config.uint(
     'relay-gas-limit',
     parseInt(env.RELAY_GAS_LIMIT, 10) || 4000000
@@ -68,6 +81,30 @@ const main = async () => {
   const FILTER_POLLING_INTERVAL = config.uint(
     'filter-polling-interval',
     parseInt(env.FILTER_POLLING_INTERVAL, 10) || 60000
+  )
+  const MAX_GAS_PRICE_IN_GWEI = config.uint(
+    'max-gas-price-in-gwei',
+    parseInt(env.MAX_GAS_PRICE_IN_GWEI, 10) || 100
+  )
+  const GAS_RETRY_INCREMENT = config.uint(
+    'gas-retry-increment',
+    parseInt(env.GAS_RETRY_INCREMENT, 10) || 5
+  )
+  const NUM_CONFIRMATIONS = config.uint(
+    'num-confirmations',
+    parseInt(env.NUM_CONFIRMATIONS, 10) || 1
+  )
+  const NUM_EVENT_CONFIRMATIONS = config.uint(
+    'num-event-confirmations',
+    parseInt(env.NUM_EVENT_CONFIRMATIONS, 10) || 0
+  )
+  const MULTI_RELAY_LIMIT = config.uint(
+    'multi-relay-limit',
+    parseInt(env.MULTI_RELAY_LIMIT, 10) || 10
+  )
+  const RESUBMISSION_TIMEOUT = config.uint(
+    'resubmission-timeout',
+    parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
   )
 
   if (!ADDRESS_MANAGER_ADDRESS) {
@@ -103,12 +140,23 @@ const main = async () => {
     l2RpcProvider: l2Provider,
     l1Wallet: wallet,
     relayGasLimit: RELAY_GAS_LIMIT,
+    //batch system
+    minBatchSize: MIN_BATCH_SIZE,
+    maxWaitTimeS: MAX_WAIT_TIME_S,
+    maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
     filterEndpoint: FILTER_ENDPOINT,
     filterPollingInterval: FILTER_POLLING_INTERVAL,
+    // gas price
+    maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
+    gasRetryIncrement: GAS_RETRY_INCREMENT,
+    numConfirmations: NUM_CONFIRMATIONS,
+    numEventConfirmations: NUM_EVENT_CONFIRMATIONS,
+    multiRelayLimit: MULTI_RELAY_LIMIT,
+    resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
   })
 
   await service.start()

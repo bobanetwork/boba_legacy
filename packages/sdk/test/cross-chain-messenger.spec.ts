@@ -705,7 +705,7 @@ describe('CrossChainMessenger', () => {
         })
 
         describe('when the message has been relayed but the relay failed', () => {
-          it('should return a status of READY_FOR_RELAY', async () => {
+          it('should return a status of RELAYED_FAILED', async () => {
             const message = await sendAndGetDummyMessage(
               MessageDirection.L2_TO_L1
             )
@@ -721,7 +721,7 @@ describe('CrossChainMessenger', () => {
             ])
 
             expect(await messenger.getMessageStatus(message)).to.equal(
-              MessageStatus.READY_FOR_RELAY
+              MessageStatus.RELAYED_FAILED
             )
           })
         })

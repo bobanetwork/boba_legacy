@@ -129,6 +129,11 @@ export enum MessageStatus {
    * Message has been relayed.
    */
   RELAYED,
+
+  /**
+   * Message has been relayed but failed in execution.
+   */
+  RELAYED_FAILED,
 }
 
 /**

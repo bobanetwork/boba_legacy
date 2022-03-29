@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Wallet } from 'ethers'
+import { Wallet, utils } from 'ethers'
 import { sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
@@ -25,6 +25,10 @@ interface MessageRelayerOptions {
    * transaction.
    */
   relayGasLimit?: number
+
+  //batch system
+  minBatchSize: number
+  maxWaitTimeS: number
 
   /**
    * Index of the first L2 transaction to start processing from.
@@ -55,6 +59,21 @@ interface MessageRelayerOptions {
   filterEndpoint?: string
 
   filterPollingInterval?: number
+
+  // gas fee
+  maxGasPriceInGwei?: number
+
+  gasRetryIncrement?: number
+
+  numConfirmations?: number
+
+  numEventConfirmations?: number
+
+  multiRelayLimit?: number
+
+  resubmissionTimeout?: number
+
+  maxWaitTxTimeS: number
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -62,6 +81,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     super('Message_Relayer', options, {
       relayGasLimit: {
         default: 4_000_000,
+      },
+      minBatchSize: {
+        default: 2,
+      },
+      maxWaitTimeS: {
+        default: 60,
       },
       fromL2TransactionIndex: {
         default: 0,
@@ -75,6 +100,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       filterPollingInterval: {
         default: 60000,
       },
+      maxWaitTxTimeS: {
+        default: 180,
+      },
     })
   }
 
@@ -84,6 +112,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     //filter
     filter: Array<any>
     lastFilterPollingTimestamp: number
+    //batch system
+    timeSinceLastRelayS: number
+    timeOfLastRelayS: number
+    messageBuffer: Array<any>
+    timeOfLastPendingRelay: any
+    didWork: boolean
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -93,6 +127,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       pollingInterval: this.options.pollingInterval,
       filterPollingInterval: this.options.filterPollingInterval,
       getLogsInterval: this.options.getLogsInterval,
+      minBatchSize: this.options.minBatchSize,
+      maxWaitTimeS: this.options.maxWaitTimeS,
     })
 
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
@@ -110,109 +146,261 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     // filter
     this.state.filter = []
     this.state.lastFilterPollingTimestamp = 0
+
+    //batch system
+    this.state.timeSinceLastRelayS = 0
+    this.state.timeOfLastRelayS = Date.now()
+    this.state.messageBuffer = []
+    this.state.timeOfLastPendingRelay = false
   }
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
+      if (!this.state.didWork) {
+        await sleep(this.options.pollingInterval)
+      }
+
+      this.state.didWork = false
 
       await this._getFilter()
 
       try {
-        // Loop strategy is as follows:
-        // 1. Get the current L2 tip
-        // 2. While we're not at the tip:
-        //    2.1. Get the transaction for the next L2 block to parse.
-        //    2.2. Find any messages sent in the L2 block.
-        //    2.3. Make sure all messages are ready to be relayed.
-        //    3.4. Relay the messages.
-        const l2BlockNumber =
-          await this.state.messenger.l2Provider.getBlockNumber()
+        //Batch flushing logic
+        const secondsElapsed = Math.floor(
+          (Date.now() - this.state.timeOfLastRelayS) / 1000
+        )
+        console.log('\n***********************************')
+        console.log('Seconds elapsed since last batch push:', secondsElapsed)
+        const timeOut =
+          secondsElapsed > this.options.maxWaitTimeS ? true : false
 
-        while (this.state.highestCheckedL2Tx <= l2BlockNumber) {
-          this.logger.info(`checking L2 block ${this.state.highestCheckedL2Tx}`)
-
-          const block =
-            await this.state.messenger.l2Provider.getBlockWithTransactions(
-              this.state.highestCheckedL2Tx
-            )
-
-          // Should never happen.
-          if (block.transactions.length !== 1) {
-            throw new Error(
-              `got an unexpected number of transactions in block: ${block.number}`
-            )
-          }
-
-          const messages = await this.state.messenger.getMessagesByTransaction(
-            block.transactions[0].hash
+        let pendingTXTimeOut = true
+        if (this.state.timeOfLastPendingRelay !== false) {
+          const pendingTXSecondsElapsed = Math.floor(
+            (Date.now() - this.state.timeOfLastPendingRelay) / 1000
           )
+          console.log('\n***********************************')
+          console.log(
+            'Next tx since last tx submitted',
+            pendingTXSecondsElapsed
+          )
+          pendingTXTimeOut =
+            pendingTXSecondsElapsed > this.options.maxWaitTxTimeS ? true : false
+        }
 
-          // No messages in this transaction so we can move on to the next one.
-          if (messages.length === 0) {
-            this.state.highestCheckedL2Tx++
-            continue
-          }
+        const bufferFull =
+          this.state.messageBuffer.length >= this.options.minBatchSize
+            ? true
+            : false
 
-          // Make sure that all messages sent within the transaction are finalized. If any messages
-          // are not finalized, then we're going to break the loop which will trigger the sleep and
-          // wait for a few seconds before we check again to see if this transaction is finalized.
-          let isFinalized = true
-          for (const message of messages) {
-            const status = await this.state.messenger.getMessageStatus(message)
-            if (
-              status === MessageStatus.IN_CHALLENGE_PERIOD ||
-              status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
-            ) {
-              isFinalized = false
+        // check gas price
+        const gasPrice = await this.options.l1Wallet.getGasPrice()
+        const gasPriceGwei = Number(utils.formatUnits(gasPrice, 'gwei'))
+        const gasPriceAcceptable =
+          gasPriceGwei < this.options.maxGasPriceInGwei ? true : false
+
+        console.log(gasPrice)
+        console.log(gasPriceAcceptable)
+        console.log(pendingTXTimeOut)
+        console.log(bufferFull)
+        console.log(this.state.messageBuffer)
+
+        if (
+          this.state.messageBuffer.length !== 0 &&
+          (bufferFull || timeOut) &&
+          pendingTXTimeOut
+        ) {
+          if (gasPriceAcceptable) {
+            this.state.didWork = true
+            if (bufferFull) {
+              console.log('Buffer full: flushing')
             }
-          }
+            if (timeOut) {
+              console.log('Buffer timeout: flushing')
+            }
 
-          if (!isFinalized) {
-            this.logger.info(
-              `tx not yet finalized, waiting: ${this.state.highestCheckedL2Tx}`
-            )
-            break
-          } else {
-            this.logger.info(
-              `tx is finalized, relaying: ${this.state.highestCheckedL2Tx}`
-            )
-          }
+            // Filter out messages which have been processed
+            const newMB = []
+            for (const cur of this.state.messageBuffer) {
+              const status = await this.state.messenger.getMessageStatus(cur)
+              if (
+                // check failed message here too
+                status !== MessageStatus.RELAYED &&
+                status !== MessageStatus.RELAYED_FAILED
+              ) {
+                newMB.push(cur)
+              }
+            }
+            this.state.messageBuffer = newMB
 
-          // If we got here then all messages in the transaction are finalized. Now we can relay
-          // each message to L1.
-          for (const message of messages) {
-            try {
-              // console.log(message)
-
-              const status = await this.state.messenger.getMessageStatus(
-                message
+            if (this.state.messageBuffer.length === 0) {
+              this.state.timeOfLastPendingRelay = false
+            } else {
+              // Limit the number of messages to be submitted per batch.
+              const subBuffer = this.state.messageBuffer.slice(
+                0,
+                this.options.multiRelayLimit
               )
-              if (status === MessageStatus.RELAYED) {
-                this.logger.info('Message has already been relayed, skipping.')
-                continue
-              }
-
-              // filter out messages not meant for this relayer
-              if (this.state.filter.includes(message.target)) {
-                this.logger.info('Message not intended for target, skipping.')
-                continue
-              }
-
-              const tx = await this.state.messenger.finalizeMessage(message)
+              this.logger.info('Prepared message subBuffer', {
+                subLen: subBuffer.length,
+                bufLen: this.state.messageBuffer.length,
+                limit: this.options.multiRelayLimit,
+              })
+              // const receipt = await this._relayMultiMessageToL1(
+              //   subBuffer.reduce((acc, cur) => {
+              //     acc.push(cur.payload)
+              //     return acc
+              //   }, [])
+              // )
+              const tx = await this.state.messenger.finalizeBatchMessage(subBuffer)
               this.logger.info(`relayer sent tx: ${tx.hash}`)
-            } catch (err) {
-              if (err.message.includes('message has already been received')) {
-                // It's fine, the message was relayed by someone else
-              } else {
+
+              // if (!receipt) {
+              //   this.logger.error(
+              //     'No receipt for relayMultiMessage transaction'
+              //   )
+              // } else if (receipt.status === 1) {
+              //   this.logger.info('Successful relayMultiMessage', {
+              //     blockNumber: receipt.blockNumber,
+              //     transactionIndex: receipt.transactionIndex,
+              //     status: receipt.status,
+              //     msgCount: subBuffer.length,
+              //     gasUsed: receipt.gasUsed.toString(),
+              //     effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+              //   })
+              // } else {
+              //   this.logger.warning('Unsuccessful relayMultiMessage', {
+              //     blockNumber: receipt.blockNumber,
+              //     transactionIndex: receipt.transactionIndex,
+              //     status: receipt.status,
+              //     msgCount: subBuffer.length,
+              //     gasUsed: receipt.gasUsed.toString(),
+              //     effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+              //   })
+              // }
+
+              // add a delay between two tx
+              this.state.timeOfLastPendingRelay = Date.now()
+            }
+          } else {
+            console.log('Current gas price is unacceptable')
+            // add the time interval between two tx
+            this.state.timeOfLastPendingRelay = Date.now()
+          }
+
+          this.state.timeOfLastRelayS = Date.now()
+        } else {
+          console.log(
+            'Buffer still too small - current buffer length:',
+            this.state.messageBuffer.length
+          )
+          console.log('Buffer flush size set to:', this.options.minBatchSize)
+          console.log('***********************************\n')
+        }
+
+        // scanning the new messages only if the pending messages are relayed
+        // to l1
+        if (this.state.timeOfLastPendingRelay === false) {
+          // Loop strategy is as follows:
+          // 1. Get the current L2 tip
+          // 2. While we're not at the tip:
+          //    2.1. Get the transaction for the next L2 block to parse.
+          //    2.2. Find any messages sent in the L2 block.
+          //    2.3. Make sure all messages are ready to be relayed.
+          //    3.4. Relay the messages.
+          const l2BlockNumber =
+            await this.state.messenger.l2Provider.getBlockNumber()
+
+          while (this.state.highestCheckedL2Tx <= l2BlockNumber) {
+            this.logger.info(`checking L2 block ${this.state.highestCheckedL2Tx}`)
+
+            const block =
+              await this.state.messenger.l2Provider.getBlockWithTransactions(
+                this.state.highestCheckedL2Tx
+              )
+
+            // Should never happen.
+            if (block.transactions.length !== 1) {
+              throw new Error(
+                `got an unexpected number of transactions in block: ${block.number}`
+              )
+            }
+
+            const messages = await this.state.messenger.getMessagesByTransaction(
+              block.transactions[0].hash
+            )
+
+            // No messages in this transaction so we can move on to the next one.
+            if (messages.length === 0) {
+              this.state.highestCheckedL2Tx++
+              continue
+            }
+
+            // Make sure that all messages sent within the transaction are finalized. If any messages
+            // are not finalized, then we're going to break the loop which will trigger the sleep and
+            // wait for a few seconds before we check again to see if this transaction is finalized.
+            let isFinalized = true
+            for (const message of messages) {
+              const status = await this.state.messenger.getMessageStatus(message)
+              if (
+                status === MessageStatus.IN_CHALLENGE_PERIOD ||
+                status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
+              ) {
+                isFinalized = false
+              }
+            }
+
+            if (!isFinalized) {
+              this.logger.info(
+                `tx not yet finalized, waiting: ${this.state.highestCheckedL2Tx}`
+              )
+              break
+            } else {
+              this.logger.info(
+                `tx is finalized, relaying: ${this.state.highestCheckedL2Tx}`
+              )
+            }
+
+            // If we got here then all messages in the transaction are finalized. Now we can relay
+            // each message to L1.
+            for (const message of messages) {
+              try {
+                // console.log(message)
+
+                const status = await this.state.messenger.getMessageStatus(
+                  message
+                )
+                if (status === MessageStatus.RELAYED) {
+                  this.logger.info('Message has already been relayed, skipping.')
+                  continue
+                }
+
+                if (status === MessageStatus.RELAYED_FAILED) {
+                  this.logger.info('Last message was failed, skipping.')
+                  continue
+                }
+
+                // filter out messages not meant for this relayer
+                if (this.state.filter.includes(message.target)) {
+                  this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+
+                this.state.messageBuffer.push(message)
+                this.logger.info('added message to pending buffer')
+                // const tx = await this.state.messenger.finalizeMessage(message)
+                // this.logger.info(`relayer sent tx: ${tx.hash}`)
+              } catch (err) {
                 throw err
               }
+              // await this.state.messenger.waitForMessageReceipt(message)
             }
-            await this.state.messenger.waitForMessageReceipt(message)
-          }
 
-          // All messages have been relayed so we can move on to the next block.
-          this.state.highestCheckedL2Tx++
+            // All messages have been relayed so we can move on to the next block.
+            this.state.highestCheckedL2Tx++
+          }
+        } else {
+          this.logger.info('Waiting for the pending tx to be finalized')
         }
       } catch (err) {
         this.logger.error('Caught an unhandled error', {

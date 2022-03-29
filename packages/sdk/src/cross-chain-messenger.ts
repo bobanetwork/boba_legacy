@@ -394,7 +394,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (receipt.receiptStatus === MessageReceiptStatus.RELAYED_SUCCEEDED) {
           return MessageStatus.RELAYED
         } else {
-          return MessageStatus.READY_FOR_RELAY
+          return MessageStatus.RELAYED_FAILED
         }
       }
     }
@@ -617,9 +617,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     } else {
       if (
         status === MessageStatus.RELAYED ||
-        status === MessageStatus.READY_FOR_RELAY
+        status === MessageStatus.READY_FOR_RELAY ||
+        status === MessageStatus.RELAYED_FAILED
       ) {
-        // Transactions that are relayed or ready for relay are considered complete.
+        // Transactions that are relayed or ready for relay or failed on first attempt are considered complete.
         return 0
       } else if (status === MessageStatus.STATE_ROOT_NOT_PUBLISHED) {
         // If the state root hasn't been published yet, just assume it'll be published relatively
