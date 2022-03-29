@@ -295,6 +295,76 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
+  describe('metaTransactionFee', () => {
+    it('should revert if called by someone other than the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).updateMetaTransactionFee(address1)
+      ).to.be.reverted
+    })
+
+    it('should revert if the new transaction fee is 0', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateMetaTransactionFee(0)
+      ).to.be.reverted
+    })
+
+    it('should succeed if called by the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateMetaTransactionFee(
+          ethers.utils.parseEther('10')
+        )
+      ).to.not.be.reverted
+    })
+
+    it('should emit event', async () => {
+      const metaTransactionFee = ethers.utils.parseEther('10')
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateMetaTransactionFee(
+          metaTransactionFee
+        )
+      )
+        .to.emit(Boba_GasPriceOracle, 'UpdateMetaTransactionFee')
+        .withArgs(await signer1.getAddress(), metaTransactionFee)
+    })
+  })
+
+  describe('get metaTransactionFee', () => {
+    it('should revert if metaTransactionFee is not EOA', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).updateMetaTransactionFee(
+          ethers.utils.parseEther('10')
+        )
+      ).to.be.reverted
+    })
+    it('should change when updateMetaTransactionFee is called', async () => {
+      await Boba_GasPriceOracle.connect(signer1).updateMetaTransactionFee(
+        ethers.utils.parseEther('10')
+      )
+      expect(await Boba_GasPriceOracle.metaTransactionFee()).to.equal(
+        ethers.utils.parseEther('10')
+      )
+    })
+
+    it('is the 8th storage slot', async () => {
+      const metaTransactionFee = ethers.utils.parseEther('5')
+      const slot = 8
+
+      // set the price
+      await Boba_GasPriceOracle.connect(signer1).updateMetaTransactionFee(
+        metaTransactionFee
+      )
+
+      // get the storage slot value
+      const priceAtSlot = await signer1.provider.getStorageAt(
+        Boba_GasPriceOracle.address,
+        slot
+      )
+      expect(await Boba_GasPriceOracle.metaTransactionFee()).to.equal(
+        priceAtSlot
+      )
+    })
+  })
+
   // Test cases for gas estimation
   const inputs = [
     '0x',
