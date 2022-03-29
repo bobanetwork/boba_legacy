@@ -209,7 +209,7 @@ function BobaBridge() {
         display="flex" justifyContent="center">
         <Typography
           sx={{ cursor: 'pointer' }}
-          variant="text"
+          variant="body2"
           component="span">
           {"Transaction History >"}
         </Typography>

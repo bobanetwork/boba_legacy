@@ -69,7 +69,7 @@ function TransferFastDepositBatch({
       let l2LPFeeRate = 0.1;
       if (t.symbol && batchInfo[ t.symbol ]) {
         l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
-        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * (1 - l2LPFeeRate / 100)).toFixed(3)} {t.symbol} ({l2LPFeeRate}%) </Typography>
+        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * (1 - l2LPFeeRate / 100)).toFixed(3)} {t.symbol} </Typography>
       }
       return <></>
     })
