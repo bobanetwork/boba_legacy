@@ -134,6 +134,8 @@ contract Boba_GasPriceOracle {
         require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
         l1FeeWallet = _l1FeeWallet;
         l2BobaAddress = _l2BobaAddress;
+        gasPriceOracleAddress = 0x420000000000000000000000000000000000000F;
+        metaTransactionFee = 3e18;
     }
 
     /**
