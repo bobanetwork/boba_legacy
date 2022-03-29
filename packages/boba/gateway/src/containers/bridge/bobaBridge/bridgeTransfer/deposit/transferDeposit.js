@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
+import BridgeFee from '../fee/bridgeFee';
 
 function TransferDeposit({
   token
@@ -56,13 +57,14 @@ function TransferDeposit({
         depositErc20(token.toWei_String, token.address, token.addressL2)
       )
     }
-    console.log([ 'Depositing Modal', res ]);
     dispatch(closeModal('transferPending'));
     dispatch(resetToken());
   }
 
   return <>
-    {/* <BridgeFee /> */}
+    <BridgeFee
+      time="3min - 1hr"
+    />
     <Button
       color="primary"
       variant="contained"

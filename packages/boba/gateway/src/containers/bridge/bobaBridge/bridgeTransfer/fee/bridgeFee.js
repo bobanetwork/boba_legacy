@@ -28,8 +28,8 @@ function BridgeFee({
   estFeeLabel,
   estBridgeFee,
   estBridgeFeeLabel,
-  estRecieve,
-  estRecieveLabel
+  estReceive,
+  estReceiveLabel
 }) {
 
   const ItemLabel = ({label, title}) => {
@@ -50,24 +50,24 @@ function BridgeFee({
     </S.BridgeFeeItem> : null}
 
     <S.BrigeFeeWrapper>
-      <S.BridgeFeeItem>
+      {estFee ? <S.BridgeFeeItem>
         <ItemLabel label="Est. Fee (Approval+Bridge)" title={estFeeLabel} />
         <Typography variant='body2'>
           {estFee}
         </Typography>
-      </S.BridgeFeeItem>
-      <S.BridgeFeeItem>
+      </S.BridgeFeeItem> : null}
+      {estBridgeFee ? <S.BridgeFeeItem>
         <ItemLabel label="Est. bridge fee" title={estBridgeFeeLabel} />
         <Typography variant='body2'>
           {estBridgeFee}
         </Typography>
-      </S.BridgeFeeItem>
-      <S.BridgeFeeItem>
-        <ItemLabel label="Est. recieve" title={estRecieveLabel} />
+      </S.BridgeFeeItem> : null}
+      {estReceive ? <S.BridgeFeeItem>
+        <ItemLabel label="Est. receive" title={estReceiveLabel} />
         <Typography variant='body2'>
-          {estRecieve}
+          {estReceive}
         </Typography>
-      </S.BridgeFeeItem>
+      </S.BridgeFeeItem> : null}
     </S.BrigeFeeWrapper>
   </>
 }

@@ -53,7 +53,7 @@ function TransferFastDepositBatch({
 
   let bridgeFee = '';
 
-  let estRecieve = '';
+  let estReceive = '';
 
   if (tokens.length) {
     bridgeFee = tokens.map((t) => {
@@ -65,7 +65,7 @@ function TransferFastDepositBatch({
       return <></>
     })
 
-    estRecieve = tokens.map((t) => {
+    estReceive = tokens.map((t) => {
       let l2LPFeeRate = 0.1;
       if (t.symbol && batchInfo[ t.symbol ]) {
         l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
@@ -191,7 +191,7 @@ function TransferFastDepositBatch({
         estBridgeFee={bridgeFee}
         estBridgeFeeLabel={bridgeFeeLabel}
         estFee={batchCost ? `${Number(batchCost).toFixed(5)} ETH` : 0}
-        estRecieve={estRecieve}
+        estReceive={estReceive}
       />
     <Button
       color="primary"
