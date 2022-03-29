@@ -83,19 +83,20 @@ function TokenInput({
   }
 
   useEffect(() => {
-    if (layer === 'L2') {
-      if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
-        dispatch(fetchClassicExitCost(token.address));
+    if (token.symbol) {
+      if (layer === 'L2') {
+        if (bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE) {
+          dispatch(fetchClassicExitCost(token.address));
+        } else {
+          dispatch(fetchFastExitCost(token.address));
+        }
+        dispatch(fetchL2FeeBalance())
       } else {
-        dispatch(fetchFastExitCost(token.address));
-      }
-      dispatch(fetchL2FeeBalance())
-    } else {
-      if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
-        dispatch(fetchFastDepositCost(token.address))
+        if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
+          dispatch(fetchFastDepositCost(token.address))
+        }
       }
     }
-
   }, [ dispatch, layer, token, bridgeType ]);
 
 
