@@ -152,7 +152,7 @@ function TransferFastDeposit({
     return (Number(value) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
   }
 
-  const estRecieveLabel = `You will receive approximately ${receivableAmount(token.amount)} ${token.symbol} ${!!amountToUsd(token.amount, lookupPrice, token) ? `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})` : ''} on L2.`;
+  const estReceiveLabel = `You will receive approximately ${receivableAmount(token.amount)} ${token.symbol} ${!!amountToUsd(token.amount, lookupPrice, token) ? `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})` : ''} on L2.`;
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
@@ -228,8 +228,8 @@ function TransferFastDeposit({
       estBridgeFee={`${feeRateN}%`}
       estBridgeFeeLabel={bridgeFeeLabel}
       estFee={`${estFee} ETH`}
-      estRecieve={`${receivableAmount(token.amount)}  ${token.symbol}`}
-      estRecieveLabel={estRecieveLabel}
+      estReceive={`${receivableAmount(token.amount)}  ${token.symbol}`}
+      estReceiveLabel={estReceiveLabel}
       />
     <Button
       color="primary"

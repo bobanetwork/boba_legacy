@@ -44,7 +44,7 @@ function TransferFastExit({
   const bridgeFee = `${feeRateN}%`;
   const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
-  let estRecieveLabel = ''
+  let estReceiveLabel = ''
   let estFee = `${Number(cost).toFixed(4)} ETH`;
   let estFeeLabel = null;
 
@@ -68,7 +68,6 @@ function TransferFastExit({
     }
 
     if (token.symbol === 'ETH') {
-      estFee = `${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`;
       if((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
         estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
@@ -149,7 +148,7 @@ function TransferFastExit({
 
 
   if (token.amount) {
-    estRecieveLabel = `You will receive approximately
+    estReceiveLabel = `You will receive approximately
     ${receivableAmount(token.amount)}
     ${token.symbol}
     ${!!amountToUsd(token.amount, lookupPrice, token) ?  `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})`: ''}
@@ -196,8 +195,8 @@ function TransferFastExit({
       estBridgeFeeLabel={bridgeFeeLabel}
       estFee={estFee}
       estFeeLabel={estFeeLabel}
-      estRecieve={`${receivableAmount(token.amount)}  ${token.symbol}`}
-      estRecieveLabel={estRecieveLabel}
+      estReceive={`${receivableAmount(token.amount)}  ${token.symbol}`}
+      estReceiveLabel={estReceiveLabel}
       />
     <Button
       color="primary"
