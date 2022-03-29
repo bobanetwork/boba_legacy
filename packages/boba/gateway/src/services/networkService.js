@@ -3265,17 +3265,18 @@ class NetworkService {
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
       let descriptionList = await GraphQLService.queryBridgeProposalCreated()
-      console.log("proposals", descriptionList)
-      
+
       for (let i = 0; i < totalProposals; i++) {
 
-        if(typeof(descriptionList[i]) === 'undefined') continue
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
 
-        let proposalID = descriptionList[i].args[0]
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
 
         //this is a number such as 2
         let proposalData = await delegateCheck.proposals(proposalID)
-
+        
         const proposalStates = [
           'Pending',
           'Active',
@@ -3305,7 +3306,7 @@ class NetworkService {
           hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
         }
 
-        let description = descriptionList[i].args[8].toString()
+        let description = proposalRaw.description.toString()
 
         proposalList.push({
            id: proposalID.toString(),
