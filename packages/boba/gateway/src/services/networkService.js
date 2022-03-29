@@ -75,7 +75,9 @@ import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
+
 import { sortRawTokens } from 'util/common'
+import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -151,7 +153,7 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999 
+    this.L1GasLimit = 9999999
     // setting of this value not important since it's not connected to anything in the contracts
     // "param _l1Gas Unused, but included for potential forward compatibility considerations"
     this.L2GasLimit = 1300000 //use the same as the hardcoded receive
@@ -616,7 +618,7 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
 
       if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return        
+      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
 
       if(allAddresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
@@ -1371,6 +1373,10 @@ class NetworkService {
 
     try {
 
+      // get current WAGMI_v0 balance
+
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         '0x7F969E3F19355C47f6bc957E502c79C75b373BF3',
         WAGMIv0Json.abi,
@@ -1382,7 +1388,7 @@ class NetworkService {
         L1ERC20Json.abi,
         this.L2Provider
       )
-      
+
       const balance = await contractWAGMIv0.connect(this.provider).balanceOf(this.account)
       console.log("You have WAGMIv0:", balance.toString())
 
@@ -1413,6 +1419,10 @@ class NetworkService {
 
     try {
 
+      // get current WAGMI_v0 balance
+
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
@@ -1425,7 +1435,7 @@ class NetworkService {
         L1ERC20Json.abi,
         this.L2Provider
       )
-      
+
       const balance = await contractWAGMIv1.connect(this.provider).balanceOf(this.account)
       console.log("You have WAGMIv1:", balance.toString())
 
@@ -3254,23 +3264,19 @@ class NetworkService {
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      const filter = delegateCheck.filters.ProposalCreated(
-        null, null, null, null, null,
-        null, null, null, null
-      )
-
-      // temporary fix to avoid eth_getLogs(zero, latest)
-      const descriptionList = await delegateCheck.queryFilter(filter, -4000)
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
 
       for (let i = 0; i < totalProposals; i++) {
 
-        if(typeof(descriptionList[i]) === 'undefined') continue
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
 
-        let proposalID = descriptionList[i].args[0]
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
 
         //this is a number such as 2
         let proposalData = await delegateCheck.proposals(proposalID)
-
+        
         const proposalStates = [
           'Pending',
           'Active',
@@ -3300,7 +3306,7 @@ class NetworkService {
           hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
         }
 
-        let description = descriptionList[i].args[8].toString()
+        let description = proposalRaw.description.toString()
 
         proposalList.push({
            id: proposalID.toString(),
