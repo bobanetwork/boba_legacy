@@ -1250,7 +1250,7 @@ class NetworkService {
   }
 
   handleMetaMaskError = (errorCode) => {
-    console.log("MetaMask Errorcode:",errorCode)
+    // console.log("MetaMask Errorcode:",errorCode)
     switch (errorCode) {
       case 4001:
         return 'Transaction was rejected by user: signature denied'

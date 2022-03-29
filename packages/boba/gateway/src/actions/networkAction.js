@@ -95,7 +95,6 @@ export function depositETHL2(value) {
 
 //DEPOSIT ERC20
 export function depositErc20(value, currency, currencyL2) {
-  console.log("Depositing ERC20")
   return createAction('DEPOSIT/CREATE', () =>
     networkService.depositErc20(value, currency, currencyL2)
   )

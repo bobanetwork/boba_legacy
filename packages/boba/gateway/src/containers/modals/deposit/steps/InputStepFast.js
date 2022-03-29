@@ -93,6 +93,9 @@ function InputStepFast({ handleClose, token }) {
   const lpUnits = logAmount(LPBalance, token.decimals)
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
+  console.log(['DEPOSIT COST',cost])
+  console.log(['DEPOSIT FEEBALANCE',feeBalance])
+  
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
