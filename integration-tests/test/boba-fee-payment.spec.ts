@@ -2,9 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 
-// import { fromRpcSig } from 'ethereumjs-util';
-// import ethSigUtil from '@metamask/eth-sig-util'
-// import Wallet from 'ethereumjs-wallet';
+import ethSigUtil from 'eth-sig-util'
 
 /* Imports: External */
 import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
@@ -795,52 +793,238 @@ describe('Boba Fee Payment Integration Tests', async () => {
     ).to.be.rejectedWith('insufficient boba balance to pay for gas')
   })
 
-  // it("{tag:boba} should revert if users don't have enough balance for the meta transaction", async () => {
-  //   const EIP712Domain = [
-  //     { name: 'name', type: 'string' },
-  //     { name: 'version', type: 'string' },
-  //     { name: 'chainId', type: 'uint256' },
-  //     { name: 'verifyingContract', type: 'address' },
-  //   ]
-  //   const Permit = [
-  //     { name: 'owner', type: 'address' },
-  //     { name: 'spender', type: 'address' },
-  //     { name: 'value', type: 'uint256' },
-  //     { name: 'nonce', type: 'uint256' },
-  //     { name: 'deadline', type: 'uint256' },
-  //   ]
+  describe('Meta transaction tests', async () => {
+    let EIP712Domain: any
+    let Permit: any
+    let name: string
+    let version: string
+    let chainId: number
 
-  //   const name = await L2Boba.name()
-  //   console.log({ name })
-  //   const version = '1'
-  //   const { chainId } = await env.l2Provider.getNetwork()
+    before(async () => {
+      EIP712Domain = [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ]
+      Permit = [
+        { name: 'owner', type: 'address' },
+        { name: 'spender', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' },
+      ]
 
-  //   const owner = env.l2Wallet_2.address
-  //   const spender = Boba_GasPriceOracle.address
-  //   const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
-  //   const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
-  //   const deadline = Math.floor(Date.now() / 1000) + 90
-  //   const verifyingContract = L2Boba.address
+      name = await L2Boba.name()
+      version = '1'
+      chainId = (await env.l2Provider.getNetwork()).chainId
+    })
 
-  //   const data: any = {
-  //     primaryType: 'Permit',
-  //     types: { EIP712Domain, Permit },
-  //     domain: { name, version, chainId, verifyingContract },
-  //     message: { owner, spender, value, nonce, deadline },
-  //   }
+    it('{tag:boba} should submit the meta transaction', async () => {
+      const owner = env.l2Wallet_2.address
+      const spender = Boba_GasPriceOracle.address
+      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = L2Boba.address
 
-  //   console.log(data)
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
 
-  //   const signature = ethSigUtil.signTypedData(
-  //     {privateKey: Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
-  //     data,
-  //     version: ethSigUtil.SignTypedDataVersion['V4'],
-  //   })
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+        { data }
+      )
 
-  //   const { v, r, s } = fromRpcSig(signature)
-  //   console.log(owner, spender, value, deadline, v, r, s)
+      const sig = ethers.utils.splitSignature(signature)
 
-  //   // console.log(ethSigUtil.recoverTypedSignature({ data, sig: signature }))
-  //   // await L2Boba.permit(owner, spender, value, deadline, v, r, s)
-  // })
+      const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
+
+      await Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+        owner,
+        spender,
+        value,
+        deadline,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+
+      const isBobaAsFeeToken = await Boba_GasPriceOracle.bobaFeeTokenUsers(
+        env.l2Wallet_2.address
+      )
+      const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
+
+      expect(BobaBalanceAfter).to.be.deep.eq(
+        BobaBalanceBefore.sub(BigNumber.from(value))
+      )
+      expect(isBobaAsFeeToken).to.be.eq(true)
+    })
+
+    it('{tag:boba} should revert transaction if v, r and s are incorrect', async () => {
+      const owner = env.l2Wallet_2.address
+      const spender = Boba_GasPriceOracle.address
+      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = Boba_GasPriceOracle.address
+
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
+
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+        { data }
+      )
+
+      const sig = ethers.utils.splitSignature(signature)
+
+      await expect(
+        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+          owner,
+          spender,
+          value,
+          deadline,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      ).to.be.revertedWith('execution reverted: ERC20Permit: invalid signature')
+    })
+
+    it("{tag:boba} should revert transaction if users don't have insufficient Boba token", async () => {
+      const owner = env.l2Wallet_2.address
+      const spender = Boba_GasPriceOracle.address
+      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = L2Boba.address
+
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
+
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+        { data }
+      )
+
+      const sig = ethers.utils.splitSignature(signature)
+
+      // Update fee token
+      const selectETHAsFeeTokenTx = await Boba_GasPriceOracle.connect(
+        env.l2Wallet_2
+      ).useETHAsFeeToken()
+      await selectETHAsFeeTokenTx.wait()
+
+      // Transfer all funds
+      const bobaBalance = await L2Boba.balanceOf(env.l2Wallet_2.address)
+      const transferTx = await L2Boba.connect(env.l2Wallet_2).transfer(
+        env.l2Wallet.address,
+        bobaBalance
+      )
+      await transferTx.wait()
+
+      await expect(
+        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+          owner,
+          spender,
+          value,
+          deadline,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+
+      const transferBackTx = await L2Boba.connect(env.l2Wallet).transfer(
+        env.l2Wallet_2.address,
+        bobaBalance
+      )
+      await transferBackTx.wait()
+    })
+
+    it('{tag:boba} should revert transaction if spender is not correct', async () => {
+      const owner = env.l2Wallet_2.address
+      const spender = env.addressesBOBA.FeedRegistry
+      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = L2Boba.address
+
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
+
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+        { data }
+      )
+
+      const sig = ethers.utils.splitSignature(signature)
+
+      await expect(
+        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+          owner,
+          spender,
+          value,
+          deadline,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      ).to.be.revertedWith('Spender is not this contract')
+    })
+
+    it('{tag:boba} should revert transaction if value is too low', async () => {
+      const owner = env.l2Wallet_2.address
+      const spender = Boba_GasPriceOracle.address
+      const value = 1
+      const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = L2Boba.address
+
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
+
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(env.l2Wallet_2.privateKey.slice(2), 'hex'),
+        { data }
+      )
+
+      const sig = ethers.utils.splitSignature(signature)
+
+      await expect(
+        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+          owner,
+          spender,
+          value,
+          deadline,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      ).to.be.revertedWith('Value is not enough')
+    })
+  })
 })

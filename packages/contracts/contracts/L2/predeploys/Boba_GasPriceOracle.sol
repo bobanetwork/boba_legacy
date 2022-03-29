@@ -99,6 +99,7 @@ contract Boba_GasPriceOracle is Ownable {
     /**
      * Add the users that want to use BOBA as the fee token
      * using the Meta Transaction
+     * NOTE: Only work for the mainnet and local testnet
      */
     function useBobaAsFeeTokenMetaTransaction(
         address owner,
