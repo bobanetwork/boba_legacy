@@ -75,8 +75,9 @@ import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
+
 import { sortRawTokens } from 'util/common'
-import GraphQLService from "./graphQLService";
+import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -3263,8 +3264,9 @@ class NetworkService {
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      const descriptionList = await GraphQLService.queryBridgeProposalCreated()
-
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+      console.log("proposals", descriptionList)
+      
       for (let i = 0; i < totalProposals; i++) {
 
         if(typeof(descriptionList[i]) === 'undefined') continue
