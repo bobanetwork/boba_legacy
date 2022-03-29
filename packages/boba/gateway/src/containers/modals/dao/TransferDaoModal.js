@@ -46,14 +46,8 @@ function TransferDaoModal({ open = false }) {
 
     const submit = async () => {
         let res = await dispatch(transferDao({recipient, amount}));
-
-        if(res) {
-            dispatch(openAlert(`Governance token transferred`))
-            handleClose()
-        } else {
-            dispatch(openError(`Failed to transfer governance token`))
-            handleClose()
-        }
+        if(res) dispatch(openAlert(`Governance token transferred`))
+        handleClose()
     }
 
     const disabledTransfer = amount <= 0 || !recipient;

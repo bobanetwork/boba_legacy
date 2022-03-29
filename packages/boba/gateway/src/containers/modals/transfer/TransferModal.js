@@ -77,18 +77,14 @@ function TransferModal ({ open, token, minHeight }) {
   async function submit () {
     if ( token.address && recipient )
     {
-      try {
-        console.log("Amount to transfer:", value_Wei_String)
-        const transferResponseGood = await dispatch(
-          transfer(recipient, value_Wei_String, token.address)
-        )
-        if (transferResponseGood) {
-          dispatch(openAlert('Transaction submitted'))
-        }
-        handleClose()
-      } catch (err) {
-        //guess not really?
+      console.log("Amount to transfer:", value_Wei_String)
+      const res = await dispatch(
+        transfer(recipient, value_Wei_String, token.address)
+      )
+      if (res) {
+        dispatch(openAlert('Transaction submitted'))
       }
+      handleClose()
     }
   }
 

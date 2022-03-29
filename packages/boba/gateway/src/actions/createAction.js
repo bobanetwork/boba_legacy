@@ -23,43 +23,63 @@ export function createAction (key, asyncAction) {
     
     try {
       const response = await asyncAction()
-
+      
       if( response === false ) {
         return false
       }
 
-      //deal with metamask errors
+      //deal with metamask errors - they will have a 'code' field so we can detect those
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
-        let errorMessage = networkService.handleMetaMaskError(response.code) ?? response.message;
-        if (response.hasOwnProperty('data')) { 
-          errorMessage = response.data.message
+
+        console.log("Error keys:", Object.keys(response))
+        console.log("Error code:", response.code)
+        console.log("Error reason:", response.reason)
+
+        // the basic error message
+        let errorMessage = response.message
+
+        // provide more information in special cases
+        // MetaMask user rejected sig - throw up a banner
+        if (response.code === 4001) { 
+          errorMessage = 'MetaMask: Transaction was rejected by user - signature denied'
         }
+        // No internet case - throw up a banner
+        if(response.hasOwnProperty('reason') && response.reason.includes('could not detect network')) {
+          console.log("Gateway error: No network")
+          errorMessage = 'Gateway: No internet'
+        }
+        // ethers error
+        if(response.hasOwnProperty('reason') && response.reason.includes('missing revert data in call exception')) {
+          console.log("Slow network or rate throttling - code 1")
+          // intercept error
+          return false
+        }
+        // ethers error
+        if(response.hasOwnProperty('reason') && response.reason.includes('resolver or addr is not configured for ENS name')) {
+          console.log("Slow network or rate throttling - code 2")
+          // intercept error
+          return false
+        }
+        // ethers error
+        if(response.hasOwnProperty('reason') && response.reason.includes('missing response')) {
+          console.log("Slow network or rate throttling - code 3")
+          // intercept error
+          return false
+        }
+
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage })
         dispatch({ type: `${key}/ERROR` })
+
         return false
-      }
+      } 
 
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
 
     } catch (error) {
-      console.log("Error RAW:", {error})
+
+      console.log("Unhandled error RAW:", {error})
       
-      if(error.message.includes('NETWORK_ERROR')) {
-        console.log("Internet down")
-        return false
-      }
-      if(error.message.includes('Network Error')) {
-        console.log("Internet down")
-        return false
-      }
-      if(error.message.includes('503')) {
-        console.log("503 Service Unavailable")
-        return false
-      }
-      const errorMessage = networkService.handleMetaMaskError(error.code) ?? error.message;
-      dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage })
-      dispatch({ type: `${key}/ERROR` })
       return false
     }
   }
