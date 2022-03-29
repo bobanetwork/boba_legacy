@@ -96,6 +96,9 @@ function Proposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
+    let hasVoted = false     
+    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true 
+
     return (
         <S.Wrapper>
             <S.GridContainer container
@@ -108,7 +111,7 @@ function Proposal({
                     xs={12}
                     md={12}
                 >
-                    <Typography variant="body2" style={{ fontWeight: '700', textDecoration: 'underline' }}>
+                    <Typography variant="body2" style={{ fontWeight: '700' }}>
                         Proposal {proposal.id} : <FormatDescription description={proposal.description} />
                     </Typography>
                     <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', my: '10px' }}>
@@ -143,16 +146,12 @@ function Proposal({
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; {proposal.state}</span>
 
                             }
-                            {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
-                                <span style={{ color: 'yellow' }}>
-                                    <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; {proposal.state}</span>
-                            }
-                            {proposal.state === 'Active' && !proposal.hasVoted &&
+                            {proposal.state === 'Active' && !hasVoted &&
                                 <span style={{ fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; Proposal active
                                 </span>
                             }
-                            {proposal.state === 'Active' && proposal.hasVoted &&
+                            {proposal.state === 'Active' && hasVoted &&
                                 <span style={{ fontSize: '0.8em', lineHeight: '1.2em', color: 'green', fontWeight: '700' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; Vote recorded: thank you
                                 </span>
@@ -209,21 +208,21 @@ function Proposal({
                             gap: '20px'
                         }}
                     >
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="primary"
                                 variant="outlined"
                                 onClick={(e) => { updateVote(proposal.id, 1, 'Cast Vote For') }}
                             >Vote For</Button>
                         }
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="primary"
                                 variant="outlined"
                                 onClick={(e) => { updateVote(proposal.id, 0, 'Cast Vote Against') }}
                             >Vote Against</Button>
                         }
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="outline"
                                 variant="outlined"

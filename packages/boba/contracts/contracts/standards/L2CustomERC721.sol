@@ -23,6 +23,12 @@ contract L2CustomERC721 is L2StandardERC721 {
     )
         L2StandardERC721(_l2Bridge, _l1Contract, _name, _symbol, _baseTokenURI) {}
 
+    function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
+        super.mint(_to, _tokenId, _data);
+
+        // do something with _data
+    }
+
     /**
     * @dev Override the tokenURI method to return your onChain metadata.
     * You basically can just copy the same logic from your original ERC721 contract.

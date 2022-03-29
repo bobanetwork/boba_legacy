@@ -15,7 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
-import { Watcher } from '@eth-optimism/core-utils'
+
+import {
+  CrossChainMessenger,
+} from '@eth-optimism/sdk'
+
 import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
@@ -58,6 +62,11 @@ import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
+import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+
+//WAGMI ABIs
+import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
+import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
 
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
@@ -66,7 +75,9 @@ import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
+
 import { sortRawTokens } from 'util/common'
+import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 //import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -142,7 +153,8 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts
+    this.L1GasLimit = 9999999
+    // setting of this value not important since it's not connected to anything in the contracts
     // "param _l1Gas Unused, but included for potential forward compatibility considerations"
     this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
@@ -429,7 +441,7 @@ class NetworkService {
      return allAddresses
   }
 
-async initializeBase( networkGateway ) {
+  async initializeBase( networkGateway ) {
 
     console.log('NS: initializeBase() for', networkGateway)
 
@@ -566,7 +578,7 @@ async initializeBase( networkGateway ) {
               'L2': L2a
             }
           }
-        } 
+        }
         else if(key === 'WAGMIv0') {
           allTokens[key] = {
             'L1': 'WAGMIv0',
@@ -602,6 +614,8 @@ async initializeBase( networkGateway ) {
 
       console.log("tokens:",allTokens)
       this.tokenAddresses = allTokens
+
+      if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
 
       if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
@@ -661,27 +675,23 @@ async initializeBase( networkGateway ) {
         this.L2Provider
       )
 
-      this.watcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1MessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
-
-      this.fastWatcher = new Watcher({
-        l1: {
-          provider: this.L1Provider,
-          messengerAddress: allAddresses.L1FastMessengerAddress,
-        },
-        l2: {
-          provider: this.L2Provider,
-          messengerAddress: allAddresses.L2MessengerAddress,
-        },
-      })
+      if(networkGateway === 'mainnet') {
+        this.watcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 1,
+          fastRelayer: false,
+        })
+        this.fastWatcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 1,
+          fastRelayer: true,
+        })
+      } else {
+        this.watcher = null
+        this.fastWatcher = null
+      }
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
@@ -835,12 +845,6 @@ async initializeBase( networkGateway ) {
   }
 
   async switchChain( targetLayer ) {
-  //  this.correctChain( layer )
-  //}
-
-  //async correctChain( targetLayer ) {
-
-    // this needds to trigger justSwitchedChain
 
     const nw = getNetwork()
     const network = store.getState().setup.network
@@ -1040,9 +1044,12 @@ async initializeBase( networkGateway ) {
       const nftName = await contract.name()
       const nftSymbol = await contract.symbol()
       const nftMeta = await contract.tokenURI(tokenID)
+      console.log("nftMeta RAW:", nftMeta)
       const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
       const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+
+      console.log("meta:", meta)
 
       const NFT = {
         UUID,
@@ -1054,7 +1061,6 @@ async initializeBase( networkGateway ) {
         meta
       }
 
-      console.log("NFT:",NFT)
       await addNFT( NFT )
 
     } catch (error) {
@@ -1264,7 +1270,7 @@ async initializeBase( networkGateway ) {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract
+      const depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositETH(
           this.L2GasLimit,
           utils.formatBytes32String(new Date().getTime().toString()),
@@ -1274,22 +1280,18 @@ async initializeBase( networkGateway ) {
       )
 
       //at this point the tx has been submitted, and we are waiting...
-      await depositTx.wait()
+      await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTx.hash)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
       console.log(' block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
-      const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-        depositTx.hash
-      )
-      console.log(' got L1->L2 message hash', msgHash)
-
-      const receipt = await this.watcher.getL2TransactionReceipt(
-        msgHash
-      )
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
 
       const time_stop = new Date().getTime()
@@ -1297,7 +1299,7 @@ async initializeBase( networkGateway ) {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTx.hash,
+        "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
         "endTime": time_stop,
@@ -1321,96 +1323,135 @@ async initializeBase( networkGateway ) {
     }
   }
 
+  async monsterMint() {
 
+    console.log("NS: monsterMint")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on Rinkeby and Mainnet
+    if (this.networkGateway === 'local') return
+
+    try {
+
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      const tx = await contract
+        .connect(this.provider.getSigner())
+        .mint(1)
+
+      const receipt = await tx.wait()
+      console.log("NS: monsterMint TX:", receipt.logs)
+
+      const rawData = receipt.logs[3].topics[1]
+      const numberHexString = rawData.slice(-64)
+      let tokenID = parseInt(numberHexString, 16)
+      await this.addNFT( allAddresses.BobaMonsters, tokenID )
+
+      return tx
+    } catch (error) {
+      console.log("NS: monsterMint error:", error)
+      return error
+    }
+
+  }
 
   async settle_v0() {
 
     console.log("NS: settle_v0")
 
-    let tx = null
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
 
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const contractLSP = new ethers.Contract(
+        '0x7F969E3F19355C47f6bc957E502c79C75b373BF3',
+        WAGMIv0Json.abi,
+        this.L2Provider
+      )
 
-      // if(currency === allAddresses.L2_ETH_Address) {
-      //   //we are sending ETH
+      const contractWAGMIv0 = new ethers.Contract(
+        '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
 
-      //   let wei = BigNumber.from(value_Wei_String)
+      const balance = await contractWAGMIv0.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv0:", balance.toString())
 
-      //   tx = await this.provider.send('eth_sendTransaction',
-      //     [
-      //       {
-      //         from: this.account,
-      //         to: address,
-      //         value: ethers.utils.hexlify(wei)
-      //       }
-      //     ]
-      //   )
-
-      // } else {
-      //   //any ERC20 json will do....
-      //   tx = await this.L2_TEST_Contract
-      //     .connect(this.provider.getSigner()).attach(currency).transfer(
-      //       address,
-      //       value_Wei_String
-      //     )
-      //   await tx.wait()
-      // }
-
-      return tx
+      const TX = await contractLSP
+      .connect(this.provider.getSigner())
+      .settle(
+        balance,
+        ethers.utils.parseEther("0")
+      )
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: settle_v0 error:", error)
       return error
     }
+
   }
 
   async settle_v1() {
 
     console.log("NS: settle_v1")
 
-    let tx = null
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
 
     try {
 
       // get current WAGMI_v0 balance
-      
+
       // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
       // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
+        WAGMIv1Json.abi,
+        this.L2Provider
+      )
 
-      // if(currency === allAddresses.L2_ETH_Address) {
-      //   //we are sending ETH
+      const contractWAGMIv1 = new ethers.Contract(
+        '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
 
-      //   let wei = BigNumber.from(value_Wei_String)
+      const balance = await contractWAGMIv1.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv1:", balance.toString())
 
-      //   tx = await this.provider.send('eth_sendTransaction',
-      //     [
-      //       {
-      //         from: this.account,
-      //         to: address,
-      //         value: ethers.utils.hexlify(wei)
-      //       }
-      //     ]
-      //   )
-
-      // } else {
-      //   //any ERC20 json will do....
-      //   tx = await this.L2_TEST_Contract
-      //     .connect(this.provider.getSigner()).attach(currency).transfer(
-      //       address,
-      //       value_Wei_String
-      //     )
-      //   await tx.wait()
-      // }
-
-      return tx
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: settle_v1 error:", error)
       return error
     }
+
   }
 
   //Transfer funds from one account to another, on the L2
@@ -1450,6 +1491,41 @@ async initializeBase( networkGateway ) {
       return tx
     } catch (error) {
       console.log("NS: transfer error:", error)
+      return error
+    }
+  }
+
+  //Transfer funds from one account to another, on the L2
+  async transferNFT(recipient, token) {
+
+    console.log("Transferring NFT:", token.address)
+    console.log("tokenID:", token.tokenID)
+    console.log("Transferring to:", recipient)
+
+    try {
+
+      const contract = new ethers.Contract(
+        token.address,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      console.log("contract:",contract)
+
+      const tx = await contract
+        .connect(this.provider.getSigner())
+        .transferFrom(
+            this.account,  // address from,
+            recipient,     // address to,
+            token.tokenID
+          )
+
+      const receipt = await tx.wait()
+      console.log("NS: NFT transfer TX:", receipt.logs)
+
+      return tx
+    } catch (error) {
+      console.log("NS: NFT transfer error:", error)
       return error
     }
   }
@@ -1669,7 +1745,7 @@ async initializeBase( networkGateway ) {
           value_Wei_String
         )
         await approveStatus.wait()
-        console.log("ERC 20 L1 SWAP ops approved:",approveStatus)
+        console.log("ERC20 L1 SWAP ops approved:",approveStatus)
       }
 
       return true
@@ -1744,13 +1820,13 @@ async initializeBase( networkGateway ) {
             value_Wei_String
           )
         await approveStatus.wait()
-        console.log("ERC 20 L1 ops approved:",approveStatus)
+        console.log("ERC20 L1 ops approved:",approveStatus)
       }
 
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract
+      const depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositERC20(
           currency,
           currencyL2,
@@ -1759,25 +1835,21 @@ async initializeBase( networkGateway ) {
           utils.formatBytes32String(new Date().getTime().toString())
         )
 
-      console.log("depositTxStatus:",depositTx)
+      console.log("depositTxStatus:",depositTX)
 
       //at this point the tx has been submitted, and we are waiting...
-      await depositTx.wait()
+      await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTx.hash)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
       console.log(' block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
-      const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-        depositTx.hash
-      )
-      console.log(' got L1->L2 message hash', msgHash)
-
-      const receipt = await this.watcher.getL2TransactionReceipt(
-        msgHash
-      )
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
 
       const time_stop = new Date().getTime()
@@ -1785,7 +1857,7 @@ async initializeBase( networkGateway ) {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTx.hash,
+        "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
         "endTime": time_stop,
@@ -1857,8 +1929,11 @@ async initializeBase( networkGateway ) {
       //can close window now
       updateSignatureStatus_exitTRAD(true)
 
-      const [L2ToL1msgHash] = await this.watcher.getMessageHashesFromL2Tx(tx.hash)
-      console.log(' got L2->L1 message hash', L2ToL1msgHash)
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(tx, opts)
+      console.log(' got L2->L1 receipt', receipt)
 
       return tx
     } catch (error) {
@@ -2275,10 +2350,9 @@ async initializeBase( networkGateway ) {
 
     const time_start = new Date().getTime()
     console.log("TX start time:", time_start)
-
-    let depositTX
     console.log("Depositing...")
-    depositTX = await this.L1LPContract
+
+    let depositTX = await this.L1LPContract
       .connect(this.provider.getSigner()).clientDepositL1(
         value_Wei_String,
         currency,
@@ -2295,13 +2369,10 @@ async initializeBase( networkGateway ) {
 
     updateSignatureStatus_depositLP(true)
 
-    // Waiting the response from L2
-    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-      depositTX.hash
-    )
-    console.log(' got L1->L2 message hash', msgHash)
-
-    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2369,13 +2440,10 @@ async initializeBase( networkGateway ) {
 
     updateSignatureStatus_depositLP(true)
 
-    // Waiting the response from L2
-    const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-      depositTX.hash
-    )
-    console.log(' got L1->L2 message hash', msgHash)
-
-    const receipt = await this.watcher.getL2TransactionReceipt(msgHash)
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2801,15 +2869,10 @@ async initializeBase( networkGateway ) {
     //closes the modal
     updateSignatureStatus_exitLP(true)
 
-    // Waiting for the response from L1
-    const [msgHash] = await this.fastWatcher.getMessageHashesFromL2Tx(
-      depositTX.hash
-    )
-    console.log(' got L2->L1 message hash', msgHash)
-
-    const receipt = await this.fastWatcher.getL1TransactionReceipt(
-      msgHash
-    )
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -2890,15 +2953,10 @@ async initializeBase( networkGateway ) {
     //closes the modal
     updateSignatureStatus_exitLP(true)
 
-    // Waiting for the response from L1
-    const [msgHash] = await this.fastWatcher.getMessageHashesFromL2Tx(
-      depositTX.hash
-    )
-    console.log(' got L2->L1 message hash', msgHash)
-
-    const receipt = await this.fastWatcher.getL1TransactionReceipt(
-      msgHash
-    )
+    const opts = {
+      fromBlock: -4000
+    }
+    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
     console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
 
     const time_stop = new Date().getTime()
@@ -3206,23 +3264,19 @@ async initializeBase( networkGateway ) {
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      const filter = delegateCheck.filters.ProposalCreated(
-        null, null, null, null, null,
-        null, null, null, null
-      )
-
-      // temporary fix to avoid eth_getLogs(zero, latest)
-      const descriptionList = await delegateCheck.queryFilter(filter, -4000)
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
 
       for (let i = 0; i < totalProposals; i++) {
 
-        if(typeof(descriptionList[i]) === 'undefined') continue
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
 
-        let proposalID = descriptionList[i].args[0]
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
 
         //this is a number such as 2
         let proposalData = await delegateCheck.proposals(proposalID)
-
+        
         const proposalStates = [
           'Pending',
           'Active',
@@ -3252,7 +3306,7 @@ async initializeBase( networkGateway ) {
           hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
         }
 
-        let description = descriptionList[i].args[8].toString()
+        let description = proposalRaw.description.toString()
 
         proposalList.push({
            id: proposalID.toString(),
@@ -3497,7 +3551,7 @@ async initializeBase( networkGateway ) {
     )
     const l1SecurityFee = await this.gasOracleContract.getL1Fee(
       ethers.utils.serializeTransaction(deepCopyPayload)
-    );
+    )
     return l1SecurityFee.toNumber()
   }
 
@@ -3505,8 +3559,8 @@ async initializeBase( networkGateway ) {
   /*****                L2 Fee              *****/
   /***********************************************/
   async estimateL2Fee(payload=this.payloadForL1SecurityFee) {
-    const l2GasPrice = await this.L2Provider.getGasPrice();
-    const l2GasEstimate = await this.L2Provider.estimateGas(payload);
+    const l2GasPrice = await this.L2Provider.getGasPrice()
+    const l2GasEstimate = await this.L2Provider.estimateGas(payload)
     return l2GasPrice.mul(l2GasEstimate).toNumber()
   }
 
