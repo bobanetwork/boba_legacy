@@ -900,7 +900,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ).to.be.revertedWith('execution reverted: ERC20Permit: invalid signature')
     })
 
-    it("{tag:boba} should revert transaction if users don't have insufficient Boba token", async () => {
+    it("{tag:boba} should revert transaction if users don't have sufficient Boba token", async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
       const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
