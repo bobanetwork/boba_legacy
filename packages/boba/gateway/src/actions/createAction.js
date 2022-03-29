@@ -79,7 +79,7 @@ export function createAction (key, asyncAction) {
 
     } catch (error) {
 
-      console.log("Unhandled error RAW:", {error})
+      console.log("Unhandled error RAW:", {error, key, asyncAction})
       
       return false
     }
