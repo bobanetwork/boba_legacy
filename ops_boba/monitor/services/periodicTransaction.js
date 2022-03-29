@@ -34,11 +34,17 @@ module.exports.sendTransactionPeriodically = async () => {
   //   })
   // }
 
+  const startingTime = new Date()
   try {
-    await bobaContract.transfer(wallet.address, configs.periodicBobaAmount)
+    const tx = await bobaContract.transfer(
+      wallet.address,
+      configs.periodicBobaAmount
+    )
+    await tx.wait()
     logger.info('Transfered Boba token periodically for testing in L2', {
       amount: configs.periodicBobaAmount,
       address: wallet.address,
+      totalTime: (new Date() - startingTime) / 1000,
     })
   } catch (e) {
     logger.error('Error while transfer Boba periodically for testing in L2', {

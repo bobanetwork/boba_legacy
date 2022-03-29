@@ -82,7 +82,7 @@ class BlockMonitorService extends OptimismEnv {
     this.logger.info('Fetching the block data...')
     const [blocksData, receiptsData] = await this.getChainData(
       latestSQLBlock,
-      this.latestBlock
+      Math.min(this.latestBlock, latestSQLBlock + 1000)
     )
 
     const receipts = {}
@@ -108,7 +108,7 @@ class BlockMonitorService extends OptimismEnv {
     this.logger.info('Writing the receipt data...')
     for (let receiptData of receiptsData) {
       const correspondingBlock = blocksData.filter(
-        (i) => i.hash === receiptData.blockHash
+        (i) => i && i.hash === receiptData.blockHash
       )
       if (correspondingBlock.length) {
         receiptData.timestamp = correspondingBlock[0].timestamp
@@ -143,17 +143,22 @@ class BlockMonitorService extends OptimismEnv {
       this.logger.info('Fetching the block data...')
       const [blocksData, receiptsData] = await this.getChainData(
         this.scannedLastBlock,
-        this.latestBlock
+        Math.min(latestBlock, this.latestBlock + 1000)
       )
 
       const receipts = {}
       for (const receipt of receiptsData) {
-        receipts[receipt.transactionHash] = receipt
+        if (receipt && receipt.transactionHash) {
+          receipts[receipt.transactionHash] = receipt
+        }
       }
 
       // write the block data into MySQL
       this.logger.info('Writing the block data...')
       for (const blockData of blocksData) {
+        if (!blockData) {
+          continue
+        }
         await this.databaseService.insertBlockData(blockData)
         // write the transaction data into MySQL
         if (blockData.transactions.length) {
@@ -169,7 +174,7 @@ class BlockMonitorService extends OptimismEnv {
       this.logger.info('Writing the receipt data...')
       for (let receiptData of receiptsData) {
         const correspondingBlock = blocksData.filter(
-          (i) => i.hash === receiptData.blockHash
+          (i) => i && i.hash === receiptData.blockHash
         )
         if (correspondingBlock.length) {
           receiptData.timestamp = correspondingBlock[0].timestamp
@@ -236,7 +241,7 @@ class BlockMonitorService extends OptimismEnv {
         }
       }
       promiseCount = 0
-    // } else {
+      // } else {
       // this.logger.info('No waiting cross domain message found.')
     }
 
@@ -263,7 +268,7 @@ class BlockMonitorService extends OptimismEnv {
     }
     const blocksData = await Promise.all(promisesBlock)
     for (const blockData of blocksData) {
-      if (blockData.transactions.length) {
+      if (blockData && blockData.transactions.length) {
         blockData.transactions.forEach((i) => {
           promisesReceipt.push(this.L2Provider.getTransactionReceipt(i.hash))
         })
@@ -279,7 +284,7 @@ class BlockMonitorService extends OptimismEnv {
     this.logger.info(`Searching ${receiptData.transactionHash}...`)
 
     const filteredBlockData = blocksData.filter(
-      (i) => i.hash === receiptData.blockHash
+      (i) => i && i.hash === receiptData.blockHash
     )
 
     let crossDomainMessageSendTime
@@ -512,8 +517,7 @@ class BlockMonitorService extends OptimismEnv {
     return (async () => {
       for (let i = 0; i < 2; i++) {
         try {
-          const result = await func(param)
-          return result
+          return await func(param)
         } catch (error) {
           console.log(`${func}returned an error!`, error)
           await sleep(1000)
