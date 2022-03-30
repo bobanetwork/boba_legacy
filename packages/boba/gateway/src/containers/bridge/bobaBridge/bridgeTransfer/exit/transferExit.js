@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import BN from 'bignumber.js';
 
+import { Box, Typography } from '@mui/material';
+
 import Button from 'components/button/Button';
 
 import { exitBOBA } from 'actions/networkAction';
@@ -16,6 +18,7 @@ import { amountToUsd, logAmount } from 'util/amountConvert';
 import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
 
+import parse from 'html-react-parser';
 
 function TransferExit({
   token
@@ -30,39 +33,44 @@ function TransferExit({
 
   let estFee = `${Number(cost).toFixed(4)} ETH`;
 
-  let estFeeLabel = '';
+  let ETHstring = '';
+  let warning = false;
 
   if (cost && Number(cost) > 0) {
 
     if (token.symbol !== 'ETH') {
       if (Number(cost) > Number(feeBalance)) {
-        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
+        warning = true
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
         <br/>TRANSACTION WILL FAIL.`
       }
       else if (Number(cost) > Number(feeBalance) * 0.96) {
-        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
+        warning = true
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
         <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
       }
       else {
-        estFeeLabel = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH`
+        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
     if (token.symbol === 'ETH') {
 
       if ((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
-        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        warning = true
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
         <br/>TRANSACTION WILL FAIL.`
       }
       else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
-        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        warning = true
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
         <br/>TRANSACTION MIGHT FAIL.`
       } else {
-        estFeeLabel = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
+        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
       }
     }
   }
@@ -114,8 +122,20 @@ function TransferExit({
       time="7 Days"
       timeLabel="Your funds will be available on L1 in 7 days"
       estFee={estFee}
-      estFeeLabel={estFeeLabel}
     />
+    <Box>
+      {warning && (
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          {parse(ETHstring)}
+        </Typography>
+      )}
+
+      {!warning && (
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          {parse(ETHstring)}
+        </Typography>
+      )}
+    </Box>
     <Button
       color="primary"
       variant="contained"
