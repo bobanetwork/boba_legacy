@@ -82,7 +82,7 @@ contract Boba_GasPriceOracle {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == _owner || _owner == address(0), "caller is not the owner");
+        require(msg.sender == _owner, "caller is not the owner");
         _;
     }
 
@@ -113,7 +113,6 @@ contract Boba_GasPriceOracle {
      */
     function initialize(address _l1FeeWallet, address _l2BobaAddress)
         public
-        onlyOwner
         onlyNotInitialized
     {
         require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
@@ -121,6 +120,7 @@ contract Boba_GasPriceOracle {
         l2BobaAddress = _l2BobaAddress;
 
         // Initialize the parameters
+        _owner = msg.sender;
         gasPriceOracleAddress = 0x420000000000000000000000000000000000000F;
         metaTransactionFee = 3e18;
         maxPriceRatio = 5000;
