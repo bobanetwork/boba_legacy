@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Wallet, utils } from 'ethers'
+import { Wallet, utils, constants } from 'ethers'
 import { sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
@@ -165,6 +165,22 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       await this._getFilter()
 
       try {
+        // Check that the correct address is set in the address manager,
+        // this is a requirement for batch-relayer
+        const relayer =
+          await this.state.messenger.contracts.l1.AddressManager.getAddress(
+            'L2BatchMessageRelayer'
+          )
+        // If it is address(0), then message relaying is not authenticated
+        if (relayer !== constants.AddressZero) {
+          const address = await this.options.l1Wallet.getAddress()
+          if (relayer !== address) {
+            throw new Error(
+              `OVM_L2MessageRelayer (${relayer}) is not set to message-passer EOA ${address}`
+            )
+          }
+        }
+
         //Batch flushing logic
         const secondsElapsed = Math.floor(
           (Date.now() - this.state.timeOfLastRelayS) / 1000

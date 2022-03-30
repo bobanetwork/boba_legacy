@@ -40,10 +40,6 @@ const main = async () => {
 
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   const L1_NODE_WEB3_URL = config.str('l1-node-web3-url', env.L1_NODE_WEB3_URL)
-  const ADDRESS_MANAGER_ADDRESS = config.str(
-    'address-manager-address',
-    env.ADDRESS_MANAGER_ADDRESS
-  )
   const RELAYER_PRIVATE_KEY = config.str(
     'l1-wallet-key',
     env.RELAYER_PRIVATE_KEY
@@ -110,9 +106,6 @@ const main = async () => {
     parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
   )
 
-  if (!ADDRESS_MANAGER_ADDRESS) {
-    throw new Error('Must pass ADDRESS_MANAGER_ADDRESS')
-  }
   if (!L1_NODE_WEB3_URL) {
     throw new Error('Must pass L1_NODE_WEB3_URL')
   }
