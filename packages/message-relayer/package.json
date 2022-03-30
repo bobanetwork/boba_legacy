@@ -8,7 +8,7 @@
     "dist/*"
   ],
   "scripts": {
-    "start": "ts-node ./bin/run.ts",
+    "start": "node ./exec/run-message-relayer.js",
     "build": "tsc -p ./tsconfig.build.json",
     "clean": "rimraf  dist/ ./tsconfig.build.tsbuildinfo",
     "lint": "yarn lint:fix && yarn lint:check",
@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@eth-optimism/common-ts": "^0.2.2",
-    "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "^0.8.1",
     "@eth-optimism/sdk": "1.0.1",
     "@sentry/node": "^6.3.1",

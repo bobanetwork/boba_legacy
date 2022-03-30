@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/node'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 
-import { MessageRelayerService } from '../src'
+import { MessageRelayerService } from '../service'
 
 dotenv.config()
 
@@ -44,7 +44,7 @@ const main = async () => {
     'address-manager-address',
     env.ADDRESS_MANAGER_ADDRESS
   )
-  const L1_WALLET_KEY = config.str('l1-wallet-key', env.L1_WALLET_KEY)
+  const RELAYER_PRIVATE_KEY = config.str('l1-wallet-key', env.RELAYER_PRIVATE_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
   //batch system
@@ -127,13 +127,13 @@ const main = async () => {
   })
 
   let wallet: Wallet
-  if (L1_WALLET_KEY) {
-    wallet = new Wallet(L1_WALLET_KEY, l1Provider)
+  if (RELAYER_PRIVATE_KEY) {
+    wallet = new Wallet(RELAYER_PRIVATE_KEY, l1Provider)
   } else if (MNEMONIC) {
     wallet = Wallet.fromMnemonic(MNEMONIC, HD_PATH)
     wallet = wallet.connect(l1Provider)
   } else {
-    throw new Error('Must pass one of L1_WALLET_KEY or MNEMONIC')
+    throw new Error('Must pass one of RELAYER_PRIVATE_KEY or MNEMONIC')
   }
 
   const service = new MessageRelayerService({
@@ -162,4 +162,4 @@ const main = async () => {
   await service.start()
 }
 
-main()
+export default main

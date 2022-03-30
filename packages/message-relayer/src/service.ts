@@ -252,7 +252,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               //     return acc
               //   }, [])
               // )
-              const tx = await this.state.messenger.finalizeBatchMessage(subBuffer)
+              const tx = await this.state.messenger.finalizeBatchMessage(
+                subBuffer
+              )
               this.logger.info(`relayer sent tx: ${tx.hash}`)
 
               // if (!receipt) {
@@ -312,7 +314,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             await this.state.messenger.l2Provider.getBlockNumber()
 
           while (this.state.highestCheckedL2Tx <= l2BlockNumber) {
-            this.logger.info(`checking L2 block ${this.state.highestCheckedL2Tx}`)
+            this.logger.info(
+              `checking L2 block ${this.state.highestCheckedL2Tx}`
+            )
 
             const block =
               await this.state.messenger.l2Provider.getBlockWithTransactions(
@@ -326,9 +330,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               )
             }
 
-            const messages = await this.state.messenger.getMessagesByTransaction(
-              block.transactions[0].hash
-            )
+            const messages =
+              await this.state.messenger.getMessagesByTransaction(
+                block.transactions[0].hash
+              )
 
             // No messages in this transaction so we can move on to the next one.
             if (messages.length === 0) {
@@ -341,7 +346,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // wait for a few seconds before we check again to see if this transaction is finalized.
             let isFinalized = true
             for (const message of messages) {
-              const status = await this.state.messenger.getMessageStatus(message)
+              const status = await this.state.messenger.getMessageStatus(
+                message
+              )
               if (
                 status === MessageStatus.IN_CHALLENGE_PERIOD ||
                 status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
@@ -371,7 +378,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                   message
                 )
                 if (status === MessageStatus.RELAYED) {
-                  this.logger.info('Message has already been relayed, skipping.')
+                  this.logger.info(
+                    'Message has already been relayed, skipping.'
+                  )
                   continue
                 }
 
