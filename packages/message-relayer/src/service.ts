@@ -262,40 +262,38 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 bufLen: this.state.messageBuffer.length,
                 limit: this.options.multiRelayLimit,
               })
-              // const receipt = await this._relayMultiMessageToL1(
-              //   subBuffer.reduce((acc, cur) => {
-              //     acc.push(cur.payload)
-              //     return acc
-              //   }, [])
-              // )
+
+              // at this point, all relayed messages are removed, the tx should not fail
               const tx = await this.state.messenger.finalizeBatchMessage(
                 subBuffer
               )
               this.logger.info(`relayer sent tx: ${tx.hash}`)
+              // only check for this txs receipt
+              const receipt = await tx.wait()
 
-              // if (!receipt) {
-              //   this.logger.error(
-              //     'No receipt for relayMultiMessage transaction'
-              //   )
-              // } else if (receipt.status === 1) {
-              //   this.logger.info('Successful relayMultiMessage', {
-              //     blockNumber: receipt.blockNumber,
-              //     transactionIndex: receipt.transactionIndex,
-              //     status: receipt.status,
-              //     msgCount: subBuffer.length,
-              //     gasUsed: receipt.gasUsed.toString(),
-              //     effectiveGasPrice: receipt.effectiveGasPrice.toString(),
-              //   })
-              // } else {
-              //   this.logger.warning('Unsuccessful relayMultiMessage', {
-              //     blockNumber: receipt.blockNumber,
-              //     transactionIndex: receipt.transactionIndex,
-              //     status: receipt.status,
-              //     msgCount: subBuffer.length,
-              //     gasUsed: receipt.gasUsed.toString(),
-              //     effectiveGasPrice: receipt.effectiveGasPrice.toString(),
-              //   })
-              // }
+              if (!receipt) {
+                this.logger.error(
+                  'No receipt for relayMultiMessage transaction'
+                )
+              } else if (receipt.status === 1) {
+                this.logger.info('Successful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              } else {
+                this.logger.warning('Unsuccessful relayMultiMessage', {
+                  blockNumber: receipt.blockNumber,
+                  transactionIndex: receipt.transactionIndex,
+                  status: receipt.status,
+                  msgCount: subBuffer.length,
+                  gasUsed: receipt.gasUsed.toString(),
+                  effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                })
+              }
 
               // add a delay between two tx
               this.state.timeOfLastPendingRelay = Date.now()
@@ -387,38 +385,27 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
             for (const message of messages) {
-              try {
-                // console.log(message)
-
-                const status = await this.state.messenger.getMessageStatus(
-                  message
-                )
-                if (status === MessageStatus.RELAYED) {
-                  this.logger.info(
-                    'Message has already been relayed, skipping.'
-                  )
-                  continue
-                }
-
-                if (status === MessageStatus.RELAYED_FAILED) {
-                  this.logger.info('Last message was failed, skipping.')
-                  continue
-                }
-
-                // filter out messages not meant for this relayer
-                if (this.state.filter.includes(message.target)) {
-                  this.logger.info('Message not intended for target, skipping.')
-                  continue
-                }
-
-                this.state.messageBuffer.push(message)
-                this.logger.info('added message to pending buffer')
-                // const tx = await this.state.messenger.finalizeMessage(message)
-                // this.logger.info(`relayer sent tx: ${tx.hash}`)
-              } catch (err) {
-                throw err
+              const status = await this.state.messenger.getMessageStatus(
+                message
+              )
+              if (status === MessageStatus.RELAYED) {
+                this.logger.info('Message has already been relayed, skipping.')
+                continue
               }
-              // await this.state.messenger.waitForMessageReceipt(message)
+
+              if (status === MessageStatus.RELAYED_FAILED) {
+                this.logger.info('Last message was failed, skipping.')
+                continue
+              }
+
+              // filter out messages not meant for this relayer
+              if (this.state.filter.includes(message.target)) {
+                this.logger.info('Message not intended for target, skipping.')
+                continue
+              }
+
+              this.state.messageBuffer.push(message)
+              this.logger.info('added message to pending buffer')
             }
 
             // All messages have been relayed so we can move on to the next block.
