@@ -11,13 +11,12 @@ import { OVM_GasPriceOracle } from "./OVM_GasPriceOracle.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /* Contract Imports */
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 /**
  * @title Boba_GasPriceOracle
  */
-contract Boba_GasPriceOracle is Ownable {
+contract Boba_GasPriceOracle {
     using SafeERC20 for IERC20;
 
     /*************
@@ -30,6 +29,9 @@ contract Boba_GasPriceOracle is Ownable {
     /*************
      * Variables *
      *************/
+
+    // Owner address
+    address private _owner;
 
     // Address on L1 that will hold the fees once withdrawn. Dynamically initialized within l2geth.
     address public l1FeeWallet;
@@ -59,6 +61,7 @@ contract Boba_GasPriceOracle is Ownable {
      *  Events   *
      *************/
 
+    event TransferOwnership(address, address);
     event UseBobaAsFeeToken(address);
     event UseBobaAsFeeTokenMetaTransaction(address);
     event UseETHAsFeeToken(address);
@@ -68,6 +71,20 @@ contract Boba_GasPriceOracle is Ownable {
     event UpdateGasPriceOracleAddress(address, address);
     event UpdateMetaTransactionFee(address, uint256);
     event Withdraw(address, address);
+
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    modifier onlyNotInitialized() {
+        require(address(l1FeeWallet) == address(0), "Contract has been initialized");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == _owner || _owner == address(0), "caller is not the owner");
+        _;
+    }
 
     /***************
      * Constructor *
@@ -81,11 +98,50 @@ contract Boba_GasPriceOracle is Ownable {
         require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
         l1FeeWallet = _l1FeeWallet;
         l2BobaAddress = _l2BobaAddress;
+        _owner = msg.sender;
     }
 
     /********************
      * Public Functions *
      ********************/
+
+    /**
+     * transfer ownership
+     * @param _newOwner new owner address
+     */
+    function transferOwnership(address _newOwner) public onlyOwner {
+        require(_newOwner != address(0), "Ownable: new owner is the zero address");
+        address oldOwner = _owner;
+        _owner = _newOwner;
+        emit TransferOwnership(oldOwner, _newOwner);
+    }
+
+    /**
+     * Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    /**
+     * Initialize l1FeeWallet and l2BobaAddress.
+     */
+    function initialize(address _l1FeeWallet, address _l2BobaAddress)
+        public
+        onlyOwner
+        onlyNotInitialized
+    {
+        require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
+        l1FeeWallet = _l1FeeWallet;
+        l2BobaAddress = _l2BobaAddress;
+
+        // Initialize the parameters
+        gasPriceOracleAddress = 0x420000000000000000000000000000000000000F;
+        metaTransactionFee = 3e18;
+        maxPriceRatio = 5000;
+        priceRatio = 2000;
+        minPriceRatio = 500;
+    }
 
     /**
      * Add the users that want to use BOBA as the fee token
@@ -102,7 +158,7 @@ contract Boba_GasPriceOracle is Ownable {
      * NOTE: Only works for the mainnet and local testnet
      */
     function useBobaAsFeeTokenMetaTransaction(
-        address owner,
+        address tokenOwner,
         address spender,
         uint256 value,
         uint256 deadline,
@@ -110,14 +166,14 @@ contract Boba_GasPriceOracle is Ownable {
         bytes32 r,
         bytes32 s
     ) public {
-        require(!Address.isContract(owner), "Account not EOA");
+        require(!Address.isContract(tokenOwner), "Account not EOA");
         require(spender == address(this), "Spender is not this contract");
         require(value >= metaTransactionFee, "Value is not enough");
         L2GovernanceERC20 bobaToken = L2GovernanceERC20(l2BobaAddress);
-        bobaToken.permit(owner, spender, value, deadline, v, r, s);
-        IERC20(l2BobaAddress).safeTransferFrom(owner, address(this), metaTransactionFee);
-        bobaFeeTokenUsers[owner] = true;
-        emit UseBobaAsFeeTokenMetaTransaction(owner);
+        bobaToken.permit(tokenOwner, spender, value, deadline, v, r, s);
+        IERC20(l2BobaAddress).safeTransferFrom(tokenOwner, address(this), metaTransactionFee);
+        bobaFeeTokenUsers[tokenOwner] = true;
+        emit UseBobaAsFeeTokenMetaTransaction(tokenOwner);
     }
 
     /**

@@ -51,6 +51,44 @@ describe('Boba_GasPriceOracle', () => {
         await signer1.getAddress()
       )
     })
+    it('should transfer ownership', async () => {
+      const signer1Address = await signer1.getAddress()
+      const signer2Address = await signer2.getAddress()
+      await Boba_GasPriceOracle.connect(signer1).transferOwnership(
+        signer2Address
+      )
+      expect(await Boba_GasPriceOracle.owner()).to.equal(signer2Address)
+
+      await Boba_GasPriceOracle.connect(signer2).transferOwnership(
+        signer1Address
+      )
+      expect(await Boba_GasPriceOracle.owner()).to.equal(signer1Address)
+    })
+    it('should revert if called by someone other than the owner', async () => {
+      const signer1Address = await signer1.getAddress()
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).transferOwnership(signer1Address)
+      ).to.be.reverted
+    })
+    it('should revert if ownership is transferred to zero address', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).transferOwnership(
+          ethers.constants.AddressZero
+        )
+      ).to.be.reverted
+    })
+  })
+
+  describe('initialize', () => {
+    it('should revert if contract has been initialized', async () => {
+      const signer1Address = await signer1.getAddress()
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).initialize(
+          signer1Address,
+          signer1Address
+        )
+      ).to.be.reverted
+    })
   })
 
   describe('updatePriceRatio', () => {
