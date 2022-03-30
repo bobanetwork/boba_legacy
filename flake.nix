@@ -17,8 +17,13 @@
       flake = false;
     };
     hardhat = {
-      url = "github:nomiclabs/hardhat";
-      flake = false;
+      url = "github:tgunnoe/hardhat-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.dream2nix.follows = "dream2nix";
+    };
+    devshell = {
+      url = "github:numtide/devshell";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -26,6 +31,7 @@
     self,
     nixpkgs,
     flake-utils,
+    devshell,
     dream2nix,
     hardhat,
     openzeppelin-contracts
@@ -41,17 +47,14 @@
         config.projectRoot = ./. ;
         config.overridesDirs = [ ./overrides ];
       };
-      hardhat = inputs.dream2nix.lib2.init {
-        systems = supportedSystems;
-        #pkgs = pkgs;
-        config.projectRoot = ./.;
-        config.overridesDirs = [ ./overrides ];
-      };
 
       boba =
         flake-utils.lib.eachDefaultSystem (system:
           let
-            pkgs = nixpkgs.legacyPackages.${system};
+            pkgs = import nixpkgs {
+              inherit system;
+              overlays = [ devshell.overlay ];
+            };
           in
           rec {
             packages = flake-utils.lib.flattenTree {
@@ -81,32 +84,14 @@
         );
     in
       lib.recursiveUpdate
-        (hardhat.makeFlakeOutputs {
-          pname = "hardhat";
-          source = inputs.hardhat;
-          packageOverrides = {
-            hardhat = {
-              correct-tsconfig-path = {
-                postPatch = ''
-                  substituteInPlace ./tsconfig.json --replace \
-                    '"extends": "../../config/typescript/tsconfig.json"' \
-                    '"extends": "./config/typescript/tsconfig.json"'
-                  substituteInPlace ./src/tsconfig.json --replace \
-                    '"extends": "../../../config/typescript/tsconfig.json"' \
-                    '"extends": "../config/typescript/tsconfig.json"'
-
-                  cp -r ${inputs.hardhat}/config/ \
-                    ./
-
-                  '';
-                };
-              };
-          };
-        })
-        ( lib.recursiveUpdate
-          (boba-monorepo.makeFlakeOutputs {
+        (boba-monorepo.makeFlakeOutputs {
           pname = "boba";
           source = ./. ;
+          settings = [
+            {
+              #subsystemInfo.noDev = true;
+            }
+          ];
           inject = {
             express-prom-bundle."6.4.1" = [
               ["prom-client" "13.2.0"]
@@ -114,10 +99,6 @@
             "@eth-optimism/core-utils"."0.8.1"  = [
               [ "@types/node" "15.14.9" ]
             ];
-
-            # "@eth-optimism/smock"."1.1.10"  = [
-            #   ["@eth-optimism/core-utils" "0.6.0"]
-            # ];
           };
           packageOverrides = {
             "@openzeppelin/contracts" = {
@@ -141,5 +122,5 @@
           apps = boba.apps;
 
           #defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
-        });
+        };
 }
