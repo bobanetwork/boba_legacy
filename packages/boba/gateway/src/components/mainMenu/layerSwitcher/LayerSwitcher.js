@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { IconButton, Typography, useMediaQuery } from '@mui/material'
+import { IconButton, Typography, useMediaQuery, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { switchChain, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
@@ -29,7 +29,8 @@ import truncate from 'truncate-middle'
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
 
-function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = false }) {
+function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = false }) {
+
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -193,31 +194,22 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
 
   return (
     <S.LayerSwitcherWrapper>
-      <IconButton
-        sx={{
-          gap: '5px',
-          opacity: !layer || layer === 'L2' ? '0.5' :'1',
-          border: layer === 'L1' ? 'solid white 3px' : '',
-      }}
-        onClick={() => { dispatchSwitchLayer('L1') }}
-        aria-label="eth"
+      <ToggleButtonGroup
+        value={layer}
+        exclusive
+        onChange={(e, n)=> dispatchSwitchLayer(n)}
+        aria-label="text alignment"
       >
-        <EthereumIcon />
-      </IconButton>
-      <IconButton
-        sx={{
-          gap: '5px',
-          opacity: !layer || layer === 'L1' ? '0.5' :'1',
-          border: layer === 'L2' ? 'solid white 3px' : '',
-      }}
-        onClick={() => { dispatchSwitchLayer('L2') }}
-        aria-label="boba"
-      >
-        <BobaIcon />
-      </IconButton>
+        <ToggleButton sx={{borderRadius: '12px 0 0 12px'}} value="L1" aria-label="left aligned">
+          <EthereumIcon />
+        </ToggleButton>
+        <ToggleButton sx={{borderRadius: '0 12px 12px 0'}} value="L2" aria-label="centered">
+          <BobaIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
@@ -228,7 +220,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
       </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
     </S.LayerSwitcherWrapper>)
 }
