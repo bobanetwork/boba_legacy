@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box,Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import BN from 'bignumber.js';
 
@@ -19,6 +19,7 @@ import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
 import { selectLookupPrice } from 'selectors/lookupSelector';
 
+import parse from 'html-react-parser'
 
 function TransferFastExit({
   token
@@ -42,48 +43,56 @@ function TransferFastExit({
   const loading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
   const signatureStatus = useSelector(selectSignatureStatus_exitLP)
 
+  const lpUnits = logAmount(LPBalance, token.decimals)
+  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
+
+
   const bridgeFee = `${feeRateN}%`;
   const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
   let estReceiveLabel = ''
   let estFee = `${Number(cost).toFixed(4)} ETH`;
   let estFeeLabel = null;
+  let warningString = '';
+  let warning = false
 
-
-  if(cost && Number(cost) > 0) {
+  if (cost && Number(cost) > 0) {
 
     if (token.symbol !== 'ETH') {
-      if(Number(cost) > Number(feeBalance)) {
-        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+      if (Number(cost) > Number(feeBalance)) {
+        warning = true
+        warningString = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
         <br/>TRANSACTION WILL FAIL.`
       }
-      else if(Number(cost) > Number(feeBalance) * 0.96) {
-        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+      else if (Number(cost) > Number(feeBalance) * 0.96) {
+        warning = true
+        warningString = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
         <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
       }
       else {
-        estFeeLabel = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
+        warningString = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
     if (token.symbol === 'ETH') {
-      if((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
-        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+      if ((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
+        warning = true
+        warningString = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
         <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
         <br/>TRANSACTION WILL FAIL.`
       }
       else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
-        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        warning = true
+        warningString = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
         <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
         <br/>TRANSACTION MIGHT FAIL.`
       } else {
-        estFeeLabel = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
+        warningString = `Transaction total (amount + approval + bridge): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
       }
     }
   }
-
 
   useEffect(() => {
     const lbl = Number(logAmount(LPLiquidity, token.decimals))
@@ -115,8 +124,6 @@ function TransferFastExit({
     const maxValue = logAmount(token.balance, token.decimals)
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(maxValue))
-    const lpUnits = logAmount(LPBalance, token.decimals)
-    const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -152,7 +159,7 @@ function TransferFastExit({
     estReceiveLabel = `You will receive approximately
     ${receivableAmount(token.amount)}
     ${token.symbol}
-    ${!!amountToUsd(token.amount, lookupPrice, token) ?  `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})`: ''}
+    ${!!amountToUsd(token.amount, lookupPrice, token) ? `($${amountToUsd(token.amount, lookupPrice, token).toFixed(2)})` : ''}
     on L1.`
   }
 
@@ -200,26 +207,35 @@ function TransferFastExit({
       estReceiveLabel={estReceiveLabel}
     />
     <Box>
+
+      {warning && <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+        {parse(warningString)}
+      </Typography>}
+
+      {!warning && <Typography variant="body2" sx={{ mt: 2 }}>
+        {parse(warningString)}
+      </Typography>}
+
       {(Number(LPRatio) < 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
-            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-              The pool's balance and balance/liquidity ratio are too low.
-              Please use the classic bridge.
-            </Typography>
-          )}
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          The pool's balance and balance/liquidity ratio are too low.
+          Please use the classic bridge.
+        </Typography>
+      )}
 
-          {(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(balanceSubPending) * 0.90) && (
-            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-              The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
-              Please use the classic bridge.
-            </Typography>
-          )}
+      {(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(balanceSubPending) * 0.90) && (
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+          Please use the classic bridge.
+        </Typography>
+      )}
 
-          {(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
-            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-              The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
-              Please use the classic bridge or reduce the amount.
-            </Typography>
-          )}
+      {(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
+          Please use the classic bridge or reduce the amount.
+        </Typography>
+      )}
     </Box>
     <Button
       color="primary"
