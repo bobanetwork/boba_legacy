@@ -74,11 +74,11 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1648580395,
-        "narHash": "sha256-tloiNQgzUyLr688wTQBt/FiR/fYAFu9xYywei5NWacU=",
+        "lastModified": 1648666454,
+        "narHash": "sha256-MmmDJx4acB6x+DCRNz1IGRJAX4PhvM27CbYZ6lYv4sM=",
         "owner": "tgunnoe",
         "repo": "dream2nix",
-        "rev": "0b4b79f4f24ca0cb8d17171d1b1f305b24f50452",
+        "rev": "fb232c8cb0ad9b92baa86d8d96916526fa25d287",
         "type": "github"
       },
       "original": {
@@ -206,11 +206,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1648203577,
-        "narHash": "sha256-CbXZkiVTA0ByV/yncFHCAGIa/AfcSb0cjqzEa56rO+Y=",
+        "lastModified": 1648553562,
+        "narHash": "sha256-xQhRKu6h0phd56oCzGjkhHkY4eDI1XKedGqkFtlXapk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "d89f18a17e51532ed5f4d45297b0ddf11e46b9c8",
+        "rev": "9b168e5e62406fa2e55e132f390379a6ba22b402",
         "type": "github"
       },
       "original": {
@@ -239,11 +239,11 @@
     "openzeppelin-contracts": {
       "flake": false,
       "locked": {
-        "lastModified": 1648545343,
-        "narHash": "sha256-QEJMVEQBlMUn5jfQdOxZzPIpywk7Cc1phKHkUijLADA=",
+        "lastModified": 1648654597,
+        "narHash": "sha256-w/VEhMpTZoKikuOz6+vqjraDLhL8I991V1LW0cmD4M8=",
         "owner": "openzeppelin",
         "repo": "openzeppelin-contracts",
-        "rev": "02fcc75bb7f35376c22def91b0fb9bc7a50b9458",
+        "rev": "3f49408fb60eddc7b45e6ee28d5baf95ce1dc665",
         "type": "github"
       },
       "original": {

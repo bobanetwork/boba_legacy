@@ -80,6 +80,7 @@
             defaultPackage = packages.l2geth;
             apps.boba = flake-utils.lib.mkApp { drv = packages.l2geth; };
             defaultApp = apps.boba;
+            shell = import ./shell.nix { inherit self system pkgs hardhat; };
           }
         );
     in
@@ -120,7 +121,7 @@
         {
           packages = boba.packages;
           apps = boba.apps;
-
+          devShell = boba.shell;
           #defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
         };
 }
