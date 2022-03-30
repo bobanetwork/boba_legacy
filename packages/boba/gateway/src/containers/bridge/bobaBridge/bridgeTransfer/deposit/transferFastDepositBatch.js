@@ -21,26 +21,25 @@ import { Typography, Box } from '@mui/material';
 import Button from 'components/button/Button';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanceBatch, selectL2FeeRate } from 'selectors/balanceSelector';
+import { selectFastDepositBatchCost, selectL1FeeBalance, selectUserAndL2LPBalanceBatch, selectL2FeeRate } from 'selectors/balanceSelector';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
 import BridgeFee from '../fee/bridgeFee';
+import parse from 'html-react-parser';
 
-/*
-Transfer Fast Deposit Batch
-*/
 
 function TransferFastDepositBatch({
   tokens
 }) {
 
-
   const dispatch = useDispatch();
 
-  const [ validValue, setValidValue ] = useState(false);
+  const [ validValue, setValidValue ] = useState(true);
+  const [ warning, setWarning ] = useState(false);
+  const [ ETHString, setETHString ] = useState('');
 
-  const feeBalance = useSelector(selectL2FeeBalance)
+  const feeBalance = useSelector(selectL1FeeBalance)
   const batchInfo = useSelector(selectUserAndL2LPBalanceBatch)
   const batchCost = useSelector(selectFastDepositBatchCost)
   const feeRate = useSelector(selectL2FeeRate)
@@ -100,44 +99,58 @@ function TransferFastDepositBatch({
   }, [ signatureStatus, depositLoading, dispatch ])
 
 
+
   useEffect(() => {
+    setWarning(false)
+    setETHString('')
     const ethTokens = tokens.filter(i => i.symbol === 'ETH');
+    // Make sure user have enough ETH to cover the cost and ETH amount
+    // that they want to transfer
     if (ethTokens.length === 1) {
       // there should be only one input for ETH
       let ethToken = ethTokens[ 0 ];
-      if (Number(ethToken.value) + Number(batchCost) > Number(feeBalance)) {
-        // WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
-        // THIS TRANSACTION WILL FAIL.`
+      if (Number(ethToken.amount) + Number(batchCost) > Number(feeBalance)) {
+        setWarning(true)
+        setETHString(`<br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>THIS TRANSACTION WILL FAIL.`);
+
         setValidValue(false);
       }
-      else if ((Number(ethToken.value) + Number(batchCost)) > Number(feeBalance) * 0.96) {
+      else if ((Number(ethToken.amount) + Number(batchCost)) > Number(feeBalance) * 0.96) {
         setValidValue(true);
-        // CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
-        // THIS TRANSACTION MIGHT FAIL.`
+        setWarning(true);
+        setETHString(`<br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+      <br/>THIS TRANSACTION MIGHT FAIL.`)
       }
     } else if (ethTokens.length > 1) {
       // diable the transfer incase of multiple tokens
+
       setValidValue(false);
     } else {
       if (Number(batchCost) > Number(feeBalance)) {
-        // L1 ETH balance is not sufficient to cover tx will fail.
+        setWarning(true)
+        setETHString(`<br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
+        <br/>THIS TRANSACTION WILL FAIL.`)
         setValidValue(true);
       } else if (Number(batchCost) > Number(feeBalance) * 0.96) {
-        // your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
-        // tx might fail  It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
+        setWarning(true)
+        setETHString(`<br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`)
         setValidValue(true);
       }
     }
 
+    let invalidInput = false;
 
     tokens.forEach((token) => {
       const maxValue = logAmount(token.balance, token.decimals);
       const tooSmall = new BN(token.amount).lte(new BN(0.0))
       const tooBig = new BN(token.amount).gt(new BN(maxValue))
-
       if (tooSmall || tooBig) {
-        setValidValue(false)
-      } else if (batchInfo[ token.symbol ]) {
+        invalidInput = true;
+      }
+
+      if (batchInfo[ token.symbol ]) {
         const LPBalance = batchInfo[ token.symbol ].l2LPBalance
         const LPRatio = batchInfo[ token.symbol ].LPRatio
         if (
@@ -145,13 +158,17 @@ function TransferFastDepositBatch({
           (Number(LPRatio) < 0.10 && Number(token.amount) <= Number(LPBalance) * 0.90) ||
           (Number(LPRatio) >= 0.10 && Number(token.amount) > Number(LPBalance) * 0.90)
         ) {
-          setValidValue(false)
+          invalidInput = true;
         }
-      } else {
-        setValidValue(true)
       }
-
     })
+
+    if (invalidInput) {
+      setValidValue(false)
+    } else {
+      setValidValue(true)
+    }
+
   }, [ tokens, batchInfo, batchCost, feeBalance ])
 
   const doFastDeposit = async () => {
@@ -194,10 +211,46 @@ function TransferFastDepositBatch({
       estReceive={estReceive}
     />
     <Box>
-      {tokens.map(i => i.symbol).includes('OMG') ? <Typography variant="body2" sx={{ mt: 2 }}>
+      {tokens.map(i => i.symbol).includes('OMG') ? <Typography variant="body2" sx={{ my: 2 }}>
         The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
         In some cases, three interactions with MetaMask are needed.
       </Typography> : null}
+      {warning && (
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          {parse(ETHString)}
+        </Typography>
+      )}
+
+      {tokens.map((token) => {
+        let lpString = '';
+        let LPRatio = 1, LPBalance = Infinity
+        if (token.symbol && batchInfo[token.symbol]) {
+          LPRatio = batchInfo[token.symbol].LPRatio
+          LPBalance = batchInfo[token.symbol].l2LPBalance
+        }
+        if(Number(LPRatio) < 0.10 && Number(token.amount) > Number(LPBalance) * 0.90)  {
+          lpString  = <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance and balance/liquidity ratio are low.
+            Please use the classic bridge.
+          </Typography>
+        }
+
+        if(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(LPBalance) * 0.90){
+          lpString  =  <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
+            Please use the classic bridge.
+          </Typography>
+        }
+
+        if(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(LPBalance) * 0.90){
+          lpString = <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The {token.symbol} pool's balance (of {Number(LPBalance).toFixed(2)} including inflight bridges) is too low.
+            Please use the classic bridge or reduce the amount.
+          </Typography>
+        }
+        return lpString;
+      })}
+
     </Box>
     <Button
       color="primary"
