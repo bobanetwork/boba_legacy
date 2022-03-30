@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { Typography } from '@mui/material'
-import { switchFee } from 'actions/setupAction.js'
+import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -40,6 +40,10 @@ function FeeSwitcher() {
     dispatch(switchFee(targetFee))
   }, [ dispatch ])
 
+  const dispatchSwitchFeeMetaTransaction = useCallback(() => {
+    dispatch(switchFeeMetaTransaction())
+  }, [ dispatch ])
+
   if (!accountEnabled || layer !== 'L2') {
     return null
   }
@@ -47,6 +51,8 @@ function FeeSwitcher() {
   return (
     <S.FeeSwitcherWrapper>
       <Typography variant="body2">Fee</Typography>
+      {/* Only works for switching from ETH to BOBA */}
+      <Typography variant="body2" onClick={() => {dispatchSwitchFeeMetaTransaction()}}>Meta Transaction </Typography>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)

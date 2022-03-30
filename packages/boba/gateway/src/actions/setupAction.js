@@ -61,7 +61,11 @@ export function switchFee(targetFee) {
   return createAction('SETUP/SWITCHFEE', () => networkService.switchFee(targetFee))
 }
 
+export function switchFeeMetaTransaction(targetFee) {
+  console.log("SA: Switching fee to", targetFee)
+  return createAction('SETUP/SWITCHFEE', () => networkService.switchFeeMetaTransaction())
+}
 
-export async function addBobaFee ( bobaFee ) {  
+export async function addBobaFee ( bobaFee ) {
   store.dispatch({ type: 'BOBAFEE/ADD/SUCCESS', payload: bobaFee })
 }

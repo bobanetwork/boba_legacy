@@ -79,6 +79,7 @@ import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
+import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
 import GraphQLService from "./graphQLService"
@@ -495,6 +496,66 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       console.log(error)
       return error
     }
+  }
+
+  async switchFeeMetaTransaction() {
+    const EIP712Domain = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ]
+    const Permit = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ]
+
+    const bobaFeeContract = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.provider.getSigner()
+    )
+
+    const name = await this.BobaContract.name()
+    const version = '1'
+    const chainId = (await this.L2Provider.getNetwork()).chainId
+
+    const owner = this.account
+    const spender = bobaFeeContract.address
+    const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
+    const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    // 5 minutes
+    const deadline = Math.floor(Date.now() / 1000) + 300
+    const verifyingContract = this.BobaContract.address
+
+    const data = {
+      primaryType: 'Permit',
+      types: { EIP712Domain, Permit },
+      domain: { name, version, chainId, verifyingContract },
+      message: { owner, spender, value, nonce, deadline },
+    }
+
+    let signature
+    try {
+      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+    // Send request
+    try {
+      await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.useBobaAsFeeToken', { owner, spender, value: value + 1, deadline, signature, data })
+      await this.getBobaFeeChoice()
+    } catch (error) {
+      console.log(error.response.data)
+      return error.response.data
+    }
+
   }
 
   async getAddress(contractName, varToSet) {
@@ -3369,7 +3430,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
         //this is a number such as 2
         let proposalData = await delegateCheck.proposals(proposalID)
-        
+
         const proposalStates = [
           'Pending',
           'Active',
