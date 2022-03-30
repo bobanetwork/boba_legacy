@@ -2,7 +2,7 @@ service: sls-boba-rinkeby-meta-transaction # NOTE: update this with your service
 
 provider:
   name: aws
-  runtime: python3.7
+  runtime: nodejs12.x
   stackName: sls-boba-rinkeby-meta-transaction
   stage: prod
   region: us-east-1

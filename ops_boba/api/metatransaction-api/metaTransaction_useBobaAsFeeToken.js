@@ -57,7 +57,8 @@ const verifyBobay = async (body) => {
     typeof spender === 'undefined' ||
     typeof value === 'undefined' ||
     typeof deadline === 'undefined' ||
-    typeof signature === 'undefined'
+    typeof signature === 'undefined' ||
+    typeof data === 'undefined'
   ) {
     return {
       isVerified: false,
