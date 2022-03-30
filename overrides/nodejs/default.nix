@@ -46,6 +46,10 @@ let
     url = "https://github.com/tgunnoe/solc-bin-test/raw/master/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02";
     sha256 = "17ak1ahikf7drxjr4752jpzphsijarnw0s6vjxj99s82rkhd932x";
   };
+  solc-066-wasm = builtins.fetchurl {
+    url = "https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/bin/soljson-v0.6.6+commit.6c089d02.js";
+    sha256 = "1hnbs71jbrz7sp3lcy7qcay0wz4g5fnw763p9hrmqb324s00kxh9";
+  };
   solc-0517-amd64 = builtins.fetchurl {
     url = "https://github.com/tgunnoe/solc-bin-test/raw/master/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13";
     sha256 = "1wqnkvqs2cs4xcckgny1ha55sbhvak4287lb2xy799gzsfjffp63";
@@ -58,6 +62,11 @@ let
     url = "https://github.com/tgunnoe/solc-bin-test/raw/master/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810";
     sha256 = "1skz68p6l6f9gzf4ffq17k63jirwp8jc1v8jhdprw0s5wa71738a";
   };
+  solc-0411-wasm = builtins.fetchurl {
+    url = "https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/wasm/soljson-v0.4.11+commit.68ef5810.js";
+    sha256 = "01phl48360y99261gmrzpyqmi7z80akdpcgrw9bxch5qz1sc5cyy";
+  };
+
   wasm-list = builtins.fetchurl {
     url = "https://github.com/tgunnoe/solc-bin-test/raw/master/hardhat-nodejs/compilers/wasm/list.json";
     sha256 = "1kcpz9a74jss9kgy3nfhlvwbryv5i9db214g53pcrr0h62g9ikss";
@@ -79,7 +88,9 @@ let
       ln -sf ${solc-0517-amd64} $out/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
       ln -sf ${solc-0411-amd64} $out/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
       ln -sf ${solc-0517-wasm} $out/hardhat-nodejs/compilers/wasm/soljson-v0.5.17+commit.d19bba13.js
+      ln -sf ${solc-0411-wasm} $out/hardhat-nodejs/compilers/wasm/soljson-v0.4.11+commit.68ef5810.js
       ln -sf ${solc-089-wasm} $out/hardhat-nodejs/compilers/wasm/soljson-v0.8.9+commit.e5eed63a.js
+      ln -sf ${solc-066-wasm} $out/hardhat-nodejs/compilers/wasm/soljson-v0.6.6+commit.6c089d02.js
     '';
     };
   };
@@ -173,16 +184,61 @@ in
           ./tsconfig.build-copy.json
       '';
     };
-    add-solc = {
+    add-hardhat-cache = let
+      config-home = let
+        telemetry-consent = pkgs.writeTextFile {
+          name = "telemetry-consent.json";
+          text = ''
+            {
+              "consent": false
+            }
+          '';
+        };
+      in
+        pkgs.stdenv.mkDerivation rec {
+          pname = "hardhat-config";
+          version = "0.0.1";
+          builder = pkgs.writeTextFile {
+            name = "builder.sh";
+            text = ''
+              . $stdenv/setup
+              mkdir -p $out/hardhat-nodejs/
+              ln -sf ${telemetry-consent} $out/hardhat-nodejs/telemetry-consent.json
+            '';
+          };
+        };
+      data-home = let
+        analytics = pkgs.writeTextFile {
+          name = "analytics.json";
+          text = ''
+            {
+              "analytics": {
+                "clientId": "db6b71c6-9c4d-440e-aef5-e1d9b1d422fc"
+              }
+            }
+          '';
+        };
+      in
+        pkgs.stdenv.mkDerivation rec {
+          pname = "hardhat-data";
+          version = "0.0.1";
+          builder = pkgs.writeTextFile {
+            name = "builder.sh";
+            text = ''
+              . $stdenv/setup
+              mkdir -p $out/hardhat-nodejs/
+              ln -sf ${analytics} $out/hardhat-nodejs/analytics.json
+            '';
+          };
+        };
+    in {
       XDG_CACHE_HOME = "${solc-cache}";
+      XDG_CONFIG_HOME = "${config-home}";
+      XDG_DATA_HOME = "${data-home}";
     };
     add-inputs = {
-      buildInputs = old: old ++ [
-        pkgs.yarn
-        #solc-cache
-      ];
       nativeBuildInputs = old: old ++ [
-        pkgs.udev
+        pkgs.yarn
       ];
 
     };
