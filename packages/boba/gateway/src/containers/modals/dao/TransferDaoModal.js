@@ -16,7 +16,7 @@ limitations under the License. */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { closeModal, openAlert, openError } from 'actions/uiAction';
+import { closeModal, openAlert } from 'actions/uiAction';
 import { transferDao } from 'actions/daoAction';
 
 import Modal from 'components/modal/Modal'
@@ -69,7 +69,7 @@ function TransferDaoModal({ open = false }) {
                     onChange={i => setRecipient(i.target.value)}
                     fullWidth
                     paste
-                    sx={{fontSize: '50px', marginBottom: '20px'}}  
+                    sx={{fontSize: '50px', marginBottom: '20px'}}
                 />
                 <Input
                     label='Amount to Transfer'

@@ -48,13 +48,12 @@ function TransferDeposit({
 
   const doDeposit = async () => {
     dispatch(openModal('transferPending'));
-    let res;
     if (token.symbol === 'ETH') {
-      res = await dispatch(
+      await dispatch(
         depositETHL2(token.toWei_String)
       )
     } else {
-      res = await dispatch(
+      await dispatch(
         depositErc20(token.toWei_String, token.address, token.addressL2)
       )
     }

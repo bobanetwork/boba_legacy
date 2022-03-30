@@ -13,17 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import networkService from "services/networkService"
-
 export function createAction (key, asyncAction) {
 
   return async function (dispatch) {
 
     dispatch({ type: `${key}/REQUEST` })
-    
+
     try {
       const response = await asyncAction()
-      
+
       if( response === false ) {
         return false
       }
@@ -40,7 +38,7 @@ export function createAction (key, asyncAction) {
 
         // provide more information in special cases
         // MetaMask user rejected sig - throw up a banner
-        if (response.code === 4001) { 
+        if (response.code === 4001) {
           console.log("MetaMask: user denied signature")
           errorMessage = 'MetaMask: Transaction was rejected by user - signature denied'
         }
@@ -72,7 +70,7 @@ export function createAction (key, asyncAction) {
         dispatch({ type: `${key}/ERROR` })
 
         return false
-      } 
+      }
 
       dispatch({ type: `${key}/SUCCESS`, payload: response })
       return true
@@ -80,7 +78,7 @@ export function createAction (key, asyncAction) {
     } catch (error) {
 
       console.log("Unhandled error RAW:", {error, key, asyncAction})
-      
+
       return false
     }
   }

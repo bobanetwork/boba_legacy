@@ -56,22 +56,22 @@ function TransferFastDepositBatch({
   let estReceive = '';
 
   if (tokens.length) {
-    bridgeFee = tokens.map((t) => {
+    bridgeFee = tokens.map((t, i) => {
       let l2LPFeeRate = 0.1;
       if (t.symbol && batchInfo[ t.symbol ]) {
         l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
-        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * l2LPFeeRate / 100).toFixed(3)} {t.symbol} ({l2LPFeeRate}%) </Typography>
+        return <Typography key={i} component="span" display="block" variant="body2"> {((t.amount ? t.amount : 0) * l2LPFeeRate / 100).toFixed(3)} {t.symbol} ({l2LPFeeRate}%) </Typography>
       }
-      return <></>
+      return <React.Fragment key={i}></React.Fragment>
     })
 
-    estReceive = tokens.map((t) => {
+    estReceive = tokens.map((t,i) => {
       let l2LPFeeRate = 0.1;
       if (t.symbol && batchInfo[ t.symbol ]) {
         l2LPFeeRate = batchInfo[ t.symbol ].l2LPFeeRate;
-        return <Typography variant="body2"> {((t.amount ? t.amount : 0) * (1 - l2LPFeeRate / 100)).toFixed(3)} {t.symbol} </Typography>
+        return <Typography key={i} component="span" display="block" variant="body2"> {((t.amount ? t.amount : 0) * (1 - l2LPFeeRate / 100)).toFixed(3)} {t.symbol} </Typography>
       }
-      return <></>
+      return <React.Fragment key={i}></React.Fragment>
     })
   }
 
@@ -193,14 +193,12 @@ function TransferFastDepositBatch({
       estFee={batchCost ? `${Number(batchCost).toFixed(5)} ETH` : 0}
       estReceive={estReceive}
     />
-    {/* <Box>
-      {!!token && token.symbol === 'OMG' && (
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
-          In some cases, three interactions with MetaMask are needed.
-        </Typography>
-      )}
-    </Box> */}
+    <Box>
+      {tokens.map(i => i.symbol).includes('OMG') ? <Typography variant="body2" sx={{ mt: 2 }}>
+        The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
+        In some cases, three interactions with MetaMask are needed.
+      </Typography> : null}
+    </Box>
     <Button
       color="primary"
       variant="contained"

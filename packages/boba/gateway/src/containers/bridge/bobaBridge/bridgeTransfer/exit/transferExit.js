@@ -11,10 +11,8 @@ import { exitBOBA } from 'actions/networkAction';
 import { closeModal, openAlert, openModal } from 'actions/uiAction';
 
 import { selectClassicExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
-import { selectLookupPrice } from 'selectors/lookupSelector'
 
-
-import { amountToUsd, logAmount } from 'util/amountConvert';
+import { logAmount } from 'util/amountConvert';
 import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
 
@@ -29,7 +27,7 @@ function TransferExit({
 
   const cost = useSelector(selectClassicExitCost);
   const feeBalance = useSelector(selectL2FeeBalance)
-  const lookupPrice = useSelector(selectLookupPrice)
+
 
   let estFee = `${Number(cost).toFixed(4)} ETH`;
 

@@ -1,5 +1,11 @@
 export const menuItems = [
   {
+    key: 'AccountNow',
+    icon: "WalletIcon",
+    title: "Account",
+    url: "/Bridge"
+  },
+  {
     key: 'Bridge',
     icon: "WalletIcon",
     title: "Bridge",

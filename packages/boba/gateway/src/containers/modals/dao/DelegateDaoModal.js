@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux'
 
 import { Box, Typography} from '@mui/material'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -69,7 +69,7 @@ function DelegateDaoModal({ open }) {
             <Box sx={{mb: 2,display: 'flex', alignItems: 'center'}}>
                 <BobaGlassIcon />
                 <Typography variant="body1" >
-                    Delegate my BOBA votes 
+                    Delegate my BOBA votes
                 </Typography>
             </Box>
             <S.DividerLine />

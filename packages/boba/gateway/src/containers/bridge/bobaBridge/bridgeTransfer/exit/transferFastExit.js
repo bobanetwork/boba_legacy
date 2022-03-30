@@ -148,7 +148,7 @@ function TransferFastExit({
       //Whew, finally!
       setValidValue(true)
     }
-  }, [ token, setValidValue, cost, feeBalance, LPBalance, LPPending, LPRatio ])
+  }, [ token, setValidValue, cost, feeBalance, balanceSubPending, LPRatio ])
 
   const receivableAmount = (value) => {
     return (Number(token.amount) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
