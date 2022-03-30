@@ -1,0 +1,35 @@
+service: sls-boba-rinkeby-meta-transaction # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: python3.7
+  stackName: sls-boba-rinkeby-meta-transaction
+  stage: prod
+  region: us-east-1
+  role: ${file(env-rinkeby.yml):ROLE}
+
+package:
+  exclude:
+    - .gitignore
+    - node_modules
+  individually: true
+
+functions:
+  boba_useBobaAsFeeToken:
+    handler: metaTransaction_useBobaAsFeeToken.rinkebyHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.useBobaAsFeeToken
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}
+
