@@ -86,14 +86,15 @@ const PageHeader = ({ maintenance }) => {
               </Drawer>
             </S.HeaderWrapper>
           </Container>
-        ) : (<S.HeaderWrapper>
-          <BobaLogo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px'}} />
-          <MenuItems setOpen={setOpen} />
-          <LayerSwitcher />
-          {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
-          <FeeSwitcher />
-          <ThemeSwitcher />
-        </S.HeaderWrapper>)
+        )
+          : (<S.HeaderWrapper>
+            <BobaLogo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px' }} />
+            <MenuItems setOpen={setOpen} />
+            <FeeSwitcher />
+            <LayerSwitcher />
+            {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
+            <ThemeSwitcher />
+          </S.HeaderWrapper>)
       }
     </>
   )

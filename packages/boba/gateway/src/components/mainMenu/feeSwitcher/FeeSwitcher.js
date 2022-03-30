@@ -18,68 +18,53 @@ import { Typography } from '@mui/material'
 import { switchFee } from 'actions/setupAction.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-  selectAccountEnabled, 
-  selectBobaFeeChoice, 
-  selectBobaPriceRatio 
+import {
+  selectAccountEnabled,
+  selectBobaFeeChoice,
+  selectLayer
 } from 'selectors/setupSelector'
 import * as S from './FeeSwitcher.styles.js'
+import Select from 'components/select/Select'
+
 
 function FeeSwitcher() {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const feePriceRatio = useSelector(selectBobaPriceRatio())
+  // const feePriceRatio = useSelector(selectBobaPriceRatio())
+
+  const layer = useSelector(selectLayer());
 
   const dispatchSwitchFee = useCallback((targetFee) => {
     dispatch(switchFee(targetFee))
   }, [ dispatch ])
 
-  if (!accountEnabled) {
+  if (!accountEnabled || layer !== 'L2') {
     return null
   }
 
   return (
     <S.FeeSwitcherWrapper>
-    <S.FeeSwitcherLeft>
-      {!!feeUseBoba && 
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>Fee Token: BOBA</Typography>
-      }
-      {!feeUseBoba && 
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>Fee Token: ETH</Typography>
-      }
-      <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Price Ratio: <span style={{opacity: 0.3}}>{feePriceRatio}</span></Typography>
-      </S.FeeSwitcherLeft>
-      <S.FeeSwitcherRight>
-        {!!feeUseBoba && 
-        <Typography variant="body2"
-          onClick={() => { dispatchSwitchFee('ETH') }}
-          sx={{
-            textDecoration: 'underline',
-            opacity: 0.6,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          Change to ETH
-        </Typography>
-      }
-      {!feeUseBoba && 
-        <Typography variant="body2"
-          onClick={() => { dispatchSwitchFee('BOBA') }}
-          sx={{
-            textDecoration: 'underline',
-            opacity: 0.6,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          Change to BOBA
-        </Typography>
-      }
-      </S.FeeSwitcherRight>
-    </S.FeeSwitcherWrapper>)
+      <Typography variant="body2">Fee</Typography>
+      <Select
+        onSelect={(e, d) => {
+          dispatchSwitchFee(e.target.value)
+        }}
+        value={ !feeUseBoba ? "ETH" : 'BOBA'}
+        options={[ {
+          value: 'ETH',
+          title: 'ETH',
+        },
+        {
+          value: 'BOBA',
+          title: 'BOBA',
+        }
+        ]}
+      />
+    </S.FeeSwitcherWrapper>
+  )
+
 }
 
 export default FeeSwitcher
