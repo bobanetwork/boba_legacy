@@ -1,3 +1,4 @@
+import { Box, Typography } from '@mui/material';
 import { resetToken } from 'actions/bridgeAction';
 import { depositErc20, depositETHL2 } from 'actions/networkAction';
 import { closeModal, openModal } from 'actions/uiAction';
@@ -13,7 +14,7 @@ import BridgeFee from '../fee/bridgeFee';
 function TransferDeposit({
   token
 }) {
-  console.log([ 'TRANSFER DEPOSIT' ])
+  console.log([ 'TRANSFER DEPOSIT', token ])
 
   const [ validValue, setValidValue ] = useState(false);
   const dispatch = useDispatch();
@@ -65,6 +66,18 @@ function TransferDeposit({
     <BridgeFee
       time="3min - 1hr"
     />
+
+    <Box>
+      {!!token &&  token.symbol === 'OMG' && (
+        <Typography variant="body2" sx={{ my: 1 }}>
+          NOTE: The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
+          In some cases, three interactions with MetaMask are needed. If you are bridging out of a
+          new wallet, it starts out with a 0 approval, and therefore, only two interactions with
+          MetaMask will be needed.
+        </Typography>
+      )}
+    </Box>
+
     <Button
       color="primary"
       variant="contained"

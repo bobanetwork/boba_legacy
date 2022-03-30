@@ -17,10 +17,11 @@ import { resetToken } from 'actions/bridgeAction';
 import { approveFastDepositBatch, depositL1LPBatch } from 'actions/networkAction';
 import { closeModal, openAlert, openError, openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
+import { Box,Typography } from '@mui/material';
 import Button from 'components/button/Button';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanceBatch,selectL2FeeRate } from 'selectors/balanceSelector';
+import { selectFastDepositBatchCost, selectL2FeeBalance, selectUserAndL2LPBalanceBatch, selectL2FeeRate } from 'selectors/balanceSelector';
 import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
@@ -186,13 +187,21 @@ function TransferFastDepositBatch({
 
   return <>
     <BridgeFee
-        time="10mins - 3hrs"
-        timeLabel="In most cases, a fast bridge takes less than 10 minutes. However, if Ethereum is congested, it can take as long as 3 hours"
-        estBridgeFee={bridgeFee}
-        estBridgeFeeLabel={bridgeFeeLabel}
-        estFee={batchCost ? `${Number(batchCost).toFixed(5)} ETH` : 0}
-        estReceive={estReceive}
-      />
+      time="10mins - 3hrs"
+      timeLabel="In most cases, a fast bridge takes less than 10 minutes. However, if Ethereum is congested, it can take as long as 3 hours"
+      estBridgeFee={bridgeFee}
+      estBridgeFeeLabel={bridgeFeeLabel}
+      estFee={batchCost ? `${Number(batchCost).toFixed(5)} ETH` : 0}
+      estReceive={estReceive}
+    />
+    {/* <Box>
+      {!!token && token.symbol === 'OMG' && (
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
+          In some cases, three interactions with MetaMask are needed.
+        </Typography>
+      )}
+    </Box> */}
     <Button
       color="primary"
       variant="contained"

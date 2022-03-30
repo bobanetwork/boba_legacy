@@ -80,9 +80,9 @@ function TransferFastDeposit({
 
   const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
 
-  const estFee =  token.symbol === 'ETH' ?
-      `${(Number(token.amount) + Number(cost)).toFixed(4)}`
-      : `${Number(cost).toFixed(4)}`
+  const estFee = token.symbol === 'ETH' ?
+    `${(Number(token.amount) + Number(cost)).toFixed(4)}`
+    : `${Number(cost).toFixed(4)}`
 
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
@@ -230,7 +230,38 @@ function TransferFastDeposit({
       estFee={`${estFee} ETH`}
       estReceive={`${receivableAmount(token.amount)}  ${token.symbol}`}
       estReceiveLabel={estReceiveLabel}
-      />
+    />
+
+    <Box>
+      {(Number(LPRatio) < 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
+        <Typography variant="body2" sx={{ my: 1, color: 'red' }}>
+          The {token.symbol} pool's balance and balance/liquidity ratio are low.
+          Please use the classic bridge.
+        </Typography>
+      )}
+
+      {(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(balanceSubPending) * 0.90) && (
+        <Typography variant="body2" sx={{ my: 1, color: 'red' }}>
+          The {token.symbol} pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
+          Please use the classic bridge.
+        </Typography>
+      )}
+
+      {(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
+        <Typography variant="body2" sx={{ my: 1, color: 'red' }}>
+          The {token.symbol} pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
+          Please use the classic bridge or reduce the amount.
+        </Typography>
+      )}
+
+      {!!token && token.symbol === 'OMG' && (
+        <Typography variant="body2" sx={{my: 1}}>
+          The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
+          In some cases, three interactions with MetaMask are needed.
+        </Typography>
+      )}
+    </Box>
+
     <Button
       color="primary"
       variant="contained"

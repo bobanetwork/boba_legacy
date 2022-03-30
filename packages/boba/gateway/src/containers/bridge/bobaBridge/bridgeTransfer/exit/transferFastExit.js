@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box,Typography } from '@mui/material';
 
 import BN from 'bignumber.js';
 
@@ -197,7 +198,29 @@ function TransferFastExit({
       estFeeLabel={estFeeLabel}
       estReceive={`${receivableAmount(token.amount)}  ${token.symbol}`}
       estReceiveLabel={estReceiveLabel}
-      />
+    />
+    <Box>
+      {(Number(LPRatio) < 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
+            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+              The pool's balance and balance/liquidity ratio are too low.
+              Please use the classic bridge.
+            </Typography>
+          )}
+
+          {(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(balanceSubPending) * 0.90) && (
+            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+              The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+              Please use the classic bridge.
+            </Typography>
+          )}
+
+          {(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
+            <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+              The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
+              Please use the classic bridge or reduce the amount.
+            </Typography>
+          )}
+    </Box>
     <Button
       color="primary"
       variant="contained"
