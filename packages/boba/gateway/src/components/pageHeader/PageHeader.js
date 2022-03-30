@@ -4,6 +4,7 @@ import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
+import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
 import { useState } from 'react'
 import { Box, Container, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import NavIcon from 'components/icons/NavIcon'
@@ -90,6 +91,7 @@ const PageHeader = ({ maintenance }) => {
           <MenuItems setOpen={setOpen} />
           <LayerSwitcher />
           {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
+          <FeeSwitcher />
           <ThemeSwitcher />
         </S.HeaderWrapper>)
       }

@@ -16,6 +16,7 @@ limitations under the License. */
 
 import networkService from 'services/networkService'
 import { createAction } from './createAction'
+import store from 'store'
 
 export function setEnableAccount(enabled) {
   console.log("setEnableAccount:", enabled)
@@ -53,4 +54,14 @@ export function setAccountNumber(account) {
 export function switchChain(layer) {
   console.log("SA: Switching chain to", layer)
   return createAction('SETUP/SWITCH', () => networkService.switchChain(layer))
+}
+
+export function switchFee(targetFee) {
+  console.log("SA: Switching fee to", targetFee)
+  return createAction('SETUP/SWITCHFEE', () => networkService.switchFee(targetFee))
+}
+
+
+export async function addBobaFee ( bobaFee ) {  
+  store.dispatch({ type: 'BOBAFEE/ADD/SUCCESS', payload: bobaFee })
 }

@@ -45,3 +45,15 @@ export function selectJustSwitchedChain () {
     return state.setup['justSwitchedChain']
   }
 }
+
+export function selectBobaFeeChoice () {
+  return function (state) {
+    return state.setup['bobaFeeChoice']
+  }
+}
+
+export function selectBobaPriceRatio () {
+  return function (state) {
+    return state.setup['bobaFeePriceRatio']
+  }
+}
