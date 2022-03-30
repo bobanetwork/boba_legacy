@@ -49,6 +49,9 @@ import networkService from 'services/networkService';
 import { amountToUsd, logAmount } from 'util/amountConvert';
 import BridgeFee from '../fee/bridgeFee';
 import { selectLookupPrice } from 'selectors/lookupSelector';
+import { Box, Typography } from '@mui/material';
+
+import parse from 'html-react-parser';
 
 function TransferFastDeposit({
   token
@@ -80,9 +83,7 @@ function TransferFastDeposit({
 
   const bridgeFeeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
 
-  const estFee = token.symbol === 'ETH' ?
-    `${(Number(token.amount) + Number(cost)).toFixed(4)}`
-    : `${Number(cost).toFixed(4)}`
+  const estFee = `${Number(cost).toFixed(4)}`;
 
   //ok, we are on L1, but the funds will be paid out on l2
   //goal now is to find out as much as we can about the state of the l2 pools...
@@ -115,7 +116,7 @@ function TransferFastDeposit({
     const maxValue = logAmount(token.balance, token.decimals);
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(maxValue))
-    console.group([ 'VALIDATE' ])
+
     if (tooSmall || tooBig) {
       console.log(`SMALL & BIG`)
       setValidValue(false)
@@ -221,6 +222,50 @@ function TransferFastDeposit({
     }
   }
 
+
+  let ETHstring = ''
+  let warning = false
+
+  if(cost && Number(cost) > 0) {
+    if (token.symbol !== 'ETH') {
+      if(Number(cost) > Number(feeBalance)) {
+        warning = true
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
+        <br/>THIS TRANSACTION WILL FAIL.`
+      }
+      else if(Number(cost) > Number(feeBalance) * 0.96) {
+        warning = true
+        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
+      }
+      else {
+        ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH`
+      }
+    }
+
+    if (token.symbol === 'ETH') {
+      if((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
+        warning = true
+        ETHstring = `Transaction total (amount + gas): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        <br/>THIS TRANSACTION WILL FAIL.`
+      }
+      else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
+        warning = true
+        ETHstring = `Transaction total (amount + gas): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
+        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        <br/>THIS TRANSACTION MIGHT FAIL.`
+      } else {
+        ETHstring = `Transaction total (amount + gas): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
+        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
+      }
+    }
+  }
+
   return <>
     <BridgeFee
       time="20mins - 3hrs"
@@ -260,6 +305,18 @@ function TransferFastDeposit({
           In some cases, three interactions with MetaMask are needed.
         </Typography>
       )}
+
+    {warning && (
+        <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+          {parse(ETHstring)}
+        </Typography>
+      )}
+
+      {!warning && (
+        <Typography variant="body2" sx={{mt: 2}}>
+          {parse(ETHstring)}
+        </Typography>
+    )}
     </Box>
 
     <Button

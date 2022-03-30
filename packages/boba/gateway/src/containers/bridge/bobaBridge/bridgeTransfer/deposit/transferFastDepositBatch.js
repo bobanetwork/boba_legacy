@@ -17,7 +17,7 @@ import { resetToken } from 'actions/bridgeAction';
 import { approveFastDepositBatch, depositL1LPBatch } from 'actions/networkAction';
 import { closeModal, openAlert, openError, openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
-import { Box,Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import Button from 'components/button/Button';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,7 +26,6 @@ import { selectLoading } from 'selectors/loadingSelector';
 import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector';
 import { logAmount } from 'util/amountConvert';
 import BridgeFee from '../fee/bridgeFee';
-import { Typography } from '@mui/material';
 
 /*
 Transfer Fast Deposit Batch
