@@ -82,23 +82,8 @@ contract Boba_GasPriceOracle {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == _owner || _owner == address(0), "caller is not the owner");
+        require(msg.sender == _owner, "caller is not the owner");
         _;
-    }
-
-    /***************
-     * Constructor *
-     ***************/
-
-    /**
-     * @param _l1FeeWallet Initial address for the L1 wallet that will hold fees once withdrawn.
-     * @param _l2BobaAddress L2 Boba Token address
-     */
-    constructor(address _l1FeeWallet, address _l2BobaAddress) {
-        require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
-        l1FeeWallet = _l1FeeWallet;
-        l2BobaAddress = _l2BobaAddress;
-        _owner = msg.sender;
     }
 
     /********************
@@ -126,16 +111,13 @@ contract Boba_GasPriceOracle {
     /**
      * Initialize l1FeeWallet and l2BobaAddress.
      */
-    function initialize(address _l1FeeWallet, address _l2BobaAddress)
-        public
-        onlyOwner
-        onlyNotInitialized
-    {
+    function initialize(address _l1FeeWallet, address _l2BobaAddress) public onlyNotInitialized {
         require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
         l1FeeWallet = _l1FeeWallet;
         l2BobaAddress = _l2BobaAddress;
 
         // Initialize the parameters
+        _owner = msg.sender;
         gasPriceOracleAddress = 0x420000000000000000000000000000000000000F;
         metaTransactionFee = 3e18;
         maxPriceRatio = 5000;

@@ -32,10 +32,9 @@ describe('Boba_GasPriceOracle', () => {
   let Boba_GasPriceOracle: Contract
   let OVM_GasPriceOracle: Contract
   beforeEach(async () => {
-    Boba_GasPriceOracle = await Factory__Boba_GasPriceOracle.deploy(
-      address1,
-      address2
-    )
+    Boba_GasPriceOracle = await Factory__Boba_GasPriceOracle.deploy()
+    const signer1Address = await signer1.getAddress()
+    await Boba_GasPriceOracle.initialize(address1, address2)
     OVM_GasPriceOracle = await Factory__OVM_GasPriceOracle.deploy(
       await signer1.getAddress()
     )
@@ -110,10 +109,6 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get priceRatio', () => {
-    it('should return zero at first', async () => {
-      expect(await Boba_GasPriceOracle.priceRatio()).to.equal(initialGasPrice)
-    })
-
     it('should change when priceRatio is called', async () => {
       const priceRatio = 1234
 
