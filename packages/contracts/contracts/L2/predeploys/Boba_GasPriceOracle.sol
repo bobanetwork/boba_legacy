@@ -86,21 +86,6 @@ contract Boba_GasPriceOracle {
         _;
     }
 
-    /***************
-     * Constructor *
-     ***************/
-
-    /**
-     * @param _l1FeeWallet Initial address for the L1 wallet that will hold fees once withdrawn.
-     * @param _l2BobaAddress L2 Boba Token address
-     */
-    constructor(address _l1FeeWallet, address _l2BobaAddress) {
-        require(_l1FeeWallet != address(0) && _l2BobaAddress != address(0));
-        l1FeeWallet = _l1FeeWallet;
-        l2BobaAddress = _l2BobaAddress;
-        _owner = msg.sender;
-    }
-
     /********************
      * Public Functions *
      ********************/
