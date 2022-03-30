@@ -45,7 +45,8 @@ const main = async () => {
     env.ADDRESS_MANAGER_ADDRESS
   )
   const RELAYER_PRIVATE_KEY = config.str(
-    'l1-wallet-key', env.RELAYER_PRIVATE_KEY
+    'l1-wallet-key',
+    env.RELAYER_PRIVATE_KEY
   )
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
