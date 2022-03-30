@@ -46,7 +46,8 @@ function TokenInput({
 
 
   const underZero = new BN(token.amount).lt(new BN(0))
-  const overMax = new BN(token.amount).gt(new BN(token.balance))
+  const maxValue = logAmount(token.balance, token.decimals);
+  const overMax = new BN(token.amount).gt(new BN(maxValue))
 
   let amount = 0;
   if (token.symbol) {
@@ -184,7 +185,7 @@ function TokenInput({
       }
       {token.amount !== '' && overMax ?
         <Typography variant="body3" sx={{ mt: 1 }}>
-          Value too large: the value must be smaller than {Number(token.balance).toFixed(3)}
+          Value too large: the value must be smaller than {Number(logAmount(token.balance, token.decimals)).toFixed(3)}
         </Typography>
         : null}
     </S.TokenInputWrapper>

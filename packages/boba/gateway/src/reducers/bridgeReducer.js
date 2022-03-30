@@ -23,8 +23,6 @@ const initialState = {
 function bridgeReducer(state = initialState, action) {
   switch (action.type) {
     case 'BRIDGE/TYPE/SELECT':
-      console.log(`${action.type}`);
-      console.table(action.payload)
       return { ...state, bridgeType: action.payload }
 
     case 'BRIDGE/TOKEN/RESET':
@@ -73,8 +71,6 @@ function bridgeReducer(state = initialState, action) {
           amount,
           toWei_String
         };
-      console.log(['newTokens',newTokens])
-
         return { ...state, tokens: newTokens }
       }
     default:
