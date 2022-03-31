@@ -25,6 +25,7 @@ import {
 } from 'selectors/setupSelector'
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
+import Tooltip from 'components/tooltip/Tooltip.js'
 
 
 function FeeSwitcher() {
@@ -46,7 +47,11 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Typography variant="body2">Fee</Typography>
+      <Tooltip
+        title={'The whole network will choose BOBA or ETH as the gas fee according to you.'}
+        >
+        <Typography variant="body2">Fee</Typography>
+      </Tooltip>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
