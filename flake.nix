@@ -43,7 +43,6 @@
 
       boba-monorepo = inputs.dream2nix.lib2.init {
         systems = supportedSystems;
-        #pkgs = pkgs;
         config.projectRoot = ./. ;
         config.overridesDirs = [ ./overrides ];
       };
@@ -77,10 +76,29 @@
                 };
               };
             };
+            nixpkgs = pkgs;
             defaultPackage = packages.l2geth;
-            apps.boba = flake-utils.lib.mkApp { drv = packages.l2geth; };
-            defaultApp = apps.boba;
+            apps = {
+              l2geth = flake-utils.lib.mkApp { drv = packages.l2geth; };
+            };
+
+            defaultApp = apps.l2geth;
             shell = import ./shell.nix { inherit self system pkgs hardhat; };
+            shells =
+              let
+                bobapkgs = self.packages.${system};
+              in
+              {
+                "@eth-optimism/data-transport-layer" = pkgs.devshell.mkShell {
+                  name = "Data Transport Layer";
+                  env = [
+                    {
+                      name = "HTTP_PORT";
+                      value = 8080;
+                    }
+                  ];
+                };
+              };
           }
         );
     in
@@ -122,6 +140,6 @@
           packages = boba.packages;
           apps = boba.apps;
           devShell = boba.shell;
-          #defaultPackage."x86_64-linux" = self.packages."x86_64-linux".optimism;
+          devShells = boba.shells;
         };
 }
