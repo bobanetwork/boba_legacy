@@ -11,7 +11,7 @@
     "build:contracts": "hardhat compile",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "clean": "rm -rf ./artifacts ./cache",
-    "lint": "yarn lint:fix && yarn lint:check",
+    "lint": "yarn lint:check",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",
     "lint:fix": "yarn lint:check --fix",
     "lint:contracts": "yarn solhint -f table contracts/**/*.sol",
