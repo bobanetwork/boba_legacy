@@ -53,20 +53,7 @@ const main = async () => {
     'gas-price-oracle',
     env.GAS_PRICE_ORACLE_ADDRESS
   )
-  // 0.015 GWEI
-  const GAS_PRICE_ORACLE_FLOOR_PRICE = config.uint(
-    'gas-price-oracle-floor-price',
-    parseInt(env.GAS_PRICE_ORACLE_FLOOR_PRICE, 10) || 150000
-  )
-  // 2 GWEI
-  const GAS_PRICE_ORACLE_ROOF_PRICE = config.uint(
-    'gas-price-oracle-roof-price',
-    parseInt(env.GAS_PRICE_ORACLE_ROOF_PRICE, 10) || 20000000
-  )
-  const GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE = config.uint(
-    'gas-price-oracle-min-percent-change',
-    parseFloat(env.GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE) || 0.05
-  )
+
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
     parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60 * 5
@@ -108,6 +95,21 @@ const main = async () => {
   const MAX_L1_BASE_FEE = config.uint(
     'max-l1-base-fee',
     parseInt(env.MAX_L1_BASE_FEE, 10) || 225000000000
+  )
+
+  // boba gas fee
+  const POLYGON_IO_API_KEY = config.str(
+    'polygon-io-api-key',
+    env.POLYGON_IO_API_KEY
+  )
+  // boba gas fee / eth gas fee = BOBA_AS_FEE_TOKEN_RATIO_100X
+  const BOBA_FEE_RATIO_100X = config.uint(
+    'boba-fee-ratio-100x',
+    parseInt(env.BOBA_FEE_RATIO_100X, 10) || 85
+  )
+  const BOBA_FEE_RATIO_MIN_PERCENT_CHANGE = config.uint(
+    'boba-fee-ratio-min-percent-change',
+    parseFloat(env.BOBA_FEE_RATIO_MIN_PERCENT_CHANGE) || 0.05
   )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
@@ -173,9 +175,6 @@ const main = async () => {
     proposerAddress,
     relayerAddress,
     fastRelayerAddress,
-    gasFloorPrice: GAS_PRICE_ORACLE_FLOOR_PRICE,
-    gasRoofPrice: GAS_PRICE_ORACLE_ROOF_PRICE,
-    gasPriceMinPercentChange: GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE,
     pollingInterval: POLLING_INTERVAL,
     burnedGasFeeRatio100X: BURNED_GAS_FEE_RATIO_100X,
     maxBurnedGas: MAX_BURNED_GAS,
@@ -184,6 +183,9 @@ const main = async () => {
     minOverhead: MIN_OVERHEAD,
     minL1BaseFee: MIN_L1_BASE_FEE,
     maxL1BaseFee: MAX_L1_BASE_FEE,
+    polygonAPIKey: POLYGON_IO_API_KEY,
+    bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
+    bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
   })
 
   await service.start()

@@ -1,20 +1,24 @@
-FROM node:14-alpine
+FROM --platform=linux/amd64 node:14-buster
 
-RUN apk add --no-cache git
+RUN apt-get update && apt-get install -y bash git python build-essential
 
 WORKDIR /
 
 COPY *.json yarn.lock ./
 COPY patches ./patches
 
-COPY ops_boba ./ops_boba
+COPY ops_boba/monitor ./ops_boba/monitor
 COPY packages/core-utils ./packages/core-utils
 COPY packages/common-ts ./packages/common-ts
 COPY packages/boba/contracts ./packages/boba/contracts
+COPY packages/boba/register ./packages/boba/register
 COPY packages/contracts ./packages/contracts
 COPY packages/boba/turing ./packages/boba/turing
+COPY packages/sdk ./packages/sdk
 
 RUN yarn install && yarn build
+
+RUN rm -rf /usr/local/share/.cache
 
 WORKDIR /ops_boba/monitor
 

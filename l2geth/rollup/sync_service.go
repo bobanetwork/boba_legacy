@@ -934,13 +934,9 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return fmt.Errorf("invalid transaction: %w", err)
 	}
 
-	// Prevent transactions without enough balance from
-	// being accepted by the chain but allow through 0
-	// gas price transactions
-	cost := tx.Value()
-	if tx.GasPrice().Cmp(common.Big0) != 0 {
-		cost = cost.Add(cost, fee)
-	}
+	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
+	isFeeTokenUpdate := s.bc.Config().IsFeeTokenUpdate(nextBlockNumber)
+
 	state, err := s.bc.State()
 	if err != nil {
 		return err
@@ -948,6 +944,18 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	from, err := types.Sender(s.signer, tx)
 	if err != nil {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInvalidSender)
+	}
+
+	// Check if the wallet address picks BOBA as the fee token
+	feeTokenSelection := state.GetFeeTokenSelection(from)
+	isBobaFeeTokenSelect := feeTokenSelection.Cmp(common.Big1) == 0 && isFeeTokenUpdate
+
+	// Prevent transactions without enough balance from
+	// being accepted by the chain but allow through 0
+	// gas price transactions
+	cost := tx.Value()
+	if !isBobaFeeTokenSelect && tx.GasPrice().Cmp(common.Big0) != 0 {
+		cost = cost.Add(cost, fee)
 	}
 	if state.GetBalance(from).Cmp(cost) < 0 {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
@@ -976,9 +984,20 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return err
 	}
 
-	// Ensure that the user approved enough gas to do the transaction
-	if err := s.validateGasLimit(tx, l2GasPrice, s.RollupGpo); err != nil {
-		return fmt.Errorf("invalid transaction: %w", err)
+	if isFeeTokenUpdate {
+		// Ensure that the user approved enough gas to do the transaction
+		estimateGas, err := s.validateGasLimit(tx, l2GasPrice, s.RollupGpo, nextBlockNumber)
+		if err != nil {
+			return fmt.Errorf("invalid transaction: %w", err)
+		}
+		// Ensure that the BOBA balance is enough for the gas fee
+		if isBobaFeeTokenSelect {
+			bobaPriceRatio := state.GetBobaPriceRatio()
+			bobaCost := new(big.Int).Mul(bobaPriceRatio, estimateGas.Mul(estimateGas, tx.GasPrice()))
+			if state.GetBobaBalance(from).Cmp(bobaCost) < 0 {
+				return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientBobaFunds)
+			}
+		}
 	}
 
 	// Reject user transactions that do not have large enough of a gas price.
@@ -1007,26 +1026,22 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 }
 
 // Validate that gas limit approved by the user is larger than the actual usage
-func (s *SyncService) validateGasLimit(tx *types.Transaction, l2GasPrice *big.Int, gpo *gasprice.RollupOracle) error {
-	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
-	isFeeUpdate := s.bc.Config().IsFeeUpdate(nextBlockNumber)
-	if isFeeUpdate {
-		intrGas, err := core.IntrinsicGas(tx.Data(), tx.To() == nil, true, s.bc.Config().IsIstanbul(nextBlockNumber))
-		if err != nil {
-			return err
-		}
-		// Ensure that tx.Gas() is larger than l1SecurityFee / l2GasPrice + intrGas
-		l2ExtraGas, err := fees.CalculateL1GasFromGPO(tx.Data(), l2GasPrice, gpo)
-		if err != nil {
-			return err
-		}
-		estimateGas := new(big.Int).Add(l2ExtraGas, big.NewInt(int64(intrGas)))
-		log.Debug("Validate gas limit", "estimateGas", estimateGas, "l2GasPrice", l2GasPrice, "gasLimit", tx.Gas(), "intrGas", intrGas, "l2ExtraGas", l2ExtraGas)
-		if big.NewInt(int64(tx.Gas())).Cmp(estimateGas) < 0 {
-			return core.ErrIntrinsicGas
-		}
+func (s *SyncService) validateGasLimit(tx *types.Transaction, l2GasPrice *big.Int, gpo *gasprice.RollupOracle, nextBlockNumber *big.Int) (*big.Int, error) {
+	intrGas, err := core.IntrinsicGas(tx.Data(), tx.To() == nil, true, s.bc.Config().IsIstanbul(nextBlockNumber))
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	// Ensure that tx.Gas() is larger than l1SecurityFee / l2GasPrice + intrGas
+	l2ExtraGas, err := fees.CalculateL1GasFromGPO(tx.Data(), l2GasPrice, gpo)
+	if err != nil {
+		return nil, err
+	}
+	estimateGas := new(big.Int).Add(l2ExtraGas, big.NewInt(int64(intrGas)))
+	log.Debug("Validate gas limit", "estimateGas", estimateGas, "l2GasPrice", l2GasPrice, "gasLimit", tx.Gas(), "intrGas", intrGas, "l2ExtraGas", l2ExtraGas)
+	if big.NewInt(int64(tx.Gas())).Cmp(estimateGas) < 0 {
+		return nil, core.ErrIntrinsicGas
+	}
+	return estimateGas, nil
 }
 
 // Higher level API for applying transactions. Should only be called for
