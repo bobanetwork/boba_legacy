@@ -34,6 +34,13 @@ type StateDB interface {
 	TuringCharge(userID common.Address) error
 	TuringCheck(userID common.Address) error
 
+	SubBobaBalance(common.Address, *big.Int)
+	AddBobaBalance(common.Address, *big.Int)
+	GetBobaBalance(common.Address) *big.Int
+
+	GetFeeTokenSelection(common.Address) *big.Int
+	GetBobaPriceRatio() *big.Int
+
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)
 
