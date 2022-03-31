@@ -54,7 +54,7 @@
     "hardhat-gas-reporter": "^1.0.4",
     "rimraf": "^3.0.2",
     "prom-client": "^14.0.1",
-    "prom-client": "^14.0.1"
+    "eth-sig-util": "^2.5.2"
   },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.15",

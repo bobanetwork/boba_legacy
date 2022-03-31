@@ -7,6 +7,7 @@ import {
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
 import { utils, BigNumber } from 'ethers'
+import { L2GovernanceERC20Helper } from './L2GovernanceERC20Helper'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -45,6 +46,8 @@ export interface RollupDeployConfig {
   bobaTuringPrice: string
   // Turing helper json
   TuringHelperJson: any
+  // L1 Boba Token address
+  l1BobaTokenAddress: any
   // Block height to activate berlin hardfork
   berlinBlock: number
 }
@@ -112,6 +115,23 @@ export const makeL2GenesisFile = async (
     },
     BobaTuringHelper: {
       Self: predeploys.BobaTuringHelper
+    },
+    // Token decimal is 0 for BOBA Token
+    L2GovernanceERC20: {
+      _name: 'Boba Network',
+      _symbol: 'BOBA',
+      l1Token: cfg.l1BobaTokenAddress,
+      l2Bridge:predeploys.L2StandardBridge,
+    },
+    Boba_GasPriceOracle: {
+      _owner: cfg.gasPriceOracleOwner,
+      l1FeeWallet: cfg.l1FeeWalletAddress,
+      l2BobaAddress: predeploys.L2GovernanceERC20,
+      minPriceRatio: 500,
+      maxPriceRatio: 5000,
+      priceRatio: 2000,
+      gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
+      metaTransactionFee: utils.parseEther('3'),
     }
   }
 
@@ -131,6 +151,9 @@ export const makeL2GenesisFile = async (
       dump[predeployAddress].code = '0x4B60005260206000F3'
     } else if (predeployName === 'BobaTuringHelper') {
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
+
+    } else if (predeployName === 'L2GovernanceERC20') {
+      dump[predeployAddress].code = L2GovernanceERC20Helper.L2GovernanceERC20Bytecode
     } else {
       const artifact = getContractArtifact(predeployName)
       dump[predeployAddress].code = artifact.deployedBytecode
@@ -143,7 +166,7 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
-        break
+        continue
       }
       const storageLayout = await getStorageLayout(predeployName)
       // Calculate the mapping keys

@@ -1,7 +1,6 @@
 /* Imports: External */
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import path from 'path'
-import dirtree from 'directory-tree'
 import fs from 'fs'
 
 const deployFn: DeployFunction = async (hre) => {
