@@ -61,8 +61,7 @@ export function switchFee(targetFee) {
   return createAction('SETUP/SWITCHFEE', () => networkService.switchFee(targetFee))
 }
 
-export function switchFeeMetaTransaction(targetFee) {
-  console.log("SA: Switching fee to", targetFee)
+export function switchFeeMetaTransaction() {
   return createAction('SETUP/SWITCHFEE', () => networkService.switchFeeMetaTransaction())
 }
 

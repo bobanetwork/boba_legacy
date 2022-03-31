@@ -23,9 +23,15 @@ import {
   selectBobaFeeChoice,
   selectLayer
 } from 'selectors/setupSelector'
+
+import { selectlayer2Balance } from 'selectors/balanceSelector'
+
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
 import Tooltip from 'components/tooltip/Tooltip.js'
+import { isEqual } from 'lodash'
+import BN from 'bignumber.js'
+import { logAmount } from 'util/amountConvert.js'
 
 
 function FeeSwitcher() {
@@ -37,15 +43,21 @@ function FeeSwitcher() {
 
   const layer = useSelector(selectLayer());
 
+  const l2Balances = useSelector(selectlayer2Balance, isEqual)
+  const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH');
+
   const dispatchSwitchFee = useCallback((targetFee) => {
-    /*
-    if(account.ETH === too small && switching to BOBA) {
+    const ethToken = l2EthBalance[ 0 ];
+    //NOTE: HARD CODED ETH to 0.01
+    const tooSmallEth = new BN(logAmount(ethToken.balance, ethToken.decimals)).lte(new BN(0.01))
+    console.log([ `tooSmallEth`, tooSmallEth ])
+    console.log([ `ETH BALANCE`, logAmount(ethToken.balance, ethToken.decimals) ])
+    if (targetFee === 'BOBA' && tooSmallEth) {
       dispatch(switchFeeMetaTransaction())
     } else {
-    */
       dispatch(switchFee(targetFee))
-    //}
-  }, [ dispatch ])
+    }
+  }, [ dispatch, l2EthBalance ])
 
   if (!accountEnabled || layer !== 'L2') {
     return null
@@ -53,7 +65,6 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Typography variant="body2">Fee</Typography>
       <Tooltip
         title={'BOBA or ETH will be used across Boba according to your choice.'}
         >
