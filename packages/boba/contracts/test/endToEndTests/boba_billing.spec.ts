@@ -13,8 +13,8 @@ import {
 
 let L2Boba: Contract
 let L2BillingContract: Contract
-let treasuryAddress: string
-const transactionFee = utils.parseEther('1')
+let l2FeeWallet: string
+const exitFee = utils.parseEther('1')
 
 let signer: Signer
 let signer2: Signer
@@ -32,19 +32,16 @@ describe('L2 Billing Contract', async () => {
     signerAddress = await signer.getAddress()
     signer2Address = await signer2.getAddress()
 
-    treasuryAddress = signerAddress
+    l2FeeWallet = signerAddress
 
     L2Boba = await (
       await ethers.getContractFactory('L1ERC20')
     ).deploy(initialSupply, tokenName, tokenSymbol, 18)
 
     const billingContract = await ethers.getContractFactory('L2BillingContract')
-    L2BillingContract = await billingContract.deploy(
-      L2Boba.address,
-      treasuryAddress,
-      transactionFee
-    )
+    L2BillingContract = await billingContract.deploy()
     await L2BillingContract.deployed()
+    await L2BillingContract.initialize(L2Boba.address, l2FeeWallet, exitFee)
   })
 
   describe('Initialization', async () => {
@@ -54,8 +51,8 @@ describe('L2 Billing Contract', async () => {
     })
 
     it('should have correct treasury address', async () => {
-      const foundAddress = await L2BillingContract.treasuryAddress()
-      expect(foundAddress).to.eq(treasuryAddress)
+      const foundAddress = await L2BillingContract.l2FeeWallet()
+      expect(foundAddress).to.eq(l2FeeWallet)
     })
 
     it('should have correct owner address set', async () => {
@@ -63,9 +60,15 @@ describe('L2 Billing Contract', async () => {
       expect(owner).to.eq(signerAddress)
     })
 
-    it('should have correct transaction fee', async () => {
-      const fee = await L2BillingContract.transactionFee()
-      expect(fee).to.eq(transactionFee)
+    it('should have correct exit fee', async () => {
+      const fee = await L2BillingContract.exitFee()
+      expect(fee).to.eq(exitFee)
+    })
+
+    it('should not initialize twice', async () => {
+      await expect(
+        L2BillingContract.initialize(L2Boba.address, l2FeeWallet, exitFee)
+      ).to.be.revertedWith('Contract has been initialized')
     })
   })
 
@@ -75,45 +78,58 @@ describe('L2 Billing Contract', async () => {
         L2BillingContract.collectFeeFrom(
           '0x0000000000000000000000000000000000000000'
         )
-      ).to.be.revertedWith('account cannot be zero')
+      ).to.be.revertedWith('Account cannot be zero')
     })
 
     it('should revert when having insufficient balance', async () => {
-      await L2Boba.connect(signer2).approve(
-        L2BillingContract.address,
-        transactionFee
-      )
+      await L2Boba.connect(signer2).approve(L2BillingContract.address, exitFee)
       await expect(
         L2BillingContract.connect(signer2).collectFeeFrom(signer2Address)
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     })
 
     it('should collect fee from an address successfully', async () => {
-      await L2Boba.connect(signer).transfer(signer2Address, transactionFee)
+      await L2Boba.connect(signer).transfer(signer2Address, exitFee)
 
-      const balanceBefore = await L2Boba.balanceOf(treasuryAddress)
-      await L2Boba.connect(signer2).approve(
-        L2BillingContract.address,
-        transactionFee
-      )
+      const balanceBefore = await L2Boba.balanceOf(L2BillingContract.address)
+      await L2Boba.connect(signer2).approve(L2BillingContract.address, exitFee)
       await L2BillingContract.connect(signer2).collectFeeFrom(signer2Address)
-      const balanceAfter = await L2Boba.balanceOf(treasuryAddress)
+      const balanceAfter = await L2Boba.balanceOf(L2BillingContract.address)
 
-      expect(balanceAfter.sub(balanceBefore)).to.eq(transactionFee)
+      expect(balanceAfter.sub(balanceBefore)).to.eq(exitFee)
     })
 
     it('should collect fee successfully', async () => {
-      await L2Boba.connect(signer).transfer(signer2Address, transactionFee)
+      await L2Boba.connect(signer).transfer(signer2Address, exitFee)
 
-      const balanceBefore = await L2Boba.balanceOf(treasuryAddress)
-      await L2Boba.connect(signer2).approve(
-        L2BillingContract.address,
-        transactionFee
-      )
+      const balanceBefore = await L2Boba.balanceOf(L2BillingContract.address)
+      await L2Boba.connect(signer2).approve(L2BillingContract.address, exitFee)
       await L2BillingContract.connect(signer2).collectFee()
-      const balanceAfter = await L2Boba.balanceOf(treasuryAddress)
+      const balanceAfter = await L2Boba.balanceOf(L2BillingContract.address)
 
-      expect(balanceAfter.sub(balanceBefore)).to.eq(transactionFee)
+      expect(balanceAfter.sub(balanceBefore)).to.eq(exitFee)
+    })
+
+    it('should not withdaw fee if balance is too low', async () => {
+      await expect(L2BillingContract.withdraw()).to.be.revertedWith(
+        'Balance is too low'
+      )
+    })
+
+    it('should withdraw fee successfully', async () => {
+      await L2Boba.connect(signer).transfer(
+        L2BillingContract.address,
+        ethers.utils.parseEther('150')
+      )
+
+      const L2BillingContractBalanace = await L2Boba.balanceOf(
+        L2BillingContract.address
+      )
+
+      const balanceBefore = await L2Boba.balanceOf(signerAddress)
+      await L2BillingContract.connect(signer).withdraw()
+      const balanceAfter = await L2Boba.balanceOf(signerAddress)
+      expect(balanceBefore).to.eq(balanceAfter.sub(L2BillingContractBalanace))
     })
   })
 })

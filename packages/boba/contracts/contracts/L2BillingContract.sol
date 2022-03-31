@@ -1,65 +1,95 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
-contract L2BillingContract is Ownable {
+contract L2BillingContract {
     using SafeERC20 for IERC20;
 
+    /*************
+     * Variables *
+     *************/
+
+    address public owner;
     address public feeTokenAddress;
-    address public treasuryAddress;
-    uint256 public transactionFee;
+    address public l2FeeWallet;
+    uint256 public exitFee;
 
-    event NFTExitFee (
-        address _account,
-        uint256 _amount
-    );
+    /*************
+     *   Events  *
+     *************/
 
-    constructor(address _feeTokenAddress, address _treasuryAddress, uint256 _transactionFee) {
+    event TransferOwnership(address, address);
+    event UpdateExitFee(uint256);
+    event CollectFee(address, uint256);
+    event Withdraw(address, uint256);
+
+    /*************
+     * Modifiers *
+     *************/
+
+    modifier onlyNotInitiator() {
+        require(feeTokenAddress == address(0), "Contract has been initialized");
+        _;
+    }
+
+    modifier onlyInitiator() {
+        require(feeTokenAddress != address(0), "Contract has not been initialized");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(owner == msg.sender, "Caller is not the owner");
+        _;
+    }
+
+    /*************
+     * Functions *
+     *************/
+
+    function initialize(address _feeTokenAddress, address _l2FeeWallet, uint256 _exitFee) public onlyNotInitiator {
         feeTokenAddress = _feeTokenAddress;
-        treasuryAddress = _treasuryAddress;
-        transactionFee = _transactionFee;
+        l2FeeWallet = _l2FeeWallet;
+        exitFee = _exitFee;
+        owner = msg.sender;
     }
 
+    function transferOwnership(address _newOwner) public onlyOwner {
+        require(_newOwner != address(0), "Ownable: new owner is the zero address");
+        address oldOwner = owner;
+        owner = _newOwner;
+        emit TransferOwnership(oldOwner, _newOwner);
+    }
 
-    function updateFeeTokenAddress(address _feeTokenAddress)
+      function updateExitFee(uint256 _exitFee)
         public
         onlyOwner()
     {
-        require(_feeTokenAddress != address(0), "fee token address cannot be zero");
-        feeTokenAddress = _feeTokenAddress;
+        require(_exitFee > 0, "exit fee cannot be zero");
+        exitFee = _exitFee;
+
+        emit UpdateExitFee(_exitFee);
     }
 
-    function updateTreasuryAddress(address _treasuryAddress)
-        public
-        onlyOwner()
-    {
-        require(_treasuryAddress != address(0), "treasury address cannot be zero");
-        treasuryAddress = _treasuryAddress;
+    function collectFeeFrom(address _account) external onlyInitiator {
+        require(_account != address(0), "Account cannot be zero");
+        IERC20(feeTokenAddress).safeTransferFrom(_account, address(this), exitFee);
+
+        emit CollectFee(_account, exitFee);
     }
 
-      function updateTransactionFee(uint256 _transactionFee)
-        public
-        onlyOwner()
-    {
-        require(_transactionFee > 0, "transaction fee cannot be zero");
-        transactionFee = _transactionFee;
+    function collectFee() external onlyInitiator {
+        IERC20(feeTokenAddress).safeTransferFrom(msg.sender, address(this), exitFee);
+
+        emit CollectFee(msg.sender, exitFee);
     }
 
+    function withdraw() external onlyInitiator {
+        uint256 balance = IERC20(feeTokenAddress).balanceOf(address(this));
+        require(balance >= 150e18, "Balance is too low");
+        IERC20(feeTokenAddress).safeTransfer(l2FeeWallet, balance);
 
-
-    function collectFeeFrom(address _account) external {
-        require(_account != address(0), "account cannot be zero");
-        IERC20(feeTokenAddress).safeTransferFrom(_account, treasuryAddress, transactionFee);
-
-        emit NFTExitFee(_account, transactionFee);
-    }
-
-    function collectFee() external {
-        IERC20(feeTokenAddress).safeTransferFrom(msg.sender, treasuryAddress, transactionFee);
-
-        emit NFTExitFee(msg.sender, transactionFee);
+        emit Withdraw(l2FeeWallet, balance);
     }
 }
