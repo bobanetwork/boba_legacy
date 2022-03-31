@@ -1,8 +1,9 @@
 /* Imports: External */
-import { Wallet, utils, constants } from 'ethers'
+import { Wallet, utils, constants, BigNumber } from 'ethers'
 import { sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
+import * as ynatm from '@eth-optimism/ynatm'
 import {
   CrossChainMessenger,
   MessageStatus,
@@ -264,12 +265,53 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               })
 
               // at this point, all relayed messages are removed, the tx should not fail
-              const tx = await this.state.messenger.finalizeBatchMessage(
-                subBuffer
+
+              // ynatm logic
+              const sendTxAndWaitForReceipt = async (
+                _gasPrice: BigNumber
+              ): Promise<any> => {
+                // Generate the transaction we will repeatedly submit
+                const txResponse =
+                  await this.state.messenger.finalizeBatchMessage(subBuffer, {
+                    overrides: {
+                      gasPrice: _gasPrice,
+                    },
+                  })
+                const txReceipt = await txResponse.wait(
+                  this.options.numConfirmations
+                )
+                return txReceipt
+              }
+              // const tx = await this.state.messenger.finalizeBatchMessage(
+              //   subBuffer
+              // )
+              // this.logger.info(`relayer sent tx: ${tx.hash}`)
+              const minGasPrice = await this._getGasPriceInGwei(
+                this.options.l1Wallet
               )
-              this.logger.info(`relayer sent tx: ${tx.hash}`)
+              let receipt
+              try {
+                receipt = await ynatm.send({
+                  sendTransactionFunction: sendTxAndWaitForReceipt,
+                  minGasPrice: ynatm.toGwei(minGasPrice),
+                  maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+                  gasPriceScalingFunction: ynatm.LINEAR(
+                    this.options.gasRetryIncrement
+                  ),
+                  delay: this.options.resubmissionTimeout,
+                })
+
+                this.logger.info('Relay message transaction sent', { receipt })
+              } catch (err) {
+                this.logger.error('Relay attempt failed, skipping.', {
+                  message: err.toString(),
+                  stack: err.stack,
+                  code: err.code,
+                })
+              }
+              // this.logger.info('Message Batch successfully relayed to Layer 1!')
               // only check for this txs receipt
-              const receipt = await tx.wait()
+              // const receipt = await tx.wait()
 
               if (!receipt) {
                 this.logger.error(
@@ -355,6 +397,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               continue
             }
 
+            // this.state.didWork = true
             // Make sure that all messages sent within the transaction are finalized. If any messages
             // are not finalized, then we're going to break the loop which will trigger the sleep and
             // wait for a few seconds before we check again to see if this transaction is finalized.
@@ -449,5 +492,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     } catch {
       this.logger.error('CRITICAL ERROR: Failed to fetch the Filter')
     }
+  }
+
+  private async _getGasPriceInGwei(signer): Promise<number> {
+    return parseInt(utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10)
   }
 }
