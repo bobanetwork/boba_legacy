@@ -2,19 +2,13 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
     dream2nix = {
-      #url = "github:nix-community/dream2nix";
-      # while waiting fy my PRs to be merged above:
-      url = "github:tgunnoe/dream2nix/workspace-name-fix";
+      url = "github:nix-community/dream2nix";
       #url = "path:/home/tgunnoe/src/boba/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    openzeppelin-contracts = {
-      url = "github:openzeppelin/openzeppelin-contracts";
-      flake = false;
     };
     hardhat = {
       url = "github:tgunnoe/hardhat-flake";
@@ -34,7 +28,6 @@
     devshell,
     dream2nix,
     hardhat,
-    openzeppelin-contracts
   } @inputs:
     let
       lib = nixpkgs.lib;

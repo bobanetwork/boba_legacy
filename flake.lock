@@ -74,16 +74,15 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1648666454,
-        "narHash": "sha256-MmmDJx4acB6x+DCRNz1IGRJAX4PhvM27CbYZ6lYv4sM=",
-        "owner": "tgunnoe",
+        "lastModified": 1649072822,
+        "narHash": "sha256-ZgVC5TmKqVV+2nVxOgQHv6AT3CVx/5RdlhcejwX1mZ8=",
+        "owner": "nix-community",
         "repo": "dream2nix",
-        "rev": "fb232c8cb0ad9b92baa86d8d96916526fa25d287",
+        "rev": "0f0fa910569b2acc96bf815bdd33ad6629cbd573",
         "type": "github"
       },
       "original": {
-        "owner": "tgunnoe",
-        "ref": "workspace-name-fix",
+        "owner": "nix-community",
         "repo": "dream2nix",
         "type": "github"
       }
@@ -236,22 +235,6 @@
         "type": "github"
       }
     },
-    "openzeppelin-contracts": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1648654597,
-        "narHash": "sha256-w/VEhMpTZoKikuOz6+vqjraDLhL8I991V1LW0cmD4M8=",
-        "owner": "openzeppelin",
-        "repo": "openzeppelin-contracts",
-        "rev": "3f49408fb60eddc7b45e6ee28d5baf95ce1dc665",
-        "type": "github"
-      },
-      "original": {
-        "owner": "openzeppelin",
-        "repo": "openzeppelin-contracts",
-        "type": "github"
-      }
-    },
     "poetry2nix": {
       "flake": false,
       "locked": {
@@ -300,8 +283,7 @@
         "dream2nix": "dream2nix",
         "flake-utils": "flake-utils_2",
         "hardhat": "hardhat",
-        "nixpkgs": "nixpkgs",
-        "openzeppelin-contracts": "openzeppelin-contracts"
+        "nixpkgs": "nixpkgs"
       }
     },
     "src": {
