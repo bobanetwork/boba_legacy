@@ -1,11 +1,12 @@
 .github
 
-node_modules
-.env
 **/.env
-
-test
+**/docker-compose.yml
+**/Dockerfile
 **/*_test.go
+
+node_modules
+test
 build/_workspace
 build/bin
 build/_bin
