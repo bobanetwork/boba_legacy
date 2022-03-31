@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { Typography } from '@mui/material'
-import { switchFee } from 'actions/setupAction.js'
+import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -38,7 +38,13 @@ function FeeSwitcher() {
   const layer = useSelector(selectLayer());
 
   const dispatchSwitchFee = useCallback((targetFee) => {
-    dispatch(switchFee(targetFee))
+    /*
+    if(account.ETH === too small && switching to BOBA) {
+      dispatch(switchFeeMetaTransaction())
+    } else {
+    */
+      dispatch(switchFee(targetFee))
+    //}
   }, [ dispatch ])
 
   if (!accountEnabled || layer !== 'L2') {
@@ -47,8 +53,9 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
+      <Typography variant="body2">Fee</Typography>
       <Tooltip
-        title={'The whole network will choose BOBA or ETH as the gas fee according to you.'}
+        title={'BOBA or ETH will be used across Boba according to your choice.'}
         >
         <Typography variant="body2">Fee</Typography>
       </Tooltip>
