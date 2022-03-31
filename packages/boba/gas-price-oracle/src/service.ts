@@ -245,7 +245,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
     this.logger.info('Connecting to Boba_GasPriceOracle...')
     const Boba_GasPriceOracleAddress =
-      await this.state.Lib_AddressManager.getAddress('Boba_GasPriceOracle')
+      await this.state.Lib_AddressManager.getAddress(
+        'Proxy__Boba_GasPriceOracle'
+      )
     this.state.Boba_GasPriceOracle = new Contract(
       Boba_GasPriceOracleAddress,
       Boba_GasPriceOracleJson.abi,
@@ -477,6 +479,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
               Number(utils.formatEther(this.state.L1ETHCostFee.toString())) * 10
             ).toFixed(6)
           ),
+          L1ETHCostFeeUSD: Number(
+            (
+              Number(
+                Number(utils.formatEther(this.state.L1ETHCostFee.toString()))
+              ) * this.state.ETHUSDPrice
+            ).toFixed(2)
+          ),
         },
       })
     } catch (error) {
@@ -530,7 +539,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
       await this._writeL2FeeCollect()
 
-      this.logger.info('Got L2 Gas Cost', {
+      this.logger.info('Got L2 Gas Collect', {
         network: 'L2',
         data: {
           L2ETHCollectFee: Number(
@@ -543,6 +552,31 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
               Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
               10
             ).toFixed(6)
+          ),
+          L2BOBACollectFee: Number(
+            Number(
+              utils.formatEther(this.state.L2BOBACollectFee.toString())
+            ).toFixed(6)
+          ),
+          L2BOBACollectFee10X: Number(
+            (
+              Number(
+                utils.formatEther(this.state.L2BOBACollectFee.toString())
+              ) * 10
+            ).toFixed(6)
+          ),
+          L2ETHCollectFeeUSD: Number(
+            (
+              Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
+              this.state.ETHUSDPrice
+            ).toFixed(2)
+          ),
+          L2BOBACollectFeeUSD: Number(
+            (
+              Number(
+                utils.formatEther(this.state.L2BOBACollectFee.toString())
+              ) * this.state.BOBAUSDPrice
+            ).toFixed(2)
           ),
         },
       })
