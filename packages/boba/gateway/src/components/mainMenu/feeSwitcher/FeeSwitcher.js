@@ -25,6 +25,7 @@ import {
 } from 'selectors/setupSelector'
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
+import Tooltip from 'components/tooltip/Tooltip.js'
 
 
 function FeeSwitcher() {
@@ -37,11 +38,13 @@ function FeeSwitcher() {
   const layer = useSelector(selectLayer());
 
   const dispatchSwitchFee = useCallback((targetFee) => {
-    dispatch(switchFee(targetFee))
-  }, [ dispatch ])
-
-  const dispatchSwitchFeeMetaTransaction = useCallback(() => {
-    dispatch(switchFeeMetaTransaction())
+    /*
+    if(account.ETH === too small && switching to BOBA) {
+      dispatch(switchFeeMetaTransaction())
+    } else {
+    */
+      dispatch(switchFee(targetFee))
+    //}
   }, [ dispatch ])
 
   if (!accountEnabled || layer !== 'L2') {
@@ -51,8 +54,11 @@ function FeeSwitcher() {
   return (
     <S.FeeSwitcherWrapper>
       <Typography variant="body2">Fee</Typography>
-      {/* Only works for switching from ETH to BOBA */}
-      <Typography variant="body2" onClick={() => {dispatchSwitchFeeMetaTransaction()}}>Meta Transaction </Typography>
+      <Tooltip
+        title={'BOBA or ETH will be used across Boba according to your choice.'}
+        >
+        <Typography variant="body2">Fee</Typography>
+      </Tooltip>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
