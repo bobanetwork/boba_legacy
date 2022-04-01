@@ -83,13 +83,6 @@ function NewProposalModal({ open }) {
       }),
     }
 
-/*
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-*/
     const submit = async () => {
         
         let res = null

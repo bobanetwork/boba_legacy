@@ -710,7 +710,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM', 'WAGMIv0',
-                               'OLO', 'WAGMIv1'
+                               'OLO', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
                               ]
 
       //not all tokens are on Rinkeby
@@ -747,6 +747,18 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
           allTokens[key] = {
             'L1': 'WAGMIv1',
             'L2': '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197'
+          }
+        }
+        else if(key === 'WAGMIv2') {
+          allTokens[key] = {
+            'L1': 'WAGMIv2',
+            'L2': '0x76B5908ecd0ae3DB23011ae96b7C1f803D63136c'
+          }
+        }
+        else if(key === 'WAGMIv2-Oolong') {
+          allTokens[key] = {
+            'L1': 'WAGMIv2-Oolong',
+            'L2': '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D'
           }
         }
         else if(key === 'OLO') {
@@ -1133,14 +1145,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       toRange: 1000,
     })
 
-    //console.log("getExits",response)
-
     if (response.status === 201) {
       const transactions = response.data
       const filteredTransactions = transactions.filter(
         (i) => i.exitL2 && i.crossDomainMessage
       )
-      console.log("filteredTransactions",filteredTransactions)
       return { exited: filteredTransactions }
     }
 
@@ -1352,6 +1361,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
+        
         if (token.symbolL1 === 'xBOBA') {
           //there is no L1 xBOBA
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -1362,6 +1372,14 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         }
         else if (token.symbolL1 === 'WAGMIv1') {
           //there is no L1 WAGMIv1
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv2') {
+          //there is no L2 WAGMIv1
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv2-Oolong') {
+          //there is no L2 WAGMIv2OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'OLO') {
@@ -1377,20 +1395,18 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' &&
-            token.balance.gt(new BN(0)) &&
+        if(token.balance.lte(new BN(1000000))) {
+          //do nothing
+        } 
+        else if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
-            token.symbol !== 'WAGMIv1'
+            token.symbol !== 'WAGMIv1' &&
+            token.symbol !== 'WAGMIv2' &&
+            token.symbol !== 'WAGMIv2-Oolong'
           ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'xBOBA') {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv0' ) {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv1' ) {
+        } else if (token.layer === 'L2') {
           layer2Balances.push(token)
         }
       })
@@ -1533,10 +1549,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     try {
 
-      // get current WAGMI_v0 balance
-
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         '0x7F969E3F19355C47f6bc957E502c79C75b373BF3',
         WAGMIv0Json.abi,
@@ -1579,10 +1591,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     try {
 
-      // get current WAGMI_v0 balance
-
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
@@ -1609,6 +1617,51 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       return TX
     } catch (error) {
       console.log("NS: settle_v1 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v2() {
+
+    console.log("NS: settle_v2")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
+        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv2 = new ethers.Contract(
+        '0x76B5908ecd0ae3DB23011ae96b7C1f803D63136c',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv2.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv2:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v2 error:", error)
       return error
     }
 
@@ -2180,6 +2233,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         feeMin: (feeRateL / 10).toFixed(1),
         feeMax: (feeRateH / 10).toFixed(1)
       }
+
     } catch (error) {
       console.log("NS: getL1TotalFeeRate error:", error)
       return error
@@ -2437,17 +2491,18 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
 
     try {
-      // Deposit
-      const addLiquidityTX = await (L1orL2Pool === 'L1LP'
+      const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).addLiquidity(
+      )
+      .connect(this.provider.getSigner())
+      .addLiquidity(
         value_Wei_String,
         currency,
         otherField
       )
-      await addLiquidityTX.wait()
-      return true
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: addLiquidity error:", error)
       return error
@@ -2463,7 +2518,9 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).withdrawReward(
+      )
+      .connect(this.provider.getSigner())
+      .withdrawReward(
         value_Wei_String,
         currencyAddress,
         this.account
@@ -2485,7 +2542,9 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).withdrawLiquidity(
+      )
+      .connect(this.provider.getSigner())
+      .withdrawLiquidity(
         value_Wei_String,
         currency,
         this.account
@@ -2512,52 +2571,59 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     console.log("TX start time:", time_start)
     console.log("Depositing...")
 
-    let depositTX = await this.L1LPContract
-      .connect(this.provider.getSigner()).clientDepositL1(
-        value_Wei_String,
-        currency,
-        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-      )
+    try {
 
-    console.log("depositTX",depositTX)
+      let depositTX = await this.L1LPContract
+        .connect(this.provider.getSigner()).clientDepositL1(
+          value_Wei_String,
+          currency,
+          currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+        )
 
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
+      console.log("depositTX",depositTX)
 
-    const block = await this.L1Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
 
-    updateSignatureStatus_depositLP(true)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
 
-    const opts = {
-      fromBlock: -4000
+      updateSignatureStatus_depositLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": true,
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+
+    } catch (error) {
+      console.log("NS: depositL1LP error:", error)
+      return error
     }
-    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": true,
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   async depositL1LPBatch(payload) {
@@ -2577,58 +2643,64 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     updateSignatureStatus_depositLP(false)
 
-    console.log("payload:",updatedPayload)
+    try {
+      console.log("payload:",updatedPayload)
 
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
 
-    let depositTX
-    console.log("Depositing...")
-    depositTX = await this.L1LPContract
-      .connect(this.provider.getSigner()).clientDepositL1Batch(
-        updatedPayload,
-        ETHAmount !== 0 ? { value: ETHAmount } : {}
-      )
+      let depositTX
+      console.log("Depositing...")
+      depositTX = await this.L1LPContract
+        .connect(this.provider.getSigner()).clientDepositL1Batch(
+          updatedPayload,
+          ETHAmount !== 0 ? { value: ETHAmount } : {}
+        )
 
-    console.log("depositTX",depositTX)
+      console.log("depositTX",depositTX)
 
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
 
-    const block = await this.L1Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
 
-    updateSignatureStatus_depositLP(true)
+      updateSignatureStatus_depositLP(true)
 
-    const opts = {
-      fromBlock: -4000
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": true,
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+
+    } catch (error) {
+      console.log("NS: depositL1LPBatch error:", error)
+      return error
     }
-    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": true,
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   /***************************************/
@@ -2679,9 +2751,10 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     ) {
       balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
     } else {
-      balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
-        allAddresses.L1LPAddress
-      )
+      balance = await this.L1_TEST_Contract
+        .attach(tokenAddress)
+        .connect(this.L1Provider)
+        .balanceOf(allAddresses.L1LPAddress)
     }
 
     //console.log("L1LPBalance(tokenAddress):",balance.toString())
@@ -2925,139 +2998,144 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       balance_BN = await this.L2Provider.getBalance(this.account)
     }
 
-    //console.log("Address:",currencyAddress)
-    if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    try {
+      //console.log("Address:",currencyAddress)
+      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
 
-      const L2ERC20Contract = new ethers.Contract(
-        currencyAddress,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
-
-      balance_BN = await L2ERC20Contract.balanceOf(
-        this.account
-      )
-      console.log("Initial Balance:", utils.formatEther(balance_BN))
-
-      let allowance_BN = await L2ERC20Contract.allowance(
-        this.account,
-        allAddresses.L2LPAddress
-      )
-      console.log("Allowance:",utils.formatEther(allowance_BN))
-
-      if (balance_BN.gt(allowance_BN)) {
-
-        //Estimate gas
-        const tx = await L2ERC20Contract.populateTransaction.approve(
-          allAddresses.L2LPAddress,
-          balance_BN
+        const L2ERC20Contract = new ethers.Contract(
+          currencyAddress,
+          L2ERC20Json.abi,
+          this.provider.getSigner()
         )
 
-        approvalGas_BN = await this.L2Provider.estimateGas(tx)
-        approvalCost_BN = approvalGas_BN.mul(gasPrice)
-        console.log("Cost to Approve (ETH):", utils.formatEther(approvalCost_BN))
-
-        const approveStatus = await L2ERC20Contract.approve(
-          allAddresses.L2LPAddress,
-          balance_BN
+        balance_BN = await L2ERC20Contract.balanceOf(
+          this.account
         )
-        await approveStatus.wait()
+        console.log("Initial Balance:", utils.formatEther(balance_BN))
 
-        if (!approveStatus)
-          return false
+        let allowance_BN = await L2ERC20Contract.allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+        console.log("Allowance:",utils.formatEther(allowance_BN))
 
-      } else {
-        console.log("Allowance already suitable:", utils.formatEther(allowance_BN))
+        if (balance_BN.gt(allowance_BN)) {
+
+          //Estimate gas
+          const tx = await L2ERC20Contract.populateTransaction.approve(
+            allAddresses.L2LPAddress,
+            balance_BN
+          )
+
+          approvalGas_BN = await this.L2Provider.estimateGas(tx)
+          approvalCost_BN = approvalGas_BN.mul(gasPrice)
+          console.log("Cost to Approve (ETH):", utils.formatEther(approvalCost_BN))
+
+          const approveStatus = await L2ERC20Contract.approve(
+            allAddresses.L2LPAddress,
+            balance_BN
+          )
+          await approveStatus.wait()
+
+          if (!approveStatus)
+            return false
+
+        } else {
+          console.log("Allowance already suitable:", utils.formatEther(allowance_BN))
+        }
+
       }
 
+      const tx2 = await this.L2LPContract
+        .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+          balance_BN,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
+        )
+
+      let depositGas_BN = await this.L2Provider.estimateGas(tx2)
+
+      let l1SecurityFee = BigNumber.from('0')
+      if (this.networkGateway === 'mainnet') {
+        delete tx2.from
+        l1SecurityFee = await this.gasOracleContract.getL1Fee(
+          utils.serializeTransaction(tx2)
+        )
+        // We can't correctly calculate the final l1 securifty fee,
+        // so we increase it by 1.1X to make sure that users have
+        // enough balance to cover it
+        l1SecurityFee = l1SecurityFee.mul('11').div('10')
+        console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+      }
+
+      console.log("Deposit gas", depositGas_BN.toString())
+      let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
+      console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
+
+      if(currencyAddress === allAddresses.L2_ETH_Address) {
+        //if fee token, need to consider cost to exit
+        balance_BN = balance_BN.sub(depositCost_BN)
+      }
+
+      const ccBal = await this.L2Provider.getBalance(this.account)
+
+      console.log("Balance:", utils.formatEther(ccBal))
+      console.log("Cost to exit:", utils.formatEther(depositCost_BN))
+      console.log("Amount to exit:", utils.formatEther(balance_BN))
+      console.log("Should be zero (if exiting ETH):", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
+
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
+
+      const depositTX = await this.L2LPContract
+        .connect(this.provider.getSigner()).clientDepositL2(
+          balance_BN,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
+        )
+
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
+
+      const block = await this.L2Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
+
+      //closes the modal
+      updateSignatureStatus_exitLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": false, //since we are going L2->L1
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+    } catch (error) {
+      console.log("NS: fastExitAll error:", error)
+      return error
     }
-
-    const tx2 = await this.L2LPContract
-      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
-        balance_BN,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
-      )
-
-    let depositGas_BN = await this.L2Provider.estimateGas(tx2)
-
-    let l1SecurityFee = BigNumber.from('0')
-    if (this.networkGateway === 'mainnet') {
-      delete tx2.from
-      l1SecurityFee = await this.gasOracleContract.getL1Fee(
-        utils.serializeTransaction(tx2)
-      )
-      // We can't correctly calculate the final l1 securifty fee,
-      // so we increase it by 1.1X to make sure that users have
-      // enough balance to cover it
-      l1SecurityFee = l1SecurityFee.mul('11').div('10')
-      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
-    }
-
-    console.log("Deposit gas", depositGas_BN.toString())
-    let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
-    console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
-
-    if(currencyAddress === allAddresses.L2_ETH_Address) {
-      //if fee token, need to consider cost to exit
-      balance_BN = balance_BN.sub(depositCost_BN)
-    }
-
-    const ccBal = await this.L2Provider.getBalance(this.account)
-
-    console.log("Balance:", utils.formatEther(ccBal))
-    console.log("Cost to exit:", utils.formatEther(depositCost_BN))
-    console.log("Amount to exit:", utils.formatEther(balance_BN))
-    console.log("Should be zero (if exiting ETH):", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-
-    const depositTX = await this.L2LPContract
-      .connect(this.provider.getSigner()).clientDepositL2(
-        balance_BN,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
-      )
-
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
-
-    const block = await this.L2Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
-
-    //closes the modal
-    updateSignatureStatus_exitLP(true)
-
-    const opts = {
-      fromBlock: -4000
-    }
-    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": false, //since we are going L2->L1
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   /**************************************************************/
@@ -3069,79 +3147,85 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     console.log("depositL2LP currencyAddress",currencyAddress)
 
-    if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    try {
 
-      const L2ERC20Contract = new ethers.Contract(
-        currencyAddress,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
+      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
 
-      let allowance_BN = await L2ERC20Contract.allowance(
-        this.account,
-        allAddresses.L2LPAddress
-      )
-
-      let depositAmount_BN = BigNumber.from(value_Wei_String)
-
-      if (depositAmount_BN.gt(allowance_BN)) {
-        const approveStatus = await L2ERC20Contract.approve(
-          allAddresses.L2LPAddress,
-          value_Wei_String
+        const L2ERC20Contract = new ethers.Contract(
+          currencyAddress,
+          L2ERC20Json.abi,
+          this.provider.getSigner()
         )
-        await approveStatus.wait()
-        if (!approveStatus) return false
+
+        let allowance_BN = await L2ERC20Contract.allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+
+        let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+        if (depositAmount_BN.gt(allowance_BN)) {
+          const approveStatus = await L2ERC20Contract.approve(
+            allAddresses.L2LPAddress,
+            value_Wei_String
+          )
+          await approveStatus.wait()
+          if (!approveStatus) return false
+        }
       }
+
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
+
+      const depositTX = await this.L2LPContract
+        .connect(this.provider.getSigner()).clientDepositL2(
+          value_Wei_String,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+        )
+
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
+
+      const block = await this.L2Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
+
+      //closes the modal
+      updateSignatureStatus_exitLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": false, //since we are going L2->L1
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+    } catch (error) {
+      console.log("NS: depositL2LP error:", error)
+      return error
     }
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-
-    const depositTX = await this.L2LPContract
-      .connect(this.provider.getSigner()).clientDepositL2(
-        value_Wei_String,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
-      )
-
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
-
-    const block = await this.L2Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
-
-    //closes the modal
-    updateSignatureStatus_exitLP(true)
-
-    const opts = {
-      fromBlock: -4000
-    }
-    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": false, //since we are going L2->L1
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   async fetchLookUpPrice(params) {
@@ -3171,9 +3255,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
 
     try {
-      //console.log('Checking DAO balance')
       let balance = await this.BobaContract.balanceOf(this.account)
-      //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: getDaoBalance', error)
@@ -3191,9 +3273,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
 
     try {
-      //console.log('Checking DAO balance')
       let balance = await this.xBobaContract.balanceOf(this.account)
-      //console.log('balance',balance)
       return { balanceX: formatEther(balance) }
     } catch (error) {
       console.log('Error: getDaoBalanceX', error)
@@ -3316,8 +3396,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
-      const res = { proposalThreshold: formatEther(rawThreshold) }
-      return res
+      return { proposalThreshold: formatEther(rawThreshold) }
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
       return error
@@ -3399,6 +3478,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
           callData,
           description
       )
+
       return res
 
     } catch (error) {
@@ -3505,8 +3585,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       const delegateCheck = await this.delegateContract
         .connect(this.provider.getSigner())
         .attach(allAddresses.GovernorBravoDelegator)
-      let res = delegateCheck.castVote(id, userVote)
-      return res
+      return delegateCheck.castVote(id, userVote)
     } catch(error) {
       console.log("NS: castProposalVote error:",error)
       return error
@@ -3561,7 +3640,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
   }
 
-
   /***********************************************/
   /*****       Fixed savings account         *****/
   /***********************************************/
@@ -3608,7 +3686,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()
-      return true
+      return TX
     } catch (error) {
       console.log("NS: addFS_Savings error:", error)
       return error
@@ -3630,7 +3708,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       )
       const TX = await FixedSavings.unstake(stakeID)
       await TX.wait()
-      return true
+      return TX
     } catch (error) {
       console.log("NS: withdrawFS_Savings error:", error)
       return error

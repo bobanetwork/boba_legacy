@@ -7,7 +7,7 @@ export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   background: `${theme.palette.mode === 'light' ? '#FFFFFF' : "rgba(255, 255, 255, 0.06)"}`,
   borderRadius: '12px',
-  padding: '0px 10px'
+  padding: '0'
 }));
 
 export const LayerContent = styled(Box)(({ theme }) => ({
@@ -15,7 +15,7 @@ export const LayerContent = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
   flexDirection: 'column',
-  marginLeft: '5px',
+  marginInline: '10px',
   [ theme.breakpoints.down('md') ]: {
     flex: 1,
   },

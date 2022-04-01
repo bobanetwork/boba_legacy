@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux'
 
 import { Box, Typography} from '@mui/material'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction';
+import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -27,9 +27,9 @@ import Button from 'components/button/Button'
 import { delegateVotes } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
-import BobaGlassIcon from 'components/icons/BobaGlassIcon';
+import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
-import * as S from './daoModal.styles';
+import * as S from './daoModal.styles'
 
 function DelegateDaoModal({ open }) {
 
@@ -50,23 +50,17 @@ function DelegateDaoModal({ open }) {
     const submit = async () => {
         let res = await dispatch(delegateVotes({ recipient }));
         if (res) {
-            dispatch(openAlert(`Votes delegated successfully!`));
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`));
-            handleClose();
+            dispatch(openAlert(`Votes delegated successfully!`))
         }
+        handleClose()
     }
 
     const submitMe = async () => {
         let res = await dispatch(delegateVotes({ recipient: wAddress }))
         if (res) {
             dispatch(openAlert(`Vote self-delegation successfull!`))
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`))
-            handleClose();
         }
+        handleClose()
     }
 
     return (
@@ -86,7 +80,7 @@ function DelegateDaoModal({ open }) {
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                 <Typography variant="h3" sx={{mb: 1}}>
-                    To someone else
+                    To me
                 </Typography>
                 <Typography variant="body3" component="p"
                     style={{ opacity: 0.65}}>
@@ -102,7 +96,7 @@ function DelegateDaoModal({ open }) {
                     onClick={()=>{submitMe()}}
                     color='primary'
                     variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power to yourself"}
                     loading={loading}
                     triggerTime={new Date()}
                     fullWidth={true}
