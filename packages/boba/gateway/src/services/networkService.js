@@ -556,7 +556,10 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     } catch (error) {
       console.log(error)
       // sigh
-      const errorData = error.response.data.error.error.error.body      
+      let errorData = error.response.data.error
+      if(errorData.hasOwnProperty('error')) {
+        errorData = errorData.error.error.body
+      }
       return errorData
     }
   }

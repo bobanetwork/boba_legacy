@@ -51,9 +51,9 @@ function FeeSwitcher() {
     // NOTE: HARD CODED ETH to 0.01
     // actual fee is more like 0.000052
     const tooSmallEth = new BN(logAmount(ethBalance.balance, 18)).lte(new BN(0.001))
-    //console.log([ `tooSmallEth`, tooSmallEth ])
-    //console.log("l2EthBalance",ethBalance.balance)
-    //console.log([ `ETH BALANCE`, logAmount(ethBalance.balance, 18) ])
+    // console.log([ `tooSmallEth`, tooSmallEth ])
+    // console.log("l2EthBalance",ethBalance.balance)
+    // console.log([ `ETH BALANCE`, logAmount(ethBalance.balance, 18) ])
     if (targetFee === 'BOBA' && tooSmallEth) {
       dispatch(switchFeeMetaTransaction())
     } else {
