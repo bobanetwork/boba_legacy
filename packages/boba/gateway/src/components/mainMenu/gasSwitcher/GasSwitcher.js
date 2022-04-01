@@ -8,7 +8,6 @@ import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
 
 import networkService from 'services/networkService.js'
-import { getMaxHealthBlockLag } from 'util/masterConfig'
 
 function GasSwitcher({ isMobile }) {
 
@@ -17,7 +16,7 @@ function GasSwitcher({ isMobile }) {
 
   useEffect(() => {
     async function getGasSavings() {
-      if (networkService.networkGateway === 'mainnet' /*|| networkService.networkGateway === 'rinkeby'*/) {
+      if (networkService.networkGateway === 'mainnet') {
         const l1SecurityFee = await networkService.estimateL1SecurityFee()
         const l2Fee = await networkService.estimateL2Fee()
         // The l1 security fee is moved to the l2 fee
@@ -33,11 +32,6 @@ function GasSwitcher({ isMobile }) {
   }, [ gas ])
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'Healthy'
-
-  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
-    healthStatus = 'Unhealthy'
-  }
 
   return (
     <S.Menu>
@@ -61,10 +55,12 @@ function GasSwitcher({ isMobile }) {
         <S.Label component="p" variant="body2">L2</S.Label>
         <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
-      <S.MenuItem>
-        <S.Label component="p" variant="body2">Verification</S.Label>
-        <S.Value component="p" variant="body2">{healthStatus}</S.Value>
-      </S.MenuItem>
+      {verifierStatus.hasOwnProperty('matchedBlock') &&
+        <S.MenuItem>
+          <S.Label component="p" variant="body2">Last Verified Block</S.Label>
+          <S.Value component="p" variant="body2">{Number(verifierStatus.matchedBlock)}</S.Value>
+        </S.MenuItem>
+      }
     </S.Menu>
   )
 
