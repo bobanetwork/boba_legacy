@@ -68,8 +68,6 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
-  numEventConfirmations?: number
-
   multiRelayLimit?: number
 
   resubmissionTimeout?: number
@@ -114,7 +112,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     filter: Array<any>
     lastFilterPollingTimestamp: number
     //batch system
-    timeSinceLastRelayS: number
     timeOfLastRelayS: number
     messageBuffer: Array<any>
     timeOfLastPendingRelay: any
@@ -147,7 +144,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.lastFilterPollingTimestamp = 0
 
     //batch system
-    this.state.timeSinceLastRelayS = 0
     this.state.timeOfLastRelayS = Date.now()
     this.state.messageBuffer = []
     this.state.timeOfLastPendingRelay = false
