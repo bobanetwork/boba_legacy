@@ -970,12 +970,11 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo               uint64 = params.TxGas - 1
-		hi               uint64
-		cap              uint64
-		blockNr          *big.Int
-		isGasUpdate      bool = true
-		isFeeTokenUpdate bool = true
+		lo          uint64 = params.TxGas - 1
+		hi          uint64
+		cap         uint64
+		blockNr     *big.Int
+		isGasUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
@@ -1007,28 +1006,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	if args.From == nil {
 		args.From = &common.Address{}
 	}
-	// Get hard fork status
-	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
-	if err == nil {
-		blockNr = block.Number()
-		isGasUpdate = b.ChainConfig().IsGasUpdate(blockNr)
-		isFeeTokenUpdate = b.ChainConfig().IsFeeTokenUpdate(blockNr)
-	}
-	// Get state
-	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-	// If gas price is 0 or nil, the returned gas limit doesn't include the
-	// l1 security fee
-	gasPrice := new(big.Int)
-	price, err := b.SuggestPrice(ctx)
-	if err == nil && isFeeTokenUpdate {
-		if args.GasPrice == nil {
-			// gasPrice is used to calculate the l2ExtraFee
-			gasPrice = price
-		} else {
-			// Set gasPrice to the gas price from input
-			gasPrice = (*big.Int)(args.GasPrice)
-		}
-	}
+
 	// Create a helper to check if a gas allowance results in an executable transaction
 	executable := func(gas uint64) (bool, []byte, error) {
 		args.Gas = (*hexutil.Uint64)(&gas)
@@ -1070,6 +1048,13 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
+	// Get hard fork status
+	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
+	if err == nil {
+		blockNr = block.Number()
+		isGasUpdate = b.ChainConfig().IsGasUpdate(blockNr)
+	}
+
 	if !isGasUpdate {
 		return hexutil.Uint64(hi), nil
 	}
@@ -1078,6 +1063,9 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	if args.Data != nil {
 		data = []byte(*args.Data)
 	}
+
+	// Get state
+	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 
 	l2ExtraGas := new(big.Int)
 	if rcfg.UsingOVM {
