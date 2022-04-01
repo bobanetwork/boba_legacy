@@ -140,8 +140,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       l1ChainId,
     })
 
-    // console.log(this.state.messenger.contracts.l1.L1MultiMessageRelayer)
-
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
 
     // filter
@@ -182,7 +180,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           }
         }
 
-        //Batch flushing logic
+        // Batch flushing logic
         const secondsElapsed = Math.floor(
           (Date.now() - this.state.timeOfLastRelayS) / 1000
         )
@@ -282,10 +280,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 )
                 return txReceipt
               }
-              // const tx = await this.state.messenger.finalizeBatchMessage(
-              //   subBuffer
-              // )
-              // this.logger.info(`relayer sent tx: ${tx.hash}`)
+
               const minGasPrice = await this._getGasPriceInGwei(
                 this.options.l1Wallet
               )
@@ -309,10 +304,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                   code: err.code,
                 })
               }
-              // this.logger.info('Message Batch successfully relayed to Layer 1!')
-              // only check for this txs receipt
-              // const receipt = await tx.wait()
 
+              // only check for this txs receipt
               if (!receipt) {
                 this.logger.error(
                   'No receipt for relayMultiMessage transaction'
@@ -365,7 +358,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           //    2.1. Get the transaction for the next L2 block to parse.
           //    2.2. Find any messages sent in the L2 block.
           //    2.3. Make sure all messages are ready to be relayed.
-          //    3.4. Relay the messages.
+          //    3.4. Add message to the pending relay buffer.
           const l2BlockNumber =
             await this.state.messenger.l2Provider.getBlockNumber()
 
@@ -421,7 +414,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               break
             } else {
               this.logger.info(
-                `tx is finalized, relaying: ${this.state.highestCheckedL2Tx}`
+                `tx is finalized, attempting to add to pending buffer: ${this.state.highestCheckedL2Tx}`
               )
             }
 
@@ -463,11 +456,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               this.logger.info('added message to pending buffer')
             }
 
-            // All messages have been relayed so we can move on to the next block.
+            // All messages have been added to the buffer so we can move on to the next block.
             this.state.highestCheckedL2Tx++
           }
         } else {
-          this.logger.info('Waiting for the pending tx to be finalized')
+          this.logger.info('Waiting for the current pending tx to be finalized')
         }
       } catch (err) {
         this.logger.error('Caught an unhandled error', {
