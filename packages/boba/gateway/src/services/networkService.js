@@ -552,7 +552,7 @@ class NetworkService {
                                'OMG', 'FRAX',  'FXS',  'DODO',
                                'UST', 'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM', 'WAGMIv0',
-                               'OLO', 'WAGMIv1'
+                               'OLO', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
                               ]
 
       //not all tokens are on Rinkeby
@@ -589,6 +589,18 @@ class NetworkService {
           allTokens[key] = {
             'L1': 'WAGMIv1',
             'L2': '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197'
+          }
+        }
+        else if(key === 'WAGMIv2') {
+          allTokens[key] = {
+            'L1': 'WAGMIv2',
+            'L2': '0x76B5908ecd0ae3DB23011ae96b7C1f803D63136c'
+          }
+        }
+        else if(key === 'WAGMIv2-Oolong') {
+          allTokens[key] = {
+            'L1': 'WAGMIv2-Oolong',
+            'L2': '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D'
           }
         }
         else if(key === 'OLO') {
@@ -1192,6 +1204,7 @@ class NetworkService {
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
+        
         if (token.symbolL1 === 'xBOBA') {
           //there is no L1 xBOBA
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -1202,6 +1215,14 @@ class NetworkService {
         }
         else if (token.symbolL1 === 'WAGMIv1') {
           //there is no L1 WAGMIv1
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv2') {
+          //there is no L2 WAGMIv1
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv2-Oolong') {
+          //there is no L2 WAGMIv2OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'OLO') {
@@ -1217,20 +1238,18 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if (token.layer === 'L1' &&
-            token.balance.gt(new BN(0)) &&
+        if(token.balance.lte(new BN(0))) {
+          //do nothing
+        } 
+        else if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
-            token.symbol !== 'WAGMIv1'
+            token.symbol !== 'WAGMIv1' &&
+            token.symbol !== 'WAGMIv2' &&
+            token.symbol !== 'WAGMIv2-Oolong'
           ) {
           layer1Balances.push(token)
-        } else if (token.layer === 'L2' && token.balance.gt(new BN(0))) {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'xBOBA') {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv0' ) {
-          layer2Balances.push(token)
-        } else if (token.layer === 'L2' && token.symbol === 'WAGMIv1' ) {
+        } else if (token.layer === 'L2') {
           layer2Balances.push(token)
         }
       })
@@ -1373,10 +1392,6 @@ class NetworkService {
 
     try {
 
-      // get current WAGMI_v0 balance
-
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         '0x7F969E3F19355C47f6bc957E502c79C75b373BF3',
         WAGMIv0Json.abi,
@@ -1419,10 +1434,6 @@ class NetworkService {
 
     try {
 
-      // get current WAGMI_v0 balance
-
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
         //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
@@ -1449,6 +1460,51 @@ class NetworkService {
       return TX
     } catch (error) {
       console.log("NS: settle_v1 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v2() {
+
+    console.log("NS: settle_v2")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
+      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
+        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv2 = new ethers.Contract(
+        '0x76B5908ecd0ae3DB23011ae96b7C1f803D63136c',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv2.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv2:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v2 error:", error)
       return error
     }
 

@@ -64,6 +64,14 @@ function TokenList({
     await dispatch(settle_v1())
   }
 
+  async function doSettle_v2 () {
+    //await dispatch(settle_v2())
+  }
+
+  async function doSettle_v2OLO () {
+    //await dispatch(settle_v2OLO())
+  }
+
   if (isMobile) {
     return (
       <S.Content>
@@ -139,7 +147,13 @@ function TokenList({
                 </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+              {enabled && chain === 'L2' && 
+                token.symbol !== 'OLO' && 
+                token.symbol !== 'xBOBA' && 
+                token.symbol !== 'WAGMIv0' && 
+                token.symbol !== 'WAGMIv1' &&
+                token.symbol !== 'WAGMIv2' && 
+                token.symbol !== 'WAGMIv2-Oolong' &&
                 <>
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -207,20 +221,13 @@ function TokenList({
                   gap: '10px',
                 }}>
                   <Typography variant="body3" component="p" >
-                    If TVL = {TVL_v0.toFixed(0)}M, each option settles for {WAGMI_v0.toFixed(1)} BOBA
+                    Settled for 1 BOBA
                   </Typography>
-                  <Slider
-                    min={0}
-                    max={100}
-                    value={sliderValue_v0}
-                    onChange={handleSliderChange_v0}
-                    aria-label="WAGMIv0"
-                  />
                   <Button
                     onClick={() => { doSettle_v0() }}
                     variant="contained"
                     color="primary"
-                    disabled={true}
+                    disabled={false}
                     tooltip="Settle your WAGMv0 long options."
                     fullWidth
                   >
@@ -252,6 +259,50 @@ function TokenList({
                     variant="contained"
                     disabled={true}
                     tooltip="Settle your WAGMv1 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Typography variant="body3" component="p" >
+                    Settles for 1 BOBA
+                  </Typography>
+                  <Button
+                    onClick={() => { doSettle_v2() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv2 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv2-Oolong' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Typography variant="body3" component="p" >
+                    If Oolong volume exceeds &#36;25mm in April, settles for 2 BOBA, otherwise 1 BOBA
+                  </Typography>
+                  <Button
+                    onClick={() => { doSettle_v2OLO() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv2-Oolong long options."
                     fullWidth
                   >
                     Settle
@@ -323,7 +374,13 @@ function TokenList({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
+          {enabled && chain === 'L2' && 
+            token.symbol !== 'OLO' && 
+            token.symbol !== 'xBOBA' && 
+            token.symbol !== 'WAGMIv0' && 
+            token.symbol !== 'WAGMIv1' &&
+            token.symbol !== 'WAGMIv2' &&
+            token.symbol !== 'WAGMIv2-Oolong' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -387,13 +444,6 @@ function TokenList({
               flexDirection: 'column',
               gap: '10px',
             }}>
-              <Slider
-                min={0}
-                max={100}
-                value={sliderValue_v0}
-                onChange={handleSliderChange_v0}
-                aria-label="WAGMIv0"
-              />
               <div style={{
                 display: 'flex',
                 justifyContent: 'flex-start',
@@ -402,13 +452,13 @@ function TokenList({
                 gap: '10px',
               }}>
                 <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  If TVL = {TVL_v0.toFixed(0)}M each option<br/> settles for {WAGMI_v0.toFixed(1)} BOBA
+                  Settled for 1 BOBA
                 </Typography>
                 <Button
                   onClick={() => { doSettle_v0() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv0 long options"
                   fullWidth
                 >
@@ -455,6 +505,69 @@ function TokenList({
               </div>
             </div>
           }
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
+                  Settles for 1 BOBA
+                </Typography>
+                <Button
+                  onClick={() => { doSettle_v2() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv2 long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2-Oolong' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
+                  If Oolong volume exceeds &#36;25mm in April, settles for 2 BOBA, otherwise 1 BOBA
+                </Typography>
+                <Button
+                  onClick={() => { doSettle_v2OLO() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv2-Oolong long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
+          
         </S.TableCell>
       </S.TableBody>
     </S.Content>
