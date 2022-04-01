@@ -55,10 +55,12 @@ function GasSwitcher({ isMobile }) {
         <S.Label component="p" variant="body2">L2</S.Label>
         <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
-      <S.MenuItem>
-        <S.Label component="p" variant="body2">Last Verified Block</S.Label>
-        <S.Value component="p" variant="body2">{Number(verifierStatus.matchedBlock)}</S.Value>
-      </S.MenuItem>
+      {verifierStatus.hasOwnProperty('matchedBlock') &&
+        <S.MenuItem>
+          <S.Label component="p" variant="body2">Last Verified Block</S.Label>
+          <S.Value component="p" variant="body2">{Number(verifierStatus.matchedBlock)}</S.Value>
+        </S.MenuItem>
+      }
     </S.Menu>
   )
 

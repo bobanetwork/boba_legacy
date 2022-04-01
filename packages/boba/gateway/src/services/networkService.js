@@ -1235,7 +1235,7 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if(token.balance.lte(new BN(0))) {
+        if(token.balance.lte(new BN(1000000))) {
           //do nothing
         } 
         else if (token.layer === 'L1' &&
@@ -2073,6 +2073,7 @@ class NetworkService {
         feeMin: (feeRateL / 10).toFixed(1),
         feeMax: (feeRateH / 10).toFixed(1)
       }
+
     } catch (error) {
       console.log("NS: getL1TotalFeeRate error:", error)
       return error
@@ -2330,17 +2331,18 @@ class NetworkService {
     }
 
     try {
-      // Deposit
-      const addLiquidityTX = await (L1orL2Pool === 'L1LP'
+      const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).addLiquidity(
+      )
+      .connect(this.provider.getSigner())
+      .addLiquidity(
         value_Wei_String,
         currency,
         otherField
       )
-      await addLiquidityTX.wait()
-      return true
+      await TX.wait()
+      return TX
     } catch (error) {
       console.log("NS: addLiquidity error:", error)
       return error
@@ -2356,7 +2358,9 @@ class NetworkService {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).withdrawReward(
+      )
+      .connect(this.provider.getSigner())
+      .withdrawReward(
         value_Wei_String,
         currencyAddress,
         this.account
@@ -2378,7 +2382,9 @@ class NetworkService {
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
-      ).connect(this.provider.getSigner()).withdrawLiquidity(
+      )
+      .connect(this.provider.getSigner())
+      .withdrawLiquidity(
         value_Wei_String,
         currency,
         this.account
@@ -2405,52 +2411,59 @@ class NetworkService {
     console.log("TX start time:", time_start)
     console.log("Depositing...")
 
-    let depositTX = await this.L1LPContract
-      .connect(this.provider.getSigner()).clientDepositL1(
-        value_Wei_String,
-        currency,
-        currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
-      )
+    try {
 
-    console.log("depositTX",depositTX)
+      let depositTX = await this.L1LPContract
+        .connect(this.provider.getSigner()).clientDepositL1(
+          value_Wei_String,
+          currency,
+          currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+        )
 
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
+      console.log("depositTX",depositTX)
 
-    const block = await this.L1Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
 
-    updateSignatureStatus_depositLP(true)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
 
-    const opts = {
-      fromBlock: -4000
+      updateSignatureStatus_depositLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": true,
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+
+    } catch (error) {
+      console.log("NS: depositL1LP error:", error)
+      return error
     }
-    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": true,
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   async depositL1LPBatch(payload) {
@@ -2470,58 +2483,64 @@ class NetworkService {
 
     updateSignatureStatus_depositLP(false)
 
-    console.log("payload:",updatedPayload)
+    try {
+      console.log("payload:",updatedPayload)
 
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
 
-    let depositTX
-    console.log("Depositing...")
-    depositTX = await this.L1LPContract
-      .connect(this.provider.getSigner()).clientDepositL1Batch(
-        updatedPayload,
-        ETHAmount !== 0 ? { value: ETHAmount } : {}
-      )
+      let depositTX
+      console.log("Depositing...")
+      depositTX = await this.L1LPContract
+        .connect(this.provider.getSigner()).clientDepositL1Batch(
+          updatedPayload,
+          ETHAmount !== 0 ? { value: ETHAmount } : {}
+        )
 
-    console.log("depositTX",depositTX)
+      console.log("depositTX",depositTX)
 
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
 
-    const block = await this.L1Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
 
-    updateSignatureStatus_depositLP(true)
+      updateSignatureStatus_depositLP(true)
 
-    const opts = {
-      fromBlock: -4000
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": true,
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+
+    } catch (error) {
+      console.log("NS: depositL1LPBatch error:", error)
+      return error
     }
-    const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": true,
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   /***************************************/
@@ -2572,9 +2591,10 @@ class NetworkService {
     ) {
       balance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
     } else {
-      balance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(
-        allAddresses.L1LPAddress
-      )
+      balance = await this.L1_TEST_Contract
+        .attach(tokenAddress)
+        .connect(this.L1Provider)
+        .balanceOf(allAddresses.L1LPAddress)
     }
 
     //console.log("L1LPBalance(tokenAddress):",balance.toString())
@@ -2818,139 +2838,144 @@ class NetworkService {
       balance_BN = await this.L2Provider.getBalance(this.account)
     }
 
-    //console.log("Address:",currencyAddress)
-    if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    try {
+      //console.log("Address:",currencyAddress)
+      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
 
-      const L2ERC20Contract = new ethers.Contract(
-        currencyAddress,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
-
-      balance_BN = await L2ERC20Contract.balanceOf(
-        this.account
-      )
-      console.log("Initial Balance:", utils.formatEther(balance_BN))
-
-      let allowance_BN = await L2ERC20Contract.allowance(
-        this.account,
-        allAddresses.L2LPAddress
-      )
-      console.log("Allowance:",utils.formatEther(allowance_BN))
-
-      if (balance_BN.gt(allowance_BN)) {
-
-        //Estimate gas
-        const tx = await L2ERC20Contract.populateTransaction.approve(
-          allAddresses.L2LPAddress,
-          balance_BN
+        const L2ERC20Contract = new ethers.Contract(
+          currencyAddress,
+          L2ERC20Json.abi,
+          this.provider.getSigner()
         )
 
-        approvalGas_BN = await this.L2Provider.estimateGas(tx)
-        approvalCost_BN = approvalGas_BN.mul(gasPrice)
-        console.log("Cost to Approve (ETH):", utils.formatEther(approvalCost_BN))
-
-        const approveStatus = await L2ERC20Contract.approve(
-          allAddresses.L2LPAddress,
-          balance_BN
+        balance_BN = await L2ERC20Contract.balanceOf(
+          this.account
         )
-        await approveStatus.wait()
+        console.log("Initial Balance:", utils.formatEther(balance_BN))
 
-        if (!approveStatus)
-          return false
+        let allowance_BN = await L2ERC20Contract.allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+        console.log("Allowance:",utils.formatEther(allowance_BN))
 
-      } else {
-        console.log("Allowance already suitable:", utils.formatEther(allowance_BN))
+        if (balance_BN.gt(allowance_BN)) {
+
+          //Estimate gas
+          const tx = await L2ERC20Contract.populateTransaction.approve(
+            allAddresses.L2LPAddress,
+            balance_BN
+          )
+
+          approvalGas_BN = await this.L2Provider.estimateGas(tx)
+          approvalCost_BN = approvalGas_BN.mul(gasPrice)
+          console.log("Cost to Approve (ETH):", utils.formatEther(approvalCost_BN))
+
+          const approveStatus = await L2ERC20Contract.approve(
+            allAddresses.L2LPAddress,
+            balance_BN
+          )
+          await approveStatus.wait()
+
+          if (!approveStatus)
+            return false
+
+        } else {
+          console.log("Allowance already suitable:", utils.formatEther(allowance_BN))
+        }
+
       }
 
+      const tx2 = await this.L2LPContract
+        .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+          balance_BN,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
+        )
+
+      let depositGas_BN = await this.L2Provider.estimateGas(tx2)
+
+      let l1SecurityFee = BigNumber.from('0')
+      if (this.networkGateway === 'mainnet') {
+        delete tx2.from
+        l1SecurityFee = await this.gasOracleContract.getL1Fee(
+          utils.serializeTransaction(tx2)
+        )
+        // We can't correctly calculate the final l1 securifty fee,
+        // so we increase it by 1.1X to make sure that users have
+        // enough balance to cover it
+        l1SecurityFee = l1SecurityFee.mul('11').div('10')
+        console.log("l1Security fee (ETH)", l1SecurityFee.toString())
+      }
+
+      console.log("Deposit gas", depositGas_BN.toString())
+      let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
+      console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
+
+      if(currencyAddress === allAddresses.L2_ETH_Address) {
+        //if fee token, need to consider cost to exit
+        balance_BN = balance_BN.sub(depositCost_BN)
+      }
+
+      const ccBal = await this.L2Provider.getBalance(this.account)
+
+      console.log("Balance:", utils.formatEther(ccBal))
+      console.log("Cost to exit:", utils.formatEther(depositCost_BN))
+      console.log("Amount to exit:", utils.formatEther(balance_BN))
+      console.log("Should be zero (if exiting ETH):", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
+
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
+
+      const depositTX = await this.L2LPContract
+        .connect(this.provider.getSigner()).clientDepositL2(
+          balance_BN,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
+        )
+
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
+
+      const block = await this.L2Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
+
+      //closes the modal
+      updateSignatureStatus_exitLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": false, //since we are going L2->L1
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+    } catch (error) {
+      console.log("NS: fastExitAll error:", error)
+      return error
     }
-
-    const tx2 = await this.L2LPContract
-      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
-        balance_BN,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : '1' } : {}
-      )
-
-    let depositGas_BN = await this.L2Provider.estimateGas(tx2)
-
-    let l1SecurityFee = BigNumber.from('0')
-    if (this.networkGateway === 'mainnet') {
-      delete tx2.from
-      l1SecurityFee = await this.gasOracleContract.getL1Fee(
-        utils.serializeTransaction(tx2)
-      )
-      // We can't correctly calculate the final l1 securifty fee,
-      // so we increase it by 1.1X to make sure that users have
-      // enough balance to cover it
-      l1SecurityFee = l1SecurityFee.mul('11').div('10')
-      console.log("l1Security fee (ETH)", l1SecurityFee.toString())
-    }
-
-    console.log("Deposit gas", depositGas_BN.toString())
-    let depositCost_BN = depositGas_BN.mul(gasPrice).add(l1SecurityFee)
-    console.log("Deposit gas cost (ETH)", utils.formatEther(depositCost_BN))
-
-    if(currencyAddress === allAddresses.L2_ETH_Address) {
-      //if fee token, need to consider cost to exit
-      balance_BN = balance_BN.sub(depositCost_BN)
-    }
-
-    const ccBal = await this.L2Provider.getBalance(this.account)
-
-    console.log("Balance:", utils.formatEther(ccBal))
-    console.log("Cost to exit:", utils.formatEther(depositCost_BN))
-    console.log("Amount to exit:", utils.formatEther(balance_BN))
-    console.log("Should be zero (if exiting ETH):", ccBal.sub(balance_BN.add(depositCost_BN)).toString())
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-
-    const depositTX = await this.L2LPContract
-      .connect(this.provider.getSigner()).clientDepositL2(
-        balance_BN,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value : balance_BN.sub(depositCost_BN) } : {}
-      )
-
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
-
-    const block = await this.L2Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
-
-    //closes the modal
-    updateSignatureStatus_exitLP(true)
-
-    const opts = {
-      fromBlock: -4000
-    }
-    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": false, //since we are going L2->L1
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   /**************************************************************/
@@ -2962,79 +2987,85 @@ class NetworkService {
 
     console.log("depositL2LP currencyAddress",currencyAddress)
 
-    if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    try {
 
-      const L2ERC20Contract = new ethers.Contract(
-        currencyAddress,
-        L2ERC20Json.abi,
-        this.provider.getSigner()
-      )
+      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
 
-      let allowance_BN = await L2ERC20Contract.allowance(
-        this.account,
-        allAddresses.L2LPAddress
-      )
-
-      let depositAmount_BN = BigNumber.from(value_Wei_String)
-
-      if (depositAmount_BN.gt(allowance_BN)) {
-        const approveStatus = await L2ERC20Contract.approve(
-          allAddresses.L2LPAddress,
-          value_Wei_String
+        const L2ERC20Contract = new ethers.Contract(
+          currencyAddress,
+          L2ERC20Json.abi,
+          this.provider.getSigner()
         )
-        await approveStatus.wait()
-        if (!approveStatus) return false
+
+        let allowance_BN = await L2ERC20Contract.allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+
+        let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+        if (depositAmount_BN.gt(allowance_BN)) {
+          const approveStatus = await L2ERC20Contract.approve(
+            allAddresses.L2LPAddress,
+            value_Wei_String
+          )
+          await approveStatus.wait()
+          if (!approveStatus) return false
+        }
       }
+
+      const time_start = new Date().getTime()
+      console.log("TX start time:", time_start)
+
+      const depositTX = await this.L2LPContract
+        .connect(this.provider.getSigner()).clientDepositL2(
+          value_Wei_String,
+          currencyAddress,
+          currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+        )
+
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
+
+      const block = await this.L2Provider.getTransaction(depositTX.hash)
+      console.log(' block:', block)
+
+      //closes the modal
+      updateSignatureStatus_exitLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
+      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+
+      const time_stop = new Date().getTime()
+      console.log("TX finish time:", time_stop)
+
+      const data = {
+        "key": process.env.REACT_APP_SPEED_CHECK,
+        "hash": depositTX.hash,
+        "l1Tol2": false, //since we are going L2->L1
+        "startTime": time_start,
+        "endTime": time_stop,
+        "block": block.blockNumber,
+        "cdmHash": receipt.transactionHash,
+        "cdmBlock": receipt.blockNumber
+      }
+
+      console.log("Speed checker data payload:", data)
+
+      const speed = await omgxWatcherAxiosInstance(
+        this.networkGateway
+      ).post('send.crossdomainmessage', data)
+
+      console.log("Speed checker:", speed)
+
+      return receipt
+    } catch (error) {
+      console.log("NS: depositL2LP error:", error)
+      return error
     }
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-
-    const depositTX = await this.L2LPContract
-      .connect(this.provider.getSigner()).clientDepositL2(
-        value_Wei_String,
-        currencyAddress,
-        currencyAddress === allAddresses.L2_ETH_Address ? { value: value_Wei_String } : {}
-      )
-
-    //at this point the tx has been submitted, and we are waiting...
-    await depositTX.wait()
-
-    const block = await this.L2Provider.getTransaction(depositTX.hash)
-    console.log(' block:', block)
-
-    //closes the modal
-    updateSignatureStatus_exitLP(true)
-
-    const opts = {
-      fromBlock: -4000
-    }
-    const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-    console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
-
-    const time_stop = new Date().getTime()
-    console.log("TX finish time:", time_stop)
-
-    const data = {
-      "key": process.env.REACT_APP_SPEED_CHECK,
-      "hash": depositTX.hash,
-      "l1Tol2": false, //since we are going L2->L1
-      "startTime": time_start,
-      "endTime": time_stop,
-      "block": block.blockNumber,
-      "cdmHash": receipt.transactionHash,
-      "cdmBlock": receipt.blockNumber
-    }
-
-    console.log("Speed checker data payload:", data)
-
-    const speed = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('send.crossdomainmessage', data)
-
-    console.log("Speed checker:", speed)
-
-    return receipt
   }
 
   async fetchLookUpPrice(params) {
@@ -3064,9 +3095,7 @@ class NetworkService {
     }
 
     try {
-      //console.log('Checking DAO balance')
       let balance = await this.BobaContract.balanceOf(this.account)
-      //console.log('balance',balance)
       return { balance: formatEther(balance) }
     } catch (error) {
       console.log('Error: getDaoBalance', error)
@@ -3084,9 +3113,7 @@ class NetworkService {
     }
 
     try {
-      //console.log('Checking DAO balance')
       let balance = await this.xBobaContract.balanceOf(this.account)
-      //console.log('balance',balance)
       return { balanceX: formatEther(balance) }
     } catch (error) {
       console.log('Error: getDaoBalanceX', error)
@@ -3209,8 +3236,7 @@ class NetworkService {
     try {
       const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
       const rawThreshold = await delegateCheck.proposalThreshold()
-      const res = { proposalThreshold: formatEther(rawThreshold) }
-      return res
+      return { proposalThreshold: formatEther(rawThreshold) }
     } catch (error) {
       console.log('NS: getProposalThreshold error:', error)
       return error
@@ -3292,6 +3318,7 @@ class NetworkService {
           callData,
           description
       )
+
       return res
 
     } catch (error) {
@@ -3398,8 +3425,7 @@ class NetworkService {
       const delegateCheck = await this.delegateContract
         .connect(this.provider.getSigner())
         .attach(allAddresses.GovernorBravoDelegator)
-      let res = delegateCheck.castVote(id, userVote)
-      return res
+      return delegateCheck.castVote(id, userVote)
     } catch(error) {
       console.log("NS: castProposalVote error:",error)
       return error
@@ -3454,7 +3480,6 @@ class NetworkService {
 
   }
 
-
   /***********************************************/
   /*****       Fixed savings account         *****/
   /***********************************************/
@@ -3501,7 +3526,7 @@ class NetworkService {
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()
-      return true
+      return TX
     } catch (error) {
       console.log("NS: addFS_Savings error:", error)
       return error
@@ -3523,7 +3548,7 @@ class NetworkService {
       )
       const TX = await FixedSavings.unstake(stakeID)
       await TX.wait()
-      return true
+      return TX
     } catch (error) {
       console.log("NS: withdrawFS_Savings error:", error)
       return error
