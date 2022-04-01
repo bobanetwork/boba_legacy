@@ -425,6 +425,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               )
             }
 
+            // we skip messages which are targeted to CanonicalTransactionChain
+            // since they are not allowed and to avoid top level relay fails
+            const canonicalTransactionChain =
+              await this.state.messenger.contracts.l1.AddressManager.getAddress(
+                'CanonicalTransactionChain'
+              )
+
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
             for (const message of messages) {
@@ -444,6 +451,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               // filter out messages not meant for this relayer
               if (this.state.filter.includes(message.target)) {
                 this.logger.info('Message not intended for target, skipping.')
+                continue
+              }
+
+              if (message.target === canonicalTransactionChain) {
+                this.logger.info('Message target is CTC, skipping.')
                 continue
               }
 
