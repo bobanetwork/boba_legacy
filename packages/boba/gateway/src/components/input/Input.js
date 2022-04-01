@@ -17,7 +17,12 @@ import React from 'react'
 import BN from 'bignumber.js'
 import Select from 'react-select'
 import * as S from './Input.styles'
+
 import { selectCustomStyles } from './Select.styles'
+
+import { selectBobaFeeChoice } from 'selectors/setupSelector'
+
+import { useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
@@ -55,6 +60,8 @@ function Input({
   style
 }) {
 
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+
   async function handlePaste() {
     try {
       const text = await navigator.clipboard.readText()
@@ -89,9 +96,14 @@ function Input({
     return acc
   }, []): null
 
-  //since ETH is the fee token, harder to use all b/c need to take
-  //operation-specific fees into account
-  allowUseAll = (unit === 'ETH') ? false : allowUseAll
+  // since ETH is the fee token, harder to use all b/c need to take
+  // operation-specific fees into account
+  
+  if(feeUseBoba && unit === 'BOBA') {
+    allowUseAll = false
+  } else if (!feeUseBoba && unit === 'ETH') {
+    allowUseAll = false
+  } // else - do nothing and do not override the externally set allowUseAll
 
   return (
     <div style={{width: '100%'}}>

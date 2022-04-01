@@ -75,20 +75,13 @@ function TransferModal ({ open, token, minHeight }) {
   }
 
   async function submit () {
-    if ( token.address && recipient )
-    {
-      try {
-        console.log("Amount to transfer:", value_Wei_String)
-        const transferResponseGood = await dispatch(
-          transfer(recipient, value_Wei_String, token.address)
-        )
-        if (transferResponseGood) {
-          dispatch(openAlert('Transaction submitted'))
-        }
-        handleClose()
-      } catch (err) {
-        //guess not really?
-      }
+    if ( token.address && recipient ) {
+      console.log("Amount to transfer:", value_Wei_String)
+      const transferResponseGood = await dispatch(
+        transfer(recipient, value_Wei_String, token.address)
+      )
+      if (transferResponseGood) dispatch(openAlert('Transaction submitted'))
+      handleClose() 
     }
   }
 
@@ -116,22 +109,15 @@ function TransferModal ({ open, token, minHeight }) {
           Transfer to another Boba wallet
         </Typography>
 
-        <Typography variant="body1" sx={{mb: 1}}>
-          From L2 Address: {wAddress}
-        </Typography>
-
-        <Typography variant="body1" sx={{mb: 1}}>
-          To L2 Address:
-        </Typography>
-
-        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
           <Input
             placeholder='Recipient address on Boba (0x...)'
             value={recipient}
             onChange={i => setRecipient(i.target.value)}
             fullWidth
             paste
-            sx={{fontSize: '50px', marginBottom: '20px'}}
+            sx={{fontSize: '50px'}}
+            newStyle
           />
 
           <Input

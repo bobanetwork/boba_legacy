@@ -52,8 +52,6 @@ import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
 
 import ExitModal from 'containers/modals/exit/ExitModal'
 
-import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
-
 import FarmWrapper from 'containers/farm/FarmWrapper'
 import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
@@ -120,7 +118,6 @@ function Home() {
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
 
-  const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
   const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
@@ -223,8 +220,6 @@ function Home() {
       {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
-
-      {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}
 
       {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
 

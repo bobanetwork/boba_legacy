@@ -14,10 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Typography } from '@mui/material'
-import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   selectAccountEnabled,
   selectBobaFeeChoice,
@@ -26,13 +25,17 @@ import {
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
+import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
+
+import { Typography } from '@mui/material'
+
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
 import Tooltip from 'components/tooltip/Tooltip.js'
 import { isEqual } from 'lodash'
+
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
-
 
 function FeeSwitcher() {
 
@@ -41,7 +44,7 @@ function FeeSwitcher() {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
   // const feePriceRatio = useSelector(selectBobaPriceRatio())
 
-  const layer = useSelector(selectLayer());
+  const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
   const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH')
