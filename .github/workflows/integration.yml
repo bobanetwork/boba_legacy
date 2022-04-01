@@ -40,6 +40,11 @@ jobs:
           ec2-instance-type: m4.4xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
+          aws-resource-tags: |
+            [{
+              "Key": "Name",
+              "Value": "github-actions"
+            }]
       - name: Start EC2 runner retry
         if: steps.start-ec2-runner-1.outcome == 'failure'
         id: start-ec2-runner-2
