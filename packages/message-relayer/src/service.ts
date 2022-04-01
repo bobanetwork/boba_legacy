@@ -411,9 +411,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // we skip messages which are targeted to CanonicalTransactionChain
             // since they are not allowed and to avoid top level relay fails
             const canonicalTransactionChain =
-              await this.state.messenger.contracts.l1.AddressManager.getAddress(
-                'CanonicalTransactionChain'
-              )
+              this.state.messenger.contracts.l1.CanonicalTransactionChain
+                .address
 
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
