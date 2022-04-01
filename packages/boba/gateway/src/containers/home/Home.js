@@ -57,7 +57,6 @@ import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 
 import SaveWrapper from 'containers/save/SaveWrapper'
-import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
 
 import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
@@ -116,8 +115,6 @@ function Home() {
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
-
-  const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -218,8 +215,6 @@ function Home() {
       {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
-
-      {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
 
       {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
