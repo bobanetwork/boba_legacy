@@ -29,12 +29,12 @@ contract L2BillingContract {
      * Modifiers *
      *************/
 
-    modifier onlyNotInitiator() {
+    modifier onlyNotInitialized() {
         require(feeTokenAddress == address(0), "Contract has been initialized");
         _;
     }
 
-    modifier onlyInitiator() {
+    modifier onlyInitialized() {
         require(feeTokenAddress != address(0), "Contract has not been initialized");
         _;
     }
@@ -48,7 +48,10 @@ contract L2BillingContract {
      * Functions *
      *************/
 
-    function initialize(address _feeTokenAddress, address _l2FeeWallet, uint256 _exitFee) public onlyNotInitiator {
+    function initialize(address _feeTokenAddress, address _l2FeeWallet, uint256 _exitFee) public onlyNotInitialized {
+        require(_feeTokenAddress != address(0), "Fee token address cannot be zero");
+        require(_l2FeeWallet != address(0), "L2 fee wallet cannot be zero");
+        require(_exitFee > 0, "exit fee cannot be zero");
         feeTokenAddress = _feeTokenAddress;
         l2FeeWallet = _l2FeeWallet;
         exitFee = _exitFee;
@@ -72,20 +75,13 @@ contract L2BillingContract {
         emit UpdateExitFee(_exitFee);
     }
 
-    function collectFeeFrom(address _account) external onlyInitiator {
-        require(_account != address(0), "Account cannot be zero");
-        IERC20(feeTokenAddress).safeTransferFrom(_account, address(this), exitFee);
-
-        emit CollectFee(_account, exitFee);
-    }
-
-    function collectFee() external onlyInitiator {
+    function collectFee() external onlyInitialized {
         IERC20(feeTokenAddress).safeTransferFrom(msg.sender, address(this), exitFee);
 
         emit CollectFee(msg.sender, exitFee);
     }
 
-    function withdraw() external onlyInitiator {
+    function withdraw() external onlyInitialized {
         uint256 balance = IERC20(feeTokenAddress).balanceOf(address(this));
         require(balance >= 150e18, "Balance is too low");
         IERC20(feeTokenAddress).safeTransfer(l2FeeWallet, balance);

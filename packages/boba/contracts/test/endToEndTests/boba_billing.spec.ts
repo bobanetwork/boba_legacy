@@ -45,6 +45,15 @@ describe('L2 Billing Contract', async () => {
   })
 
   describe('Initialization', async () => {
+    it('should revert when initialize with invalid params', async () =>{
+      const billingContract = await ethers.getContractFactory('L2BillingContract')
+      const l2BillingContract = await billingContract.deploy()
+      await l2BillingContract.deployed()
+      await expect(l2BillingContract.
+        initialize('0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000')
+        ).to.be.revertedWith('Fee token address cannot be zero')
+    })
+
     it('should have correct address', async () => {
       const feeTokenAddress = await L2BillingContract.feeTokenAddress()
       expect(feeTokenAddress).to.eq(L2Boba.address)
@@ -73,30 +82,11 @@ describe('L2 Billing Contract', async () => {
   })
 
   describe('Collect fee', async () => {
-    it('should fail when address is incorrect', async () => {
-      await expect(
-        L2BillingContract.collectFeeFrom(
-          '0x0000000000000000000000000000000000000000'
-        )
-      ).to.be.revertedWith('Account cannot be zero')
-    })
-
     it('should revert when having insufficient balance', async () => {
       await L2Boba.connect(signer2).approve(L2BillingContract.address, exitFee)
       await expect(
-        L2BillingContract.connect(signer2).collectFeeFrom(signer2Address)
+        L2BillingContract.connect(signer2).collectFee()
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
-    })
-
-    it('should collect fee from an address successfully', async () => {
-      await L2Boba.connect(signer).transfer(signer2Address, exitFee)
-
-      const balanceBefore = await L2Boba.balanceOf(L2BillingContract.address)
-      await L2Boba.connect(signer2).approve(L2BillingContract.address, exitFee)
-      await L2BillingContract.connect(signer2).collectFeeFrom(signer2Address)
-      const balanceAfter = await L2Boba.balanceOf(L2BillingContract.address)
-
-      expect(balanceAfter.sub(balanceBefore)).to.eq(exitFee)
     })
 
     it('should collect fee successfully', async () => {
