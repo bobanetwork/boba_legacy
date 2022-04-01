@@ -22,6 +22,11 @@ contract L1CustomERC721 is L1StandardERC721 {
         string memory _baseTokenURI
     ) L1StandardERC721(_l1Bridge, _l2Contract, _name, _symbol, _baseTokenURI) {}
 
+    function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
+        super.mint(_to, _tokenId, _data);
+
+        // do something with _data
+    }
 
     /**
     * @dev Override the tokenURI method to return your onChain metadata.

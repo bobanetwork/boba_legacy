@@ -113,12 +113,12 @@ export const CONTRACT_ADDRESSES: {
   31337: {
     l1: {
       AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1', // this is the Proxy__L1CrossDomainMessenger
-      L1CrossDomainMessengerFast: '0xf5059a5D33d5853360D16C683c16e67980206f36', // this is the Proxy__L1CrossDomainMessengerFast
-      L1StandardBridge: '0x4A679253410272dd5232B3Ff7cF5dbB88f295319',
-      StateCommitmentChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
-      CanonicalTransactionChain: '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82',
-      BondManager: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
+      L1CrossDomainMessenger: '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f', // this is the Proxy__L1CrossDomainMessenger
+      L1CrossDomainMessengerFast: '0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B', // this is the Proxy__L1CrossDomainMessengerFast
+      L1StandardBridge: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
+      StateCommitmentChain: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
+      CanonicalTransactionChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
+      BondManager: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
       L1MultiMessageRelayer: '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,

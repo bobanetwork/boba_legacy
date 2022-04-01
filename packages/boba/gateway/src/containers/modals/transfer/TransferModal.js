@@ -183,7 +183,7 @@ function TransferModal ({ open, token, minHeight }) {
             color='primary'
             variant="contained"
             loading={loading}
-            tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+            tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer your funds to another Boba wallet"}
             disabled={!validValue}
             triggerTime={new Date()}
             fullWidth={isMobile}

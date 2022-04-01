@@ -1,13 +1,10 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils } from 'ethers'
-import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
 import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import L1BobaJson from '../artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
-import L2GovernanceERC20Json from '../artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import xL2GovernanceERC20Json from '../artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
@@ -15,8 +12,6 @@ import preSupportedTokens from '../preSupportedTokens.json'
 
 let Factory__L1ERC20: ContractFactory
 let Factory__L2ERC20: ContractFactory
-let Factory__L1Boba: ContractFactory
-let Factory__L2Boba: ContractFactory
 let Factory__xL2Boba: ContractFactory
 
 let L1ERC20: Contract
@@ -30,6 +25,19 @@ const initialSupply_8 = utils.parseUnits('10000', 8)
 const initialSupply_18 = utils.parseEther('10000000000')
 
 const deployFn: DeployFunction = async (hre) => {
+  const registerLPToken = async (L1TokenAddress, L2TokenAddress) => {
+    const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
+      L1TokenAddress,
+      L2TokenAddress
+    )
+    await registerL1LP.wait()
+
+    const registerL2LP = await Proxy__L2LiquidityPool.registerPool(
+      L1TokenAddress,
+      L2TokenAddress
+    )
+    await registerL2LP.wait()
+  }
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -40,20 +48,8 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l1
   )
 
-  Factory__L1Boba = new ContractFactory(
-    L1BobaJson.abi,
-    L1BobaJson.bytecode,
-    (hre as any).deployConfig.deployer_l1
-  )
-
   Factory__L2ERC20 = getContractFactory(
     'L2StandardERC20',
-    (hre as any).deployConfig.deployer_l2
-  )
-
-  Factory__L2Boba = new ContractFactory(
-    L2GovernanceERC20Json.abi,
-    L2GovernanceERC20Json.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
 
@@ -67,6 +63,10 @@ const deployFn: DeployFunction = async (hre) => {
   let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
+    // Bypass BOBA token, because we have deployed it
+    if (token.symbol === 'BOBA') {
+      continue
+    }
     if (
       (hre as any).deployConfig.network === 'local' ||
       token.symbol === 'TEST'
@@ -82,18 +82,13 @@ const deployFn: DeployFunction = async (hre) => {
         supply = initialSupply_8
       }
 
-      if (token.symbol !== 'BOBA') {
-        L1ERC20 = await Factory__L1ERC20.deploy(
-          supply,
-          token.name,
-          token.symbol,
-          token.decimals
-        )
-        await L1ERC20.deployTransaction.wait()
-      } else {
-        L1ERC20 = await Factory__L1Boba.deploy()
-        await L1ERC20.deployTransaction.wait()
-      }
+      L1ERC20 = await Factory__L1ERC20.deploy(
+        supply,
+        token.name,
+        token.symbol,
+        token.decimals
+      )
+      await L1ERC20.deployTransaction.wait()
 
       tokenAddressL1 = L1ERC20.address
 
@@ -158,59 +153,31 @@ const deployFn: DeployFunction = async (hre) => {
 
     //Set up things on L2 for these tokens
 
-    if (token.symbol !== 'BOBA') {
-      L2ERC20 = await Factory__L2ERC20.deploy(
-        (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddressL1,
-        token.name,
-        token.symbol,
-        tokenDecimals
-      )
-      await L2ERC20.deployTransaction.wait()
+    L2ERC20 = await Factory__L2ERC20.deploy(
+      (hre as any).deployConfig.L2StandardBridgeAddress,
+      tokenAddressL1,
+      token.name,
+      token.symbol,
+      tokenDecimals
+    )
+    await L2ERC20.deployTransaction.wait()
 
-      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
-        ...L2ERC20,
-        receipt: L2ERC20.receipt,
-        address: L2ERC20.address,
-        abi: L2ERC20.abi,
-      }
-      await hre.deployments.save(
-        'TK_L2' + token.symbol,
-        L2ERC20DeploymentSubmission
-      )
-      await registerBobaAddress(
-        addressManager,
-        'TK_L2' + token.symbol,
-        L2ERC20.address
-      )
-      console.log(`TK_L2${token.symbol} was deployed to ${L2ERC20.address}`)
-    } else {
-      L2ERC20 = await Factory__L2Boba.deploy(
-        (hre as any).deployConfig.L2StandardBridgeAddress,
-        tokenAddressL1,
-        token.name,
-        token.symbol,
-        tokenDecimals
-      )
-      await L2ERC20.deployTransaction.wait()
-
-      const L2ERC20DeploymentSubmission: DeploymentSubmission = {
-        ...L2ERC20,
-        receipt: L2ERC20.receipt,
-        address: L2ERC20.address,
-        abi: L2GovernanceERC20Json.abi,
-      }
-      await hre.deployments.save(
-        'TK_L2' + token.symbol,
-        L2ERC20DeploymentSubmission
-      )
-      await registerBobaAddress(
-        addressManager,
-        'TK_L2' + token.symbol,
-        L2ERC20.address
-      )
-      console.log(`TK_L2${token.name} was deployed to ${L2ERC20.address}`)
+    const L2ERC20DeploymentSubmission: DeploymentSubmission = {
+      ...L2ERC20,
+      receipt: L2ERC20.receipt,
+      address: L2ERC20.address,
+      abi: L2ERC20.abi,
     }
+    await hre.deployments.save(
+      'TK_L2' + token.symbol,
+      L2ERC20DeploymentSubmission
+    )
+    await registerBobaAddress(
+      addressManager,
+      'TK_L2' + token.symbol,
+      L2ERC20.address
+    )
+    console.log(`TK_L2${token.symbol} was deployed to ${L2ERC20.address}`)
 
     // Register tokens in LPs
     const Proxy__L1LiquidityPoolDeployment = await hre.deployments.getOrNull(
@@ -231,19 +198,39 @@ const deployFn: DeployFunction = async (hre) => {
       (hre as any).deployConfig.deployer_l2
     )
 
-    const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
-      tokenAddressL1,
-      L2ERC20.address
-    )
-    await registerL1LP.wait()
-
-    const registerL2LP = await Proxy__L2LiquidityPool.registerPool(
-      tokenAddressL1,
-      L2ERC20.address
-    )
-    await registerL2LP.wait()
+    await registerLPToken(tokenAddressL1, L2ERC20.address)
     console.log(`${token.name} was registered in LPs`)
   }
+
+  // Add predeployment Boba token
+  const L1BobaAddress = await addressManager.getAddress('TK_L1BOBA')
+  const L2BobaAddress = await addressManager.getAddress('TK_L2BOBA')
+
+  const L1Boba = getContractFactory('BOBA')
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(L1BobaAddress) as any
+  const L2Boba = getContractFactory('L2GovernanceERC20')
+    .connect((hre as any).deployConfig.deployer_l2)
+    .attach(L2BobaAddress) as any
+
+  const L1BobaDeploymentSubmission: DeploymentSubmission = {
+    ...L1Boba,
+    receipt: L1Boba.receipt,
+    address: L1Boba.address,
+    abi: L1Boba.interface,
+  }
+  const L2BobaDeploymentSubmission: DeploymentSubmission = {
+    ...L2Boba,
+    receipt: L2Boba.receipt,
+    address: L2Boba.address,
+    abi: L2Boba.interface,
+  }
+
+  await hre.deployments.save('TK_L1BOBA', L1BobaDeploymentSubmission)
+  await hre.deployments.save('TK_L2BOBA', L2BobaDeploymentSubmission)
+
+  await registerLPToken(L1BobaAddress, L2BobaAddress)
+  console.log(`BOBA was registered in LPs`)
 
   // Deploy xBoba
   L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)

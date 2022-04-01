@@ -27,6 +27,7 @@ const initialState = {
   depositModal: false,
   depositBatchModal: false,
   transferModal: false,
+  transferNFTModal: false,
   exitModal: false,
   mergeModal: false,
   confirmationModal: false,

@@ -40,7 +40,24 @@ describe('Native ETH value integration tests', () => {
       expect(realBalances[1]).to.deep.eq(expectedBalances[1])
     }
 
-    const value = 10
+    // In the local test environment, test acounts can use zero gas price.
+    // In l2geth, we override the gas price in api.go if the gas price is nil or zero
+    // gasPrice := new(big.Int)
+    // price, err := b.SuggestPrice(ctx)
+    // if err == nil && args.GasPrice == nil && isFeeTokenUpdate {
+    //   gasPrice = price
+    //   args.GasPrice = (*hexutil.Big)(price)
+    // }
+    // The design for overwriting the gas price is to get the correct estimated gas
+    // from state_transition.go, because the calculation for the l1 security fee is based on
+    // the gas price.
+    // This requires users to have enough balance to pypass the estimateGas checks and they
+    // can't transfer all ETH balance without providing the gas limit,
+    // because all balance + l1securityfee is larger than the total balance
+    // In the production environment, this problem doesn't exist, because
+    // users can't use zero gas price and they have to have enough balance to
+    // cover the cost
+    const value = ethers.utils.parseEther('1')
     await fundUser(env.messenger, value, wallet.address)
 
     const initialBalances = await getBalances()
@@ -61,6 +78,8 @@ describe('Native ETH value integration tests', () => {
       to: wallet.address,
       value,
       gasPrice: 0,
+      // Provide the gas limit to ignore the eth_estimateGas
+      gasLimit: 1100000,
     })
     await backAgain.wait()
 
