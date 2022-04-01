@@ -210,12 +210,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         const gasPriceAcceptable =
           gasPriceGwei < this.options.maxGasPriceInGwei ? true : false
 
-        console.log(gasPrice)
-        console.log(gasPriceAcceptable)
-        console.log(pendingTXTimeOut)
-        console.log(bufferFull)
-        console.log(this.state.messageBuffer)
-
         if (
           this.state.messageBuffer.length !== 0 &&
           (bufferFull || timeOut) &&
