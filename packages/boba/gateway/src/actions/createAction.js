@@ -28,6 +28,13 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      if(response && typeof(response) === 'string' && response.includes('execution reverted: ERC20Permit')) {
+        let errorMessage = JSON.parse(response)
+        dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage.error.message })
+        dispatch({ type: `${key}/ERROR` })
+        return false
+      }
+
       //deal with metamask errors
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
         let errorMessage = networkService.handleMetaMaskError(response.code) ?? response.message;

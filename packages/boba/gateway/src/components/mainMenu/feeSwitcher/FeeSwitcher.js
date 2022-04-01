@@ -44,20 +44,22 @@ function FeeSwitcher() {
   const layer = useSelector(selectLayer());
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
-  const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH');
+  const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH')
+  const ethBalance = l2EthBalance[0]
 
   const dispatchSwitchFee = useCallback((targetFee) => {
-    const ethToken = l2EthBalance[ 0 ];
-    //NOTE: HARD CODED ETH to 0.01
-    const tooSmallEth = new BN(logAmount(ethToken.balance, ethToken.decimals)).lte(new BN(0.01))
-    console.log([ `tooSmallEth`, tooSmallEth ])
-    console.log([ `ETH BALANCE`, logAmount(ethToken.balance, ethToken.decimals) ])
+    // NOTE: HARD CODED ETH to 0.01
+    // actual fee is more like 0.000052
+    const tooSmallEth = new BN(logAmount(ethBalance.balance, 18)).lte(new BN(0.001))
+    //console.log([ `tooSmallEth`, tooSmallEth ])
+    //console.log("l2EthBalance",ethBalance.balance)
+    //console.log([ `ETH BALANCE`, logAmount(ethBalance.balance, 18) ])
     if (targetFee === 'BOBA' && tooSmallEth) {
       dispatch(switchFeeMetaTransaction())
     } else {
       dispatch(switchFee(targetFee))
     }
-  }, [ dispatch, l2EthBalance ])
+  }, [ dispatch, ethBalance ])
 
   if (!accountEnabled || layer !== 'L2') {
     return null

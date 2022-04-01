@@ -417,11 +417,10 @@ class NetworkService {
     console.log("getBobaFeeChoice()")
     console.log("this.account:",this.account)
 
-    //Interact with contract
     const bobaFeeContract = new ethers.Contract(
       allAddresses.Boba_GasPriceOracle,
       Boba_GasPriceOracleJson.abi,
-      this.L2Provider//this.provider.getSigner()
+      this.L2Provider
     )
 
     try {
@@ -499,6 +498,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
   }
 
   async switchFeeMetaTransaction() {
+
     const EIP712Domain = [
       { name: 'name', type: 'string' },
       { name: 'version', type: 'string' },
@@ -527,6 +527,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const spender = bobaFeeContract.address
     const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
     const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    
     // 5 minutes
     const deadline = Math.floor(Date.now() / 1000) + 300
     const verifyingContract = this.BobaContract.address
@@ -547,15 +548,17 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
     // Send request
     try {
-      await metaTransactionAxiosInstance(
+      const response = await metaTransactionAxiosInstance(
         this.networkGateway
-      ).post('/send.useBobaAsFeeToken', { owner, spender, value: value + 1, deadline, signature, data })
+      ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
+      console.log("response",response)
       await this.getBobaFeeChoice()
     } catch (error) {
-      console.log(error.response.data)
-      return error.response.data
+      console.log(error)
+      // sigh
+      const errorData = error.response.data.error.error.error.body      
+      return errorData
     }
-
   }
 
   async getAddress(contractName, varToSet) {
