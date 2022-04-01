@@ -18,7 +18,7 @@ function TokenList({
   loading
 }) {
   const [ dropDownBox, setDropDownBox ] = useState(false)
-  const [ sliderValue_v0, setSliderValue_v0 ] = useState(55)
+
   const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
 
   const theme = useTheme()
@@ -35,9 +35,6 @@ function TokenList({
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-  const WAGMI_v0 = 1 + (sliderValue_v0 / 100)
-  const TVL_v0 = Number(300 + (sliderValue_v0 / 100) * 700)
-
   let WAGMI_v1 = 1 + (sliderValue_v1 / 11.1)
   if(sliderValue_v1 === 0) {
     WAGMI_v1 = 0.5
@@ -46,10 +43,6 @@ function TokenList({
 
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
-  }
-
-  const handleSliderChange_v0 = (e) => {
-    setSliderValue_v0(e.target.value)
   }
 
   const handleSliderChange_v1 = (e) => {
@@ -61,7 +54,7 @@ function TokenList({
   }
 
   async function doSettle_v1 () {
-    await dispatch(settle_v1())
+    //await dispatch(settle_v1())
   }
 
   async function doSettle_v2 () {

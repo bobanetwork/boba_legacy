@@ -113,7 +113,6 @@ export async function addToken ( tokenContractAddressL1 ) {
       )
     }
     else if (_tokenContractAddressL1 === 'wagmiv2-oolong') {
-      console.log("_tokenContractAddressL1:",_tokenContractAddressL1)
       if(tA['WAGMIv2-Oolong'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv2-Oolong'].L2.toLowerCase()
       tokenContract = new ethers.Contract(
         _tokenContractAddressL2, 
