@@ -149,3 +149,18 @@ type GovernorVotingPeriodSet @entity {
   oldVotingPeriod: String
   newVotingPeriod: String
 }
+
+type UseBobaAsFeeTokenEvent @entity {
+  id: ID!
+  address: Bytes
+}
+
+type UseBobaAsFeeTokenMetaTransactionEvent @entity {
+  id: ID!
+  address: Bytes
+}
+
+type UseETHAsFeeTokenEvent @entity {
+  id: ID!
+  address: Bytes
+}

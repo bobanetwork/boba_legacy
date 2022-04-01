@@ -98,3 +98,27 @@ dataSources:
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleGovernorVotingPeriodSet
       file: ./src/GovernorBravoDelegateMapping.ts
+
+  - kind: ethereum/contract
+    name: Boba_GasPriceOracle
+    network: {{network}}
+    source:
+      address: '{{contracts.Boba_GasPriceOracle.address}}'
+      abi: Boba_GasPriceOracle
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Boba_GasPriceOracle
+      abis:
+        - name: Boba_GasPriceOracle
+          file: ./abis/Boba_GasPriceOracle.json
+      eventHandlers:
+        - event: UseBobaAsFeeToken(address)
+          handler: handleUseBobaAsFeeToken
+        - event: UseBobaAsFeeTokenMetaTransaction(address)
+          handler: handleUseBobaAsFeeTokenMetaTransaction
+        - event: UseETHAsFeeToken(address)
+          handler: handleUseETHAsFeeToken
+      file: ./src/Boba_GasPriceOracleMapping.ts

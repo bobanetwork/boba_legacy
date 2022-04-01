@@ -25,6 +25,7 @@ var (
 	Big2   = big.NewInt(2)
 	Big3   = big.NewInt(3)
 	Big4   = big.NewInt(4)
+	Big7   = big.NewInt(7)
 	Big32  = big.NewInt(32)
 	Big256 = big.NewInt(256)
 	Big257 = big.NewInt(257)

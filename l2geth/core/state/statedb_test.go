@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
 
 // Tests that updating a state trie does not leak any database writes prior to
@@ -852,5 +853,65 @@ func TestStateDBAccessList(t *testing.T) {
 	}
 	if got, exp := len(state.accessList.slots), 1; got != exp {
 		t.Fatalf("expected empty, got %d", got)
+	}
+}
+
+func TestStateDBBobaAsFeeToken(t *testing.T) {
+	addr := common.BytesToAddress([]byte{33})
+	rcfg.OvmL2BobaToken = common.HexToAddress("0x4200000000000000000000000000000000000023")
+	rcfg.OvmBobaGasPricOracle = common.HexToAddress("0x4200000000000000000000000000000000000024")
+
+	memDb := rawdb.NewMemoryDatabase()
+	db := NewDatabase(memDb)
+	state, _ := New(common.Hash{}, db)
+
+	bobaBalance := state.GetBobaBalance(addr)
+	if bobaBalance.Cmp(common.Big0) != 0 {
+		t.Fatal("expect 0 boba balance")
+	}
+
+	// Add boba balance
+	state.AddBobaBalance(addr, common.Big1)
+	bobaBalance = state.GetBobaBalance(addr)
+	if bobaBalance.Cmp(common.Big1) != 0 {
+		t.Fatal("expect 1 boba balance")
+	}
+
+	// Sub boba balance
+	state.SubBobaBalance(addr, common.Big1)
+	bobaBalance = state.GetBobaBalance(addr)
+	fmt.Println(bobaBalance)
+	if bobaBalance.Cmp(common.Big0) != 0 {
+		t.Fatal("expect 0 boba balance")
+	}
+
+	// Get Boba price ratio
+	bobaPriceRatio := state.GetBobaPriceRatio()
+	if bobaPriceRatio.Cmp(common.Big0) != 0 {
+		t.Fatal("expect 0 boba price ratio")
+	}
+
+	// Update boba price ratio
+	state.SetBobaPriceRatio(big.NewInt(1))
+
+	// Get Boba price ratio
+	bobaPriceRatio = state.GetBobaPriceRatio()
+	if bobaPriceRatio.Cmp(common.Big1) != 0 {
+		t.Fatal("expect 1 boba price ratio")
+	}
+
+	// Get fee token selection
+	isFeeTokenSelected := state.GetFeeTokenSelection(addr)
+	if isFeeTokenSelected.Cmp(common.Big0) != 0 {
+		t.Fatal("expect 0 fee token selection")
+	}
+
+	// Update fee token selection
+	state.SetBobaAsFeeToken(addr)
+
+	// Get fee token selection
+	isFeeTokenSelected = state.GetFeeTokenSelection(addr)
+	if isFeeTokenSelected.Cmp(common.Big1) != 0 {
+		t.Fatal("expect 1 fee token selection")
 	}
 }

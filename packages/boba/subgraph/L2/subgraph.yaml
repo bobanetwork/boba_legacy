@@ -9,7 +9,7 @@ dataSources:
     network: boba
     source:
 
-      address: '0x8d3866a79aA780BA3DC1a300a1567635F3754a0e'
+      address: '0x3A92cA39476fF84Dc579C868D4D7dE125513B034'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
@@ -63,7 +63,7 @@ dataSources:
     name: GovernorBravoDelegate
     network: boba
     source:
-      address: '0x472e5C097C790c6a44366a89a987Ec996A4d83e0'
+      address: '0x2CC555B5B1a4Cf7fA5401B29ab46fc5ba2e205b0'
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
@@ -98,3 +98,27 @@ dataSources:
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleGovernorVotingPeriodSet
       file: ./src/GovernorBravoDelegateMapping.ts
+
+  - kind: ethereum/contract
+    name: Boba_GasPriceOracle
+    network: boba
+    source:
+      address: '0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51'
+      abi: Boba_GasPriceOracle
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Boba_GasPriceOracle
+      abis:
+        - name: Boba_GasPriceOracle
+          file: ./abis/Boba_GasPriceOracle.json
+      eventHandlers:
+        - event: UseBobaAsFeeToken(address)
+          handler: handleUseBobaAsFeeToken
+        - event: UseBobaAsFeeTokenMetaTransaction(address)
+          handler: handleUseBobaAsFeeTokenMetaTransaction
+        - event: UseETHAsFeeToken(address)
+          handler: handleUseETHAsFeeToken
+      file: ./src/Boba_GasPriceOracleMapping.ts
