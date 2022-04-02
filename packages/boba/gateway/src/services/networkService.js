@@ -2149,7 +2149,12 @@ class NetworkService {
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'WAGMIv1' && cur !== 'OLO') {
+      if(cur !== 'xBOBA' && 
+        cur !== 'WAGMIv0' && 
+        cur !== 'WAGMIv1' && 
+        cur !== 'OLO' &&
+        cur !== 'WAGMIv2' && 
+        cur !== 'WAGMIv2-Oolong') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -2231,7 +2236,12 @@ class NetworkService {
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && cur !== 'WAGMIv0' && cur !== 'WAGMIv1' && cur !== 'OLO') {
+      if(cur !== 'xBOBA' && 
+        cur !== 'WAGMIv0' && 
+        cur !== 'WAGMIv1' && 
+        cur !== 'OLO' && 
+        cur !== 'WAGMIv2' && 
+        cur !== 'WAGMIv2-Oolong') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
