@@ -24,7 +24,7 @@ import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 
 import AlertIcon from 'components/icons/AlertIcon'
 
-import { openAlert, openError, openModal } from 'actions/uiAction'
+import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
@@ -53,8 +53,11 @@ class Save extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      bobaFeeChoice
     } = this.props.setup
+
+    console.log("this.props.setup:",this.props.setup)
 
     const {
       layer2,
@@ -64,6 +67,7 @@ class Save extends React.Component {
       stakeInfo,
       accountEnabled,
       netLayer,
+      bobaFeeChoice,
       loading: false,
       layer2,
       stakeValue: '',
@@ -86,10 +90,13 @@ class Save extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      bobaFeeChoice
     } = this.props.setup
 
-    const { layer2 } = this.props.balance
+    const { 
+      layer2 
+    } = this.props.balance
 
     if (!isEqual(prevState.balance.layer2, layer2)) {
       this.setState({ layer2 })
@@ -103,27 +110,40 @@ class Save extends React.Component {
       this.setState({ accountEnabled })
     }
 
+    if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
+      this.setState({ bobaFeeChoice })
+    }
+
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
       this.setState({ netLayer })
     }
 
   }
 
-  async handleAddSave() {
-    if (this.state.accountEnabled)
-      this.props.dispatch(openModal('saveDepositModal'))
-  }
-
-
   getMaxTransferValue () {
-    const { layer2 } = this.state
+
+    const { layer2, bobaFeeChoice } = this.state
+    
     const bobaBalance = Object.keys(layer2).reduce((acc, cur) => {
+
       if (layer2[cur]['symbolL2'] === 'BOBA') {
         const bal = layer2[cur]['balance']
         acc = logAmount(bal, 18)
+        if (bobaFeeChoice) {
+          let ret = Number(acc) - 1.0
+          if(ret > 0)
+            return ret.toString() 
+          else
+            return '0'
+        } else {
+          // we are using ETH to pay for the fees - can stake full amount
+          return acc
+        } 
       }
+
       return acc
     }, 0)
+
     return bobaBalance
   }
 
@@ -154,13 +174,10 @@ class Save extends React.Component {
 
     const addTX = await this.props.dispatch(addFS_Savings(value_Wei_String))
 
-    if (addTX) {
-      this.props.dispatch(openAlert("Your BOBA was staked"))
-      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
-    } else {
-      this.props.dispatch(openError("Failed to stake BOBA"))
-      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
-    }
+    if (addTX) this.props.dispatch(openAlert("Your BOBA was staked"))
+
+    this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
+ 
   }
 
 
@@ -172,7 +189,8 @@ class Save extends React.Component {
       netLayer,
       layer2,
       stakeValue,
-      loading
+      loading,
+      bobaFeeChoice
     } = this.state
 
 
@@ -182,15 +200,23 @@ class Save extends React.Component {
     })
 
     let bobaWeiString = '0'
+
     if (typeof (bobaBalance[ 0 ]) !== 'undefined') {
       bobaWeiString = bobaBalance[ 0 ].balance.toString()
     }
 
     let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
 
+    if (bobaFeeChoice) {
+      let ret = l2BalanceBOBA - 1.0
+      if(ret > 0)
+        l2BalanceBOBA = ret 
+      else
+        l2BalanceBOBA = 0
+    } 
+
     let totalBOBAstaked = 0
     Object.keys(stakeInfo).forEach((v, i) => {
-      // console.log("Stakeinfo:",stakeInfo[i])
       // only count active stakes
       if(stakeInfo[i].isActive) {
         totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)

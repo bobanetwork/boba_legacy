@@ -9,7 +9,7 @@ import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import * as S from './Token.styles'
 import { tokenTableHeads } from './token.tableHeads'
-import TokenList from './tokenList/TokenList'
+import ListToken from 'components/listToken/listToken'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
@@ -102,7 +102,7 @@ function TokenPage() {
           </S.TableHeading>
           {networkLayer === 'L2' ? !balanceLoading || !!childBalance.length ? childBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L2'}
@@ -115,7 +115,7 @@ function TokenPage() {
           </S.LoaderContainer> : null}
           {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L1'}

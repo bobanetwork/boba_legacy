@@ -27,12 +27,15 @@ import { orderBy } from 'lodash'
 import BN from 'bn.js'
 
 import { logAmount } from 'util/amountConvert'
-
 import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
 } from 'actions/nftAction'
+
+import {
+  addBobaFee,
+} from 'actions/setupAction'
 
 import {
   updateSignatureStatus_exitLP,
@@ -63,6 +66,7 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
@@ -75,6 +79,7 @@ import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
+import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
 import GraphQLService from "./graphQLService"
@@ -407,6 +412,158 @@ class NetworkService {
 
   }
 
+  async getBobaFeeChoice() {
+
+    console.log("getBobaFeeChoice()")
+    console.log("this.account:",this.account)
+
+    const bobaFeeContract = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.L2Provider
+    )
+
+    try {
+
+      let priceRatio = await bobaFeeContract.priceRatio()
+      console.log("BFO: priceRatio:",priceRatio)
+
+      let feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
+      console.log("BFO: feeChoice:",feeChoice)
+
+      const bobaFee = {
+        priceRatio: priceRatio.toString(),
+        feeChoice
+      }
+
+      await addBobaFee( bobaFee )
+
+      return bobaFee
+
+    } catch (error) {
+
+      console.log(error)
+      return error
+    }
+
+  }
+
+  async switchFee( targetFee ) {
+
+    console.log("switchFee()")
+    console.log("this.account:",this.account)
+
+    if( this.L1orL2 !== 'L2' ) return
+
+    // Interact with contract
+    // this only works on L2?
+    const bobaFeeContract = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.provider.getSigner()
+    )
+
+    try {
+
+      let tx = null
+
+      if( targetFee === 'BOBA' ) {
+        tx = await bobaFeeContract.useBobaAsFeeToken()
+        await tx.wait()
+
+      } else if (targetFee === 'ETH') {
+        tx = await bobaFeeContract.useETHAsFeeToken()
+        await tx.wait()
+      }
+
+      await this.getBobaFeeChoice()
+
+/*
+  const inputs = [
+    '0x',
+    '0x00',
+    '0x01',
+    '0x0001',
+    '0x0101',
+    '0xffff',
+    '0x00ff00ff00ff00ff00ff00ff',
+  ]
+const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
+*/
+      return tx
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
+
+  async switchFeeMetaTransaction() {
+
+    const EIP712Domain = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ]
+    const Permit = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ]
+
+    const bobaFeeContract = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.provider.getSigner()
+    )
+
+    const name = await this.BobaContract.name()
+    const version = '1'
+    const chainId = (await this.L2Provider.getNetwork()).chainId
+
+    const owner = this.account
+    const spender = bobaFeeContract.address
+    const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
+    const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    
+    // 5 minutes
+    const deadline = Math.floor(Date.now() / 1000) + 300
+    const verifyingContract = this.BobaContract.address
+
+    const data = {
+      primaryType: 'Permit',
+      types: { EIP712Domain, Permit },
+      domain: { name, version, chainId, verifyingContract },
+      message: { owner, spender, value, nonce, deadline },
+    }
+
+    let signature
+    try {
+      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+    // Send request
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
+      console.log("response",response)
+      await this.getBobaFeeChoice()
+    } catch (error) {
+      console.log(error)
+      // sigh
+      let errorData = error.response.data.error
+      if(errorData.hasOwnProperty('error')) {
+        errorData = errorData.error.error.body
+      }
+      return errorData
+    }
+  }
+
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
     if (address === ERROR_ADDRESS) {
@@ -503,6 +660,7 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+      if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
 
       // not critical
       this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
@@ -822,6 +980,8 @@ class NetworkService {
       }
 
       this.bindProviderListeners()
+
+      await this.getBobaFeeChoice()
 
       return this.L1orL2 // return the layer we are actually on
 
@@ -3366,7 +3526,7 @@ class NetworkService {
 
         //this is a number such as 2
         let proposalData = await delegateCheck.proposals(proposalID)
-        
+
         const proposalStates = [
           'Pending',
           'Active',

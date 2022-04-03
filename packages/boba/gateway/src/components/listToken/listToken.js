@@ -8,9 +8,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
-import * as S from './TokenList.styles'
+import * as S from './listToken.styles'
 
-function TokenList({
+function ListToken({
   token,
   chain,
   networkLayer,
@@ -567,4 +567,4 @@ function TokenList({
   )
 }
 
-export default React.memo(TokenList)
+export default React.memo(ListToken)
