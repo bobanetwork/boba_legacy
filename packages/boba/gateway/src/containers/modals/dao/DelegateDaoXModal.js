@@ -17,8 +17,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
-
-import { closeModal, openAlert } from 'actions/uiAction';
+import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -28,7 +27,7 @@ import { delegateVotesX } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
 
-import BobaGlassIcon from 'components/icons/BobaGlassIcon';
+import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 import * as S from './daoModal.styles';
 
@@ -94,7 +93,7 @@ function DelegateDaoXModal({ open }) {
                     onClick={()=>{submitMe()}}
                     color='primary'
                     variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power to yourself"}
                     loading={loading}
                     triggerTime={new Date()}
                     fullWidth={true}

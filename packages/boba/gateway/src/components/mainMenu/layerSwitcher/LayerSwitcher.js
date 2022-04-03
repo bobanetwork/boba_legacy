@@ -31,7 +31,6 @@ import Button from 'components/button/Button.js'
 
 function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = false }) {
 
-
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -200,10 +199,10 @@ function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = fal
         onChange={(e, n)=> dispatchSwitchLayer(n)}
         aria-label="text alignment"
       >
-        <ToggleButton sx={{borderRadius: '12px 0 0 12px'}} value="L1" aria-label="left aligned">
+        <ToggleButton sx={{borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
           <EthereumIcon />
         </ToggleButton>
-        <ToggleButton sx={{borderRadius: '0 12px 12px 0'}} value="L2" aria-label="centered">
+        <ToggleButton sx={{borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
           <BobaIcon />
         </ToggleButton>
       </ToggleButtonGroup>

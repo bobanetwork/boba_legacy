@@ -76,7 +76,7 @@ function DelegateDaoModal({ open }) {
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                 <Typography variant="h3" sx={{mb: 1}}>
-                    To someone else
+                    To me
                 </Typography>
                 <Typography variant="body3" component="p"
                     style={{ opacity: 0.65}}>
@@ -92,7 +92,7 @@ function DelegateDaoModal({ open }) {
                     onClick={()=>{submitMe()}}
                     color='primary'
                     variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power to yourself"}
                     loading={loading}
                     triggerTime={new Date()}
                     fullWidth={true}

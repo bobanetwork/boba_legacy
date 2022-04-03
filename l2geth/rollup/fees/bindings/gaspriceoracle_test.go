@@ -18,6 +18,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/eth/gasprice"
 	"github.com/ethereum-optimism/optimism/l2geth/ethdb"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
 
 // Test that the fee calculation is the same in both go and solidity
@@ -39,7 +40,7 @@ func TestCalculateFee(t *testing.T) {
 
 	// Set the L1 base fee
 	if _, err := gpo.SetL1BaseFee(opts, big.NewInt(1)); err != nil {
-		t.Fatal("cannot set 1l base fee")
+		t.Fatal("cannot set l1 base fee")
 	}
 	sim.Commit()
 
@@ -139,6 +140,33 @@ func TestCalculateFee(t *testing.T) {
 			}
 			if l1GasGPO.Cmp(l1GasState) != 0 {
 				t.Fatal("l1 gas from GPO and state mismatch")
+			}
+			l1FeeData, l1GasPriceBasedData, _, scalarBasedData, err := fees.DeriveL1GasDataInfo(msg, state)
+			if err != nil {
+				t.Fatal("cannot derive l1 Gas info")
+			}
+			_, l1GasPriceBasedMSG, _, scalarBasedMSG, err := fees.DeriveL1GasInfo(msg, state)
+			if err != nil {
+				t.Fatal("cannot derive l1 Gas info")
+			}
+			expectL1Fee = l1GasGPO.Mul(l1GasGPO, l2GasPrice)
+			if l1FeeData.Cmp(expectL1Fee) != 0 {
+				t.Fatal("l1 fee from DeriveL1GasDataInfo and GPO mismatch")
+			}
+			if l1GasPriceBasedData.Cmp(l1GasPriceBasedMSG) != 0 {
+				t.Fatal("l1 gas prices mismatch")
+			}
+			if scalarBasedData.Cmp(scalarBasedMSG) != 0 {
+				t.Fatal("scalar mismatch")
+			}
+
+			// Write gas oracle owner address
+			state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceOracleOwnerSlot, addr.Hash())
+			_, _ = state.Commit(false)
+
+			gasPriceOracleAddress := fees.ReadGasPriceOracleOwner(state)
+			if gasPriceOracleAddress != addr {
+				t.Fatal("gas price oracle owner address mismatch")
 			}
 		})
 	}
