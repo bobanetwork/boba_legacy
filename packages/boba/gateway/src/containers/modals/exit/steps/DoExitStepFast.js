@@ -142,7 +142,7 @@ function DoExitStepFast({ handleClose, token }) {
   async function doExit() {
 
     console.log("Amount to exit:", value_Wei_String)
-
+    
     let res = await dispatch(
       depositL2LP(
         token.address,
