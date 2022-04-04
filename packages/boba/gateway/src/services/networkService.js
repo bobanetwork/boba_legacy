@@ -618,6 +618,9 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
       this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
 
+      //this.L1ProviderBASE.eth.handleRevert = true
+      //this.L2ProviderBASE.eth.handleRevert = true
+
       if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
         this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
@@ -1423,7 +1426,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
   }
 
   handleMetaMaskError = (errorCode) => {
-    console.log("MetaMask Errorcode:",errorCode)
+    // console.log("MetaMask Errorcode:",errorCode)
     switch (errorCode) {
       case 4001:
         return 'Transaction was rejected by user: signature denied'
@@ -2413,8 +2416,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       L2: allAddresses.L2_ETH_Address
     }])
 
-    //console.log("tokenAddressList:",tokenAddressList)
-
     const L2LPContract = new ethers.Contract(
       allAddresses.L2LPAddress,
       L2LPJson.abi,
@@ -2584,7 +2585,8 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     try {
 
       let depositTX = await this.L1LPContract
-        .connect(this.provider.getSigner()).clientDepositL1(
+        .connect(this.provider.getSigner())
+        .clientDepositL1(
           value_Wei_String,
           currency,
           currency === allAddresses.L1_ETH_Address ? { value: value_Wei_String } : {}
@@ -2766,8 +2768,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         .connect(this.L1Provider)
         .balanceOf(allAddresses.L1LPAddress)
     }
-
-    //console.log("L1LPBalance(tokenAddress):",balance.toString())
 
     return balance.toString()
 
