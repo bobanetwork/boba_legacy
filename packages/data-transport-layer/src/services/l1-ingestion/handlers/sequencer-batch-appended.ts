@@ -112,7 +112,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           .add(BigNumber.from(transactionIndex))
           .toNumber()
 
-        console.log('L2 block number for this TX is:', indexL2 + 1)
+        // console.log('L2 block number for this TX is:', indexL2 + 1)
 
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
@@ -287,7 +287,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing: '0x',
     }
-    console.log('Final Decoded legacy TX', { transaction, ret })
+    // console.log('Final Decoded legacy TX', { transaction, ret })
     return ret
   } else if (
     blockNumber >= turing_v0_height &&
@@ -310,7 +310,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing: toHexString(turingBuffer),
     }
-    console.log('Final Decoded v0 TX', { transaction, ret })
+    // console.log('Final Decoded v0 TX', { transaction, ret })
     return ret
   } else if (blockNumber >= turing_v1_height) {
     let restoredData = ''
@@ -335,7 +335,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing,
     }
-    console.log('Final Decoded v1 TX', { transaction, ret })
+    // console.log('Final Decoded v1 TX', { transaction, ret })
     return ret
   }
 }
@@ -354,11 +354,11 @@ const turingParse_v0 = (
     // The 'slice' chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
     // the '3' is correct because we are operating on the buffer, not the string
     sequencerTransaction = sequencerTransaction.slice(3)
-    console.log('Found a v0 non-turing TX:', {
-      turingLength,
-      turing: '0x',
-      restoredSequencerTransaction: toHexString(sequencerTransaction),
-    })
+    // console.log('Found a v0 non-turing TX:', {
+    //   turingLength,
+    //   turing: '0x',
+    //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+    // })
   } else if (turingLength > 0 && turingLength < sequencerTransaction.length) {
     const turingCandidate = remove0x(
       toHexString(sequencerTransaction.slice(-turingLength))
@@ -373,28 +373,28 @@ const turingParse_v0 = (
       sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
       // The 'slice' chops off the header field and the `-turingLength` chops off the Turing data
       // the '3' is correct because we are operating on the buffer, not the string
-      console.log('Found a v0 Turing TX:', {
-        turingLength,
-        turing: toHexString(turing),
-        restoredSequencerTransaction: toHexString(sequencerTransaction),
-      })
+      // console.log('Found a v0 Turing TX:', {
+      //   turingLength,
+      //   turing: toHexString(turing),
+      //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+      // })
     } else {
       // unknown/corrupted/legacy format
       // In this case, will add '0x', the default, by doing nothing
-      console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
-        turingLength,
-        turing: '0x',
-        restoredSequencerTransaction: toHexString(sequencerTransaction),
-      })
+      // console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
+      //   turingLength,
+      //   turing: '0x',
+      //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+      // })
     }
   } else {
     // unknown/corrupted/legacy format
     // In this case, will add '0x', the default, by doing nothing
-    console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
-      turingLength,
-      turing: '0x',
-      restoredSequencerTransaction: toHexString(sequencerTransaction),
-    })
+    // console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
+    //   turingLength,
+    //   turing: '0x',
+    //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+    // })
   }
   return [sequencerTransaction, turing]
 }
@@ -417,18 +417,18 @@ const turingParse_v1 = (
     // The .slice(headerLength) chops off the Turing header
     // '6' is correct here because we are operating on the string
     dataHexString = dataHexString.slice(6)
-    console.log('Found a v1 non-turing TX:', {
-      turingLength,
-      turing: '0x',
-      restoredData: dataHexString,
-    })
+    // console.log('Found a v1 non-turing TX:', {
+    //   turingLength,
+    //   turing: '0x',
+    //   restoredData: dataHexString,
+    // })
     return [add0x(dataHexString), '0x']
   } else if (turingLength > 0 && turingLength < dataHexString.length) {
     const turingCandidate = dataHexString.slice(-turingLength)
-    console.log('turingCandidate', { turingCandidate })
+    // console.log('turingCandidate', { turingCandidate })
 
     const turingCall = turingCandidate.slice(0, 8).toLowerCase()
-    console.log('turingCall', { turingCall })
+    // console.log('turingCall', { turingCall })
 
     // methodID for GetResponse is 7d93616c -> [125 147 97 108]
     // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
@@ -438,30 +438,30 @@ const turingParse_v1 = (
       dataHexString = dataHexString.slice(6, -turingLength)
       // The `headerLength` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
       // '6' is correct here because we are operating on the string
-      console.log('Found a v1 Turing TX:', {
-        turingLength,
-        turing: turingHexString,
-        restoredData: dataHexString,
-      })
+      // console.log('Found a v1 Turing TX:', {
+      //   turingLength,
+      //   turing: turingHexString,
+      //   restoredData: dataHexString,
+      // })
       return [add0x(dataHexString), add0x(turingHexString)]
     } else {
       // unknown/corrupted/legacy format
       // In this case, will add '0x', the default, and do nothing
-      console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
-        turingLength,
-        turing: '0x',
-        restoredData: dataHexString,
-      })
+      // console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
+      //   turingLength,
+      //   turing: '0x',
+      //   restoredData: dataHexString,
+      // })
       return [add0x(dataHexString), '0x']
     }
   } else {
     // unknown/corrupted/legacy format
     // In this case, will add '0x', the default, and do nothing
-    console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
-      turingLength,
-      turing: '0x',
-      restoredData: dataHexString,
-    })
+    // console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
+    //   turingLength,
+    //   turing: '0x',
+    //   restoredData: dataHexString,
+    // })
     return [add0x(dataHexString), '0x']
   }
 }
