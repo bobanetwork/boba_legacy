@@ -4,28 +4,41 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-
-/* Interface */
-import "@boba/turing-hybrid-compute/contracts/ITuringHelper.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./TuringHelper.sol";
 
 /**
  * @title BobaTuringCredit
  * @dev The credit system for Boba Turing
  */
-contract BobaTuringCredit {
+contract BobaTuringCredit is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     /**********************
      * Contract Variables *
      **********************/
-    address public owner;
+    struct TuringRunner {
+        uint256 prepaidBalance;
+        uint256 unclaimedRevenue;
+        uint256 tokenAmountStaked;
+    }
 
-    mapping(address => uint256) public prepaidBalance;
+    struct ApiEndpoint {
+        string url;
+        address turingHelper; // who is responsible for the api?
+    }
 
-    address public turingToken;
+    // TODO: Maybe find a more efficient data structure for this
+    /// @dev Key being the turingHelper contract address.
+    mapping(address => TuringRunner) public turingRunners;
+    mapping(string => ApiEndpoint[]) public decentralizedApiCommands;
+
+    IERC20 public turingToken;
     uint256 public turingPrice;
-    uint256 public ownerRevenue;
+
+    /// @dev Amount of boba tokens needed to stake to register your own TuringHelper.
+    uint256 public turingStake;
 
     /********************
      *      Events      *
@@ -51,8 +64,15 @@ contract BobaTuringCredit {
         _;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner || owner == address(0), "caller is not the owner");
+    modifier lockStake() {
+        require(turingToken.balanceOf(_msgSender()) >= turingStake, "Not enough tokens");
+        require(turingToken.allowance(_msgSender(), address(this)) >= turingStake, "Allowance too low");
+        require(turingToken.transferFrom(_msgSender(), address(this), turingStake), "Transfer failed");
+        _;
+    }
+
+    modifier isOwnerOfTuringHelper(address _turingHelper) {
+        require(Ownable(_turingHelper).owner() == _msgSender(), "Caller not owner of TuringHelper"); // also implicitly requires the turingHelper to be set
         _;
     }
 
@@ -68,24 +88,41 @@ contract BobaTuringCredit {
      * Public Functions *
      ********************/
 
+    /// @dev Helper method for TuringHelper to get a "random" url out of the endpoints available for a specific command.
+    function getDecentralizedOracle(string memory _command) public returns (string memory, address) {
+        // TODO: use some sort of error score or at least remove failing TuringRunners from array sooner or later.
+        // TODO: For server errors the TuringRunners might be punished with their staked tokens.
+
+        // TODO: Ensure that Geth maybe removes the endPoints without turingCredits OR(!!??) make turingHelpers independent from apiUrls if possible
+        ApiEndpoint memory apiEndpoint = decentralizedApiCommands[_command]
+            [uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))];
+        return (apiEndpoint.url, apiEndpoint.turingHelper);
+    }
+
+    function registerAsTuringRunner(string[] memory _commands, string[] memory _endpoints) external lockStake {
+        require(_commands.length == _endpoints.length, "Invalid api configuration");
+
+        TuringHelper newTuringHelper = new TuringHelper(address(this), _msgSender());
+        // regular factory, not using clone pattern here (needs to be discussed)
+        // TODO: Funding TuringHelper needs to be done by users, and ensure that their contracts are the only ones using up the funds!
+
+        turingRunners[address(newTuringHelper)] = TuringRunner({prepaidBalance : 0, unclaimedRevenue : 0, tokenAmountStaked : turingStake});
+
+        for (uint i = 0; i < _commands.length; i++) {
+            // add endpoints in a categorized manner to allow different logic
+            // TODO: This way we would also need to have a way to ensure that users can only add commands if the logic is truly similar
+            // TODO: The staked/locked tokens minimize bad behavior, but still people might categorize it wrong? Just keep it open and punish them if wrong configured?
+            decentralizedApiCommands[_commands[i]].push(ApiEndpoint(_endpoints[i], address(newTuringHelper)));
+        }
+    }
+
     /**
      * @dev Update turing token
      *
      * @param _turingToken credit token address
      */
     function updateTuringToken(address _turingToken) public onlyOwner onlyNotInitialized {
-        turingToken = _turingToken;
-    }
-
-    /**
-     * @dev transfer ownership
-     *
-     * @param _newOwner new owner address
-     */
-    function transferOwnership(address _newOwner) public onlyOwner {
-        require(_newOwner != address(0));
-        owner = _newOwner;
-        emit TransferOwnership(msg.sender, _newOwner);
+        turingToken = IERC20(_turingToken);
     }
 
     /**
@@ -104,22 +141,23 @@ contract BobaTuringCredit {
      * @param _helperContractAddress the address of the turing helper contract
      */
     function addBalanceTo(uint256 _addBalanceAmount, address _helperContractAddress)
-        public
-        onlyInitialized
+    public
+    onlyInitialized
     {
         require(_addBalanceAmount != 0, "Invalid amount");
+        require(Ownable(_helperContractAddress).owner() != address(0), "TuringHelper not registered");
         require(Address.isContract(_helperContractAddress), "Address is EOA");
         require(
             ERC165Checker.supportsInterface(_helperContractAddress, 0x2f7adf43),
             "Invalid Helper Contract"
         );
 
-        prepaidBalance[_helperContractAddress] += _addBalanceAmount;
+        turingRunners[_helperContractAddress].prepaidBalance += _addBalanceAmount;
 
-        emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
+        emit AddBalanceTo(_msgSender(), _addBalanceAmount, _helperContractAddress);
 
         // Transfer token to this contract
-        IERC20(turingToken).safeTransferFrom(msg.sender, address(this), _addBalanceAmount);
+        turingToken.safeTransferFrom(_msgSender(), address(this), _addBalanceAmount);
     }
 
     /**
@@ -127,21 +165,33 @@ contract BobaTuringCredit {
      */
     function getCreditAmount(address _helperContractAddress) public view returns (uint256) {
         require(turingPrice != 0, "Unlimited credit");
-        return prepaidBalance[_helperContractAddress].div(turingPrice);
+        return turingRunners[_helperContractAddress].prepaidBalance.div(turingPrice);
     }
 
     /**
-     * @dev Owner withdraws revenue
+     * @dev Turing runner withdraws revenue
      *
-     * @param _withdrawAmount the revenue amount that the owner wants to withdraw
+     * @param _withdrawAmount the revenue amount that the user wants to withdraw
      */
-    function withdrawRevenue(uint256 _withdrawAmount) public onlyOwner onlyInitialized {
-        require(_withdrawAmount <= ownerRevenue, "Invalid Amount");
+    function withdrawRevenue(uint256 _withdrawAmount, address _turingHelper) public isOwnerOfTuringHelper(_turingHelper) onlyInitialized {
+        require(_withdrawAmount <= turingRunners[_turingHelper].unclaimedRevenue, "Invalid Amount");
 
-        ownerRevenue -= _withdrawAmount;
+        turingRunners[_turingHelper].unclaimedRevenue -= _withdrawAmount;
 
-        emit WithdrawRevenue(msg.sender, _withdrawAmount);
+        emit WithdrawRevenue(_msgSender(), _withdrawAmount);
 
-        IERC20(turingToken).safeTransfer(owner, _withdrawAmount);
+        turingToken.safeTransfer(_msgSender(), _withdrawAmount);
+    }
+
+    function unregisterAsTuringRunner(address _turingHelper) external isOwnerOfTuringHelper(_turingHelper) onlyInitialized {
+        TuringRunner memory turingRunner = turingRunners[_turingHelper];
+
+        // pay back remaining funds (leave responsibility to turingRunner for reimbursing people who funded the turingHelper)
+        turingToken.safeTransfer(_msgSender(),
+            turingRunner.unclaimedRevenue + turingRunner.tokenAmountStaked + turingRunner.prepaidBalance);
+
+        turingRunner.tokenAmountStaked = 0;
+        turingRunner.unclaimedRevenue = 0;
+        turingRunner.prepaidBalance = 0;
     }
 }
