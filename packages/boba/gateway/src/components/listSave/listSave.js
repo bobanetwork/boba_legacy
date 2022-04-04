@@ -99,7 +99,7 @@ class ListSave extends React.Component {
               Earned
             </Typography>
             <Typography variant="body2">
-              <BobaIcon dark={true} /> {' '} {earned.toFixed(3)}
+              <BobaIcon /> {' '} {earned.toFixed(3)}
             </Typography>
           </Box>
           <Box sx={{ textAlign: 'left' }}>
@@ -120,10 +120,10 @@ class ListSave extends React.Component {
             <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', opacity: '0.65', paddingRight: '6px'}}>Next unstake window:</Typography>
             <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em' }}>{unlocktimeNextBegin} - {unlocktimeNextEnd}</Typography>
           </Box>
-          {/* 
+          {/*
           <Box sx={{ width: '100%', my: 2 }}>
             <LinearProgress color='warning' value={70} variant="determinate" />
-          </Box> 
+          </Box>
           */}
         </S.StakeItemContent>
         <S.StakeItemAction>
