@@ -92,7 +92,7 @@ function InputStepFast({ handleClose, token }) {
   const maxValue = logAmount(token.balance, token.decimals)
   const lpUnits = logAmount(LPBalance, token.decimals)
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits  
-  
+
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
