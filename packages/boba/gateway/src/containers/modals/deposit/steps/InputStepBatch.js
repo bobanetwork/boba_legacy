@@ -72,16 +72,6 @@ function InputStepBatch({ handleClose }) {
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
   // console.log("ETH available for paying fees:",Number(feeBalance))
-
-  
-  console.group('FAST BATCH');
-  console.log([
-    'BatchInfo', batchInfo
-  ])
-  console.log([
-    'batchCost', batchCost
-  ])
-  console.groupEnd('FAST BATCH');
   
   async function doDeposit() {
 
@@ -98,7 +88,6 @@ function InputStepBatch({ handleClose }) {
 
     console.log(`Updated payload: `, updatedPayload)
 
-    // return;
     let res
     res = await dispatch(
       approveFastDepositBatch(updatedPayload)

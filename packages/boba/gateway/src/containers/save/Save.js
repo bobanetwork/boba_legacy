@@ -226,17 +226,17 @@ class Save extends React.Component {
     return (
       <S.StakePageContainer>
         <Box sx={{ my: 1 }}>
-          <PageTitle title="Boba Stake" />
+          <PageTitle title="Stake BOBA" />
           {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnect </Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connecting </Typography>
+            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2 </Typography>
+            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
           }
         </Box>
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>
               <Box sx={{ my: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <Typography variant="body2" sx={{ opacity: 0.65 }}> Stake Boba Earn Boba </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.65 }}> Stake BOBA Earn BOBA </Typography>
                 <Typography variant="h1"
                   sx={{
                     background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
