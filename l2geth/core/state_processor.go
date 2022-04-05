@@ -124,6 +124,9 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		}
 	}
 
+	// Determine the L2 Boba fee if users chose BOBA as the fee token
+	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
+
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
 
@@ -135,10 +138,8 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		return nil, err
 	}
 
-	// Determine the L2 Boba fee if users chose BOBA as the fee token
-	// Otherwise, L2BobaFee = 0
+	// Calculate the boba fee related information that is to be included
 	L2BobaFee := new(big.Int)
-	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
 	if feeTokenSelection.Cmp(common.Big1) == 0 {
 		bobaPriceRatio := statedb.GetBobaPriceRatio()
 		L2BobaFee = new(big.Int).Mul(big.NewInt(int64(gas)), new(big.Int).Mul(msg.GasPrice(), bobaPriceRatio))
