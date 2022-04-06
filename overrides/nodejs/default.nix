@@ -199,8 +199,7 @@ in
     };
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules"`
-        ln -s $out/lib/node_modules/@eth-optimism/contracts/artifacts/contracts $out/lib/node_modules/@eth-optimism/contracts/contracts
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts"`
       '';
     };
     add-inputs = {
