@@ -96,15 +96,6 @@ in
       XDG_CACHE_HOME = "${solc-cache}";
     };
   };
-  # doesn't apply currently
-  "@openzeppelin/contracts" = {
-    # _condition = satisfiesSemver "^4.3.2";
-    add-regenesis-patch = {
-      patches = [
-        "${./../..}/patches/@openzeppelin+contracts+4.3.2.patch"
-      ];
-    };
-  };
   "@boba/contracts" = {
     #inherit correct-tsconfig-path;
     inherit add-yarn;
@@ -282,6 +273,19 @@ in
         cp ${./../..}/tsconfig.build.json \
           ./tsconfig-copy.json
       '';
+    };
+  };
+  "@openzeppelin/contracts" = {
+    add-regenesis-patch = {
+      prePatch = ''
+        cp -r ${../../.}/patches .
+        substituteInPlace ./patches/@openzeppelin+contracts+4.3.2.patch --replace \
+          '/node_modules/@openzeppelin/contracts/' \
+          '/'
+      '';
+      patches = [
+        "./patches/@openzeppelin+contracts+4.3.2.patch"
+      ];
     };
   };
   optimism = {
