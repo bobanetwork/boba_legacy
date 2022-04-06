@@ -256,7 +256,17 @@ in
       '';
     };
   };
-
+  "@eth-optimism/integration-tests" = {
+    correct-tsconfig-path = {
+      postPatch = ''
+        substituteInPlace ./tsconfig.json --replace \
+          '"extends": "../tsconfig.json"' \
+          '"extends": "./tsconfig-copy.json"'
+        cp ${./../..}/tsconfig.build.json \
+          ./tsconfig-copy.json
+      '';
+    };
+  };
   "@boba/register" = {
     inherit add-yarn;
     cleanup-dir = {
