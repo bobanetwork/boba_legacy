@@ -46,7 +46,9 @@
             pkgs = import nixpkgs {
               inherit system;
               overlays = [ devshell.overlay ];
+              # TODO: Make this an overlay instead
             };
+            bobapkgs = self.packages.${system};
           in
           rec {
             packages = flake-utils.lib.flattenTree {
@@ -76,10 +78,11 @@
             };
 
             defaultApp = apps.l2geth;
-            shell = import ./shell.nix { inherit self system pkgs hardhat; };
+
+            shell = import ./shell.nix { inherit bobapkgs pkgs; };
             shells =
               let
-                bobapkgs = self.packages.${system};
+
               in
               {
                 "@eth-optimism/data-transport-layer" = pkgs.devshell.mkShell {

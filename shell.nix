@@ -1,15 +1,13 @@
 {
-  self,
-  system,
   pkgs,
-  hardhat,
+  bobapkgs,
 }:
 
 pkgs.devshell.mkShell {
   name = "Boba Network";
-  packages = with pkgs; [
-    self.packages.${system}."@eth-optimism/data-transport-layer"
-    #hardhat.packages.${system}.hardhat
+  packages = with pkgs bobapkgs; [
+    "@eth-optimism/data-transport-layer"
+    "@eth-optimism/l2geth"
     nodePackages.lerna
     nodePackages.typescript
     nodePackages.yarn
