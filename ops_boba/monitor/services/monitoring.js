@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const axios = require('axios')
 const _ = require('lodash')
 const web3 = require('web3')
@@ -5,7 +6,8 @@ const ethers = require('ethers')
 const fluxAggregatorJson = require('@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json')
 const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const addressesMainnet = require('@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089')
-const L2ERC20Json = require('@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json')
+const ERC20Json = require('@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json')
+const L1LPJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
 const L2LPJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
 const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
@@ -63,13 +65,18 @@ for (const key of supportedTokens) {
 
 const l2TestContract = new ethers.Contract(
   allTokenAddresses['BOBA'],
-  L2ERC20Json.abi,
+  ERC20Json.abi,
   l2Provider
 )
 const L2LPContract = new ethers.Contract(
   addressesMainnet.Proxy__L2LiquidityPool,
   L2LPJson.abi,
   l2Provider
+)
+const L1LPContract = new ethers.Contract(
+  addressesMainnet.Proxy__L1LiquidityPool,
+  L1LPJson.abi,
+  l1Provider
 )
 
 const convertWeiToEther = (wei) => {
@@ -118,6 +125,27 @@ const getL2LPInfoPromise = async (tokenAddress) => {
     tokenName = await contract.name()
     decimals = await contract.decimals()
   }
+
+  const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
+
+  return {
+    tokenAddress,
+    tokenBalance,
+    tokenSymbol,
+    tokenName,
+    poolTokenInfo,
+    decimals,
+  }
+}
+
+const getL1LPInfoPromise = async (tokenAddress) => {
+  const contract = l2TestContract.attach(tokenAddress)
+  const tokenBalance = (
+    await contract.balanceOf(addressesMainnet.Proxy__L2LiquidityPool)
+  ).toString()
+  const tokenSymbol = await contract.symbol()
+  const tokenName = await contract.name()
+  const decimals = await contract.decimals()
 
   const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
 
@@ -191,6 +219,9 @@ const logL2Pool = async (blockNumber) => {
       ),
     }
 
+    tokenData.balanceRatio =
+      tokenData.tokenBalance / tokenData.userDepositAmount || 0
+
     if (prices.data[token.tokenSymbol.toLowerCase()]) {
       tokenData.priceUSD = prices.data[token.tokenSymbol.toLowerCase()].usd
       tokenData.totalTokenUSDValue = tokenData.priceUSD * tokenData.tokenBalance
@@ -199,6 +230,69 @@ const logL2Pool = async (blockNumber) => {
     logger.info(`L2 ${token.tokenSymbol} token pool`, {
       networkName: configs.OMGXNetwork.L2,
       key: 'l2Pool',
+      data: tokenData,
+    })
+  })
+}
+
+const logL1Pool = async (blockNumber) => {
+  const l1LPInfoPromise = []
+  Object.keys(allTokenAddresses).forEach((key) => {
+    l1LPInfoPromise.push(getL1LPInfoPromise(allTokenAddresses[key]))
+  })
+
+  const l1LPInfos = await Promise.all(l1LPInfoPromise)
+  l1LPInfos.forEach((token) => {
+    const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+    const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+    const duration =
+      new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+    const durationDays = duration / (60 * 60 * 24 * 1000)
+    const annualRewardEstimate = (365 * rewards) / durationDays
+
+    let annualYieldEstimate = (100 * annualRewardEstimate) / userIn
+    if (!annualYieldEstimate) {
+      annualYieldEstimate = 0
+    }
+
+    const tokenData = {
+      blockNumber,
+      symbol: token.tokenSymbol,
+      name: token.tokenName,
+      decimals: token.decimals,
+      l1TokenAddress: token.poolTokenInfo.l1TokenAddress.toLowerCase(),
+      l2TokenAddress: token.poolTokenInfo.l2TokenAddress.toLowerCase(),
+      accUserReward: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.accUserReward,
+          token.decimals
+        )
+      ),
+      accUserRewardPerShare: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.accUserRewardPerShare,
+          token.decimals
+        )
+      ),
+      userDepositAmount: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.userDepositAmount,
+          token.decimals
+        )
+      ),
+      startTime: token.poolTokenInfo.startTime.toNumber(),
+      APR: annualYieldEstimate,
+      tokenBalance: parseFloat(
+        ethers.utils.formatUnits(token.tokenBalance, token.decimals)
+      ),
+    }
+
+    tokenData.balanceRatio =
+      tokenData.tokenBalance / tokenData.userDepositAmount || 0
+
+    logger.info(`L1 ${token.tokenSymbol} token pool`, {
+      networkName: configs.OMGXNetwork.L1,
+      key: 'l1Pool',
       data: tokenData,
     })
   })
@@ -411,7 +505,7 @@ const setupProvider = async (networkName, url, pollingIntervalSecond = 10) => {
 
   let blockNumber = await provider.getBlockNumber()
 
-  if (networkName === configs.OMGXNetwork.L1) {
+  if (networkName === configs.OMGXNetwork.L1 && configs.nodeEnv !== 'local') {
     provider.on('debug', (info) => {
       if (info.action === 'request') {
         logger.info('ethers', info.request)
@@ -457,6 +551,8 @@ const setupProvider = async (networkName, url, pollingIntervalSecond = 10) => {
     // log L2 pool
     if (networkName === configs.OMGXNetwork.L2) {
       logPromise.push(logL2Pool(latestBlock))
+    } else {
+      logPromise.push(logL1Pool(latestBlock))
     }
 
     await Promise.all(logPromise)

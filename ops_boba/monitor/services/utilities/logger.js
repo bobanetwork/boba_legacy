@@ -6,9 +6,9 @@ const alignColorsAndTime = format.combine(
   format.colorize({
     message: true,
   }),
-  // format.timestamp({
-  //   format: 'YYYY-MM-DDTHH:mm:ssZ',
-  // }),
+  format.timestamp({
+    format: 'YYYY-MM-DDTHH:mm:ssZ',
+  }),
   format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label'] }),
   format.printf((info) => {
     const timestamp = colorizer.colorize(
@@ -25,9 +25,9 @@ const alignColorsAndTime = format.combine(
   })
 )
 const production = format.combine(
-  // format.timestamp({
-  //   format: 'YYYY-MM-DDTHH:mm:ssZ',
-  // }),
+  format.timestamp({
+    format: 'YYYY-MM-DDTHH:mm:ssZ',
+  }),
   format.json()
 )
 

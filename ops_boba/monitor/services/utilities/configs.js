@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+module.exports.nodeEnv = process.env.NODE_ENV || 'local'
+
 module.exports.l1WsUrl = process.env.L1_NODE_WEB3_WS
 module.exports.l2WsUrl = process.env.L2_NODE_WEB3_WS
 module.exports.l1Url = process.env.L1_NODE_WEB3_URL
