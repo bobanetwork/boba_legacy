@@ -17,6 +17,7 @@ import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridge.sol";
 
 /* External Imports */
 import "../standards/xL2GovernanceERC20.sol";
+import "../L2BillingContract.sol";
 
 /**
  * @dev An L2 LiquidityPool implementation
@@ -109,8 +110,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     address public xBOBAAddress;
     address public BOBAAddress;
 
-    // mapping use address to the status of xBOBA
+    // mapping user address to the status of xBOBA
     mapping(address => bool) public xBOBAStatus;
+
+    // billing contract address
+    address public billingContractAddress;
 
     /********************
      *       Event      *
@@ -214,6 +218,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     modifier onlyInitialized() {
         require(address(L1LiquidityPoolAddress) != address(0), "Contract has not yet been initialized");
+        _;
+    }
+
+    modifier onlyWithBillingContract() {
+        require(billingContractAddress != address(0), "Billing contract address is not set");
         _;
     }
 
@@ -358,6 +367,21 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         onlyInitialized()
     {
         DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS = _l1GasFee;
+    }
+
+    /**
+     * @dev Configure billing contract address.
+     *
+     * @param _billingContractAddress billing contract address
+     */
+    function configureBillingContractAddress(
+        address _billingContractAddress
+    )
+        public
+        onlyOwner()
+    {
+        require(_billingContractAddress != address(0), "Billing contract address cannot be zero");
+        billingContractAddress = _billingContractAddress;
     }
 
     /**
@@ -615,15 +639,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         external
         payable
         whenNotPaused
+        onlyWithBillingContract
     {
-        uint256 startingGas = gasleft();
-        require(startingGas > extraGasRelay, "Insufficient Gas For a Relay Transaction");
-
-        uint256 desiredGasLeft = startingGas.sub(extraGasRelay);
-        uint256 i;
-        while (gasleft() > desiredGasLeft) {
-            i++;
-        }
+        // Collect the exit fee
+        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
+        IERC20(BOBAAddress).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
