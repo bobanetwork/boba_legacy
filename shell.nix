@@ -5,9 +5,7 @@
 
 pkgs.devshell.mkShell {
   name = "Boba Network";
-  packages = with pkgs bobapkgs; [
-    "@eth-optimism/data-transport-layer"
-    "@eth-optimism/l2geth"
+  packages = with pkgs; with bobapkgs; [
     nodePackages.lerna
     nodePackages.typescript
     nodePackages.yarn
