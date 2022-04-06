@@ -30,6 +30,9 @@ let
       pkgs.yarn
     ];
   };
+  add-solc = {
+    XDG_CACHE_HOME = "${solc-cache}";
+  };
   solc-cache = import ./solc-cache.nix { inherit pkgs; };
 in
 {
@@ -91,10 +94,7 @@ in
     };
   };
   "@boba/turing-hybrid-compute" = {
-    inherit add-yarn;
-    add-solc = {
-      XDG_CACHE_HOME = "${solc-cache}";
-    };
+    inherit add-yarn add-solc;
   };
   "@boba/contracts" = {
     #inherit correct-tsconfig-path;
@@ -193,10 +193,7 @@ in
   };
   "@eth-optimism/message-relayer" = { inherit correct-tsconfig-path; };
   "@eth-optimism/contracts" = {
-    inherit correct-tsconfig-path;
-    add-solc = {
-      XDG_CACHE_HOME = "${solc-cache}";
-    };
+    inherit correct-tsconfig-path add-solc;
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts"`
@@ -241,10 +238,7 @@ in
     };
   };
   "@eth-optimism/data-transport-layer" = {
-    inherit correct-tsconfig-path;
-    add-solc = {
-      XDG_CACHE_HOME = "${solc-cache}";
-    };
+    inherit correct-tsconfig-path add-solc;
     install-symlinks = {
       installPhase = ''
         ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
@@ -257,6 +251,7 @@ in
     };
   };
   "@eth-optimism/integration-tests" = {
+    inherit add-solc;
     correct-tsconfig-path = {
       postPatch = ''
         substituteInPlace ./tsconfig.json --replace \

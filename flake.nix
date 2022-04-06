@@ -114,6 +114,9 @@
             "@eth-optimism/core-utils"."0.8.1"  = [
               [ "@types/node" "15.14.9" ]
             ];
+            "@eth-optimism/integration-tests"."0.2.3" = [
+              [ "@openzeppelin/contracts" "4.3.2" ]
+            ];
           };
         })
         {
