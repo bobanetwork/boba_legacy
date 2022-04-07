@@ -16,7 +16,7 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import AlertIcon from 'components/icons/AlertIcon'
 import { isEqual, orderBy } from 'lodash'
 import { selectTransactions } from 'selectors/transactionSelector'
-import { fetchBalances, fetchTransactions } from "actions/networkAction"
+import { fetchTransactions } from "actions/networkAction"
 import { POLL_INTERVAL } from "util/constant"
 import useInterval from "util/useInterval"
 
