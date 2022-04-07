@@ -16,12 +16,10 @@ contract DiscretionaryExitFee is Ownable {
     using SafeMath for uint256;
 
     address public l2Bridge;
-    address public BOBAAddress;
     address public billingContractAddress;
 
-    constructor(address _l2Bridge, address _BOBAAddress) {
+    constructor(address _l2Bridge) {
         l2Bridge = _l2Bridge;
-        BOBAAddress = _BOBAAddress;
     }
 
     modifier onlyWithBillingContract() {
@@ -47,7 +45,7 @@ contract DiscretionaryExitFee is Ownable {
     ) external payable onlyWithBillingContract {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(BOBAAddress).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
         require(msg.value != 0 || _l2Token != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
 

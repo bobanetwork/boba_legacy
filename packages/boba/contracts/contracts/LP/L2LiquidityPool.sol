@@ -206,11 +206,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         _;
     }
 
-    modifier onlyGasPriceOracleOwner() {
-        require(msg.sender == OVM_GasPriceOracle(Lib_PredeployAddresses.OVM_GAS_PRICE_ORACLE).owner(), 'Caller is not the gasPriceOracle owner');
-        _;
-    }
-
     modifier onlyNotInitialized() {
         require(address(L1LiquidityPoolAddress) == address(0), "Contract has been initialized");
         _;
@@ -310,16 +305,6 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         userRewardMinFeeRate = _userRewardMinFeeRate;
         userRewardMaxFeeRate = _userRewardMaxFeeRate;
         ownerRewardFeeRate = _ownerRewardFeeRate;
-    }
-
-    function configureExtraGasRelay(
-        uint256 _extraGas
-    )
-        public
-        onlyGasPriceOracleOwner()
-        onlyInitialized()
-    {
-        extraGasRelay = _extraGas;
     }
 
     /**
@@ -643,7 +628,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(BOBAAddress).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
         require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error

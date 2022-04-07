@@ -2772,4 +2772,22 @@ describe('Liquidity Pool Test', async () => {
       // expect(preL2ERC20_2Balance).to.deep.eq(postL2ERC20_2Balance)
     })
   })
+
+  describe('Configuration tests', async () => {
+    it('{tag:mrf} should not allow to configure billing contract address for non-owner', async () => {
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet_2).configureBillingContractAddress(
+          env.addressesBOBA.Proxy__BobaBillingContract
+        )
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('{tag:mrf} should not allow to configure billing contract address to zero address', async () => {
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet).configureBillingContractAddress(
+          ethers.constants.AddressZero
+        )
+      ).to.be.revertedWith('Billing contract address cannot be zero')
+    })
+  })
 })

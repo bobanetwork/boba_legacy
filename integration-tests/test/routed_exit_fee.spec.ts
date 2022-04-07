@@ -66,8 +66,7 @@ describe('Standard Exit Fee', async () => {
     )
 
     ExitFeeContract = await Factory__ExitFeeContract.deploy(
-      L2StandardBridgeAddress,
-      env.addressesBOBA.TOKENS.BOBA.L2
+      L2StandardBridgeAddress
     )
 
     await ExitFeeContract.configureBillingContractAddress(
@@ -363,6 +362,24 @@ describe('Standard Exit Fee', async () => {
         preBobaBalanceBillingContract.add(exitFee)
       )
       expect(postBobaBalance).to.eq(preBobaBalance.sub(exitFee))
+    })
+  })
+
+  describe('Configuration tests', async () => {
+    it('{tag:other} should not allow to configure billing contract address for non-owner', async () => {
+      await expect(
+        ExitFeeContract.connect(env.l2Wallet_2).configureBillingContractAddress(
+          env.addressesBOBA.Proxy__BobaBillingContract
+        )
+      ).to.be.revertedWith('Ownable: caller is not the owner')
+    })
+
+    it('{tag:other} should not allow to configure billing contract address to zero address', async () => {
+      await expect(
+        ExitFeeContract.connect(env.l2Wallet).configureBillingContractAddress(
+          ethers.constants.AddressZero
+        )
+      ).to.be.revertedWith('Billing contract address cannot be zero')
     })
   })
 })
