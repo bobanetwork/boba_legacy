@@ -50,9 +50,9 @@ function TransferModal ({ open, token, minHeight }) {
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
-  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
-  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      //support for Use Max
-  const [ max_Float, setMax_Float ] = useState('0')                //support for Use Max
+  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max - amount to transfer in wei_string
+  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      //support for Use Max - the max possible wei string
+  const [ max_Float, setMax_Float ] = useState('0')                //support for Use Max - a number like 0.09 ETH
   const [ fee, setFee ] = useState('0')
 
   const [ recipient, setRecipient ] = useState('')
@@ -67,8 +67,6 @@ function TransferModal ({ open, token, minHeight }) {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
   const feePriceRatio = useSelector(selectBobaPriceRatio())
 
-  console.log("feePriceRatio:",feePriceRatio)
-
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -76,36 +74,35 @@ function TransferModal ({ open, token, minHeight }) {
 
     async function estimateCost() {
       
-      console.log("Token:",token)
-      console.log("token.balance.toString()", token.balance.toString())
-      
       let cost_BN = await networkService.transferEstimate(recipient, token.balance.toString(), token.address)
-      console.log("Cost_BN:",cost_BN) 
       
       //sigh - convert from BN.js to ethers.BigNumber
       let max_BN = BigNumber.from(token.balance.toString()) 
 
-      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio))
-
       // both ETH and BOBA have 18 decimals so this is safe
-      if(token.symbol === 'ETH' && !feeUseBoba) {
-        //we are transferring ETH and paying in ETH
+      if(token.symbol === 'ETH') {
+        // we are transferring ETH and paying in either token
+        // since MetaMask does not know about BOBA, we need to subtract the ETH fee 
+        // regardless of how we are paying, otherwise will get an error in MetaMask 
         max_BN = max_BN.sub(cost_BN)
       } 
       else if (token.symbol === 'BOBA' && feeUseBoba) {
-        //we are transferring BOBA and paying in BOBA
-        max_BN = max_BN.sub(cost_BN)
+        // we are transferring BOBA and paying in BOBA
+        // so need to subtract the BOBA fee
+        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(feePriceRatio)))
       }
-      else {
-        // do nothing, we are transferring and paying in different tokens
-      }
+      
       // if the transferrable amount is less than the gas, 
       // set the transferrable amount to zero
       if(max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
       }
+
       setMax_Wei_String(max_BN.toString())
       setMax_Float(utils.formatUnits(max_BN, token.decimals))
+
+      // display the correct Fee amount to the user
+      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio)) 
       setFee(utils.formatUnits(cost_BN, token.decimals))
     }
     if (recipient !== '') estimateCost()
@@ -132,7 +129,6 @@ function TransferModal ({ open, token, minHeight }) {
   async function submit () {
     if ( token.address && recipient )
     {
-      console.log("Amount to transfer:", value_Wei_String)
       const res = await dispatch(
         transfer(recipient, value_Wei_String, token.address)
       )
@@ -204,21 +200,13 @@ function TransferModal ({ open, token, minHeight }) {
 
         {fee && !feeUseBoba && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
-            Balance: {token.balance.toString()}
-            <br/>
             Fee: {fee} ETH
-            <br/>
-            MaxTransfer (Balance - fee): {max_Wei_String}
           </Typography>
         )}
 
         {fee && feeUseBoba && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
-            Balance: ${token.balance.toString()}
-            <br/>
-            Fee: ${fee} BOBA
-            <br/>
-            MaxTransfer (Balance - fee): {max_Wei_String}
+            Fee: {fee} BOBA
           </Typography>
         )}
 
