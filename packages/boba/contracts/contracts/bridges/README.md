@@ -96,15 +96,15 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Users have to approve the Boba for the exit fee first. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
 
 ```js
 const exitFee = await BOBABillingContract.exitFee()
-const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-  L2Bridge.address,
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
   exitFee
 )
-await approveBOBATX.wait()
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
@@ -122,14 +122,15 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Users have to approve the Boba for the exit fee first. They then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
 
 ```js
 const exitFee = await BOBABillingContract.exitFee()
-const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-  L2Bridge.address,
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
   exitFee
 )
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
