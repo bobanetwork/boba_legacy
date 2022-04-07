@@ -55,28 +55,37 @@ const addressManager = new ethers.Contract(
 const bobaDecimal = (1e18).toString()
 
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
-const allTokenAddresses = {}
+const allTokenL2Addresses = {}
+const allTokenL1Addresses = {}
 
 for (const key of supportedTokens) {
+  if (addressesMainnet['TK_L1' + key]) {
+    allTokenL1Addresses[key] = addressesMainnet['TK_L1' + key]
+  }
   if (addressesMainnet['TK_L2' + key]) {
-    allTokenAddresses[key] = addressesMainnet['TK_L2' + key]
+    allTokenL2Addresses[key] = addressesMainnet['TK_L2' + key]
   }
 }
 
-const l2TestContract = new ethers.Contract(
-  allTokenAddresses['BOBA'],
+const l1TestContract = new ethers.Contract(
+  allTokenL1Addresses['BOBA'],
   ERC20Json.abi,
-  l2Provider
+  l1Provider
 )
-const L2LPContract = new ethers.Contract(
-  addressesMainnet.Proxy__L2LiquidityPool,
-  L2LPJson.abi,
+const l2TestContract = new ethers.Contract(
+  allTokenL2Addresses['BOBA'],
+  ERC20Json.abi,
   l2Provider
 )
 const L1LPContract = new ethers.Contract(
   addressesMainnet.Proxy__L1LiquidityPool,
   L1LPJson.abi,
   l1Provider
+)
+const L2LPContract = new ethers.Contract(
+  addressesMainnet.Proxy__L2LiquidityPool,
+  L2LPJson.abi,
+  l2Provider
 )
 
 const convertWeiToEther = (wei) => {
@@ -139,15 +148,15 @@ const getL2LPInfoPromise = async (tokenAddress) => {
 }
 
 const getL1LPInfoPromise = async (tokenAddress) => {
-  const contract = l2TestContract.attach(tokenAddress)
+  const contract = l1TestContract.attach(tokenAddress)
   const tokenBalance = (
-    await contract.balanceOf(addressesMainnet.Proxy__L2LiquidityPool)
+    await contract.balanceOf(addressesMainnet.Proxy__L1LiquidityPool)
   ).toString()
   const tokenSymbol = await contract.symbol()
   const tokenName = await contract.name()
   const decimals = await contract.decimals()
 
-  const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
+  const poolTokenInfo = await L1LPContract.poolInfo(tokenAddress)
 
   return {
     tokenAddress,
@@ -161,8 +170,8 @@ const getL1LPInfoPromise = async (tokenAddress) => {
 
 const logL2Pool = async (blockNumber) => {
   const l2LPInfoPromise = []
-  Object.keys(allTokenAddresses).forEach((key) => {
-    l2LPInfoPromise.push(getL2LPInfoPromise(allTokenAddresses[key]))
+  Object.keys(allTokenL2Addresses).forEach((key) => {
+    l2LPInfoPromise.push(getL2LPInfoPromise(allTokenL2Addresses[key]))
   })
   const prices = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${supportedTokens.join()}&vs_currencies=usd`,
@@ -237,8 +246,8 @@ const logL2Pool = async (blockNumber) => {
 
 const logL1Pool = async (blockNumber) => {
   const l1LPInfoPromise = []
-  Object.keys(allTokenAddresses).forEach((key) => {
-    l1LPInfoPromise.push(getL1LPInfoPromise(allTokenAddresses[key]))
+  Object.keys(allTokenL1Addresses).forEach((key) => {
+    l1LPInfoPromise.push(getL1LPInfoPromise(allTokenL1Addresses[key]))
   })
 
   const l1LPInfos = await Promise.all(l1LPInfoPromise)
@@ -302,15 +311,15 @@ const logBalance = (provider, blockNumber, networkName) => {
   const promiseData =
     networkName === configs.OMGXNetwork.L1
       ? [
-          provider.getBalance(configs.l1PoolAddress),
-          provider.getGasPrice(),
-          networkName,
-        ]
+        provider.getBalance(configs.l1PoolAddress),
+        provider.getGasPrice(),
+        networkName,
+      ]
       : [
-          provider.getBalance(configs.l2PoolAddress),
-          provider.getGasPrice(),
-          networkName,
-        ]
+        provider.getBalance(configs.l2PoolAddress),
+        provider.getGasPrice(),
+        networkName,
+      ]
 
   return Promise.all(promiseData)
     .then(async (values) => {
