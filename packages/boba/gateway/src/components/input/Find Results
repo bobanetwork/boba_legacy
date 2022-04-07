@@ -1,0 +1,671 @@
+Searching 355 files for "TRANSFER_NFT"
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/actions/networkAction.js:
+  186  
+  187  export function transferNFT(recipient, nft) {
+  188:   return createAction('TRANSFER_NFT/CREATE', () =>
+  189      networkService.transferNFT(recipient, nft)
+  190    )
+
+1 match in 1 file
+
+
+Searching 355 files for "TRANSFER"
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/actions/daoAction.js:
+   41  }
+   42  
+   43: export function transferDao({ recipient, amount }) {
+   44:     return createAction('TRANSFER/DAO/CREATE', () => networkService.transferDao({ recipient, amount }))
+   45  }
+   46  
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/actions/networkAction.js:
+  173  }
+  174  
+  175: export function transfer(recipient, value, currency) {
+  176:   return createAction('TRANSFER/CREATE', () =>
+  177:     networkService.transfer(recipient, value, currency)
+  178    )
+  179  }
+  180  
+  181: export function transferEstimate(recipient, value, currency) {
+  182:   return createAction('TRANSFER_ESTIMATE/CREATE', () =>
+  183:     networkService.transferEstimate(recipient, value, currency)
+  184    )
+  185  }
+  186  
+  187: export function transferNFT(recipient, nft) {
+  188:   return createAction('TRANSFER_NFT/CREATE', () =>
+  189:     networkService.transferNFT(recipient, nft)
+  190    )
+  191  }
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/components/listAccount/listAccount.js:
+   88      // {
+   89      //   try {
+   90:     //     console.log("Amount to transfer:", value_Wei_String)
+   91:     //     const transferResponseGood = await dispatch(
+   92:     //       transfer(recipient, value_Wei_String, token.address)
+   93      //     )
+   94:     //     if (transferResponseGood) {
+   95      //       dispatch(openAlert('Transaction submitted'))
+   96      //     }
+   ..
+  178                  {chain === 'L2' && token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' &&
+  179                    <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
+  180:                     Bridge/Transfer
+  181                    </S.TextTableCell>
+  182                  }
+  ...
+  286  
+  287                    <Button
+  288:                     onClick={()=>{this.handleModalClick('transferModal', token, false)}}
+  289                      variant="contained"
+  290                      disabled={disabled}
+  291:                     tooltip="Transfer funds from one L2 account to another L2 account."
+  292                      fullWidth
+  293                    >
+  294:                     Transfer
+  295                    </Button>
+  296                  </>
+  ...
+  304                      target="_blank" 
+  305                      rel="noopener noreferrer" 
+  306:                     href={'https://cbridge.celer.network/#/transfer'}
+  307                    >
+  308                      CELER BRIDGE
+  309                    </Link>
+  310                    <Button
+  311:                     onClick={()=>{this.handleModalClick('transferModal', token, false)}}
+  312                      variant="contained"
+  313                      disabled={disabled}
+  314:                     tooltip="Transfer funds from one L2 account to another L2 account."
+  315                      fullWidth
+  316                    >
+  317:                     Transfer
+  318                    </Button>
+  319                  </>
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/components/listNFT/listNFT.js:
+   60    }
+   61  
+   62:   async handleTransfer() {
+   63  
+   64      const token ={
+   ..
+   69      console.log("setting nft details:", token)
+   70  
+   71:     this.props.dispatch(openModal('transferNFTModal', token))
+   72    }
+   73  
+   ..
+  197              variant="contained"
+  198              style={{marginTop: '10px', marginBottom: '10px'}}
+  199:             onClick={(e) => {this.handleTransfer()}}
+  200              size="small"
+  201            >
+  202:             Transfer
+  203            </Button>
+  204            <Button
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/components/listToken/listToken.js:
+  170  
+  171                    <Button
+  172:                     onClick={() => { handleModalClick('transferModal', token, false) }}
+  173                      variant="contained"
+  174                      color="primary"
+  175                      disabled={disabled}
+  176:                     tooltip="Transfer funds from one L2 account to another L2 account."
+  177                      fullWidth
+  178                    >
+  179:                     Transfer
+  180                    </Button>
+  181                  </>
+  ...
+  189                      target="_blank"
+  190                      rel="noopener noreferrer"
+  191:                     href={'https://cbridge.celer.network/#/transfer'}
+  192                    >
+  193                      CELER BRIDGE
+  194                    </Link>
+  195                    <Button
+  196:                     onClick={() => { handleModalClick('transferModal', token, false) }}
+  197                      variant="contained"
+  198                      color="primary"
+  199                      disabled={disabled}
+  200:                     tooltip="Transfer funds from one L2 account to another L2 account."
+  201                      fullWidth
+  202                    >
+  203:                     Transfer
+  204                    </Button>
+  205                  </>
+  ...
+  396                </Button>
+  397                <Button
+  398:                 onClick={() => { handleModalClick('transferModal', token, false) }}
+  399                  variant="contained"
+  400                  color="primary"
+  401                  disabled={disabled}
+  402:                 tooltip="Transfer funds from one L2 account to another L2 account."
+  403                  fullWidth
+  404                >
+  405:                 Transfer
+  406                </Button>
+  407              </>
+  ...
+  414                  target="_blank"
+  415                  rel="noopener noreferrer"
+  416:                 href={'https://cbridge.celer.network/#/transfer'}
+  417                >
+  418                  CELER BRIDGE
+  419                </Link>
+  420                <Button
+  421:                 onClick={() => { handleModalClick('transferModal', token, false) }}
+  422                  variant="contained"
+  423                  color="primary"
+  424                  disabled={disabled}
+  425:                 tooltip="Transfer funds from one L2 account to another L2 account."
+  426                  fullWidth
+  427                >
+  428:                 Transfer
+  429                </Button>
+  430              </>
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/account/Account.js:
+  250                component="p"
+  251              >
+  252:               You have not connected your wallet. To see your balances, bridge, and transfer, connect to MetaMask
+  253              </S.AlertText>
+  254            </S.AlertInfo>
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/account/Account.module.scss:
+  225            }
+  226          }
+  227:         .transfer {
+  228            font-size: 0.8em;
+  229            font-family: 'MrEavesXL', 'Messina';
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/airdrop/Airdrop.module.scss:
+   32          align-items: center;
+   33  
+   34:         .transferContainer, .delegateContainer {
+   35              margin: auto;
+   36              border-radius: 12px;
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/dao/Dao.module.scss:
+   42      }
+   43  
+   44:     .transferContainer,
+   45      .delegateContainer {
+   46        display: flex;
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/home/Home.js:
+   48  import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
+   49  
+   50: import TransferModal from 'containers/modals/transfer/TransferModal'
+   51: import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
+   52  
+   53  import ExitModal from 'containers/modals/exit/ExitModal'
+   ..
+  109    const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
+  110    
+  111:   const transferModalState = useSelector(selectModalState('transferModal'))
+  112:   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
+  113    
+  114    const exitModalState = useSelector(selectModalState('exitModal'))
+  ...
+  212        {!!depositBatchModalState && <DepositBatchModal open={depositBatchModalState} />}
+  213  
+  214:       {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
+  215:       {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
+  216  
+  217        {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/modals/deposit/steps/InputStepBatch.js:
+  174  
+  175    // Make sure user have enough ETH to cover the cost and ETH amount
+  176:   // that they want to transfer
+  177    const filterETH = payload.filter(i => i.symbol === 'ETH')
+  178    if (filterETH.length === 1) {
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/modals/farm/FarmDepositModal.js:
+   87    }
+   88  
+   89:   getMaxTransferValue () {
+   90  
+   91      const { stakeToken, bobaFeeChoice, netLayer } = this.state
+   ..
+  122      if( value &&
+  123          Number(value) > 0.0 &&
+  124:         Number(value) <= Number(this.getMaxTransferValue())
+  125      ) {
+  126          this.setState({
+  ...
+  234              type="number"
+  235              unit={stakeToken.symbol}
+  236:             maxValue={this.getMaxTransferValue()}
+  237              onChange={i=>{this.handleStakeValue(i.target.value)}}
+  238:             onUseMax={i=>{this.handleStakeValue(this.getMaxTransferValue())}}
+  239              allowUseAll={true}
+  240              newStyle
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/modals/farm/FarmWithdrawModal.js:
+   64      })
+   65  
+   66:     this.setMaxTransferValue()
+   67  
+   68    }
+   ..
+   91          LPBalance_Wei_String: lpBalanceWeiString
+   92        }, ()=>{
+   93:         this.setMaxTransferValue()
+   94        })
+   95      }
+   ..
+  120    }
+  121  
+  122:   setMaxTransferValue() {
+  123  
+  124      const { userInfo, withdrawToken, LPBalance_Wei_String } = this.state
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/modals/transfer/TransferModal.js:
+   17  import { useDispatch, useSelector } from 'react-redux'
+   18  
+   19: import { transfer } from 'actions/networkAction'
+   20  import { closeModal, openAlert } from 'actions/uiAction'
+   21  import { selectLoading } from 'selectors/loadingSelector'
+   ..
+   36  import { WrapperActionsModal } from 'components/modal/Modal.styles'
+   37  
+   38: function TransferModal ({ open, token, minHeight }) {
+   39  
+   40    const dispatch = useDispatch()
+   ..
+   47    const [ validValue, setValidValue ] = useState(false)
+   48  
+   49:   const loading = useSelector(selectLoading([ 'TRANSFER/CREATE' ]))
+   50    const wAddress = networkService.account ? networkService.account : ''
+   51  
+   ..
+   78      if ( token.address && recipient )
+   79      {
+   80:       console.log("Amount to transfer:", value_Wei_String)
+   81        const res = await dispatch(
+   82:         transfer(recipient, value_Wei_String, token.address)
+   83        )
+   84        if (res) dispatch(openAlert('Transaction submitted'))
+   ..
+   91      setValue_Wei_String('0')
+   92      setRecipient('')
+   93:     dispatch(closeModal('transferModal'))
+   94    }
+   95  
+   ..
+  108        <Box>
+  109          <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
+  110:           Transfer to another Boba wallet
+  111          </Typography>
+  112  
+  ...
+  123  
+  124            <Input
+  125:             label="Amount to Transfer"
+  126              placeholder=""
+  127              value={value}
+  ...
+  150  
+  151          <Typography variant="body2" sx={{mt: 2, fontWeight: '700', color: 'red'}}>
+  152:           CAUTION: This function is only for transfers from one Boba wallet to another Boba wallet.
+  153:           You cannot directly transfer funds from a Boba wallet to an L1 address or to another chain. 
+  154            Your funds will be lost if you try to do so.
+  155          </Typography>
+  ...
+  171              variant="contained"
+  172              loading={loading}
+  173:             tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer your funds to another Boba wallet"}
+  174              disabled={!validValue}
+  175              triggerTime={new Date()}
+  ...
+  177              size="large"
+  178            >
+  179:             Transfer to another Boba wallet
+  180            </Button>
+  181        </WrapperActionsModal>
+  ...
+  184  }
+  185  
+  186: export default React.memo(TransferModal)
+  187  
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/modals/transfer/TransferNFTModal.js:
+   17  import { useDispatch, useSelector } from 'react-redux'
+   18  
+   19: import { transferNFT } from 'actions/networkAction'
+   20  import { closeModal, openAlert } from 'actions/uiAction'
+   21  import { selectLoading } from 'selectors/loadingSelector'
+   ..
+   30  import { WrapperActionsModal } from 'components/modal/Modal.styles'
+   31  
+   32: function TransferNFTModal ({ open, token, minHeight }) {
+   33  
+   34    const dispatch = useDispatch()
+   ..
+   36    const [ recipient, setRecipient ] = useState('')
+   37  
+   38:   const loading = useSelector(selectLoading([ 'TRANSFER/CREATE' ]))
+   39  
+   40    const theme = useTheme()
+   ..
+   44      if ( token.address && recipient )
+   45      {
+   46:       const transferResponseGood = await dispatch(
+   47:         transferNFT(recipient, token)
+   48        )
+   49:       if (transferResponseGood) dispatch(openAlert('NFT transfer submitted'))
+   50        handleClose()
+   51      }
+   ..
+   54    function handleClose () {
+   55      setRecipient('')
+   56:     dispatch(closeModal('transferNFTModal'))
+   57    }
+   58  
+   ..
+   61        <Box>
+   62          <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
+   63:           Transfer an NFT to another Boba wallet
+   64          </Typography>
+   65  
+   ..
+   81  
+   82          <Typography variant="body2" sx={{mt: 2, fontWeight: '700', color: 'red'}}>
+   83:           CAUTION: This function is only for transfering an NFT from one Boba wallet to another Boba wallet.
+   84:           You cannot directly transfer an NFT from a Boba wallet to an L1 address or to another chain. 
+   85            Your NFT will be lost if you try to do so. You can bridge NFTs to other chains on NFT marketplaces 
+   86            that support bridging.
+   ..
+  103              variant="contained"
+  104              loading={loading}
+  105:             tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to transfer your NFT to another Boba wallet"}
+  106              disabled={!recipient}
+  107              triggerTime={new Date()}
+  ...
+  109              size="large"
+  110            >
+  111:             Transfer to another Boba wallet
+  112            </Button>
+  113        </WrapperActionsModal>
+  ...
+  116  }
+  117  
+  118: export default React.memo(TransferNFTModal)
+  119  
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/save/Save.js:
+  121    }
+  122  
+  123:   getMaxTransferValue () {
+  124  
+  125      const { layer2, bobaFeeChoice } = this.state
+  ...
+  151      if( value &&
+  152        (Number(value) > 0.0) &&
+  153:       (Number(value) <= Number(this.getMaxTransferValue()))
+  154        ) {
+  155          this.setState({
+  ...
+  277                  type="number"
+  278                  // unit={'BOBA'}
+  279:                 maxValue={this.getMaxTransferValue()}
+  280                  onChange={i=>{this.handleStakeValue(i.target.value)}}
+  281:                 onUseMax={i=>{this.handleStakeValue(this.getMaxTransferValue())}}
+  282                  newStyle
+  283                  disabled={netLayer !== 'L2'}
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/wallet/Wallet.js:
+   94                component="p"
+   95              >
+   96:               Connect to MetaMask to see your balances, transfer, and bridge
+   97              </S.AlertText>
+   98            </S.AlertInfo>
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/containers/wallet/nft/Nft.js:
+  212                    Please enter the contract address and TokenID to display an NFT.<br/>
+  213                    If you don't know your TokenID, you can look it up in the blockexplorer.<br/>
+  214:                   It's shown for mint or transfer events.
+  215                  </Typography>
+  216                </Box>
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/Boba_GasPriceOracle.json:
+   36          }
+   37        ],
+   38:       "name": "TransferOwnership",
+   39        "type": "event"
+   40      },
+   ..
+  373          }
+  374        ],
+  375:       "name": "transferOwnership",
+  376        "outputs": [],
+  377        "stateMutability": "nonpayable",
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/BobaAirdrop.json:
+   74          }
+   75        ],
+   76:       "name": "OwnershipTransferred",
+   77        "type": "event"
+   78      },
+   ..
+  191          }
+  192        ],
+  193:       "name": "transferOwnership",
+  194        "outputs": [],
+  195        "stateMutability": "nonpayable",
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/BobaAirdropSecond.json:
+   79          }
+   80        ],
+   81:       "name": "OwnershipTransferred",
+   82        "type": "event"
+   83      },
+   ..
+  281          }
+  282        ],
+  283:       "name": "transferOwnership",
+  284        "outputs": [],
+  285        "stateMutability": "nonpayable",
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/L1ERC20.json:
+   72          }
+   73        ],
+   74:       "name": "Transfer",
+   75        "type": "event"
+   76      },
+   ..
+  255          }
+  256        ],
+  257:       "name": "transfer",
+  258        "outputs": [
+  259          {
+  ...
+  284          }
+  285        ],
+  286:       "name": "transferFrom",
+  287        "outputs": [
+  288          {
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/NFTMonsterV2.json:
+    3    "contractName": "NFTMonsterV2",
+    4    "sourceName": "",
+    5:   "abi": [{"type":"constructor","stateMutability":"nonpayable","inputs":[{"type":"string","name":"name_","internalType":"string"},{"type":"string","name":"symbol_","internalType":"string"},{"type":"uint256","name":"maxNFTs_","internalType":"uint256"},{"type":"address[]","name":"creatorAddresses_","internalType":"address[]"},{"type":"address","name":"turingHelperAddress_","internalType":"address"}]},{"type":"event","name":"Approval","inputs":[{"type":"address","name":"owner","internalType":"address","indexed":true},{"type":"address","name":"approved","internalType":"address","indexed":true},{"type":"uint256","name":"tokenId","internalType":"uint256","indexed":true}],"anonymous":false},{"type":"event","name":"ApprovalForAll","inputs":[{"type":"address","name":"owner","internalType":"address","indexed":true},{"type":"address","name":"operator","internalType":"address","indexed":true},{"type":"bool","name":"approved","internalType":"bool","indexed":false}],"anonymous":false},{"type":"event","name":"MintedNFT","inputs":[{"type":"uint256","name":"id","internalType":"uint256","indexed":true}],"anonymous":false},{"type":"event","name":"OwnershipTransferred","inputs":[{"type":"address","name":"previousOwner","internalType":"address","indexed":true},{"type":"address","name":"newOwner","internalType":"address","indexed":true}],"anonymous":false},{"type":"event","name":"Paused","inputs":[{"type":"address","name":"account","internalType":"address","indexed":false}],"anonymous":false},{"type":"event","name":"Transfer","inputs":[{"type":"address","name":"from","internalType":"address","indexed":true},{"type":"address","name":"to","internalType":"address","indexed":true},{"type":"uint256","name":"tokenId","internalType":"uint256","indexed":true}],"anonymous":false},{"type":"event","name":"Unpaused","inputs":[{"type":"address","name":"account","internalType":"address","indexed":false}],"anonymous":false},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"MAX_MINT_IN_PUBLIC","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"PRICE","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"ROYALTY_PERCENTAGE","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"amountMintedInPublicSale","inputs":[{"type":"address","name":"","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"approve","inputs":[{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"availableTokenCount","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"balanceOf","inputs":[{"type":"address","name":"owner","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"bytes","name":"","internalType":"bytes"}],"name":"bridgeExtraData","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"burn","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"exists","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"getApproved","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"isApprovedForAll","inputs":[{"type":"address","name":"owner","internalType":"address"},{"type":"address","name":"operator","internalType":"address"}]},{"type":"function","stateMutability":"payable","outputs":[],"name":"mint","inputs":[{"type":"uint256","name":"_count","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"name","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"owner","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"ownerOf","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"paused","inputs":[]},{"type":"function","stateMutability":"pure","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"price","inputs":[{"type":"uint256","name":"_count","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"projectOwners","inputs":[{"type":"uint256","name":"","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"recoverERC20","inputs":[{"type":"address","name":"tokenAddress","internalType":"address"},{"type":"uint256","name":"tokenAmount","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"recoverERC721","inputs":[{"type":"address","name":"tokenAddress","internalType":"address"},{"type":"uint256","name":"tokenId_","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"renounceOwnership","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"receiver","internalType":"address"},{"type":"uint256","name":"royaltyAmount","internalType":"uint256"}],"name":"royaltyInfo","inputs":[{"type":"uint256","name":"_tokenId","internalType":"uint256"},{"type":"uint256","name":"_salePrice","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"safeTransferFrom","inputs":[{"type":"address","name":"from","internalType":"address"},{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"safeTransferFrom","inputs":[{"type":"address","name":"from","internalType":"address"},{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"tokenId","internalType":"uint256"},{"type":"bytes","name":"_data","internalType":"bytes"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"setApprovalForAll","inputs":[{"type":"address","name":"operator","internalType":"address"},{"type":"bool","name":"approved","internalType":"bool"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"startTrading","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"supportsInterface","inputs":[{"type":"bytes4","name":"_interfaceId","internalType":"bytes4"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"symbol","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"tokenCount","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"tokenURI","inputs":[{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"totalSupply","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"transferFrom","inputs":[{"type":"address","name":"from","internalType":"address"},{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"tokenId","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"transferOwnership","inputs":[{"type":"address","name":"newOwner","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"withdraw","inputs":[]}],
+    6    "bytecode": "0x",
+    7    "linkReferences": {},
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/deployment/contracts/OMG.json:
+    1: [{"constant":true,"inputs":[],"name":"mintingFinished","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"unpause","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"mint","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"paused","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"finishMinting","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"pause","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"},{"name":"_releaseTime","type":"uint256"}],"name":"mintTimelocked","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[],"name":"MintFinished","type":"event"},{"anonymous":false,"inputs":[],"name":"Pause","type":"event"},{"anonymous":false,"inputs":[],"name":"Unpause","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}]
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/reducers/transactionReducer.js:
+   23          ...action.payload
+   24        }
+   25:     case 'TRANSFER/CREATE/SUCCESS':
+   26        return {
+   27          ...state
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/reducers/uiReducer.js:
+   27    depositModal: false,
+   28    depositBatchModal: false,
+   29:   transferModal: false,
+   30:   transferNFTModal: false,
+   31    exitModal: false,
+   32    mergeModal: false,
+   ..
+   37    farmDepositModal: false,
+   38    farmWithdrawModal: false,
+   39:   transferDaoModal: false,
+   40    delegateDaoModal: false,
+   41    delegateDaoXModal: false,
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/services/networkService.js:
+ 1432          return 'Transaction was rejected by user: signature denied'
+ 1433        //case -32603:
+ 1434:       //  return 'Execution reverted: ERC20: transfer amount exceeds balance'
+ 1435        default:
+ 1436          return null
+ ....
+ 1671    }
+ 1672  
+ 1673:   //Transfer funds from one account to another, on the L2
+ 1674:   async transfer(address, value_Wei_String, currency) {
+ 1675  
+ 1676      let tx = null
+ ....
+ 1698            .connect(this.provider.getSigner())
+ 1699            .attach(currency)
+ 1700:           .transfer(
+ 1701              address,
+ 1702              value_Wei_String
+ ....
+ 1707        return tx
+ 1708      } catch (error) {
+ 1709:       console.log("NS: transfer error:", error)
+ 1710        return error
+ 1711      }
+ 1712    }
+ 1713  
+ 1714:   //Transfer funds from one account to another, on the L2
+ 1715:   async transferEstimate(address, value_Wei_String, currency) {
+ 1716  
+ 1717      /*
+ ....
+ 1735          gas_BN = await this.provider.estimateGas({to: address, value: value_Wei_String}) //* priceRatio
+ 1736          cost_BN = gas_BN.mul(gasPrice_BN)
+ 1737:         console.log("ETH: Transfer cost in ETH:", utils.formatEther(cost_BN))
+ 1738  
+ 1739          // tx = await this.provider.send('eth_sendTransaction',
+ ....
+ 1758            .populateTransaction
+ 1759            .attach(currency)
+ 1760:           .transfer(address,value_Wei_String)
+ 1761  
+ 1762          gas_BN = await this.L2Provider.estimateGas(tx)
+ ....
+ 1764          cost_BN = gas_BN.mul(gasPrice_BN)
+ 1765  
+ 1766:         console.log("ERC20: Transfer cost in ETH:", utils.formatEther(cost_BN))
+ 1767        }
+ 1768  
+ 1769        return cost_BN
+ 1770      } catch (error) {
+ 1771:       console.log("NS: transferEstimate error:", error)
+ 1772        return error
+ 1773      }
+ 1774    }
+ 1775  
+ 1776:   //Transfer funds from one account to another, on the L2
+ 1777:   async transferNFT(recipient, token) {
+ 1778  
+ 1779:     console.log("Transferring NFT:", token.address)
+ 1780      console.log("tokenID:", token.tokenID)
+ 1781:     console.log("Transferring to:", recipient)
+ 1782  
+ 1783      try {
+ ....
+ 1793        const tx = await contract
+ 1794          .connect(this.provider.getSigner())
+ 1795:         .transferFrom(
+ 1796              this.account,  // address from,
+ 1797              recipient,     // address to,
+ ....
+ 1800  
+ 1801        const receipt = await tx.wait()
+ 1802:       console.log("NS: NFT transfer TX:", receipt.logs)
+ 1803  
+ 1804        return tx
+ 1805      } catch (error) {
+ 1806:       console.log("NS: NFT transfer error:", error)
+ 1807        return error
+ 1808      }
+ ....
+ 3392    }
+ 3393  
+ 3394:   //Transfer DAO Funds
+ 3395:   async transferDao({ recipient, amount }) {
+ 3396  
+ 3397      if( this.L1orL2 !== 'L2' ) return
+ ....
+ 3399  
+ 3400      if(!this.account) {
+ 3401:       console.log('NS: transferDao() error - called but account === null')
+ 3402        return
+ 3403      }
+ ....
+ 3406        const tx = await this.BobaContract
+ 3407          .connect(this.provider.getSigner())
+ 3408:         .transfer(recipient, parseEther(amount.toString()))
+ 3409        await tx.wait()
+ 3410        return tx
+ 3411      } catch (error) {
+ 3412:       console.log('NS: transferDao error:', error)
+ 3413        return error
+ 3414      }
+
+149 matches across 27 files
+
+
+Searching 355 files for "selectBobaFeeChoice"
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/components/input/Input.js:
+   21  import { selectCustomStyles } from './Select.styles'
+   22  
+   23: import { selectBobaFeeChoice } from 'selectors/setupSelector'
+   24  
+   25  import { useSelector } from 'react-redux'
+   ..
+   61  }) {
+   62  
+   63:   const feeUseBoba = useSelector(selectBobaFeeChoice())
+   64  
+   65    async function handlePaste() {
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/components/mainMenu/feeSwitcher/FeeSwitcher.js:
+   20  import {
+   21    selectAccountEnabled,
+   22:   selectBobaFeeChoice,
+   23    selectLayer
+   24  } from 'selectors/setupSelector'
+   ..
+   42    const dispatch = useDispatch()
+   43    const accountEnabled = useSelector(selectAccountEnabled())
+   44:   const feeUseBoba = useSelector(selectBobaFeeChoice())
+   45    // const feePriceRatio = useSelector(selectBobaPriceRatio())
+   46  
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/gateway/src/selectors/setupSelector.js:
+   47  }
+   48  
+   49: export function selectBobaFeeChoice () {
+   50    return function (state) {
+   51      return state.setup['bobaFeeChoice']
+
+5 matches across 3 files

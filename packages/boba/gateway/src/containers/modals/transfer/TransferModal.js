@@ -13,13 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { transfer } from 'actions/networkAction'
+import { transfer, transferEstimate } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectLookupPrice } from 'selectors/lookupSelector'
+
+import { ethers, BigNumber, utils } from 'ethers'
+
+import {
+   selectAccountEnabled,
+   selectBobaFeeChoice,
+   selectBobaPriceRatio,
+   selectLayer
+} from 'selectors/setupSelector'
 
 import BN from 'bignumber.js'
 
@@ -31,6 +40,7 @@ import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
+
 import networkService from 'services/networkService'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
@@ -41,33 +51,78 @@ function TransferModal ({ open, token, minHeight }) {
 
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
+  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      //support for Use Max
+  const [ max_Float, setMax_Float ] = useState('0')                //support for Use Max
+  const [ fee, setFee ] = useState('0')
 
   const [ recipient, setRecipient ] = useState('')
-
   const [ validValue, setValidValue ] = useState(false)
 
   const loading = useSelector(selectLoading([ 'TRANSFER/CREATE' ]))
+
   const wAddress = networkService.account ? networkService.account : ''
 
   const lookupPrice = useSelector(selectLookupPrice)
 
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
+
+  console.log("feePriceRatio:",feePriceRatio)
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  let maxValue = '0'
+  useEffect(() => {
 
-  if(token) {
-    maxValue = logAmount(token.balance, token.decimals)
-  }
+    async function estimateCost() {
+      
+      console.log("Token:",token)
+      console.log("token.balance.toString()", token.balance.toString())
+      
+      let cost_BN = await networkService.transferEstimate(recipient, token.balance.toString(), token.address)
+      console.log("Cost_BN:",cost_BN) 
+      
+      //sigh - convert from BN.js to ethers.BigNumber
+      let max_BN = BigNumber.from(token.balance.toString()) 
+
+      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio))
+
+      // both ETH and BOBA have 18 decimals so this is safe
+      if(token.symbol === 'ETH' && !feeUseBoba) {
+        //we are transferring ETH and paying in ETH
+        max_BN = max_BN.sub(cost_BN)
+      } 
+      else if (token.symbol === 'BOBA' && feeUseBoba) {
+        //we are transferring BOBA and paying in BOBA
+        max_BN = max_BN.sub(cost_BN)
+      }
+      else {
+        // do nothing, we are transferring and paying in different tokens
+      }
+      // if the transferrable amount is less than the gas, 
+      // set the transferrable amount to zero
+      if(max_BN.lt(BigNumber.from('0'))) {
+        max_BN = BigNumber.from('0')
+      }
+      setMax_Wei_String(max_BN.toString())
+      setMax_Float(utils.formatUnits(max_BN, token.decimals))
+      setFee(utils.formatUnits(cost_BN, token.decimals))
+    }
+    if (recipient !== '') estimateCost()
+  }, [token, feeUseBoba, recipient])
 
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
-    const tooBig   = new BN(value).gt(new BN(maxValue))
+    const tooBig   = new BN(value).gt(new BN(max_Float))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } else {
+    } 
+    else if (!recipient) {
+      setValidValue(false)
+    } 
+    else {
       setValidValue(true)
     }
 
@@ -90,6 +145,9 @@ function TransferModal ({ open, token, minHeight }) {
     setValue('')
     setValue_Wei_String('0')
     setRecipient('')
+    setMax_Wei_String('0')
+    setMax_Float('0')
+    setFee('0')
     dispatch(closeModal('transferModal'))
   }
 
@@ -121,6 +179,7 @@ function TransferModal ({ open, token, minHeight }) {
             newStyle
           />
 
+        {!!recipient &&
           <Input
             label="Amount to Transfer"
             placeholder=""
@@ -130,17 +189,38 @@ function TransferModal ({ open, token, minHeight }) {
               setAmount(i.target.value)
               setValue_Wei_String(toWei_String(i.target.value, token.decimals))
             }}
-            onUseMax={(i)=>{       // they want to use the maximum
-              setAmount(maxValue)  // so the input value updates for the user
-              setValue_Wei_String(token.balance.toString())
+            onUseMax={(i)=>{        // they want to use the maximum
+              setAmount(max_Float)  // so the input value updates for the user
+              setValue_Wei_String(max_Wei_String)
             }}
             allowUseAll={true}
             unit={token.symbol}
-            maxValue={maxValue}
+            maxValue={max_Float}
             variant="standard"
             newStyle
           />
+        }
         </Box>
+
+        {fee && !feeUseBoba && (
+          <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
+            Balance: {token.balance.toString()}
+            <br/>
+            Fee: {fee} ETH
+            <br/>
+            MaxTransfer (Balance - fee): {max_Wei_String}
+          </Typography>
+        )}
+
+        {fee && feeUseBoba && (
+          <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
+            Balance: ${token.balance.toString()}
+            <br/>
+            Fee: ${fee} BOBA
+            <br/>
+            MaxTransfer (Balance - fee): {max_Wei_String}
+          </Typography>
+        )}
 
         {convertToUSD && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
@@ -166,7 +246,7 @@ function TransferModal ({ open, token, minHeight }) {
           </Button>
         ) : null}
           <Button
-            onClick={() => {submit({useLedgerSign: false})}}
+            onClick={()=>{submit()}}
             color='primary'
             variant="contained"
             loading={loading}

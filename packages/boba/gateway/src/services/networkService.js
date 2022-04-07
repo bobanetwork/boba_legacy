@@ -1682,15 +1682,23 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
         let wei = BigNumber.from(value_Wei_String)
 
-        tx = await this.provider.send('eth_sendTransaction',
-          [
-            {
-              from: this.account,
-              to: address,
-              value: ethers.utils.hexlify(wei)
-            }
-          ]
-        )
+        tx = await this.provider
+        .getSigner()
+        .sendTransaction({
+          to: address, 
+          value: ethers.utils.hexlify(wei)
+        })
+
+
+        // tx = await this.provider.send('eth_sendTransaction',
+        //   [
+        //     {
+        //       from: this.account,
+        //       to: address,
+        //       value: ethers.utils.hexlify(wei)
+        //     }
+        //   ]
+        // )
 
       } else {
         //any ERC20 json will do....
@@ -1707,6 +1715,83 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       return tx
     } catch (error) {
       console.log("NS: transfer error:", error)
+      return error
+    }
+  }
+
+  //Transfer funds from one account to another, on the L2
+  async transferEstimate(recipient, value_Wei_String, currency) {
+
+    const layer2Balance = await this.L2Provider.getBalance(this.account)
+    
+    console.log("layer2Balance", layer2Balance)
+    console.log("layer2Balance", layer2Balance.toString())
+
+    //const value_Wei_String =  '192436496857297262' //'10000000'
+    console.log("value_Wei_String", value_Wei_String)
+    const address = this.account
+
+    const gasPrice_BN = await this.L2Provider.getGasPrice()
+    console.log("L2 gas price", gasPrice_BN.toString())
+
+    let cost_BN = BigNumber.from('0')
+    let gas_BN = BigNumber.from('0')
+    let safe_BN = BigNumber.from('15')
+    let ten_BN = BigNumber.from('10')
+
+    try {
+
+      if(currency === allAddresses.L2_ETH_Address) {
+
+
+/*
+31911
+
+10637000000000
+*/
+
+
+
+//this.provider
+
+//tx = await this.provider.getSigner().sendTransaction({to: address, value: ethers.utils.hexlify(wei)})
+
+        gas_BN = await this.provider
+          .getSigner()
+          .estimateGas({
+            from: this.account, 
+            to: recipient, 
+            value: value_Wei_String
+          })
+
+        cost_BN = gas_BN.mul(gasPrice_BN)//.mul(safe_BN).div(ten_BN)
+        console.log("ETH: Transfer cost in ETH:", utils.formatEther(cost_BN))
+
+      } else {
+
+        const ERC20Contract = new ethers.Contract(
+          currency,
+          L2ERC20Json.abi, // any old abi will do...
+          this.provider.getSigner()//this.L2Provider  // this.provider.getSigner()
+        )
+
+        const tx = await ERC20Contract
+          //.connect(this.provider.getSigner())
+          .populateTransaction
+          .transfer( 
+            recipient, 
+            value_Wei_String
+          )
+
+        gas_BN = await this.L2Provider.estimateGas( tx )
+
+        cost_BN = gas_BN.mul( gasPrice_BN )
+        console.log("ERC20: Transfer cost in ETH:", utils.formatEther( cost_BN ))
+      }
+
+      return cost_BN
+    } catch (error) {
+      console.log("NS: transferEstimate error:", error)
       return error
     }
   }

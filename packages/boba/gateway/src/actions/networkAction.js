@@ -178,6 +178,12 @@ export function transfer(recipient, value, currency) {
   )
 }
 
+export function transferEstimate(value_Wei_String, currency) {
+  return createAction('TRANSFER_ESTIMATE/CREATE', () =>
+    networkService.transferEstimate(value_Wei_String, currency)
+  )
+}
+
 export function transferNFT(recipient, nft) {
   return createAction('TRANSFER_NFT/CREATE', () =>
     networkService.transferNFT(recipient, nft)
