@@ -156,6 +156,7 @@ function TransferModal ({ open, token, minHeight }) {
   return (
     <Modal open={open} onClose={handleClose} maxWidth="md" minHeight="500px">
       <Box>
+      
         <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
           Transfer to another Boba wallet
         </Typography>
@@ -168,7 +169,7 @@ function TransferModal ({ open, token, minHeight }) {
             fullWidth
             paste
             sx={{fontSize: '50px'}}
-            newStyle
+            
           />
 
         {!!recipient &&

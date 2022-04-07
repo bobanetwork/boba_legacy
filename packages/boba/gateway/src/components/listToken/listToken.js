@@ -27,6 +27,7 @@ function ListToken({
   const enabled = (networkLayer === chain) ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
+  
   const amountInNumber = token.symbol === 'ETH' ?
   Number(logAmount(token.balance, token.decimals, 3)):
   Number(logAmount(token.balance, token.decimals, 2))
