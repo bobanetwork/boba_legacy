@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 
 import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
+import FeeSwitcher from './feeSwitcher/FeeSwitcher'
 import MenuItems from './menuItems/MenuItems'
 
 import { useTheme } from '@emotion/react'
@@ -56,6 +57,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
                   </S.WrapperCloseIcon>
                   <NetworkSwitcher />
                   <LayerSwitcher />
+                  <FeeSwitcher />
                   <WalletPicker />
                 </S.DrawerHeader>
                 <MenuItems setOpen={setOpen} />
@@ -74,4 +76,4 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
   );
 }
 
-export default MainMenu;
+export default MainMenu

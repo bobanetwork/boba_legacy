@@ -8,9 +8,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
-import * as S from './TokenList.styles'
+import * as S from './listToken.styles'
 
-function TokenList({
+function ListToken({
   token,
   chain,
   networkLayer,
@@ -27,6 +27,7 @@ function TokenList({
   const enabled = (networkLayer === chain) ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
+  
   const amountInNumber = token.symbol === 'ETH' ?
   Number(logAmount(token.balance, token.decimals, 3)):
   Number(logAmount(token.balance, token.decimals, 2))
@@ -567,4 +568,4 @@ function TokenList({
   )
 }
 
-export default React.memo(TokenList)
+export default React.memo(ListToken)

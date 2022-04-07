@@ -51,7 +51,6 @@ function Account ({ enabled }) {
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
-  //const baseEnabled = useSelector(selectBaseEnabled())
   const networkLayer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
 
