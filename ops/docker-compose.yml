@@ -327,8 +327,6 @@ services:
       L1_ETH_RPC: http://l1_chain:8545
       L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      << : *sequencer_bs_pk
-      << : *proposer_bs_pk
       RETRIES: 200
 
   integration_tests:
@@ -441,3 +439,15 @@ services:
       L2_START_BLOCK: 1
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+
+  kms:
+    image: bobanetwork/local-kms:latest
+    environment:
+      - PORT=8888
+      - KMS_REGION=us-east-1
+    volumes:
+      - type: bind
+        source: ./seed.yaml
+        target: /init/seed.yaml
+    ports:
+      - 8888:8888

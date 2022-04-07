@@ -172,34 +172,34 @@ var (
 		Value:  1,
 		EnvVar: prefixEnvVar("BLOCK_OFFSET"),
 	}
-	SequencerPrivateKeyFlag = cli.StringFlag{
-		Name:   "sequencer-private-key",
-		Usage:  "The private key to use for sending to the sequencer contract",
-		EnvVar: prefixEnvVar("SEQUENCER_PRIVATE_KEY"),
-	}
-	ProposerPrivateKeyFlag = cli.StringFlag{
-		Name:   "proposer-private-key",
-		Usage:  "The private key to use for sending to the proposer contract",
-		EnvVar: prefixEnvVar("PROPOSER_PRIVATE_KEY"),
-	}
-	MnemonicFlag = cli.StringFlag{
-		Name: "mnemonic",
-		Usage: "The mnemonic used to derive the wallets for either the " +
-			"sequencer or the proposer",
-		EnvVar: prefixEnvVar("MNEMONIC"),
-	}
-	SequencerHDPathFlag = cli.StringFlag{
-		Name: "sequencer-hd-path",
-		Usage: "The HD path used to derive the sequencer wallet from the " +
-			"mnemonic. The mnemonic flag must also be set.",
-		EnvVar: prefixEnvVar("SEQUENCER_HD_PATH"),
-	}
-	ProposerHDPathFlag = cli.StringFlag{
-		Name: "proposer-hd-path",
-		Usage: "The HD path used to derive the proposer wallet from the " +
-			"mnemonic. The mnemonic flag must also be set.",
-		EnvVar: prefixEnvVar("PROPOSER_HD_PATH"),
-	}
+	// SequencerPrivateKeyFlag = cli.StringFlag{
+	// 	Name:   "sequencer-private-key",
+	// 	Usage:  "The private key to use for sending to the sequencer contract",
+	// 	EnvVar: prefixEnvVar("SEQUENCER_PRIVATE_KEY"),
+	// }
+	// ProposerPrivateKeyFlag = cli.StringFlag{
+	// 	Name:   "proposer-private-key",
+	// 	Usage:  "The private key to use for sending to the proposer contract",
+	// 	EnvVar: prefixEnvVar("PROPOSER_PRIVATE_KEY"),
+	// }
+	// MnemonicFlag = cli.StringFlag{
+	// 	Name: "mnemonic",
+	// 	Usage: "The mnemonic used to derive the wallets for either the " +
+	// 		"sequencer or the proposer",
+	// 	EnvVar: prefixEnvVar("MNEMONIC"),
+	// }
+	// SequencerHDPathFlag = cli.StringFlag{
+	// 	Name: "sequencer-hd-path",
+	// 	Usage: "The HD path used to derive the sequencer wallet from the " +
+	// 		"mnemonic. The mnemonic flag must also be set.",
+	// 	EnvVar: prefixEnvVar("SEQUENCER_HD_PATH"),
+	// }
+	// ProposerHDPathFlag = cli.StringFlag{
+	// 	Name: "proposer-hd-path",
+	// 	Usage: "The HD path used to derive the proposer wallet from the " +
+	// 		"mnemonic. The mnemonic flag must also be set.",
+	// 	EnvVar: prefixEnvVar("PROPOSER_HD_PATH"),
+	// }
 	MetricsServerEnableFlag = cli.BoolFlag{
 		Name:   "metrics-server-enable",
 		Usage:  "Whether or not to run the embedded metrics server",
@@ -252,11 +252,11 @@ var optionalFlags = []cli.Flag{
 	SentryDsnFlag,
 	SentryTraceRateFlag,
 	BlockOffsetFlag,
-	SequencerPrivateKeyFlag,
-	ProposerPrivateKeyFlag,
-	MnemonicFlag,
-	SequencerHDPathFlag,
-	ProposerHDPathFlag,
+	// SequencerPrivateKeyFlag,
+	// ProposerPrivateKeyFlag,
+	// MnemonicFlag,
+	// SequencerHDPathFlag,
+	// ProposerHDPathFlag,
 	MetricsServerEnableFlag,
 	MetricsHostnameFlag,
 	MetricsPortFlag,

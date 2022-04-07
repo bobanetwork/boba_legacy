@@ -16,11 +16,10 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 	github.com/urfave/cli v1.22.5
+	github.com/welthee/go-ethereum-aws-kms-tx-signer v0.0.0-20211013075913-ca566ae7abeb // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
 )
 
 replace github.com/ethereum-optimism/optimism/l2geth => ../../l2geth
 
 replace github.com/ethereum-optimism/optimism/go/bss-core => ../bss-core
-
-replace github.com/ethereum/go-ethereum => ../go-ethereum

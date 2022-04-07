@@ -2,17 +2,18 @@ package drivers
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"errors"
 	"math/big"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
+	ethawskmssigner "github.com/welthee/go-ethereum-aws-kms-tx-signer"
 )
 
 // ErrClearPendingRetry signals that a transaction from a previous running
@@ -30,7 +31,8 @@ func ClearPendingTx(
 	txMgr txmgr.TxManager,
 	l1Client L1Client,
 	walletAddr common.Address,
-	privKey *ecdsa.PrivateKey,
+	svc *kms.KMS,
+	keyId string,
 	chainID *big.Int,
 ) error {
 
@@ -54,7 +56,7 @@ func ClearPendingTx(
 		log.Info(name+" clearing pending tx", "nonce", nonce)
 
 		signedTx, err := SignClearingTx(
-			name, ctx, walletAddr, nonce, l1Client, privKey, chainID,
+			name, ctx, walletAddr, nonce, l1Client, svc, keyId, chainID,
 		)
 		if err != nil {
 			log.Error(name+" unable to sign clearing tx", "nonce", nonce,
@@ -133,7 +135,8 @@ func SignClearingTx(
 	walletAddr common.Address,
 	nonce uint64,
 	l1Client L1Client,
-	privKey *ecdsa.PrivateKey,
+	svc *kms.KMS,
+	keyId string,
 	chainID *big.Int,
 ) (*types.Transaction, error) {
 
@@ -174,10 +177,12 @@ func SignClearingTx(
 	}
 
 	tx := CraftClearingTx(walletAddr, nonce, gasFeeCap, gasTipCap, gasLimit)
-
-	return types.SignTx(
-		tx, types.LatestSignerForChainID(chainID), privKey,
-	)
+	opts, _ := ethawskmssigner.NewAwsKmsTransactorWithChainID(svc, "asdf", chainID)
+	return opts.Signer(walletAddr, tx)
+	// return types.SignTx(
+	// 	tx, types.LatestSignerForChainID(chainID), privKey,
+	// )
+	// return &tx.WithSignature(types.LatestSignerForChainID(chainID))
 }
 
 // CraftClearingTx creates an unsigned clearing transaction which sends 0 ETH

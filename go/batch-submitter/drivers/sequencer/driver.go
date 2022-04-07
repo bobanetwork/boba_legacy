@@ -2,16 +2,12 @@ package sequencer
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/ctc"
-	"github.com/ethereum-optimism/optimism/go/batch-submitter/x509int"
 	"github.com/ethereum-optimism/optimism/go/bss-core/drivers"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
@@ -20,9 +16,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
+	ethawskmssigner "github.com/welthee/go-ethereum-aws-kms-tx-signer"
 )
 
 const (
@@ -39,9 +35,9 @@ type Config struct {
 	MaxTxSize   uint64
 	CTCAddr     common.Address
 	ChainID     *big.Int
-	PrivKey     *ecdsa.PrivateKey
 	KeyId       string
-	KmsEndpoint string
+	KeyAddress  common.Address
+	KMS         kms.KMS
 }
 
 type Driver struct {
@@ -78,7 +74,7 @@ func NewDriver(cfg Config) (*Driver, error) {
 		cfg.L1Client,
 	)
 
-	walletAddr := crypto.PubkeyToAddress(cfg.PrivKey.PublicKey)
+	walletAddr := cfg.KeyAddress
 
 	return &Driver{
 		cfg:            cfg,
@@ -115,7 +111,7 @@ func (d *Driver) ClearPendingTx(
 ) error {
 
 	return drivers.ClearPendingTx(
-		d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, d.cfg.PrivKey,
+		d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, &d.cfg.KMS, d.cfg.KeyId,
 		d.cfg.ChainID,
 	)
 }
@@ -230,37 +226,8 @@ func (d *Driver) CraftBatchTx(
 
 		log.Info(name+" batch constructed", "num_txs", len(batchElements), "length", len(batchCallData))
 
-		kmsPubKey := func() common.Address {
-			sess, _ := session.NewSession(&aws.Config{
-				Region:   aws.String("us-east-1"),
-				Endpoint: aws.String(d.cfg.KmsEndpoint)},
-			)
-			svc := kms.New(sess)
-			input := &kms.GetPublicKeyInput{
-				KeyId: aws.String(d.cfg.KeyId),
-			}
-			publicKeyOutput, _ := svc.GetPublicKey(input)
-			pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
-			return crypto.PubkeyToAddress(*pub)
-		}
-		kmsSign := func(message []byte) []byte {
-			sess, _ := session.NewSession(&aws.Config{
-				Region:   aws.String("us-east-1"),
-				Endpoint: aws.String(d.cfg.KmsEndpoint)},
-			)
-			svc := kms.New(sess)
-			result, _ := svc.Sign(&kms.SignInput{
-				KeyId:            aws.String(d.cfg.KeyId),
-				MessageType:      aws.String("DIGEST"),
-				Message:          message,
-				SigningAlgorithm: aws.String("ECDSA_SHA_256"),
-			})
-			return result.Signature
-		}
-		opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
-		// opts, err := bind.NewKeyedTransactorWithChainID(
-		// 	d.cfg.PrivKey, d.cfg.ChainID,
-		// )
+		opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+
 		if err != nil {
 			return nil, totalTxSize, err
 		}
@@ -300,47 +267,8 @@ func (d *Driver) SubmitBatchTx(
 	tx *types.Transaction,
 ) (*types.Transaction, error) {
 
-	kmsPubKey := func() common.Address {
-		sess, _ := session.NewSession(&aws.Config{
-			Region:   aws.String("us-east-1"),
-			Endpoint: aws.String(d.cfg.KmsEndpoint)},
-		)
-		svc := kms.New(sess)
-		input := &kms.GetPublicKeyInput{
-			KeyId: aws.String(d.cfg.KeyId),
-		}
-		publicKeyOutput, _ := svc.GetPublicKey(input)
-		pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
-		return crypto.PubkeyToAddress(*pub)
-	}
-	kmsSign := func(message []byte) []byte {
-		sess, _ := session.NewSession(&aws.Config{
-			Region:   aws.String("us-east-1"),
-			Endpoint: aws.String(d.cfg.KmsEndpoint)},
-		)
-		svc := kms.New(sess)
-		result, _ := svc.Sign(&kms.SignInput{
-			KeyId:            aws.String(d.cfg.KeyId),
-			MessageType:      aws.String("DIGEST"),
-			Message:          message,
-			SigningAlgorithm: aws.String("ECDSA_SHA_256"),
-		})
-		// type asn1EcSig struct {
-		// 	R asn1.RawValue
-		// 	S asn1.RawValue
-		// }
-		// var sigAsn1 asn1EcSig
-		// _, err = asn1.Unmarshal(result.Signature, &sigAsn1)
-		// if err != nil {
-		// 	return nil, nil, err
-		// }
+	opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
 
-		// sigAsn1.R.Bytes, sigAsn1.S.Bytes, nil
-	}
-	opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
-	// opts, err := bind.NewKeyedTransactorWithChainID(
-	// 	d.cfg.PrivKey, d.cfg.ChainID,
-	// )
 	if err != nil {
 		return nil, err
 	}
