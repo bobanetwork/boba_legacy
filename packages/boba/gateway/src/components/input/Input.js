@@ -17,6 +17,7 @@ import React from 'react'
 import BN from 'bignumber.js'
 import Select from 'react-select'
 import * as S from './Input.styles'
+
 import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
@@ -89,10 +90,6 @@ function Input({
     return acc
   }, []): null
 
-  //since ETH is the fee token, harder to use all b/c need to take
-  //operation-specific fees into account
-  allowUseAll = (unit === 'ETH') ? false : allowUseAll
-
   return (
     <div style={{width: '100%'}}>
       <S.Wrapper newstyle={newStyle ? 1 : 0} style={style}>
@@ -163,7 +160,7 @@ function Input({
         {unit && (
           <S.ActionsWrapper>
             <Typography variant="body2" component="p" sx={{opacity: 0.7, textAlign: "end", mb: 2}}>
-              Max Amount: {Number(maxValue).toFixed(3)}
+              Max Amount: {Number(maxValue).toFixed(5)}
             </Typography>
             {allowUseAll && (
               <Box>
@@ -181,7 +178,6 @@ function Input({
                   sx={{margin: '10px 0px'}}
                   loading={loading}
                   triggerTime={new Date()}
-                  tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
                   disabled={disabledExitAll}
                 >
                   Bridge All
@@ -208,7 +204,7 @@ function Input({
       }
       {value !== '' && overMax ?
         <Typography variant="body2" sx={{mt: 1}}>
-          Value too large: the value must be smaller than {Number(maxValue).toFixed(3)}
+          Value too large: the value must be smaller than {Number(maxValue).toFixed(5)}
         </Typography>
         : null}
     </div>

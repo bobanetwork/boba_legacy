@@ -71,8 +71,7 @@ function InputStepBatch({ handleClose }) {
 
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
-  // console.log("ETH available for paying fees:",Number(feeBalance))
-
+  // console.log("ETH available for paying fees:",Number(feeBalance))  
   async function doDeposit() {
 
     console.log(`User input payload: `, payload)

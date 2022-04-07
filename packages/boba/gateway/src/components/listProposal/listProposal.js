@@ -22,7 +22,7 @@ import Button from 'components/button/Button'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import * as S from "./Proposal.styles"
+import * as S from "./listProposal.styles"
 
 const useStyles = makeStyles({
     colorPrimary: {
@@ -33,12 +33,13 @@ const useStyles = makeStyles({
     }
 });
 
-function Proposal({
+function ListProposal({
     proposal
 }) {
 
     const dispatch = useDispatch()
     const classes = useStyles()
+
     const [ votePercent, setVotePercent ] = useState(undefined)
 
     useEffect(() => {
@@ -250,4 +251,4 @@ function Proposal({
 }
 
 
-export default React.memo(Proposal)
+export default React.memo(ListProposal)

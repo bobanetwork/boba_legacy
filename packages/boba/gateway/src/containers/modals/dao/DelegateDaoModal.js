@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Box, Typography} from '@mui/material'
@@ -49,17 +49,13 @@ function DelegateDaoModal({ open }) {
 
     const submit = async () => {
         let res = await dispatch(delegateVotes({ recipient }));
-        if (res) {
-            dispatch(openAlert(`Votes delegated successfully!`))
-        }
+        if (res) dispatch(openAlert(`Votes delegated successfully!`))
         handleClose()
     }
 
     const submitMe = async () => {
         let res = await dispatch(delegateVotes({ recipient: wAddress }))
-        if (res) {
-            dispatch(openAlert(`Vote self-delegation successfull!`))
-        }
+        if (res) dispatch(openAlert(`Vote self-delegation successfull!`))
         handleClose()
     }
 
@@ -73,7 +69,7 @@ function DelegateDaoModal({ open }) {
             <Box sx={{mb: 2,display: 'flex', alignItems: 'center'}}>
                 <BobaGlassIcon />
                 <Typography variant="body1" >
-                    Delegate my BOBA votes 
+                    Delegate my BOBA votes
                 </Typography>
             </Box>
             <S.DividerLine />

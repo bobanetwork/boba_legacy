@@ -43,17 +43,11 @@ function TransferNFTModal ({ open, token, minHeight }) {
   async function submit () {
     if ( token.address && recipient )
     {
-      try {
-        const transferResponseGood = await dispatch(
-          transferNFT(recipient, token)
-        )
-        if (transferResponseGood) {
-          dispatch(openAlert('NFT transfer submitted'))
-        }
-        handleClose()
-      } catch (err) {
-        //guess not really?
-      }
+      const transferResponseGood = await dispatch(
+        transferNFT(recipient, token)
+      )
+      if (transferResponseGood) dispatch(openAlert('NFT transfer submitted'))
+      handleClose()
     }
   }
 
@@ -104,7 +98,7 @@ function TransferNFTModal ({ open, token, minHeight }) {
           </Button>
         ) : null}
           <Button
-            onClick={() => {submit({useLedgerSign: false})}}
+            onClick={() => {submit()}}
             color='primary'
             variant="contained"
             loading={loading}
