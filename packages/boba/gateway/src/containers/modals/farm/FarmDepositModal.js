@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 import { addLiquidity, getFarmInfo } from 'actions/farmAction'
 
 import Button from 'components/button/Button'
@@ -60,7 +60,7 @@ class FarmDepositModal extends React.Component {
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
-      
+
       if ( stakeToken.symbol !== 'ETH' ) {
         this.props.dispatch(fetchAllowance(
           stakeToken.currency,
@@ -96,14 +96,14 @@ class FarmDepositModal extends React.Component {
     if( bobaFeeChoice && stakeToken.symbol === 'BOBA' && netLayer === 'L2' ) {
       let safeRet = Number(amount) - 1.0
       if(safeRet > 0)
-        return safeRet.toString() 
+        return safeRet.toString()
       else
         return '0'
-    } 
+    }
     else if ( !bobaFeeChoice && stakeToken.symbol === 'ETH' ) {
       let safeRet = Number(amount) - 0.01
       if(safeRet > 0)
-        return safeRet.toString() 
+        return safeRet.toString()
       else
         return '0'
     }
@@ -164,7 +164,7 @@ class FarmDepositModal extends React.Component {
         stakeToken.currency,
         stakeToken.LPAddress
       ))
-    } 
+    }
     this.setState({ loading: false })
 
   }
