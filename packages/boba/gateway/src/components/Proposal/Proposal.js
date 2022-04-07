@@ -17,7 +17,7 @@ import { Circle } from '@mui/icons-material'
 import { Box, LinearProgress, Link, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { castProposalVote, executeProposal, queueProposal } from 'actions/daoAction'
-import { openAlert, openError } from 'actions/uiAction'
+import { openAlert } from 'actions/uiAction'
 import Button from 'components/button/Button'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -38,7 +38,7 @@ function Proposal({
 }) {
 
     const dispatch = useDispatch()
-    const classes = useStyles();
+    const classes = useStyles()
     const [ votePercent, setVotePercent ] = useState(undefined)
 
     useEffect(() => {
@@ -55,29 +55,17 @@ function Proposal({
 
     const updateVote = async (id, userVote, label) => {
         let res = await dispatch(castProposalVote({ id, userVote }));
-        if (res) {
-            dispatch(openAlert(`${label}`));
-        } else {
-            dispatch(openError(`Failed to cast vote!`));
-        }
+        if (res) dispatch(openAlert(`${label}`))
     }
 
     const doQueueProposal = async () => {
         let res = await dispatch(queueProposal(proposal.id))
-        if (res) {
-            dispatch(openAlert(`Proposal is queuing`));
-        } else {
-            dispatch(openError(`Failed to queue proposal`));
-        }
+        if (res) dispatch(openAlert(`Proposal is queuing`))
     }
 
     const doExecuteProposal = async () => {
         let res = await dispatch(executeProposal(proposal.id))
-        if (res) {
-            dispatch(openAlert(`Proposal is executing`));
-        } else {
-            dispatch(openError(`Failed to execute proposal`));
-        }
+        if (res) dispatch(openAlert(`Proposal is executing`))
     }
 
     const FormatDescription = ({ description }) => {
@@ -85,7 +73,13 @@ function Proposal({
             let descList = description.split('@@')
             if (descList[ 1 ] !== '') {
                 //should validate http link
-                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link color="inherit" variant="body2" target="_blank" rel="noopener noreferrer" href={descList[ 1 ]}>MORE DETAILS</Link>  </>
+                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link 
+                    color="inherit" 
+                    variant="body2" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    href={descList[ 1 ]}
+                  >MORE DETAILS</Link></>
             } else {
                 return <>{descList[ 0 ]}</>
             }
@@ -95,6 +89,9 @@ function Proposal({
 
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
+
+    let hasVoted = false     
+    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true 
 
     return (
         <S.Wrapper>
@@ -108,7 +105,7 @@ function Proposal({
                     xs={12}
                     md={12}
                 >
-                    <Typography variant="body2" style={{ fontWeight: '700', textDecoration: 'underline' }}>
+                    <Typography variant="body2" style={{ fontWeight: '700' }}>
                         Proposal {proposal.id} : <FormatDescription description={proposal.description} />
                     </Typography>
                     <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', my: '10px' }}>
@@ -128,10 +125,15 @@ function Proposal({
                         </Box>
                         <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
                             Status: &nbsp;
-                            {proposal.state === 'Defeated' &&
+                            {proposal.state === 'Defeated' && proposal.totalVotes < 1000000 &&
                                 <span style={{ color: 'red' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp;
-                                    {proposal.state}</span>
+                                    Defeated: No Quorum</span>
+                            }
+                            {proposal.state === 'Defeated' && proposal.totalVotes >= 1000000 &&
+                                <span style={{ color: 'red' }}>
+                                    <Circle sx={{ height: "10px", width: "10px" }} />&nbsp;
+                                    Defeated</span>
                             }
                             {proposal.state === 'Succeeded' &&
                                 <span style={{ color: 'green' }}>
@@ -143,16 +145,17 @@ function Proposal({
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; {proposal.state}</span>
 
                             }
-                            {proposal.state !== 'Succeeded' && proposal.state !== 'Defeated' &&
-                                <span style={{ color: 'yellow' }}>
+                            {proposal.state === 'Pending' &&
+                                <span style={{ color: 'green' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; {proposal.state}</span>
+
                             }
-                            {proposal.state === 'Active' && !proposal.hasVoted &&
+                            {proposal.state === 'Active' && !hasVoted &&
                                 <span style={{ fontSize: '0.8em', lineHeight: '1.2em', color: 'yellow', fontWeight: '700' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; Proposal active
                                 </span>
                             }
-                            {proposal.state === 'Active' && proposal.hasVoted &&
+                            {proposal.state === 'Active' && hasVoted &&
                                 <span style={{ fontSize: '0.8em', lineHeight: '1.2em', color: 'green', fontWeight: '700' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp; Vote recorded: thank you
                                 </span>
@@ -160,7 +163,9 @@ function Proposal({
                         </Typography>
                     </Box>
                 </S.GridItemTag>
-                <S.GridItemTagR
+                
+                {proposal.totalVotes > 0 &&
+                    <S.GridItemTagR
                     item
                     xs={12}
                     md={12}
@@ -170,15 +175,15 @@ function Proposal({
                         display: 'flex',
                         justifyContent: 'space-between',
                     }}>
-                        {votePercent !== 'NA' &&
-                            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
-                        }
+                        <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
                         <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', opacity: 0.3 }}>Total: {proposal.totalVotes}</Typography>
                     </Box>
                     <Box sx={{ width: '100%', my: 2 }}>
                         <LinearProgress
                             classes={{ colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary }}
-                            variant="determinate" value={votePercent} />
+                            variant="determinate" 
+                            value={votePercent} 
+                        />
                     </Box>
                     <Box sx={{
                         width: '100%',
@@ -197,6 +202,7 @@ function Proposal({
                         </Typography>
                     </Box>
                 </S.GridItemTagR>
+                }
                 <S.GridItemTag item
                     xs={12}
                     md={12}
@@ -209,21 +215,21 @@ function Proposal({
                             gap: '20px'
                         }}
                     >
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="primary"
                                 variant="outlined"
                                 onClick={(e) => { updateVote(proposal.id, 1, 'Cast Vote For') }}
                             >Vote For</Button>
                         }
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="primary"
                                 variant="outlined"
                                 onClick={(e) => { updateVote(proposal.id, 0, 'Cast Vote Against') }}
                             >Vote Against</Button>
                         }
-                        {proposal.state === 'Active' && !proposal.hasVoted &&
+                        {proposal.state === 'Active' && !hasVoted &&
                             <Button
                                 type="outline"
                                 variant="outlined"

@@ -246,12 +246,10 @@ var (
 	BobaRinkebyGasUpdatedForkNum = big.NewInt(0)
 
 	// BobaMainnetFeeUpdatedForkNum is the height at which the fee update fork activates on Mainnet.
-	// In progress
-	BobaMainnetFeeUpdatedForkNum = big.NewInt(500000)
+	BobaMainnetFeeUpdatedForkNum = big.NewInt(550000)
 
 	// BobaRinkebyFeeUpdatedForkNum is the height at which the fee update fork activates on Rinkeby.
-	// In progress
-	BobaRinkebyFeeUpdatedForkNum = big.NewInt(100)
+	BobaRinkebyFeeUpdatedForkNum = big.NewInt(50000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -452,6 +450,9 @@ func (c *ChainConfig) IsSDUpdate(num *big.Int) bool {
 }
 
 func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetGasUpdatedForkNum, num)
 	}
@@ -461,7 +462,10 @@ func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
 	return true
 }
 
-func (c *ChainConfig) IsFeeUpdate(num *big.Int) bool {
+func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetFeeUpdatedForkNum, num)
 	}

@@ -14,9 +14,6 @@ import networkService from 'services/networkService'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-
-import { monsterMint } from 'actions/networkAction'
-
 import Copy from 'components/copy/Copy'
 
 class Nft extends React.Component {
@@ -87,14 +84,6 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
-  async doMonsterMint() {
-    console.log("dispatch Monster mint")
-    if (this.state.accountEnabled) {
-      console.log("dispatch Monster mint")
-      this.props.dispatch(monsterMint())
-    }
-  }
-
   render() {
 
     const {
@@ -156,27 +145,6 @@ class Nft extends React.Component {
       return (
         <S.NFTPageContainer>
           <S.NFTActionContent>
-          <S.NFTFormContent>
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-                  <BobaGlassIcon />
-                  <Typography variant="body1" >
-                    Monster Mint
-                  </Typography>
-                </Box>
-                <S.DividerLine />
-                <Button
-                  type="primary"
-                  variant="contained"
-                  fullWidth={true}
-                  onClick={(i) => { this.doMonsterMint() }}
-                  disabled={loading}
-                  sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
-                >
-                  Mint my monster
-                </Button>
-              </Box>
-            </S.NFTFormContent>
             <S.NFTFormContent>
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -190,7 +158,7 @@ class Nft extends React.Component {
                   <br/>Useful addresses
                 </Typography>
                 <Typography variant="body2" >
-                  Turing monsters (Mainnet):
+                  Turing monsters:
                 </Typography>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography variant="body3" >
@@ -198,16 +166,6 @@ class Nft extends React.Component {
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>
-                <Typography variant="body2" >
-                  Turing monsters (Rinkeby):
-                </Typography>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body3" >
-                    0x02C92e7420Ba673ebf0080A6F3ce76D5cd4c854e
-                  </Typography>
-                  <Copy value={'0x02C92e7420Ba673ebf0080A6F3ce76D5cd4c854e'} light={false} />
-                </Box>
-
               </Box>
               <Box sx={{
                 display: 'flex',

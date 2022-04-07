@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction';
+import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -28,7 +28,7 @@ import { delegateVotesX } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
 
-import BobaGlassIcon from 'components/icons/BobaGlassIcon';
+import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 import * as S from './daoModal.styles';
 
@@ -52,23 +52,17 @@ function DelegateDaoXModal({ open }) {
     const submit = async () => {
         let res = await dispatch(delegateVotesX({ recipient }));
         if (res) {
-            dispatch(openAlert(`Votes delegated successfully!`));
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`));
-            handleClose();
-        }
+            dispatch(openAlert(`Votes delegated successfully!`))
+        } 
+        handleClose()
     }
 
     const submitMe = async () => {
         let res = await dispatch(delegateVotesX({ recipient: wAddress }))
         if (res) {
             dispatch(openAlert(`Vote self-delegation successfull!`))
-            handleClose();
-        } else {
-            dispatch(openError(`Failed to delegate`))
-            handleClose();
         }
+        handleClose()
     }
 
     return (
@@ -104,7 +98,7 @@ function DelegateDaoXModal({ open }) {
                     onClick={()=>{submitMe()}}
                     color='primary'
                     variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power from one L2 address to another L2 address"}
+                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate xBOBA voting power to yourself"}
                     loading={loading}
                     triggerTime={new Date()}
                     fullWidth={true}

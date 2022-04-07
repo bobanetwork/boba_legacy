@@ -48,6 +48,8 @@ if [ $L1_CROSS_DOMAIN_MESSENGER_ADDRESS == null ]; then
     envSet L1_CROSS_DOMAIN_MESSENGER_ADDRESS L1CrossDomainMessenger
 fi
 
+envSet L1_BOBA_TOKEN_ADDRESS TK_L1BOBA
+
 # build the dump file
 yarn run build:dump
 
