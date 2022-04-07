@@ -91,8 +91,12 @@ class FarmDepositModal extends React.Component {
     const { stakeToken, bobaFeeChoice, netLayer } = this.state
 
     let amount = logAmount(stakeToken.balance, stakeToken.decimals)
-    console.log("amount1:",amount)
 
+    // should not be hardcoded - ToDo - lookup actual cost
+    // three scenarios - 
+    // L1 staking ETH 
+    // L2 staking ETH and paying in ETH
+    // L2 staking BOBA and paying in BOBA 
     if( bobaFeeChoice && stakeToken.symbol === 'BOBA' && netLayer === 'L2' ) {
       let safeRet = Number(amount) - 1.0
       if(safeRet > 0)
@@ -100,7 +104,14 @@ class FarmDepositModal extends React.Component {
       else
         return '0'
     } 
-    else if ( !bobaFeeChoice && stakeToken.symbol === 'ETH' ) {
+    else if ( !bobaFeeChoice && stakeToken.symbol === 'ETH' && netLayer === 'L2' ) {
+      let safeRet = Number(amount) - 0.01
+      if(safeRet > 0)
+        return safeRet.toString() 
+      else
+        return '0'
+    }
+    else if ( stakeToken.symbol === 'ETH' && netLayer === 'L1' ) {
       let safeRet = Number(amount) - 0.01
       if(safeRet > 0)
         return safeRet.toString() 

@@ -707,11 +707,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      this.supportedTokens = [ 'USDT',  'DAI', 'USDC',  'WBTC',
-                               'REP',  'BAT',  'ZRX', 'SUSHI',
-                               'LINK',  'UNI', 'BOBA', 'xBOBA',
-                               'OMG', 'FRAX',  'FXS',  'DODO',
-                               'UST', 'BUSD',  'BNB',   'FTM',
+      this.supportedTokens = [ 'USDT',   'DAI', 'USDC',  'WBTC',
+                               'REP',    'BAT',  'ZRX', 'SUSHI',
+                               'LINK',   'UNI', 'BOBA', 'xBOBA',
+                               'OMG',   'FRAX',  'FXS',  'DODO',
+                               'UST',   'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM', 'WAGMIv0',
                                'OLO', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
                               ]
@@ -861,7 +861,26 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
           l1ChainId: 1,
           fastRelayer: true,
         })
-      } else {
+      } else if (networkGateway === 'rinkeby') {
+        this.watcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 4,
+          fastRelayer: false,
+        })
+        this.fastWatcher = new CrossChainMessenger({
+          l1SignerOrProvider: this.L1Provider,
+          l2SignerOrProvider: this.L2Provider,
+          l1ChainId: 4,
+          fastRelayer: true,
+        })
+      }
+
+
+
+
+
+      else {
         this.watcher = null
         this.fastWatcher = null
       }
@@ -1263,12 +1282,27 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
   }
 
-  async getL2FeeBalance() {
+  async getL2BalanceETH() {
     try {
       const balance = await this.L2Provider.getBalance(this.account)
       return utils.formatEther(balance)
     } catch (error) {
-      console.log("NS: getL2FeeBalance error:",error)
+      console.log("NS: getL2BalanceETH error:",error)
+      return error
+    }
+  }
+
+  async getL2BalanceBOBA() {
+    try {
+      const ERC20Contract = new ethers.Contract(
+        this.tokenAddresses['BOBA'].L2,
+        L2ERC20Json.abi, //any old abi will do...
+        this.provider.getSigner()
+      )
+      const balance = await ERC20Contract.balanceOf(this.account)
+      return utils.formatEther(balance)
+    } catch (error) {
+      console.log("NS: getL2BalanceBOBA error:",error)
       return error
     }
   }
@@ -2266,8 +2300,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const cost_BN = gas_BN.mul(gasPrice)
     console.log("Classical exit cost (ETH):", utils.formatEther(cost_BN))
 
+    const totalCost = utils.formatEther(cost_BN.add(approvalCost_BN))
+    console.log("Classical exit total cost (ETH):", totalCost)
+
     //returns total cost in ETH
-    return utils.formatEther(cost_BN.add(approvalCost_BN))
+    return totalCost
   }
 
   /***********************************************/
@@ -3012,7 +3049,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const gasPrice = await this.L1Provider.getGasPrice()
     console.log("Fast deposit gas price", gasPrice.toString())
 
-    // We use Boba as an example
+    // We use BOBA as an example
     const ERC20Contract = new ethers.Contract(
       this.tokenAddresses['BOBA'].L1,
       L2ERC20Json.abi, //any old abi will do...
@@ -3418,7 +3455,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     if( this.L1orL2 !== 'L2' ) return
     if( !this.BobaContract ) return
-
+ 
     if(!this.account) {
       console.log('NS: delegateVotes() error - called but account === null')
       return
@@ -3474,7 +3511,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
   }
 
-  //Create Proposal
+  // Create Proposal
   async createProposal(payload) {
 
     if( this.L1orL2 !== 'L2' ) return
@@ -3735,14 +3772,14 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
           this.account,
           allAddresses.BobaFixedSavings
         )
-      console.log("Allowance",allowance_BN.toString())
+      console.log("Allowance", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
 
-      console.log("Deposit:",depositAmount_BN)
+      console.log("Deposit:", depositAmount_BN)
 
       if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Need to approve YES:",depositAmount_BN)
+        console.log("Need to approve YES:", depositAmount_BN)
         const approveStatus = await this.BobaContract
         .connect(this.provider.getSigner())
         .approve(
@@ -3752,7 +3789,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         await approveStatus.wait()
         if (!approveStatus) return false
       } else {
-        console.log("Allowance is sufficient:",allowance_BN.toString(), depositAmount_BN.toString())
+        console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
       }
 
       const TX = await FixedSavings.stake(value_Wei_String)

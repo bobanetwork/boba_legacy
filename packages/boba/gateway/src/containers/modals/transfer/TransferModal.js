@@ -48,9 +48,9 @@ function TransferModal ({ open, token, minHeight }) {
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
-  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max - amount to transfer in wei_string
-  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      //support for Use Max - the max possible wei string
-  const [ max_Float, setMax_Float ] = useState('0')                //support for Use Max - a number like 0.09 ETH
+  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  // support for Use Max - amount to transfer in wei_string
+  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      // support for Use Max - the max possible wei string
+  const [ max_Float, setMax_Float ] = useState('0')                // support for Use Max - a number like 0.09 ETH
   const [ fee, setFee ] = useState('0')
 
   const [ recipient, setRecipient ] = useState('')
