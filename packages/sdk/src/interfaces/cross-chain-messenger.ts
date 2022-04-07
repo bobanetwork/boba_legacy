@@ -413,6 +413,24 @@ export interface ICrossChainMessenger {
   ): Promise<TransactionResponse>
 
   /**
+   * Finalizes a batch of cross chain messages that was sent from L2 to L1. Only applicable for L2 to L1
+   * messages. Will throw an error if the message has not completed its challenge period yet.
+   *
+   * @param messages Messages to finalize.
+   * @param opts Additional options.
+   * @param opts.signer Optional signer to use to send the transaction.
+   * @param opts.overrides Optional transaction overrides.
+   * @returns Transaction response for the finalization transaction.
+   */
+  finalizeBatchMessage(
+    messages: Array<MessageLike>,
+    opts?: {
+      signer?: Signer
+      overrides?: Overrides
+    }
+  ): Promise<TransactionResponse>
+
+  /**
    * Deposits some ETH into the L2 chain.
    *
    * @param amount Amount of ETH to deposit (in wei).
@@ -597,6 +615,23 @@ export interface ICrossChainMessenger {
     ): Promise<TransactionRequest>
 
     /**
+     * Generates a batch message finalization transaction that can be signed and executed. Only
+     * applicable for L2 to L1 messages. Will throw an error if the message has not completed
+     * its challenge period yet.
+     *
+     * @param messages Messages to generate the finalization transaction for.
+     * @param opts Additional options.
+     * @param opts.overrides Optional transaction overrides.
+     * @returns Transaction that can be signed and executed to finalize the message.
+     */
+    finalizeBatchMessage(
+      messages: Array<MessageLike>,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<TransactionRequest>
+
+    /**
      * Generates a transaction for approving some tokens to deposit into the L2 chain.
      *
      * @param l1Token The L1 token address.
@@ -745,6 +780,21 @@ export interface ICrossChainMessenger {
      */
     finalizeMessage(
       message: MessageLike,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<BigNumber>
+
+    /**
+     * Estimates gas required to finalize a batch cross chain message. Only applies to L2 to L1 messages.
+     *
+     * @param messages Array of Messages to generate the finalization transaction for.
+     * @param opts Additional options.
+     * @param opts.overrides Optional transaction overrides.
+     * @returns Gas estimate for the transaction.
+     */
+    finalizeBatchMessage(
+      messages: Array<MessageLike>,
       opts?: {
         overrides?: Overrides
       }
