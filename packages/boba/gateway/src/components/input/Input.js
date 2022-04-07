@@ -20,10 +20,6 @@ import * as S from './Input.styles'
 
 import { selectCustomStyles } from './Select.styles'
 
-import { selectBobaFeeChoice } from 'selectors/setupSelector'
-
-import { useSelector } from 'react-redux'
-
 import Button from 'components/button/Button'
 
 import { Box, Typography } from '@mui/material'
@@ -59,8 +55,6 @@ function Input({
   selectValue,
   style
 }) {
-
-  const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   async function handlePaste() {
     try {

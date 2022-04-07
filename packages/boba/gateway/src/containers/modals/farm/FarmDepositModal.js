@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 import { addLiquidity, getFarmInfo } from 'actions/farmAction'
 
 import Button from 'components/button/Button'

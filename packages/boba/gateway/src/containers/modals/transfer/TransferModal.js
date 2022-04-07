@@ -16,18 +16,16 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { transfer, transferEstimate } from 'actions/networkAction'
+import { transfer } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 
-import { ethers, BigNumber, utils } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 
 import {
-   selectAccountEnabled,
    selectBobaFeeChoice,
    selectBobaPriceRatio,
-   selectLayer
 } from 'selectors/setupSelector'
 
 import BN from 'bignumber.js'
@@ -39,7 +37,7 @@ import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
-import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
+import { amountToUsd, toWei_String } from 'util/amountConvert'
 
 import networkService from 'services/networkService'
 
@@ -59,8 +57,6 @@ function TransferModal ({ open, token, minHeight }) {
   const [ validValue, setValidValue ] = useState(false)
 
   const loading = useSelector(selectLoading([ 'TRANSFER/CREATE' ]))
-
-  const wAddress = networkService.account ? networkService.account : ''
 
   const lookupPrice = useSelector(selectLookupPrice)
 
@@ -106,7 +102,7 @@ function TransferModal ({ open, token, minHeight }) {
       setFee(utils.formatUnits(cost_BN, token.decimals))
     }
     if (recipient !== '') estimateCost()
-  }, [token, feeUseBoba, recipient])
+  }, [token, feeUseBoba, recipient, feePriceRatio])
 
   function setAmount(value) {
 
