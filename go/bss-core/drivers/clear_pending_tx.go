@@ -177,12 +177,8 @@ func SignClearingTx(
 	}
 
 	tx := CraftClearingTx(walletAddr, nonce, gasFeeCap, gasTipCap, gasLimit)
-	opts, _ := ethawskmssigner.NewAwsKmsTransactorWithChainID(svc, "asdf", chainID)
+	opts, _ := ethawskmssigner.NewAwsKmsTransactorWithChainID(svc, keyId, chainID)
 	return opts.Signer(walletAddr, tx)
-	// return types.SignTx(
-	// 	tx, types.LatestSignerForChainID(chainID), privKey,
-	// )
-	// return &tx.WithSignature(types.LatestSignerForChainID(chainID))
 }
 
 // CraftClearingTx creates an unsigned clearing transaction which sends 0 ETH
