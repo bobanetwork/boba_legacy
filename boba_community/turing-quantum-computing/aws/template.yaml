@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification for your Turing calls.
+Resources:
+  quote:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: turing_quantum-computer.lambda_handler
+      Runtime: python3.9
+      CodeUri: .
+      Description: 'Turing Example - Quantum computer'
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
