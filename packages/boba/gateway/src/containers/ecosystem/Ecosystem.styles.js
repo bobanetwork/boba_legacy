@@ -1,6 +1,28 @@
-import { Box } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import Card from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+
+export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [theme.breakpoints.between('md', 'lg')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.between('sm', 'md')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+  },
+}))
 
 export const TileCard = styled(Card)(({ theme, ...props }) => ({
   borderRadius: '5px',
@@ -50,4 +72,19 @@ export const TileFooter = styled(Box)(({ theme, ...props }) => ({
   alignItems: 'center',
   height: '30px',
   overflow: 'hidden',
+}))
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
+}))
+
+export const CategoryList = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'flex-start',
+  gap: '10px',
+  alignItems: 'center',
+  margin: '10px'
 }))

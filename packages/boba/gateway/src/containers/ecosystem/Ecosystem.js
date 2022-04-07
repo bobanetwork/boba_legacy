@@ -10,10 +10,15 @@ import * as S from './Ecosystem.styles'
 import { loadProjectByCategory } from './project.list'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Tooltip from 'components/tooltip/Tooltip'
+import Button from 'components/button/Button'
+
+const PROJECT_CAT = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
 
 function ECOSYSTEM() {
 
   const [ projectByCategory, setprojectByCategory ] = useState({})
+
+  const [ category, setCategory ] = useState('defi')
 
   useEffect(() => {
     setprojectByCategory(loadProjectByCategory())
@@ -23,8 +28,28 @@ function ECOSYSTEM() {
   }, [])
 
   return (
-    <>
-      <PageTitle title="Ecosystem" />
+    <S.EcoSystemPageContainer>
+      {/* <PageTitle title="Ecosystem" /> */}
+      <S.CategoryList>
+        {PROJECT_CAT.map((cat, i) => {
+          return <Button
+            key={i}
+            onClick={() => {
+              setCategory(cat)
+            }}
+            sx={{ textTransform: 'uppercase' }}
+            variant={category === cat ? "contained" : "standard"}
+            color="primary"
+            size="small"
+          >{cat}</Button>
+        })}
+      </S.CategoryList>
+      <S.DividerLine />
+      <div>
+        {Object.keys(projectByCategory).length > 0 ? projectByCategory[ category ].map((project) => {
+          return <div>{project.title}</div>
+        }) : null}
+      </div>
       <div className={styles.container}>
         {
           Object.keys(projectByCategory).map((d) => {
@@ -82,7 +107,7 @@ function ECOSYSTEM() {
           })
         }
       </div>
-    </>
+    </S.EcoSystemPageContainer>
   )
 
 }
