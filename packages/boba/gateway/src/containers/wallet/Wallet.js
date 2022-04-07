@@ -7,7 +7,14 @@ import Tabs from 'components/tabs/Tabs'
 import Nft from "containers/wallet/nft/Nft"
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectLayer } from "selectors/setupSelector"
+
+import { 
+  selectAccountEnabled, 
+  selectLayer,
+  selectBobaFeeChoice,
+  selectBobaPriceRatio
+} from "selectors/setupSelector"
+
 import Token from "./token/Token"
 import * as S from './wallet.styles'
 
@@ -16,6 +23,9 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import AlertIcon from 'components/icons/AlertIcon'
 import { isEqual, orderBy } from 'lodash'
 import { selectTransactions } from 'selectors/transactionSelector'
+import { fetchTransactions } from "actions/networkAction"
+import { POLL_INTERVAL } from "util/constant"
+import useInterval from "util/useInterval"
 
 function Wallet() {
 
@@ -24,8 +34,11 @@ function Wallet() {
 
   const dispatch = useDispatch()
 
-  const layer = useSelector(selectLayer());
+  const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
@@ -64,6 +77,18 @@ function Wallet() {
     ...pendingL2
   ]
 
+  useEffect(()=>{
+    if (accountEnabled) {
+      dispatch(fetchTransactions())
+    }
+  },[ dispatch, accountEnabled ])
+
+  useInterval(() => {
+    if (accountEnabled) {
+      dispatch(fetchTransactions())
+    }
+  }, POLL_INTERVAL)
+
   useEffect(() => {
     if (layer === 'L2') {
       setChain('Boba Wallet')
@@ -84,7 +109,15 @@ function Wallet() {
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
-
+      {feeUseBoba && layer === 'L2' &&
+        <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
+          <Typography variant="body2" sx={{ opacity: "0.6"}}>
+          You are using BOBA to pay for gas. 
+          <br/>NOTE: please maintain a minimal ETH balance (e.g. 0.02 ETH) in your wallet otherwise 
+          MetaMask may incorrectly reject transactions.
+          </Typography>
+        </Box>
+      }
       {!accountEnabled &&
         <S.LayerAlert>
           <S.AlertInfo>

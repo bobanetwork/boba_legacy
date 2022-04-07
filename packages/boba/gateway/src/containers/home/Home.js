@@ -124,7 +124,7 @@ function Home() {
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
-  const tokenIndex = useSelector(selectModalState('tokenIndex'));
+  const tokenIndex = useSelector(selectModalState('tokenIndex'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))

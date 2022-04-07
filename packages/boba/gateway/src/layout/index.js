@@ -123,6 +123,8 @@ function App () {
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
               background: radioGreen,
+              borderWidth: '1.4px',
+              borderColor: radioGreen,
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
@@ -143,6 +145,20 @@ function App () {
                 backgroundColor: radioGreen,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              }
+            },
+          },
+          {
+            props: { variant: 'standard', color: 'primary' },
+            style: {
+              color: light ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.45)',
+              background: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.65)',//'rgba(255, 255, 255, 0.06)',
+              borderWidth: '1.4px',
+              borderColor: radioGreen,
+              filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
+              "&:hover": {
+                color: radioGreen,
+                boxShadow: light ? 'none' : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }
             },
           },
@@ -188,6 +204,12 @@ function App () {
             props: { size: 'large'},
             style: {
               fontSize: '1rem',
+            },
+          },
+          {
+            props: { size: 'small'},
+            style: {
+              fontSize: '0.8rem',
             },
           },
         ],

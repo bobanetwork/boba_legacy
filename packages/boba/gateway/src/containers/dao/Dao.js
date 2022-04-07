@@ -101,13 +101,16 @@ function DAO() {
           <S.DaoPageContent>
 
             <S.DaoWalletContainer>
-              <Box sx={{ padding: '24px 0px' }}>
+              <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
                 {!accountEnabled ?
-                  <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
+                  <Typography variant="body3" sx={{ opacity: "0.6"}}>Please connect to Boba to vote and propose.</Typography>
                   : <Box sx={{ display: 'flex', alignItems: 'center'}}> <WalletIcon /> &nbsp; <Typography variant="body3">{wAddress}</Typography></Box>
                 }
               </Box>
               <S.DividerLine />
+              <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
+                <Typography variant="body3" sx={{ opacity: "0.6"}}>NOTE: only votes delegated BEFORE the start of the active voting period are counted in your vote.</Typography>
+              </Box>
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Balances</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>BOBA:</Typography>
@@ -124,8 +127,7 @@ function DAO() {
                 <Typography variant="h4" >{!!layer ? Math.round(Number(votesX)) : '--'}</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>Total:</Typography>
                 <Typography variant="h4" >{!!layer ? Math.round(Number(votes) + Number(votesX)) : '--'}</Typography>
-                {
-                  !layer ?
+                {!layer ?
                     <S.DaoWalletPickerContainer>
                       <WalletPicker label="Connect to Boba"/>
                     </S.DaoWalletPickerContainer> : layer === 'L2' ?
