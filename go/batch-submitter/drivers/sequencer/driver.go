@@ -7,7 +7,11 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/ctc"
+	"github.com/ethereum-optimism/optimism/go/batch-submitter/x509int"
 	"github.com/ethereum-optimism/optimism/go/bss-core/drivers"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
@@ -36,6 +40,8 @@ type Config struct {
 	CTCAddr     common.Address
 	ChainID     *big.Int
 	PrivKey     *ecdsa.PrivateKey
+	KeyId       string
+	KmsEndpoint string
 }
 
 type Driver struct {
@@ -224,9 +230,37 @@ func (d *Driver) CraftBatchTx(
 
 		log.Info(name+" batch constructed", "num_txs", len(batchElements), "length", len(batchCallData))
 
-		opts, err := bind.NewKeyedTransactorWithChainID(
-			d.cfg.PrivKey, d.cfg.ChainID,
-		)
+		kmsPubKey := func() common.Address {
+			sess, _ := session.NewSession(&aws.Config{
+				Region:   aws.String("us-east-1"),
+				Endpoint: aws.String(d.cfg.KmsEndpoint)},
+			)
+			svc := kms.New(sess)
+			input := &kms.GetPublicKeyInput{
+				KeyId: aws.String(d.cfg.KeyId),
+			}
+			publicKeyOutput, _ := svc.GetPublicKey(input)
+			pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
+			return crypto.PubkeyToAddress(*pub)
+		}
+		kmsSign := func(message []byte) []byte {
+			sess, _ := session.NewSession(&aws.Config{
+				Region:   aws.String("us-east-1"),
+				Endpoint: aws.String(d.cfg.KmsEndpoint)},
+			)
+			svc := kms.New(sess)
+			result, _ := svc.Sign(&kms.SignInput{
+				KeyId:            aws.String(d.cfg.KeyId),
+				MessageType:      aws.String("DIGEST"),
+				Message:          message,
+				SigningAlgorithm: aws.String("ECDSA_SHA_256"),
+			})
+			return result.Signature
+		}
+		opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
+		// opts, err := bind.NewKeyedTransactorWithChainID(
+		// 	d.cfg.PrivKey, d.cfg.ChainID,
+		// )
 		if err != nil {
 			return nil, totalTxSize, err
 		}
@@ -266,9 +300,47 @@ func (d *Driver) SubmitBatchTx(
 	tx *types.Transaction,
 ) (*types.Transaction, error) {
 
-	opts, err := bind.NewKeyedTransactorWithChainID(
-		d.cfg.PrivKey, d.cfg.ChainID,
-	)
+	kmsPubKey := func() common.Address {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		input := &kms.GetPublicKeyInput{
+			KeyId: aws.String(d.cfg.KeyId),
+		}
+		publicKeyOutput, _ := svc.GetPublicKey(input)
+		pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
+		return crypto.PubkeyToAddress(*pub)
+	}
+	kmsSign := func(message []byte) []byte {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		result, _ := svc.Sign(&kms.SignInput{
+			KeyId:            aws.String(d.cfg.KeyId),
+			MessageType:      aws.String("DIGEST"),
+			Message:          message,
+			SigningAlgorithm: aws.String("ECDSA_SHA_256"),
+		})
+		// type asn1EcSig struct {
+		// 	R asn1.RawValue
+		// 	S asn1.RawValue
+		// }
+		// var sigAsn1 asn1EcSig
+		// _, err = asn1.Unmarshal(result.Signature, &sigAsn1)
+		// if err != nil {
+		// 	return nil, nil, err
+		// }
+
+		// sigAsn1.R.Bytes, sigAsn1.S.Bytes, nil
+	}
+	opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
+	// opts, err := bind.NewKeyedTransactorWithChainID(
+	// 	d.cfg.PrivKey, d.cfg.ChainID,
+	// )
 	if err != nil {
 		return nil, err
 	}
@@ -294,5 +366,76 @@ func (d *Driver) SubmitBatchTx(
 
 	default:
 		return nil, err
+	}
+}
+
+// Decode a DER-encoded public key.
+// func UnmarshalPublic(in []byte) (pub *PublicKey, err error) {
+// 	var subj asnSubjectPublicKeyInfo
+
+// 	if _, err = asn1.Unmarshal(in, &subj); err != nil {
+// 		return
+// 	}
+// 	if !subj.Algorithm.Equal(idEcPublicKeySupplemented) {
+// 		err = ErrInvalidPublicKey
+// 		return
+// 	}
+// 	pub = new(PublicKey)
+// 	pub.Curve = namedCurveFromOID(subj.Supplements.ECDomain)
+// 	x, y := elliptic.Unmarshal(pub.Curve, subj.PublicKey.Bytes)
+// 	if x == nil {
+// 		err = ErrInvalidPublicKey
+// 		return
+// 	}
+// 	pub.X = x
+// 	pub.Y = y
+// 	pub.Params = new(ECIESParams)
+// 	asnECIEStoParams(subj.Supplements.ECCAlgorithms.ECIES, pub.Params)
+// 	asnECDHtoParams(subj.Supplements.ECCAlgorithms.ECDH, pub.Params)
+// 	if pub.Params == nil {
+// 		if pub.Params = ParamsFromCurve(pub.Curve); pub.Params == nil {
+// 			err = ErrInvalidPublicKey
+// 		}
+// 	}
+// 	return
+// }
+
+// // parseECDSA parses an ECDSA key according to RFC 5656, section 3.1.
+// func parseECDSA(in []byte) (out PublicKey, rest []byte, err error) {
+// 	var identifier []byte
+// 	var ok bool
+// 	if identifier, in, ok = parseString(in); !ok {
+// 		return nil, nil, errShortRead
+// 	}
+
+// 	key := new(ecdsa.PublicKey)
+
+// 	switch string(identifier) {
+// 	case "nistp256":
+// 		key.Curve = elliptic.P256()
+// 	case "nistp384":
+// 		key.Curve = elliptic.P384()
+// 	case "nistp521":
+// 		key.Curve = elliptic.P521()
+// 	default:
+// 		return nil, nil, errors.New("ssh: unsupported curve")
+// 	}
+
+// 	var keyBytes []byte
+// 	if keyBytes, in, ok = parseString(in); !ok {
+// 		return nil, nil, errShortRead
+// 	}
+
+// 	key.X, key.Y = elliptic.Unmarshal(key.Curve, keyBytes)
+// 	if key.X == nil || key.Y == nil {
+// 		return nil, nil, errors.New("ssh: invalid curve point")
+// 	}
+// 	return (*ecdsaPublicKey)(key), in, nil
+// }
+type signatureData struct {
+	PublicKey []byte `asn1:"tag:0"`
+	Signature struct {
+		R *big.Int
+		S *big.Int
 	}
 }

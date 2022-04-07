@@ -124,6 +124,8 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
 				PrivKey:     sequencerPrivKey,
+				KeyId:       "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+				KmsEndpoint: "http://kms:8888",
 			})
 			if err != nil {
 				return err
@@ -153,6 +155,8 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
 				PrivKey:     proposerPrivKey,
+				KeyId:       "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
+				KmsEndpoint: "http://kms:8888",
 			})
 			if err != nil {
 				return err

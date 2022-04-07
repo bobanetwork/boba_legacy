@@ -7,8 +7,13 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/kms"
+
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/ctc"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/scc"
+	"github.com/ethereum-optimism/optimism/go/batch-submitter/x509int"
 	"github.com/ethereum-optimism/optimism/go/bss-core/drivers"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
@@ -37,6 +42,8 @@ type Config struct {
 	CTCAddr     common.Address
 	ChainID     *big.Int
 	PrivKey     *ecdsa.PrivateKey
+	KeyId       string
+	KmsEndpoint string
 }
 
 type Driver struct {
@@ -188,9 +195,37 @@ func (d *Driver) CraftBatchTx(
 
 	log.Info(name+" batch constructed", "num_state_roots", len(stateRoots))
 
-	opts, err := bind.NewKeyedTransactorWithChainID(
-		d.cfg.PrivKey, d.cfg.ChainID,
-	)
+	kmsPubKey := func() common.Address {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		input := &kms.GetPublicKeyInput{
+			KeyId: aws.String(d.cfg.KeyId),
+		}
+		publicKeyOutput, _ := svc.GetPublicKey(input)
+		pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
+		return crypto.PubkeyToAddress(*pub)
+	}
+	kmsSign := func(message []byte) []byte {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		result, _ := svc.Sign(&kms.SignInput{
+			KeyId:            aws.String(d.cfg.KeyId),
+			MessageType:      aws.String("DIGEST"),
+			Message:          message,
+			SigningAlgorithm: aws.String("ECDSA_SHA_256"),
+		})
+		return result.Signature
+	}
+	opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
+	// opts, err := bind.NewKeyedTransactorWithChainID(
+	// 	d.cfg.PrivKey, d.cfg.ChainID,
+	// )
 	if err != nil {
 		return nil, totalStateRootSize, err
 	}
@@ -236,9 +271,37 @@ func (d *Driver) SubmitBatchTx(
 	tx *types.Transaction,
 ) (*types.Transaction, error) {
 
-	opts, err := bind.NewKeyedTransactorWithChainID(
-		d.cfg.PrivKey, d.cfg.ChainID,
-	)
+	kmsPubKey := func() common.Address {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		input := &kms.GetPublicKeyInput{
+			KeyId: aws.String(d.cfg.KeyId),
+		}
+		publicKeyOutput, _ := svc.GetPublicKey(input)
+		pub, _ := x509int.ParsePKIXPublicKey(publicKeyOutput.PublicKey)
+		return crypto.PubkeyToAddress(*pub)
+	}
+	kmsSign := func(message []byte) []byte {
+		sess, _ := session.NewSession(&aws.Config{
+			Region:   aws.String("us-east-1"),
+			Endpoint: aws.String(d.cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
+		result, _ := svc.Sign(&kms.SignInput{
+			KeyId:            aws.String(d.cfg.KeyId),
+			MessageType:      aws.String("DIGEST"),
+			Message:          message,
+			SigningAlgorithm: aws.String("ECDSA_SHA_256"),
+		})
+		return result.Signature
+	}
+	opts, err := bind.NewGeneralKMSTransactorWithChainID(kmsPubKey, kmsSign, d.cfg.ChainID)
+	// opts, err := bind.NewKeyedTransactorWithChainID(
+	// 	d.cfg.PrivKey, d.cfg.ChainID,
+	// )
 	if err != nil {
 		return nil, err
 	}
