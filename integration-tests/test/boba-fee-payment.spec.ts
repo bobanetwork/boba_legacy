@@ -793,6 +793,28 @@ describe('Boba Fee Payment Integration Tests', async () => {
     ).to.be.rejectedWith('insufficient boba balance to pay for gas')
   })
 
+  it('{tag:boba} should return the correct receipt', async () => {
+    const randomWallet = ethers.Wallet.createRandom().connect(
+      env.l2Wallet.provider
+    )
+
+    const transferTx = await env.l2Wallet.sendTransaction({
+      to: randomWallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+    await transferTx.wait()
+
+    const registerTx = await Boba_GasPriceOracle.connect(
+      randomWallet
+    ).useBobaAsFeeToken()
+    await registerTx.wait()
+
+    const json = await env.l2Provider.send('eth_getTransactionReceipt', [
+      registerTx.hash,
+    ])
+    expect(json.l2BobaFee).to.deep.equal(BigNumber.from(0))
+  })
+
   describe('Meta transaction tests', async () => {
     let EIP712Domain: any
     let Permit: any
