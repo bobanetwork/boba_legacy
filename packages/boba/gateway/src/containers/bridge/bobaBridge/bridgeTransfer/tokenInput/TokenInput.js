@@ -155,7 +155,9 @@ function TokenInput({
               <ArrowDropDown fontSize="medium" />
             </S.TokenPicker>
         }
-        <S.TextFieldWrapper>
+        <S.TextFieldWrapper
+          error={underZero || overMax}
+          >
           {!token.symbol ?
             <S.TextFieldTag
               placeholder="enter amount"
@@ -172,19 +174,18 @@ function TokenInput({
               }}
               fullWidth={true}
               variant="standard"
-              error={underZero || overMax}
             />}
         </S.TextFieldWrapper>
         {!isMobile && multibridgeMode ? <Action /> : null}
       </S.TokenInputContent>
       {token.amount !== '' && underZero ?
-        <Typography variant="body3" sx={{ mt: 1 }}>
+        <Typography variant="body3" sx={{ mt: 1, color: 'red' }}>
           Value too small: the value must be greater than 0
         </Typography>
         : null
       }
       {token.amount !== '' && overMax ?
-        <Typography variant="body3" sx={{ mt: 1 }}>
+        <Typography variant="body3" sx={{ mt: 1, color: 'red' }}>
           Value too large: the value must be smaller than {Number(logAmount(token.balance, token.decimals)).toFixed(3)}
         </Typography>
         : null}
