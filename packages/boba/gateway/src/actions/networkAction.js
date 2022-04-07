@@ -95,7 +95,6 @@ export function depositETHL2(value) {
 
 //DEPOSIT ERC20
 export function depositErc20(value, currency, currencyL2) {
-  console.log("Depositing ERC20")
   return createAction('DEPOSIT/CREATE', () =>
     networkService.depositErc20(value, currency, currencyL2)
   )
@@ -176,6 +175,12 @@ export function approveERC20_L1LP(
 export function transfer(recipient, value, currency) {
   return createAction('TRANSFER/CREATE', () =>
     networkService.transfer(recipient, value, currency)
+  )
+}
+
+export function transferEstimate(value_Wei_String, currency) {
+  return createAction('TRANSFER_ESTIMATE/CREATE', () =>
+    networkService.transferEstimate(value_Wei_String, currency)
   )
 }
 

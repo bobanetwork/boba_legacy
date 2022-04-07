@@ -29,6 +29,7 @@ import {
   fetchTransactions,
   fetchBalances
 } from 'actions/networkAction'
+import { openModal } from 'actions/uiAction'
 
 function WalletPicker({
   label = 'Connect',
@@ -51,6 +52,13 @@ function WalletPicker({
     async function initializeAccount() {
 
       const initialized = await networkService.initializeAccount(network)
+      console.log(['initialized',initialized])
+      if (initialized === 'wrongnetwork') {
+
+        dispatch(openModal('wrongNetworkModal'));
+
+        return false;
+      }
 
       if (initialized === false) {
         console.log("WP: Account NOT enabled for", network, accountEnabled)

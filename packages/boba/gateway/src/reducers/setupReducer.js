@@ -28,6 +28,8 @@ const initialState = {
   accountNumber: null,
   network: process.env.REACT_APP_CHAIN,
   justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
+  bobaFeePriceRatio: null,
+  bobaFeeChoice: null
 }
 
 function setupReducer (state = initialState, action) {
@@ -73,6 +75,13 @@ function setupReducer (state = initialState, action) {
       return { 
         ...state, 
         justSwitchedChain: true
+      }
+    case 'BOBAFEE/ADD/SUCCESS':
+      console.log("BOBAFEE/ADD/SUCCESS:",action.payload)
+      return { 
+        ...state,
+        bobaFeePriceRatio: action.payload.priceRatio,
+        bobaFeeChoice: action.payload.feeChoice
       }
     default:
       return state

@@ -152,13 +152,13 @@ function App () {
             props: { variant: 'standard', color: 'primary' },
             style: {
               color: light ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.45)',
-              background: 'rgba(255, 255, 255, 0.06)',
+              background: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.65)',//'rgba(255, 255, 255, 0.06)',
               borderWidth: '1.4px',
               borderColor: radioGreen,
               filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
               "&:hover": {
                 color: radioGreen,
-                boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+                boxShadow: light ? 'none' : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }
             },
           },
