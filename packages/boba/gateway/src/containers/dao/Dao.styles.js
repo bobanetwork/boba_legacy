@@ -70,6 +70,7 @@ export const DaoWalletAction = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   width: '100%',
   margin: '10px auto',
+  gap: '10px',
 }));
 
 export const DaoProposalContainer = styled(Box)(({ theme }) => ({

@@ -20,10 +20,6 @@ import * as S from './Input.styles'
 
 import { selectCustomStyles } from './Select.styles'
 
-import { selectBobaFeeChoice } from 'selectors/setupSelector'
-
-import { useSelector } from 'react-redux'
-
 import Button from 'components/button/Button'
 
 import { Box, Typography } from '@mui/material'
@@ -60,8 +56,6 @@ function Input({
   style
 }) {
 
-  const feeUseBoba = useSelector(selectBobaFeeChoice())
-
   async function handlePaste() {
     try {
       const text = await navigator.clipboard.readText()
@@ -95,15 +89,6 @@ function Input({
     acc.push({ value: cur, label: tokenImageElement(cur) })
     return acc
   }, []): null
-
-  // since ETH is the fee token, harder to use all b/c need to take
-  // operation-specific fees into account
-  
-  if(feeUseBoba && unit === 'BOBA') {
-    allowUseAll = false
-  } else if (!feeUseBoba && unit === 'ETH') {
-    allowUseAll = false
-  } // else - do nothing and do not override the externally set allowUseAll
 
   return (
     <div style={{width: '100%'}}>
@@ -175,7 +160,7 @@ function Input({
         {unit && (
           <S.ActionsWrapper>
             <Typography variant="body2" component="p" sx={{opacity: 0.7, textAlign: "end", mb: 2}}>
-              Max Amount: {Number(maxValue).toFixed(3)}
+              Max Amount: {Number(maxValue).toFixed(5)}
             </Typography>
             {allowUseAll && (
               <Box>
@@ -193,7 +178,6 @@ function Input({
                   sx={{margin: '10px 0px'}}
                   loading={loading}
                   triggerTime={new Date()}
-                  tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
                   disabled={disabledExitAll}
                 >
                   Bridge All
@@ -220,7 +204,7 @@ function Input({
       }
       {value !== '' && overMax ?
         <Typography variant="body2" sx={{mt: 1}}>
-          Value too large: the value must be smaller than {Number(maxValue).toFixed(3)}
+          Value too large: the value must be smaller than {Number(maxValue).toFixed(5)}
         </Typography>
         : null}
     </div>
