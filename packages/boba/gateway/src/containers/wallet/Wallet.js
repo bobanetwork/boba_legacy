@@ -16,6 +16,9 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import AlertIcon from 'components/icons/AlertIcon'
 import { isEqual, orderBy } from 'lodash'
 import { selectTransactions } from 'selectors/transactionSelector'
+import { fetchBalances, fetchTransactions } from "actions/networkAction"
+import { POLL_INTERVAL } from "util/constant"
+import useInterval from "util/useInterval"
 
 function Wallet() {
 
@@ -63,6 +66,18 @@ function Wallet() {
     ...pendingL1,
     ...pendingL2
   ]
+
+  useEffect(()=>{
+    if (accountEnabled) {
+      dispatch(fetchTransactions())
+    }
+  },[ dispatch, accountEnabled ])
+
+  useInterval(() => {
+    if (accountEnabled) {
+      dispatch(fetchTransactions())
+    }
+  }, POLL_INTERVAL)
 
   useEffect(() => {
     if (layer === 'L2') {
