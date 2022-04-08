@@ -235,35 +235,35 @@ func ValidateConfig(cfg *Config) error {
 		return err
 	}
 
-	// Enforce that either sequencer-private-key or mnemonic + sequencer-hd-path
-	// is enabled, but not both or neither.
-	usingSequencerPrivateKey := cfg.SequencerPrivateKey != ""
-	usingSequencerHDPath := cfg.Mnemonic != "" && cfg.SequencerHDPath != ""
-	if usingSequencerPrivateKey == usingSequencerHDPath {
-		return ErrSequencerPrivKeyOrMnemonic
-	}
+	// // Enforce that either sequencer-private-key or mnemonic + sequencer-hd-path
+	// // is enabled, but not both or neither.
+	// usingSequencerPrivateKey := cfg.SequencerPrivateKey != ""
+	// usingSequencerHDPath := cfg.Mnemonic != "" && cfg.SequencerHDPath != ""
+	// if usingSequencerPrivateKey == usingSequencerHDPath {
+	// 	return ErrSequencerPrivKeyOrMnemonic
+	// }
 
-	// Enforce that either proposer-private-key or mnemonic + proposer-hd-path
-	// is enabled, but not both or neither.
-	usingProposerPrivateKey := cfg.ProposerPrivateKey != ""
-	usingProposerHDPath := cfg.Mnemonic != "" && cfg.ProposerHDPath != ""
-	if usingProposerPrivateKey == usingProposerHDPath {
-		return ErrProposerPrivKeyOrMnemonic
-	}
+	// // Enforce that either proposer-private-key or mnemonic + proposer-hd-path
+	// // is enabled, but not both or neither.
+	// usingProposerPrivateKey := cfg.ProposerPrivateKey != ""
+	// usingProposerHDPath := cfg.Mnemonic != "" && cfg.ProposerHDPath != ""
+	// if usingProposerPrivateKey == usingProposerHDPath {
+	// 	return ErrProposerPrivKeyOrMnemonic
+	// }
 
-	// If mnemonic is used, the sequencer-hd-path and proposer-hd-path must
-	// differ to avoid resuing the same wallet for both.
-	if cfg.Mnemonic != "" && cfg.SequencerHDPath == cfg.ProposerHDPath {
-		return ErrSameSequencerAndProposerHDPath
-	}
+	// // If mnemonic is used, the sequencer-hd-path and proposer-hd-path must
+	// // differ to avoid resuing the same wallet for both.
+	// if cfg.Mnemonic != "" && cfg.SequencerHDPath == cfg.ProposerHDPath {
+	// 	return ErrSameSequencerAndProposerHDPath
+	// }
 
-	// If private keys are used, ensure the keys are different to avoid resuing
-	// the same wallet for both.
-	if usingSequencerPrivateKey && usingProposerPrivateKey &&
-		cfg.SequencerPrivateKey == cfg.ProposerPrivateKey {
+	// // If private keys are used, ensure the keys are different to avoid resuing
+	// // the same wallet for both.
+	// if usingSequencerPrivateKey && usingProposerPrivateKey &&
+	// 	cfg.SequencerPrivateKey == cfg.ProposerPrivateKey {
 
-		return ErrSameSequencerAndProposerPrivKey
-	}
+	// 	return ErrSameSequencerAndProposerPrivKey
+	// }
 
 	// Ensure the Sentry Data Source Name is set when using Sentry.
 	if cfg.SentryEnable && cfg.SentryDsn == "" {
