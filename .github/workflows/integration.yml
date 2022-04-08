@@ -37,7 +37,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-00b46fa1102c70ff2
-          ec2-instance-type: m4.4xlarge
+          ec2-instance-type: m6i.4xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
           aws-resource-tags: |
@@ -53,7 +53,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-00b46fa1102c70ff2
-          ec2-instance-type: m4.4xlarge
+          ec2-instance-type: m6i.4xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
           aws-resource-tags: |
@@ -105,7 +105,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-00b46fa1102c70ff2
-          ec2-instance-type: t2.2xlarge
+          ec2-instance-type: t3.2xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
           aws-resource-tags: |
@@ -121,7 +121,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-00b46fa1102c70ff2
-          ec2-instance-type: t2.2xlarge
+          ec2-instance-type: t3.2xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
           aws-resource-tags: |
