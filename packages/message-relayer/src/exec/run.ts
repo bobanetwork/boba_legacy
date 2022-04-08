@@ -40,15 +40,21 @@ const main = async () => {
 
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   const L1_NODE_WEB3_URL = config.str('l1-node-web3-url', env.L1_NODE_WEB3_URL)
-  const RELAYER_PRIVATE_KEY = config.str(
-    'l1-wallet-key',
-    env.RELAYER_PRIVATE_KEY
-  )
+  let RELAYER_PRIVATE_KEY = config.str('l1-wallet-key', env.RELAYER_PRIVATE_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
 
   // run as message relayer fast
   const FAST_RELAYER = config.bool('fast-relayer', env.FAST_RELAYER === 'true')
+  // check if FAST_RELAYER_PRIVATE_KEY is passed
+  const FAST_RELAYER_PRIVATE_KEY = config.str(
+    'l1-wallet-key-fast',
+    env.FAST_RELAYER_PRIVATE_KEY
+  )
+  // if this exists and is fast-relayer mode, use this account
+  if (FAST_RELAYER_PRIVATE_KEY && FAST_RELAYER) {
+    RELAYER_PRIVATE_KEY = FAST_RELAYER_PRIVATE_KEY
+  }
   //batch system
   const MIN_BATCH_SIZE = config.uint(
     'min-batch-size',

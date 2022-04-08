@@ -1168,7 +1168,6 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         })
       }
 
-      console.log(batchMessage)
       if (this.fastRelayer) {
         // ethers.js v5 does not handle overloading
         return this.contracts.l1.L1MultiMessageRelayerFast.populateTransaction[

@@ -132,7 +132,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       isFastRelayer: this.options.isFastRelayer,
     })
 
-    console.log(this.options.isFastRelayer)
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
     this.state.messenger = new CrossChainMessenger({
