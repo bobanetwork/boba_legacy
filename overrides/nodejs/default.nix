@@ -161,7 +161,22 @@ in
       XDG_DATA_HOME = "${data-home}";
     };
   };
-  "@boba/gas-price-oracle" = { inherit correct-tsconfig-path; };
+  "@boba/gas-price-oracle" = {
+    correct-tsconfig-path = {
+      postPatch = ''
+        substituteInPlace ./tsconfig.json --replace \
+          '"extends": "../../../tsconfig.json"' \
+          '"extends": "./tsconfig-copy.json"'
+        substituteInPlace ./tsconfig.build.json --replace \
+          '"extends": "../../../tsconfig.build.json"' \
+          '"extends": "./tsconfig.build-copy.json"'
+        cp ${./../..}/tsconfig.build.json \
+          ./tsconfig.build-copy.json
+        cp ${./../..}/tsconfig.json \
+          ./tsconfig-copy.json
+      '';
+    };
+  };
   "@boba/message-relayer-fast" = {
     correct-tsconfig-path = {
       postPatch = ''
