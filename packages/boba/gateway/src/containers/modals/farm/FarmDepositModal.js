@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
-import { closeModal, openAlert, openError } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 import { addLiquidity, getFarmInfo } from 'actions/farmAction'
 
 import Button from 'components/button/Button'
@@ -21,10 +21,12 @@ import { fetchAllowance } from 'actions/farmAction'
 class FarmDepositModal extends React.Component {
 
   constructor(props) {
-    super(props);
+
+    super(props)
 
     const { open } = this.props
     const { stakeToken } = this.props.farm
+    const { bobaFeeChoice, netLayer } = this.props.setup
 
     this.state = {
       open,
@@ -34,6 +36,8 @@ class FarmDepositModal extends React.Component {
       value_Wei_String: '',
       // allowance
       loading: false,
+      bobaFeeChoice,
+      netLayer
     }
   }
 
@@ -41,9 +45,18 @@ class FarmDepositModal extends React.Component {
 
     const { open } = this.props
     const { stakeToken } = this.props.farm
+    const { bobaFeeChoice, netLayer } = this.props.setup
 
     if (prevState.open !== open) {
       this.setState({ open })
+    }
+
+    if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
+      this.setState({ bobaFeeChoice })
+    }
+
+    if (!isEqual(prevState.setup.netLayer, netLayer)) {
+      this.setState({ netLayer })
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
@@ -74,8 +87,39 @@ class FarmDepositModal extends React.Component {
   }
 
   getMaxTransferValue () {
-    const { stakeToken } = this.state
-    return logAmount(stakeToken.balance, stakeToken.decimals)
+
+    const { stakeToken, bobaFeeChoice, netLayer } = this.state
+
+    let amount = logAmount(stakeToken.balance, stakeToken.decimals)
+
+    // should not be hardcoded - ToDo - lookup actual cost
+    // three scenarios - 
+    // L1 staking ETH 
+    // L2 staking ETH and paying in ETH
+    // L2 staking BOBA and paying in BOBA 
+    if( bobaFeeChoice && stakeToken.symbol === 'BOBA' && netLayer === 'L2' ) {
+      let safeRet = Number(amount) - 1.0
+      if(safeRet > 0)
+        return safeRet.toString() 
+      else
+        return '0'
+    } 
+    else if ( !bobaFeeChoice && stakeToken.symbol === 'ETH' && netLayer === 'L2' ) {
+      let safeRet = Number(amount) - 0.01
+      if(safeRet > 0)
+        return safeRet.toString() 
+      else
+        return '0'
+    }
+    else if ( stakeToken.symbol === 'ETH' && netLayer === 'L1' ) {
+      let safeRet = Number(amount) - 0.01
+      if(safeRet > 0)
+        return safeRet.toString() 
+      else
+        return '0'
+    }
+
+    return amount
   }
 
   handleClose() {
@@ -131,10 +175,9 @@ class FarmDepositModal extends React.Component {
         stakeToken.currency,
         stakeToken.LPAddress
       ))
-      this.setState({ loading: false })
-    } else {
-      this.setState({ loading: false })
-    }
+    } 
+    this.setState({ loading: false })
+
   }
 
   async handleConfirm() {
@@ -152,13 +195,10 @@ class FarmDepositModal extends React.Component {
     if (addLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was added"))
       this.props.dispatch(getFarmInfo())
-      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
-      this.props.dispatch(closeModal("farmDepositModal"))
-    } else {
-      this.props.dispatch(openError("Failed to add liquidity"))
-      this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
-      this.props.dispatch(closeModal("farmDepositModal"))
     }
+
+    this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
+    this.props.dispatch(closeModal("farmDepositModal"))
   }
 
   render() {
@@ -168,11 +208,10 @@ class FarmDepositModal extends React.Component {
       stakeToken,
       stakeValue,
       stakeValueValid,
-      //stakeValueBadEntry,
       loading,
     } = this.state
 
-    const {approvedAllowance} = this.props.farm;
+    const { approvedAllowance } = this.props.farm
 
     let allowanceGTstake = false
 
@@ -237,7 +276,6 @@ class FarmDepositModal extends React.Component {
                 color='primary'
                 size="large"
                 variant="contained"
-                // fullWidth={isMobile}
               >
                 Approve amount
               </Button>
@@ -245,7 +283,7 @@ class FarmDepositModal extends React.Component {
           </>
         }
 
-        {(stakeValueValid && allowanceGTstake) &&
+        {stakeValueValid && allowanceGTstake &&
           <>
             {stakeToken.symbol !== 'ETH' &&
               <Typography variant="body2" sx={{mt: 2}}>
@@ -267,7 +305,6 @@ class FarmDepositModal extends React.Component {
                 color='primary'
                 size="large"
                 variant="contained"
-                // fullWidth={isMobile}
               >
                 Stake!
               </Button>
@@ -284,6 +321,7 @@ const mapStateToProps = state => ({
   ui: state.ui,
   farm: state.farm,
   balance: state.balance,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(FarmDepositModal)

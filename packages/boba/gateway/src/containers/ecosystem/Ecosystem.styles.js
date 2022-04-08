@@ -58,7 +58,7 @@ export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
   position: 'absolute',
   margin: 'auto',
   top: '15px',
-  background: '#272B30',
+  background:  theme.palette.mode === 'light' ? '#c7c3c3' : '#272B30',
   'img': {
     width: '50px',
     maxHeight: '60px',
@@ -73,8 +73,7 @@ export const TileFooter = styled(Box)(({ theme, ...props }) => ({
   overflow: 'hidden',
   borderBottomLeftRadius: '12px',
   borderBottomRightRadius: '12px',
-  background: 'rgba(255, 255, 255, 0.06)',
-  display: 'flex',
+  background: theme.palette.background.secondary,
   justifyContent: 'space-around',
   padding: '1rem',
   gap: 1,
@@ -125,7 +124,7 @@ export const ProjectContainer = styled(Box)(({ theme }) => ({
 export const ProjectContent = styled(Box)(({ theme }) => ({
   borderTopLeftRadius: '12px',
   borderTopRightRadius: '12px',
-  background: 'rgba(255, 255, 255, 0.06)',
+  background: theme.palette.background.secondary, //'rgba(255, 255, 255, 0.06)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',

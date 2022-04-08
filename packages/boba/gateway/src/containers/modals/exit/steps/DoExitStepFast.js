@@ -17,8 +17,8 @@ import React, { useState, useEffect } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
-import { depositL2LP, fastExitAll } from 'actions/networkAction'
-import { openAlert, openError } from 'actions/uiAction'
+import { depositL2LP } from 'actions/networkAction'
+import { openAlert } from 'actions/uiAction'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector'
@@ -43,7 +43,8 @@ import {
   fetchL1LPPending,
   fetchL1TotalFeeRate,
   fetchL1FeeRateN,
-  fetchL2FeeBalance,
+  fetchL2BalanceBOBA,
+  fetchL2BalanceETH,
   fetchL1LPLiquidity
 } from 'actions/balanceAction'
 
@@ -53,9 +54,15 @@ import {
   selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString,
   selectL1LPPendingString,
-  selectL2FeeBalance,
+  selectL2BalanceBOBA,
+  selectL2BalanceETH,
   selectL1LPLiquidity
 } from 'selectors/balanceSelector'
+
+import {
+   selectBobaFeeChoice,
+   selectBobaPriceRatio,
+} from 'selectors/setupSelector'
 
 function DoExitStepFast({ handleClose, token }) {
 
@@ -63,17 +70,29 @@ function DoExitStepFast({ handleClose, token }) {
 
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')
+  const [ max_Float, setMax_Float ] = useState(0.0) // support for Use Max - a number like 0.09 ETH
+
+  const [ errorString, setErrorString ] = useState('')
+
+  const [ feeETH, setFeeETH ] = useState(0.0)
+  const [ feeBOBA, setFeeBOBA ] = useState(0.0)
 
   const [ LPRatio, setLPRatio ] = useState(0)
 
   const LPBalance = useSelector(selectL1LPBalanceString)
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
+
   const feeRate = useSelector(selectL1FeeRate)
   const feeRateN = useSelector(selectL1FeeRateN)
 
   const cost = useSelector(selectFastExitCost)
-  const feeBalance = useSelector(selectL2FeeBalance)
+
+  const feeBalanceETH = useSelector(selectL2BalanceETH)
+  const feeBalanceBOBA = useSelector(selectL2BalanceBOBA)
+
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const [ validValue, setValidValue ] = useState(false)
 
@@ -82,47 +101,86 @@ function DoExitStepFast({ handleClose, token }) {
   const lookupPrice = useSelector(selectLookupPrice)
   const signatureStatus = useSelector(selectSignatureStatus_exitLP)
 
-  const maxValue = logAmount(token.balance, token.decimals)
   const lpUnits = logAmount(LPBalance, token.decimals)
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   function setAmount(value) {
 
-    const tooSmall = new BN(value).lte(new BN(0.0))
-    const tooBig   = new BN(value).gt(new BN(maxValue))
+    const balance = Number(logAmount(token.balance, token.decimals))  
 
-    // console.log("ETH fees:",Number(cost))
-    // console.log("Transaction token value:",Number(value))
-    // console.log("ETH available for fees:",Number(feeBalance))
-    // console.log("LPRatio:",Number(LPRatio))
-    // console.log("LPBalance:",Number(balanceSubPending))
+    const tooSmall = new BN(value).lte(new BN(0.0))
+    const tooBig   = new BN(value).gt(new BN(max_Float))
+
+    setErrorString('')
 
     if (tooSmall || tooBig) {
+      setErrorString('Warning: Value out of bounds')
       setValidValue(false)
       setValue(value)
       return false
-    } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
-      //insufficient ETH to cover the ETH amount plus gas
+    } 
+    else if (
+      token.symbol === 'ETH' && 
+      (Number(value) + feeETH) > balance) {
+      if(feeUseBoba)
+        setErrorString('Warning: ETH amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+      else
+        setErrorString('Warning: ETH amount + fees > balance')
       setValidValue(false)
       setValue(value)
       return false
-    } else if ((Number(cost) > Number(feeBalance))) {
-      //insufficient ETH to pay exit fees
+    }
+    else if (
+      //pay BOBA, exit BOBA - check BOBA amount
+      feeUseBoba &&
+      token.symbol === 'BOBA' && 
+      (Number(value) + feeBOBA) > balance) 
+    {
+      // insufficient BOBA to cover the BOBA amount plus gas
+      setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
       setValue(value)
       return false
-    } else if (Number(LPRatio) < 0.1) {
-      //not enough balance/liquidity ratio
-      //we always want some balance for unstaking
+    }
+    else if (
+      // insufficient ETH to cover exit fees
+      // it does not matter if you are paying in ETH or BOBA
+      feeETH > Number(feeBalanceETH)) 
+    {
+      // insufficient ETH to cover exit fees
+      if(feeUseBoba)
+        setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+      else
+        setErrorString('Warning: ETH balance too low to cover gas')
       setValidValue(false)
       setValue(value)
       return false
-    } else if (Number(value) > Number(balanceSubPending) * 0.9) {
+    }
+    else if (
+      // insufficient BOBA to cover exit fees
+      feeUseBoba &&
+      feeBOBA > Number(feeBalanceBOBA)) 
+    {
+      setErrorString('Warning: BOBA balance too low to cover gas')
+      setValidValue(false)
+      setValue(value)
+      return false
+    } 
+    else if (Number(LPRatio) < 0.1) {
+      // not enough balance/liquidity ratio
+      // we always want some balance for unstaking
+      setErrorString('Warning: Insufficient balance in pool - reduce amount or use classical exit')
+      setValidValue(false)
+      setValue(value)
+      return false
+    } 
+    else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out all the balance
       //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
       //this is because the every time someone exits, the limit is recalculated
       //via Number(LPBalance) * 0.9, and LPBalance changes over time
+      setErrorString('Warning: Insufficient balance in pool - reduce amount or use classical exit')
       setValidValue(false)
       setValue(value)
       return false
@@ -142,7 +200,7 @@ function DoExitStepFast({ handleClose, token }) {
   async function doExit() {
 
     console.log("Amount to exit:", value_Wei_String)
-
+    
     let res = await dispatch(
       depositL2LP(
         token.address,
@@ -162,41 +220,6 @@ function DoExitStepFast({ handleClose, token }) {
 
   }
 
-  async function doExitAll() {
-
-    console.log("Amount to exit:", token.balance.toString())
-
-    const value = logAmount(token.balance, token.decimals)
-    const valid = setAmount(token.symbol === 'ETH' ? maxValue - Number(cost): maxValue)
-
-    if(valid) {
-      let res = await dispatch(
-        fastExitAll(
-          token.address
-        )
-      )
-      if (res) {
-        dispatch(
-            openAlert(
-              `${token.symbol} was bridged. You will receive approximately
-              ${receivableAmount(value)} ${token.symbol}
-              minus gas fees (if bridging ETH) on L1.`
-            )
-          )
-        handleClose()
-      }
-    } else {
-      dispatch(
-        openError(
-          `You cannot currently fast bridge all of your ${token.symbol} due to insufficient liquidity ratio (of ${Number(LPRatio).toFixed(2)})
-          and/or insufficient pool balance (of ${Number(balanceSubPending).toFixed(2)}). Please reduce the amount you wish to exit
-          to below ${Number(balanceSubPending).toFixed(2)*0.9} or use the classic bridge instead.`
-        )
-      )
-    }
-
-  }
-
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
       //console.log("Token:",token)
@@ -206,7 +229,8 @@ function DoExitStepFast({ handleClose, token }) {
       dispatch(fetchL1TotalFeeRate())
       dispatch(fetchL1FeeRateN(token.addressL1))
       dispatch(fetchFastExitCost(token.address))
-      dispatch(fetchL2FeeBalance())
+      dispatch(fetchL2BalanceETH())
+      dispatch(fetchL2BalanceBOBA())
     }
     // to clean up state and fix the
     // error in console for max state update.
@@ -232,6 +256,39 @@ function DoExitStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, loading, handleClose ])
 
+  useEffect(() => {
+    function estimateMax() {
+      
+      const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
+      
+      //console.log("ETH fees:", safeCost)
+      //console.log("BOBA fees:", safeCost * feePriceRatio)
+
+      setFeeETH(safeCost)
+      setFeeBOBA(safeCost * feePriceRatio)
+
+      const balance = Number(logAmount(token.balance, token.decimals))
+
+      // because of MetaMask issue always have to limit ETH
+      if(token.symbol === 'ETH') {
+        if(balance - safeCost > 0.0)
+          setMax_Float(balance - safeCost)
+        else
+          setMax_Float(0.0)
+      } 
+      else if (token.symbol === 'BOBA' && feeUseBoba) {
+        if(balance - safeCost > 0.0)
+          setMax_Float(balance - safeCost)
+        else
+          setMax_Float(0.0)
+      } 
+      else {
+        setMax_Float(balance)
+      }
+    }
+    if (Number(cost) > 0) estimateMax()
+  }, [ token, cost, feeUseBoba, feePriceRatio ])
+
   const feeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
   const theme = useTheme()
@@ -241,44 +298,21 @@ function DoExitStepFast({ handleClose, token }) {
   if( loading ) buttonLabel = 'Close'
 
   let ETHstring = ''
-  let warning = false
-
-  if(cost && Number(cost) > 0) {
-
-    if (token.symbol !== 'ETH') {
-      if(Number(cost) > Number(feeBalance)) {
-        warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
-        <br/>TRANSACTION WILL FAIL.`
-      }
-      else if(Number(cost) > Number(feeBalance) * 0.96) {
-        warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
-        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
-      }
-      else {
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
-      }
+  if(feeETH && Number(feeETH) > 0) {
+    if(feeUseBoba) {
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA` 
+    } else {
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH` 
     }
+  }
 
-    if (token.symbol === 'ETH') {
-      if((Number(value) + Number(cost)) > Number(feeBalance)) {
-        warning = true
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
-        <br/>TRANSACTION WILL FAIL.`
-      }
-      else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
-        warning = true
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
-        <br/>TRANSACTION MIGHT FAIL.`
-      } else {
-        ETHstring = `Transaction total (amount + approval + bridge): ${(Number(value) + Number(cost)).toFixed(4)} ETH`
-      }
-    }
+  // prohibit ExitAll when paying with the token that is to be exited 
+  let allowExitall = true
+  if(token.symbol === 'ETH') {
+    allowExitall = false
+  } 
+  else if (token.symbol === 'BOBA' && feeUseBoba) {
+    allowExitall = false
   }
 
   return (
@@ -294,28 +328,38 @@ function DoExitStepFast({ handleClose, token }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast exit takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
+          In most cases, a fast exit takes less than 20 minutes. 
+          However, if Ethereum is congested, it can take as long as 3 hours. 
+          The amount input window will block transactions that are likely to fail. 
         </Typography>
 
-        <Input
-          label={`Amount to bridge to L1`}
-          placeholder="0"
-          value={value}
-          type="number"
-          onChange={(i)=>{
-            setAmount(i.target.value)
-            setValue_Wei_String(toWei_String(i.target.value, token.decimals))
-          }}
-          unit={token.symbol}
-          maxValue={maxValue}
-          newStyle
-          variant="standard"
-          loading={loading}
-          onExitAll={doExitAll}
-          allowExitAll={true}
-          disabledExitAll={!cost}
-        />
-
+        {max_Float > 0.0 &&
+          <Input
+            label={`Amount to bridge to L1`}
+            placeholder="0"
+            value={value}
+            type="number"
+            onChange={(i)=>{
+              setAmount(i.target.value)
+              setValue_Wei_String(toWei_String(i.target.value, token.decimals))
+            }}
+            onUseMax={(i)=>{                                // they want to use the maximum
+              setAmount(max_Float)                          // so the display value updates for the user
+              setValue_Wei_String(token.balance.toString()) // this is ok because BridgeAll is blocked for both ETH and BOBA
+            }}
+            allowExitAll={allowExitall}
+            unit={token.symbol}
+            maxValue={max_Float}
+            variant="standard"
+            newStyle
+            loading={loading}
+          />
+        }
+        {max_Float === 0 &&
+          <Typography variant="body1" sx={{mt: 2}}>
+            Loading...
+          </Typography>
+        }
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
             {value &&
@@ -328,15 +372,20 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {warning && (
-          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            {parse(ETHstring)}
-          </Typography>
-        )}
+        <Typography variant="body2" sx={{mt: 2}}>
+          {parse(ETHstring)}
+        </Typography>
 
-        {!warning && (
-          <Typography variant="body2" sx={{mt: 2}}>
-            {parse(ETHstring)}
+        {errorString !== '' &&
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            {errorString}
+          </Typography>
+        }
+
+        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            The pool's balance and balance/liquidity ratio are too low.
+            Please use the classic bridge.
           </Typography>
         )}
 
