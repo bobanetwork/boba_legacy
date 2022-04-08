@@ -527,7 +527,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const spender = bobaFeeContract.address
     const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
     const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
-    
+
     // 5 minutes
     const deadline = Math.floor(Date.now() / 1000) + 300
     const verifyingContract = this.BobaContract.address
@@ -1398,7 +1398,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        
+
         if (token.symbolL1 === 'xBOBA') {
           //there is no L1 xBOBA
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -1434,7 +1434,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       tokenBalances.forEach((token) => {
         if(token.balance.lte(new BN(1000000))) {
           //do nothing
-        } 
+        }
         else if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
@@ -1727,7 +1727,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         tx = await this.provider
           .getSigner()
           .sendTransaction({
-            to: address, 
+            to: address,
             value: ethers.utils.hexlify(wei)
           })
 
@@ -1767,8 +1767,8 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         gas_BN = await this.provider
           .getSigner()
           .estimateGas({
-            from: this.account, 
-            to: recipient, 
+            from: this.account,
+            to: recipient,
             value: value_Wei_String
           })
 
@@ -1785,8 +1785,8 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
         const tx = await ERC20Contract
           .populateTransaction
-          .transfer( 
-            recipient, 
+          .transfer(
+            recipient,
             value_Wei_String
           )
 
@@ -2410,11 +2410,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && 
-        cur !== 'WAGMIv0' && 
-        cur !== 'WAGMIv1' && 
+      if(cur !== 'xBOBA' &&
+        cur !== 'WAGMIv0' &&
+        cur !== 'WAGMIv1' &&
         cur !== 'OLO' &&
-        cur !== 'WAGMIv2' && 
+        cur !== 'WAGMIv2' &&
         cur !== 'WAGMIv2-Oolong') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
@@ -2497,11 +2497,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && 
-        cur !== 'WAGMIv0' && 
-        cur !== 'WAGMIv1' && 
-        cur !== 'OLO' && 
-        cur !== 'WAGMIv2' && 
+      if(cur !== 'xBOBA' &&
+        cur !== 'WAGMIv0' &&
+        cur !== 'WAGMIv1' &&
+        cur !== 'OLO' &&
+        cur !== 'WAGMIv2' &&
         cur !== 'WAGMIv2-Oolong') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
@@ -2616,6 +2616,48 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       console.log("NS: addLiquidity error:", error)
       return error
     }
+  }
+
+  async liquidityEstimate(currency, value_Wei_String) {
+    let otherField = {}
+    const gasPrice_BN = await this.L2Provider.getGasPrice()
+
+    if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
+      //console.log("Yes we have ETH")
+      otherField = { value: value_Wei_String }
+    }
+
+    console.log([`gasPrice_BN`,gasPrice_BN.toString()])
+
+    try {
+      const tx = await this.L2LPContract
+        .populateTransaction
+        .addLiquidity(
+          value_Wei_String,
+          currency,
+          otherField
+        );
+
+      console.log([ `tx`, tx ]);
+      let gas_BN = await this.L2Provider.estimateGas(tx)
+
+      let cost_BN = gas_BN.mul(gasPrice_BN)
+
+      console.log([`gas_BN`,gas_BN])
+
+      console.log([`cost_BN`,cost_BN])
+
+      const safety_margin = BigNumber.from('1000000000000')
+      console.log("ERC20: Safety margin: liquidityEstimate", utils.formatEther(safety_margin))
+
+      console.log("l1cost_BN liquidityEstimate", cost_BN.add(safety_margin))
+
+      return cost_BN.add(safety_margin)
+    } catch (error) {
+      console.log('NS: liquidityEstimate error:', error);
+      return error;
+    }
+
   }
 
   /***********************************************/
@@ -3455,7 +3497,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     if( this.L1orL2 !== 'L2' ) return
     if( !this.BobaContract ) return
- 
+
     if(!this.account) {
       console.log('NS: delegateVotes() error - called but account === null')
       return
