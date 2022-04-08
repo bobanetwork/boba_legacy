@@ -57,6 +57,7 @@ const bobaDecimal = (1e18).toString()
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const allTokenL2Addresses = {}
 const allTokenL1Addresses = {}
+const tokensBalance = {}
 
 for (const key of supportedTokens) {
   if (addressesMainnet['TK_L1' + key]) {
@@ -231,6 +232,17 @@ const logL2Pool = async (blockNumber) => {
     tokenData.balanceRatio =
       tokenData.tokenBalance / tokenData.userDepositAmount || 0
 
+    if (tokensBalance[token.tokenSymbol]) {
+      tokensBalance[token.tokenSymbol].l2TokenBalance = tokenData.tokenBalance
+      tokensBalance[token.tokenSymbol].l2UserDepositAmount =
+        tokenData.userDepositAmount
+    } else {
+      tokensBalance[token.tokenSymbol] = {
+        l2TokenBalance: tokenData.tokenBalance,
+        l2UserDepositAmount: tokenData.userDepositAmount,
+      }
+    }
+
     if (prices.data[token.tokenSymbol.toLowerCase()]) {
       tokenData.priceUSD = prices.data[token.tokenSymbol.toLowerCase()].usd
       tokenData.totalTokenUSDValue = tokenData.priceUSD * tokenData.tokenBalance
@@ -299,6 +311,17 @@ const logL1Pool = async (blockNumber) => {
     tokenData.balanceRatio =
       tokenData.tokenBalance / tokenData.userDepositAmount || 0
 
+    if (tokensBalance[token.tokenSymbol]) {
+      tokensBalance[token.tokenSymbol].l1TokenBalance = tokenData.tokenBalance
+      tokensBalance[token.tokenSymbol].l1UserDepositAmount =
+        tokenData.userDepositAmount
+    } else {
+      tokensBalance[token.tokenSymbol] = {
+        l1TokenBalance: tokenData.tokenBalance,
+        l1UserDepositAmount: tokenData.userDepositAmount,
+      }
+    }
+
     logger.info(`L1 ${token.tokenSymbol} token pool`, {
       networkName: configs.OMGXNetwork.L1,
       key: 'l1Pool',
@@ -311,15 +334,15 @@ const logBalance = (provider, blockNumber, networkName) => {
   const promiseData =
     networkName === configs.OMGXNetwork.L1
       ? [
-        provider.getBalance(configs.l1PoolAddress),
-        provider.getGasPrice(),
-        networkName,
-      ]
+          provider.getBalance(configs.l1PoolAddress),
+          provider.getGasPrice(),
+          networkName,
+        ]
       : [
-        provider.getBalance(configs.l2PoolAddress),
-        provider.getGasPrice(),
-        networkName,
-      ]
+          provider.getBalance(configs.l2PoolAddress),
+          provider.getGasPrice(),
+          networkName,
+        ]
 
   return Promise.all(promiseData)
     .then(async (values) => {
@@ -499,6 +522,32 @@ const initConnection = async (networkName, url) => {
   return provider
 }
 
+const logDeltaBalance = () => {
+  let token
+  Object.keys(tokensBalance).forEach((key) => {
+    token = tokensBalance[key]
+    if (
+      token.l1UserDepositAmount === undefined ||
+      token.l2UserDepositAmount === undefined ||
+      token.l1TokenBalance === undefined ||
+      token.l2TokenBalance === undefined
+    ) {
+      return
+    }
+
+    const delta =
+      token.l1UserDepositAmount +
+      token.l2UserDepositAmount -
+      (token.l1TokenBalance + token.l2TokenBalance)
+
+    logger.info(`Delta Liquidity Pool Balance of ${key}`, {
+      delta,
+      key: 'DeltaLPBalance',
+      token: key,
+    })
+  })
+}
+
 const setupProvider = async (networkName, url, pollingIntervalSecond = 10) => {
   let provider
 
@@ -565,6 +614,7 @@ const setupProvider = async (networkName, url, pollingIntervalSecond = 10) => {
     }
 
     await Promise.all(logPromise)
+    logDeltaBalance()
 
     blockNumber = latestBlock + 1
     await sleep(pollingIntervalSecond * 1000)
