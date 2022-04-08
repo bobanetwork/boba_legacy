@@ -2,9 +2,9 @@ import { expect } from '../../../setup'
 
 /* External Imports */
 import { ethers } from 'hardhat'
-import { ContractFactory, Contract, Signer } from 'ethers'
+import { ContractFactory, Contract, Signer, utils } from 'ethers'
 
-import { calculateL1GasUsed, calculateL1Fee } from '@eth-optimism/core-utils'
+import { calculateL1Fee } from '@eth-optimism/core-utils'
 
 describe('Boba_GasPriceOracle', () => {
   const initialGasPrice = 0
@@ -292,7 +292,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get gasPriceOracleAddress', () => {
-    it('should revert if gasPriceOracleAddress is not EOA', async () => {
+    it('should revert if caller is not EOA', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateGasPriceOracleAddress(
           address1
@@ -362,7 +362,7 @@ describe('Boba_GasPriceOracle', () => {
   })
 
   describe('get metaTransactionFee', () => {
-    it('should revert if metaTransactionFee is not EOA', async () => {
+    it('should revert if caller is not EOA', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateMetaTransactionFee(
           ethers.utils.parseEther('10')
@@ -395,6 +395,100 @@ describe('Boba_GasPriceOracle', () => {
       expect(await Boba_GasPriceOracle.metaTransactionFee()).to.equal(
         priceAtSlot
       )
+    })
+  })
+
+  describe('receivedETHAmount', () => {
+    it('should revert if called by someone other than the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).updateMetaTransactionFee(address1)
+      ).to.be.reverted
+    })
+
+    it('should revert if the new receivedETHAmount is below 0.001 ETH', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+          utils.parseEther('0.0009')
+        )
+      ).to.be.reverted
+    })
+
+    it('should revert if the new receivedETHAmount is larger than 0.01 ETH', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+          utils.parseEther('0.011')
+        )
+      ).to.be.reverted
+    })
+
+    it('should succeed if called by the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+          ethers.utils.parseEther('0.003')
+        )
+      ).to.not.be.reverted
+    })
+
+    it('should emit event', async () => {
+      const receivedETHAmount = ethers.utils.parseEther('0.006')
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+          receivedETHAmount
+        )
+      )
+        .to.emit(Boba_GasPriceOracle, 'UpdateReceivedETHAmount')
+        .withArgs(await signer1.getAddress(), receivedETHAmount)
+    })
+  })
+
+  describe('get receivedETHAmount', () => {
+    it('should revert if caller is not owne', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).updateReceivedETHAmount(
+          utils.parseEther('0.006')
+        )
+      ).to.be.reverted
+    })
+    it('should change when updateReceivedETHAmount is called', async () => {
+      await Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+        ethers.utils.parseEther('0.005')
+      )
+      expect(await Boba_GasPriceOracle.receivedETHAmount()).to.equal(
+        ethers.utils.parseEther('0.005')
+      )
+    })
+
+    it('is the 9th storage slot', async () => {
+      const receivedETHAmount = ethers.utils.parseEther('0.003')
+      const slot = 9
+
+      // set the price
+      await Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+        receivedETHAmount
+      )
+
+      // get the storage slot value
+      const receivedETHAmountSlot = await signer1.provider.getStorageAt(
+        Boba_GasPriceOracle.address,
+        slot
+      )
+      expect(await Boba_GasPriceOracle.receivedETHAmount()).to.equal(
+        receivedETHAmountSlot
+      )
+    })
+  })
+
+  describe('withdrawBOBA', () => {
+    it('should revert if the balance is not enough', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer2).withdrawBOBA()).to.be
+        .reverted
+    })
+  })
+
+  describe('withdrawETH', () => {
+    it('should revert if called by someone other than the owner', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer2).withdrawETH()).to.be
+        .reverted
     })
   })
 
