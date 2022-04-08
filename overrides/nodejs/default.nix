@@ -265,6 +265,16 @@ in
       '';
     };
   };
+  "@eth-optimism/hardhat-node" = {
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/hardhat-node/ | grep -v "package.json\|node_modules\|hardhat.config.js"`
+        mkdir -p $out/bin
+        makeWrapper $out/lib/node_modules/@eth-optimism/hardhat-node/node_modules/hardhat/internal/cli/cli.js $out/bin/hardhat \
+          --run "cd $out/lib/node_modules/@eth-optimism/hardhat-node/"
+      '';
+    };
+  };
   "@eth-optimism/integration-tests" = {
     inherit add-solc;
     correct-tsconfig-path = {
