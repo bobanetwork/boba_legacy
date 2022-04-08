@@ -169,7 +169,7 @@ function Wallet() {
             }}
             variant="text"
             component="span">
-            Bridging in progress...
+            Transaction in progress...
           </Typography>
         </S.PendingIndicator> : null}
       </S.WalletActionContainer>
