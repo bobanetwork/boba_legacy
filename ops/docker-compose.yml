@@ -293,7 +293,8 @@ services:
     image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
+      dockerfile: ./ops/docker/Dockerfile.message-relayer
+    entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -301,6 +302,7 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
+      RELAYER_PRIVATE_KEY: ${FAST_RELAYER_PRIVATE_KEY}
       RETRIES: 200
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
@@ -308,8 +310,7 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
-      # Integration tests require 0 confirmations. Suggested to use 5 for production.
-      NUM_EVENT_CONFIRMATIONS: 0
+      FAST_RELAYER: 'true'
 
   batch_submitter:
     depends_on:

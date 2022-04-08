@@ -46,6 +46,9 @@ const main = async () => {
   )
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
+
+  // run as message relayer fast
+  const FAST_RELAYER = config.bool('fast-relayer', env.FAST_RELAYER === 'true')
   //batch system
   const MIN_BATCH_SIZE = config.uint(
     'min-batch-size',
@@ -148,6 +151,7 @@ const main = async () => {
     numConfirmations: NUM_CONFIRMATIONS,
     multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
+    isFastRelayer: FAST_RELAYER,
   })
 
   await service.start()

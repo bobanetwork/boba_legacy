@@ -1,6 +1,6 @@
 /* Imports: External */
 import { Wallet, utils, constants, BigNumber } from 'ethers'
-import { sleep } from '@eth-optimism/core-utils'
+import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
 import * as ynatm from '@eth-optimism/ynatm'
@@ -73,6 +73,8 @@ interface MessageRelayerOptions {
   resubmissionTimeout?: number
 
   maxWaitTxTimeS: number
+
+  isFastRelayer: boolean
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -127,14 +129,17 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       getLogsInterval: this.options.getLogsInterval,
       minBatchSize: this.options.minBatchSize,
       maxWaitTimeS: this.options.maxWaitTimeS,
+      isFastRelayer: this.options.isFastRelayer,
     })
 
+    console.log(this.options.isFastRelayer)
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
     this.state.messenger = new CrossChainMessenger({
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,
       l1ChainId,
+      fastRelayer: this.options.isFastRelayer,
     })
 
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
@@ -162,10 +167,18 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       try {
         // Check that the correct address is set in the address manager,
         // this is a requirement for batch-relayer
-        const relayer =
-          await this.state.messenger.contracts.l1.AddressManager.getAddress(
-            'L2BatchMessageRelayer'
-          )
+        let relayer: Address
+        if (this.options.isFastRelayer) {
+          relayer =
+            await this.state.messenger.contracts.l1.AddressManager.getAddress(
+              'L2BatchFastMessageRelayer'
+            )
+        } else {
+          relayer =
+            await this.state.messenger.contracts.l1.AddressManager.getAddress(
+              'L2BatchMessageRelayer'
+            )
+        }
         // If it is address(0), then message relaying is not authenticated
         if (relayer !== constants.AddressZero) {
           const address = await this.options.l1Wallet.getAddress()
@@ -417,6 +430,19 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
             for (const message of messages) {
+              // filter out messages not meant for this relayer
+              if (this.options.isFastRelayer) {
+                if (!this.state.filter.includes(message.target)) {
+                  this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+              } else {
+                if (this.state.filter.includes(message.target)) {
+                  this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+              }
+
               const status = await this.state.messenger.getMessageStatus(
                 message
               )
@@ -427,12 +453,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
               if (status === MessageStatus.RELAYED_FAILED) {
                 this.logger.info('Last message was failed, skipping.')
-                continue
-              }
-
-              // filter out messages not meant for this relayer
-              if (this.state.filter.includes(message.target)) {
-                this.logger.info('Message not intended for target, skipping.')
                 continue
               }
 

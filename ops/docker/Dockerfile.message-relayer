@@ -34,4 +34,6 @@ COPY --from=builder /optimism/packages/message-relayer/node_modules ./node_modul
 
 # copy this over in case you want to run alongside other services
 COPY ./ops/scripts/relayer.sh .
+COPY ./ops/scripts/relayer-fast.sh .
+COPY ./ops/scripts/wait-for-l1-and-l2.sh .
 ENTRYPOINT ["npm", "run", "start"]
