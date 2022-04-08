@@ -52,6 +52,30 @@
           in
           rec {
             packages = flake-utils.lib.flattenTree {
+              monorepo = pkgs.stdenv.mkDerivation {
+                pname = "boba-monorepo";
+                version = "0.0.1";
+                builder = pkgs.writeTextFile {
+                  name = "builder.sh";
+                  text = ''
+                    . $stdenv/setup
+                    mkdir -p $out/boba
+                    mkdir -p $out/optimism
+                    ln -sf ${bobapkgs."@eth-optimism/l2geth"} $out/l2geth
+                    ln -sf ${bobapkgs."@eth-optimism/core-utils"} $out/optimism/core-utils
+                    ln -sf ${bobapkgs."@eth-optimism/common-ts"} $out/optimism/common-ts
+                    ln -sf ${bobapkgs."@eth-optimism/data-transport-layer"} $out/optimism/data-transport-layer
+                    ln -sf ${bobapkgs."@eth-optimism/contracts"} $out/optimism/contracts
+                    ln -sf ${bobapkgs."@eth-optimism/message-relayer"} $out/optimism/message-relayer
+                    ln -sf ${bobapkgs."@eth-optimism/sdk"} $out/optimism/sdk
+                    ln -sf ${bobapkgs."@boba/contracts"} $out/boba/contracts
+                    ln -sf ${bobapkgs."@boba/message-relayer-fast"} $out/boba/message-relayer-fast
+                    ln -sf ${bobapkgs."@boba/gas-price-oracle"} $out/boba/gas-price-oracle
+                    ln -sf ${bobapkgs."@boba/gateway"} $out/boba/gateway
+                    ln -sf ${bobapkgs."@boba/turing-hybrid-compute"} $out/boba/turing
+                  '';
+                };
+              };
               dtl-image = pkgs.dockerTools.buildLayeredImage {
                 maxLayers = 125;
                 name = "dtl";
@@ -72,7 +96,7 @@
               };
             };
             nixpkgs = pkgs;
-            defaultPackage = packages.l2geth;
+            defaultPackage = packages.monorepo;
             apps = {
               l2geth = flake-utils.lib.mkApp { drv = packages.l2geth; };
             };
@@ -122,7 +146,9 @@
         {
           packages = boba.packages;
           apps = boba.apps;
+          defaultPackage = boba.defaultPackage;
           devShell = boba.shell;
           devShells = boba.shells;
+
         };
 }
