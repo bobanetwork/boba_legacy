@@ -8,11 +8,10 @@ import Nft from "containers/wallet/nft/Nft"
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 
-import { 
-  selectAccountEnabled, 
+import {
+  selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice,
-  selectBobaPriceRatio
+  selectBobaFeeChoice
 } from "selectors/setupSelector"
 
 import Token from "./token/Token"
@@ -38,7 +37,6 @@ function Wallet() {
   const accountEnabled = useSelector(selectAccountEnabled())
 
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
@@ -112,8 +110,8 @@ function Wallet() {
       {feeUseBoba && layer === 'L2' &&
         <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
           <Typography variant="body2" sx={{ opacity: "0.6"}}>
-          You are using BOBA to pay for gas. 
-          <br/>NOTE: please maintain a minimal ETH balance (e.g. 0.02 ETH) in your wallet otherwise 
+          You are using BOBA to pay for gas.
+          <br/>NOTE: please maintain a minimal ETH balance (e.g. 0.02 ETH) in your wallet otherwise
           MetaMask may incorrectly reject transactions.
           </Typography>
         </Box>

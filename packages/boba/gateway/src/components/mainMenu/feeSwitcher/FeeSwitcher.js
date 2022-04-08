@@ -26,6 +26,7 @@ import {
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
 import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
+import { openAlert } from 'actions/uiAction'
 
 import { Typography } from '@mui/material'
 
@@ -48,20 +49,26 @@ function FeeSwitcher() {
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
   const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH')
-  const ethBalance = l2EthBalance[0]
+  const ethBalance = l2EthBalance[ 0 ]
 
-  const dispatchSwitchFee = useCallback((targetFee) => {
+  const dispatchSwitchFee = useCallback(async (targetFee) => {
     // NOTE: HARD CODED ETH to 0.01
     // actual fee is more like 0.000052
     const tooSmallEth = new BN(logAmount(ethBalance.balance, 18)).lte(new BN(0.001))
     // console.log([ `tooSmallEth`, tooSmallEth ])
     // console.log("l2EthBalance",ethBalance.balance)
     // console.log([ `ETH BALANCE`, logAmount(ethBalance.balance, 18) ])
+    let res;
     if (targetFee === 'BOBA' && tooSmallEth) {
-      dispatch(switchFeeMetaTransaction())
+      res = await dispatch(switchFeeMetaTransaction())
     } else {
-      dispatch(switchFee(targetFee))
+      res = await dispatch(switchFee(targetFee))
     }
+
+    if (res) {
+      dispatch(openAlert(`Succesfully changed fee to ${targetFee}`))
+    }
+
   }, [ dispatch, ethBalance ])
 
   if (!accountEnabled || layer !== 'L2') {
@@ -72,14 +79,14 @@ function FeeSwitcher() {
     <S.FeeSwitcherWrapper>
       <Tooltip
         title={'BOBA or ETH will be used across Boba according to your choice.'}
-        >
+      >
         <Typography variant="body2">Fee</Typography>
       </Tooltip>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={ !feeUseBoba ? "ETH" : 'BOBA'}
+        value={!feeUseBoba ? "ETH" : 'BOBA'}
         options={[ {
           value: 'ETH',
           title: 'ETH',
