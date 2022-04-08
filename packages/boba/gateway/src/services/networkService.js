@@ -3843,6 +3843,37 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
   }
 
+  async savingEstimate(value_Wei_String) {
+    const gasPrice_BN = await this.L2Provider.getGasPrice()
+    let cost_BN = BigNumber.from('0')
+    let gas_BN = BigNumber.from('0')
+    try {
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider.getSigner()
+      )
+
+      const tx = FixedSavings
+        .populateTransaction
+        .stake(value_Wei_String);
+
+      gas_BN = await this.L2Provider.estimateGas( tx )
+
+      cost_BN = gas_BN.mul(gasPrice_BN)
+      console.log("ERC20: Transfer cost in ETH:", utils.formatEther(cost_BN))
+
+      const safety_margin = BigNumber.from('1000000000000')
+      console.log("ERC20: Safety margin:", utils.formatEther(safety_margin))
+
+      return cost_BN.add(safety_margin)
+
+    } catch (error) {
+      console.log('NS: savingEstimate() error', error);
+      return error;
+    }
+  }
+
   async withdrawFS_Savings(stakeID) {
 
     if(!this.account) {

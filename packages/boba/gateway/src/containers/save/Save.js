@@ -142,9 +142,11 @@ class Save extends React.Component {
       // get the BobaFixedSavings Address
       const allAddresses = networkService.getAllAddresses()
 
-      let cost_BN = await networkService.transferEstimate(allAddresses.BobaFixedSavings,
+      /* let cost_BN = await networkService.transferEstimate(allAddresses.BobaFixedSavings,
         token.balance.toString(),
-        token.address)
+        token.address) */
+      // FIXME: this one also failing
+      let cost_BN = await networkService.savingEstimate(token.balance.toString());
 
       max_BN = BigNumber.from(token.balance.toString());
       console.log([ `max_BN`, max_BN ]);
