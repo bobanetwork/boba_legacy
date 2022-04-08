@@ -52,7 +52,7 @@ function Wallet() {
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
       i.action.status === "pending" &&
-      (now - i.timeStamp) < 500
+      (now - i.timeStamp) < 20
     ) {
       return true
     }
@@ -65,7 +65,7 @@ function Wallet() {
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
       i.action.status === "pending" &&
-      (now - i.timeStamp) < 500
+      (now - i.timeStamp) < 20
     ) {
       return true
     }
