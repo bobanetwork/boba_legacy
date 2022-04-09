@@ -21,12 +21,13 @@ import { openAlert } from 'actions/uiAction'
 import {
   selectAccountEnabled,
   selectBobaFeeChoice,
-  selectLayer
+  selectLayer,
+  selectBobaPriceRatio
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
-import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
+import { switchFee } from 'actions/setupAction.js'
 import { openAlert } from 'actions/uiAction'
 
 import { Typography } from '@mui/material'
@@ -80,7 +81,6 @@ function FeeSwitcher() {
         dispatch(openAlert('You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA. \
           If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.'))
       } else {
-        dispatch(openAlert('Fee switch transaction submitted'))
         res = await dispatch(switchFee(targetFee))
       }
     }
@@ -90,7 +90,6 @@ function FeeSwitcher() {
         dispatch(openAlert('You cannot change the fee token to ETH since your ETH balance is below 0.02 ETH. \
           If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.'))
       } else {
-        dispatch(openAlert('Fee switch transaction submitted'))
         res = await dispatch(switchFee(targetFee))
       }
     }
