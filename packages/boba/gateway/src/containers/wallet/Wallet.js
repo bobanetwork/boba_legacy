@@ -227,7 +227,7 @@ function Wallet() {
             <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
             <S.footerLink 
               target='_blank' 
-              href={'https://oolongswap.com'} 
+              href={'https://oolongswap.com/'} 
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9'}}
             >
