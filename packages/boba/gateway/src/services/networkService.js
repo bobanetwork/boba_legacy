@@ -863,11 +863,6 @@ class NetworkService {
           fastRelayer: true,
         })
       }
-
-
-
-
-
       else {
         this.watcher = null
         this.fastWatcher = null
@@ -2583,8 +2578,9 @@ class NetworkService {
     let otherField = {}
 
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
-      //console.log("Yes we have ETH")
-      otherField = { value: value_Wei_String }
+      // console.log("Yes we have ETH")
+      // add value field
+      otherField['value'] = value_Wei_String 
     }
 
     try {
@@ -2606,46 +2602,77 @@ class NetworkService {
     }
   }
 
-  async liquidityEstimate(currency, value_Wei_String) {
-    let otherField = {}
-    const gasPrice_BN = await this.L2Provider.getGasPrice()
+  async liquidityEstimate(currency) {
 
-    if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
-      //console.log("Yes we have ETH")
-      otherField = { value: value_Wei_String }
+    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
+    
+    let otherField = { 
+      from: benchmarkAccount
     }
 
-    console.log([`gasPrice_BN`,gasPrice_BN.toString()])
-
+    const gasPrice_BN = await this.provider.getGasPrice()
+    console.log("gas price", gasPrice_BN.toString())
+    
+    let approvalCost_BN = BigNumber.from('0')
+    let stakeCost_BN = BigNumber.from('0')
+    
     try {
-      const tx = await this.L2LPContract
+
+      // first, we need the allowance of the benchmarkAccount
+      const L2ERC20Contract = this.L2_TEST_Contract
+        .connect(this.provider.getSigner())
+        .attach(currency)
+
+      let allowance_BN = await L2ERC20Contract
+        .allowance(
+          benchmarkAccount,
+          allAddresses.L2LPAddress
+        )
+
+      console.log("benchmarkAllowance_BN",allowance_BN)
+
+      if( currency === allAddresses.L2_ETH_Address ) {
+        otherField['value'] = allowance_BN.toString() 
+      }
+      
+      // second, we need the approval cost if non-ETH
+      if( currency !== allAddresses.L2_ETH_Address ) {
+
+        const tx1 = await L2ERC20Contract
+          .populateTransaction
+          .approve(
+            allAddresses.L2LPAddress,
+            allowance_BN.toString() 
+          )
+
+        const approvalGas_BN = await this.provider.estimateGas(tx1)
+        approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
+        console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+      }
+       
+      // third, we need the addLiquidity cost
+      const tx2 = await this.L2LPContract
+        .connect(this.provider)
         .populateTransaction
         .addLiquidity(
-          value_Wei_String,
-          currency,
+          allowance_BN.toString(),
+          this.tokenAddresses['BOBA'].L2,
           otherField
-        );
+        )
+      const stakeGas_BN = await this.provider.estimateGas(tx2)
+      stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
+      console.log("addLiquidity cost in ETH:", utils.formatEther(stakeCost_BN))
 
-      console.log([ `tx`, tx ]);
-      let gas_BN = await this.L2Provider.estimateGas(tx)
+      const safety_margin_BN = BigNumber.from('1000000000000')
+      console.log("Stake safety margin:", utils.formatEther(safety_margin_BN))
 
-      let cost_BN = gas_BN.mul(gasPrice_BN)
+      return approvalCost_BN.add(stakeCost_BN).add(safety_margin_BN)
 
-      console.log([`gas_BN`,gas_BN])
-
-      console.log([`cost_BN`,cost_BN])
-
-      const safety_margin = BigNumber.from('1000000000000')
-      console.log("ERC20: Safety margin: liquidityEstimate", utils.formatEther(safety_margin))
-
-      console.log("l1cost_BN liquidityEstimate", cost_BN.add(safety_margin))
-
-      return cost_BN.add(safety_margin)
     } catch (error) {
-      console.log('NS: liquidityEstimate error:', error);
-      return error;
+      console.log('NS: liquidityEstimate() error', error)
+      return error
     }
-
+  
   }
 
   /***********************************************/
@@ -2984,10 +3011,12 @@ class NetworkService {
         this.provider.getSigner()
       )
 
-      const tx = await ERC20Contract.populateTransaction.approve(
-        allAddresses.L2LPAddress,
-        utils.parseEther('1.0')
-      )
+      const tx = await ERC20Contract
+        .populateTransaction
+        .approve(
+          allAddresses.L2LPAddress,
+          utils.parseEther('1.0')
+        )
 
       const approvalGas_BN = await this.L2Provider.estimateGas(tx)
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
@@ -2996,7 +3025,9 @@ class NetworkService {
 
     //in some cases zero not allowed
     const tx2 = await this.L2LPContract
-      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+      .connect(this.provider.getSigner())
+      .populateTransaction
+      .clientDepositL2(
         currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
         currencyAddress,
         currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
@@ -3832,33 +3863,60 @@ class NetworkService {
   }
 
   async savingEstimate(value_Wei_String) {
+    
     const gasPrice_BN = await this.L2Provider.getGasPrice()
+    console.log("savingEstimate gas price", gasPrice_BN.toString())
+    
     let cost_BN = BigNumber.from('0')
     let gas_BN = BigNumber.from('0')
+    
+    console.log("value_Wei_String", value_Wei_String)
+    
+    let depositAmount_BN = BigNumber.from(value_Wei_String)
+    let approvalCost_BN = BigNumber.from('0')
+    let stakeCost_BN = BigNumber.from('0')
+    
     try {
+
+      const BobaContract = new ethers.Contract(
+        allTokens.BOBA.L2,
+        Boba.abi,
+        this.provider.getSigner()
+      )
+      
+      const tx1 = await BobaContract
+        .populateTransaction
+        .approve(
+          allAddresses.BobaFixedSavings,
+          utils.parseEther('1.0')
+        )
+
+      const approvalGas_BN = await this.L2Provider.estimateGas(tx1)
+      approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
+      console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
         L2SaveJson.abi,
         this.provider.getSigner()
       )
 
-      const tx = FixedSavings
+      const tx2 = await FixedSavings
         .populateTransaction
-        .stake(value_Wei_String);
+        .stake(utils.parseEther('0.1'))
 
-      gas_BN = await this.L2Provider.estimateGas( tx )
-
-      cost_BN = gas_BN.mul(gasPrice_BN)
-      console.log("ERC20: Transfer cost in ETH:", utils.formatEther(cost_BN))
+      const stakeGas_BN = await this.L2Provider.estimateGas(tx2)
+      stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
+      console.log("Stake cost in ETH:", utils.formatEther(stakeCost_BN))
 
       const safety_margin = BigNumber.from('1000000000000')
-      console.log("ERC20: Safety margin:", utils.formatEther(safety_margin))
+      console.log("Stake safety margin:", utils.formatEther(safety_margin))
 
-      return cost_BN.add(safety_margin)
+      return approvalCost_BN.add(stakeCost_BN).add(safety_margin)
 
     } catch (error) {
-      console.log('NS: savingEstimate() error', error);
-      return error;
+      console.log('NS: savingEstimate() error', error)
+      return error
     }
   }
 
@@ -3885,10 +3943,12 @@ class NetworkService {
   }
 
   async getFS_Saves() {
+
     if(this.account === null) {
       console.log('NS: getFS_Saves() error - called but account === null')
       return
     }
+
     try {
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,

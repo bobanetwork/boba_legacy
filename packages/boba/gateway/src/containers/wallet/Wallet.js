@@ -99,7 +99,7 @@ function Wallet() {
       console.log("l2Balances",l2Balances)
       const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')  
-      setTooSmallETH(true/*new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003))*/)
+      setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
       setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
     }
   },[ l2Balances, accountEnabled ])
@@ -144,10 +144,11 @@ function Wallet() {
               component="p"
             >
               <span style={{opacity: '1.0'}}>WARNING: Low ETH balance</span>.
-            {' '} 
-            <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting, 
-            otherwise MetaMask may incorrectly reject transactions. If you are stuck because you 
-            ran out of ETH, use EMERGENCY SWAP to swap 3 BOBA for 0.002 ETH.</span> 
+              {' '} 
+              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH) 
+              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions. 
+              If you are stuck because you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 
+              0.05 ETH at market rates.</span> 
             </S.AlertText>
           </S.AlertInfo>
           <Button

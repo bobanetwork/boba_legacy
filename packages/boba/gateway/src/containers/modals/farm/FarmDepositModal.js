@@ -9,7 +9,7 @@ import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
-import { logAmount, powAmount, toWei_String } from 'util/amountConvert'
+import { powAmount, toWei_String } from 'util/amountConvert'
 import BN from 'bignumber.js'
 
 import { Box, Typography } from '@mui/material'
@@ -36,18 +36,18 @@ class FarmDepositModal extends React.Component {
       stakeValue: '',
       stakeValueValid: false,
       value_Wei_String: '',
-      // allowance
       loading: false,
       bobaFeeChoice,
       netLayer,
       bobaFeePriceRatio,
       max_Wei_String: '0',
-      max_Float: '0',
+      max_Float_String: '0.0',
+      fee: '0'
     }
   }
 
   componentDidMount() {
-    this.getMaxTransferValue();
+    this.getMaxTransferValue()
   }
 
   async componentDidUpdate(prevState) {
@@ -60,12 +60,12 @@ class FarmDepositModal extends React.Component {
       this.setState({ open })
     }
 
-    if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
-      this.setState({ bobaFeeChoice }, () => this.getMaxTransferValue())
-    }
-
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
       this.setState({ netLayer })
+    }
+
+    if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
+      this.setState({ bobaFeeChoice })
     }
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
@@ -97,38 +97,40 @@ class FarmDepositModal extends React.Component {
 
   async getMaxTransferValue() {
 
-    const { stakeToken, bobaFeeChoice, bobaFeePriceRatio, netLayer } = this.state
+    const { 
+      stakeToken, 
+      bobaFeeChoice, 
+      bobaFeePriceRatio, 
+      netLayer 
+    } = this.state
 
-    let amount = logAmount(stakeToken.balance, stakeToken.decimals)
-
-    // should not be hardcoded - ToDo - lookup actual cost
-    // three scenarios -
-    // L1 staking ETH
-    // L2 staking ETH and paying in ETH
-    // L2 staking BOBA and paying in BOBA
     if (netLayer === 'L2') {
 
-      let cost_BN = await networkService.liquidityEstimate(
-        stakeToken.currency,
-        stakeToken.balance.toString()
-      )
+      let cost_BN = await networkService
+        .liquidityEstimate(
+          stakeToken.currency
+        )
 
-      let max_BN = BigNumber.from(stakeToken.balance.toString());
-
-      console.log([ `cost_BN`, cost_BN ]);
-      console.log([ `max_BN`, max_BN ]);
+      let max_BN = BigNumber.from(stakeToken.balance.toString())
+      let fee = '0'
 
       // both ETH and BOBA have 18 decimals so this is safe
       if (stakeToken.symbol === 'ETH') {
-        // we are staking ETH and paying in ether token
+        // we are staking ETH
         // since MetaMask does not know about BOBA, we need to subtract the ETH fee
         // regardless of how we are paying, otherwise will get an error in MetaMask
         max_BN = max_BN.sub(cost_BN)
+        // minimum ETH in account
+        max_BN = max_BN.sub(BigNumber.from(toWei_String(0.002, 18)))
+        fee = utils.formatUnits(cost_BN, stakeToken.decimals)
       }
       else if (stakeToken.symbol === 'BOBA' && bobaFeeChoice) {
         // we are staking BOBA and paying in BOBA
         // so need to subtract the BOBA fee
         max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+        // make sure user maintains minimum BOBA in account
+        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
+        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
       }
 
       // if the max amount is less than the gas,
@@ -136,34 +138,34 @@ class FarmDepositModal extends React.Component {
       if (max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
       }
+      
+      this.setState({ 
+        max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals),
+        fee
+      })
 
-      console.log([ `max_BN`, max_BN.toString() ]);
-      console.log([ `max_BN to float`, utils.formatUnits(max_BN, stakeToken.decimals) ]);
-
-      return max_BN.toString();
     }
-    else if (stakeToken.symbol === 'ETH' && netLayer === 'L1') {
-      let safeRet = Number(amount) - 0.01
-      if (safeRet > 0)
-        return safeRet.toString()
-      else
-        return '0'
-    }
-
-    return amount
+    else {
+      this.setState({ 
+        max_Float_String: utils.formatUnits(stakeToken.balance, stakeToken.decimals) 
+      })
+    } 
   }
 
   handleClose() {
     this.props.dispatch(closeModal("farmDepositModal"))
   }
 
-  handleStakeValue(value) {
+  handleStakeValue( value ) {
 
-    const { stakeToken } = this.state
+    const { 
+      stakeToken, 
+      max_Float_String 
+    } = this.state
 
     if (value &&
       Number(value) > 0.0 &&
-      Number(value) <= Number(this.state.max_Float)
+      Number(value) <= Number(max_Float_String)
     ) {
       this.setState({
         stakeValue: value,
@@ -181,7 +183,10 @@ class FarmDepositModal extends React.Component {
 
   async handleApprove() {
 
-    const { stakeToken, value_Wei_String } = this.state
+    const { 
+      stakeToken, 
+      value_Wei_String 
+    } = this.state
 
     this.setState({ loading: true })
 
@@ -213,7 +218,10 @@ class FarmDepositModal extends React.Component {
 
   async handleConfirm() {
 
-    const { stakeToken, value_Wei_String } = this.state
+    const { 
+      stakeToken, 
+      value_Wei_String 
+    } = this.state
 
     this.setState({ loading: true })
 
@@ -240,7 +248,10 @@ class FarmDepositModal extends React.Component {
       stakeValue,
       stakeValueValid,
       loading,
-      max_Float
+      max_Float_String,
+      netLayer,
+      bobaFeeChoice,
+      fee 
     } = this.state
 
     const { approvedAllowance } = this.props.farm
@@ -259,6 +270,8 @@ class FarmDepositModal extends React.Component {
       allowanceGTstake = true
     }
 
+    let allowUseAll = netLayer === 'L2' ? true : false
+
     return (
       <Modal
         open={open}
@@ -267,6 +280,7 @@ class FarmDepositModal extends React.Component {
         minHeight="380px"
       >
         <Box>
+
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Stake {`${stakeToken.symbol}`}
           </Typography>
@@ -276,14 +290,25 @@ class FarmDepositModal extends React.Component {
             value={stakeValue}
             type="number"
             unit={stakeToken.symbol}
-            maxValue={max_Float}
+            maxValue={max_Float_String}
             onChange={i => { this.handleStakeValue(i.target.value) }}
-            onUseMax={i => { this.handleStakeValue(max_Float) }}
-            allowUseAll={true}
+            onUseMax={i => { this.handleStakeValue(max_Float_String) }}
+            allowUseAll={allowUseAll}
             newStyle
             variant="standard"
           />
         </Box>
+
+        {netLayer === 'L2' && bobaFeeChoice && fee &&
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Fee: {fee} BOBA
+          </Typography>
+        }
+        {netLayer === 'L2' && !bobaFeeChoice && fee &&
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Fee: {fee} ETH
+          </Typography>
+        }
 
         {!allowanceGTstake && stakeToken.symbol !== 'ETH' &&
           <>

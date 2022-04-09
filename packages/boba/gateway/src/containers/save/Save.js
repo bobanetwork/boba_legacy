@@ -132,44 +132,46 @@ class Save extends React.Component {
 
   async getMaxTransferValue () {
 
-    const { layer2, bobaFeeChoice, bobaFeePriceRatio } = this.state
-    // as staking the boba check the bobabalance
-    const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA');
+    const { 
+      layer2, 
+      bobaFeeChoice, 
+      bobaFeePriceRatio 
+    } = this.state
+    
+    // as staking BOBA check the bobabalance
+    const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA')
+    console.log("Token:",token)
 
     let max_BN = BigNumber.from('0')
-    // boba token available prepare transferEstimate
+
+    // BOBA available prepare transferEstimate
     if (token) {
-      // get the BobaFixedSavings Address
-      const allAddresses = networkService.getAllAddresses()
-
-      /* let cost_BN = await networkService.transferEstimate(allAddresses.BobaFixedSavings,
-        token.balance.toString(),
-        token.address) */
-      // FIXME: this one also failing
-      let cost_BN = await networkService.savingEstimate(token.balance.toString());
-
-      max_BN = BigNumber.from(token.balance.toString());
-      console.log([ `max_BN`, max_BN ]);
-      //  We are transfering the BOBA and paying in Boba
-      // so need to substract the BOBA fee
-
-      if (bobaFeeChoice) {
-        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
-      }
-
-      console.log(`max_BN >>>`, max_BN.toString());
-      console.log(`max_BN >>>`, utils.formatUnits(max_BN, token.decimals))
-
-      this.setState({
-        max_Wei_String: max_BN.toString(),
-        max_Float: utils.formatUnits(max_BN, token.decimals)
-      })
-    } else {
-      this.setState({
-        max_Wei_String: max_BN.toString(),
-        max_Float: '0'
-      })
+      console.log("balance:",token.balance.toString())
+      let cost_BN = await networkService.savingEstimate(token.balance.toString())
+      console.log([ `cost_BN`, cost_BN ])
     }
+    //   max_BN = BigNumber.from(token.balance.toString());
+    //   console.log([ `max_BN`, max_BN ]);
+    //   //  We are transfering the BOBA and paying in Boba
+    //   // so need to substract the BOBA fee
+
+    //   if (bobaFeeChoice) {
+    //     max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+    //   }
+
+    //   console.log(`max_BN >>>`, max_BN.toString());
+    //   console.log(`max_BN >>>`, utils.formatUnits(max_BN, token.decimals))
+
+    //   this.setState({
+    //     max_Wei_String: max_BN.toString(),
+    //     max_Float: utils.formatUnits(max_BN, token.decimals)
+    //   })
+//    } else {
+      // this.setState({
+      //   max_Wei_String: max_BN.toString(),
+      //   max_Float: '0'
+      // })
+//    }
 
   }
 
@@ -200,12 +202,11 @@ class Save extends React.Component {
 
     const addTX = await this.props.dispatch(addFS_Savings(value_Wei_String))
 
-    if (addTX) this.props.dispatch(openAlert("Your BOBA was staked"))
+    if (addTX) this.props.dispatch(openAlert("Your BOBA were staked"))
 
     this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
 
   }
-
 
   render() {
 
@@ -257,9 +258,6 @@ class Save extends React.Component {
                   <Typography variant="h3" >
                     {totalBOBAstaked} Boba
                   </Typography>
-                  {/*<Typography variant="body2" sx={{ opacity: 0.65 }}>
-                    ≈ $0
-                  </Typography>*/}
                 </Box>
               </S.StakeItem>
             </S.StakeEarnContainer>
