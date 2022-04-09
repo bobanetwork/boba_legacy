@@ -16,11 +16,10 @@ import Nft from "containers/wallet/nft/Nft"
 import Token from './token/Token'
 import * as S from './wallet.styles'
 
-import { 
-  selectAccountEnabled, 
+import {
+  selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice,
-  selectBobaPriceRatio
+  selectBobaFeeChoice
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -50,7 +49,6 @@ function Wallet() {
   const accountEnabled = useSelector(selectAccountEnabled())
 
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
@@ -137,7 +135,6 @@ function Wallet() {
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
-
       {layer === 'L2' && tooSmallETH &&
         <S.LayerAlert>
           <S.AlertInfo>

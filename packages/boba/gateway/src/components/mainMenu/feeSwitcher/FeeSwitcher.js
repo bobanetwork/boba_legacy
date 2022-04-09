@@ -26,7 +26,9 @@ import {
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
+
 import { switchFee } from 'actions/setupAction.js'
+import { openAlert } from 'actions/uiAction'
 
 import { Typography } from '@mui/material'
 
@@ -65,6 +67,8 @@ function FeeSwitcher() {
     console.log([ `ETH BALANCE`, logAmount(balanceETH.balance, 18) ])
     console.log([ `tooSmallETH`, tooSmallETH ])
 
+    let res
+    
     if (feeUseBoba && targetFee === 'BOBA') {
       // do nothing - already set to BOBA
     } 
@@ -77,8 +81,7 @@ function FeeSwitcher() {
         dispatch(openAlert('You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA. \
           If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.'))
       } else {
-        dispatch(openAlert('Fee switch transaction submitted'))
-        dispatch(switchFee(targetFee))
+        res = await dispatch(switchFee(targetFee))
       }
     }
     else if (feeUseBoba && targetFee === 'ETH') {
@@ -87,11 +90,16 @@ function FeeSwitcher() {
         dispatch(openAlert('You cannot change the fee token to ETH since your ETH balance is below 0.02 ETH. \
           If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.'))
       } else {
-        dispatch(openAlert('Fee switch transaction submitted'))
-        dispatch(switchFee(targetFee))
+        res = await dispatch(switchFee(targetFee))
       }
     }
+    
+    if (res) {
+      dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
+    }
+    
   }, [ dispatch, balanceETH, balanceBOBA ])
+
 
   if (!accountEnabled || layer !== 'L2') {
     return null
@@ -101,14 +109,14 @@ function FeeSwitcher() {
     <S.FeeSwitcherWrapper>
       <Tooltip
         title={'BOBA or ETH will be used across Boba according to your choice.'}
-        >
+      >
         <Typography variant="body2">Fee</Typography>
       </Tooltip>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={ !feeUseBoba ? "ETH" : 'BOBA'}
+        value={!feeUseBoba ? "ETH" : 'BOBA'}
         options={[ {
           value: 'ETH',
           title: 'ETH',

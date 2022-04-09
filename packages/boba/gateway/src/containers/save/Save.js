@@ -39,7 +39,9 @@ import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 import ListSave from 'components/listSave/listSave'
 
-import { logAmount, toWei_String } from 'util/amountConvert'
+import { toWei_String } from 'util/amountConvert'
+import networkService from 'services/networkService'
+import { BigNumber, utils } from 'ethers'
 
 class Save extends React.Component {
 
@@ -54,10 +56,9 @@ class Save extends React.Component {
     const {
       accountEnabled,
       netLayer,
-      bobaFeeChoice
+      bobaFeeChoice,
+      bobaFeePriceRatio
     } = this.props.setup
-
-    console.log("this.props.setup:",this.props.setup)
 
     const {
       layer2,
@@ -68,11 +69,14 @@ class Save extends React.Component {
       accountEnabled,
       netLayer,
       bobaFeeChoice,
-      loading: false,
+      bobaFeePriceRatio,
       layer2,
+      loading: false,
       stakeValue: '',
       stakeValueValid: false,
-      value_Wei_String: ''
+      value_Wei_String: '',
+      max_Wei_String: '0',
+      max_Float: '0',
     }
 
   }
@@ -80,6 +84,7 @@ class Save extends React.Component {
   componentDidMount() {
     this.props.dispatch(getFS_Saves())
     this.props.dispatch(getFS_Info())
+    this.getMaxTransferValue()
   }
 
   componentDidUpdate(prevState) {
@@ -91,15 +96,16 @@ class Save extends React.Component {
     const {
       accountEnabled,
       netLayer,
-      bobaFeeChoice
+      bobaFeeChoice,
+      bobaFeePriceRatio
     } = this.props.setup
 
-    const { 
-      layer2 
+    const {
+      layer2
     } = this.props.balance
 
     if (!isEqual(prevState.balance.layer2, layer2)) {
-      this.setState({ layer2 })
+      this.setState({ layer2 },()=> this.getMaxTransferValue())
     }
 
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
@@ -111,7 +117,11 @@ class Save extends React.Component {
     }
 
     if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
-      this.setState({ bobaFeeChoice })
+      this.setState({ bobaFeeChoice }, ()=> this.getMaxTransferValue())
+    }
+
+    if (!isEqual(prevState.setup.bobaFeePriceRatio, bobaFeePriceRatio)) {
+      this.setState({ bobaFeePriceRatio },()=> this.getMaxTransferValue())
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
@@ -120,38 +130,54 @@ class Save extends React.Component {
 
   }
 
-  getMaxTransferValue () {
+  async getMaxTransferValue () {
 
-    const { layer2, bobaFeeChoice } = this.state
-    
-    const bobaBalance = Object.keys(layer2).reduce((acc, cur) => {
+    const { layer2, bobaFeeChoice, bobaFeePriceRatio } = this.state
+    // as staking the boba check the bobabalance
+    const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA');
 
-      if (layer2[cur]['symbolL2'] === 'BOBA') {
-        const bal = layer2[cur]['balance']
-        acc = logAmount(bal, 18)
-        if (bobaFeeChoice) {
-          let ret = Number(acc) - 1.0
-          if(ret > 0)
-            return ret.toString() 
-          else
-            return '0'
-        } else {
-          // we are using ETH to pay for the fees - can stake full amount
-          return acc
-        } 
+    let max_BN = BigNumber.from('0')
+    // boba token available prepare transferEstimate
+    if (token) {
+      // get the BobaFixedSavings Address
+      const allAddresses = networkService.getAllAddresses()
+
+      /* let cost_BN = await networkService.transferEstimate(allAddresses.BobaFixedSavings,
+        token.balance.toString(),
+        token.address) */
+      // FIXME: this one also failing
+      let cost_BN = await networkService.savingEstimate(token.balance.toString());
+
+      max_BN = BigNumber.from(token.balance.toString());
+      console.log([ `max_BN`, max_BN ]);
+      //  We are transfering the BOBA and paying in Boba
+      // so need to substract the BOBA fee
+
+      if (bobaFeeChoice) {
+        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
       }
 
-      return acc
-    }, 0)
+      console.log(`max_BN >>>`, max_BN.toString());
+      console.log(`max_BN >>>`, utils.formatUnits(max_BN, token.decimals))
 
-    return bobaBalance
+      this.setState({
+        max_Wei_String: max_BN.toString(),
+        max_Float: utils.formatUnits(max_BN, token.decimals)
+      })
+    } else {
+      this.setState({
+        max_Wei_String: max_BN.toString(),
+        max_Float: '0'
+      })
+    }
+
   }
 
   handleStakeValue(value) {
     if( value &&
       (Number(value) > 0.0) &&
-      (Number(value) <= Number(this.getMaxTransferValue()))
-      ) {
+      (Number(value) <= Number(this.state.max_Float))
+    ) {
         this.setState({
           stakeValue: value,
           stakeValueValid: true,
@@ -177,7 +203,7 @@ class Save extends React.Component {
     if (addTX) this.props.dispatch(openAlert("Your BOBA was staked"))
 
     this.setState({ loading: false, stakeValue: '', value_Wei_String: ''})
- 
+
   }
 
 
@@ -187,33 +213,10 @@ class Save extends React.Component {
       stakeInfo,
       accountEnabled,
       netLayer,
-      layer2,
       stakeValue,
       loading,
-      bobaFeeChoice
+      max_Float,
     } = this.state
-
-
-    let bobaBalance = layer2.filter((i) => {
-      if (i.symbol === 'BOBA') return true
-      return false
-    })
-
-    let bobaWeiString = '0'
-
-    if (typeof (bobaBalance[ 0 ]) !== 'undefined') {
-      bobaWeiString = bobaBalance[ 0 ].balance.toString()
-    }
-
-    let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
-
-    if (bobaFeeChoice) {
-      let ret = l2BalanceBOBA - 1.0
-      if(ret > 0)
-        l2BalanceBOBA = ret 
-      else
-        l2BalanceBOBA = 0
-    } 
 
     let totalBOBAstaked = 0
     Object.keys(stakeInfo).forEach((v, i) => {
@@ -269,16 +272,16 @@ class Save extends React.Component {
                 }}
               >
                 <Typography variant="body2"> Boba Balance:</Typography>
-                <Typography variant="body2"> {l2BalanceBOBA} </Typography>
+                <Typography variant="body2"> {max_Float} </Typography>
               </Box>
               <Input
                 placeholder={`Amount to stake`}
                 value={stakeValue}
                 type="number"
                 // unit={'BOBA'}
-                maxValue={this.getMaxTransferValue()}
+                maxValue={max_Float}
                 onChange={i=>{this.handleStakeValue(i.target.value)}}
-                onUseMax={i=>{this.handleStakeValue(this.getMaxTransferValue())}}
+                onUseMax={i=>{this.handleStakeValue(max_Float)}}
                 newStyle
                 disabled={netLayer !== 'L2'}
                 variant="standard"
