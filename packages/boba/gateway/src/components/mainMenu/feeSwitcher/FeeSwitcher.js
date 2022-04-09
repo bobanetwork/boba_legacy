@@ -16,6 +16,7 @@ limitations under the License. */
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { openAlert } from 'actions/uiAction'
 
 import {
   selectAccountEnabled,
@@ -43,33 +44,63 @@ function FeeSwitcher() {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  // const feePriceRatio = useSelector(selectBobaPriceRatio())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
-  const l2EthBalance = l2Balances.filter((i) => i.symbol === 'ETH')
-  const ethBalance = l2EthBalance[ 0 ]
 
-  const dispatchSwitchFee = useCallback(async (targetFee) => {
-    // NOTE: HARD CODED ETH to 0.01
-    // actual fee is more like 0.000052
-    const tooSmallEth = new BN(logAmount(ethBalance.balance, 18)).lte(new BN(0.001))
-    // console.log([ `tooSmallEth`, tooSmallEth ])
-    // console.log("l2EthBalance",ethBalance.balance)
-    // console.log([ `ETH BALANCE`, logAmount(ethBalance.balance, 18) ])
-    let res;
-    if (targetFee === 'BOBA' && tooSmallEth) {
-      res = await dispatch(switchFeeMetaTransaction())
-    } else {
-      res = await dispatch(switchFee(targetFee))
+  const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
+  const balanceETH = l2BalanceETH[0]
+
+  const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
+  const balanceBOBA = l2BalanceBOBA[0]
+
+  const dispatchSwitchFee = useCallback((targetFee) => {
+    
+    const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
+    const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+
+    console.log([ `BOBA BALANCE`, logAmount(balanceBOBA.balance, 18) ])
+    console.log([ `tooSmallBOBA`, tooSmallBOBA ])
+    console.log([ `ETH BALANCE`, logAmount(balanceETH.balance, 18) ])
+    console.log([ `tooSmallETH`, tooSmallETH ])
+
+    let res
+    
+    if (feeUseBoba && targetFee === 'BOBA') {
+      // do nothing - already set to BOBA
+    } 
+    else if ( !feeUseBoba && targetFee === 'ETH' ) {
+      // do nothing - already set to ETH
+    } 
+    else if ( !feeUseBoba && targetFee === 'BOBA' ) {
+      // change to BOBA
+      if( tooSmallBOBA ) {
+        dispatch(openAlert('You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA. \
+          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.'))
+      } else {
+        dispatch(openAlert('Fee switch transaction submitted'))
+        res = await dispatch(switchFee(targetFee))
+      }
     }
-
+    else if (feeUseBoba && targetFee === 'ETH') {
+      // change to ETH
+      if( tooSmallETH ) {
+        dispatch(openAlert('You cannot change the fee token to ETH since your ETH balance is below 0.02 ETH. \
+          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.'))
+      } else {
+        dispatch(openAlert('Fee switch transaction submitted'))
+        res = await dispatch(switchFee(targetFee))
+      }
+    }
+    
     if (res) {
-      dispatch(openAlert(`Succesfully changed fee to ${targetFee}`))
+      dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
     }
+    
+  }, [ dispatch, balanceETH, balanceBOBA ])
 
-  }, [ dispatch, ethBalance ])
 
   if (!accountEnabled || layer !== 'L2') {
     return null
