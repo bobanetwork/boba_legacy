@@ -122,7 +122,6 @@ class FarmDepositModal extends React.Component {
         max_BN = max_BN.sub(cost_BN)
         // minimum ETH in account
         max_BN = max_BN.sub(BigNumber.from(toWei_String(0.002, 18)))
-        fee = utils.formatUnits(cost_BN, stakeToken.decimals)
       }
       else if (stakeToken.symbol === 'BOBA' && bobaFeeChoice) {
         // we are staking BOBA and paying in BOBA
@@ -130,15 +129,26 @@ class FarmDepositModal extends React.Component {
         max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
         // make sure user maintains minimum BOBA in account
         max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
       }
+      else if (stakeToken.symbol === 'BOBA' && !bobaFeeChoice) {
+        // make sure user maintains minimum BOBA in account
+        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
+      } 
+      else {
+        // do not adjust max_BN
+      }
+
+      if(bobaFeeChoice)
+        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
+      else 
+        fee = utils.formatUnits(cost_BN, stakeToken.decimals)
 
       // if the max amount is less than the gas,
       // set the max amount to zero
       if (max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
       }
-      
+
       this.setState({ 
         max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals),
         fee
@@ -263,13 +273,15 @@ class FarmDepositModal extends React.Component {
       new BN(approvedAllowance).gte(powAmount(stakeValue, stakeToken.decimals))
     ) {
       allowanceGTstake = true
-    }
-
-    //do not need to approve ETH
-    if (Number(stakeValue) > 0 && stakeToken.symbol === 'ETH') {
+    } else if (Number(stakeValue) > 0 && 
+      stakeToken.symbol === 'ETH'
+    ) {
+      //do not need to approve ETH
       allowanceGTstake = true
     }
 
+    // we do this because there is no fee estimation logic (yet) for this 
+    // on L1
     let allowUseAll = netLayer === 'L2' ? true : false
 
     return (
@@ -277,10 +289,8 @@ class FarmDepositModal extends React.Component {
         open={open}
         maxWidth="md"
         onClose={() => { this.handleClose() }}
-        minHeight="380px"
       >
         <Box>
-
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Stake {`${stakeToken.symbol}`}
           </Typography>
@@ -297,18 +307,19 @@ class FarmDepositModal extends React.Component {
             newStyle
             variant="standard"
           />
-        </Box>
 
-        {netLayer === 'L2' && bobaFeeChoice && fee &&
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            Fee: {fee} BOBA
-          </Typography>
-        }
-        {netLayer === 'L2' && !bobaFeeChoice && fee &&
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            Fee: {fee} ETH
-          </Typography>
-        }
+          {netLayer === 'L2' && bobaFeeChoice && fee &&
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Fee: {fee} BOBA
+            </Typography>
+          }
+
+          {netLayer === 'L2' && !bobaFeeChoice && fee &&
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Fee: {fee} ETH
+            </Typography>
+          }
+        </Box>
 
         {!allowanceGTstake && stakeToken.symbol !== 'ETH' &&
           <>

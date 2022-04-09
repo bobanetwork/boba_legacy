@@ -76,7 +76,8 @@ class Save extends React.Component {
       stakeValueValid: false,
       value_Wei_String: '',
       max_Wei_String: '0',
-      max_Float: '0',
+      max_Float_String: '0.0',
+      fee: '0'
     }
 
   }
@@ -105,7 +106,7 @@ class Save extends React.Component {
     } = this.props.balance
 
     if (!isEqual(prevState.balance.layer2, layer2)) {
-      this.setState({ layer2 },()=> this.getMaxTransferValue())
+      this.setState({ layer2 },() => this.getMaxTransferValue())
     }
 
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
@@ -117,11 +118,11 @@ class Save extends React.Component {
     }
 
     if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
-      this.setState({ bobaFeeChoice }, ()=> this.getMaxTransferValue())
+      this.setState({ bobaFeeChoice })
     }
 
     if (!isEqual(prevState.setup.bobaFeePriceRatio, bobaFeePriceRatio)) {
-      this.setState({ bobaFeePriceRatio },()=> this.getMaxTransferValue())
+      this.setState({ bobaFeePriceRatio })
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
@@ -142,43 +143,52 @@ class Save extends React.Component {
     const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA')
     console.log("Token:",token)
 
-    let max_BN = BigNumber.from('0')
-
     // BOBA available prepare transferEstimate
     if (token) {
-      console.log("balance:",token.balance.toString())
-      let cost_BN = await networkService.savingEstimate(token.balance.toString())
+      //console.log("balance:",token.balance.toString())
+      let cost_BN = await networkService.savingEstimate()
       console.log([ `cost_BN`, cost_BN ])
+      let max_BN = BigNumber.from(token.balance.toString())
+      let fee = '0'
+
+      if (bobaFeeChoice) {
+        // we are staking BOBA and paying in BOBA
+        // so need to subtract the BOBA fee
+        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+      }
+
+      // make sure user maintains minimum BOBA in account
+      max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
+      
+      if(bobaFeeChoice)
+        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), token.decimals)
+      else 
+        fee = utils.formatUnits(cost_BN, token.decimals)
+
+      // if the max amount is less than the gas,
+      // set the max amount to zero
+      if (max_BN.lt(BigNumber.from('0'))) {
+        max_BN = BigNumber.from('0')
+      }
+
+      this.setState({ 
+        max_Float_String: utils.formatUnits(max_BN, token.decimals),
+        fee
+      })
+
     }
-    //   max_BN = BigNumber.from(token.balance.toString());
-    //   console.log([ `max_BN`, max_BN ]);
-    //   //  We are transfering the BOBA and paying in Boba
-    //   // so need to substract the BOBA fee
-
-    //   if (bobaFeeChoice) {
-    //     max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
-    //   }
-
-    //   console.log(`max_BN >>>`, max_BN.toString());
-    //   console.log(`max_BN >>>`, utils.formatUnits(max_BN, token.decimals))
-
-    //   this.setState({
-    //     max_Wei_String: max_BN.toString(),
-    //     max_Float: utils.formatUnits(max_BN, token.decimals)
-    //   })
-//    } else {
-      // this.setState({
-      //   max_Wei_String: max_BN.toString(),
-      //   max_Float: '0'
-      // })
-//    }
 
   }
 
   handleStakeValue(value) {
+
+    const { 
+      max_Float_String 
+    } = this.state
+
     if( value &&
       (Number(value) > 0.0) &&
-      (Number(value) <= Number(this.state.max_Float))
+      (Number(value) <= Number(max_Float_String))
     ) {
         this.setState({
           stakeValue: value,
@@ -216,7 +226,9 @@ class Save extends React.Component {
       netLayer,
       stakeValue,
       loading,
-      max_Float,
+      max_Float_String,
+      bobaFeeChoice,
+      fee 
     } = this.state
 
     let totalBOBAstaked = 0
@@ -270,20 +282,31 @@ class Save extends React.Component {
                 }}
               >
                 <Typography variant="body2"> Boba Balance:</Typography>
-                <Typography variant="body2"> {max_Float} </Typography>
+                <Typography variant="body2"> {max_Float_String} </Typography>
               </Box>
               <Input
                 placeholder={`Amount to stake`}
                 value={stakeValue}
                 type="number"
                 // unit={'BOBA'}
-                maxValue={max_Float}
+                maxValue={max_Float_String}
                 onChange={i=>{this.handleStakeValue(i.target.value)}}
-                onUseMax={i=>{this.handleStakeValue(max_Float)}}
+                onUseMax={i=>{this.handleStakeValue(max_Float_String)}}
                 newStyle
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
+              {netLayer === 'L2' && bobaFeeChoice && fee &&
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Fee: {fee} BOBA
+                </Typography>
+              }
+
+              {netLayer === 'L2' && !bobaFeeChoice && fee &&
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Fee: {fee} ETH
+                </Typography>
+              }
               {!accountEnabled ? <WalletPicker fullWidth={true} label="Connect to Boba" /> : null }
               { netLayer === 'L2' ?
                   <Button
