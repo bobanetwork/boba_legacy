@@ -21,12 +21,12 @@ import { openAlert } from 'actions/uiAction'
 import {
   selectAccountEnabled,
   selectBobaFeeChoice,
-  selectLayer
+  selectLayer,
+  selectBobaPriceRatio
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
-
-import { switchFee, switchFeeMetaTransaction } from 'actions/setupAction.js'
+import { switchFee } from 'actions/setupAction.js'
 
 import { Typography } from '@mui/material'
 
