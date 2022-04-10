@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Box, Typography } from "@mui/material"
+import { Box, Typography, IconButton } from '@mui/material'
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
@@ -116,3 +116,14 @@ export const AlertInfo = styled(Box)`
   align-items: center;
   flex: 1;
 `;
+
+export const footerLink = styled(IconButton)(({ theme }) => ({
+  '&:hover ': {
+    svg: {
+      path: {
+        fill: theme.palette.primary.main,
+        fillOpacity: 1,
+      }
+    }
+  }
+}))

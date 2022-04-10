@@ -128,7 +128,7 @@ function TransferModal ({ open, token, minHeight }) {
       const res = await dispatch(
         transfer(recipient, value_Wei_String, token.address)
       )
-      if (res) dispatch(openAlert('Transaction submitted'))
+      if (res) dispatch(openAlert('Transfer submitted'))
       handleClose()
     }
   }

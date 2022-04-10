@@ -28,7 +28,6 @@ function ECOSYSTEM() {
 
   return (
     <S.EcoSystemPageContainer>
-      {/* <PageTitle title="Ecosystem" /> */}
       <S.CategoryList>
         {PROJECT_CAT.map((cat, i) => {
           return <Button
