@@ -49,8 +49,6 @@ function FeeSwitcher() {
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  console.log([`l2Balances`,l2Balances])
-
   const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
   const balanceETH = l2BalanceETH[0]
 
