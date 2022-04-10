@@ -11,7 +11,7 @@ import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
 import defiyieldLogo from '../../images/ecosystem/defiyield.webp'
 import dodoLogo from '../../images/ecosystem/dodo.webp'
-import domFiLogo from '../../images/ecosystem/dominationFinance.svg'
+import domFiLogo from '../../images/ecosystem/dominanaceFinanace.webp'
 import fraxLogo from '../../images/ecosystem/frax.webp'
 import l2ChartsLogo from '../../images/ecosystem/l2Charts.webp'
 import layerSwapLogo from '../../images/ecosystem/layerswap.webp'
@@ -119,7 +119,7 @@ export const projectList = [
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
     "type": "defi",
-    "image": unidexLogo, 
+    "image": unidexLogo,
     "description": "The meta-aggregator of everything in DeFi. Charts, perpetuals, swaps, limit-orders, data, and more everyday."
   },
   {

@@ -21,6 +21,7 @@ import { closeModal } from 'actions/uiAction'
 
 import DoExitStep from './steps/DoExitStep'
 import DoExitStepFast from './steps/DoExitStepFast'
+import { fetchTransactions } from 'actions/networkAction'
 
 function ExitModal({ open, token, fast, minHeight }) {
 
@@ -28,6 +29,7 @@ function ExitModal({ open, token, fast, minHeight }) {
 
   function handleClose() {
     dispatch(closeModal('exitModal'))
+    dispatch(fetchTransactions())
   }
 
   return (
