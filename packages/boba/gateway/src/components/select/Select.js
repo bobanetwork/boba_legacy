@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
+import { Select as MuiSelect, MenuItem } from '@mui/material';
 import * as styles from './Select.module.scss';
+import * as S from './Select.style';
 
 function Select ({
   label,
@@ -25,6 +27,7 @@ function Select ({
   error = '',
   className
 }) {
+  console.log([`SELECT VALUE`, value])
   const selected = options.find(i => i.value === value);
 
   function renderOption (i) {
@@ -47,20 +50,29 @@ function Select ({
 
   const renderSelect = (
     <>
-      <select
+      <MuiSelect
         className={styles.select}
         value={value}
         onChange={onSelect}
+        autoWidth
+        MenuProps={{
+          sx: {
+            '&& .Mui-selected':{
+              backgroundColor: 'transparent !important',
+              color: '#BAE21A'
+            }
+          }
+        }}
       >
         {options.map((i, index) => (
-          <option
+          <MenuItem
             key={index}
             value={i.value}
           >
             {renderOption(i)}
-          </option>
+          </MenuItem>
         ))}
-      </select>
+      </MuiSelect>
       <div className={styles.selected}>
         <div className={styles.details}>
           <div className={styles.title}>{selected ? selected.title : error}</div>
@@ -81,9 +93,9 @@ function Select ({
       ].join(' ')}
     >
       {label && <div className={styles.label}>{label}</div>}
-      <div className={styles.field}>
+      <S.Field>
         {loading ? renderLoading : renderSelect}
-      </div>
+      </S.Field>
     </div>
   );
 }
