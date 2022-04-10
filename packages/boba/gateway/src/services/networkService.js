@@ -455,8 +455,6 @@ class NetworkService {
 
     if( this.L1orL2 !== 'L2' ) return
 
-    // Interact with contract
-    // this only works on L2?
     const bobaFeeContract = new ethers.Contract(
       allAddresses.Boba_GasPriceOracle,
       Boba_GasPriceOracleJson.abi,
@@ -478,18 +476,6 @@ class NetworkService {
 
       await this.getBobaFeeChoice()
 
-/*
-  const inputs = [
-    '0x',
-    '0x00',
-    '0x01',
-    '0x0001',
-    '0x0101',
-    '0xffff',
-    '0x00ff00ff00ff00ff00ff00ff',
-  ]
-const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
-*/
       return tx
     } catch (error) {
       console.log(error)
@@ -497,71 +483,73 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     }
   }
 
-  async switchFeeMetaTransaction() {
+  async getETHMetaTransaction() {
 
-    const EIP712Domain = [
-      { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' },
-      { name: 'chainId', type: 'uint256' },
-      { name: 'verifyingContract', type: 'address' },
-    ]
-    const Permit = [
-      { name: 'owner', type: 'address' },
-      { name: 'spender', type: 'address' },
-      { name: 'value', type: 'uint256' },
-      { name: 'nonce', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' },
-    ]
+    console.log("triggering getETHMetaTransaction")
 
-    const bobaFeeContract = new ethers.Contract(
-      allAddresses.Boba_GasPriceOracle,
-      Boba_GasPriceOracleJson.abi,
-      this.provider.getSigner()
-    )
+    // const EIP712Domain = [
+    //   { name: 'name', type: 'string' },
+    //   { name: 'version', type: 'string' },
+    //   { name: 'chainId', type: 'uint256' },
+    //   { name: 'verifyingContract', type: 'address' },
+    // ]
+    // const Permit = [
+    //   { name: 'owner', type: 'address' },
+    //   { name: 'spender', type: 'address' },
+    //   { name: 'value', type: 'uint256' },
+    //   { name: 'nonce', type: 'uint256' },
+    //   { name: 'deadline', type: 'uint256' },
+    // ]
 
-    const name = await this.BobaContract.name()
-    const version = '1'
-    const chainId = (await this.L2Provider.getNetwork()).chainId
+    // const bobaFeeContract = new ethers.Contract(
+    //   allAddresses.Boba_GasPriceOracle,
+    //   Boba_GasPriceOracleJson.abi,
+    //   this.provider.getSigner()
+    // )
 
-    const owner = this.account
-    const spender = bobaFeeContract.address
-    const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
-    const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    // const name = await this.BobaContract.name()
+    // const version = '1'
+    // const chainId = (await this.L2Provider.getNetwork()).chainId
+
+    // const owner = this.account
+    // const spender = bobaFeeContract.address
+    // const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
+    // const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
     
-    // 5 minutes
-    const deadline = Math.floor(Date.now() / 1000) + 300
-    const verifyingContract = this.BobaContract.address
+    // // 5 minutes
+    // const deadline = Math.floor(Date.now() / 1000) + 300
+    // const verifyingContract = this.BobaContract.address
 
-    const data = {
-      primaryType: 'Permit',
-      types: { EIP712Domain, Permit },
-      domain: { name, version, chainId, verifyingContract },
-      message: { owner, spender, value, nonce, deadline },
-    }
+    // const data = {
+    //   primaryType: 'Permit',
+    //   types: { EIP712Domain, Permit },
+    //   domain: { name, version, chainId, verifyingContract },
+    //   message: { owner, spender, value, nonce, deadline },
+    // }
 
-    let signature
-    try {
-      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-    // Send request
-    try {
-      const response = await metaTransactionAxiosInstance(
-        this.networkGateway
-      ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
-      console.log("response",response)
-      await this.getBobaFeeChoice()
-    } catch (error) {
-      console.log(error)
-      // sigh
-      let errorData = error.response.data.error
-      if(errorData.hasOwnProperty('error')) {
-        errorData = errorData.error.error.body
-      }
-      return errorData
-    }
+    // let signature
+    // try {
+    //   signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+    // } catch (error) {
+    //   console.log(error)
+    //   return error
+    // }
+    // // Send request
+    // try {
+    //   const response = await metaTransactionAxiosInstance(
+    //     this.networkGateway
+    //   ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
+    //   console.log("response",response)
+    //   await this.getBobaFeeChoice()
+    // } catch (error) {
+    //   console.log(error)
+    //   // sigh
+    //   let errorData = error.response.data.error
+    //   if(errorData.hasOwnProperty('error')) {
+    //     errorData = errorData.error.error.body
+    //   }
+    //   return errorData
+    // }
   }
 
   async getAddress(contractName, varToSet) {
@@ -875,11 +863,6 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
           fastRelayer: true,
         })
       }
-
-
-
-
-
       else {
         this.watcher = null
         this.fastWatcher = null
@@ -1398,7 +1381,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
-        
+
         if (token.symbolL1 === 'xBOBA') {
           //there is no L1 xBOBA
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
@@ -1434,7 +1417,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       tokenBalances.forEach((token) => {
         if(token.balance.lte(new BN(1000000))) {
           //do nothing
-        } 
+        }
         else if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
@@ -1727,7 +1710,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         tx = await this.provider
           .getSigner()
           .sendTransaction({
-            to: address, 
+            to: address,
             value: ethers.utils.hexlify(wei)
           })
 
@@ -1767,8 +1750,8 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         gas_BN = await this.provider
           .getSigner()
           .estimateGas({
-            from: this.account, 
-            to: recipient, 
+            from: this.account,
+            to: recipient,
             value: value_Wei_String
           })
 
@@ -1785,8 +1768,8 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
         const tx = await ERC20Contract
           .populateTransaction
-          .transfer( 
-            recipient, 
+          .transfer(
+            recipient,
             value_Wei_String
           )
 
@@ -2410,11 +2393,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     const userInfo = {}
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && 
-        cur !== 'WAGMIv0' && 
-        cur !== 'WAGMIv1' && 
+      if(cur !== 'xBOBA' &&
+        cur !== 'WAGMIv0' &&
+        cur !== 'WAGMIv1' &&
         cur !== 'OLO' &&
-        cur !== 'WAGMIv2' && 
+        cur !== 'WAGMIv2' &&
         cur !== 'WAGMIv2-Oolong') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
@@ -2497,11 +2480,11 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
   async getL2LPInfo() {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
-      if(cur !== 'xBOBA' && 
-        cur !== 'WAGMIv0' && 
-        cur !== 'WAGMIv1' && 
-        cur !== 'OLO' && 
-        cur !== 'WAGMIv2' && 
+      if(cur !== 'xBOBA' &&
+        cur !== 'WAGMIv0' &&
+        cur !== 'WAGMIv1' &&
+        cur !== 'OLO' &&
+        cur !== 'WAGMIv2' &&
         cur !== 'WAGMIv2-Oolong') {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
@@ -2595,8 +2578,9 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
     let otherField = {}
 
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
-      //console.log("Yes we have ETH")
-      otherField = { value: value_Wei_String }
+      // console.log("Yes we have ETH")
+      // add value field
+      otherField['value'] = value_Wei_String 
     }
 
     try {
@@ -2616,6 +2600,80 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       console.log("NS: addLiquidity error:", error)
       return error
     }
+  }
+
+  async liquidityEstimate(currency) {
+
+    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
+    
+    let otherField = { 
+      from: benchmarkAccount
+    }
+
+    const gasPrice_BN = await this.provider.getGasPrice()
+    console.log("gas price", gasPrice_BN.toString())
+    
+    let approvalCost_BN = BigNumber.from('0')
+    let stakeCost_BN = BigNumber.from('0')
+    
+    try {
+
+      // first, we need the allowance of the benchmarkAccount
+      const BOBA = this.L2_TEST_Contract
+        .connect(this.provider)
+        .attach(this.tokenAddresses['BOBA'].L2)
+
+      let allowance_BN = await BOBA
+        .allowance(
+          benchmarkAccount,
+          allAddresses.L2LPAddress
+        )
+
+      console.log("benchmarkAllowance", allowance_BN.toString() )
+
+      if( currency === allAddresses.L2_ETH_Address ) {
+        otherField['value'] = allowance_BN.toString() 
+      }
+      
+      // second, we need the approval cost if non-ETH
+      if( currency !== allAddresses.L2_ETH_Address ) {
+
+        const tx1 = await BOBA
+          .populateTransaction
+          .approve(
+            allAddresses.L2LPAddress,
+            allowance_BN.toString(), 
+            otherField
+          )
+
+        const approvalGas_BN = await this.provider.estimateGas(tx1)
+        approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
+        console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+      }
+       
+      // third, we need the addLiquidity cost
+      const tx2 = await this.L2LPContract
+        .connect(this.provider)
+        .populateTransaction
+        .addLiquidity(
+          allowance_BN.toString(),
+          this.tokenAddresses['BOBA'].L2,
+          otherField
+        )
+      const stakeGas_BN = await this.provider.estimateGas(tx2)
+      stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
+      console.log("addLiquidity cost in ETH:", utils.formatEther(stakeCost_BN))
+
+      const safety_margin_BN = BigNumber.from('1000000000000')
+      console.log("Stake safety margin:", utils.formatEther(safety_margin_BN))
+
+      return approvalCost_BN.add(stakeCost_BN).add(safety_margin_BN)
+
+    } catch (error) {
+      console.log('NS: liquidityEstimate() error', error)
+      return error
+    }
+  
   }
 
   /***********************************************/
@@ -2954,10 +3012,12 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
         this.provider.getSigner()
       )
 
-      const tx = await ERC20Contract.populateTransaction.approve(
-        allAddresses.L2LPAddress,
-        utils.parseEther('1.0')
-      )
+      const tx = await ERC20Contract
+        .populateTransaction
+        .approve(
+          allAddresses.L2LPAddress,
+          utils.parseEther('1.0')
+        )
 
       const approvalGas_BN = await this.L2Provider.estimateGas(tx)
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
@@ -2966,7 +3026,9 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     //in some cases zero not allowed
     const tx2 = await this.L2LPContract
-      .connect(this.provider.getSigner()).populateTransaction.clientDepositL2(
+      .connect(this.provider.getSigner())
+      .populateTransaction
+      .clientDepositL2(
         currencyAddress === allAddresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
         currencyAddress,
         currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
@@ -3455,7 +3517,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
 
     if( this.L1orL2 !== 'L2' ) return
     if( !this.BobaContract ) return
- 
+
     if(!this.account) {
       console.log('NS: delegateVotes() error - called but account === null')
       return
@@ -3775,8 +3837,7 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       console.log("Allowance", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
-
-      console.log("Deposit:", depositAmount_BN)
+      console.log("Deposit", depositAmount_BN)
 
       if (depositAmount_BN.gt(allowance_BN)) {
         console.log("Need to approve YES:", depositAmount_BN)
@@ -3797,6 +3858,72 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
       return TX
     } catch (error) {
       console.log("NS: addFS_Savings error:", error)
+      return error
+    }
+  }
+
+  async savingEstimate() {
+    
+    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
+    
+    let otherField = { 
+      from: benchmarkAccount
+    }
+
+    const gasPrice_BN = await this.provider.getGasPrice()
+    console.log("gas price", gasPrice_BN.toString())
+    
+    let approvalCost_BN = BigNumber.from('0')
+    let stakeCost_BN = BigNumber.from('0')
+    
+    try {
+
+      // first, we need the allowance of the benchmarkAccount
+      let allowance_BN = await this.BobaContract
+        .connect(this.provider)
+        .allowance(
+          benchmarkAccount,
+          allAddresses.BobaFixedSavings
+        )
+      console.log("benchmarkAllowance_BN",allowance_BN.toString())
+
+      // second, we need the approval cost
+      const tx1 = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .populateTransaction
+        .approve(
+          allAddresses.BobaFixedSavings,
+          allowance_BN.toString(), 
+        )
+
+      const approvalGas_BN = await this.provider.estimateGas(tx1)
+      approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
+      console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
+
+      // third, we need the stake cost
+      const FixedSavings = new ethers.Contract(
+        allAddresses.BobaFixedSavings,
+        L2SaveJson.abi,
+        this.provider
+      )
+
+      const tx2 = await FixedSavings
+        .populateTransaction
+        .stake(
+          allowance_BN.toString(),
+          otherField
+        )
+      const stakeGas_BN = await this.provider.estimateGas(tx2)
+      stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
+      console.log("Stake cost in ETH:", utils.formatEther(stakeCost_BN))
+
+      const safety_margin_BN = BigNumber.from('1000000000000')
+      console.log("Stake safety margin:", utils.formatEther(safety_margin_BN))
+
+      return approvalCost_BN.add(stakeCost_BN).add(safety_margin_BN)
+
+    } catch (error) {
+      console.log('NS: stakingEstimate() error', error)
       return error
     }
   }
@@ -3824,10 +3951,12 @@ const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
   }
 
   async getFS_Saves() {
+
     if(this.account === null) {
       console.log('NS: getFS_Saves() error - called but account === null')
       return
     }
+
     try {
       const FixedSavings = new ethers.Contract(
         allAddresses.BobaFixedSavings,
