@@ -14,9 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { Select as MuiSelect, MenuItem } from '@mui/material';
+import { Select as MuiSelect, MenuItem, useTheme } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
+import { ArrowDropDownCircleOutlined, ArrowDropDownOutlined } from '@mui/icons-material';
 
 function Select ({
   label,
@@ -27,7 +28,7 @@ function Select ({
   error = '',
   className
 }) {
-  console.log([`SELECT VALUE`, value])
+  const theme = useTheme();
   const selected = options.find(i => i.value === value);
 
   function renderOption (i) {
@@ -51,6 +52,7 @@ function Select ({
   const renderSelect = (
     <>
       <MuiSelect
+        IconComponent={()=> <ArrowDropDownOutlined />}
         className={styles.select}
         value={value}
         onChange={onSelect}
@@ -79,7 +81,9 @@ function Select ({
           <div className={styles.subTitle}>{selected ? selected.subTitle : ''}</div>
         </div>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8.71038 12.4393C9.29616 13.0251 10.2459 13.0251 10.8317 12.4393L13.9814 9.28962C14.9264 8.34468 14.2571 6.72896 12.9208 6.72896L6.62132 6.72896C5.28496 6.72896 4.61571 8.34467 5.56066 9.28962L8.71038 12.4393Z" fill="white" fillOpacity="0.45"/>
+          <path d="M8.71038 12.4393C9.29616 13.0251 10.2459 13.0251 10.8317 12.4393L13.9814 9.28962C14.9264 8.34468 14.2571 6.72896 12.9208 6.72896L6.62132 6.72896C5.28496 6.72896 4.61571 8.34467 5.56066 9.28962L8.71038 12.4393Z"
+            fill={theme.palette.text.primary}
+            fillOpacity="0.45" />
         </svg>
       </div>
     </>
