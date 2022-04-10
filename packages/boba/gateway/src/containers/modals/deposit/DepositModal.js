@@ -21,6 +21,7 @@ import { closeModal } from 'actions/uiAction'
 
 import InputStep from './steps/InputStep'
 import InputStepFast from './steps/InputStepFast'
+import { fetchTransactions } from 'actions/networkAction'
 
 function DepositModal({ open, token, fast }) {
 
@@ -28,6 +29,7 @@ function DepositModal({ open, token, fast }) {
 
   function handleClose() {
     dispatch(closeModal('depositModal'))
+    dispatch(fetchTransactions())
   }
 
   return (

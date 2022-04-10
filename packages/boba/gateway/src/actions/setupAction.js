@@ -61,8 +61,8 @@ export function switchFee(targetFee) {
   return createAction('SETUP/SWITCHFEE', () => networkService.switchFee(targetFee))
 }
 
-export function switchFeeMetaTransaction() {
-  return createAction('SETUP/SWITCHFEE', () => networkService.switchFeeMetaTransaction())
+export function getETHMetaTransaction() {
+  return createAction('SETUP/GETETH', () => networkService.getETHMetaTransaction())
 }
 
 export async function addBobaFee ( bobaFee ) {

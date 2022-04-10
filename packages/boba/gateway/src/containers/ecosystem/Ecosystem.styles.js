@@ -149,9 +149,6 @@ export const ProjectDescription = styled(Typography)(({ theme }) => ({
   'WebkitBoxOrient': 'vertical'
 }))
 
-
-
-
 export const footerLink = styled(IconButton)(({ theme }) => ({
   '&:hover ': {
     svg: {
