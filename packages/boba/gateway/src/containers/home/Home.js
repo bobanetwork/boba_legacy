@@ -30,13 +30,20 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchExits
+  fetchExits,
+  getMonsterInfo
 } from 'actions/networkAction'
 
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectBaseEnabled, 
+  selectAccountEnabled, 
+  selectNetwork, 
+  selectLayer,
+  selectMonster 
+} from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
 
@@ -72,7 +79,11 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import { 
+  fetchAirdropStatusL1, 
+  fetchAirdropStatusL2 
+} from 'actions/airdropAction'
+
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
 
@@ -127,6 +138,9 @@ function Home() {
   const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const monsterNumber = useSelector(selectMonster())
+
+  console.log("monsterNumber:", monsterNumber)
 
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
@@ -179,8 +193,9 @@ function Home() {
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
+      dispatch(getMonsterInfo())       // account specific
     }
-    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())

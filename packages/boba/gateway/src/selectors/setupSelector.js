@@ -57,3 +57,9 @@ export function selectBobaPriceRatio () {
     return state.setup['bobaFeePriceRatio']
   }
 }
+
+export function selectMonster () {
+  return function (state) {
+    return state.nft['monsterNumber']
+  }
+}

@@ -16,6 +16,8 @@ import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Copy from 'components/copy/Copy'
 
+import truncate from 'truncate-middle'
+
 class Nft extends React.Component {
 
   constructor(props) {
@@ -161,8 +163,8 @@ class Nft extends React.Component {
                   Turing monsters:
                 </Typography>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body3" >
-                    0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793
+                  <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                    0xce45...D793
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>

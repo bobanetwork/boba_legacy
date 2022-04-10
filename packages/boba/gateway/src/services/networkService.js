@@ -904,7 +904,7 @@ class NetworkService {
       return 'enabled'
 
     } catch (error) {
-      console.log(`NS: ERROR :InitializeBase `,error)
+      console.log(`NS: ERROR: InitializeBase `,error)
       return false
     }
   }
@@ -1203,6 +1203,27 @@ class NetworkService {
     } else {
       return []
     }
+  }
+
+  async checkMonster() {
+
+    try {
+
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      const monsterBalance = await contract.balanceOf(this.account)
+      
+      return Number(monsterBalance.toString())
+
+    } catch (error) {
+      console.log("NS: checkMonster error:",error)
+      return error
+    }
+
   }
 
   async addNFT( address, tokenID ) {

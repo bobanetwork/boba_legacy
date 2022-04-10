@@ -208,6 +208,12 @@ export function monsterMint() {
   )
 }
 
+export function getMonsterInfo() {
+  return createAction('MONSTER/INFO', () =>
+    networkService.checkMonster()
+  )
+}
+
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))

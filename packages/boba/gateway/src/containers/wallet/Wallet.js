@@ -99,10 +99,12 @@ function Wallet() {
       console.log("l2Balances",l2Balances)
       const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
-      if (l2BalanceETH[0]) {
+      
+      if (l2BalanceETH && l2BalanceETH[0]) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
       }
-      if (l2BalanceBOBA[0]) {
+      
+      if (l2BalanceBOBA && l2BalanceBOBA[0]) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
       }
     }
