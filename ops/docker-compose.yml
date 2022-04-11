@@ -316,6 +316,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
+      - kms
     image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
