@@ -97,6 +97,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import Monster from 'containers/monster/Monster'
 
 import { Box, Container } from '@mui/material'
 
@@ -142,8 +143,6 @@ function Home() {
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
   const monsterNumber = useSelector(selectMonster())
-
-  console.log("monsterNumber:", monsterNumber)
 
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
@@ -352,6 +351,9 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Monster" &&
+              <Monster />
             }
           </Container>
           <PageFooter/>
