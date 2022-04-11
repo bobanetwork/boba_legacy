@@ -48,6 +48,7 @@ contract Boba_GasPriceOracle {
     uint256 public minPriceRatio = 500;
 
     // The price ratio of ETH and BOBA
+    // This price ratio considers the saving percentage of using BOBA as the fee token
     uint256 public priceRatio;
 
     // Gas price oracle address
@@ -62,6 +63,9 @@ contract Boba_GasPriceOracle {
     // Received ETH amount for the swap - 0.005
     uint256 public receivedETHAmount = 5e15;
 
+    // Price ratio without discount
+    uint256 public marketPriceRatio;
+
     /*************
      *  Events   *
      *************/
@@ -70,7 +74,7 @@ contract Boba_GasPriceOracle {
     event UseBobaAsFeeToken(address);
     event SwapBOBAForETHMetaTransaction(address);
     event UseETHAsFeeToken(address);
-    event UpdatePriceRatio(address, uint256);
+    event UpdatePriceRatio(address, uint256, uint256);
     event UpdateMaxPriceRatio(address, uint256);
     event UpdateMinPriceRatio(address, uint256);
     event UpdateGasPriceOracleAddress(address, address);
@@ -142,6 +146,7 @@ contract Boba_GasPriceOracle {
         maxPriceRatio = 5000;
         priceRatio = 2000;
         minPriceRatio = 500;
+        marketPriceRatio = 2000;
     }
 
     /**
@@ -174,12 +179,12 @@ contract Boba_GasPriceOracle {
     ) public {
         require(!Address.isContract(tokenOwner), "Account not EOA");
         require(spender == address(this), "Spender is not this contract");
-        uint256 totalCost = receivedETHAmount.mul(priceRatio).add(metaTransactionFee);
+        uint256 totalCost = receivedETHAmount.mul(marketPriceRatio).add(metaTransactionFee);
         require(value >= totalCost, "Value is not enough");
         L2GovernanceERC20 bobaToken = L2GovernanceERC20(l2BobaAddress);
         bobaToken.permit(tokenOwner, spender, value, deadline, v, r, s);
         IERC20(l2BobaAddress).safeTransferFrom(tokenOwner, address(this), totalCost);
-        (bool sent, ) = address(msg.sender).call{ value: receivedETHAmount }("");
+        (bool sent, ) = address(tokenOwner).call{ value: receivedETHAmount }("");
         require(sent, "Failed to send ETH");
         emit SwapBOBAForETHMetaTransaction(tokenOwner);
     }
@@ -198,11 +203,14 @@ contract Boba_GasPriceOracle {
     /**
      * Update the price ratio of ETH and BOBA
      * @param _priceRatio the price ratio of ETH and BOBA
+     * @param _marketPriceRatio tha market price ratio of ETH and BOBA
      */
-    function updatePriceRatio(uint256 _priceRatio) public onlyOwner {
+    function updatePriceRatio(uint256 _priceRatio, uint256 _marketPriceRatio) public onlyOwner {
         require(_priceRatio <= maxPriceRatio && _priceRatio >= minPriceRatio);
+        require(_marketPriceRatio <= maxPriceRatio && _marketPriceRatio >= minPriceRatio);
         priceRatio = _priceRatio;
-        emit UpdatePriceRatio(owner(), _priceRatio);
+        marketPriceRatio = _marketPriceRatio;
+        emit UpdatePriceRatio(owner(), _priceRatio, _marketPriceRatio);
     }
 
     /**

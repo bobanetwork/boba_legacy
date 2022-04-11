@@ -133,6 +133,7 @@ export const makeL2GenesisFile = async (
       gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
       metaTransactionFee: utils.parseEther('3'),
       receivedETHAmount: utils.parseEther('0.005'),
+      marketPriceRatio: 2000,
     }
   }
 
