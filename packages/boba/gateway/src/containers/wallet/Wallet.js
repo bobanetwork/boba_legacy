@@ -136,7 +136,8 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
-//&& tooSmallETH
+// disable hisding the EMERGENCY SWAP for testing
+// && tooSmallETH
 
   return (
     <S.PageContainer>
@@ -149,7 +150,7 @@ function Wallet() {
               variant="body2"
               component="p"
             >
-              <span style={{opacity: '1.0'}}>WARNING: Low ETH balance</span>.
+              <span style={{opacity: '1.0'}}>NOTE: ETH balance</span>.
               {' '}
               <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
               regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.

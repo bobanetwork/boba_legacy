@@ -510,14 +510,7 @@ class NetworkService {
       this.provider.getSigner()
     )
 
-    const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-    const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-    const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-    const value = receivedETHAmount
-      .mul(marketPriceRatio)
-      .add(metaTransactionFee)
-      .toString()
-
+    let value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
     const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
     const deadline = Math.floor(Date.now() / 1000) + 300
     const verifyingContract = this.BobaContract.address
@@ -541,7 +534,6 @@ class NetworkService {
       return error
     }
 
-    // Send request
     try {
       const response = await metaTransactionAxiosInstance(
         this.networkGateway
@@ -557,36 +549,6 @@ class NetworkService {
       }
       return errorData
     }
-
-
-    // const name = await this.BobaContract.name()
-    // const version = '1'
-    // const chainId = (await this.L2Provider.getNetwork()).chainId
-
-    // const owner = this.account
-    // const spender = bobaFeeContract.address
-    // const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
-    // const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
-    
-    // // 5 minutes
-    // const deadline = Math.floor(Date.now() / 1000) + 300
-    // const verifyingContract = this.BobaContract.address
-
-    // const data = {
-    //   primaryType: 'Permit',
-    //   types: { EIP712Domain, Permit },
-    //   domain: { name, version, chainId, verifyingContract },
-    //   message: { owner, spender, value, nonce, deadline },
-    // }
-
-    // let signature
-    // try {
-    //   signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
-    // } catch (error) {
-    //   console.log(error)
-    //   return error
-    // }
-
   }
 
   async getAddress(contractName, varToSet) {
