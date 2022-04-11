@@ -74,19 +74,13 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 		log.Root().SetHandler(log.LvlFilterHandler(logLevel, logHandler))
 
 		// Parse  CTC contract address.
-		ctcAddress, err := bsscore.ParseWalletPrivKeyAndContractAddr(
-			"Sequencer",
-			cfg.CTCAddress,
-		)
+		ctcAddress, err := bsscore.ParseContractAddr("Sequencer", cfg.CTCAddress)
 		if err != nil {
 			return err
 		}
 
 		// Parse and SCC contract address.
-		sccAddress, err := bsscore.ParseWalletPrivKeyAndContractAddr(
-			"Proposer",
-			cfg.SCCAddress,
-		)
+		sccAddress, err := bsscore.ParseContractAddr("Proposer", cfg.SCCAddress)
 		if err != nil {
 			return err
 		}
@@ -118,13 +112,13 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			NumConfirmations:     cfg.NumConfirmations,
 		}
 		sess, _ := session.NewSession(&aws.Config{
-			Region:   aws.String("us-east-1"),
-			Endpoint: aws.String("http://kms:8888")},
+			Region:   aws.String(cfg.KmsRegion),
+			Endpoint: aws.String(cfg.KmsEndpoint)},
 		)
 		svc := kms.New(sess)
 		var services []*bsscore.Service
 		if cfg.RunTxBatchSubmitter {
-			pubkey, err := ethawskmssigner.GetPubKey(svc, "0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
+			pubkey, err := ethawskmssigner.GetPubKey(svc, cfg.SequencerKeyId)
 			if err != nil {
 				return err
 			}
@@ -137,7 +131,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				MaxTxSize:   cfg.MaxL1TxSize,
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
-				KeyId:       "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+				KeyId:       cfg.SequencerKeyId,
 				KeyAddress:  keyAddr,
 				KMS:         *svc,
 			})
@@ -159,7 +153,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 		}
 
 		if cfg.RunStateBatchSubmitter {
-			pubkey, err := ethawskmssigner.GetPubKey(svc, "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc")
+			pubkey, err := ethawskmssigner.GetPubKey(svc, cfg.ProposerKeyId)
 			if err != nil {
 				return err
 			}
@@ -173,7 +167,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				SCCAddr:     sccAddress,
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
-				KeyId:       "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
+				KeyId:       cfg.ProposerKeyId,
 				KeyAddress:  keyAddr,
 				KMS:         *svc,
 			})

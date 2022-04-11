@@ -108,12 +108,9 @@ func ParsePrivateKeyStr(privKeyStr string) (*ecdsa.PrivateKey, error) {
 	return crypto.HexToECDSA(hex)
 }
 
-// ParseWalletPrivKeyAndContractAddr returns contract address to send to for a
+// ParseContractAddr returns contract address to send to for a
 // particular sub-service.
-func ParseWalletPrivKeyAndContractAddr(
-	name string,
-	contractAddrStr string,
-) (common.Address, error) {
+func ParseContractAddr(name string, contractAddrStr string) (common.Address, error) {
 
 	// Parse the target contract address the wallet will send to.
 	contractAddress, err := ParseAddress(contractAddrStr)

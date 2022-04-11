@@ -11,26 +11,11 @@ import (
 )
 
 var (
-	// ErrSequencerPrivKeyOrMnemonic signals that the user tried to set both
-	// sequencer wallet derivation methods or neither of them.
-	ErrSequencerPrivKeyOrMnemonic = errors.New("either sequencer-private-key " +
-		"or mnemonic + sequencer-hd-path must be set")
 
-	// ErrProposererPrivKeyOrMnemonic signals that the user tried to set
-	// both proposer wallet derivation methods or neither of them.
-	ErrProposerPrivKeyOrMnemonic = errors.New("either proposer-private-key " +
-		"or mnemonic + proposer-hd-path must be set")
-
-	// ErrSameSequencerAndProposerHDPath signals that the user specified the
-	// same sequencer and proposer derivations paths, which otherwise would
+	// ErrSameSequencerAndProposerKeyId signals that the user specified
+	// the same sequencer and proposer KMS keys, which otherwise would
 	// lead to the two using the same wallet.
-	ErrSameSequencerAndProposerHDPath = errors.New("sequencer-hd-path and " +
-		"proposer-hd-path must be distinct when using mnemonic")
-
-	// ErrSameSequencerAndProposerPrivKey signals that the user specified
-	// the same sequencer and proposer private keys, which otherwise would
-	// lead to the two using the same wallet.
-	ErrSameSequencerAndProposerPrivKey = errors.New("sequencer-priv-key and " +
+	ErrSameSequencerAndProposerKeyId = errors.New("sequencer-priv-key and " +
 		"proposer-priv-key must be distinct")
 
 	// ErrSentryDSNNotSet signals that not Data Source Name was provided
@@ -113,6 +98,15 @@ type Config struct {
 	// mempool on startup.
 	ClearPendingTxs bool
 
+	// KMS setup
+	SequencerKeyId string
+
+	ProposerKeyId string
+
+	KmsEndpoint string
+
+	KmsRegion string
+
 	/* Optional Params */
 
 	// MaxL1GasPrice is the maximum L1 gas price that the
@@ -141,27 +135,6 @@ type Config struct {
 	// BlockOffset is the offset between the CTC contract start and the L2 geth
 	// blocks.
 	BlockOffset uint64
-
-	// SequencerPrivateKey the private key of the wallet used to submit
-	// transactions to the CTC contract.
-	SequencerPrivateKey string
-
-	// PropopserPrivateKey the private key of the wallet used to submit
-	// transaction to the SCC contract.
-	ProposerPrivateKey string
-
-	// Mnemonic is the HD seed used to derive the wallet private keys for both
-	// the sequence and proposer. Must be used in conjunction with
-	// SequencerHDPath and ProposerHDPath.
-	Mnemonic string
-
-	// SequencerHDPath is the derivation path used to obtain the private key for
-	// the sequencer transactions.
-	SequencerHDPath string
-
-	// ProposerHDPath is the derivation path used to obtain the private key for
-	// the proposer transactions.
-	ProposerHDPath string
 
 	// MetricsServerEnable if true, will create a metrics client and log to
 	// Prometheus.
@@ -200,18 +173,17 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		SafeMinimumEtherBalance: ctx.GlobalUint64(flags.SafeMinimumEtherBalanceFlag.Name),
 		ClearPendingTxs:         ctx.GlobalBool(flags.ClearPendingTxsFlag.Name),
 		/* Optional Flags */
-		MaxL1GasPrice:   ctx.GlobalUint64(flags.MaxL1GasPriceFlag.Name),
-		LogLevel:        ctx.GlobalString(flags.LogLevelFlag.Name),
-		LogTerminal:     ctx.GlobalBool(flags.LogTerminalFlag.Name),
-		SentryEnable:    ctx.GlobalBool(flags.SentryEnableFlag.Name),
-		SentryDsn:       ctx.GlobalString(flags.SentryDsnFlag.Name),
-		SentryTraceRate: ctx.GlobalDuration(flags.SentryTraceRateFlag.Name),
-		BlockOffset:     ctx.GlobalUint64(flags.BlockOffsetFlag.Name),
-		// SequencerPrivateKey: ctx.GlobalString(flags.SequencerPrivateKeyFlag.Name),
-		// ProposerPrivateKey:  ctx.GlobalString(flags.ProposerPrivateKeyFlag.Name),
-		// Mnemonic:            ctx.GlobalString(flags.MnemonicFlag.Name),
-		// SequencerHDPath:     ctx.GlobalString(flags.SequencerHDPathFlag.Name),
-		// ProposerHDPath:      ctx.GlobalString(flags.ProposerHDPathFlag.Name),
+		MaxL1GasPrice:       ctx.GlobalUint64(flags.MaxL1GasPriceFlag.Name),
+		LogLevel:            ctx.GlobalString(flags.LogLevelFlag.Name),
+		LogTerminal:         ctx.GlobalBool(flags.LogTerminalFlag.Name),
+		SentryEnable:        ctx.GlobalBool(flags.SentryEnableFlag.Name),
+		SentryDsn:           ctx.GlobalString(flags.SentryDsnFlag.Name),
+		SentryTraceRate:     ctx.GlobalDuration(flags.SentryTraceRateFlag.Name),
+		BlockOffset:         ctx.GlobalUint64(flags.BlockOffsetFlag.Name),
+		SequencerKeyId:      ctx.GlobalString(flags.SequencerKeyIdFlag.Name),
+		ProposerKeyId:       ctx.GlobalString(flags.ProposerKeyIdFlag.Name),
+		KmsEndpoint:         ctx.GlobalString(flags.KmsEndpointFlag.Name),
+		KmsRegion:           ctx.GlobalString(flags.KmsRegionFlag.Name),
 		MetricsServerEnable: ctx.GlobalBool(flags.MetricsServerEnableFlag.Name),
 		MetricsHostname:     ctx.GlobalString(flags.MetricsHostnameFlag.Name),
 		MetricsPort:         ctx.GlobalUint64(flags.MetricsPortFlag.Name),
@@ -235,35 +207,12 @@ func ValidateConfig(cfg *Config) error {
 		return err
 	}
 
-	// // Enforce that either sequencer-private-key or mnemonic + sequencer-hd-path
-	// // is enabled, but not both or neither.
-	// usingSequencerPrivateKey := cfg.SequencerPrivateKey != ""
-	// usingSequencerHDPath := cfg.Mnemonic != "" && cfg.SequencerHDPath != ""
-	// if usingSequencerPrivateKey == usingSequencerHDPath {
-	// 	return ErrSequencerPrivKeyOrMnemonic
-	// }
-
-	// // Enforce that either proposer-private-key or mnemonic + proposer-hd-path
-	// // is enabled, but not both or neither.
-	// usingProposerPrivateKey := cfg.ProposerPrivateKey != ""
-	// usingProposerHDPath := cfg.Mnemonic != "" && cfg.ProposerHDPath != ""
-	// if usingProposerPrivateKey == usingProposerHDPath {
-	// 	return ErrProposerPrivKeyOrMnemonic
-	// }
-
-	// // If mnemonic is used, the sequencer-hd-path and proposer-hd-path must
-	// // differ to avoid resuing the same wallet for both.
-	// if cfg.Mnemonic != "" && cfg.SequencerHDPath == cfg.ProposerHDPath {
-	// 	return ErrSameSequencerAndProposerHDPath
-	// }
-
-	// // If private keys are used, ensure the keys are different to avoid resuing
+	// // Ensure the KMS keys are different to avoid resuing
 	// // the same wallet for both.
-	// if usingSequencerPrivateKey && usingProposerPrivateKey &&
-	// 	cfg.SequencerPrivateKey == cfg.ProposerPrivateKey {
+	if cfg.ProposerKeyId == cfg.SequencerKeyId {
 
-	// 	return ErrSameSequencerAndProposerPrivKey
-	// }
+		return ErrSameSequencerAndProposerKeyId
+	}
 
 	// Ensure the Sentry Data Source Name is set when using Sentry.
 	if cfg.SentryEnable && cfg.SentryDsn == "" {

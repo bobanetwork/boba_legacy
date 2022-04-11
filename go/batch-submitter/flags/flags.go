@@ -172,34 +172,26 @@ var (
 		Value:  1,
 		EnvVar: prefixEnvVar("BLOCK_OFFSET"),
 	}
-	// SequencerPrivateKeyFlag = cli.StringFlag{
-	// 	Name:   "sequencer-private-key",
-	// 	Usage:  "The private key to use for sending to the sequencer contract",
-	// 	EnvVar: prefixEnvVar("SEQUENCER_PRIVATE_KEY"),
-	// }
-	// ProposerPrivateKeyFlag = cli.StringFlag{
-	// 	Name:   "proposer-private-key",
-	// 	Usage:  "The private key to use for sending to the proposer contract",
-	// 	EnvVar: prefixEnvVar("PROPOSER_PRIVATE_KEY"),
-	// }
-	// MnemonicFlag = cli.StringFlag{
-	// 	Name: "mnemonic",
-	// 	Usage: "The mnemonic used to derive the wallets for either the " +
-	// 		"sequencer or the proposer",
-	// 	EnvVar: prefixEnvVar("MNEMONIC"),
-	// }
-	// SequencerHDPathFlag = cli.StringFlag{
-	// 	Name: "sequencer-hd-path",
-	// 	Usage: "The HD path used to derive the sequencer wallet from the " +
-	// 		"mnemonic. The mnemonic flag must also be set.",
-	// 	EnvVar: prefixEnvVar("SEQUENCER_HD_PATH"),
-	// }
-	// ProposerHDPathFlag = cli.StringFlag{
-	// 	Name: "proposer-hd-path",
-	// 	Usage: "The HD path used to derive the proposer wallet from the " +
-	// 		"mnemonic. The mnemonic flag must also be set.",
-	// 	EnvVar: prefixEnvVar("PROPOSER_HD_PATH"),
-	// }
+	SequencerKeyIdFlag = cli.StringFlag{
+		Name:   "sequencer-key-id",
+		Usage:  "The key id to use for signing the sequencer transactions",
+		EnvVar: prefixEnvVar("SEQUENCER_KEY_ID"),
+	}
+	ProposerKeyIdFlag = cli.StringFlag{
+		Name:   "proposer-key-id",
+		Usage:  "The key id to use for signing the proposer transactions",
+		EnvVar: prefixEnvVar("PROPOSER_KEY_ID"),
+	}
+	KmsEndpointFlag = cli.StringFlag{
+		Name:   "kms-endpoint",
+		Usage:  "The URL for AWS KMS",
+		EnvVar: prefixEnvVar("KMS_ENDPOINT"),
+	}
+	KmsRegionFlag = cli.StringFlag{
+		Name:   "kms-region-flag",
+		Usage:  "AWS KMS region.",
+		EnvVar: prefixEnvVar("KMS_REGION"),
+	}
 	MetricsServerEnableFlag = cli.BoolFlag{
 		Name:   "metrics-server-enable",
 		Usage:  "Whether or not to run the embedded metrics server",
@@ -242,6 +234,10 @@ var requiredFlags = []cli.Flag{
 	RunStateBatchSubmitterFlag,
 	SafeMinimumEtherBalanceFlag,
 	ClearPendingTxsFlag,
+	SequencerKeyIdFlag,
+	ProposerKeyIdFlag,
+	KmsEndpointFlag,
+	KmsRegionFlag,
 }
 
 var optionalFlags = []cli.Flag{
@@ -252,11 +248,6 @@ var optionalFlags = []cli.Flag{
 	SentryDsnFlag,
 	SentryTraceRateFlag,
 	BlockOffsetFlag,
-	// SequencerPrivateKeyFlag,
-	// ProposerPrivateKeyFlag,
-	// MnemonicFlag,
-	// SequencerHDPathFlag,
-	// ProposerHDPathFlag,
 	MetricsServerEnableFlag,
 	MetricsHostnameFlag,
 	MetricsPortFlag,

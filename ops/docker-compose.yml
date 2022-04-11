@@ -328,6 +328,10 @@ services:
       L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       RETRIES: 200
+      BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
+      BATCH_SUBMITTER_KMS_REGION: us-east-1
+      BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+      BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
 
   integration_tests:
     image: bobanetwork/integration-tests:latest

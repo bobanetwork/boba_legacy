@@ -20,109 +20,109 @@ var validateConfigTests = []struct {
 		},
 		expErr: fmt.Errorf("unknown level: unknown"),
 	},
-	{
-		name: "sequencer priv key or mnemonic none set",
-		cfg: batchsubmitter.Config{
-			LogLevel: "info",
+	// {
+	// 	name: "sequencer priv key or mnemonic none set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel: "info",
 
-			SequencerPrivateKey: "",
-			Mnemonic:            "",
-			SequencerHDPath:     "",
-		},
-		expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	},
-	{
-		name: "sequencer priv key or mnemonic both set",
-		cfg: batchsubmitter.Config{
-			LogLevel: "info",
+	// 		SequencerPrivateKey: "",
+	// 		Mnemonic:            "",
+	// 		SequencerHDPath:     "",
+	// 	},
+	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "sequencer priv key or mnemonic both set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel: "info",
 
-			SequencerPrivateKey: "sequencer-privkey",
-			Mnemonic:            "mnemonic",
-			SequencerHDPath:     "sequencer-path",
-		},
-		expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	},
-	{
-		name: "sequencer priv key or mnemonic only mnemonic set",
-		cfg: batchsubmitter.Config{
-			LogLevel: "info",
+	// 		SequencerPrivateKey: "sequencer-privkey",
+	// 		Mnemonic:            "mnemonic",
+	// 		SequencerHDPath:     "sequencer-path",
+	// 	},
+	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "sequencer priv key or mnemonic only mnemonic set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel: "info",
 
-			SequencerPrivateKey: "",
-			Mnemonic:            "mnemonic",
-			SequencerHDPath:     "",
-		},
-		expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	},
-	{
-		name: "sequencer priv key or mnemonic only hdpath set",
-		cfg: batchsubmitter.Config{
-			LogLevel: "info",
+	// 		SequencerPrivateKey: "",
+	// 		Mnemonic:            "mnemonic",
+	// 		SequencerHDPath:     "",
+	// 	},
+	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "sequencer priv key or mnemonic only hdpath set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel: "info",
 
-			SequencerPrivateKey: "",
-			Mnemonic:            "",
-			SequencerHDPath:     "sequencer-path",
-		},
-		expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	},
-	{
-		name: "proposer priv key or mnemonic none set",
-		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
+	// 		SequencerPrivateKey: "",
+	// 		Mnemonic:            "",
+	// 		SequencerHDPath:     "sequencer-path",
+	// 	},
+	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "proposer priv key or mnemonic none set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel:            "info",
+	// 		SequencerPrivateKey: "sequencer-privkey",
 
-			ProposerPrivateKey: "",
-			Mnemonic:           "",
-			ProposerHDPath:     "",
-		},
-		expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	},
-	{
-		name: "proposer priv key or mnemonic both set",
-		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
+	// 		ProposerPrivateKey: "",
+	// 		Mnemonic:           "",
+	// 		ProposerHDPath:     "",
+	// 	},
+	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "proposer priv key or mnemonic both set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel:            "info",
+	// 		SequencerPrivateKey: "sequencer-privkey",
 
-			ProposerPrivateKey: "proposer-privkey",
-			Mnemonic:           "mnemonic",
-			ProposerHDPath:     "proposer-path",
-		},
-		expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	},
-	{
-		name: "proposer priv key or mnemonic only mnemonic set",
-		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
+	// 		ProposerPrivateKey: "proposer-privkey",
+	// 		Mnemonic:           "mnemonic",
+	// 		ProposerHDPath:     "proposer-path",
+	// 	},
+	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "proposer priv key or mnemonic only mnemonic set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel:            "info",
+	// 		SequencerPrivateKey: "sequencer-privkey",
 
-			ProposerPrivateKey: "",
-			Mnemonic:           "mnemonic",
-			ProposerHDPath:     "",
-		},
-		expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	},
-	{
-		name: "proposer priv key or mnemonic only hdpath set",
-		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
+	// 		ProposerPrivateKey: "",
+	// 		Mnemonic:           "mnemonic",
+	// 		ProposerHDPath:     "",
+	// 	},
+	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "proposer priv key or mnemonic only hdpath set",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel:            "info",
+	// 		SequencerPrivateKey: "sequencer-privkey",
 
-			ProposerPrivateKey: "",
-			Mnemonic:           "",
-			ProposerHDPath:     "proposer-path",
-		},
-		expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	},
-	{
-		name: "same sequencer and proposer hd path",
-		cfg: batchsubmitter.Config{
-			LogLevel: "info",
+	// 		ProposerPrivateKey: "",
+	// 		Mnemonic:           "",
+	// 		ProposerHDPath:     "proposer-path",
+	// 	},
+	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
+	// },
+	// {
+	// 	name: "same sequencer and proposer hd path",
+	// 	cfg: batchsubmitter.Config{
+	// 		LogLevel: "info",
 
-			Mnemonic:        "mnemonic",
-			SequencerHDPath: "path",
-			ProposerHDPath:  "path",
-		},
-		expErr: batchsubmitter.ErrSameSequencerAndProposerHDPath,
-	},
+	// 		Mnemonic:        "mnemonic",
+	// 		SequencerHDPath: "path",
+	// 		ProposerHDPath:  "path",
+	// 	},
+	// 	expErr: batchsubmitter.ErrSameSequencerAndProposerHDPath,
+	// },
 	{
 		name: "same sequencer and proposer privkey",
 		cfg: batchsubmitter.Config{
