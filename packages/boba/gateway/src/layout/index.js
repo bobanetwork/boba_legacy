@@ -85,9 +85,11 @@ function App () {
       body2: {
         fontSize: 16,
         fontWeight: 400,
+        lineHeight: '1.0em'
       },
       body3: {
-        fontSize: '0.8em'
+        fontSize: '0.8em',
+        lineHeight: '1.0em'
       },
       body4: {
         fontSize: 12

@@ -13,6 +13,7 @@ import ListToken from 'components/listToken/listToken'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
+import Link from 'components/icons/LinkIcon'
 
 function TokenPage() {
 
@@ -24,6 +25,7 @@ function TokenPage() {
   const networkLayer = useSelector(selectLayer())
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
+  const layer = useSelector(selectLayer())
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
@@ -84,6 +86,24 @@ function TokenPage() {
   } else {
 
     return (
+    <>
+      {layer === 'L2' &&
+        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Typography variant="body2">
+            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
+            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
+            <S.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9'}}
+            >
+              Oologswap <Link />
+            </S.footerLink>
+          </Typography>
+        </Box>
+      }
+
       <S.TokenPageContainer>
         <S.TokenPageContent>
           <S.TableHeading>
@@ -127,7 +147,7 @@ function TokenPage() {
           </S.LoaderContainer> : null}
         </S.TokenPageContent>
       </S.TokenPageContainer>
-    )
+    </>)
   }
 
 }
