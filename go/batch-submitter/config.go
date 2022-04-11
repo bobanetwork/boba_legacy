@@ -22,6 +22,14 @@ var (
 	// with which to configure Sentry logging.
 	ErrSentryDSNNotSet = errors.New("sentry-dsn must be set if use-sentry " +
 		"is true")
+
+	ErrProposerKeyIdNotSet = errors.New("set proposer kms key id")
+
+	ErrSequencerKeyIdNotSet = errors.New("set sequencer kms key id")
+
+	ErrKmsEndpointNotSet = errors.New("kms endpoint not set")
+
+	ErrKmsRegionNotSet = errors.New("kms region not Set")
 )
 
 type Config struct {
@@ -206,7 +214,16 @@ func ValidateConfig(cfg *Config) error {
 	if err != nil {
 		return err
 	}
+	// // Ensure the KMS keys are different to avoid resuing
+	// // the same wallet for both.
+	if cfg.SequencerKeyId == "" {
 
+		return ErrSequencerKeyIdNotSet
+	}
+	if cfg.ProposerKeyId == "" {
+
+		return ErrProposerKeyIdNotSet
+	}
 	// // Ensure the KMS keys are different to avoid resuing
 	// // the same wallet for both.
 	if cfg.ProposerKeyId == cfg.SequencerKeyId {
@@ -214,6 +231,12 @@ func ValidateConfig(cfg *Config) error {
 		return ErrSameSequencerAndProposerKeyId
 	}
 
+	if cfg.KmsEndpoint == "" {
+		return ErrKmsEndpointNotSet
+	}
+	if cfg.KmsRegion == "" {
+		return ErrKmsRegionNotSet
+	}
 	// Ensure the Sentry Data Source Name is set when using Sentry.
 	if cfg.SentryEnable && cfg.SentryDsn == "" {
 		return ErrSentryDSNNotSet

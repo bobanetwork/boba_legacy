@@ -20,128 +20,58 @@ var validateConfigTests = []struct {
 		},
 		expErr: fmt.Errorf("unknown level: unknown"),
 	},
-	// {
-	// 	name: "sequencer priv key or mnemonic none set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel: "info",
-
-	// 		SequencerPrivateKey: "",
-	// 		Mnemonic:            "",
-	// 		SequencerHDPath:     "",
-	// 	},
-	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "sequencer priv key or mnemonic both set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel: "info",
-
-	// 		SequencerPrivateKey: "sequencer-privkey",
-	// 		Mnemonic:            "mnemonic",
-	// 		SequencerHDPath:     "sequencer-path",
-	// 	},
-	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "sequencer priv key or mnemonic only mnemonic set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel: "info",
-
-	// 		SequencerPrivateKey: "",
-	// 		Mnemonic:            "mnemonic",
-	// 		SequencerHDPath:     "",
-	// 	},
-	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "sequencer priv key or mnemonic only hdpath set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel: "info",
-
-	// 		SequencerPrivateKey: "",
-	// 		Mnemonic:            "",
-	// 		SequencerHDPath:     "sequencer-path",
-	// 	},
-	// 	expErr: batchsubmitter.ErrSequencerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "proposer priv key or mnemonic none set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel:            "info",
-	// 		SequencerPrivateKey: "sequencer-privkey",
-
-	// 		ProposerPrivateKey: "",
-	// 		Mnemonic:           "",
-	// 		ProposerHDPath:     "",
-	// 	},
-	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "proposer priv key or mnemonic both set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel:            "info",
-	// 		SequencerPrivateKey: "sequencer-privkey",
-
-	// 		ProposerPrivateKey: "proposer-privkey",
-	// 		Mnemonic:           "mnemonic",
-	// 		ProposerHDPath:     "proposer-path",
-	// 	},
-	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "proposer priv key or mnemonic only mnemonic set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel:            "info",
-	// 		SequencerPrivateKey: "sequencer-privkey",
-
-	// 		ProposerPrivateKey: "",
-	// 		Mnemonic:           "mnemonic",
-	// 		ProposerHDPath:     "",
-	// 	},
-	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "proposer priv key or mnemonic only hdpath set",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel:            "info",
-	// 		SequencerPrivateKey: "sequencer-privkey",
-
-	// 		ProposerPrivateKey: "",
-	// 		Mnemonic:           "",
-	// 		ProposerHDPath:     "proposer-path",
-	// 	},
-	// 	expErr: batchsubmitter.ErrProposerPrivKeyOrMnemonic,
-	// },
-	// {
-	// 	name: "same sequencer and proposer hd path",
-	// 	cfg: batchsubmitter.Config{
-	// 		LogLevel: "info",
-
-	// 		Mnemonic:        "mnemonic",
-	// 		SequencerHDPath: "path",
-	// 		ProposerHDPath:  "path",
-	// 	},
-	// 	expErr: batchsubmitter.ErrSameSequencerAndProposerHDPath,
-	// },
 	{
-		name: "same sequencer and proposer privkey",
+		name: "sequencer key id or proposer id not set",
 		cfg: batchsubmitter.Config{
 			LogLevel: "info",
 
-			SequencerPrivateKey: "privkey",
-			ProposerPrivateKey:  "privkey",
+			SequencerKeyId: "",
+			ProposerKeyId:  "",
 		},
-		expErr: batchsubmitter.ErrSameSequencerAndProposerPrivKey,
+		expErr: batchsubmitter.ErrSequencerKeyIdNotSet,
 	},
+	{
+		name: "sequencer key id or proposer id not set",
+		cfg: batchsubmitter.Config{
+			LogLevel: "info",
+
+			SequencerKeyId: "a",
+			ProposerKeyId:  "a",
+		},
+		expErr: batchsubmitter.ErrSameSequencerAndProposerKeyId,
+	},
+	{
+		name: "endpoint not set",
+		cfg: batchsubmitter.Config{
+			LogLevel: "info",
+
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+		},
+		expErr: batchsubmitter.ErrKmsEndpointNotSet,
+	},
+	{
+		name: "kms region not set",
+		cfg: batchsubmitter.Config{
+			LogLevel: "info",
+
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+		},
+		expErr: batchsubmitter.ErrKmsRegionNotSet,
+	},
+
 	{
 		name: "sentry-dsn not set when sentry-enable is true",
 		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
-			ProposerPrivateKey:  "proposer-privkey",
-
-			SentryEnable: true,
-			SentryDsn:    "",
+			LogLevel:       "info",
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+			KmsRegion:      "d",
+			SentryEnable:   true,
+			SentryDsn:      "",
 		},
 		expErr: batchsubmitter.ErrSentryDSNNotSet,
 	},
@@ -149,46 +79,40 @@ var validateConfigTests = []struct {
 	{
 		name: "valid config with privkeys and no sentry",
 		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
-			ProposerPrivateKey:  "proposer-privkey",
-			SentryEnable:        false,
-			SentryDsn:           "",
+			LogLevel:       "info",
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+			KmsRegion:      "d",
+			SentryEnable:   false,
+			SentryDsn:      "",
 		},
 		expErr: nil,
 	},
-	{
-		name: "valid config with mnemonic and no sentry",
-		cfg: batchsubmitter.Config{
-			LogLevel:        "info",
-			Mnemonic:        "mnemonic",
-			SequencerHDPath: "sequencer-path",
-			ProposerHDPath:  "proposer-path",
-			SentryEnable:    false,
-			SentryDsn:       "",
-		},
-		expErr: nil,
-	},
+
 	{
 		name: "valid config with privkeys and sentry",
 		cfg: batchsubmitter.Config{
-			LogLevel:            "info",
-			SequencerPrivateKey: "sequencer-privkey",
-			ProposerPrivateKey:  "proposer-privkey",
-			SentryEnable:        true,
-			SentryDsn:           "batch-submitter",
+			LogLevel:       "info",
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+			KmsRegion:      "d",
+			SentryEnable:   true,
+			SentryDsn:      "batch-submitter",
 		},
 		expErr: nil,
 	},
 	{
 		name: "valid config with mnemonic and sentry",
 		cfg: batchsubmitter.Config{
-			LogLevel:        "info",
-			Mnemonic:        "mnemonic",
-			SequencerHDPath: "sequencer-path",
-			ProposerHDPath:  "proposer-path",
-			SentryEnable:    true,
-			SentryDsn:       "batch-submitter",
+			LogLevel:       "info",
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+			KmsRegion:      "d",
+			SentryEnable:   true,
+			SentryDsn:      "batch-submitter",
 		},
 		expErr: nil,
 	},

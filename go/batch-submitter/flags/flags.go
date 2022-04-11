@@ -127,6 +127,30 @@ var (
 		Required: true,
 		EnvVar:   prefixEnvVar("CLEAR_PENDING_TXS"),
 	}
+	SequencerKeyIdFlag = cli.StringFlag{
+		Name:     "sequencer-key-id",
+		Usage:    "The key id to use for signing the sequencer transactions",
+		Required: true,
+		EnvVar:   prefixEnvVar("SEQUENCER_KEY_ID"),
+	}
+	ProposerKeyIdFlag = cli.StringFlag{
+		Name:     "proposer-key-id",
+		Usage:    "The key id to use for signing the proposer transactions",
+		Required: true,
+		EnvVar:   prefixEnvVar("PROPOSER_KEY_ID"),
+	}
+	KmsEndpointFlag = cli.StringFlag{
+		Name:     "kms-endpoint",
+		Usage:    "The URL for AWS KMS",
+		Required: true,
+		EnvVar:   prefixEnvVar("KMS_ENDPOINT"),
+	}
+	KmsRegionFlag = cli.StringFlag{
+		Name:     "kms-region-flag",
+		Usage:    "AWS KMS region.",
+		Required: true,
+		EnvVar:   prefixEnvVar("KMS_REGION"),
+	}
 
 	/* Optional Flags */
 
@@ -171,26 +195,6 @@ var (
 		Usage:  "The offset between the CTC contract start and the L2 geth blocks",
 		Value:  1,
 		EnvVar: prefixEnvVar("BLOCK_OFFSET"),
-	}
-	SequencerKeyIdFlag = cli.StringFlag{
-		Name:   "sequencer-key-id",
-		Usage:  "The key id to use for signing the sequencer transactions",
-		EnvVar: prefixEnvVar("SEQUENCER_KEY_ID"),
-	}
-	ProposerKeyIdFlag = cli.StringFlag{
-		Name:   "proposer-key-id",
-		Usage:  "The key id to use for signing the proposer transactions",
-		EnvVar: prefixEnvVar("PROPOSER_KEY_ID"),
-	}
-	KmsEndpointFlag = cli.StringFlag{
-		Name:   "kms-endpoint",
-		Usage:  "The URL for AWS KMS",
-		EnvVar: prefixEnvVar("KMS_ENDPOINT"),
-	}
-	KmsRegionFlag = cli.StringFlag{
-		Name:   "kms-region-flag",
-		Usage:  "AWS KMS region.",
-		EnvVar: prefixEnvVar("KMS_REGION"),
 	}
 	MetricsServerEnableFlag = cli.BoolFlag{
 		Name:   "metrics-server-enable",
