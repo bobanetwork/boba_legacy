@@ -123,16 +123,11 @@ class listNFT extends React.Component {
       tokenID
     } = this.state
 
-    //console.log("meta:", meta)
-    //console.log("URL:", URL)
-
     let rarity = ''
     if(meta && meta.hasOwnProperty("attributes")) {
       if(meta.attributes.length === 5){
         if(meta.attributes[3].trait_type === 'Top') {
           rarity = 'Basic'
-          console.log(meta.attributes[3].value)
-          console.log(meta.attributes[4].value)
           if(meta.attributes[3].value === 'crown' && meta.attributes[4].value === 'wizzard') {
             rarity = 'Rarest (2/1000)' // 1000 * 5/256 * 20/256
           } else if (meta.attributes[3].value === 'crown') {
