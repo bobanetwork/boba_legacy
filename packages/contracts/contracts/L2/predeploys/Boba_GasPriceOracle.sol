@@ -265,6 +265,13 @@ contract Boba_GasPriceOracle {
     }
 
     /**
+     * Get the price for swapping BOBA for ETH
+     */
+    function getBOBAForSwap() public view returns (uint256) {
+        return receivedETHAmount.mul(marketPriceRatio).add(metaTransactionFee);
+    }
+
+    /**
      * Get L1 Boba fee for fee estimation
      * @param _txData the data payload
      */

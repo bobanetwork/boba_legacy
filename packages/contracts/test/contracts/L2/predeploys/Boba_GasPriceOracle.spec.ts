@@ -542,6 +542,18 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
+  describe('getBOBAForSwap', () => {
+    it('should get correct BOBA for swapping BOBA for ETH', async () => {
+      const BobaCost = await Boba_GasPriceOracle.getBOBAForSwap()
+      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
+      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
+      expect(
+        receivedETHAmount.mul(marketPriceRatio).add(metaTransactionFee)
+      ).to.equal(BobaCost)
+    })
+  })
+
   // Test cases for gas estimation
   const inputs = [
     '0x',

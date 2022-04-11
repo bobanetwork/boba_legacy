@@ -883,12 +883,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
       const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-      const value = receivedETHAmount
-        .mul(marketPriceRatio)
-        .add(metaTransactionFee)
-        .toString()
+      const value = await Boba_GasPriceOracle.getBOBAForSwap()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -945,13 +940,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     it('{tag:boba} should revert transaction if v, r and s are incorrect', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
-      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-      const value = receivedETHAmount
-        .mul(marketPriceRatio)
-        .add(metaTransactionFee)
-        .toString()
+      const value = await Boba_GasPriceOracle.getBOBAForSwap()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = Boba_GasPriceOracle.address
@@ -986,13 +975,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     it("{tag:boba} should revert transaction if users don't have sufficient Boba token", async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
-      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-      const value = receivedETHAmount
-        .mul(marketPriceRatio)
-        .add(metaTransactionFee)
-        .toString()
+      const value = await Boba_GasPriceOracle.getBOBAForSwap()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -1051,13 +1034,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     it('{tag:boba} should revert transaction if spender is not correct', async () => {
       const owner = env.l2Wallet_2.address
       const spender = env.addressesBOBA.FeedRegistry
-      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-      const value = receivedETHAmount
-        .mul(marketPriceRatio)
-        .add(metaTransactionFee)
-        .toString()
+      const value = await Boba_GasPriceOracle.getBOBAForSwap()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -1154,12 +1131,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const owner = newWallet.address
       const spender = Boba_GasPriceOracle.address
       const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-      const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-      const value = receivedETHAmount
-        .mul(marketPriceRatio)
-        .add(metaTransactionFee)
-        .toString()
+      const value = await Boba_GasPriceOracle.getBOBAForSwap()
       const nonce = (await L2Boba.nonces(newWallet.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
