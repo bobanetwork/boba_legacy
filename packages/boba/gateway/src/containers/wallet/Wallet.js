@@ -55,7 +55,7 @@ function Wallet() {
 
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
-    
+
   const now = Math.floor(Date.now() / 1000)
 
   const pendingL1 = orderedTransactions.filter((i) => {
@@ -97,10 +97,14 @@ function Wallet() {
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
       console.log("l2Balances",l2Balances)
-      const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
-      const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')  
-      setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
-      setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
+      const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
+      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
+      if (l2BalanceETH[0]) {
+        setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
+      }
+      if (l2BalanceBOBA[0]) {
+        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
+      }
     }
   },[ l2Balances, accountEnabled ])
 
@@ -144,11 +148,11 @@ function Wallet() {
               component="p"
             >
               <span style={{opacity: '1.0'}}>WARNING: Low ETH balance</span>.
-              {' '} 
-              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH) 
-              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions. 
-              If you are stuck because you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 
-              0.05 ETH at market rates.</span> 
+              {' '}
+              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
+              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
+              If you are stuck because you ran out of ETH, use EMERGENCY SWAP to swap BOBA for
+              0.05 ETH at market rates.</span>
             </S.AlertText>
           </S.AlertInfo>
           <Button
@@ -224,11 +228,11 @@ function Wallet() {
       {layer === 'L2' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
           <Typography variant="body2">
-            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '} 
+            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
             <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-            <S.footerLink 
-              target='_blank' 
-              href={'https://oolongswap.com/'} 
+            <S.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9'}}
             >
