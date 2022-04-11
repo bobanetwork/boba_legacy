@@ -312,6 +312,7 @@ export const getAllOEContracts = (
       CanonicalTransactionChain: undefined,
       BondManager: undefined,
       L1MultiMessageRelayer: undefined,
+      L1MultiMessageRelayerFast: undefined,
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   }
