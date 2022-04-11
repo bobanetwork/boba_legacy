@@ -63,3 +63,9 @@ export function selectMonster () {
     return state.nft['monsterNumber']
   }
 }
+
+export function selectMonsterInfo () {
+  return function (state) {
+    return state.nft['monsterInfo']
+  }
+}

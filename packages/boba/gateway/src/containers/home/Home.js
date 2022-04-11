@@ -30,9 +30,12 @@ import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchExits,
-  getMonsterInfo
+  fetchExits
 } from 'actions/networkAction'
+
+import {
+  getMonsterInfo
+} from 'actions/nftAction'
 
 import networkService from 'services/networkService'
 
@@ -210,12 +213,13 @@ function Home() {
     dispatch(fetchGas())
     dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
-  }, [dispatch, maintenance])
+  }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
+      dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 

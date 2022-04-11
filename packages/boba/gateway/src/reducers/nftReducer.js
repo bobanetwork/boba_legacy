@@ -28,7 +28,8 @@ if (nftList) {
 
 const initialState = {
   list: nftList ? nftList : {},
-  monsterNumber: 0
+  monsterNumber: 0,
+  monsterInfo: {}
 }
 
 function nftReducer (state = initialState, action) {
@@ -50,6 +51,18 @@ function nftReducer (state = initialState, action) {
         } 
       }
 
+    case 'MONSTER/INFO/SUCCESS':
+      return { 
+        ...state,
+        monsterInfo: action.payload
+      }
+
+    case 'MONSTER/NUMBER/SUCCESS':
+      return { 
+        ...state,
+        monsterNumber: action.payload
+      }
+      
     case 'NFT/REMOVE/SUCCESS':
 
       let listN = state.list
@@ -62,13 +75,6 @@ function nftReducer (state = initialState, action) {
         list: listN
       }
 
-    case 'MONSTER/INFO/SUCCESS':
-
-      return { 
-        ...state,
-        monsterNumber: action.payload
-      }
-      
     default:
       return state
   }

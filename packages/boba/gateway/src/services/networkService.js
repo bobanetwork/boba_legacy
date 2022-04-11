@@ -31,6 +31,8 @@ import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
+  addMonster,
+  getNFTs
 } from 'actions/nftAction'
 
 import {
@@ -1207,6 +1209,10 @@ class NetworkService {
 
   async checkMonster() {
 
+    const NFTs = getNFTs()
+    //console.log("NFTs:",NFTs)
+    let validMonsters = []
+
     try {
 
       const contract = new ethers.Contract(
@@ -1216,7 +1222,44 @@ class NetworkService {
       )
 
       const monsterBalance = await contract.balanceOf(this.account)
-      
+
+      let monsterType = 0
+      let topMagic = 0
+      let topTop = 0
+
+      if(NFTs && Number(monsterBalance) > 0) {
+        for (const [key, value] of Object.entries(NFTs)) {
+          //console.log(`${key}: ${value.name}`)
+          if(value.name === 'TuringMonster') {
+            const owner = await contract.ownerOf(value.tokenID)
+            //console.log("owner:", owner)
+            if(owner.toLowerCase() === this.account.toLowerCase()) {
+              const attributes = {
+                top:   value.meta.attributes[3].value,
+                magic: value.meta.attributes[4].value,
+              }
+              if(value.meta.attributes[3].value === 'crown') topTop = 1
+              if(value.meta.attributes[4].value === 'wizzard') topMagic = 1
+              validMonsters.push({tokenID: value.tokenID, attributes}) 
+            }
+          }
+        }
+
+        if(topMagic === 0 && topTop === 0) {
+          validMonsters.push({monsterType: 'basic'})
+        } else if (topMagic === 0 && topTop === 1) {
+          validMonsters.push({monsterType: 'crowned'})
+        } else if (topMagic === 1 && topTop === 0) {
+          validMonsters.push({monsterType: 'wizard'})
+        } else if (topMagic === 1 && topTop === 1) {
+          validMonsters.push({monsterType: 'crowned wizard'})
+        }
+
+        //console.log("adding monster info:",validMonsters)
+        await addMonster( validMonsters )
+
+      }
+
       return Number(monsterBalance.toString())
 
     } catch (error) {

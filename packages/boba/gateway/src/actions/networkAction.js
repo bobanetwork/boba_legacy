@@ -202,17 +202,11 @@ export function settle_v1() {
   )
 }
 
-export function monsterMint() {
-  return createAction('MONSTER/CREATE', () =>
-    networkService.monsterMint()
-  )
-}
-
-export function getMonsterInfo() {
-  return createAction('MONSTER/INFO', () =>
-    networkService.checkMonster()
-  )
-}
+// export function monsterMint() {
+//   return createAction('MONSTER/CREATE', () =>
+//     networkService.monsterMint()
+//   )
+// }
 
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
