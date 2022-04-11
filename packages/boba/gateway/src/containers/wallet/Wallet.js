@@ -136,10 +136,12 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
+//&& tooSmallETH
+
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
-      {layer === 'L2' && tooSmallETH &&
+      {layer === 'L2'  &&
         <S.LayerAlert>
           <S.AlertInfo>
             <AlertIcon />

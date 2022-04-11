@@ -487,25 +487,77 @@ class NetworkService {
 
     console.log("triggering getETHMetaTransaction")
 
-    // const EIP712Domain = [
-    //   { name: 'name', type: 'string' },
-    //   { name: 'version', type: 'string' },
-    //   { name: 'chainId', type: 'uint256' },
-    //   { name: 'verifyingContract', type: 'address' },
-    // ]
-    // const Permit = [
-    //   { name: 'owner', type: 'address' },
-    //   { name: 'spender', type: 'address' },
-    //   { name: 'value', type: 'uint256' },
-    //   { name: 'nonce', type: 'uint256' },
-    //   { name: 'deadline', type: 'uint256' },
-    // ]
+    const EIP712Domain = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ]
+    const Permit = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ]
 
-    // const bobaFeeContract = new ethers.Contract(
-    //   allAddresses.Boba_GasPriceOracle,
-    //   Boba_GasPriceOracleJson.abi,
-    //   this.provider.getSigner()
-    // )
+    const owner = this.account
+    const spender = allAddresses.Boba_GasPriceOracle
+
+    const Boba_GasPriceOracle = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.provider.getSigner()
+    )
+
+    const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+    const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
+    const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
+    const value = receivedETHAmount
+      .mul(marketPriceRatio)
+      .add(metaTransactionFee)
+      .toString()
+
+    const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    const deadline = Math.floor(Date.now() / 1000) + 300
+    const verifyingContract = this.BobaContract.address
+
+    const name = await this.BobaContract.name()
+    const version = '1'
+    const chainId = (await this.L2Provider.getNetwork()).chainId
+
+    const data = {
+      primaryType: 'Permit',
+      types: { EIP712Domain, Permit },
+      domain: { name, version, chainId, verifyingContract },
+      message: { owner, spender, value, nonce, deadline },
+    }
+
+    let signature
+    try {
+      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+
+    // Send request
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.swapBOBAForETH', { owner, spender, value, deadline, signature, data })
+      console.log("response",response)
+      await this.getBobaFeeChoice()
+    } catch (error) {
+      console.log(error)
+      // sigh
+      let errorData = error.response.data.error
+      if(errorData.hasOwnProperty('error')) {
+        errorData = errorData.error.error.body
+      }
+      return errorData
+    }
+
 
     // const name = await this.BobaContract.name()
     // const version = '1'
@@ -534,22 +586,7 @@ class NetworkService {
     //   console.log(error)
     //   return error
     // }
-    // // Send request
-    // try {
-    //   const response = await metaTransactionAxiosInstance(
-    //     this.networkGateway
-    //   ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
-    //   console.log("response",response)
-    //   await this.getBobaFeeChoice()
-    // } catch (error) {
-    //   console.log(error)
-    //   // sigh
-    //   let errorData = error.response.data.error
-    //   if(errorData.hasOwnProperty('error')) {
-    //     errorData = errorData.error.error.body
-    //   }
-    //   return errorData
-    // }
+
   }
 
   async getAddress(contractName, varToSet) {
