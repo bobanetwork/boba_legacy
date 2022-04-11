@@ -21,7 +21,7 @@ my-eth-app
     │       ├── abis
     │       │   ├── erc20.json
     │       │   └── ownable.json
-    │       ├── addresses.js
+    │       ├── addresses.ts
     │       └── index.ts
     ├── react-app
     │   ├── README.md
@@ -37,7 +37,7 @@ my-eth-app
     │   └── src
     │       ├── App.css
     │       ├── App.tsx
-    │       ├── App.test.ts
+    │       ├── App.test.tsx
     │       ├── ethereumLogo.svg
     │       ├── index.css
     │       ├── index.ts

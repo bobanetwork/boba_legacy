@@ -1,5 +1,5 @@
 {
-  "name": "@my-app/monorepo",
+  "name": "@turing/monorepo",
   "version": "1.0.0",
   "keywords": [
     "ethereum",
@@ -9,15 +9,15 @@
   ],
   "private": true,
   "scripts": {
-    "subgraph:auth": "yarn workspace @my-app/subgraph auth",
-    "subgraph:codegen": "yarn workspace @my-app/subgraph codegen",
-    "subgraph:build": "yarn workspace @my-app/subgraph build",
-    "subgraph:deploy": "yarn workspace @my-app/subgraph deploy",
-    "react-app:build": "yarn workspace @my-app/react-app build",
-    "react-app:eject": "yarn workspace @my-app/react-app eject",
-    "react-app:ipfs": "yarn workspace @my-app/react-app ipfs",
-    "react-app:start": "yarn workspace @my-app/react-app start",
-    "react-app:test": "yarn workspace @my-app/react-app test"
+    "subgraph:auth": "yarn workspace @turing/subgraph auth",
+    "subgraph:codegen": "yarn workspace @turing/subgraph codegen",
+    "subgraph:build": "yarn workspace @turing/subgraph build",
+    "subgraph:deploy": "yarn workspace @turing/subgraph deploy",
+    "react-app:build": "yarn workspace @turing/react-app build",
+    "react-app:eject": "yarn workspace @turing/react-app eject",
+    "react-app:ipfs": "yarn workspace @turing/react-app ipfs",
+    "react-app:start": "yarn workspace @turing/react-app start",
+    "react-app:test": "yarn workspace @turing/react-app test"
   },
   "workspaces": {
     "packages": [

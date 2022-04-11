@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { Body, Button, Container, Header, Image, Link } from "./components";
 import logo from "./assets/logo.png";
 
-import { addresses, abis } from "@my-app/contracts";
+import { addresses, abis } from "@turing/contracts";
 import GET_TRANSFERS from "./graphql/subgraph";
 
 function WalletButton() {
