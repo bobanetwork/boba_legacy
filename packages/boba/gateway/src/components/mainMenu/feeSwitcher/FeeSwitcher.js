@@ -56,7 +56,7 @@ function FeeSwitcher() {
   const balanceBOBA = l2BalanceBOBA[0]
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
-    
+
     const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
     const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
 
@@ -66,13 +66,13 @@ function FeeSwitcher() {
     //console.log([ `tooSmallETH`, tooSmallETH ])
 
     let res
-    
+
     if (feeUseBoba && targetFee === 'BOBA') {
       // do nothing - already set to BOBA
-    } 
+    }
     else if ( !feeUseBoba && targetFee === 'ETH' ) {
       // do nothing - already set to ETH
-    } 
+    }
     else if ( !feeUseBoba && targetFee === 'BOBA' ) {
       // change to BOBA
       if( tooSmallBOBA ) {
@@ -91,11 +91,11 @@ function FeeSwitcher() {
         res = await dispatch(switchFee(targetFee))
       }
     }
-    
+
     if (res) {
       dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
     }
-    
+
   }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
 
   if (!accountEnabled || layer !== 'L2') {

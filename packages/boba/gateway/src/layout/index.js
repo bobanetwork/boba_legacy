@@ -50,7 +50,7 @@ function App () {
       background: {
         default: light ? "#FFFFFF" : "#111315",
         secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.02)',
-        secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
+        secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
