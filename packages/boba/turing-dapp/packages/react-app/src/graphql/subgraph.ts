@@ -7,7 +7,7 @@ const GET_TRANSFERS = gql`
       id
       from
       to
-      value
+      tokenId
     }
   }
 `;
