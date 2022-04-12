@@ -46,4 +46,4 @@ if [[ ! -z "$BOBA_URL" ]]; then
 fi
 
 # go go go
-exec node ./exec/run-message-relayer-fast.js
+exec yarn start

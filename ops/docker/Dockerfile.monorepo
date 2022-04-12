@@ -51,7 +51,6 @@ COPY integration-tests/package.json ./integration-tests/package.json
 
 COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
 COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
-COPY packages/boba/message-relayer-fast/package.json ./packages/boba/message-relayer-fast/package.json
 COPY packages/boba/turing/package.json ./packages/boba/turing/package.json
 
 # copy over the patches, if any...
