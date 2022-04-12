@@ -97,9 +97,8 @@ function TokenPage() {
               target='_blank'
               href={'https://oolongswap.com/'}
               aria-label="link"
-              style={{fontSize: '1.0em', opacity: '0.9'}}
-            >
-              Oologswap <Link />
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Oologswap <Link />
             </S.footerLink>
           </Typography>
         </Box>

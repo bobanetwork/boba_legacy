@@ -119,12 +119,10 @@ export const AlertInfo = styled(Box)`
 `;
 
 export const footerLink = styled(IconButton)(({ theme }) => ({
-  '&:hover ': {
     svg: {
       path: {
         fill: theme.palette.primary.main,
         fillOpacity: 1,
       }
     }
-  }
 }))
