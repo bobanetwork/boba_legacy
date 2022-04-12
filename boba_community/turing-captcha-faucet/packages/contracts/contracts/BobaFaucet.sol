@@ -128,7 +128,7 @@ contract BobaFaucet is Ownable {
         bytes32 hashedKey = keccak256(abi.encodePacked(_key));
         uint256 result = _verifyKey(_uuid, hashedKey);
 
-        require(result == 1, 'Invalid key and UUID');
+        require(result == 1, 'Captcha wrong');
 
         BobaClaimRecords[msg.sender] = block.timestamp;
         IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
@@ -145,7 +145,7 @@ contract BobaFaucet is Ownable {
         bytes32 hashedKey = keccak256(abi.encodePacked(_key));
         uint256 result = _verifyKey(_uuid, hashedKey);
 
-        require(result == 1, 'Invalid key and UUID');
+        require(result == 1, 'Captcha wrong');
 
         ETHClaimRecords[msg.sender] = block.timestamp;
 
