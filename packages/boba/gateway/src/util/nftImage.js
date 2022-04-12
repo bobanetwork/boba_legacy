@@ -26,8 +26,6 @@ const getIpfsUrl = (url) => {
 
 export const getNftImageUrl = async (url) => {
 
-    console.log("URL1:", url)
-
     try {
 
         if(url.substring(0,29) === 'data:application/json;base64,') { // we have an svg
