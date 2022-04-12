@@ -8,7 +8,7 @@ import { Box, CircularProgress, Icon, Typography } from '@mui/material'
 import Link from 'components/icons/LinkIcon'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
-import { openAlert, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
@@ -105,11 +105,20 @@ function Wallet() {
       if (l2BalanceETH && l2BalanceETH.balance) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
       }
-      if (l2BalanceBOBA && l2BalanceBOBA) {
+      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
+      } else {
+        // in case of empty boba balance we are setting tooSmallBoba
+        setTooSmallBOBA(true)
       }
     }
   },[ l2Balances, accountEnabled ])
+
+  useEffect(() => {
+    if (tooSmallBOBA && tooSmallETH) {
+      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+    }
+  },[tooSmallETH, tooSmallBOBA, dispatch])
 
   useInterval(() => {
     if (accountEnabled) {
