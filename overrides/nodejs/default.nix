@@ -211,7 +211,8 @@ in
     inherit correct-tsconfig-path add-solc;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig"`
+        rm $out/.bin/hardhat
       '';
     };
     add-inputs = {
@@ -255,16 +256,26 @@ in
   "@eth-optimism/data-transport-layer" = {
     inherit correct-tsconfig-path add-solc;
     install-symlinks = {
-      installPhase = ''
+      postInstall = ''
         ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
       '';
     };
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/data-transport-layer/ | grep -v "package.json\|dist\|node_modules"`
+
       '';
     };
   };
+  # "hardhat" = {
+  #   cleanup-dir = {
+  #     postFixup = ''
+  #       mkdir -p $out/bin
+  #       makeWrapper $out/lib/node_modules/hardhat/internal/cli/cli.js $out/bin/hardhat \
+  #         --run "cd $out/lib/node_modules/hardhat/"
+  #     '';
+  #   };
+  # };
+
   "@eth-optimism/hardhat-node" = {
     cleanup-dir = {
       postFixup = ''

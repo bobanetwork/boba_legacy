@@ -46,8 +46,8 @@
             pkgs = import nixpkgs {
               inherit system;
               overlays = [ devshell.overlay ];
-              # TODO: Make this an overlay instead
             };
+            # TODO: Make this an overlay instead
             bobapkgs = self.packages.${system};
           in
           rec {
@@ -68,6 +68,7 @@
                     ln -sf ${bobapkgs."@eth-optimism/contracts"} $out/optimism/contracts
                     ln -sf ${bobapkgs."@eth-optimism/message-relayer"} $out/optimism/message-relayer
                     ln -sf ${bobapkgs."@eth-optimism/sdk"} $out/optimism/sdk
+                    ln -sf ${bobapkgs."@eth-optimism/hardhat-node"} $out/hardhat
                     ln -sf ${bobapkgs."@boba/contracts"} $out/boba/contracts
                     ln -sf ${bobapkgs."@boba/message-relayer-fast"} $out/boba/message-relayer-fast
                     ln -sf ${bobapkgs."@boba/gas-price-oracle"} $out/boba/gas-price-oracle
@@ -103,7 +104,7 @@
 
             defaultApp = apps.l2geth;
 
-            shell = import ./shell.nix { inherit bobapkgs pkgs; };
+            shell = import ./devshell.nix { inherit bobapkgs pkgs; };
             shells =
               let
 
@@ -111,10 +112,33 @@
               {
                 "@eth-optimism/data-transport-layer" = pkgs.devshell.mkShell {
                   name = "Data Transport Layer";
-                  env = [
+                  devshell.startup.node-env.text = "export PATH=$PATH:${bobapkgs."@eth-optimism/data-transport-layer"}/.bin";
+                };
+                "@eth-optimism/contracts" = pkgs.devshell.mkShell {
+                  name = "Optimism Contracts";
+                  devshell.startup.node-env.text = "export PATH=$PATH:${bobapkgs."@eth-optimism/contracts"}/lib/node_modules/.bin";
+                  packages = with pkgs; with bobapkgs; [
+                    bobapkgs."@eth-optimism/hardhat-node"
+                  ];
+
+                  commands = [
                     {
-                      name = "HTTP_PORT";
-                      value = 8080;
+                      name = "build";
+                      help = "build with hardhat, eg: hardhat compile";
+                      category = "build";
+                      command = "hardhat compile $@";
+                    }
+                    {
+                      name = "test";
+                      help = "test contracts with hardhat";
+                      category = "test";
+                      command = "hardhat test $@";
+                    }
+                    {
+                      name = "validate";
+                      help = "validate contracts with hardhat";
+                      category = "validate";
+                      command = "hardhat validateOutput $@";
                     }
                   ];
                 };
