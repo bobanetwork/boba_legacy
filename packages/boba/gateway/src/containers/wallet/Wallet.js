@@ -96,7 +96,6 @@ function Wallet() {
 
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
-      console.log("l2Balances",l2Balances)
       const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
       
