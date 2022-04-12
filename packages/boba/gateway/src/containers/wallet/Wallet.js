@@ -115,10 +115,12 @@ function Wallet() {
   },[ l2Balances, accountEnabled ])
 
   useEffect(() => {
-    if (tooSmallBOBA && tooSmallETH) {
-      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+    if (layer === 'L2') {
+      if (tooSmallBOBA && tooSmallETH) {
+        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      }
     }
-  },[tooSmallETH, tooSmallBOBA, dispatch])
+  },[tooSmallETH, tooSmallBOBA,layer, dispatch])
 
   useInterval(() => {
     if (accountEnabled) {
