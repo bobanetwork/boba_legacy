@@ -650,6 +650,7 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
+      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
 
       // not critical
       this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
@@ -4047,6 +4048,65 @@ class NetworkService {
       console.log('NS: getSaves error:', error)
       return error
     }
+  }
+
+  async estimateApprove() {
+
+    const approvalAmount = utils.parseEther('10.0')
+
+    let allowance_BN = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .allowance(
+        this.account,
+        allAddresses.BobaFixedSavings
+      )
+    console.log("Fixed Savings Allowance", allowance_BN.toString())
+
+    let approveStatus = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .approve(
+        allAddresses.BobaFixedSavings,
+        approvalAmount
+      )
+    await approveStatus.wait()
+    console.log("Fixed Savings Approval", approveStatus)
+
+    // DiscretionaryExitFee: 0x583963636aa1344B9A609b34E1C9e7b5603df0A5
+    allowance_BN = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .allowance(
+        this.account,
+        allAddresses.DiscretionaryExitFee
+      )
+    console.log("DiscretionaryExitFee Allowance", allowance_BN.toString())
+
+    approveStatus = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .approve(
+        allAddresses.DiscretionaryExitFee,
+        approvalAmount
+      )
+    await approveStatus.wait()
+    console.log("DiscretionaryExitFee Approval", approveStatus)
+
+    // L2LP
+    allowance_BN = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .allowance(
+        this.account,
+        allAddresses.L2LPAddress
+      )
+    console.log("L2LP", allowance_BN.toString())
+
+    approveStatus = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .approve(
+        allAddresses.L2LPAddress,
+        approvalAmount
+      )
+    await approveStatus.wait()
+    console.log("L2LP", approveStatus)
+
   }
 
   async getFS_Info() {
