@@ -25,7 +25,18 @@ async function main() {
     TuringHelperFactoryJson.abi,
     TuringHelperFactoryJson.bytecode, testWallet)
 
-  const turingHelperFactory = await Factory__TuringHelperFactory.deploy(implementationTuringHelper)
+
+  let BOBAL2Address
+  let BobaTuringCreditAddress
+  if (hre.network.name === 'boba_rinkeby') {
+    BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+    BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+  } else if (hre.network.name === 'boba_mainnet') {
+    BOBAL2Address = '0x_________________'
+    BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
+  }
+
+  const turingHelperFactory = await Factory__TuringHelperFactory.deploy(BOBAL2Address, implementationTuringHelper, BobaTuringCreditAddress)
   console.log("TuringHelperFactory contract deployed at", turingHelperFactory.address)
 }
 
