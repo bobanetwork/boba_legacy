@@ -3989,8 +3989,7 @@ class NetworkService {
 
     } catch (error) {
       console.log('NS: stakingEstimate() error', error)
-      return BigNumber.from('0')
-      // return error
+      return error
     }
   }
 
