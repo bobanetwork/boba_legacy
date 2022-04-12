@@ -873,7 +873,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       chainId = (await env.l2Provider.getNetwork()).chainId
 
       // Add ETH first
-      env.l2Wallet.sendTransaction({
+      await env.l2Wallet.sendTransaction({
         to: Boba_GasPriceOracle.address,
         value: ethers.utils.parseEther('10'),
       })
@@ -908,7 +908,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
+      await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
         owner,
         spender,
         value,
@@ -917,8 +917,6 @@ describe('Boba Fee Payment Integration Tests', async () => {
         sig.r,
         sig.s
       )
-      const receipt = await tx.wait()
-      const txETHFee = receipt.gasUsed.mul(tx.gasPrice)
 
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
       const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
