@@ -1,0 +1,32 @@
+.footerContainer {
+    position: fixed;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    right: 0px;
+    bottom: 0px;
+    padding: 1rem;
+    color: rgb(0, 125, 53);
+    transition: color 250ms ease 0s;
+    font-size: 15px;
+    cursor: default;
+}
+
+.footerDot {
+    width: 8px;
+    height: 8px;
+    min-height: 8px;
+    min-width: 8px;
+    border-radius: 50%;
+    position: relative;
+    background-color: rgb(0, 125, 53);
+    transition: background-color 250ms ease 0s;
+    margin-left: 5px;
+}
+
+.footerGas {
+    font-weight: 500;
+    color: rgb(110, 114, 125);
+    font-size: 15px;
+    margin-right: 5px;
+}
