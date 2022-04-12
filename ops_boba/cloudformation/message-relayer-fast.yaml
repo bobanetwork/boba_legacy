@@ -16,7 +16,7 @@ Parameters:
 
   MessageRelayerFastImage:
     Type: String
-    Default: boba_message-relayer-fast
+    Default: message-relayer
 
   DockerPrefix:
     Type: String
