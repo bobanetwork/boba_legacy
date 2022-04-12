@@ -20,8 +20,10 @@ const BobaGasPriceOracleInterface = new ethers.utils.Interface([
   'function useBobaAsFeeToken()',
   'function useETHAsFeeToken()',
   'function bobaFeeTokenUsers(address) view returns (bool)',
-  'function useBobaAsFeeTokenMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+  'function swapBOBAForETHMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
   'function metaTransactionFee() view returns (uint256)',
+  'function marketPriceRatio() view returns (uint256)',
+  'function receivedETHAmount() view returns (uint256)',
 ])
 
 const L2BobaInterface = new ethers.utils.Interface([
@@ -81,9 +83,14 @@ const verifyBobay = async (body) => {
   }
 
   const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
+  const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
+  const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+  const totalCost = receivedETHAmount
+    .mul(marketPriceRatio)
+    .add(metaTransactionFee)
   const L2BobaBalance = await L2Boba.balanceOf(owner)
   const bigNumberValue = ethers.BigNumber.from(value)
-  if (bigNumberValue.lt(metaTransactionFee)) {
+  if (bigNumberValue.lt(totalCost)) {
     return {
       isVerified: false,
       errorMessage: 'Invalid value',
@@ -122,7 +129,7 @@ module.exports.mainnetHandler = async (event, context, callback) => {
   const sig = ethers.utils.splitSignature(signature)
   // Send transaction to node
   try {
-    const tx = await Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
       owner,
       spender,
       value,
@@ -163,9 +170,32 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
     })
   }
 
+  const { owner, spender, value, deadline, signature } = body
+  // Get r s v from signature
+  const sig = ethers.utils.splitSignature(signature)
+  // Send transaction to node
+  try {
+    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
+      owner,
+      spender,
+      value,
+      deadline,
+      sig.v,
+      sig.r,
+      sig.s
+    )
+    await tx.wait()
+  } catch (err) {
+    return callback(null, {
+      headers,
+      statusCode: 400,
+      body: JSON.stringify({ status: 'failure', error: err }),
+    })
+  }
+
   return callback(null, {
     headers,
-    statusCode: 400,
-    body: JSON.stringify({ status: 'failure', error: 'not support' }),
+    statusCode: 201,
+    body: JSON.stringify({ status: 'success' }),
   })
 }

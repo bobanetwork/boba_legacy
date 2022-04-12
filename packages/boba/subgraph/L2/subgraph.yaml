@@ -8,8 +8,7 @@ dataSources:
     name: L2LiquidityPool
     network: boba
     source:
-
-      address: '0x8d3866a79aA780BA3DC1a300a1567635F3754a0e'
+      address: '0x3A92cA39476fF84Dc579C868D4D7dE125513B034'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
@@ -117,8 +116,8 @@ dataSources:
       eventHandlers:
         - event: UseBobaAsFeeToken(address)
           handler: handleUseBobaAsFeeToken
-        - event: UseBobaAsFeeTokenMetaTransaction(address)
-          handler: handleUseBobaAsFeeTokenMetaTransaction
+        - event: SwapBOBAForETHMetaTransaction(address)
+          handler: handleSwapBOBAForETHMetaTransaction
         - event: UseETHAsFeeToken(address)
           handler: handleUseETHAsFeeToken
       file: ./src/Boba_GasPriceOracleMapping.ts
