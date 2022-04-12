@@ -59,13 +59,30 @@ function FeeSwitcher() {
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
-    if (!balanceBOBA) {
-      dispatch(openError('Wallet empty - please bridge in BOBA from L1'))
-      return;
+    console.log("balanceBOBA:",balanceBOBA)
+    console.log("balanceETH:",balanceETH)
+
+    let tooSmallETH = false
+    let tooSmallBOBA = false
+
+    if(typeof(balanceBOBA) === 'undefined') {
+      tooSmallBOBA = true
+    } else {
+      //check actual balance
+      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
     }
 
-    const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
-    const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+    if(typeof(balanceETH) === 'undefined') {
+      tooSmallETH = true
+    } else {
+      //check actual balance
+      tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
+    }
+
+    if (!balanceBOBA && !balanceETH) {
+      dispatch(openError('Wallet completely empty - please bridge in ETH or BOBA from L1'))
+      return
+    }
 
     let res
 

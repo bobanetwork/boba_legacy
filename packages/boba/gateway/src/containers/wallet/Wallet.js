@@ -104,11 +104,14 @@ function Wallet() {
 
       if (l2BalanceETH && l2BalanceETH.balance) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
+      } else {
+        // in case of zero ETH balance we are setting tooSmallETH
+        setTooSmallETH(true)
       }
       if (l2BalanceBOBA && l2BalanceBOBA.balance) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
       } else {
-        // in case of empty boba balance we are setting tooSmallBoba
+        // in case of zero BOBA balance we are setting tooSmallBOBA
         setTooSmallBOBA(true)
       }
     }
@@ -120,7 +123,7 @@ function Wallet() {
         dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
       }
     }
-  },[tooSmallETH, tooSmallBOBA,layer, dispatch])
+  },[tooSmallETH, tooSmallBOBA, layer, dispatch])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -170,9 +173,9 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-                WARNING: Low ETH balance. Using Boba requires a minimum ETH balance (of 0.002 ETH)
-              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
-              If you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
+              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting, 
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use 
+              EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
             </Typography>
           </S.AlertInfo>
           <Button
