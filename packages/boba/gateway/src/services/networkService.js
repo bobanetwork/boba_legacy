@@ -3657,13 +3657,25 @@ class NetworkService {
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
+/*
+        // for text only proposals, set target to a null address
+         const addresses = ['0x000000000000000000000000000000000000dEaD'] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = [''] // the function that will carry out the proposal
+
+        const calldatas = [
+           '0x0000000000000000000000000000000000000000000000000000000000000000',
+         ]
+
+         const description = '# Text only proposal' // the description of the proposal
+         */
+
     if( payload.action === 'text-proposal' ) {
-      address = [delegateCheck.address] // anything will do, as long at it's not blank
+      address = ['0x000000000000000000000000000000000000dEaD']
       description = payload.text.slice(0, 252) //100+150+2
-      callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
-        ['uint256'],
-        [value1]
-      )]
+      callData = [
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ]
     } else if ( payload.action === 'change-lp1-fee' ) {
       signatures = ['configureFeeExits(uint256,uint256,uint256)']
       value1 = Number(payload.value[0])
