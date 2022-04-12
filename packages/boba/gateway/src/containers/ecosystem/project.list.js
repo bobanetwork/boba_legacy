@@ -29,6 +29,7 @@ import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import multiSigLogo from '../../images/ecosystem/multiSig.svg'
+import brewery from '../../images/ecosystem/brewery.svg'
 
 /**
  * thematical order of type.
@@ -342,6 +343,16 @@ export const projectList = [
     "type": "nft",
     "image": shibuiDAOLogo,
     "description": ""
+  },
+  {
+    "title": "Boba Brewery",
+    "canLaunch": true,
+    "link": "http://bobabrewery.com/",
+    "telegram": "https://t.me/bobabrewery",
+    "twitter": "https://twitter.com/boba_brewery",
+    "type": "defi",
+    "image": brewery,
+    "description": "Boba Brewery is the first exclusive launchpad for decentralized fundraising in Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
   }
 ]
 
