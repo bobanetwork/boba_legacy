@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Alert from '../../components/Alert/Alert'
-import Footer from '../../components/Footer/Footer'
 import Faucet from '../Faucet/Faucet'
 
 import { selectAlert, selectError } from '../../redux/selector/uiSelector'
@@ -29,7 +28,6 @@ function Home() {
             >
                 {errorMessage}
             </Alert>
-
             <Alert
                 type='success'
                 duration={0}
@@ -40,7 +38,6 @@ function Home() {
                 {alertMessage}
             </Alert>
             <Faucet />
-            <Footer />
         </>
     )
 }

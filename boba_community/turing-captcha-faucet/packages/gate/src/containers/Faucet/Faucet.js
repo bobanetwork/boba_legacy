@@ -57,13 +57,22 @@ function Faucet() {
 
     return (
         <div className='faucetContainer'>
-            <div className='title'>Request testnet BOBA</div>
+            <div className='title'>Request testnet BOBA or ETH</div>
             <div className='middleText'>Get testnet BOBA and ETH for an account
-                on Boba Rinkeby testnets so you can
-                create and test your own smart contract.
+                on Boba Rinkeby. You can use these testnet tokens to 
+                create and test your own smart contracts on Boba Rinkeby.
+            </div>
+            <div className='middleText'>
+              You are limited to one BOBA request and one ETH request every 24 hours, and 
+              you must have some Rinkeby ETH in your account to use this faucet.
+              If you do not 
+              have any Rinkeby ETH, you can get some from{' '}
+              <a target="_blank" href='https://faucets.chain.link/rinkeby'>Chainlink Faucet</a>,{' '}
+              <a target="_blank" href='https://faucet.rinkeby.io'>Rinkeby Authenticated Faucet</a>,{' '}or
+              {' '}<a target="_blank" href='https://rinkebyfaucet.com'>RINKEBY FAUCET</a>.
             </div>
             <div className='smallText'>Testnet account adddress</div>
-            <Input placeholder='' className='faucetInput' value={account ? account: 'Unknown'} disabled/>
+            <Input placeholder='' className='faucetInput' value={account ? account: 'Wallet not connected'} disabled/>
             <div className='smallText' style={{marginTop: 10}}>Request type</div>
             <Radio.Group onChange={onChange} value={value}>
                 <Radio value={1}
@@ -91,7 +100,7 @@ function Faucet() {
             >
                 {loading? 'Pending...': 'Send Request'}
             </Button>
-            <div className='smallText' style={{marginTop: 20}}>Your result will be hashed and compared off-chain through Turing. Email us at&nbsp;<a href={"mailto:contact@enya.ai"}> contact@enya.ai </a>&nbsp;if there are questions or issues about Turing, thanks!</div>
+            <div className='smallText' style={{marginTop: 20}}>Your result will be hashed and compared off-chain through Turing.</div>
         </div>
     )
 }

@@ -81,7 +81,7 @@ p {
     left: 0;
     right: 0;
     pointer-events: none;
-    background: radial-gradient(60% 60% at 50% 50%,#061122 0,rgba(255, 255, 255, 0) 100%);
+    background: #dce7f3;
     z-index: -1;
     width: 200vw;
     height: 200vh;
