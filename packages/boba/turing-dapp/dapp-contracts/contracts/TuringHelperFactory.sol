@@ -36,7 +36,7 @@ contract TuringHelperFactory is Ownable {
 
     // TODO: add also support for ETH payments (with then just swapping to Boba for TuringCredit etc.)
     // https://github.com/OolongSwap/oolongswap-deployments
-    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) external {
+    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) external returns (TuringHelper) {
 
         // This will create a minimal proxy for the implementation contract.
         TuringHelper implementation = TuringHelper(Clones.clone(turingImplementation));
@@ -61,5 +61,7 @@ contract TuringHelperFactory is Ownable {
         implementation.transferOwnership(_msgSender());
 
         emit TuringHelperDeployed(implementation, amountBoba);
+
+        return implementation;
     }
 }

@@ -36,13 +36,15 @@ export const Header = styled.header`
   color: white;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
   min-height: 70px;
 `;
 
+export const HeaderCol = styled.div`
+  flex-direction: column;
+  width: 50%;
+`
+
 export const Image = styled.img`
-  height: 40vmin;
-  margin-bottom: 16px;
   pointer-events: none;
 `;
 
