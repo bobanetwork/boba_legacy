@@ -40,10 +40,10 @@ import {
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { 
-  selectBaseEnabled, 
-  selectAccountEnabled, 
-  selectNetwork, 
+import {
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectNetwork,
   selectLayer
 } from 'selectors/setupSelector'
 
@@ -85,9 +85,9 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { 
-  fetchAirdropStatusL1, 
-  fetchAirdropStatusL2 
+import {
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2
 } from 'actions/airdropAction'
 
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
@@ -126,10 +126,10 @@ function Home() {
 
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
-  
+
   const transferModalState = useSelector(selectModalState('transferModal'))
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
-  
+
   const exitModalState = useSelector(selectModalState('exitModal'))
   const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
@@ -365,7 +365,8 @@ function Home() {
               <Ecosystem />
             }
             {pageDisplay === "Bridge" &&
-              <Bridge/>
+              <Bridge />
+            }
             {pageDisplay === "Monster" &&
               <MonsterWrapper />
             }
