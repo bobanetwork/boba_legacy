@@ -100,11 +100,9 @@ function Wallet() {
     if (accountEnabled && l2Balances.length > 0)  {
       const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
-      
       if (l2BalanceETH && l2BalanceETH[0]) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
       }
-      
       if (l2BalanceBOBA && l2BalanceBOBA[0]) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
       }
@@ -140,6 +138,9 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
+// disable hisding the EMERGENCY SWAP for testing
+// 
+
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
@@ -148,15 +149,18 @@ function Wallet() {
           <S.AlertInfo>
             <AlertIcon />
             <S.AlertText
-              variant="body2"
+              variant="body3"
               component="p"
             >
-              <span style={{opacity: '1.0'}}>WARNING: Low ETH balance</span>.
+              <span style={{opacity: '1.0'}}>NOTE: ETH balance</span>.
               {' '}
               <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
               regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
-              If you are stuck because you ran out of ETH, use EMERGENCY SWAP to swap BOBA for
-              0.05 ETH at market rates.</span>
+              <br/><br/>If you are stuck because you ran out of ETH, use EMERGENCY SWAP to swap BOBA for
+              0.05 ETH at market rates.
+              <br/><br/>EMERGENCY SWAPs are metatransactions and are not shown in 
+              the history tab, but can be looked up in the blockexplorer token transfers for BOBA.
+              </span>
             </S.AlertText>
           </S.AlertInfo>
           <Button
