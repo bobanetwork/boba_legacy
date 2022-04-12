@@ -130,9 +130,9 @@ const BaseServices = {
   //ETH gas station
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
   // Mainnet meta transaction
-  MAINNET_META_TRANSACTION: `https://api-metatx.mainnet.boba.network/`,
+  MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
   // Rinkeby meta transaction
-  RINKEBY_META_TRANSACTION: `https://api-metatx.rinkeby.boba.network/`,
+  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
 }
 
 export function getNetwork () {
