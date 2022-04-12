@@ -386,6 +386,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (stateRoot === null) {
           return MessageStatus.STATE_ROOT_NOT_PUBLISHED
         } else {
+          // for the fast relayer this should be zero
           const challengePeriod = await this.getChallengePeriodSeconds()
           const targetBlock = await this.l1Provider.getBlock(
             stateRoot.batch.blockNumber
@@ -669,6 +670,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getChallengePeriodSeconds(): Promise<number> {
+    // if fast relayer return no challenge period
+    if (this.fastRelayer) {
+      return 0
+    }
     const challengePeriod =
       await this.contracts.l1.StateCommitmentChain.FRAUD_PROOF_WINDOW()
     return challengePeriod.toNumber()
@@ -1118,7 +1123,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       const proof = await this.getMessageProof(resolved)
 
       if (this.fastRelayer) {
-        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction.relayMessage(
+        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction[
+          'relayMessage(address,address,bytes,uint256,(bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes))'
+        ](
           resolved.target,
           resolved.sender,
           resolved.message,
@@ -1161,10 +1168,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         })
       }
 
-      return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
-        batchMessage,
-        opts?.overrides || {}
-      )
+      if (this.fastRelayer) {
+        // ethers.js v5 does not handle overloading
+        return this.contracts.l1.L1MultiMessageRelayerFast.populateTransaction[
+          'batchRelayMessages((address,address,bytes,uint256,(bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes))[])'
+        ](batchMessage, opts?.overrides || {})
+      } else {
+        return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
+          batchMessage,
+          opts?.overrides || {}
+        )
+      }
     },
 
     depositETH: async (

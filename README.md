@@ -75,7 +75,7 @@ as well as a docker-compose file for bringing up local testnets easily
   * [`contracts`](./packages/boba/contracts): Solidity smart contracts implementing the fast bridges, the DAO, etc.
   * [`gas-price-oracle`](./packages/boba/gas-price-oracle): A custom gas price oracle
   * [`gateway`](./packages/boba/gateway): The Boba Web gateway
-  * [`message-relayer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
+  * [`message-relayer-fast`](./packages/message-relayer): A batch message relayer that can be run for the fast mode without a 7 day delay
   * [`register`](./packages/boba/register): Code for registering addresses in the AddressManager
   * [`subgraph`](./packages/boba/subgraph): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
 
