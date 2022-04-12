@@ -22,17 +22,9 @@ const main = async () => {
     'gas-price-oracle-owner-key',
     env.GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY
   )
-  const SEQUENCER_PRIVATE_KEY = config.str(
-    'sequencer-private-key',
-    env.SEQUENCER_PRIVATE_KEY
-  )
   const SEQUENCER_ADDRESS = config.str(
     'sequencer-address',
     env.SEQUENCER_ADDRESS
-  )
-  const PROPOSER_PRIVATE_KEY = config.str(
-    'proposer-private-key',
-    env.PROPOSER_PRIVATE_KEY
   )
   const PROPOSER_ADDRESS = config.str('proposer-address', env.PROPOSER_ADDRESS)
   const RELAYER_PRIVATE_KEY = config.str(
@@ -115,11 +107,11 @@ const main = async () => {
   if (!GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY) {
     throw new Error('Must pass GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY')
   }
-  if (!SEQUENCER_ADDRESS && !SEQUENCER_PRIVATE_KEY) {
-    throw new Error('Must pass SEQUENCER_ADDRESS or SEQUENCER_PRIVATE_KEY')
+  if (!SEQUENCER_ADDRESS) {
+    throw new Error('Must pass SEQUENCER_ADDRESS')
   }
-  if (!PROPOSER_ADDRESS && !PROPOSER_PRIVATE_KEY) {
-    throw new Error('Must pass PROPOSER_ADDRESS or PROPOSER_PRIVATE_KEY')
+  if (!PROPOSER_ADDRESS) {
+    throw new Error('Must pass PROPOSER_ADDRESS')
   }
   if (!RELAYER_ADDRESS && !RELAYER_PRIVATE_KEY) {
     throw new Error('Must pass RELAYER_ADDRESS or RELAYER_PRIVATE_KEY')
@@ -143,11 +135,7 @@ const main = async () => {
 
   // sequencer, proposer, relayer and fast relayer addresses
   const sequencerAddress = SEQUENCER_ADDRESS
-    ? SEQUENCER_ADDRESS
-    : new Wallet(SEQUENCER_PRIVATE_KEY, l2Provider).address
   const proposerAddress = PROPOSER_ADDRESS
-    ? PROPOSER_ADDRESS
-    : new Wallet(PROPOSER_PRIVATE_KEY, l2Provider).address
   const relayerAddress = RELAYER_ADDRESS
     ? RELAYER_ADDRESS
     : new Wallet(RELAYER_PRIVATE_KEY, l2Provider).address

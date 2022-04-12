@@ -268,6 +268,10 @@ jobs:
       - run: git checkout -f $(git -c user.name=x -c user.email=x@x commit-tree $(git hash-object -t tree /dev/null) < /dev/null) || true
       - uses: actions/checkout@v3
 
+      - name: Bring KMS up
+        working-directory: ./ops
+        run: docker-compose pull kms
+
       - name: Bring the stack up
         working-directory: ./ops
         run: BUILD=2 DAEMON=1 ./up_local.sh
