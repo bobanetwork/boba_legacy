@@ -44,8 +44,7 @@ import {
   selectBaseEnabled, 
   selectAccountEnabled, 
   selectNetwork, 
-  selectLayer,
-  selectMonster 
+  selectLayer
 } from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
@@ -97,7 +96,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
-import Monster from 'containers/monster/Monster'
+import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
 
@@ -142,7 +141,6 @@ function Home() {
   const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
-  const monsterNumber = useSelector(selectMonster())
 
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
@@ -353,7 +351,7 @@ function Home() {
               <Ecosystem />
             }
             {pageDisplay === "Monster" &&
-              <Monster />
+              <MonsterWrapper />
             }
           </Container>
           <PageFooter/>
