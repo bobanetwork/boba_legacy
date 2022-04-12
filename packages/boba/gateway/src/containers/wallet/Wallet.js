@@ -19,7 +19,8 @@ import * as S from './wallet.styles'
 import {
   selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice
+  selectBobaFeeChoice,
+  selectNetwork,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -47,6 +48,7 @@ function Wallet() {
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const network = useSelector(selectNetwork())
 
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
@@ -96,7 +98,6 @@ function Wallet() {
 
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
-      console.log("l2Balances",l2Balances)
       const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
       
@@ -134,6 +135,7 @@ function Wallet() {
   }
 
   async function emergencySwap () {
+    if(network !== 'rinkeby') return
     const res = await dispatch(getETHMetaTransaction())
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
@@ -141,7 +143,7 @@ function Wallet() {
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
-      {layer === 'L2' && tooSmallETH &&
+      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
         <S.LayerAlert>
           <S.AlertInfo>
             <AlertIcon />
