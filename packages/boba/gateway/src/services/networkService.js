@@ -1239,7 +1239,7 @@ class NetworkService {
               }
               if(value.meta.attributes[3].value === 'crown') topTop = 1
               if(value.meta.attributes[4].value === 'wizzard') topMagic = 1
-              validMonsters.push({tokenID: value.tokenID, attributes}) 
+              validMonsters.push({tokenID: value.tokenID, attributes})
             }
           }
         }
@@ -2643,7 +2643,7 @@ class NetworkService {
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
       // console.log("Yes we have ETH")
       // add value field
-      otherField['value'] = value_Wei_String 
+      otherField['value'] = value_Wei_String
     }
 
     try {
@@ -2668,17 +2668,17 @@ class NetworkService {
   async liquidityEstimate(currency) {
 
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -2695,9 +2695,9 @@ class NetworkService {
       console.log("benchmarkAllowance", allowance_BN.toString() )
 
       if( currency === allAddresses.L2_ETH_Address ) {
-        otherField['value'] = allowance_BN.toString() 
+        otherField['value'] = allowance_BN.toString()
       }
-      
+
       // second, we need the approval cost if non-ETH
       if( currency !== allAddresses.L2_ETH_Address ) {
 
@@ -2705,7 +2705,7 @@ class NetworkService {
           .populateTransaction
           .approve(
             allAddresses.L2LPAddress,
-            allowance_BN.toString(), 
+            allowance_BN.toString(),
             otherField
           )
 
@@ -2713,7 +2713,7 @@ class NetworkService {
         approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
-       
+
       // third, we need the addLiquidity cost
       const tx2 = await this.L2LPContract
         .connect(this.provider)
@@ -2736,7 +2736,7 @@ class NetworkService {
       console.log('NS: liquidityEstimate() error', error)
       return error
     }
-  
+
   }
 
   /***********************************************/
@@ -3938,21 +3938,21 @@ class NetworkService {
   }
 
   async savingEstimate() {
-    
+
     // used to generate gas estimates for contracts that cannot set amount === 0
     // to avoid need to approve amount
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -3970,7 +3970,7 @@ class NetworkService {
         .populateTransaction
         .approve(
           allAddresses.BobaFixedSavings,
-          allowance_BN.toString(), 
+          allowance_BN.toString(),
         )
 
       const approvalGas_BN = await this.provider.estimateGas(tx1)

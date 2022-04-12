@@ -98,7 +98,7 @@ function TokenPage() {
               href={'https://oolongswap.com/'}
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-            >Oologswap <Link />
+            >Oolongswap <Link />
             </S.footerLink>
           </Typography>
         </Box>
