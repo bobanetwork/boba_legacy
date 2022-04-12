@@ -33,10 +33,19 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
+import {
+  getMonsterInfo
+} from 'actions/nftAction'
+
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectBaseEnabled, 
+  selectAccountEnabled, 
+  selectNetwork, 
+  selectLayer
+} from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
 
@@ -72,7 +81,11 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import { 
+  fetchAirdropStatusL1, 
+  fetchAirdropStatusL2 
+} from 'actions/airdropAction'
+
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
 
@@ -83,6 +96,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
 
@@ -179,8 +193,9 @@ function Home() {
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
+      dispatch(getMonsterInfo())       // account specific
     }
-    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
@@ -195,12 +210,13 @@ function Home() {
     dispatch(fetchGas())
     dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
-  }, [dispatch, maintenance])
+  }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
+      dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -333,6 +349,9 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Monster" &&
+              <MonsterWrapper />
             }
           </Container>
           <PageFooter/>

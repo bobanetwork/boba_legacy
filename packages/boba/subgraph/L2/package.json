@@ -8,8 +8,7 @@
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "create:subgraph:rinkeby": "graph create --node https://graph.rinkeby.boba.network:8020 boba/Bridges",
     "deploy:subgraph:rinkeby": "graph deploy boba/Bridges --ipfs https://graph.rinkeby.boba.network:5001 --node https://graph.rinkeby.boba.network:8020",
-    "create:subgraph:mainnet": "graph create --node https://graph.mainnet.boba.network:8020 boba/Bridges",
-    "deploy:subgraph:mainnet": "graph deploy boba/Bridges --ipfs https://graph.mainnet.boba.network:5001 --node https://graph.mainnet.boba.network:8020"
+    "deploy:subgraph:mainnet": "graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.29.0",

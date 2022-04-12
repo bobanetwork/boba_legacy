@@ -16,6 +16,8 @@ import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Copy from 'components/copy/Copy'
 
+import truncate from 'truncate-middle'
+
 class Nft extends React.Component {
 
   constructor(props) {
@@ -23,7 +25,9 @@ class Nft extends React.Component {
     super(props)
 
     const {
-      list
+      list,
+      monsterNumber,
+      monsterInfo
     } = this.props.nft
 
     const {
@@ -38,13 +42,19 @@ class Nft extends React.Component {
       loading: this.props.loading[ 'NFT/ADD' ],
       accountEnabled,
       netLayer,
+      monsterNumber,
+      monsterInfo
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { list } = this.props.nft
+    const {
+      list,
+      monsterNumber,
+      monsterInfo
+    } = this.props.nft
 
     const {
       accountEnabled,
@@ -53,6 +63,14 @@ class Nft extends React.Component {
 
     if (!isEqual(prevState.nft.list, list)) {
       this.setState({ list })
+    }
+
+    if (!isEqual(prevState.nft.monsterNumber, monsterNumber)) {
+      this.setState({ monsterNumber })
+    }
+
+    if (!isEqual(prevState.nft.monsterInfo, monsterInfo)) {
+      this.setState({ monsterInfo })
     }
 
     if (!isEqual(prevState.loading[ 'NFT/ADD' ], this.props.loading[ 'NFT/ADD' ])) {
@@ -84,6 +102,7 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
+
   render() {
 
     const {
@@ -92,6 +111,8 @@ class Nft extends React.Component {
       tokenID,
       loading,
       netLayer,
+      monsterInfo,
+      monsterNumber
     } = this.state
 
     if (!netLayer) {
@@ -161,8 +182,8 @@ class Nft extends React.Component {
                   Turing monsters:
                 </Typography>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body3" >
-                    0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793
+                  <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                    0xce45...D793
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>

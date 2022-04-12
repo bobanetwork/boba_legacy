@@ -1,9 +1,9 @@
-service: sls-boba-mainnet-meta-transaction # NOTE: update this with your service name
+service: sls-boba-mainnet-metaTransaction # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stackName: sls-boba-mainnet-meta-transaction
+  stackName: sls-boba-mainnet-metaTransaction
   stage: prod
   region: us-east-1
   role: ${file(env-mainnet.yml):ROLE}
@@ -15,8 +15,8 @@ package:
   individually: true
 
 functions:
-  boba_useBobaAsFeeToken:
-    handler: metaTransaction_useBobaAsFeeToken.mainnetHandler
+  boba_swapBOBAForETH:
+    handler: metaTransaction_swapBOBAForETH.mainnetHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
@@ -27,7 +27,7 @@ functions:
         - ${file(env-mainnet.yml):SUBNET_ID_2}
     events:
       - http:
-          path: send.useBobaAsFeeToken
+          path: send.swapBOBAForETH
           method: post
           cors: true
     layers:

@@ -708,6 +708,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           this.options.bobaFeeRatio100X) /
           100
       )
+      const targetMarketPriceRatio = Math.floor(
+        this.state.ETHUSDPrice / this.state.BOBAUSDPrice
+      )
       if (targetPriceRatio !== priceRatioInt) {
         let targetUpdatedPriceRatio = targetPriceRatio
         if (targetPriceRatio > priceRatio) {
@@ -729,11 +732,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         const gasPriceTx =
           await this.state.Boba_GasPriceOracle.updatePriceRatio(
             targetUpdatedPriceRatio,
+            targetMarketPriceRatio,
             { gasPrice: 0 }
           )
         await gasPriceTx.wait()
         this.logger.info('Updated price ratio', {
           priceRatio: targetUpdatedPriceRatio,
+          targetMarketPriceRatio,
         })
       } else {
         this.logger.info('No need to update price ratio', {

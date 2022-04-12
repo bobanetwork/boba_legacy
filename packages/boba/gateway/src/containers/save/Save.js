@@ -30,10 +30,10 @@ import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-import PageTitle from 'components/pageTitle/PageTitle'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
@@ -244,7 +244,7 @@ class Save extends React.Component {
         <Box sx={{ my: 1 }}>
           <PageTitle title="Stake BOBA" />
           {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2 </Typography>
+            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
             : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
           }
         </Box>
@@ -268,7 +268,7 @@ class Save extends React.Component {
                     Active stakes
                   </Typography>
                   <Typography variant="h3" >
-                    {totalBOBAstaked} Boba
+                    {totalBOBAstaked} BOBA
                   </Typography>
                 </Box>
               </S.StakeItem>
@@ -281,7 +281,7 @@ class Save extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <Typography variant="body2"> Boba Balance:</Typography>
+                <Typography variant="body2"> BOBA Balance:</Typography>
                 <Typography variant="body2"> {max_Float_String} </Typography>
               </Box>
               <Input
@@ -359,7 +359,7 @@ class Save extends React.Component {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <BobaGlassIcon />
                 <Typography variant="body1" >
-                  Stake Boba
+                  Stake BOBA
                 </Typography>
               </Box>
             </S.StakeHeadContainer>
