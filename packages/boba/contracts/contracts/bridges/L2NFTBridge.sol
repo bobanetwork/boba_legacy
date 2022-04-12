@@ -24,6 +24,10 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+/* External Imports */
+import { L2BillingContract } from "../L2BillingContract.sol";
 
 /**
  * @title L2NFTBridge
@@ -40,6 +44,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  // add is interface
 contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     /********************************
      * External Contract References *
@@ -64,6 +69,8 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     // Maps L2 NFT address to NFTInfo
     mapping(address => PairNFTInfo) public pairNFTInfo;
 
+    // billing contract address
+    address public billingContractAddress;
     /***************
      * Constructor *
      ***************/
@@ -80,13 +87,13 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         _;
     }
 
-    modifier onlyGasPriceOracleOwner() {
-        require(msg.sender == OVM_GasPriceOracle(Lib_PredeployAddresses.OVM_GAS_PRICE_ORACLE).owner(), 'Caller is not the gasPriceOracle owner');
+    modifier onlyInitialized() {
+        require(address(messenger) != address(0), "Contract has not yet been initialized");
         _;
     }
 
-    modifier onlyInitialized() {
-        require(address(messenger) != address(0), "Contract has not yet been initialized");
+    modifier onlyWithBillingContract() {
+        require(billingContractAddress != address(0), "Billing contract address is not set");
         _;
     }
 
@@ -144,16 +151,18 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     }
 
     /**
-     * @param _extraGasRelay The extra gas for exiting L2
+     * @dev Configure billing contract address.
+     *
+     * @param _billingContractAddress billing contract address
      */
-    function configureExtraGasRelay(
-        uint256 _extraGasRelay
+    function configureBillingContractAddress(
+        address _billingContractAddress
     )
         public
-        onlyGasPriceOracleOwner()
-        onlyInitialized()
+        onlyOwner()
     {
-        extraGasRelay = _extraGasRelay;
+        require(_billingContractAddress != address(0), "Billing contract address cannot be zero");
+        billingContractAddress = _billingContractAddress;
     }
 
     /***
@@ -351,15 +360,11 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         bytes memory _data
     )
         internal
+        onlyWithBillingContract()
     {
-        uint256 startingGas = gasleft();
-        require(startingGas > extraGasRelay, "Insufficient Gas For a Relay Transaction");
-
-        uint256 desiredGasLeft = startingGas.sub(extraGasRelay);
-        uint256 i;
-        while (gasleft() > desiredGasLeft) {
-            i++;
-        }
+        // Collect the exit fee
+        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
+        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract != address(0), "Can't Find L1 NFT Contract");
