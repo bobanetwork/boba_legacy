@@ -59,6 +59,11 @@ function FeeSwitcher() {
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
+    if (!balanceBOBA) {
+      dispatch(openError('Wallet empty - please bridge in BOBA from L1'))
+      return;
+    }
+
     const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
     const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
 
