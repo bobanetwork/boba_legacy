@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
-import { Circle } from "@mui/icons-material"
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Circle, Info } from "@mui/icons-material"
+import { Box, CircularProgress, Icon, Typography } from '@mui/material'
 import Link from 'components/icons/LinkIcon'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
@@ -150,16 +150,19 @@ function Wallet() {
       {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
         <S.LayerAlert>
           <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body3"
+            {/* <AlertIcon /> */}
+            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Typography
+              flex={4}
+              variant="body2"
               component="p"
+              ml={2}
+              style={{ opacity: '0.6' }}
             >
-              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
+                WARNING: Low ETH balance. Using Boba requires a minimum ETH balance (of 0.002 ETH)
               regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
               If you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
-              </span>
-            </S.AlertText>
+            </Typography>
           </S.AlertInfo>
           <Button
             onClick={()=>{emergencySwap()}}
