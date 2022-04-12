@@ -46,8 +46,9 @@ function TokenPage() {
         return 'omg'
       } else if(i.symbolL1 === 'BOBA') {
         return 'boba-network'
-      }
-      else {
+      } else if(i.symbolL1 === 'OLO') {
+        return 'oolongswap'
+      } else {
         return i.symbolL1.toLowerCase()
       }
     })

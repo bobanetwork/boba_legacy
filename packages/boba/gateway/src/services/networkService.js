@@ -3927,6 +3927,8 @@ class NetworkService {
 
   async savingEstimate() {
     
+    // used to generate gas estimates for contracts that cannot set amount === 0
+    // to avoid need to approve amount
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
     
     let otherField = { 

@@ -5,19 +5,16 @@ import { isEqual } from 'lodash'
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Monster.styles'
 
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Typography, Grid } from '@mui/material'
 
-import Input from 'components/input/Input'
-import Button from 'components/button/Button'
+import { Circle } from '@mui/icons-material'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import networkService from 'services/networkService'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import Copy from 'components/copy/Copy'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-
-import truncate from 'truncate-middle'
 
 class Monster extends React.Component {
 
@@ -108,12 +105,8 @@ class Monster extends React.Component {
 
     const {
       list,
-      contractAddress,
-      tokenID,
-      loading,
       netLayer,
       monsterInfo,
-      monsterNumber
     } = this.state
 
     let tokenIDverified = null
@@ -145,7 +138,6 @@ class Monster extends React.Component {
 
       return (
         <S.TokenPageContainer>
-          <S.TokenPageContentEmpty>
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -159,7 +151,6 @@ class Monster extends React.Component {
               </S.AlertInfo>
               <WalletPicker label="Connect to Boba"/>
             </S.LayerAlert>
-          </S.TokenPageContentEmpty>
         </S.TokenPageContainer>
       )
 
@@ -189,6 +180,16 @@ class Monster extends React.Component {
     else {
 
       return (
+      <S.StakePageContainer>
+        <Box sx={{ my: 1 }}>
+          <PageTitle title="MonsterVerse" />
+          {(netLayer !== 'L2') ?
+            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
+            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
+          }
+        </Box>
+        <Grid container spacing={1} sx={{ my: 2 }}>
+
         <S.NFTPageContainer>
           <S.NFTActionContent>
             <S.NFTFormContent>
@@ -205,7 +206,8 @@ class Monster extends React.Component {
                 </Typography>
                 {tokenIDverified === null && 
                   <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    <br/>You have one or more Turing Monsters, but you have not added them to your NFT page (Wallet>NFT>Add NFT). Please add them to join the MonsterVerse.
+                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>Wallet>NFT>Add NFT</strong>). 
+                    Please add them to join the MonsterVerse.
                   </Typography>
                 }
               </Box>
@@ -222,6 +224,7 @@ class Monster extends React.Component {
                       URL={list[v].url}
                       meta={list[v].meta}
                       tokenID={list[v].tokenID}
+                      small={"true"}
                     />)
                   }
                 })
@@ -256,6 +259,9 @@ class Monster extends React.Component {
               </Box>
           </S.NFTListContainer>
         </S.NFTPageContainer>
+            </Grid>
+      </S.StakePageContainer>
+
     )}
   }
 }

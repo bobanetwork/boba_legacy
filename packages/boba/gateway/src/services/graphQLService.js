@@ -6,7 +6,13 @@ require('dotenv').config()
 class GraphQLService {
 
   getBridgeEndpoint = () => {
-    return `https://graph.${process.env.REACT_APP_CHAIN ?? 'rinkeby'}.boba.network/subgraphs/name/boba/Bridges`
+    if(process.env.REACT_APP_CHAIN === 'mainnet') {
+      return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
+    } else if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+      return `https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges`
+    } else {
+      return ''
+    }
   }
 
   async queryBridgeProposalCreated() {
@@ -18,6 +24,11 @@ class GraphQLService {
     -H "Content-Type: application/json" \
     -d '{"query":"{ governorProposalCreateds {proposalId values description proposer}}"}' \
     https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
+
+    curl -g -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"query":"{ governorProposalCreateds {proposalId values description proposer}}"}' \
+    https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
     */
 
     const client = new apollo.ApolloClient({

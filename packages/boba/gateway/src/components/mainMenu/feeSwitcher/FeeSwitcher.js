@@ -22,7 +22,8 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  selectBobaPriceRatio
+  selectBobaPriceRatio,
+  selectNetwork
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -44,6 +45,7 @@ function FeeSwitcher() {
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
   const feePriceRatio = useSelector(selectBobaPriceRatio())
+  const network = useSelector(selectNetwork())
 
   const layer = useSelector(selectLayer())
 
@@ -59,11 +61,6 @@ function FeeSwitcher() {
 
     const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
     const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
-
-    //console.log([ `BOBA BALANCE`, logAmount(balanceBOBA.balance, 18) ])
-    //console.log([ `tooSmallBOBA`, tooSmallBOBA ])
-    //console.log([ `ETH BALANCE`, logAmount(balanceETH.balance, 18) ])
-    //console.log([ `tooSmallETH`, tooSmallETH ])
 
     let res
 
@@ -98,7 +95,15 @@ function FeeSwitcher() {
 
   }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
 
-  if (!accountEnabled || layer !== 'L2') {
+  if (!accountEnabled) {
+    return null
+  }
+
+  if (layer !== 'L2') {
+    return null
+  }
+
+  if (network === 'mainnet') {
     return null
   }
 
