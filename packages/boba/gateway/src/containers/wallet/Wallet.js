@@ -19,7 +19,8 @@ import * as S from './wallet.styles'
 import {
   selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice
+  selectBobaFeeChoice,
+  selectNetwork,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -47,6 +48,7 @@ function Wallet() {
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const network = useSelector(selectNetwork())
 
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
@@ -96,13 +98,14 @@ function Wallet() {
 
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
-      console.log("l2Balances",l2Balances)
       const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
-      if (l2BalanceETH[0]) {
+      
+      if (l2BalanceETH && l2BalanceETH[0]) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH[0].balance, 18)).lt(new BN(0.003)))
       }
-      if (l2BalanceBOBA[0]) {
+      
+      if (l2BalanceBOBA && l2BalanceBOBA[0]) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA[0].balance, 18)).lt(new BN(4.0)))
       }
     }
@@ -132,6 +135,7 @@ function Wallet() {
   }
 
   async function emergencySwap () {
+    if(network !== 'rinkeby') return
     const res = await dispatch(getETHMetaTransaction())
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
@@ -139,7 +143,7 @@ function Wallet() {
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
-      {layer === 'L2' && tooSmallETH &&
+      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
         <S.LayerAlert>
           <S.AlertInfo>
             <AlertIcon />
@@ -224,22 +228,6 @@ function Wallet() {
         !accountEnabled ?
           <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
           : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-      }
-      {layer === 'L2' &&
-        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
-          <Typography variant="body2">
-            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
-            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-            <S.footerLink
-              target='_blank'
-              href={'https://oolongswap.com/'}
-              aria-label="link"
-              style={{fontSize: '1.0em', opacity: '0.9'}}
-            >
-              Oologswap <Link />
-            </S.footerLink>
-          </Typography>
-        </Box>
       }
       <Box sx={{ mt: 2 }}>
         <Tabs

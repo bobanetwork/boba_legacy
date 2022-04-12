@@ -86,20 +86,18 @@ function DAO() {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <>
-
       <div className={styles.container}>
         <S.DaoPageContainer>
-          <PageTitle title="DAO" />
-            <S.DaoWalletHead>
-            {
-              (layer !== 'L2') ?
-                <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2</Typography>
-                : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-            }
-            </S.DaoWalletHead>
-          <S.DaoPageContent>
 
+          <Box sx={{ my: 1, paddingBottom: '20px' }}>
+            <PageTitle title="DAO" />
+            {(layer !== 'L2') ?
+              <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
+              : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
+            }
+          </Box>
+
+          <S.DaoPageContent>
             <S.DaoWalletContainer>
               <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
                 {!accountEnabled ?
@@ -108,9 +106,6 @@ function DAO() {
                 }
               </Box>
               <S.DividerLine />
-              <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
-                <Typography variant="body3" sx={{ opacity: "0.6"}}>NOTE: only votes delegated BEFORE the start of the active voting period are counted in your vote.</Typography>
-              </Box>
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Balances</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>BOBA:</Typography>
@@ -162,6 +157,9 @@ function DAO() {
                         <LayerSwitcher isButton={true} />
                       </S.LayerAlert>
                 }
+                <Box sx={{ padding: '12px 0px'}}>
+                  <Typography variant="body3">Only votes delegated BEFORE the start of the active voting period are counted in your vote</Typography>
+                </Box>
               </Box>
               <S.DividerLine />
               <Box sx={{
@@ -186,7 +184,9 @@ function DAO() {
                 >
                   Create new proposal
                 </Button>
-                <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
+                <Box sx={{ padding: '12px 0px'}}>
+                  <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
+                </Box>
               </Box>
             </S.DaoWalletContainer>
             <S.DaoProposalContainer>
@@ -220,7 +220,7 @@ function DAO() {
           </S.DaoPageContent>
         </S.DaoPageContainer>
       </div>
-    </>)
+    )
 }
 
 export default React.memo(DAO)

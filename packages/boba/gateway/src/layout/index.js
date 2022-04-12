@@ -81,13 +81,18 @@ function App () {
       },
       body1: {
         fontSize: 18,
+        display: 'block'
       },
       body2: {
         fontSize: 16,
         fontWeight: 400,
+        lineHeight: '1.0em',
+        display: 'block'
       },
       body3: {
-        fontSize: '0.8em'
+        fontSize: 14,
+        lineHeight: '1.1em',
+        display: 'block'
       },
       body4: {
         fontSize: 12
