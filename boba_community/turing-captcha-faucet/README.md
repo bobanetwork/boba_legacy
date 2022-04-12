@@ -4,15 +4,13 @@
 - [Directory Structure](#Directory-Structure)
 - [Specification](#Specification)
 - [Impementation](#Implementaion)
-  * [Step 1: Creating API endpoints](#Step1--Creating-API-endpoints)
+  * [Step1: Creating API endpoints](#Step1--Creating-API-endpoints)
   * [Step2: Creating Boba Faucet Contract](#Step2--Creating-Boba-Faucet-Contract)
   * [Step3: Funding Turing Helper Contract](#Step3--Funding-Turing-Helper-Contract)
 
 ## Overview
 
-Boba Faucet is a system for getting Boba Rinkeby ETH and Boba Rinkeby Boba Token. It's implemented using the Turing. Turing is a system for interacting with the outside world from within solidity smart contracts.
-
-Before claiming the token, users have to answer the CAPTCHA. The answer is hashed and compared off-chain via Turing. Once the answer is verified, the smart contract releases the funds.
+Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Turing is a system for interacting with the outside world from within solidity smart contracts. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
 
 ## Directory Structure
 
@@ -26,7 +24,7 @@ Before claiming the token, users have to answer the CAPTCHA. The answer is hashe
 
 This procedure takes place in five steps:
 
-1. User gets the CAPTCHA image and UUID of the image
+1. User obtains the CAPTCHA image and the image UUID
 
    The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is 
 
@@ -37,9 +35,9 @@ This procedure takes place in five steps:
    }
    ```
 
-   > The UUID and hashed CAPTCHA answer are stored in the AWS Redis.
+   The UUID and hashed CAPTCHA answer are stored in AWS Redis.
 
-2. User sends the transaction to the `Boba Faucet` contract with UUID and CAPTCHA answer
+2. User sends a transaction to the `Boba Faucet` contract with the UUID and CAPTCHA answer
 
    ```javascript
    const BobaFaucet = new ethers.Contract(
@@ -51,17 +49,17 @@ This procedure takes place in five steps:
    await tx.wait()
    ```
 
-3. Geth sends the request to the backend and retrieves the result
+The answer is hashed in the `Boba Faucet` contract first before sending it to backend API.
 
-   >  The answer is hashed in the `Boba Faucet` contract first before sending it to backend API.
-   >
-   > ```
-   > bytes32 hashedKey = keccak256(abi.encodePacked(_key));
-   > bytes memory encRequest = abi.encodePacked(_uuid, hashedKey);
-   > bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
-   > ```
+```javascript
+    bytes32 hashedKey = keccak256(abi.encodePacked(_key));
+    bytes memory encRequest = abi.encodePacked(_uuid, hashedKey);
+    bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
+```
 
-   The POST request is sent to `https://api-turing.boba.network/verify.captcha` . It decodes the input and verifies the UUID with the hashed answer.
+3. Geth sends a request to the backend and retrieves the result
+
+   The POST request with the hashed answer is sent to `https://api-turing.boba.network/verify.captcha`. It decodes the input and verifies the UUID with the hashed answer.
 
    ```python
    paramsHexString = body['params'][0]
@@ -95,19 +93,22 @@ This procedure takes place in five steps:
 
 4. Geth atomically revises the calldata
 
-   On the contract level, we only need to decode the result from the Turing request and release the funds if the answer is correct.
+On the contract level, we decode the result from the Turing request and release the funds if the answer is correct.
 
-   ```solidity
-   // Decode the response from outside API
-   bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
-   uint256 result = abi.decode(encResponse,(uint256));
-   // Release the funds if it is correct
-   require(result == 1, 'Invalid key and UUID');
-   IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
-   ```
+```javascript
+    
 
-5. User gets the funds if the answer is correct or the error message
-   <img width="873" alt="image" src="https://user-images.githubusercontent.com/46272347/153475813-f4ffd103-3b95-4df7-a951-a321b84ff34a.png">
+    // Decode the response from outside API
+    bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
+    uint256 result = abi.decode(encResponse,(uint256));
+    // Release the funds if it is correct
+    require(result == 1, 'Captcha wrong');
+    IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
+```
+
+5. User obtains the funds if the answer is correct or sees and error message
+
+<img width="873" alt="image" src="https://user-images.githubusercontent.com/46272347/153475813-f4ffd103-3b95-4df7-a951-a321b84ff34a.png">
 
 ## Implementation
 
@@ -176,11 +177,11 @@ with open("env.yml", 'r') as ymlfile:
     return returnPayload(False)
 ```
 
-### Step2: Creating Boba Faucet Contract
+### Step2: Creating the Boba Faucet Contract
 
-The smart contract imports [Turing Helper Contract](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/contracts/TuringHelper.sol), so it can interact with outside API endpoints.
+The smart contract imports the [Turing Helper Contract](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/contracts/TuringHelper.sol), so it can interact with outside API endpoints.
 
-```solidity
+```javascript
 import './TuringHelper.sol';
 
 contract BobaFaucet is Ownable {
@@ -207,8 +208,7 @@ contract BobaFaucet is Ownable {
         // The key is hashed
         bytes32 hashedKey = keccak256(abi.encodePacked(_key));
         uint256 result = _verifyKey(_uuid, hashedKey);
-
-        require(result == 1, 'Invalid key and UUID');
+        require(result == 1, 'Captcha wrong');
 
         BobaClaimRecords[msg.sender] = block.timestamp;
         IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
