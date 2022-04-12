@@ -1,15 +1,12 @@
 {
   "name": "@eth-optimism/message-relayer",
   "version": "0.1.12",
-  "description": "[Optimism] Cross Domain Message Relayer service",
+  "description": "[Optimism] Service for automatically relaying L2 to L1 transactions",
   "main": "dist/index",
   "types": "dist/index",
   "files": [
     "dist/*"
   ],
-  "bin": {
-    "withdraw": "./src/exec/withdraw.ts"
-  },
   "scripts": {
     "start": "node ./exec/run-message-relayer.js",
     "build": "tsc -p ./tsconfig.build.json",
@@ -17,15 +14,14 @@
     "lint": "yarn lint:fix && yarn lint:check",
     "pre-commit": "lint-staged",
     "lint:fix": "yarn lint:check --fix",
-    "lint:check": "eslint .",
-    "test": "hardhat test --show-stack-traces",
-    "test:coverage": "nyc hardhat test && nyc merge .nyc_output coverage.json"
+    "lint:check": "eslint . --max-warnings=0"
   },
   "keywords": [
     "optimism",
     "ethereum",
     "relayer"
   ],
+  "homepage": "https://github.com/ethereum-optimism/optimism/tree/develop/packages/message-relayer#readme",
   "license": "MIT",
   "author": "Optimism PBC",
   "repository": {
@@ -34,30 +30,21 @@
   },
   "dependencies": {
     "@eth-optimism/common-ts": "^0.2.2",
-    "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "^0.8.1",
     "@eth-optimism/ynatm": "^0.2.2",
-    "@sentry/node": "6.2.5",
+    "@eth-optimism/sdk": "1.0.1",
+    "@sentry/node": "^6.3.1",
     "bcfg": "^0.1.6",
-    "dotenv": "^8.2.0",
-    "ethers": "^5.4.5",
-    "merkletreejs": "^0.2.18",
-    "node-fetch": "^2.6.1",
-    "rlp": "^2.2.6"
+    "dotenv": "^10.0.0",
+    "ethers": "^5.5.4",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "@eth-optimism/smock": "^1.1.9",
-    "@nomiclabs/ethereumjs-vm": "^4",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@types/chai": "^4.2.18",
-    "@types/chai-as-promised": "^7.1.4",
-    "@types/mocha": "^8.2.2",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "babel-eslint": "^10.1.0",
-    "chai": "^4.3.6",
-    "chai-as-promised": "^7.1.1",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
@@ -69,9 +56,7 @@
     "ethereum-waffle": "^3.3.0",
     "hardhat": "^2.3.0",
     "lint-staged": "11.0.0",
-    "lodash": "^4.17.21",
-    "mocha": "^8.4.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.1",
     "typescript": "^4.2.3"
   }
 }

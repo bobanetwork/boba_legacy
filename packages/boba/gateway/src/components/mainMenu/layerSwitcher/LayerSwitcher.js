@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { IconButton, Typography, useMediaQuery } from '@mui/material'
+import { IconButton, Typography, useMediaQuery, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { switchChain, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
@@ -29,7 +29,7 @@ import truncate from 'truncate-middle'
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
 
-function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = false }) {
+function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = false }) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -103,19 +103,19 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
           <S.LayerSwitcherIcon
             size='small'
             fullWidth={fullWidth}
-            onClick={() => dispatchSwitchLayer('L2')}
+            onClick={() => { dispatchSwitchLayer('L2') }}
           >
             <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill="white" fillOpacity="0.85"/>
+              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill="white" fillOpacity="0.85" />
             </svg>
           </S.LayerSwitcherIcon> :
           <S.LayerSwitcherIcon
             size='small'
             fullWidth={fullWidth}
-            onClick={() => dispatchSwitchLayer('L1')}
+            onClick={() => { dispatchSwitchLayer('L1') }}
           >
             <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill="white" fillOpacity="0.85"/>
+              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill="white" fillOpacity="0.85" />
             </svg>
           </S.LayerSwitcherIcon>
         }
@@ -193,31 +193,22 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
 
   return (
     <S.LayerSwitcherWrapper>
-      <IconButton
-        sx={{
-          gap: '5px',
-          opacity: !layer || layer === 'L2' ? '0.5' :'1',
-          border: layer === 'L1' ? 'solid white 3px' : '',
-      }}
-        onClick={() => { dispatchSwitchLayer('L1') }}
-        aria-label="eth"
+      <ToggleButtonGroup
+        value={layer}
+        exclusive
+        onChange={(e, n)=> dispatchSwitchLayer(n)}
+        aria-label="text alignment"
       >
-        <EthereumIcon />
-      </IconButton>
-      <IconButton
-        sx={{
-          gap: '5px',
-          opacity: !layer || layer === 'L1' ? '0.5' :'1',
-          border: layer === 'L2' ? 'solid white 3px' : '',
-      }}
-        onClick={() => { dispatchSwitchLayer('L2') }}
-        aria-label="boba"
-      >
-        <BobaIcon />
-      </IconButton>
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
+          <EthereumIcon />
+        </ToggleButton>
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
+          <BobaIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
@@ -228,7 +219,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
       </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-        <Typography component='p' variant="body4" sx={{opacity: 0.3}} >{wAddress}</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
     </S.LayerSwitcherWrapper>)
 }

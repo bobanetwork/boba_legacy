@@ -40,7 +40,7 @@ export const Style = styled(Box)`
   outline: 0;
   box-sizing: border-box;
   max-width: 100%;
-  border-radius: 12px;
+  border-radius: 20px;
 `;
 
 export const IconButtonTag = styled(IconButton)(({ theme }) => ({
@@ -60,3 +60,18 @@ export const WrapperActionsModal = styled(Box)`
    justify-content: flex-end;
    margin-top: 50px;
  `;
+
+ 
+export const ModalHead = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: '5px'
+}));
+
+
+export const Content = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap:'10px',
+}));

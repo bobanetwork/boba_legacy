@@ -9,10 +9,11 @@ import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import * as S from './Token.styles'
 import { tokenTableHeads } from './token.tableHeads'
-import TokenList from './tokenList/TokenList'
+import ListToken from 'components/listToken/listToken'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
+import Link from 'components/icons/LinkIcon'
 
 function TokenPage() {
 
@@ -24,6 +25,7 @@ function TokenPage() {
   const networkLayer = useSelector(selectLayer())
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
+  const layer = useSelector(selectLayer())
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
@@ -44,8 +46,9 @@ function TokenPage() {
         return 'omg'
       } else if(i.symbolL1 === 'BOBA') {
         return 'boba-network'
-      }
-      else {
+      } else if(i.symbolL1 === 'OLO') {
+        return 'oolongswap'
+      } else {
         return i.symbolL1.toLowerCase()
       }
     })
@@ -84,6 +87,23 @@ function TokenPage() {
   } else {
 
     return (
+    <>
+      {layer === 'L2' &&
+        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Typography variant="body2">
+            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
+            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
+            <S.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Oologswap <Link />
+            </S.footerLink>
+          </Typography>
+        </Box>
+      }
+
       <S.TokenPageContainer>
         <S.TokenPageContent>
           <S.TableHeading>
@@ -101,7 +121,7 @@ function TokenPage() {
           </S.TableHeading>
           {networkLayer === 'L2' ? !balanceLoading || !!childBalance.length ? childBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L2'}
@@ -114,7 +134,7 @@ function TokenPage() {
           </S.LoaderContainer> : null}
           {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L1'}
@@ -127,7 +147,7 @@ function TokenPage() {
           </S.LoaderContainer> : null}
         </S.TokenPageContent>
       </S.TokenPageContainer>
-    )
+    </>)
   }
 
 }

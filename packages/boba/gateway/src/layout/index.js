@@ -34,11 +34,13 @@ function App () {
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
 
+  const radioGreen = '#BAE21A'
+
   let MUItheme = createTheme({
     palette: {
       mode: theme === 'light' ? 'light' : 'dark',
       primary: {
-        main: '#BAE21A',
+        main: radioGreen,
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
       },
@@ -48,7 +50,7 @@ function App () {
       background: {
         default: light ? "#FFFFFF" : "#111315",
         secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.02)',
-        secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
+        secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
@@ -56,7 +58,7 @@ function App () {
       },
       neutral: {
         main: '#fff',
-        contrastText: '#BAE21A',
+        contrastText: radioGreen,
       },
     },
     typography: {
@@ -79,13 +81,18 @@ function App () {
       },
       body1: {
         fontSize: 18,
+        display: 'block'
       },
       body2: {
         fontSize: 16,
         fontWeight: 400,
+        lineHeight: '1.0em',
+        display: 'block'
       },
       body3: {
-        fontSize: '0.8em'
+        fontSize: 14,
+        lineHeight: '1.1em',
+        display: 'block'
       },
       body4: {
         fontSize: 12
@@ -120,27 +127,43 @@ function App () {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: '#BAE21A',
+              background: radioGreen,
+              borderWidth: '1.4px',
+              borderColor: radioGreen,
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: "#BAE21A",
+                backgroundColor: radioGreen,
               }
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: '#BAE21A' , //light ? '#000' : '#fff',
+              color: radioGreen, //light ? '#000' : '#fff',
               borderWidth: '1.4px',
-              borderColor: '#BAE21A',
+              borderColor: radioGreen,
               filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
               "&:hover": {
                 color: '#000',
-                borderColor: '#BAE21A',
-                backgroundColor: "#BAE21A",
+                borderColor: radioGreen,
+                backgroundColor: radioGreen,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              }
+            },
+          },
+          {
+            props: { variant: 'standard', color: 'primary' },
+            style: {
+              color: light ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.45)',
+              background: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+              borderWidth: '1.4px',
+              borderColor: radioGreen,
+              filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
+              "&:hover": {
+                color: radioGreen,
+                boxShadow: light ? 'none' : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }
             },
           },
@@ -186,6 +209,12 @@ function App () {
             props: { size: 'large'},
             style: {
               fontSize: '1rem',
+            },
+          },
+          {
+            props: { size: 'small'},
+            style: {
+              fontSize: '0.8rem',
             },
           },
         ],

@@ -23,7 +23,8 @@ import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-import Select from 'react-select'
+// import Select from 'react-select'
+import Select from 'components/select/Select'
 
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors/daoSelector'
@@ -45,17 +46,17 @@ function NewProposalModal({ open }) {
 
     const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
-    
+
     const proposalThreshold = useSelector(selectProposalThreshold)
 
-    const onActionChange = (e) => {
+  const onActionChange = (e) => {
         setVotingThreshold('')
         setLPfeeMin('')
         setLPfeeMax('')
         setLPfeeOwn('')
         setProposeText('')
         setProposalUri('')
-        setAction(e.value)
+        setAction(e.target.value)
     }
 
     function handleClose() {
@@ -70,10 +71,10 @@ function NewProposalModal({ open }) {
     }
 
     const options = [
-      { value: 'change-threshold', label: 'Change Voting Threshold' },
-      { value: 'text-proposal',    label: 'Freeform Text Proposal' },
-      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' },
-      { value: 'change-lp2-fee',   label: 'Change L2 LP fees' }
+      { value: 'change-threshold', label: 'Change Voting Threshold' ,title: 'Change Voting Threshold' },
+      { value: 'text-proposal',    label: 'Freeform Text Proposal' ,title: 'Freeform Text Proposal' },
+      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' ,title: 'Change L1 LP fees' },
+      { value: 'change-lp2-fee',   label: 'Change L2 LP fees',title: 'Change L2 LP fees' }
     ]
 
     const customStyles = {
@@ -83,15 +84,8 @@ function NewProposalModal({ open }) {
       }),
     }
 
-/*
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-*/
     const submit = async () => {
-        
+
         let res = null
 
         if (action === 'change-threshold') {
@@ -112,7 +106,7 @@ function NewProposalModal({ open }) {
               text: ''  //extra text if any
             }))
         }
-        
+
         if (res) {
             dispatch(openAlert(`Proposal has been submitted. It will be listed soon`))
         }
@@ -163,24 +157,25 @@ function NewProposalModal({ open }) {
                 New Proposal
                 </Typography>
             </Box>
-            
+
             <Box sx={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-                    {action === '' && 
+                    {action === '' &&
                         <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
-                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and 
-                        change to the bridge fee limits for the L1 and L2 bridge pools. 
+                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and
+                        change to the bridge fee limits for the L1 and L2 bridge pools.
                         </Typography>
-                    }
+            }
                     <Select
                         options={options}
-                        onChange={onActionChange}
+                        onSelect={onActionChange}
                         styles={customStyles}
-                        sx={{marginBottom: '20px'}} 
+                        sx={{ marginBottom: '20px' }}
+                        value={action}
                     >
                     </Select>
-                    {action === 'change-threshold' && 
+                    {action === 'change-threshold' &&
                     <>
-                        <Typography variant="body2" 
+                        <Typography variant="body2"
                             style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5'}}
                         >
                             The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
@@ -192,13 +187,13 @@ function NewProposalModal({ open }) {
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
                             fullWidth
-                            sx={{marginBottom: '20px'}} 
+                            sx={{marginBottom: '20px'}}
                         />
                     </>
                     }
-                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') && 
-                    <> 
-                        <Typography variant="body2" 
+                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
+                    <>
+                        <Typography variant="body2"
                             style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5'}}
                         >
                             Possible settings range from 0.0% to 5.0%.
@@ -230,9 +225,9 @@ function NewProposalModal({ open }) {
                         />
                     </>
                     }
-                    {action === 'text-proposal' && 
+                    {action === 'text-proposal' &&
                     <>
-                        <Typography variant="body2" 
+                        <Typography variant="body2"
                             style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
                         >
                             Your proposal title is limited to 100 characters. Use the link field below to provide more information.
@@ -240,13 +235,13 @@ function NewProposalModal({ open }) {
                         <Input
                             placeholder="Title (<100 characters)"
                             value={proposeText}
-                            onChange={(i)=>setProposeText(i.target.value.slice(0, 100))} 
+                            onChange={(i)=>setProposeText(i.target.value.slice(0, 100))}
                         />
-                        <Typography variant="body2" 
+                        <Typography variant="body2"
                             style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
                         >
-                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate 
-                            website. The link length is limited to 150 characters. You may need to use a link shortener. 
+                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate
+                            website. The link length is limited to 150 characters. You may need to use a link shortener.
                         </Typography>
                         <Input
                             placeholder="URI, https://..."

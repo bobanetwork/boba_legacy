@@ -63,6 +63,7 @@ export const CONTRACT_ADDRESSES: {
       StateCommitmentChain: '0xdE7355C971A5B733fe2133753Abd7e5441d441Ec',
       CanonicalTransactionChain: '0xfBd2541e316948B259264c02f370eD088E04c3Db',
       BondManager: '0x60660e6CDEb423cf847dD11De4C473130D65b627',
+      L1MultiMessageRelayer: '0x5fD2CF99586B9D92f56CbaD0A3Ea4DF256A0070B',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -76,6 +77,7 @@ export const CONTRACT_ADDRESSES: {
       StateCommitmentChain: '0x39e52546e091A28831414949B1601449be03b307',
       CanonicalTransactionChain: '0x321Bf0Df8F02FE665a7f7CcE31684A6dadB014b0',
       BondManager: '0xAF41D3399A91C43E8f2d70d9b47741b10CFA4Fc4',
+      L1MultiMessageRelayer: '0x5C6263BCAa00C7f5988E148dB3CA178e1262E69f',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -89,6 +91,7 @@ export const CONTRACT_ADDRESSES: {
       StateCommitmentChain: '0x1afcA918eff169eE20fF8AB6Be75f3E872eE1C1A',
       CanonicalTransactionChain: '0x2ebA8c4EfDB39A8Cd8f9eD65c50ec079f7CEBD81',
       BondManager: '0xE5AE60bD6F8DEe4D0c2BC9268e23B92F1cacC58F',
+      L1MultiMessageRelayer: '0x0000000000000000000000000000000000000000',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -102,6 +105,7 @@ export const CONTRACT_ADDRESSES: {
       StateCommitmentChain: '0xD7754711773489F31A0602635f3F167826ce53C5',
       CanonicalTransactionChain: '0xf7B88A133202d41Fe5E2Ab22e6309a1A4D50AF74',
       BondManager: '0xc5a603d273E28185c18Ba4d26A0024B2d2F42740',
+      L1MultiMessageRelayer: '0x0000000000000000000000000000000000000000',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -109,12 +113,13 @@ export const CONTRACT_ADDRESSES: {
   31337: {
     l1: {
       AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-      L1CrossDomainMessenger: '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1', // this is the Proxy__L1CrossDomainMessenger
-      L1CrossDomainMessengerFast: '0xf5059a5D33d5853360D16C683c16e67980206f36', // this is the Proxy__L1CrossDomainMessengerFast
-      L1StandardBridge: '0x4A679253410272dd5232B3Ff7cF5dbB88f295319',
-      StateCommitmentChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
-      CanonicalTransactionChain: '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82',
-      BondManager: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
+      L1CrossDomainMessenger: '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f', // this is the Proxy__L1CrossDomainMessenger
+      L1CrossDomainMessengerFast: '0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B', // this is the Proxy__L1CrossDomainMessengerFast
+      L1StandardBridge: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
+      StateCommitmentChain: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
+      CanonicalTransactionChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
+      BondManager: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
+      L1MultiMessageRelayer: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -301,6 +306,7 @@ export const getAllOEContracts = (
       StateCommitmentChain: undefined,
       CanonicalTransactionChain: undefined,
       BondManager: undefined,
+      L1MultiMessageRelayer: undefined,
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   }

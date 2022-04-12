@@ -314,11 +314,25 @@ class l1BridgeMonitorService extends OptimismEnv {
     const crossDomainMessages =
       await this.databaseService.getL1CrossDomainData()
     for (const eachCrossDomainMessage of crossDomainMessages) {
-      const [l1ToL2msgHash] = await this.watcher.getMessageHashesFromL1Tx(
+      const transaction = await this.L1Provider.getTransaction(
         eachCrossDomainMessage.hash
       )
-      const l2Message = await this.getL1ToL2TransactionReceipt(l1ToL2msgHash)
-      if (l2Message !== false) {
+      const resolved = await this.watcher.toCrossChainMessage(transaction)
+      const latestL2Block = await this.L2Provider.getBlockNumber()
+      let CDMReceipt = null
+      let i = 0
+      let l2Message = null
+      while (i < 4 && CDMReceipt == null) {
+        CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
+          fromBlock: latestL2Block - (i + 1) * 5000,
+          toBlock: latestL2Block - i * 5000,
+        })
+        i += 1
+      }
+      if (CDMReceipt !== null) {
+        l2Message = CDMReceipt.transactionReceipt
+      }
+      if (CDMReceipt !== null) {
         const l2Hash = l2Message.transactionHash
         const l2BlockNumber = Number(l2Message.blockNumber)
         const l2BlockHash = l2Message.blockHash
@@ -404,7 +418,7 @@ class l1BridgeMonitorService extends OptimismEnv {
 
   async getL1ToL2TransactionReceipt(l1ToL2msgHash) {
     const blockNumber = await this.L2Provider.getBlockNumber()
-    const startBlock = Math.max(blockNumber - 50000, 0)
+    const startBlock = Math.max(blockNumber - 5000, 0)
 
     const filter = {
       address: this.OVM_L2CrossDomainMessenger,

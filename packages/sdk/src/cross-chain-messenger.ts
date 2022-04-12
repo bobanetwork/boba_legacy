@@ -359,9 +359,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
   }
 
-  public async getMessageStatus(message: MessageLike): Promise<MessageStatus> {
+  public async getMessageStatus(
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
+    } = {}
+  ): Promise<MessageStatus> {
     const resolved = await this.toCrossChainMessage(message)
-    const receipt = await this.getMessageReceipt(resolved)
+
+    const receipt = await this.getMessageReceipt(resolved, opts)
 
     if (resolved.direction === MessageDirection.L1_TO_L2) {
       if (receipt === null) {
@@ -394,14 +401,18 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (receipt.receiptStatus === MessageReceiptStatus.RELAYED_SUCCEEDED) {
           return MessageStatus.RELAYED
         } else {
-          return MessageStatus.READY_FOR_RELAY
+          return MessageStatus.RELAYED_FAILED
         }
       }
     }
   }
 
   public async getMessageReceipt(
-    message: MessageLike
+    message: MessageLike,
+    opts?: {
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
+    }
   ): Promise<MessageReceipt> {
     const resolved = await this.toCrossChainMessage(message)
     const messageHash = hashCrossChainMessage(resolved)
@@ -418,7 +429,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
 
     const relayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.RelayedMessage(messageHash)
+      messenger.filters.RelayedMessage(messageHash),
+      opts?.fromBlock,
+      opts?.toBlock
     )
 
     // Great, we found the message. Convert it into a transaction receipt.
@@ -436,7 +449,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     // We didn't find a transaction that relayed the message. We now attempt to find
     // FailedRelayedMessage events instead.
     const failedRelayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.FailedRelayedMessage(messageHash)
+      messenger.filters.FailedRelayedMessage(messageHash),
+      opts?.fromBlock,
+      opts?.toBlock
     )
 
     // A transaction can fail to be relayed multiple times. We'll always return the last
@@ -469,6 +484,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       confirmations?: number
       pollIntervalMs?: number
       timeoutMs?: number
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
     } = {}
   ): Promise<MessageReceipt> {
     // Resolving once up-front is slightly more efficient.
@@ -477,7 +494,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let totalTimeMs = 0
     while (totalTimeMs < (opts.timeoutMs || Infinity)) {
       const tick = Date.now()
-      const receipt = await this.getMessageReceipt(resolved)
+      const receipt = await this.getMessageReceipt(resolved, opts)
       if (receipt !== null) {
         return receipt
       } else {
@@ -495,6 +512,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     opts: {
       pollIntervalMs?: number
       timeoutMs?: number
+      fromBlock?: BlockTag
+      toBlock?: BlockTag
     } = {}
   ): Promise<void> {
     // Resolving once up-front is slightly more efficient.
@@ -503,7 +522,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let totalTimeMs = 0
     while (totalTimeMs < (opts.timeoutMs || Infinity)) {
       const tick = Date.now()
-      const currentStatus = await this.getMessageStatus(resolved)
+      const currentStatus = await this.getMessageStatus(resolved, opts)
 
       // Handle special cases for L1 to L2 messages.
       if (resolved.direction === MessageDirection.L1_TO_L2) {
@@ -617,9 +636,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     } else {
       if (
         status === MessageStatus.RELAYED ||
-        status === MessageStatus.READY_FOR_RELAY
+        status === MessageStatus.READY_FOR_RELAY ||
+        status === MessageStatus.RELAYED_FAILED
       ) {
-        // Transactions that are relayed or ready for relay are considered complete.
+        // Transactions that are relayed or ready for relay or failed on first attempt are considered complete.
         return 0
       } else if (status === MessageStatus.STATE_ROOT_NOT_PUBLISHED) {
         // If the state root hasn't been published yet, just assume it'll be published relatively
@@ -905,6 +925,18 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     )
   }
 
+  public async finalizeBatchMessage(
+    messages: Array<MessageLike>,
+    opts?: {
+      signer?: Signer
+      overrides?: Overrides
+    }
+  ): Promise<TransactionResponse> {
+    return (opts?.signer || this.l1Signer).sendTransaction(
+      await this.populateTransaction.finalizeBatchMessage(messages, opts)
+    )
+  }
+
   public async depositETH(
     amount: NumberLike,
     opts?: {
@@ -1106,6 +1138,35 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     },
 
+    finalizeBatchMessage: async (
+      messages: Array<MessageLike>,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<TransactionRequest> => {
+      const batchMessage = []
+      for (const message of messages) {
+        const resolved = await this.toCrossChainMessage(message)
+
+        if (resolved.direction === MessageDirection.L1_TO_L2) {
+          throw new Error(`cannot finalize L1 to L2 message`)
+        }
+        const proof = await this.getMessageProof(resolved)
+        batchMessage.push({
+          target: resolved.target,
+          sender: resolved.sender,
+          message: resolved.message,
+          messageNonce: resolved.messageNonce,
+          proof,
+        })
+      }
+
+      return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
+        batchMessage,
+        opts?.overrides || {}
+      )
+    },
+
     depositETH: async (
       amount: NumberLike,
       opts?: {
@@ -1217,6 +1278,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<BigNumber> => {
       return this.l1Provider.estimateGas(
         await this.populateTransaction.finalizeMessage(message, opts)
+      )
+    },
+
+    finalizeBatchMessage: async (
+      messages: Array<MessageLike>,
+      opts?: {
+        overrides?: Overrides
+      }
+    ): Promise<BigNumber> => {
+      return this.l1Provider.estimateGas(
+        await this.populateTransaction.finalizeBatchMessage(messages, opts)
       )
     },
 

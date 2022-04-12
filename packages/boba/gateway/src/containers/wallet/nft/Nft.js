@@ -14,6 +14,9 @@ import networkService from 'services/networkService'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
+import Copy from 'components/copy/Copy'
+
+import truncate from 'truncate-middle'
 
 class Nft extends React.Component {
 
@@ -22,24 +25,52 @@ class Nft extends React.Component {
     super(props)
 
     const {
-      list
+      list,
+      monsterNumber,
+      monsterInfo
     } = this.props.nft
+
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
 
     this.state = {
       list,
       contractAddress: '',
       tokenID: '',
-      loading: this.props.loading[ 'NFT/ADD' ]
+      loading: this.props.loading[ 'NFT/ADD' ],
+      accountEnabled,
+      netLayer,
+      monsterNumber,
+      monsterInfo
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { list } = this.props.nft
+    const {
+      list,
+      monsterNumber,
+      monsterInfo
+    } = this.props.nft
+
+    const {
+      accountEnabled,
+      netLayer
+    } = this.props.setup
 
     if (!isEqual(prevState.nft.list, list)) {
       this.setState({ list })
+    }
+
+    if (!isEqual(prevState.nft.monsterNumber, monsterNumber)) {
+      this.setState({ monsterNumber })
+    }
+
+    if (!isEqual(prevState.nft.monsterInfo, monsterInfo)) {
+      this.setState({ monsterInfo })
     }
 
     if (!isEqual(prevState.loading[ 'NFT/ADD' ], this.props.loading[ 'NFT/ADD' ])) {
@@ -47,6 +78,14 @@ class Nft extends React.Component {
       if (this.props.loading[ 'NFT/ADD' ]) {
         this.setState({ contractAddress: '' })
       }
+    }
+
+    if (!isEqual(prevState.setup.accountEnabled, accountEnabled)) {
+      this.setState({ accountEnabled })
+    }
+
+    if (!isEqual(prevState.setup.netLayer, netLayer)) {
+      this.setState({ netLayer })
     }
 
   }
@@ -63,18 +102,20 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
+
   render() {
 
     const {
       list,
       contractAddress,
       tokenID,
-      loading
+      loading,
+      netLayer,
+      monsterInfo,
+      monsterNumber
     } = this.state
 
-    const layer = networkService.L1orL2
-
-    if (!layer) {
+    if (!netLayer) {
 
       return (
         <S.TokenPageContainer>
@@ -97,7 +138,7 @@ class Nft extends React.Component {
         </S.TokenPageContainer>
       )
 
-    } else if (layer === 'L1') {
+    } else if (netLayer === 'L1') {
 
       return (
         <S.TokenPageContainer>
@@ -122,7 +163,7 @@ class Nft extends React.Component {
 
     else {
 
-    return (
+      return (
         <S.NFTPageContainer>
           <S.NFTActionContent>
             <S.NFTFormContent>
@@ -134,6 +175,18 @@ class Nft extends React.Component {
                   </Typography>
                 </Box>
                 <S.DividerLine />
+                <Typography variant="body1" >
+                  <br/>Useful addresses
+                </Typography>
+                <Typography variant="body2" >
+                  Turing monsters:
+                </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                    0xce45...D793
+                  </Typography>
+                  <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
+                </Box>
               </Box>
               <Box sx={{
                 display: 'flex',
@@ -152,10 +205,10 @@ class Nft extends React.Component {
                 />
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Token Id
+                  Token ID
                 </Typography>
                 <Input
-                  placeholder='tokenID - e.g. 3'
+                  placeholder='TokenID - e.g. 3'
                   value={tokenID}
                   onChange={this.handleInputID}
                 // paste
@@ -172,26 +225,15 @@ class Nft extends React.Component {
                 {loading ? 'Adding NFT...' : 'Add NFT'}
               </Button>
             </S.NFTFormContent>
-            {/* <S.NFTFormContent>
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="body1" >
-                    Guess you need
-                  </Typography>
-                </Box>
-                <S.DividerLine />
-              </Box>
-            </S.NFTFormContent> */}
           </S.NFTActionContent>
-          <S.NFTListContainer dataempty={Object.keys(list).length === 0}>
+          <S.NFTListContainer data-empty={Object.keys(list).length === 0}>
             {Object.keys(list).length === 0 ?
               <Box>
-                  <Typography variant="body2"  sx={{opacity: 0.65}} >
-                    Please enter the contract address and tokenID to add NFT for display. 
-                  </Typography>  
-                  <Typography variant="body2"  sx={{opacity: 0.65}} >
-                    If you don't know your tokenID, you can look it up in blockexplorer. It's shown for mint or transfer events.
-                  </Typography>  
+                <Typography variant="body2"  sx={{opacity: 0.65}} >
+                  Please enter the contract address and TokenID to display an NFT.<br/>
+                  If you don't know your TokenID, you can look it up in the blockexplorer.<br/>
+                  It's shown for mint or transfer events.
+                </Typography>
               </Box>
               : <Grid
                 container
@@ -204,13 +246,13 @@ class Nft extends React.Component {
                   return (
                     <ListNFT
                       key={key_UUID}
-                      name={list[ v ].name}
-                      symbol={list[ v ].symbol}
-                      address={list[ v ].address}
-                      UUID={list[ v ].UUID}
-                      URL={list[ v ].url}
-                      meta={list[ v ].meta}
-                      tokenID={list[ v ].tokenID}
+                      name={list[v].name}
+                      symbol={list[v].symbol}
+                      address={list[v].address}
+                      UUID={list[v].UUID}
+                      URL={list[v].url}
+                      meta={list[v].meta}
+                      tokenID={list[v].tokenID}
                     />)
                 })
                 }
@@ -223,7 +265,8 @@ class Nft extends React.Component {
 
 const mapStateToProps = state => ({
   nft: state.nft,
-  loading: state.loading
+  loading: state.loading,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(Nft)

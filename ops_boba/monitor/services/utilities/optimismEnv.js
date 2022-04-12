@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const ethers = require('ethers')
-const core_utils_1 = require('@eth-optimism/core-utils')
+const { CrossChainMessenger } = require('@eth-optimism/sdk')
 const { Logger } = require('@eth-optimism/common-ts')
 const Mutex = require('async-mutex').Mutex
 const fetch = require('node-fetch')
@@ -249,15 +249,12 @@ class OptimismEnv {
     )
 
     // watcher
-    this.watcher = new core_utils_1.Watcher({
-      l1: {
-        provider: this.L1Provider,
-        messengerAddress: this.L1CrossDomainMessenger,
-      },
-      l2: {
-        provider: this.L2Provider,
-        messengerAddress: OVM_L2_CROSS_DOMAIN_MESSENGER,
-      },
+    const { chainId } = await this.L1Provider.getNetwork()
+    this.watcher = new CrossChainMessenger({
+      l1SignerOrProvider: this.L1Provider,
+      l2SignerOrProvider: this.L2Provider,
+      l1ChainId: chainId,
+      fastRelayer: false,
     })
 
     this.logger.info('Set up')

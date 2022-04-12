@@ -1,35 +1,62 @@
+import React, { useEffect, useState } from "react"
+import { useDispatch, useSelector } from 'react-redux'
+
+import Button from 'components/button/Button'
+
 import { Circle } from "@mui/icons-material"
 import { Box, CircularProgress, Typography } from '@mui/material'
-import { switchChain } from "actions/setupAction"
-import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import Link from 'components/icons/LinkIcon'
+
+import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
+import { openAlert, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
 import Nft from "containers/wallet/nft/Nft"
-import React, { useEffect, useState } from "react"
-import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectLayer } from "selectors/setupSelector"
-import Token from "./token/Token"
+import Token from './token/Token'
 import * as S from './wallet.styles'
+
+import {
+  selectAccountEnabled,
+  selectLayer,
+  selectBobaFeeChoice,
+  selectNetwork,
+} from "selectors/setupSelector"
+
+import { selectlayer2Balance } from 'selectors/balanceSelector'
+import { selectTransactions } from 'selectors/transactionSelector'
 
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
 import AlertIcon from 'components/icons/AlertIcon'
 import { isEqual, orderBy } from 'lodash'
-import { selectTransactions } from 'selectors/transactionSelector'
+
+import { POLL_INTERVAL } from "util/constant"
+import useInterval from "util/useInterval"
+
+import BN from 'bignumber.js'
+import { logAmount } from 'util/amountConvert.js'
 
 function Wallet() {
 
   const [ page, setPage ] = useState('Token')
   const [ chain, setChain ] = useState('')
+  const [ tooSmallETH, setTooSmallETH ] = useState(false)
+  const [ tooSmallBOBA, setTooSmallBOBA ] = useState(false)
 
   const dispatch = useDispatch()
 
-  const layer = useSelector(selectLayer());
+  const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const network = useSelector(selectNetwork())
+
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
-
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+
+  // low balance warnings
+  const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
   const now = Math.floor(Date.now() / 1000)
 
@@ -39,7 +66,7 @@ function Wallet() {
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
       i.action.status === "pending" &&
-      (now - i.timeStamp) < 500
+      (now - i.timeStamp) < 20
     ) {
       return true
     }
@@ -52,7 +79,7 @@ function Wallet() {
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
       i.action.status === "pending" &&
-      (now - i.timeStamp) < 500
+      (now - i.timeStamp) < 20
     ) {
       return true
     }
@@ -63,6 +90,32 @@ function Wallet() {
     ...pendingL1,
     ...pendingL2
   ]
+
+  useEffect(()=>{
+    if (accountEnabled)
+      dispatch(fetchTransactions())
+  },[ dispatch, accountEnabled ])
+
+  useEffect(()=>{
+    if (accountEnabled && l2Balances.length > 0)  {
+
+      const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
+      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
+
+      if (l2BalanceETH && l2BalanceETH.balance) {
+        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
+      }
+      if (l2BalanceBOBA && l2BalanceBOBA) {
+        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
+      }
+    }
+  },[ l2Balances, accountEnabled ])
+
+  useInterval(() => {
+    if (accountEnabled) {
+      dispatch(fetchTransactions())
+    }
+  }, POLL_INTERVAL)
 
   useEffect(() => {
     if (layer === 'L2') {
@@ -81,9 +134,42 @@ function Wallet() {
     }
   }
 
+  async function emergencySwap () {
+    if(network !== 'rinkeby') return
+    const res = await dispatch(getETHMetaTransaction())
+    if (res) dispatch(openAlert('Emergency Swap submitted'))
+  }
+
+  console.log("layer:", layer)
+  console.log("tooSmallETH:", tooSmallETH)
+  console.log("network:", network)
+
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />
+      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body3"
+              component="p"
+            >
+              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
+              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
+              If you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
+              </span>
+            </S.AlertText>
+          </S.AlertInfo>
+          <Button
+            onClick={()=>{emergencySwap()}}
+            color='primary'
+            variant='outlined'
+          >
+            EMERGENCY SWAP
+          </Button>
+        </S.LayerAlert>
+      }
 
       {!accountEnabled &&
         <S.LayerAlert>
@@ -136,7 +222,7 @@ function Wallet() {
             }}
             variant="text"
             component="span">
-            Bridging in progress...
+            Transaction in progress...
           </Typography>
         </S.PendingIndicator> : null}
       </S.WalletActionContainer>

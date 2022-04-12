@@ -33,10 +33,19 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
+import {
+  getMonsterInfo
+} from 'actions/nftAction'
+
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectBaseEnabled, 
+  selectAccountEnabled, 
+  selectNetwork, 
+  selectLayer
+} from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
 
@@ -46,20 +55,19 @@ import { selectAlert, selectError } from 'selectors/uiSelector'
 
 import DepositModal from 'containers/modals/deposit/DepositModal'
 import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
-import TransferModal from 'containers/modals/transfer/TransferModal'
-import ExitModal from 'containers/modals/exit/ExitModal'
 
-import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
+import TransferModal from 'containers/modals/transfer/TransferModal'
+import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
+
+import ExitModal from 'containers/modals/exit/ExitModal'
 
 import FarmWrapper from 'containers/farm/FarmWrapper'
 import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 
 import SaveWrapper from 'containers/save/SaveWrapper'
-import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
 
 import DAO from 'containers/dao/Dao'
-import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
@@ -73,7 +81,11 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import { 
+  fetchAirdropStatusL1, 
+  fetchAirdropStatusL2 
+} from 'actions/airdropAction'
+
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
 
@@ -84,6 +96,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
 
@@ -105,21 +118,21 @@ function Home() {
   const [ mobileMenuOpen ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
+
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
+  
   const transferModalState = useSelector(selectModalState('transferModal'))
+  const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
+  
   const exitModalState = useSelector(selectModalState('exitModal'))
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
 
-  const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
-  const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
-
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
 
-  const tranferBobaDaoModalState = useSelector(selectModalState('transferDaoModal'))
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
@@ -180,8 +193,9 @@ function Home() {
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
+      dispatch(getMonsterInfo())       // account specific
     }
-    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
@@ -196,12 +210,13 @@ function Home() {
     dispatch(fetchGas())
     dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
-  }, [dispatch, maintenance])
+  }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
+      dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -210,19 +225,16 @@ function Home() {
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!depositBatchModalState && <DepositBatchModal  open={depositBatchModalState} />}
+      {!!depositBatchModalState && <DepositBatchModal open={depositBatchModalState} />}
 
-      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
+      {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
+      {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
+
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
-
-      {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}
-
-      {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
 
       {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
-      {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
@@ -337,6 +349,9 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Monster" &&
+              <MonsterWrapper />
             }
           </Container>
           <PageFooter/>

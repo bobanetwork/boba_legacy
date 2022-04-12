@@ -17,6 +17,8 @@
 package core
 
 import (
+	"math/big"
+
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/consensus"
 	"github.com/ethereum-optimism/optimism/l2geth/consensus/misc"
@@ -101,10 +103,29 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	// Compute the fee related information that is to be included
 	// on the receipt. This must happen before the state transition
 	// to ensure that the correct information is used.
-	l1Fee, l1GasPrice, l1GasUsed, scalar, err := fees.DeriveL1GasInfo(msg, statedb)
-	if err != nil {
-		return nil, err
+	var (
+		l1Fee      *big.Int
+		l1GasPrice *big.Int
+		l1GasUsed  *big.Int
+		scalar     *big.Float
+	)
+
+	// Use updated L1GasData calculation once fee choice logic has
+	// been enabled
+	if config.IsFeeTokenUpdate(header.Number) {
+		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasDataInfo(msg, statedb)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		l1Fee, l1GasPrice, l1GasUsed, scalar, err = fees.DeriveL1GasInfo(msg, statedb)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	// Determine the L2 Boba fee if users chose BOBA as the fee token
+	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
 
 	// Apply the transaction to the current state (included in the env)
 	_, gas, failed, err := ApplyMessage(vmenv, msg, gp)
@@ -115,6 +136,13 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	}
 	if err != nil {
 		return nil, err
+	}
+
+	// Calculate the boba fee related information that is to be included
+	L2BobaFee := new(big.Int)
+	if feeTokenSelection.Cmp(common.Big1) == 0 {
+		bobaPriceRatio := statedb.GetBobaPriceRatio()
+		L2BobaFee = new(big.Int).Mul(big.NewInt(int64(gas)), new(big.Int).Mul(msg.GasPrice(), bobaPriceRatio))
 	}
 
 	// Update the state with pending changes
@@ -146,6 +174,7 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	receipt.BlockNumber = header.Number
 	receipt.TransactionIndex = uint(statedb.TxIndex())
 	receipt.Turing = vmenv.Context.Turing
+	receipt.L2BobaFee = L2BobaFee
 
 	return receipt, err
 }

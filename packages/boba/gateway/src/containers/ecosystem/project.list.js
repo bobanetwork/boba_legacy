@@ -11,6 +11,7 @@ import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
 import defiyieldLogo from '../../images/ecosystem/defiyield.webp'
 import dodoLogo from '../../images/ecosystem/dodo.webp'
+import domFiLogo from '../../images/ecosystem/dominanaceFinanace.webp'
 import fraxLogo from '../../images/ecosystem/frax.webp'
 import l2ChartsLogo from '../../images/ecosystem/l2Charts.webp'
 import layerSwapLogo from '../../images/ecosystem/layerswap.webp'
@@ -20,7 +21,6 @@ import OolongswapLogo from '../../images/ecosystem/Oolongswap.webp'
 import safepalLogo from '../../images/ecosystem/safepal.webp'
 import satisLogo from '../../images/ecosystem/satis.webp'
 import shibuiDAOLogo from '../../images/ecosystem/shibuidao.svg'
-import swapperChanLogo from '../../images/ecosystem/swapperChan.webp'
 import synLogo from '../../images/ecosystem/syn.webp'
 import thetanutsLogo from '../../images/ecosystem/thetanuts.webp'
 import tofuNftLogo from '../../images/ecosystem/tofuNft.webp'
@@ -28,6 +28,7 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
+import multiSigLogo from '../../images/ecosystem/multiSig.svg'
 
 /**
  * thematical order of type.
@@ -90,15 +91,14 @@ export const projectList = [
     "description": "The most widely used cross-chain liquidity network connecting all blockchains"
   },
   {
-    "title": "SwapperChan",
+    "title": "Domination Finance",
     "canLaunch": true,
-    "link": "https://swapperchan.com/swap",
-    "telegram": "https://t.me/swapperchan",
-    "twitter": "https://twitter.com/SwapperChan",
-    "discord": "https://discord.com/invite/u6V3g5gdpV",
+    "link": "https://domination.finance/",
+    "twitter": "https://twitter.com/dominationfi",
+    "discord": "https://discord.domination.finance/",
     "type": "defi",
-    "image": swapperChanLogo,
-    "description": "Decentralized Trading Platform"
+    "image": domFiLogo,
+    "description": "The world’s first DEX for dominance trading."
   },
   {
     "title": "Zencha",
@@ -119,7 +119,7 @@ export const projectList = [
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
     "type": "defi",
-    "image": unidexLogo, 
+    "image": unidexLogo,
     "description": "The meta-aggregator of everything in DeFi. Charts, perpetuals, swaps, limit-orders, data, and more everyday."
   },
   {
@@ -224,6 +224,14 @@ export const projectList = [
     "type": "tool",
     "image": bandProtocolLogo,
     "description": "Secure, scalable cross-chain decentralized "
+  },
+  {
+    "title": "Boba MultiSig",
+    "canLaunch": true,
+    "link": "https://multisig.boba.network/",
+    "type": "wallet",
+    "image": multiSigLogo,
+    "description": "The most trusted platform to manage digital assets on Ethereum"
   },
   {
     "title": "MEW",

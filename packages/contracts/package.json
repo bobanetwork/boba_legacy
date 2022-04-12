@@ -26,7 +26,7 @@
     "autogen:artifacts": "ts-node scripts/generate-artifacts.ts && ts-node scripts/generate-deployed-artifacts.ts",
     "test": "yarn test:contracts",
     "test:contracts": "hardhat test --show-stack-traces",
-    "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage && istanbul check-coverage --statements 82 --branches 66 --functions 76 --lines 83",
+    "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage && istanbul check-coverage --statements 79 --branches 63 --functions 71 --lines 79",
     "test:slither": "slither .",
     "pretest:slither": "rm -f @openzeppelin && rm -f @ens && rm -f hardhat && ln -s ../../node_modules/@openzeppelin @openzeppelin && ln -s ../../node_modules/@ens @ens && ln -s ../../node_modules/hardhat hardhat",
     "posttest:slither": "rm -f @openzeppelin && rm -f @ens && rm -f hardhat",

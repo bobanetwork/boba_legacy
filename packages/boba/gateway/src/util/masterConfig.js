@@ -129,6 +129,10 @@ const BaseServices = {
   COIN_GECKO_URL: `https://api.coingecko.com/api/v3/`,
   //ETH gas station
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
+  // Mainnet meta transaction
+  MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
+  // Rinkeby meta transaction
+  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
 }
 
 export function getNetwork () {

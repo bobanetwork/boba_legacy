@@ -72,6 +72,7 @@ type Receipt struct {
 	L1GasUsed  *big.Int   `json:"l1GasUsed" gencodec:"required"`
 	L1Fee      *big.Int   `json:"l1Fee" gencodec:"required"`
 	FeeScalar  *big.Float `json:"l1FeeScalar" gencodec:"required"`
+	L2BobaFee  *big.Int   `json:"L2BobaFee"`
 
 	// Using Turing
 	Turing []byte `json:"turing"`
@@ -99,6 +100,18 @@ type receiptRLP struct {
 
 // storedReceiptRLP is the storage encoding of a receipt.
 type storedReceiptRLP struct {
+	PostStateOrStatus []byte
+	CumulativeGasUsed uint64
+	Logs              []*LogForStorage
+	// UsingOVM
+	L1GasUsed  *big.Int
+	L1GasPrice *big.Int
+	L1Fee      *big.Int
+	FeeScalar  string
+	L2BobaFee  *big.Int
+}
+
+type storedReceiptRLPLegacy struct {
 	PostStateOrStatus []byte
 	CumulativeGasUsed uint64
 	Logs              []*LogForStorage
@@ -217,6 +230,7 @@ func (r *ReceiptForStorage) EncodeRLP(w io.Writer) error {
 		L1GasPrice:        r.L1GasPrice,
 		L1Fee:             r.L1Fee,
 		FeeScalar:         feeScalar,
+		L2BobaFee:         r.L2BobaFee,
 	}
 	for i, log := range r.Logs {
 		enc.Logs[i] = (*LogForStorage)(log)
@@ -247,32 +261,64 @@ func (r *ReceiptForStorage) DecodeRLP(s *rlp.Stream) error {
 
 func decodeStoredReceiptRLP(r *ReceiptForStorage, blob []byte) error {
 	var stored storedReceiptRLP
-	if err := rlp.DecodeBytes(blob, &stored); err != nil {
-		return err
-	}
-	if err := (*Receipt)(r).setStatus(stored.PostStateOrStatus); err != nil {
-		return err
-	}
-	r.CumulativeGasUsed = stored.CumulativeGasUsed
-	r.Logs = make([]*Log, len(stored.Logs))
-	for i, log := range stored.Logs {
-		r.Logs[i] = (*Log)(log)
-	}
-	r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
+	var storedLegacy storedReceiptRLPLegacy
+	err := rlp.DecodeBytes(blob, &stored)
+	if err != nil {
+		err = rlp.DecodeBytes(blob, &storedLegacy)
+		if err != nil {
+			return err
+		} else {
+			if err := (*Receipt)(r).setStatus(storedLegacy.PostStateOrStatus); err != nil {
+				return err
+			}
+			r.CumulativeGasUsed = storedLegacy.CumulativeGasUsed
+			r.Logs = make([]*Log, len(storedLegacy.Logs))
+			for i, log := range storedLegacy.Logs {
+				r.Logs[i] = (*Log)(log)
+			}
+			r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
 
-	// UsingOVM
-	scalar := new(big.Float)
-	if stored.FeeScalar != "" {
-		var ok bool
-		scalar, ok = scalar.SetString(stored.FeeScalar)
-		if !ok {
-			return errors.New("cannot parse fee scalar")
+			// UsingOVM
+			scalar := new(big.Float)
+			if storedLegacy.FeeScalar != "" {
+				var ok bool
+				scalar, ok = scalar.SetString(storedLegacy.FeeScalar)
+				if !ok {
+					return errors.New("cannot parse fee scalar")
+				}
+			}
+			r.L1GasUsed = storedLegacy.L1GasUsed
+			r.L1GasPrice = storedLegacy.L1GasPrice
+			r.L1Fee = storedLegacy.L1Fee
+			r.FeeScalar = scalar
+			r.L2BobaFee = common.Big0
 		}
+	} else {
+		if err := (*Receipt)(r).setStatus(stored.PostStateOrStatus); err != nil {
+			return err
+		}
+		r.CumulativeGasUsed = stored.CumulativeGasUsed
+		r.Logs = make([]*Log, len(stored.Logs))
+		for i, log := range stored.Logs {
+			r.Logs[i] = (*Log)(log)
+		}
+		r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
+
+		// UsingOVM
+		scalar := new(big.Float)
+		if stored.FeeScalar != "" {
+			var ok bool
+			scalar, ok = scalar.SetString(stored.FeeScalar)
+			if !ok {
+				return errors.New("cannot parse fee scalar")
+			}
+		}
+		r.L1GasUsed = stored.L1GasUsed
+		r.L1GasPrice = stored.L1GasPrice
+		r.L1Fee = stored.L1Fee
+		r.FeeScalar = scalar
+		r.L2BobaFee = stored.L2BobaFee
 	}
-	r.L1GasUsed = stored.L1GasUsed
-	r.L1GasPrice = stored.L1GasPrice
-	r.L1Fee = stored.L1Fee
-	r.FeeScalar = scalar
 
 	return nil
 }

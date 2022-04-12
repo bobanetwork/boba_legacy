@@ -15,7 +15,7 @@ export const NFTPageContainer = styled(Box)(({ theme }) => ({
   //   width: '90%',
   //   padding: '0px',
   // },
-  [theme.breakpoints.down('sm')]: {
+  [ theme.breakpoints.down('sm') ]: {
     width: '100%',
     padding: '0px',
     flexDirection: 'column',
@@ -28,7 +28,7 @@ export const NFTActionContent = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'flex-start',
   gap: '10px',
-  [theme.breakpoints.down('sm')]: {
+  [ theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
 }));
@@ -42,23 +42,22 @@ export const NFTFormContent = styled(Box)(({ theme }) => ({
   gap: '10px',
   height: 'fit-content',
   background: theme.palette.background.secondary,
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
-  },
-}));
-
-export const NFTListContainer = styled(Grid)(({ theme, dataempty }) => ({
-  width: '63%',
-  background: !!dataempty ? theme.palette.background.secondary : 'none',
-  padding: !!dataempty ? '10px' : 0,
-  borderRadius: !!dataempty ? '20px' : 0,
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
 }));
 
+export const NFTListContainer = styled(Grid)((props) => ({
+  width: '63%',
+  background: !props['data-empty'] ? props.theme.palette.background.secondary : 'none',
+  padding: !props['data-empty'] ? '10px' : 0,
+  borderRadius: !props['data-empty'] ? '20px' : 0,
+  [ props.theme.breakpoints.down('sm') ]: {
+    width: '100%',
+  },
+}))
 
-export const NFTPageContent = styled(Grid)(({theme}) => ({
+export const NFTPageContent = styled(Grid)(({ theme }) => ({
   marginTop: '20px',
   padding: '10px',
   borderRadius: '20px',
@@ -72,7 +71,7 @@ export const TableHeading = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   background: theme.palette.background.secondary,
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     marginBottom: "5px",
   },
 }))
@@ -100,7 +99,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
-  [theme.breakpoints.up('md')]: {
+  [ theme.breakpoints.up('md') ]: {
   },
 }));
 
@@ -114,10 +113,10 @@ export const AlertInfo = styled(Box)`
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderRadius: '8px',
   background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     padding: ' 30px 10px',
   },
-  [theme.breakpoints.up('md')]: {
+  [ theme.breakpoints.up('md') ]: {
     padding: '20px',
   },
 }));
@@ -127,7 +126,7 @@ export const GridItemTagContainer = styled(Grid)(({ theme, ...props }) => ({
   flexDirection: 'row',
   justifyContent: "left",
   alignItems: "center",
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column'
   }
 }));
@@ -154,27 +153,27 @@ export const DropdownWrapper = styled(Box)`
 export const DropdownContent = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column',
     gap: '0',
   },
-  [theme.breakpoints.up('md')]: {
+  [ theme.breakpoints.up('md') ]: {
     flexDirection: 'row',
     gap: '16px',
   },
 }));
 
-export const FarmActionContainer = styled(Box)(({theme})=>({
+export const FarmActionContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-around',
   alignItems: 'center',
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     width: '100%'
   }
 }))
 
-export const FarmListContainer = styled(Box)(({theme})=>({
-  [theme.breakpoints.down('md')]: {
+export const FarmListContainer = styled(Box)(({ theme }) => ({
+  [ theme.breakpoints.down('md') ]: {
     display: 'flex',
     flexDirection: 'column',
     gap: '5px'
@@ -210,9 +209,9 @@ export const BpIcon = styled('span')(({ theme }) => ({
 
 
 export const DividerLine = styled(Divider)(({ theme }) => ({
-  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
   boxSizing: 'border-box',
-  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 

@@ -1,11 +1,40 @@
+const axios = require('axios')
 const _ = require('lodash')
 const web3 = require('web3')
 const ethers = require('ethers')
 const fluxAggregatorJson = require('@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json')
 const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
-const { WebSocketProvider } = require('@ethersproject/providers')
+const addressesMainnet = require('@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089')
+const L2ERC20Json = require('@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json')
+const L2LPJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
 const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
+const { sleep } = require('@eth-optimism/core-utils')
+
+const supportedTokens = [
+  'USDT',
+  'DAI',
+  'USDC',
+  'WBTC',
+  'REP',
+  'BAT',
+  'ZRX',
+  'SUSHI',
+  'LINK',
+  'UNI',
+  'BOBA',
+  'OMG',
+  'FRAX',
+  'FXS',
+  'DODO',
+  'UST',
+  'BUSD',
+  'BNB',
+  'FTM',
+  'MATIC',
+  'UMA',
+  'DOM',
+]
 
 let l1PoolBalance
 let l1BlockNumber
@@ -22,6 +51,26 @@ const addressManager = new ethers.Contract(
   l1Provider
 )
 const bobaDecimal = (1e18).toString()
+
+const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
+const allTokenAddresses = {}
+
+for (const key of supportedTokens) {
+  if (addressesMainnet['TK_L2' + key]) {
+    allTokenAddresses[key] = addressesMainnet['TK_L2' + key]
+  }
+}
+
+const l2TestContract = new ethers.Contract(
+  allTokenAddresses['BOBA'],
+  L2ERC20Json.abi,
+  l2Provider
+)
+const L2LPContract = new ethers.Contract(
+  addressesMainnet.Proxy__L2LiquidityPool,
+  L2LPJson.abi,
+  l2Provider
+)
 
 const convertWeiToEther = (wei) => {
   return parseFloat(web3.utils.fromWei(wei.toString(), 'ether'))
@@ -45,6 +94,114 @@ const getOracleAmouts = () => {
     }
   }
   return result
+}
+
+const getL2LPInfoPromise = async (tokenAddress) => {
+  let tokenBalance
+  let tokenSymbol
+  let tokenName
+  let decimals
+
+  if (tokenAddress === L2_ETH_Address) {
+    tokenBalance = (
+      await l2Provider.getBalance(addressesMainnet.Proxy__L2LiquidityPool)
+    ).toString()
+    tokenSymbol = 'ETH'
+    tokenName = 'Ethereum'
+    decimals = 18
+  } else {
+    const contract = l2TestContract.attach(tokenAddress)
+    tokenBalance = (
+      await contract.balanceOf(addressesMainnet.Proxy__L2LiquidityPool)
+    ).toString()
+    tokenSymbol = await contract.symbol()
+    tokenName = await contract.name()
+    decimals = await contract.decimals()
+  }
+
+  const poolTokenInfo = await L2LPContract.poolInfo(tokenAddress)
+
+  return {
+    tokenAddress,
+    tokenBalance,
+    tokenSymbol,
+    tokenName,
+    poolTokenInfo,
+    decimals,
+  }
+}
+
+const logL2Pool = async (blockNumber) => {
+  const l2LPInfoPromise = []
+  Object.keys(allTokenAddresses).forEach((key) => {
+    l2LPInfoPromise.push(getL2LPInfoPromise(allTokenAddresses[key]))
+  })
+  const prices = await axios.get(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${supportedTokens.join()}&vs_currencies=usd`,
+    {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+  const l2LPInfos = await Promise.all(l2LPInfoPromise)
+  l2LPInfos.forEach((token) => {
+    const userIn = Number(token.poolTokenInfo.userDepositAmount.toString())
+    const rewards = Number(token.poolTokenInfo.accUserReward.toString())
+    const duration =
+      new Date().getTime() - Number(token.poolTokenInfo.startTime) * 1000
+    const durationDays = duration / (60 * 60 * 24 * 1000)
+    const annualRewardEstimate = (365 * rewards) / durationDays
+
+    let annualYieldEstimate = (100 * annualRewardEstimate) / userIn
+    if (!annualYieldEstimate) {
+      annualYieldEstimate = 0
+    }
+
+    const tokenData = {
+      blockNumber,
+      symbol: token.tokenSymbol,
+      name: token.tokenName,
+      decimals: token.decimals,
+      l1TokenAddress: token.poolTokenInfo.l1TokenAddress.toLowerCase(),
+      l2TokenAddress: token.poolTokenInfo.l2TokenAddress.toLowerCase(),
+      accUserReward: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.accUserReward,
+          token.decimals
+        )
+      ),
+      accUserRewardPerShare: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.accUserRewardPerShare,
+          token.decimals
+        )
+      ),
+      userDepositAmount: parseFloat(
+        ethers.utils.formatUnits(
+          token.poolTokenInfo.userDepositAmount,
+          token.decimals
+        )
+      ),
+      startTime: token.poolTokenInfo.startTime.toNumber(),
+      APR: annualYieldEstimate,
+      tokenBalance: parseFloat(
+        ethers.utils.formatUnits(token.tokenBalance, token.decimals)
+      ),
+    }
+
+    if (prices.data[token.tokenSymbol.toLowerCase()]) {
+      tokenData.priceUSD = prices.data[token.tokenSymbol.toLowerCase()].usd
+      tokenData.totalTokenUSDValue = tokenData.priceUSD * tokenData.tokenBalance
+    }
+
+    logger.info(`L2 ${token.tokenSymbol} token pool`, {
+      networkName: configs.OMGXNetwork.L2,
+      key: 'l2Pool',
+      data: tokenData,
+    })
+  })
 }
 
 const logBalance = (provider, blockNumber, networkName) => {
@@ -83,7 +240,7 @@ const logBalance = (provider, blockNumber, networkName) => {
               .toNumber()
           }
         } catch (e) {
-          logError(e.message, 'oracleAddressesFunds')
+          logError(e.message, 'oracleAddressesFunds')(e)
         }
       }
     })
@@ -114,16 +271,12 @@ const logBalance = (provider, blockNumber, networkName) => {
         })
       }
     })
-    .catch((err) => {
-      logger.error(`Get ${networkName} balance error`, {
-        networkName,
-        key: 'balance',
-        error: err.message,
-      })
-    })
+    .catch(
+      logError(`Get ${networkName} balance error`, 'balance', { networkName })
+    )
 }
 
-const logTransaction = (socket, trans, networkName, metadata) => {
+const logTransaction = (provider, trans, networkName, metadata, timestamp) => {
   // check from/to address is pool address
   const poolAddress =
     networkName === configs.OMGXNetwork.L1
@@ -138,30 +291,28 @@ const logTransaction = (socket, trans, networkName, metadata) => {
     return
   }
 
-  socket
+  return provider
     .getTransactionReceipt(trans.hash)
     .then((receipt) => {
-      try {
-        logger.info('transaction ' + trans.hash, {
-          key: 'transaction',
+      if (!receipt) {
+        return
+      }
+      logger.info('transaction ' + trans.hash, {
+        key: 'transaction',
+        timestamp,
+        poolAddress,
+        networkName,
+        data: _.omit(receipt, ['logs']),
+      })
+      receipt.logs.forEach((log) => {
+        logger.info('event ' + log.address, {
           poolAddress,
           networkName,
-          data: _.omit(receipt, ['logs']),
+          timestamp,
+          key: 'event',
+          data: log,
         })
-        receipt.logs.forEach((log) => {
-          logger.info('event ' + log.address, {
-            poolAddress,
-            networkName,
-            key: 'event',
-            data: log,
-          })
-        })
-      } catch (err) {
-        logError('Error while logging transaction receipt', 'receipt', {
-          ...metadata,
-          receipt,
-        })
-      }
+      })
     })
     .catch(
       logError('Error while getting transaction receipt', 'transaction', {
@@ -170,7 +321,7 @@ const logTransaction = (socket, trans, networkName, metadata) => {
     )
 }
 
-const logData = (socket, blockNumber, networkName) => {
+const logData = (provider, blockNumber, networkName) => {
   const poolAddress =
     networkName === configs.OMGXNetwork.L1
       ? configs.l1PoolAddress
@@ -181,43 +332,24 @@ const logData = (socket, blockNumber, networkName) => {
     poolAddress,
   }
 
-  return socket
+  return provider
     .getBlockWithTransactions(blockNumber)
     .then((block) => {
-      block?.transactions.forEach((trans) => {
-        logTransaction(socket, trans, networkName, metadata)
-      })
+      if (block && block.transactions && block.transactions.length) {
+        return Promise.all(
+          block.transactions.map((tx) => {
+            return logTransaction(
+              provider,
+              tx,
+              networkName,
+              metadata,
+              new Date(block.timestamp * 1000).toISOString()
+            )
+          })
+        )
+      }
     })
     .catch(logError('Error while getting block', 'block', { ...metadata }))
-}
-
-const onConnected = (networkName) => {
-  return (event) => {
-    logger.info(`${networkName} network connected`, {
-      url: event.target._url,
-      key: 'network',
-    })
-  }
-}
-
-const onError = (networkName, provider) => {
-  return async (event) => {
-    logger.error(`${networkName} network failed to connect`, {
-      networkName,
-      error: event.message,
-      url: event.target._url,
-      key: 'network',
-    })
-    await provider.destroy()
-    setTimeout(() => {
-      logger.info(`${networkName} reconnecting ...`, {
-        networkName,
-        url: event.target._url,
-        key: 'network',
-      })
-      setupProvider(networkName, event.target._url)
-    }, configs.monitoringReconnectSecs * 1000)
-  }
 }
 
 module.exports.validateMonitoring = () => {
@@ -230,8 +362,55 @@ module.exports.validateMonitoring = () => {
   )
 }
 
-const setupProvider = async (networkName, url) => {
-  const provider = new WebSocketProvider(url)
+const initConnection = async (networkName, url) => {
+  logger.info(`Trying to connect to the ${networkName} network...`, {
+    url,
+    key: 'network',
+  })
+  const provider = new ethers.providers.StaticJsonRpcProvider(url)
+
+  for (let i = 0; i < 10; i++) {
+    try {
+      await provider.detectNetwork()
+      logger.info(`Successfully connected to the ${networkName} network.`, {
+        url,
+        key: 'network',
+      })
+      break
+    } catch (err) {
+      if (i < 9) {
+        logger.error(`Unable to connect to ${networkName} network`, {
+          url,
+          key: 'network',
+          retryAttemptsRemaining: 9 - i,
+        })
+        await sleep(1000)
+      } else {
+        throw new Error(
+          `Unable to connect to the ${networkName} network, check that your ${networkName} endpoint is correct.`
+        )
+      }
+    }
+  }
+
+  return provider
+}
+
+const setupProvider = async (networkName, url, pollingIntervalSecond = 10) => {
+  let provider
+
+  while (!provider) {
+    try {
+      provider = await initConnection(networkName, url)
+      break
+    } catch (e) {
+      logError(e.message, 'network', { url })(e)
+    }
+    await sleep(configs.monitoringReconnectSecs * 1000)
+  }
+
+  let blockNumber = await provider.getBlockNumber()
+
   if (networkName === configs.OMGXNetwork.L1) {
     provider.on('debug', (info) => {
       if (info.action === 'request') {
@@ -252,27 +431,39 @@ const setupProvider = async (networkName, url) => {
             l2Provider
           ),
         })
-      } catch (e) {
-        logError(e.message, 'AddressManager', {
+      } catch (err) {
+        logError(err.message, 'AddressManager', {
           address: addressKey,
-        })
+        })(err)
       }
     }
   }
 
-  provider._websocket.addEventListener('open', onConnected(networkName))
-  provider._websocket.addEventListener('error', onError(networkName, provider))
-  provider
-    ._subscribe('block', ['newHeads'], (result) => {
-      const blockNumber = parseInt(result.number, 16)
-
-      // log transactions and events
-      logData(provider, result.number, networkName)
-
-      // log balances
-      logBalance(provider, blockNumber, networkName).catch()
+  while (true) {
+    const latestBlock = await provider.getBlockNumber()
+    logger.info(`Start monitoring to block ${latestBlock}`, {
+      network: networkName,
     })
-    .catch()
+    const logPromise = []
+
+    for (let i = blockNumber; i <= latestBlock; i++) {
+      // log transactions and events
+      logPromise.push(logData(provider, i, networkName))
+    }
+
+    // log balance
+    logPromise.push(logBalance(provider, latestBlock, networkName))
+
+    // log L2 pool
+    if (networkName === configs.OMGXNetwork.L2) {
+      logPromise.push(logL2Pool(latestBlock))
+    }
+
+    await Promise.all(logPromise)
+
+    blockNumber = latestBlock + 1
+    await sleep(pollingIntervalSecond * 1000)
+  }
 }
 
 module.exports.setupProvider = setupProvider

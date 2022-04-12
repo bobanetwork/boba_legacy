@@ -45,3 +45,27 @@ export function selectJustSwitchedChain () {
     return state.setup['justSwitchedChain']
   }
 }
+
+export function selectBobaFeeChoice () {
+  return function (state) {
+    return state.setup['bobaFeeChoice']
+  }
+}
+
+export function selectBobaPriceRatio () {
+  return function (state) {
+    return state.setup['bobaFeePriceRatio']
+  }
+}
+
+export function selectMonster () {
+  return function (state) {
+    return state.nft['monsterNumber']
+  }
+}
+
+export function selectMonsterInfo () {
+  return function (state) {
+    return state.nft['monsterInfo']
+  }
+}

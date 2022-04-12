@@ -1,5 +1,5 @@
-import { Box, Typography } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { Box, Typography, IconButton } from '@mui/material'
+import { styled } from '@mui/material/styles'
 
 export const TokenPageContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -117,3 +117,12 @@ export const AlertInfo = styled(Box)`
   align-items: center;
   flex: 1;
 `;
+
+export const footerLink = styled(IconButton)(({ theme }) => ({
+    svg: {
+      path: {
+        fill: theme.palette.primary.main,
+        fillOpacity: 1,
+      }
+    }
+}))

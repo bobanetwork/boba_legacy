@@ -146,7 +146,7 @@ describe('Basic RPC tests', () => {
       )
     })
 
-    it('{tag:rpc} should reject a transaction with too low of a fee', async () => {
+    it('{tag:rpc} should reject a transaction with a too low gas limit or too low', async () => {
       const isHH = await isHardhat()
       let gasPrice
       if (isHH) {
@@ -160,8 +160,18 @@ describe('Basic RPC tests', () => {
 
       const tx = {
         ...defaultTransactionFactory(),
-        gasPrice: 1,
+        gasPrice: 1000,
       }
+
+      const gasLimit = await env.l2Wallet.estimateGas(tx)
+      tx.gasLimit = gasLimit.toNumber() - 6000
+
+      await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
+        'invalid transaction: intrinsic gas too low'
+      )
+
+      tx.gasPrice = 1
+      tx.gasLimit = gasLimit.toNumber()
 
       await expect(env.l2Wallet.sendTransaction(tx)).to.be.rejectedWith(
         /gas price too low: 1 wei, use at least tx\.gasPrice = \d+ wei/
@@ -354,7 +364,7 @@ describe('Basic RPC tests', () => {
         const l1Fee =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
-          ).getL1Fee(raw)
+          ).getL1Fee('0x')
         const l1GasPrice =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
@@ -362,7 +372,7 @@ describe('Basic RPC tests', () => {
         const l1GasUsed =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
-          ).getL1GasUsed(raw)
+          ).getL1GasUsed('0x')
         const scalar =
           await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
             gasPriceOracleWallet
@@ -385,6 +395,7 @@ describe('Basic RPC tests', () => {
         expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
         expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
         expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
+        expect(json.l2BobaFee).to.deep.equal(BigNumber.from(0))
       })
     })
 
@@ -526,6 +537,28 @@ describe('Basic RPC tests', () => {
         await expect(
           env.l2Provider.send('eth_estimateGas', [revertingDeployTx])
         ).to.be.reverted
+      })
+
+      it('{tag:rpc} should return a constant gas estimate', async () => {
+        let gasPrice = 1
+        const standardGas = await env.l2Provider.estimateGas({
+          from: env.l2Wallet.address,
+          to: defaultTransactionFactory().to,
+          value: 1,
+          gasPrice: 0,
+          data: ethers.utils.hexlify(1234),
+        })
+        while (gasPrice < 10) {
+          const estimateGas = await env.l2Provider.estimateGas({
+            from: env.l2Wallet.address,
+            to: defaultTransactionFactory().to,
+            value: 1,
+            gasPrice,
+            data: ethers.utils.hexlify(1234),
+          })
+          expect(standardGas).to.deep.eq(estimateGas)
+          gasPrice += 1
+        }
       })
     })
 
