@@ -31,6 +31,8 @@ import { getToken } from 'actions/tokenAction'
 
 import {
   addNFT,
+  addMonster,
+  getNFTs
 } from 'actions/nftAction'
 
 import {
@@ -487,69 +489,68 @@ class NetworkService {
 
     console.log("triggering getETHMetaTransaction")
 
-    // const EIP712Domain = [
-    //   { name: 'name', type: 'string' },
-    //   { name: 'version', type: 'string' },
-    //   { name: 'chainId', type: 'uint256' },
-    //   { name: 'verifyingContract', type: 'address' },
-    // ]
-    // const Permit = [
-    //   { name: 'owner', type: 'address' },
-    //   { name: 'spender', type: 'address' },
-    //   { name: 'value', type: 'uint256' },
-    //   { name: 'nonce', type: 'uint256' },
-    //   { name: 'deadline', type: 'uint256' },
-    // ]
+    const EIP712Domain = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ]
+    const Permit = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ]
 
-    // const bobaFeeContract = new ethers.Contract(
-    //   allAddresses.Boba_GasPriceOracle,
-    //   Boba_GasPriceOracleJson.abi,
-    //   this.provider.getSigner()
-    // )
+    const owner = this.account
+    const spender = allAddresses.Boba_GasPriceOracle
 
-    // const name = await this.BobaContract.name()
-    // const version = '1'
-    // const chainId = (await this.L2Provider.getNetwork()).chainId
+    const Boba_GasPriceOracle = new ethers.Contract(
+      allAddresses.Boba_GasPriceOracle,
+      Boba_GasPriceOracleJson.abi,
+      this.provider.getSigner()
+    )
 
-    // const owner = this.account
-    // const spender = bobaFeeContract.address
-    // const value = (await bobaFeeContract.metaTransactionFee()).toNumber()
-    // const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
-    
-    // // 5 minutes
-    // const deadline = Math.floor(Date.now() / 1000) + 300
-    // const verifyingContract = this.BobaContract.address
+    let value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
+    const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
+    const deadline = Math.floor(Date.now() / 1000) + 300
+    const verifyingContract = this.BobaContract.address
 
-    // const data = {
-    //   primaryType: 'Permit',
-    //   types: { EIP712Domain, Permit },
-    //   domain: { name, version, chainId, verifyingContract },
-    //   message: { owner, spender, value, nonce, deadline },
-    // }
+    const name = await this.BobaContract.name()
+    const version = '1'
+    const chainId = (await this.L2Provider.getNetwork()).chainId
 
-    // let signature
-    // try {
-    //   signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
-    // } catch (error) {
-    //   console.log(error)
-    //   return error
-    // }
-    // // Send request
-    // try {
-    //   const response = await metaTransactionAxiosInstance(
-    //     this.networkGateway
-    //   ).post('/send.useBobaAsFeeToken', { owner, spender, value, deadline, signature, data })
-    //   console.log("response",response)
-    //   await this.getBobaFeeChoice()
-    // } catch (error) {
-    //   console.log(error)
-    //   // sigh
-    //   let errorData = error.response.data.error
-    //   if(errorData.hasOwnProperty('error')) {
-    //     errorData = errorData.error.error.body
-    //   }
-    //   return errorData
-    // }
+    const data = {
+      primaryType: 'Permit',
+      types: { EIP712Domain, Permit },
+      domain: { name, version, chainId, verifyingContract },
+      message: { owner, spender, value, nonce, deadline },
+    }
+
+    let signature
+    try {
+      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.swapBOBAForETH', { owner, spender, value, deadline, signature, data })
+      console.log("response",response)
+      await this.getBobaFeeChoice()
+    } catch (error) {
+      console.log(error)
+      // sigh
+      let errorData = error.response.data.error
+      if(errorData.hasOwnProperty('error')) {
+        errorData = errorData.error.error.body
+      }
+      return errorData
+    }
   }
 
   async getAddress(contractName, varToSet) {
@@ -904,7 +905,7 @@ class NetworkService {
       return 'enabled'
 
     } catch (error) {
-      console.log(`NS: ERROR :InitializeBase `,error)
+      console.log(`NS: ERROR: InitializeBase `,error)
       return false
     }
   }
@@ -1203,6 +1204,68 @@ class NetworkService {
     } else {
       return []
     }
+  }
+
+  async checkMonster() {
+
+    const NFTs = getNFTs()
+    //console.log("NFTs:",NFTs)
+    let validMonsters = []
+
+    try {
+
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      const monsterBalance = await contract.balanceOf(this.account)
+
+      let monsterType = 0
+      let topMagic = 0
+      let topTop = 0
+
+      if(NFTs && Number(monsterBalance) > 0) {
+        for (const [key, value] of Object.entries(NFTs)) {
+          //console.log(`${key}: ${value.name}`)
+          if(value.name === 'TuringMonster') {
+            const owner = await contract.ownerOf(value.tokenID)
+            //console.log("owner:", owner)
+            if(owner.toLowerCase() === this.account.toLowerCase()) {
+              const attributes = {
+                top:   value.meta.attributes[3].value,
+                magic: value.meta.attributes[4].value,
+              }
+              if(value.meta.attributes[3].value === 'crown') topTop = 1
+              if(value.meta.attributes[4].value === 'wizzard') topMagic = 1
+              validMonsters.push({tokenID: value.tokenID, attributes})
+            }
+          }
+        }
+
+        if(topMagic === 0 && topTop === 0) {
+          validMonsters.push({monsterType: 'basic'})
+        } else if (topMagic === 0 && topTop === 1) {
+          validMonsters.push({monsterType: 'crowned'})
+        } else if (topMagic === 1 && topTop === 0) {
+          validMonsters.push({monsterType: 'wizard'})
+        } else if (topMagic === 1 && topTop === 1) {
+          validMonsters.push({monsterType: 'crowned wizard'})
+        }
+
+        //console.log("adding monster info:",validMonsters)
+        await addMonster( validMonsters )
+
+      }
+
+      return Number(monsterBalance.toString())
+
+    } catch (error) {
+      console.log("NS: checkMonster error:",error)
+      return error
+    }
+
   }
 
   async addNFT( address, tokenID ) {
@@ -2580,7 +2643,7 @@ class NetworkService {
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
       // console.log("Yes we have ETH")
       // add value field
-      otherField['value'] = value_Wei_String 
+      otherField['value'] = value_Wei_String
     }
 
     try {
@@ -2605,17 +2668,17 @@ class NetworkService {
   async liquidityEstimate(currency) {
 
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -2632,9 +2695,9 @@ class NetworkService {
       console.log("benchmarkAllowance", allowance_BN.toString() )
 
       if( currency === allAddresses.L2_ETH_Address ) {
-        otherField['value'] = allowance_BN.toString() 
+        otherField['value'] = allowance_BN.toString()
       }
-      
+
       // second, we need the approval cost if non-ETH
       if( currency !== allAddresses.L2_ETH_Address ) {
 
@@ -2642,7 +2705,7 @@ class NetworkService {
           .populateTransaction
           .approve(
             allAddresses.L2LPAddress,
-            allowance_BN.toString(), 
+            allowance_BN.toString(),
             otherField
           )
 
@@ -2650,7 +2713,7 @@ class NetworkService {
         approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
-       
+
       // third, we need the addLiquidity cost
       const tx2 = await this.L2LPContract
         .connect(this.provider)
@@ -2673,7 +2736,7 @@ class NetworkService {
       console.log('NS: liquidityEstimate() error', error)
       return error
     }
-  
+
   }
 
   /***********************************************/
@@ -3594,13 +3657,25 @@ class NetworkService {
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
+/*
+        // for text only proposals, set target to a null address
+         const addresses = ['0x000000000000000000000000000000000000dEaD'] // the address of the contract where the function will be called
+        const values = [0] // the eth necessary to send to the contract above
+        const signatures = [''] // the function that will carry out the proposal
+
+        const calldatas = [
+           '0x0000000000000000000000000000000000000000000000000000000000000000',
+         ]
+
+         const description = '# Text only proposal' // the description of the proposal
+         */
+
     if( payload.action === 'text-proposal' ) {
-      address = [delegateCheck.address] // anything will do, as long at it's not blank
+      address = ['0x000000000000000000000000000000000000dEaD']
       description = payload.text.slice(0, 252) //100+150+2
-      callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
-        ['uint256'],
-        [value1]
-      )]
+      callData = [
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ]
     } else if ( payload.action === 'change-lp1-fee' ) {
       signatures = ['configureFeeExits(uint256,uint256,uint256)']
       value1 = Number(payload.value[0])
@@ -3863,19 +3938,21 @@ class NetworkService {
   }
 
   async savingEstimate() {
-    
+
+    // used to generate gas estimates for contracts that cannot set amount === 0
+    // to avoid need to approve amount
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -3893,7 +3970,7 @@ class NetworkService {
         .populateTransaction
         .approve(
           allAddresses.BobaFixedSavings,
-          allowance_BN.toString(), 
+          allowance_BN.toString(),
         )
 
       const approvalGas_BN = await this.provider.estimateGas(tx1)

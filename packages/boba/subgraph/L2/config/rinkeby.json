@@ -12,6 +12,9 @@
     },
     "Boba_GasPriceOracle": {
       "address": "0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b"
+    },
+    "TuringMonsters": {
+      "address": "0x757b8E819d91659844E44F2141402831B60Fa4EE"
     }
   }
 }

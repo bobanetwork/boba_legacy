@@ -21,6 +21,7 @@ export interface OEL1Contracts {
   CanonicalTransactionChain: Contract
   BondManager: Contract
   L1MultiMessageRelayer: Contract
+  L1MultiMessageRelayerFast: Contract
 }
 
 /**

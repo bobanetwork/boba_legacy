@@ -97,13 +97,14 @@ class FarmDepositModal extends React.Component {
 
   async getMaxTransferValue() {
 
-    const { 
-      stakeToken, 
-      bobaFeeChoice, 
-      bobaFeePriceRatio, 
-      netLayer 
+    const {
+      stakeToken,
+      bobaFeeChoice,
+      bobaFeePriceRatio,
+      netLayer
     } = this.state
 
+    let max_BN = BigNumber.from(stakeToken.balance.toString())
     if (netLayer === 'L2') {
 
       let cost_BN = await networkService
@@ -111,7 +112,6 @@ class FarmDepositModal extends React.Component {
           stakeToken.currency
         )
 
-      let max_BN = BigNumber.from(stakeToken.balance.toString())
       let fee = '0'
 
       // both ETH and BOBA have 18 decimals so this is safe
@@ -133,14 +133,14 @@ class FarmDepositModal extends React.Component {
       else if (stakeToken.symbol === 'BOBA' && !bobaFeeChoice) {
         // make sure user maintains minimum BOBA in account
         max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-      } 
+      }
       else {
         // do not adjust max_BN
       }
 
       if(bobaFeeChoice)
         fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
-      else 
+      else
         fee = utils.formatUnits(cost_BN, stakeToken.decimals)
 
       // if the max amount is less than the gas,
@@ -149,17 +149,17 @@ class FarmDepositModal extends React.Component {
         max_BN = BigNumber.from('0')
       }
 
-      this.setState({ 
+      this.setState({
         max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals),
         fee
       })
 
     }
     else {
-      this.setState({ 
-        max_Float_String: utils.formatUnits(stakeToken.balance, stakeToken.decimals) 
+      this.setState({
+        max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals)
       })
-    } 
+    }
   }
 
   handleClose() {
@@ -168,9 +168,9 @@ class FarmDepositModal extends React.Component {
 
   handleStakeValue( value ) {
 
-    const { 
-      stakeToken, 
-      max_Float_String 
+    const {
+      stakeToken,
+      max_Float_String
     } = this.state
 
     if (value &&
@@ -193,9 +193,9 @@ class FarmDepositModal extends React.Component {
 
   async handleApprove() {
 
-    const { 
-      stakeToken, 
-      value_Wei_String 
+    const {
+      stakeToken,
+      value_Wei_String
     } = this.state
 
     this.setState({ loading: true })
@@ -228,9 +228,9 @@ class FarmDepositModal extends React.Component {
 
   async handleConfirm() {
 
-    const { 
-      stakeToken, 
-      value_Wei_String 
+    const {
+      stakeToken,
+      value_Wei_String
     } = this.state
 
     this.setState({ loading: true })
@@ -261,7 +261,7 @@ class FarmDepositModal extends React.Component {
       max_Float_String,
       netLayer,
       bobaFeeChoice,
-      fee 
+      fee
     } = this.state
 
     const { approvedAllowance } = this.props.farm
@@ -273,14 +273,14 @@ class FarmDepositModal extends React.Component {
       new BN(approvedAllowance).gte(powAmount(stakeValue, stakeToken.decimals))
     ) {
       allowanceGTstake = true
-    } else if (Number(stakeValue) > 0 && 
+    } else if (Number(stakeValue) > 0 &&
       stakeToken.symbol === 'ETH'
     ) {
       //do not need to approve ETH
       allowanceGTstake = true
     }
 
-    // we do this because there is no fee estimation logic (yet) for this 
+    // we do this because there is no fee estimation logic (yet) for this
     // on L1
     let allowUseAll = netLayer === 'L2' ? true : false
 
