@@ -11,7 +11,8 @@ for building boba's stack.
    Make sure to follow the instructions at the end of the install, for example
    reload your shell profile or run the shell script.
 2. Run the command:
-    nix --experimental-features 'nix-command flakes' develop 'github:bobanetwork/boba/nix'
+
+    `nix --experimental-features 'nix-command flakes' develop 'github:bobanetwork/boba/nix'`
 
 This will drop you into a shell with various tools and commands to build Boba
 Network's stack. It should print a menu for these commands. For example, to
