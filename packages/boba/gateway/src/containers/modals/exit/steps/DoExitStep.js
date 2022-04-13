@@ -43,16 +43,18 @@ import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
-import { 
+import {
   fetchClassicExitCost,
-  fetchL2BalanceETH, 
-  fetchL2BalanceBOBA, 
+  fetchL2BalanceETH,
+  fetchL2BalanceBOBA,
+  fetchExitFee,
 } from 'actions/balanceAction'
 
-import { 
+import {
   selectClassicExitCost, //estimated total cost of this exit
   selectL2BalanceETH,
   selectL2BalanceBOBA,
+  selectExitFee,
 } from 'selectors/balanceSelector'
 
 function DoExitStep({ handleClose, token }) {
@@ -82,13 +84,15 @@ function DoExitStep({ handleClose, token }) {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
   const feePriceRatio = useSelector(selectBobaPriceRatio())
 
+  const exitFee = useSelector(selectExitFee)
+
   function setAmount(value) {
 
     const balance = Number(logAmount(token.balance, token.decimals))
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(max_Float))
-  
+
     setErrorString('')
 
     if (tooSmall || tooBig) {
@@ -96,11 +100,11 @@ function DoExitStep({ handleClose, token }) {
       setValidValue(false)
       setValue(value)
       return false
-    } 
+    }
     else if (
       !feeUseBoba && // check is needed regardless of fee token choice
-      token.symbol === 'ETH' && 
-      (Number(value) + feeETH) > balance) 
+      token.symbol === 'ETH' &&
+      (Number(value) + feeETH) > balance)
     {
       // insufficient ETH to cover the ETH amount plus gas
       // due to MetaMask issue, this is needed even if you are paying in ETH
@@ -111,8 +115,8 @@ function DoExitStep({ handleClose, token }) {
     }
     else if (
       feeUseBoba && // check is needed regardless of fee token choice
-      token.symbol === 'ETH' && 
-      (Number(value) + feeETH) > balance) 
+      token.symbol === 'ETH' &&
+      (Number(value) + feeETH) > balance)
     {
       // insufficient ETH to cover the ETH amount plus gas
       // due to MetaMask issue, this is needed even if you are paying in ETH
@@ -123,8 +127,8 @@ function DoExitStep({ handleClose, token }) {
     }
     else if (
       feeUseBoba &&
-      token.symbol === 'BOBA' && 
-      (Number(value) + feeBOBA) > balance) 
+      token.symbol === 'BOBA' &&
+      (Number(value) + feeBOBA) > balance)
     {
       // insufficient BOBA to cover the BOBA amount plus gas
       setErrorString('Warning: BOBA amount + fees > balance')
@@ -134,7 +138,7 @@ function DoExitStep({ handleClose, token }) {
     }
     else if (
       !feeUseBoba &&
-      feeETH > Number(feeBalanceETH)) 
+      feeETH > Number(feeBalanceETH))
     {
       // insufficient ETH to cover exit fees
       setErrorString('Warning: ETH balance too low.')
@@ -144,7 +148,7 @@ function DoExitStep({ handleClose, token }) {
     }
     else if (
       feeUseBoba &&
-      feeETH > Number(feeBalanceETH)) 
+      feeETH > Number(feeBalanceETH))
     {
       // insufficient ETH to cover exit fees
       setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
@@ -154,7 +158,7 @@ function DoExitStep({ handleClose, token }) {
     }
     else if (
       feeUseBoba &&
-      feeBOBA > Number(feeBalanceBOBA)) 
+      feeBOBA > Number(feeBalanceBOBA))
     {
       // insufficient BOBA to cover exit fees
       setErrorString('Warning: BOBA balance too low')
@@ -208,13 +212,14 @@ function DoExitStep({ handleClose, token }) {
       dispatch(fetchClassicExitCost(token.address))
       dispatch(fetchL2BalanceETH())
       dispatch(fetchL2BalanceBOBA())
+      dispatch(fetchExitFee())
     }
   }, [ token, dispatch ])
 
   useEffect(() => {
 
     function estimateMax() {
-      
+
       const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
       console.log("ETH fees:", safeCost)
       console.log("BOBA fees:", safeCost * feePriceRatio)
@@ -230,13 +235,13 @@ function DoExitStep({ handleClose, token }) {
           setMax_Float(balance - safeCost)
         else
           setMax_Float(0.0)
-      } 
+      }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
         if(balance - safeCost > 0.0)
           setMax_Float(balance - safeCost)
         else
           setMax_Float(0.0)
-      } 
+      }
       else {
         setMax_Float(balance)
       }
@@ -248,17 +253,17 @@ function DoExitStep({ handleClose, token }) {
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA` 
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH` 
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
-  // prohibit ExitAll when paying with the token that is to be exited 
+  // prohibit ExitAll when paying with the token that is to be exited
   let allowExitall = true
   if(token.symbol === 'ETH') {
     allowExitall = false
-  } 
+  }
   else if (token.symbol === 'BOBA' && feeUseBoba) {
     allowExitall = false
   }
@@ -281,6 +286,7 @@ function DoExitStep({ handleClose, token }) {
               setValue_Wei_String(toWei_String(i.target.value, token.decimals))
             }}
             onUseMax={(i)=>{//they want to use the maximum
+              console.log(i)
               setAmount(max_Float) //so the display value updates for the user
               setValue_Wei_String(token.balance.toString())
             }}
@@ -304,11 +310,15 @@ function DoExitStep({ handleClose, token }) {
               on L1. Your funds will be available on L1 in 7 days.`}
           </Typography>
         )}
-        
+
         <Typography variant="body2" sx={{mt: 2}}>
           {parse(ETHstring)}
         </Typography>
-        
+
+        <Typography variant="body2" sx={{mt: 2}}>
+          {parse(`Exit Fee: ${exitFee} BOBA`)}
+        </Typography>
+
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {errorString}

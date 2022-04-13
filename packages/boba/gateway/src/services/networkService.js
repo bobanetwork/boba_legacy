@@ -53,7 +53,7 @@ import L2ERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L
 import OVM_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json'
 
 // Boba contracts
-import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+import DiscretionaryExitFeeJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
 import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
@@ -61,6 +61,7 @@ import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2Standa
 import Boba from "@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
 import GovernorBravoDelegate from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
+import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json"
 
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
@@ -115,6 +116,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   }
 }
 let allTokens = {}
+
+const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
 
 class NetworkService {
 
@@ -647,7 +650,6 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
       //if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
@@ -2266,32 +2268,62 @@ class NetworkService {
     updateSignatureStatus_exitTRAD(false)
 
     try {
+
+      const L2BillingContract = new ethers.Contract(
+        allAddresses.Proxy__BobaBillingContract,
+        L2BillingContractJson.abi,
+        this.L2Provider,
+      )
+      let BobaApprovalAmount = await L2BillingContract.exitFee()
+
       //now coming in as a value_Wei_String
       const value = BigNumber.from(value_Wei_String)
 
       const allowance = await this.checkAllowance(
         currencyAddress,
-        allAddresses.DiscretionaryExitBurn
+        allAddresses.DiscretionaryExitFee
       )
 
-      //no need to approve L2 ETH
-      if( currencyAddress !== allAddresses.L2_ETH_Address && allowance.lt(value) ) {
+      const BobaAllowance = await this.checkAllowance(
+        allAddresses.TK_L2BOBA,
+        allAddresses.DiscretionaryExitFee
+      )
+
+      if (utils.getAddress(currencyAddress) === utils.getAddress(allAddresses.TK_L2BOBA)) {
+        BobaApprovalAmount = BobaApprovalAmount.add(value)
+      }
+
+      // Should approve BOBA
+      if ( BobaAllowance.lt(BobaApprovalAmount) ) {
         const res = await this.approveERC20(
-          value_Wei_String,
-          currencyAddress,
-          allAddresses.DiscretionaryExitBurn
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.DiscretionaryExitFee
         )
         if (!res) return false
       }
 
-      const DiscretionaryExitBurnContract = new ethers.Contract(
-        allAddresses.DiscretionaryExitBurn,
-        DiscretionaryExitBurnJson.abi,
+      // Should approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+          utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA) &&
+          allowance.lt(value)
+        ) {
+        const res = await this.approveERC20(
+          value,
+          currencyAddress,
+          allAddresses.DiscretionaryExitFee
+        )
+        if (!res) return false
+      }
+
+      const DiscretionaryExitFeeContract = new ethers.Contract(
+        allAddresses.DiscretionaryExitFee,
+        DiscretionaryExitFeeJson.abi,
         this.provider.getSigner()
       )
-      console.log("DiscretionaryExitBurnContract",DiscretionaryExitBurnContract)
+      console.log("DiscretionaryExitFeeContract",DiscretionaryExitFeeContract)
 
-      const tx = await DiscretionaryExitBurnContract.burnAndWithdraw(
+      const tx = await DiscretionaryExitFeeContract.payAndWithdraw(
         currencyAddress,
         value_Wei_String,
         this.L1GasLimit,
@@ -2337,22 +2369,22 @@ class NetworkService {
       )
 
       const tx = await ERC20Contract.populateTransaction.approve(
-        allAddresses.DiscretionaryExitBurn,
+        allAddresses.DiscretionaryExitFee,
         utils.parseEther('1.0')
       )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas(tx)
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
 
-    const DiscretionaryExitBurnContract = new ethers.Contract(
-      allAddresses.DiscretionaryExitBurn,
-      DiscretionaryExitBurnJson.abi,
+    const DiscretionaryExitFeeContract = new ethers.Contract(
+      allAddresses.DiscretionaryExitFee,
+      DiscretionaryExitFeeJson.abi,
       this.provider.getSigner()
     )
 
-    const tx2 = await DiscretionaryExitBurnContract.populateTransaction.burnAndWithdraw(
+    const tx2 = await DiscretionaryExitFeeContract.populateTransaction.payAndWithdraw(
       allAddresses.L2_ETH_Address,
       utils.parseEther('0.00001'),
       this.L1GasLimit,
@@ -2360,7 +2392,7 @@ class NetworkService {
       { value: utils.parseEther('0.00001') }
     )
 
-    const gas_BN = await this.L2Provider.estimateGas(tx2)
+    const gas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
     console.log("Classical exit gas", gas_BN.toString())
 
     const cost_BN = gas_BN.mul(gasPrice)
@@ -2686,8 +2718,6 @@ class NetworkService {
   }
 
   async liquidityEstimate(currency) {
-
-    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
 
     let otherField = {
       from: benchmarkAccount
@@ -3102,7 +3132,7 @@ class NetworkService {
           utils.parseEther('1.0')
         )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas(tx)
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
@@ -3117,7 +3147,7 @@ class NetworkService {
         currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
       )
 
-    const depositGas_BN = await this.L2Provider.estimateGas(tx2)
+    const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
 
     let l1SecurityFee = BigNumber.from('0')
     if (this.networkGateway === 'mainnet') {
@@ -3251,10 +3281,33 @@ class NetworkService {
       balance_BN = await this.L2Provider.getBalance(this.account)
     }
 
-    try {
-      //console.log("Address:",currencyAddress)
-      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    let BobaApprovalAmount = await L2BillingContract.exitFee()
 
+    const BobaAllowance = await this.checkAllowance(
+      allAddresses.TK_L2BOBA,
+      allAddresses.L2LPAddress,
+    )
+
+    try {
+      // Approve BOBA first
+      if (BobaAllowance.lt(BobaApprovalAmount)) {
+        const approveStatus = await this.approveERC20(
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.L2LPAddress
+        )
+        if (!approveStatus) return false
+      }
+
+      // Approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+        utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA)
+      ) {
         const L2ERC20Contract = new ethers.Contract(
           currencyAddress,
           L2ERC20Json.abi,
@@ -3400,9 +3453,36 @@ class NetworkService {
 
     console.log("depositL2LP currencyAddress",currencyAddress)
 
-    try {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    let BobaApprovalAmount = await L2BillingContract.exitFee()
 
-      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    const BobaAllowance = await this.checkAllowance(
+      allAddresses.TK_L2BOBA,
+      allAddresses.L2LPAddress,
+    )
+
+    try {
+      // Approve BOBA first
+      if (utils.getAddress(currencyAddress) === utils.getAddress(allAddresses.TK_L2BOBA)) {
+        BobaApprovalAmount = BobaApprovalAmount.add(BigNumber.from(value_Wei_String))
+      }
+      if (BobaAllowance.lt(BobaApprovalAmount)) {
+        const approveStatus = await this.approveERC20(
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.L2LPAddress
+        )
+        if (!approveStatus) return false
+      }
+
+      // Approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+        utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA)
+      ) {
 
         const L2ERC20Contract = new ethers.Contract(
           currencyAddress,
@@ -4260,6 +4340,18 @@ class NetworkService {
       }
     }
     return payload
+  }
+
+  /***********************************************/
+  /*****              Exit fee               *****/
+  /***********************************************/
+  async getExitFeeFromBillingContract() {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    return ethers.utils.formatEther(await L2BillingContract.exitFee())
   }
 }
 
