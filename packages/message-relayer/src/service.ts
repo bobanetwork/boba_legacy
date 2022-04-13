@@ -239,7 +239,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Filter out messages which have been processed
             const newMB = []
             for (const cur of this.state.messageBuffer) {
-              const status = await this.state.messenger.getMessageStatus(cur)
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(cur)
               if (
                 // check failed message here too
                 status !== MessageStatus.RELAYED &&
@@ -398,9 +399,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // wait for a few seconds before we check again to see if this transaction is finalized.
             let isFinalized = true
             for (const message of messages) {
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message
+                )
               if (
                 status === MessageStatus.IN_CHALLENGE_PERIOD ||
                 status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
@@ -442,9 +444,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 }
               }
 
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message
+                )
               if (status === MessageStatus.RELAYED) {
                 this.logger.info('Message has already been relayed, skipping.')
                 continue

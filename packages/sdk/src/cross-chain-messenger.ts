@@ -408,6 +408,60 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
   }
 
+  public async getMessageStatusFromContracts(
+    message: MessageLike
+  ): Promise<MessageStatus> {
+    const resolved = await this.toCrossChainMessage(message)
+    const messageHash = hashCrossChainMessage(resolved)
+    if (resolved.direction === MessageDirection.L1_TO_L2) {
+      throw new Error(`can only determine for L2 to L1 messages`)
+    } else {
+      const stateRoot = await this.getMessageStateRoot(resolved)
+      if (stateRoot === null) {
+        return MessageStatus.STATE_ROOT_NOT_PUBLISHED
+      } else {
+        // for the fast relayer this should be zero
+        const challengePeriod = await this.getChallengePeriodSeconds()
+        const targetBlock = await this.l1Provider.getBlock(
+          stateRoot.batch.blockNumber
+        )
+        const latestBlock = await this.l1Provider.getBlock('latest')
+        if (targetBlock.timestamp + challengePeriod > latestBlock.timestamp) {
+          return MessageStatus.IN_CHALLENGE_PERIOD
+        } else {
+          let successStatus: boolean
+          let failedStatus: boolean
+          if (this.fastRelayer) {
+            successStatus =
+              await this.contracts.l1.L1CrossDomainMessengerFast.successfulMessages(
+                messageHash
+              )
+            failedStatus =
+              await this.contracts.l1.L1CrossDomainMessengerFast.failedMessages(
+                messageHash
+              )
+          } else {
+            successStatus =
+              await this.contracts.l1.L1CrossDomainMessenger.successfulMessages(
+                messageHash
+              )
+            failedStatus =
+              await this.contracts.l1.L1CrossDomainMessenger.failedMessages(
+                messageHash
+              )
+          }
+          if (successStatus) {
+            return MessageStatus.RELAYED
+          } else if (failedStatus) {
+            return MessageStatus.RELAYED_FAILED
+          } else {
+            return MessageStatus.READY_FOR_RELAY
+          }
+        }
+      }
+    }
+  }
+
   public async getMessageReceipt(
     message: MessageLike,
     opts?: {
