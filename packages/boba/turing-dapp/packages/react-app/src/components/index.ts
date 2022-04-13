@@ -1,5 +1,11 @@
 import styled from "styled-components";
 
+const primaryColor = '#ccff00'
+
+export const H1 = styled.h1`
+  color: ${primaryColor};
+`
+
 export const Body = styled.div`
   align-items: center;
   color: white;

@@ -1,23 +1,17 @@
-import {useQuery} from "@apollo/client";
 import {Contract} from "@ethersproject/contracts";
 import {
-  shortenAddress,
-  useCall,
   useContractFunction,
   useEthers,
-  useLookupAddress,
-  useNotifications,
-  Notification,
 } from "@usedapp/core";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import { utils } from 'ethers'
 import {Body, Button, Container, Header, HeaderCol, Image, Link} from "./components";
 import logo from "./assets/logo.min.jpg";
 
 import {addresses, abis} from "@turing/contracts";
-import GET_TRANSFERS from "./graphql/subgraph";
 import {WalletButton} from "./components/WalletButton";
 import {L2GovernanceERC20, TuringHelperFactory} from "@turing/contracts/gen/types";
+import {TuringIntro} from "./components/TuringIntro";
 
 function App() {
   /*
@@ -63,6 +57,8 @@ function App() {
       </Header>
       <Body>
 
+
+        <TuringIntro />
         <Button disabled={account === undefined} onClick={async () => {
           // TODO: Add loading status
           await approveBoba(contractTuringFactory.address, amountBobaToDeposit);
