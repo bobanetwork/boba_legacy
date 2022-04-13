@@ -6,20 +6,21 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	ethawskmssigner "github.com/welthee/go-ethereum-aws-kms-tx-signer"
 )
 
 // ErrClearPendingRetry signals that a transaction from a previous running
 // instance confirmed rather than our clearing transaction on startup. In this
 // case the caller should retry.
 var ErrClearPendingRetry = errors.New("retry clear pending txn")
+
+type signTransaction func() (*bind.TransactOpts, error)
 
 // ClearPendingTx publishes a NOOP transaction at the wallet's next unused
 // nonce. This is used on restarts in order to clear the mempool of any prior
@@ -31,9 +32,7 @@ func ClearPendingTx(
 	txMgr txmgr.TxManager,
 	l1Client L1Client,
 	walletAddr common.Address,
-	svc *kms.KMS,
-	keyId string,
-	chainID *big.Int,
+	sign signTransaction,
 ) error {
 
 	// Query for the submitter's current nonce.
@@ -56,8 +55,7 @@ func ClearPendingTx(
 		log.Info(name+" clearing pending tx", "nonce", nonce)
 
 		signedTx, err := SignClearingTx(
-			name, ctx, walletAddr, nonce, l1Client, svc, keyId, chainID,
-		)
+			name, ctx, walletAddr, nonce, l1Client, sign)
 		if err != nil {
 			log.Error(name+" unable to sign clearing tx", "nonce", nonce,
 				"err", err)
@@ -135,9 +133,7 @@ func SignClearingTx(
 	walletAddr common.Address,
 	nonce uint64,
 	l1Client L1Client,
-	svc *kms.KMS,
-	keyId string,
-	chainID *big.Int,
+	sign signTransaction,
 ) (*types.Transaction, error) {
 
 	gasTipCap, err := l1Client.SuggestGasTipCap(ctx)
@@ -177,7 +173,7 @@ func SignClearingTx(
 	}
 
 	tx := CraftClearingTx(walletAddr, nonce, gasFeeCap, gasTipCap, gasLimit)
-	opts, _ := ethawskmssigner.NewAwsKmsTransactorWithChainID(svc, keyId, chainID)
+	opts, _ := sign()
 	return opts.Signer(walletAddr, tx)
 }
 

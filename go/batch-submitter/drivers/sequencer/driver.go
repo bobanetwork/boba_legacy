@@ -110,10 +110,10 @@ func (d *Driver) ClearPendingTx(
 	l1Client *ethclient.Client,
 ) error {
 
-	return drivers.ClearPendingTx(
-		d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, &d.cfg.KMS, d.cfg.KeyId,
-		d.cfg.ChainID,
-	)
+	sign := func() (*bind.TransactOpts, error) {
+		return ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+	}
+	return drivers.ClearPendingTx(d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, sign)
 }
 
 // GetBatchBlockRange returns the start and end L2 block heights that need to be
