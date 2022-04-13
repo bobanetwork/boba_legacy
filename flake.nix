@@ -74,6 +74,7 @@
                     ln -sf ${bobapkgs."@boba/gas-price-oracle"} $out/boba/gas-price-oracle
                     ln -sf ${bobapkgs."@boba/gateway"} $out/boba/gateway
                     ln -sf ${bobapkgs."@boba/turing-hybrid-compute"} $out/boba/turing
+                    ln -sf ${bobapkgs."@eth-optimism/replica-healthcheck"} $out/optimism/replica-healthcheck
                   '';
                 };
               };
