@@ -15,7 +15,7 @@ limitations under the License. */
 
 import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
 import { IconButton, Typography, useTheme, useMediaQuery } from '@mui/material';
-import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost, fetchL2FeeBalance } from 'actions/balanceAction';
+import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost } from 'actions/balanceAction';
 import { removeToken, setTokenAmount } from 'actions/bridgeAction';
 import { openModal } from 'actions/uiAction';
 import BN from 'bignumber.js';
@@ -91,7 +91,7 @@ function TokenInput({
         } else {
           dispatch(fetchFastExitCost(token.address));
         }
-        dispatch(fetchL2FeeBalance())
+        // dispatch(fetchL2FeeBalance())
       } else {
         if (bridgeType === BRIDGE_TYPE.FAST_BRIDGE) {
           dispatch(fetchFastDepositCost(token.address))
@@ -125,11 +125,11 @@ function TokenInput({
     <S.TokenInputWrapper>
       <S.TokenInputTitle
       >
-        <Typography variant="body2">
-          <Typography variant="body2" component="span" sx={{ opacity: 0.65 }}>
+        <Typography variant="body2" whiteSpace="nowrap">
+          <Typography variant="body2" component="span" sx={{ display: 'inline', opacity: 0.65 }}>
             Available Balance : &nbsp;
           </Typography>
-          <Typography variant="body2" component="span" sx={{textDecoration: 'underline'}}>
+          <Typography variant="body2" component="span" sx={{ display: 'inline',textDecoration: 'underline'}}>
             {amount}
           </Typography>
         </Typography>

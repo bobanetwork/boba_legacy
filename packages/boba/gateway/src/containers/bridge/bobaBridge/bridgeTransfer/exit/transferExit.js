@@ -10,90 +10,175 @@ import Button from 'components/button/Button';
 import { exitBOBA } from 'actions/networkAction';
 import { closeModal, openAlert, openModal } from 'actions/uiAction';
 
-import { selectClassicExitCost, selectL2FeeBalance } from 'selectors/balanceSelector';
+import { selectClassicExitCost, selectExitFee, selectL2BalanceBOBA, selectL2BalanceETH} from 'selectors/balanceSelector';
 
 import { logAmount } from 'util/amountConvert';
 import { resetToken } from 'actions/bridgeAction';
 import BridgeFee from '../fee/bridgeFee';
 
 import parse from 'html-react-parser';
+import { selectBobaFeeChoice, selectBobaPriceRatio } from 'selectors/setupSelector';
+import { fetchClassicExitCost, fetchExitFee, fetchL2BalanceBOBA, fetchL2BalanceETH } from 'actions/balanceAction';
+import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector';
+import { updateSignatureStatus_exitTRAD } from 'actions/signAction';
+import { selectLoading } from 'selectors/loadingSelector';
 
 function TransferExit({
   token
 }) {
   console.log([ 'TRANSFER EXIT' ])
   const [ validValue, setValidValue ] = useState(false);
+  const [ errorString, setErrorString ] = useState(false);
+
+  const [ max_Float, setMax_Float ] = useState(0.0) // support for Use Max - a number like 0.09 ETH
+  const [ feeETH, setFeeETH ] = useState(0.0)
+  const [ feeBOBA, setFeeBOBA ] = useState(0.0)
+
   const dispatch = useDispatch();
 
   const cost = useSelector(selectClassicExitCost);
-  const feeBalance = useSelector(selectL2FeeBalance)
+  const feeBalanceETH = useSelector(selectL2BalanceETH)
+  const feeBalanceBOBA = useSelector(selectL2BalanceBOBA)
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
+  const loading = useSelector(selectLoading(['EXIT/CREATE']))
 
-  let estFee = `${Number(cost).toFixed(4)} ETH`;
+  const signatureStatus = useSelector(selectSignatureStatus_exitTRAD)
 
-  let ETHstring = '';
-  let warning = false;
+  const exitFee = useSelector(selectExitFee)
 
-  if (cost && Number(cost) > 0) {
+  let estFee = '';
 
-    if (token.symbol !== 'ETH') {
-      if (Number(cost) > Number(feeBalance)) {
-        warning = true
-        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover gas.
-        <br/>TRANSACTION WILL FAIL.`
-      }
-      else if (Number(cost) > Number(feeBalance) * 0.96) {
-        warning = true
-        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
-        <br/>TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L2 wallet to cover gas.`
-      }
-      else {
-        ETHstring = `Estimated gas (approval + exit): ${Number(cost).toFixed(4)} ETH`
-      }
-    }
-
-    if (token.symbol === 'ETH') {
-
-      if ((Number(token.amount) + Number(cost)) > Number(feeBalance)) {
-        warning = true
-        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
-        <br/>WARNING: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
-        <br/>TRANSACTION WILL FAIL.`
-      }
-      else if ((Number(token.amount) + Number(cost)) > Number(feeBalance) * 0.96) {
-        warning = true
-        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH
-        <br/>CAUTION: your L2 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
-        <br/>TRANSACTION MIGHT FAIL.`
-      } else {
-        ETHstring = `Transaction total (amount + approval + exit): ${(Number(token.amount) + Number(cost)).toFixed(4)} ETH`
-      }
+  if(feeETH && Number(feeETH) > 0) {
+    if(feeUseBoba) {
+      estFee = `${Number(feeBOBA).toFixed(4)} BOBA`
+    } else {
+      estFee = `${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
+  useEffect(() => {
+    if (typeof(token) !== 'undefined') {
+      console.log("Token:",token)
+      dispatch(fetchClassicExitCost(token.address))
+      dispatch(fetchL2BalanceETH())
+      dispatch(fetchL2BalanceBOBA())
+      dispatch(fetchExitFee())
+    }
+  }, [ token, dispatch ])
+
+  useEffect(() => {
+    if (signatureStatus && loading) {
+      //we are all set - can close the window
+      //transaction has been sent and signed
+      dispatch(closeModal('transferPending'));
+      dispatch(resetToken());
+      updateSignatureStatus_exitTRAD(false);
+    }
+  }, [ signatureStatus, loading, dispatch ])
 
   useEffect(() => {
 
-    const maxValue = logAmount(token.balance, token.decimals);
+    const balance = logAmount(token.balance, token.decimals);
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
-    const tooBig = new BN(token.amount).gt(new BN(maxValue))
+    const tooBig = new BN(token.amount).gt(new BN(max_Float))
+
+    setErrorString('')
 
     if (tooSmall || tooBig) {
+      setErrorString('Warning: Value out of bounds')
       setValidValue(false)
-    } else if (token.symbol === 'ETH' && (Number(cost) + Number(token.amount)) > Number(feeBalance)) {
-      //insufficient ETH to cover the ETH amount plus gas
+    } else if (
+      !feeUseBoba && // check is needed regardless of fee token choice
+      token.symbol === 'ETH' &&
+      (Number(token.amount) + feeETH) > balance)
+    {
+       // insufficient ETH to cover the ETH amount plus gas
+      // due to MetaMask issue, this is needed even if you are paying in ETH
+      setErrorString('Warning: ETH amount + fees > balance')
       setValidValue(false)
-    } else if ((Number(cost) > Number(feeBalance))) {
-      //insufficient ETH to pay exit fees
+    } else if (
+      feeUseBoba && // check is needed regardless of fee token choice
+      token.symbol === 'ETH' &&
+      (Number(token.amount) + feeETH) > balance)
+    {
+      // insufficient ETH to cover the ETH amount plus gas
+      // due to MetaMask issue, this is needed even if you are paying in ETH
+      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
       setValidValue(false)
-    } else {
+    } else if (
+      feeUseBoba &&
+      token.symbol === 'BOBA' &&
+      (Number(token.amount) + feeBOBA) > balance)
+    {
+      // insufficient BOBA to cover the BOBA amount plus gas
+      setErrorString('Warning: BOBA amount + fees > balance')
+      setValidValue(false)
+    } else if (
+      !feeUseBoba &&
+      feeETH > Number(feeBalanceETH))
+    {
+      // insufficient ETH to cover exit fees
+      setErrorString('Warning: ETH balance too low.')
+      setValidValue(false)
+    } else if (
+      feeUseBoba &&
+      feeETH > Number(feeBalanceETH))
+    {
+      console.log(['feeETH',feeETH])
+      console.log(['feeBalanceETH',feeBalanceETH])
+      // insufficient ETH to cover exit fees
+      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
+      setValidValue(false)
+    } else if (
+      feeUseBoba &&
+      feeBOBA > Number(feeBalanceBOBA))
+    {
+      // insufficient BOBA to cover exit fees
+      setErrorString('Warning: BOBA balance too low')
+      setValidValue(false)
+    }
+    else {
       //Whew, finally!
       setValidValue(true)
     }
 
-  }, [ token, setValidValue, cost, feeBalance ])
+  }, [ token, setErrorString, setValidValue, feeUseBoba, feeBOBA, feeETH, feeBalanceBOBA, feeBalanceETH, cost, max_Float ])
+
+
+  useEffect(() => {
+
+    function estimateMax() {
+
+      const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
+      console.log("ETH fees:", safeCost)
+      console.log("BOBA fees:", safeCost * feePriceRatio)
+
+      setFeeETH(safeCost)
+      setFeeBOBA(safeCost * feePriceRatio)
+
+      const balance = Number(logAmount(token.balance, token.decimals))
+
+      // because of MetaMask issue always have to limit ETH
+      if(token.symbol === 'ETH') {
+        if(balance - safeCost > 0.0)
+          setMax_Float(balance - safeCost)
+        else
+          setMax_Float(0.0)
+      }
+      else if (token.symbol === 'BOBA' && feeUseBoba) {
+        if(balance - safeCost > 0.0)
+          setMax_Float(balance - safeCost)
+        else
+          setMax_Float(0.0)
+      }
+      else {
+        setMax_Float(balance)
+      }
+    }
+    if (Number(cost) > 0) estimateMax()
+  }, [ token, cost, feeUseBoba, feePriceRatio ])
 
 
   const doExit = async () => {
@@ -122,17 +207,17 @@ function TransferExit({
       estFee={estFee}
     />
     <Box>
-      {warning && (
-        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
-          {parse(ETHstring)}
-        </Typography>
-      )}
 
-      {!warning && (
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          {parse(ETHstring)}
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        {parse(`Exit Fee: ${exitFee} BOBA`)}
+      </Typography>
+
+      {errorString !== '' &&
+        <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+          {errorString}
         </Typography>
-      )}
+      }
+
     </Box>
     <Button
       color="primary"
