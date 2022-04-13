@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     dream2nix = {
       url = "github:nix-community/dream2nix";
       #url = "path:/home/tgunnoe/src/boba/dream2nix";
@@ -149,7 +149,10 @@
       lib.recursiveUpdate
         (boba-monorepo.makeFlakeOutputs {
           pname = "boba";
-          source = ./. ;
+          source = builtins.path {
+            path = ./.;
+            filter = path: _: baseNameOf path != "flake.nix" && baseNameOf path != "overrides";
+          };
           settings = [
             {
               #subsystemInfo.noDev = true;
