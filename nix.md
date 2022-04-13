@@ -1,6 +1,8 @@
 [https://nixos.org/](Nix) is a purely functional, declarative system that builds
 isolated packages (derivations) into their own unique subdirectories where
-dependencies are tied to a graph rather than versions.
+dependencies are tied to a graph rather than versions.  See [serokell's
+article](https://serokell.io/blog/what-is-nix) for a light runthrough or a more
+detailed take [from shopify](https://shopify.engineering/what-is-nix).
 
 # Setup
 You only need nix installed; it is able to provide yarn and all other tooling
@@ -52,6 +54,8 @@ This uses a few nix-based technologies:
 - Creating a docker image for any of the outputs is easily done by using the
   output name in `pkgs.dockerTools.buildImage`:
   [example](https://github.com/bobanetwork/boba/blob/nix/flake.nix#L80-L98)
+  Nix builds docker images better than docker itself, see [this
+  presentation](https://www.youtube.com/watch?v=pfIDYQ36X0k)
 
 - All of nix can be hidden behind commands using devshell.
   [Devshell](https://numtide.github.io/devshell/) can [load configurations from
