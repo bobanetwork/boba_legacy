@@ -5,7 +5,6 @@ import Button from 'components/button/Button'
 
 import { Circle, Info } from "@mui/icons-material"
 import { Box, CircularProgress, Icon, Typography } from '@mui/material'
-import Link from 'components/icons/LinkIcon'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
@@ -19,7 +18,6 @@ import * as S from './wallet.styles'
 import {
   selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice,
   selectNetwork,
 } from "selectors/setupSelector"
 
@@ -49,8 +47,6 @@ function Wallet() {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
-
-  const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
@@ -142,9 +138,9 @@ function Wallet() {
 
   const handleSwitch = (l) => {
     if (l === 'Token') {
-      setPage('Token');
+      setPage('Token')
     } else if (l === 'NFT') {
-      setPage('NFT');
+      setPage('NFT')
     }
   }
 
@@ -154,9 +150,9 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
-  console.log("layer:", layer)
-  console.log("tooSmallETH:", tooSmallETH)
-  console.log("network:", network)
+  //console.log("layer:", layer)
+  //console.log("tooSmallETH:", tooSmallETH)
+  //console.log("network:", network)
 
   return (
     <S.PageContainer>
