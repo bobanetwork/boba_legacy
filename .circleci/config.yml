@@ -222,8 +222,8 @@ jobs:
       - run:
           name: Bring up the stack
           command: |
-            docker-compose build --progress=plain
-            docker-compose up -d --scale replica_healthcheck=1
+            ./scripts/build-ci.sh
+            BUILD=2 DAEMON=1 ./up_local.sh
           working_directory: ops
       - run:
           name: Wait for sequencer
