@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/drivers/proposer"
@@ -112,8 +113,9 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			NumConfirmations:     cfg.NumConfirmations,
 		}
 		sess, _ := session.NewSession(&aws.Config{
-			Region:   aws.String(cfg.KmsRegion),
-			Endpoint: aws.String(cfg.KmsEndpoint)},
+			Credentials: credentials.NewEnvCredentials(),
+			Region:      aws.String(cfg.KmsRegion),
+			Endpoint:    aws.String(cfg.KmsEndpoint)},
 		)
 		svc := kms.New(sess)
 		var services []*bsscore.Service
