@@ -650,7 +650,11 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
-      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
+      //if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
+
+      // not critical
+      this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
+      console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
 
       // not critical
       this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
@@ -1207,10 +1211,23 @@ class NetworkService {
     }
   }
 
+  async fetchMyMonsters() {
+
+    // let monsterList = await GraphQLService.queryMonsterTransfer()
+    // console.log("monsterList:",monsterList)
+    // this returns too many events to be directly useful
+
+    //   for (let i = 0; i < totalProposals; i++) {
+    //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+    //     if(typeof(proposalRaw) === 'undefined') continue
+    //     let proposalID = proposalRaw.proposalId
+    //     //this is a number such as 2
+    //     let proposalData = await delegateCheck.proposals(proposalID)
+  }
+
   async checkMonster() {
 
     const NFTs = getNFTs()
-    //console.log("NFTs:",NFTs)
     let validMonsters = []
 
     try {
@@ -1223,12 +1240,11 @@ class NetworkService {
 
       const monsterBalance = await contract.balanceOf(this.account)
 
-      let monsterType = 0
       let topMagic = 0
       let topTop = 0
 
       if(NFTs && Number(monsterBalance) > 0) {
-        for (const [key, value] of Object.entries(NFTs)) {
+        for (const [ value ] of Object.entries(NFTs)) {
           //console.log(`${key}: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
@@ -1255,7 +1271,6 @@ class NetworkService {
           validMonsters.push({monsterType: 'crowned wizard'})
         }
 
-        //console.log("adding monster info:",validMonsters)
         await addMonster( validMonsters )
 
       }
@@ -1269,6 +1284,7 @@ class NetworkService {
 
   }
 
+  /* This is for manually adding NFTs */
   async addNFT( address, tokenID ) {
 
     try {
@@ -1296,7 +1312,10 @@ class NetworkService {
         tokenID,
         symbol: nftSymbol,
         url,
-        meta
+        meta,
+        account: this.account,
+        network: this.networkGateway,
+        layer: this.L1orL2
       }
 
       await addNFT( NFT )
@@ -3658,19 +3677,6 @@ class NetworkService {
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
-/*
-        // for text only proposals, set target to a null address
-         const addresses = ['0x000000000000000000000000000000000000dEaD'] // the address of the contract where the function will be called
-        const values = [0] // the eth necessary to send to the contract above
-        const signatures = [''] // the function that will carry out the proposal
-
-        const calldatas = [
-           '0x0000000000000000000000000000000000000000000000000000000000000000',
-         ]
-
-         const description = '# Text only proposal' // the description of the proposal
-         */
-
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
       description = payload.text.slice(0, 252) //100+150+2
@@ -3910,24 +3916,47 @@ class NetworkService {
           this.account,
           allAddresses.BobaFixedSavings
         )
-      console.log("Allowance", allowance_BN.toString())
+      console.log("Allowance:", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
-      console.log("Deposit", depositAmount_BN)
+      console.log("Deposit:", depositAmount_BN)
+
+      try {
+        if (depositAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", depositAmount_BN)
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.BobaFixedSavings,
+              value_Wei_String
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: addFS_Savings approve error:", error)
+        return error
+      }
+
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
+      console.log("Updated Allowance:", allowance_BN.toString())
 
       if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Need to approve YES:", depositAmount_BN)
-        const approveStatus = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .approve(
-          allAddresses.BobaFixedSavings,
-          value_Wei_String
-        )
-        await approveStatus.wait()
-        if (!approveStatus) return false
+        console.log("Allowance still too small:", allowance_BN.toString(), depositAmount_BN.toString())
       } else {
-        console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        console.log("Allowance is now sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
       }
+
+      console.log("allAddresses.BobaFixedSavings", allAddresses.BobaFixedSavings)
+      console.log("FixedSavings.address", FixedSavings.address)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()
@@ -4053,59 +4082,65 @@ class NetworkService {
   async estimateApprove() {
 
     const approvalAmount = utils.parseEther('10.0')
+    let allowance_BN = null
+    let approveStatus = null
 
-    let allowance_BN = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .allowance(
-        this.account,
-        allAddresses.BobaFixedSavings
-      )
-    console.log("Fixed Savings Allowance", allowance_BN.toString())
+    if(allAddresses.hasOwnProperty('BobaFixedSavings')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
+      console.log("Fixed Savings Allowance", allowance_BN.toString())
 
-    let approveStatus = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .approve(
-        allAddresses.BobaFixedSavings,
-        approvalAmount
-      )
-    await approveStatus.wait()
-    console.log("Fixed Savings Approval", approveStatus)
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.BobaFixedSavings,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("Fixed Savings Approval", approveStatus)
+    }
+    
+    if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.DiscretionaryExitFee
+        )
+      console.log("DiscretionaryExitFee Allowance", allowance_BN.toString())
 
-    // DiscretionaryExitFee: 0x583963636aa1344B9A609b34E1C9e7b5603df0A5
-    allowance_BN = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .allowance(
-        this.account,
-        allAddresses.DiscretionaryExitFee
-      )
-    console.log("DiscretionaryExitFee Allowance", allowance_BN.toString())
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.DiscretionaryExitFee,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("DiscretionaryExitFee Approval", approveStatus)
+    }
 
-    approveStatus = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .approve(
-        allAddresses.DiscretionaryExitFee,
-        approvalAmount
-      )
-    await approveStatus.wait()
-    console.log("DiscretionaryExitFee Approval", approveStatus)
+    if(allAddresses.hasOwnProperty('L2LPAddress')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+      console.log("L2LP", allowance_BN.toString())
 
-    // L2LP
-    allowance_BN = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .allowance(
-        this.account,
-        allAddresses.L2LPAddress
-      )
-    console.log("L2LP", allowance_BN.toString())
-
-    approveStatus = await this.BobaContract
-      .connect(this.provider.getSigner())
-      .approve(
-        allAddresses.L2LPAddress,
-        approvalAmount
-      )
-    await approveStatus.wait()
-    console.log("L2LP", approveStatus)
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.L2LPAddress,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("L2LP", approveStatus)
+    }
 
   }
 
