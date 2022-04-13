@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
-import { Circle } from "@mui/icons-material"
-import { Box, CircularProgress, Typography } from '@mui/material'
-import Link from 'components/icons/LinkIcon'
+import { Circle, Info } from "@mui/icons-material"
+import { Box, CircularProgress, Icon, Typography } from '@mui/material'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
-import { openAlert, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
@@ -19,7 +18,6 @@ import * as S from './wallet.styles'
 import {
   selectAccountEnabled,
   selectLayer,
-  selectBobaFeeChoice,
   selectNetwork,
 } from "selectors/setupSelector"
 
@@ -49,8 +47,6 @@ function Wallet() {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
-
-  const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
@@ -104,12 +100,26 @@ function Wallet() {
 
       if (l2BalanceETH && l2BalanceETH.balance) {
         setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
+      } else {
+        // in case of zero ETH balance we are setting tooSmallETH
+        setTooSmallETH(true)
       }
-      if (l2BalanceBOBA && l2BalanceBOBA) {
+      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
+      } else {
+        // in case of zero BOBA balance we are setting tooSmallBOBA
+        setTooSmallBOBA(true)
       }
     }
   },[ l2Balances, accountEnabled ])
+
+  useEffect(() => {
+    if (layer === 'L2') {
+      if (tooSmallBOBA && tooSmallETH) {
+        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      }
+    }
+  },[tooSmallETH, tooSmallBOBA, layer, dispatch])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -128,9 +138,9 @@ function Wallet() {
 
   const handleSwitch = (l) => {
     if (l === 'Token') {
-      setPage('Token');
+      setPage('Token')
     } else if (l === 'NFT') {
-      setPage('NFT');
+      setPage('NFT')
     }
   }
 
@@ -140,9 +150,9 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
-  console.log("layer:", layer)
-  console.log("tooSmallETH:", tooSmallETH)
-  console.log("network:", network)
+  //console.log("layer:", layer)
+  //console.log("tooSmallETH:", tooSmallETH)
+  //console.log("network:", network)
 
   return (
     <S.PageContainer>
@@ -150,16 +160,19 @@ function Wallet() {
       {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
         <S.LayerAlert>
           <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body3"
+            {/* <AlertIcon /> */}
+            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Typography
+              flex={4}
+              variant="body2"
               component="p"
+              ml={2}
+              style={{ opacity: '0.6' }}
             >
-              <span style={{opacity: '0.6'}}>Using Boba requires a minimum ETH balance (of 0.002 ETH)
-              regardless of your fee setting, otherwise MetaMask may incorrectly reject transactions.
-              If you ran out of ETH, use EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
-              </span>
-            </S.AlertText>
+              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting, 
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use 
+              EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
+            </Typography>
           </S.AlertInfo>
           <Button
             onClick={()=>{emergencySwap()}}

@@ -45,7 +45,8 @@ import {
   fetchL1FeeRateN,
   fetchL2BalanceBOBA,
   fetchL2BalanceETH,
-  fetchL1LPLiquidity
+  fetchL1LPLiquidity,
+  fetchExitFee,
 } from 'actions/balanceAction'
 
 import {
@@ -56,7 +57,8 @@ import {
   selectL1LPPendingString,
   selectL2BalanceBOBA,
   selectL2BalanceETH,
-  selectL1LPLiquidity
+  selectL1LPLiquidity,
+  selectExitFee,
 } from 'selectors/balanceSelector'
 
 import {
@@ -104,9 +106,11 @@ function DoExitStepFast({ handleClose, token }) {
   const lpUnits = logAmount(LPBalance, token.decimals)
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
+  const exitFee = useSelector(selectExitFee)
+
   function setAmount(value) {
 
-    const balance = Number(logAmount(token.balance, token.decimals))  
+    const balance = Number(logAmount(token.balance, token.decimals))
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(max_Float))
@@ -118,9 +122,9 @@ function DoExitStepFast({ handleClose, token }) {
       setValidValue(false)
       setValue(value)
       return false
-    } 
+    }
     else if (
-      token.symbol === 'ETH' && 
+      token.symbol === 'ETH' &&
       (Number(value) + feeETH) > balance) {
       if(feeUseBoba)
         setErrorString('Warning: ETH amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
@@ -133,8 +137,8 @@ function DoExitStepFast({ handleClose, token }) {
     else if (
       //pay BOBA, exit BOBA - check BOBA amount
       feeUseBoba &&
-      token.symbol === 'BOBA' && 
-      (Number(value) + feeBOBA) > balance) 
+      token.symbol === 'BOBA' &&
+      (Number(value) + feeBOBA) > balance)
     {
       // insufficient BOBA to cover the BOBA amount plus gas
       setErrorString('Warning: BOBA amount + fees > balance')
@@ -145,7 +149,7 @@ function DoExitStepFast({ handleClose, token }) {
     else if (
       // insufficient ETH to cover exit fees
       // it does not matter if you are paying in ETH or BOBA
-      feeETH > Number(feeBalanceETH)) 
+      feeETH > Number(feeBalanceETH))
     {
       // insufficient ETH to cover exit fees
       if(feeUseBoba)
@@ -159,13 +163,13 @@ function DoExitStepFast({ handleClose, token }) {
     else if (
       // insufficient BOBA to cover exit fees
       feeUseBoba &&
-      feeBOBA > Number(feeBalanceBOBA)) 
+      feeBOBA > Number(feeBalanceBOBA))
     {
       setErrorString('Warning: BOBA balance too low to cover gas')
       setValidValue(false)
       setValue(value)
       return false
-    } 
+    }
     else if (Number(LPRatio) < 0.1) {
       // not enough balance/liquidity ratio
       // we always want some balance for unstaking
@@ -173,7 +177,7 @@ function DoExitStepFast({ handleClose, token }) {
       setValidValue(false)
       setValue(value)
       return false
-    } 
+    }
     else if (Number(value) > Number(balanceSubPending) * 0.9) {
       //not enough absolute balance
       //we don't want one large bridge to wipe out all the balance
@@ -200,7 +204,7 @@ function DoExitStepFast({ handleClose, token }) {
   async function doExit() {
 
     console.log("Amount to exit:", value_Wei_String)
-    
+
     let res = await dispatch(
       depositL2LP(
         token.address,
@@ -231,6 +235,7 @@ function DoExitStepFast({ handleClose, token }) {
       dispatch(fetchFastExitCost(token.address))
       dispatch(fetchL2BalanceETH())
       dispatch(fetchL2BalanceBOBA())
+      dispatch(fetchExitFee())
     }
     // to clean up state and fix the
     // error in console for max state update.
@@ -258,9 +263,9 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     function estimateMax() {
-      
+
       const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
-      
+
       //console.log("ETH fees:", safeCost)
       //console.log("BOBA fees:", safeCost * feePriceRatio)
 
@@ -275,13 +280,13 @@ function DoExitStepFast({ handleClose, token }) {
           setMax_Float(balance - safeCost)
         else
           setMax_Float(0.0)
-      } 
+      }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
         if(balance - safeCost > 0.0)
           setMax_Float(balance - safeCost)
         else
           setMax_Float(0.0)
-      } 
+      }
       else {
         setMax_Float(balance)
       }
@@ -300,17 +305,17 @@ function DoExitStepFast({ handleClose, token }) {
   let ETHstring = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA` 
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH` 
+      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
-  // prohibit ExitAll when paying with the token that is to be exited 
+  // prohibit ExitAll when paying with the token that is to be exited
   let allowExitall = true
   if(token.symbol === 'ETH') {
     allowExitall = false
-  } 
+  }
   else if (token.symbol === 'BOBA' && feeUseBoba) {
     allowExitall = false
   }
@@ -328,9 +333,9 @@ function DoExitStepFast({ handleClose, token }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast exit takes less than 20 minutes. 
-          However, if Ethereum is congested, it can take as long as 3 hours. 
-          The amount input window will block transactions that are likely to fail. 
+          In most cases, a fast exit takes less than 20 minutes.
+          However, if Ethereum is congested, it can take as long as 3 hours.
+          The amount input window will block transactions that are likely to fail.
         </Typography>
 
         {max_Float > 0.0 &&
@@ -374,6 +379,10 @@ function DoExitStepFast({ handleClose, token }) {
 
         <Typography variant="body2" sx={{mt: 2}}>
           {parse(ETHstring)}
+        </Typography>
+
+        <Typography variant="body2" sx={{mt: 2}}>
+          {parse(`Exit Fee: ${exitFee} BOBA`)}
         </Typography>
 
         {errorString !== '' &&

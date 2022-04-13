@@ -176,6 +176,7 @@ describe('CrossChainMessenger', () => {
                 CanonicalTransactionChain: '0x' + '15'.repeat(20),
                 BondManager: '0x' + '16'.repeat(20),
                 L1MultiMessageRelayer: '0x' + '17'.repeat(20),
+                L1MultiMessageRelayerFast: '0x' + '18'.repeat(20),
               },
               l2: {
                 L2CrossDomainMessenger: '0x' + '22'.repeat(20),

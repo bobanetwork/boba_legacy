@@ -17,7 +17,7 @@ import React from 'react';
 import { Select as MuiSelect, MenuItem, useTheme } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
-import { ArrowDropDownCircleOutlined, ArrowDropDownOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined } from '@mui/icons-material';
 
 function Select ({
   label,

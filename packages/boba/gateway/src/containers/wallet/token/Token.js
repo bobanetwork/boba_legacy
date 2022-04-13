@@ -10,10 +10,13 @@ import { selectTokens } from 'selectors/tokenSelector'
 import * as S from './Token.styles'
 import { tokenTableHeads } from './token.tableHeads'
 import ListToken from 'components/listToken/listToken'
+import Button from 'components/button/Button'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
 import Link from 'components/icons/LinkIcon'
+
+import networkService from 'services/networkService'
 
 function TokenPage() {
 
@@ -61,6 +64,13 @@ function TokenPage() {
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
+  const GasEstimateApprove = () => {
+    let approval = networkService.estimateApprove()
+    console.log("GasEstimateApprove:",approval)
+  }
+
+  const debug = false
+
   if (!accountEnabled) {
 
     return (
@@ -98,9 +108,18 @@ function TokenPage() {
               href={'https://oolongswap.com/'}
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-            >Oologswap <Link />
+            >Oolongswap <Link />
             </S.footerLink>
           </Typography>
+          {debug &&
+            <Button
+              onClick={()=>{GasEstimateApprove()}}
+              color='primary'
+              variant="contained"
+            >
+              GasEstimateApprove
+            </Button>
+          }
         </Box>
       }
 

@@ -1,5 +1,19 @@
 # Boba Network Subgraphs
 
+Please us the offical hosted service
+
+https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query
+
+## Legacy/Outdated Documention
+
+OUTDATED
+
+OUTDATED
+
+OUTDATED
+
+OUTDATED
+
 These subgraphs index the **StandardBridge**, the **LiquidityPool**, and the **Boba DAO** contracts.
 
 ## Requirements

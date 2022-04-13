@@ -40,7 +40,10 @@ export async function addNFT ( NFT ) {
     tokenID: NFT.tokenID,
     symbol:  NFT.symbol,
     url: NFT.url,
-    meta: NFT.meta
+    meta: NFT.meta,
+    account: NFT.account,
+    network: NFT.network,
+    layer: NFT.layer
   }
 
   store.dispatch({

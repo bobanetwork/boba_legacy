@@ -96,9 +96,15 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Then, users call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
 
 ```js
+const exitFee = await BOBABillingContract.exitFee()
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
+  exitFee
+)
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
@@ -116,9 +122,15 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Users then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
 
 ```js
+const exitFee = await BOBABillingContract.exitFee()
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
+  exitFee
+)
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
@@ -151,14 +163,18 @@ await tx.wait()
 
 ### Mainnet
 
-| Contract Name      | Contract Address                           |
-| ------------------ | ------------------------------------------ |
-| Proxy__L1NFTBridge | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
-| Proxy__L2NFTBridge | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| Contract Name              | Contract Address                           |
+| -------------------------- | ------------------------------------------ |
+| Proxy__L1NFTBridge         | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
+| Proxy__L2NFTBridge         | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| Proxy__BobaBillingContract | 0x29F373e4869e69faaeCD3bF747dd1d965328b69f |
+| TK_L2BOBA                  | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
 
 ### Rinkeby
 
-| Contract Name      | Contract Address                           |
-| ------------------ | ------------------------------------------ |
-| Proxy__L1NFTBridge | 0x01F5d5D6de3a8c7A157B22FD331A1F177b7bE043 |
-| Proxy__L2NFTBridge | 0x5E368E9dce71B624D7DdB155f360E7A4969eB7aA |
+| Contract Name              | Contract Address                           |
+| -------------------------- | ------------------------------------------ |
+| Proxy__L1NFTBridge         | 0x01F5d5D6de3a8c7A157B22FD331A1F177b7bE043 |
+| Proxy__L2NFTBridge         | 0x5E368E9dce71B624D7DdB155f360E7A4969eB7aA |
+| Proxy__BobaBillingContract | 0x39ecF941443851762f58194e1eD54EE9F6987Cd1 |
+| TK_L2BOBA                  | 0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309 |

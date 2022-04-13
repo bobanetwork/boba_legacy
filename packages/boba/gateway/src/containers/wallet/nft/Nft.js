@@ -16,8 +16,6 @@ import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Copy from 'components/copy/Copy'
 
-import truncate from 'truncate-middle'
-
 class Nft extends React.Component {
 
   constructor(props) {
@@ -102,6 +100,9 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
+  // async fetchMyMonsters() {
+  //   networkService.fetchMyMonsters()
+  // }
 
   render() {
 
@@ -111,8 +112,6 @@ class Nft extends React.Component {
       tokenID,
       loading,
       netLayer,
-      monsterInfo,
-      monsterNumber
     } = this.state
 
     if (!netLayer) {
@@ -187,6 +186,17 @@ class Nft extends React.Component {
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>
+                {/*
+                <Button
+                  type="primary"
+                  variant="contained"
+                  fullWidth={true}
+                  onClick={(i) => { this.fetchMyMonsters() }}
+                  sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
+                >
+                  Fetch My Monsters
+                </Button>
+              */}
               </Box>
               <Box sx={{
                 display: 'flex',

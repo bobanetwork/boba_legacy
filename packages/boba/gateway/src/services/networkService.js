@@ -53,7 +53,7 @@ import L2ERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L
 import OVM_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json'
 
 // Boba contracts
-import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
+import DiscretionaryExitFeeJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
 import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
@@ -61,6 +61,7 @@ import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2Standa
 import Boba from "@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
 import GovernorBravoDelegate from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
 import GovernorBravoDelegator from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
+import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json"
 
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
@@ -115,6 +116,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   }
 }
 let allTokens = {}
+
+const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
 
 class NetworkService {
 
@@ -647,9 +650,13 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'DiscretionaryExitBurn', 'DiscretionaryExitBurn'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
+      //if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
+
+      // not critical
+      this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
+      console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
 
       // not critical
       this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
@@ -1206,10 +1213,23 @@ class NetworkService {
     }
   }
 
+  async fetchMyMonsters() {
+
+    // let monsterList = await GraphQLService.queryMonsterTransfer()
+    // console.log("monsterList:",monsterList)
+    // this returns too many events to be directly useful
+
+    //   for (let i = 0; i < totalProposals; i++) {
+    //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+    //     if(typeof(proposalRaw) === 'undefined') continue
+    //     let proposalID = proposalRaw.proposalId
+    //     //this is a number such as 2
+    //     let proposalData = await delegateCheck.proposals(proposalID)
+  }
+
   async checkMonster() {
 
     const NFTs = getNFTs()
-    //console.log("NFTs:",NFTs)
     let validMonsters = []
 
     try {
@@ -1222,12 +1242,11 @@ class NetworkService {
 
       const monsterBalance = await contract.balanceOf(this.account)
 
-      let monsterType = 0
       let topMagic = 0
       let topTop = 0
 
       if(NFTs && Number(monsterBalance) > 0) {
-        for (const [key, value] of Object.entries(NFTs)) {
+        for (const [ value ] of Object.entries(NFTs)) {
           //console.log(`${key}: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
@@ -1239,7 +1258,7 @@ class NetworkService {
               }
               if(value.meta.attributes[3].value === 'crown') topTop = 1
               if(value.meta.attributes[4].value === 'wizzard') topMagic = 1
-              validMonsters.push({tokenID: value.tokenID, attributes}) 
+              validMonsters.push({tokenID: value.tokenID, attributes})
             }
           }
         }
@@ -1254,7 +1273,6 @@ class NetworkService {
           validMonsters.push({monsterType: 'crowned wizard'})
         }
 
-        //console.log("adding monster info:",validMonsters)
         await addMonster( validMonsters )
 
       }
@@ -1268,6 +1286,7 @@ class NetworkService {
 
   }
 
+  /* This is for manually adding NFTs */
   async addNFT( address, tokenID ) {
 
     try {
@@ -1295,7 +1314,10 @@ class NetworkService {
         tokenID,
         symbol: nftSymbol,
         url,
-        meta
+        meta,
+        account: this.account,
+        network: this.networkGateway,
+        layer: this.L1orL2
       }
 
       await addNFT( NFT )
@@ -2246,32 +2268,62 @@ class NetworkService {
     updateSignatureStatus_exitTRAD(false)
 
     try {
+
+      const L2BillingContract = new ethers.Contract(
+        allAddresses.Proxy__BobaBillingContract,
+        L2BillingContractJson.abi,
+        this.L2Provider,
+      )
+      let BobaApprovalAmount = await L2BillingContract.exitFee()
+
       //now coming in as a value_Wei_String
       const value = BigNumber.from(value_Wei_String)
 
       const allowance = await this.checkAllowance(
         currencyAddress,
-        allAddresses.DiscretionaryExitBurn
+        allAddresses.DiscretionaryExitFee
       )
 
-      //no need to approve L2 ETH
-      if( currencyAddress !== allAddresses.L2_ETH_Address && allowance.lt(value) ) {
+      const BobaAllowance = await this.checkAllowance(
+        allAddresses.TK_L2BOBA,
+        allAddresses.DiscretionaryExitFee
+      )
+
+      if (utils.getAddress(currencyAddress) === utils.getAddress(allAddresses.TK_L2BOBA)) {
+        BobaApprovalAmount = BobaApprovalAmount.add(value)
+      }
+
+      // Should approve BOBA
+      if ( BobaAllowance.lt(BobaApprovalAmount) ) {
         const res = await this.approveERC20(
-          value_Wei_String,
-          currencyAddress,
-          allAddresses.DiscretionaryExitBurn
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.DiscretionaryExitFee
         )
         if (!res) return false
       }
 
-      const DiscretionaryExitBurnContract = new ethers.Contract(
-        allAddresses.DiscretionaryExitBurn,
-        DiscretionaryExitBurnJson.abi,
+      // Should approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+          utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA) &&
+          allowance.lt(value)
+        ) {
+        const res = await this.approveERC20(
+          value,
+          currencyAddress,
+          allAddresses.DiscretionaryExitFee
+        )
+        if (!res) return false
+      }
+
+      const DiscretionaryExitFeeContract = new ethers.Contract(
+        allAddresses.DiscretionaryExitFee,
+        DiscretionaryExitFeeJson.abi,
         this.provider.getSigner()
       )
-      console.log("DiscretionaryExitBurnContract",DiscretionaryExitBurnContract)
+      console.log("DiscretionaryExitFeeContract",DiscretionaryExitFeeContract)
 
-      const tx = await DiscretionaryExitBurnContract.burnAndWithdraw(
+      const tx = await DiscretionaryExitFeeContract.payAndWithdraw(
         currencyAddress,
         value_Wei_String,
         this.L1GasLimit,
@@ -2317,22 +2369,22 @@ class NetworkService {
       )
 
       const tx = await ERC20Contract.populateTransaction.approve(
-        allAddresses.DiscretionaryExitBurn,
+        allAddresses.DiscretionaryExitFee,
         utils.parseEther('1.0')
       )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas(tx)
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
 
-    const DiscretionaryExitBurnContract = new ethers.Contract(
-      allAddresses.DiscretionaryExitBurn,
-      DiscretionaryExitBurnJson.abi,
+    const DiscretionaryExitFeeContract = new ethers.Contract(
+      allAddresses.DiscretionaryExitFee,
+      DiscretionaryExitFeeJson.abi,
       this.provider.getSigner()
     )
 
-    const tx2 = await DiscretionaryExitBurnContract.populateTransaction.burnAndWithdraw(
+    const tx2 = await DiscretionaryExitFeeContract.populateTransaction.payAndWithdraw(
       allAddresses.L2_ETH_Address,
       utils.parseEther('0.00001'),
       this.L1GasLimit,
@@ -2340,7 +2392,7 @@ class NetworkService {
       { value: utils.parseEther('0.00001') }
     )
 
-    const gas_BN = await this.L2Provider.estimateGas(tx2)
+    const gas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
     console.log("Classical exit gas", gas_BN.toString())
 
     const cost_BN = gas_BN.mul(gasPrice)
@@ -2643,7 +2695,7 @@ class NetworkService {
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
       // console.log("Yes we have ETH")
       // add value field
-      otherField['value'] = value_Wei_String 
+      otherField['value'] = value_Wei_String
     }
 
     try {
@@ -2667,18 +2719,16 @@ class NetworkService {
 
   async liquidityEstimate(currency) {
 
-    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -2695,9 +2745,9 @@ class NetworkService {
       console.log("benchmarkAllowance", allowance_BN.toString() )
 
       if( currency === allAddresses.L2_ETH_Address ) {
-        otherField['value'] = allowance_BN.toString() 
+        otherField['value'] = allowance_BN.toString()
       }
-      
+
       // second, we need the approval cost if non-ETH
       if( currency !== allAddresses.L2_ETH_Address ) {
 
@@ -2705,7 +2755,7 @@ class NetworkService {
           .populateTransaction
           .approve(
             allAddresses.L2LPAddress,
-            allowance_BN.toString(), 
+            allowance_BN.toString(),
             otherField
           )
 
@@ -2713,7 +2763,7 @@ class NetworkService {
         approvalCost_BN = approvalGas_BN.mul(gasPrice_BN)
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
-       
+
       // third, we need the addLiquidity cost
       const tx2 = await this.L2LPContract
         .connect(this.provider)
@@ -2736,7 +2786,7 @@ class NetworkService {
       console.log('NS: liquidityEstimate() error', error)
       return error
     }
-  
+
   }
 
   /***********************************************/
@@ -3082,7 +3132,7 @@ class NetworkService {
           utils.parseEther('1.0')
         )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas(tx)
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
@@ -3097,7 +3147,7 @@ class NetworkService {
         currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
       )
 
-    const depositGas_BN = await this.L2Provider.estimateGas(tx2)
+    const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
 
     let l1SecurityFee = BigNumber.from('0')
     if (this.networkGateway === 'mainnet') {
@@ -3231,10 +3281,33 @@ class NetworkService {
       balance_BN = await this.L2Provider.getBalance(this.account)
     }
 
-    try {
-      //console.log("Address:",currencyAddress)
-      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    let BobaApprovalAmount = await L2BillingContract.exitFee()
 
+    const BobaAllowance = await this.checkAllowance(
+      allAddresses.TK_L2BOBA,
+      allAddresses.L2LPAddress,
+    )
+
+    try {
+      // Approve BOBA first
+      if (BobaAllowance.lt(BobaApprovalAmount)) {
+        const approveStatus = await this.approveERC20(
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.L2LPAddress
+        )
+        if (!approveStatus) return false
+      }
+
+      // Approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+        utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA)
+      ) {
         const L2ERC20Contract = new ethers.Contract(
           currencyAddress,
           L2ERC20Json.abi,
@@ -3380,9 +3453,36 @@ class NetworkService {
 
     console.log("depositL2LP currencyAddress",currencyAddress)
 
-    try {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    let BobaApprovalAmount = await L2BillingContract.exitFee()
 
-      if( currencyAddress !== allAddresses.L2_ETH_Address ) {
+    const BobaAllowance = await this.checkAllowance(
+      allAddresses.TK_L2BOBA,
+      allAddresses.L2LPAddress,
+    )
+
+    try {
+      // Approve BOBA first
+      if (utils.getAddress(currencyAddress) === utils.getAddress(allAddresses.TK_L2BOBA)) {
+        BobaApprovalAmount = BobaApprovalAmount.add(BigNumber.from(value_Wei_String))
+      }
+      if (BobaAllowance.lt(BobaApprovalAmount)) {
+        const approveStatus = await this.approveERC20(
+          BobaApprovalAmount,
+          allAddresses.TK_L2BOBA,
+          allAddresses.L2LPAddress
+        )
+        if (!approveStatus) return false
+      }
+
+      // Approve other tokens
+      if( currencyAddress !== allAddresses.L2_ETH_Address &&
+        utils.getAddress(currencyAddress) !== utils.getAddress(allAddresses.TK_L2BOBA)
+      ) {
 
         const L2ERC20Contract = new ethers.Contract(
           currencyAddress,
@@ -3658,12 +3758,11 @@ class NetworkService {
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
-      address = [delegateCheck.address] // anything will do, as long at it's not blank
+      address = ['0x000000000000000000000000000000000000dEaD']
       description = payload.text.slice(0, 252) //100+150+2
-      callData = [ethers.utils.defaultAbiCoder.encode( //placeholder value
-        ['uint256'],
-        [value1]
-      )]
+      callData = [
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ]
     } else if ( payload.action === 'change-lp1-fee' ) {
       signatures = ['configureFeeExits(uint256,uint256,uint256)']
       value1 = Number(payload.value[0])
@@ -3897,24 +3996,47 @@ class NetworkService {
           this.account,
           allAddresses.BobaFixedSavings
         )
-      console.log("Allowance", allowance_BN.toString())
+      console.log("Allowance:", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
-      console.log("Deposit", depositAmount_BN)
+      console.log("Deposit:", depositAmount_BN)
+
+      try {
+        if (depositAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", depositAmount_BN)
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.BobaFixedSavings,
+              value_Wei_String
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: addFS_Savings approve error:", error)
+        return error
+      }
+
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
+      console.log("Updated Allowance:", allowance_BN.toString())
 
       if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Need to approve YES:", depositAmount_BN)
-        const approveStatus = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .approve(
-          allAddresses.BobaFixedSavings,
-          value_Wei_String
-        )
-        await approveStatus.wait()
-        if (!approveStatus) return false
+        console.log("Allowance still too small:", allowance_BN.toString(), depositAmount_BN.toString())
       } else {
-        console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        console.log("Allowance is now sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
       }
+
+      console.log("allAddresses.BobaFixedSavings", allAddresses.BobaFixedSavings)
+      console.log("FixedSavings.address", FixedSavings.address)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()
@@ -3926,21 +4048,21 @@ class NetworkService {
   }
 
   async savingEstimate() {
-    
+
     // used to generate gas estimates for contracts that cannot set amount === 0
     // to avoid need to approve amount
     const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-    
-    let otherField = { 
+
+    let otherField = {
       from: benchmarkAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
     console.log("gas price", gasPrice_BN.toString())
-    
+
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
-    
+
     try {
 
       // first, we need the allowance of the benchmarkAccount
@@ -3958,7 +4080,7 @@ class NetworkService {
         .populateTransaction
         .approve(
           allAddresses.BobaFixedSavings,
-          allowance_BN.toString(), 
+          allowance_BN.toString(),
         )
 
       const approvalGas_BN = await this.provider.estimateGas(tx1)
@@ -4035,6 +4157,71 @@ class NetworkService {
       console.log('NS: getSaves error:', error)
       return error
     }
+  }
+
+  async estimateApprove() {
+
+    const approvalAmount = utils.parseEther('10.0')
+    let allowance_BN = null
+    let approveStatus = null
+
+    if(allAddresses.hasOwnProperty('BobaFixedSavings')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.BobaFixedSavings
+        )
+      console.log("Fixed Savings Allowance", allowance_BN.toString())
+
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.BobaFixedSavings,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("Fixed Savings Approval", approveStatus)
+    }
+    
+    if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.DiscretionaryExitFee
+        )
+      console.log("DiscretionaryExitFee Allowance", allowance_BN.toString())
+
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.DiscretionaryExitFee,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("DiscretionaryExitFee Approval", approveStatus)
+    }
+
+    if(allAddresses.hasOwnProperty('L2LPAddress')) {
+      allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.L2LPAddress
+        )
+      console.log("L2LP", allowance_BN.toString())
+
+      approveStatus = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .approve(
+          allAddresses.L2LPAddress,
+          approvalAmount
+        )
+      await approveStatus.wait()
+      console.log("L2LP", approveStatus)
+    }
+
   }
 
   async getFS_Info() {
@@ -4153,6 +4340,18 @@ class NetworkService {
       }
     }
     return payload
+  }
+
+  /***********************************************/
+  /*****              Exit fee               *****/
+  /***********************************************/
+  async getExitFeeFromBillingContract() {
+    const L2BillingContract = new ethers.Contract(
+      allAddresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    return ethers.utils.formatEther(await L2BillingContract.exitFee())
   }
 }
 
