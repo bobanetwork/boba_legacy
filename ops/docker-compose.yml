@@ -297,6 +297,7 @@ services:
       FAST_RELAYER: 'true'
 
   batch_submitter:
+    restart: always
     depends_on:
       - l1_chain
       - dtl
