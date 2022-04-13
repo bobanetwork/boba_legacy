@@ -44,9 +44,10 @@ class GraphQLService {
     return await client.query({ query })
   }
 
-  async queryMonsterTransfer() {
+  async queryMonsterTransfer( account ) {
 
-    const query = apollo.gql(`query { turingMonstersTransferEvents(where:{ to: "0xfd233D94C9858fe8321E50f319e8066A24614883" }) { to from tokenId } }`)
+
+    let query = apollo.gql(`query { turingMonstersTransferEvents(where:{ to: "${account}" }) { to from tokenId } }`)
 
   /*
      curl -g -X POST \
@@ -68,7 +69,6 @@ query GetTUMOEvents($wallet: Bytes!) {
 } 
 }
 
-
   */
     const client = new apollo.ApolloClient({
       uri: this.getBridgeEndpoint(),
@@ -80,10 +80,7 @@ query GetTUMOEvents($wallet: Bytes!) {
     })
 
     return await client.query({ 
-      query,
-      variables : {
-        to: '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-      } 
+      query
     })
   }
 }
