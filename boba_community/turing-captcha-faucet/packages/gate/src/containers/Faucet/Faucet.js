@@ -39,7 +39,7 @@ function Faucet() {
     setLoading(true);
     const res = await networkService.verifyCAPTCHAImage(value, captchaInfo.uuid, key);
     if (res.error) {
-      let error = res.error.data.message;
+      let error = res?.error?.data?.message;
       if (error === "execution reverted: Invalid request") {
         error = "You reached the request limit. Please come back again after 24 hours!";
       }
@@ -94,7 +94,11 @@ function Faucet() {
         <img src={`data:image/png;base64,${captchaInfo.imageBase64}`} className="captchaImage" />
       }
       <Input placeholder="Enter the characters you see" className="captchaInput"
-             onChange={e => setKey(e.target.value)} />
+             onChange={e => setKey(e.target.value)} onKeyUp={e => {
+               if (e.key === 'Enter') {
+                  sendRequest()
+               }
+      }} />
       <Button
         className={buttonDisabled ? "disableRequestButton" : "requestButton"}
         disabled={buttonDisabled}
