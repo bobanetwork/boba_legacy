@@ -1215,9 +1215,9 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    // let monsterList = await GraphQLService.queryMonsterTransfer()
-    // console.log("monsterList:",monsterList)
-    // this returns too many events to be directly useful
+    let monsterList = await GraphQLService.queryMonsterTransfer()
+    console.log("monsterList:",monsterList)
+    //this returns too many events to be directly useful
 
     //   for (let i = 0; i < totalProposals; i++) {
     //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]

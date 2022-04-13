@@ -46,7 +46,7 @@ class GraphQLService {
 
   async queryMonsterTransfer() {
 
-    const query = apollo.gql(`query { turingMonstersTransferEvents { to from tokenId } }`)
+    const query = apollo.gql(`query { turingMonstersTransferEvents(where:{ to: "0xfd233D94C9858fe8321E50f319e8066A24614883" }) { to from tokenId } }`)
 
   /*
      curl -g -X POST \
@@ -58,6 +58,17 @@ class GraphQLService {
     -H "Content-Type: application/json" \
     -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
     https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
+
+
+query GetTUMOEvents($wallet: Bytes!) { 
+  turingMonstersTransferEvents(where:{ 
+      to: $wallet
+    }) {
+  tokenId, to, from
+} 
+}
+
+
   */
     const client = new apollo.ApolloClient({
       uri: this.getBridgeEndpoint(),
