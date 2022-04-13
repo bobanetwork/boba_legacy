@@ -46,14 +46,14 @@ in
 
         # Use fakeSha256 when the dependencies change
         #vendorSha256 = pkgs.lib.fakeSha256;
-        vendorSha256 = "sha256-gHz9A0K2CeqkH+vQ2rV0Um1xp5NrRApB81ASx1iOsp0=";
+        vendorSha256 = "sha256-4/x/ixgTKq9rTqluKZT8JCyjwY+AeKT27SfIfB2rsfA=";
         outputs = [ "out" "geth" "clef" ];
 
         # Move binaries to separate outputs and symlink them back to $out
         postInstall = pkgs.lib.concatStringsSep "\n" (
           builtins.map (bin: "mkdir -p \$${bin}/bin && mv $out/bin/${bin} \$${bin}/bin/ && ln -s \$${bin}/bin/${bin} $out/bin/") [ "geth" "clef" ]
         );
-        runVend = true;
+        proxyVendor = true;
         subPackages = [
           "cmd/abigen"
           "cmd/bootnode"
@@ -212,7 +212,6 @@ in
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig"`
-        rm $out/.bin/hardhat
       '';
     };
     add-inputs = {
@@ -298,6 +297,9 @@ in
       '';
     };
   };
+  "@eth-optimism/replica-healthcheck" = {
+    inherit correct-tsconfig-path;
+  };
   "@boba/register" = {
     inherit add-yarn;
     cleanup-dir = {
@@ -329,6 +331,7 @@ in
     };
   };
   optimism = {
+    inherit add-solc;
     add-inputs = {
       buildInputs = old: old ++ [
         pkgs.yarn
