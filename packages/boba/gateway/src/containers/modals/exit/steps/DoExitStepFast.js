@@ -117,8 +117,14 @@ function DoExitStepFast({ handleClose, token }) {
 
     setErrorString('')
 
-    if (tooSmall || tooBig) {
-      setErrorString('Warning: Value out of bounds')
+    if (tooSmall) {
+      setErrorString('Value too small')
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (tooBig) {
+      setErrorString('Value too big')
       setValidValue(false)
       setValue(value)
       return false
@@ -138,9 +144,9 @@ function DoExitStepFast({ handleClose, token }) {
       //pay BOBA, exit BOBA - check BOBA amount
       feeUseBoba &&
       token.symbol === 'BOBA' &&
-      (Number(value) + feeBOBA) > balance)
+      (Number(value) + feeBOBA + exitFee) > balance)
     {
-      // insufficient BOBA to cover the BOBA amount plus gas
+      // insufficient BOBA to cover the BOBA amount plus gas plus exitFee
       setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
       setValue(value)
@@ -163,9 +169,9 @@ function DoExitStepFast({ handleClose, token }) {
     else if (
       // insufficient BOBA to cover exit fees
       feeUseBoba &&
-      feeBOBA > Number(feeBalanceBOBA))
+      (feeBOBA + exitFee) > Number(feeBalanceBOBA))
     {
-      setErrorString('Warning: BOBA balance too low to cover gas')
+      setErrorString('Warning: BOBA balance too low to cover gas/fees')
       setValidValue(false)
       setValue(value)
       return false
@@ -282,8 +288,14 @@ function DoExitStepFast({ handleClose, token }) {
           setMax_Float(0.0)
       }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
+          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+        else
+          setMax_Float(0.0)
+      }
+      else if (token.symbol === 'BOBA' && !feeUseBoba) {
+        if(balance - exitFee > 0.0)
+          setMax_Float(balance - exitFee)
         else
           setMax_Float(0.0)
       }
@@ -305,9 +317,9 @@ function DoExitStepFast({ handleClose, token }) {
   let ETHstring = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA`
+      ETHstring = `Estimated gas: ${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH`
+      ETHstring = `Estimated gas: ${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -319,6 +331,8 @@ function DoExitStepFast({ handleClose, token }) {
   else if (token.symbol === 'BOBA' && feeUseBoba) {
     allowExitall = false
   }
+
+  const balance = Number(logAmount(token.balance, token.decimals))
 
   return (
     <>
@@ -360,11 +374,23 @@ function DoExitStepFast({ handleClose, token }) {
             loading={loading}
           />
         }
+
         {max_Float === 0 &&
           <Typography variant="body1" sx={{mt: 2}}>
             Loading...
           </Typography>
         }
+        
+        <Typography variant="body2" sx={{mt: 2}}>
+          {parse(`Token balance: ${Number(balance).toFixed(6)} ${token.symbol}`)}
+          <br/>
+          {parse(`Message Relay Fee: ${exitFee} BOBA`)}
+          <br/>
+          {parse(ETHstring)}
+          <br/>
+          {parse(`Max exitable balance (balance - fees): ${Number(max_Float).toFixed(6)} ${token.symbol}`)}
+        </Typography>
+
         {validValue && token && (
           <Typography variant="body2" sx={{mt: 2}}>
             {value &&
@@ -376,14 +402,6 @@ function DoExitStepFast({ handleClose, token }) {
             }
           </Typography>
         )}
-
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(ETHstring)}
-        </Typography>
-
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Exit Fee: ${exitFee} BOBA`)}
-        </Typography>
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
@@ -398,23 +416,16 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
-          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance and balance/liquidity ratio are too low.
-            Please use the classic bridge.
-          </Typography>
-        )}
-
         {(Number(LPRatio) < 0.10 && Number(value) <= Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+            The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
             Please use the classic bridge.
           </Typography>
         )}
 
         {(Number(LPRatio) >= 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
+            The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
             Please use the classic bridge or reduce the amount.
           </Typography>
         )}
