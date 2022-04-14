@@ -30,6 +30,7 @@ import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import multiSigLogo from '../../images/ecosystem/multiSig.svg'
 import brewery from '../../images/ecosystem/brewery.svg'
+import bodhLogo from '../../images/ecosystem/bodhfinance.svg'
 
 /**
  * thematical order of type.
@@ -353,7 +354,17 @@ export const projectList = [
     "type": "defi",
     "image": brewery,
     "description": "Boba Brewery is the first exclusive launchpad for decentralized fundraising in Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
-  }
+  },
+  {
+    "title": "Bodh Finance",
+    "canLaunch": true,
+    "link": "https://bodh.finance/",
+    "twitter": "https://twitter.com/BodhFinance",
+    "discord": "https://discord.gg/za9KXX5m6E",
+    "type": "defi",
+    "image": bodhLogo,
+    "description": "The leading Lending protocol on Boba Network."
+  },
 ]
 
 
