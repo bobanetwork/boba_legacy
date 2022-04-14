@@ -50,21 +50,3 @@ export const LayerDivider = styled(Divider)(({ theme }) => ({
   boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
-
-export const LayerSwitcherIconWrapper = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  borderRadius: '12px',
-  height: '40px',
-  width: '40px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  cursor: 'pointer'
-}))
-
-export const LayerSwitcherIcon = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 'fit-content'
-}))
