@@ -8,7 +8,6 @@ pkgs.devshell.mkShell {
   packages = with pkgs; with bobapkgs; [
     nodePackages.lerna
     nodePackages.typescript
-    nodePackages.yarn
     nix-direnv
     bobapkgs."@eth-optimism/hardhat-node"
   ];
