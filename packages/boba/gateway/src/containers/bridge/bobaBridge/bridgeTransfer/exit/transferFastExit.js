@@ -116,10 +116,10 @@ function TransferFastExit({
     setErrorString('')
 
     if (tooSmall) {
-      setErrorString('Warning: Value too small')
+      // setErrorString('Warning: Value too small')
       setValidValue(false)
     } else if (tooBig) {
-      setErrorString('Warning: Value too big')
+      // setErrorString('Warning: Value too big')
       setValidValue(false)
     } else if (
       token.symbol === 'ETH' &&
@@ -282,7 +282,7 @@ function TransferFastExit({
       </Typography>
 
       <Typography variant="body2" sx={{ mt: 2 }}>
-      {parse(`Max exitable balance (balance - fees): ${Number(max_Float).toFixed(6)} ${token.symbol}`)}
+        {parse(`Max exitable balance (balance - fees): ${Number(max_Float).toFixed(6)} ${token.symbol}`)}
       </Typography>
 
       {errorString !== '' &&
