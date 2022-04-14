@@ -57,6 +57,9 @@ services:
         ROLLUP_ENFORCE_FEES: 'true'
         # turing credit contract
         TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
+        # fee token
+        L2_BOBA_TOKEN_ADDRESS: "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
+        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51"
     logging:
       driver: "json-file"
       options:
