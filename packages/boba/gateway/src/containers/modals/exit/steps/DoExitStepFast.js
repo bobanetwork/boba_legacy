@@ -304,7 +304,7 @@ function DoExitStepFast({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
   const feeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
 
@@ -380,7 +380,7 @@ function DoExitStepFast({ handleClose, token }) {
             Loading...
           </Typography>
         }
-        
+
         <Typography variant="body2" sx={{mt: 2}}>
           {parse(`Token balance: ${Number(balance).toFixed(6)} ${token.symbol}`)}
           <br/>

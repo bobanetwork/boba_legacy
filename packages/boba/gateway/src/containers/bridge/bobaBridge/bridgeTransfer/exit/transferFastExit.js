@@ -176,7 +176,7 @@ function TransferFastExit({
       //Whew, finally!
       setValidValue(true)
     }
-  }, [ token, setValidValue, setErrorString, feeBalanceBOBA, feeBalanceETH, feeUseBoba, feeBOBA, feeETH, max_Float, balanceSubPending, LPRatio ])
+  }, [ token, setValidValue, setErrorString, feeBalanceBOBA, feeBalanceETH, feeUseBoba, feeBOBA, feeETH, max_Float, balanceSubPending, LPRatio, exitFee ])
 
 
   useEffect(() => {
@@ -215,7 +215,7 @@ function TransferFastExit({
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
   const receivableAmount = (value) => {
     return (Number(token.amount) * ((100 - Number(feeRateN)) / 100)).toFixed(3)
