@@ -37,15 +37,16 @@ const initialState = {
   l2lpETHLiquidity: '',
   gas: {},
   userAndL2LPBlanceBatch: {},
+  exitFee: '',
 }
 
 function balanceReducer(state = initialState, action) {
   switch (action.type) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
-      return { 
-        ...state, 
-        layer1, 
+      return {
+        ...state,
+        layer1,
         layer2
       }
     case 'GAS/GET/SUCCESS':
@@ -162,6 +163,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state,
         userAndL2LPBlanceBatch: action.payload
+      }
+    case 'FETCH/EXITFEE/SUCCESS':
+      return {
+        ...state,
+        exitFee: action.payload
       }
     case 'BALANCE/L1/RESET':
       return {

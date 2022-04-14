@@ -36,7 +36,6 @@ function Input({
   unit,
   value,
   onChange,
-  onUseMax,
   onSelect,
   sx,
   paste,
@@ -46,8 +45,7 @@ function Input({
   variant,
   newStyle = false,
   allowUseAll = false,
-  allowExitAll = false,
-  onExitAll,
+  onUseMax,
   loading,
   maxLength,
   selectOptions,
@@ -160,27 +158,15 @@ function Input({
         {unit && (
           <S.ActionsWrapper>
             <Typography variant="body2" component="p" sx={{opacity: 0.7, textAlign: "end", mb: 2}}>
-              Max Amount: {Number(maxValue).toFixed(5)}
+              Max Amount<br/>{Number(maxValue).toFixed(5)}
             </Typography>
             {allowUseAll && (
               <Box>
-                <Button onClick={handleClickMax} variant="small" >
-                  Use All
-                </Button>
-              </Box>
-            )}
-            {allowExitAll && (
-              <Box>
-                <Button
-                  onClick={onExitAll}
-                  variant="small"
-                  size="small"
-                  sx={{margin: '10px 0px'}}
-                  loading={loading}
-                  triggerTime={new Date()}
-                  disabled={disabledExitAll}
+                <Button 
+                  onClick={handleClickMax} 
+                  variant="small" 
                 >
-                  Bridge All
+                  Use All
                 </Button>
               </Box>
             )}

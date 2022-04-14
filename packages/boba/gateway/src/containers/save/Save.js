@@ -133,45 +133,46 @@ class Save extends React.Component {
 
   async getMaxTransferValue () {
 
-    const { 
-      layer2, 
-      bobaFeeChoice, 
-      bobaFeePriceRatio 
+    const {
+      layer2,
+      bobaFeeChoice,
+      bobaFeePriceRatio,
+      netLayer
     } = this.state
-    
+
     // as staking BOBA check the bobabalance
     const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA')
-    console.log("Token:",token)
 
     // BOBA available prepare transferEstimate
     if (token) {
-      //console.log("balance:",token.balance.toString())
-      let cost_BN = await networkService.savingEstimate()
-      console.log([ `cost_BN`, cost_BN ])
+
       let max_BN = BigNumber.from(token.balance.toString())
       let fee = '0'
 
-      if (bobaFeeChoice) {
-        // we are staking BOBA and paying in BOBA
-        // so need to subtract the BOBA fee
-        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+      if (netLayer === 'L2') {
+        let cost_BN = await networkService.savingEstimate()
+        console.log([ `cost_BN`, cost_BN ])
+        if (bobaFeeChoice) {
+          // we are staking BOBA and paying in BOBA
+          // so need to subtract the BOBA fee
+          max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+        }
+
+        // make sure user maintains minimum BOBA in account
+        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
+
+        if (bobaFeeChoice)
+          fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), token.decimals)
+        else
+          fee = utils.formatUnits(cost_BN, token.decimals)
       }
-
-      // make sure user maintains minimum BOBA in account
-      max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-      
-      if(bobaFeeChoice)
-        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), token.decimals)
-      else 
-        fee = utils.formatUnits(cost_BN, token.decimals)
-
       // if the max amount is less than the gas,
       // set the max amount to zero
       if (max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
       }
 
-      this.setState({ 
+      this.setState({
         max_Float_String: utils.formatUnits(max_BN, token.decimals),
         fee
       })
@@ -182,8 +183,8 @@ class Save extends React.Component {
 
   handleStakeValue(value) {
 
-    const { 
-      max_Float_String 
+    const {
+      max_Float_String
     } = this.state
 
     if( value &&
@@ -228,7 +229,7 @@ class Save extends React.Component {
       loading,
       max_Float_String,
       bobaFeeChoice,
-      fee 
+      fee
     } = this.state
 
     let totalBOBAstaked = 0
