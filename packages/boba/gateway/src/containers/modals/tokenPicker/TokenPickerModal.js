@@ -1,9 +1,7 @@
 
-import { Box, Typography, useTheme , useMediaQuery} from '@mui/material'
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { updateToken } from 'actions/bridgeAction'
 import { closeModal } from 'actions/uiAction'
-import * as LayoutS from 'components/common/common.styles'
-import Input from 'components/input/Input'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'lodash'
 import React, { useState } from 'react'
@@ -14,13 +12,19 @@ import { logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './TokenPickerModal.styles'
 
-function TokenPickerModal({ open,tokenIndex }) {
+// the L2 token which can not be exited so exclude from dropdown in case of L2
+const NON_EXITABLE_TOKEN = [
+  'OLO','xBOBA', 'WAGMIv0', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
+]
+
+function TokenPickerModal({ open, tokenIndex }) {
 
   const layer = useSelector(selectLayer())
   const dispatch = useDispatch()
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  
+
   const [ search, setSearch ] = useState('')
 
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
@@ -40,6 +44,11 @@ function TokenPickerModal({ open,tokenIndex }) {
     dispatch(closeModal('tokenPicker'))
   }
 
+  const addToken = (token) => {
+    dispatch(updateToken({token, tokenIndex}));
+    handleClose();
+  }
+
   return (
     <Modal
       open={open}
@@ -51,7 +60,12 @@ function TokenPickerModal({ open,tokenIndex }) {
   >
       <S.TokenList>
         {_balances.length > 0
-          ? _balances.map((token) => {
+          ? _balances.filter((token) => {
+            if (layer === 'L2') {
+              return !(NON_EXITABLE_TOKEN.indexOf(token.symbol) > 0);
+            }
+            return true;
+          }).map((token) => {
 
             const amount = token.symbol === 'ETH' ?
               Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
@@ -60,6 +74,7 @@ function TokenPickerModal({ open,tokenIndex }) {
             return <S.TokenListItem
               key={token.symbol}
               p={1}
+              onClick={() => { addToken(token) }}
             >
               <Box sx={{
                 display: 'flex',

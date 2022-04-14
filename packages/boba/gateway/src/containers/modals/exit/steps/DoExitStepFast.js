@@ -66,7 +66,7 @@ import {
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
 
-function DoExitStepFast({ handleClose, token }) {
+function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -369,6 +369,8 @@ function DoExitStepFast({ handleClose, token }) {
             variant="standard"
             newStyle
             loading={loading}
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
 
@@ -417,7 +419,7 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {loading && (
+        {!isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>

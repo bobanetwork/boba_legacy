@@ -71,7 +71,7 @@ function InputStepBatch({ handleClose }) {
 
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
-  // console.log("ETH available for paying fees:",Number(feeBalance))  
+  // console.log("ETH available for paying fees:",Number(feeBalance))
   async function doDeposit() {
 
     console.log(`User input payload: `, payload)
@@ -258,7 +258,7 @@ function InputStepBatch({ handleClose }) {
         </Typography>
 
         <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast bridge takes less than 10 minutes. 
+          In most cases, a fast bridge takes less than 10 minutes.
           However, if Ethereum is congested, it can take as long as 3 hours.
           Click the + symbol to add additional tokens to bridge.
         </Typography>

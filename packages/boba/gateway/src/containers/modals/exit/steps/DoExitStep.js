@@ -57,7 +57,7 @@ import {
   selectExitFee,
 } from 'selectors/balanceSelector'
 
-function DoExitStep({ handleClose, token }) {
+function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -86,12 +86,25 @@ function DoExitStep({ handleClose, token }) {
 
   const exitFee = useSelector(selectExitFee)
 
+
   function setAmount(value) {
+    // (Number(value) + feeBOBA + exitFee) > balance)
+
 
     const balance = Number(logAmount(token.balance, token.decimals))
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(max_Float))
+
+
+    console.group([ "FEES" ])
+    console.log([ 'errorString', errorString ])
+    console.log([ 'feeBOBA', feeBOBA ])
+    console.log([ 'exitFee', exitFee ])
+    console.log([ 'balance', balance ])
+    console.log([ 'value', value ])
+    console.log([ 'feeBalanceBOBA', feeBalanceBOBA ])
+    console.groupEnd([ "FEES" ])
 
     setErrorString('')
 
@@ -169,7 +182,7 @@ function DoExitStep({ handleClose, token }) {
 
     let res = await dispatch(
       exitBOBA(
-        token.address, 
+        token.address,
         value_Wei_String
       )
     )
@@ -295,6 +308,8 @@ function DoExitStep({ handleClose, token }) {
             maxValue={max_Float}
             variant="standard"
             newStyle
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
         {max_Float === 0 &&
@@ -321,7 +336,7 @@ function DoExitStep({ handleClose, token }) {
           </Typography>
         }
 
-        {loading && (
+        { !isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will close when your transaction has been signed and submitted.
           </Typography>

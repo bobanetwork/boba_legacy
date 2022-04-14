@@ -13,34 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material'
-import { IconButton, Typography, useTheme, useMediaQuery } from '@mui/material'
-import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost } from 'actions/balanceAction'
-import { removeToken, setTokenAmount } from 'actions/bridgeAction'
+import { ArrowDropDown } from '@mui/icons-material'
+import { Typography } from '@mui/material'
 import { openModal } from 'actions/uiAction'
-import BN from 'bignumber.js'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector'
-import { selectLayer } from 'selectors/setupSelector'
-import { logAmount, toWei_String } from 'util/amountConvert'
+import { selectMultiBridgeMode } from 'selectors/bridgeSelector'
 import { getCoinImage } from 'util/coinImage'
-import { BRIDGE_TYPE } from 'util/constant'
 import * as S from './TokenInput.styles'
 
 function TokenInput({
   token,
   index,
 }) {
-
-  const bridgeType = useSelector(selectBridgeType())
-  const layer = useSelector(selectLayer())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
-
   const dispatch = useDispatch()
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const openTokenPicker = () => {
     dispatch(openModal('tokenPicker', null, null, index))

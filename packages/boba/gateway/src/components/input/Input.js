@@ -51,7 +51,9 @@ function Input({
   selectOptions,
   defaultSelect,
   selectValue,
-  style
+  style,
+  isBridge,
+  openTokenPicker
 }) {
 
   async function handlePaste() {
@@ -126,9 +128,17 @@ function Input({
                 value={selectValue ? { value: selectValue, label: tokenImageElement(selectValue) } : null}
               />:
               <S.UnitContent>
-                <div>
+                <Box
+                  sx={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                  if (isBridge) {
+                    openTokenPicker()
+                  }
+                }}>
                   {tokenImageElement(unit)}
-                </div>
+                </Box>
               </S.UnitContent>
             }
             <S.InputWrapper>
@@ -162,9 +172,9 @@ function Input({
             </Typography>
             {allowUseAll && (
               <Box>
-                <Button 
-                  onClick={handleClickMax} 
-                  variant="small" 
+                <Button
+                  onClick={handleClickMax}
+                  variant="small"
                 >
                   Use All
                 </Button>

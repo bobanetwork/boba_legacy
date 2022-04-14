@@ -60,7 +60,7 @@ import {
   selectL2LPLiquidity
 } from 'selectors/balanceSelector'
 
-function InputStepFast({ handleClose, token }) {
+function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -91,7 +91,7 @@ function InputStepFast({ handleClose, token }) {
 
   const maxValue = logAmount(token.balance, token.decimals)
   const lpUnits = logAmount(LPBalance, token.decimals)
-  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits  
+  const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   function setAmount(value) {
 
@@ -333,6 +333,8 @@ function InputStepFast({ handleClose, token }) {
           maxValue={maxValue}
           variant="standard"
           newStyle
+          isBridge={isBridge}
+          openTokenPicker={openTokenPicker}
         />
 
         {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
@@ -384,7 +386,7 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(depositLoading || approvalLoading) && (
+        {!isBridge  && (depositLoading || approvalLoading) && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>

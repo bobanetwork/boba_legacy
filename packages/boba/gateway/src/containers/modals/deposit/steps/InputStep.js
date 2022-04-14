@@ -19,7 +19,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 
-function InputStep({ handleClose, token }) {
+function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -123,6 +123,8 @@ function InputStep({ handleClose, token }) {
           maxValue={maxValue}
           variant="standard"
           newStyle
+          isBridge={isBridge}
+          openTokenPicker={openTokenPicker}
         />
 
         {!!convertToUSD && (
