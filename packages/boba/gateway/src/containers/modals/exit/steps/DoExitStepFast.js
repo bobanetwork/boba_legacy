@@ -117,14 +117,17 @@ function DoExitStepFast({ handleClose, token }) {
 
     setErrorString('')
 
-    if (tooSmall) {
-      setErrorString('Value too small')
+    if (value <= 0) {
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (tooSmall) {
       setValidValue(false)
       setValue(value)
       return false
     }
     else if (tooBig) {
-      setErrorString('Value too big')
       setValidValue(false)
       setValue(value)
       return false
@@ -209,8 +212,6 @@ function DoExitStepFast({ handleClose, token }) {
 
   async function doExit() {
 
-    console.log("Amount to exit:", value_Wei_String)
-
     let res = await dispatch(
       depositL2LP(
         token.address,
@@ -221,7 +222,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (res) {
       dispatch(
           openAlert(
-            `${token.symbol} was bridged. You will receive approximately
+            `${token.symbol} was bridged to L1. You will receive approximately
             ${receivableAmount(value)} ${token.symbol} on L1.`
           )
         )
@@ -232,7 +233,6 @@ function DoExitStepFast({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      //console.log("Token:",token)
       dispatch(fetchL1LPBalance(token.addressL1))
       dispatch(fetchL1LPLiquidity(token.addressL1))
       dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
@@ -272,9 +272,6 @@ function DoExitStepFast({ handleClose, token }) {
 
       const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
 
-      //console.log("ETH fees:", safeCost)
-      //console.log("BOBA fees:", safeCost * feePriceRatio)
-
       setFeeETH(safeCost)
       setFeeBOBA(safeCost * feePriceRatio)
 
@@ -306,7 +303,7 @@ function DoExitStepFast({ handleClose, token }) {
     if (Number(cost) > 0) estimateMax()
   }, [ token, cost, feeUseBoba, feePriceRatio ])
 
-  const feeLabel = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The current fee is ${feeRateN}%.`
+  const feeLabel = `The current LP fee is ${feeRateN}%.`
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -324,15 +321,19 @@ function DoExitStepFast({ handleClose, token }) {
   }
 
   // prohibit ExitAll when paying with the token that is to be exited
-  let allowExitall = true
+  let allowUseAll = true
   if(token.symbol === 'ETH') {
-    allowExitall = false
+    allowUseAll = false
   }
   else if (token.symbol === 'BOBA' && feeUseBoba) {
-    allowExitall = false
+    allowUseAll = false
   }
 
   const balance = Number(logAmount(token.balance, token.decimals))
+
+  let receiveL1 = `You will receive approximately ${receivableAmount(value)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
+              on L1.`
 
   return (
     <>
@@ -344,12 +345,8 @@ function DoExitStepFast({ handleClose, token }) {
 
         <Typography variant="body2" sx={{mb: 3}}>
           {feeLabel}
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast exit takes less than 20 minutes.
-          However, if Ethereum is congested, it can take as long as 3 hours.
-          The amount input window will block transactions that are likely to fail.
+          <br/>
+          Bridge time: 15 minutes normally, as long as 3 hours when ETH is conjested.
         </Typography>
 
         {max_Float > 0.0 &&
@@ -366,7 +363,7 @@ function DoExitStepFast({ handleClose, token }) {
               setAmount(max_Float)                          // so the display value updates for the user
               setValue_Wei_String(token.balance.toString()) // this is ok because BridgeAll is blocked for both ETH and BOBA
             }}
-            allowExitAll={allowExitall}
+            allowUseAll={allowUseAll}
             unit={token.symbol}
             maxValue={max_Float}
             variant="standard"
@@ -382,26 +379,16 @@ function DoExitStepFast({ handleClose, token }) {
         }
         
         <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Token balance: ${Number(balance).toFixed(6)} ${token.symbol}`)}
-          <br/>
           {parse(`Message Relay Fee: ${exitFee} BOBA`)}
           <br/>
           {parse(ETHstring)}
-          <br/>
-          {parse(`Max exitable balance (balance - fees): ${Number(max_Float).toFixed(6)} ${token.symbol}`)}
         </Typography>
 
-        {validValue && token && (
+        {validValue && token && value &&
           <Typography variant="body2" sx={{mt: 2}}>
-            {value &&
-              `You will receive approximately
-              ${receivableAmount(value)}
-              ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
-              on L1.`
-            }
+            {receiveL1}
           </Typography>
-        )}
+        }
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
