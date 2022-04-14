@@ -32,8 +32,6 @@ def turing_verifyCAPTCHA(event, context):
     if keyInRedis:
         print('keyInRedis: ', keyInRedis.decode('utf-8'), 'key: ', key)
         isMatch = keyInRedis.decode('utf-8') == key
-        if isMatch:
-            db.delete(uuid)
         return returnPayload(isMatch)
     else:
         return returnPayload(False)
