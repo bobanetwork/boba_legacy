@@ -174,7 +174,9 @@ function Input({
               <Box>
                 <Button
                   onClick={handleClickMax}
-                  variant="small"
+                  color='primary'
+                  variant='contained'
+                  size="small"
                 >
                   Use All
                 </Button>

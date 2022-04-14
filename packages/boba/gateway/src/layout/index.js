@@ -54,7 +54,7 @@ function App () {
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
-        input: light ? "#fff" : "rgba(9, 22, 43, 0.5)"
+        input: light ? "#fff" : "rgba(255, 255, 255, 0.04)"
       },
       neutral: {
         main: '#fff',

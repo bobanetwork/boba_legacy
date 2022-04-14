@@ -329,8 +329,6 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     allowUseAll = false
   }
 
-  const balance = Number(logAmount(token.balance, token.decimals))
-
   let receiveL1 = `You will receive approximately ${receivableAmount(value)} ${token.symbol}
               ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
               on L1.`
@@ -429,7 +427,8 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color='neutral'
+          variant="standard"
+          color="primary"
           size='large'
         >
           {buttonLabel}

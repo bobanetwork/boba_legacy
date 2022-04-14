@@ -146,7 +146,8 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
+          variant="standard"
+          color="primary"
           size="large"
         >
           {buttonLabel_1}

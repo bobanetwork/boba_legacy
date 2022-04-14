@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Typography, Switch } from "@mui/material";
+import { Box, Typography, Switch, useTheme } from "@mui/material";
 import { setPage } from 'actions/uiAction';
 
 import BobaIcon from 'components/icons/BobaIcon.js';
@@ -24,6 +24,8 @@ function BobaBridge() {
   const multibridgeMode = useSelector(selectMultiBridgeMode())
   const dispatch = useDispatch()
 
+  const theme = useTheme()
+  const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
 
   if (!accountEnabled) {
@@ -59,11 +61,11 @@ function BobaBridge() {
               <WalletPicker />
             </Box>
           </Box>
-          <Box sx={{ alignSelf: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.04)', mt: 2, p: 1 }}>
+          <S.IconSwitcher >
             <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill="white" fillOpacity="0.85" />
+              <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
             </svg>
-          </Box>
+          </S.IconSwitcher>
           <Box width="100%">
             <Box>
               <Typography

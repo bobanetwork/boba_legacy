@@ -14,7 +14,7 @@ export const TokenList = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap: '10px',
   height: '350px',
-  overflow: 'scroll',
+  overflowY: 'scroll',
   [ theme.breakpoints.down('sm') ]: {
     height: '400px',
   }

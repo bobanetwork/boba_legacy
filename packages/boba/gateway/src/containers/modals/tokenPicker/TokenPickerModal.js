@@ -4,7 +4,7 @@ import { updateToken } from 'actions/bridgeAction'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'lodash'
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLayer } from 'selectors/setupSelector'
@@ -25,8 +25,6 @@ function TokenPickerModal({ open, tokenIndex }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const [ search, setSearch ] = useState('')
-
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
 
@@ -35,10 +33,6 @@ function TokenPickerModal({ open, tokenIndex }) {
   if (layer === 'L2') {
     balances = l2Balance
   }
-
-  let _balances = balances.filter((b) => {
-    return !!b.symbol.toLowerCase().includes(search) || !!b.currency.includes(search);
-  })
 
   const handleClose = () => {
     dispatch(closeModal('tokenPicker'))
@@ -59,8 +53,8 @@ function TokenPickerModal({ open, tokenIndex }) {
       newStyle={true}
   >
       <S.TokenList>
-        {_balances.length > 0
-          ? _balances.filter((token) => {
+        {balances.length > 0
+          ? balances.filter((token) => {
             if (layer === 'L2') {
               return !(NON_EXITABLE_TOKEN.indexOf(token.symbol) > 0);
             }

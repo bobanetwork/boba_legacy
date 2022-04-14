@@ -423,7 +423,8 @@ function InputStepBatch({ handleClose }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
+          variant="standard"
+          color="primary"
           size="large"
         >
           {buttonLabel_1}

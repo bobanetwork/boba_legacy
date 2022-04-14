@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Button, Divider as MuiDivider, Typography } from "@mui/material";
+import { Box, Button, Divider as MuiDivider, IconButton, Typography } from "@mui/material";
 
 export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
@@ -28,8 +28,9 @@ export const Divider = styled(MuiDivider)(({ theme }) => ({
 
 
 export const ChainInput = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
+  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0 ,0, 0.04)'}`,
+  border: '1px solid',
+  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
   boxSizing: 'border-box',
   borderRadius: '12px',
   height: '50px',
@@ -103,3 +104,16 @@ export const AlertInfo = styled(Box)`
   align-items: center;
   flex: 1;
 `;
+
+export const IconSwitcher = styled(IconButton)(({ theme }) => ({
+  background: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.04)",
+  border: '1px solid',
+  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
+  borderRadius: '12px',
+  height: '40px',
+  width: '40px',
+  display: 'flex',
+  alignSelf: 'center',
+  justifyContent: 'center',
+  alignItems: 'center'
+}))
