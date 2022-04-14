@@ -88,7 +88,6 @@ import { sortRawTokens } from 'util/common'
 import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
-//import addresses_Local from "@boba/register/addresses/addressesLocal_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
 
 require('dotenv').config()
@@ -116,8 +115,6 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   }
 }
 let allTokens = {}
-
-const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
 
 class NetworkService {
 
@@ -167,6 +164,8 @@ class NetworkService {
     // setting of this value not important since it's not connected to anything in the contracts
     // "param _l1Gas Unused, but included for potential forward compatibility considerations"
     this.L2GasLimit = 1300000 //use the same as the hardcoded receive
+
+    this.gasEstimateAccount = null
 
     // Dao
     this.BobaContract = null
@@ -616,6 +615,8 @@ class NetworkService {
       if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
         this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
+        this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
+        console.log('gasEstimateAccount:', this.gasEstimateAccount)
       }
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
@@ -2373,7 +2374,7 @@ class NetworkService {
         utils.parseEther('1.0')
       )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: this.gasEstimateAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
@@ -2392,7 +2393,7 @@ class NetworkService {
       { value: utils.parseEther('0.00001') }
     )
 
-    const gas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
+    const gas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
     console.log("Classical exit gas", gas_BN.toString())
 
     const cost_BN = gas_BN.mul(gasPrice)
@@ -2693,8 +2694,7 @@ class NetworkService {
     let otherField = {}
 
     if( currency === allAddresses.L1_ETH_Address || currency === allAddresses.L2_ETH_Address ) {
-      // console.log("Yes we have ETH")
-      // add value field
+      // add value field for ETH
       otherField['value'] = value_Wei_String
     }
 
@@ -2720,42 +2720,24 @@ class NetworkService {
   async liquidityEstimate(currency) {
 
     let otherField = {
-      from: benchmarkAccount
+      from: this.gasEstimateAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
-    console.log("gas price", gasPrice_BN.toString())
-
     let approvalCost_BN = BigNumber.from('0')
     let stakeCost_BN = BigNumber.from('0')
 
     try {
 
-      // first, we need the allowance of the benchmarkAccount
-      const BOBA = this.L2_TEST_Contract
-        .connect(this.provider)
-        .attach(this.tokenAddresses['BOBA'].L2)
-
-      let allowance_BN = await BOBA
-        .allowance(
-          benchmarkAccount,
-          allAddresses.L2LPAddress
-        )
-
-      console.log("benchmarkAllowance", allowance_BN.toString() )
-
-      if( currency === allAddresses.L2_ETH_Address ) {
-        otherField['value'] = allowance_BN.toString()
-      }
-
-      // second, we need the approval cost if non-ETH
+      // First, we need the approval cost
+      // not relevant to ETH
       if( currency !== allAddresses.L2_ETH_Address ) {
 
-        const tx1 = await BOBA
+        const tx1 = await this.BobaContract
           .populateTransaction
           .approve(
             allAddresses.L2LPAddress,
-            allowance_BN.toString(),
+            utils.parseEther('1.0'),
             otherField
           )
 
@@ -2764,12 +2746,13 @@ class NetworkService {
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
 
-      // third, we need the addLiquidity cost
+      // Second, we need the addLiquidity cost
+      // all ERC20s will be the same, so use the BOBA contract
       const tx2 = await this.L2LPContract
         .connect(this.provider)
         .populateTransaction
         .addLiquidity(
-          allowance_BN.toString(),
+          utils.parseEther('1.0'),
           this.tokenAddresses['BOBA'].L2,
           otherField
         )
@@ -2778,7 +2761,7 @@ class NetworkService {
       console.log("addLiquidity cost in ETH:", utils.formatEther(stakeCost_BN))
 
       const safety_margin_BN = BigNumber.from('1000000000000')
-      console.log("Stake safety margin:", utils.formatEther(safety_margin_BN))
+      console.log("Safety margin:", utils.formatEther(safety_margin_BN))
 
       return approvalCost_BN.add(stakeCost_BN).add(safety_margin_BN)
 
@@ -3132,7 +3115,7 @@ class NetworkService {
           utils.parseEther('1.0')
         )
 
-      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: benchmarkAccount})
+      const approvalGas_BN = await this.L2Provider.estimateGas({...tx, from: this.gasEstimateAccount})
       approvalCost_BN = approvalGas_BN.mul(gasPrice)
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
@@ -3147,7 +3130,7 @@ class NetworkService {
         currencyAddress === allAddresses.L2_ETH_Address ? { value : '1'} : {}
       )
 
-    const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: benchmarkAccount})
+    const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
 
     let l1SecurityFee = BigNumber.from('0')
     if (this.networkGateway === 'mainnet') {
@@ -4051,10 +4034,9 @@ class NetworkService {
 
     // used to generate gas estimates for contracts that cannot set amount === 0
     // to avoid need to approve amount
-    const benchmarkAccount = '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
 
     let otherField = {
-      from: benchmarkAccount
+      from: this.gasEstimateAccount
     }
 
     const gasPrice_BN = await this.provider.getGasPrice()
@@ -4069,7 +4051,7 @@ class NetworkService {
       let allowance_BN = await this.BobaContract
         .connect(this.provider)
         .allowance(
-          benchmarkAccount,
+          this.gasEstimateAccount,
           allAddresses.BobaFixedSavings
         )
       console.log("benchmarkAllowance_BN",allowance_BN.toString())
