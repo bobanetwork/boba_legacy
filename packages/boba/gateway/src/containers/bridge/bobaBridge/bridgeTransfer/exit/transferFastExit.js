@@ -115,8 +115,11 @@ function TransferFastExit({
 
     setErrorString('')
 
-    if (tooSmall || tooBig) {
-      setErrorString('Warning: Value out of bounds')
+    if (tooSmall) {
+      setErrorString('Warning: Value too small')
+      setValidValue(false)
+    } else if (tooBig) {
+      setErrorString('Warning: Value too big')
       setValidValue(false)
     } else if (
       token.symbol === 'ETH' &&
@@ -132,8 +135,9 @@ function TransferFastExit({
       //pay BOBA, exit BOBA - check BOBA amount
       feeUseBoba &&
       token.symbol === 'BOBA' &&
-      (Number(token.amount) + feeBOBA > balance)
-    ) {
+      (Number(token.amount) + feeBOBA + exitFee) > balance)
+    {
+        // insufficient BOBA to cover the BOBA amount plus gas plus exitFee
       setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
     }
@@ -150,9 +154,9 @@ function TransferFastExit({
     } else if (
       // insufficient BOBA to cover exit fees
       feeUseBoba &&
-      feeBOBA > Number(feeBalanceBOBA)
+      (feeBOBA + exitFee) > Number(feeBalanceBOBA)
     ) {
-      setErrorString('Warning: BOBA balance too low to cover gas')
+      setErrorString('Warning: BOBA balance too low to cover gas/fees')
       setValidValue(false)
     }
     else if (Number(LPRatio) < 0.1) {
@@ -196,8 +200,13 @@ function TransferFastExit({
           setMax_Float(0.0)
       }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
+          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+        else
+          setMax_Float(0.0)
+      } else if (token.symbol === 'BOBA' && !feeUseBoba) {
+        if (balance - exitFee > 0.0)
+          setMax_Float(balance - exitFee)
         else
           setMax_Float(0.0)
       }
@@ -267,10 +276,14 @@ function TransferFastExit({
     />
     <Box>
 
+
       <Typography variant="body2" sx={{ mt: 2 }}>
-        {parse(`Exit Fee: ${exitFee} BOBA`)}
+        {parse(`Message Relay Fee: ${exitFee} BOBA`)}
       </Typography>
 
+      <Typography variant="body2" sx={{ mt: 2 }}>
+      {parse(`Max exitable balance (balance - fees): ${Number(max_Float).toFixed(6)} ${token.symbol}`)}
+      </Typography>
 
       {errorString !== '' &&
         <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
@@ -287,14 +300,14 @@ function TransferFastExit({
 
       {(Number(LPRatio) < 0.10 && Number(token.amount) <= Number(balanceSubPending) * 0.90) && (
         <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
-          The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is low.
+          The pool's balance/liquidity ratio (of {Number(LPRatio).toFixed(2)}) is too low.
           Please use the classic bridge.
         </Typography>
       )}
 
       {(Number(LPRatio) >= 0.10 && Number(token.amount) > Number(balanceSubPending) * 0.90) && (
         <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
-          The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is low.
+          The pool's balance (of {Number(balanceSubPending).toFixed(2)} including inflight bridges) is too low.
           Please use the classic bridge or reduce the amount.
         </Typography>
       )}
