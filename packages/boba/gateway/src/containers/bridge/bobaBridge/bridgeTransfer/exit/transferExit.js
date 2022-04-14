@@ -12,16 +12,16 @@ import { closeModal, openAlert, openModal } from 'actions/uiAction';
 
 import { selectClassicExitCost, selectExitFee, selectL2BalanceBOBA, selectL2BalanceETH} from 'selectors/balanceSelector';
 
-import { logAmount } from 'util/amountConvert';
-import { resetToken } from 'actions/bridgeAction';
-import BridgeFee from '../fee/bridgeFee';
+import { logAmount } from 'util/amountConvert'
+import { resetToken } from 'actions/bridgeAction'
+import BridgeFee from '../fee/bridgeFee'
 
-import parse from 'html-react-parser';
-import { selectBobaFeeChoice, selectBobaPriceRatio } from 'selectors/setupSelector';
-import { fetchClassicExitCost, fetchExitFee, fetchL2BalanceBOBA, fetchL2BalanceETH } from 'actions/balanceAction';
-import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector';
-import { updateSignatureStatus_exitTRAD } from 'actions/signAction';
-import { selectLoading } from 'selectors/loadingSelector';
+import parse from 'html-react-parser'
+import { selectBobaFeeChoice, selectBobaPriceRatio } from 'selectors/setupSelector'
+import { fetchClassicExitCost, fetchExitFee, fetchL2BalanceBOBA, fetchL2BalanceETH } from 'actions/balanceAction'
+import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector'
+import { updateSignatureStatus_exitTRAD } from 'actions/signAction'
+import { selectLoading } from 'selectors/loadingSelector'
 
 function TransferExit({
   token
@@ -34,7 +34,7 @@ function TransferExit({
   const [ feeETH, setFeeETH ] = useState(0.0)
   const [ feeBOBA, setFeeBOBA ] = useState(0.0)
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const cost = useSelector(selectClassicExitCost);
   const feeBalanceETH = useSelector(selectL2BalanceETH)
