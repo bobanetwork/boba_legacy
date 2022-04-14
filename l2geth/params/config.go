@@ -246,7 +246,7 @@ var (
 	BobaRinkebyGasUpdatedForkNum = big.NewInt(0)
 
 	// BobaMainnetFeeUpdatedForkNum is the height at which the fee update fork activates on Mainnet.
-	BobaMainnetFeeUpdatedForkNum = big.NewInt(550000)
+	BobaMainnetFeeUpdatedForkNum = big.NewInt(485000)
 
 	// BobaRinkebyFeeUpdatedForkNum is the height at which the fee update fork activates on Rinkeby.
 	BobaRinkebyFeeUpdatedForkNum = big.NewInt(50000)
