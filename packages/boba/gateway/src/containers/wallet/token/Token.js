@@ -110,7 +110,6 @@ function TokenPage() {
 
   } else {
 
-    console.log([ 'childBalance', childBalance ]);
     return (
     <>
       {layer === 'L2' &&
