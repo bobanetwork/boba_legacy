@@ -14,18 +14,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react'
 import { Typography } from '@mui/material'
-
-import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
+import React from 'react'
+import { connect } from 'react-redux'
+import ReactCardFlip from 'react-card-flip'
 import * as styles from './listNFT.module.scss'
+import * as S from './listNFT.styles'
+import { removeNFT } from 'actions/nftAction'
+import Button from 'components/button/Button'
+import { openModal } from 'actions/uiAction'
 
 class listNFT extends React.Component {
 
   constructor(props) {
 
-    super(props);
+    super(props)
 
     const {
       name,
@@ -33,7 +37,9 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      meta
+      meta,
+      tokenID,
+      small
     } = this.props
 
     this.state = {
@@ -42,16 +48,43 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      meta
+      meta,
+      tokenID,
+      isFlipped: false,
+      small
     }
+
+    this.handleClick = this.handleClick.bind(this)
   }
+
+  handleClick(e) {
+    e.preventDefault();
+    this.setState(prevState => ({ isFlipped: !prevState.isFlipped }));
+  }
+
+  async handleTransfer() {
+
+    const token ={
+      address: this.state.address,
+      tokenID: this.state.tokenID,
+    }
+
+    console.log("setting nft details:", token)
+
+    this.props.dispatch(openModal('transferNFTModal', token))
+  }
+
+  async handleRemove() {
+    this.props.dispatch(removeNFT(this.state.UUID))
+  }
+
 
   componentDidUpdate(prevState) {
 
     const {
       name, symbol, address,
-      UUID, URL, meta
-    } = this.props;
+      UUID, URL, meta, tokenID
+    } = this.props
 
     if (!isEqual(prevState.name, name)) {
       this.setState({ name })
@@ -77,80 +110,118 @@ class listNFT extends React.Component {
       this.setState({ meta })
     }
 
+    if (!isEqual(prevState.tokenID, tokenID)) {
+      this.setState({ tokenID })
+    }
+
   }
 
   render() {
 
     const {
-      name,
       symbol,
       URL,
-      meta
+      isFlipped,
+      meta,
+      tokenID,
+      small
     } = this.state
 
+    let rarity = ''
+    if(meta && meta.hasOwnProperty("attributes")) {
+      if(meta.attributes.length === 5){
+        if(meta.attributes[3].trait_type === 'Top') {
+          rarity = 'Basic'
+          if(meta.attributes[3].value === 'crown' && meta.attributes[4].value === 'wizzard') {
+            rarity = 'Rarest (2/1000)' // 1000 * 5/256 * 20/256
+          } else if (meta.attributes[3].value === 'crown') {
+            rarity = 'Very rare (20/1000)' // 1000 * 5/256
+          } else if (meta.attributes[4].value === 'wizzard') {
+            rarity = 'Rare (78/1000)' // 1000 * 20/256
+          }
+        }
+      }
+    }
+
     let imgSource = URL
-    if(URL.substring(0,4)==='<svg') {
+    if (URL.substring(0, 4) === '<svg') {
       imgSource = `data:image/svg+xml;utf8,${URL}`
     }
 
     return (
-      <div className={styles.ListNFT}>
-
-        <img 
-          src={imgSource}
-          alt="NFT URI"
-          width={'100%'} 
-        />
-
-        <div className={styles.topContainer}>
-          <div className={styles.Table2}>
-          
-            <Typography variant="h4">
-              {name} ({symbol})
-            </Typography>
-
-            {meta.collection !== '' &&
-              <Typography variant="body3">
-                Collection: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.collection}
-                </Typography>
+      <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical" >
+        <S.ListNFTItem 
+          item 
+          small={small}
+          onClick={this.handleClick}
+        >
+          <img
+            src={imgSource}
+            alt="NFT URI"
+            width={small ? '50%' : '100%'}
+          />
+          <div
+            style={{padding: '10px 5px'}}
+            className={styles.topContainer}>
+            {!small && <>
+              <Typography variant="body1">
+                {meta.name}{' '}({symbol})
               </Typography>
-            }
-            {meta.rank !== '' &&
               <Typography variant="body3">
-                Rank: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.rank}
-                </Typography>
+                TokenID:{' '}{tokenID}
               </Typography>
-            }
-            {meta.rarity_score !== '' &&
-              <Typography variant="body3">
-                Rarity: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.rarity_score}
-                </Typography>
-              </Typography>
-            }
-            {(meta.attributes || []).map((attr, index) => {
-              return (<Typography variant="body3" key={index}>{attr.trait_type}: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {attr.value}
-                </Typography>
-              </Typography>)
-            })}
-            {(meta.traits || []).map((attr, index) => {
-              return (<Typography variant="body3" key={index}>
-                {attr.trait_type}: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {attr.trait_value}
-                </Typography>
-              </Typography>)
-            })}
+              </>
+            }            
           </div>
-        </div>
-      </div>
+        </S.ListNFTItem>
+        <S.ListNFTItem 
+          active={'true'} 
+          item 
+          small={small}
+          onClick={this.handleClick}
+        >
+          {meta.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta.collection}</Typography>}
+          {meta.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta.rank}</Typography>}
+          {meta.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta.rarity_score}</Typography>}
+          {rarity !== ''            && <Typography variant="body3">Rarity:{' '}{rarity}</Typography>}
+          {(meta.attributes || []).map((attr, index) => {
+            return (
+              <Typography variant="body3" key={index}>
+                {attr.trait_type}:{' '}{attr.value}
+              </Typography>
+            )
+          })}
+          {(meta.traits || []).map((attr, index) => {
+            return (
+              <Typography variant="body3" key={index}>
+                {attr.trait_type}:{' '}{attr.trait_value}
+              </Typography>
+            )
+          })}
+          {!small && <>
+            <Button
+              type="primary"
+              variant="contained"
+              style={{marginTop: '10px', marginBottom: '10px'}}
+              onClick={(e) => {this.handleTransfer()}}
+              size="small"
+            >
+              Transfer
+            </Button>
+            <Button
+              type="primary"
+              variant="contained"
+              onClick={(e) => {
+                e.stopPropagation();
+                this.handleRemove();
+              }}
+              size="small"
+            >
+              Remove
+            </Button>
+        </>}
+        </S.ListNFTItem>
+      </ReactCardFlip>
     )
   }
 }

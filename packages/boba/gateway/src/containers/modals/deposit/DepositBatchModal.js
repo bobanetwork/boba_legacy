@@ -20,6 +20,7 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import InputStepBatch from './steps/InputStepBatch'
+import { fetchTransactions } from 'actions/networkAction'
 
 function DepositBatchModal({ open }) {
 
@@ -27,6 +28,7 @@ function DepositBatchModal({ open }) {
 
   function handleClose() {
     dispatch(closeModal('depositBatchModal'))
+    dispatch(fetchTransactions())
   }
 
   return (

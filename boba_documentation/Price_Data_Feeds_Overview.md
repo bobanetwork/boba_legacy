@@ -94,9 +94,9 @@ Here, `value` is the price to submit, note: in decimals as returned by the contr
 
 For more info refer:
 
-[[contracts]](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/oracle)
+[[contracts]](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/oracle)
 
-[[examples]](https://github.com/omgnetwork/optimism-v2/tree/develop/boba_examples/boba-straw)
+[[examples]](https://github.com/bobanetwork/boba/tree/develop/boba_examples/boba-straw)
 
 ### 1.b I want my contracts to receive data
 
@@ -156,7 +156,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 ## 2. Witnet Price Feeds
 
-Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. Learn more about Witnet protocol [here]( https://docs.witnet.io/)
+Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. Learn more about Witnet protocol [here](https://docs.witnet.io/)
 
 #### Feeds supported:
 
@@ -172,11 +172,9 @@ It's just as easy to make your contracts listen to Witnet's price feed. Please r
 
 ## 3. Turing
 
-*Note: Turing is currently in testing on Boba Rinkeby*
-
 Turing is Boba's off-chain compute system, and among many other things - you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data
 
-In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/turing)
+In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing)
 
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to the external endpoint to retrieve the price data - which are subject to unavailability or distortion. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
 
@@ -186,7 +184,7 @@ Note: Unlike a feed contract where every data query remains on-chain, Turing req
 
 *Fee*: 0.01 BOBA for one Turing request
 
-*Quick-Link*: https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
+*Quick-Link*: https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
 
 ### I want my contracts to receive data
 
@@ -217,6 +215,6 @@ address public helperAddr;
 
 For a more detailed walk through, refer to:
 
-[[guide]](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md)
+[[guide]](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md)
 
-[[examples]](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/contracts/Lending.sol)
+[[examples]](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/contracts/Lending.sol)

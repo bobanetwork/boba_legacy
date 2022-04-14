@@ -68,10 +68,6 @@ type PublicEthereumAPI struct {
 	b Backend
 }
 
-type callmsg struct {
-	types.Message
-}
-
 // NewPublicEthereumAPI creates a new Ethereum protocol API.
 func NewPublicEthereumAPI(b Backend) *PublicEthereumAPI {
 	return &PublicEthereumAPI{b}
@@ -974,9 +970,12 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo  uint64 = params.TxGas - 1
-		hi  uint64
-		cap uint64
+		lo               uint64 = params.TxGas - 1
+		hi               uint64
+		cap              uint64
+		blockNr          *big.Int
+		isGasUpdate      bool = true
+		isFeeTokenUpdate bool = true
 	)
 	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
@@ -1008,20 +1007,42 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	if args.From == nil {
 		args.From = &common.Address{}
 	}
+	// Get hard fork status
+	block, err := b.BlockByNumberOrHash(ctx, blockNrOrHash)
+	if err == nil {
+		blockNr = block.Number()
+		isGasUpdate = b.ChainConfig().IsGasUpdate(blockNr)
+		isFeeTokenUpdate = b.ChainConfig().IsFeeTokenUpdate(blockNr)
+	}
+	// Get state
+	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	// If gas price is 0 or nil, the returned gas limit doesn't include the
+	// l1 security fee
+	gasPrice := new(big.Int)
+	price, err := b.SuggestPrice(ctx)
+	if err == nil && isFeeTokenUpdate {
+		if args.GasPrice == nil {
+			// gasPrice is used to calculate the l2ExtraFee
+			gasPrice = price
+		} else {
+			// Set gasPrice to the gas price from input
+			gasPrice = (*big.Int)(args.GasPrice)
+		}
+	}
 	// Create a helper to check if a gas allowance results in an executable transaction
-	executable := func(gas uint64) (bool, []byte) {
+	executable := func(gas uint64) (bool, []byte, error) {
 		args.Gas = (*hexutil.Uint64)(&gas)
 
 		res, _, failed, err := DoCall(ctx, b, args, blockNrOrHash, nil, &vm.Config{}, 0, gasCap)
 		if err != nil || failed {
-			return false, res
+			return false, res, err
 		}
-		return true, res
+		return true, res, err
 	}
 	// Execute the binary search and hone in on an executable gas limit
 	for lo+1 < hi {
 		mid := (hi + lo) / 2
-		ok, _ := executable(mid)
+		ok, _, _ := executable(mid)
 
 		if !ok {
 			lo = mid
@@ -1031,7 +1052,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	}
 	// Reject the transaction as invalid if it still fails at the highest allowance
 	if hi == cap {
-		ok, res := executable(hi)
+		ok, res, err := executable(hi)
 		if !ok {
 			if len(res) >= 4 && bytes.Equal(res[:4], abi.RevertSelector) {
 				reason, errUnpack := abi.UnpackRevert(res)
@@ -1041,20 +1062,16 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 				}
 				return 0, err
 			}
+			// Return the detailed error message
+			if err != nil {
+				return 0, err
+			}
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
 	}
 
-	nonce, _ := b.GetPoolNonce(ctx, *args.From)
-
-	value := new(big.Int)
-	if args.Value != nil {
-		value = args.Value.ToInt()
-	}
-
-	gasPrice := new(big.Int)
-	if args.GasPrice != nil {
-		gasPrice = args.GasPrice.ToInt()
+	if !isGasUpdate {
+		return hexutil.Uint64(hi), nil
 	}
 
 	var data []byte
@@ -1062,17 +1079,24 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		data = []byte(*args.Data)
 	}
 
-	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
-
-	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	l2ExtraGas := new(big.Int)
 	if rcfg.UsingOVM {
-		if msg.GasPrice().Cmp(common.Big0) != 0 {
-			l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, state, nil)
+		if gasPrice.Cmp(common.Big0) != 0 {
+			l2ExtraGas, _ = fees.CalculateL1GasFromState(data, state, nil)
 		}
 	}
 
-	return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	// Get gas usage for l1 security fee
+	intrGas, err := core.IntrinsicGas(data, args.To == nil, true, b.ChainConfig().IsIstanbul(blockNr))
+	if err != nil {
+		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	}
+	// Add l1 security fee if it hasn't been calculated into gas limit
+	if hi >= intrGas+l2ExtraGas.Uint64() && args.GasPrice != nil {
+		return hexutil.Uint64(hi), nil
+	} else {
+		return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
+	}
 }
 
 // EstimateGas returns an estimate of the amount of gas needed to execute the
@@ -1503,6 +1527,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 		"l1GasUsed":   (*hexutil.Big)(receipt.L1GasUsed),
 		"l1Fee":       (*hexutil.Big)(receipt.L1Fee),
 		"l1FeeScalar": receipt.FeeScalar.String(),
+		"l2BobaFee":   (*hexutil.Big)(receipt.L2BobaFee),
 	}
 
 	// Assign receipt status or post state.
@@ -1738,36 +1763,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 	txMeta := types.NewTransactionMeta(nil, 0, nil, nil, types.QueueOriginSequencer, nil, nil, encodedTx)
 	tx.SetTransactionMeta(txMeta)
 
-	ret, err := SubmitTransaction(ctx, s.b, tx)
-
-	// if err != nil && err.Error() == "turing retry needed" {
-	// 	blockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
-	// 	tdBytes := hexutil.Bytes(tx.Data())
-
-	// 	signer := types.MakeSigner(s.b.ChainConfig(), s.b.CurrentBlock().Number())
-	// 	from, err := types.Sender(signer, tx)
-
-	// 	callArgs := CallArgs{
-	// 		From:     &from,
-	// 		To:       tx.To(),
-	// 		GasPrice: (*hexutil.Big)(tx.GasPrice()),
-	// 		Value:    (*hexutil.Big)(tx.Value()),
-	// 		Data:     &tdBytes,
-	// 	}
-
-	// 	_, _, failed, err2 := DoCall(ctx, s.b, callArgs, blockNrOrHash, nil, &vm.Config{}, 0, new(big.Int).SetUint64(8000000))
-	// 	if failed {
-	// 		log.Error("TURING api.go gasEstimate failed", "err", err2)
-	// 		return common.Hash{}, err
-	// 	}
-
-	// 	log.Debug("TURING ethapi/api.go calling again after gasEstimate")
-	// 	ret, err = SubmitTransaction(ctx, s.b, tx)
-
-	// 	log.Debug("TURING ethapi/api.go second call is done", "ret", ret, "err", err)
-	// }
-
-	return ret, err
+	return SubmitTransaction(ctx, s.b, tx)
 }
 
 // Sign calculates an ECDSA signature for:

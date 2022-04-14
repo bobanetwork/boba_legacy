@@ -30,21 +30,23 @@ const initialState = {
   fastDepositCost: '',
   fastDepositBatchCost: '',
   l1FeeBalance: '',
-  l2FeeBalance: '',
+  l2BalanceETH: '',
+  l2BalanceBOBA: '',
   l1lpLiquidity: '',
   l2lpLiquidity: '',
   l2lpETHLiquidity: '',
   gas: {},
   userAndL2LPBlanceBatch: {},
+  exitFee: '',
 }
 
 function balanceReducer(state = initialState, action) {
   switch (action.type) {
     case 'BALANCE/GET/SUCCESS':
       const { layer1, layer2 } = action.payload
-      return { 
-        ...state, 
-        layer1, 
+      return {
+        ...state,
+        layer1,
         layer2
       }
     case 'GAS/GET/SUCCESS':
@@ -132,10 +134,15 @@ function balanceReducer(state = initialState, action) {
         ...state,
         l1FeeBalance: action.payload
       }
-    case 'FETCH/L2FEE/BALANCE/SUCCESS':
+    case 'FETCH/L2ETH/BALANCE/SUCCESS':
       return {
         ...state,
-        l2FeeBalance: action.payload
+        l2BalanceETH: action.payload
+      }
+    case 'FETCH/L2BOBA/BALANCE/SUCCESS':
+      return {
+        ...state,
+        l2BalanceBOBA: action.payload
       }
     case 'FETCH/L1LP/LIQUIDITY/SUCCESS':
       return {
@@ -156,6 +163,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state,
         userAndL2LPBlanceBatch: action.payload
+      }
+    case 'FETCH/EXITFEE/SUCCESS':
+      return {
+        ...state,
+        exitFee: action.payload
       }
     case 'BALANCE/L1/RESET':
       return {

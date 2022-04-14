@@ -870,12 +870,6 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 			w.current.tcount++
 			txs.Shift()
 
-		// case core.ErrTuringRetry:
-		// 	// Turing transaction needs to be retried after populating the cache. This special
-		// 	// error code rolls back the first attempt as if it had never happened.
-		// 	txs.Shift()
-		// 	return 2
-
 		default:
 			// Strange error, discard the transaction and get the next in line (note, the
 			// nonce-too-high clause will prevent us from executing in vain).

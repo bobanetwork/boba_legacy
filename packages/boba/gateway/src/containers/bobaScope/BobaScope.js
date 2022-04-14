@@ -36,17 +36,21 @@ import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 import useInterval from 'util/useInterval'
-import PageHeader from 'components/pageHeader/PageHeader'
 
 import { POLL_INTERVAL } from 'util/constant'
+import PageTitle from 'components/pageTitle/PageTitle'
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 function BobaScope() {
 
   const dispatch = useDispatch()
 
-  const [searchData, setSearchData] = useState('')
+  const [ searchData, setSearchData ] = useState('')
 
   const activeTab = useSelector(selectActiveDataTab, isEqual)
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   const unorderedSevens = useSelector(selectSevens, isEqual)
   const orderedSevens = orderBy(unorderedSevens, i => i.timeStamp, 'desc')
@@ -57,15 +61,37 @@ function BobaScope() {
   const fastExits = orderedFastExits
 
   useInterval(() => {
-    batch(()=>{
-      dispatch(fetchSevens())
-      dispatch(fetchFastExits())
-    })
+    if (accountEnabled) {
+      batch(() => {
+        dispatch(fetchSevens())
+        dispatch(fetchFastExits())
+      })
+    }
   }, POLL_INTERVAL)
 
+  if (!accountEnabled) {
+
+    return <S.ScopePageContainer>
+      <PageTitle title="Boba Scope" />
+      <S.LayerAlert>
+        <S.AlertInfo>
+          <AlertIcon />
+          <S.AlertText
+            variant="body2"
+            component="p"
+          >
+            Connect to MetaMask to access Boba Scope
+          </S.AlertText>
+        </S.AlertInfo>
+        <WalletPicker />
+      </S.LayerAlert>
+    </S.ScopePageContainer>
+  }
+
+
   return (
-    <>
-      <PageHeader title="BobaScope" />
+    <S.ScopePageContainer>
+      <PageTitle title="Boba Scope" />
 
       <S.Header>
         <div className={styles.searchInput}>
@@ -73,7 +99,7 @@ function BobaScope() {
             size='small'
             placeholder='Search by hash'
             value={searchData}
-            onChange={i=>{setSearchData(i.target.value)}}
+            onChange={i => { setSearchData(i.target.value) }}
             className={styles.searchBar}
           />
         </div>
@@ -81,9 +107,9 @@ function BobaScope() {
       <div className={styles.data}>
         <div className={styles.section}>
           <Tabs
-            onClick={tab => {dispatch(setActiveDataTab(tab))}}
+            onClick={tab => { dispatch(setActiveDataTab(tab)) }}
             activeTab={activeTab}
-            tabs={['Seven Day Queue', 'Fast Exits']}
+            tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
           />
 
           {activeTab === 'Seven Day Queue' && (
@@ -100,7 +126,7 @@ function BobaScope() {
           )}
         </div>
       </div>
-    </>
+    </S.ScopePageContainer>
   );
 }
 

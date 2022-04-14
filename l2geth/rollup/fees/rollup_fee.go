@@ -22,6 +22,9 @@ var (
 	// ErrInsufficientFunds represents the error case of when the user doesn't
 	// have enough funds to cover the transaction
 	ErrInsufficientFunds = errors.New("insufficient funds for l1Fee + l2Fee + value")
+	// ErrInsufficientBobaFunds represents the error case of when the user doesn't
+	// have enough funds to cover the transaction
+	ErrInsufficientBobaFunds = errors.New("insufficient boba funds for l1Fee + l2Fee + value")
 	// errMissingInput represents the error case of missing required input to
 	// PaysEnough
 	errMissingInput = errors.New("missing input")
@@ -95,6 +98,49 @@ func CalculateTotalFee(tx *types.Transaction, gpo RollupOracle) (*big.Int, error
 	return fee, nil
 }
 
+// CalculateL1GasFromState computes the L1 portion of the gas given
+// a tx.data and a StateDB
+func CalculateL1GasFromState(txData []byte, state StateDB, gpo *common.Address) (*big.Int, error) {
+	gpo = &rcfg.L2GasPriceOracleAddress
+	l1Fee, err := CalculateL1DataFee(txData, state, gpo)
+
+	if err != nil {
+		return new(big.Int), err
+	}
+	_, _, _, l2GasPrice := readGPOStorageSlots(*gpo, state)
+	if l2GasPrice.BitLen() == 0 {
+		return new(big.Int), nil
+	} else {
+		return new(big.Int).Div(l1Fee, l2GasPrice), nil
+	}
+}
+
+// CalculateL1GasFromGPO will calculate the l1 fee given a tx.data.
+// This function is used at the RPC layer to ensure that users
+// have enough ETH to cover their fee
+func CalculateL1GasFromGPO(txData []byte, l2GasPrice *big.Int, gpo RollupOracle) (*big.Int, error) {
+	// Read the variables from the cache
+	l1GasPrice, err := gpo.SuggestL1GasPrice(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	overhead, err := gpo.SuggestOverhead(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	scalar, err := gpo.SuggestScalar(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	l1Fee := CalculateL1Fee(txData, overhead, l1GasPrice, scalar)
+	if l2GasPrice.BitLen() == 0 {
+		return new(big.Int), nil
+	} else {
+		return new(big.Int).Div(l1Fee, l2GasPrice), nil
+	}
+}
+
 // CalculateMsgFee will calculate the total fee given a Message.
 // This function is used during the state transition to transfer
 // value to the sequencer. Since Messages do not have a signature
@@ -150,6 +196,18 @@ func CalculateL1MsgFee(msg Message, state StateDB, gpo *common.Address) (*big.In
 	return l1Fee, nil
 }
 
+// CalculateL1MsgFee computes the L1 portion of the fee given
+// a tx.Data and a StateDB
+func CalculateL1DataFee(txData []byte, state StateDB, gpo *common.Address) (*big.Int, error) {
+	if gpo == nil {
+		gpo = &rcfg.L2GasPriceOracleAddress
+	}
+
+	l1GasPrice, overhead, scalar, _ := readGPOStorageSlots(*gpo, state)
+	l1Fee := CalculateL1Fee(txData, overhead, l1GasPrice, scalar)
+	return l1Fee, nil
+}
+
 // CalculateL1Fee computes the L1 fee
 func CalculateL1Fee(data []byte, overhead, l1GasPrice *big.Int, scalar *big.Float) *big.Int {
 	l1GasUsed := CalculateL1GasUsed(data, overhead)
@@ -184,6 +242,15 @@ func DeriveL1GasInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, 
 	return l1Fee, l1GasPrice, l1GasUsed, scalar, nil
 }
 
+// DeriveL1GasDataInfo reads L1 gas related information to be included
+// on the receipt
+func DeriveL1GasDataInfo(msg Message, state StateDB) (*big.Int, *big.Int, *big.Int, *big.Float, error) {
+	l1GasPrice, overhead, scalar, _ := readGPOStorageSlots(rcfg.L2GasPriceOracleAddress, state)
+	l1GasUsed := CalculateL1GasUsed(msg.Data(), overhead)
+	l1Fee := CalculateL1Fee(msg.Data(), overhead, l1GasPrice, scalar)
+	return l1Fee, l1GasPrice, l1GasUsed, scalar, nil
+}
+
 func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int, *big.Float, *big.Int) {
 	l2GasPrice := state.GetState(addr, rcfg.L2GasPriceSlot)
 	l1GasPrice := state.GetState(addr, rcfg.L1GasPriceSlot)
@@ -192,6 +259,12 @@ func readGPOStorageSlots(addr common.Address, state StateDB) (*big.Int, *big.Int
 	decimals := state.GetState(addr, rcfg.DecimalsSlot)
 	scaled := ScaleDecimals(scalar.Big(), decimals.Big())
 	return l1GasPrice.Big(), overhead.Big(), scaled, l2GasPrice.Big()
+}
+
+// ReadGasPriceOracleOwner reads gas oracle owner address
+func ReadGasPriceOracleOwner(state StateDB) common.Address {
+	gasPriceOracleOwner := state.GetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceOracleOwnerSlot)
+	return common.BigToAddress(gasPriceOracleOwner.Big())
 }
 
 // ScaleDecimals will scale a value by decimals

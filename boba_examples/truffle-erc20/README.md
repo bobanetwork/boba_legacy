@@ -4,7 +4,7 @@ Hi there! Welcome to our ERC20 Truffle example. If you're interested in writing 
 
 Let's begin.
 
-## Step 1: Compile your contracts 
+## Step 1: Compile your contracts
 
 Compiling a contract for Boba is identical to compiling a contract for Ethereum mainchain. Notably, all standard solidity compiler versions can be used. For this ERC20, we will use `0.6.12`. Create a `truffle-config.js` and add the following to it:
 
@@ -57,7 +57,7 @@ Woot! It's time to test our contract. Since the JSON RPC provider URL (for Boba 
 yarn test:integration
 ```
 
-You should see a set of passing tests for your ERC20 contract. 
+You should see a set of passing tests for your ERC20 contract.
 
 ```bash
 
@@ -110,10 +110,10 @@ module.exports = function (deployer, accounts) {
 
   // deployment steps
   deployer.deploy(
-    ERC20, 
-    10000, 
-    tokenName, 
-    tokenDecimals, 
+    ERC20,
+    10000,
+    tokenName,
+    tokenDecimals,
     tokenSymbol
   )
 }
@@ -130,7 +130,7 @@ After a few seconds your contract should be deployed. Now you'll see this in you
 
 ```bash
 
-$ yarn deploy          
+$ yarn deploy
 yarn run v1.22.15
 $ truffle migrate --network boba_rinkeby --config truffle-config
 
@@ -183,4 +183,4 @@ That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you 
 
 ## Troubleshooting
 
-Example project not working? [Create a Github Issue](https://github.com/omgnetwork/optimism-v2/develop/boba_examples/truffle-erc20/issues).
+Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20/issues).

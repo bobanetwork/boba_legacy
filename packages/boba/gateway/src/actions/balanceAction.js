@@ -70,10 +70,18 @@ export function fetchL1FeeBalance() {
     return createAction('FETCH/L1FEE/BALANCE', () => networkService.getL1FeeBalance())
 }
 
-export function fetchL2FeeBalance() {
-    return createAction('FETCH/L2FEE/BALANCE', () => networkService.getL2FeeBalance())
+export function fetchL2BalanceETH() {
+    return createAction('FETCH/L2ETH/BALANCE', () => networkService.getL2BalanceETH())
+}
+
+export function fetchL2BalanceBOBA() {
+    return createAction('FETCH/L2BOBA/BALANCE', () => networkService.getL2BalanceBOBA())
 }
 
 export function fetchUserAndL2LPBalanceBatch(tokenList) {
     return createAction('FETCH/USER/L2LP/BALANCE/BATCH', () => networkService.getL2UserAndLPBalanceBatch(tokenList))
+}
+
+export function fetchExitFee() {
+  return createAction('FETCH/EXITFEE', () => networkService.getExitFeeFromBillingContract())
 }

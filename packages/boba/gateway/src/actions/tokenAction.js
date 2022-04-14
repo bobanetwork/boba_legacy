@@ -96,6 +96,30 @@ export async function addToken ( tokenContractAddressL1 ) {
         erc20abi,
         networkService.L2Provider,
       )
+    } else if (_tokenContractAddressL1 === 'wagmiv1') {
+      if(tA['WAGMIv1'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv1'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+    }
+    else if (_tokenContractAddressL1 === 'wagmiv2') {
+      if(tA['WAGMIv2'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv2'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+    }
+    else if (_tokenContractAddressL1 === 'wagmiv2-oolong') {
+      if(tA['WAGMIv2-Oolong'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv2-Oolong'].L2.toLowerCase()
+      tokenContract = new ethers.Contract(
+        _tokenContractAddressL2, 
+        erc20abi,
+        networkService.L2Provider,
+      )
+
     } else if (_tokenContractAddressL1 === 'olo') {
       if(tA['OLO'].L2 !== null) _tokenContractAddressL2 = tA['OLO'].L2.toLowerCase()
       tokenContract = new ethers.Contract(
@@ -135,7 +159,13 @@ export async function addToken ( tokenContractAddressL1 ) {
     }
     
     const tokenInfo = {
-      currency: (_symbolL1 === 'xBOBA' || _symbolL1 === 'WAGMIv0') ? _tokenContractAddressL2 : _tokenContractAddressL1,
+      currency: (
+        _symbolL1 === 'xBOBA'   || 
+        _symbolL1 === 'WAGMIv0' || 
+        _symbolL1 === 'WAGMIv1' ||
+        _symbolL1 === 'WAGMIv2' ||
+        _symbolL1 === 'WAGMIv2-Oolong'
+        ) ? _tokenContractAddressL2 : _tokenContractAddressL1,
       addressL1: _tokenContractAddressL1,
       addressL2: _tokenContractAddressL2,
       symbolL1,
@@ -150,14 +180,14 @@ export async function addToken ( tokenContractAddressL1 ) {
       payload: tokenInfo
     });
 
-    return tokenInfo;
+    return tokenInfo
 
   } catch (error) {
 
     store.dispatch({
       type: 'TOKEN/GET/FAILURE',
       payload: {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'},
-    });
+    })
 
     return {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'};
   }

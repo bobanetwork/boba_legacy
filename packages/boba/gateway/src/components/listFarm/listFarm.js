@@ -16,9 +16,11 @@ import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
 
-import { Box, Typography, Fade,  CircularProgress } from '@mui/material';
+import { Box, Typography, Fade, CircularProgress } from '@mui/material';
 import * as S from "./ListFarm.styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
+import Tooltip from 'components/tooltip/Tooltip';
+import { HelpOutline } from '@mui/icons-material';
 
 class ListFarm extends React.Component {
 
@@ -55,7 +57,7 @@ class ListFarm extends React.Component {
 
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.dispatch(getAllAddresses());
   }
 
@@ -132,9 +134,9 @@ class ListFarm extends React.Component {
 
     const userReward = BigNumber.from(userInfo.pendingReward).add(
       BigNumber.from(userInfo.amount)
-      .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
-      .div(BigNumber.from(powAmount(1, 12)))
-      .sub(BigNumber.from(userInfo.rewardDebt))
+        .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
+        .div(BigNumber.from(powAmount(1, 12)))
+        .sub(BigNumber.from(userInfo.rewardDebt))
     ).toString()
 
     let getRewardTX = await this.props.dispatch(getReward(
@@ -170,9 +172,9 @@ class ListFarm extends React.Component {
     if (Object.keys(userInfo).length && Object.keys(poolInfo).length && accountEnabled) {
       userReward = BigNumber.from(userInfo.pendingReward).add(
         BigNumber.from(userInfo.amount)
-        .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
-        .div(BigNumber.from(powAmount(1, 12)))
-        .sub(BigNumber.from(userInfo.rewardDebt))
+          .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
+          .div(BigNumber.from(powAmount(1, 12)))
+          .sub(BigNumber.from(userInfo.rewardDebt))
       ).toString()
     }
 
@@ -185,38 +187,38 @@ class ListFarm extends React.Component {
     let logo = getCoinImage(symbol)
 
     //Deal with Token migration to REPv2
-    if( symbol === 'REPv2' ) {
+    if (symbol === 'REPv2') {
       logo = getCoinImage('REP')
     }
 
-    if(showAll === false) {
-      if(Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
+    if (showAll === false) {
+      if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
         return null
       }
     }
 
-    if(showStakesOnly === true) {
-      if(Number(logAmount(userInfo.amount, decimals, 2)) < 0.001) {
+    if (showStakesOnly === true) {
+      if (Number(logAmount(userInfo.amount, decimals, 2)) < 0.001) {
         return null
       }
     }
 
     let enableReward = false
-    if( Number(logAmount(userReward, decimals, 3)) >= 0.001 ) {
+    if (Number(logAmount(userReward, decimals, 3)) >= 0.001) {
       enableReward = true
     }
 
     return (
       <S.Wrapper dropDownBox={dropDownBox}>
         {pageLoading ? (
-          <Box sx={{textAlign: 'center'}}>
+          <Box sx={{ textAlign: 'center' }}>
             <CircularProgress color="secondary" />
           </Box>
         ) : (
           <S.GridContainer container
             spacing={2}
             direction="row"
-            justifyContent="flex-start"
+            justifyContent="space-around"
             alignItems="center"
           >
 
@@ -224,8 +226,26 @@ class ListFarm extends React.Component {
               <S.GridItemTag item
                 xs={12}
                 md={2}
+                sx={{
+                  gap: 2,
+                  justifyContent: 'space-between'
+                }}
               >
-                <Typography variant="overline" style={{lineHeight: '1em', fontSize: '1.2em'}}>{symbol}</Typography>
+                <Box
+                  display="flex"
+                  direction="row"
+                  justifyContent="flex-start" gap="10px" alignItems="center"
+                >
+                  <img src={logo} alt="logo" width={35} height={35} />
+                  <Typography variant="overline" style={{ lineHeight: '1em', fontSize: '1.2em' }}>{symbol}</Typography>
+                </Box>
+                <Box
+                  disabled={disabled}
+                  onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+                  sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
+                >
+                  {accountEnabled ? <ExpandMoreIcon /> : <></>}
+                </Box>
               </S.GridItemTag>
             }
 
@@ -235,121 +255,204 @@ class ListFarm extends React.Component {
                 md={2}
                 style={{
                   justifyContent: 'flex-start',
-                  alignItems:'center',
+                  alignItems: 'center',
                 }}
               >
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                   <img src={logo} alt="logo" width={35} height={35} />
-                  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start', paddingLeft: '8px'}}>
-                    <Typography variant="overline" style={{lineHeight: '1em'}}>{symbol}</Typography>
-                    <Typography variant="overline" style={{lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)'}}>{name}</Typography>
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
+                    <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
+                    <Typography variant="overline" style={{ lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)' }}>{name}</Typography>
                   </div>
                 </div>
               </S.GridItemTag>
             }
 
-            <S.GridItemTag item
-              xs={4}
-              md={2}
+            {isMobile ? (
+              <S.GridItemTag item
+                xs={6}
+                md={2}
+                flexDirection="column"
+                sx={{ alignItems: "flex-start" }}
               >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Balance</Typography>
-              ) : (null)}
-              <Typography variant="body1">
+                <Box display="flex" gap="5px">
+                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}
+                    whiteSpace="nowrap">Available Balance
+                  </Typography>
+                  <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
+                    <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+                  </Tooltip>
+                </Box>
+                <Typography variant="body2">
+                  {poolInfo.tokenBalance ?
+                    `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
+                  }
+                </Typography>
+              </S.GridItemTag>
+            ) : <S.GridItemTag item
+              xs={6}
+              md={2}
+            >
+              <Typography variant="body2">
                 {poolInfo.tokenBalance ?
-                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
+                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
                 }
               </Typography>
-            </S.GridItemTag>
+            </S.GridItemTag>}
 
-            <S.GridItemTag item
-              xs={4}
-              md={2}
+            {isMobile ?
+              <S.GridItemTag item
+                xs={6}
+                md={2}
+                flexDirection="column"
+                sx={{ alignItems: "flex-end" }}
               >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Liquidity</Typography>
-              ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
-                {poolInfo.userDepositAmount ?
-                  `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
-                }
-              </Typography>
-            </S.GridItemTag>
+                <Box
+                  display="flex" gap="5px"
+                >
 
-            <S.GridItemTag item
-              xs={4}
-              md={1}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>APR %</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-                {`${logAmount(poolInfo.APR, 0, 2)}`}
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={4}
-              md={1}
-            >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Your Stake</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-                {accountEnabled ?
-                  userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
-                  : <></>
-                }
-              </Typography>
-            </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={4}
-              md={1}
+                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }} whiteSpace="nowrap">Total Staked
+                  </Typography>
+                  <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
+                    <HelpOutline sx={{ opacity: 0.65 }} />
+                  </Tooltip>
+                </Box>
+                <Typography variant="body2" >
+                  {poolInfo.userDepositAmount ?
+                    `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
+                  }
+                </Typography>
+              </S.GridItemTag>
+              :
+              <S.GridItemTag item
+                xs={6}
+                md={2}
               >
-              {isMobile ? (
-                <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
-              ) : (null)}
-              <Typography variant="body1">
-              {accountEnabled ?
-                userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
-                : <></>
-              }
-              </Typography>
-            </S.GridItemTag>
+                <Typography variant="body2" >
+                  {poolInfo.userDepositAmount ?
+                    `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
+                  }
+                </Typography>
+              </S.GridItemTag>}
 
-            <S.GridItemTag item
-              xs={3}
-              md={1}
-            >
-              <Box
-                disabled={disabled}
-                onClick={()=>{this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false })}}
-                sx={{display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : ""}}
+
+            {isMobile ? <S.DividerLine sx={{ mt: 2 }} /> : null}
+
+            {isMobile ?
+              <S.GridItemTag item
+                xs={4}
+                md={2}
+                flexDirection="column"
+                sx={{ alignItems: "flex-start" }}
               >
-                {accountEnabled ? <ExpandMoreIcon/>: <></>}
-              </Box>
-            </S.GridItemTag>
+                <Box display="flex" gap="5px">
+                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }} whiteSpace="nowrap">Past APR %
+                  </Typography>
+                  <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
+                    <HelpOutline sx={{ opacity: 0.65 }} />
+                  </Tooltip>
+                </Box>
+                <Typography variant="body2">
+                  {`${logAmount(poolInfo.APR, 0, 2)}`}
+                </Typography>
+              </S.GridItemTag>
+              : <S.GridItemTag item
+                xs={4}
+                md={2}
+              >
+                <Typography variant="body2">
+                  {`${logAmount(poolInfo.APR, 0, 2)}`}
+                </Typography>
+              </S.GridItemTag>}
+
+            {isMobile ?
+              <S.GridItemTag item
+                xs={4}
+                md={2}
+                flexDirection="column"
+                sx={{ alignItems: "center" }}
+              >
+                <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}>Your Stake</Typography>
+                <Typography variant="body2">
+                  {accountEnabled ?
+                    userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                    : <></>
+                  }
+                </Typography>
+              </S.GridItemTag>
+              : <S.GridItemTag item
+                xs={4}
+                md={2}
+              >
+                <Typography variant="body2">
+                  {accountEnabled ?
+                    userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
+                    : <></>
+                  }
+                </Typography>
+              </S.GridItemTag>}
+
+            {isMobile ?
+              <S.GridItemTag item
+                xs={4}
+                md={1}
+                flexDirection="column"
+                sx={{ alignItems: "flex-end" }}
+              >
+                <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}>Earned</Typography>
+
+                <Typography variant="body2">
+                  {accountEnabled ?
+                    userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
+                    : <></>
+                  }
+                </Typography>
+              </S.GridItemTag>
+              : <S.GridItemTag item
+                xs={4}
+                md={1}
+              >
+                <Typography variant="body2">
+                  {accountEnabled ?
+                    userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
+                    : <></>
+                  }
+                </Typography>
+              </S.GridItemTag>}
+            {!isMobile ?
+              <S.GridItemTag item
+                xs={3}
+                md={1}
+              >
+                <Box
+                  disabled={disabled}
+                  onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+                  sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
+                >
+                  {accountEnabled ? <ExpandMoreIcon /> : <></>}
+                </Box>
+              </S.GridItemTag>
+              : null}
           </S.GridContainer>
         )}
 
         {/*********************************************/
-        /**************  Drop Down Box ****************/
-        /**********************************************/
+          /**************  Drop Down Box ****************/
+          /**********************************************/
         }
         {dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownContent>
               <S.DropdownWrapper>
-                <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Earned</Typography>
-                <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
+                <Typography sx={{ flex: 1 }} variant="body2" component="div">{`${symbol}`} Earned</Typography>
+                <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
                   variant="contained"
                   fullWidth
                   disabled={logAmount(userReward, decimals) === '0' || disabled || !enableReward}
-                  onClick={()=>{this.handleHarvest()}}
+                  onClick={() => { this.handleHarvest() }}
                   loading={loading}
-                  sx={{flex: 1}}
+                  sx={{ flex: 1 }}
                 >
                   Harvest
                 </Button>
@@ -358,14 +461,14 @@ class ListFarm extends React.Component {
               <S.DropdownWrapper>
                 {logAmount(userInfo.amount, decimals) === '0' ?
                   <>
-                    <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Staked</Typography>
-                    <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">0.00</Typography>
+                    <Typography sx={{ flex: 1 }} variant="body2" component="div">{`${symbol}`} Staked</Typography>
+                    <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">0.00</Typography>
                     <Button
-                      variant="contained"
-                      onClick={() => {this.handleStakeToken()}}
+                      variant="outlined"
+                      onClick={() => { this.handleStakeToken() }}
                       disabled={disabled}
                       fullWidth
-                      sx={{flex: 1}}
+                      sx={{ flex: 1 }}
                     >
                       Stake
                     </Button>
@@ -373,15 +476,15 @@ class ListFarm extends React.Component {
                   <>
                     <Typography variant="body2" component="div">{`${symbol}`} Staked</Typography>
                     <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
-                    <Box sx={{display: "flex", alignItems: "center", gap: "5px"}}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
                       <Button
                         variant="outlined"
                         color="neutral"
-                        onClick={() => {!disabled && this.handleWithdrawToken()}}
+                        onClick={() => { !disabled && this.handleWithdrawToken() }}
                       >
-                        <RemoveIcon/>
+                        <RemoveIcon />
                       </Button>
-                      <Button variant="contained" onClick={() => {!disabled && this.handleStakeToken()}}>
+                      <Button variant="contained" onClick={() => { !disabled && this.handleStakeToken() }}>
                         Stake More
                       </Button>
                     </Box>
@@ -390,7 +493,7 @@ class ListFarm extends React.Component {
               </S.DropdownWrapper>
             </S.DropdownContent>
           </Fade>
-        ) : null }
+        ) : null}
 
       </S.Wrapper>
     )
@@ -398,7 +501,7 @@ class ListFarm extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    farm: state.farm,
+  farm: state.farm,
 })
 
 export default connect(mapStateToProps)(ListFarm)

@@ -1,6 +1,28 @@
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid } from "@mui/material"
 
+export const EarnPageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [theme.breakpoints.between('md', 'lg')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.between('sm', 'md')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+  },
+}))
+
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
   borderTopLeftRadius: "6px",
@@ -26,15 +48,14 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     padding: '25px 50px',
   },
-
-}));
+}))
 
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
   [theme.breakpoints.up('md')]: {
   },
-}));
+}))
 
 export const AlertInfo = styled(Box)`
   display: flex;
@@ -45,14 +66,14 @@ export const AlertInfo = styled(Box)`
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderRadius: '8px',
-  background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
+  // background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
     padding: ' 30px 10px',
   },
   [theme.breakpoints.up('md')]: {
     padding: '20px',
   },
-}));
+}))
 
 export const GridItemTagContainer = styled(Grid)(({ theme, ...props }) => ({
   spacing: 2,
@@ -68,6 +89,7 @@ export const GridItemTag = styled(Grid)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap:5px;
 `;
 
 export const DropdownWrapper = styled(Box)`
@@ -96,12 +118,21 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const FarmActionContainer = styled(Box)(({theme})=>({
+export const FarmAction = styled(Box)(({theme})=>({
   display: 'flex',
   justifyContent: 'space-around',
   alignItems: 'center',
   [theme.breakpoints.down('md')]: {
     width: '100%'
+  }
+}))
+
+export const EarnActionContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column'
   }
 }))
 
@@ -139,3 +170,33 @@ export const BpIcon = styled('span')(({ theme }) => ({
       theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
   },
 }))
+
+export const PageSwitcher = styled(Box)(({ theme }) => ({
+  width: 'fit-content',
+  padding: '3px',
+  background: theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)': 'rgba(255, 255, 255, 0.04)',
+  cursor: 'pointer',
+  display: 'flex',
+  borderRadius: '12px',
+  height: '48px',
+  'span': {
+    padding: '2px 15px',
+    fontWeight: 'bold',
+    borderRadius: '12px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '&.active': {
+      color: '#031313',
+      background: '#BAE21A',
+    }
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
+    'span': {
+      width: '50%'
+    }
+  },
+
+}));

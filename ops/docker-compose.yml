@@ -63,10 +63,6 @@
 x-deployer_pk: &deployer_pk
   DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
-# Account #19
-x-gas-price-oracle_pk: &gas-price-oracle_pk
-  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
-
 # Account #1
 x-sequencer_pk: &sequencer_pk
   SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
@@ -74,6 +70,13 @@ x-sequencer_pk: &sequencer_pk
 # Account #2
 x-proposer_pk: &proposer_pk
   PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
+
+x-sequencer_bs_pk: &sequencer_bs_pk
+  BATCH_SUBMITTER_SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
+
+# Account #2
+x-proposer_bs_pk: &proposer_bs_pk
+  BATCH_SUBMITTER_PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
 
 # Account #8
 x-relayer_pk: &relayer_pk
@@ -190,6 +193,9 @@ services:
       << : *fast-relayer_pk
       RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
 
   dtl:
     depends_on:
@@ -214,6 +220,9 @@ services:
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
       RETRIES: 200
+      # if no need to support Turing v0 set height of v0 = v1
+      DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
+      DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -230,6 +239,7 @@ services:
     entrypoint: sh ./geth.sh
     env_file:
       - ./envs/geth.env
+    restart: always
     environment:
       ETH1_HTTP: http://l1_chain:8545
       ROLLUP_TIMESTAMP_REFRESH: 5s
@@ -243,6 +253,8 @@ services:
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
       EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
@@ -270,8 +282,6 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
-      # Integration tests require 0 confirmations. Suggested to use 5 for production.
-      NUM_EVENT_CONFIRMATIONS: 0
 
   # a second relay system for messages that need to get to L1 quickly
   # NOTE - all withdrawal messages use the standard relayer with its 7 day window
@@ -280,10 +290,11 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/boba_message-relayer-fast
+    image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
+      dockerfile: ./ops/docker/Dockerfile.message-relayer
+    entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -298,27 +309,27 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
-      # Integration tests require 0 confirmations. Suggested to use 5 for production.
-      NUM_EVENT_CONFIRMATIONS: 0
+      FAST_RELAYER: 'true'
 
   batch_submitter:
     depends_on:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/batch-submitter:latest
+    image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter
-    entrypoint: ./batches.sh
+    entrypoint: ./batch-submitter.sh
     env_file:
-      - ./envs/batches.env
+      - ./envs/batch-submitter.env
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L2_NODE_WEB3_URL: http://l2geth:8545
+      L1_ETH_RPC: http://l1_chain:8545
+      L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      << : *sequencer_pk
-      << : *proposer_pk
+      << : *sequencer_bs_pk
+      << : *proposer_bs_pk
+      RETRIES: 200
 
   integration_tests:
     image: bobanetwork/integration-tests:latest
@@ -334,6 +345,7 @@ services:
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
+      BASE_URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
@@ -341,31 +353,6 @@ services:
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
-
-  gas_oracle:
-    depends_on:
-      - l1_chain
-      - l2geth
-    image: bobanetwork/boba_gas-price-oracle
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_gas-price-oracle
-    environment:
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L2_NODE_WEB3_URL: http://l2geth:8545
-      GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : *gas-price-oracle_pk #same as the deployer
-      << : *sequencer_pk
-      << : *proposer_pk
-      << : *relayer_pk
-      << : *fast-relayer_pk
-      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
-      GAS_PRICE_ORACLE_ROOF_PRICE: 5
-      GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
-      POLLING_INTERVAL:
-      RETRIES: 200
 
   replica:
     depends_on:
@@ -395,6 +382,8 @@ services:
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
       SEQUENCER_CLIENT_HTTP: http://l2geth:8545
       EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
     ports:
       - ${L2GETH_HTTP_PORT:-8549}:8545
       - ${L2GETH_WS_PORT:-8550}:8546
@@ -425,6 +414,8 @@ services:
         ROLLUP_POLL_INTERVAL_FLAG: "10s"
         TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
         EMERGENCY_FORK_NUMBER: 0
+        L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546

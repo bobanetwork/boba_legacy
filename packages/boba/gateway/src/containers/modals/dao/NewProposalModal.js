@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { Box, Typography, useMediaQuery } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -23,13 +23,12 @@ import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-import Select from 'react-select'
-
-import { useTheme } from '@emotion/react'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+// import Select from 'react-select'
+import Select from 'components/select/Select'
 
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors/daoSelector'
+import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 function NewProposalModal({ open }) {
 
@@ -47,19 +46,17 @@ function NewProposalModal({ open }) {
 
     const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
     const proposalThreshold = useSelector(selectProposalThreshold)
 
-    const onActionChange = (e) => {
+  const onActionChange = (e) => {
         setVotingThreshold('')
         setLPfeeMin('')
         setLPfeeMax('')
         setLPfeeOwn('')
         setProposeText('')
         setProposalUri('')
-        setAction(e.value)
+        setAction(e.target.value)
     }
 
     function handleClose() {
@@ -74,10 +71,10 @@ function NewProposalModal({ open }) {
     }
 
     const options = [
-      { value: 'change-threshold', label: 'Change Voting Threshold' },
-      { value: 'text-proposal',    label: 'Freeform Text Proposal' },
-      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' },
-      { value: 'change-lp2-fee',   label: 'Change L2 LP fees' }
+      { value: 'change-threshold', label: 'Change Voting Threshold' ,title: 'Change Voting Threshold' },
+      { value: 'text-proposal',    label: 'Freeform Text Proposal' ,title: 'Freeform Text Proposal' },
+      { value: 'change-lp1-fee',   label: 'Change L1 LP fees' ,title: 'Change L1 LP fees' },
+      { value: 'change-lp2-fee',   label: 'Change L2 LP fees',title: 'Change L2 LP fees' }
     ]
 
     const customStyles = {
@@ -87,15 +84,8 @@ function NewProposalModal({ open }) {
       }),
     }
 
-/*
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-*/
     const submit = async () => {
-        
+
         let res = null
 
         if (action === 'change-threshold') {
@@ -116,7 +106,7 @@ function NewProposalModal({ open }) {
               text: ''  //extra text if any
             }))
         }
-        
+
         if (res) {
             dispatch(openAlert(`Proposal has been submitted. It will be listed soon`))
         }
@@ -158,30 +148,35 @@ function NewProposalModal({ open }) {
         <Modal
             open={open}
             onClose={handleClose}
-            maxWidth="md"
+            maxWidth="sm"
         >
-        <Box>
-            <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
+            <Box>
+            <Box sx={{mb: 2,display: 'flex', alignItems: 'center'}}>
+                <BobaGlassIcon />
+                <Typography variant="body1" >
                 New Proposal
-            </Typography>
-            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                </Typography>
+            </Box>
+
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                    {action === '' &&
+                        <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
+                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and
+                        change to the bridge fee limits for the L1 and L2 bridge pools.
+                        </Typography>
+            }
                     <Select
                         options={options}
-                        onChange={onActionChange}
+                        onSelect={onActionChange}
                         styles={customStyles}
-                        sx={{marginBottom: '20px'}} 
+                        sx={{ marginBottom: '20px' }}
+                        value={action}
                     >
                     </Select>
-                    {action === '' && 
-                        <Typography variant="body2" style={{lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5'}}>
-                        Currently, the DAO can change the voting threshold, propose free-form text proposals, and 
-                        change to the bridge fee limits for the L1 and L2 bridge pools. 
-                        </Typography>
-                    }
-                    {action === 'change-threshold' && 
+                    {action === 'change-threshold' &&
                     <>
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                        <Typography variant="body2"
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5'}}
                         >
                             The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
                         </Typography>
@@ -192,14 +187,14 @@ function NewProposalModal({ open }) {
                             type="number"
                             onChange={(i)=>setVotingThreshold(i.target.value)}
                             fullWidth
-                            sx={{marginBottom: '20px'}} 
+                            sx={{marginBottom: '20px'}}
                         />
                     </>
                     }
-                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') && 
-                    <> 
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5', marginTop: '20px', marginBottom: '20px'}}
+                    {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
+                    <>
+                        <Typography variant="body2"
+                            style={{lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5'}}
                         >
                             Possible settings range from 0.0% to 5.0%.
                             All three values must be specified and the maximum fee must be larger than the minimum fee.
@@ -211,7 +206,6 @@ function NewProposalModal({ open }) {
                             type="number"
                             onChange={(i)=>setLPfeeMin(i.target.value)}
                             fullWidth
-                            sx={{marginBottom: '20px'}} 
                         />
                         <Input
                             label="New LP maximum fee (%)"
@@ -220,7 +214,6 @@ function NewProposalModal({ open }) {
                             type="number"
                             onChange={(i)=>setLPfeeMax(i.target.value)}
                             fullWidth
-                            sx={{marginBottom: '20px'}} 
                         />
                         <Input
                             label="New LP operator fee (%)"
@@ -229,14 +222,13 @@ function NewProposalModal({ open }) {
                             type="number"
                             onChange={(i)=>setLPfeeOwn(i.target.value)}
                             fullWidth
-                            sx={{marginBottom: '20px'}} 
                         />
                     </>
                     }
-                    {action === 'text-proposal' && 
+                    {action === 'text-proposal' &&
                     <>
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        <Typography variant="body2"
+                            style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
                         >
                             Your proposal title is limited to 100 characters. Use the link field below to provide more information.
                         </Typography>
@@ -244,45 +236,36 @@ function NewProposalModal({ open }) {
                             placeholder="Title (<100 characters)"
                             value={proposeText}
                             onChange={(i)=>setProposeText(i.target.value.slice(0, 100))}
-                            sx={{marginTop: '20px'}}  
                         />
-                        <Typography variant="body2" 
-                            style={{lineHeight: '1', fontSize: '0.8em', paddingTop: '20px', color: '#f8e5e5'}}
+                        <Typography variant="body2"
+                            style={{lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5'}}
                         >
-                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate 
-                            website. The link length is limited to 150 characters. You may need to use a link shortener. 
+                            You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate
+                            website. The link length is limited to 150 characters. You may need to use a link shortener.
                         </Typography>
                         <Input
                             placeholder="URI, https://..."
                             value={proposalUri}
                             onChange={(i)=>setProposalUri(i.target.value.slice(0, 150))}
-                            sx={{marginTop: '20px'}} 
                         />
                     </>
                     }
             </Box>
         </Box>
-            <WrapperActionsModal>
-                <Button
-                    onClick={handleClose}
-                    color='neutral'
-                    size='large'
-                >
-                    Cancel
-                </Button>
-                <Button
+        <Box sx={{width: '100%', my: 2}}>
+            <Button
                     onClick={()=>{submit()}}
                     color='primary'
-                    variant='contained'
+                    variant='outlined'
                     tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}
                     loading={loading}
                     disabled={disabled()}
-                    fullWidth={isMobile}
+                    fullWidth={true}
                     size="large"
                 >
-                    Propose
+                    Submit
                 </Button>
-            </WrapperActionsModal>
+        </Box>
         </Modal >
     )
 }

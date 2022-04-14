@@ -10,7 +10,13 @@
       "l2geth",
       "integration-tests",
       "specs",
-      "ops_boba/monitor"
+      "ops_boba/monitor",
+      "go/gas-oracle",
+      "go/proxyd",
+      "go/op-exporter",
+      "ops/docker/rpc-proxy",
+      "ops/docker/hardhat",
+      "go/batch-submitter"
     ],
     "nohoist": [
       "examples/*"

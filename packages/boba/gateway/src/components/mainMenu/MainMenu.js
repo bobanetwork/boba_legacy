@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 
 import { ReactComponent as Logo } from './../../images/logo-boba.svg'
+import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
 import { ReactComponent as CloseIcon } from './../../images/icons/close-modal.svg'
-
 import * as S from "./MainMenu.styles"
 
 import { Link } from 'react-router-dom'
 
 import NetworkSwitcher from './networkSwitcher/NetworkSwitcher'
 import LayerSwitcher from './layerSwitcher/LayerSwitcher'
+import FeeSwitcher from './feeSwitcher/FeeSwitcher'
 import MenuItems from './menuItems/MenuItems'
 
 import { useTheme } from '@emotion/react'
@@ -56,6 +57,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
                   </S.WrapperCloseIcon>
                   <NetworkSwitcher />
                   <LayerSwitcher />
+                  <FeeSwitcher />
                   <WalletPicker />
                 </S.DrawerHeader>
                 <MenuItems setOpen={setOpen} />
@@ -66,26 +68,12 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
         </Container>
       ) : (
         <S.Menu>
-          <Logo style={{maxWidth: '160px'}}/>
-          <div style={{
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'flex-start', 
-            flexDirection: 'column',
-            borderRight: 'solid white',
-            borderWidth: '1px',
-            paddingRight: '10px',
-          }}
-          >
-            <NetworkSwitcher />
-            <LayerSwitcher />
-          </div>
+          <BobaLogo style={{maxWidth: '140px'}}/>
           <MenuItems setOpen={setOpen} />
-          <WalletPicker />
         </S.Menu>
       )}
     </>
   );
 }
 
-export default MainMenu;
+export default MainMenu

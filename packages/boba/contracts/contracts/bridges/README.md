@@ -19,11 +19,11 @@ Boba NFT bridges support **native L1 NFTs** and **native L2 NFTs** to be moved b
 * Native L1 NFT: the original NFT contract was deployed on L1
 * Native L2 NFT: the original NFT contract was deployed on L2
 
-Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to Ethereum takes 7 days. **Not all NFTs are bridgeable - developers must use specialized NFT contracts (e.g. L2StandardERC721.sol) to enable this functionality.** 
+Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to Ethereum takes 7 days. **Not all NFTs are bridgeable - developers must use specialized NFT contracts (e.g. L2StandardERC721.sol) to enable this functionality.**
 
 ## Native L1 NFT - Developer Requirements
 
-Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please deploy [L2StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
+Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
 
 ```js
 const Factory__L2StandardERC721 = new ethers.ContractFactory(
@@ -34,8 +34,9 @@ const Factory__L2StandardERC721 = new ethers.ContractFactory(
 const L2StandardERC721 = await Factory__L2StandardERC721.deploy(
   L2_NFT_BRIDGE_ADDRESS,   // L2 NFT Bridge Address
   L1_NFT_CONTRACT_ADDRESS, // Your L1 NFT Address
-  NFT_NAME, 
-  NFT_SYMBOL
+  NFT_NAME,
+  NFT_SYMBOL,
+  BASE_URI
 )
 await L2StandardERC721.deployTransaction.wait()
 ```
@@ -44,10 +45,10 @@ await L2StandardERC721.deployTransaction.wait()
 
 ## Native L2 NFT - Developer Requirements
 
-Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
+Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
 ```js
-const Factory__L2StandardERC721 = new ethers.ContractFactory(
+const Factory__L1StandardERC721 = new ethers.ContractFactory(
   L1StandardERC721.abi,
   L1StandardERC721.bytecode,
   L1Wallet
@@ -55,8 +56,9 @@ const Factory__L2StandardERC721 = new ethers.ContractFactory(
 const L1StandardERC721 = await Factory__L1StandardERC721.deploy(
   L1_NFT_BRIDGE_ADDRESS, // L1 NFT Bridge Address
   L2_NFT_CONTRACT_ADDRESS, // Your L2 NFT Address
-  NFT_NAME, 
-  NFT_SYMBOL
+  NFT_NAME,
+  NFT_SYMBOL,
+  BASE_URI
 )
 await L2StandardERC721.deployTransaction.wait()
 ```
@@ -80,8 +82,7 @@ Users then call the `depositNFT` or `depositNFTTo` function to deposit NFT to L2
 const tx = await L1NFTBrige.depositNFT(
   L1_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -95,14 +96,19 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Then, users call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
 
 ```js
+const exitFee = await BOBABillingContract.exitFee()
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
+  exitFee
+)
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -116,14 +122,19 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Users then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
 
 ```js
+const exitFee = await BOBABillingContract.exitFee()
+const approveBOBATx = await L2BOBAToken.approve(
+  L2NFTBrige.address,
+  exitFee
+)
+await approveBOBATx.wait()
 const tx = await L2NFTBrige.withdraw(
   L2_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -143,8 +154,7 @@ Users then call the `depositNFT` or `depositNFTTo` function to deposit NFT to L2
 const tx = await L1NFTBrige.depositNFT(
   L1_NFT_CONTRACT_ADDRESS,
   TOKEN_ID,
-  9999999, // L2 gas
-  ethers.utils.formatBytes32String(new Date().getTime().toString())
+  9999999 // L2 gas
 )
 await tx.wait()
 ```
@@ -153,14 +163,18 @@ await tx.wait()
 
 ### Mainnet
 
-| Contract Name      | Contract Address                           |
-| ------------------ | ------------------------------------------ |
-| Proxy__L1NFTBridge | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
-| Proxy__L2NFTBridge | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| Contract Name              | Contract Address                           |
+| -------------------------- | ------------------------------------------ |
+| Proxy__L1NFTBridge         | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
+| Proxy__L2NFTBridge         | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| Proxy__BobaBillingContract | 0x29F373e4869e69faaeCD3bF747dd1d965328b69f |
+| TK_L2BOBA                  | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
 
 ### Rinkeby
 
-| Contract Name      | Contract Address                           |
-| ------------------ | ------------------------------------------ |
-| Proxy__L1NFTBridge | 0x01F5d5D6de3a8c7A157B22FD331A1F177b7bE043 |
-| Proxy__L2NFTBridge | 0x5E368E9dce71B624D7DdB155f360E7A4969eB7aA |
+| Contract Name              | Contract Address                           |
+| -------------------------- | ------------------------------------------ |
+| Proxy__L1NFTBridge         | 0x01F5d5D6de3a8c7A157B22FD331A1F177b7bE043 |
+| Proxy__L2NFTBridge         | 0x5E368E9dce71B624D7DdB155f360E7A4969eB7aA |
+| Proxy__BobaBillingContract | 0x39ecF941443851762f58194e1eD54EE9F6987Cd1 |
+| TK_L2BOBA                  | 0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309 |

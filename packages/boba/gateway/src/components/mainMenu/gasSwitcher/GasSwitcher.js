@@ -7,10 +7,7 @@ import * as S from './GasSwitcher.styles.js'
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
 
-import { Typography } from '@mui/material'
-
 import networkService from 'services/networkService.js'
-import { getMaxHealthBlockLag } from 'util/masterConfig'
 
 function GasSwitcher({ isMobile }) {
 
@@ -19,7 +16,7 @@ function GasSwitcher({ isMobile }) {
 
   useEffect(() => {
     async function getGasSavings() {
-      if (networkService.networkGateway === 'mainnet' || networkService.networkGateway === 'rinkeby') {
+      if (networkService.networkGateway === 'mainnet') {
         const l1SecurityFee = await networkService.estimateL1SecurityFee()
         const l2Fee = await networkService.estimateL2Fee()
         // The l1 security fee is moved to the l2 fee
@@ -35,33 +32,35 @@ function GasSwitcher({ isMobile }) {
   }, [ gas ])
 
   const verifierStatus = useSelector(selectVerifierStatus)
-  let healthStatus = 'healthy'
-
-  if (Number(verifierStatus.matchedBlock) + getMaxHealthBlockLag() < gas.blockL2) {
-    healthStatus = 'unhealthy'
-  }
 
   return (
     <S.Menu>
       <S.MenuItem>
-        <S.Label variant="body2">Ethereum Gas</S.Label>
-        <Typography variant="body2">{gas.gasL1} Gwei</Typography>
+        <S.Label component="p" variant="body2">Ethereum</S.Label>
+        <S.Value component="p" variant="body2">{gas.gasL1} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">Boba Gas</S.Label><Typography variant="body2">{gas.gasL2} Gwei</Typography>
+        <S.Label component="p" variant="body2">Boba</S.Label>
+        <S.Value component="p" variant="body2">{gas.gasL2} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">Savings</S.Label><Typography variant="body2">{savings.toFixed(0)}x</Typography>
+        <S.Label component="p" variant="body2">Savings</S.Label>
+        <S.Value component="p" variant="body2">{savings.toFixed(0)}x</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">L1 Block</S.Label><Typography variant="body2">{gas.blockL1}</Typography>
+        <S.Label component="p" variant="body2">L1</S.Label>
+        <S.Value component="p" variant="body2">{gas.blockL1}</S.Value>
       </S.MenuItem>
       <S.MenuItem>
-        <S.Label variant="body2">L2 Block</S.Label><Typography variant="body2">{gas.blockL2}</Typography>
+        <S.Label component="p" variant="body2">L2</S.Label>
+        <S.Value component="p" variant="body2">{gas.blockL2}</S.Value>
       </S.MenuItem>
-      <S.MenuItem>
-        <S.Label variant="body2">Verified to</S.Label><Typography variant="body2">{verifierStatus.matchedBlock} {`(${healthStatus})`}</Typography>
-      </S.MenuItem>
+      {verifierStatus.hasOwnProperty('matchedBlock') &&
+        <S.MenuItem>
+          <S.Label component="p" variant="body2">Last Verified Block</S.Label>
+          <S.Value component="p" variant="body2">{Number(verifierStatus.matchedBlock)}</S.Value>
+        </S.MenuItem>
+      }
     </S.Menu>
   )
 

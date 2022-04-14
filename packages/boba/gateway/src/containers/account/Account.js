@@ -15,12 +15,11 @@ limitations under the License. */
 
 import React,{useState,useEffect,useCallback} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import { isEqual } from 'lodash'
 
 //Selectors
-import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
@@ -29,8 +28,8 @@ import ListAccountBatch from 'components/listAccount/listAccountBatch'
 
 import * as S from './Account.styles'
 
-import PageHeader from 'components/pageHeader/PageHeader'
 import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@mui/material'
+
 import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'
@@ -40,24 +39,20 @@ import TabPanel from 'components/tabs/TabPanel'
 
 import NetworkSwitcherIcon from 'components/icons/NetworkSwitcherIcon'
 
-import PendingTransaction from './PendingTransaction'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
+
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
 function Account ({ enabled }) {
 
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
-  const baseEnabled = useSelector(selectBaseEnabled())
   const networkLayer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
-  
-  console.log("Account - network:", network)
-  console.log("Account - layer:", networkLayer)
-  console.log("Account - baseEnabled:", baseEnabled)
-  console.log("Account - accountEnabled:", accountEnabled)
 
   const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
@@ -71,52 +66,64 @@ function Account ({ enabled }) {
 
   const disabled = depositLoading || exitLoading
 
-  const getLookupPrice = useCallback(()=>{
+  const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
-    const symbolList = Object.values(tokenList).map((i)=> {
-      if(i.symbolL1 === 'ETH') {
+    const symbolList = Object.values(tokenList).map((i) => {
+      if (i.symbolL1 === 'ETH') {
         return 'ethereum'
-      } else if(i.symbolL1 === 'OMG') {
+      } else if (i.symbolL1 === 'OMG') {
         return 'omg'
-      } else {
+      } else if(i.symbolL1 === 'BOBA') {
+        return 'boba-network'
+      }
+      else {
         return i.symbolL1.toLowerCase()
       }
     })
     dispatch(fetchLookUpPrice(symbolList))
-  },[ tokenList, dispatch, accountEnabled ])
+  }, [ tokenList, dispatch, accountEnabled ])
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+  // const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
-  const pendingL1 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
-  const pendingL2 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L2' &&
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const pendingL1 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
 
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
+  // const pendingL2 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L2' &&
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
+
+  // const pending = [
+  //   ...pendingL1,
+  //   ...pendingL2
+  // ]
+
+      // {pending.length > 0 &&
+      //   <Grid sx={{margin: '10px 0px'}}>
+      //     <Grid item xs={12}>
+      //       <PendingTransaction />
+      //     </Grid>
+      //   </Grid>
+      // }
 
   useEffect(()=>{
     if (!accountEnabled) return
@@ -232,7 +239,22 @@ function Account ({ enabled }) {
 
   return (
     <>
-      <PageHeader title="Bridge"/>
+      {/*<PageTitle title="Wallet"/>*/}
+
+      {!accountEnabled &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You have not connected your wallet. To see your balances, bridge, and transfer, connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
 
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>
@@ -247,13 +269,7 @@ function Account ({ enabled }) {
         </S.LayerAlert>
       }
 
-      {pending.length > 0 &&
-        <Grid sx={{margin: '10px 0px'}}>
-          <Grid item xs={12}>
-            <PendingTransaction />
-          </Grid>
-        </Grid>
-      }
+
       {isMobile ? (
         <>
           <Tabs value={activeTab} onChange={handleChange} sx={{color: '#fff', fontWeight: 700, my: 2}}>

@@ -50,6 +50,7 @@ export const handleSequencerBlock = {
         nonce: BigNumber.from(transaction.nonce).toString(),
         target: transaction.to,
         data: transaction.input,
+        turing: '0x',
       }
 
       transactionEntry = {
@@ -84,6 +85,7 @@ export const handleSequencerBlock = {
         origin: ethers.utils.getAddress(transaction.l1TxOrigin),
         data: transaction.input,
         decoded: null,
+        turing: '0x',
         queueIndex:
           transaction.queueIndex === null ||
           transaction.queueIndex === undefined

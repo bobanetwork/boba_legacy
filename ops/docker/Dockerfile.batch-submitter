@@ -1,33 +1,19 @@
-FROM bobanetwork/builder AS builder
+FROM golang:1.17.3-alpine3.13 as builder
 
-FROM node:14-alpine
+RUN apk add --no-cache make gcc musl-dev linux-headers git jq bash
 
-RUN apk add --no-cache curl bash jq
+COPY ./l2geth /l2geth
+COPY ./go/bss-core /go/bss-core
+COPY ./go/batch-submitter/go.mod ./go/batch-submitter/go.sum /go/batch-submitter/
+WORKDIR /go/batch-submitter
+RUN go mod graph | grep -v l2geth | grep -v bss-core | awk '{if ($1 !~ "@") print $2}' | xargs -n 1 go get
+COPY ./go/batch-submitter/ ./
+RUN make
 
-WORKDIR /opt/optimism
+FROM alpine:3.13
 
-# copy top level files
-COPY --from=builder /optimism/*.json /optimism/yarn.lock ./
-COPY --from=builder /optimism/node_modules ./node_modules
+RUN apk add --no-cache ca-certificates jq curl
+COPY --from=builder /go/batch-submitter/batch-submitter /usr/local/bin/
 
-# copy deps (would have been nice if docker followed the symlinks required)
-COPY --from=builder /optimism/packages/core-utils/package.json ./packages/core-utils/package.json
-COPY --from=builder /optimism/packages/core-utils/dist ./packages/core-utils/dist
-COPY --from=builder /optimism/packages/common-ts/package.json ./packages/common-ts/package.json
-COPY --from=builder /optimism/packages/common-ts/dist ./packages/common-ts/dist
-
-COPY --from=builder /optimism/packages/contracts/package.json ./packages/contracts/package.json
-COPY --from=builder /optimism/packages/contracts/deployments ./packages/contracts/deployments
-COPY --from=builder /optimism/packages/contracts/dist ./packages/contracts/dist
-COPY --from=builder /optimism/packages/contracts/artifacts ./packages/contracts/artifacts
-
-# copy the service
-WORKDIR /opt/optimism/packages/batch-submitter
-COPY --from=builder /optimism/packages/batch-submitter/package.json ./
-COPY --from=builder /optimism/packages/batch-submitter/dist ./dist
-COPY --from=builder /optimism/packages/batch-submitter/exec ./exec
-COPY --from=builder /optimism/packages/batch-submitter/node_modules ./node_modules
-
-# copy this over in case you want to run alongside other services
-COPY ./ops/scripts/batches.sh .
-ENTRYPOINT ["npm", "run", "start"]
+COPY ./ops/scripts/batch-submitter.sh .
+ENTRYPOINT ["batch-submitter"]

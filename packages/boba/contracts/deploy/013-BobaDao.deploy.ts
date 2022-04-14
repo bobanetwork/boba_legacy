@@ -53,7 +53,7 @@ const deployFn: DeployFunction = async (hre) => {
   } else {
     // set config for local/rinkeby
     delay_before_execute_s = 0
-    eta_delay_s = 0
+    eta_delay_s = 5
     governor_voting_period = 259200 // 3 days in seconds
     governor_voting_delay = 172800 // 2 days in seconds
     governor_proposal_threshold = utils.parseEther('50000')
@@ -159,18 +159,18 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   // set Dao in L2LP
-  const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
-    'Proxy__L2LiquidityPool'
-  )
+  // const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
+  //   'Proxy__L2LiquidityPool'
+  // )
 
-  Proxy__L2LiquidityPool = new Contract(
-    Proxy__L2LiquidityPoolDeployment.address,
-    L2LiquidityPoolJson.abi,
-    (hre as any).deployConfig.deployer_l2
-  )
+  // Proxy__L2LiquidityPool = new Contract(
+  //   Proxy__L2LiquidityPoolDeployment.address,
+  //   L2LiquidityPoolJson.abi,
+  //   (hre as any).deployConfig.deployer_l2
+  // )
 
-  await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
-  console.log(`LP Dao role transferred to Timelock`)
+  // await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
+  // console.log(`LP Dao role transferred to Timelock`)
 
   // set admin Timelock
   console.log('Queue setPendingAdmin...')
@@ -227,6 +227,13 @@ const deployFn: DeployFunction = async (hre) => {
   if (process.env.NETWORK !== 'mainnet') {
     console.log('Execute setPendingAdmin...')
     // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
+    await new Promise((r) => setTimeout(r, 5000))
+    // since this is local submit random tx - (can be made better)
+    await (hre as any).deployConfig.deployer_l2.sendTransaction({
+      to: (hre as any).deployConfig.deployer_l2.address,
+      value: utils.parseEther('0.01'),
+    })
+
     await Timelock.executeTransaction(
       Timelock.address,
       0,

@@ -3,7 +3,8 @@
 .Select {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  // margin-bottom: 10px;
+  min-width: 100px;
 
   .label {
     margin-bottom: 10px;
@@ -11,11 +12,13 @@
 
   .field {
     position: relative;
-    border: 2px solid $gray4;
+    border: 2px solid rgba(255, 255, 255, 0.15);
     transition: all 200ms ease-in-out;
     display: flex;
     flex-direction: row;
     align-items: center;
+    border-radius: 12px;
+
   }
 
   .select {
@@ -32,6 +35,7 @@
     top: 0;
     bottom: 0;
     opacity: 0;
+    width: 100%;
   }
 
   .selected {
@@ -39,8 +43,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 50px;
-    margin-left: 10px;
+    justify-content: center;
+    height: 40px;
+    padding-inline: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
 
     .details {
       text-align: left;

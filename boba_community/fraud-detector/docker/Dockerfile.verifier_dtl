@@ -1,5 +1,0 @@
-FROM bobanetwork/data-transport-layer:release
-
-COPY boba_community/fraud-detector/docker/state-dump.latest.json /opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json
-
-ENTRYPOINT ["node", "dist/src/services/run.js"]

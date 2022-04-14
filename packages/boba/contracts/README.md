@@ -3,7 +3,7 @@
 
 ## 1. Automatic contract deployment and serving
 
-This spins up the entire stack, with all contracts deployed, and all the right things needed for the wallet to function, and for development work on the wallet.
+This spins up the entire stack, with all contracts deployed, all the right things needed for the wallet to function, and for development work on the wallet.
 
 ```bash
 
@@ -30,7 +30,7 @@ Spin up the base local L1/L2:
 ```
 
 $ cd ops
-$ docker-compose up -V
+$ BUILD=1 DAEMON=0 ./up_local.sh
 
 ```
 
@@ -47,7 +47,7 @@ TEST_PRIVATE_KEY_1=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f
 TEST_PRIVATE_KEY_2=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 TEST_PRIVATE_KEY_3=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 TARGET_GAS_LIMIT=9000000000
-CHAIN_ID=28
+CHAIN_ID=28 #for Rinkeby
 TEST=1 #This deploys the ERC20 test token
 
 ```

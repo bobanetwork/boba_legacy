@@ -6,9 +6,11 @@ import { isEqual } from 'lodash'
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 
+import { settle_v0 } from 'actions/networkAction'
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import { Box, Typography, Link, Fade } from '@mui/material'
+import { Box, Typography, Link, Fade, Slider } from '@mui/material'
 import * as S from './ListAccount.styles'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -34,7 +36,8 @@ class ListAccount extends React.Component {
       dropDownBox: false,
       networkLayer,
       disabled,
-      loading
+      loading,
+      sliderValue: 55,
     }
 
   }
@@ -75,6 +78,29 @@ class ListAccount extends React.Component {
     this.props.dispatch(openModal(modalName, token, fast))
   }
 
+  handleSliderChange = (e) => {
+    this.setState({sliderValue: e.target.value})
+  }
+
+  settle_v0() {
+    this.props.dispatch(settle_v0())
+    // if ( token.address && recipient )
+    // {
+    //   try {
+    //     console.log("Amount to transfer:", value_Wei_String)
+    //     const transferResponseGood = await dispatch(
+    //       transfer(recipient, value_Wei_String, token.address)
+    //     )
+    //     if (transferResponseGood) {
+    //       dispatch(openAlert('Transaction submitted'))
+    //     }
+    //     handleClose()
+    //   } catch (err) {
+    //     //guess not really?
+    //   }
+    // }
+  }
+
   render() {
 
     const {
@@ -82,7 +108,8 @@ class ListAccount extends React.Component {
       chain,
       dropDownBox,
       networkLayer,
-      disabled
+      disabled,
+      sliderValue
     } = this.state
 
     const enabled = (networkLayer === chain) ? true : false
@@ -91,6 +118,24 @@ class ListAccount extends React.Component {
     const amount = token.symbol === 'ETH' ? 
       Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, {minimumFractionDigits: 3,maximumFractionDigits:3}) :
       Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits:2})
+
+    const WAGMI_v0 = 1 + (sliderValue / 100)
+    const TVL = Number(300 + (sliderValue / 100) * 700)
+
+    const marks = [
+      {
+        value: 30,
+        label: '500M',
+      },
+      {
+        value: 50,
+        label: '650M',
+      },
+      {
+        value: 70,
+        label: '800M',
+      },
+    ];
 
     return (
       <>
@@ -135,7 +180,12 @@ class ListAccount extends React.Component {
                     Bridge/Transfer
                   </S.TextTableCell>
                 }
-                {token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' &&
+                {chain === 'L2' && token.symbol === 'WAGMIv0' &&
+                  <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
+                    Settle
+                  </S.TextTableCell>
+                }
+                {token.symbol !== 'xBOBA' &&
                   <Box sx={{display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
                     <ExpandMoreIcon sx={{width: "12px"}}/>
                   </Box>
@@ -151,20 +201,21 @@ class ListAccount extends React.Component {
           {dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownWrapper>
+
               {!enabled && chain === 'L1' &&
                 <S.AccountAlertBox>
                   <Box
-                       sx={{
-                         flex: 1,
-                       }}
-                     >
-                       <Typography variant="body2" component="p" >
-                         You are on L2. To use L1, click SWITCH LAYER
-                       </Typography>
-                     </Box>
-                     <Box sx={{ textAlign: 'center'}}>
-                       <LayerSwitcher isButton={true} />
-                     </Box>
+                      sx={{
+                        flex: 1,
+                      }}
+                    >
+                      <Typography variant="body2" component="p" >
+                        Wrong Network. Please connect to Boba.
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center'}}>
+                      <LayerSwitcher isButton={true} />
+                    </Box>
                 </S.AccountAlertBox>
               }
 
@@ -176,7 +227,7 @@ class ListAccount extends React.Component {
                        }}
                      >
                        <Typography variant="body2" component="p" >
-                         You are on L1. To use L2, click SWITCH LAYER
+                         Wrong network. Please connect to Ethereum.
                        </Typography>
                      </Box>
                      <Box sx={{ textAlign: 'center'}}>
@@ -211,7 +262,7 @@ class ListAccount extends React.Component {
               </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' &&  token.symbol !== 'WAGMIv0' &&
                 <>
                   <Button
                     onClick={()=>{this.handleModalClick('exitModal', token, false)}}
@@ -266,6 +317,38 @@ class ListAccount extends React.Component {
                     Transfer
                   </Button>
                 </>
+              }
+
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
+                <div style={{  
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Typography variant="body3" component="p" >
+                    At a TVL of {TVL}M each WAGMI will settle for {WAGMI_v0} BOBA 
+                  </Typography>
+                  <Slider 
+                    min={0}
+                    max={100}
+                    value={sliderValue} 
+                    onChange={this.handleSliderChange} 
+                    aria-label="WAGMIv0" 
+                    step={10}
+                    marks={marks} 
+                  />
+                  <Button
+                    onClick={()=>{this.settle_v0()}}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv0 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
               }
             </S.DropdownWrapper>
           </Fade>

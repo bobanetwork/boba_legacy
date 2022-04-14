@@ -71,6 +71,10 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   // The credit price for each off-chain computation
   const bobaTuringPrice =
     env.BOBA_TURING_PRICE || utils.parseEther('1').toString()
+  // The block height at which the berlin hardfork activates
+  const berlinBlock = parseInt(env.BERLIN_BLOCK, 10) || 0
+  // The L1 boba token address
+  const l1BobaTokenAddress = env.L1_BOBA_TOKEN_ADDRESS
 
   ensure(whitelistOwner, 'WHITELIST_OWNER')
   ensure(gasPriceOracleOwner, 'GAS_PRICE_ORACLE_OWNER')
@@ -80,6 +84,8 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   ensure(l1StandardBridgeAddress, 'L1_STANDARD_BRIDGE_ADDRESS')
   ensure(l1FeeWalletAddress, 'L1_FEE_WALLET_ADDRESS')
   ensure(l1CrossDomainMessengerAddress, 'L1_CROSS_DOMAIN_MESSENGER_ADDRESS')
+  ensure(berlinBlock, 'BERLIN_BLOCK')
+  ensure(l1BobaTokenAddress, 'L1_BOBA_TOKEN_ADDRESS')
 
   // Basic warning so users know that the whitelist will be disabled if the owner is the zero address.
   if (env.WHITELIST_OWNER === '0x' + '00'.repeat(20)) {
@@ -105,6 +111,8 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     l1CrossDomainMessengerAddress,
     bobaTuringPrice,
     TuringHelperJson,
+    berlinBlock,
+    l1BobaTokenAddress,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))
