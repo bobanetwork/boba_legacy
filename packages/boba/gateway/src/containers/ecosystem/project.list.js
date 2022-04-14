@@ -30,6 +30,7 @@ import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import multiSigLogo from '../../images/ecosystem/multiSig.svg'
 import brewery from '../../images/ecosystem/brewery.svg'
+import symbiosisLogo from '../../images/ecosystem/symbiosis.svg'
 
 /**
  * thematical order of type.
@@ -353,7 +354,18 @@ export const projectList = [
     "type": "defi",
     "image": brewery,
     "description": "Boba Brewery is the first exclusive launchpad for decentralized fundraising in Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
-  }
+  },
+  {
+    "title": "Symbiosis",
+    "canLaunch": true,
+    "link": "https://symbiosis.finance/",
+    "telegram": "https://t.me/symbiosis_finance",
+    "twitter": "https://twitter.com/symbiosis_fi",
+    "discord": "https://discord.gg/vmQjR2d7WC",
+    "type": "defi",
+    "image": symbiosisLogo,
+    "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
+  },
 ]
 
 
