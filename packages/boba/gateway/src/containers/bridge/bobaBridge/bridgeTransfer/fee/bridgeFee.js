@@ -51,7 +51,7 @@ function BridgeFee({
 
     <S.BrigeFeeWrapper>
       {estFee ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. Fee (Approval+Bridge)" title={estFeeLabel} />
+        <ItemLabel label="Est. gas" title={estFeeLabel} />
         <Typography variant='body2'>
           {estFee}
         </Typography>

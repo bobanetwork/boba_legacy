@@ -243,7 +243,7 @@ function DoExitStep({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
   let ETHstring = ''
 

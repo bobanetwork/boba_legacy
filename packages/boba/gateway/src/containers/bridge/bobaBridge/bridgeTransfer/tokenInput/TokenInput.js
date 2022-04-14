@@ -13,20 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material';
-import { IconButton, Typography, useTheme, useMediaQuery } from '@mui/material';
-import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost } from 'actions/balanceAction';
-import { removeToken, setTokenAmount } from 'actions/bridgeAction';
-import { openModal } from 'actions/uiAction';
-import BN from 'bignumber.js';
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector';
-import { selectLayer } from 'selectors/setupSelector';
-import { logAmount, toWei_String } from 'util/amountConvert';
-import { getCoinImage } from 'util/coinImage';
-import { BRIDGE_TYPE } from 'util/constant';
-import * as S from './TokenInput.styles';
+import { AddCircleOutline, ArrowDropDown, RemoveCircleOutline } from '@mui/icons-material'
+import { IconButton, Typography, useTheme, useMediaQuery } from '@mui/material'
+import { fetchClassicExitCost, fetchFastDepositCost, fetchFastExitCost } from 'actions/balanceAction'
+import { removeToken, setTokenAmount } from 'actions/bridgeAction'
+import { openModal } from 'actions/uiAction'
+import BN from 'bignumber.js'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector'
+import { selectLayer } from 'selectors/setupSelector'
+import { logAmount, toWei_String } from 'util/amountConvert'
+import { getCoinImage } from 'util/coinImage'
+import { BRIDGE_TYPE } from 'util/constant'
+import * as S from './TokenInput.styles'
 
 function TokenInput({
   token,
@@ -44,9 +44,8 @@ function TokenInput({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-
   const underZero = new BN(token.amount).lt(new BN(0))
-  const maxValue = logAmount(token.balance, token.decimals);
+  const maxValue = logAmount(token.balance, token.decimals)
   const overMax = new BN(token.amount).gt(new BN(maxValue))
 
   let amount = 0;

@@ -27,8 +27,8 @@ function TransferExit({
   token
 }) {
   console.log([ 'TRANSFER EXIT' ])
-  const [ validValue, setValidValue ] = useState(false);
-  const [ errorString, setErrorString ] = useState(false);
+  const [ validValue, setValidValue ] = useState(false)
+  const [ errorString, setErrorString ] = useState(false)
 
   const [ max_Float, setMax_Float ] = useState(0.0) // support for Use Max - a number like 0.09 ETH
   const [ feeETH, setFeeETH ] = useState(0.0)
@@ -48,8 +48,7 @@ function TransferExit({
 
   const exitFee = useSelector(selectExitFee)
 
-  let estFee = '';
-
+  let estFee = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
       estFee = `${Number(feeBOBA).toFixed(4)} BOBA`
@@ -72,71 +71,65 @@ function TransferExit({
     if (signatureStatus && loading) {
       //we are all set - can close the window
       //transaction has been sent and signed
-      dispatch(closeModal('transferPending'));
-      dispatch(resetToken());
-      updateSignatureStatus_exitTRAD(false);
+      dispatch(closeModal('transferPending'))
+      dispatch(resetToken())
+      updateSignatureStatus_exitTRAD(false)
     }
   }, [ signatureStatus, loading, dispatch ])
 
   useEffect(() => {
 
-    const balance = logAmount(token.balance, token.decimals);
+    const balance = logAmount(token.balance, token.decimals)
+
     const tooSmall = new BN(token.amount).lte(new BN(0.0))
     const tooBig = new BN(token.amount).gt(new BN(max_Float))
 
     setErrorString('')
 
-    if (tooSmall || tooBig) {
-      setErrorString('Warning: Value out of bounds')
+    const value = Number(token.amount)
+
+    if (value <= 0) {
+      setValidValue(false)
+    }
+    else if (tooSmall) {
+      setValidValue(false)
+    }
+    else if (tooBig) {
       setValidValue(false)
     } else if (
-      !feeUseBoba && // check is needed regardless of fee token choice
       token.symbol === 'ETH' &&
-      (Number(token.amount) + feeETH) > balance)
-    {
-       // insufficient ETH to cover the ETH amount plus gas
-      // due to MetaMask issue, this is needed even if you are paying in ETH
-      setErrorString('Warning: ETH amount + fees > balance')
-      setValidValue(false)
-    } else if (
-      feeUseBoba && // check is needed regardless of fee token choice
-      token.symbol === 'ETH' &&
-      (Number(token.amount) + feeETH) > balance)
+      (value + feeETH) > balance)
     {
       // insufficient ETH to cover the ETH amount plus gas
       // due to MetaMask issue, this is needed even if you are paying in ETH
-      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
+      if(feeUseBoba)
+        setErrorString('Warning: ETH amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+      else
+        setErrorString('Warning: ETH amount + fees > balance')
       setValidValue(false)
     } else if (
       feeUseBoba &&
       token.symbol === 'BOBA' &&
-      (Number(token.amount) + feeBOBA) > balance)
+      (value + feeBOBA + exitFee) > balance)
     {
       // insufficient BOBA to cover the BOBA amount plus gas
       setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
     } else if (
-      !feeUseBoba &&
       feeETH > Number(feeBalanceETH))
     {
-      // insufficient ETH to cover exit fees
-      setErrorString('Warning: ETH balance too low.')
-      setValidValue(false)
-    } else if (
-      feeUseBoba &&
-      feeETH > Number(feeBalanceETH))
-    {
-      console.log(['feeETH',feeETH])
-      console.log(['feeBalanceETH',feeBalanceETH])
-      // insufficient ETH to cover exit fees
-      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
+      if(feeUseBoba) {
+        setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
+      } else {
+        setErrorString('Warning: ETH balance too low.')
+      }      
       setValidValue(false)
     } else if (
       feeUseBoba &&
       feeBOBA > Number(feeBalanceBOBA))
     {
       // insufficient BOBA to cover exit fees
-      setErrorString('Warning: BOBA balance too low')
+      setErrorString('Warning: BOBA balance too low to cover gas/fees')
       setValidValue(false)
     }
     else {
@@ -146,14 +139,11 @@ function TransferExit({
 
   }, [ token, setErrorString, setValidValue, feeUseBoba, feeBOBA, feeETH, feeBalanceBOBA, feeBalanceETH, cost, max_Float ])
 
-
   useEffect(() => {
 
     function estimateMax() {
 
       const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
-      console.log("ETH fees:", safeCost)
-      console.log("BOBA fees:", safeCost * feePriceRatio)
 
       setFeeETH(safeCost)
       setFeeBOBA(safeCost * feePriceRatio)
@@ -168,8 +158,14 @@ function TransferExit({
           setMax_Float(0.0)
       }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
+          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+        else
+          setMax_Float(0.0)
+      }
+      else if (token.symbol === 'BOBA' && !feeUseBoba) {
+        if(balance - exitFee > 0.0)
+          setMax_Float(balance - exitFee)
         else
           setMax_Float(0.0)
       }
@@ -178,16 +174,16 @@ function TransferExit({
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
 
   const doExit = async () => {
-    dispatch(openModal('transferPending'));
+    dispatch(openModal('transferPending'))
 
     let res = await dispatch(exitBOBA(token.address, token.toWei_String))
 
-    dispatch(closeModal('transferPending'));
-    dispatch(resetToken());
+    dispatch(closeModal('transferPending'))
+    dispatch(resetToken())
 
     if (res) {
       dispatch(
@@ -201,13 +197,14 @@ function TransferExit({
   }
 
   return <>
+
     <BridgeFee
       time="7 Days"
       timeLabel="Your funds will be available on L1 in 7 days"
       estFee={estFee}
     />
-    <Box>
 
+    <Box>
       <Typography variant="body2" sx={{ mt: 2 }}>
         {parse(`Exit Fee: ${exitFee} BOBA`)}
       </Typography>
@@ -217,8 +214,8 @@ function TransferExit({
           {errorString}
         </Typography>
       }
-
     </Box>
+
     <Button
       color="primary"
       variant="contained"
@@ -227,7 +224,8 @@ function TransferExit({
       onClick={doExit}
       disabled={!validValue}
       fullWidth={true}
-    >Classic Bridge</Button></>
+    >Classic Bridge</Button>
+  </>
 };
 
 export default React.memo(TransferExit);
