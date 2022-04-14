@@ -13,6 +13,7 @@ import L2TokenPoolJson from '@boba/contracts/artifacts/contracts/TokenPool.sol/T
 import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import xL2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
+import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
 
 import { OptimismEnv } from './shared/env'
 
@@ -39,6 +40,8 @@ describe('Liquidity Pool Test', async () => {
   let L1BOBAToken: Contract
   let L2BOBAToken: Contract
   let xBOBAToken: Contract
+
+  let BOBABillingContract: Contract
 
   let env: OptimismEnv
 
@@ -136,6 +139,12 @@ describe('Liquidity Pool Test', async () => {
     xBOBAToken = new Contract(
       env.addressesBOBA.TOKENS.xBOBA.L2,
       xL2GovernanceERC20Json.abi,
+      env.l2Wallet
+    )
+
+    BOBABillingContract = new Contract(
+      env.addressesBOBA.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
       env.l2Wallet
     )
   })
@@ -406,8 +415,20 @@ describe('Liquidity Pool Test', async () => {
       fastExitAmount,
       { gasLimit: 7000000 }
     )
-
     await approveKateL2TX.wait()
+
+    // Approve BOBA
+    const exitFee = await BOBABillingContract.exitFee()
+    const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_3).approve(
+      L2LiquidityPool.address,
+      exitFee
+    )
+    await approveBOBATX.wait()
+
+    const BobaBalanceBefore = await L2BOBAToken.balanceOf(
+      BOBABillingContract.address
+    )
+
     const depositTx = await env.waitForXDomainTransactionFast(
       L2LiquidityPool.connect(env.l2Wallet_3).clientDepositL2(
         fastExitAmount,
@@ -415,6 +436,11 @@ describe('Liquidity Pool Test', async () => {
         { gasLimit: 7000000 }
       )
     )
+
+    const BobaBalanceAfter = await L2BOBAToken.balanceOf(
+      BOBABillingContract.address
+    )
+    expect(BobaBalanceAfter).to.deep.eq(BobaBalanceBefore.add(exitFee))
 
     const poolInfo = await L1LiquidityPool.poolInfo(L1ERC20.address)
 
@@ -697,9 +723,9 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  /* In this test, we provide liquidity X to a pool, 
-     but then trigger a X + 1000 liquidity request. 
-     If the system is working correctly, this should trigger a revert 
+  /* In this test, we provide liquidity X to a pool,
+     but then trigger a X + 1000 liquidity request.
+     If the system is working correctly, this should trigger a revert
   */
 
   // it('{tag:mrf} 1 should revert unfulfillable swap-offs', async () => {
@@ -793,6 +819,14 @@ describe('Liquidity Pool Test', async () => {
     //     { gasLimit: 7000000 }
     //   )
     // )
+
+    // Approve BOBA
+    const exitFee = await BOBABillingContract.exitFee()
+    const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+      L2LiquidityPool.address,
+      exitFee
+    )
+    await approveBOBATX.wait()
 
     const ret = await env.waitForXDomainTransactionFast(
       L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
@@ -1353,6 +1387,14 @@ describe('Liquidity Pool Test', async () => {
     it('{tag:mrf} should fail to fast exit L2 with incorrect inputs', async () => {
       const fastExitAmount = utils.parseEther('10')
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2LiquidityPool.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await expect(
         L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
           fastExitAmount,
@@ -1377,6 +1419,14 @@ describe('Liquidity Pool Test', async () => {
       const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
         ethers.constants.AddressZero
       )
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2LiquidityPool.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       const depositTx = await env.waitForXDomainTransactionFast(
         L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
@@ -1671,6 +1721,14 @@ describe('Liquidity Pool Test', async () => {
       //   )
       // )
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2LiquidityPool.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransactionFast(
         L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
           fastExitAmount,
@@ -1727,39 +1785,27 @@ describe('Liquidity Pool Test', async () => {
     })
   })
 
-  describe('Relay gas burn tests', async () => {
-    it('{tag:mrf} should not allow updating extraGasRelay for non-owner', async () => {
-      const newExtraGasRelay = 500000
+  describe('Exit fee tests', async () => {
+    it('{tag:mrf} should not allow updating exit fee for non-owner', async () => {
+      const nexExitFee = ethers.utils.parseEther('120')
       await expect(
-        L2LiquidityPool.connect(env.l2Wallet_2).configureExtraGasRelay(
-          newExtraGasRelay
-        )
-      ).to.be.revertedWith('Caller is not the gasPriceOracle owner')
+        BOBABillingContract.connect(env.l2Wallet_2).updateExitFee(nexExitFee)
+      ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('{tag:mrf} should allow updating extraGasRelay for owner', async () => {
-      // approximate and set new extra gas to over it for tests
-      const approveBobL2TX = await L2ERC20.approve(
-        L2LiquidityPool.address,
-        utils.parseEther('10')
-      )
-      await approveBobL2TX.wait()
-      const estimatedGas = await L2LiquidityPool.estimateGas.clientDepositL2(
-        utils.parseEther('10'),
-        L2ERC20.address
-      )
-
-      const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await L2LiquidityPool.connect(
-        env.l2Wallet_4
-      ).configureExtraGasRelay(newExtraGasRelay)
+    it('{tag:mrf} should allow updating exit fee for owner', async () => {
+      const exitFeeBefore = await BOBABillingContract.exitFee()
+      const newExitFee = exitFeeBefore.mul(2)
+      const configureTx = await BOBABillingContract.connect(
+        env.l2Wallet
+      ).updateExitFee(newExitFee)
       await configureTx.wait()
 
-      const updatedExtraGasRelay = await L2LiquidityPool.extraGasRelay()
-      expect(updatedExtraGasRelay).to.eq(newExtraGasRelay)
+      const updatedExitFee = await BOBABillingContract.exitFee()
+      expect(newExitFee).to.eq(updatedExitFee)
     })
 
-    it('{tag:mrf} should be able to fast exit with correct added gas', async () => {
+    it('{tag:mrf} should be able to fast exit with correct exit fee', async () => {
       const fastExitAmount = utils.parseEther('10')
 
       const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -1773,6 +1819,21 @@ describe('Liquidity Pool Test', async () => {
       )
       await approveBobL2TX.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2LiquidityPool.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
+      const BobBobaBalanceBefore = await L2BOBAToken.balanceOf(
+        env.l2Wallet.address
+      )
+      const billingContractBalanceBefore = await L2BOBAToken.balanceOf(
+        BOBABillingContract.address
+      )
+
       const depositTx = await env.waitForXDomainTransactionFast(
         L2LiquidityPool.clientDepositL2(fastExitAmount, L2ERC20.address)
       )
@@ -1784,21 +1845,56 @@ describe('Liquidity Pool Test', async () => {
       const postBobL1ERC20Balance = await L1ERC20.balanceOf(
         env.l1Wallet.address
       )
+      const BobBobaBalanceAfter = await L2BOBAToken.balanceOf(
+        env.l2Wallet.address
+      )
+      const billingContractBalanceAfter = await L2BOBAToken.balanceOf(
+        BOBABillingContract.address
+      )
 
       expect(postBobL1ERC20Balance).to.deep.eq(
         preBobL1ERC20Balance.add(fastExitAmount.mul(remainingPercent).div(1000))
       )
 
-      const extraGasRelay = await L2LiquidityPool.extraGasRelay()
-      expect(depositTx.receipt.gasUsed).to.be.gt(extraGasRelay)
+      expect(billingContractBalanceAfter).to.deep.eq(
+        billingContractBalanceBefore.add(exitFee)
+      )
+      expect(BobBobaBalanceAfter).to.deep.eq(BobBobaBalanceBefore.sub(exitFee))
+    })
 
-      // update it back to zero for tests
-      const configureTx = await L2LiquidityPool.connect(
-        env.l2Wallet_4
-      ).configureExtraGasRelay(0)
-      await configureTx.wait()
-      const finalExtraGasRelay = await L2LiquidityPool.extraGasRelay()
-      expect(finalExtraGasRelay).to.eq(0)
+    it('{tag:mrf} should not fast exit without Boba', async () => {
+      const fastExitAmount = utils.parseEther('10')
+
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2LiquidityPool.connect(newWallet).clientDepositL2(
+          fastExitAmount,
+          L2ERC20.address
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:mrf} should not fast exit without approving Boba', async () => {
+      const fastExitAmount = utils.parseEther('10')
+
+      const approveBobL2TX = await L2ERC20.approve(
+        L2LiquidityPool.address,
+        utils.parseEther('10')
+      )
+      await approveBobL2TX.wait()
+
+      await expect(
+        L2LiquidityPool.clientDepositL2(fastExitAmount, L2ERC20.address)
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
     })
   })
 
@@ -2674,6 +2770,24 @@ describe('Liquidity Pool Test', async () => {
       //   )
       // )
       // expect(preL2ERC20_2Balance).to.deep.eq(postL2ERC20_2Balance)
+    })
+  })
+
+  describe('Configuration tests', async () => {
+    it('{tag:mrf} should not allow to configure billing contract address for non-owner', async () => {
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet_2).configureBillingContractAddress(
+          env.addressesBOBA.Proxy__BobaBillingContract
+        )
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('{tag:mrf} should not allow to configure billing contract address to zero address', async () => {
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet).configureBillingContractAddress(
+          ethers.constants.AddressZero
+        )
+      ).to.be.revertedWith('Billing contract address cannot be zero')
     })
   })
 })

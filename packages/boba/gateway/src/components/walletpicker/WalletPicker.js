@@ -45,14 +45,14 @@ function WalletPicker({
 
   const dispatchBootAccount = useCallback(() => {
 
-    console.log("Calling initializeAccount for:", network)
+    //console.log("Calling initializeAccount for:", network)
 
     if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
 
       const initialized = await networkService.initializeAccount(network)
-      console.log(['initialized',initialized])
+      //console.log(['initialized',initialized])
       if (initialized === 'wrongnetwork') {
 
         dispatch(openModal('wrongNetworkModal'));

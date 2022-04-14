@@ -1,19 +1,27 @@
-import { Box, Typography, useTheme } from '@mui/material'
-import { fetchLookUpPrice } from 'actions/networkAction'
-import { isEqual } from 'lodash'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
+
+import { fetchLookUpPrice } from 'actions/networkAction'
+
 import * as S from './Token.styles'
+import { Box, Typography, useTheme } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
+
 import ListToken from 'components/listToken/listToken'
+import Button from 'components/button/Button'
+import Link from 'components/icons/LinkIcon'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
-import Link from 'components/icons/LinkIcon'
+
+import { isEqual } from 'lodash'
+
+import networkService from 'services/networkService'
 
 function TokenPage() {
 
@@ -27,6 +35,8 @@ function TokenPage() {
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
   const layer = useSelector(selectLayer())
 
+  const [ debug, setDebug ] = useState(false)
+
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
   const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
@@ -34,6 +44,15 @@ function TokenPage() {
   const disabled = depositLoading || exitLoading
 
   const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
+
+  useEffect(() => {
+    if (!accountEnabled) return
+    const gasEstimateAccount = networkService.gasEstimateAccount
+    const wAddress = networkService.account
+    if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
+      setDebug(true)
+    }
+  }, [ accountEnabled, networkService ])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -60,6 +79,11 @@ function TokenPage() {
     if (!accountEnabled) return
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
+
+  const GasEstimateApprove = () => {
+    let approval = networkService.estimateApprove()
+    console.log("GasEstimateApprove:",approval)
+  }
 
   if (!accountEnabled) {
 
@@ -98,9 +122,18 @@ function TokenPage() {
               href={'https://oolongswap.com/'}
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-            >Oologswap <Link />
+            >Oolongswap <Link />
             </S.footerLink>
           </Typography>
+          {debug &&
+            <Button
+              onClick={()=>{GasEstimateApprove()}}
+              color='primary'
+              variant="contained"
+            >
+              GasEstimateApprove
+            </Button>
+          }
         </Box>
       }
 

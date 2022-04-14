@@ -22,7 +22,7 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  selectBobaPriceRatio,
+  //selectBobaPriceRatio,
   selectNetwork
 } from 'selectors/setupSelector'
 
@@ -44,7 +44,7 @@ function FeeSwitcher() {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const feePriceRatio = useSelector(selectBobaPriceRatio())
+  //const feePriceRatio = useSelector(selectBobaPriceRatio())
   const network = useSelector(selectNetwork())
 
   const layer = useSelector(selectLayer())
@@ -59,8 +59,30 @@ function FeeSwitcher() {
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
-    const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
-    const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+    //console.log("balanceBOBA:",balanceBOBA)
+    //console.log("balanceETH:",balanceETH)
+
+    let tooSmallETH = false
+    let tooSmallBOBA = false
+
+    if(typeof(balanceBOBA) === 'undefined') {
+      tooSmallBOBA = true
+    } else {
+      //check actual balance
+      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+    }
+
+    if(typeof(balanceETH) === 'undefined') {
+      tooSmallETH = true
+    } else {
+      //check actual balance
+      tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
+    }
+
+    if (!balanceBOBA && !balanceETH) {
+      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      return
+    }
 
     let res
 
@@ -73,8 +95,8 @@ function FeeSwitcher() {
     else if ( !feeUseBoba && targetFee === 'BOBA' ) {
       // change to BOBA
       if( tooSmallBOBA ) {
-        dispatch(openError('You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA. \
-          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.'))
+        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA.
+          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -82,8 +104,8 @@ function FeeSwitcher() {
     else if (feeUseBoba && targetFee === 'ETH') {
       // change to ETH
       if( tooSmallETH ) {
-        dispatch(openError('You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH. \
-          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.'))
+        dispatch(openError(`You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH.
+          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
