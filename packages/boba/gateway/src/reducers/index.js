@@ -37,6 +37,7 @@ import daoReducer from './daoReducer'
 import airdropReducer from './airdropReducer'
 import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
+import bridgeReducer from './bridgeReducer';
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -61,6 +62,7 @@ const rootReducer = combineReducers({
   airdrop: airdropReducer,
   fixed: fixedReducer,
   verifier: verifierReducer,
+  bridge: bridgeReducer,
 })
 
 export default rootReducer

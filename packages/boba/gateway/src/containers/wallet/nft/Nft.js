@@ -23,7 +23,9 @@ class Nft extends React.Component {
     super(props)
 
     const {
-      list
+      list,
+      monsterNumber,
+      monsterInfo
     } = this.props.nft
 
     const {
@@ -38,13 +40,19 @@ class Nft extends React.Component {
       loading: this.props.loading[ 'NFT/ADD' ],
       accountEnabled,
       netLayer,
+      monsterNumber,
+      monsterInfo
     }
 
   }
 
   componentDidUpdate(prevState) {
 
-    const { list } = this.props.nft
+    const {
+      list,
+      monsterNumber,
+      monsterInfo
+    } = this.props.nft
 
     const {
       accountEnabled,
@@ -53,6 +61,14 @@ class Nft extends React.Component {
 
     if (!isEqual(prevState.nft.list, list)) {
       this.setState({ list })
+    }
+
+    if (!isEqual(prevState.nft.monsterNumber, monsterNumber)) {
+      this.setState({ monsterNumber })
+    }
+
+    if (!isEqual(prevState.nft.monsterInfo, monsterInfo)) {
+      this.setState({ monsterInfo })
     }
 
     if (!isEqual(prevState.loading[ 'NFT/ADD' ], this.props.loading[ 'NFT/ADD' ])) {
@@ -83,6 +99,10 @@ class Nft extends React.Component {
   async addNFT() {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
+
+  // async fetchMyMonsters() {
+  //   networkService.fetchMyMonsters()
+  // }
 
   render() {
 
@@ -161,11 +181,22 @@ class Nft extends React.Component {
                   Turing monsters:
                 </Typography>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body3" >
-                    0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793
+                  <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                    0xce45...D793
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>
+                {/*
+                <Button
+                  type="primary"
+                  variant="contained"
+                  fullWidth={true}
+                  onClick={(i) => { this.fetchMyMonsters() }}
+                  sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
+                >
+                  Fetch My Monsters
+                </Button>
+              */}
               </Box>
               <Box sx={{
                 display: 'flex',

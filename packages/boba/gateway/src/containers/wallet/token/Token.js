@@ -1,18 +1,27 @@
-import { Box, Typography, useTheme } from '@mui/material'
-import { fetchLookUpPrice } from 'actions/networkAction'
-import { isEqual } from 'lodash'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
+
+import { fetchLookUpPrice } from 'actions/networkAction'
+
 import * as S from './Token.styles'
+import { Box, Typography, useTheme } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
+
 import ListToken from 'components/listToken/listToken'
+import Button from 'components/button/Button'
+import Link from 'components/icons/LinkIcon'
 
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
+
+import { isEqual } from 'lodash'
+
+import networkService from 'services/networkService'
 
 function TokenPage() {
 
@@ -24,6 +33,9 @@ function TokenPage() {
   const networkLayer = useSelector(selectLayer())
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
+  const layer = useSelector(selectLayer())
+
+  const [ debug, setDebug ] = useState(false)
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
@@ -32,6 +44,15 @@ function TokenPage() {
   const disabled = depositLoading || exitLoading
 
   const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
+
+  useEffect(() => {
+    if (!accountEnabled) return
+    const gasEstimateAccount = networkService.gasEstimateAccount
+    const wAddress = networkService.account
+    if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
+      setDebug(true)
+    }
+  }, [ accountEnabled ])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -44,8 +65,9 @@ function TokenPage() {
         return 'omg'
       } else if(i.symbolL1 === 'BOBA') {
         return 'boba-network'
-      }
-      else {
+      } else if(i.symbolL1 === 'OLO') {
+        return 'oolongswap'
+      } else {
         return i.symbolL1.toLowerCase()
       }
     })
@@ -57,6 +79,11 @@ function TokenPage() {
     if (!accountEnabled) return
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
+
+  const GasEstimateApprove = () => {
+    let approval = networkService.estimateApprove()
+    console.log("GasEstimateApprove:",approval)
+  }
 
   if (!accountEnabled) {
 
@@ -84,6 +111,32 @@ function TokenPage() {
   } else {
 
     return (
+    <>
+      {layer === 'L2' &&
+        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Typography variant="body2">
+            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
+            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
+            <S.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Oolongswap <Link />
+            </S.footerLink>
+          </Typography>
+          {debug &&
+            <Button
+              onClick={()=>{GasEstimateApprove()}}
+              color='primary'
+              variant="contained"
+            >
+              GasEstimateApprove
+            </Button>
+          }
+        </Box>
+      }
+
       <S.TokenPageContainer>
         <S.TokenPageContent>
           <S.TableHeading>
@@ -127,7 +180,7 @@ function TokenPage() {
           </S.LoaderContainer> : null}
         </S.TokenPageContent>
       </S.TokenPageContainer>
-    )
+    </>)
   }
 
 }

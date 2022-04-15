@@ -1,21 +1,17 @@
-import { Divider, Grid } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { Divider, Grid } from "@mui/material"
+import { styled } from '@mui/material/styles'
 
-
-export const ListNFTItem = styled(Grid)(({ theme, active }) => ({
+export const ListNFTItem = styled(Grid)(({ theme, active, small }) => ({
   borderRadius: '10px',
-  maxWidth: '200px',
-  minWidth: '200px',
-  background: theme.palette.background.secondary,
+  width: `${ small ? '150px' : '200px'}`,
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
   alignItems: 'flex-start',
-  //gap: '30px',
   border: '1px solid transparent',
   padding: active ? '10px' : '0px',
-  minHeight: '250px',
+  minHeight: `${ small ? 'unset' : '250px'}`,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     maxWidth: '160px',

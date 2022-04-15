@@ -54,7 +54,7 @@ function App () {
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
-        input: light ? "#fff" : "rgba(9, 22, 43, 0.5)"
+        input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)"
       },
       neutral: {
         main: '#fff',
@@ -81,13 +81,18 @@ function App () {
       },
       body1: {
         fontSize: 18,
+        display: 'block'
       },
       body2: {
         fontSize: 16,
         fontWeight: 400,
+        lineHeight: '1.0em',
+        display: 'block'
       },
       body3: {
-        fontSize: '0.8em'
+        fontSize: 14,
+        lineHeight: '1.1em',
+        display: 'block'
       },
       body4: {
         fontSize: 12
