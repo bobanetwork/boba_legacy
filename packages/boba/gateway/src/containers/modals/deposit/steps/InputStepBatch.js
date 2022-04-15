@@ -46,7 +46,6 @@ import {
 
 import {
   selectlayer1Balance,
-  selectL2FeeRate,
   selectFastDepositBatchCost,
   selectL1FeeBalance,
   selectUserAndL2LPBalanceBatch,
@@ -61,7 +60,6 @@ function InputStepBatch({ isBridge, handleClose }) {
 
   const userBalance = useSelector(selectlayer1Balance)
   const batchInfo = useSelector(selectUserAndL2LPBalanceBatch)
-  const feeRate = useSelector(selectL2FeeRate)
 
   const batchCost = useSelector(selectFastDepositBatchCost)
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas

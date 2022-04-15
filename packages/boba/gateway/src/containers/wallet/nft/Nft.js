@@ -100,9 +100,9 @@ class Nft extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
-  // async fetchMyMonsters() {
-  //   networkService.fetchMyMonsters()
-  // }
+  async fetchMyMonsters() {
+    networkService.fetchMyMonsters()
+  }
 
   render() {
 
@@ -186,7 +186,7 @@ class Nft extends React.Component {
                   </Typography>
                   <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
                 </Box>
-                {/*
+
                 <Button
                   type="primary"
                   variant="contained"
@@ -196,7 +196,7 @@ class Nft extends React.Component {
                 >
                   Fetch My Monsters
                 </Button>
-              */}
+
               </Box>
               <Box sx={{
                 display: 'flex',

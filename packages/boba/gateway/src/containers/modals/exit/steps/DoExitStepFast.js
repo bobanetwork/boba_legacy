@@ -50,7 +50,6 @@ import {
 } from 'actions/balanceAction'
 
 import {
-  selectL1FeeRate,
   selectL1FeeRateN,
   selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString,
@@ -85,7 +84,6 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
 
-  const feeRate = useSelector(selectL1FeeRate)
   const feeRateN = useSelector(selectL1FeeRateN)
 
   const cost = useSelector(selectFastExitCost)
