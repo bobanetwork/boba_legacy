@@ -26,7 +26,10 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, bridgeType: action.payload }
 
     case 'BRIDGE/TOKEN/RESET':
-      return { ...state, tokens: [] }
+      return { ...state, 
+        tokens: [],
+        multiBridgeMode: false
+    }
 
     case 'BRIDGE/TOKEN/SELECT':
       return {
