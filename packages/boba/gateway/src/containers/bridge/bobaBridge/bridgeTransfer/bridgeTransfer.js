@@ -17,7 +17,6 @@ import { ArrowDropDown } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
 import { resetToken, setBridgeType } from 'actions/bridgeAction'
 import { openModal } from 'actions/uiAction'
-import * as LayoutS from 'components/common/common.styles'
 
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'

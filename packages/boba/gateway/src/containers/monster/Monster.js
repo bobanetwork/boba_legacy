@@ -226,6 +226,8 @@ class Monster extends React.Component {
                       tokenID={list[v].tokenID}
                       small={"true"}
                     />)
+                  } else {
+                    return null
                   }
                 })
               }
