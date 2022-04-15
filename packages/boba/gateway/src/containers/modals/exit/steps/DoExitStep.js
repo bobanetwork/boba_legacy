@@ -299,6 +299,26 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           Cancel
         </Button>
       </Box>)
+  } else if ( exitFee > Number(feeBalanceBOBA) ) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          <br/>
+          BOBA balance: {Number(feeBalanceBOBA)}
+          <br/>
+          Insufficient BOBA balance to cover xChain message relay. You need at least {exitFee} BOBA.
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
   }
 
   return (
