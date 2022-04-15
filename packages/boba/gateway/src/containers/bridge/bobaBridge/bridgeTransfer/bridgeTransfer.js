@@ -73,7 +73,7 @@ function BridgeTransfer() {
         </S.TokenPicker>
       }
 
-      {tokens.length && !multibridgeMode &&
+      {tokens.length > 0 && !multibridgeMode &&
         <Box display="flex" justifyContent="space-between">
           <Typography variant="body2">
             {bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
@@ -90,20 +90,20 @@ function BridgeTransfer() {
         </Box>
       }
 
-      {tokens.length && !multibridgeMode && layer === 'L1' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
-        <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
-      }
-
-      {tokens.length && !multibridgeMode && layer === 'L1' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
-        <InputStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
-      }
-
-      {tokens.length && !multibridgeMode && layer === 'L2' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
-        <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
-      }
-
-      {tokens.length && !multibridgeMode && layer === 'L2' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
-        <DoExitStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
+      {tokens.length > 0 && !multibridgeMode && <>
+        {layer === 'L1' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
+          <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
+        }
+        {layer === 'L1' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
+          <InputStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
+        }
+        {layer === 'L2' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
+          <DoExitStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
+        }
+        {layer === 'L2' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
+          <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
+        }
+        </>
       }
 
       {multibridgeMode ? <InputStepBatch handleClose={onReset} isBridge={true}  /> : null}
