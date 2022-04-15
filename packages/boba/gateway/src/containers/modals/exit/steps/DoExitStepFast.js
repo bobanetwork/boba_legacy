@@ -133,6 +133,13 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       return false
     }
     else if (
+      exitFee > Number(feeBalanceBOBA)) {
+      setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA.`)
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (
       token.symbol === 'ETH' &&
       (Number(value) + feeETH) > balance) {
       if(feeUseBoba)
@@ -338,6 +345,26 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       <Box>
         <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
           Sorry, nothing to exit - no {token.symbol} in this wallet
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
+  } else if ( exitFee > Number(feeBalanceBOBA) ) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          <br/>
+          BOBA balance: {Number(feeBalanceBOBA)}
+          <br/>
+          Insufficient BOBA balance to cover xChain message relay. You need at least {exitFee} BOBA.
         </Typography>
         <Button
           onClick={handleClose}
