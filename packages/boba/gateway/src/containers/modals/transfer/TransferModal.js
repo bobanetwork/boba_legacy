@@ -169,7 +169,7 @@ function TransferModal ({ open, token, minHeight }) {
             fullWidth
             paste
             sx={{fontSize: '50px'}}
-            
+            newStyle
           />
 
         {!!recipient &&

@@ -52,7 +52,7 @@ function TokenPage() {
     if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
       setDebug(true)
     }
-  }, [ accountEnabled, networkService ])
+  }, [ accountEnabled ])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return

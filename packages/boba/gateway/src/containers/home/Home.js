@@ -40,10 +40,10 @@ import {
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { 
-  selectBaseEnabled, 
-  selectAccountEnabled, 
-  selectNetwork, 
+import {
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectNetwork,
   selectLayer
 } from 'selectors/setupSelector'
 
@@ -71,6 +71,10 @@ import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
+import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
+import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
+import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 
 import {
   fetchDaoBalance,
@@ -81,9 +85,9 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { 
-  fetchAirdropStatusL1, 
-  fetchAirdropStatusL2 
+import {
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2
 } from 'actions/airdropAction'
 
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
@@ -96,6 +100,7 @@ import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import Bridge from 'containers/bridge/Bridge'
 import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
@@ -121,14 +126,19 @@ function Home() {
 
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
-  
+
   const transferModalState = useSelector(selectModalState('transferModal'))
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
-  
+
   const exitModalState = useSelector(selectModalState('exitModal'))
+  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
+  const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
+  const transferPendingModalState = useSelector(selectModalState('transferPending'));
+  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
+  const tokenIndex = useSelector(selectModalState('tokenIndex'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -238,6 +248,10 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
+      {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
+      {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
+      {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
 
       <Alert
         type='error'
@@ -349,6 +363,9 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Bridge" &&
+              <Bridge />
             }
             {pageDisplay === "Monster" &&
               <MonsterWrapper />

@@ -57,15 +57,15 @@ import {
   selectExitFee,
 } from 'selectors/balanceSelector'
 
-function DoExitStep({ handleClose, token }) {
+function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  // support for Use Max - amount to transfer in wei_string
   const [ max_Float, setMax_Float ] = useState(0.0)                // support for Use Max - a number like 0.09 ETH
-
   const [ errorString, setErrorString ] = useState('')
+
 
   const [ feeETH, setFeeETH ] = useState(0.0)
   const [ feeBOBA, setFeeBOBA ] = useState(0.0)
@@ -86,12 +86,25 @@ function DoExitStep({ handleClose, token }) {
 
   const exitFee = useSelector(selectExitFee)
 
+
   function setAmount(value) {
+    // (Number(value) + feeBOBA + exitFee) > balance)
+
 
     const balance = Number(logAmount(token.balance, token.decimals))
 
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(max_Float))
+
+
+    console.group([ "FEES" ])
+    console.log([ 'errorString', errorString ])
+    console.log([ 'feeBOBA', feeBOBA ])
+    console.log([ 'exitFee', exitFee ])
+    console.log([ 'balance', balance ])
+    console.log([ 'value', value ])
+    console.log([ 'feeBalanceBOBA', feeBalanceBOBA ])
+    console.groupEnd([ "FEES" ])
 
     setErrorString('')
 
@@ -169,7 +182,7 @@ function DoExitStep({ handleClose, token }) {
 
     let res = await dispatch(
       exitBOBA(
-        token.address, 
+        token.address,
         value_Wei_String
       )
     )
@@ -243,15 +256,16 @@ function DoExitStep({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
   let ETHstring = ''
 
+
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas: ${Number(feeBOBA).toFixed(4)} BOBA`
+      ETHstring = `Est. gas: ${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas: ${Number(feeETH).toFixed(4)} ETH`
+      ETHstring = `Est. gas: ${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -264,16 +278,19 @@ function DoExitStep({ handleClose, token }) {
     allowUseAll = false
   }
 
-  let receiveL1 = `You will receive ${Number(value).toFixed(3)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
-              on L1. Your funds will be available on L1 in 7 days.`
+  let receiveL1 = `Est. receive ${Number(value).toFixed(3)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}. 
+              Your funds will be available on L1 in 7 days.`
 
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Classic Bridge to L1 ({`${token ? token.symbol : ''}`})
-        </Typography>
+
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
+            Classic Bridge to L1 ({`${token ? token.symbol : ''}`})
+          </Typography>
+        }
 
         {max_Float > 0.0 &&
           <Input
@@ -294,8 +311,11 @@ function DoExitStep({ handleClose, token }) {
             maxValue={max_Float}
             variant="standard"
             newStyle
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
+
         {max_Float === 0 &&
           <Typography variant="body1" sx={{mt: 2}}>
             Loading...
@@ -303,7 +323,7 @@ function DoExitStep({ handleClose, token }) {
         }
 
         <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Message Relay Fee: ${exitFee} BOBA`)}
+          {parse(`xChain relay fee: ${exitFee} BOBA`)}
           <br/>
           {parse(ETHstring)}
         </Typography>
@@ -320,7 +340,7 @@ function DoExitStep({ handleClose, token }) {
           </Typography>
         }
 
-        {loading && (
+        { !isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will close when your transaction has been signed and submitted.
           </Typography>
@@ -328,28 +348,30 @@ function DoExitStep({ handleClose, token }) {
       </Box>
 
       <WrapperActionsModal>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          {buttonLabel}
+        </Button>
+        {token && (
           <Button
-            onClick={handleClose}
-            color="neutral"
+            onClick={doExit}
+            color="primary"
+            variant="contained"
+            loading={loading}
+            tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+            disabled={!validValue}
+            triggerTime={new Date()}
+            fullWidth={isMobile}
             size="large"
           >
-            {buttonLabel}
+            Bridge to L1
           </Button>
-          {token && (
-            <Button
-              onClick={doExit}
-              color="primary"
-              variant="contained"
-              loading={loading}
-              tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
-              disabled={!validValue}
-              triggerTime={new Date()}
-              fullWidth={isMobile}
-              size="large"
-            >
-              Bridge to L1
-            </Button>
-          )}
+        )}
       </WrapperActionsModal>
 
     </>
