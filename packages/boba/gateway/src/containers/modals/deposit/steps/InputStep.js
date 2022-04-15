@@ -101,10 +101,11 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
-        </Typography>
-
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
+            Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
+          </Typography>
+        }
         <Input
           label="Amount to bridge to L2"
           placeholder="0.0"
@@ -146,9 +147,10 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          variant="standard"
-          color="primary"
-          size="large"
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
         >
           {buttonLabel_1}
         </Button>
