@@ -150,10 +150,6 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
-  //console.log("layer:", layer)
-  //console.log("tooSmallETH:", tooSmallETH)
-  //console.log("network:", network)
-
   return (
     <S.PageContainer>
       <PageTitle title="Wallet" />

@@ -14,7 +14,6 @@ import networkService from 'services/networkService'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import Copy from 'components/copy/Copy'
 
 class Nft extends React.Component {
 
@@ -30,7 +29,9 @@ class Nft extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      network,
+      walletAddress
     } = this.props.setup
 
     this.state = {
@@ -40,6 +41,8 @@ class Nft extends React.Component {
       loading: this.props.loading[ 'NFT/ADD' ],
       accountEnabled,
       netLayer,
+      network,
+      walletAddress,
       monsterNumber,
       monsterInfo
     }
@@ -56,7 +59,9 @@ class Nft extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      network,
+      walletAddress
     } = this.props.setup
 
     if (!isEqual(prevState.nft.list, list)) {
@@ -86,6 +91,14 @@ class Nft extends React.Component {
       this.setState({ netLayer })
     }
 
+    if (!isEqual(prevState.setup.network, network)) {
+      this.setState({ network })
+    }
+
+    if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
+      this.setState({ walletAddress })
+    }
+
   }
 
   handleInputAddress = event => {
@@ -112,6 +125,8 @@ class Nft extends React.Component {
       tokenID,
       loading,
       netLayer,
+      network,
+      walletAddress
     } = this.state
 
     if (!netLayer) {
@@ -174,66 +189,52 @@ class Nft extends React.Component {
                   </Typography>
                 </Box>
                 <S.DividerLine />
-                <Typography variant="body1" >
-                  <br/>Useful addresses
+                <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                  <br/>Monsters can be autoadded to your wallet
                 </Typography>
-                <Typography variant="body2" >
-                  Turing monsters:
-                </Typography>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    0xce45...D793
-                  </Typography>
-                  <Copy value={'0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'} light={false} />
-                </Box>
-
                 <Button
                   type="primary"
-                  variant="contained"
+                  variant="outlined"
                   fullWidth={true}
                   onClick={(i) => { this.fetchMyMonsters() }}
-                  sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
+                  sx={{ flex: 1, marginTop: '20px' }}
                 >
                   Fetch My Monsters
                 </Button>
-
               </Box>
               <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px'
               }}>
+                <S.DividerLine />
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Contract Address
+                  Other NFTs must be added manually
                 </Typography>
-
                 <Input
-                  placeholder='Address 0x...'
+                  placeholder='Contract address 0x...'
                   value={contractAddress}
                   onChange={this.handleInputAddress}
                 // paste
                 />
-
-                <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Token ID
-                </Typography>
                 <Input
                   placeholder='TokenID - e.g. 3'
                   value={tokenID}
                   onChange={this.handleInputID}
                 // paste
                 />
+                <Button
+                  type="primary"
+                  variant="outlined"
+                  fullWidth={true}
+                  onClick={(i) => { this.addNFT() }}
+                  disabled={loading || contractAddress === '' || tokenID === ''}
+                  sx={{ flex: 1 }}
+                >
+                  {loading ? 'Adding NFT...' : 'Add NFT'}
+                </Button>
               </Box>
-              <Button
-                type="primary"
-                variant="contained"
-                fullWidth={true}
-                onClick={(i) => { this.addNFT() }}
-                disabled={loading || contractAddress === '' || tokenID === ''}
-                sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
-              >
-                {loading ? 'Adding NFT...' : 'Add NFT'}
-              </Button>
+              
             </S.NFTFormContent>
           </S.NFTActionContent>
           <S.NFTListContainer data-empty={Object.keys(list).length === 0}>
@@ -253,6 +254,21 @@ class Nft extends React.Component {
               >
                 {Object.keys(list).map((v, i) => {
                   const key_UUID = `nft_` + i
+                  if(list[v].hasOwnProperty('account')) {
+                    // new storage format - check for chain
+                    if(list[v].network !== network) {
+                      //console.log("NFT not on this network")
+                      return null
+                    }
+                    if(list[v].layer !== netLayer) {
+                      //console.log("NFT not on this layer")
+                      return null
+                    }
+                    if(list[v].account.toLowerCase() !== walletAddress.toLowerCase()) {
+                      //console.log("NFT not owned by this wallet")
+                      return null
+                    }
+                  }
                   return (
                     <ListNFT
                       key={key_UUID}
@@ -272,6 +288,20 @@ class Nft extends React.Component {
     )}
   }
 }
+
+/*
+    UUID: NFT.UUID,
+    address: NFT.address,
+    name:  NFT.name, 
+    tokenID: NFT.tokenID,
+    symbol:  NFT.symbol,
+    url: NFT.url,
+    meta: NFT.meta,
+    account: NFT.account,
+    network: NFT.network,
+    layer: NFT.layer
+    */
+
 
 const mapStateToProps = state => ({
   nft: state.nft,
