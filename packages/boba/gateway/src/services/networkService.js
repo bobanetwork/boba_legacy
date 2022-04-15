@@ -1216,11 +1216,23 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    // let monsterList = await GraphQLService.queryMonsterTransfer()
-    // console.log("monsterList:",monsterList)
-    // this returns too many events to be directly useful
+    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
+    console.log("monsterList:", monsterList)
 
-    //   for (let i = 0; i < totalProposals; i++) {
+    let monsters = []
+
+    if(monsterList.hasOwnProperty('data')) {
+      monsters = monsterList.data.turingMonstersTransferEvents
+    }
+    console.log("length:",monsters.length)
+
+
+
+    // we can overwrite legacy local entries if people already have entered them
+    // also need to compute the "best" monster
+
+    //for (let i = 0; i < totalProposals; i++) {
+
     //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]
     //     if(typeof(proposalRaw) === 'undefined') continue
     //     let proposalID = proposalRaw.proposalId
@@ -1242,6 +1254,7 @@ class NetworkService {
       )
 
       const monsterBalance = await contract.balanceOf(this.account)
+      console.log("you have", monsterBalance, "monsters")
 
       let topMagic = 0
       let topTop = 0
@@ -1304,7 +1317,7 @@ class NetworkService {
       console.log("nftMeta RAW:", nftMeta)
       const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
-      const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+      const { url , meta = [] } = await getNftImageUrl(nftMeta)
 
       console.log("meta:", meta)
 

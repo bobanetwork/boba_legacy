@@ -44,21 +44,37 @@ class GraphQLService {
     return await client.query({ query })
   }
 
-  async queryMonsterTransfer() {
+  async queryMonsterTransfer(walletAddress) {
 
-    const query = apollo.gql(`query { turingMonstersTransferEvents { to from tokenId } }`)
+    const query = apollo.gql(`query GetTUMOEvents($wallet: Bytes!) { 
+      turingMonstersTransferEvents(where: {
+        to: $wallet }) { tokenId, to, from } }`)
+    
+    /*
+    curl -g -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
+      https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
 
-  /*
-     curl -g -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
-    https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
+    curl -g -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
+      https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
 
-         curl -g -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
-    https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
-  */
+    curl -g -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"query":"{ turingMonstersTransferEvents(where: {to: \"0xADDRESS\"}) { to from tokenId }}"}' \
+      https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
+
+    query GetTUMOEvents($wallet: Bytes!) { 
+        turingMonstersTransferEvents(where:{ 
+            to: $wallet
+          }) {
+        tokenId, to, from
+      } 
+    }
+    */
+
     const client = new apollo.ApolloClient({
       uri: this.getBridgeEndpoint(),
       link: new apollo.HttpLink({ 
@@ -70,9 +86,9 @@ class GraphQLService {
 
     return await client.query({ 
       query,
-      variables : {
-        to: '0x4161aEf7ac9F8772B83Cda1E5F054ADe308d9049'
-      } 
+      variables: {
+        wallet: walletAddress
+      }
     })
   }
 }

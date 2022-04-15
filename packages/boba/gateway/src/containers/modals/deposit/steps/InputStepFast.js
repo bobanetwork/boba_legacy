@@ -51,7 +51,6 @@ import {
  } from 'actions/balanceAction'
 
 import {
-  selectL2FeeRate,
   selectL2FeeRateN,
   selectFastDepositCost,
   selectL2LPBalanceString,
@@ -72,7 +71,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
-  const feeRate = useSelector(selectL2FeeRate)
+
   const feeRateN = useSelector(selectL2FeeRateN)
 
   const cost = useSelector(selectFastDepositCost)
