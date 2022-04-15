@@ -19,7 +19,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 
-function InputStep({ handleClose, token }) {
+function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -101,10 +101,11 @@ function InputStep({ handleClose, token }) {
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
-        </Typography>
-
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
+            Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
+          </Typography>
+        }
         <Input
           label="Amount to bridge to L2"
           placeholder="0.0"
@@ -123,6 +124,8 @@ function InputStep({ handleClose, token }) {
           maxValue={maxValue}
           variant="standard"
           newStyle
+          isBridge={isBridge}
+          openTokenPicker={openTokenPicker}
         />
 
         {!!convertToUSD && (
@@ -144,8 +147,10 @@ function InputStep({ handleClose, token }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
-          size="large"
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
         >
           {buttonLabel_1}
         </Button>

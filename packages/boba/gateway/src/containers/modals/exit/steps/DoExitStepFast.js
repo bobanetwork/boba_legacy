@@ -66,7 +66,7 @@ import {
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
 
-function DoExitStepFast({ handleClose, token }) {
+function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -301,9 +301,9 @@ function DoExitStepFast({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
-  const feeLabel = `The current LP fee is ${feeRateN}%.`
+  const feeLabel = `Liquidity pool fee: ${feeRateN}%`
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -314,9 +314,9 @@ function DoExitStepFast({ handleClose, token }) {
   let ETHstring = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas: ${Number(feeBOBA).toFixed(4)} BOBA`
+      ETHstring = `Est. gas: ${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas: ${Number(feeETH).toFixed(4)} ETH`
+      ETHstring = `Est. gas: ${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -329,25 +329,17 @@ function DoExitStepFast({ handleClose, token }) {
     allowUseAll = false
   }
 
-  const balance = Number(logAmount(token.balance, token.decimals))
-
-  let receiveL1 = `You will receive approximately ${receivableAmount(value)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
-              on L1.`
+  let receiveL1 = `Est. receive ${receivableAmount(value)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`
 
   return (
     <>
       <Box>
-
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
-          Fast Bridge to L1
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          {feeLabel}
-          <br/>
-          Bridge time: 15 minutes normally, as long as 3 hours when ETH is conjested.
-        </Typography>
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
+            Fast Bridge to L1
+          </Typography>
+        }
 
         {max_Float > 0.0 &&
           <Input
@@ -369,6 +361,8 @@ function DoExitStepFast({ handleClose, token }) {
             variant="standard"
             newStyle
             loading={loading}
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
 
@@ -377,9 +371,14 @@ function DoExitStepFast({ handleClose, token }) {
             Loading...
           </Typography>
         }
-        
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Message Relay Fee: ${exitFee} BOBA`)}
+
+        <Typography variant="body2" sx={{mb: 3}}>
+          <br/>
+          {feeLabel}
+          <br/>
+          Est. time: 15 minutes to 3 hours
+          <br/>
+          {parse(`xChain relay fee: ${exitFee} BOBA`)}
           <br/>
           {parse(ETHstring)}
         </Typography>
@@ -417,7 +416,7 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {loading && (
+        {!isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>
@@ -427,7 +426,9 @@ function DoExitStepFast({ handleClose, token }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color='neutral'
+          disabled={false}
+          variant='outlined'
+          color='primary'
           size='large'
         >
           {buttonLabel}

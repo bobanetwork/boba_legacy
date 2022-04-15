@@ -25,9 +25,9 @@ export function setTheme (theme) {
   }
 }
 
-export function openModal (modal, token, fast) {
+export function openModal (modal, token, fast, tokenIndex) {
   return function (dispatch) {
-    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast })
+    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast, tokenIndex });
   }
 }
 
