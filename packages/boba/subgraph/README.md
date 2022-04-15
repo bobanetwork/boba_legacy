@@ -1,20 +1,6 @@
 # Boba Network Subgraphs
 
-Please us the offical hosted service
-
-https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query
-
-## Legacy/Outdated Documention
-
-OUTDATED
-
-OUTDATED
-
-OUTDATED
-
-OUTDATED
-
-These subgraphs index the **StandardBridge**, the **LiquidityPool**, and the **Boba DAO** contracts.
+These subgraphs index the **StandardBridge**, the **LiquidityPool**, the **Boba DAO**, and the **TuringMonster** contracts.
 
 ## Requirements
 
@@ -31,44 +17,38 @@ First, `cd` to either the **L1** or the **L2** folders, depending on where you w
 
 ### L1 Subgraphs
 
-The deploy key is required to deploy subgraphs to **The Graph Node**. 
+The deploy key is required to deploy subgraphs to **The Graph Node**. Depending on which chain you are indexing, provide either `mainnet` or `rinkeby` as a setting to `yarn prepare:`.
 
 ```bash
 graph auth --studio $DEPLOY_KEY
 yarn install
-yarn prepare:mainnet # yarn prepare:rinkeby
+yarn prepare:mainnet 
+#or, yarn prepare:rinkeby
 yarn codegen
 yarn build
-graph deploy --studio boba-network # graph deploy --studio boba-network-rinkeby
+graph deploy --studio boba-network 
+# or, graph deploy --studio boba-network-rinkeby
 ```
 
 ### L2 Subgraphs
 
-The admin port is not public. 
+The admin port for rinkeby is not public. 
 
 ```bash
 yarn install
 yarn prepare:mainnet
+#or, yarn prepare:rinkeby
 yarn codegen
 yarn build
-yarn deploy:subgraph:mainnet
-# OR
-# graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph
+graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph
+# or, yarn deploy:subgraph:rinkeby
 ```
 
 ## Querying
 
-### L2 Subgraphs
+* The Mainnet Graph Node is hosted by **The Graph** team. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs. You can experiment here: [ bobanetwork/boba-l2-subgraph](https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query).
 
-> Mainnet Graph Node is hosted by **The Graph** team. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs
-
-> Rinkeby: https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges/graphql
-
-## Graph Node
-
-> Mainnet Graph Node is hosted by **The Graph** team. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs
-
-> Rinkeby endpoint: https://graph.rinkeby.boba.network
+* Rinkeby endpoint: https://graph.rinkeby.boba.network. you can experiment here: [boba/Bridges/graphql](https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges/graphql)
 
 | **Port** | **Purpose**                               | **Routes**              | URL                                                          | **Permission** |
 | -------- | ----------------------------------------- | ----------------------- | ------------------------------------------------------------ | -------------- |

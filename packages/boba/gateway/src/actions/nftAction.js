@@ -29,9 +29,10 @@ export async function addNFT ( NFT ) {
   const UUID = NFT.UUID
 
   //if we already have added it, no need to add again
-  if (state.nft.list[UUID]) {
-    return state.nft.list[UUID]
-  }
+  // overwite the old entry
+  // if (state.nft.list[UUID]) {
+  //   return state.nft.list[UUID]
+  // }
   
   const info = {
     UUID: NFT.UUID,
