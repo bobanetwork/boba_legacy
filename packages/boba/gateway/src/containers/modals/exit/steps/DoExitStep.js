@@ -96,16 +96,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig   = new BN(value).gt(new BN(max_Float))
 
-
-    console.group([ "FEES" ])
-    console.log([ 'errorString', errorString ])
-    console.log([ 'feeBOBA', feeBOBA ])
-    console.log([ 'exitFee', exitFee ])
-    console.log([ 'balance', balance ])
-    console.log([ 'value', value ])
-    console.log([ 'feeBalanceBOBA', feeBalanceBOBA ])
-    console.groupEnd([ "FEES" ])
-
     setErrorString('')
 
     if (value <= 0) {
@@ -122,6 +112,13 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
       setValidValue(false)
       setValue(value)
       return false
+    }
+    else if (
+       exitFee > Number(feeBalanceBOBA)) {
+       setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA.`)
+       setValidValue(false)
+       setValue(value)
+       return false
     }
     else if (
       token.symbol === 'ETH' &&

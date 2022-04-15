@@ -107,7 +107,6 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const balanceSubPending = lpUnits - logAmount(LPPending, token.decimals) //subtract the in flight exits
 
   const exitFee = useSelector(selectExitFee)
-  console.log("exitFee:",exitFee)
 
   function setAmount(value) {
 
