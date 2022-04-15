@@ -22,7 +22,6 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  //selectBobaPriceRatio,
   selectNetwork
 } from 'selectors/setupSelector'
 
@@ -44,7 +43,6 @@ function FeeSwitcher() {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  //const feePriceRatio = useSelector(selectBobaPriceRatio())
   const network = useSelector(selectNetwork())
 
   const layer = useSelector(selectLayer())
