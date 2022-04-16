@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Box, Typography, IconButton } from '@mui/material'
+import { Box } from '@mui/material'
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',

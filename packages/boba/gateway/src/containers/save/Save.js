@@ -242,13 +242,16 @@ class Save extends React.Component {
 
     return (
       <S.StakePageContainer>
+
+        <PageTitle title={'Stake'} />
+
         <Box sx={{ my: 1 }}>
-          <PageTitle title="Stake BOBA" />
           {(netLayer !== 'L2') ?
             <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
             : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
           }
         </Box>
+        
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>

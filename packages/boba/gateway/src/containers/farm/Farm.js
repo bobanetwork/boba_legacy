@@ -31,8 +31,10 @@ import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import WalletPicker from 'components/walletpicker/WalletPicker'
+
+import Connect from 'containers/connect/Connect'
 import PageTitle from 'components/pageTitle/PageTitle'
+
 import { Circle, HelpOutline } from '@mui/icons-material'
 
 class Farm extends React.Component {
@@ -212,22 +214,13 @@ class Farm extends React.Component {
 
     return (
       <S.EarnPageContainer>
-        <PageTitle title="Earn" />
 
-        {!accountEnabled &&
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon />
-              <S.AlertText
-                variant="body2"
-                component="p"
-              >
-                Connect to MetaMask to see your balances and contribute to the liquidity pool 
-              </S.AlertText>
-            </S.AlertInfo>
-            <WalletPicker />
-          </S.LayerAlert>
-        }
+        <PageTitle title={'Earn'} />
+
+        <Connect 
+          userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
+          accountEnabled={accountEnabled}
+        />
 
         <S.Wrapper dropDownBox={dropDownBox}>
 
@@ -238,8 +231,8 @@ class Farm extends React.Component {
               md={10}
             >
               <Typography variant="body2" sx={{ mt: 2 }}>
-                Bridging fees are proportionally distributed to stakers. The bridges are not farms. Your earnings only increase when someone uses the
-                bridge you have staked into.
+                Bridging fees are proportionally distributed to stakers. The bridges are not farms. 
+                Your earnings only increase when someone uses the bridge you have staked into.
               </Typography>
             </S.GridItemTag>
 
@@ -325,11 +318,6 @@ class Farm extends React.Component {
               />
             </S.FarmAction>
           </S.EarnActionContainer>
-          <Box sx={{ my: 2 }}>
-            {!accountEnabled ?
-              <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-              : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
-          </Box>
 
           {layer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
-import { Circle, Info } from "@mui/icons-material"
+import { Info } from "@mui/icons-material"
 import { Box, CircularProgress, Icon, Typography } from '@mui/material'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
@@ -11,8 +11,10 @@ import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } f
 import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
-import Nft from "containers/wallet/nft/Nft"
+import Nft from 'containers/wallet/nft/Nft'
 import Token from './token/Token'
+import Connect from 'containers/connect/Connect'
+
 import * as S from './wallet.styles'
 import * as G from '../Global.styles'
 
@@ -25,9 +27,7 @@ import {
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
-import AlertIcon from 'components/icons/AlertIcon'
 import { isEqual, orderBy } from 'lodash'
 
 import { POLL_INTERVAL } from "util/constant"
@@ -154,7 +154,12 @@ function Wallet() {
   return (
     <S.PageContainer>
       
-      <PageTitle title="Wallet" />
+      <PageTitle title={'Wallet'} />
+
+      <Connect 
+        userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
+        accountEnabled={accountEnabled}
+      />
 
       {layer === 'L2' && tooSmallETH && network === 'rinkeby' && 
         <G.LayerAlert>
@@ -179,21 +184,6 @@ function Wallet() {
           >
             EMERGENCY SWAP
           </Button>
-        </G.LayerAlert>
-      }
-
-      {!accountEnabled &&
-        <G.LayerAlert>
-          <G.AlertInfo>
-            <AlertIcon />
-            <G.AlertText
-              variant="body2"
-              component="p"
-            >
-              Connect to MetaMask to see your balances, transfer, and bridge
-            </G.AlertText>
-          </G.AlertInfo>
-          <WalletPicker />
         </G.LayerAlert>
       }
 
@@ -238,13 +228,8 @@ function Wallet() {
             </Typography>
           </S.PendingIndicator>
         }
-
       </S.WalletActionContainer>
-      {
-        !accountEnabled ?
-          <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-          : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-      }
+
       <Box sx={{ mt: 2 }}>
         <Tabs
           activeTab={page}
