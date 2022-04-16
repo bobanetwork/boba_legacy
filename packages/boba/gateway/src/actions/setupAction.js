@@ -45,9 +45,9 @@ export function setLayer(layer) {
   }
 }
 
-export function setAccountNumber(account) {
+export function setWalletAddress(account) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/ACCOUNT_NUMBER/SET', payload: account })
+    return dispatch({ type: 'SETUP/WALLETADDRESS/SET', payload: account })
   }
 }
 
