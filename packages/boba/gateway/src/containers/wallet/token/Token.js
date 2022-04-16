@@ -5,8 +5,10 @@ import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelec
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
+import { selectTransactions } from 'selectors/transactionSelector'
 
 import { fetchLookUpPrice } from 'actions/networkAction'
+import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
@@ -17,8 +19,9 @@ import { tokenTableHeads } from './token.tableHeads'
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
+import Pulse from 'components/pulse/PulsingBadge'
 
-import { isEqual } from 'lodash'
+import { isEqual, orderBy } from 'lodash'
 
 import networkService from 'services/networkService'
 
@@ -40,6 +43,50 @@ function TokenPage() {
   const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
 
   const disabled = depositLoading || exitLoading
+
+  const unorderedTransactions = useSelector(selectTransactions, isEqual)
+  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+
+  // low balance warnings
+  const l2Balances = useSelector(selectlayer2Balance, isEqual)
+
+  const now = Math.floor(Date.now() / 1000)
+
+  const pendingL1 = orderedTransactions.filter((i) => {
+    if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+      i.crossDomainMessage &&
+      i.crossDomainMessage.crossDomainMessage === 1 &&
+      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+      i.action.status === "pending"
+    ) {
+      return true
+    }
+    return false
+  })
+
+  const pendingL2 = orderedTransactions.filter((i) => {
+    if (i.chain === 'L2' &&
+      i.crossDomainMessage &&
+      i.crossDomainMessage.crossDomainMessage === 1 &&
+      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+      i.action.status === "pending"
+    ) {
+      return true
+    }
+    return false
+  })
+
+  const pending = [
+    ...pendingL1,
+    ...pendingL2
+  ]
+
+  const inflight = pending.filter((i) => {
+    if (pending && i.hasOwnProperty('stateRoot') && i.stateRoot.stateRootHash === null) {
+      return true
+    }
+    return false
+  })
 
   useEffect(() => {
     if (!accountEnabled) return
@@ -130,6 +177,23 @@ function TokenPage() {
               GasEstimateApprove
             </Button>
           }
+        </Box>
+      }
+
+      {!!accountEnabled && inflight.length > 0 && 
+        <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
+          <Typography 
+            variant="body2"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => {
+              dispatch(setPageAction('History'))
+              dispatch(setActiveHistoryTab("Pending"))
+            }}
+          >
+            <span style={{opacity: '0.9'}}>Bridge in progress:</span>{' '}
+            <span style={{opacity: '0.6'}}>Click for detailed status</span>
+            <Pulse variant="success"/>
+          </Typography>
         </Box>
       }
 

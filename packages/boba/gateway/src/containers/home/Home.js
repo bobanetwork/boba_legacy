@@ -94,7 +94,6 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
 
 import Airdrop from 'containers/airdrop/Airdrop'
-import Account from 'containers/account/Account'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
@@ -334,9 +333,6 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "AccountNow" &&
-              <Account />
-            }
             {pageDisplay === "History" &&
               <Transactions />
             }

@@ -49,44 +49,8 @@ function Wallet() {
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
-
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
-
-  const now = Math.floor(Date.now() / 1000)
-
-  const pendingL1 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
-      i.crossDomainMessage &&
-      i.crossDomainMessage.crossDomainMessage === 1 &&
-      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending" &&
-      (now - i.timeStamp) < 20
-    ) {
-      return true
-    }
-    return false
-  })
-
-  const pendingL2 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L2' &&
-      i.crossDomainMessage &&
-      i.crossDomainMessage.crossDomainMessage === 1 &&
-      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending" &&
-      (now - i.timeStamp) < 20
-    ) {
-      return true
-    }
-    return false
-  })
-
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
 
   useEffect(()=>{
     if (accountEnabled)
@@ -212,22 +176,6 @@ function Wallet() {
             Boba Wallet
           </Typography>
         </G.PageSwitcher>
-
-        {!!accountEnabled && pending.length > 0 && 
-          <S.PendingIndicator>
-            <CircularProgress color="primary" size="20px"/>
-            <Typography
-              sx={{ cursor: 'pointer' }}
-              onClick={() => {
-                dispatch(setPageAction('History'))
-                dispatch(setActiveHistoryTab("Pending"))
-              }}
-              variant="text"
-              component="span">
-              Transaction in progress...
-            </Typography>
-          </S.PendingIndicator>
-        }
       </S.WalletActionContainer>
 
       <Box sx={{ mt: 2 }}>
