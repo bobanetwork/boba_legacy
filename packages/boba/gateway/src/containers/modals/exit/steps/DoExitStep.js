@@ -25,6 +25,7 @@ import { openAlert } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector'
@@ -39,7 +40,6 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
@@ -255,14 +255,14 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
     if (Number(cost) > 0) estimateMax()
   }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
-  let ETHstring = ''
+  let estGas = ''
 
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Est. gas: ${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Est. gas: ${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -275,9 +275,8 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
     allowUseAll = false
   }
 
-  let receiveL1 = `Est. receive ${Number(value).toFixed(3)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}. 
-              Your funds will be available on L1 in 7 days.`
+  let receiveL1 = `${Number(value).toFixed(3)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}.`
 
   if( Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
@@ -358,17 +357,14 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           </Typography>
         }
 
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`xChain relay fee: ${exitFee} BOBA`)}
-          <br/>
-          {parse(ETHstring)}
-        </Typography>
 
-        {validValue && token && value &&
-          <Typography variant="body2" sx={{mt: 2}}>
-            {receiveL1}
-          </Typography>
-        }
+        <BridgeFee
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="In 7 days."
+          timeInfo="Your funds will be available in 7 days."
+        />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>

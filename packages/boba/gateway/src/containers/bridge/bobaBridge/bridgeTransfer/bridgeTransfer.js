@@ -18,10 +18,12 @@ import { Box, Typography } from '@mui/material'
 import { resetToken, setBridgeType } from 'actions/bridgeAction'
 import { openModal } from 'actions/uiAction'
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectBridgeTokens, selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector'
-import { selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectTokens } from 'selectors/tokenSelector'
+
 import { BRIDGE_TYPE } from 'util/constant'
 import * as S from './bridgeTransfer.styles'
 
@@ -30,15 +32,18 @@ import DoExitStepFast from 'containers/modals/exit/steps/DoExitStepFast'
 import InputStep from 'containers/modals/deposit/steps/InputStep'
 import InputStepFast from 'containers/modals/deposit/steps/InputStepFast'
 import InputStepBatch from 'containers/modals/deposit/steps/InputStepBatch'
+import { fetchLookUpPrice } from 'actions/networkAction'
 
 function BridgeTransfer() {
 
+  const accountEnabled = useSelector(selectAccountEnabled())
   const layer = useSelector(selectLayer())
   const bridgeType = useSelector(selectBridgeType())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
+  const tokenList = useSelector(selectTokens)
+  const tokens = useSelector(selectBridgeTokens())
 
   const dispatch = useDispatch()
-  const tokens = useSelector(selectBridgeTokens())
 
   useEffect(() => {
     dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
@@ -55,6 +60,33 @@ function BridgeTransfer() {
   const openTokenPicker = (index = 0) => {
     dispatch(openModal('tokenPicker', null, null, index))
   }
+
+
+  const getLookupPrice = useCallback(() => {
+    if (!accountEnabled) return
+    // only run once all the tokens have been added to the tokenList
+    if (Object.keys(tokenList).length < 27) return
+    const symbolList = Object.values(tokenList).map((i) => {
+      if (i.symbolL1 === 'ETH') {
+        return 'ethereum'
+      } else if (i.symbolL1 === 'OMG') {
+        return 'omg'
+      } else if(i.symbolL1 === 'BOBA') {
+        return 'boba-network'
+      } else if(i.symbolL1 === 'OLO') {
+        return 'oolongswap'
+      } else {
+        return i.symbolL1.toLowerCase()
+      }
+    })
+    dispatch(fetchLookUpPrice(symbolList))
+  }, [ tokenList, dispatch, accountEnabled ])
+
+  useEffect(() => {
+    if (!accountEnabled) return
+    getLookupPrice()
+  }, [ getLookupPrice, accountEnabled ])
+
 
   return (
     <S.BridgeTransferContainer my={1}>
