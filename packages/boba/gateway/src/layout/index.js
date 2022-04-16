@@ -36,6 +36,13 @@ function App () {
 
   const radioGreen = '#BAE21A'
 
+/*
+#24262E dark grey
+
+border-radius: ${theme.shape.borderRadius}px;
+
+*/
+
   let MUItheme = createTheme({
     palette: {
       mode: theme === 'light' ? 'light' : 'dark',
@@ -43,18 +50,20 @@ function App () {
         main: radioGreen,
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
+        border: light ? 'solid 1px rgba(0, 0, 0, 0.22)' : 'solid 1px #2d2f3a',
+        borderRadius: '8px',
       },
       secondary: {
         main: light ? '#1CD6D1' : '#CCFF00',
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
-        secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.02)',
+        secondary: light ? 'rgba(0, 0, 0, 0.00)' : '#24262E',
         secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
-        input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)"
+        input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)",
       },
       neutral: {
         main: '#fff',

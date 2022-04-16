@@ -1,5 +1,6 @@
 import { Box, Typography, IconButton } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { shadows } from '@mui/system'
 
 export const TokenPageContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -13,7 +14,7 @@ export const TokenPageContainer = styled(Box)(({ theme }) => ({
     overflowX: 'scroll',
     display: 'block'
   },
-}));
+}))
 
 export const TokenPageContentEmpty = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -22,9 +23,9 @@ export const TokenPageContentEmpty = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '10px',
-  borderRadius: '20px',
-  gap: '10px',
   height: 'fit-content',
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
 }))
 
@@ -35,9 +36,9 @@ export const TokenPageContent = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '10px',
-  borderRadius: '20px',
-  gap: '10px',
   height: 'fit-content',
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
   [ theme.breakpoints.down('sm') ]: {
     width: 'fit-content',
@@ -50,12 +51,7 @@ export const LoaderContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: '20px',
   height: '200px',
-  background: theme.palette.background.secondary,
-  [ theme.breakpoints.down('sm') ]: {
-    height: '200px',
-  },
 }))
 
 export const TableHeading = styled(Box)(({ theme }) => ({
@@ -73,11 +69,7 @@ export const TableHeading = styled(Box)(({ theme }) => ({
       display: 'none'
      }
   },
-  [ theme.breakpoints.up('md') ]: {
-    marginBottom: "20px",
-  },
 }));
-
 
 export const TableHeadingItem = styled(Typography)`
   width: 20%;
@@ -102,14 +94,14 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
     width: '100%',
   },
 
-}));
+}))
 
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
   [theme.breakpoints.up('md')]: {
   },
-}));
+}))
 
 export const AlertInfo = styled(Box)`
   display: flex;

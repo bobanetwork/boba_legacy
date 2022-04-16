@@ -23,7 +23,6 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-
 export const WalletTitleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',

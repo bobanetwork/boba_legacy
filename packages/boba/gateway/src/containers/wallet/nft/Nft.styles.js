@@ -7,14 +7,6 @@ export const NFTPageContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   width: '100%',
   gap: '10px',
-  // [theme.breakpoints.between('md', 'lg')]: {
-  //   width: '90%',
-  //   padding: '0px',
-  // },
-  // [theme.breakpoints.between('sm', 'md')]: {
-  //   width: '90%',
-  //   padding: '0px',
-  // },
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
     padding: '0px',
@@ -28,6 +20,9 @@ export const NFTActionContent = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'flex-start',
   gap: '10px',
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
+  background: theme.palette.background.secondary,
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
@@ -38,10 +33,8 @@ export const NFTFormContent = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'flex-start',
   padding: '10px',
-  borderRadius: '20px',
   gap: '10px',
   height: 'fit-content',
-  background: theme.palette.background.secondary,
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
@@ -49,9 +42,10 @@ export const NFTFormContent = styled(Box)(({ theme }) => ({
 
 export const NFTListContainer = styled(Grid)((props) => ({
   width: '63%',
+  border: props.theme.palette.primary.border,
   background: !props['data-empty'] ? props.theme.palette.background.secondary : 'none',
   padding: !props['data-empty'] ? '10px' : 0,
-  borderRadius: !props['data-empty'] ? '20px' : 0,
+  borderRadius: !props['data-empty'] ? props.theme.palette.primary.borderRadius : 0,
   [ props.theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
@@ -60,7 +54,7 @@ export const NFTListContainer = styled(Grid)((props) => ({
 export const NFTPageContent = styled(Grid)(({ theme }) => ({
   marginTop: '20px',
   padding: '10px',
-  borderRadius: '20px',
+  borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
 }))
 

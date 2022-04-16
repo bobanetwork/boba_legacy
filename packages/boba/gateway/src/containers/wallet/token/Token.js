@@ -9,15 +9,15 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { fetchLookUpPrice } from 'actions/networkAction'
 
 import * as S from './Token.styles'
-import { Box, Typography, useTheme } from '@mui/material'
+
+import { Box, Typography, useTheme, CircularProgress } from '@mui/material'
+import { shadows } from '@mui/system'
+
 import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
-
-import lightLoader from 'images/boba2/loading_light.gif'
-import darkLoader from 'images/boba2/loading_dark.gif'
 
 import { isEqual } from 'lodash'
 
@@ -42,8 +42,6 @@ function TokenPage() {
   const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
 
   const disabled = depositLoading || exitLoading
-
-  const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
 
   useEffect(() => {
     if (!accountEnabled) return
@@ -138,7 +136,7 @@ function TokenPage() {
       }
 
       <S.TokenPageContainer>
-        <S.TokenPageContent>
+        <S.TokenPageContent sx={{ boxShadow: 1 }}>
           <S.TableHeading>
             {tokenTableHeads.map((item) => {
               return (
@@ -162,8 +160,9 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : <S.LoaderContainer>
-            <img src={loaderImage} height="100%" alt="balance loading" />
+          }) : 
+          <S.LoaderContainer>
+            <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
           {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
             return (
@@ -175,8 +174,9 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : <S.LoaderContainer>
-            <img src={loaderImage} height="100%" alt="balance loading" />
+          }) : 
+          <S.LoaderContainer>
+            <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
         </S.TokenPageContent>
       </S.TokenPageContainer>

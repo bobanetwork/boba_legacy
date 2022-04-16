@@ -5,12 +5,12 @@ export const Content = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '20px',
-  marginBottom: '5px',
+  //marginBottom: '5px',
   width: '100%',
   padding: '10px',
   borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
   [ theme.breakpoints.down('sm') ]: {
-    padding: '10px 5px',
+    //padding: '10px 5px',
   }
 }))
 
@@ -36,12 +36,10 @@ export const TableCell = styled(Box)(({ theme, isMobile }) => ({
   }
 }));
 
-
 export const TextTableCell = styled(Typography)`
   opacity: ${(props) => !props.enabled ? "0.4" : "1.0"};
   font-weight: 700;
 `;
-
 
 export const DropdownWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',

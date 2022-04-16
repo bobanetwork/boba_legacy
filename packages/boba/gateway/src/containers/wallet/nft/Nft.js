@@ -234,7 +234,6 @@ class Nft extends React.Component {
                   {loading ? 'Adding NFT...' : 'Add NFT'}
                 </Button>
               </Box>
-              
             </S.NFTFormContent>
           </S.NFTActionContent>
           <S.NFTListContainer data-empty={Object.keys(list).length === 0}>
