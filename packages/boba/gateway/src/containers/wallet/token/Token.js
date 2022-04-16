@@ -9,10 +9,9 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { fetchLookUpPrice } from 'actions/networkAction'
 
 import * as S from './Token.styles'
+import * as G from '../../Global.styles'
 
-import { Box, Typography, useTheme, CircularProgress } from '@mui/material'
-import { shadows } from '@mui/system'
-
+import { Box, Typography, CircularProgress } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
@@ -26,7 +25,6 @@ import networkService from 'services/networkService'
 function TokenPage() {
 
   const dispatch = useDispatch()
-  const theme = useTheme()
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
@@ -86,8 +84,8 @@ function TokenPage() {
   if (!accountEnabled) {
 
     return (
-      <S.TokenPageContainer>
-        <S.TokenPageContentEmpty>
+      <G.Container>
+        <G.ContentEmpty>
           <Box
             sx={{
               display: 'flex',
@@ -102,8 +100,8 @@ function TokenPage() {
               No Data
             </Typography>
           </Box>
-        </S.TokenPageContentEmpty>
-      </S.TokenPageContainer>
+        </G.ContentEmpty>
+      </G.Container>
     )
 
   } else {
@@ -115,13 +113,13 @@ function TokenPage() {
           <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
             <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-            <S.footerLink
+            <G.footerLink
               target='_blank'
               href={'https://oolongswap.com/'}
               aria-label="link"
               style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
             >Oolongswap <Link />
-            </S.footerLink>
+            </G.footerLink>
           </Typography>
           {debug &&
             <Button
@@ -135,8 +133,8 @@ function TokenPage() {
         </Box>
       }
 
-      <S.TokenPageContainer>
-        <S.TokenPageContent sx={{ boxShadow: 1 }}>
+      <G.Container>
+        <G.Content>
           <S.TableHeading>
             {tokenTableHeads.map((item) => {
               return (
@@ -178,8 +176,8 @@ function TokenPage() {
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
-        </S.TokenPageContent>
-      </S.TokenPageContainer>
+        </G.Content>
+      </G.Container>
     </>)
   }
 

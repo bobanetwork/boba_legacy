@@ -35,6 +35,7 @@ function App () {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
+  const buttonColor = '#228fe5' //'#24a0ed'
 
 /*
 #24262E dark grey
@@ -50,8 +51,9 @@ border-radius: ${theme.shape.borderRadius}px;
         main: radioGreen,
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
-        border: light ? 'solid 1px rgba(0, 0, 0, 0.22)' : 'solid 1px #2d2f3a',
+        border: light ? 'solid 1px rgba(0, 0, 0, 0.16)' : 'solid 1px #2d2f3a',
         borderRadius: '8px',
+        borderBottom: light ? 'solid 1px rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.04)',
       },
       secondary: {
         main: light ? '#1CD6D1' : '#CCFF00',
@@ -136,27 +138,31 @@ border-radius: ${theme.shape.borderRadius}px;
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: radioGreen,
+              background: buttonColor,
               borderWidth: '1.4px',
-              borderColor: radioGreen,
+              borderColor: buttonColor,
+              fontWeight: 500,
+              color: '#fff',
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: radioGreen,
+                backgroundColor: buttonColor,
               }
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: radioGreen, //light ? '#000' : '#fff',
+              color: buttonColor,
+              borderColor: buttonColor,
+              background: light ? '#fff' : 'none', 
               borderWidth: '1.4px',
-              borderColor: radioGreen,
-              filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
+              fontWeight: 700,
+              filter: "drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))",
               "&:hover": {
                 color: '#000',
-                borderColor: radioGreen,
-                backgroundColor: radioGreen,
+                borderColor: buttonColor,
+                backgroundColor: buttonColor,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }

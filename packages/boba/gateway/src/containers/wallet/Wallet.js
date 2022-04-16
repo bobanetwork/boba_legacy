@@ -14,6 +14,7 @@ import Tabs from 'components/tabs/Tabs'
 import Nft from "containers/wallet/nft/Nft"
 import Token from './token/Token'
 import * as S from './wallet.styles'
+import * as G from '../Global.styles'
 
 import {
   selectAccountEnabled,
@@ -152,11 +153,12 @@ function Wallet() {
 
   return (
     <S.PageContainer>
+      
       <PageTitle title="Wallet" />
-      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            {/* <AlertIcon /> */}
+
+      {layer === 'L2' && tooSmallETH && network === 'rinkeby' && 
+        <G.LayerAlert>
+          <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
             <Typography
               flex={4}
@@ -169,7 +171,7 @@ function Wallet() {
               otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use 
               EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
             </Typography>
-          </S.AlertInfo>
+          </G.AlertInfo>
           <Button
             onClick={()=>{emergencySwap()}}
             color='primary'
@@ -177,26 +179,26 @@ function Wallet() {
           >
             EMERGENCY SWAP
           </Button>
-        </S.LayerAlert>
+        </G.LayerAlert>
       }
 
       {!accountEnabled &&
-        <S.LayerAlert>
-          <S.AlertInfo>
+        <G.LayerAlert>
+          <G.AlertInfo>
             <AlertIcon />
-            <S.AlertText
+            <G.AlertText
               variant="body2"
               component="p"
             >
               Connect to MetaMask to see your balances, transfer, and bridge
-            </S.AlertText>
-          </S.AlertInfo>
+            </G.AlertText>
+          </G.AlertInfo>
           <WalletPicker />
-        </S.LayerAlert>
+        </G.LayerAlert>
       }
-      <S.WalletActionContainer
-      >
-        <S.PageSwitcher>
+
+      <S.WalletActionContainer>
+        <G.PageSwitcher>
           <Typography
             className={chain === 'Ethereum Wallet' ? 'active' : ''}
             onClick={() => {
@@ -219,21 +221,24 @@ function Wallet() {
             component="span">
             Boba Wallet
           </Typography>
-        </S.PageSwitcher>
-        {!!accountEnabled && pending.length > 0 ? <S.PendingIndicator
-        >
-          <CircularProgress color="primary" size="20px"/>
-          <Typography
-            sx={{ cursor: 'pointer' }}
-            onClick={() => {
-              dispatch(setPageAction('History'))
-              dispatch(setActiveHistoryTab("Pending"))
-            }}
-            variant="text"
-            component="span">
-            Transaction in progress...
-          </Typography>
-        </S.PendingIndicator> : null}
+        </G.PageSwitcher>
+
+        {!!accountEnabled && pending.length > 0 && 
+          <S.PendingIndicator>
+            <CircularProgress color="primary" size="20px"/>
+            <Typography
+              sx={{ cursor: 'pointer' }}
+              onClick={() => {
+                dispatch(setPageAction('History'))
+                dispatch(setActiveHistoryTab("Pending"))
+              }}
+              variant="text"
+              component="span">
+              Transaction in progress...
+            </Typography>
+          </S.PendingIndicator>
+        }
+
       </S.WalletActionContainer>
       {
         !accountEnabled ?

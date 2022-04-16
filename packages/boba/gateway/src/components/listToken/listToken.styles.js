@@ -1,19 +1,14 @@
 import { styled } from '@mui/material/styles'
-import { Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material'
 
 export const Content = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '20px',
-  //marginBottom: '5px',
   width: '100%',
   padding: '10px',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-  [ theme.breakpoints.down('sm') ]: {
-    //padding: '10px 5px',
-  }
+  borderBottom: theme.palette.primary.borderBottom
 }))
-
 
 export const TableBody = styled(Box)(({ theme }) => ({
   display: 'flex',

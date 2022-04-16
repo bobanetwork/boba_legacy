@@ -7,7 +7,7 @@ export const Tabs = styled(Box)(({theme})=>({
    justifyContent: 'flex-start',
    flex: 1,
    marginBottom: '20px',
-   borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+   borderBottom: theme.palette.primary.borderBottom,
    [theme.breakpoints.down('md')]:{
       width: '100%'
    }
