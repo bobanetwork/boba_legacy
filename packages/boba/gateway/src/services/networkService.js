@@ -1237,7 +1237,6 @@ class NetworkService {
       }
       this.checkMonster()
     }
-
   }
 
   async checkMonster() {
@@ -1255,7 +1254,6 @@ class NetworkService {
       )
 
       const monsterBalance = await contract.balanceOf(this.account)
-      //console.log("You have", monsterBalance, "monsters")
 
       let topMagic = 0
       let topTop = 0

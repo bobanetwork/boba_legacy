@@ -289,20 +289,6 @@ class Nft extends React.Component {
   }
 }
 
-/*
-    UUID: NFT.UUID,
-    address: NFT.address,
-    name:  NFT.name, 
-    tokenID: NFT.tokenID,
-    symbol:  NFT.symbol,
-    url: NFT.url,
-    meta: NFT.meta,
-    account: NFT.account,
-    network: NFT.network,
-    layer: NFT.layer
-    */
-
-
 const mapStateToProps = state => ({
   nft: state.nft,
   loading: state.loading,
