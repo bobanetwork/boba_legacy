@@ -25,9 +25,6 @@ function BobaBridge() {
   const tokens = useSelector(selectBridgeTokens())
   const dispatch = useDispatch()
 
-  console.log("tokens:",tokens.length)
-  console.log("multibridgeMode:",multibridgeMode)
-
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 

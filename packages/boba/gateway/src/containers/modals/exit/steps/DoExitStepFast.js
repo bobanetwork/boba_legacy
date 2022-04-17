@@ -26,14 +26,13 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
-
-import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
@@ -66,6 +65,7 @@ import {
 } from 'selectors/setupSelector'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
+  console.log([`DO EXIT STEP FAST`, token])
 
   const dispatch = useDispatch()
 
@@ -308,20 +308,18 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     if (Number(cost) > 0) estimateMax()
   }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
-  const feeLabel = `Liquidity pool fee: ${feeRateN}%`
-
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   let buttonLabel = 'Cancel'
   if( loading ) buttonLabel = 'Close'
 
-  let ETHstring = ''
+  let estGas = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Est. gas: ${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Est. gas: ${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -334,7 +332,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     allowUseAll = false
   }
 
-  let receiveL1 = `Est. receive ${receivableAmount(value)} ${token.symbol}
+  let receiveL1 = `${receivableAmount(value)} ${token.symbol}
               ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`
 
   if( Number(logAmount(token.balance, token.decimals)) === 0) {
@@ -416,22 +414,13 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
           </Typography>
         }
 
-        <Typography variant="body2" sx={{mb: 3}}>
-          <br/>
-          {feeLabel}
-          <br/>
-          Est. time: 15 minutes to 3 hours
-          <br/>
-          {parse(`xChain relay fee: ${exitFee} BOBA`)}
-          <br/>
-          {parse(ETHstring)}
-        </Typography>
-
-        {validValue && token && value &&
-          <Typography variant="body2" sx={{mt: 2}}>
-            {receiveL1}
-          </Typography>
-        }
+        <BridgeFee
+          lpFee={`${feeRateN}%`}
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="15 minutes to 3 hours"
+        />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>

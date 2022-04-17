@@ -37,6 +37,7 @@ import { isEqual } from 'lodash'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
+import { HelpOutline } from '@mui/icons-material'
 
 function FeeSwitcher() {
 
@@ -129,11 +130,10 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip
-        title={'BOBA or ETH will be used across Boba according to your choice.'}
-      >
-        <Typography variant="body2">Fee</Typography>
+      <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
+      <Typography variant="body2">Fee</Typography>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
