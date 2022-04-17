@@ -35,7 +35,7 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import Connect from 'containers/connect/Connect'
 import PageTitle from 'components/pageTitle/PageTitle'
 
-import { Circle, HelpOutline } from '@mui/icons-material'
+import { HelpOutline } from '@mui/icons-material'
 
 class Farm extends React.Component {
 
@@ -222,55 +222,15 @@ class Farm extends React.Component {
           accountEnabled={accountEnabled}
         />
 
-        <S.Wrapper dropDownBox={dropDownBox}>
 
-          <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
 
-            <S.GridItemTag
-              item xs={10}
-              md={10}
-            >
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                Bridging fees are proportionally distributed to stakers. The bridges are not farms. 
-                Your earnings only increase when someone uses the bridge you have staked into.
-              </Typography>
-            </S.GridItemTag>
 
-            <Tooltip
-              title={
-                <Typography variant="body2" sx={{ mt: 1, fontSize: '0.9em' }}>
-                  <span style={{ fontWeight: '700' }}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG.
-                  <br /><br />
-                  <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
-                  they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
-                  Note that bridge operations do not change the pool's liquidity, but only its balance.
-                  The difference between what was deposited into the L1 pool (10 OMG) and what was sent
-                  to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by stakers.
-                  <br /><br />
-                  <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                  bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
-                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the 
-                  7 day fraud proof window, which also applies to the operator.
-                  <br /><br />
-                  <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an automatic supply-and-demand approach to setting the fees.
-                  When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool and vice-versa.
-                </Typography>
-              }
 
-            >
-              <S.GridItemTag
-                item
-                xs={2}
-                md={2}
-                // onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
-                sx={{ color: "#0ebf9a" }}
-              >
-                Learn More
-              </S.GridItemTag>
-            </Tooltip>
-          </S.GridItemTagContainer>
+            
 
-        </S.Wrapper>
+
+
+
 
         <Box sx={{ my: 1, width: '100%' }}>
           <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
@@ -317,7 +277,40 @@ class Farm extends React.Component {
                 label="My Stakes Only"
               />
             </S.FarmAction>
+
           </S.EarnActionContainer>
+
+          <S.Help>
+            
+            <Typography variant="body3">
+              Bridging fees are proportionally distributed to stakers. The bridges are not farms. 
+              Your earnings only increase when someone uses the bridge you have staked into.
+            </Typography>
+
+            <Tooltip
+              title={
+                <Typography variant="body2" sx={{ mt: 1, fontSize: '0.9em' }}>
+                  <span style={{ fontWeight: '700' }}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG.
+                  <br /><br />
+                  <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
+                  they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
+                  Note that bridge operations do not change the pool's liquidity, but only its balance.
+                  The difference between what was deposited into the L1 pool (10 OMG) and what was sent
+                  to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by stakers.
+                  <br /><br />
+                  <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
+                  bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
+                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the 
+                  7 day fraud proof window, which also applies to the operator.
+                  <br /><br />
+                  <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an automatic supply-and-demand approach to setting the fees.
+                  When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool and vice-versa.
+                </Typography>
+              }
+            >
+              <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
+            </Tooltip>
+          </S.Help>
 
           {layer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>

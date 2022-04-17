@@ -21,7 +21,7 @@ import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
@@ -29,100 +29,142 @@ import truncate from 'truncate-middle'
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
 
-function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = false }) {
+import { 
+  setEnableAccount, 
+  setWalletAddress
+} from 'actions/setupAction'
+
+import {
+  fetchTransactions,
+  fetchBalances
+} from 'actions/networkAction'
+
+import { openModal } from 'actions/uiAction'
+
+function LayerSwitcher({ 
+  isIcon = false, 
+  isButton = false, 
+  size, 
+  fullWidth = false, 
+  buttonConnectToBoba = false,
+  buttonConnect = false
+}) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
 
   let layer = useSelector(selectLayer())
+  const network = useSelector(selectNetwork())
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
+  const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
 
   const dispatchSwitchLayer = useCallback((targetLayer) => {
-    dispatch(setLayer(layer))
-    if (!layer && targetLayer === 'L1') {
-      dispatch(switchChain('L1'))
+    if (targetLayer === 'L1') {
+       connectToETH()
     }
-    else if (!layer && targetLayer === 'L2') {
-      dispatch(switchChain('L2'))
-    }
-    else if (layer === 'L1' && targetLayer === 'L2') {
-      dispatch(setLayer(null))
-      dispatch(switchChain('L2'))
-    }
-    else if (layer === 'L2' && targetLayer === 'L1') {
-      dispatch(setLayer(null))
-      dispatch(switchChain('L1'))
-    }
-    else {
-      // do nothing - we are on the correct chain
-    }
+    else 
+      connectToBOBA()
   }, [ dispatch, layer ])
 
+  const dispatchBootAccount = useCallback(() => {
 
-  if (!accountEnabled) {
-    return null
+    if (!accountEnabled) initializeAccount()
+
+    async function initializeAccount() {
+
+      const initialized = await networkService.initializeAccount(network)
+
+      console.log("initialized:",initialized)
+      
+      if (initialized === 'wrongnetwork') {
+        dispatch(openModal('wrongNetworkModal'))
+        return false
+      } 
+      else if (initialized === false) {
+        console.log("WP: Account NOT enabled for", network, accountEnabled)
+        dispatch(setEnableAccount(false))
+        return false
+      }
+      else if (initialized === 'L1' || initialized === 'L2') {
+        console.log("WP: Account IS enabled for", initialized)
+        dispatch(setLayer(initialized))
+        dispatch(setEnableAccount(true))
+        dispatch(setWalletAddress(networkService.account))
+        dispatch(fetchTransactions())
+        dispatch(fetchBalances())
+        return true
+      }
+      else {
+        return false
+      }
+    }
+
+  }, [ dispatch, accountEnabled, network ])
+
+
+  // this will switch chain, if needed, and then connect to Boba
+  async function connectToBOBA () {
+    console.log("connecting to Boba")
+    await networkService.switchChain('L2')
+    await dispatchBootAccount()
   }
 
-  if (isButton) {
+   // this will switch chain, if needed, and then connect to Ethereum
+  async function connectToETH () {
+    console.log("connecting to Ethereum")
+    await networkService.switchChain('L1')
+    await dispatchBootAccount()
+  }
+
+  // this will connect to whatever is set in MM
+  async function connect () {
+    console.log("connecting to chain set in MM")
+    await dispatchBootAccount()
+  }
+
+  // single button labeled "connect to boba"
+  if (buttonConnectToBoba) {
     return (
       <S.LayerSwitcherWrapperMobile>
-        <S.LayerWrapper>
-          {!layer ? <WalletPicker /> : layer === 'L1' ?
+        <S.LayerWrapper> 
             <Button
               type="primary"
               variant="contained"
               size='small'
               fullWidth={fullWidth}
-              onClick={() => dispatchSwitchLayer('L2')}
+              onClick={()=>connectToBOBA()}
             >
-              Switch
-            </Button> :
-            <Button
-              type="primary"
-              variant="contained"
-              size='small'
-              fullWidth={fullWidth}
-              onClick={() => dispatchSwitchLayer('L1')}
-            >
-              Switch
-            </Button>
-          }
+              Connect To Boba
+            </Button> 
         </S.LayerWrapper>
       </S.LayerSwitcherWrapperMobile>
     )
-  }
-
-  if (isIcon) {
+  } 
+  // single button labelled "connect"
+  else if (buttonConnect) {
     return (
-      <>
-        {layer === 'L1' ?
-          <S.IconSwitcher
-            size='small'
-            onClick={() => { dispatchSwitchLayer('L2') }}
-          >
-            <SvgIcon>
-              <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
-              </svg>
-            </SvgIcon>
-          </S.IconSwitcher> :
-          <S.IconSwitcher
-            size='small'
-            onClick={() => { dispatchSwitchLayer('L1') }}
-          >
-            <SvgIcon>
-              <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
-              </svg>
-            </SvgIcon>
-          </S.IconSwitcher>
-        }
-      </>
+      <S.LayerSwitcherWrapperMobile>
+        <S.LayerWrapper>
+          {!layer ? 
+            <WalletPicker /> 
+            : 
+            <Button
+              type="primary"
+              variant="contained"
+              size='small'
+              fullWidth={fullWidth}
+              onClick={()=>connect()}
+            >
+              Connect
+            </Button> 
+          }
+        </S.LayerWrapper>
+      </S.LayerSwitcherWrapperMobile>
     )
   }
 
@@ -221,7 +263,7 @@ function LayerSwitcher({ isIcon = false, isButton = false, size, fullWidth = fal
         }} >Select chain to connect</Typography>
       </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>
         <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
     </S.LayerSwitcherWrapper>)

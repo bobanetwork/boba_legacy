@@ -48,13 +48,14 @@ export const Content = styled(Box)(({ theme }) => ({
 export const LayerAlert = styled(Box)(({ theme }) => ({
   width: "50%",
   margin: '20px auto',
+  gap: '30px',
+  paddingLeft: '25px',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: '30px',
-  borderRadius: '12px',
-  padding: '25px',
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
   [ theme.breakpoints.up('md') ]: {
     width: '100%',

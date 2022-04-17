@@ -4,10 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import Button from 'components/button/Button'
 
 import { Info } from "@mui/icons-material"
-import { Box, CircularProgress, Icon, Typography } from '@mui/material'
+import { Box, Icon, Typography } from '@mui/material'
 
 import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
-import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
@@ -25,10 +25,9 @@ import {
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
 
 import PageTitle from 'components/pageTitle/PageTitle'
-import { isEqual, orderBy } from 'lodash'
+import { isEqual } from 'lodash'
 
 import { POLL_INTERVAL } from "util/constant"
 import useInterval from "util/useInterval"

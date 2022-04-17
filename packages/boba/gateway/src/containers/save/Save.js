@@ -38,6 +38,7 @@ import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 import ListSave from 'components/listSave/listSave'
+import Connect from 'containers/connect/Connect'
 
 import { toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'
@@ -245,12 +246,12 @@ class Save extends React.Component {
 
         <PageTitle title={'Stake'} />
 
-        <Box sx={{ my: 1 }}>
-          {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
-          }
-        </Box>
+        <Connect 
+          userPrompt={'Please connect to Boba to stake'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
         
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
@@ -311,8 +312,8 @@ class Save extends React.Component {
                   Fee: {fee} ETH
                 </Typography>
               }
-              {!accountEnabled ? <WalletPicker fullWidth={true} label="Connect to Boba" /> : null }
-              { netLayer === 'L2' ?
+
+              { netLayer === 'L2' &&
                   <Button
                     color="primary"
                     variant="outlined"
@@ -323,20 +324,6 @@ class Save extends React.Component {
                   >
                     Stake
                   </Button>
-                  : netLayer === 'L1' ?
-                  <S.LayerAlert>
-                    <S.AlertInfo>
-                      <AlertIcon />
-                      <S.AlertText
-                        variant="body3"
-                        component="p"
-                      >
-                        You are on Ethereum. To stake, SWITCH to Boba
-                      </S.AlertText>
-                    </S.AlertInfo>
-                    <LayerSwitcher fullWidth={true} isButton={true} />
-                  </S.LayerAlert>
-                  : null
               }
             </S.StakeInputContainer>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }} style={{lineHeight: '1.0em'}}>

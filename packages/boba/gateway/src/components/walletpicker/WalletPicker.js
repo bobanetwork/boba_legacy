@@ -26,7 +26,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   selectAccountEnabled,
-  selectJustSwitchedChain,
   selectNetwork
 } from 'selectors/setupSelector'
 
@@ -48,11 +47,11 @@ function WalletPicker({
 
   const network = useSelector(selectNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
-  const justSwitchedChain = useSelector(selectJustSwitchedChain())
+
+  const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
+  console.log("chainChangedFromMM:", chainChangedFromMM)
 
   const dispatchBootAccount = useCallback(() => {
-
-    //console.log("Calling initializeAccount for:", network)
 
     if (!accountEnabled) initializeAccount()
 
@@ -66,13 +65,13 @@ function WalletPicker({
       }
 
       if (initialized === false) {
-        console.log("WP: Account NOT enabled for", network, accountEnabled)
+        console.log("WP: Account IS NOT enabled for:", network, accountEnabled)
         dispatch(setEnableAccount(false))
         return false
       }
 
       if (initialized === 'L1' || initialized === 'L2') {
-        console.log("WP: Account IS enabled for", initialized)
+        console.log("WP: Account IS enabled for:", initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
@@ -84,10 +83,19 @@ function WalletPicker({
 
   }, [ dispatch, accountEnabled, network ])
 
+  // useEffect(() => {
+  //   // auto connect to MM if we just switched chains
+  //   if (justSwitchedChain) dispatchBootAccount()
+  // }, [ justSwitchedChain, dispatchBootAccount ])
+
   useEffect(() => {
-    // auto connect to MM if we just switched chains
-    if (justSwitchedChain) dispatchBootAccount()
-  }, [ justSwitchedChain, dispatchBootAccount ])
+    // auto reconnect to MM if we just switched chains from 
+    // inside MM and then unset the flag.
+    if (chainChangedFromMM) {
+      dispatchBootAccount()
+      localStorage.setItem('chainChangedFromMM', false)
+    }
+  }, [ chainChangedFromMM, dispatchBootAccount ])
 
   return (
     <>
@@ -98,7 +106,7 @@ function WalletPicker({
         size={size}
         disabled={accountEnabled}
         fullWidth={fullWidth}
-        onClick={() => dispatchBootAccount()}
+        onClick={()=>dispatchBootAccount()}
       >
         {label}
       </Button>

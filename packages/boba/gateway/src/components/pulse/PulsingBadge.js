@@ -1,6 +1,5 @@
 import React from "react"
 
-import { Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { red, lightBlue, yellow, green } from '@mui/material/colors'
 

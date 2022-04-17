@@ -13,7 +13,6 @@ export const Tabs = styled(Box)(({theme})=>({
    }
 }));
 
-
 export const TabItem = styled(Box)(({ theme }) => ({
    opacity: 0.7,
    transition: 'color 200ms ease-in-out',
@@ -23,9 +22,9 @@ export const TabItem = styled(Box)(({ theme }) => ({
       opacity: 1,
    },
    '&.active': {
-      color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main}`,
+      color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main }`,
       opacity: 1,
-      borderBottom: `2px solid #BAE21A`,
+      borderBottom: theme.palette.primary.tabBorderBottom,
       marginBottom: '-2px',
       zIndex: 1,
    },

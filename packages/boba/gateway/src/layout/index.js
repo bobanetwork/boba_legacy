@@ -48,15 +48,16 @@ border-radius: ${theme.shape.borderRadius}px;
     palette: {
       mode: theme === 'light' ? 'light' : 'dark',
       primary: {
-        main: radioGreen,
+        main: buttonColor,
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
-        border: light ? 'solid 1px rgba(0, 0, 0, 0.16)' : 'solid 1px #2d2f3a',
+        border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px #2d2f3a',
         borderRadius: '8px',
         borderBottom: light ? 'solid 1px rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.04)',
+        tabBorderBottom: light ? `solid 2px ${buttonColor}}` : `2px solid ${buttonColor}}`,
       },
       secondary: {
-        main: light ? '#1CD6D1' : '#CCFF00',
+        main: light ? buttonColor : buttonColor,
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
@@ -69,7 +70,7 @@ border-radius: ${theme.shape.borderRadius}px;
       },
       neutral: {
         main: '#fff',
-        contrastText: radioGreen,
+        contrastText: buttonColor,
       },
     },
     typography: {
@@ -144,7 +145,7 @@ border-radius: ${theme.shape.borderRadius}px;
               fontWeight: 500,
               color: '#fff',
               "&:hover": {
-                boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
+                boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
                 backgroundColor: buttonColor,
               }

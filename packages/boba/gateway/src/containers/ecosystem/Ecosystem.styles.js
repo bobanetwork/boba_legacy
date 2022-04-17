@@ -1,5 +1,4 @@
 import { Box, Divider, Grid, IconButton, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 
 export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({

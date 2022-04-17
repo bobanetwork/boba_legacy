@@ -8,7 +8,7 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import { fetchLookUpPrice } from 'actions/networkAction'
-import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
@@ -46,11 +46,6 @@ function TokenPage() {
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
-
-  // low balance warnings
-  const l2Balances = useSelector(selectlayer2Balance, isEqual)
-
-  const now = Math.floor(Date.now() / 1000)
 
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
