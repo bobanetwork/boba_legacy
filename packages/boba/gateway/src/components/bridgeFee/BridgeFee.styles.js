@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 export const BrigeFeeWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
+  margin: '10px 0',
   [ theme.breakpoints.down('sm') ]: {
     flexDirection: 'column',
   }
