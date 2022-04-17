@@ -15,35 +15,37 @@ limitations under the License. */
 import React from 'react'
 
 import { HelpOutline } from '@mui/icons-material'
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 import Tooltip from 'components/tooltip/Tooltip'
 
-import * as S from './bridgeFee.styles'
+import * as S from './BridgeFee.styles'
 
 function BridgeFee({
   time,
-  timeLabel,
   estFee,
-  estFeeLabel,
-  estBridgeFee,
-  estBridgeFeeLabel,
+  exitFee,
+  lpFee,
   estReceive,
-  estReceiveLabel
+  exitFeeInfo,
+  timeInfo,
+  estFeeInfo,
+  lpFeeInfo,
+  estReceiveInfo
 }) {
 
-  const ItemLabel = ({label, title}) => {
+  const ItemLabel = ({ label, info }) => {
     return <S.BridgeFeeItemLabel variant='body2'>
       {label}
-      {title ? <Tooltip title={title}>
+      {info ? <Tooltip title={info}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip> : null}
     </S.BridgeFeeItemLabel>
   }
 
-  return <>
+  return <Box py={2}>
     {time ? <S.BridgeFeeItem>
-      <ItemLabel label="Est. time" title={timeLabel} />
+      <ItemLabel label="Est. time" info={timeInfo} />
       <Typography variant='body2'>
         {time}
       </Typography>
@@ -51,25 +53,31 @@ function BridgeFee({
 
     <S.BrigeFeeWrapper>
       {estFee ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. gas" title={estFeeLabel} />
+        <ItemLabel label="Est. gas" info={estFeeInfo} />
         <Typography variant='body2'>
           {estFee}
         </Typography>
       </S.BridgeFeeItem> : null}
-      {estBridgeFee ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. bridge fee" title={estBridgeFeeLabel} />
+      {lpFee ? <S.BridgeFeeItem>
+        <ItemLabel label="LP fee" info={lpFeeInfo} />
         <Typography variant='body2'>
-          {estBridgeFee}
+          {lpFee}
+        </Typography>
+      </S.BridgeFeeItem> : null}
+      {exitFee ? <S.BridgeFeeItem>
+        <ItemLabel label="xChain Relay fee" info={exitFeeInfo} />
+        <Typography variant='body2'>
+          {exitFee}
         </Typography>
       </S.BridgeFeeItem> : null}
       {estReceive ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. receive" title={estReceiveLabel} />
+        <ItemLabel label="Est. receive" info={estReceiveInfo} />
         <Typography variant='body2'>
           {estReceive}
         </Typography>
       </S.BridgeFeeItem> : null}
     </S.BrigeFeeWrapper>
-  </>
+  </Box>
 }
 
 export default BridgeFee;

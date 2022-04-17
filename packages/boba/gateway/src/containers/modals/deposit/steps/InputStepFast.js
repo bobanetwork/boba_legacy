@@ -25,6 +25,7 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -336,22 +337,16 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
           openTokenPicker={openTokenPicker}
         />
 
-        <Typography variant="body2" sx={{mb: 3}}>
-          <br/>
-          LP fee: {`${feeRateN}%`}
-          <br/>
-          Est. gas: {`${Number(cost).toFixed(4)} ETH`}
-          <br/>
-          Est. time: less than 20 minutes to 3 hours
-        </Typography>
+        <BridgeFee
+          lpFee={`${feeRateN}%`}
+          estReceive={`${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})` : ''}`}
+          time="20 mins - 3 hours"
+          estFee={`${Number(cost).toFixed(4)} ETH`}
+        />
 
-        {/* Only ERC20 tokens */}
-        {validValue && token && (
-          <Typography variant="body2" sx={{mt: 2}}>
-            {`Est. receive: ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`}
-          </Typography>
-        )}
-        
+
+
+
         {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             The {token.symbol} pool's balance and balance/liquidity ratio are low.
