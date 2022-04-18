@@ -62,7 +62,7 @@ dataSources:
     name: GovernorBravoDelegate
     network: boba
     source:
-      address: '0x472e5C097C790c6a44366a89a987Ec996A4d83e0'
+      address: '0x2CC555B5B1a4Cf7fA5401B29ab46fc5ba2e205b0'
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
@@ -102,7 +102,7 @@ dataSources:
     name: Boba_GasPriceOracle
     network: boba
     source:
-      address: '0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b'
+      address: '0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51'
       abi: Boba_GasPriceOracle
     mapping:
       kind: ethereum/events
@@ -127,7 +127,7 @@ dataSources:
     name: TuringMonsters
     network: boba
     source:
-      address: '0x757b8E819d91659844E44F2141402831B60Fa4EE'
+      address: '0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'
       abi: TuringMonsters
     mapping:
       kind: ethereum/events

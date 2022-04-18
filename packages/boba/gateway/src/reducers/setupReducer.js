@@ -25,7 +25,7 @@ const initialState = {
   accountEnabled: null,
   baseEnabled: null,
   netLayer: null,
-  accountNumber: null,
+  walletAddress: null,
   network: process.env.REACT_APP_CHAIN,
   justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
   bobaFeePriceRatio: null,
@@ -41,10 +41,10 @@ function setupReducer (state = initialState, action) {
         accountEnabled: action.payload,
         justSwitchedChain: false
       }
-    case 'SETUP/ACCOUNT_NUMBER/SET':
+    case 'SETUP/WALLETADDRESS/SET':
       return { 
         ...state, 
-        accountNumber: action.payload,
+        walletAddress: action.payload,
       }
     case 'SETUP/BASE/SET':
       return { 

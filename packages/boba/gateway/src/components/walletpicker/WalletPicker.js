@@ -13,16 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { setEnableAccount, setLayer } from 'actions/setupAction'
+import { 
+  setEnableAccount, 
+  setWalletAddress,
+  setLayer 
+} from 'actions/setupAction'
+
 import Button from 'components/button/Button'
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   selectAccountEnabled,
   selectJustSwitchedChain,
   selectNetwork
 } from 'selectors/setupSelector'
+
 import networkService from 'services/networkService'
 
 import {
@@ -54,9 +61,7 @@ function WalletPicker({
       const initialized = await networkService.initializeAccount(network)
       //console.log(['initialized',initialized])
       if (initialized === 'wrongnetwork') {
-
-        dispatch(openModal('wrongNetworkModal'));
-
+        dispatch(openModal('wrongNetworkModal'))
         return false;
       }
 
@@ -70,6 +75,7 @@ function WalletPicker({
         console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
+        dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
         dispatch(fetchBalances())
         return true

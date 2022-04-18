@@ -29,6 +29,9 @@ const initialState = {
   transferModal: false,
   transferNFTModal: false,
   exitModal: false,
+  bridgeTypeSwitch: false,
+  tokenPicker: false,
+  transferPending: false,
   mergeModal: false,
   confirmationModal: false,
   wrongNetworkModal: false,
@@ -62,7 +65,8 @@ function uiReducer (state = initialState, action) {
       return { ...state,
         [action.payload]: true,
         fast: action.fast,
-        token: action.token
+        token: action.token,
+        tokenIndex: action.tokenIndex,
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }

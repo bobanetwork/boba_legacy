@@ -113,8 +113,14 @@ class Monster extends React.Component {
 
     //figure out which monster type we are dealing with
     let monsterType = 'Monster'
+
+    // since it uses FIND, this code will only find one of your monsters
+    // FIX ME to show the 'top' monster for this wallet if you have several 
+    // in which case you are lucky. 
     if(monsterInfo.length > 0) {
+      
       tokenIDverified = monsterInfo.find(e => e.tokenID)
+
       if(typeof(tokenIDverified) !== 'undefined') {
         tokenIDverified = Number(monsterInfo.find(e => e.tokenID).tokenID)
       } else {
@@ -226,6 +232,8 @@ class Monster extends React.Component {
                       tokenID={list[v].tokenID}
                       small={"true"}
                     />)
+                  } else {
+                    return null
                   }
                 })
               }

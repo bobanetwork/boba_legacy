@@ -26,14 +26,13 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
-
-import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
@@ -50,7 +49,6 @@ import {
 } from 'actions/balanceAction'
 
 import {
-  selectL1FeeRate,
   selectL1FeeRateN,
   selectFastExitCost, //estimated total cost of this exit
   selectL1LPBalanceString,
@@ -66,7 +64,8 @@ import {
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
 
-function DoExitStepFast({ handleClose, token }) {
+function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
+  console.log([`DO EXIT STEP FAST`, token])
 
   const dispatch = useDispatch()
 
@@ -85,7 +84,6 @@ function DoExitStepFast({ handleClose, token }) {
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
 
-  const feeRate = useSelector(selectL1FeeRate)
   const feeRateN = useSelector(selectL1FeeRateN)
 
   const cost = useSelector(selectFastExitCost)
@@ -128,6 +126,13 @@ function DoExitStepFast({ handleClose, token }) {
       return false
     }
     else if (tooBig) {
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (
+      exitFee > Number(feeBalanceBOBA)) {
+      setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA.`)
       setValidValue(false)
       setValue(value)
       return false
@@ -301,9 +306,7 @@ function DoExitStepFast({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
-
-  const feeLabel = `The current LP fee is ${feeRateN}%.`
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -311,12 +314,12 @@ function DoExitStepFast({ handleClose, token }) {
   let buttonLabel = 'Cancel'
   if( loading ) buttonLabel = 'Close'
 
-  let ETHstring = ''
+  let estGas = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas: ${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas: ${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
@@ -329,25 +332,56 @@ function DoExitStepFast({ handleClose, token }) {
     allowUseAll = false
   }
 
-  const balance = Number(logAmount(token.balance, token.decimals))
+  let receiveL1 = `${receivableAmount(value)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`
 
-  let receiveL1 = `You will receive approximately ${receivableAmount(value)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
-              on L1.`
+  if( Number(logAmount(token.balance, token.decimals)) === 0) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          Sorry, nothing to exit - no {token.symbol} in this wallet
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
+  } else if ( exitFee > Number(feeBalanceBOBA) ) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          <br/>
+          BOBA balance: {Number(feeBalanceBOBA)}
+          <br/>
+          Insufficient BOBA balance to cover xChain message relay. You need at least {exitFee} BOBA.
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
+  }
 
   return (
     <>
       <Box>
-
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
-          Fast Bridge to L1
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          {feeLabel}
-          <br/>
-          Bridge time: 15 minutes normally, as long as 3 hours when ETH is conjested.
-        </Typography>
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
+            Fast Bridge to L1
+          </Typography>
+        }
 
         {max_Float > 0.0 &&
           <Input
@@ -369,6 +403,8 @@ function DoExitStepFast({ handleClose, token }) {
             variant="standard"
             newStyle
             loading={loading}
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
 
@@ -377,18 +413,14 @@ function DoExitStepFast({ handleClose, token }) {
             Loading...
           </Typography>
         }
-        
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Message Relay Fee: ${exitFee} BOBA`)}
-          <br/>
-          {parse(ETHstring)}
-        </Typography>
 
-        {validValue && token && value &&
-          <Typography variant="body2" sx={{mt: 2}}>
-            {receiveL1}
-          </Typography>
-        }
+        <BridgeFee
+          lpFee={`${feeRateN}%`}
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="15 minutes to 3 hours"
+        />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
@@ -417,7 +449,7 @@ function DoExitStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {loading && (
+        {!isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>
@@ -427,7 +459,9 @@ function DoExitStepFast({ handleClose, token }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color='neutral'
+          disabled={false}
+          variant='outlined'
+          color='primary'
           size='large'
         >
           {buttonLabel}

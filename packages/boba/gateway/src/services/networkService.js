@@ -1216,21 +1216,33 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    // let monsterList = await GraphQLService.queryMonsterTransfer()
-    // console.log("monsterList:",monsterList)
-    // this returns too many events to be directly useful
+    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
-    //   for (let i = 0; i < totalProposals; i++) {
-    //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]
-    //     if(typeof(proposalRaw) === 'undefined') continue
-    //     let proposalID = proposalRaw.proposalId
-    //     //this is a number such as 2
-    //     let proposalData = await delegateCheck.proposals(proposalID)
+    const contract = new ethers.Contract(
+      allAddresses.BobaMonsters,
+      TuringMonsterJson.abi,
+      this.L2Provider
+    )
+
+    if(monsterList.hasOwnProperty('data')) {
+      const monsters = monsterList.data.turingMonstersTransferEvents
+      for (let i = 0; i < monsters.length; i++) {
+        // console.log("adding monster:", i + 1)
+        const tokenId = monsters[i].tokenId
+        const owner = await contract.ownerOf(tokenId)
+            //console.log("owner:", owner)
+        if(owner.toLowerCase() === this.account.toLowerCase()) {
+          this.addNFT( allAddresses.BobaMonsters, tokenId )
+        }
+      }
+      this.checkMonster()
+    }
   }
 
   async checkMonster() {
 
     const NFTs = getNFTs()
+
     let validMonsters = []
 
     try {
@@ -1247,8 +1259,9 @@ class NetworkService {
       let topTop = 0
 
       if(NFTs && Number(monsterBalance) > 0) {
-        for (const [ value ] of Object.entries(NFTs)) {
-          //console.log(`${key}: ${value.name}`)
+        //console.log("checking monsters")
+        for (const [ key, value ] of Object.entries(NFTs)) {
+          //console.log(`${key} value: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
             //console.log("owner:", owner)
@@ -1290,6 +1303,8 @@ class NetworkService {
   /* This is for manually adding NFTs */
   async addNFT( address, tokenID ) {
 
+    console.log("address", address)
+
     try {
 
       const contract = new ethers.Contract(
@@ -1304,7 +1319,7 @@ class NetworkService {
       console.log("nftMeta RAW:", nftMeta)
       const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
-      const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+      const { url , meta = [] } = await getNftImageUrl(nftMeta)
 
       console.log("meta:", meta)
 
