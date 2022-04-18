@@ -88,11 +88,6 @@ const main = async () => {
     parseInt(env.MAX_L1_BASE_FEE, 10) || 225000000000
   )
 
-  // boba gas fee
-  const POLYGON_IO_API_KEY = config.str(
-    'polygon-io-api-key',
-    env.POLYGON_IO_API_KEY
-  )
   // boba gas fee / eth gas fee = BOBA_AS_FEE_TOKEN_RATIO_100X
   const BOBA_FEE_RATIO_100X = config.uint(
     'boba-fee-ratio-100x',
@@ -172,7 +167,6 @@ const main = async () => {
     minOverhead: MIN_OVERHEAD,
     minL1BaseFee: MIN_L1_BASE_FEE,
     maxL1BaseFee: MAX_L1_BASE_FEE,
-    polygonAPIKey: POLYGON_IO_API_KEY,
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
   })

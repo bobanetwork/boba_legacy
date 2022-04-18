@@ -18,6 +18,7 @@ import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1Liquid
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -58,9 +59,6 @@ interface GasPriceOracleOptions {
   // Max L1 base fee
   maxL1BaseFee: number
 
-  // Polygon.io API key
-  polygonAPIKey: string
-
   // boba fee / eth fee
   bobaFeeRatio100X: number
 
@@ -89,6 +87,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
     L2BOBA: Contract
+    BobaStraw_ETHUSD: Contract
+    BobaStraw_BOBAUSD: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
     L1RelayerBalance: BigNumber
@@ -274,6 +274,26 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       )
     this.logger.info('Connected to Proxy__BobaBillingContract', {
       address: this.state.BobaBillingContractAddress,
+    })
+
+    // Load BOBA straw contracts
+    const BobaStraw_ETHUSDAddress =
+      await this.state.Lib_AddressManager.getAddress('BobaStraw_ETHUSD')
+    const BobaStraw_BOBAUSDAddress =
+      await this.state.Lib_AddressManager.getAddress('BobaStraw_BOBAUSD')
+    this.state.BobaStraw_ETHUSD = new Contract(
+      BobaStraw_ETHUSDAddress,
+      FluxAggregatorJson.abi,
+      this.options.l2RpcProvider
+    )
+    this.state.BobaStraw_BOBAUSD = new Contract(
+      BobaStraw_BOBAUSDAddress,
+      FluxAggregatorJson.abi,
+      this.options.l2RpcProvider
+    )
+    this.logger.info('Connected to BobaStraw', {
+      BobaStraw_ETHUSD: BobaStraw_ETHUSDAddress,
+      BobaStraw_BOBAUSD: BobaStraw_BOBAUSDAddress,
     })
 
     // Total cost
@@ -877,18 +897,21 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   private async _queryTokenPrice(tokenPair): Promise<void> {
-    const RequestURL = `https://api.polygon.io/v1/last/crypto/${tokenPair}?apiKey=${this.options.polygonAPIKey}`
-    const response = await fetch(RequestURL)
-    if (response.status === 200) {
-      const json = await response.json()
-      if (json.status === 'success') {
-        if (tokenPair === 'BOBA/USD') {
-          this.state.BOBAUSDPrice = Number(json.last.price)
-        }
-        if (tokenPair === 'ETH/USD') {
-          this.state.ETHUSDPrice = Number(json.last.price)
-        }
-      }
+    if (tokenPair === 'ETH/USD') {
+      const lastestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
+      const decimals = await this.state.BobaStraw_ETHUSD.decimals()
+      const preETHUSDPrice = lastestAnswer.div(
+        BigNumber.from(10).pow(decimals - 2)
+      )
+      this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
+    }
+    if (tokenPair === 'BOBA/USD') {
+      const lastestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
+      const decimals = await this.state.BobaStraw_BOBAUSD.decimals()
+      const preBOBAUSDPrice = lastestAnswer.div(
+        BigNumber.from(10).pow(decimals - 2)
+      )
+      this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
     }
   }
 }
