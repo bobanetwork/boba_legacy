@@ -1,10 +1,22 @@
 import styled from "styled-components";
+import { InputAdornment, StepLabel } from "@mui/material";
+import { muiTheme } from "../mui.theme";
 
 const primaryColor = '#ccff00'
 
 export const H1 = styled.h1`
   color: ${primaryColor};
+  margin-bottom: 0.2em;
 `
+
+export const P = styled.p`
+  font-size: 0.7em;
+  text-align: center;
+`
+
+export const SmallerParagraph = styled.p`
+  font-size: 0.55em;
+  text-align: center;`
 
 export const Body = styled.div`
   align-items: center;
@@ -15,6 +27,22 @@ export const Body = styled.div`
   justify-content: center;
   margin-top: 40px;
 `;
+
+export const StyledInputAdornment = styled(InputAdornment)({
+  'p[class*="MuiTypography-root"]': {
+    color: muiTheme.palette.primary.main,
+  }
+})
+
+export const StyledStepLabel = styled(StepLabel)({
+  'span[class*="MuiStepLabel-label Mui-active"]': {
+    color: muiTheme.palette.primary.main,
+  },
+  '&.Mui-disabled .MuiStepLabel-label, span[class*="MuiStepLabel-label Mui-completed"]': {
+    color: muiTheme.palette.secondary.contrastText,
+  },
+  '.MuiSvgIcon-root circle:not(.Mui-active circle)': {color: muiTheme.palette.secondary.contrastText},
+})
 
 export const Button = styled.button`
   background-color: white;
@@ -27,6 +55,12 @@ export const Button = styled.button`
   padding: 12px 24px;
   text-align: center;
   text-decoration: none;
+
+  :disabled {
+    background-color: #888;
+    color: #222;
+    cursor: not-allowed;
+  }
 `;
 
 export const Container = styled.div`
