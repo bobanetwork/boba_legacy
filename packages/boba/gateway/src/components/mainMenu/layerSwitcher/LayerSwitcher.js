@@ -19,9 +19,18 @@ import { useTheme } from '@mui/styles'
 import { switchChain, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
+
+import { 
+  selectAccountEnabled, 
+  selectNetwork, 
+  selectLayer,
+  selectConnectETH,
+  selectConnectBOBA,
+  selectConnect
+} from 'selectors/setupSelector'
+
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
@@ -31,7 +40,7 @@ import Button from 'components/button/Button.js'
 
 import { 
   setEnableAccount, 
-  setWalletAddress
+  setWalletAddress,
 } from 'actions/setupAction'
 
 import {
@@ -56,12 +65,20 @@ function LayerSwitcher({
   let layer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
 
+  const connectETHRequest = useSelector(selectConnectETH())
+  const connectBOBARequest = useSelector(selectConnectBOBA())
+  const connectRequest = useSelector(selectConnect())
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
+  
   const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
+  const wantChain = JSON.parse(localStorage.getItem('wantChain'))
+  const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
+  console.log("chainChangedInit:", chainChangedInit)
 
   const dispatchSwitchLayer = useCallback((targetLayer) => {
 
@@ -75,7 +92,7 @@ function LayerSwitcher({
       connectToETH()
     }
 
-  }, [ dispatch, layer ])
+  }, [ connectToBOBA, connectToETH ])
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -112,17 +129,67 @@ function LayerSwitcher({
 
   }, [ dispatch, accountEnabled, network ])
 
+  useEffect(() => {
+    // detect mismatch and correct the mismatch
+    if (wantChain === 'L1' && layer === 'L2') {
+      dispatchBootAccount()
+    } 
+    else if (wantChain === 'L2' && layer === 'L1') 
+    {
+      dispatchBootAccount()
+    }
+  }, [ wantChain, layer, dispatchBootAccount ])
+
+  useEffect(() => {
+    // auto reconnect to MM if we just switched chains from 
+    // with the chain switcher, and then unset the flag.
+    if (chainChangedInit) {
+      dispatchBootAccount()
+      localStorage.setItem('chainChangedInit', false)
+    }
+  }, [ chainChangedInit, dispatchBootAccount ])
+
+    useEffect(() => {
+    // auto reconnect to MM if we just switched chains from 
+    // inside MM, and then unset the flag.
+    if (chainChangedFromMM) {
+      dispatchBootAccount()
+      localStorage.setItem('chainChangedFromMM', false)
+    }
+  }, [ chainChangedFromMM, dispatchBootAccount ])
+
+  useEffect(() => {
+    if(connectETHRequest) {
+      localStorage.setItem('wantChain', JSON.stringify('L1'))
+      networkService.switchChain('L1')
+      dispatchBootAccount()
+    }
+  }, [ connectETHRequest, dispatchBootAccount ])
+
+  useEffect(() => {
+    if(connectBOBARequest) {
+      localStorage.setItem('wantChain', JSON.stringify('L2'))
+      networkService.switchChain('L2')
+      dispatchBootAccount()
+    }
+  }, [ connectBOBARequest, dispatchBootAccount ])
+
+  useEffect(() => {
+    if(connectRequest) {
+      dispatchBootAccount()
+    }
+  }, [ connectRequest, dispatchBootAccount ])
 
   // this will switch chain, if needed, and then connect to Boba
   async function connectToBOBA () {
-    console.log("connecting to Boba")
+    localStorage.setItem('wantChain', JSON.stringify('L2'))
     await networkService.switchChain('L2')
     await dispatchBootAccount()
   }
 
    // this will switch chain, if needed, and then connect to Ethereum
   async function connectToETH () {
-    console.log("connecting to Ethereum")
+    localStorage.setItem('wantChain', JSON.stringify('L1'))
     await networkService.switchChain('L1')
     await dispatchBootAccount()
   }
@@ -133,42 +200,42 @@ function LayerSwitcher({
     await dispatchBootAccount()
   }
 
-  // single button labeled "connect to boba"
-  if (buttonConnectToBoba) {
-    return (
-      <S.LayerSwitcherWrapperMobile>
-        <S.LayerWrapper> 
-            <Button
-              type="primary"
-              variant="contained"
-              size='small'
-              fullWidth={fullWidth}
-              onClick={()=>connectToBOBA()}
-            >
-              Connect To Boba
-            </Button> 
-        </S.LayerWrapper>
-      </S.LayerSwitcherWrapperMobile>
-    )
-  } 
-  // single button labelled "connect"
-  else if (buttonConnect) {
-    return (
-      <S.LayerSwitcherWrapperMobile>
-        <S.LayerWrapper>
-          <Button
-            type="primary"
-            variant="contained"
-            size='small'
-            fullWidth={fullWidth}
-            onClick={()=>connect()}
-          >
-            Connect
-          </Button> 
-        </S.LayerWrapper>
-      </S.LayerSwitcherWrapperMobile>
-    )
-  }
+  // // single button labeled "connect to boba"
+  // if (buttonConnectToBoba) {
+  //   return (
+  //     <S.LayerSwitcherWrapperMobile>
+  //       <S.LayerWrapper> 
+  //           <Button
+  //             type="primary"
+  //             variant="contained"
+  //             size='small'
+  //             fullWidth={fullWidth}
+  //             onClick={()=>connectToBOBA()}
+  //           >
+  //             Connect To Boba
+  //           </Button> 
+  //       </S.LayerWrapper>
+  //     </S.LayerSwitcherWrapperMobile>
+  //   )
+  // } 
+  // // single button labelled "connect"
+  // else if (buttonConnect) {
+  //   return (
+  //     <S.LayerSwitcherWrapperMobile>
+  //       <S.LayerWrapper>
+  //         <Button
+  //           type="primary"
+  //           variant="contained"
+  //           size='small'
+  //           fullWidth={fullWidth}
+  //           onClick={()=>connect()}
+  //         >
+  //           Connect
+  //         </Button> 
+  //       </S.LayerWrapper>
+  //     </S.LayerSwitcherWrapperMobile>
+  //   )
+  // }
 
   // if (isMobile) {
   //   return (

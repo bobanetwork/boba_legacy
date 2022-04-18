@@ -28,7 +28,9 @@ import { openModal } from 'actions/uiAction'
 import { 
   setEnableAccount, 
   setWalletAddress,
-  setLayer
+  setLayer,
+  setConnectETH,
+  setConnectBOBA
 } from 'actions/setupAction'
 
 import {
@@ -45,107 +47,26 @@ function BobaBridge() {
   const multibridgeMode = useSelector(selectMultiBridgeMode())
   const tokens = useSelector(selectBridgeTokens())
   const dispatch = useDispatch()
-
   const [ toL2, setToL2 ] = useState(true)
-
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
-
   const network = useSelector(selectNetwork())
-  const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
-  const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-  //localStorage.setItem('wantChain', JSON.stringify('L2'))
-  const wantChain = JSON.parse(localStorage.getItem('wantChain'))
-
-  console.log("chainChangedFromMM:", chainChangedFromMM)
-  console.log("chainChangedInit:", chainChangedInit)
-  console.log("wantChain:", wantChain)
-
-  const dispatchBootAccount = useCallback(() => {
-
-    if (!accountEnabled) initializeAccount()
-
-    async function initializeAccount() {
-
-      const initialized = await networkService.initializeAccount(network)
-
-      console.log("initialized:",initialized)
-      
-      if (initialized === 'wrongnetwork') {
-        dispatch(openModal('wrongNetworkModal'))
-        return false
-      } 
-      else if (initialized === false) {
-        console.log("WP: Account NOT enabled for", network, accountEnabled)
-        dispatch(setEnableAccount(false))
-        return false
-      }
-      else if (initialized === 'L1' || initialized === 'L2') {
-        console.log("WP: Account IS enabled for", initialized)
-        dispatch(setLayer(initialized))
-        dispatch(setEnableAccount(true))
-        dispatch(setWalletAddress(networkService.account))
-        dispatch(fetchTransactions())
-        dispatch(fetchBalances())
-        return true
-      }
-      else {
-        return false
-      }
-    }
-
-  }, [ dispatch, accountEnabled, network ])
-
-  useEffect(() => {
-    // detect mismatch and correct the mismatch
-    if (wantChain === 'L1' && layer === 'L2') {
-      dispatchBootAccount()
-    } 
-    else if (wantChain === 'L2' && layer === 'L1') 
-    {
-      dispatchBootAccount()
-    }
-  }, [ wantChain, layer, dispatchBootAccount ])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from 
-    // with the chain switcher, and then unset the flag.
-    if (chainChangedInit) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedInit', false)
-    }
-  }, [ chainChangedInit, dispatchBootAccount ])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from 
-    // inside MM, and then unset the flag.
-    if (chainChangedFromMM) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedFromMM', false)
-    }
-  }, [ chainChangedFromMM, dispatchBootAccount ])
-
+  
   async function connectToETH () {
-    console.log("connecting to eth")
-    localStorage.setItem('wantChain', JSON.stringify('L1'))
-    await networkService.switchChain('L1')
-    await dispatchBootAccount()
+    dispatch(setConnectETH(true))
   }
 
   async function connectToBOBA () {
-    console.log("connecting to boba")
-    localStorage.setItem('wantChain', JSON.stringify('L2'))
-    await networkService.switchChain('L2')
-    await dispatchBootAccount()
+    dispatch(setConnectBOBA(true))
   }
 
   async function switchDirection () {
     console.log("layer:",layer)
     if(accountEnabled) {
       if(layer === 'L1')
-        await connectToBOBA()
+        dispatch(setConnectBOBA(true))
       else
-        await connectToETH()
+        dispatch(setConnectETH(true))
     } else {
       setToL2(!toL2)
     }

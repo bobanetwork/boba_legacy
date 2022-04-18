@@ -18,6 +18,12 @@ import Connect from 'containers/connect/Connect'
 import * as S from './wallet.styles'
 import * as G from '../Global.styles'
 
+import { 
+  setConnectETH,
+  setConnectBOBA
+} from 'actions/setupAction'
+
+
 import {
   selectAccountEnabled,
   selectLayer,
@@ -99,7 +105,6 @@ function Wallet() {
     }
   }, [ layer ])
 
-
   const handleSwitch = (l) => {
     if (l === 'Token') {
       setPage('Token')
@@ -156,7 +161,7 @@ function Wallet() {
             className={chain === 'Ethereum Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
-                dispatch(switchChain('L1'))
+                dispatch(setConnectETH(true))
               }
             }}
             variant="body2"
@@ -167,7 +172,7 @@ function Wallet() {
             className={chain === 'Boba Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
-                dispatch(switchChain('L2'))
+                dispatch(setConnectBOBA(true))
               }
             }}
             variant="body2"

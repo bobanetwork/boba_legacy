@@ -1,14 +1,23 @@
 import React from "react"
 import * as G from '../Global.styles'
 
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import { useDispatch } from "react-redux"
 import AlertIcon from 'components/icons/AlertIcon'
+import Button from 'components/button/Button.js'
+
+import { 
+  setConnectETH,
+  setConnectBOBA,
+  setConnect
+} from 'actions/setupAction'
 
 const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = '' }) => {
   
+  const dispatch = useDispatch()
+
   if(!accountEnabled && !connectToBoba) {
     return (
-      <G.LayerAlert>
+      <G.LayerAlert style={{padding: '20px'}}>
         <G.AlertInfo>
           <AlertIcon />
           <G.AlertText
@@ -18,13 +27,20 @@ const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = ''
             {userPrompt}
           </G.AlertText>
         </G.AlertInfo>
-        <LayerSwitcher buttonConnect={true}/>
+        <Button
+          type="primary"
+          variant="contained"
+          size='small'
+          onClick={()=>dispatch(setConnect(true))}
+        >
+          Connect
+        </Button> 
       </G.LayerAlert>
     )
   }
   else if (layer !== 'L2' && connectToBoba) {
     return (
-      <G.LayerAlert>
+      <G.LayerAlert style={{padding: '20px'}}>
         <G.AlertInfo>
           <AlertIcon />
           <G.AlertText
@@ -34,7 +50,14 @@ const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = ''
             {userPrompt}
           </G.AlertText>
         </G.AlertInfo>
-        <LayerSwitcher buttonConnectToBoba={true}/>
+        <Button
+          type="primary"
+          variant="contained"
+          size='small'
+          onClick={()=>dispatch(setConnectBOBA(true))}
+        >
+          Connect to Boba
+        </Button> 
       </G.LayerAlert>
     )
   }
