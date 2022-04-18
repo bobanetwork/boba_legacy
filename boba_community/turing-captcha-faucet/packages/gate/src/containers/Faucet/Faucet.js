@@ -110,8 +110,11 @@ function Faucet() {
         {loading ? "Pending..." :
           hasFunds ? "Send Request" : "Not enough funds"}
       </Button>
-      <div className="smallText" style={{ marginTop: 20 }}>Your result will be hashed and compared off-chain through
-        Turing.&nbsp;{account && !hasFunds ? <span style={{color: 'red'}}>Thus, you need to have some ETH on your wallet.</span> : ''}
+      <div className="smallText" style={{ marginTop: 20 }}>{account && !hasFunds
+          ? <span style={{color: 'red'}}>
+            This faucet uses Turing, thus you need to have some ETH on your wallet. Bridge some funds from L1 Rinkeby to L2 Boba Rinkeby via our&nbsp;
+            <a href="https://gateway.rinkeby.boba.network/" title="Gateway - Bridge ETH" target="_blank">Gateway</a>.</span>
+        : 'Your result will be hashed and compared off-chain through Turing.'}
       </div>
     </div>
   );
