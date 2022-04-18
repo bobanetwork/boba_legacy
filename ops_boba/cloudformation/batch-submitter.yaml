@@ -37,6 +37,40 @@ Conditions:
     !Equals [!Ref EnvironmentName, "production"]
 
 Resources:
+  PrimaryAsymmetricKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub Primary key for ${AWS::StackName}
+      KeySpec: ECC_SECG_P256K1
+      KeyUsage: SIGN_VERIFY
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Ref AWS::StackName
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+
+  SecondaryAsymmetricKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub Secondary key for ${AWS::StackName}
+      KeySpec: ECC_SECG_P256K1
+      KeyUsage: SIGN_VERIFY
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Ref AWS::StackName
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+
   TaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -60,6 +94,17 @@ Resources:
                     - "arn:aws:s3:::${S3BucketV2}/bath-submitter.env"
                     - S3BucketV2:
                         Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+        - PolicyName: AllowAccessToKMS
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Sign
+                  - kms:Verify
+                Resource:
+                  - !GetAtt PrimaryAsymmetricKey.Arn
+                  - !GetAtt SecondaryAsymmetricKey.Arn
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -94,6 +139,10 @@ Resources:
                 - "http://${EndpointAddress}:8081"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerInt:DNSName"
+            - Name: PRIMARY_KMS_KEY
+              Value: !GetAtt PrimaryAsymmetricKey.Arn
+            - Name: SECONDARY_KMS_KEY
+              Value: !GetAtt SecondaryAsymmetricKey.Arn
           DockerLabels:
             com.datadoghq.ad.check_names: '["batch_submitter"]'
             com.datadoghq.ad.init_configs: '[{}]'
