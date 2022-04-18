@@ -1,7 +1,7 @@
 import { Grid, Link, Typography } from '@mui/material'
 import AlertIcon from 'components/icons/AlertIcon'
 import PageTitle from 'components/pageTitle/PageTitle'
-import WalletPicker from 'components/walletpicker/WalletPicker'
+
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled } from 'selectors/setupSelector'
@@ -14,21 +14,6 @@ function Help() {
   return (
     <S.HelpPageContainer>
       <PageTitle title="HELP/FAQ" />
-
-      {!accountEnabled &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              Connect to MetaMask
-            </S.AlertText>
-          </S.AlertInfo>
-          <WalletPicker />
-        </S.LayerAlert>
-      }
 
       <Grid item xs={12}>
 

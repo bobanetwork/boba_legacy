@@ -26,7 +26,7 @@ import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
-import WalletPicker from 'components/walletpicker/WalletPicker.js'
+
 import Button from 'components/button/Button.js'
 
 import { 
@@ -150,91 +150,87 @@ function LayerSwitcher({
     return (
       <S.LayerSwitcherWrapperMobile>
         <S.LayerWrapper>
-          {!layer ? 
-            <WalletPicker /> 
-            : 
-            <Button
-              type="primary"
-              variant="contained"
-              size='small'
-              fullWidth={fullWidth}
-              onClick={()=>connect()}
-            >
-              Connect
-            </Button> 
-          }
+          <Button
+            type="primary"
+            variant="contained"
+            size='small'
+            fullWidth={fullWidth}
+            onClick={()=>connect()}
+          >
+            Connect
+          </Button> 
         </S.LayerWrapper>
       </S.LayerSwitcherWrapperMobile>
     )
   }
 
-  if (isMobile) {
-    return (
-      <S.LayerSwitcherWrapperMobile>
-        <S.LayerWrapper>
-          <IconButton
-            sx={{ gap: '5px' }}
-            aria-label="eth"
-          >
-            <EthereumIcon />
-          </IconButton>
-          <S.LayerContent>
-            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-            {layer === 'L1' ?
-              <Typography component='p' variant="body4" sx={{
-                color: 'rgba(255, 255, 255, 0.3)'
-              }} >{wAddress}</Typography> :
-              <Typography variant="body4" sx={{
-                opacity: '0.3',
-                whiteSpace: 'nowrap'
-              }} >Not Connected</Typography>
-            }
-          </S.LayerContent>
-          {!layer ? <WalletPicker /> : layer === 'L1' ? null :
-            <Button
-              type="primary"
-              variant="contained"
-              size='small'
-              onClick={() => dispatchSwitchLayer('L1')}
-            >
-              Switch
-            </Button>}
-        </S.LayerWrapper>
-        <S.LayerDivider>
-        </S.LayerDivider>
-        <S.LayerWrapper>
-          <IconButton
-            sx={{ gap: '5px' }}
-            aria-label="boba"
-          >
-            <BobaIcon />
-          </IconButton>
-          <S.LayerContent>
-            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-            {layer === 'L2' ?
-              <Typography component='p' variant="body4" sx={{
-                color: 'rgba(255, 255, 255, 0.3)'
-              }} >{wAddress}</Typography> :
-              <Typography variant="body4" sx={{
-                opacity: '0.3',
-                whiteSpace: 'nowrap'
-              }} >Not Connected</Typography>
-            }
-          </S.LayerContent>
-          {!layer ? <WalletPicker /> : layer === 'L2' ? null :
-            <Button
-              type="primary"
-              variant="contained"
-              size='small'
-              onClick={() => dispatchSwitchLayer('L2')}
-            >
-              Switch
-            </Button>
-          }
-        </S.LayerWrapper>
-      </S.LayerSwitcherWrapperMobile>
-    )
-  }
+  // if (isMobile) {
+  //   return (
+  //     <S.LayerSwitcherWrapperMobile>
+  //       <S.LayerWrapper>
+  //         <IconButton
+  //           sx={{ gap: '5px' }}
+  //           aria-label="eth"
+  //         >
+  //           <EthereumIcon />
+  //         </IconButton>
+  //         <S.LayerContent>
+  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+  //           {layer === 'L1' ?
+  //             <Typography component='p' variant="body4" sx={{
+  //               color: 'rgba(255, 255, 255, 0.3)'
+  //             }} >{wAddress}</Typography> :
+  //             <Typography variant="body4" sx={{
+  //               opacity: '0.3',
+  //               whiteSpace: 'nowrap'
+  //             }} >Not Connected</Typography>
+  //           }
+  //         </S.LayerContent>
+  //         {!layer ? <WalletPicker /> : layer === 'L1' ? null :
+  //           <Button
+  //             type="primary"
+  //             variant="contained"
+  //             size='small'
+  //             onClick={() => dispatchSwitchLayer('L1')}
+  //           >
+  //             Switch
+  //           </Button>}
+  //       </S.LayerWrapper>
+  //       <S.LayerDivider>
+  //       </S.LayerDivider>
+  //       <S.LayerWrapper>
+  //         <IconButton
+  //           sx={{ gap: '5px' }}
+  //           aria-label="boba"
+  //         >
+  //           <BobaIcon />
+  //         </IconButton>
+  //         <S.LayerContent>
+  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
+  //           {layer === 'L2' ?
+  //             <Typography component='p' variant="body4" sx={{
+  //               color: 'rgba(255, 255, 255, 0.3)'
+  //             }} >{wAddress}</Typography> :
+  //             <Typography variant="body4" sx={{
+  //               opacity: '0.3',
+  //               whiteSpace: 'nowrap'
+  //             }} >Not Connected</Typography>
+  //           }
+  //         </S.LayerContent>
+  //         {!layer ? <WalletPicker /> : layer === 'L2' ? null :
+  //           <Button
+  //             type="primary"
+  //             variant="contained"
+  //             size='small'
+  //             onClick={() => dispatchSwitchLayer('L2')}
+  //           >
+  //             Switch
+  //           </Button>
+  //         }
+  //       </S.LayerWrapper>
+  //     </S.LayerSwitcherWrapperMobile>
+  //   )
+  // }
 
   return (
     <S.LayerSwitcherWrapper>

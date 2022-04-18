@@ -26,8 +26,6 @@ import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
-import WalletPicker from 'components/walletpicker/WalletPicker'
-
 import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
 

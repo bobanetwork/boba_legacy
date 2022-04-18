@@ -32,8 +32,6 @@ import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
 import PageTitle from 'components/pageTitle/PageTitle'
 
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
