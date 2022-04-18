@@ -117,8 +117,9 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
 let allTokens = {}
 
 function handleChangeChainOnce(chainID_hex_string) {
-  console.log("handleChangeChainOnce: switched to chain",Number(chainID_hex_string))
+  console.log("handleChangeChainOnce: switched to chain", Number(chainID_hex_string))
   localStorage.setItem('chainChangedInit', true)
+  console.log("chainChangedInit", true)
   localStorage.setItem('newChain', Number(chainID_hex_string))
   // and remove the listner
   window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
@@ -1074,6 +1075,7 @@ class NetworkService {
 
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
+      console.log("calling: window.ethereum.on('chainChanged', handleChangeChainOnce)")
       window.ethereum.on('chainChanged', handleChangeChainOnce)
       return true
     } catch (error) {

@@ -35,14 +35,8 @@ function App () {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const buttonColor = '#228fe5' //'#24a0ed'
-
-/*
-#24262E dark grey
-
-border-radius: ${theme.shape.borderRadius}px;
-
-*/
+  const buttonColor = '#228fe5' //blue
+  const darkGrey = '#1b1c1f'
 
   let MUItheme = createTheme({
     palette: {
@@ -61,7 +55,7 @@ border-radius: ${theme.shape.borderRadius}px;
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
-        secondary: light ? 'rgba(0, 0, 0, 0.00)' : '#24262E',
+        secondary: light ? 'rgba(0, 0, 0, 0.0)' : darkGrey, 
         secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',

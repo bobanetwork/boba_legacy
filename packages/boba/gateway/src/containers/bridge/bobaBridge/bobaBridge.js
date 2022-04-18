@@ -54,9 +54,12 @@ function BobaBridge() {
   const network = useSelector(selectNetwork())
   const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
+  //localStorage.setItem('wantChain', JSON.stringify('L2'))
+  const wantChain = JSON.parse(localStorage.getItem('wantChain'))
 
-  console.log("chainChangedFromMM:",chainChangedFromMM)
-  console.log("chainChangedInit:",chainChangedInit)
+  console.log("chainChangedFromMM:", chainChangedFromMM)
+  console.log("chainChangedInit:", chainChangedInit)
+  console.log("wantChain:", wantChain)
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -94,13 +97,15 @@ function BobaBridge() {
   }, [ dispatch, accountEnabled, network ])
 
   useEffect(() => {
-    // auto reconnect to MM if we just switched chains from 
-    // inside MM, and then unset the flag.
-    if (chainChangedFromMM) {
+    // detect mismatch and correct the mismatch
+    if (wantChain === 'L1' && layer === 'L2') {
       dispatchBootAccount()
-      localStorage.setItem('chainChangedFromMM', false)
+    } 
+    else if (wantChain === 'L2' && layer === 'L1') 
+    {
+      dispatchBootAccount()
     }
-  }, [ chainChangedFromMM, dispatchBootAccount ])
+  }, [ wantChain, layer, dispatchBootAccount ])
 
   useEffect(() => {
     // auto reconnect to MM if we just switched chains from 
@@ -111,14 +116,25 @@ function BobaBridge() {
     }
   }, [ chainChangedInit, dispatchBootAccount ])
 
+  useEffect(() => {
+    // auto reconnect to MM if we just switched chains from 
+    // inside MM, and then unset the flag.
+    if (chainChangedFromMM) {
+      dispatchBootAccount()
+      localStorage.setItem('chainChangedFromMM', false)
+    }
+  }, [ chainChangedFromMM, dispatchBootAccount ])
+
   async function connectToETH () {
     console.log("connecting to eth")
+    localStorage.setItem('wantChain', JSON.stringify('L1'))
     await networkService.switchChain('L1')
     await dispatchBootAccount()
   }
 
   async function connectToBOBA () {
     console.log("connecting to boba")
+    localStorage.setItem('wantChain', JSON.stringify('L2'))
     await networkService.switchChain('L2')
     await dispatchBootAccount()
   }

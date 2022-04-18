@@ -15,6 +15,7 @@ import networkService from 'services/networkService'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
+import Connect from 'containers/connect/Connect'
 
 class Nft extends React.Component {
 
@@ -127,7 +128,8 @@ class Nft extends React.Component {
       loading,
       netLayer,
       network,
-      walletAddress
+      walletAddress,
+      accountEnabled,
     } = this.state
 
     if (!netLayer) {
@@ -154,23 +156,15 @@ class Nft extends React.Component {
       )
 
     } else if (netLayer === 'L1') {
-
       return (
         <G.Container>
           <G.ContentEmpty>
-            <G.LayerAlert>
-              <G.AlertInfo>
-                <AlertIcon />
-                <G.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  You are on Ethereum. To use Boba NFTs, SWITCH to Boba
-                </G.AlertText>
-              </G.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </G.LayerAlert>
+            <Connect 
+              userPrompt={'You are on Ethereum. To use Boba NFTs, connect to Boba'}
+              accountEnabled={accountEnabled}
+              connectToBoba={true}
+              layer={netLayer}
+            />
           </G.ContentEmpty>
         </G.Container>
       )
@@ -264,7 +258,7 @@ class Nft extends React.Component {
                       //console.log("NFT not on this layer")
                       return null
                     }
-                    if(list[v].account.toLowerCase() !== walletAddress.toLowerCase()) {
+                    if(walletAddress && (list[v].account.toLowerCase() !== walletAddress.toLowerCase())) {
                       //console.log("NFT not owned by this wallet")
                       return null
                     }

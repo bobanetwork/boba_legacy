@@ -64,11 +64,17 @@ function LayerSwitcher({
   const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
 
   const dispatchSwitchLayer = useCallback((targetLayer) => {
+
     if (targetLayer === 'L1') {
        connectToETH()
     }
-    else 
+    else if (targetLayer === 'L2') {
       connectToBOBA()
+    } else {
+      // handles the strange targetLayer === null when people click on ETH icon a second time
+      connectToETH()
+    }
+
   }, [ dispatch, layer ])
 
   const dispatchBootAccount = useCallback(() => {
