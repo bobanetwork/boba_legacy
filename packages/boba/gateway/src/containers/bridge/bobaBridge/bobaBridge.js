@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 import { useDispatch, useSelector } from "react-redux"
 
@@ -23,22 +23,10 @@ import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 import { selectBridgeTokens, selectMultiBridgeMode } from "selectors/bridgeSelector"
 import { resetToken, setMultiBridgeMode } from "actions/bridgeAction"
 
-import { openModal } from 'actions/uiAction'
-
 import { 
-  setEnableAccount, 
-  setWalletAddress,
-  setLayer,
   setConnectETH,
   setConnectBOBA
 } from 'actions/setupAction'
-
-import {
-  fetchTransactions,
-  fetchBalances
-} from 'actions/networkAction'
-
-import networkService from 'services/networkService'
 
 function BobaBridge() {
 
@@ -50,7 +38,6 @@ function BobaBridge() {
   const [ toL2, setToL2 ] = useState(true)
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
-  const network = useSelector(selectNetwork())
   
   async function connectToETH () {
     dispatch(setConnectETH(true))

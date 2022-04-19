@@ -60,7 +60,12 @@ function Help() {
         </Typography>
         <Typography variant="body2" component="p" sx={{ mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7' }}>
           Please use your browser's developer console to see the error message and then please check the project's{' '}
-          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/bobanetwork/boba/issues'>GitHub issues list</Link>{' '}
+          <a
+            target='_blank'
+            style={{ lineHeight: '1.0em', fontWeight: '700', fontSize: '1.0em', opacity: '0.9', color: '#228fe5' }} 
+            href='https://github.com/bobanetwork/boba/issues'
+          >GitHub issues list
+          </a>{' '}
           to see if other people have had the same problem. If not, please file a new GitHub issue.
         </Typography>
 
@@ -69,10 +74,15 @@ function Help() {
         </Typography>
         <Typography variant="body2" component="p" sx={{ mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7' }}>
           We love hearing about new features that you would like. Please file suggestions,
-          prefaced with `Gateway Feature`, in our{' '}
-          <Link variant="body2" style={{ lineHeight: '1.0em', fontWeight: '700' }} href='https://github.com/bobanetwork/boba/issues'>GitHub issues list</Link>.
+          prefaced with `Gateway Feature`, in our {' '}
+          <a
+            target='_blank'
+            style={{ lineHeight: '1.0em', fontWeight: '700', fontSize: '1.0em', opacity: '0.9', color: '#228fe5' }} 
+            href='https://github.com/bobanetwork/boba/issues'
+          >GitHub issues and features list
+          </a>.
           Expect a turnaround time of several days for us to be able to consider new UI/GateWay features.
-          Keep in mind that this is an opensource project, so help out, $ git clone, $ yarn, $ yarn start, and then open a PR.
+          Keep in mind that this is an opensource project, so help out and open a PR.
         </Typography>
 
       </Grid>
@@ -82,3 +92,14 @@ function Help() {
 }
 
 export default React.memo(Help)
+
+
+/*
+            <G.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Oolongswap <Link />
+            </G.footerLink>
+            */

@@ -7,12 +7,8 @@ import * as S from './Monster.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 
-import { Circle } from '@mui/icons-material'
 import PageTitle from 'components/pageTitle/PageTitle'
-
 import networkService from 'services/networkService'
-
-import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Connect from 'containers/connect/Connect'
 

@@ -205,7 +205,6 @@ class Farm extends React.Component {
       poolTab,
       showMDO,
       showMSO,
-      dropDownBox,
       accountEnabled,
       layer,
     } = this.state
@@ -221,16 +220,6 @@ class Farm extends React.Component {
           userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
           accountEnabled={accountEnabled}
         />
-
-
-
-
-
-            
-
-
-
-
 
         <Box sx={{ my: 1, width: '100%' }}>
           <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>

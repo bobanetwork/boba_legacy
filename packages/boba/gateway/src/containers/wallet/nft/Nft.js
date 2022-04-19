@@ -12,8 +12,6 @@ import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Connect from 'containers/connect/Connect'
 

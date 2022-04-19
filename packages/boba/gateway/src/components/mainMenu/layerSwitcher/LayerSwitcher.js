@@ -14,9 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { IconButton, Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, SvgIcon } from '@mui/material'
+import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { switchChain, setLayer } from 'actions/setupAction.js'
+import { setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
@@ -35,8 +35,6 @@ import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
-
-import Button from 'components/button/Button.js'
 
 import { 
   setEnableAccount, 
@@ -199,43 +197,6 @@ function LayerSwitcher({
     console.log("connecting to chain set in MM")
     await dispatchBootAccount()
   }
-
-  // // single button labeled "connect to boba"
-  // if (buttonConnectToBoba) {
-  //   return (
-  //     <S.LayerSwitcherWrapperMobile>
-  //       <S.LayerWrapper> 
-  //           <Button
-  //             type="primary"
-  //             variant="contained"
-  //             size='small'
-  //             fullWidth={fullWidth}
-  //             onClick={()=>connectToBOBA()}
-  //           >
-  //             Connect To Boba
-  //           </Button> 
-  //       </S.LayerWrapper>
-  //     </S.LayerSwitcherWrapperMobile>
-  //   )
-  // } 
-  // // single button labelled "connect"
-  // else if (buttonConnect) {
-  //   return (
-  //     <S.LayerSwitcherWrapperMobile>
-  //       <S.LayerWrapper>
-  //         <Button
-  //           type="primary"
-  //           variant="contained"
-  //           size='small'
-  //           fullWidth={fullWidth}
-  //           onClick={()=>connect()}
-  //         >
-  //           Connect
-  //         </Button> 
-  //       </S.LayerWrapper>
-  //     </S.LayerSwitcherWrapperMobile>
-  //   )
-  // }
 
   // if (isMobile) {
   //   return (
