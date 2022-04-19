@@ -7,8 +7,6 @@ import * as styles from './Airdrop.module.scss'
 
 import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 import moment from 'moment'
@@ -17,7 +15,7 @@ import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropActi
 import { logAmount } from 'util/amountConvert'
 import truncate from 'truncate-middle'
 import PageTitle from 'components/pageTitle/PageTitle'
-
+import Connect from 'containers/connect/Connect'
 
 class Airdrop extends React.Component {
 
@@ -121,7 +119,8 @@ class Airdrop extends React.Component {
       claimDetailsL2,
       layer2,
       walletAddress,
-      netLayer
+      netLayer,
+      accountEnabled
     } = this.state
 
     let omgBalance = layer2.filter((i) => {
@@ -134,8 +133,6 @@ class Airdrop extends React.Component {
       console.log("omgBalance:", omgBalance[ 0 ])
       omgWeiString = omgBalance[ 0 ].balance.toString()
     }
-
-    //console.log("omgWeiString:",omgWeiString)
 
     let l2BalanceOMG = Number(logAmount(omgWeiString, 18))
 
@@ -173,50 +170,18 @@ class Airdrop extends React.Component {
       claimedL2time = moment.unix(claimDetailsL2.claimedTimestamp).format('MM/DD/YYYY hh:mm a')
     }
 
-    if (netLayer === 'L1') {
-      return <S.AirDropPageContainer>
-        <div className={styles.container}>
-          <PageTitle title="Airdrop" />
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon />
-              <S.AlertText
-                variant="body2"
-                component="p"
-              >
-                You are on Ethereum Mainnet. To claim your BOBA, SWITCH to Boba
-              </S.AlertText>
-            </S.AlertInfo>
-            <LayerSwitcher isButton={true} />
-          </S.LayerAlert>
-        </div>
-      </S.AirDropPageContainer>
-    }
-
-    if (!netLayer) {
-      return <S.AirDropPageContainer>
-        <div className={styles.container}>
-          <PageTitle title="Airdrop" />
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon />
-              <S.AlertText
-                variant="body2"
-                component="p"
-              >
-                Connect to MetaMask to claim your BOBA
-              </S.AlertText>
-            </S.AlertInfo>
-            <WalletPicker />
-          </S.LayerAlert>
-        </div>
-      </S.AirDropPageContainer>
-    }
-
     return (
       <S.AirDropPageContainer>
         <PageTitle title="Airdrop" />
 
+        <Connect 
+          userPrompt={'Please connect to Boba claim your airdrop'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+
+        {netLayer === 'L2' &&
         <Grid item xs={12}>
 
           <Box>
@@ -400,6 +365,7 @@ class Airdrop extends React.Component {
             </Box>
           </Box>
         </Grid>
+      }
       </S.AirDropPageContainer>
     )
   }
