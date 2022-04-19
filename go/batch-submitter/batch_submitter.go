@@ -125,6 +125,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				return err
 			}
 			keyAddr := crypto.PubkeyToAddress(*pubkey)
+			log.Info("Batch submitter sequencer account address", "keyAddr", keyAddr)
 			batchTxDriver, err := sequencer.NewDriver(sequencer.Config{
 				Name:        "Sequencer",
 				L1Client:    l1Client,
@@ -160,6 +161,7 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				return err
 			}
 			keyAddr := crypto.PubkeyToAddress(*pubkey)
+			log.Info("Batch submitter proposer account address", "keyAddr", keyAddr)
 			batchStateDriver, err := proposer.NewDriver(proposer.Config{
 				Name:        "Proposer",
 				L1Client:    l1Client,
