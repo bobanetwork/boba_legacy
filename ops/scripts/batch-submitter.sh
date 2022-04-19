@@ -25,7 +25,8 @@ curl --fail \
     $L2_ETH_RPC
 
 echo "waits for kms to be up"
-curl \
+if [ "$BUILD_ENV" == "development" ]; then
+  curl \
     -X POST \
     --silent \
     --fail \
@@ -37,6 +38,7 @@ curl \
     --retry-delay 3 \
     --output /dev/null \
     $BATCH_SUBMITTER_KMS_ENDPOINT
+fi
 
 # go
 exec batch-submitter "$@"

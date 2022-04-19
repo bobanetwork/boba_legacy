@@ -112,11 +112,19 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			ReceiptQueryInterval: time.Second,
 			NumConfirmations:     cfg.NumConfirmations,
 		}
-		sess, _ := session.NewSession(&aws.Config{
-			Credentials: credentials.NewEnvCredentials(),
-			Region:      aws.String(cfg.KmsRegion),
-			Endpoint:    aws.String(cfg.KmsEndpoint)},
-		)
+		sess := session.Must(session.NewSession())
+		if cfg.BuildEnv == "production" {
+			sess, _ = session.NewSession(&aws.Config{
+				Region:   aws.String(cfg.KmsRegion),
+				Endpoint: aws.String(cfg.KmsEndpoint)},
+			)
+		} else {
+			sess, _ = session.NewSession(&aws.Config{
+				Credentials: credentials.NewEnvCredentials(),
+				Region:      aws.String(cfg.KmsRegion),
+				Endpoint:    aws.String(cfg.KmsEndpoint)},
+			)
+		}
 		svc := kms.New(sess)
 		var services []*bsscore.Service
 		if cfg.RunTxBatchSubmitter {
