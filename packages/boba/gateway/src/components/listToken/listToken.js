@@ -22,12 +22,13 @@ function ListToken({
   const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
 
   const theme = useTheme()
+  
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch();
   const enabled = (networkLayer === chain) ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
-  
+
   const amountInNumber = token.symbol === 'ETH' ?
   Number(logAmount(token.balance, token.decimals, 3)):
   Number(logAmount(token.balance, token.decimals, 2))

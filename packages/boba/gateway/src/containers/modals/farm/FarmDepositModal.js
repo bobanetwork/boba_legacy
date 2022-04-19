@@ -70,7 +70,7 @@ class FarmDepositModal extends React.Component {
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
 
-      if (stakeToken.symbol !== 'ETH') {
+      if ( stakeToken.symbol !== 'ETH' ) {
         this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress

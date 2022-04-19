@@ -13,11 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
-import * as S from './Tabs.styles';
+import React from 'react'
+import * as S from './Tabs.styles'
 
-// TODO @deprecated;
-// @deprecated;
 function Tabs ({ tabs, activeTab, onClick, className }) {
 
   return (
@@ -33,24 +31,6 @@ function Tabs ({ tabs, activeTab, onClick, className }) {
       })}
     </S.Tabs>
   );
-  // return (
-  //   <div className={[ styles.Tabs, className ].join(' ')}>
-  //     {tabs.map((i, index) => {
-  //       return (
-  //         <div
-  //           key={index}
-  //           onClick={() => onClick(i)}
-  //           className={[
-  //             styles.tab,
-  //             activeTab === i ? styles.active : ''
-  //           ].join(' ')}
-  //         >
-  //           {i}
-  //         </div>
-  //       );
-  //     })}
-  //   </div>
-  // );
 }
 
-export default React.memo(Tabs);
+export default React.memo(Tabs)

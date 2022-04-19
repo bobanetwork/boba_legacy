@@ -7,14 +7,10 @@ import * as S from './Monster.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 
-import { Circle } from '@mui/icons-material'
 import PageTitle from 'components/pageTitle/PageTitle'
-
 import networkService from 'services/networkService'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import WalletPicker from 'components/walletpicker/WalletPicker'
+import Connect from 'containers/connect/Connect'
 
 class Monster extends React.Component {
 
@@ -107,14 +103,21 @@ class Monster extends React.Component {
       list,
       netLayer,
       monsterInfo,
+      accountEnabled
     } = this.state
 
     let tokenIDverified = null
 
     //figure out which monster type we are dealing with
     let monsterType = 'Monster'
+
+    // since it uses FIND, this code will only find one of your monsters
+    // FIX ME to show the 'top' monster for this wallet if you have several 
+    // in which case you are lucky. 
     if(monsterInfo.length > 0) {
+      
       tokenIDverified = monsterInfo.find(e => e.tokenID)
+
       if(typeof(tokenIDverified) !== 'undefined') {
         tokenIDverified = Number(monsterInfo.find(e => e.tokenID).tokenID)
       } else {
@@ -134,60 +137,19 @@ class Monster extends React.Component {
       }
     }
 
-    if (!netLayer) {
+    return (
 
-      return (
-        <S.TokenPageContainer>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  Not connected. To access the MonsterVerse, CONNECT to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <WalletPicker label="Connect to Boba"/>
-            </S.LayerAlert>
-        </S.TokenPageContainer>
-      )
-
-    } else if (netLayer === 'L1') {
-
-      return (
-        <S.TokenPageContainer>
-          <S.TokenPageContentEmpty>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  You are on Ethereum. To access the MonsterVerse, SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </S.LayerAlert>
-          </S.TokenPageContentEmpty>
-        </S.TokenPageContainer>
-      )
-    }
-
-    else {
-
-      return (
       <S.StakePageContainer>
-        <Box sx={{ my: 1 }}>
-          <PageTitle title="MonsterVerse" />
-          {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
-          }
-        </Box>
+
+        <PageTitle title={'MonsterVerse'} />
+
+        <Connect 
+          userPrompt={'Please connect to Boba'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+
         <Grid container spacing={1} sx={{ my: 2 }}>
 
         <S.NFTPageContainer>
@@ -226,6 +188,8 @@ class Monster extends React.Component {
                       tokenID={list[v].tokenID}
                       small={"true"}
                     />)
+                  } else {
+                    return null
                   }
                 })
               }
@@ -259,10 +223,10 @@ class Monster extends React.Component {
               </Box>
           </S.NFTListContainer>
         </S.NFTPageContainer>
-            </Grid>
-      </S.StakePageContainer>
+      </Grid>
+    </S.StakePageContainer>
 
-    )}
+    )
   }
 }
 

@@ -2,10 +2,11 @@ package proposer
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 	"strings"
+
+	"github.com/aws/aws-sdk-go/service/kms"
 
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/ctc"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/bindings/scc"
@@ -18,8 +19,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethawskmssigner "github.com/welthee/go-ethereum-aws-kms-tx-signer"
 )
 
 // stateRootSize is the size in bytes of a state root.
@@ -36,7 +37,9 @@ type Config struct {
 	SCCAddr     common.Address
 	CTCAddr     common.Address
 	ChainID     *big.Int
-	PrivKey     *ecdsa.PrivateKey
+	KeyId       string
+	KeyAddress  common.Address
+	KMS         kms.KMS
 }
 
 type Driver struct {
@@ -74,7 +77,7 @@ func NewDriver(cfg Config) (*Driver, error) {
 		cfg.SCCAddr, parsed, cfg.L1Client, cfg.L1Client, cfg.L1Client,
 	)
 
-	walletAddr := crypto.PubkeyToAddress(cfg.PrivKey.PublicKey)
+	walletAddr := cfg.KeyAddress
 
 	return &Driver{
 		cfg:            cfg,
@@ -109,11 +112,10 @@ func (d *Driver) ClearPendingTx(
 	txMgr txmgr.TxManager,
 	l1Client *ethclient.Client,
 ) error {
-
-	return drivers.ClearPendingTx(
-		d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, d.cfg.PrivKey,
-		d.cfg.ChainID,
-	)
+	sign := func() (*bind.TransactOpts, error) {
+		return ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+	}
+	return drivers.ClearPendingTx(d.cfg.Name, ctx, txMgr, l1Client, d.walletAddr, sign)
 }
 
 // GetBatchBlockRange returns the start and end L2 block heights that need to be
@@ -188,9 +190,8 @@ func (d *Driver) CraftBatchTx(
 
 	log.Info(name+" batch constructed", "num_state_roots", len(stateRoots))
 
-	opts, err := bind.NewKeyedTransactorWithChainID(
-		d.cfg.PrivKey, d.cfg.ChainID,
-	)
+	opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+
 	if err != nil {
 		return nil, totalStateRootSize, err
 	}
@@ -236,9 +237,8 @@ func (d *Driver) SubmitBatchTx(
 	tx *types.Transaction,
 ) (*types.Transaction, error) {
 
-	opts, err := bind.NewKeyedTransactorWithChainID(
-		d.cfg.PrivKey, d.cfg.ChainID,
-	)
+	opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+
 	if err != nil {
 		return nil, err
 	}
