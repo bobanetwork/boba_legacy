@@ -409,14 +409,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getMessageStatusFromContracts(
-    message: MessageLike
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<MessageStatus> {
     const resolved = await this.toCrossChainMessage(message)
     const messageHash = hashCrossChainMessage(resolved)
     if (resolved.direction === MessageDirection.L1_TO_L2) {
       throw new Error(`can only determine for L2 to L1 messages`)
     } else {
-      const stateRoot = await this.getMessageStateRoot(resolved)
+      const stateRoot = await this.getMessageStateRoot(resolved, opts)
       if (stateRoot === null) {
         return MessageStatus.STATE_ROOT_NOT_PUBLISHED
       } else {
@@ -734,7 +737,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getMessageStateRoot(
-    message: MessageLike
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<StateRoot | null> {
     const resolved = await this.toCrossChainMessage(message)
 
@@ -756,7 +762,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     // Pull down the state root batch, we'll try to pick out the specific state root that
     // corresponds to our message.
     const stateRootBatch = await this.getStateRootBatchByTransactionIndex(
-      messageTxIndex
+      messageTxIndex,
+      opts
     )
 
     // No state root batch, no state root.
@@ -785,12 +792,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateBatchAppendedEventByBatchIndex(
-    batchIndex: number
+    batchIndex: number,
+    opts?: {
+      fromBlock?: BlockTag
+    }
   ): Promise<ethers.Event | null> {
     const events = await this.contracts.l1.StateCommitmentChain.queryFilter(
       this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
         batchIndex
-      )
+      ),
+      opts?.fromBlock
     )
 
     if (events.length === 0) {
@@ -804,7 +815,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateBatchAppendedEventByTransactionIndex(
-    transactionIndex: number
+    transactionIndex: number,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<ethers.Event | null> {
     const isEventHi = (event: ethers.Event, index: number) => {
       const prevTotalElements = event.args._prevTotalElements.toNumber()
@@ -826,7 +840,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let lowerBound = 0
     let upperBound = totalBatches.toNumber() - 1
     let batchEvent: ethers.Event | null =
-      await this.getStateBatchAppendedEventByBatchIndex(upperBound)
+      await this.getStateBatchAppendedEventByBatchIndex(upperBound, opts)
 
     // Only happens when no batches have been submitted yet.
     if (batchEvent === null) {
@@ -847,7 +861,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     while (lowerBound < upperBound) {
       const middleOfBounds = Math.floor((lowerBound + upperBound) / 2)
       batchEvent = await this.getStateBatchAppendedEventByBatchIndex(
-        middleOfBounds
+        middleOfBounds,
+        opts
       )
 
       if (isEventHi(batchEvent, transactionIndex)) {
@@ -863,10 +878,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateRootBatchByTransactionIndex(
-    transactionIndex: number
+    transactionIndex: number,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<StateRootBatch | null> {
     const stateBatchAppendedEvent =
-      await this.getStateBatchAppendedEventByTransactionIndex(transactionIndex)
+      await this.getStateBatchAppendedEventByTransactionIndex(
+        transactionIndex,
+        opts
+      )
     if (stateBatchAppendedEvent === null) {
       return null
     }

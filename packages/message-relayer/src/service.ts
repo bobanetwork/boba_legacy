@@ -42,6 +42,12 @@ interface MessageRelayerOptions {
   pollingInterval?: number
 
   /**
+   * L1 block to start querying State commitments from. Recommended to set to the StateCommitmentChain deploy height
+   * not essential, only needed for optimization, event searches are already filtered by batchIndex
+   */
+  l1StartOffset?: number
+
+  /**
    * Size of the block range to query when looking for new SentMessage events.
    */
   getLogsInterval?: number
@@ -94,6 +100,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       },
       pollingInterval: {
         default: 5000,
+      },
+      l1StartOffset: {
+        default: 0,
       },
       getLogsInterval: {
         default: 2000,
@@ -240,7 +249,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             const newMB = []
             for (const cur of this.state.messageBuffer) {
               const status =
-                await this.state.messenger.getMessageStatusFromContracts(cur)
+                await this.state.messenger.getMessageStatusFromContracts(cur, {
+                  fromBlock: this.options.l1StartOffset,
+                })
               if (
                 // check failed message here too
                 status !== MessageStatus.RELAYED &&
@@ -403,7 +414,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             for (const message of messages) {
               const status =
                 await this.state.messenger.getMessageStatusFromContracts(
-                  message
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
                 )
               if (
                 status === MessageStatus.IN_CHALLENGE_PERIOD ||
@@ -448,7 +462,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
               const status =
                 await this.state.messenger.getMessageStatusFromContracts(
-                  message
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
                 )
               if (status === MessageStatus.RELAYED) {
                 this.logger.info('Message has already been relayed, skipping.')
