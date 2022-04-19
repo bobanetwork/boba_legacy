@@ -1,15 +1,14 @@
 import { gql } from "@apollo/client";
 
-// See more example queries on https://thegraph.com/explorer/subgraph/paulrberg/create-eth-app
-const GET_TRANSFERS = gql`
+const GET_TURING_HELPER_DEPLOYED = gql`
   {
-    transfers(first: 10) {
+    deployedTuringHelpers(first: 1) {
       id
-      from
-      to
-      tokenId
+      owner
+      proxy
+      depositedBoba
     }
   }
 `;
 
-export default GET_TRANSFERS;
+export default GET_TURING_HELPER_DEPLOYED;

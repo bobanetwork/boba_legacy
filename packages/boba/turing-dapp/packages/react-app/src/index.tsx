@@ -8,16 +8,12 @@ import App from "./App";
 import { getChainConfig } from "./constants/network.constants";
 import { ThemeProvider } from "@mui/material";
 import { muiTheme } from "./mui.theme";
-
-const client = new ApolloClient({
-  cache: new InMemoryCache(),
-  uri: "https://api.thegraph.com/subgraphs/name/paulrberg/create-eth-app" // TODO
-});
+import { subgraphClient } from "./graphql/subgraph-client";
 
 ReactDOM.render(
   <React.StrictMode>
     <DAppProvider config={getChainConfig()}>
-      <ApolloProvider client={client}>
+      <ApolloProvider client={subgraphClient}>
         <ThemeProvider theme={muiTheme}>
           <App />
         </ThemeProvider>

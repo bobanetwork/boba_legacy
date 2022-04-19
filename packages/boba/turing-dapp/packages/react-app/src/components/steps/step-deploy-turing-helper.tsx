@@ -1,21 +1,25 @@
-import { L2GovernanceERC20, TuringHelperFactory } from "@turing/contracts/gen/types";
+import { TuringHelperFactory } from "@turing/contracts/gen/types";
 import { Contract } from "@ethersproject/contracts";
 import { abis, addresses } from "@turing/contracts";
 import { utils } from "ethers";
 import { shortenAddress, useContractFunction, useEthers } from "@usedapp/core";
-import { Button, SmallerParagraph, StyledInputAdornment } from "../index";
-import React, { useEffect } from "react";
+import { Button, SmallerParagraph } from "../index";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { getPrettyTransactionStatus, isLoading } from "../../utils/ethers.utils";
 import { enableNotifications } from "../../utils/notification.utils";
 import { BigNumber } from "@ethersproject/bignumber";
-import { FormControl, FormHelperText, OutlinedInput } from "@mui/material";
+import { Chip, FormControl, FormHelperText, OutlinedInput } from "@mui/material";
 import { muiTheme } from "../../mui.theme";
-import { parseEther, parseUnits, formatEther } from "@ethersproject/units";
+import { formatEther } from "@ethersproject/units";
+import { useQuery } from "@apollo/client";
+import GET_TURING_HELPER_DEPLOYED from "../../graphql/subgraph";
+import { toast } from "react-toastify";
 
 interface IStepDeployTuringHelperProps {
   amountBobaForFundingWei: BigNumber;
+  handleNextStep: () => void;
 }
 
 interface IStepDeployTuringHelperState {
@@ -29,10 +33,11 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
   const { account } = useEthers();
   const contractTuringFactory: TuringHelperFactory = new Contract(addresses.TuringHelperFactory, new utils.Interface(abis.turingHelperFactory)) as TuringHelperFactory;
 
+  //#region form_handling
   const [values, setValues] = React.useState<IStepDeployTuringHelperState>({
     unparsedPermittedCallers: "",
     parsedPermittedCallers: [],
-    validInput: false,
+    validInput: false
   });
 
   const {
@@ -40,10 +45,6 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
     send: deployTuringHelper
   } = useContractFunction(contractTuringFactory, "deployMinimal", { transactionName: "DeployTuringHelper" });
   const loadingState: boolean = isLoading(deployState);
-
-  if (newTransaction) {
-    newTransaction = enableNotifications(deployState);
-  }
 
   const handleChangePermittedCallers = (event: React.ChangeEvent<HTMLInputElement>) => {
     let isValid = true;
@@ -61,6 +62,31 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
       parsedPermittedCallers: parsedAddresses
     });
   };
+  //#endregion
+
+  //#region subgraph
+  const [newTuringHelper, setNewTuringHelper] = useState<string>("");
+
+  const { loading, error: subgraphQueryError, data: subgraphData } = useQuery(GET_TURING_HELPER_DEPLOYED, {
+    skip: !(deployState.status === "Success")
+  }); // newTransaction ?
+
+  useEffect(() => {
+    if (subgraphQueryError) {
+      toast("Error while querying subgraph:" + subgraphQueryError.message, { type: "error" });
+      return;
+    }
+    if (!loading && subgraphData && subgraphData.deployedTuringHelpers) {
+      console.log({ deployedTuringHelpers: subgraphData.deployedTuringHelpers });
+      // TODO: Evaluate type, correct value?
+      setNewTuringHelper(subgraphData.deployedTuringHelpers[0]);
+    }
+  }, [loading, subgraphQueryError, subgraphData]);
+  //#endregion
+
+  if (newTransaction) {
+    newTransaction = enableNotifications(deployState);
+  }
 
   return <div style={{ textAlign: "center", marginTop: "2em" }}>
     <SmallerParagraph>Let's deploy the TuringHelper contract. This will also fund the BobaCredit contract (deployed by
@@ -83,13 +109,13 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
           You need to approve some BOBA tokens first!
         </FormHelperText>
         : values.validInput || !values.unparsedPermittedCallers
-        ? <FormHelperText id="outlined-permittedcallers-helper-text"
-                          style={{ color: muiTheme.palette.secondary.contrastText }}>
-          Enter your smart contract addresses which should be allowed to make off-chain requests through your
-          TuringHelper.</FormHelperText>
-        : <FormHelperText id="outlined-permittedcallers-helper-text" style={{ color: "#cc0000" }}>
-          Address list invalid. Please enter a comma-separated list such as 0x..., 0x... with existing addresses.
-        </FormHelperText>}
+          ? <FormHelperText id="outlined-permittedcallers-helper-text"
+                            style={{ color: muiTheme.palette.secondary.contrastText }}>
+            Enter your smart contract addresses which should be allowed to make off-chain requests through your
+            TuringHelper.</FormHelperText>
+          : <FormHelperText id="outlined-permittedcallers-helper-text" style={{ color: "#cc0000" }}>
+            Address list invalid. Please enter a comma-separated list such as 0x..., 0x... with existing addresses.
+          </FormHelperText>}
     </FormControl>
 
     <Button style={{ marginTop: 14 }}
@@ -101,5 +127,20 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
       {loadingState
         ? <><FontAwesomeIcon icon={solid("spinner")} spin={true} />&nbsp;{getPrettyTransactionStatus(deployState)}</>
         : `Deploy TuringHelper & Deposit ${formatEther(props.amountBobaForFundingWei?.toString())} BOBA`}</Button>
+
+
+    {newTuringHelper ?
+    <>
+      <p style={{ fontSize: "0.7em", color: muiTheme.palette.primary.main, marginTop: "2em" }}>
+        Congrats, you did it! That's your own TuringHelper:
+      </p>
+
+      <Chip label={newTuringHelper} color="primary" style={{ paddingLeft: 6 }}
+            icon={<FontAwesomeIcon bounce={true} icon={solid("file-contract")} />}
+            onClick={async () => {
+              await navigator.clipboard.writeText(newTuringHelper);
+              toast("Contract address copied", { type: "info" });
+            }} />
+    </> : ''}
   </div>;
 };

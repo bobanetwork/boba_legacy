@@ -12,23 +12,13 @@ import { StepDeployTuringHelper } from "./steps/step-deploy-turing-helper";
 import { StepDeployAWS } from "./steps/step-deploy-aws";
 import { muiTheme } from "../mui.theme";
 import { BigNumber } from "@ethersproject/bignumber";
+import { StepImplementAWSLambda } from "./steps/step-implement-aws-lambda";
 
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set<number>());
   const [amountBobaTokensToUseWei, setAmountBobaTokensToUseWei] = React.useState(BigNumber.from(0));
-
-  const steps = [{
-    label: 'Approve BOBA',
-    component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei} />,
-  }, {
-    label: 'Deploy/Fund Turing',
-    component: <StepDeployTuringHelper amountBobaForFundingWei={amountBobaTokensToUseWei} />,
-  }, {
-    label: 'Deploy AWS endpoint',
-    component: <StepDeployAWS />,
-  }];
 
   const isStepOptional = (step: number) => {
     return false; // step === 1;
@@ -72,6 +62,20 @@ export default function HorizontalLinearStepper() {
     setActiveStep(0);
   };
 
+  const steps = [{
+    label: 'Approve BOBA',
+    component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei} handleNextStep={handleNext} />,
+  }, {
+    label: 'Deploy/Fund Turing',
+    component: <StepDeployTuringHelper amountBobaForFundingWei={amountBobaTokensToUseWei} handleNextStep={handleNext} />,
+  }, {
+    label: 'Implement AWS lambda',
+    component: <StepImplementAWSLambda />,
+  }, {
+    label: 'Deploy AWS endpoint',
+    component: <StepDeployAWS />,
+  }];
+
   // const isLargeScreen = useMediaQuery('(min-width:600px)');
 
   return (
@@ -97,17 +101,6 @@ export default function HorizontalLinearStepper() {
           );
         })}
       </Stepper>
-      {activeStep === steps.length ? (
-        <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Reset</Button>
-          </Box>
-        </>
-      ) : (
         <>
           {steps[activeStep].component}
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
@@ -125,12 +118,12 @@ export default function HorizontalLinearStepper() {
                 Skip
               </Button>
             )}
-            <Button onClick={handleNext} style={{backgroundColor: muiTheme.palette.secondary.contrastText, color: muiTheme.palette.secondary.main}}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            {activeStep === steps.length - 1 ? ''
+            : <Button onClick={handleNext} style={{backgroundColor: muiTheme.palette.secondary.contrastText, color: muiTheme.palette.secondary.main}}>
+                Next
+              </Button>}
           </Box>
         </>
-      )}
     </Box>
   );
 }

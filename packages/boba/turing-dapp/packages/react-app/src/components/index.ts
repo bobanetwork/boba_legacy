@@ -21,6 +21,7 @@ export const SmallerParagraph = styled.p`
 export const Body = styled.div`
   align-items: center;
   color: white;
+  background-color: black;
   display: flex;
   flex-direction: column;
   font-size: calc(10px + 2vmin);

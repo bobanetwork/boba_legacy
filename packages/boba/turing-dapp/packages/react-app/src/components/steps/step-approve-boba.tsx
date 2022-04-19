@@ -17,8 +17,6 @@ import {
   OutlinedInput
 } from "@mui/material";
 import { muiTheme } from "../../mui.theme";
-import { toast } from "react-toastify";
-import { getBlockExplorerBaseURL } from "../../utils/environment.utils";
 import { enableNotifications } from "../../utils/notification.utils";
 
 interface IStepApproveBobaState {
@@ -26,6 +24,7 @@ interface IStepApproveBobaState {
 }
 interface IStepApproveBobaProps {
   setAmountBobaTokensToUseWei: Dispatch<SetStateAction<BigNumber>>;
+  handleNextStep: () => void;
 }
 
 let newTransaction: boolean = true;
@@ -56,6 +55,7 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
 
   if (newTransaction) {
     newTransaction = enableNotifications(approveState)
+    if (approveState.status === 'Success') props.handleNextStep();
   }
 
     return <div style={{ textAlign: "center", marginTop: "2em" }}>
@@ -73,7 +73,7 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
           "aria-label": "boba"
         }}
       />
-      {hasEnoughBOBA
+      {!account || hasEnoughBOBA
         ? <FormHelperText id="outlined-boba-helper-text" style={{ color: muiTheme.palette.secondary.contrastText }}>
           How many calls do you want to prepay? (0.01 BOBA / call)</FormHelperText>
         : <FormHelperText id="outlined-boba-helper-text" style={{ color: "#cc0000" }}>
@@ -81,7 +81,7 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
         </FormHelperText>}
     </FormControl>
 
-    <Button style={{ marginTop: 14 }} disabled={account === undefined || loadingState || !hasEnoughBOBA}
+    <Button style={{ marginTop: 14 }} disabled={!account || loadingState || !hasEnoughBOBA}
             onClick={async () => {
               newTransaction = true;
               await approveBoba(addresses.TuringHelperFactory, amountBobaTokensToUseWei);
