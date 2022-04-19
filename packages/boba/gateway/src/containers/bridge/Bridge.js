@@ -7,7 +7,7 @@ import * as S from './Bridge.styles'
 
 function BridgeContainer() {
 
-  const theme = useTheme();
+  const theme = useTheme()
   const accountEnabled = useSelector(selectAccountEnabled())
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 

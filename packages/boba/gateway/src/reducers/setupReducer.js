@@ -29,7 +29,10 @@ const initialState = {
   network: process.env.REACT_APP_CHAIN,
   justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
   bobaFeePriceRatio: null,
-  bobaFeeChoice: null
+  bobaFeeChoice: null,
+  connectETH: false,
+  connectBOBA: false,
+  connect: false
 }
 
 function setupReducer (state = initialState, action) {
@@ -61,6 +64,21 @@ function setupReducer (state = initialState, action) {
       return { 
         ...state, 
         network: action.payload
+      }
+    case 'SETUP/CONNECT_ETH':
+      return { 
+        ...state, 
+        connectETH: action.payload
+      }
+    case 'SETUP/CONNECT_BOBA':
+      return { 
+        ...state, 
+        connectBOBA: action.payload
+      }
+    case 'SETUP/CONNECT':
+      return { 
+        ...state, 
+        connect: action.payload
       }
     case 'SETUP/SWITCH/REQUEST':
       console.log("SR:REQUEST - setting just changed to true")
