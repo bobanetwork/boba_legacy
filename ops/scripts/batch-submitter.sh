@@ -24,19 +24,5 @@ curl --fail \
     --output /dev/null \
     $L2_ETH_RPC
 
-echo "waits for kms to be up"
-curl \
-    -X POST \
-    --silent \
-    --fail \
-    --show-error \
-    -H "Content-Type: application/json" \
-    -H "X-Amz-Target:TrentService.ListKeys" \
-    --retry-connrefused \
-    --retry $RETRIES \
-    --retry-delay 3 \
-    --output /dev/null \
-    $BATCH_SUBMITTER_KMS_ENDPOINT
-
 # go
 exec batch-submitter "$@"
