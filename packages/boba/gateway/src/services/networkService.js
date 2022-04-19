@@ -116,6 +116,15 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
 }
 let allTokens = {}
 
+function handleChangeChainOnce(chainID_hex_string) {
+  console.log("handleChangeChainOnce: switched to chain", Number(chainID_hex_string))
+  localStorage.setItem('chainChangedInit', true)
+  console.log("chainChangedInit", true)
+  localStorage.setItem('newChain', Number(chainID_hex_string))
+  // and remove the listner
+  window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
+}
+
 class NetworkService {
 
   constructor() {
@@ -190,9 +199,17 @@ class NetworkService {
       window.location.reload()
     })
     window.ethereum.on('chainChanged', () => {
-      console.log('chainChanged')
-      localStorage.setItem('changeChain', true)
-      window.location.reload()
+      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
+      // do not reload window in the special case where the user 
+      // changed chains AND conncted at the same time
+      // otherwise the user gets confused about why they are going through
+      // two window reloads
+      if(chainChangedInit) {
+        localStorage.setItem('chainChangedInit', false)
+      } else {
+        localStorage.setItem('chainChangedFromMM', true)
+        window.location.reload()
+      }
     })
   }
 
@@ -927,13 +944,11 @@ class NetworkService {
       // connect to the wallet
       await window.ethereum.request({method: 'eth_requestAccounts'})
       this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
       this.account = await this.provider.getSigner().getAddress()
 
       const networkMM = await this.provider.getNetwork()
       this.chainID = networkMM.chainId
       this.networkName = networkMM.name
-
       this.networkGateway = networkGateway
 
       console.log('NS: networkMM:', networkMM)
@@ -990,7 +1005,8 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners()
+      this.bindProviderListeners() 
+      // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
 
@@ -1030,6 +1046,7 @@ class NetworkService {
 
   }
 
+
   async switchChain( targetLayer ) {
 
     const nw = getNetwork()
@@ -1042,7 +1059,7 @@ class NetworkService {
       blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
     }
 
-    //the chainParams are only needed for the L2's
+    //the chainParams are only needed for the L2s
     const chainParam = {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
@@ -1054,18 +1071,28 @@ class NetworkService {
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
+    console.log("switchChain to:", targetLayer)
+
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
+      console.log("calling: window.ethereum.on('chainChanged', handleChangeChainOnce)")
+      window.ethereum.on('chainChanged', handleChangeChainOnce)
+      return true
     } catch (error) {
       // 4902 = the chain has not been added to MetaMask.
+      // So, lets add it
       if (error.code === 4902) {
         try {
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
+          window.ethereum.on('chainChanged', handleChangeChainOnce)
+          return true
         } catch (addError) {
           console.log("MetaMask - Error adding new RPC: ", addError)
+          return addError
         }
       } else { //some other error code
         console.log("MetaMask - Switch Error: ", error.code)
+        return error
       }
     }
   }

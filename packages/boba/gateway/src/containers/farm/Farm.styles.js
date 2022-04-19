@@ -50,6 +50,18 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   },
 }))
 
+export const Help = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: '30px',
+  margin: '10px 0px',
+  padding: '10px',
+  borderRadius: theme.palette.primary.borderRadius,
+  background: theme.palette.background.secondary,
+}))
+
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
@@ -91,32 +103,6 @@ export const GridItemTag = styled(Grid)`
   align-items: center;
   gap:5px;
 `;
-
-export const DropdownWrapper = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 5px;
-  width: 100%;
-  padding: 16px;
-  margin-top: 16px;
-  background-color: ${props => props.theme.palette.background.secondary};
-  border-radius: 12px;
-  text-align: left;
-`;
-
-export const DropdownContent = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    gap: '0',
-  },
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
-    gap: '16px',
-  },
-}));
 
 export const FarmAction = styled(Box)(({theme})=>({
   display: 'flex',
