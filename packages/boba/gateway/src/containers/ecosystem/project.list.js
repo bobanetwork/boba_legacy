@@ -50,7 +50,7 @@ export const projectList = [
     "discord": "http://discord.gg/savwHHXsmU",
     "type": "defi",
     "image": OolongswapLogo,
-    "description": "The leading DEX built on Boba Network (Ethereum’s newest L2). OolongSwap incorporates all of the features you need from a traditional DEX while pioneering new ideas from DeFi 2.0 such as Protocol Controlled Value."
+    "description": "The leading DEX on Boba. OolongSwap incorporates all of the features you need from a traditional DEX while pioneering new ideas from DeFi 2.0 such as Protocol Controlled Value."
   },
   {
     "title": "FRAX",
@@ -80,7 +80,7 @@ export const projectList = [
     "twitter": "https://twitter.com/AnyswapNetwork",
     "type": "bridge",
     "image": multiChainLogo,
-    "description": "Cross-Chain Router Protocol, envisioned to be the ultimate router for Web3"
+    "description": "Cross-Chain Router Protocol, envisioned to be the ultimate router for Web3."
   },
   {
     "title": "Synapse",
@@ -112,7 +112,7 @@ export const projectList = [
     "discord": "https://discord.com/invite/DwjPNvAwdd",
     "type": "defi",
     "image": zenchaLogo,
-    "description": "The First StableSwap Exchange & Liquidity Pool on Boba Network"
+    "description": "The First StableSwap Exchange & Liquidity Pool on Boba."
   },
   {
     "title": "Unidex",
@@ -154,7 +154,7 @@ export const projectList = [
     "twitter": "https://twitter.com/boba_punks",
     "type": "nft",
     "image": bobaPunksLogo,
-    "description": "The first punks on Boba Network."
+    "description": "The first punks on Boba."
   },
   {
     "title": "Boba Doge",
@@ -165,7 +165,7 @@ export const projectList = [
     "discord": "http://discord.gg/jvXBqpKgdt",
     "type": "token",
     "image": bobaDogeLogo,
-    "description": "The first dog coin on Boba Network."
+    "description": "The first dog coin on Boba."
   },
   {
     "title": "ApeBoard",
@@ -200,7 +200,7 @@ export const projectList = [
     "title": "Dodo",
     "canLaunch": true,
     "link": "https://dodoex.io/",
-    "twitter": "https://twitter.com/BreederDodo?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor",
+    "twitter": "https://twitter.com/BreederDodo",
     "discord": "http://discord.gg/tyKReUK",
     "type": "defi",
     "image": dodoLogo,
@@ -354,7 +354,7 @@ export const projectList = [
     "twitter": "https://twitter.com/boba_brewery",
     "type": "defi",
     "image": brewery,
-    "description": "Boba Brewery is the first exclusive launchpad for decentralized fundraising in Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
+    "description": "Boba Brewery is the first launchpad for decentralized fundraising in the Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
   },
   {
     "title": "Bodh Finance",
