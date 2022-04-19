@@ -272,10 +272,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 _gasPrice: BigNumber
               ): Promise<any> => {
                 // Generate the transaction we will repeatedly submit
+                const nonce = await this.options.l1Wallet.getTransactionCount()
                 const txResponse =
                   await this.state.messenger.finalizeBatchMessage(subBuffer, {
                     overrides: {
                       gasPrice: _gasPrice,
+                      nonce,
                     },
                   })
                 const txReceipt = await txResponse.wait(
