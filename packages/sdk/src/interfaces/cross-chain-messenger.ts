@@ -205,6 +205,14 @@ export interface ICrossChainMessenger {
   getMessageStatus(message: MessageLike): Promise<MessageStatus>
 
   /**
+   * Retrieves the relay status of a message from the contracts
+   *
+   * @param message Cross chain message to check the status of.
+   * @returns Status of the message.
+   */
+  getMessageStatusFromContracts(message: MessageLike): Promise<MessageStatus>
+
+  /**
    * Finds the receipt of the transaction that executed a particular cross chain message.
    *
    * @param message Message to find the receipt of.

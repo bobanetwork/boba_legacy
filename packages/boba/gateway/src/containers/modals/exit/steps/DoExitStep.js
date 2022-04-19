@@ -276,7 +276,7 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
   }
 
   let receiveL1 = `${Number(value).toFixed(3)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}.`
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`
 
   if( Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
@@ -290,7 +290,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           disabled={false}
           variant='outlined'
           color='primary'
-          size='large'
         >
           Cancel
         </Button>
@@ -310,7 +309,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           disabled={false}
           variant='outlined'
           color='primary'
-          size='large'
         >
           Cancel
         </Button>
@@ -357,12 +355,11 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           </Typography>
         }
 
-
         <BridgeFee
           estFee={estGas}
           exitFee={`${exitFee} BOBA`}
           estReceive={receiveL1}
-          time="In 7 days."
+          time="In 7 days"
           timeInfo="Your funds will be available in 7 days."
         />
 
@@ -385,7 +382,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           disabled={false}
           variant='outlined'
           color='primary'
-          size='large'
         >
           {buttonLabel}
         </Button>
@@ -399,7 +395,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
             disabled={!validValue}
             triggerTime={new Date()}
             fullWidth={isMobile}
-            size="large"
           >
             Bridge to L1
           </Button>

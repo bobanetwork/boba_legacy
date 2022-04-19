@@ -22,6 +22,7 @@ function ListToken({
   const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
 
   const theme = useTheme()
+  
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch();
   const enabled = (networkLayer === chain) ? true : false

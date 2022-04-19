@@ -40,6 +40,24 @@ export function selectLayer () {
   }
 }
 
+export function selectConnectETH () {
+  return function (state) {
+    return state.setup['connectETH']
+  }
+}
+
+export function selectConnectBOBA () {
+  return function (state) {
+    return state.setup['connectBOBA']
+  }
+}
+
+export function selectConnect () {
+  return function (state) {
+    return state.setup['connect']
+  }
+}
+
 export function selectJustSwitchedChain () {
   return function (state) {
     return state.setup['justSwitchedChain']

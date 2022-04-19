@@ -132,7 +132,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     }
     else if (
       exitFee > Number(feeBalanceBOBA)) {
-      setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA.`)
+      setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA`)
       setValidValue(false)
       setValue(value)
       return false

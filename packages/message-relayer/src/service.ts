@@ -42,6 +42,12 @@ interface MessageRelayerOptions {
   pollingInterval?: number
 
   /**
+   * L1 block to start querying State commitments from. Recommended to set to the StateCommitmentChain deploy height
+   * not essential, only needed for optimization, event searches are already filtered by batchIndex
+   */
+  l1StartOffset?: number
+
+  /**
    * Size of the block range to query when looking for new SentMessage events.
    */
   getLogsInterval?: number
@@ -94,6 +100,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       },
       pollingInterval: {
         default: 5000,
+      },
+      l1StartOffset: {
+        default: 0,
       },
       getLogsInterval: {
         default: 2000,
@@ -239,7 +248,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Filter out messages which have been processed
             const newMB = []
             for (const cur of this.state.messageBuffer) {
-              const status = await this.state.messenger.getMessageStatus(cur)
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(cur, {
+                  fromBlock: this.options.l1StartOffset,
+                })
               if (
                 // check failed message here too
                 status !== MessageStatus.RELAYED &&
@@ -271,10 +283,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 _gasPrice: BigNumber
               ): Promise<any> => {
                 // Generate the transaction we will repeatedly submit
+                const nonce = await this.options.l1Wallet.getTransactionCount()
                 const txResponse =
                   await this.state.messenger.finalizeBatchMessage(subBuffer, {
                     overrides: {
                       gasPrice: _gasPrice,
+                      nonce,
                     },
                   })
                 const txReceipt = await txResponse.wait(
@@ -398,9 +412,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // wait for a few seconds before we check again to see if this transaction is finalized.
             let isFinalized = true
             for (const message of messages) {
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
+                )
               if (
                 status === MessageStatus.IN_CHALLENGE_PERIOD ||
                 status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
@@ -442,9 +460,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 }
               }
 
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
+                )
               if (status === MessageStatus.RELAYED) {
                 this.logger.info('Message has already been relayed, skipping.')
                 continue
