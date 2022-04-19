@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum-optimism/optimism/go/bss-core/mock"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -76,11 +77,11 @@ func TestSignClearingTxEstimateGasSuccess(t *testing.T) {
 		testGasTipCap,
 		new(big.Int).Mul(testBaseFee, big.NewInt(2)),
 	)
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	tx, err := drivers.SignClearingTx(
-		"TEST", context.Background(), testWalletAddr, testNonce, l1Client,
-		testPrivKey, testChainID,
-	)
+		"TEST", context.Background(), testWalletAddr, testNonce, l1Client, sign)
 	require.Nil(t, err)
 	require.NotNil(t, tx)
 	require.Equal(t, &testWalletAddr, tx.To())
@@ -106,11 +107,11 @@ func TestSignClearingTxSuggestGasTipCapFail(t *testing.T) {
 			return nil, errSuggestGasTipCap
 		},
 	})
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	tx, err := drivers.SignClearingTx(
-		"TEST", context.Background(), testWalletAddr, testNonce, l1Client,
-		testPrivKey, testChainID,
-	)
+		"TEST", context.Background(), testWalletAddr, testNonce, l1Client, sign)
 	require.Equal(t, errSuggestGasTipCap, err)
 	require.Nil(t, tx)
 }
@@ -128,11 +129,12 @@ func TestSignClearingTxHeaderByNumberFail(t *testing.T) {
 			return testGasTipCap, nil
 		},
 	})
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	tx, err := drivers.SignClearingTx(
-		"TEST", context.Background(), testWalletAddr, testNonce, l1Client,
-		testPrivKey, testChainID,
-	)
+		"TEST", context.Background(), testWalletAddr, testNonce, l1Client, sign)
+
 	require.Equal(t, errHeaderByNumber, err)
 	require.Nil(t, tx)
 }
@@ -155,11 +157,11 @@ func TestSignClearingTxEstimateGasFail(t *testing.T) {
 			return testGasTipCap, nil
 		},
 	})
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	tx, err := drivers.SignClearingTx(
-		"TEST", context.Background(), testWalletAddr, testNonce, l1Client,
-		testPrivKey, testChainID,
-	)
+		"TEST", context.Background(), testWalletAddr, testNonce, l1Client, sign)
 	require.Equal(t, errEstimateGas, err)
 	require.Nil(t, tx)
 }
@@ -233,11 +235,11 @@ func TestClearPendingTxClearingTxConfirms(t *testing.T) {
 			}, nil
 		},
 	})
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	err := drivers.ClearPendingTx(
-		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr,
-		testPrivKey, testChainID,
-	)
+		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr, sign)
 	require.Nil(t, err)
 }
 
@@ -250,11 +252,13 @@ func TestClearPendingTxPreviousTxConfirms(t *testing.T) {
 			return core.ErrNonceTooLow
 		},
 	})
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 
 	err := drivers.ClearPendingTx(
-		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr,
-		testPrivKey, testChainID,
-	)
+		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr, sign)
+
 	require.Equal(t, drivers.ErrClearPendingRetry, err)
 }
 
@@ -273,11 +277,11 @@ func TestClearPendingTxTimeout(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	err := drivers.ClearPendingTx(
-		"test", ctx, h.txMgr, h.l1Client, testWalletAddr, testPrivKey,
-		testChainID,
-	)
+		"test", ctx, h.txMgr, h.l1Client, testWalletAddr, sign)
 	require.Equal(t, context.DeadlineExceeded, err)
 }
 
@@ -302,11 +306,12 @@ func TestClearPendingTxMultipleConfs(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	sign := func() (*bind.TransactOpts, error) {
+		return bind.NewKeyedTransactorWithChainID(testPrivKey, testChainID)
+	}
 	// The txmgr should timeout waiting for the txn to confirm.
 	err := drivers.ClearPendingTx(
-		"test", ctx, h.txMgr, h.l1Client, testWalletAddr, testPrivKey,
-		testChainID,
-	)
+		"test", ctx, h.txMgr, h.l1Client, testWalletAddr, sign)
 	require.Equal(t, context.DeadlineExceeded, err)
 
 	// Now set the chain height to the earliest the transaction will be
@@ -317,8 +322,6 @@ func TestClearPendingTxMultipleConfs(t *testing.T) {
 
 	// Publishing should succeed.
 	err = drivers.ClearPendingTx(
-		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr,
-		testPrivKey, testChainID,
-	)
+		"test", context.Background(), h.txMgr, h.l1Client, testWalletAddr, sign)
 	require.Nil(t, err)
 }
