@@ -4,6 +4,7 @@ import { isEqual } from 'lodash'
 
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Nft.styles'
+import * as G from '../../Global.styles'
 
 import { Box, Grid, Typography } from '@mui/material'
 
@@ -11,9 +12,8 @@ import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
+import Connect from 'containers/connect/Connect'
 
 class Nft extends React.Component {
 
@@ -126,14 +126,15 @@ class Nft extends React.Component {
       loading,
       netLayer,
       network,
-      walletAddress
+      walletAddress,
+      accountEnabled,
     } = this.state
 
     if (!netLayer) {
 
       return (
-        <S.TokenPageContainer>
-          <S.TokenPageContentEmpty>
+        <G.Container>
+          <G.ContentEmpty>
             <Box
               sx={{
                 display: 'flex',
@@ -148,38 +149,30 @@ class Nft extends React.Component {
                 No Data
               </Typography>
             </Box>
-          </S.TokenPageContentEmpty>
-        </S.TokenPageContainer>
+          </G.ContentEmpty>
+        </G.Container>
       )
 
     } else if (netLayer === 'L1') {
-
       return (
-        <S.TokenPageContainer>
-          <S.TokenPageContentEmpty>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  You are on Ethereum. To use Boba NFTs, SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </S.LayerAlert>
-          </S.TokenPageContentEmpty>
-        </S.TokenPageContainer>
+        <G.Container>
+          <G.ContentEmpty>
+            <Connect 
+              userPrompt={'You are on Ethereum. To use Boba NFTs, connect to Boba'}
+              accountEnabled={accountEnabled}
+              connectToBoba={true}
+              layer={netLayer}
+            />
+          </G.ContentEmpty>
+        </G.Container>
       )
     }
 
     else {
 
       return (
-        <S.NFTPageContainer>
-          <S.NFTActionContent>
+        <G.Container>
+          <S.NFTActionContent sx={{ boxShadow: 1 }}>
             <S.NFTFormContent>
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -188,7 +181,7 @@ class Nft extends React.Component {
                     Add NFT
                   </Typography>
                 </Box>
-                <S.DividerLine />
+                <G.DividerLine />
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   <br/>Monsters can be autoadded to your wallet
                 </Typography>
@@ -207,7 +200,7 @@ class Nft extends React.Component {
                 flexDirection: 'column',
                 gap: '10px'
               }}>
-                <S.DividerLine />
+                <G.DividerLine />
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   Other NFTs must be added manually
                 </Typography>
@@ -234,10 +227,9 @@ class Nft extends React.Component {
                   {loading ? 'Adding NFT...' : 'Add NFT'}
                 </Button>
               </Box>
-              
             </S.NFTFormContent>
           </S.NFTActionContent>
-          <S.NFTListContainer data-empty={Object.keys(list).length === 0}>
+          <S.NFTListContainer data-empty={Object.keys(list).length === 0} sx={{ boxShadow: 1 }}>
             {Object.keys(list).length === 0 ?
               <Box>
                 <Typography variant="body2"  sx={{opacity: 0.65}} >
@@ -264,7 +256,7 @@ class Nft extends React.Component {
                       //console.log("NFT not on this layer")
                       return null
                     }
-                    if(list[v].account.toLowerCase() !== walletAddress.toLowerCase()) {
+                    if(walletAddress && (list[v].account.toLowerCase() !== walletAddress.toLowerCase())) {
                       //console.log("NFT not owned by this wallet")
                       return null
                     }
@@ -284,7 +276,7 @@ class Nft extends React.Component {
                 }
               </Grid>}
           </S.NFTListContainer>
-        </S.NFTPageContainer>
+        </G.Container>
     )}
   }
 }
