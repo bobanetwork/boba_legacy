@@ -1,20 +1,25 @@
+
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
 
-import * as S from './Airdrop.styles'
-import * as styles from './Airdrop.module.scss'
+import { isEqual } from 'lodash'
+import moment from 'moment'
+import truncate from 'truncate-middle'
 
 import { Box, Grid, Typography } from '@mui/material'
+
+import * as S from './Airdrop.styles'
+
 import Button from 'components/button/Button'
-import AlertIcon from 'components/icons/AlertIcon'
+import PageTitle from 'components/pageTitle/PageTitle'
+
 import networkService from 'services/networkService'
-import moment from 'moment'
+
 import { openAlert } from 'actions/uiAction'
 import { initiateAirdrop, getAirdropL1, getAirdropL2 } from 'actions/airdropAction'
+
 import { logAmount } from 'util/amountConvert'
-import truncate from 'truncate-middle'
-import PageTitle from 'components/pageTitle/PageTitle'
+
 import Connect from 'containers/connect/Connect'
 
 class Airdrop extends React.Component {
@@ -174,7 +179,7 @@ class Airdrop extends React.Component {
       <S.AirDropPageContainer>
         <PageTitle title="Airdrop" />
 
-        <Connect 
+        <Connect
           userPrompt={'Please connect to Boba claim your airdrop'}
           accountEnabled={accountEnabled}
           connectToBoba={true}

@@ -15,11 +15,17 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { openError, openModal } from 'actions/uiAction'
 import { Box, Typography } from '@mui/material'
+import { orderBy } from 'lodash'
 
 import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'
+import PageTitle from 'components/pageTitle/PageTitle'
+import Select from 'components/select/Select'
+
+import Connect from 'containers/connect/Connect'
 
 import { selectDaoBalance, selectDaoVotes, selectDaoBalanceX, selectDaoVotesX, selectProposalThreshold } from 'selectors/daoSelector'
 import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
@@ -28,18 +34,6 @@ import { selectLoading } from 'selectors/loadingSelector'
 
 import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
-
-import PageTitle from 'components/pageTitle/PageTitle'
-import { Circle } from '@mui/icons-material'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
-import networkService from 'services/networkService'
-import truncateMiddle from 'truncate-middle'
-import WalletIcon from 'components/icons/WalletIcon'
-import Connect from 'containers/connect/Connect'
-
-import { orderBy } from 'lodash'
-import Select from 'components/select/Select'
 
 const PER_PAGE = 8
 
@@ -52,7 +46,6 @@ function DAO() {
   const votes = useSelector(selectDaoVotes)
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
-  const wAddress = networkService.account ? truncateMiddle(networkService.account, 6, 6, '...') : '';
 
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -91,7 +84,7 @@ function DAO() {
 
           <PageTitle title={'DAO'} />
 
-          <Connect 
+          <Connect
             userPrompt={'Please connect to Boba to vote and propose'}
             accountEnabled={accountEnabled}
             connectToBoba={true}

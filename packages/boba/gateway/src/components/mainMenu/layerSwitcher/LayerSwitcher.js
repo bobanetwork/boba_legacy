@@ -22,9 +22,9 @@ import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { 
-  selectAccountEnabled, 
-  selectNetwork, 
+import {
+  selectAccountEnabled,
+  selectNetwork,
   selectLayer,
   selectConnectETH,
   selectConnectBOBA,
@@ -36,8 +36,8 @@ import * as S from './LayerSwitcher.styles.js'
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 
-import { 
-  setEnableAccount, 
+import {
+  setEnableAccount,
   setWalletAddress,
 } from 'actions/setupAction'
 
@@ -48,14 +48,7 @@ import {
 
 import { openModal } from 'actions/uiAction'
 
-function LayerSwitcher({ 
-  isIcon = false, 
-  isButton = false, 
-  size, 
-  fullWidth = false, 
-  buttonConnectToBoba = false,
-  buttonConnect = false
-}) {
+function LayerSwitcher() {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -69,28 +62,14 @@ function LayerSwitcher({
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
-  
+
   const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
   const wantChain = JSON.parse(localStorage.getItem('wantChain'))
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
+
   console.log("chainChangedInit:", chainChangedInit)
-
-  const dispatchSwitchLayer = useCallback((targetLayer) => {
-
-    if (targetLayer === 'L1') {
-       connectToETH()
-    }
-    else if (targetLayer === 'L2') {
-      connectToBOBA()
-    } else {
-      // handles the strange targetLayer === null when people click on ETH icon a second time
-      connectToETH()
-    }
-
-  }, [ connectToBOBA, connectToETH ])
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -101,11 +80,11 @@ function LayerSwitcher({
       const initialized = await networkService.initializeAccount(network)
 
       console.log("initialized:",initialized)
-      
+
       if (initialized === 'wrongnetwork') {
         dispatch(openModal('wrongNetworkModal'))
         return false
-      } 
+      }
       else if (initialized === false) {
         console.log("WP: Account NOT enabled for", network, accountEnabled)
         dispatch(setEnableAccount(false))
@@ -127,19 +106,53 @@ function LayerSwitcher({
 
   }, [ dispatch, accountEnabled, network ])
 
+  // this will connect to whatever is set in MM
+  async function connect () {
+    console.log("connecting to chain set in MM")
+    await dispatchBootAccount()
+  }
+
+  // this will switch chain, if needed, and then connect to Boba
+  const connectToBOBA = useCallback(async () => {
+    localStorage.setItem('wantChain', JSON.stringify('L2'))
+    await networkService.switchChain('L2')
+    await dispatchBootAccount()
+  }, [dispatchBootAccount])
+
+   // this will switch chain, if needed, and then connect to Ethereum
+  const connectToETH = useCallback(async() => {
+    localStorage.setItem('wantChain', JSON.stringify('L1'))
+    await networkService.switchChain('L1')
+    await dispatchBootAccount()
+  }, [dispatchBootAccount])
+
+  const dispatchSwitchLayer = useCallback((targetLayer) => {
+
+    if (targetLayer === 'L1') {
+       connectToETH()
+    }
+    else if (targetLayer === 'L2') {
+      connectToBOBA()
+    } else {
+      // handles the strange targetLayer === null when people click on ETH icon a second time
+      connectToETH()
+    }
+
+  }, [ connectToBOBA, connectToETH ])
+
   useEffect(() => {
     // detect mismatch and correct the mismatch
     if (wantChain === 'L1' && layer === 'L2') {
       dispatchBootAccount()
-    } 
-    else if (wantChain === 'L2' && layer === 'L1') 
+    }
+    else if (wantChain === 'L2' && layer === 'L1')
     {
       dispatchBootAccount()
     }
   }, [ wantChain, layer, dispatchBootAccount ])
 
   useEffect(() => {
-    // auto reconnect to MM if we just switched chains from 
+    // auto reconnect to MM if we just switched chains from
     // with the chain switcher, and then unset the flag.
     if (chainChangedInit) {
       dispatchBootAccount()
@@ -148,7 +161,7 @@ function LayerSwitcher({
   }, [ chainChangedInit, dispatchBootAccount ])
 
     useEffect(() => {
-    // auto reconnect to MM if we just switched chains from 
+    // auto reconnect to MM if we just switched chains from
     // inside MM, and then unset the flag.
     if (chainChangedFromMM) {
       dispatchBootAccount()
@@ -178,25 +191,6 @@ function LayerSwitcher({
     }
   }, [ connectRequest, dispatchBootAccount ])
 
-  // this will switch chain, if needed, and then connect to Boba
-  async function connectToBOBA () {
-    localStorage.setItem('wantChain', JSON.stringify('L2'))
-    await networkService.switchChain('L2')
-    await dispatchBootAccount()
-  }
-
-   // this will switch chain, if needed, and then connect to Ethereum
-  async function connectToETH () {
-    localStorage.setItem('wantChain', JSON.stringify('L1'))
-    await networkService.switchChain('L1')
-    await dispatchBootAccount()
-  }
-
-  // this will connect to whatever is set in MM
-  async function connect () {
-    console.log("connecting to chain set in MM")
-    await dispatchBootAccount()
-  }
 
   // if (isMobile) {
   //   return (

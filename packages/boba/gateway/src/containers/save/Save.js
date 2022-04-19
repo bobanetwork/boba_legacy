@@ -22,8 +22,6 @@ import { isEqual } from 'lodash'
 
 import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 
-import AlertIcon from 'components/icons/AlertIcon'
-
 import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
@@ -244,13 +242,13 @@ class Save extends React.Component {
 
         <PageTitle title={'Stake'} />
 
-        <Connect 
+        <Connect
           userPrompt={'Please connect to Boba to stake'}
           accountEnabled={accountEnabled}
           connectToBoba={true}
           layer={netLayer}
         />
-        
+
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>
