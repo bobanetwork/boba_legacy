@@ -898,20 +898,34 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   private async _queryTokenPrice(tokenPair): Promise<void> {
     if (tokenPair === 'ETH/USD') {
-      const lastestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
+      const latestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
       const decimals = await this.state.BobaStraw_ETHUSD.decimals()
-      const preETHUSDPrice = lastestAnswer.div(
-        BigNumber.from(10).pow(decimals - 2)
-      )
-      this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
+      // Keep two decimal places
+      if (decimals >= 2) {
+        const preETHUSDPrice = latestAnswer.div(
+          BigNumber.from(10).pow(decimals - 2)
+        )
+        this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
+      } else {
+        this.state.ETHUSDPrice = latestAnswer
+          .div(BigNumber.from(10).pow(decimals))
+          .toNumber()
+      }
     }
     if (tokenPair === 'BOBA/USD') {
-      const lastestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
+      const latestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
       const decimals = await this.state.BobaStraw_BOBAUSD.decimals()
-      const preBOBAUSDPrice = lastestAnswer.div(
-        BigNumber.from(10).pow(decimals - 2)
-      )
-      this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
+      // Keep two decimal places
+      if (decimals >= 2) {
+        const preBOBAUSDPrice = latestAnswer.div(
+          BigNumber.from(10).pow(decimals - 2)
+        )
+        this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
+      } else {
+        this.state.BOBAUSDPrice = latestAnswer
+          .div(BigNumber.from(10).pow(decimals))
+          .toNumber()
+      }
     }
   }
 }
