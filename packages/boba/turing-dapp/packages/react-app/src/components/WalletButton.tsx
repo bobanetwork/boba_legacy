@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {shortenAddress, useEthers, useLookupAddress} from "@usedapp/core";
 import {Button} from "./index";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export function WalletButton() {
   const [rendered, setRendered] = useState("");
@@ -34,8 +36,8 @@ export function WalletButton() {
         }
       }}
     >
-      {rendered === "" && "Connect Wallet"}
-      {rendered !== "" && rendered}
+      {rendered === "" && <><FontAwesomeIcon bounce={true} icon={solid('plug')}/>&nbsp;Connect Wallet</>}
+      {rendered !== "" && <><FontAwesomeIcon icon={solid('wallet')}/>&nbsp;{rendered}</>}
     </Button>
   );
 }

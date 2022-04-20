@@ -54,6 +54,12 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
         indexed: false,
         internalType: "contract TuringHelper",
         name: "proxy",

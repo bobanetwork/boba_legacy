@@ -164,3 +164,10 @@ type UseETHAsFeeTokenEvent @entity {
   id: ID!
   address: Bytes
 }
+
+type TuringHelperDeployedEvent @entity {
+  id: ID!
+  owner: Bytes
+  proxy: Bytes
+  depositedBoba: String
+}

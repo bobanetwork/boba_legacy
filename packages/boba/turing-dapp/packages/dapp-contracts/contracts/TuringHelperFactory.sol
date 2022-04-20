@@ -15,7 +15,7 @@ contract TuringHelperFactory is Ownable {
     ITuringCredit public turingCredit;
     IERC20 public bobaToken;
 
-    event TuringHelperDeployed(TuringHelper proxy, uint256 depositedBoba);
+    event TuringHelperDeployed(address indexed owner, TuringHelper proxy, uint256 depositedBoba);
 
     modifier takePayment(uint256 bobaToDeposit) {
         require(bobaToken.balanceOf(_msgSender()) >= bobaToDeposit, "Not enough tokens");
@@ -60,7 +60,7 @@ contract TuringHelperFactory is Ownable {
         // TODO: Transfer ownership, maybe solve with .delegatecall to automatically have original msgSender as owner
         implementation.transferOwnership(_msgSender());
 
-        emit TuringHelperDeployed(implementation, amountBoba);
+        emit TuringHelperDeployed(_msgSender(), implementation, amountBoba);
 
         return implementation;
     }

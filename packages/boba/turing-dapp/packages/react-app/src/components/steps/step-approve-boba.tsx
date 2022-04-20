@@ -1,6 +1,6 @@
 import { Button, SmallerParagraph, StyledInputAdornment } from "../index";
 import React, { Dispatch, SetStateAction } from "react";
-import { shortenTransactionHash, useContractFunction, useEthers, useTokenBalance } from "@usedapp/core";
+import { useContractFunction, useEthers, useTokenBalance } from "@usedapp/core";
 import { parseEther } from "@ethersproject/units";
 import { L2GovernanceERC20 } from "@turing/contracts/gen/types";
 import { Contract } from "@ethersproject/contracts";

@@ -106,7 +106,7 @@ export interface TuringHelperFactoryInterface extends utils.Interface {
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
-    "TuringHelperDeployed(address,uint256)": EventFragment;
+    "TuringHelperDeployed(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
@@ -126,11 +126,12 @@ export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface TuringHelperDeployedEventObject {
+  owner: string;
   proxy: string;
   depositedBoba: BigNumber;
 }
 export type TuringHelperDeployedEvent = TypedEvent<
-  [string, BigNumber],
+  [string, string, BigNumber],
   TuringHelperDeployedEventObject
 >;
 
@@ -259,11 +260,13 @@ export interface TuringHelperFactory extends BaseContract {
       newOwner?: string | null
     ): OwnershipTransferredEventFilter;
 
-    "TuringHelperDeployed(address,uint256)"(
+    "TuringHelperDeployed(address,address,uint256)"(
+      owner?: string | null,
       proxy?: null,
       depositedBoba?: null
     ): TuringHelperDeployedEventFilter;
     TuringHelperDeployed(
+      owner?: string | null,
       proxy?: null,
       depositedBoba?: null
     ): TuringHelperDeployedEventFilter;

@@ -52,7 +52,7 @@ my-eth-app
         ├── src
         │   └── mappings
         │       ├── tokens.ts
-        │       └── transfers.ts
+        │       └── turing-helper-factory.ts
         └── subgraph.yaml
 ```
 
