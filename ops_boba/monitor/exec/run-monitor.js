@@ -3,6 +3,7 @@
 const configs = require('../services/utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const { logger } = require('../services/utilities/logger')
+require('dotenv').config()
 
 const loop = async (func) => {
   while (true) {
@@ -80,26 +81,40 @@ const main = async () => {
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
-  if (configs.enableTxResponseTime) {
-    loop(() => loopLogTx()).catch()
+  // enable the periodic transaction and check on Mainnet
+  if (process.env.STAGE === 'mainnet') {
+    if (configs.enableTxResponseTime) {
+      loop(() => loopLogTx()).catch()
+    }
+
+    const L1_MONITOR_INTERVAL = process.env.L1_MONITOR_INTERVAL || 5 * 60
+    const L2_MONITOR_INTERVAL = process.env.L2_MONITOR_INTERVAL || 5 * 60
+
+    const {
+      setupProvider,
+      validateMonitoring,
+    } = require('../services/monitoring')
+
+    if (validateMonitoring()) {
+      logger.info('Start addresses monitoring service!')
+      setupProvider(
+        configs.OMGXNetwork.L1,
+        configs.l1Url,
+        L1_MONITOR_INTERVAL
+      ).catch()
+      setupProvider(
+        configs.OMGXNetwork.L2,
+        configs.l2Url,
+        L2_MONITOR_INTERVAL
+      ).catch()
+    } else {
+      logger.error(
+        'Addresses Monitoring: Env variables for monitoring is missing!'
+      )
+    }
+
+    loop(() => loopTransferTx()).catch()
   }
-
-  const {
-    setupProvider,
-    validateMonitoring,
-  } = require('../services/monitoring')
-
-  if (validateMonitoring()) {
-    logger.info('Start addresses monitoring service!')
-    setupProvider(configs.OMGXNetwork.L1, configs.l1Url, 5).catch()
-    setupProvider(configs.OMGXNetwork.L2, configs.l2Url, 15).catch()
-  } else {
-    logger.error(
-      'Addresses Monitoring: Env variables for monitoring is missing!'
-    )
-  }
-
-  loop(() => loopTransferTx()).catch()
 }
 
 ;(async () => {
