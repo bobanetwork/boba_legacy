@@ -1,11 +1,11 @@
 import {
   UseBobaAsFeeToken,
-  UseBobaAsFeeTokenMetaTransaction,
+  SwapBOBAForETHMetaTransaction,
   UseETHAsFeeToken,
 } from '../generated/Boba_GasPriceOracle/Boba_GasPriceOracle'
 import {
   UseBobaAsFeeTokenEvent,
-  UseBobaAsFeeTokenMetaTransactionEvent,
+  SwapBOBAForETHMetaTransactionEvent,
   UseETHAsFeeTokenEvent,
 } from '../generated/schema'
 
@@ -17,12 +17,12 @@ export function handleUseBobaAsFeeToken(event: UseBobaAsFeeToken): void {
   useBobaAsFeeTokenEvent.save()
 }
 
-export function handleUseBobaAsFeeTokenMetaTransaction(event: UseBobaAsFeeTokenMetaTransaction): void {
+export function handleSwapBOBAForETHMetaTransaction(event: SwapBOBAForETHMetaTransaction): void {
   let id = event.transaction.hash.toHex()
-  let useBobaAsFeeTokenMetaTransactionEvent = new UseBobaAsFeeTokenMetaTransactionEvent(id)
-  useBobaAsFeeTokenMetaTransactionEvent.id = id
-  useBobaAsFeeTokenMetaTransactionEvent.address = event.params.param0
-  useBobaAsFeeTokenMetaTransactionEvent.save()
+  let swapBOBAForETHMetaTransactionEvent = new SwapBOBAForETHMetaTransactionEvent(id)
+  swapBOBAForETHMetaTransactionEvent.id = id
+  swapBOBAForETHMetaTransactionEvent.address = event.params.param0
+  swapBOBAForETHMetaTransactionEvent.save()
 }
 
 export function handleUseETHAsFeeToken(event: UseETHAsFeeToken): void {

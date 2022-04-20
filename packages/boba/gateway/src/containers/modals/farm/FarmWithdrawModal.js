@@ -170,20 +170,14 @@ class FarmWithdrawModal extends React.Component {
     if (withdrawLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was withdrawn."))
       this.props.dispatch(getFarmInfo())
-      this.setState({
-        loading: false,
-        value: '',
-        value_Wei_String: ''
-      })
-      this.props.dispatch(closeModal("farmWithdrawModal"))
-    } else {
-      this.setState({
-        loading: false,
-        value: '',
-        value_Wei_String: ''
-      })
-      this.props.dispatch(closeModal("farmWithdrawModal"))
     }
+    this.setState({
+      loading: false,
+      value: '',
+      value_Wei_String: ''
+    })
+    this.props.dispatch(closeModal("farmWithdrawModal"))
+
   }
 
   render() {

@@ -1,9 +1,11 @@
 import React from 'react'
 import * as S from './PageHeader.styles'
 import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
+import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
+import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
 import { useState } from 'react'
 import { Box, Container, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import NavIcon from 'components/icons/NavIcon'
@@ -13,7 +15,7 @@ import networkService from 'services/networkService';
 import { makeStyles } from '@mui/styles'
 import Copy from 'components/copy/Copy'
 import { useSelector } from 'react-redux'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectMonster } from 'selectors/setupSelector'
 
 const useStyles = makeStyles({
   root: {
@@ -30,12 +32,16 @@ const PageHeader = ({ maintenance }) => {
   const [ walletOpen, setWalletOpen ] = useState();
   const theme = useTheme()
   const accountEnabled = useSelector(selectAccountEnabled())
+  const monsterNumber = useSelector(selectMonster())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  let Logo = BobaLogo
+  if(monsterNumber>0) Logo = BobaLogoM
 
   if (maintenance) {
     return (
       <S.HeaderWrapper>
-        <BobaLogo style={{ maxWidth: '140px', paddingTop: '20px' }} />
+        <Logo style={{ maxWidth: '140px', paddingTop: '20px' }} />
         <ThemeSwitcher />
       </S.HeaderWrapper>
     )
@@ -47,7 +53,7 @@ const PageHeader = ({ maintenance }) => {
         isMobile ? (
           <Container>
             <S.HeaderWrapper>
-              <BobaLogo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
+              <Logo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
               <S.HeaderActionButton>
                 <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
@@ -85,13 +91,15 @@ const PageHeader = ({ maintenance }) => {
               </Drawer>
             </S.HeaderWrapper>
           </Container>
-        ) : (<S.HeaderWrapper>
-          <BobaLogo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px'}} />
-          <MenuItems setOpen={setOpen} />
-          <LayerSwitcher />
-          {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
-          <ThemeSwitcher />
-        </S.HeaderWrapper>)
+        )
+          : (<S.HeaderWrapper>
+            <Logo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px' }} />
+            <MenuItems setOpen={setOpen} />
+            <FeeSwitcher />
+            <LayerSwitcher />
+            {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
+            <ThemeSwitcher />
+          </S.HeaderWrapper>)
       }
     </>
   )

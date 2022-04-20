@@ -7,12 +7,11 @@ export const Tabs = styled(Box)(({theme})=>({
    justifyContent: 'flex-start',
    flex: 1,
    marginBottom: '20px',
-   borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+   borderBottom: theme.palette.primary.borderBottom,
    [theme.breakpoints.down('md')]:{
       width: '100%'
    }
 }));
-
 
 export const TabItem = styled(Box)(({ theme }) => ({
    opacity: 0.7,
@@ -23,9 +22,9 @@ export const TabItem = styled(Box)(({ theme }) => ({
       opacity: 1,
    },
    '&.active': {
-      color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main}`,
+      color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main }`,
       opacity: 1,
-      borderBottom: `2px solid #BAE21A`,
+      borderBottom: theme.palette.primary.tabBorderBottom,
       marginBottom: '-2px',
       zIndex: 1,
    },

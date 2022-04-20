@@ -13,13 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { transfer } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectLookupPrice } from 'selectors/lookupSelector'
+
+import { BigNumber, utils } from 'ethers'
+
+import {
+   selectBobaFeeChoice,
+   selectBobaPriceRatio,
+} from 'selectors/setupSelector'
 
 import BN from 'bignumber.js'
 
@@ -30,7 +37,8 @@ import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
-import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
+import { amountToUsd, toWei_String } from 'util/amountConvert'
+
 import networkService from 'services/networkService'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
@@ -40,34 +48,74 @@ function TransferModal ({ open, token, minHeight }) {
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
-  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
+  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  // support for Use Max - amount to transfer in wei_string
+  const [ max_Wei_String, setMax_Wei_String ] = useState('0')      // support for Use Max - the max possible wei string
+  const [ max_Float, setMax_Float ] = useState('0')                // support for Use Max - a number like 0.09 ETH
+  const [ fee, setFee ] = useState('0')
 
   const [ recipient, setRecipient ] = useState('')
-
   const [ validValue, setValidValue ] = useState(false)
 
   const loading = useSelector(selectLoading([ 'TRANSFER/CREATE' ]))
-  const wAddress = networkService.account ? networkService.account : ''
 
   const lookupPrice = useSelector(selectLookupPrice)
+
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
+  const feePriceRatio = useSelector(selectBobaPriceRatio())
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  let maxValue = '0'
+  useEffect(() => {
 
-  if(token) {
-    maxValue = logAmount(token.balance, token.decimals)
-  }
+    async function estimateCost() {
+      
+      let cost_BN = await networkService.transferEstimate(recipient, token.balance.toString(), token.address)
+      
+      //sigh - convert from BN.js to ethers.BigNumber
+      let max_BN = BigNumber.from(token.balance.toString()) 
+
+      // both ETH and BOBA have 18 decimals so this is safe
+      if(token.symbol === 'ETH') {
+        // we are transferring ETH and paying in either token
+        // since MetaMask does not know about BOBA, we need to subtract the ETH fee 
+        // regardless of how we are paying, otherwise will get an error in MetaMask 
+        max_BN = max_BN.sub(cost_BN)
+      } 
+      else if (token.symbol === 'BOBA' && feeUseBoba) {
+        // we are transferring BOBA and paying in BOBA
+        // so need to subtract the BOBA fee
+        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(feePriceRatio)))
+      }
+      
+      // if the transferrable amount is less than the gas, 
+      // set the transferrable amount to zero
+      if(max_BN.lt(BigNumber.from('0'))) {
+        max_BN = BigNumber.from('0')
+      }
+
+      setMax_Wei_String(max_BN.toString())
+      setMax_Float(utils.formatUnits(max_BN, token.decimals))
+
+      // display the correct Fee amount to the user
+      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio)) 
+      setFee(utils.formatUnits(cost_BN, token.decimals))
+    }
+    if (recipient !== '') estimateCost()
+  }, [token, feeUseBoba, recipient, feePriceRatio])
 
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
-    const tooBig   = new BN(value).gt(new BN(maxValue))
+    const tooBig   = new BN(value).gt(new BN(max_Float))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } else {
+    } 
+    else if (!recipient) {
+      setValidValue(false)
+    } 
+    else {
       setValidValue(true)
     }
 
@@ -77,18 +125,11 @@ function TransferModal ({ open, token, minHeight }) {
   async function submit () {
     if ( token.address && recipient )
     {
-      try {
-        console.log("Amount to transfer:", value_Wei_String)
-        const transferResponseGood = await dispatch(
-          transfer(recipient, value_Wei_String, token.address)
-        )
-        if (transferResponseGood) {
-          dispatch(openAlert('Transaction submitted'))
-        }
-        handleClose()
-      } catch (err) {
-        //guess not really?
-      }
+      const res = await dispatch(
+        transfer(recipient, value_Wei_String, token.address)
+      )
+      if (res) dispatch(openAlert('Transfer submitted'))
+      handleClose()
     }
   }
 
@@ -96,6 +137,9 @@ function TransferModal ({ open, token, minHeight }) {
     setValue('')
     setValue_Wei_String('0')
     setRecipient('')
+    setMax_Wei_String('0')
+    setMax_Float('0')
+    setFee('0')
     dispatch(closeModal('transferModal'))
   }
 
@@ -112,28 +156,23 @@ function TransferModal ({ open, token, minHeight }) {
   return (
     <Modal open={open} onClose={handleClose} maxWidth="md" minHeight="500px">
       <Box>
+      
         <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
           Transfer to another Boba wallet
         </Typography>
 
-        <Typography variant="body1" sx={{mb: 1}}>
-          From L2 Address: {wAddress}
-        </Typography>
-
-        <Typography variant="body1" sx={{mb: 1}}>
-          To L2 Address:
-        </Typography>
-
-        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
           <Input
             placeholder='Recipient address on Boba (0x...)'
             value={recipient}
             onChange={i => setRecipient(i.target.value)}
             fullWidth
             paste
-            sx={{fontSize: '50px', marginBottom: '20px'}}
+            sx={{fontSize: '50px'}}
+            newStyle
           />
 
+        {!!recipient &&
           <Input
             label="Amount to Transfer"
             placeholder=""
@@ -143,17 +182,30 @@ function TransferModal ({ open, token, minHeight }) {
               setAmount(i.target.value)
               setValue_Wei_String(toWei_String(i.target.value, token.decimals))
             }}
-            onUseMax={(i)=>{       // they want to use the maximum
-              setAmount(maxValue)  // so the input value updates for the user
-              setValue_Wei_String(token.balance.toString())
+            onUseMax={(i)=>{        // they want to use the maximum
+              setAmount(max_Float)  // so the input value updates for the user
+              setValue_Wei_String(max_Wei_String)
             }}
             allowUseAll={true}
             unit={token.symbol}
-            maxValue={maxValue}
+            maxValue={max_Float}
             variant="standard"
             newStyle
           />
+        }
         </Box>
+
+        {fee && !feeUseBoba && (
+          <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
+            Fee: {fee} ETH
+          </Typography>
+        )}
+
+        {fee && feeUseBoba && (
+          <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
+            Fee: {fee} BOBA
+          </Typography>
+        )}
 
         {convertToUSD && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
@@ -179,7 +231,7 @@ function TransferModal ({ open, token, minHeight }) {
           </Button>
         ) : null}
           <Button
-            onClick={() => {submit({useLedgerSign: false})}}
+            onClick={()=>{submit()}}
             color='primary'
             variant="contained"
             loading={loading}

@@ -17,7 +17,6 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
-
 import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
@@ -51,17 +50,13 @@ function DelegateDaoXModal({ open }) {
 
     const submit = async () => {
         let res = await dispatch(delegateVotesX({ recipient }));
-        if (res) {
-            dispatch(openAlert(`Votes delegated successfully!`))
-        } 
+        if (res) dispatch(openAlert(`Votes delegated successfully!`))
         handleClose()
     }
 
     const submitMe = async () => {
         let res = await dispatch(delegateVotesX({ recipient: wAddress }))
-        if (res) {
-            dispatch(openAlert(`Vote self-delegation successfull!`))
-        }
+        if (res) dispatch(openAlert(`Vote self-delegation successfull!`))
         handleClose()
     }
 
@@ -75,7 +70,7 @@ function DelegateDaoXModal({ open }) {
                 <Box sx={{mb: 2, display: 'flex', alignItems: 'center'}}>
                     <BobaGlassIcon />
                     <Typography variant="body1" >
-                        Delegate my BOBA votes 
+                        Delegate my BOBA votes
                     </Typography>
                 </Box>
                 <S.DividerLine />

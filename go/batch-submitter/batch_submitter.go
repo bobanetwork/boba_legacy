@@ -5,15 +5,21 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/drivers/proposer"
 	"github.com/ethereum-optimism/optimism/go/batch-submitter/drivers/sequencer"
 	bsscore "github.com/ethereum-optimism/optimism/go/bss-core"
 	"github.com/ethereum-optimism/optimism/go/bss-core/dial"
 	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
 	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/getsentry/sentry-go"
 	"github.com/urfave/cli"
+	ethawskmssigner "github.com/welthee/go-ethereum-aws-kms-tx-signer"
 )
 
 // Main is the entrypoint into the batch submitter service. This method returns
@@ -68,20 +74,14 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 
 		log.Root().SetHandler(log.LvlFilterHandler(logLevel, logHandler))
 
-		// Parse sequencer private key and CTC contract address.
-		sequencerPrivKey, ctcAddress, err := bsscore.ParseWalletPrivKeyAndContractAddr(
-			"Sequencer", cfg.Mnemonic, cfg.SequencerHDPath,
-			cfg.SequencerPrivateKey, cfg.CTCAddress,
-		)
+		// Parse  CTC contract address.
+		ctcAddress, err := bsscore.ParseContractAddr("Sequencer", cfg.CTCAddress)
 		if err != nil {
 			return err
 		}
 
-		// Parse proposer private key and SCC contract address.
-		proposerPrivKey, sccAddress, err := bsscore.ParseWalletPrivKeyAndContractAddr(
-			"Proposer", cfg.Mnemonic, cfg.ProposerHDPath,
-			cfg.ProposerPrivateKey, cfg.SCCAddress,
-		)
+		// Parse and SCC contract address.
+		sccAddress, err := bsscore.ParseContractAddr("Proposer", cfg.SCCAddress)
 		if err != nil {
 			return err
 		}
@@ -112,9 +112,20 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			ReceiptQueryInterval: time.Second,
 			NumConfirmations:     cfg.NumConfirmations,
 		}
-
+		sess, _ := session.NewSession(&aws.Config{
+			Credentials: credentials.NewEnvCredentials(),
+			Region:      aws.String(cfg.KmsRegion),
+			Endpoint:    aws.String(cfg.KmsEndpoint)},
+		)
+		svc := kms.New(sess)
 		var services []*bsscore.Service
 		if cfg.RunTxBatchSubmitter {
+			pubkey, err := ethawskmssigner.GetPubKey(svc, cfg.SequencerKeyId)
+			if err != nil {
+				return err
+			}
+			keyAddr := crypto.PubkeyToAddress(*pubkey)
+			log.Info("Batch submitter sequencer account address", "keyAddr", keyAddr)
 			batchTxDriver, err := sequencer.NewDriver(sequencer.Config{
 				Name:        "Sequencer",
 				L1Client:    l1Client,
@@ -123,7 +134,9 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				MaxTxSize:   cfg.MaxL1TxSize,
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
-				PrivKey:     sequencerPrivKey,
+				KeyId:       cfg.SequencerKeyId,
+				KeyAddress:  keyAddr,
+				KMS:         *svc,
 			})
 			if err != nil {
 				return err
@@ -143,6 +156,12 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 		}
 
 		if cfg.RunStateBatchSubmitter {
+			pubkey, err := ethawskmssigner.GetPubKey(svc, cfg.ProposerKeyId)
+			if err != nil {
+				return err
+			}
+			keyAddr := crypto.PubkeyToAddress(*pubkey)
+			log.Info("Batch submitter proposer account address", "keyAddr", keyAddr)
 			batchStateDriver, err := proposer.NewDriver(proposer.Config{
 				Name:        "Proposer",
 				L1Client:    l1Client,
@@ -152,7 +171,9 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				SCCAddr:     sccAddress,
 				CTCAddr:     ctcAddress,
 				ChainID:     chainID,
-				PrivKey:     proposerPrivKey,
+				KeyId:       cfg.ProposerKeyId,
+				KeyAddress:  keyAddr,
+				KMS:         *svc,
 			})
 			if err != nil {
 				return err

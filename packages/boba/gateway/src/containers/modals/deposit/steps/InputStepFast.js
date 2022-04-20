@@ -25,6 +25,7 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -51,7 +52,6 @@ import {
  } from 'actions/balanceAction'
 
 import {
-  selectL2FeeRate,
   selectL2FeeRateN,
   selectFastDepositCost,
   selectL2LPBalanceString,
@@ -60,7 +60,7 @@ import {
   selectL2LPLiquidity
 } from 'selectors/balanceSelector'
 
-function InputStepFast({ handleClose, token }) {
+function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -72,7 +72,7 @@ function InputStepFast({ handleClose, token }) {
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
   const LPLiquidity = useSelector(selectL2LPLiquidity)
-  const feeRate = useSelector(selectL2FeeRate)
+
   const feeRateN = useSelector(selectL2FeeRateN)
 
   const cost = useSelector(selectFastDepositCost)
@@ -241,8 +241,6 @@ function InputStepFast({ handleClose, token }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%. The ${token.symbol} fee is ${feeRateN}%.`
-
   let buttonLabel_1 = 'Cancel'
   if( depositLoading || approvalLoading ) buttonLabel_1 = 'CLOSE WINDOW'
 
@@ -261,59 +259,61 @@ function InputStepFast({ handleClose, token }) {
   let warning = false
 
   if(cost && Number(cost) > 0) {
+
     if (token.symbol !== 'ETH') {
       if(Number(cost) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
+        ETHstring = `WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover the estimated gas.
         <br/>THIS TRANSACTION WILL FAIL.`
       }
       else if(Number(cost) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
+        ETHstring = `CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated cost.
         <br/>THIS TRANSACTION MIGHT FAIL. It would be safer to have slightly more ETH in your L1 wallet to cover gas.`
-      }
-      else {
-        ETHstring = `Estimated gas of bridging ${token.symbol} (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
 
     if (token.symbol === 'ETH') {
       if((Number(value) + Number(cost)) > Number(feeBalance)) {
         warning = true
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
+        ETHstring = `WARNING: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.
         <br/>THIS TRANSACTION WILL FAIL.`
       }
       else if ((Number(value) + Number(cost)) > Number(feeBalance) * 0.96) {
         warning = true
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH
-        <br/>CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
+        ETHstring = `CAUTION: your L1 ETH balance of ${Number(feeBalance).toFixed(4)} is very close to the estimated total.
         <br/>THIS TRANSACTION MIGHT FAIL.`
-      } else {
-        ETHstring = `Transaction total (amount + gas): ${(Number(value) + Number(cost)).toFixed(4)} ETH
-        <br/>Estimated gas (approval + bridge): ${Number(cost).toFixed(4)} ETH`
       }
     }
+  }
+
+  if( Number(logAmount(token.balance, token.decimals)) === 0) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          Sorry, nothing to deposit - no {token.symbol} in this wallet
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
   }
 
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
-          Fast Bridge to L2
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          {label}
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast bridge takes less than 20 minutes. However, if Ethereum is congested, it can take as long as 3 hours.
-        </Typography>
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
+            Fast Bridge to L2
+          </Typography>
+        }
 
         <Input
           label={`Amount to bridge`}
@@ -333,7 +333,19 @@ function InputStepFast({ handleClose, token }) {
           maxValue={maxValue}
           variant="standard"
           newStyle
+          isBridge={isBridge}
+          openTokenPicker={openTokenPicker}
         />
+
+        <BridgeFee
+          lpFee={`${feeRateN}%`}
+          estReceive={`${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})` : ''}`}
+          time="20 mins - 3 hours"
+          estFee={`${Number(cost).toFixed(4)} ETH`}
+        />
+
+
+
 
         {(Number(LPRatio) < 0.10 && Number(value) > Number(balanceSubPending) * 0.90) && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
@@ -356,23 +368,8 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        <br />
-
-        {/* Only ERC20 tokens */}
-        {validValue && token &&(
-          <Typography variant="body2" sx={{mt: 2}}>
-            {`You will receive approximately ${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ?  `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''} on L2.`}
-          </Typography>
-        )}
-
         {warning && (
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
-            {parse(ETHstring)}
-          </Typography>
-        )}
-
-        {!warning && (
-          <Typography variant="body2" sx={{mt: 2}}>
             {parse(ETHstring)}
           </Typography>
         )}
@@ -384,7 +381,7 @@ function InputStepFast({ handleClose, token }) {
           </Typography>
         )}
 
-        {(depositLoading || approvalLoading) && (
+        {!isBridge  && (depositLoading || approvalLoading) && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will automatically close when your transaction has been signed and submitted.
           </Typography>
@@ -394,8 +391,10 @@ function InputStepFast({ handleClose, token }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
-          size="large"
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
         >
           {buttonLabel_1}
         </Button>

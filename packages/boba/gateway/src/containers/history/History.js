@@ -20,10 +20,9 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import { Box, useMediaQuery, useTheme } from '@mui/material'
+import { useMediaQuery, useTheme } from '@mui/material'
 
 import moment from 'moment'
-
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
@@ -32,8 +31,6 @@ import { selectActiveHistoryTab } from 'selectors/uiSelector'
 import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
 import { selectLayer } from 'selectors/setupSelector'
-
-import Tabs from 'components/tabs/Tabs'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -45,8 +42,8 @@ import * as styles from './TX_All.module.scss'
 
 import useInterval from 'util/useInterval'
 import PageTitle from 'components/pageTitle/PageTitle'
-import WalletPicker from 'components/walletpicker/WalletPicker'
-import AlertIcon from 'components/icons/AlertIcon'
+import Connect from 'containers/connect/Connect'
+import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
 
@@ -87,24 +84,12 @@ function History() {
 
     <S.HistoryPageContainer>
 
-      <Box sx={{ my: 1 }}>
-        <PageTitle title="History" />
-      </Box>
-
-      {!layer &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              Connect to MetaMask to see your history
-            </S.AlertText>
-          </S.AlertInfo>
-          <WalletPicker />
-        </S.LayerAlert>
-      }
+      <PageTitle title={'History'} />
+      
+      <Connect 
+        userPrompt={'Connect to MetaMask to see your history'}
+        accountEnabled={layer}
+      />
 
       {layer && <>
       <S.Header>

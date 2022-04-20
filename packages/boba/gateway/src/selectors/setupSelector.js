@@ -40,8 +40,50 @@ export function selectLayer () {
   }
 }
 
+export function selectConnectETH () {
+  return function (state) {
+    return state.setup['connectETH']
+  }
+}
+
+export function selectConnectBOBA () {
+  return function (state) {
+    return state.setup['connectBOBA']
+  }
+}
+
+export function selectConnect () {
+  return function (state) {
+    return state.setup['connect']
+  }
+}
+
 export function selectJustSwitchedChain () {
   return function (state) {
     return state.setup['justSwitchedChain']
+  }
+}
+
+export function selectBobaFeeChoice () {
+  return function (state) {
+    return state.setup['bobaFeeChoice']
+  }
+}
+
+export function selectBobaPriceRatio () {
+  return function (state) {
+    return state.setup['bobaFeePriceRatio']
+  }
+}
+
+export function selectMonster () {
+  return function (state) {
+    return state.nft['monsterNumber']
+  }
+}
+
+export function selectMonsterInfo () {
+  return function (state) {
+    return state.nft['monsterInfo']
   }
 }

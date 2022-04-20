@@ -1,10 +1,11 @@
 import { Wallet, providers } from 'ethers'
-import { MessageRelayerService } from '../service'
 import { Bcfg } from '@eth-optimism/core-utils'
 import { Logger, LoggerOptions } from '@eth-optimism/common-ts'
 import * as Sentry from '@sentry/node'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
+
+import { MessageRelayerService } from '../service'
 
 dotenv.config()
 
@@ -39,16 +40,21 @@ const main = async () => {
 
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   const L1_NODE_WEB3_URL = config.str('l1-node-web3-url', env.L1_NODE_WEB3_URL)
-  const ADDRESS_MANAGER_ADDRESS = config.str(
-    'address-manager-address',
-    env.ADDRESS_MANAGER_ADDRESS
-  )
-  const RELAYER_PRIVATE_KEY = config.str(
-    'relayer-private-key',
-    env.RELAYER_PRIVATE_KEY
-  )
+  let RELAYER_PRIVATE_KEY = config.str('l1-wallet-key', env.RELAYER_PRIVATE_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
+
+  // run as message relayer fast
+  const FAST_RELAYER = config.bool('fast-relayer', env.FAST_RELAYER === 'true')
+  // check if FAST_RELAYER_PRIVATE_KEY is passed
+  const FAST_RELAYER_PRIVATE_KEY = config.str(
+    'l1-wallet-key-fast',
+    env.FAST_RELAYER_PRIVATE_KEY
+  )
+  // if this exists and is fast-relayer mode, use this account
+  if (FAST_RELAYER_PRIVATE_KEY && FAST_RELAYER) {
+    RELAYER_PRIVATE_KEY = FAST_RELAYER_PRIVATE_KEY
+  }
   //batch system
   const MIN_BATCH_SIZE = config.uint(
     'min-batch-size',
@@ -74,10 +80,6 @@ const main = async () => {
     'get-logs-interval',
     parseInt(env.GET_LOGS_INTERVAL, 10) || 2000
   )
-  const L2_BLOCK_OFFSET = config.uint(
-    'l2-start-offset',
-    parseInt(env.L2_BLOCK_OFFSET, 10) || 1
-  )
   const L1_START_OFFSET = config.uint(
     'l1-start-offset',
     parseInt(env.L1_BLOCK_OFFSET, 10) || 1
@@ -100,25 +102,19 @@ const main = async () => {
     'gas-retry-increment',
     parseInt(env.GAS_RETRY_INCREMENT, 10) || 5
   )
-  const RESUBMISSION_TIMEOUT = config.uint(
-    'resubmission-timeout',
-    parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
-  )
   const NUM_CONFIRMATIONS = config.uint(
     'num-confirmations',
     parseInt(env.NUM_CONFIRMATIONS, 10) || 1
-  )
-  const NUM_EVENT_CONFIRMATIONS = config.uint(
-    'num-event-confirmations',
-    parseInt(env.NUM_EVENT_CONFIRMATIONS, 10) || 0
   )
   const MULTI_RELAY_LIMIT = config.uint(
     'multi-relay-limit',
     parseInt(env.MULTI_RELAY_LIMIT, 10) || 10
   )
-  if (!ADDRESS_MANAGER_ADDRESS) {
-    throw new Error('Must pass ADDRESS_MANAGER_ADDRESS')
-  }
+  const RESUBMISSION_TIMEOUT = config.uint(
+    'resubmission-timeout',
+    parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
+  )
+
   if (!L1_NODE_WEB3_URL) {
     throw new Error('Must pass L1_NODE_WEB3_URL')
   }
@@ -126,8 +122,14 @@ const main = async () => {
     throw new Error('Must pass L2_NODE_WEB3_URL')
   }
 
-  const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
-  const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
+  const l2Provider = new providers.StaticJsonRpcProvider({
+    url: L2_NODE_WEB3_URL,
+    headers: { 'User-Agent': 'message-relayer' },
+  })
+  const l1Provider = new providers.StaticJsonRpcProvider({
+    url: L1_NODE_WEB3_URL,
+    headers: { 'User-Agent': 'message-relayer' },
+  })
 
   let wallet: Wallet
   if (RELAYER_PRIVATE_KEY) {
@@ -140,9 +142,7 @@ const main = async () => {
   }
 
   const service = new MessageRelayerService({
-    l1RpcProvider: l1Provider,
     l2RpcProvider: l2Provider,
-    addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
     l1Wallet: wallet,
     relayGasLimit: RELAY_GAS_LIMIT,
     //batch system
@@ -151,7 +151,6 @@ const main = async () => {
     maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
-    l2BlockOffset: L2_BLOCK_OFFSET,
     l1StartOffset: L1_START_OFFSET,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
@@ -161,11 +160,12 @@ const main = async () => {
     maxGasPriceInGwei: MAX_GAS_PRICE_IN_GWEI,
     gasRetryIncrement: GAS_RETRY_INCREMENT,
     numConfirmations: NUM_CONFIRMATIONS,
-    numEventConfirmations: NUM_EVENT_CONFIRMATIONS,
     multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
+    isFastRelayer: FAST_RELAYER,
   })
 
   await service.start()
 }
+
 export default main

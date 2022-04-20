@@ -38,7 +38,8 @@ class listNFT extends React.Component {
       UUID,
       URL,
       meta,
-      tokenID
+      tokenID,
+      small
     } = this.props
 
     this.state = {
@@ -50,8 +51,10 @@ class listNFT extends React.Component {
       meta,
       tokenID,
       isFlipped: false,
+      small
     }
-    this.handleClick = this.handleClick.bind(this);
+
+    this.handleClick = this.handleClick.bind(this)
   }
 
   handleClick(e) {
@@ -120,19 +123,15 @@ class listNFT extends React.Component {
       URL,
       isFlipped,
       meta,
-      tokenID
+      tokenID,
+      small
     } = this.state
-
-    //console.log("meta:", meta)
-    //console.log("URL:", URL)
 
     let rarity = ''
     if(meta && meta.hasOwnProperty("attributes")) {
       if(meta.attributes.length === 5){
         if(meta.attributes[3].trait_type === 'Top') {
           rarity = 'Basic'
-          console.log(meta.attributes[3].value)
-          console.log(meta.attributes[4].value)
           if(meta.attributes[3].value === 'crown' && meta.attributes[4].value === 'wizzard') {
             rarity = 'Rarest (2/1000)' // 1000 * 5/256 * 20/256
           } else if (meta.attributes[3].value === 'crown') {
@@ -153,25 +152,32 @@ class listNFT extends React.Component {
       <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical" >
         <S.ListNFTItem 
           item 
+          small={small}
           onClick={this.handleClick}
         >
           <img
             src={imgSource}
             alt="NFT URI"
-            width={'100%'}
+            width={small ? '50%' : '100%'}
           />
           <div
             style={{padding: '10px 5px'}}
             className={styles.topContainer}>
-            <Typography variant="body1">
-              {meta.name}{' '}({symbol})
-            </Typography>
-            <Typography variant="body3">TokenID:{' '}{tokenID}</Typography>
+            {!small && <>
+              <Typography variant="body1">
+                {meta.name}{' '}({symbol})
+              </Typography>
+              <Typography variant="body3">
+                TokenID:{' '}{tokenID}
+              </Typography>
+              </>
+            }            
           </div>
         </S.ListNFTItem>
         <S.ListNFTItem 
           active={'true'} 
           item 
+          small={small}
           onClick={this.handleClick}
         >
           {meta.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta.collection}</Typography>}
@@ -192,26 +198,28 @@ class listNFT extends React.Component {
               </Typography>
             )
           })}
-          <Button
-            type="primary"
-            variant="contained"
-            style={{marginTop: '10px', marginBottom: '10px'}}
-            onClick={(e) => {this.handleTransfer()}}
-            size="small"
-          >
-            Transfer
-          </Button>
-          <Button
-            type="primary"
-            variant="contained"
-            onClick={(e) => {
-              e.stopPropagation();
-              this.handleRemove();
-            }}
-            size="small"
-          >
-            Remove
-          </Button>
+          {!small && <>
+            <Button
+              type="primary"
+              variant="contained"
+              style={{marginTop: '10px', marginBottom: '10px'}}
+              onClick={(e) => {this.handleTransfer()}}
+              size="small"
+            >
+              Transfer
+            </Button>
+            <Button
+              type="primary"
+              variant="contained"
+              onClick={(e) => {
+                e.stopPropagation();
+                this.handleRemove();
+              }}
+              size="small"
+            >
+              Remove
+            </Button>
+        </>}
         </S.ListNFTItem>
       </ReactCardFlip>
     )

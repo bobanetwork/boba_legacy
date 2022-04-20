@@ -1,29 +1,42 @@
-import { Box, Typography, useTheme } from '@mui/material'
-import { fetchLookUpPrice } from 'actions/networkAction'
-import { isEqual } from 'lodash'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
-import * as S from './Token.styles'
-import { tokenTableHeads } from './token.tableHeads'
-import TokenList from './tokenList/TokenList'
+import { selectTransactions } from 'selectors/transactionSelector'
 
-import lightLoader from 'images/boba2/loading_light.gif'
-import darkLoader from 'images/boba2/loading_dark.gif'
+import { fetchLookUpPrice } from 'actions/networkAction'
+import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+
+import * as S from './Token.styles'
+import * as G from '../../Global.styles'
+
+import { Box, Typography, CircularProgress } from '@mui/material'
+import { tokenTableHeads } from './token.tableHeads'
+
+import ListToken from 'components/listToken/listToken'
+import Button from 'components/button/Button'
+import Link from 'components/icons/LinkIcon'
+import Pulse from 'components/pulse/PulsingBadge'
+
+import { isEqual, orderBy } from 'lodash'
+
+import networkService from 'services/networkService'
 
 function TokenPage() {
 
   const dispatch = useDispatch()
-  const theme = useTheme()
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
   const networkLayer = useSelector(selectLayer())
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
+  const layer = useSelector(selectLayer())
+
+  const [ debug, setDebug ] = useState(false)
 
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
@@ -31,7 +44,53 @@ function TokenPage() {
 
   const disabled = depositLoading || exitLoading
 
-  const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
+  const unorderedTransactions = useSelector(selectTransactions, isEqual)
+  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+
+  const pendingL1 = orderedTransactions.filter((i) => {
+    if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+      i.crossDomainMessage &&
+      i.crossDomainMessage.crossDomainMessage === 1 &&
+      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+      i.action.status === "pending"
+    ) {
+      return true
+    }
+    return false
+  })
+
+  const pendingL2 = orderedTransactions.filter((i) => {
+    if (i.chain === 'L2' &&
+      i.crossDomainMessage &&
+      i.crossDomainMessage.crossDomainMessage === 1 &&
+      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+      i.action.status === "pending"
+    ) {
+      return true
+    }
+    return false
+  })
+
+  const pending = [
+    ...pendingL1,
+    ...pendingL2
+  ]
+
+  const inflight = pending.filter((i) => {
+    if (pending && i.hasOwnProperty('stateRoot') && i.stateRoot.stateRootHash === null) {
+      return true
+    }
+    return false
+  })
+
+  useEffect(() => {
+    if (!accountEnabled) return
+    const gasEstimateAccount = networkService.gasEstimateAccount
+    const wAddress = networkService.account
+    if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
+      setDebug(true)
+    }
+  }, [ accountEnabled ])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -44,8 +103,9 @@ function TokenPage() {
         return 'omg'
       } else if(i.symbolL1 === 'BOBA') {
         return 'boba-network'
-      }
-      else {
+      } else if(i.symbolL1 === 'OLO') {
+        return 'oolongswap'
+      } else {
         return i.symbolL1.toLowerCase()
       }
     })
@@ -58,11 +118,16 @@ function TokenPage() {
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
+  const GasEstimateApprove = () => {
+    let approval = networkService.estimateApprove()
+    console.log("GasEstimateApprove:",approval)
+  }
+
   if (!accountEnabled) {
 
     return (
-      <S.TokenPageContainer>
-        <S.TokenPageContentEmpty>
+      <G.Container>
+        <G.ContentEmpty>
           <Box
             sx={{
               display: 'flex',
@@ -77,15 +142,58 @@ function TokenPage() {
               No Data
             </Typography>
           </Box>
-        </S.TokenPageContentEmpty>
-      </S.TokenPageContainer>
+        </G.ContentEmpty>
+      </G.Container>
     )
 
   } else {
 
     return (
-      <S.TokenPageContainer>
-        <S.TokenPageContent>
+    <>
+      {layer === 'L2' &&
+        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Typography variant="body2">
+            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
+            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
+            <G.footerLink
+              target='_blank'
+              href={'https://oolongswap.com/'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Oolongswap <Link />
+            </G.footerLink>
+          </Typography>
+          {debug &&
+            <Button
+              onClick={()=>{GasEstimateApprove()}}
+              color='primary'
+              variant="contained"
+            >
+              GasEstimateApprove
+            </Button>
+          }
+        </Box>
+      }
+
+      {!!accountEnabled && inflight.length > 0 && 
+        <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
+          <Typography 
+            variant="body2"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => {
+              dispatch(setPageAction('History'))
+              dispatch(setActiveHistoryTab("Pending"))
+            }}
+          >
+            <span style={{opacity: '0.9'}}>Bridge in progress:</span>{' '}
+            <span style={{opacity: '0.6'}}>Click for detailed status</span>
+            <Pulse variant="success"/>
+          </Typography>
+        </Box>
+      }
+
+      <G.Container>
+        <G.Content>
           <S.TableHeading>
             {tokenTableHeads.map((item) => {
               return (
@@ -101,7 +209,7 @@ function TokenPage() {
           </S.TableHeading>
           {networkLayer === 'L2' ? !balanceLoading || !!childBalance.length ? childBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L2'}
@@ -109,12 +217,13 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : <S.LoaderContainer>
-            <img src={loaderImage} height="100%" alt="balance loading" />
+          }) : 
+          <S.LoaderContainer>
+            <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
           {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
             return (
-              <TokenList
+              <ListToken
                 key={i.currency}
                 token={i}
                 chain={'L1'}
@@ -122,12 +231,13 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : <S.LoaderContainer>
-            <img src={loaderImage} height="100%" alt="balance loading" />
+          }) : 
+          <S.LoaderContainer>
+            <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
-        </S.TokenPageContent>
-      </S.TokenPageContainer>
-    )
+        </G.Content>
+      </G.Container>
+    </>)
   }
 
 }

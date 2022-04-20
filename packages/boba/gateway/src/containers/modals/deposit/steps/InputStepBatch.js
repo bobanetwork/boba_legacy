@@ -46,13 +46,12 @@ import {
 
 import {
   selectlayer1Balance,
-  selectL2FeeRate,
   selectFastDepositBatchCost,
   selectL1FeeBalance,
   selectUserAndL2LPBalanceBatch,
 } from 'selectors/balanceSelector'
 
-function InputStepBatch({ handleClose }) {
+function InputStepBatch({ isBridge, handleClose }) {
 
   const dispatch = useDispatch()
 
@@ -61,7 +60,6 @@ function InputStepBatch({ handleClose }) {
 
   const userBalance = useSelector(selectlayer1Balance)
   const batchInfo = useSelector(selectUserAndL2LPBalanceBatch)
-  const feeRate = useSelector(selectL2FeeRate)
 
   const batchCost = useSelector(selectFastDepositBatchCost)
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
@@ -72,7 +70,6 @@ function InputStepBatch({ handleClose }) {
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
 
   // console.log("ETH available for paying fees:",Number(feeBalance))
-
   async function doDeposit() {
 
     console.log(`User input payload: `, payload)
@@ -135,8 +132,6 @@ function InputStepBatch({ handleClose }) {
       handleClose()
     }
   }, [ signatureStatus, depositLoading, handleClose ])
-
-  const label = `The fee varies between ${feeRate.feeMin} and ${feeRate.feeMax}%.`
 
   function getOptions() {
     const selectTokens = Object.keys(payload).reduce((acc, cur) => {
@@ -250,23 +245,11 @@ function InputStepBatch({ handleClose }) {
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
-          Batch Bridge to Boba
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          {label}
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-          In most cases, a fast bridge takes less than 10 minutes. 
-          However, if Ethereum is congested, it can take as long as 3 hours.
-          Click the + symbol to add additional tokens to bridge.
-        </Typography>
-
-        <Typography variant="body2" sx={{mb: 3}}>
-
-        </Typography>
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 1}}>
+            Batch Bridge to Boba
+          </Typography>
+        }
 
         {payload.map((_, index) => {
           let maxValue = 0, LPRatio = 1, LPBalance = Infinity
@@ -366,10 +349,15 @@ function InputStepBatch({ handleClose }) {
           )
         })}
 
+        <Typography variant="body2" sx={{mb: 3}}>
+        Click the + symbol to add additional tokens to bridge.
+        <br/>
+        Est. time: less than 10 minutes to 3 hours.  
+        </Typography>
+
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
           <div style={{flexDirection: 'column'}}>
             <Typography variant="body2" sx={{mb: 0}}>Est. total fee</Typography>
-            <Typography variant="body2" sx={{mb: 1}}>(Approval + Bridge)</Typography>
             {batchCost === 0 ? <></>: <Typography variant="body2" sx={{mb: 1}}>{Number(batchCost).toFixed(5)} ETH</Typography>}
           </div>
           <div style={{flexDirection: 'column'}}>
@@ -424,8 +412,10 @@ function InputStepBatch({ handleClose }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
-          size="large"
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
         >
           {buttonLabel_1}
         </Button>

@@ -16,6 +16,7 @@ limitations under the License. */
 
 import networkService from 'services/networkService'
 import { createAction } from './createAction'
+import store from 'store'
 
 export function setEnableAccount(enabled) {
   console.log("setEnableAccount:", enabled)
@@ -44,13 +45,44 @@ export function setLayer(layer) {
   }
 }
 
-export function setAccountNumber(account) {
+export function setWalletAddress(account) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/ACCOUNT_NUMBER/SET', payload: account })
+    return dispatch({ type: 'SETUP/WALLETADDRESS/SET', payload: account })
   }
 }
 
 export function switchChain(layer) {
   console.log("SA: Switching chain to", layer)
   return createAction('SETUP/SWITCH', () => networkService.switchChain(layer))
+}
+
+export function switchFee(targetFee) {
+  console.log("SA: Switching fee to", targetFee)
+  return createAction('SETUP/SWITCHFEE', () => networkService.switchFee(targetFee))
+}
+
+export function getETHMetaTransaction() {
+  return createAction('SETUP/GETETH', () => networkService.getETHMetaTransaction())
+}
+
+export async function addBobaFee ( bobaFee ) {
+  store.dispatch({ type: 'BOBAFEE/ADD/SUCCESS', payload: bobaFee })
+}
+
+export function setConnectETH( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT_ETH', payload: state })
+  }
+}
+
+export function setConnectBOBA( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT_BOBA', payload: state })
+  }
+}
+
+export function setConnect( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT', payload: state })
+  }
 }

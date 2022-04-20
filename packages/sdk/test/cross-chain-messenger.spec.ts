@@ -175,6 +175,8 @@ describe('CrossChainMessenger', () => {
                 StateCommitmentChain: '0x' + '14'.repeat(20),
                 CanonicalTransactionChain: '0x' + '15'.repeat(20),
                 BondManager: '0x' + '16'.repeat(20),
+                L1MultiMessageRelayer: '0x' + '17'.repeat(20),
+                L1MultiMessageRelayerFast: '0x' + '18'.repeat(20),
               },
               l2: {
                 L2CrossDomainMessenger: '0x' + '22'.repeat(20),
@@ -704,7 +706,7 @@ describe('CrossChainMessenger', () => {
         })
 
         describe('when the message has been relayed but the relay failed', () => {
-          it('should return a status of READY_FOR_RELAY', async () => {
+          it('should return a status of RELAYED_FAILED', async () => {
             const message = await sendAndGetDummyMessage(
               MessageDirection.L2_TO_L1
             )
@@ -720,7 +722,7 @@ describe('CrossChainMessenger', () => {
             ])
 
             expect(await messenger.getMessageStatus(message)).to.equal(
-              MessageStatus.READY_FOR_RELAY
+              MessageStatus.RELAYED_FAILED
             )
           })
         })

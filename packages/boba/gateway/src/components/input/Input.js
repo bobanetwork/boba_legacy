@@ -17,6 +17,7 @@ import React from 'react'
 import BN from 'bignumber.js'
 import Select from 'react-select'
 import * as S from './Input.styles'
+
 import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
@@ -35,7 +36,6 @@ function Input({
   unit,
   value,
   onChange,
-  onUseMax,
   onSelect,
   sx,
   paste,
@@ -45,14 +45,15 @@ function Input({
   variant,
   newStyle = false,
   allowUseAll = false,
-  allowExitAll = false,
-  onExitAll,
+  onUseMax,
   loading,
   maxLength,
   selectOptions,
   defaultSelect,
   selectValue,
-  style
+  style,
+  isBridge,
+  openTokenPicker
 }) {
 
   async function handlePaste() {
@@ -88,10 +89,6 @@ function Input({
     acc.push({ value: cur, label: tokenImageElement(cur) })
     return acc
   }, []): null
-
-  //since ETH is the fee token, harder to use all b/c need to take
-  //operation-specific fees into account
-  allowUseAll = (unit === 'ETH') ? false : allowUseAll
 
   return (
     <div style={{width: '100%'}}>
@@ -131,9 +128,17 @@ function Input({
                 value={selectValue ? { value: selectValue, label: tokenImageElement(selectValue) } : null}
               />:
               <S.UnitContent>
-                <div>
+                <Box
+                  sx={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                  if (isBridge) {
+                    openTokenPicker()
+                  }
+                }}>
                   {tokenImageElement(unit)}
-                </div>
+                </Box>
               </S.UnitContent>
             }
             <S.InputWrapper>
@@ -163,28 +168,17 @@ function Input({
         {unit && (
           <S.ActionsWrapper>
             <Typography variant="body2" component="p" sx={{opacity: 0.7, textAlign: "end", mb: 2}}>
-              Max Amount: {Number(maxValue).toFixed(3)}
+              Max Amount<br/>{Number(maxValue).toFixed(5)}
             </Typography>
             {allowUseAll && (
               <Box>
-                <Button onClick={handleClickMax} variant="small" >
-                  Use All
-                </Button>
-              </Box>
-            )}
-            {allowExitAll && (
-              <Box>
                 <Button
-                  onClick={onExitAll}
-                  variant="small"
+                  onClick={handleClickMax}
+                  color='primary'
+                  variant='contained'
                   size="small"
-                  sx={{margin: '10px 0px'}}
-                  loading={loading}
-                  triggerTime={new Date()}
-                  tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
-                  disabled={disabledExitAll}
                 >
-                  Bridge All
+                  Use All
                 </Button>
               </Box>
             )}
@@ -208,7 +202,7 @@ function Input({
       }
       {value !== '' && overMax ?
         <Typography variant="body2" sx={{mt: 1}}>
-          Value too large: the value must be smaller than {Number(maxValue).toFixed(3)}
+          Value too large: the value must be smaller than {Number(maxValue).toFixed(5)}
         </Typography>
         : null}
     </div>

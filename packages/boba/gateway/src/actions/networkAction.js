@@ -95,7 +95,6 @@ export function depositETHL2(value) {
 
 //DEPOSIT ERC20
 export function depositErc20(value, currency, currencyL2) {
-  console.log("Depositing ERC20")
   return createAction('DEPOSIT/CREATE', () =>
     networkService.depositErc20(value, currency, currencyL2)
   )
@@ -179,6 +178,12 @@ export function transfer(recipient, value, currency) {
   )
 }
 
+export function transferEstimate(value_Wei_String, currency) {
+  return createAction('TRANSFER_ESTIMATE/CREATE', () =>
+    networkService.transferEstimate(value_Wei_String, currency)
+  )
+}
+
 export function transferNFT(recipient, nft) {
   return createAction('TRANSFER_NFT/CREATE', () =>
     networkService.transferNFT(recipient, nft)
@@ -197,11 +202,11 @@ export function settle_v1() {
   )
 }
 
-export function monsterMint() {
-  return createAction('MONSTER/CREATE', () =>
-    networkService.monsterMint()
-  )
-}
+// export function monsterMint() {
+//   return createAction('MONSTER/CREATE', () =>
+//     networkService.monsterMint()
+//   )
+// }
 
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>

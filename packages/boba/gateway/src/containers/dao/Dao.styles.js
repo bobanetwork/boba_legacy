@@ -26,7 +26,8 @@ export const DaoPageContainer = styled(Box)(({ theme }) => ({
 
 export const DaoPageContent = styled(Box)(({ theme }) => ({
   display: 'flex',
-  justifyContent: 'space-around',
+  flexDirection: 'row',
+  justifyContent: 'center',
   alignItems: 'flex-start',
   paddingTop: '0px',
   gap: '10px',
@@ -36,14 +37,13 @@ export const DaoPageContent = styled(Box)(({ theme }) => ({
 }));
 
 export const DaoWalletContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.secondary,
-  margin: 'auto',
   display: 'flex',
   flexDirection: 'column',
   padding: '0px 20px',
   minHeight: '700px',
-  borderRadius: '20px',
   width: '30%',
+  borderRadius: theme.palette.primary.borderRadius,
+  background: theme.palette.background.secondary,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
@@ -70,6 +70,7 @@ export const DaoWalletAction = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   width: '100%',
   margin: '10px auto',
+  gap: '10px',
 }));
 
 export const DaoProposalContainer = styled(Box)(({ theme }) => ({
@@ -79,7 +80,7 @@ export const DaoProposalContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start',
   padding: '0 32px',
   minHeight: '500px',
-  borderRadius: '20px',
+  borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
@@ -227,4 +228,32 @@ export const DividerLine = styled(Divider)(({ theme }) => ({
   boxSizing: 'border-box',
   boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
+}))
+
+export const DaoProposalHead = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  alignSelf: 'flex-start',
+  justifyContent: 'space-between',
+  padding: '24px 0px',
+  width: '100%',
+  margin: '5px',
+  [theme.breakpoints.down('sm')]: {
+    padding: '0px',
+  },
+}))
+
+export const DaoProposalListContainer = styled(Box)(({ theme }) => ({
+  overflowY: 'auto',
+  margin: '10px auto',
+  borderRadius: '8px',
+  padding: '20px 10px',
+  width: '100%',
+  height: '600px',
+  '.loadingContainer' : {
+    padding: '10px auto',
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: '0px',
+  },
 }))
