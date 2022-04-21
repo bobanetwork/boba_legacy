@@ -9,7 +9,7 @@ function EthereumIcon({ selected = true }) {
 
   if (!selected) {
     return <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="30" height="30" rx="8" fill={recColor} fill-opacity="0.15" />
+      <rect width="30" height="30" rx="8" fill={recColor} fillOpacity="0.15" />
       <path d="M15.1376 5L15.0034 5.45578V18.6802L15.1376 18.8141L21.2761 15.1856L15.1376 5Z" fill="#E5E7EB" />
       <path d="M15.1387 5L9 15.1856L15.1387 18.8141V12.3953V5Z" fill="#F9F9FA" />
       <path d="M15.1376 19.9763L15.062 20.0685V24.7792L15.1376 25L21.2799 16.3496L15.1376 19.9763Z" fill="#E5E7EB" />

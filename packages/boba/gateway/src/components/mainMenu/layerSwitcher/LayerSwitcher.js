@@ -14,9 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setLayer } from 'actions/setupAction.js'
+import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
@@ -47,8 +47,11 @@ import {
 } from 'actions/networkAction'
 
 import { openModal } from 'actions/uiAction'
+import Button from 'components/button/Button.js'
 
-function LayerSwitcher() {
+function LayerSwitcher({
+  visisble = true
+}) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -170,7 +173,7 @@ function LayerSwitcher() {
   }, [ connectETHRequest, dispatchBootAccount ])
 
   useEffect(() => {
-    if(connectBOBARequest) {
+    if (connectBOBARequest) {
       localStorage.setItem('wantChain', JSON.stringify('L2'))
       networkService.switchChain('L2')
       dispatchBootAccount()
@@ -183,8 +186,60 @@ function LayerSwitcher() {
     }
   }, [ connectRequest, dispatchBootAccount ])
 
+  if (!visisble) {
+    return null
+  }
+
+  const MobileLayer = ({layer, title, icon, onConnect, isConnected}) => {
+    return <S.LayerWrapper>
+      <IconButton
+        sx={{ gap: '5px' }}
+        aria-label="eth"
+      >
+        {icon}
+      </IconButton>
+      <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >{title} </Typography>
+        <S.Label >{layer === 'L1' ? wAddress : 'Not Connected' }</S.Label>
+      </S.LayerContent>
+      {!layer ?
+        <Button
+          type="primary"
+          variant="contained"
+          size='small'
+          onClick={() => dispatch(setConnect(true))}
+        >
+          connect
+        </Button> : !isConnected ?
+        <Button
+          type="primary"
+          variant="contained"
+          size='small'
+          onClick={onConnect}
+        >
+          Switch
+        </Button> : null}
+    </S.LayerWrapper>
+  }
+
+  if (isMobile) {
+    return (
+      <S.LayerSwitcherWrapperMobile>
+        <MobileLayer title="Ethereum" layer={layer} icon={<EthereumIcon />}
+          onConnect={()=> connectToETH()}
+          isConnected={layer === 'L1'}
+        />
+        <S.LayerDivider />
+        <MobileLayer title="Boba Network" layer={layer} icon={<BobaIcon />}
+          onConnect={()=> connectToBOBA()}
+          isConnected={layer === 'L2'}
+        />
+      </S.LayerSwitcherWrapperMobile>
+    )
+  }
+
   return (
-    <S.LayerSwitcherWrapper  m={isMobile ? 2 : 0} p={isMobile ? 2 : 0}>
+    <S.LayerSwitcherWrapper >
       <ToggleButtonGroup
         value={layer}
         exclusive

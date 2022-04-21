@@ -53,7 +53,7 @@ export const ChainInput = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     gap: '5px',
     padding: '5px',
-    minWidth: '134px'
+    minWidth: '120px'
   }
 }))
 
