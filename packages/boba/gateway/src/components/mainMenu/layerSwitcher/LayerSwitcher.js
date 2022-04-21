@@ -16,7 +16,7 @@ limitations under the License. */
 
 import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
+import { setConnect, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'

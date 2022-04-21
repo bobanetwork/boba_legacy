@@ -33,6 +33,7 @@ import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import * as S from './Dao.styles'
+import * as G from 'containers/Global.styles'
 import * as styles from './Dao.module.scss'
 
 const PER_PAGE = 8
@@ -100,7 +101,7 @@ function DAO() {
                 <Typography variant="body1" style={{ opacity: '0.5' }}>xBOBA:</Typography>
                 <Typography variant="h4" >{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
               </Box>
-              <S.DividerLine />
+              <G.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Votes</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>Boba:</Typography>
@@ -133,7 +134,7 @@ function DAO() {
                   <Typography variant="body3">Only votes delegated BEFORE the start of the active voting period are counted in your vote</Typography>
                 </Box>
               </Box>
-              <S.DividerLine />
+              <G.DividerLine />
               <Box sx={{
                 width: '100%',
                 display: 'flex',
@@ -171,7 +172,7 @@ function DAO() {
                       value={selectedState}
                   ></Select>
               </S.DaoProposalHead>
-              <S.DividerLine />
+              <G.DividerLine />
               <S.DaoProposalListContainer>
                   {!!loading && !proposals.length ? <div className={styles.loadingContainer}> Loading... </div> : null}
                   {paginatedProposals
