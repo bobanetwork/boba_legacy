@@ -73,6 +73,7 @@ const PageHeader = ({ maintenance }) => {
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
                   <MenuItems setOpen={setOpen} />
+                  <ThemeSwitcher />
                 </S.StyleDrawer>
               </Drawer>
               <Drawer open={walletOpen} onClose={() => setWalletOpen(false)} classes={{ paper: classes.root }}>

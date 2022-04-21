@@ -183,43 +183,8 @@ function LayerSwitcher() {
     }
   }, [ connectRequest, dispatchBootAccount ])
 
-  if (isMobile) {
-    return (
-      <S.LayerSwitcherWrapperMobile>
-      <ToggleButtonGroup
-        value={layer}
-        exclusive
-        onChange={(e, n) => dispatchSwitchLayer(n)}
-        aria-label="text alignment"
-      >
-        <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          <EthereumIcon />
-        </ToggleButton>
-        <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
-          <BobaIcon />
-        </ToggleButton>
-      </ToggleButtonGroup>
-      {layer === 'L1' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
-      </S.LayerContent> : null}
-      {!layer ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
-        <Typography variant="body4" sx={{
-          opacity: '0.3',
-          whiteSpace: 'nowrap'
-        }} >Select chain to connect</Typography>
-      </S.LayerContent> : null}
-      {layer === 'L2' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>
-        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
-      </S.LayerContent> : null}
-      </S.LayerSwitcherWrapperMobile>
-    )
-  }
-
   return (
-    <S.LayerSwitcherWrapper>
+    <S.LayerSwitcherWrapper  m={isMobile ? 2 : 0} p={isMobile ? 2 : 0}>
       <ToggleButtonGroup
         value={layer}
         exclusive
