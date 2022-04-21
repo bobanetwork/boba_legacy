@@ -269,10 +269,10 @@ function LayerSwitcher() {
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          <EthereumIcon />
+          <EthereumIcon selected={layer === 'L1'}/>
         </ToggleButton>
         <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
-          <BobaIcon />
+          <BobaIcon selected={layer === 'L2'} />
         </ToggleButton>
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
