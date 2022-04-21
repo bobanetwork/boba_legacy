@@ -21,9 +21,6 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
-
-import AlertIcon from 'components/icons/AlertIcon'
-
 import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
