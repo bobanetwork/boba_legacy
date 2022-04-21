@@ -63,21 +63,6 @@
 x-deployer_pk: &deployer_pk
   DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
-# Account #1
-x-sequencer_pk: &sequencer_pk
-  SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
-
-# Account #2
-x-proposer_pk: &proposer_pk
-  PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
-
-x-sequencer_bs_pk: &sequencer_bs_pk
-  BATCH_SUBMITTER_SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
-
-# Account #2
-x-proposer_bs_pk: &proposer_bs_pk
-  BATCH_SUBMITTER_PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
-
 # Account #8
 x-relayer_pk: &relayer_pk
   RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
@@ -148,9 +133,9 @@ services:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       # these keys are hardhat's first 2 accounts, DO NOT use in production
       << : *deployer_pk
-      << : *sequencer_pk
-      << : *proposer_pk
       << : *relayer_pk
+      SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+      PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
       # setting the whitelist owner to address(0) disables the whitelist
       WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
       L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
@@ -312,10 +297,12 @@ services:
       FAST_RELAYER: 'true'
 
   batch_submitter:
+    restart: always
     depends_on:
       - l1_chain
       - dtl
       - l2geth
+      - kms
     image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
@@ -327,9 +314,15 @@ services:
       L1_ETH_RPC: http://l1_chain:8545
       L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
-      << : *sequencer_bs_pk
-      << : *proposer_bs_pk
       RETRIES: 200
+      #KMS access setup
+      AWS_ACCESS_KEY_ID: "1"
+      AWS_SECRET_ACCESS_KEY: "11"
+      BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
+      BATCH_SUBMITTER_KMS_REGION: us-east-1
+      #aliases are setup, check seed.yml
+      BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+      BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
 
   integration_tests:
     image: bobanetwork/integration-tests:latest
@@ -441,3 +434,16 @@ services:
       L2_START_BLOCK: 1
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+
+  #in no way should this be running in production
+  kms:
+    image: bobanetwork/local-kms:latest
+    environment:
+      PORT: "8888"
+      KMS_REGION: "us-east-1"
+    volumes:
+      - type: bind
+        source: ./seed.yaml
+        target: /init/seed.yaml
+    ports:
+      - 8888:8888

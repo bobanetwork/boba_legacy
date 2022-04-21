@@ -79,7 +79,7 @@ class BlockMonitorService extends OptimismEnv {
     const latestSQLBlock = latestSQLBlockQuery[0]['MAX(blockNumber)']
 
     // get the blocks, transactions and receipts
-    this.logger.info('Fetching the block data...')
+    // this.logger.info('Fetching the block data...')
     const [blocksData, receiptsData] = await this.getChainData(
       latestSQLBlock,
       Math.min(this.latestBlock, latestSQLBlock + 1000)
@@ -91,7 +91,7 @@ class BlockMonitorService extends OptimismEnv {
     }
 
     // write the block data into MySQL
-    this.logger.info('Writing the block data...')
+    // this.logger.info('Writing the block data...')
     for (const blockData of blocksData) {
       await this.databaseService.insertBlockData(blockData)
       // write the transaction data into MySQL
@@ -105,7 +105,7 @@ class BlockMonitorService extends OptimismEnv {
     }
 
     // write the receipt data into MySQL
-    this.logger.info('Writing the receipt data...')
+    // this.logger.info('Writing the receipt data...')
     for (let receiptData of receiptsData) {
       const correspondingBlock = blocksData.filter(
         (i) => i && i.hash === receiptData.blockHash
@@ -136,11 +136,11 @@ class BlockMonitorService extends OptimismEnv {
     const latestBlock = await this.L2Provider.getBlockNumber()
 
     if (latestBlock > this.latestBlock) {
-      this.logger.info('Finding new blocks...')
+      // this.logger.info('Finding new blocks...')
       this.latestBlock = latestBlock
 
       // get the blocks, transactions and receipts
-      this.logger.info('Fetching the block data...')
+      // this.logger.info('Fetching the block data...')
       const [blocksData, receiptsData] = await this.getChainData(
         this.scannedLastBlock,
         Math.min(latestBlock, this.latestBlock + 1000)
@@ -154,7 +154,7 @@ class BlockMonitorService extends OptimismEnv {
       }
 
       // write the block data into MySQL
-      this.logger.info('Writing the block data...')
+      // this.logger.info('Writing the block data...')
       for (const blockData of blocksData) {
         if (!blockData) {
           continue
@@ -171,7 +171,7 @@ class BlockMonitorService extends OptimismEnv {
       }
 
       // write the receipt data into MySQL
-      this.logger.info('Writing the receipt data...')
+      // this.logger.info('Writing the receipt data...')
       for (let receiptData of receiptsData) {
         const correspondingBlock = blocksData.filter(
           (i) => i && i.hash === receiptData.blockHash
@@ -264,7 +264,7 @@ class BlockMonitorService extends OptimismEnv {
     const promisesReceipt = []
     for (let i = startingBlock; i <= endingBlock; i++) {
       promisesBlock.push(this.L2Provider.getBlockWithTransactions(i))
-      this.logger.info(`Pushing block`)
+      // this.logger.info(`Pushing block`)
     }
     const blocksData = await Promise.all(promisesBlock)
     for (const blockData of blocksData) {

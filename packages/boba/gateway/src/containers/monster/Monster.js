@@ -217,7 +217,11 @@ class Monster extends React.Component {
                 </Typography>
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Here is where we will showcase new features and projects, for you to see first.
+                  Here is where we will showcase new features and projects, for you to see first. 
+                  Check out the top right of the screen to test the new dual fee system. You can toggle 
+                  back and forth between ETH and BOBA. This is a beta feature which is currently being tested, 
+                  so it might not work smoothly in all circumstances. Any feedback welcome - looking forward to 
+                  MUIs!!! Haha.
                 </Typography>
 
               </Box>

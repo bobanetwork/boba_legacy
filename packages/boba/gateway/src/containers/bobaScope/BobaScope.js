@@ -40,7 +40,6 @@ import * as S from './History.styles'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-
 import Connect from 'containers/connect/Connect'
 
 

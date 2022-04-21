@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract Proxy__Boba_GasPriceOracle {
+contract Boba_GasPriceOracleProxyCall {
     address public gasPriceOracleAddress;
 
     constructor(address _gasPriceOracleAddress) {

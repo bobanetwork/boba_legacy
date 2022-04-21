@@ -69,8 +69,6 @@ function LayerSwitcher() {
   const wantChain = JSON.parse(localStorage.getItem('wantChain'))
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
 
-  console.log("chainChangedInit:", chainChangedInit)
-
   const dispatchBootAccount = useCallback(() => {
 
     if (!accountEnabled) initializeAccount()
@@ -106,24 +104,18 @@ function LayerSwitcher() {
 
   }, [ dispatch, accountEnabled, network ])
 
-  // this will connect to whatever is set in MM
-  async function connect () {
-    console.log("connecting to chain set in MM")
-    await dispatchBootAccount()
-  }
-
   // this will switch chain, if needed, and then connect to Boba
-  const connectToBOBA = useCallback(async () => {
+  const connectToBOBA = useCallback(() => {
     localStorage.setItem('wantChain', JSON.stringify('L2'))
-    await networkService.switchChain('L2')
-    await dispatchBootAccount()
+    networkService.switchChain('L2')
+    dispatchBootAccount()
   }, [dispatchBootAccount])
 
    // this will switch chain, if needed, and then connect to Ethereum
-  const connectToETH = useCallback(async() => {
+  const connectToETH = useCallback(() => {
     localStorage.setItem('wantChain', JSON.stringify('L1'))
-    await networkService.switchChain('L1')
-    await dispatchBootAccount()
+    networkService.switchChain('L1')
+    dispatchBootAccount()
   }, [dispatchBootAccount])
 
   const dispatchSwitchLayer = useCallback((targetLayer) => {
@@ -160,7 +152,7 @@ function LayerSwitcher() {
     }
   }, [ chainChangedInit, dispatchBootAccount ])
 
-    useEffect(() => {
+  useEffect(() => {
     // auto reconnect to MM if we just switched chains from
     // inside MM, and then unset the flag.
     if (chainChangedFromMM) {
@@ -191,81 +183,47 @@ function LayerSwitcher() {
     }
   }, [ connectRequest, dispatchBootAccount ])
 
-
-  // if (isMobile) {
-  //   return (
-  //     <S.LayerSwitcherWrapperMobile>
-  //       <S.LayerWrapper>
-  //         <IconButton
-  //           sx={{ gap: '5px' }}
-  //           aria-label="eth"
-  //         >
-  //           <EthereumIcon />
-  //         </IconButton>
-  //         <S.LayerContent>
-  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-  //           {layer === 'L1' ?
-  //             <Typography component='p' variant="body4" sx={{
-  //               color: 'rgba(255, 255, 255, 0.3)'
-  //             }} >{wAddress}</Typography> :
-  //             <Typography variant="body4" sx={{
-  //               opacity: '0.3',
-  //               whiteSpace: 'nowrap'
-  //             }} >Not Connected</Typography>
-  //           }
-  //         </S.LayerContent>
-  //         {!layer ? <WalletPicker /> : layer === 'L1' ? null :
-  //           <Button
-  //             type="primary"
-  //             variant="contained"
-  //             size='small'
-  //             onClick={() => dispatchSwitchLayer('L1')}
-  //           >
-  //             Switch
-  //           </Button>}
-  //       </S.LayerWrapper>
-  //       <S.LayerDivider>
-  //       </S.LayerDivider>
-  //       <S.LayerWrapper>
-  //         <IconButton
-  //           sx={{ gap: '5px' }}
-  //           aria-label="boba"
-  //         >
-  //           <BobaIcon />
-  //         </IconButton>
-  //         <S.LayerContent>
-  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-  //           {layer === 'L2' ?
-  //             <Typography component='p' variant="body4" sx={{
-  //               color: 'rgba(255, 255, 255, 0.3)'
-  //             }} >{wAddress}</Typography> :
-  //             <Typography variant="body4" sx={{
-  //               opacity: '0.3',
-  //               whiteSpace: 'nowrap'
-  //             }} >Not Connected</Typography>
-  //           }
-  //         </S.LayerContent>
-  //         {!layer ? <WalletPicker /> : layer === 'L2' ? null :
-  //           <Button
-  //             type="primary"
-  //             variant="contained"
-  //             size='small'
-  //             onClick={() => dispatchSwitchLayer('L2')}
-  //           >
-  //             Switch
-  //           </Button>
-  //         }
-  //       </S.LayerWrapper>
-  //     </S.LayerSwitcherWrapperMobile>
-  //   )
-  // }
+  if (isMobile) {
+    return (
+      <S.LayerSwitcherWrapperMobile>
+      <ToggleButtonGroup
+        value={layer}
+        exclusive
+        onChange={(e, n) => dispatchSwitchLayer(n)}
+        aria-label="text alignment"
+      >
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
+          <EthereumIcon />
+        </ToggleButton>
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
+          <BobaIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
+      {layer === 'L1' ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
+      </S.LayerContent> : null}
+      {!layer ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
+        <Typography variant="body4" sx={{
+          opacity: '0.3',
+          whiteSpace: 'nowrap'
+        }} >Select chain to connect</Typography>
+      </S.LayerContent> : null}
+      {layer === 'L2' ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
+      </S.LayerContent> : null}
+      </S.LayerSwitcherWrapperMobile>
+    )
+  }
 
   return (
     <S.LayerSwitcherWrapper>
       <ToggleButtonGroup
         value={layer}
         exclusive
-        onChange={(e, n)=> dispatchSwitchLayer(n)}
+        onChange={(e, n) => dispatchSwitchLayer(n)}
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
