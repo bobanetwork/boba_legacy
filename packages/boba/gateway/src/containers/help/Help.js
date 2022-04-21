@@ -1,6 +1,9 @@
-import { Grid, Typography } from '@mui/material'
-import PageTitle from 'components/pageTitle/PageTitle'
 import React from 'react'
+
+import { Grid, Typography } from '@mui/material'
+
+import PageTitle from 'components/pageTitle/PageTitle'
+
 import * as S from './Help.styles'
 
 function Help() {
@@ -56,8 +59,8 @@ function Help() {
           Please use your browser's developer console to see the error message and then please check the project's{' '}
           <a
             target='_blank'
-            style={{ lineHeight: '1.0em', fontWeight: '700', fontSize: '1.0em', opacity: '0.9', color: '#228fe5' }} 
             rel="noopener noreferrer"
+            style={{ lineHeight: '1.0em', fontWeight: '700', fontSize: '1.0em', opacity: '0.9', color: '#228fe5' }}
             href='https://github.com/bobanetwork/boba/issues'
           >GitHub issues list
           </a>{' '}
@@ -72,8 +75,8 @@ function Help() {
           prefaced with `Gateway Feature`, in our {' '}
           <a
             target='_blank'
+            rel="noopener noreferrer"
             style={{ lineHeight: '1.0em', fontWeight: '700', fontSize: '1.0em', opacity: '0.9', color: '#228fe5' }}
-            rel="noopener noreferrer" 
             href='https://github.com/bobanetwork/boba/issues'
           >GitHub issues and features list
           </a>.

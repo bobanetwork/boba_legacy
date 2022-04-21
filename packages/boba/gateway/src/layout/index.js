@@ -55,7 +55,7 @@ function App () {
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
-        secondary: light ? 'rgba(0, 0, 0, 0.0)' : darkGrey, 
+        secondary: light ? 'rgba(0, 0, 0, 0.04)' : darkGrey,
         secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : '#1A1D1F',
@@ -150,7 +150,7 @@ function App () {
             style: {
               color: buttonColor,
               borderColor: buttonColor,
-              background: light ? '#fff' : 'none', 
+              background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
               filter: "drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))",
