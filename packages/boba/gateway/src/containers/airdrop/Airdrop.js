@@ -3,11 +3,10 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import * as S from './Airdrop.styles'
-import * as styles from './Airdrop.module.scss'
 
 import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
-import AlertIcon from 'components/icons/AlertIcon'
+
 import networkService from 'services/networkService'
 import moment from 'moment'
 import { openAlert } from 'actions/uiAction'

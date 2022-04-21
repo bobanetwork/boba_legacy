@@ -14,13 +14,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import Button from 'components/button/Button'
 
 import { 
   selectAccountEnabled, 
@@ -69,7 +70,6 @@ function LayerSwitcher({
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
   
@@ -77,20 +77,6 @@ function LayerSwitcher({
   const wantChain = JSON.parse(localStorage.getItem('wantChain'))
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
   console.log("chainChangedInit:", chainChangedInit)
-
-  const dispatchSwitchLayer = useCallback((targetLayer) => {
-
-    if (targetLayer === 'L1') {
-       connectToETH()
-    }
-    else if (targetLayer === 'L2') {
-      connectToBOBA()
-    } else {
-      // handles the strange targetLayer === null when people click on ETH icon a second time
-      connectToETH()
-    }
-
-  }, [ connectToBOBA, connectToETH ])
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -127,6 +113,34 @@ function LayerSwitcher({
 
   }, [ dispatch, accountEnabled, network ])
 
+  // this will switch chain, if needed, and then connect to Boba
+  const connectToBOBA = useCallback(() => {
+    localStorage.setItem('wantChain', JSON.stringify('L2'))
+    networkService.switchChain('L2')
+    dispatchBootAccount()
+  }, [dispatchBootAccount])
+
+   // this will switch chain, if needed, and then connect to Ethereum
+  const connectToETH = useCallback(() => {
+    localStorage.setItem('wantChain', JSON.stringify('L1'))
+    networkService.switchChain('L1')
+    dispatchBootAccount()
+  }, [dispatchBootAccount])
+
+  const dispatchSwitchLayer = useCallback((targetLayer) => {
+
+    if (targetLayer === 'L1') {
+       connectToETH()
+    }
+    else if (targetLayer === 'L2') {
+      connectToBOBA()
+    } else {
+      // handles the strange targetLayer === null when people click on ETH icon a second time
+      connectToETH()
+    }
+
+  }, [ connectToBOBA, connectToETH ])
+
   useEffect(() => {
     // detect mismatch and correct the mismatch
     if (wantChain === 'L1' && layer === 'L2') {
@@ -147,7 +161,7 @@ function LayerSwitcher({
     }
   }, [ chainChangedInit, dispatchBootAccount ])
 
-    useEffect(() => {
+  useEffect(() => {
     // auto reconnect to MM if we just switched chains from 
     // inside MM, and then unset the flag.
     if (chainChangedFromMM) {
@@ -178,100 +192,47 @@ function LayerSwitcher({
     }
   }, [ connectRequest, dispatchBootAccount ])
 
-  // this will switch chain, if needed, and then connect to Boba
-  async function connectToBOBA () {
-    localStorage.setItem('wantChain', JSON.stringify('L2'))
-    await networkService.switchChain('L2')
-    await dispatchBootAccount()
+  if (isMobile) {
+    return (
+      <S.LayerSwitcherWrapperMobile>
+      <ToggleButtonGroup
+        value={layer}
+        exclusive
+        onChange={(e, n) => dispatchSwitchLayer(n)}
+        aria-label="text alignment"
+      >
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
+          <EthereumIcon />
+        </ToggleButton>
+        <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
+          <BobaIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
+      {layer === 'L1' ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
+      </S.LayerContent> : null}
+      {!layer ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
+        <Typography variant="body4" sx={{
+          opacity: '0.3',
+          whiteSpace: 'nowrap'
+        }} >Select chain to connect</Typography>
+      </S.LayerContent> : null}
+      {layer === 'L2' ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>
+        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
+      </S.LayerContent> : null}
+      </S.LayerSwitcherWrapperMobile>
+    )
   }
-
-   // this will switch chain, if needed, and then connect to Ethereum
-  async function connectToETH () {
-    localStorage.setItem('wantChain', JSON.stringify('L1'))
-    await networkService.switchChain('L1')
-    await dispatchBootAccount()
-  }
-
-  // this will connect to whatever is set in MM
-  async function connect () {
-    console.log("connecting to chain set in MM")
-    await dispatchBootAccount()
-  }
-
-  // if (isMobile) {
-  //   return (
-  //     <S.LayerSwitcherWrapperMobile>
-  //       <S.LayerWrapper>
-  //         <IconButton
-  //           sx={{ gap: '5px' }}
-  //           aria-label="eth"
-  //         >
-  //           <EthereumIcon />
-  //         </IconButton>
-  //         <S.LayerContent>
-  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-  //           {layer === 'L1' ?
-  //             <Typography component='p' variant="body4" sx={{
-  //               color: 'rgba(255, 255, 255, 0.3)'
-  //             }} >{wAddress}</Typography> :
-  //             <Typography variant="body4" sx={{
-  //               opacity: '0.3',
-  //               whiteSpace: 'nowrap'
-  //             }} >Not Connected</Typography>
-  //           }
-  //         </S.LayerContent>
-  //         {!layer ? <WalletPicker /> : layer === 'L1' ? null :
-  //           <Button
-  //             type="primary"
-  //             variant="contained"
-  //             size='small'
-  //             onClick={() => dispatchSwitchLayer('L1')}
-  //           >
-  //             Switch
-  //           </Button>}
-  //       </S.LayerWrapper>
-  //       <S.LayerDivider>
-  //       </S.LayerDivider>
-  //       <S.LayerWrapper>
-  //         <IconButton
-  //           sx={{ gap: '5px' }}
-  //           aria-label="boba"
-  //         >
-  //           <BobaIcon />
-  //         </IconButton>
-  //         <S.LayerContent>
-  //           <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
-  //           {layer === 'L2' ?
-  //             <Typography component='p' variant="body4" sx={{
-  //               color: 'rgba(255, 255, 255, 0.3)'
-  //             }} >{wAddress}</Typography> :
-  //             <Typography variant="body4" sx={{
-  //               opacity: '0.3',
-  //               whiteSpace: 'nowrap'
-  //             }} >Not Connected</Typography>
-  //           }
-  //         </S.LayerContent>
-  //         {!layer ? <WalletPicker /> : layer === 'L2' ? null :
-  //           <Button
-  //             type="primary"
-  //             variant="contained"
-  //             size='small'
-  //             onClick={() => dispatchSwitchLayer('L2')}
-  //           >
-  //             Switch
-  //           </Button>
-  //         }
-  //       </S.LayerWrapper>
-  //     </S.LayerSwitcherWrapperMobile>
-  //   )
-  // }
 
   return (
     <S.LayerSwitcherWrapper>
       <ToggleButtonGroup
         value={layer}
         exclusive
-        onChange={(e, n)=> dispatchSwitchLayer(n)}
+        onChange={(e, n) => dispatchSwitchLayer(n)}
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
