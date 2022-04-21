@@ -200,7 +200,7 @@ function LayerSwitcher({
       </IconButton>
       <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >{title} </Typography>
-        <S.Label >{layer === 'L1' ? wAddress : 'Not Connected' }</S.Label>
+        <S.Label >{(layer === 'L1' || layer === 'L2')? wAddress : 'Not Connected' }</S.Label>
       </S.LayerContent>
       {!layer ?
         <Button
@@ -209,7 +209,7 @@ function LayerSwitcher({
           size='small'
           onClick={() => dispatch(setConnect(true))}
         >
-          connect
+          Connect
         </Button> : !isConnected ?
         <Button
           type="primary"
@@ -226,12 +226,12 @@ function LayerSwitcher({
     return (
       <S.LayerSwitcherWrapperMobile>
         <MobileLayer title="Ethereum" layer={layer} icon={<EthereumIcon />}
-          onConnect={()=> connectToETH()}
+          onConnect={() => connectToETH()}
           isConnected={layer === 'L1'}
         />
         <S.LayerDivider />
         <MobileLayer title="Boba Network" layer={layer} icon={<BobaIcon />}
-          onConnect={()=> connectToBOBA()}
+          onConnect={() => connectToBOBA()}
           isConnected={layer === 'L2'}
         />
       </S.LayerSwitcherWrapperMobile>

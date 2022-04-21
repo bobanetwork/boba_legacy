@@ -36,6 +36,8 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  console.log("mobile:",mobile)
+
   return (
     <>
       {isMobile ? (

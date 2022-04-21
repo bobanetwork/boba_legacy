@@ -7,6 +7,7 @@ export const ThemeSwitcherTag = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.down('md') ]: {
     width: '100%',
     marginTop: '20px',
+    marginLeft: '10px'
   }
 }));
 
