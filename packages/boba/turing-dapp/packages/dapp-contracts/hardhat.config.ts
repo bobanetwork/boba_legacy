@@ -15,7 +15,7 @@ const config: HardhatUserConfig = {
     },
     boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_2],
     },
     boba_mainnet: {
       url: 'http://mainnet.boba.network',
