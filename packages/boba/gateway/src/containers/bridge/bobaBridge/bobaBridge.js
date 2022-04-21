@@ -14,7 +14,6 @@ import * as LaytoutS from 'components/common/common.styles'
 
 import {
   selectAccountEnabled,
-  selectNetwork,
   selectLayer
 } from 'selectors/setupSelector'
 

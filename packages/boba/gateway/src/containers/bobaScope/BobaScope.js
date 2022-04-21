@@ -39,7 +39,6 @@ import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 import PageTitle from 'components/pageTitle/PageTitle'
-import AlertIcon from 'components/icons/AlertIcon'
 import Connect from 'containers/connect/Connect'
 
 import { selectAccountEnabled } from 'selectors/setupSelector'

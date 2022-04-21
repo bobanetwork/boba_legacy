@@ -6,7 +6,7 @@ import Button from 'components/button/Button'
 import { Info } from "@mui/icons-material"
 import { Box, Icon, Typography } from '@mui/material'
 
-import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
+import { getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 

@@ -6,7 +6,6 @@ import AlertIcon from 'components/icons/AlertIcon'
 import Button from 'components/button/Button.js'
 
 import { 
-  setConnectETH,
   setConnectBOBA,
   setConnect
 } from 'actions/setupAction'

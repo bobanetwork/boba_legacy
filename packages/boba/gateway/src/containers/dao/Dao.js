@@ -30,12 +30,6 @@ import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
 
 import PageTitle from 'components/pageTitle/PageTitle'
-import { Circle } from '@mui/icons-material'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
-import networkService from 'services/networkService'
-import truncateMiddle from 'truncate-middle'
-import WalletIcon from 'components/icons/WalletIcon'
 import Connect from 'containers/connect/Connect'
 
 import { orderBy } from 'lodash'
@@ -52,7 +46,6 @@ function DAO() {
   const votes = useSelector(selectDaoVotes)
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
-  const wAddress = networkService.account ? truncateMiddle(networkService.account, 6, 6, '...') : '';
 
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
