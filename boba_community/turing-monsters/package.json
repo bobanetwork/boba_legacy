@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Monster Maker",
   "main": "index.js",
-  "repository": "git@github.com:bobanetwork/boba/packages/boba/turing",
+  "repository": "git@github.com:bobanetwork/boba/packages/boba/boba_community/turing-monsters",
   "license": "Internal use only",
   "private": true,
   "scripts": {

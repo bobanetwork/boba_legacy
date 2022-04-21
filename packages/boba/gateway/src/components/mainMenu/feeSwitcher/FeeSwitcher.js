@@ -22,7 +22,8 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  selectBobaPriceRatio
+  selectNetwork,
+  selectMonster
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -37,13 +38,15 @@ import { isEqual } from 'lodash'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
+import { HelpOutline } from '@mui/icons-material'
 
 function FeeSwitcher() {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const feePriceRatio = useSelector(selectBobaPriceRatio())
+  const network = useSelector(selectNetwork())
+  const monsterNumber = useSelector(selectMonster())
 
   const layer = useSelector(selectLayer())
 
@@ -57,13 +60,30 @@ function FeeSwitcher() {
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
-    const tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
-    const tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+    //console.log("balanceBOBA:",balanceBOBA)
+    //console.log("balanceETH:",balanceETH)
 
-    //console.log([ `BOBA BALANCE`, logAmount(balanceBOBA.balance, 18) ])
-    //console.log([ `tooSmallBOBA`, tooSmallBOBA ])
-    //console.log([ `ETH BALANCE`, logAmount(balanceETH.balance, 18) ])
-    //console.log([ `tooSmallETH`, tooSmallETH ])
+    let tooSmallETH = false
+    let tooSmallBOBA = false
+
+    if(typeof(balanceBOBA) === 'undefined') {
+      tooSmallBOBA = true
+    } else {
+      //check actual balance
+      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+    }
+
+    if(typeof(balanceETH) === 'undefined') {
+      tooSmallETH = true
+    } else {
+      //check actual balance
+      tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
+    }
+
+    if (!balanceBOBA && !balanceETH) {
+      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      return
+    }
 
     let res
 
@@ -76,8 +96,8 @@ function FeeSwitcher() {
     else if ( !feeUseBoba && targetFee === 'BOBA' ) {
       // change to BOBA
       if( tooSmallBOBA ) {
-        dispatch(openError('You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA. \
-          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.'))
+        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA.
+          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -85,8 +105,8 @@ function FeeSwitcher() {
     else if (feeUseBoba && targetFee === 'ETH') {
       // change to ETH
       if( tooSmallETH ) {
-        dispatch(openError('You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH. \
-          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.'))
+        dispatch(openError(`You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH.
+          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -98,17 +118,24 @@ function FeeSwitcher() {
 
   }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
 
-  if (!accountEnabled || layer !== 'L2') {
+  if (!accountEnabled) {
+    return null
+  }
+
+  if (layer !== 'L2') {
+    return null
+  }
+
+  if (network === 'mainnet' && monsterNumber < 1) {
     return null
   }
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip
-        title={'BOBA or ETH will be used across Boba according to your choice.'}
-      >
-        <Typography variant="body2">Fee</Typography>
+      <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
+      <Typography variant="body2">Fee</Typography>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)

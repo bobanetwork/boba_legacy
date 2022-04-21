@@ -155,7 +155,7 @@ type UseBobaAsFeeTokenEvent @entity {
   address: Bytes
 }
 
-type UseBobaAsFeeTokenMetaTransactionEvent @entity {
+type SwapBOBAForETHMetaTransactionEvent @entity {
   id: ID!
   address: Bytes
 }
@@ -165,9 +165,17 @@ type UseETHAsFeeTokenEvent @entity {
   address: Bytes
 }
 
+
 type TuringHelperDeployedEvent @entity {
   id: ID!
   owner: Bytes
   proxy: Bytes
   depositedBoba: String
+}
+
+type TuringMonstersTransferEvent @entity {
+  id: ID!
+  from: Bytes
+  to: Bytes
+  tokenId: String
 }

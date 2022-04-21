@@ -26,18 +26,11 @@ import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
-import WalletPicker from 'components/walletpicker/WalletPicker'
-
 import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
 
 import PageTitle from 'components/pageTitle/PageTitle'
-import { Circle } from '@mui/icons-material'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
-import networkService from 'services/networkService'
-import truncateMiddle from 'truncate-middle'
-import WalletIcon from 'components/icons/WalletIcon'
+import Connect from 'containers/connect/Connect'
 
 import { orderBy } from 'lodash'
 import Select from 'components/select/Select'
@@ -53,7 +46,6 @@ function DAO() {
   const votes = useSelector(selectDaoVotes)
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
-  const wAddress = networkService.account ? truncateMiddle(networkService.account, 6, 6, '...') : '';
 
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -86,31 +78,21 @@ function DAO() {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <>
-
       <div className={styles.container}>
-        <S.DaoPageContainer>
-          <PageTitle title="DAO" />
-            <S.DaoWalletHead>
-            {
-              (layer !== 'L2') ?
-                <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2</Typography>
-                : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-            }
-            </S.DaoWalletHead>
-          <S.DaoPageContent>
 
+        <S.DaoPageContainer>
+
+          <PageTitle title={'DAO'} />
+
+          <Connect 
+            userPrompt={'Please connect to Boba to vote and propose'}
+            accountEnabled={accountEnabled}
+            connectToBoba={true}
+            layer={layer}
+          />
+
+          <S.DaoPageContent>
             <S.DaoWalletContainer>
-              <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
-                {!accountEnabled ?
-                  <Typography variant="body3" sx={{ opacity: "0.6"}}>Please connect to Boba to vote and propose.</Typography>
-                  : <Box sx={{ display: 'flex', alignItems: 'center'}}> <WalletIcon /> &nbsp; <Typography variant="body3">{wAddress}</Typography></Box>
-                }
-              </Box>
-              <S.DividerLine />
-              <Box sx={{ padding: '24px 0px', lineHeight: '0.9em' }}>
-                <Typography variant="body3" sx={{ opacity: "0.6"}}>NOTE: only votes delegated BEFORE the start of the active voting period are counted in your vote.</Typography>
-              </Box>
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Balances</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>BOBA:</Typography>
@@ -127,41 +109,29 @@ function DAO() {
                 <Typography variant="h4" >{!!layer ? Math.round(Number(votesX)) : '--'}</Typography>
                 <Typography variant="body1" style={{ opacity: '0.5' }}>Total:</Typography>
                 <Typography variant="h4" >{!!layer ? Math.round(Number(votes) + Number(votesX)) : '--'}</Typography>
-                {!layer ?
-                    <S.DaoWalletPickerContainer>
-                      <WalletPicker label="Connect to Boba"/>
-                    </S.DaoWalletPickerContainer> : layer === 'L2' ?
-                      <S.DaoWalletAction>
-                        <Button
-                          color="primary"
-                          variant="outlined"
-                          onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-                          disabled={!accountEnabled}
-                        >
-                          Delegate BOBA
-                        </Button>
-                        <Button
-                          color="primary"
-                          variant="outlined"
-                          onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
-                          disabled={!accountEnabled}
-                        >
-                          Delegate xBOBA
-                        </Button>
-                      </S.DaoWalletAction>
-                      : <S.LayerAlert>
-                        <S.AlertInfo>
-                          <AlertIcon />
-                          <S.AlertText
-                            variant="body3"
-                            component="p"
-                          >
-                            You are on Mainnet. To use the Boba DAO, SWITCH to Boba
-                          </S.AlertText>
-                        </S.AlertInfo>
-                        <LayerSwitcher isButton={true} />
-                      </S.LayerAlert>
+                {layer === 'L2' &&
+                  <S.DaoWalletAction>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      onClick={() => { dispatch(openModal('delegateDaoModal')) }}
+                      disabled={!accountEnabled}
+                    >
+                      Delegate BOBA
+                    </Button>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
+                      disabled={!accountEnabled}
+                    >
+                      Delegate xBOBA
+                    </Button>
+                  </S.DaoWalletAction>
                 }
+                <Box sx={{ padding: '12px 0px'}}>
+                  <Typography variant="body3">Only votes delegated BEFORE the start of the active voting period are counted in your vote</Typography>
+                </Box>
               </Box>
               <S.DividerLine />
               <Box sx={{
@@ -186,7 +156,9 @@ function DAO() {
                 >
                   Create new proposal
                 </Button>
-                <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
+                <Box sx={{ padding: '12px 0px'}}>
+                  <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
+                </Box>
               </Box>
             </S.DaoWalletContainer>
             <S.DaoProposalContainer>
@@ -220,7 +192,7 @@ function DAO() {
           </S.DaoPageContent>
         </S.DaoPageContainer>
       </div>
-    </>)
+    )
 }
 
 export default React.memo(DAO)

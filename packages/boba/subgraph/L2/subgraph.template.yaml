@@ -8,7 +8,6 @@ dataSources:
     name: L2LiquidityPool
     network: {{network}}
     source:
-
       address: '{{contracts.L2LiquidityPool.address}}'
       abi: L2LiquidityPool
     mapping:
@@ -117,12 +116,33 @@ dataSources:
       eventHandlers:
         - event: UseBobaAsFeeToken(address)
           handler: handleUseBobaAsFeeToken
-        - event: UseBobaAsFeeTokenMetaTransaction(address)
-          handler: handleUseBobaAsFeeTokenMetaTransaction
+        - event: SwapBOBAForETHMetaTransaction(address)
+          handler: handleSwapBOBAForETHMetaTransaction
         - event: UseETHAsFeeToken(address)
           handler: handleUseETHAsFeeToken
       file: ./src/Boba_GasPriceOracleMapping.ts
 
+  - kind: ethereum/contract
+    name: TuringMonsters
+    network: {{network}}
+    source:
+      address: '{{contracts.TuringMonsters.address}}'
+      abi: TuringMonsters
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - TuringMonsters
+      abis:
+        - name: TuringMonsters
+          file: ./abis/TuringMonsters.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTuringMonstersTransferEvent
+      file: ./src/TuringMonstersMapping.ts
+      
+      
   - kind: ethereum/contract
     name: TuringHelperFactory
     network: {{network}}
@@ -142,3 +162,6 @@ dataSources:
         - event: TuringHelperDeployed(indexed address,address,uint256)
           handler: handleTuringHelperDeployed
       file: ./src/TuringHelperFactoryMapping.ts
+
+
+

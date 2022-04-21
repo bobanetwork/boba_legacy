@@ -1,5 +1,4 @@
 import { Box, Divider, Grid, IconButton, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 
 export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
@@ -24,69 +23,6 @@ export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
   },
 }))
 
-export const TileCard = styled(Card)(({ theme, ...props }) => ({
-  borderRadius: '5px',
-  height: '150px',
-  width: '150px',
-  padding: '5px',
-  backgroundColor: theme.palette.background.secondary,
-  justifyContent: 'space-between',
-  //maxWidth: '90%',
-  display: 'flex',
-  alignItems: 'center',
-  flexDirection: 'column',
-  margin: '10px 0',
-  border: 'solid rgba(255, 255, 255, 0.27)',
-  borderWidth: '1px',
-}))
-
-export const TileHeader = styled(Box)(({ theme, ...props }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-evenly',
-  alignItems: 'center',
-}))
-
-export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '70px',
-  height: '70px',
-  borderRadius: '50%',
-  position: 'absolute',
-  margin: 'auto',
-  top: '15px',
-  background:  theme.palette.mode === 'light' ? '#c7c3c3' : '#272B30',
-  'img': {
-    width: '50px',
-    maxHeight: '60px',
-    padding: '2px'
-  }
-}))
-
-export const TileFooter = styled(Box)(({ theme, ...props }) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  overflow: 'hidden',
-  borderBottomLeftRadius: '12px',
-  borderBottomRightRadius: '12px',
-  background: theme.palette.background.secondary,
-  justifyContent: 'space-around',
-  padding: '1rem',
-  gap: 1,
-  width: '100%'
-}))
-
-export const DividerLine = styled(Divider)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
-  boxSizing: 'border-box',
-  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
-  width: '100%'
-}))
-
 export const CategoryList = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'flex-start',
@@ -97,7 +33,6 @@ export const CategoryList = styled(Box)(({ theme }) => ({
     overflowX: 'scroll'
   },
 }))
-
 
 export const ProjectListContainer = styled(Grid)(({ theme }) => ({
   margin: "20px 10px !important",
@@ -122,8 +57,8 @@ export const ProjectContainer = styled(Box)(({ theme }) => ({
 }))
 
 export const ProjectContent = styled(Box)(({ theme }) => ({
-  borderTopLeftRadius: '12px',
-  borderTopRightRadius: '12px',
+  borderTopLeftRadius: '8px',
+  borderTopRightRadius: '8px',
   background: theme.palette.background.secondary, //'rgba(255, 255, 255, 0.06)',
   display: 'flex',
   flexDirection: 'column',
@@ -134,19 +69,60 @@ export const ProjectContent = styled(Box)(({ theme }) => ({
   gap: 1,
   marginTop: '50px',
   width: '100%',
-  height: '-webkit-fill-available'
+  height: '140px'
 }))
 
+export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '70px',
+  height: '70px',
+  borderRadius: '50%',
+  position: 'absolute',
+  margin: 'auto',
+  top: '15px',
+  background:  theme.palette.mode === 'light' ? '#c7c3c3' : '#272B30',
+  'img': {
+    width: '50px',
+    maxHeight: '60px',
+    padding: '2px'
+  }
+}))
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
+}))
 
 export const ProjectDescription = styled(Typography)(({ theme }) => ({
   width: '100%',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   opacity: 0.85,
+  fontSize: '0.7em',
   fontWeight: 400,
   display: '-webkit-box',
   'WebkitLineClamp': 3,
   'WebkitBoxOrient': 'vertical'
+}))
+
+export const TileFooter = styled(Box)(({ theme, ...props }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  overflow: 'hidden',
+  height: '45px',
+  width: '100%',
+  borderBottomLeftRadius: '8px',
+  borderBottomRightRadius: '8px',
+  background: theme.palette.background.secondary,
+  justifyContent: 'space-around',
+  padding: '1rem',
+  gap: 1,
 }))
 
 export const footerLink = styled(IconButton)(({ theme }) => ({

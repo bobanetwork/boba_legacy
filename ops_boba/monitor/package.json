@@ -15,6 +15,7 @@
     "@eth-optimism/core-utils": "0.8.1",
     "@eth-optimism/common-ts": "0.2.2",
     "@ethersproject/providers": "5.4.5",
+    "axios": "0.26.0",
     "async-mutex": "^0.3.1",
     "dotenv": "^9.0.0",
     "ethers": "^5.1.4",
