@@ -12,10 +12,18 @@ export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
 }));
 
 
+export const BobaContent = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '10px'
+}))
+
 export const BobaContentWrapper = styled(Box)(({ theme, flexDirection }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: flexDirection || 'column',
+  flexGrow: 1
 }));
 
 
@@ -39,12 +47,13 @@ export const ChainInput = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: '10px',
+  width: '100%',
   minWidth: '180px',
   [ theme.breakpoints.down('sm') ]: {
     justifyContent: 'center',
     gap: '5px',
     padding: '5px',
-    minWidth: '134px'
+    minWidth: '120px'
   }
 }))
 
