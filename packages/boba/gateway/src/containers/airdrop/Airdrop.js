@@ -11,6 +11,7 @@ import { Box, Grid, Typography } from '@mui/material'
 import * as S from './Airdrop.styles'
 
 import Button from 'components/button/Button'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import networkService from 'services/networkService'
 
