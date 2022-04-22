@@ -34,4 +34,4 @@ sed -i -e "s/grep: new RegExp(''),/grep: new RegExp('$TEST_GREP_FILTER'),/g" ./h
 cat ./hardhat.config.ts
 echo $TEST_GREP_FILTER
 echo "Now run:"
-npx hardhat test --network optimism --no-compile --config ./hardhat.config.ts
+npx hardhat test --network optimism --no-compile --config ./hardhat.config.ts "$@"
