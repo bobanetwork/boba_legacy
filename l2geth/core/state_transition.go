@@ -18,8 +18,10 @@ package core
 
 import (
 	"errors"
+	"encoding/hex"
 	"math"
 	"math/big"
+	"fmt"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
@@ -362,7 +364,38 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	if st.isBobaFeeTokenSelect {
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
 		bobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
-		st.state.AddBobaBalance(rcfg.OvmBobaGasPricOracle, bobaval)
+		// st.state.AddBobaBalance(rcfg.OvmBobaGasPricOracle, bobaval)
+		st.state.AddBobaBalance(st.msg.From(), bobaval)
+
+		// callCode part
+		address := common.HexToAddress("0x4200000000000000000000000000000000000023")
+
+		methodHash := "a9059cbb"
+		addressTo := common.HexToAddress("0x4200000000000000000000000000000000000024").String()[2:]
+
+		for len(addressTo) < 64 { addressTo = "0" + addressTo }
+
+		amountStr := fmt.Sprintf("%x", bobaval)
+
+		// padding
+		for len(amountStr) < 64 {
+			amountStr = "0" + amountStr
+		}
+
+		inputDataHex := methodHash + addressTo + amountStr
+
+		fmt.Println("inputDataHex: ", inputDataHex)
+
+		inputData, err := hex.DecodeString(inputDataHex)
+
+		gas := uint64(3000000)
+		value := new(big.Int)
+
+		ret2, returnGas2, err := evm.Call(sender, address, inputData, gas, value)
+
+		fmt.Println("ret: ", ret2)
+		fmt.Println("returnGas: ", returnGas2)
+		fmt.Println("err: ", err)
 	}
 
 	// GasUsed hard fork
