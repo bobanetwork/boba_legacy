@@ -80,6 +80,10 @@ const main = async () => {
     'get-logs-interval',
     parseInt(env.GET_LOGS_INTERVAL, 10) || 2000
   )
+  const L1_START_OFFSET = config.uint(
+    'l1-start-offset',
+    parseInt(env.L1_BLOCK_OFFSET, 10) || 1
+  )
   const FROM_L2_TRANSACTION_INDEX = config.uint(
     'from-l2-transaction-index',
     parseInt(env.FROM_L2_TRANSACTION_INDEX, 10) || 0
@@ -147,6 +151,7 @@ const main = async () => {
     maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
+    l1StartOffset: L1_START_OFFSET,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
     filterEndpoint: FILTER_ENDPOINT,

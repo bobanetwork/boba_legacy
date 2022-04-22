@@ -45,9 +45,9 @@ export function setLayer(layer) {
   }
 }
 
-export function setAccountNumber(account) {
+export function setWalletAddress(account) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/ACCOUNT_NUMBER/SET', payload: account })
+    return dispatch({ type: 'SETUP/WALLETADDRESS/SET', payload: account })
   }
 }
 
@@ -67,4 +67,22 @@ export function getETHMetaTransaction() {
 
 export async function addBobaFee ( bobaFee ) {
   store.dispatch({ type: 'BOBAFEE/ADD/SUCCESS', payload: bobaFee })
+}
+
+export function setConnectETH( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT_ETH', payload: state })
+  }
+}
+
+export function setConnectBOBA( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT_BOBA', payload: state })
+  }
+}
+
+export function setConnect( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CONNECT', payload: state })
+  }
 }

@@ -1,4 +1,4 @@
-// import bobaIcon from 'images/boba2/boba2Icon.svg'
+
 import { Box } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
@@ -14,7 +14,8 @@ export const Nav = styled('nav')(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
     width: '100%',
     gap: '20px',
-    marginTop: '130px',
+    height: '250px',
+    marginTop: '20px',
     flexWrap: 'nowrap',
     alignItems: 'flex-start',
     backgroundColor: theme.palette.background.default,
@@ -28,18 +29,6 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
-  // [ theme.breakpoints.up('md') ]: {
-  //   '&:before': {
-  //     'content': '"  "',
-  //     display: 'inline-block',
-  //     visibility: `${selected ? 'visible': 'hidden'}`,
-  //     height: '20px',
-  //     width: '20px',
-  //     backgroundImage: `url(${bobaIcon})`,
-  //     backgroundRepeat: 'no-repeat',
-  //     backgroundPosition: 'center',
-  //   }
-  // },
   [ theme.breakpoints.down('md') ]: {
     fontSize: '20px',
     fontWeight: '400',

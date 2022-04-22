@@ -25,14 +25,6 @@ export function getNFTs () {
 
 export async function addNFT ( NFT ) {
   
-  const state = store.getState()
-  const UUID = NFT.UUID
-
-  //if we already have added it, no need to add again
-  if (state.nft.list[UUID]) {
-    return state.nft.list[UUID]
-  }
-  
   const info = {
     UUID: NFT.UUID,
     address: NFT.address,

@@ -116,6 +116,15 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
 }
 let allTokens = {}
 
+function handleChangeChainOnce(chainID_hex_string) {
+  console.log("handleChangeChainOnce: switched to chain", Number(chainID_hex_string))
+  localStorage.setItem('chainChangedInit', true)
+  console.log("chainChangedInit", true)
+  localStorage.setItem('newChain', Number(chainID_hex_string))
+  // and remove the listner
+  window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
+}
+
 class NetworkService {
 
   constructor() {
@@ -190,9 +199,17 @@ class NetworkService {
       window.location.reload()
     })
     window.ethereum.on('chainChanged', () => {
-      console.log('chainChanged')
-      localStorage.setItem('changeChain', true)
-      window.location.reload()
+      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
+      // do not reload window in the special case where the user 
+      // changed chains AND conncted at the same time
+      // otherwise the user gets confused about why they are going through
+      // two window reloads
+      if(chainChangedInit) {
+        localStorage.setItem('chainChangedInit', false)
+      } else {
+        localStorage.setItem('chainChangedFromMM', true)
+        window.location.reload()
+      }
     })
   }
 
@@ -927,13 +944,11 @@ class NetworkService {
       // connect to the wallet
       await window.ethereum.request({method: 'eth_requestAccounts'})
       this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
       this.account = await this.provider.getSigner().getAddress()
 
       const networkMM = await this.provider.getNetwork()
       this.chainID = networkMM.chainId
       this.networkName = networkMM.name
-
       this.networkGateway = networkGateway
 
       console.log('NS: networkMM:', networkMM)
@@ -990,7 +1005,8 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners()
+      this.bindProviderListeners() 
+      // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
 
@@ -1030,6 +1046,7 @@ class NetworkService {
 
   }
 
+
   async switchChain( targetLayer ) {
 
     const nw = getNetwork()
@@ -1042,7 +1059,7 @@ class NetworkService {
       blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
     }
 
-    //the chainParams are only needed for the L2's
+    //the chainParams are only needed for the L2s
     const chainParam = {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
@@ -1054,18 +1071,28 @@ class NetworkService {
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
+    console.log("switchChain to:", targetLayer)
+
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
+      console.log("calling: window.ethereum.on('chainChanged', handleChangeChainOnce)")
+      window.ethereum.on('chainChanged', handleChangeChainOnce)
+      return true
     } catch (error) {
       // 4902 = the chain has not been added to MetaMask.
+      // So, lets add it
       if (error.code === 4902) {
         try {
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
+          window.ethereum.on('chainChanged', handleChangeChainOnce)
+          return true
         } catch (addError) {
           console.log("MetaMask - Error adding new RPC: ", addError)
+          return addError
         }
       } else { //some other error code
         console.log("MetaMask - Switch Error: ", error.code)
+        return error
       }
     }
   }
@@ -1216,21 +1243,33 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    // let monsterList = await GraphQLService.queryMonsterTransfer()
-    // console.log("monsterList:",monsterList)
-    // this returns too many events to be directly useful
+    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
-    //   for (let i = 0; i < totalProposals; i++) {
-    //     const proposalRaw = descriptionList.data.governorProposalCreateds[i]
-    //     if(typeof(proposalRaw) === 'undefined') continue
-    //     let proposalID = proposalRaw.proposalId
-    //     //this is a number such as 2
-    //     let proposalData = await delegateCheck.proposals(proposalID)
+    const contract = new ethers.Contract(
+      allAddresses.BobaMonsters,
+      TuringMonsterJson.abi,
+      this.L2Provider
+    )
+
+    if(monsterList.hasOwnProperty('data')) {
+      const monsters = monsterList.data.turingMonstersTransferEvents
+      for (let i = 0; i < monsters.length; i++) {
+        // console.log("adding monster:", i + 1)
+        const tokenId = monsters[i].tokenId
+        const owner = await contract.ownerOf(tokenId)
+            //console.log("owner:", owner)
+        if(owner.toLowerCase() === this.account.toLowerCase()) {
+          this.addNFT( allAddresses.BobaMonsters, tokenId )
+        }
+      }
+      this.checkMonster()
+    }
   }
 
   async checkMonster() {
 
     const NFTs = getNFTs()
+
     let validMonsters = []
 
     try {
@@ -1247,8 +1286,9 @@ class NetworkService {
       let topTop = 0
 
       if(NFTs && Number(monsterBalance) > 0) {
-        for (const [ value ] of Object.entries(NFTs)) {
-          //console.log(`${key}: ${value.name}`)
+        //console.log("checking monsters")
+        for (const [ key, value ] of Object.entries(NFTs)) {
+          //console.log(`${key} value: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
             //console.log("owner:", owner)
@@ -1290,6 +1330,8 @@ class NetworkService {
   /* This is for manually adding NFTs */
   async addNFT( address, tokenID ) {
 
+    console.log("address", address)
+
     try {
 
       const contract = new ethers.Contract(
@@ -1304,7 +1346,7 @@ class NetworkService {
       console.log("nftMeta RAW:", nftMeta)
       const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
 
-      const { url , meta = [] } = await getNftImageUrl(nftMeta !== '' ? nftMeta : `https://boredapeyachtclub.com/api/mutants/121`)
+      const { url , meta = [] } = await getNftImageUrl(nftMeta)
 
       console.log("meta:", meta)
 
@@ -3973,6 +4015,8 @@ class NetworkService {
         this.provider.getSigner()
       )
 
+      console.log("FixedSavings.address:",FixedSavings.address)
+
       let allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
         .allowance(
@@ -3984,14 +4028,16 @@ class NetworkService {
       let depositAmount_BN = BigNumber.from(value_Wei_String)
       console.log("Deposit:", depositAmount_BN)
 
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
       try {
-        if (depositAmount_BN.gt(allowance_BN)) {
-          console.log("Need to approve YES:", depositAmount_BN)
+        if (approveAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", approveAmount_BN)
           const approveStatus = await this.BobaContract
             .connect(this.provider.getSigner())
             .approve(
               allAddresses.BobaFixedSavings,
-              value_Wei_String
+              approveAmount_BN
             )
           const TX = await approveStatus.wait()
           console.log("approveStatus:", TX)
@@ -4003,23 +4049,6 @@ class NetworkService {
         console.log("NS: addFS_Savings approve error:", error)
         return error
       }
-
-      allowance_BN = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .allowance(
-          this.account,
-          allAddresses.BobaFixedSavings
-        )
-      console.log("Updated Allowance:", allowance_BN.toString())
-
-      if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Allowance still too small:", allowance_BN.toString(), depositAmount_BN.toString())
-      } else {
-        console.log("Allowance is now sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
-      }
-
-      console.log("allAddresses.BobaFixedSavings", allAddresses.BobaFixedSavings)
-      console.log("FixedSavings.address", FixedSavings.address)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()

@@ -66,13 +66,14 @@ const PageHeader = ({ maintenance }) => {
                 <S.StyleDrawer theme={theme}>
                   <S.DrawerHeader>
                     <S.WrapperCloseIcon>
-                      <Typography component='p' variant="h2" fontWeight={500}>Menu</Typography>
+                      <Typography component='p' variant="h1" fontWeight={500}>Menu</Typography>
                       <IconButton size="small" onClick={() => setOpen(false)}>
                         <CloseIcon />
                       </IconButton>
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
                   <MenuItems setOpen={setOpen} />
+                  <ThemeSwitcher />
                 </S.StyleDrawer>
               </Drawer>
               <Drawer open={walletOpen} onClose={() => setWalletOpen(false)} classes={{ paper: classes.root }}>

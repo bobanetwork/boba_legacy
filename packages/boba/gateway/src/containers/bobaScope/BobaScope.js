@@ -25,9 +25,11 @@ import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
 import { selectActiveDataTab } from 'selectors/uiSelector'
 import { selectSevens, selectFastExits } from 'selectors/dataSelector'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
@@ -38,10 +40,9 @@ import * as S from './History.styles'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import PageTitle from 'components/pageTitle/PageTitle'
-import AlertIcon from 'components/icons/AlertIcon'
-import WalletPicker from 'components/walletpicker/WalletPicker'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import Connect from 'containers/connect/Connect'
+
+
 
 function BobaScope() {
 
@@ -69,63 +70,50 @@ function BobaScope() {
     }
   }, POLL_INTERVAL)
 
-  if (!accountEnabled) {
-
-    return <S.ScopePageContainer>
-      <PageTitle title="Boba Scope" />
-      <S.LayerAlert>
-        <S.AlertInfo>
-          <AlertIcon />
-          <S.AlertText
-            variant="body2"
-            component="p"
-          >
-            Connect to MetaMask to access Boba Scope
-          </S.AlertText>
-        </S.AlertInfo>
-        <WalletPicker />
-      </S.LayerAlert>
-    </S.ScopePageContainer>
-  }
-
-
   return (
     <S.ScopePageContainer>
       <PageTitle title="Boba Scope" />
 
-      <S.Header>
-        <div className={styles.searchInput}>
-          <Input
-            size='small'
-            placeholder='Search by hash'
-            value={searchData}
-            onChange={i => { setSearchData(i.target.value) }}
-            className={styles.searchBar}
-          />
-        </div>
-      </S.Header>
-      <div className={styles.data}>
-        <div className={styles.section}>
-          <Tabs
-            onClick={tab => { dispatch(setActiveDataTab(tab)) }}
-            activeTab={activeTab}
-            tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
-          />
+      <Connect
+        userPrompt={'Please connect to a chain to use the BobaScope'}
+        accountEnabled={accountEnabled}
+      />
+      {accountEnabled &&
+        <>
+          <S.Header>
+            <div className={styles.searchInput}>
+              <Input
+                size='small'
+                placeholder='Search by hash'
+                value={searchData}
+                onChange={i => { setSearchData(i.target.value) }}
+                className={styles.searchBar}
+              />
+            </div>
+          </S.Header>
+          <div className={styles.data}>
+            <div className={styles.section}>
+              <Tabs
+                onClick={tab => { dispatch(setActiveDataTab(tab)) }}
+                activeTab={activeTab}
+                tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
+              />
 
-          {activeTab === 'Seven Day Queue' && (
-            <Sevens
-              searchData={searchData}
-              sevens={sevens}
-            />
-          )}
-          {activeTab === 'Fast Exits' && (
-            <FastExits
-              searchData={searchData}
-              data={fastExits}
-            />
-          )}
-        </div>
-      </div>
+              {activeTab === 'Seven Day Queue' && (
+                <Sevens
+                  searchData={searchData}
+                  sevens={sevens}
+                />
+              )}
+              {activeTab === 'Fast Exits' && (
+                <FastExits
+                  searchData={searchData}
+                  data={fastExits}
+                />
+              )}
+            </div>
+          </div>
+    </>}
     </S.ScopePageContainer>
   );
 }

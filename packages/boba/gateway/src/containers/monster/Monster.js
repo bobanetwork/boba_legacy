@@ -4,17 +4,14 @@ import { isEqual } from 'lodash'
 
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Monster.styles'
+import * as G from 'containers/Global.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 
-import { Circle } from '@mui/icons-material'
 import PageTitle from 'components/pageTitle/PageTitle'
-
 import networkService from 'services/networkService'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import AlertIcon from 'components/icons/AlertIcon'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import WalletPicker from 'components/walletpicker/WalletPicker'
+import Connect from 'containers/connect/Connect'
 
 class Monster extends React.Component {
 
@@ -107,14 +104,21 @@ class Monster extends React.Component {
       list,
       netLayer,
       monsterInfo,
+      accountEnabled
     } = this.state
 
     let tokenIDverified = null
 
     //figure out which monster type we are dealing with
     let monsterType = 'Monster'
+
+    // since it uses FIND, this code will only find one of your monsters
+    // FIX ME to show the 'top' monster for this wallet if you have several
+    // in which case you are lucky.
     if(monsterInfo.length > 0) {
+
       tokenIDverified = monsterInfo.find(e => e.tokenID)
+
       if(typeof(tokenIDverified) !== 'undefined') {
         tokenIDverified = Number(monsterInfo.find(e => e.tokenID).tokenID)
       } else {
@@ -125,7 +129,7 @@ class Monster extends React.Component {
 
       if(type === 'crowned') {
         monsterType = 'Crowned Monster'
-      } 
+      }
       else if (type === 'wizard') {
         monsterType = 'Wizard Monster'
       }
@@ -134,60 +138,19 @@ class Monster extends React.Component {
       }
     }
 
-    if (!netLayer) {
+    return (
 
-      return (
-        <S.TokenPageContainer>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  Not connected. To access the MonsterVerse, CONNECT to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <WalletPicker label="Connect to Boba"/>
-            </S.LayerAlert>
-        </S.TokenPageContainer>
-      )
-
-    } else if (netLayer === 'L1') {
-
-      return (
-        <S.TokenPageContainer>
-          <S.TokenPageContentEmpty>
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                  align="center"
-                >
-                  You are on Ethereum. To access the MonsterVerse, SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher isButton={true} />
-            </S.LayerAlert>
-          </S.TokenPageContentEmpty>
-        </S.TokenPageContainer>
-      )
-    }
-
-    else {
-
-      return (
       <S.StakePageContainer>
-        <Box sx={{ my: 1 }}>
-          <PageTitle title="MonsterVerse" />
-          {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba </Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
-          }
-        </Box>
+
+        <PageTitle title={'MonsterVerse'} />
+
+        <Connect
+          userPrompt={'Please connect to Boba'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+
         <Grid container spacing={1} sx={{ my: 2 }}>
 
         <S.NFTPageContainer>
@@ -200,13 +163,13 @@ class Monster extends React.Component {
                     MonsterVerse
                   </Typography>
                 </Box>
-                <S.DividerLine />
+                <G.DividerLine />
                 <Typography variant="body1" >
                   <br/>Welcome, esteemed {monsterType} {tokenIDverified}
                 </Typography>
-                {tokenIDverified === null && 
+                {tokenIDverified === null &&
                   <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>Wallet>NFT>Add NFT</strong>). 
+                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>{'Wallet > NFT > Add NFT'}</strong>).
                     Please add them to join the MonsterVerse.
                   </Typography>
                 }
@@ -226,6 +189,8 @@ class Monster extends React.Component {
                       tokenID={list[v].tokenID}
                       small={"true"}
                     />)
+                  } else {
+                    return null
                   }
                 })
               }
@@ -243,9 +208,9 @@ class Monster extends React.Component {
                 </Typography>
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong. 
-                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will 
-                  go live later in April. 
+                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong.
+                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will
+                  go live later in April.
                 </Typography>
 
                 <Typography variant="body2" sx={{ opacity: 0.95 }}>
@@ -254,15 +219,19 @@ class Monster extends React.Component {
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   Here is where we will showcase new features and projects, for you to see first.
+                  Check out the top right of the screen to test the new dual fee system. You can toggle
+                  back and forth between ETH and BOBA. This is a beta feature which is currently being tested,
+                  so it might not work smoothly in all circumstances. Any feedback welcome - looking forward to
+                  MUIs!!! Haha.
                 </Typography>
 
               </Box>
           </S.NFTListContainer>
         </S.NFTPageContainer>
-            </Grid>
-      </S.StakePageContainer>
+      </Grid>
+    </S.StakePageContainer>
 
-    )}
+    )
   }
 }
 

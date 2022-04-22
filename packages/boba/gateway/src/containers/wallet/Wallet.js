@@ -3,17 +3,26 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
-import { Circle, Info } from "@mui/icons-material"
-import { Box, CircularProgress, Icon, Typography } from '@mui/material'
+import { Info } from "@mui/icons-material"
+import { Box, Icon, Typography } from '@mui/material'
 
-import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
-import { openAlert, openError, setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { getETHMetaTransaction } from 'actions/setupAction'
+import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Tabs from 'components/tabs/Tabs'
-import Nft from "containers/wallet/nft/Nft"
+import Nft from 'containers/wallet/nft/Nft'
 import Token from './token/Token'
+import Connect from 'containers/connect/Connect'
+
 import * as S from './wallet.styles'
+import * as G from '../Global.styles'
+
+import {
+  setConnectETH,
+  setConnectBOBA
+} from 'actions/setupAction'
+
 
 import {
   selectAccountEnabled,
@@ -22,12 +31,9 @@ import {
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
 
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
-import AlertIcon from 'components/icons/AlertIcon'
-import { isEqual, orderBy } from 'lodash'
+import { isEqual } from 'lodash'
 
 import { POLL_INTERVAL } from "util/constant"
 import useInterval from "util/useInterval"
@@ -48,44 +54,8 @@ function Wallet() {
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
-
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
-
-  const now = Math.floor(Date.now() / 1000)
-
-  const pendingL1 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
-      i.crossDomainMessage &&
-      i.crossDomainMessage.crossDomainMessage === 1 &&
-      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending" &&
-      (now - i.timeStamp) < 20
-    ) {
-      return true
-    }
-    return false
-  })
-
-  const pendingL2 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L2' &&
-      i.crossDomainMessage &&
-      i.crossDomainMessage.crossDomainMessage === 1 &&
-      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending" &&
-      (now - i.timeStamp) < 20
-    ) {
-      return true
-    }
-    return false
-  })
-
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
 
   useEffect(()=>{
     if (accountEnabled)
@@ -135,7 +105,6 @@ function Wallet() {
     }
   }, [ layer ])
 
-
   const handleSwitch = (l) => {
     if (l === 'Token') {
       setPage('Token')
@@ -150,17 +119,19 @@ function Wallet() {
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
-  //console.log("layer:", layer)
-  //console.log("tooSmallETH:", tooSmallETH)
-  //console.log("network:", network)
-
   return (
     <S.PageContainer>
-      <PageTitle title="Wallet" />
+
+      <PageTitle title={'Wallet'} />
+
+      <Connect
+        userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
+        accountEnabled={accountEnabled}
+      />
+
       {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            {/* <AlertIcon /> */}
+        <G.LayerAlert>
+          <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
             <Typography
               flex={4}
@@ -169,11 +140,11 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting, 
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use 
+              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
               EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
             </Typography>
-          </S.AlertInfo>
+          </G.AlertInfo>
           <Button
             onClick={()=>{emergencySwap()}}
             color='primary'
@@ -181,31 +152,16 @@ function Wallet() {
           >
             EMERGENCY SWAP
           </Button>
-        </S.LayerAlert>
+        </G.LayerAlert>
       }
 
-      {!accountEnabled &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              Connect to MetaMask to see your balances, transfer, and bridge
-            </S.AlertText>
-          </S.AlertInfo>
-          <WalletPicker />
-        </S.LayerAlert>
-      }
-      <S.WalletActionContainer
-      >
-        <S.PageSwitcher>
+      <S.WalletActionContainer>
+        <G.PageSwitcher>
           <Typography
             className={chain === 'Ethereum Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
-                dispatch(switchChain('L1'))
+                dispatch(setConnectETH(true))
               }
             }}
             variant="body2"
@@ -216,34 +172,16 @@ function Wallet() {
             className={chain === 'Boba Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
-                dispatch(switchChain('L2'))
+                dispatch(setConnectBOBA(true))
               }
             }}
             variant="body2"
             component="span">
             Boba Wallet
           </Typography>
-        </S.PageSwitcher>
-        {!!accountEnabled && pending.length > 0 ? <S.PendingIndicator
-        >
-          <CircularProgress color="primary" size="20px"/>
-          <Typography
-            sx={{ cursor: 'pointer' }}
-            onClick={() => {
-              dispatch(setPageAction('History'))
-              dispatch(setActiveHistoryTab("Pending"))
-            }}
-            variant="text"
-            component="span">
-            Transaction in progress...
-          </Typography>
-        </S.PendingIndicator> : null}
+        </G.PageSwitcher>
       </S.WalletActionContainer>
-      {
-        !accountEnabled ?
-          <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-          : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-      }
+
       <Box sx={{ mt: 2 }}>
         <Tabs
           activeTab={page}

@@ -17,9 +17,9 @@ process.env.CONTRACTS_RPC_URL =
 
 import hre from 'hardhat'
 
-const sequencer = new Wallet(process.env.SEQUENCER_PRIVATE_KEY)
+const sequencer = process.env.SEQUENCER_ADDRESS
+const proposer = process.env.PROPOSER_ADDRESS
 const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
-const proposer = new Wallet(process.env.PROPOSER_PRIVATE_KEY)
 const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY)
 
 const parseEnv = () => {
@@ -56,8 +56,8 @@ const main = async () => {
     ctcEnqueueGasCost: config.ctcEnqueueGasCost,
     sccFraudProofWindow: config.sccFraudProofWindow,
     sccSequencerPublishWindow: config.sccFraudProofWindow,
-    ovmSequencerAddress: sequencer.address,
-    ovmProposerAddress: proposer.address,
+    ovmSequencerAddress: sequencer,
+    ovmProposerAddress: proposer,
     ovmRelayerAddress: relayer.address,
     ovmAddressManagerOwner: deployer.address,
     noCompile: process.env.NO_COMPILE ? true : false,
@@ -88,7 +88,7 @@ const main = async () => {
       return contractsAccumulator
     }, {})
 
-  contracts.OVM_Sequencer = await sequencer.getAddress()
+  contracts.OVM_Sequencer = sequencer
   contracts.Deployer = await deployer.getAddress()
 
   const addresses = JSON.stringify(contracts, null, 2)
