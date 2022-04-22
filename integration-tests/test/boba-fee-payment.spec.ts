@@ -33,6 +33,8 @@ describe('Boba Fee Payment Integration Tests', async () => {
   let Boba_GasPriceOracle: Contract
   let Proxy__Boba_GasPriceOracle: Contract
 
+  let Factory__Boba_GasPriceOracleProxyCall: ContractFactory
+  let Boba_GasPriceOracleProxyCall: Contract
   const other = '0x1234123412341234123412341234123412341234'
 
   before(async () => {
