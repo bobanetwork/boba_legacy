@@ -386,6 +386,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (stateRoot === null) {
           return MessageStatus.STATE_ROOT_NOT_PUBLISHED
         } else {
+          // for the fast relayer this should be zero
           const challengePeriod = await this.getChallengePeriodSeconds()
           const targetBlock = await this.l1Provider.getBlock(
             stateRoot.batch.blockNumber
@@ -402,6 +403,63 @@ export class CrossChainMessenger implements ICrossChainMessenger {
           return MessageStatus.RELAYED
         } else {
           return MessageStatus.RELAYED_FAILED
+        }
+      }
+    }
+  }
+
+  public async getMessageStatusFromContracts(
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
+  ): Promise<MessageStatus> {
+    const resolved = await this.toCrossChainMessage(message)
+    const messageHash = hashCrossChainMessage(resolved)
+    if (resolved.direction === MessageDirection.L1_TO_L2) {
+      throw new Error(`can only determine for L2 to L1 messages`)
+    } else {
+      const stateRoot = await this.getMessageStateRoot(resolved, opts)
+      if (stateRoot === null) {
+        return MessageStatus.STATE_ROOT_NOT_PUBLISHED
+      } else {
+        // for the fast relayer this should be zero
+        const challengePeriod = await this.getChallengePeriodSeconds()
+        const targetBlock = await this.l1Provider.getBlock(
+          stateRoot.batch.blockNumber
+        )
+        const latestBlock = await this.l1Provider.getBlock('latest')
+        if (targetBlock.timestamp + challengePeriod > latestBlock.timestamp) {
+          return MessageStatus.IN_CHALLENGE_PERIOD
+        } else {
+          let successStatus: boolean
+          let failedStatus: boolean
+          if (this.fastRelayer) {
+            successStatus =
+              await this.contracts.l1.L1CrossDomainMessengerFast.successfulMessages(
+                messageHash
+              )
+            failedStatus =
+              await this.contracts.l1.L1CrossDomainMessengerFast.failedMessages(
+                messageHash
+              )
+          } else {
+            successStatus =
+              await this.contracts.l1.L1CrossDomainMessenger.successfulMessages(
+                messageHash
+              )
+            failedStatus =
+              await this.contracts.l1.L1CrossDomainMessenger.failedMessages(
+                messageHash
+              )
+          }
+          if (successStatus) {
+            return MessageStatus.RELAYED
+          } else if (failedStatus) {
+            return MessageStatus.RELAYED_FAILED
+          } else {
+            return MessageStatus.READY_FOR_RELAY
+          }
         }
       }
     }
@@ -669,13 +727,20 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getChallengePeriodSeconds(): Promise<number> {
+    // if fast relayer return no challenge period
+    if (this.fastRelayer) {
+      return 0
+    }
     const challengePeriod =
       await this.contracts.l1.StateCommitmentChain.FRAUD_PROOF_WINDOW()
     return challengePeriod.toNumber()
   }
 
   public async getMessageStateRoot(
-    message: MessageLike
+    message: MessageLike,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<StateRoot | null> {
     const resolved = await this.toCrossChainMessage(message)
 
@@ -697,7 +762,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     // Pull down the state root batch, we'll try to pick out the specific state root that
     // corresponds to our message.
     const stateRootBatch = await this.getStateRootBatchByTransactionIndex(
-      messageTxIndex
+      messageTxIndex,
+      opts
     )
 
     // No state root batch, no state root.
@@ -726,12 +792,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateBatchAppendedEventByBatchIndex(
-    batchIndex: number
+    batchIndex: number,
+    opts?: {
+      fromBlock?: BlockTag
+    }
   ): Promise<ethers.Event | null> {
     const events = await this.contracts.l1.StateCommitmentChain.queryFilter(
       this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
         batchIndex
-      )
+      ),
+      opts?.fromBlock
     )
 
     if (events.length === 0) {
@@ -745,7 +815,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateBatchAppendedEventByTransactionIndex(
-    transactionIndex: number
+    transactionIndex: number,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<ethers.Event | null> {
     const isEventHi = (event: ethers.Event, index: number) => {
       const prevTotalElements = event.args._prevTotalElements.toNumber()
@@ -767,7 +840,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     let lowerBound = 0
     let upperBound = totalBatches.toNumber() - 1
     let batchEvent: ethers.Event | null =
-      await this.getStateBatchAppendedEventByBatchIndex(upperBound)
+      await this.getStateBatchAppendedEventByBatchIndex(upperBound, opts)
 
     // Only happens when no batches have been submitted yet.
     if (batchEvent === null) {
@@ -788,7 +861,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     while (lowerBound < upperBound) {
       const middleOfBounds = Math.floor((lowerBound + upperBound) / 2)
       batchEvent = await this.getStateBatchAppendedEventByBatchIndex(
-        middleOfBounds
+        middleOfBounds,
+        opts
       )
 
       if (isEventHi(batchEvent, transactionIndex)) {
@@ -804,10 +878,16 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getStateRootBatchByTransactionIndex(
-    transactionIndex: number
+    transactionIndex: number,
+    opts: {
+      fromBlock?: BlockTag
+    } = {}
   ): Promise<StateRootBatch | null> {
     const stateBatchAppendedEvent =
-      await this.getStateBatchAppendedEventByTransactionIndex(transactionIndex)
+      await this.getStateBatchAppendedEventByTransactionIndex(
+        transactionIndex,
+        opts
+      )
     if (stateBatchAppendedEvent === null) {
       return null
     }
@@ -1118,7 +1198,9 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       const proof = await this.getMessageProof(resolved)
 
       if (this.fastRelayer) {
-        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction.relayMessage(
+        return this.contracts.l1.L1CrossDomainMessengerFast.populateTransaction[
+          'relayMessage(address,address,bytes,uint256,(bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes))'
+        ](
           resolved.target,
           resolved.sender,
           resolved.message,
@@ -1161,10 +1243,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         })
       }
 
-      return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
-        batchMessage,
-        opts?.overrides || {}
-      )
+      if (this.fastRelayer) {
+        // ethers.js v5 does not handle overloading
+        return this.contracts.l1.L1MultiMessageRelayerFast.populateTransaction[
+          'batchRelayMessages((address,address,bytes,uint256,(bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes))[])'
+        ](batchMessage, opts?.overrides || {})
+      } else {
+        return this.contracts.l1.L1MultiMessageRelayer.populateTransaction.batchRelayMessages(
+          batchMessage,
+          opts?.overrides || {}
+        )
+      }
     },
 
     depositETH: async (

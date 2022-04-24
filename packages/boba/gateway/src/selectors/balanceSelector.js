@@ -100,3 +100,7 @@ export function selectL2BalanceBOBA (state) {
 export function selectUserAndL2LPBalanceBatch (state) {
   return state.balance.userAndL2LPBlanceBatch
 }
+
+export function selectExitFee (state) {
+  return state.balance.exitFee
+}

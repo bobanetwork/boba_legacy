@@ -5,8 +5,21 @@ import * as S from './MenuItems.styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectModalState } from 'selectors/uiSelector'
 import { setPage } from 'actions/uiAction'
+import { selectMonster } from 'selectors/setupSelector'
 
 function MenuItems ({ setOpen }) {
+
+  const monsterNumber = useSelector(selectMonster())
+  const monstersAdded = menuItems.some(item => item.key === 'Monster')
+
+  if(monsterNumber > 0 && !monstersAdded) {
+    menuItems.push({
+      key: 'Monster',
+      icon: "MonsterIcon",
+      title: "MonsterVerse",
+      url: "/"
+    })
+  }   
 
   const pageDisplay = useSelector(selectModalState('page'))
   const dispatch = useDispatch()

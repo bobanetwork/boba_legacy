@@ -1,6 +1,6 @@
 /* Imports: External */
 import { Wallet, utils, constants, BigNumber } from 'ethers'
-import { sleep } from '@eth-optimism/core-utils'
+import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
 import * as ynatm from '@eth-optimism/ynatm'
@@ -42,6 +42,12 @@ interface MessageRelayerOptions {
   pollingInterval?: number
 
   /**
+   * L1 block to start querying State commitments from. Recommended to set to the StateCommitmentChain deploy height
+   * not essential, only needed for optimization, event searches are already filtered by batchIndex
+   */
+  l1StartOffset?: number
+
+  /**
    * Size of the block range to query when looking for new SentMessage events.
    */
   getLogsInterval?: number
@@ -73,6 +79,8 @@ interface MessageRelayerOptions {
   resubmissionTimeout?: number
 
   maxWaitTxTimeS: number
+
+  isFastRelayer: boolean
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -92,6 +100,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       },
       pollingInterval: {
         default: 5000,
+      },
+      l1StartOffset: {
+        default: 0,
       },
       getLogsInterval: {
         default: 2000,
@@ -127,6 +138,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       getLogsInterval: this.options.getLogsInterval,
       minBatchSize: this.options.minBatchSize,
       maxWaitTimeS: this.options.maxWaitTimeS,
+      isFastRelayer: this.options.isFastRelayer,
     })
 
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
@@ -135,6 +147,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,
       l1ChainId,
+      fastRelayer: this.options.isFastRelayer,
     })
 
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
@@ -162,10 +175,18 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       try {
         // Check that the correct address is set in the address manager,
         // this is a requirement for batch-relayer
-        const relayer =
-          await this.state.messenger.contracts.l1.AddressManager.getAddress(
-            'L2BatchMessageRelayer'
-          )
+        let relayer: Address
+        if (this.options.isFastRelayer) {
+          relayer =
+            await this.state.messenger.contracts.l1.AddressManager.getAddress(
+              'L2BatchFastMessageRelayer'
+            )
+        } else {
+          relayer =
+            await this.state.messenger.contracts.l1.AddressManager.getAddress(
+              'L2BatchMessageRelayer'
+            )
+        }
         // If it is address(0), then message relaying is not authenticated
         if (relayer !== constants.AddressZero) {
           const address = await this.options.l1Wallet.getAddress()
@@ -227,7 +248,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Filter out messages which have been processed
             const newMB = []
             for (const cur of this.state.messageBuffer) {
-              const status = await this.state.messenger.getMessageStatus(cur)
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(cur, {
+                  fromBlock: this.options.l1StartOffset,
+                })
               if (
                 // check failed message here too
                 status !== MessageStatus.RELAYED &&
@@ -259,10 +283,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                 _gasPrice: BigNumber
               ): Promise<any> => {
                 // Generate the transaction we will repeatedly submit
+                const nonce = await this.options.l1Wallet.getTransactionCount()
                 const txResponse =
                   await this.state.messenger.finalizeBatchMessage(subBuffer, {
                     overrides: {
                       gasPrice: _gasPrice,
+                      nonce,
                     },
                   })
                 const txReceipt = await txResponse.wait(
@@ -386,9 +412,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // wait for a few seconds before we check again to see if this transaction is finalized.
             let isFinalized = true
             for (const message of messages) {
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
+                )
               if (
                 status === MessageStatus.IN_CHALLENGE_PERIOD ||
                 status === MessageStatus.STATE_ROOT_NOT_PUBLISHED
@@ -417,9 +447,26 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
             for (const message of messages) {
-              const status = await this.state.messenger.getMessageStatus(
-                message
-              )
+              // filter out messages not meant for this relayer
+              if (this.options.isFastRelayer) {
+                if (!this.state.filter.includes(message.target)) {
+                  this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+              } else {
+                if (this.state.filter.includes(message.target)) {
+                  this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+              }
+
+              const status =
+                await this.state.messenger.getMessageStatusFromContracts(
+                  message,
+                  {
+                    fromBlock: this.options.l1StartOffset,
+                  }
+                )
               if (status === MessageStatus.RELAYED) {
                 this.logger.info('Message has already been relayed, skipping.')
                 continue
@@ -427,12 +474,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
               if (status === MessageStatus.RELAYED_FAILED) {
                 this.logger.info('Last message was failed, skipping.')
-                continue
-              }
-
-              // filter out messages not meant for this relayer
-              if (this.state.filter.includes(message.target)) {
-                this.logger.info('Message not intended for target, skipping.')
                 continue
               }
 

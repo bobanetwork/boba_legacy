@@ -15,6 +15,9 @@
     },
     "TuringHelperFactory": {
       "address": "TODO"
+    },
+    "TuringMonsters": {
+      "address": "0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793"
     }
   }
 }

@@ -17,6 +17,8 @@ import L2ERC721UniqueDataJson from '../artifacts/contracts/TestUniqueDataL2Stand
 import ERC721ExtraDataJson from '../artifacts/contracts/TestExtraDataERC721.sol/TestExtraDataERC721.json'
 import L1ERC721ExtraDataJson from '../artifacts/contracts/TestExtraDataL1StandardERC721.sol/TestExtraDataL1StandardERC721.json'
 import L2ERC721ExtraDataJson from '../artifacts/contracts/TestExtraDataL2StandardERC721.sol/TestExtraDataL2StandardERC721.json'
+import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
+import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 import { ethers } from 'hardhat'
@@ -28,6 +30,9 @@ describe('NFT Bridge Test', async () => {
   let L2Bridge: Contract
   let L1ERC721: Contract
   let L2ERC721: Contract
+
+  let L2BOBAToken: Contract
+  let BOBABillingContract: Contract
 
   let env: OptimismEnv
 
@@ -47,6 +52,18 @@ describe('NFT Bridge Test', async () => {
     L2Bridge = new Contract(
       env.addressesBOBA.Proxy__L2NFTBridge,
       L2NFTBridge.abi,
+      env.l2Wallet
+    )
+
+    L2BOBAToken = new Contract(
+      env.addressesBOBA.TOKENS.BOBA.L2,
+      L2GovernanceERC20Json.abi,
+      env.l2Wallet
+    )
+
+    BOBABillingContract = new Contract(
+      env.addressesBOBA.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
       env.l2Wallet
     )
   })
@@ -105,11 +122,7 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(
-          L1ERC721.address,
-          DUMMY_TOKEN_ID,
-          9999999
-        )
+        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -141,12 +154,51 @@ describe('NFT Bridge Test', async () => {
       ).to.be.reverted
     })
 
+    it('{tag:boba} should fail to withdraw NFT if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to withdraw NFT if not approving Boba', async () => {
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should withdraw NFT', async () => {
       const approveTX = await L2ERC721.connect(env.l2Wallet_2).approve(
         L2Bridge.address,
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
@@ -184,12 +236,53 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
+    it('{tag:boba} should fail to withdraw NFT to another wallet if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdrawTo(
+          L2ERC721.address,
+          env.l2Wallet_2.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to withdraw NFT to another wallet if not approving Boba', async () => {
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdrawTo(
+          L2ERC721.address,
+          env.l2Wallet_2.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should withdraw NFT to another L1 wallet', async () => {
       const approveTX = await L2ERC721.connect(env.l2Wallet).approve(
         L2Bridge.address,
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet).withdrawTo(
           L2ERC721.address,
@@ -243,12 +336,51 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet_2.address)
     })
 
+    it('{tag:boba} should fail to withdraw NFT with metadata if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdrawWithExtraData(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to withdraw NFT with metadata if not approving Boba', async () => {
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraData(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should be able to attempt withdraw NFT with metadata', async () => {
       const approveTX = await L2ERC721.connect(env.l2Wallet_2).approve(
         L2Bridge.address,
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraData(
           L2ERC721.address,
@@ -363,6 +495,43 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
+    it('{tag:boba} should fail to exit NFT if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to exit NFT if not approving Boba', async () => {
+      // Reset allowance
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        0
+      )
+      await approveBOBATX.wait()
+
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdraw(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should exit NFT from L2', async () => {
       // mint nft
       const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
@@ -371,12 +540,16 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
-        L2Bridge.withdraw(
-          L2ERC721.address,
-          DUMMY_TOKEN_ID,
-          9999999
-        )
+        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
@@ -425,11 +598,7 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(
-          L1ERC721.address,
-          DUMMY_TOKEN_ID,
-          9999999
-        )
+        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
@@ -440,9 +609,56 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
+    it('{tag:boba} should fail to exit NFT to another L1 wallet if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdrawTo(
+          L2ERC721.address,
+          env.l2Wallet_2.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to exit NFT to another L1 wallet if not approving Boba', async () => {
+      // Reset allowance
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        0
+      )
+      await approveBOBATX.wait()
+
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdrawTo(
+          L2ERC721.address,
+          env.l2Wallet_2.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should exit NFT to another L1 wallet', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       await env.waitForXDomainTransaction(
         L2Bridge.withdrawTo(
@@ -467,6 +683,14 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L1Bridge.connect(env.l1Wallet_2).depositNFTTo(
           L1ERC721.address,
@@ -484,9 +708,54 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
 
+    it('{tag:boba} should fail to exit NFT with metadata if not enough Boba balance', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+
+      await expect(
+        L2Bridge.connect(newWallet).withdrawWithExtraData(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds balance'
+      )
+    })
+
+    it('{tag:boba} should fail to exit NFT with metadata if not approving Boba', async () => {
+      // Reset allowance
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        0
+      )
+      await approveBOBATX.wait()
+
+      await expect(
+        L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraData(
+          L2ERC721.address,
+          DUMMY_TOKEN_ID,
+          9999999
+        )
+      ).to.be.revertedWith(
+        'execution reverted: ERC20: transfer amount exceeds allowance'
+      )
+    })
+
     it('{tag:boba} should be able to attempt exit NFT with metadata from L2', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdrawWithExtraData(
@@ -571,6 +840,14 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await expect(
         L2Bridge.withdraw(L2ERC721Test.address, DUMMY_TOKEN_ID, 9999999)
       ).to.be.revertedWith("Can't Find L1 NFT Contract")
@@ -649,11 +926,7 @@ describe('NFT Bridge Test', async () => {
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
-        L1Bridge.depositNFT(
-          L1ERC721.address,
-          DUMMY_TOKEN_ID,
-          9999999
-        )
+        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
     })
 
@@ -663,6 +936,15 @@ describe('NFT Bridge Test', async () => {
         true
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC721.address,
@@ -729,12 +1011,16 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
-        L2Bridge.withdraw(
-          L2ERC721.address,
-          DUMMY_TOKEN_ID,
-          9999999
-        )
+        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
     })
 
@@ -861,13 +1147,21 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTX.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       // withdraw with metadata does not provide any advantage for non-native token
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet).withdrawWithExtraData(
           L2ERC721.address,
           DUMMY_TOKEN_ID,
           9999999
-        ) 
+        )
       )
 
       // check event WithdrawalInitiated is emitted with empty data
@@ -944,6 +1238,15 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraDataTo(
           L2ERC721.address,
@@ -1001,6 +1304,14 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       // withdraw with metadata does not provide any advantage for non-native token
       const withdrawTx = await env.waitForXDomainTransaction(
@@ -1147,6 +1458,14 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTX.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       // withdraw with metadata does not provide any advantage for non-native token
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet).withdrawWithExtraData(
@@ -1233,6 +1552,15 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet_2).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdrawWithExtraDataTo(
           L2ERC721.address,
@@ -1290,6 +1618,14 @@ describe('NFT Bridge Test', async () => {
         DUMMY_TOKEN_ID
       )
       await approveTX.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       // withdraw with metadata does not provide any advantage for non-native token
       const withdrawTx = await env.waitForXDomainTransaction(
@@ -1381,6 +1717,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdrawWithExtraData(
           L2ERC721.address,
@@ -1464,6 +1808,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdrawWithExtraDataTo(
           L2ERC721.address,
@@ -1529,6 +1881,14 @@ describe('NFT Bridge Test', async () => {
     it('{tag:boba} should be able to withdraw NFT without metadata to L1', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
@@ -1659,6 +2019,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdrawWithExtraData(
           L2ERC721.address,
@@ -1750,6 +2118,14 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdrawWithExtraDataTo(
           L2ERC721.address,
@@ -1818,6 +2194,14 @@ describe('NFT Bridge Test', async () => {
     it('{tag:boba} should be able to withdraw NFT without metadata to L1', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
 
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
@@ -1995,6 +2379,14 @@ describe('NFT Bridge Test', async () => {
       const unpauseL2Tx = await L2Bridge.unpause()
       await unpauseL2Tx.wait()
 
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
       await env.waitForXDomainTransaction(
         L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
@@ -2024,108 +2416,21 @@ describe('NFT Bridge Test', async () => {
     })
   })
 
-  describe('Relay gas burn tests', async () => {
-    before(async () => {
-      Factory__L2ERC721 = new ContractFactory(
-        ERC721Json.abi,
-        ERC721Json.bytecode,
-        env.l2Wallet
-      )
-
-      Factory__L1ERC721 = new ContractFactory(
-        L1ERC721Json.abi,
-        L1ERC721Json.bytecode,
-        env.l1Wallet
-      )
-
-      // deploy a L2 native NFT token each time if existing contracts are used for tests
-      L2ERC721 = await Factory__L2ERC721.deploy('Test', 'TST')
-
-      await L2ERC721.deployTransaction.wait()
-
-      L1ERC721 = await Factory__L1ERC721.deploy(
-        L1Bridge.address,
-        L2ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
-      )
-
-      await L1ERC721.deployTransaction.wait()
-
-      // register NFT
-      const registerL1BridgeTx = await L1Bridge.registerNFTPair(
-        L1ERC721.address,
-        L2ERC721.address,
-        'L2'
-      )
-      await registerL1BridgeTx.wait()
-
-      const registerL2BridgeTx = await L2Bridge.registerNFTPair(
-        L1ERC721.address,
-        L2ERC721.address,
-        'L2'
-      )
-      await registerL2BridgeTx.wait()
-    })
-
-    it('{tag:boba} should not allow updating extraGasRelay for non-owner', async () => {
-      const newExtraGasRelay = 500000
+  describe('Configuration tests', async () => {
+    it('{tag:boba} should not allow to configure billing contract address for non-owner', async () => {
       await expect(
-        L2Bridge.connect(env.l2Wallet_2).configureExtraGasRelay(
-          newExtraGasRelay
+        L2Bridge.connect(env.l2Wallet_2).configureBillingContractAddress(
+          env.addressesBOBA.Proxy__BobaBillingContract
         )
-      ).to.be.revertedWith('Caller is not the gasPriceOracle owner')
+      ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('{tag:boba} should allow updating extraGasRelay for owner', async () => {
-      const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
-      await mintTx.wait()
-      const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
-      await approveTx.wait()
-
-      const estimatedGas = await L2Bridge.estimateGas.withdraw(
-        L2ERC721.address,
-        DUMMY_TOKEN_ID,
-        9999999
-      )
-
-      const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await L2Bridge.connect(
-        env.l2Wallet_4
-      ).configureExtraGasRelay(newExtraGasRelay)
-      await configureTx.wait()
-
-      const updatedExtraGasRelay = await L2Bridge.extraGasRelay()
-      expect(updatedExtraGasRelay).to.eq(newExtraGasRelay)
-    })
-
-    it('{tag:boba} should be able to exit with the correct added gas', async () => {
-      const extraGas = 1000000
-
-      const resetGasTx = await L2Bridge.connect(
-        env.l2Wallet_4
-      ).configureExtraGasRelay(0)
-      await resetGasTx.wait()
-
-      const preGas = await L2Bridge.estimateGas.withdraw(
-        L2ERC721.address,
-        DUMMY_TOKEN_ID,
-        9999999
-      )
-
-      const addGasTx = await L2Bridge.connect(
-        env.l2Wallet_4
-      ).configureExtraGasRelay(extraGas)
-      await addGasTx.wait()
-
-      const afterGas = await L2Bridge.estimateGas.withdraw(
-        L2ERC721.address,
-        DUMMY_TOKEN_ID,
-        9999999
-      )
-
-      expect(afterGas).to.be.gt(preGas.add(BigNumber.from(extraGas)))
+    it('{tag:boba} should not allow to configure billing contract address to zero address', async () => {
+      await expect(
+        L2Bridge.connect(env.l2Wallet).configureBillingContractAddress(
+          ethers.constants.AddressZero
+        )
+      ).to.be.revertedWith('Billing contract address cannot be zero')
     })
   })
 })

@@ -40,12 +40,21 @@ const main = async () => {
 
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   const L1_NODE_WEB3_URL = config.str('l1-node-web3-url', env.L1_NODE_WEB3_URL)
-  const RELAYER_PRIVATE_KEY = config.str(
-    'l1-wallet-key',
-    env.RELAYER_PRIVATE_KEY
-  )
+  let RELAYER_PRIVATE_KEY = config.str('l1-wallet-key', env.RELAYER_PRIVATE_KEY)
   const MNEMONIC = config.str('mnemonic', env.MNEMONIC)
   const HD_PATH = config.str('hd-path', env.HD_PATH)
+
+  // run as message relayer fast
+  const FAST_RELAYER = config.bool('fast-relayer', env.FAST_RELAYER === 'true')
+  // check if FAST_RELAYER_PRIVATE_KEY is passed
+  const FAST_RELAYER_PRIVATE_KEY = config.str(
+    'l1-wallet-key-fast',
+    env.FAST_RELAYER_PRIVATE_KEY
+  )
+  // if this exists and is fast-relayer mode, use this account
+  if (FAST_RELAYER_PRIVATE_KEY && FAST_RELAYER) {
+    RELAYER_PRIVATE_KEY = FAST_RELAYER_PRIVATE_KEY
+  }
   //batch system
   const MIN_BATCH_SIZE = config.uint(
     'min-batch-size',
@@ -70,6 +79,10 @@ const main = async () => {
   const GET_LOGS_INTERVAL = config.uint(
     'get-logs-interval',
     parseInt(env.GET_LOGS_INTERVAL, 10) || 2000
+  )
+  const L1_START_OFFSET = config.uint(
+    'l1-start-offset',
+    parseInt(env.L1_BLOCK_OFFSET, 10) || 1
   )
   const FROM_L2_TRANSACTION_INDEX = config.uint(
     'from-l2-transaction-index',
@@ -138,6 +151,7 @@ const main = async () => {
     maxWaitTxTimeS: MAX_WAIT_TX_TIME_S,
     fromL2TransactionIndex: FROM_L2_TRANSACTION_INDEX,
     pollingInterval: POLLING_INTERVAL,
+    l1StartOffset: L1_START_OFFSET,
     getLogsInterval: GET_LOGS_INTERVAL,
     logger,
     filterEndpoint: FILTER_ENDPOINT,
@@ -148,6 +162,7 @@ const main = async () => {
     numConfirmations: NUM_CONFIRMATIONS,
     multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
+    isFastRelayer: FAST_RELAYER,
   })
 
   await service.start()

@@ -1,0 +1,129 @@
+.faucetContainer {
+    position: relative;
+    max-width: 800px;
+    width: 80%;
+    background: rgb(255, 255, 255);
+    box-shadow: rgb(0 0 0 / 1%) 0px 0px 1px, rgb(0 0 0 / 4%) 0px 4px 8px, rgb(0 0 0 / 4%) 0px 16px 24px, rgb(0 0 0 / 1%) 0px 24px 32px;
+    border-radius: 5px;
+    margin-top: calc(25vh - 160px);
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 1;
+    padding: 20px;
+    font-family: 'Averta', sans-serif;
+}
+
+.title {
+    font-size: 30px;
+    margin: 8px 0px 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: rgb(26, 43, 107);
+}
+
+.middleText {
+    margin: 24px 0px 32px;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgb(61, 69, 86);
+}
+
+.smallText {
+    margin: 0px 0px 8px;
+    width: 100%;
+    color: rgb(26, 43, 107);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+}
+
+.faucetInput {
+    max-width: 450px;
+    border-radius: 5px !important;
+    height: 50px;
+    font-size: 18px !important;
+}
+
+.faucetSelect {
+    font-size: 18px !important;
+    width: 250px !important;
+    padding: 20px !important;
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    border-radius: 5px;
+    border-color: #a0b3f2 !important;
+    background-color: #f5f7fd !important;
+    cursor: pointer;
+    padding: 0px;
+    color: rgb(109, 115, 128) !important;
+    margin-bottom: 10px !important;
+}
+
+.faucetUnselect {
+    font-size: 18px !important;
+    width: 250px !important;
+    padding: 20px !important;
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    border-radius: 5px;
+    border-color: #e7e8ea !important;
+    background-color: var( --color-zircon );
+    cursor: pointer;
+    padding: 0px;
+    color: rgb(109, 115, 128) !important;
+    margin-bottom: 10px !important;
+}
+
+.captchaImage {
+    border-radius: 5px;
+    height: 50px;
+}
+
+.captchaInput {
+    max-width: 300px;
+    border-radius: 5px !important;
+    height: 50px;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+}
+
+.disableRequestButton {
+    display: inherit !important;
+    height: 50px !important;
+    margin: 30px 16px 0px 0px !important;
+    appearance: none !important;
+    text-align: center !important;
+    border: 2px solid rgb(55, 91, 210);
+    font-size: 18px !important;
+    line-height: 20px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    background-color: rgb(55, 91, 210);
+    color: rgb(255, 255, 255);
+    padding: 0px 30px 0px 30px !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+
+.requestButton {
+    display: inherit !important;
+    height: 50px !important;
+    margin: 30px 16px 0px 0px !important;
+    appearance: none !important;
+    text-align: center !important;
+    border: 2px solid rgb(55, 91, 210) !important;
+    font-size: 18px !important;
+    line-height: 20px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    background-color: rgb(55, 91, 210) !important;
+    color: rgb(255, 255, 255) !important;
+    padding: 0px 30px 0px 30px !important;
+    border-radius: 5px !important;
+    box-shadow: none !important;
+}

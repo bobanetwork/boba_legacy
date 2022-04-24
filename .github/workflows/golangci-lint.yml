@@ -22,15 +22,15 @@ jobs:
       - name: golangci-lint gas-oracle
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.29
+          version: v1.45.2
           working-directory: go/gas-oracle
       - name: golangci-lint batch-submitter
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.29
+          version: v1.45.2
           working-directory: go/batch-submitter
       - name: golangci-lint bss-core
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.29
+          version: v1.45.2
           working-directory: go/bss-core

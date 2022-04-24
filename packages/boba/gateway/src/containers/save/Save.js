@@ -21,23 +21,19 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
-
-import AlertIcon from 'components/icons/AlertIcon'
-
 import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
-
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
+
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 import ListSave from 'components/listSave/listSave'
+import Connect from 'containers/connect/Connect'
 
 import { toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'
@@ -133,45 +129,46 @@ class Save extends React.Component {
 
   async getMaxTransferValue () {
 
-    const { 
-      layer2, 
-      bobaFeeChoice, 
-      bobaFeePriceRatio 
+    const {
+      layer2,
+      bobaFeeChoice,
+      bobaFeePriceRatio,
+      netLayer
     } = this.state
-    
+
     // as staking BOBA check the bobabalance
     const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA')
-    console.log("Token:",token)
 
     // BOBA available prepare transferEstimate
     if (token) {
-      //console.log("balance:",token.balance.toString())
-      let cost_BN = await networkService.savingEstimate()
-      console.log([ `cost_BN`, cost_BN ])
+
       let max_BN = BigNumber.from(token.balance.toString())
       let fee = '0'
 
-      if (bobaFeeChoice) {
-        // we are staking BOBA and paying in BOBA
-        // so need to subtract the BOBA fee
-        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+      if (netLayer === 'L2') {
+        let cost_BN = await networkService.savingEstimate()
+        console.log([ `cost_BN`, cost_BN ])
+        if (bobaFeeChoice) {
+          // we are staking BOBA and paying in BOBA
+          // so need to subtract the BOBA fee
+          max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
+        }
+
+        // make sure user maintains minimum BOBA in account
+        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
+
+        if (bobaFeeChoice)
+          fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), token.decimals)
+        else
+          fee = utils.formatUnits(cost_BN, token.decimals)
       }
-
-      // make sure user maintains minimum BOBA in account
-      max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-      
-      if(bobaFeeChoice)
-        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), token.decimals)
-      else 
-        fee = utils.formatUnits(cost_BN, token.decimals)
-
       // if the max amount is less than the gas,
       // set the max amount to zero
       if (max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
       }
 
-      this.setState({ 
+      this.setState({
         max_Float_String: utils.formatUnits(max_BN, token.decimals),
         fee
       })
@@ -182,8 +179,8 @@ class Save extends React.Component {
 
   handleStakeValue(value) {
 
-    const { 
-      max_Float_String 
+    const {
+      max_Float_String
     } = this.state
 
     if( value &&
@@ -228,7 +225,7 @@ class Save extends React.Component {
       loading,
       max_Float_String,
       bobaFeeChoice,
-      fee 
+      fee
     } = this.state
 
     let totalBOBAstaked = 0
@@ -241,13 +238,16 @@ class Save extends React.Component {
 
     return (
       <S.StakePageContainer>
-        <Box sx={{ my: 1 }}>
-          <PageTitle title="Stake BOBA" />
-          {(netLayer !== 'L2') ?
-            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2 </Typography>
-            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>
-          }
-        </Box>
+
+        <PageTitle title={'Stake'} />
+
+        <Connect
+          userPrompt={'Please connect to Boba to stake'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>
@@ -268,7 +268,7 @@ class Save extends React.Component {
                     Active stakes
                   </Typography>
                   <Typography variant="h3" >
-                    {totalBOBAstaked} Boba
+                    {totalBOBAstaked} BOBA
                   </Typography>
                 </Box>
               </S.StakeItem>
@@ -281,7 +281,7 @@ class Save extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <Typography variant="body2"> Boba Balance:</Typography>
+                <Typography variant="body2"> BOBA Balance:</Typography>
                 <Typography variant="body2"> {max_Float_String} </Typography>
               </Box>
               <Input
@@ -296,6 +296,7 @@ class Save extends React.Component {
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
+              
               {netLayer === 'L2' && bobaFeeChoice && fee &&
                 <Typography variant="body2" sx={{ mt: 2 }}>
                   Fee: {fee} BOBA
@@ -307,8 +308,8 @@ class Save extends React.Component {
                   Fee: {fee} ETH
                 </Typography>
               }
-              {!accountEnabled ? <WalletPicker fullWidth={true} label="Connect to Boba" /> : null }
-              { netLayer === 'L2' ?
+
+              { netLayer === 'L2' &&
                   <Button
                     color="primary"
                     variant="outlined"
@@ -319,20 +320,6 @@ class Save extends React.Component {
                   >
                     Stake
                   </Button>
-                  : netLayer === 'L1' ?
-                  <S.LayerAlert>
-                    <S.AlertInfo>
-                      <AlertIcon />
-                      <S.AlertText
-                        variant="body3"
-                        component="p"
-                      >
-                        You are on Ethereum. To stake, SWITCH to Boba
-                      </S.AlertText>
-                    </S.AlertInfo>
-                    <LayerSwitcher fullWidth={true} isButton={true} />
-                  </S.LayerAlert>
-                  : null
               }
             </S.StakeInputContainer>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }} style={{lineHeight: '1.0em'}}>
@@ -359,7 +346,7 @@ class Save extends React.Component {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <BobaGlassIcon />
                 <Typography variant="body1" >
-                  Stake Boba
+                  Stake BOBA
                 </Typography>
               </Box>
             </S.StakeHeadContainer>

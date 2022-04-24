@@ -19,7 +19,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 
-function InputStep({ handleClose, token }) {
+function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -98,13 +98,33 @@ function InputStep({ handleClose, token }) {
     convertToUSD = true
   }
 
+  if( Number(logAmount(token.balance, token.decimals)) === 0) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          Sorry, nothing to deposit - no {token.symbol} in this wallet
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
+        >
+          Cancel
+        </Button>
+      </Box>)
+  }
+
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
-        </Typography>
-
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
+            Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
+          </Typography>
+        }
         <Input
           label="Amount to bridge to L2"
           placeholder="0.0"
@@ -123,6 +143,8 @@ function InputStep({ handleClose, token }) {
           maxValue={maxValue}
           variant="standard"
           newStyle
+          isBridge={isBridge}
+          openTokenPicker={openTokenPicker}
         />
 
         {!!convertToUSD && (
@@ -144,8 +166,10 @@ function InputStep({ handleClose, token }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          color="neutral"
-          size="large"
+          disabled={false}
+          variant='outlined'
+          color='primary'
+          size='large'
         >
           {buttonLabel_1}
         </Button>

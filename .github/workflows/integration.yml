@@ -278,7 +278,7 @@ jobs:
 
       - name: Start background logging
         working-directory: ./ops
-        run: docker-compose -f docker-compose.yml logs --follow &
+        run: docker-compose -f docker-compose.yml logs --follow kms batch_submitter &
 
       - name: Run the integration tests
         working-directory: ./ops
@@ -373,9 +373,9 @@ jobs:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           label: ${{ steps.runner_info.outputs.label }}
           ec2-instance-id: ${{ steps.runner_info.outputs.ec2-instance-id }}
-      - name: Sleep for 5 seconds
+      - name: Sleep for 10 seconds
         if: steps.stop-ec2-executioner.outcome == 'failure'
-        run: sleep 5s
+        run: sleep 10s
         shell: bash
       - name: Stop EC2 executioner
         if: steps.stop-ec2-executioner.outcome == 'failure'

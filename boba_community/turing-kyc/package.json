@@ -1,0 +1,48 @@
+{
+  "name": "@boba/turing-kyc",
+  "version": "0.1.0",
+  "description": "Turing KYC example",
+  "main": "index.js",
+  "repository": "git@github.com:bobanetwork/boba/packages/boba/boba_community/turing-kyc",
+  "license": "Internal use only",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf ./artifacts ./cache",
+    "start:lambda": "python-lambda-local -f lambda_handler aws/kyc.py aws/event.json",
+    "start:lambda-sam": "cd aws && sam build && sam local invoke -e event.json && cd ..",
+    "build": "yarn build:contracts",
+    "build:contracts": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "test:local": "hardhat --network boba_local test",
+    "test:rinkeby": "hardhat --network boba_rinkeby test",
+    "test:mainnet": "hardhat --network boba_mainnet test"
+  },
+  "devDependencies": {
+    "@eth-optimism/contracts": "^0.5.11",
+    "@ethersproject/address": "^5.0.11",
+    "@ethersproject/contracts": "^5.0.11",
+    "@ethersproject/networks": "^5.0.11",
+    "@ethersproject/providers": "^5.0.24",
+    "@ethersproject/solidity": "^5.0.11",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@openzeppelin/contracts-upgradeable": "4.3.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.0.32",
+    "hardhat": "^2.8.4",
+    "mocha": "^8.3.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "base64-sol": "^1.1.0",
+    "dotenv": "^16.0.0",
+    "ip": "^1.1.5",
+    "request-promise-native": "^1.0.9",
+    "web3": "^1.6.1",
+    "web3-eth-abi": "^1.6.1"
+  }
+}

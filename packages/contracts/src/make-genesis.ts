@@ -52,6 +52,19 @@ export interface RollupDeployConfig {
   berlinBlock: number
 }
 
+const addSlotsForBobaProxyContract = (
+  dump: any, predeployAddress: string, variable: any
+) => {
+  for (const keyName of Object.keys(variable)) {
+    const key = utils.hexlify(utils.toUtf8Bytes(keyName));
+    const index = BigNumber.from('0').toHexString();
+    const newKeyPreimage = utils.concat([key, utils.hexZeroPad(index, 32)]);
+    const compositeKey = utils.keccak256(utils.hexlify(newKeyPreimage));
+    dump[predeployAddress].storage[compositeKey] = variable[keyName]
+  }
+  return dump
+}
+
 /**
  * Generates the initial state for the L2 system by injecting the relevant L2 system contracts.
  *
@@ -123,15 +136,21 @@ export const makeL2GenesisFile = async (
       l1Token: cfg.l1BobaTokenAddress,
       l2Bridge:predeploys.L2StandardBridge,
     },
+    Proxy__Boba_GasPriceOracle: {
+      proxyOwner: cfg.deployer,
+      proxyTarget: predeploys.Boba_GasPriceOracle
+    },
     Boba_GasPriceOracle: {
       _owner: cfg.gasPriceOracleOwner,
-      l1FeeWallet: cfg.l1FeeWalletAddress,
+      feeWallet: cfg.l1FeeWalletAddress,
       l2BobaAddress: predeploys.L2GovernanceERC20,
       minPriceRatio: 500,
       maxPriceRatio: 5000,
       priceRatio: 2000,
       gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
       metaTransactionFee: utils.parseEther('3'),
+      receivedETHAmount: utils.parseEther('0.005'),
+      marketPriceRatio: 2000,
     }
   }
 
@@ -150,11 +169,17 @@ export const makeL2GenesisFile = async (
       // and returns the address given by that opcode.
       dump[predeployAddress].code = '0x4B60005260206000F3'
     } else if (predeployName === 'BobaTuringHelper') {
+      // Add a default BobaTuringHelper for testing purposes
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
-
     } else if (predeployName === 'L2GovernanceERC20') {
+      // Fix the address(this) of L2GovernanceERC20
       dump[predeployAddress].code = L2GovernanceERC20Helper.L2GovernanceERC20Bytecode
+    } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
+      // Add proxy contract for Boba_GasPriceOracle
+      const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')
+      dump[predeployAddress].code = artifact.deployedBytecode
     } else {
+      // Standard case: get the deployed bytecode from the artifact
       const artifact = getContractArtifact(predeployName)
       dump[predeployAddress].code = artifact.deployedBytecode
     }
@@ -162,26 +187,32 @@ export const makeL2GenesisFile = async (
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
       if (predeployName === 'BobaTuringHelper') {
+        // Add a default BobaTuringHelper for testing purposes
         const indexOwner = BigNumber.from('0').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
         continue
       }
+      if (predeployName === 'Proxy__Boba_GasPriceOracle') {
+        // Add a proxy contract for Boba_GasPriceOracle
+        addSlotsForBobaProxyContract(dump, predeployAddress, variables[predeployName])
+        const storageLayout = await getStorageLayout('Boba_GasPriceOracle')
+        const slots = computeStorageSlots(storageLayout, variables['Boba_GasPriceOracle'])
+        for (const slot of slots) {
+          dump[predeploys.Proxy__Boba_GasPriceOracle].storage[slot.key] = slot.val
+        }
+        continue
+      }
       const storageLayout = await getStorageLayout(predeployName)
       // Calculate the mapping keys
       if (predeployName === 'Lib_ResolvedDelegateBobaProxy') {
-        for (const keyName of Object.keys(variables[predeployName])) {
-          const key = utils.hexlify(utils.toUtf8Bytes(keyName));
-          const index = BigNumber.from('0').toHexString();
-          const newKeyPreimage = utils.concat([key, utils.hexZeroPad(index, 32)]);
-          const compositeKey = utils.keccak256(utils.hexlify(newKeyPreimage));
-          dump[predeployAddress].storage[compositeKey] = variables[predeployName][keyName]
-        }
+        addSlotsForBobaProxyContract(dump, predeployAddress, variables[predeployName])
       } else {
         const slots = computeStorageSlots(storageLayout, variables[predeployName])
         for (const slot of slots) {
           dump[predeployAddress].storage[slot.key] = slot.val
+          // Add the storage slots for Proxy__BobaTuringCredit
           if (predeployName === "BobaTuringCredit") {
             dump[predeploys.Lib_ResolvedDelegateBobaProxy].storage[slot.key] = slot.val
           }

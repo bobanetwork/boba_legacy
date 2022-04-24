@@ -20,7 +20,7 @@ import { selectModalState } from 'selectors/uiSelector'
 import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
-import { Grid, Link, Typography } from '@mui/material'
+import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 import * as S from './Home.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
 
@@ -33,10 +33,19 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
+import {
+  getMonsterInfo
+} from 'actions/nftAction'
+
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
-import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
+import {
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectNetwork,
+  selectLayer
+} from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
 
@@ -62,6 +71,10 @@ import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
+import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
+import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
+import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 
 import {
   fetchDaoBalance,
@@ -72,17 +85,22 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import {
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2
+} from 'actions/airdropAction'
+
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
 
 import Airdrop from 'containers/airdrop/Airdrop'
-import Account from 'containers/account/Account'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
+import Bridge from 'containers/bridge/Bridge'
+import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
 
@@ -91,12 +109,16 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 require('dotenv').config()
 
 function Home() {
 
   const dispatch = useDispatch()
+  const theme = useTheme()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
@@ -107,14 +129,19 @@ function Home() {
 
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
-  
+
   const transferModalState = useSelector(selectModalState('transferModal'))
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
-  
+
   const exitModalState = useSelector(selectModalState('exitModal'))
+  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
+  const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
+  const transferPendingModalState = useSelector(selectModalState('transferPending'));
+  const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
+  const tokenIndex = useSelector(selectModalState('tokenIndex'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -179,8 +206,9 @@ function Home() {
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
+      dispatch(getMonsterInfo())       // account specific
     }
-    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
@@ -195,12 +223,13 @@ function Home() {
     dispatch(fetchGas())
     dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
-  }, [dispatch, maintenance])
+  }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
+      dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -222,6 +251,10 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
+      {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
+      {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
+      {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
 
       <Alert
         type='error'
@@ -242,6 +275,8 @@ function Home() {
       >
         {alertMessage}
       </Alert>
+
+      { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
         <Box sx={{
@@ -304,9 +339,6 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "AccountNow" &&
-              <Account />
-            }
             {pageDisplay === "History" &&
               <Transactions />
             }
@@ -333,6 +365,12 @@ function Home() {
             }
             {pageDisplay === "Ecosystem" &&
               <Ecosystem />
+            }
+            {pageDisplay === "Bridge" &&
+              <Bridge />
+            }
+            {pageDisplay === "Monster" &&
+              <MonsterWrapper />
             }
           </Container>
           <PageFooter/>

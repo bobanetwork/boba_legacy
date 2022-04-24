@@ -13,7 +13,7 @@ import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
 
 /* Imports: ABI */
-import Proxy__Boba_GasPriceOracleJson from '../artifacts/contracts/Proxy__Boba_GasPriceOracle.sol/Proxy__Boba_GasPriceOracle.json'
+import Boba_GasPriceOracleProxyCallJson from '../artifacts/contracts/Boba_GasPriceOracleProxyCall.sol/Boba_GasPriceOracleProxyCall.json'
 
 const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
   const gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
@@ -31,9 +31,10 @@ describe('Boba Fee Payment Integration Tests', async () => {
   let L1Boba: Contract
   let L2Boba: Contract
   let Boba_GasPriceOracle: Contract
-
-  let Factory__Proxy__Boba_GasPriceOracle: ContractFactory
   let Proxy__Boba_GasPriceOracle: Contract
+
+  let Factory__Boba_GasPriceOracleProxyCall: ContractFactory
+  let Boba_GasPriceOracleProxyCall: Contract
 
   const other = '0x1234123412341234123412341234123412341234'
 
@@ -47,20 +48,35 @@ describe('Boba Fee Payment Integration Tests', async () => {
       .attach(predeploys.L2GovernanceERC20)
       .connect(env.l2Wallet)
     Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
-      .attach(predeploys.Boba_GasPriceOracle)
+      .attach(predeploys.Proxy__Boba_GasPriceOracle)
       .connect(env.l2Wallet)
 
-    Factory__Proxy__Boba_GasPriceOracle = new ethers.ContractFactory(
-      Proxy__Boba_GasPriceOracleJson.abi,
-      Proxy__Boba_GasPriceOracleJson.bytecode,
+    Proxy__Boba_GasPriceOracle = getContractFactory(
+      'Lib_ResolvedDelegateBobaProxy'
+    )
+      .attach(predeploys.Proxy__Boba_GasPriceOracle)
+      .connect(env.l2Wallet)
+
+    Factory__Boba_GasPriceOracleProxyCall = new ethers.ContractFactory(
+      Boba_GasPriceOracleProxyCallJson.abi,
+      Boba_GasPriceOracleProxyCallJson.bytecode,
       env.l2Wallet
     )
 
-    Proxy__Boba_GasPriceOracle =
-      await Factory__Proxy__Boba_GasPriceOracle.deploy(
+    Boba_GasPriceOracleProxyCall =
+      await Factory__Boba_GasPriceOracleProxyCall.deploy(
         Boba_GasPriceOracle.address
       )
-    await Proxy__Boba_GasPriceOracle.deployTransaction.wait()
+    await Boba_GasPriceOracleProxyCall.deployTransaction.wait()
+  })
+
+  it('{tag:boba} should have correct proxy target and proxy owner', async () => {
+    expect(
+      await Proxy__Boba_GasPriceOracle.addressManager('proxyOwner')
+    ).to.be.eq(env.l1Wallet.address)
+    expect(
+      await Proxy__Boba_GasPriceOracle.addressManager('proxyTarget')
+    ).to.be.eq(predeploys.Boba_GasPriceOracle)
   })
 
   it('{tag:boba} should register to use boba as the fee token', async () => {
@@ -74,8 +90,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   it('{tag:boba} should not register the fee tokens for non EOA accounts', async () => {
-    await expect(Proxy__Boba_GasPriceOracle.useBobaAsFeeToken()).to.be.reverted
-    await expect(Proxy__Boba_GasPriceOracle.useETHAsFeeToken()).to.be.reverted
+    await expect(Boba_GasPriceOracleProxyCall.useBobaAsFeeToken()).to.be
+      .reverted
+    await expect(Boba_GasPriceOracleProxyCall.useETHAsFeeToken()).to.be.reverted
   })
 
   it('{tag:boba} Paying a nonzero but acceptable boba gasPrice fee for transferring ETH', async () => {
@@ -418,12 +435,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   it('{tag:boba} should not be able to withdraw fees before the minimum is met', async () => {
-    await expect(Boba_GasPriceOracle.withdraw()).to.be.rejected
+    await expect(Boba_GasPriceOracle.withdrawBOBA()).to.be.rejected
   })
 
   it('{tag:boba} should be able to withdraw fees back to L1 once the minimum is met', async function () {
-    const l1FeeWallet = await Boba_GasPriceOracle.l1FeeWallet()
-    const balanceBefore = await L1Boba.balanceOf(l1FeeWallet)
+    const feeWallet = await Boba_GasPriceOracle.feeWallet()
+    const balanceBefore = await L1Boba.balanceOf(feeWallet)
     const withdrawalAmount = await Boba_GasPriceOracle.MIN_WITHDRAWAL_AMOUNT()
 
     const l2WalletBalance = await L2Boba.balanceOf(env.l2Wallet.address)
@@ -446,7 +463,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const vaultBalance = await L2Boba.balanceOf(Boba_GasPriceOracle.address)
 
     // Submit the withdrawal.
-    const withdrawTx = await Boba_GasPriceOracle.withdraw({
+    const withdrawTx = await Boba_GasPriceOracle.withdrawBOBA({
       gasPrice: 0,
     })
 
@@ -456,7 +473,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await env.waitForXDomainTransaction(withdrawTx)
 
     // Balance difference should be equal to old L2 balance.
-    const balanceAfter = await L1Boba.balanceOf(l1FeeWallet)
+    const balanceAfter = await L1Boba.balanceOf(feeWallet)
     expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
       BigNumber.from(vaultBalance)
     )
@@ -540,7 +557,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     while (priceRatio < 3000) {
       const setPriceRatio = await Boba_GasPriceOracle.connect(
         env.l2Wallet_4
-      ).updatePriceRatio(priceRatio)
+      ).updatePriceRatio(priceRatio, priceRatio)
       await setPriceRatio.wait()
 
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -586,7 +603,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     while (priceRatio < 3000) {
       const setPriceRatio = await Boba_GasPriceOracle.connect(
         env.l2Wallet_4
-      ).updatePriceRatio(priceRatio)
+      ).updatePriceRatio(priceRatio, priceRatio)
       await setPriceRatio.wait()
 
       const ETHBalanceBefore = await env.l2Wallet.getBalance()
@@ -636,7 +653,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       Boba_GasPriceOracle.address
     )
 
-    const TestContract = await Factory__Proxy__Boba_GasPriceOracle.deploy(
+    const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
       Boba_GasPriceOracle.address
     )
     const receipt = await TestContract.deployTransaction.wait()
@@ -667,7 +684,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   it('{tag:boba} should pay BOBA to deploy contracts for different gas limit', async () => {
     await setPrices(env, 1000)
 
-    const data = Factory__Proxy__Boba_GasPriceOracle.getDeployTransaction(
+    const data = Factory__Boba_GasPriceOracleProxyCall.getDeployTransaction(
       Boba_GasPriceOracle.address
     )
     const estimatedGas = await env.l2Wallet.estimateGas(data)
@@ -683,7 +700,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      const TestContract = await Factory__Proxy__Boba_GasPriceOracle.deploy(
+      const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
         Boba_GasPriceOracle.address
       )
       const receipt = await TestContract.deployTransaction.wait()
@@ -735,6 +752,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
     await fundTx.wait()
 
+    const fundBobaTx = await L2Boba.transfer(
+      wallet.address,
+      ethers.utils.parseEther('10')
+    )
+    await fundBobaTx.wait()
+
     // Register the fee token
     const registerTx = await Boba_GasPriceOracle.connect(
       wallet
@@ -779,11 +802,30 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
     await fundTx.wait()
 
+    const fundBobaTx = await L2Boba.transfer(
+      wallet.address,
+      ethers.utils.parseEther('10')
+    )
+    await fundBobaTx.wait()
+
     // Register the fee token
     const registerTx = await Boba_GasPriceOracle.connect(
       wallet
     ).useBobaAsFeeToken()
     await registerTx.wait()
+
+    const BobaBalance = await L2Boba.balanceOf(wallet.address)
+    const estimateGas = await L2Boba.connect(wallet).estimateGas.transfer(
+      env.l2Wallet.address,
+      BobaBalance
+    )
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+    const returnBobaTx = await L2Boba.connect(wallet).transfer(
+      env.l2Wallet.address,
+      BobaBalance.sub(estimateGas.mul(priceRatio)),
+      { gasLimit: estimateGas }
+    )
+    await returnBobaTx.wait()
 
     await expect(
       wallet.sendTransaction({
@@ -803,6 +845,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
       value: ethers.utils.parseEther('1'),
     })
     await transferTx.wait()
+
+    const fundBobaTx = await L2Boba.transfer(
+      randomWallet.address,
+      ethers.utils.parseEther('10')
+    )
+    await fundBobaTx.wait()
 
     const registerTx = await Boba_GasPriceOracle.connect(
       randomWallet
@@ -840,12 +888,19 @@ describe('Boba Fee Payment Integration Tests', async () => {
       name = await L2Boba.name()
       version = '1'
       chainId = (await env.l2Provider.getNetwork()).chainId
+
+      // Add ETH first
+      await env.l2Wallet.sendTransaction({
+        to: Boba_GasPriceOracle.address,
+        value: ethers.utils.parseEther('10'),
+      })
     })
 
     it('{tag:boba} should submit the meta transaction', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
-      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+      const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -865,8 +920,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
+      const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
+      const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
 
-      await Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+      await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
         owner,
         spender,
         value,
@@ -876,21 +935,27 @@ describe('Boba Fee Payment Integration Tests', async () => {
         sig.s
       )
 
-      const isBobaAsFeeToken = await Boba_GasPriceOracle.bobaFeeTokenUsers(
-        env.l2Wallet_2.address
-      )
       const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
+      const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
+      const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
 
       expect(BobaBalanceAfter).to.be.deep.eq(
         BobaBalanceBefore.sub(BigNumber.from(value))
       )
-      expect(isBobaAsFeeToken).to.be.eq(true)
+      expect(ETHBalanceAfter).to.be.deep.eq(
+        ETHBalanceBefore.add(receivedETHAmount)
+      )
+      expect(GPO_ETHBalanceAfter).to.be.deep.eq(
+        GPO_ETHBalanceBefore.sub(receivedETHAmount)
+      )
     })
 
     it('{tag:boba} should revert transaction if v, r and s are incorrect', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
-      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = Boba_GasPriceOracle.address
@@ -910,7 +975,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+        Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
           owner,
           spender,
           value,
@@ -925,7 +990,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     it("{tag:boba} should revert transaction if users don't have sufficient Boba token", async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
-      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -959,7 +1024,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await transferTx.wait()
 
       await expect(
-        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+        Boba_GasPriceOracle.connect(
+          env.l2Wallet_2
+        ).swapBOBAForETHMetaTransaction(
           owner,
           spender,
           value,
@@ -982,7 +1049,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     it('{tag:boba} should revert transaction if spender is not correct', async () => {
       const owner = env.l2Wallet_2.address
       const spender = env.addressesBOBA.FeedRegistry
-      const value = (await Boba_GasPriceOracle.metaTransactionFee()).toString()
+      const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
       const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
       const deadline = Math.floor(Date.now() / 1000) + 90
       const verifyingContract = L2Boba.address
@@ -1002,7 +1069,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+        Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
           owner,
           spender,
           value,
@@ -1037,7 +1104,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.useBobaAsFeeTokenMetaTransaction(
+        Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
           owner,
           spender,
           value,
@@ -1047,6 +1114,102 @@ describe('Boba Fee Payment Integration Tests', async () => {
           sig.s
         )
       ).to.be.revertedWith('Value is not enough')
+    })
+
+    it('{tag:boba} should swap BOBA for ETH using Boba as the fee token', async () => {
+      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+
+      // Use Boba as the fee token
+      await env.l2Wallet.sendTransaction({
+        to: newWallet.address,
+        value: ethers.utils.parseEther('1'),
+      })
+      await L2Boba.transfer(newWallet.address, ethers.utils.parseEther('100'))
+      await Boba_GasPriceOracle.connect(newWallet).useBobaAsFeeToken()
+
+      // Get BOBA
+      await L2Boba.transfer(newWallet.address, ethers.utils.parseEther('100'))
+
+      // Transfer ETH back
+      const ETHBalance = await newWallet.getBalance()
+      await newWallet.sendTransaction({
+        to: env.l2Wallet.address,
+        value: ETHBalance,
+      })
+
+      const BobaBalanceBefore = await L2Boba.balanceOf(newWallet.address)
+      const ETHBalanceBefore = await newWallet.getBalance()
+      const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
+
+      const owner = newWallet.address
+      const spender = Boba_GasPriceOracle.address
+      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+      const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
+      const nonce = (await L2Boba.nonces(newWallet.address)).toNumber()
+      const deadline = Math.floor(Date.now() / 1000) + 90
+      const verifyingContract = L2Boba.address
+
+      const data: any = {
+        primaryType: 'Permit',
+        types: { EIP712Domain, Permit },
+        domain: { name, version, chainId, verifyingContract },
+        message: { owner, spender, value, nonce, deadline },
+      }
+
+      const signature = ethSigUtil.signTypedData(
+        Buffer.from(newWallet.privateKey.slice(2), 'hex'),
+        { data }
+      )
+
+      const sig = ethers.utils.splitSignature(signature)
+
+      await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
+        owner,
+        spender,
+        value,
+        deadline,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+
+      const BobaBalanceAfter = await L2Boba.balanceOf(newWallet.address)
+      const ETHBalanceAfter = await newWallet.getBalance()
+      const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
+
+      expect(BobaBalanceAfter).to.be.deep.eq(
+        BobaBalanceBefore.sub(BigNumber.from(value))
+      )
+      expect(ETHBalanceAfter).to.be.deep.eq(
+        ETHBalanceBefore.add(receivedETHAmount)
+      )
+      expect(GPO_ETHBalanceAfter).to.be.deep.eq(
+        GPO_ETHBalanceBefore.sub(receivedETHAmount)
+      )
+    })
+
+    it('{tag:boba} should retrieve ETH', async () => {
+      const feeWallet = await Boba_GasPriceOracle.feeWallet()
+      const ETHBalanceBefore = await env.l2Provider.getBalance(feeWallet)
+      const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
+
+      await Boba_GasPriceOracle.connect(env.l2Wallet_4).withdrawETH()
+
+      const ETHBalanceAfter = await env.l2Provider.getBalance(feeWallet)
+      const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        Boba_GasPriceOracle.address
+      )
+
+      expect(ETHBalanceAfter).to.be.eq(
+        ETHBalanceBefore.add(GPO_ETHBalanceBefore)
+      )
+      expect(GPO_ETHBalanceAfter).to.be.eq(BigNumber.from(0))
     })
   })
 })
