@@ -3,7 +3,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { StyledStepLabel } from "./index";
@@ -67,7 +66,7 @@ export default function HorizontalLinearStepper() {
     component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei} handleNextStep={handleNext} />,
   }, {
     label: 'Deploy/Fund Turing',
-    component: <StepDeployTuringHelper amountBobaForFundingWei={amountBobaTokensToUseWei} handleNextStep={handleNext} />,
+    component: <StepDeployTuringHelper amountBobaForFundingWei={amountBobaTokensToUseWei} />,
   }, {
     label: 'Implement AWS lambda',
     component: <StepImplementAWSLambda />,

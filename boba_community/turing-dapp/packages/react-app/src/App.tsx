@@ -18,7 +18,7 @@ function App() {
           <WalletButton/>
         </HeaderCol>
       </Header>
-      <Body style={{width: '95%', textAlign: 'center', marginRight: 'auto', marginLeft: 'auto', backgroundColor: 'black'}}>
+      <Body style={{width: '100%', textAlign: 'center', marginRight: 'auto', marginLeft: 'auto', backgroundColor: 'black'}}>
         <TuringIntro />
       </Body>
       <ToastContainer position="top-right"/>

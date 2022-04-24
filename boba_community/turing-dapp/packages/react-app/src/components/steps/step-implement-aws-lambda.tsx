@@ -66,15 +66,17 @@ pair = bytes_object.decode("ASCII") # parse to String in this case`)}
         <SmallerParagraph style={codeSubHeaderStyle}>3. Do the work and return it back to your contract:</SmallerParagraph>
         {getEditor(
           `# Send a POST request and receive a HTTPResponse object.
-  result = json.load(http.request("GET", requestURL).data) # get exchange rate
+# get exchange rate
+result = json.load(http.request("GET", requestURL).data)
 
-  # build result, 64 denotes the number of bytes in the \`bytes\` dynamic argument
-  # since we are sending back 2 32 byte numbers, 2*32 = 64
-  res = '0x'+ '{0:0{1}x}'.format(int(64),64)
-  res = res + '{0:0{1}x}'.format(int(result['last']['price'] * 100),64) # the price
-  res = res + '{0:0{1}x}'.format(int(result['last']['timestamp']/1000),64) # the timestamp
+# build result
+# 64 denotes the number of bytes in the \`bytes\` dynamic argument
+# since we are sending back 2 32 byte numbers, 2*32 = 64
+res = '0x'+ '{0:0{1}x}'.format(int(64),64)
+res = res + '{0:0{1}x}'.format(int(result['last']['price'] * 100),64)
+res = res + '{0:0{1}x}'.format(int(result['last']['timestamp']/1000),64)
 
-  returnPayload = {'statusCode': 200, 'body': json.dumps({"result": res})`)}
+returnPayload = {'statusCode': 200, 'body': json.dumps({"result": res})`)}
       </Grid>
     </Grid>
   </div>;

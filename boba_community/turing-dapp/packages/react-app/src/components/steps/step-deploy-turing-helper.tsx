@@ -19,7 +19,6 @@ import { toast } from "react-toastify";
 
 interface IStepDeployTuringHelperProps {
   amountBobaForFundingWei: BigNumber;
-  handleNextStep: () => void;
 }
 
 interface IStepDeployTuringHelperState {
@@ -69,17 +68,15 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
 
   const { loading, error: subgraphQueryError, data: subgraphData } = useQuery(GET_TURING_HELPER_DEPLOYED, {
     skip: !(deployState.status === "Success")
-  }); // newTransaction ?
+  });
 
   useEffect(() => {
     if (subgraphQueryError) {
       toast("Error while querying subgraph:" + subgraphQueryError.message, { type: "error" });
       return;
     }
-    if (!loading && subgraphData && subgraphData.deployedTuringHelpers) {
-      console.log({ deployedTuringHelpers: subgraphData.deployedTuringHelpers });
-      // TODO: Evaluate type, correct value?
-      setNewTuringHelper(subgraphData.deployedTuringHelpers[0]);
+    if (!loading && subgraphData && subgraphData.turingHelperDeployedEvents) {
+      setNewTuringHelper(subgraphData.turingHelperDeployedEvents[0].proxy);
     }
   }, [loading, subgraphQueryError, subgraphData]);
   //#endregion

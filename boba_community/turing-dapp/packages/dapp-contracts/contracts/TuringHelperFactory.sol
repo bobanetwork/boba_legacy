@@ -9,11 +9,20 @@ interface ITuringCredit {
     function addBalanceTo(uint256, address) external;
 }
 
+interface IRouter {
+    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    payable
+    returns (uint[] memory amounts);
+}
+
 contract TuringHelperFactory is Ownable {
 
     address public turingImplementation;
     ITuringCredit public turingCredit;
     IERC20 public bobaToken;
+    IRouter public router;
+    address[] private pair;
 
     event TuringHelperDeployed(address indexed owner, TuringHelper proxy, uint256 depositedBoba);
 
@@ -24,19 +33,30 @@ contract TuringHelperFactory is Ownable {
         _;
     }
 
-    constructor(address bobaToken_, address turingImplementation_, address turingCredit_) {
+    constructor(address router_, address WETH_, address bobaToken_, address turingImplementation_, address turingCredit_) {
+        pair = new address[](2);
+        pair[0] = address(WETH_);
+        pair[1] = address(bobaToken);
+
         bobaToken = IERC20(bobaToken_);
         turingImplementation = turingImplementation_;
         turingCredit = ITuringCredit(turingCredit_);
+        router = IRouter(router_);
     }
 
     function changeTuringHelperImpl(address turingImplementation_) external onlyOwner {
         turingImplementation = turingImplementation_;
     }
 
-    // TODO: add also support for ETH payments (with then just swapping to Boba for TuringCredit etc.)
+    function deployMinimalETH(address[] memory permittedCallers, uint256 minAmountOutBoba) payable external returns (TuringHelper) {
+        uint256[] memory amounts = router.swapExactETHForTokens{value: msg.value}(
+            minAmountOutBoba, pair, address(this), block.timestamp + 100);
+        return TuringHelper(address(0));
+        //TODO: return deployMinimal(permittedCallers, amounts[1]);
+    }
+
     // https://github.com/OolongSwap/oolongswap-deployments
-    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) external returns (TuringHelper) {
+    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) public returns (TuringHelper) {
 
         // This will create a minimal proxy for the implementation contract.
         TuringHelper implementation = TuringHelper(Clones.clone(turingImplementation));
@@ -46,8 +66,8 @@ contract TuringHelperFactory is Ownable {
             "initialize()"
         );
         // if (_encodedFunction.length > 0) {
-            (bool success,) = address(implementation).call(_encodedFunction);
-            require(success, "Proxy call failed");
+        (bool success,) = address(implementation).call(_encodedFunction);
+        require(success, "Proxy call failed");
         // }
 
         // add permitted callers in same transaction, for better UX

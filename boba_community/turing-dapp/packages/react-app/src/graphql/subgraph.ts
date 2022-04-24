@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 const GET_TURING_HELPER_DEPLOYED = gql`
   {
-    deployedTuringHelpers(first: 1) {
+    turingHelperDeployedEvents(first: 1) {
       id
       owner
       proxy

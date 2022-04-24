@@ -20,7 +20,7 @@ import { muiTheme } from "../../mui.theme";
 import { enableNotifications } from "../../utils/notification.utils";
 
 interface IStepApproveBobaState {
-  callsToPrepay: number;
+  callsToPrepay: string;
 }
 interface IStepApproveBobaProps {
   setAmountBobaTokensToUseWei: Dispatch<SetStateAction<BigNumber>>;
@@ -41,15 +41,16 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
   const bobaTokenBalance = useTokenBalance(contractBobaToken.address, account) ?? BigNumber.from(0);
 
   const [values, setValues] = React.useState<IStepApproveBobaState>({
-    callsToPrepay: 100
+    callsToPrepay: '100',
   });
 
   const handleChangeBobaTokens = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (isNaN(+event.target.value) || !event.target.value) return; // only numbers
-    setValues({ ...values, callsToPrepay: parseInt(event.target.value) });
+    const parsedVal = event.target.value?.replaceAll(',','')
+    if (!event.target.value || !parsedVal.match(/^\d+$/)) return; // only numbers
+    setValues({ ...values, callsToPrepay: parsedVal.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",") });
   };
 
-  const amountBobaTokensToUse = 0.01 * values.callsToPrepay; // 0.01 price for TuringCall
+  const amountBobaTokensToUse = 0.01 * parseInt(values.callsToPrepay.replaceAll(',', '')); // 0.01 price for TuringCall
   const amountBobaTokensToUseWei = parseEther(amountBobaTokensToUse.toString());
   const hasEnoughBOBA: boolean = bobaTokenBalance.gte(amountBobaTokensToUseWei);
 
