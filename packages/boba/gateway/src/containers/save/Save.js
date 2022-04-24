@@ -241,13 +241,13 @@ class Save extends React.Component {
 
         <PageTitle title={'Stake'} />
 
-        <Connect 
+        <Connect
           userPrompt={'Please connect to Boba to stake'}
           accountEnabled={accountEnabled}
           connectToBoba={true}
           layer={netLayer}
         />
-        
+
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>
@@ -296,6 +296,7 @@ class Save extends React.Component {
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
+              
               {netLayer === 'L2' && bobaFeeChoice && fee &&
                 <Typography variant="body2" sx={{ mt: 2 }}>
                   Fee: {fee} BOBA

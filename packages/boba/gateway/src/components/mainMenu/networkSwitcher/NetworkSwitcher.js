@@ -13,8 +13,8 @@ function NetworkSwitcher() {
   const masterConfig = useSelector(selectNetwork())
 
   return (
-    <S.WalletPickerContainer>
-      <S.WallerPickerWrapper>
+    <S.NetworkSwitcherContainer>
+      <S.NetworkSwitcherWrapper>
         <S.Menu>
           <S.NetWorkStyle>
             <NetworkIcon />
@@ -33,8 +33,8 @@ function NetworkSwitcher() {
             </Box>
           </S.NetWorkStyle>
         </S.Menu>
-      </S.WallerPickerWrapper>
-    </S.WalletPickerContainer>
+      </S.NetworkSwitcherWrapper>
+    </S.NetworkSwitcherContainer>
   )
 };
 
