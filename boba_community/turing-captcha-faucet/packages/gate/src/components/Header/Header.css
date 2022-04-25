@@ -1,0 +1,44 @@
+.headerContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 100px;
+}
+
+.rightContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.headerImage {
+    height: 80px
+}
+
+.bobaImage {
+    height: 30px;
+    margin-left: 5px;
+    margin-right: 20px;
+}
+
+.headerButton {
+    border-radius: 15px !important;
+    background-color: #455bf0 !important;
+    border: 0px !important;
+}
+
+.headerButtonConnect {
+    border-radius: 15px !important;
+    border: 0px !important;
+}
+
+@media screen and (max-width: 600px){
+    .headerImage {
+        height: 40px
+    }
+    .bobaImage {
+        display: none;
+    }
+}

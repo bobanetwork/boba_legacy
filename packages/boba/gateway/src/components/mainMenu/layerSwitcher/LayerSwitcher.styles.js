@@ -5,7 +5,7 @@ export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: `${theme.palette.mode === 'light' ? '#FFFFFF' : "rgba(255, 255, 255, 0.06)"}`,
+  background: theme.palette.background.secondary,
   borderRadius: '12px',
   padding: '0'
 }));
@@ -22,7 +22,6 @@ export const LayerContent = styled(Box)(({ theme }) => ({
 }))
 
 export const Label = styled(Typography)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
   color: theme.palette.text.disabled,
 }));
 

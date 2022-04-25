@@ -43,15 +43,16 @@ async function main() {
     testWallet
   ).attach('0x1EC9BA5f9695E7Bcb5d0a170a3D40D6b9039AfC9')*/
 
+  const useTestnet: boolean = true
 
   // use proxy address
-  const BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf' // testnet: '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+  const BobaTuringCreditAddress = useTestnet ? '0x208c3CE906cd85362bd29467819d3AcbE5FC1614' : '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
   const turingCredit = getContractFactory(
     'BobaTuringCredit',
     testWallet
   ).attach(BobaTuringCreditAddress)
 
-  const BOBAL2Address = '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7' // testnet: '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
+  const BOBAL2Address = useTestnet ? '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309' : '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7'
   const L2BOBAToken = new Contract(
     BOBAL2Address,
     L2GovernanceERC20Json.abi,
@@ -60,8 +61,8 @@ async function main() {
 
   const depositAmount = utils.parseEther('21')
 
-  const bobaBalance = await L2BOBAToken.balanceOf(testWallet.address)
-  console.log("BOBA Balance in your account", bobaBalance.toString())
+  // const bobaBalance = await L2BOBAToken.balanceOf(testWallet.address)
+  // console.log("BOBA Balance in your account", bobaBalance.toString())
 
   const approveTx = await L2BOBAToken.approve(
     turingCredit.address,

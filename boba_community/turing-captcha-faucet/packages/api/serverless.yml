@@ -1,0 +1,56 @@
+service: sls-boba-turing # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: python3.7
+  stackName: sls-boba-turing
+  stage: prod
+  region: us-east-1
+  role: ${file(env.yml):ROLE}
+
+package:
+  exclude:
+    - .gitignore
+  individually: true
+
+functions:
+  turing_getCAPTCHA:
+    handler: turing_getCAPTCHA.turing_getCAPTCHA
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env.yml):SUBNET_ID_1}
+        - ${file(env.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.captcha
+          method: get
+          cors: true
+    layers:
+      - ${file(env.yml):LAYERS_1}
+      - ${file(env.yml):LAYERS_2}
+  turing_verifyCAPTCHA:
+    handler: turing_verifyCAPTCHA.turing_verifyCAPTCHA
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env.yml):SUBNET_ID_1}
+        - ${file(env.yml):SUBNET_ID_2}
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+          description: 'Warm up turing_verifyCAPTCHA'
+          name: 'sls-boba-turing-verify-captcha'
+      - http:
+          path: post.captcha
+          method: post
+          cors: true
+    layers:
+      - ${file(env.yml):LAYERS_1}
+      - ${file(env.yml):LAYERS_2}

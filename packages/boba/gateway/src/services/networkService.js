@@ -4015,6 +4015,8 @@ class NetworkService {
         this.provider.getSigner()
       )
 
+      console.log("FixedSavings.address:",FixedSavings.address)
+
       let allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
         .allowance(
@@ -4026,14 +4028,16 @@ class NetworkService {
       let depositAmount_BN = BigNumber.from(value_Wei_String)
       console.log("Deposit:", depositAmount_BN)
 
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
       try {
-        if (depositAmount_BN.gt(allowance_BN)) {
-          console.log("Need to approve YES:", depositAmount_BN)
+        if (approveAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", approveAmount_BN)
           const approveStatus = await this.BobaContract
             .connect(this.provider.getSigner())
             .approve(
               allAddresses.BobaFixedSavings,
-              value_Wei_String
+              approveAmount_BN
             )
           const TX = await approveStatus.wait()
           console.log("approveStatus:", TX)
@@ -4045,23 +4049,6 @@ class NetworkService {
         console.log("NS: addFS_Savings approve error:", error)
         return error
       }
-
-      allowance_BN = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .allowance(
-          this.account,
-          allAddresses.BobaFixedSavings
-        )
-      console.log("Updated Allowance:", allowance_BN.toString())
-
-      if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Allowance still too small:", allowance_BN.toString(), depositAmount_BN.toString())
-      } else {
-        console.log("Allowance is now sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
-      }
-
-      console.log("allAddresses.BobaFixedSavings", allAddresses.BobaFixedSavings)
-      console.log("FixedSavings.address", FixedSavings.address)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()

@@ -25,9 +25,11 @@ import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
 import { selectActiveDataTab } from 'selectors/uiSelector'
 import { selectSevens, selectFastExits } from 'selectors/dataSelector'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
@@ -38,11 +40,9 @@ import * as S from './History.styles'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import PageTitle from 'components/pageTitle/PageTitle'
-import AlertIcon from 'components/icons/AlertIcon'
 import Connect from 'containers/connect/Connect'
 
-import { selectAccountEnabled } from 'selectors/setupSelector'
+
 
 function BobaScope() {
 
@@ -74,11 +74,11 @@ function BobaScope() {
     <S.ScopePageContainer>
       <PageTitle title="Boba Scope" />
 
-      <Connect 
+      <Connect
         userPrompt={'Please connect to a chain to use the BobaScope'}
         accountEnabled={accountEnabled}
       />
-      {accountEnabled && 
+      {accountEnabled &&
         <>
           <S.Header>
             <div className={styles.searchInput}>
