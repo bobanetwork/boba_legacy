@@ -5,4 +5,5 @@ This package has been built with `create-eth-app`.
 ### useDApp Developer tools
 Download via Chrome Web Store or Firefox Add-Ons. Search for *useDApp DevTools*.
 
-
+## Network config
+Set the environment variable `USE_TESTNET` to either `true` or `false` for the corresponding deployment.
