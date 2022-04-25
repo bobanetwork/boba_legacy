@@ -8,6 +8,7 @@ import {
 import { remove0x } from '@eth-optimism/core-utils'
 import { utils, BigNumber } from 'ethers'
 import { L2GovernanceERC20Helper } from './L2GovernanceERC20Helper'
+import { L2BobaSnapshotHelper } from './L2BobaSnapshotHelper'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -151,6 +152,12 @@ export const makeL2GenesisFile = async (
       metaTransactionFee: utils.parseEther('3'),
       receivedETHAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
+    },
+    L2BobaSnapshotHelper: {
+      _name: 'Boba Snapshot Helper',
+      _symbol: 'BOBA Helper',
+      l1Token: cfg.l1BobaTokenAddress,
+      l2Bridge:predeploys.L2StandardBridge,
     }
   }
 
@@ -174,6 +181,8 @@ export const makeL2GenesisFile = async (
     } else if (predeployName === 'L2GovernanceERC20') {
       // Fix the address(this) of L2GovernanceERC20
       dump[predeployAddress].code = L2GovernanceERC20Helper.L2GovernanceERC20Bytecode
+    } else if (predeployName === 'L2BobaSnapshotHelper') {
+      dump[predeployAddress].code = L2BobaSnapshotHelper.L2BobaSnapshotHelperBytecode
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')

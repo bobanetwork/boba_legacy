@@ -96,6 +96,15 @@ func GetFeeTokenSelectionKey(addr common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
+func GetBobaDelegateKey(addr common.Address) common.Hash {
+	position := common.Big6
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(addr.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
 // StateDBs within the ethereum protocol are used to store anything
 // within the merkle trie. StateDBs take care of caching and storing
 // nested states. It's the general query interface to retrieve:
@@ -303,6 +312,13 @@ func (s *StateDB) GetBobaPriceRatio() *big.Int {
 	keyPriceRatio := common.BigToHash(big.NewInt(5))
 	value := s.GetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio)
 	return value.Big()
+}
+
+// Retrieve the Boba delegate for the given address
+func (s *StateDB) GetBobaDelegate(addr common.Address) common.Address {
+	key := GetBobaDelegateKey(addr)
+	delegate := s.GetState(rcfg.OvmL2BobaToken, key)
+	return common.BytesToAddress(delegate.Bytes())
 }
 
 func (s *StateDB) GetNonce(addr common.Address) uint64 {

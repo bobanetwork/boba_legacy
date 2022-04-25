@@ -79,12 +79,12 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   it('{tag:boba} should register to use boba as the fee token', async () => {
+    const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
+    await delegateTx.wait()
     // Register l1wallet for using boba as the fee token
     const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
     await registerTx.wait()
 
-    const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
-    await delegateTx.wait()
 
     // const testTx = await L2Boba._moveVotingPower(env.l2Wallet.address, env.l2Wallet.address, utils.parseEther('0.0000001'))
     // await testTx.wait()

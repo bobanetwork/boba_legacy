@@ -34,5 +34,8 @@ export const predeploys = {
 
   // Boba gas price oracle
   Proxy__Boba_GasPriceOracle: "0x4200000000000000000000000000000000000024",
-  Boba_GasPriceOracle: "0x4200000000000000000000000000000000000025"
+  Boba_GasPriceOracle: "0x4200000000000000000000000000000000000025",
+
+  // Boba Snapshot Helper
+  L2BobaSnapshotHelper: "0x4200000000000000000000000000000000000026"
 }

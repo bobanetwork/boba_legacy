@@ -37,6 +37,7 @@ type StateDB interface {
 	SubBobaBalance(common.Address, *big.Int)
 	AddBobaBalance(common.Address, *big.Int)
 	GetBobaBalance(common.Address) *big.Int
+	GetBobaDelegate(common.Address) common.Address
 
 	GetFeeTokenSelection(common.Address) *big.Int
 	GetBobaPriceRatio() *big.Int
