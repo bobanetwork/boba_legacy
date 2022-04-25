@@ -4,7 +4,7 @@ description: A collection of links to get started on Mainnet Boba
 
 # Mainnet Links
 
-### Mainnet Links and Endpoints
+## Mainnet Links and Endpoints
 
 |                   |                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ description: A collection of links to get started on Mainnet Boba
 | Blockexplorer     | [https://blockexplorer.boba.network](https://blockexplorer.boba.network)         |
 | Websocket         | [wss://ws.mainnet.boba.network](wss://wss.mainnet.boba.network)                  |
 
-### Mainnet Contract and Token Addresses
+## Mainnet Contract and Token Addresses
 
 The `AddressManger` is located at '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'. The `AddressManager` can be queried for current addresses like this:
 

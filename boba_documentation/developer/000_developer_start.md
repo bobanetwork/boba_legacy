@@ -1,3 +1,7 @@
+---
+description: Introduction to Boba network for Developers
+---
+
 # Welcome to Boba
 
 - [Welcome to Boba](#welcome-to-boba)

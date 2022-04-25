@@ -28,4 +28,4 @@
 * [FAQ](faq.md)
 * [Telegram Support](https://t.me/bobadev)
 * [Discord Support](https://omg.eco/discord)
-* [GitHub](https://github.com/omgnetwork/optimism-v2)
+* [GitHub](https://github.com/bobanetwork/boba)

@@ -6,9 +6,13 @@ description: Frequently asked questions to get started on Boba
 
 ## What is Boba Network?
 
-Boba Network is an Optimistic Rollup that combines the great open source work done by [Optimism](https://community.optimism.io) with the research and development effort of the Enya team on swap-based onramp, fast exit, cross-chain bridging and other features.
+[Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
-We chose to build on Optimism because it is essentially a modified version of Ethereum, which makes it relatively easy to ensure EVM and Solidity compatibility, minimizing the efforts required to migrate smart contracts from L1 to L2.
+<a href="https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing">
+  <img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
+</a>
+
+Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). We chose to build on Optimism because it is essentially a modified version of Ethereum, which makes it relatively easy to ensure EVM and Solidity compatibility, minimizing the efforts required to migrate smart contracts from L1 to L2.
 
 ## Is Boba a side chain?
 
@@ -44,7 +48,7 @@ If your wallet does not support this feature, you will have to connect manually.
 
 ## How do I move assets into or out of Boba Network? <a href="038a" id="038a"></a>
 
-To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). We have detailed instructions in our [documentation](broken-reference).
+To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). We have detailed instructions in our [documentation](user/001_how-to-bridge.md).
 
 ## Can I cancel a withdrawal after it has been submitted? <a href="038a" id="038a"></a>
 
@@ -56,11 +60,9 @@ Only if the centralized exchange supports Boba Network (at writing none of them 
 
 ## Where can I find RPC endpoints and connection details? <a href="038a" id="038a"></a>
 
-Connection details for our Rinkeby network can be found [here](developer-docs/005\_parameters-rinkeby.md).
+Connection details for our Rinkeby network can be found [here](developer/005\_parameters-rinkeby.md).
 
-Connection details for our mainnet can be found [here](developer-docs/006\_parameters-mainnet.md).
-
-
+Connection details for our mainnet can be found [here](developer/006\_parameters-mainnet.md).
 
 ## Are multicall contracts supported on Boba? <a href="038a" id="038a"></a>
 
@@ -72,7 +74,7 @@ The token decimals on Boba L2 are the same as on Ethereum L1. So if the token ha
 
 ## The incentive contract for verification proofs is disabled
 
-In the current release of the Boba Network protocol, there may be rare cases in which the Sequencer submits a state root (transaction result) which is invalid and therefore could be challenged. As a result, we have not yet deployed the [Bond Manager ](https://github.com/omgnetwork/optimism/blob/develop/packages/contracts/contracts/optimistic-ethereum/OVM/verification/OVM\_BondManager.sol)contract which compensates Verifier nodes for gas spent when submitting state root challenges. Verifier nodes in a default configuration do not run the [TypeScript service which submits challenges ](https://github.com/ethereum-optimism/optimism/blob/8d67991aba584c1703692ea46273ea8a1ef45f56/packages/contracts/test/contracts/OVM/verification/OVM\_FraudVerifier.spec.ts)in the event of mismatched state roots. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
+In the current release of the Boba Network protocol, there may be rare cases in which the Sequencer submits a state root (transaction result) which is invalid and therefore could be challenged. As a result, we have not yet deployed the [Bond Manager ](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/optimistic-ethereum/OVM/verification/OVM\_BondManager.sol)contract which compensates Verifier nodes for gas spent when submitting state root challenges. Verifier nodes in a default configuration do not run the [TypeScript service which submits challenges ](https://github.com/ethereum-optimism/optimism/blob/8d67991aba584c1703692ea46273ea8a1ef45f56/packages/contracts/test/contracts/OVM/verification/OVM\_FraudVerifier.spec.ts)in the event of mismatched state roots. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
 
 ## Boba operates the only "Sequencer" node
 

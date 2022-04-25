@@ -4,7 +4,7 @@ description: Deployment examples for OVM 2.0
 
 # Contract Deployment Examples
 
-Please refer to the Github [Examples Repo](https://github.com/omgnetwork/optimism-v2/tree/develop/boba_examples). There are currently three examples and we are adding more every few days:
+Please refer to the Github [Examples Repo](https://github.com/bobanetwork/boba/tree/develop/boba_examples). Contract examples include:
 
 1. **hardhat-simple-storage** - shows how to deploy a storage contract to Rinkeby Boba.
 
@@ -195,8 +195,8 @@ Summary
 
 ````
 
-That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Optimistic Ethereum v2 and Boba! 🅾️
+That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Boba! 🅾️
 
 ### Troubleshooting
 
-Example project not working? [Create a Github Issue]https://github.com/omgnetwork/optimism-v2/issues).
+Example project not working? [Create a Github Issue]https://github.com/bobanetwork/boba/issues).

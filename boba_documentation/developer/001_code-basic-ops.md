@@ -1,12 +1,10 @@
 ---
-description: >-
-  Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through
-  examples
+description: Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through examples
 ---
 
-# Basic Operations Examples
+# Basic Operations
 
-To see examples of how to perform basic operations on Boba v2, please see the react code for the [Boba gateway](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/services/networkService.js).
+To see examples of how to perform basic operations on Boba v2, please see the react code for the [Boba gateway](https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/services/networkService.js).
 
 Below, we provide code snippets for several typical operations on the L2:
 
@@ -15,11 +13,11 @@ Below, we provide code snippets for several typical operations on the L2:
 3. An L2->L2 transfer
 4. A 'classic' bridging operation
 
-Overall, note that from the perspective of solidity code and rpc calls, Boba OVM 2.0 is identical to mainchain in most aspects, so your experience (and code) from mainchain should carry over directly. The main practical differences center on Gas and on cross-chain bridging operations.
+Overall, note that from the perspective of solidity code and rpc calls, Boba OVM is identical to mainchain in most aspects, so your experience (and code) from mainchain should carry over directly. The main practical differences center on Gas and on cross-chain bridging operations.
 
 ## 1. Check the Current Gas Price
 
-The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change of the l2 gas price is 5% in the gas price oracle. Like on mainchain, the current gas price can be obtained via `.getGasPrice()`:
+The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change of the L2 gas price is 5% in the gas price oracle. Like on mainchain, the current gas price can be obtained via `.getGasPrice()`:
 
 ```javascript
   this.L2Provider = new ethers.providers.StaticJsonRpcProvider('mainnet.boba.network')
@@ -205,19 +203,11 @@ async transfer(address, value_Wei_String, currency) {
   }
 ```
 
+## 5. Accessing latest L1 Block number
 
+The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be changed in the future. **We strongly discourage direct use of this opcode within your contracts.** Instead, if you want to access the latest L1 block number, please use the `OVM_L1BlockNumber` contract as described below.
 
-## 5.  Accessing latest L1 Block number
-
-{% hint style="info" %}
-NOTICE
-
-The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be changed in the future (pending further discussion). **We strongly discourage direct use of this opcode within your contracts.** Instead, if you want to access the latest L1 block number, please use the `OVM_L1BlockNumber` contract as described below.
-{% endhint %}
-
-The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so we've created a simple contract located at [`0x4200000000000000000000000000000000000013` (opens new window)](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000013)that will allow you to trigger this opcode.
-
-You can use this contract as follows:
+The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at [`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
 
 ```
 import { iOVM_L1BlockNumber } from "@eth-optimism/contracts/L2/predeploys/iOVM_L1BlockNumber.sol";
@@ -236,18 +226,14 @@ contract MyContract {
 }
 ```
 
-### Block Numbers and Timestamps <a href="#block-numbers-and-timestamps" id="block-numbers-and-timestamps"></a>
+### Block Numbers and Timestamps
 
-#### Block production is not constant <a href="#block-production-is-not-constant" id="block-production-is-not-constant"></a>
+#### Block production is not constant
 
-On Ethereum, the `NUMBER` opcode (`block.number` in Solidity) corresponds to the current Ethereum block number. Similarly, in Boba Network, `block.number` corresponds to the current L2 block number. However, as of the OVM 2.0 release of Optimistic Ethereum (Nov. 2021), **each transaction on L2 is placed in a separate block and blocks are NOT produced at a constant rate.**
+On Ethereum, the `NUMBER` opcode (`block.number` in Solidity) corresponds to the current Ethereum block number. Similarly, in Boba Network, `block.number` corresponds to the current L2 block number. However, **each transaction on L2 is placed in a separate block and blocks are NOT produced at a constant rate.**
 
 This is important because it means that `block.number` is currently NOT a reliable source of timing information. If you want access to the current time, you should use `block.timestamp` (the `TIMESTAMP` opcode) instead.
 
-#### Timestamp lags by up to 15 minutes <a href="#timestamp-lags-by-up-to-15-minutes" id="timestamp-lags-by-up-to-15-minutes"></a>
+#### Timestamp lags by up to 15 minutes
 
-Note that `block.timestamp` is pulled automatically from the latest L1 block seen by the L2 system. L2 currently waits for about 15 minutes (\~50 confirmations) before the L1 block is accepted. As a result, the timestamp may lag behind the current time by up to 15 minutes.
-
-
-
-\
+Note that `block.timestamp` is pulled automatically from the latest L1 block seen by the L2. L2 currently waits for about 15 minutes (\~50 confirmations) before the L1 block is accepted. As a result, the timestamp may lag behind the current time by up to 15 minutes.

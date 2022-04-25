@@ -7,7 +7,7 @@ description: Learn more about the Fast Token Bridge
 
 The fast bridge provides a method for both side users to add liquidities for the L1 Fast Bridge Pool and the L2 Fast Bridge Pool. When an ERC20 token is deposited and added to L1 Fast Bridge Pool, the L2 Fast Bridge releases the token on L2 and charges a certain percentage of the deposit amount as the transaction feee. This process is known as "fast bridge a token". e.g. depositing 100 BOBA on L1 in exchange for 99.7 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the 99.7 BOBA on L1. In addition to bridging tokens the standard bridge is also used for ETH.
 
-The Standard Bridge is composed of two main contracts the [`L1LiquidityPool` (opens new window)](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol)(for Layer 1) and the [`L2LiquidityPool` (opens new window)](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol)(for Layer 2).
+The Standard Bridge is composed of two main contracts the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol)(for Layer 1) and the [`L2LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol)(for Layer 2).
 
 Here we'll go over the basics of using this bridge to move ERC20 and ETH assets between Layer 1 and Layer 2.
 
@@ -17,7 +17,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 ### Deposit ERC20s or ETH
 
-ERC20 deposits into L2 can triggered via the `clientDepositL1`  functions on the [`L1LiquidityPool` (opens new window)](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 deposits into L2 can triggered via the `clientDepositL1`  functions on the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```js
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_LIQUIDITY_POOL_ADDRESS
@@ -58,7 +58,7 @@ await depositETHTx.wait()
 
 ### Withdraw ERC20s or ETH
 
-ERC20 and ETH withdrawals can be triggered via the `clientDepositL2` functions on the [`L2LiquidityPool` (opens new window)](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol)
+ERC20 and ETH withdrawals can be triggered via the `clientDepositL2` functions on the [`L2LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol)
 
 ```js
 const PRIVATE_KEY, L2_NODE_WEB3_URL, PROXY_L2_LIQUIDITY_POOL_ADDRESS
@@ -99,8 +99,8 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
 | Network | URL                                                          |
 | ------- | ------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Rinkeby | [Rinkeby Boba Token List](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
 
 ## Links
 

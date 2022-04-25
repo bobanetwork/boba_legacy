@@ -15,7 +15,7 @@ For most test uses, it's simpler to use [https://rinkeby.boba.network](https://r
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
 ```
-$ git clone git@github.com:omgnetwork/optimism-v2.git
+$ git clone git@github.com:bobanetwork/boba.git
 $ cd optimism-v2
 $ yarn clean
 $ yarn

@@ -4,11 +4,11 @@ description: Learn how transaction fees are calculated in Boba Network
 
 # Transaction Fees
 
-## Transaction Fees in Boba Network <a id="frontmatter-title"></a>
+## Transaction Fees in Boba Network
 
 This page refers to the **new** state of Boba Network after the gas hard fork on Boba Mainnet and Rinkeby.
 
-### Fees in a nutshell <a id="fees-in-a-nutshell"></a>
+### Fees in a nutshell
 
 Fees on Boba are, for the most part, significantly lower than on the Ethereum mainnet. The cost of every transaction is the sum of two values:
 

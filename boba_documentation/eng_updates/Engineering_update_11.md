@@ -14,7 +14,7 @@ We have been refining the Turing Monster NFT example into production quality NFT
 
 ## 3. Developer Documentation Overhaul
 
-By popular demand, we have created a better [developer onboarding document](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation/Developer_Start.md). The Turing documentation has been [updated as well](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md).
+By popular demand, we have created a better [developer onboarding document](https://github.com/bobanetwork/boba/blob/develop/boba_documentation/Developer_Start.md). The Turing documentation has been [updated as well](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md).
 
 ## 4. EIP-4844
 

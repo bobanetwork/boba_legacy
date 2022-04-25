@@ -10,7 +10,6 @@ Boba NFT bridges support **native L1 NFT** as well as **native L2 NFT**. Users c
 >
 > **Native L2 NFT**: the original NFT contract was deployed on L2
 
-{% hint style="info" %}
 NFT Bridging on Boba Network in a nutshell\
 \
 \- Native L1 & L2 NFTs are supported to be bridged between L1<>L2\
@@ -25,7 +24,7 @@ NFT Bridging on Boba Network in a nutshell\
 
 #### Requirements
 
-In order for a native L1 NFT to be moved to the Boba Network, the L1 NFT creator needs to  deploy [L2StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) smart contract on the Boba Network.
+In order for a native L1 NFT to be moved to the Boba Network, the L1 NFT creator needs to  deploy [L2StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) smart contract on the Boba Network.
 
 ```
 const Factory__L2StandardERC721 = new ethers.ContractFactory(
@@ -92,7 +91,7 @@ await tx.wait()
 
 ### Native L2 NFT
 
-The L2 NFT creator should deploy [L1StandardERC721](https://github.com/omgnetwork/optimism-v2/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum
+The L2 NFT creator should deploy [L1StandardERC721](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/standards) on Ethereum
 
 ```
 const Factory__L2StandardERC721 = new ethers.ContractFactory(

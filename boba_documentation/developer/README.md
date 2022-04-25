@@ -25,7 +25,7 @@ description: Learn more about the Boba Network and OVM 2.0
     ```
 3.  **How do I bridge funds from L1 to L2?**
 
-    There are two methods, the **classical bridge** and the **fast bridge**. You can see an example of the [classical bridge here](001\_example-code-basic-ops.md). There is working code [here](https://github.com/omgnetwork/optimism-v2/tree/develop/boba\_examples/init-fund-l2).
+    There are two methods, the **classical bridge** and the **fast bridge**. You can see an example of the [classical bridge here](001\_code-basic-ops.md). There is working code [here](https://github.com/bobanetwork/boba/tree/develop/boba\_examples/init-fund-l2).
 4.  **Do you support EIP-2470: Singleton Factory?**
 
     Yes! [ERC-2470](https://eips.ethereum.org/EIPS/eip-2470) is deployed to `0xce0042B868300000d44A59004Da54A005ffdcf9f` on the Boba L2. The address on the Boba L2 is the same as on Ethereum mainnet.
