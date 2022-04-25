@@ -59,6 +59,7 @@ import {
   selectL1FeeBalance,
   selectL2LPLiquidity
 } from 'selectors/balanceSelector'
+import { updateSignatureStatus_depositLP } from 'actions/signAction'
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -238,6 +239,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
+      updateSignatureStatus_depositLP(false);
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 

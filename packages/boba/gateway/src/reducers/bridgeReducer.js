@@ -26,7 +26,7 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, bridgeType: action.payload }
 
     case 'BRIDGE/TOKEN/RESET':
-      return { ...state, 
+      return { ...state,
         tokens: [],
         multiBridgeMode: false
     }
@@ -45,6 +45,7 @@ function bridgeReducer(state = initialState, action) {
       }
 
     case 'BRIDGE/TOKEN/UPDATE': {
+      console.log(['BRIDGE/TOKEN/UPDATE',action])
       let newTokens = [ ...state.tokens ];
       const { token, tokenIndex } = action.payload;
       newTokens[ tokenIndex ] = {

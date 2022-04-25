@@ -56,6 +56,7 @@ import {
   selectL2BalanceBOBA,
   selectExitFee,
 } from 'selectors/balanceSelector'
+import { updateSignatureStatus_exitTRAD } from 'actions/signAction'
 
 function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -206,6 +207,7 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
+      updateSignatureStatus_exitTRAD(false);
     }
   }, [ signatureStatus, loading, handleClose ])
 

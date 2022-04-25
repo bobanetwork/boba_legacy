@@ -63,6 +63,7 @@ import {
    selectBobaFeeChoice,
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
+import { updateSignatureStatus_exitLP } from 'actions/signAction'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   console.log([`DO EXIT STEP FAST`, token])
@@ -269,6 +270,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
+      updateSignatureStatus_exitLP(false)
     }
   }, [ signatureStatus, loading, handleClose ])
 
