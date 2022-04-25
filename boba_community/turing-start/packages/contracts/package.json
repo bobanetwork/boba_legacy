@@ -1,0 +1,12 @@
+{
+  "name": "@turing/contracts",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "typechain:generate": "yarn typechain --target=ethers-v5 ./src/abis/**/*.json --out-dir=./gen/types"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v5": "^10.0.0",
+    "typechain": "^8.0.0"
+  }
+}

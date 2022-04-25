@@ -62,7 +62,7 @@ dataSources:
     name: GovernorBravoDelegate
     network: boba
     source:
-      address: '0x2CC555B5B1a4Cf7fA5401B29ab46fc5ba2e205b0'
+      address: '0x472e5C097C790c6a44366a89a987Ec996A4d83e0'
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
@@ -102,7 +102,7 @@ dataSources:
     name: Boba_GasPriceOracle
     network: boba
     source:
-      address: '0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51'
+      address: '0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b'
       abi: Boba_GasPriceOracle
     mapping:
       kind: ethereum/events
@@ -121,7 +121,6 @@ dataSources:
         - event: UseETHAsFeeToken(address)
           handler: handleUseETHAsFeeToken
       file: ./src/Boba_GasPriceOracleMapping.ts
-
 
   - kind: ethereum/contract
     name: TuringMonsters
@@ -142,3 +141,24 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTuringMonstersTransferEvent
       file: ./src/TuringMonstersMapping.ts
+
+  - kind: ethereum/contract
+    name: TuringHelperFactory
+    network: boba
+    source:
+      address: '0x58dDFB37998584991d8b75F87baf0A3428dD095e'
+      abi: TuringHelperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - TuringHelperFactory
+      abis:
+        - name: TuringHelperFactory
+          file: ./abis/TuringHelperFactory.json
+      eventHandlers:
+        - event: TuringHelperDeployed(indexed address,address,uint256)
+          handler: handleTuringHelperDeployed
+      file: ./src/TuringHelperFactoryMapping.ts
+
