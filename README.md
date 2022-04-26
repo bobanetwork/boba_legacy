@@ -23,12 +23,13 @@ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.
 
 ## Documentation
 
-User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://omg.eco/support) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [`./boba_documentation`](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://discord.com/invite/YFweUKCb8a) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
 
 ### Direct Support
 
-[Telegram](https://t.me/bobadev)\
-[Discord](https://omg.eco/support)
+[Telegram for Developers](https://t.me/bobadev)\
+[Project Telegram](https://t.me/bobanetwork )\
+[Discord](https://discord.com/invite/YFweUKCb8a)
 
 ## Directory Structure
 
