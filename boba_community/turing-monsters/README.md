@@ -1,5 +1,5 @@
 ---
-description: Turing Example - Minting NFTS swith Random Attributes
+description: Turing Example - Minting NFTs with Random Attributes
 ---
 
 ## Basics

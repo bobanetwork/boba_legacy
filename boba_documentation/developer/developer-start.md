@@ -17,10 +17,6 @@ Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a un
   * native [NFT bridging](../../packages/boba/contracts/contracts/bridges/README.md)
   * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
-## Documentation
-
-Developer-focused documentation lives in [boba_documentation](../../boba_documentation) and within the service and contract sub-directories.
-
 ## Deploying standard contracts
 
 For most contracts, the deploy experience is exactly like deploying on Ethereum. You will need to have some ETH (or Rinkeby ETH) on Boba and you will have to change your RPC endpoint to either `https://mainnet.boba.network` or `https://rinkeby.boba.network`. That's it!
@@ -43,17 +39,17 @@ Turing is a system for interacting with the outside world from within solidity s
 
 [Turing Getting Started - NFTs](../../packages/boba/turing/README.md#feature-highlight-1-using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 
-[Turing Getting Started - External API](../../develop/packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+[Turing Getting Started - External API](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
 
 ## Boba-feature: Obtaining on-chain price data
 
 Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume. This list will be updated frequently:
 
-1. [Boba-Straw](../../boba_examples/boba-straw)
+1. [Boba Straw](../../boba_examples/boba-straw/README.md)
 2. [Witnet](https://docs.witnet.io/ethereum/price-feeds/)
 3. [Turing](../../packages/boba/turing/README.md)
 
-[Full Price Feed documentation](../../boba_documentation/Price_Data_Feeds_Overview.md)
+[Full Price Feed documentation](../../boba_documentation/price-feeds.md)
 
 ## Boba-feature: Bridging NFTs from L2 to L1
 
@@ -69,7 +65,7 @@ The [fraud-detector repo](../../boba_community/fraud-detector/README.md) runs a 
 
 ## Helping to Develop Boba
 
-If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/Quickstart_Local_Boba.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
+If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
 
 
 
