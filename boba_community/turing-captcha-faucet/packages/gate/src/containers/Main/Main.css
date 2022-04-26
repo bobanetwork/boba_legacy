@@ -1,0 +1,89 @@
+
+@font-face {
+    font-family: 'Averta';
+    font-style: normal;
+    font-weight: 300;
+    src: local('MyFont'), url(../../fonts/javerta-light-webfont.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Averta';
+    font-style: normal;
+    font-weight: 400;
+    src: local('MyFont'), url(../../fonts/javerta-regular-webfont.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Averta';
+    font-style: normal;
+    font-weight: 600;
+    src: local('MyFont'), url(../../fonts/javerta-semibold-webfont.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Averta';
+    font-style: normal;
+    font-weight: 700;
+    src: local('MyFont'), url(../../fonts/javerta-bold-webfont.woff2) format('woff2');
+}
+
+html {
+    font-family: 'Averta', sans-serif
+}
+
+body {
+    margin: 0;
+    font-family: 'Averta', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale ;
+}
+
+code {
+    font-family: 'Averta', sans-serif;
+}
+
+p {
+    display: inline;
+    overflow:hidden;
+    white-space: nowrap;
+}
+
+.sd {
+    font-size: 12px;
+}
+
+.md {
+    font-size: 18px;
+}
+
+.ld {
+    font-size: 25px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.background {
+    font-size: 16px;
+    font-variant: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: 'ss01' on,'ss02' on,'cv01' on,'cv03' on;
+    color: rgb(0, 0, 0);
+    --reach-dialog: 1;
+    box-sizing: border-box;
+    font-family: 'Averta', sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    background: #dce7f3;
+    z-index: -1;
+    width: 200vw;
+    height: 200vh;
+    transform: translate(-50vw, -100vh);
+}
