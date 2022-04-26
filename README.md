@@ -1,33 +1,16 @@
+---
+description: Introduction to Boba Network
+---
+
 # Welcome to Boba
 
-![boba](./packages/boba/gateway/src/images/boba2/logo-boba2.svg)
-
-<img src="./packages/boba/gateway/src/images/boba2/logo-boba2.svg" width="1000"/>
-
-- [TL;DR](#tl-dr)
-- [Documentation](#documentation)
-- [Community and DAO](#community-and-dao)
-- [Directory Structure](#directory-structure)
-- [Contributing](#contributing)
-  * [Dependencies](#dependencies)
-- [Spinning up the stack](#spinning-up-the-stack)
-  * [Helpful commands](#helpful-commands)
-  * [Running unit tests](#running-unit-tests)
-  * [Running integration tests](#running-integration-tests)
-  * [Viewing docker container logs](#viewing-docker-container-logs)
-- [License](#license)
-
-## TL;DR
+## Boba Network
 
 This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
 ![turing](./packages/boba/gateway/src/images/boba2/turing.png)
 
-<a href="https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing">
-  <img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
-</a>
-
- Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
+Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from it focus on augmenting compute, Boba differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -40,7 +23,12 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 ## Documentation
 
-User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories.
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://omg.eco/support) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
+
+### Direct Support
+
+[Telegram](https://t.me/bobadev)\
+[Discord](https://omg.eco/support)
 
 ## Directory Structure
 

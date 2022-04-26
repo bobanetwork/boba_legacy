@@ -1,10 +1,9 @@
-# Table of contents
+# Table of Contents
 
 * [README](README.md)
+* [Bug Bounty Program](boba\_documentation/bug-bounty.md)
+* [FAQ](boba\_documentation/faq.md)
 * [Boba Network](boba\_documentation/README.md)
-  * [Table of contents](boba\_documentation/SUMMARY.md)
-  * [Bug Bounty Program](boba\_documentation/bug-bounty.md)
-  * [FAQ](boba\_documentation/faq.md)
   * [Turing Hybrid Compute](packages/boba/turing/README.md)
     * [AWS code](packages/boba/turing/aws\_code/README.md)
     * [Turing Example Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
