@@ -2,7 +2,7 @@
 description: Contract deployment examples
 ---
 
-Please refer to the [boba_examples](../../boba_examples) folder. Contract examples include:
+Please refer to the `./boba_examples` folder. Contract examples include:
 
 1. **hardhat-simple-storage** - shows how to deploy a storage contract to Rinkeby Boba
 

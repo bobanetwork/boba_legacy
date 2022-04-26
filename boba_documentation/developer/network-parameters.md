@@ -16,7 +16,7 @@ description: A collection of links to get started on Boba
 
 ## Rinkeby Contract Addresses
 
-For all current addresses, please see [the address registration dump](https://github.com/bobanetwork/boba/tree/develop/packages/boba/register/addresses).
+For all current addresses, please see [the address registration dump](../../packages/boba/register/addresses).
 
 # Mainnet Links
 
@@ -33,4 +33,4 @@ For all current addresses, please see [the address registration dump](https://gi
 
 ## Mainnet Contract and Token Addresses
 
-For all current addresses, please see [the address registration dump](https://github.com/bobanetwork/boba/tree/develop/packages/boba/register/addresses).
+For all current addresses, please see [the address registration dump](../../packages/boba/register/addresses).

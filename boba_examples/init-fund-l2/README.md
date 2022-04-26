@@ -1,11 +1,11 @@
 
-## Sending funds to L2 using the StandardBridge
+## Sending ETH to L2 using the StandardBridge
 
-We've creaed a simple example fro you that moves funds to the L2 - see `/boba-examples/init-fund-l2/`.
+We've created a simple example for you that moves ETH to the L2 - see `./boba-examples/init-fund-l2/`.
 
 ### Update .env
 
-Add .env in `/boba-examples/init-fund-l2`
+First, add a `.env` to `/boba-examples/init-fund-l2`. You will need to provide your private key. 
 
 ```bash
 L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/INFURA_KEY
@@ -16,10 +16,15 @@ PRIVATE_KEY=
 
 ### Move ETH from L1 to L2
 
-Adjust the amount that you want to deposit from L1 to L2 in `/boba-examples/init-fund-l2/src/index.js`. Then, run:
+Next, adjust the amount that you want to deposit from L1 to L2 in `./boba-examples/init-fund-l2/src/index.js`:
+
+```javascript
+const TRANSFER_AMOUNT = ethers.utils.parseEther('0.0001')
+```
+
+Finally, run:
 
 ```bash
 yarn install
 yarn start
 ```
-
