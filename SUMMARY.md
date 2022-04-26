@@ -48,7 +48,6 @@
     * [Engineering Update #11](boba\_documentation/eng\_updates/Engineering\_update\_11.md)
 * [Code Examples](boba\_community/README.md)
   * [Running a Boba node (replica)](boba\_community/boba-node/README.md)
-
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
     * [packages](boba\_community/turing-captcha-faucet/packages/README.md)
       * [Contracts](boba\_community/turing-captcha-faucet/packages/contracts/README.md)

@@ -6,7 +6,7 @@ description: Introduction to Boba network for Developers
 
 ## Basics
 
-Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](packages/boba/turing/README.md). Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
+Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](/../../packages/boba/turing/README.md). Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -14,7 +14,7 @@ Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a un
   * providing a community fraud-detector that allows transactions to be independently verified by anyone
   * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
   * being organized as a DAO
-  * native [NFT bridging](packages/boba/contracts/contracts/bridges/README.md)
+  * native [NFT bridging](/../../packages/boba/contracts/contracts/bridges/README.md)
   * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
 ## Documentation
