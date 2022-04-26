@@ -44,10 +44,10 @@ We have set up a dedicated environment for the bug bounty program that should gi
 
 With the launch of the bug bounty program we put the following components in scope:
 
-* Liquidity Pool contracts: [source code](https://github.com/bobanetwork/boba/tree/develop/packages/omgx/contracts/contracts/LP)
-* Message Relayers: [source code](https://github.com/bobanetwork/boba/tree/develop/packages/omgx/contracts/contracts/Message)
-* NFT bridges: [source code](https://github.com/bobanetwork/boba/tree/develop/packages/omgx/contracts/contracts/bridges)
-* Libraries: [source code](https://github.com/bobanetwork/boba/tree/develop/packages/omgx/contracts/contracts/libraries)
+* Liquidity Pool contracts: [source code](../../packages/boba/contracts/contracts/LP)
+* Message Relayers: [source code](../../packages/boba/contracts/contracts/Message)
+* NFT bridges: [source code](../../packages/boba/contracts/contracts/bridges)
+* Libraries: [source code](../../packages/boba/contracts/contracts/libraries)
 
 The scope will be increased to other systems, so stay tuned for updates.
 

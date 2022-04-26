@@ -18,7 +18,7 @@
     * [Transaction Fees](boba\_documentation/developer/004\_transaction-fees.md)
     * [Rinkeby Links](boba\_documentation/developer/005\_parameters-rinkeby.md)
     * [Mainnet Links](boba\_documentation/developer/006\_parameters-mainnet.md)
-    * [Transaction Status and Verification](boba\_documentation/developer/007\_xdomain-tx-status.md)
+    * [Transaction Status and Verification](boba\_documentation/developer/xdomain-tx-status.md)
     * [Verifying contracts on Boba](boba\_documentation/developer/008\_verify-smart-contracts.md)
     * [Using The Graph on Boba](boba\_documentation/developer/009\_The-Graph.md)
     * [Boba Development Stack](boba\_documentation/developer/010\_boba-local-stack.md)
@@ -76,5 +76,3 @@
         * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
     * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
     * [BOBA Smart Contracts Registration](packages/boba/register/README.md)
-    * [Boba Network Subgraphs](packages/boba/subgraph/README.md)
-

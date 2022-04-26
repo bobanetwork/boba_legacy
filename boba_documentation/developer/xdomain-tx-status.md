@@ -18,7 +18,7 @@ There are 4 different mechanisms for following the status of a transaction.
 
 ## 2. Running a watcher
 
-Internally in all the services, and also in the `gateway`, the status of all transactions in monitored through a typescript watcher. See https://github.com/bobanetwork/boba/blob/develop/integration-tests/test/shared/watcher-utils.ts. Here is some generic pseudocode:
+Internally in all the services, and also in the `gateway`, the status of all transactions in monitored through a [watcher](../../integration-tests/test/shared/watcher-utils.ts). Here is some generic pseudocode:
 
 ```javascript
 
@@ -72,7 +72,7 @@ depositETHL2 = async (value_Wei_String) => {
 
 ## 3. Using the Boba Transaction API
 
-The system is documented here: https://github.com/bobanetwork/boba/tree/develop/ops_boba/api/watcher-api. 
+The system is [documented here](../../ops_boba/api/watcher-api). 
 
 > Mainnet Endpoint: https://api-watcher.mainnet.boba.network/   
 > Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  

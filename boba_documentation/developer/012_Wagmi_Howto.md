@@ -1,14 +1,5 @@
 # WAGMI Howto
 
-- [WAGMI Howto](#wagmi-howto)
-  * [TLDR](#tldr)
-  * [Math](#math)
-  * [Which smart contracts are involved and what do each of those contracts do?](#which-smart-contracts-are-involved-and-what-do-each-of-those-contracts-do-)
-  * [System deployment and Minting new WAGMI Tokens](#system-deployment-and-minting-new-wagmi-tokens)
-  * [Each WAGMI token needs a new Oracle that provides the goal-specific data](#each-wagmi-token-needs-a-new-oracle-that-provides-the-goal-specific-data)
-  * [Claims Interface](#claims-interface)
-  * [Gateway changes needed](#gateway-changes-needed)
-
 ## TLDR
 
 The WAGMI incentives program is Boba Network's take on liquidity mining 2.0. In collaboration with UMA protocol, we are be distributing WAGMI options on BOBA token to promising projects building on Boba. Users can earn WAGMI options using their favorite dApps on Boba Network. WAGMI options are KPI (key performance indicators) options redeemable for BOBA tokens based on metrics relating to Boba Network, such as monthly active wallets or project specific TVL. 

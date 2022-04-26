@@ -6,42 +6,6 @@ description: Learn more about the Boba Network
 
 ## FAQs
 
-1.  **What is the Gas Price on Boba L2?**
-
-    The Gas Price on L2 changes every **30 seconds** with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change from one value to another is capped to not more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. Like on mainchain, the current gas price can be obtained via `.getGasPrice()` and is typically around 10 Gwei.
-
-2.  **What are the decimals for tokens on the Boba L2?**
-
-    In general, the decimals on L2 mirror those of L1. You can check decimals using the blockexploer.boba.network, for example:
-
-    `https://blockexplorer.boba.network/tokens/0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc/token-transfers`
-
-    Exception: Note that the decimals on Rinkeby are generally 18, whereas on L2 mainnet they mirror the ETH L1 decimals.
-
-    You can also check the decimals of course by calling the token contracts:
-
-    ```javascript
-    const decimals = await this.ERC20_Contract.attach(tokenAddress).connect(this.L2Provider).decimals()
-    //typical values are 18 or, in some rare but important cases, 6
-    ```
-3.  **How do I bridge funds from L1 to L2?**
-
-    There are two methods, the **classical bridge** and the **fast bridge**. You can see an example of the [classical bridge here](001\_code-basic-ops.md). There is working code [here](https://github.com/bobanetwork/boba/tree/develop/boba\_examples/init-fund-l2).
-
-4.  **Do you support EIP-2470: Singleton Factory?**
-
-    Yes! [ERC-2470](https://eips.ethereum.org/EIPS/eip-2470) is deployed to `0xce0042B868300000d44A59004Da54A005ffdcf9f` on the Boba L2. The address on the Boba L2 is the same as on Ethereum mainnet.
-
-5.  **How do I follow cross domain (xDomain) transactions and their status?**
-
-    There are 4 different mechanisms for following the status of a transaction.
-
-    1. The Boba Blockexplorer (for L2) and Etherscan (for L1)
-    2. Running a typescript `watcher`
-    3. Using the Boba `watcher-api`
-    4. Third-party analytics
-
-    These methods are described [here](007\_xdomain-tx-status.md).
 
 ## Historical Notes for users of OVM 1.0 - the OVM 2.0 Changeset
 

@@ -1,12 +1,12 @@
 ---
-description: Deployment examples for OVM 2.0
+description: Deployment examples
 ---
 
 # Contract Deployment Examples
 
-Please refer to the Github [Examples Repo](https://github.com/bobanetwork/boba/tree/develop/boba_examples). Contract examples include:
+Please refer to the [boba_examples](../../boba_examples) folder. Contract examples include:
 
-1. **hardhat-simple-storage** - shows how to deploy a storage contract to Rinkeby Boba.
+1. **hardhat-simple-storage** - shows how to deploy a storage contract to Rinkeby Boba
 
 2. **init-fund-l2** - shows how to deposit funds from L1 to L2, on Rinkeby Boba
 
@@ -16,7 +16,7 @@ We'll work though one of those examples in more detail.
 
 ## Simple ERC20 Token Truffle Tutorial
 
-Hi there! Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
+Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
 
 Let's begin.
 
@@ -195,7 +195,7 @@ Summary
 
 ````
 
-That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Boba! 🅾️
+That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Boba!
 
 ### Troubleshooting
 

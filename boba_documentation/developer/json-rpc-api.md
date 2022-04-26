@@ -1,18 +1,10 @@
 # JSON-RPC API
 
-## JSON-RPC API <a href="#frontmatter-title" id="frontmatter-title"></a>
+## JSON-RPC API
 
 Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/json-rpc/API)as Ethereum. Some custom methods have been introduced to simplify certain Optimistic Ethereum specific interactions.
 
-### Custom JSON-RPC Methods <a href="#custom-json-rpc-methods" id="custom-json-rpc-methods"></a>
-
-NOTICE
-
-Custom JSON-RPC methods are currently highly subject to change. **We strongly discourage relying on these JSON-RPC methods.**
-
-***
-
-#### `eth_getBlockRange` <a href="#eth-getblockrange" id="eth-getblockrange"></a>
+#### `eth_getBlockRange`
 
 DEPRECATION NOTICE
 
@@ -88,9 +80,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockRange","params":["0x
 }
 ```
 
-***
-
-#### `rollup_getInfo` <a href="#rollup-getinfo" id="rollup-getinfo"></a>
+#### `rollup_getInfo`
 
 Returns useful L2-specific information about the current node.
 
@@ -138,9 +128,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"rollup_getInfo","params":[],"id"
 }
 ```
 
-***
-
-#### `rollup_gasPrices` <a href="#rollup-gasprices" id="rollup-gasprices"></a>
+#### `rollup_gasPrices`
 
 Returns the L1 and L2 gas prices that are being used by the Sequencer to calculate fees.
 
@@ -172,14 +160,12 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"rollup_gasPrices","params":[],"i
 }
 ```
 
-***
+### Unsupported JSON-RPC methods
 
-### Unsupported JSON-RPC methods <a href="#unsupported-json-rpc-methods" id="unsupported-json-rpc-methods"></a>
-
-#### `eth_getAccounts` <a href="#eth-getaccounts" id="eth-getaccounts"></a>
+#### `eth_getAccounts`
 
 This method is used to retrieve a list of addresses owned by a user. Boba Network nodes do not expose internal wallets for security reasons and therefore block the `eth_getAccounts` method by default. You should use external wallet software as an alternative.
 
-#### `eth_sendTransaction` <a href="#eth-sendtransaction" id="eth-sendtransaction"></a>
+#### `eth_sendTransaction`
 
 Boba Network nodes also block the `eth_sendTransaction` method for the same reasons as `eth_getAccounts`. You should use external wallet software as an alternative. Please note that this is not the same as the `eth_sendRawTransaction` method, which accepts a signed transaction as an input. `eth_sendRawTransaction` _is_ supported by Boba Network.
