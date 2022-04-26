@@ -87,13 +87,13 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/test/006_NFT_random.ts).
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts).
 
 ## Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
 **Note - Boba does not provide trading data (except for delayed data for testing).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
-Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. See `/AWS_code/turing_oracle.py` for a copy-paste example for querying trading data APIs via a wrapper at AWS Lambda:
+Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. See `./AWS_code/turing_oracle.py` for a copy-paste example for querying trading data APIs via a wrapper at AWS Lambda:
 
 ```python
 /AWS_code/turing_oracle.py
