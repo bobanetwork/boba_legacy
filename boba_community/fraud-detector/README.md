@@ -4,19 +4,14 @@ description: Learn how to help detect operator fraud
 
 # Checking Boba Mainnet for Fraud
 
-- [Fraud Detector](#fraud-detector)
-  * [0. Concepts](#0-concepts)
-  * [1. Errors and State Root Mismatches in Boba](#1-known-errors-and-state-root-mismatches-in-boba)
-  * [2. What do when you discover a state root mismatch](#2-what-do-when-you-discover-a-state-root-mismatch)
-  * [3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)](#3-running-the-fraud-detector--the-verifier--and-the-data-transport-layer--dtl-)
 
-# Fraud Detector
+
 
 Docker scripts and python source code for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service.
 
 ## 0. Concepts
 
-This repo allows you to:
+The `boba_community/fraud-detector` repo contains Docker scripts and python source code for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service. The allows you to:
 
 1. Run your own Boba geth L2 on your computer. In this case, the geth L2 will run in its `Verifier` mode. In `Verifier` mode, the geth will sync from L1 and use the transaction data from the L1 contracts to compute what the state roots should be, *if the operator is honest*.
 
