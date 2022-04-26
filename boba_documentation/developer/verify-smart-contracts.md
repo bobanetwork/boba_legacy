@@ -12,8 +12,8 @@ Navigate the logs section of the deployer address:
 
 [Mainnet](https://blockexplorer.boba.network/address/0x4200000000000000000000000000000000000007/logs)
 
-![](<../.gitbook/assets/Screenshot 2021-11-02 085337.png>)
+![](../.gitbook/assets/085337.png)
 
 Once you have provided all the necessary information, hit 'Verify & Publish'
 
-![](<../.gitbook/assets/Screenshot 2021-11-02 085339.PNG>)
+![](../.gitbook/assets/085339.png)

@@ -2,8 +2,6 @@
 description: Fee scheme in Boba Network
 ---
 
-# Fee Scheme
-
 ## Fee Scheme
 
 Fees on Boba are, for the most part, significantly lower than on the Ethereum mainnet. The cost of every transaction is the sum of two values:

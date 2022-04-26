@@ -1,5 +1,3 @@
-# JSON-RPC API
-
 ## JSON-RPC API
 
 Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/json-rpc/API)as Ethereum. Some custom methods have been introduced to simplify certain Optimistic Ethereum specific interactions.
