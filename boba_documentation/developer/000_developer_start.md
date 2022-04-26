@@ -7,7 +7,7 @@ description: Introduction to Boba network for Developers
 ## Basics
 
 
-[here](/../../packages/boba/turing/README.md)
+[here](../../packages/boba/turing/README.md)
 
 [Turing Hybrid Compute](packages/boba/turing/README.md)
 
