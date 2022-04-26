@@ -2,6 +2,8 @@
 
 ![boba](./packages/boba/gateway/src/images/boba2/logo-boba2.svg)
 
+<img src="./packages/boba/gateway/src/images/boba2/logo-boba2.svg" width="640" height=360 />
+
 - [TL;DR](#tl-dr)
 - [Documentation](#documentation)
 - [Community and DAO](#community-and-dao)
