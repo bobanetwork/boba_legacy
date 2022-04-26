@@ -23,7 +23,7 @@ Go back to the **Lambda** web console. In the `Function overview`, you will now 
 
 ## Turing StableSwap example
 
-See `./turing_stableSwap.py` for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in [`packages/boba/turing/AWS_code/turing_stableSwap.py`](./turing_stableSwap.py). To test it from your terminal, run:
+See `./turing_stableSwap.py` for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in [`./AWS_code/turing_stableSwap.py`](./turing_stableSwap.py). To test it from your terminal, run:
 
 ```bash
 #StableSwap Curl Test

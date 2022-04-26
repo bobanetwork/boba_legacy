@@ -1,16 +1,8 @@
-# Boba Faucet
+---
+description: Turing Example: CAPTCHA-based token faucet
+---
 
-- [Overview](#Overview)
-- [Directory Structure](#Directory-Structure)
-- [Specification](#Specification)
-- [Impementation](#Implementaion)
-  * [Step1: Creating API endpoints](#Step1--Creating-API-endpoints)
-  * [Step2: Creating Boba Faucet Contract](#Step2--Creating-Boba-Faucet-Contract)
-  * [Step3: Funding Turing Helper Contract](#Step3--Funding-Turing-Helper-Contract)
-
-## Overview
-
-Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Turing is a system for interacting with the outside world from within solidity smart contracts. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
+Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
 
 ## Directory Structure
 
@@ -22,11 +14,11 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 ## Specification
 
-This procedure takes place in five steps:
+The token-claiming process takes place in five steps:
 
-1. User obtains the CAPTCHA image and the image UUID
+### 1. User obtains the CAPTCHA image and the image UUID
 
-   The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is 
+The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is 
 
    ```js
    {
@@ -35,9 +27,9 @@ This procedure takes place in five steps:
    }
    ```
 
-   The UUID and hashed CAPTCHA answer are stored in AWS Redis.
+The UUID and hashed CAPTCHA answer are stored in AWS Redis.
 
-2. User sends a transaction to the `Boba Faucet` contract with the UUID and CAPTCHA answer
+### 2. User sends a transaction to the `Boba Faucet` contract with the UUID and CAPTCHA answer
 
    ```javascript
    const BobaFaucet = new ethers.Contract(
@@ -57,9 +49,9 @@ The answer is hashed in the `Boba Faucet` contract first before sending it to ba
     bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
 ```
 
-3. Geth sends a request to the backend and retrieves the result
+### 3. Geth sends a request to the backend and retrieves the result
 
-   The POST request with the hashed answer is sent to `https://api-turing.boba.network/verify.captcha`. It decodes the input and verifies the UUID with the hashed answer.
+The POST request with the hashed answer is sent to `https://api-turing.boba.network/verify.captcha`. It decodes the input and verifies the UUID with the hashed answer.
 
    ```python
    paramsHexString = body['params'][0]
@@ -91,7 +83,7 @@ The answer is hashed in the `Boba Faucet` contract first before sending it to ba
        return returnPayload
    ```
 
-4. Geth atomically revises the calldata
+### 4. Geth atomically revises the calldata
 
 On the contract level, we decode the result from the Turing request and release the funds if the answer is correct.
 
@@ -106,7 +98,7 @@ On the contract level, we decode the result from the Turing request and release 
     IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
 ```
 
-5. User obtains the funds if the answer is correct or sees and error message
+### 5. User obtains the funds if the answer is correct or sees an error message
 
 <img width="873" alt="image" src="https://user-images.githubusercontent.com/46272347/153475813-f4ffd103-3b95-4df7-a951-a321b84ff34a.png">
 
@@ -178,6 +170,33 @@ with open("env.yml", 'r') as ymlfile:
 ```
 
 ### Step2: Creating the Boba Faucet Contract
+
+# BOBA Faucet Smart Contracts
+
+## Deployment
+
+Create a `.env` file in the root directory of the contracts folder. Add environment-specific variables on new lines in the form of `NAME=VALUE`. Examples are given in the `.env.example` file. Just pick which net you want to work on and copy either the "Rinkeby" _or_ the "Local" envs to your `.env`.
+
+```bash
+
+NETWORK=rinkeby
+L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/9844f35ff4a84003a7025a65a9412002
+L2_NODE_WEB3_URL=https://rinkeby.boba.network
+ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
+DEPLOYER_PRIVATE_KEY=
+
+
+```
+
+Build and deploy all the needed contracts:
+
+```bash
+
+$ yarn build
+$ yarn deploy
+
+```
+
 
 The smart contract imports the [Turing Helper Contract](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/contracts/TuringHelper.sol), so it can interact with outside API endpoints.
 
