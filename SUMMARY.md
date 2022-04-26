@@ -20,10 +20,8 @@
 * Developer Docs
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
-  * [Gateway Development](boba\_documentation/developer/frontend-development.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
   * [Contract Deployment Examples](boba\_documentation/developer/contract-deployments.md)
-  * [ERC20 Truffle Tutorial](boba\_examples/truffle-erc20/README.md)
   * [Sending funds to L2](boba\_examples/init-fund-l2/README.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [Contract Addresses](boba\_documentation/developer/network-parameters.md)

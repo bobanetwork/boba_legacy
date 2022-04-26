@@ -1,8 +1,6 @@
 ---
-description: Deployment examples
+description: Contract deployment examples
 ---
-
-# Contract Deployment Examples
 
 Please refer to the [boba_examples](../../boba_examples) folder. Contract examples include:
 
@@ -199,4 +197,4 @@ That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you 
 
 ### Troubleshooting
 
-Example project not working? [Create a Github Issue]https://github.com/bobanetwork/boba/issues).
+Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/issues).

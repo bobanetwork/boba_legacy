@@ -49,7 +49,7 @@ Price Feed oracles are an essential part of Boba, which allow smart contracts to
 2. [Witnet](https://docs.witnet.io/ethereum/price-feeds/)
 3. [Turing](../../packages/boba/turing/README.md)
 
-[Full Price Feed documentation](../../boba_documentation/price-feeds.md)
+[Full Price Feed documentation](../../boba_documentation/developer/price-feeds.md)
 
 ## Feature: Bridging NFTs from L2 to L1
 
@@ -65,4 +65,4 @@ The [fraud-detector repo](../../boba_community/fraud-detector/README.md) runs a 
 
 ## Helping to Develop Boba
 
-If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
+If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/developer/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
