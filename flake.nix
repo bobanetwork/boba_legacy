@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     dream2nix = {
-      url = "github:nix-community/dream2nix";
+      url = "github:nix-community/dream2nix/2480581482e3cabe55c938cdaa70d9fc692f6983";
       #url = "path:/home/tgunnoe/src/boba/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
