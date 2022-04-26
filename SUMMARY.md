@@ -65,7 +65,7 @@
   * [Send funds to L2](boba\_examples/init-fund-l2/README.md)
   * [NFT-Bridge](boba\_examples/nft\_bridging/README.md)
     * [NFT Bridging](boba\_examples/nft\_bridging/BridgeToL1Support.md)
-  * [ERC20 Token Truffle Tutorial](boba\_examples/truffle-erc20/README.md)
+  * [ERC20 Truffle Tutorial](boba\_examples/truffle-erc20/README.md)
 * [Services](packages/README.md)
   * [Boba Deployments](packages/contracts/deployments/README.md)
     * [Boba Mainnet](packages/contracts/deployments/mainnet/README.md)

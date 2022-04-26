@@ -183,4 +183,4 @@ That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you 
 
 ## Troubleshooting
 
-Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20/issues).
+Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/develop/issues).
