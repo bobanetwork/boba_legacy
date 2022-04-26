@@ -17,9 +17,9 @@ let
     substituteInPlace ./tsconfig.json --replace \
       '"extends": "../../tsconfig.json"' \
       '"extends": "./tsconfig-copy.json"'
-    cp ${./../..}/tsconfig.build.json \
+    cp ${./../../..}/tsconfig.build.json \
       ./tsconfig.build-copy.json
-    cp ${./../..}/tsconfig.json \
+    cp ${./../../..}/tsconfig.json \
       ./tsconfig-copy.json
   '';
   correct-tsconfig-path = {
@@ -41,7 +41,7 @@ in
       l2geth = pkgs.buildGoModule {
         pname = "l2geth";
         version = "0.0.1";
-        src = ./../../l2geth;
+        src = ./../../../l2geth;
         doCheck = false;
 
         # Use fakeSha256 when the dependencies change
@@ -104,7 +104,7 @@ in
         substituteInPlace ./tsconfig.json --replace \
           '"extends": "../../../tsconfig.json"' \
           '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../..}/tsconfig.build.json \
+        cp ${./../../..}/tsconfig.build.json \
           ./tsconfig.build-copy.json
       '';
     };
@@ -170,9 +170,9 @@ in
         substituteInPlace ./tsconfig.build.json --replace \
           '"extends": "../../../tsconfig.build.json"' \
           '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../..}/tsconfig.build.json \
+        cp ${./../../..}/tsconfig.build.json \
           ./tsconfig.build-copy.json
-        cp ${./../..}/tsconfig.json \
+        cp ${./../../..}/tsconfig.json \
           ./tsconfig-copy.json
       '';
     };
@@ -186,9 +186,9 @@ in
         substituteInPlace ./tsconfig.build.json --replace \
           '"extends": "../../../tsconfig.build.json"' \
           '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../..}/tsconfig.build.json \
+        cp ${./../../..}/tsconfig.build.json \
           ./tsconfig.build-copy.json
-        cp ${./../..}/tsconfig.json \
+        cp ${./../../..}/tsconfig.json \
           ./tsconfig-copy.json
       '';
     };
@@ -292,7 +292,7 @@ in
         substituteInPlace ./tsconfig.json --replace \
           '"extends": "../tsconfig.json"' \
           '"extends": "./tsconfig-copy.json"'
-        cp ${./../..}/tsconfig.build.json \
+        cp ${./../../..}/tsconfig.build.json \
           ./tsconfig-copy.json
       '';
     };
@@ -312,7 +312,7 @@ in
         substituteInPlace ./tsconfig.json --replace \
           '"extends": "../../../tsconfig.json"' \
           '"extends": "./tsconfig-copy.json"'
-        cp ${./../..}/tsconfig.build.json \
+        cp ${./../../..}/tsconfig.build.json \
           ./tsconfig-copy.json
       '';
     };
@@ -320,7 +320,7 @@ in
   "@openzeppelin/contracts" = {
     add-regenesis-patch = {
       prePatch = ''
-        cp -r ${../../.}/patches .
+        cp -r ${../../../.}/patches .
         substituteInPlace ./patches/@openzeppelin+contracts+4.3.2.patch --replace \
           '/node_modules/@openzeppelin/contracts/' \
           '/'

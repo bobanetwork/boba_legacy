@@ -37,7 +37,7 @@
       boba-monorepo = inputs.dream2nix.lib2.init {
         systems = supportedSystems;
         config.projectRoot = ./. ;
-        config.overridesDirs = [ ./overrides ];
+        config.overridesDirs = [ ./nix/overrides ];
       };
 
       boba =
@@ -151,6 +151,7 @@
         (boba-monorepo.makeFlakeOutputs {
           pname = "boba";
           source = builtins.path {
+            name = "boba";
             path = ./.;
             filter = path: _: baseNameOf path != "flake.nix" && baseNameOf path != "overrides";
           };
