@@ -2,8 +2,6 @@
 description: Learn how to use Turing hybrid compute
 ---
 
-# Turing Hybrid Compute
-
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
 Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
@@ -38,7 +36,7 @@ To obtain the latest BTC-USD exchange rate, call:
 
 **Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
 
-# Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
+## Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
 With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction; everything takes places within one transaction:
 
@@ -91,7 +89,7 @@ Then, register and fund your Turing Credit account:
 
 **All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/test/006_NFT_random.ts).
 
-# Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
+## Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
 
 **Note - Boba does not provide trading data (except for delayed data for testing).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
 
@@ -124,17 +122,17 @@ You can lock-down your off-chain endpoint to only accept queries from your smart
 
 ```
 
-# AWS and Google Cloud Function Examples
+## AWS and Google Cloud Function Examples
 
-Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing/AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
+Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](./AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
-# Important Properties of Turing
+## Important Properties of Turing
 
 * Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
 * There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistent failure of your first call to your endpoint.
 
-## String length limit
+### String length limit
 
 The string length cap of 322 is large enough to return, for example, four `uint256` from the external api:
 
@@ -165,11 +163,11 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
 
 ```
 
-## One Turing call per Transaction
+### One Turing call per Transaction
 
 At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert.
 
-# Turing Architecture
+## Turing Architecture
 
 The modified Turing L2Geth, `L2TGeth`, monitors calldata for particular Keccak methodIDs of functions such as `GetRandom(uint32 rType, uint256 _random)` and `GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs in the execution flow, at any level, L2TGeth parses the calldata for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then runs the function with updated inputs, such that the new information flows back to the caller (via overloaded variables and a system for conditionally bypassing `requires`). Put simply, L2TGeth intercepts function calls, adds new information to the inputs, and then runs the function with the updated inputs.
 
@@ -282,9 +280,9 @@ $ hardhat --network boba_local test
 ✨  Done in 6.67s.
 ```
 
-# Technical Appendix: Implementation Details
+## Technical Appendix: Implementation Details
 
-## Step 1: Invoking Turing for inside a Smart contract
+### Step 1: Invoking Turing for inside a Smart contract
 
 A Turing cycle starts with specific function calls inside solidity smart contracts deployed on Boba:
 
@@ -514,7 +512,7 @@ func bobaTuringCall(input []byte, caller common.Address) hexutil.Bytes {
 
 ```
 
-## Step 2: Flow of Turing data out of the evm.context
+### Step 2: Flow of Turing data out of the evm.context
 
 `l2geth/core/state_processor.go:core.ApplyTransaction` moves the Turing data from `Context.Turing` into the `transaction.meta.L1Turing` byte array:
 
@@ -555,7 +553,7 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 
 At this point, the data are circulated to various places throughout the system as part of the block/transaction data. Notably, calls to the L2 for block/transaction data now return a new field, `l1Turing` to all callers.
 
-## Step 3: Batch submitter Turing data injection
+### Step 3: Batch submitter Turing data injection
 
 The batch submitter receives an new block/transaction from `L2TGeth`, obtains the raw call string (`rawTransaction`) and the Turing data (`l1Turing`), and if there was a Turing event (as judged from the length of the Turing string), the modified `batch-submitter` appends those data to the `rawTransaction` string. From the perspective of the CTC, it is receiving its normal batch payload.
 
@@ -590,11 +588,11 @@ private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
 
 ```
 
-## Step 4: Writing to the CTC
+### Step 4: Writing to the CTC
 
 The batch-submitter writes the data to the CTC as usual. **The CTC does not know about Turing** - that was one of the goals, so we do not have to modify the L1 contracts.
 
-## Step 5: DTL Turing data extraction; Reading from the CTC
+### Step 5: DTL Turing data extraction; Reading from the CTC
 
 The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is now called `sequencerTransaction`). The DTL uses a Turing length metadata field in the `sequencerTransaction` string. Critically, the DTL writes a slightly modified `TransactionEntry` into its database, which has a new field called `turing`. When the database is queried, it thus returns the Turing data in addition to all the usual fields.
 
@@ -637,7 +635,7 @@ The DTL reads from the CTC and unpacks the modified `rawTransaction` (which is n
 
 ```
 
-## Step 6: Verifier data ingestion
+### Step 6: Verifier data ingestion
 
 The Verifier receives all the usual data from the DTL, but, if there was a Turing call, there is now an additional data field containing the rewritten callData as a HexString. The Turing data are obtained from incoming `json` data and are written into the transaction metadata, `meta.L1Turing = turing`:
 
