@@ -1,3 +1,7 @@
+---
+description: Learn how to use Turing hybrid compute
+---
+
 # Turing Hybrid Compute
 
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
