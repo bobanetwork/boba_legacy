@@ -21,7 +21,7 @@
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
-  * [Contract Deployment Examples](boba\_documentation/developer/contract-deployments.md)
+  * [Contract Deployment Examples](boba\_documentation/developer/contract-deployment.md)
   * [Sending funds to L2](boba\_examples/init-fund-l2/README.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [Contract Addresses](boba\_documentation/developer/network-parameters.md)
