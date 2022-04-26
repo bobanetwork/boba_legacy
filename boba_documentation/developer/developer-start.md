@@ -51,7 +51,7 @@ Price Feed oracles are an essential part of Boba, which allow smart contracts to
 
 [Full Price Feed documentation](../../boba_documentation/price-feeds.md)
 
-## Boba-feature: Bridging NFTs from L2 to L1
+## Feature: Bridging NFTs from L2 to L1
 
 NFTs can be minted on Boba and can also be exported to Ethereum, if desired. The minting process is identical to Ethereum. The Boba-specific interchain NFT bridging system and contracts are [documented here](../../boba_examples/nft_bridging/README.md).
 
