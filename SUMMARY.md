@@ -18,7 +18,7 @@
   * [Turing Example API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
 
 * Developer Docs
-  * [Welcome to Boba](boba\_documentation/developer/developer\_start.md)
+  * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Gateway Development](boba\_documentation/developer/frontend-development.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
