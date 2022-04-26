@@ -1,5 +1,5 @@
 ---
-description: Boba user guide on how to bridge with Metamask
+description: How to bridge with Metamask
 ---
 
 # How To Bridge

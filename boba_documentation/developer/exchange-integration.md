@@ -14,7 +14,6 @@ For the most common usecase, moving tokens around, we've created the Standard To
 
 Beside the Standard Token Bridge, we created the Fast Token Bridge to allow you to exit assets from L2 in serval hours or even serval minutes based on the number of transactions. The Fast Token Bridge collects a certain percentage of the deposit amount as the transaction fee and distributes them to the liquidity providers.
 
-\
 Using the Standard Token Bridge
 -------------------------------
 
@@ -295,6 +294,7 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 | Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby\_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
 
 ### Links
+
 
 #### Mainnet
 
