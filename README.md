@@ -2,7 +2,7 @@
 
 ![boba](./packages/boba/gateway/src/images/boba2/logo-boba2.svg)
 
-<img src="./packages/boba/gateway/src/images/boba2/logo-boba2.svg" width="640" height=360 />
+<img src="./packages/boba/gateway/src/images/boba2/logo-boba2.svg" width="1000"/>
 
 - [TL;DR](#tl-dr)
 - [Documentation](#documentation)
