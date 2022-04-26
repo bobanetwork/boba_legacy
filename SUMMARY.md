@@ -39,8 +39,7 @@
     * [Bridging basics](boba\_documentation/developer/bridge-l1-and-l2/bridge-basics.md)
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
-  * [NFT Bridging](boba\_examples/nft\_bridging/BridgeToL1Support.md)
-    * [NFT Bridging Deepdive](boba\_examples/nft\_bridging/README.md)
+  * [NFT Bridging](boba\_examples/nft\_bridging/README.md)
 
 * [Other](packages/README.md)
   * [Dual fee system](boba\_examples/boba-fee/README.md)
