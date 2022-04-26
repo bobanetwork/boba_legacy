@@ -6,11 +6,11 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 ## Directory Structure
 
-* [`boba_community/turing-captcha-faucet/packages`](../../boba_community/turing-captcha-faucet/packages): Contains all the typescript packages and contracts
-  * [`contracts`](./packages/contracts): Solidity smart contracts implementing the Boba Faucet
-  * [`gateway`](./packages/gate): The Boba Web faucet
-  * [`deployment`](./packages/deployment): Boba faucet contract addresses
-  * [`api`](./packages/api): Boba faucet backend API
+* `boba_community/turing-captcha-faucet/packages`: Contains all the typescript packages and contracts
+  * `contracts`: Smart contracts implementing the Boba Faucet
+  * `gateway`: The Boba Web faucet frontend
+  * `deployment`: Boba faucet Rinkeby contract addresses
+  * `api`: Boba faucet backend API
 
 ## Specification
 
@@ -104,7 +104,7 @@ On the contract level, we decode the result from the Turing request and release 
 
 ## Implementation
 
-### Step1: Creating API endpoints
+### Step 1: Creating API endpoints
 
 Two simple API endpoints are created.
 
@@ -169,7 +169,7 @@ with open("env.yml", 'r') as ymlfile:
     return returnPayload(False)
 ```
 
-### Step2: Creating the Boba Faucet Contract
+### Step 2: Creating the Boba Faucet Contract
 
 # BOBA Faucet Smart Contracts
 
@@ -185,7 +185,6 @@ L2_NODE_WEB3_URL=https://rinkeby.boba.network
 ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
 DEPLOYER_PRIVATE_KEY=
 
-
 ```
 
 Build and deploy all the needed contracts:
@@ -197,8 +196,7 @@ $ yarn deploy
 
 ```
 
-
-The smart contract imports the [Turing Helper Contract](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/contracts/TuringHelper.sol), so it can interact with outside API endpoints.
+The smart contract imports the [Turing Helper Contract](../../packages/boba/turing/contracts/TuringHelper.sol) so it can interact with outside API endpoints.
 
 ```javascript
 import './TuringHelper.sol';
@@ -249,7 +247,7 @@ contract BobaFaucet is Ownable {
 }
 ```
 
-### Step3: Funding Turing Helper Contract
+### Step 3: Funding Turing Helper Contract
 
 We charge 0.01 BOBA for each Turing request and it's based on the Turing Helper Contract.
 

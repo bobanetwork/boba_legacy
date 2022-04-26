@@ -1,12 +1,6 @@
-# Turing Monster Minting
-
-- [Turing Monster Minting](#turing-monster-minting)
-  * [Basics](#basics)
-  * [Mint your Monster!](#mint-your-monster)
-  * [Getting Rinkeby ETH and Rinkeby BOBA](#getting-rinkeby-eth-and-rinkeby-boba)
-  * [Testing the Turing Monster NFT](#testing-the-turing-monster-nft)
-  * [Deploy the Turing Monster NFT without running the tests](#deploy-the-turing-monster-nft-without-running-the-tests)
-  * [Solidity Code Walkthrough](#solidity-code-walkthrough)
+---
+description: Turing Example - Minting NFTS swith Random Attributes
+---
 
 ## Basics
 
@@ -32,7 +26,7 @@ $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`boba_community/turing-monsters/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
 
 ```javascript
 
@@ -71,7 +65,6 @@ $ PRIVATE_KEY=0x... yarn test:rinkeby # for testing on rinkeby, for example
 # other choices are local and mainnet
 ```
 
-
 Ok, all done. Enjoy. The terminal will give you all the information you need to mint and send a Turing monster to your friends:
 
 ```
@@ -100,8 +93,7 @@ $ yarn build
 $ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
 ```
 
-Add the ERC721 as permitted caller to the deployed TuringHelper.
-Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
+Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
 
 ## Solidity Code Walkthrough
 

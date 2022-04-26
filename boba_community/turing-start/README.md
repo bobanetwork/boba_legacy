@@ -1,3 +1,7 @@
+---
+description: Turing Example - Getting started with Turing 
+---
+
 This project was bootstrapped with [Create Eth App](https://github.com/paulrberg/create-eth-app).
 
 ## Project Structure

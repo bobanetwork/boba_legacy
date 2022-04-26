@@ -13,14 +13,9 @@
 * [Turing Hybrid Compute](packages/boba/turing/README.md)
   * [Turing Example API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
-    * [packages](boba\_community/turing-captcha-faucet/packages/README.md)
-      * [Contracts](boba\_community/turing-captcha-faucet/packages/contracts/README.md)
   * [Turing KYC](boba\_community/turing-kyc/README.md)
   * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
   * [Turing Hello World](boba\_community/turing-start/README.md)
-    * [packages](boba\_community/turing-start/packages/README.md)
-      * [Contracts](boba\_community/turing-start/packages/contracts/README.md)
-      * [React-app](boba\_community/turing-start/packages/react-app/README.md)
 
 * Developer Docs
   * [Welcome to Boba](boba\_documentation/developer/developer\_start.md)
