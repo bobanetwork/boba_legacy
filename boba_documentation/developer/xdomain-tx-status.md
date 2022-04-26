@@ -1,5 +1,5 @@
 ---
-description: How to monitor transaction status
+description: How to monitor cross-domain transaction status
 ---
 
 # Crossdomain Transaction Status
@@ -11,15 +11,15 @@ There are 4 different mechanisms for following the status of a transaction.
 3. Using the Boba `watcher-api`
 4. Third-party analytics
 
-## 1. Blockexplorer
+## Blockexplorer
 
 Mainnet Blockexplorer: `https://blockexplorer.boba.network/address/____VALUE____/transactions`   
 
 Rinkeby Blockexplorer: `https://blockexplorer.rinkeby.boba.network/address/____VALUE____/transactions`
 
-## 2. Running a watcher
+## Running a messenger
 
-Internally in all the services, and also in the `gateway`, the status of all transactions in monitored through a [messenger](../../integration-tests/test/bridged-tokens.spec.ts). Here is some generic pseudocode:
+Internally in all the services, and also in the `gateway`, the status of all transactions is monitored through a `messenger`. Here is some generic pseudocode.
 
 ```javascript
 
@@ -63,15 +63,9 @@ Internally in all the services, and also in the `gateway`, the status of all tra
 
 ```
 
-## 3. Using the Boba Transaction API
+## Using the Boba Transaction API
 
-The system is [documented here](../../ops_boba/api/watcher-api). 
-
-> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/ 
-
-> Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  
-
-For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
+The system is [documented here](../../ops_boba/api/watcher-api). For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
 
 ### get.l2.transactions
 
@@ -128,6 +122,6 @@ For example, to get L2 transactions between two blocks, use `get.l2.transactions
 ]
 ```
 
-## 4. Using Third Party Analytics
+## Using Third Party Analytics
 
-Some teams prefer to use providers such as https://thegraph.com/en/, which is available on Boba as well.
+Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba as well.
