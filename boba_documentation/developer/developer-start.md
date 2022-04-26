@@ -45,8 +45,8 @@ Turing is a system for interacting with the outside world from within solidity s
 
 Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume:
 
-1. [Boba Straw](../../boba_examples/boba-straw/README.md)
-2. [Witnet](https://docs.witnet.io/ethereum/price-feeds/)
+1. [Boba Straw](../../boba_documentation/developer/price-feeds.md#1.-Boba-Straw)
+2. [Witnet](https://docs.witnet.io/smart-contracts/supported-chains)
 3. [Turing](../../packages/boba/turing/README.md)
 
 [Full Price Feed documentation](../../boba_documentation/developer/price-feeds.md)
