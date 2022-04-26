@@ -4,8 +4,6 @@ description: Introduction to Boba Network
 
 # Welcome to Boba
 
-## Boba Network
-
 This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
 ![turing](./packages/boba/gateway/src/images/boba2/turing.png)

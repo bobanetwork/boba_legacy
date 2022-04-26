@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [README](README.md)
+* [Welcome to Boba](README.md)
 * [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
 
@@ -15,7 +15,7 @@
   * [Turing KYC](boba\_community/turing-kyc/README.md)
   * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
   * [Turing Hello World](boba\_community/turing-start/README.md)
-  * [Turing Example API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
+  * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
 
 * Developer Docs
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
@@ -35,11 +35,11 @@
   * [JSON-RPC API](boba\_documentation/developer/json-rpc-api.md)
   * [Price Oracles](boba\_documentation/developer/price-feeds.md)
   * [WAGMI](boba\_documentation/developer/wagmi.md)
+  * [NFT Bridging](boba\_examples/nft\_bridging/README.md)
   * Token Bridging
     * [Bridging basics](boba\_documentation/developer/bridge-l1-and-l2/bridge-basics.md)
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
-  * [NFT Bridging](boba\_examples/nft\_bridging/README.md)
 
 * [Other](packages/README.md)
   * [Dual fee system](boba\_examples/boba-fee/README.md)
@@ -53,9 +53,6 @@
     * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
   * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
   * [Contracts Registration](packages/boba/register/README.md)
-
-
-
 
 
 
