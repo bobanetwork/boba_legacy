@@ -7,66 +7,59 @@ description: How to monitor transaction status
 There are 4 different mechanisms for following the status of a transaction. 
 
 1. The Boba Blockexplorer (for L2) and Etherscan (for L1)
-2. Running a typescript `watcher`
+2. Running a typescript `messenger`
 3. Using the Boba `watcher-api`
 4. Third-party analytics
 
 ## 1. Blockexplorer
 
-> Mainnet Blockexplorer : `https://blockexplorer.boba.network/address/____VALUE____/transactions`   
-> Rinkeby Blockexplorer: `https://blockexplorer.rinkeby.boba.network/address/____VALUE____/transactions`
+Mainnet Blockexplorer: `https://blockexplorer.boba.network/address/____VALUE____/transactions`   
+
+Rinkeby Blockexplorer: `https://blockexplorer.rinkeby.boba.network/address/____VALUE____/transactions`
 
 ## 2. Running a watcher
 
-Internally in all the services, and also in the `gateway`, the status of all transactions in monitored through a [watcher](../../integration-tests/test/shared/watcher-utils.ts). Here is some generic pseudocode:
+Internally in all the services, and also in the `gateway`, the status of all transactions in monitored through a [messenger](../../integration-tests/test/bridged-tokens.spec.ts). Here is some generic pseudocode:
 
 ```javascript
 
-import { Watcher } from '@eth-optimism/core-utils'
+	import {
+	  CrossChainMessenger,
+	  MessageStatus,
+	  MessageDirection,
+	} from '@eth-optimism/sdk'
 
-this.watcher = new Watcher({
-	l1: {
-	  provider: this.L1Provider,
-	  messengerAddress: this.L1MessengerAddress,
-	},
-	l2: {
-	  provider: this.L2Provider,
-	  messengerAddress: this.L2MessengerAddress,
-	},
-})
+  const messenger = new CrossChainMessenger({
+    l1SignerOrProvider: l1Wallet,
+    l2SignerOrProvider: l2Wallet,
+    l1ChainId: network.chainId,
+    fastRelayer: false,
+  })
 
-//Move ETH from L1 to L2 using the standard deposit system
-depositETHL2 = async (value_Wei_String) => {
+  withdrawalTest(
+    '{tag:other} should withdraw tokens from L2 to the depositor',
+    async () => {
+      const tx = await emessenger.withdrawERC20(
+        L1__ERC20.address,
+        L2__ERC20.address,
+        500
+      )
 
-	try {
+      await messenger.waitForMessageStatus(
+        tx,
+        MessageStatus.READY_FOR_RELAY
+      )
 
-	  const depositTxStatus = await this.L1StandardBridgeContract.depositETH(
-	    this.L2GasLimit,
-	    utils.formatBytes32String(new Date().getTime().toString()),
-	    {
-	      value: value_Wei_String
-	    }
-	  )
+      await messenger.waitForMessageReceipt(tx)
 
-	  //at this point the tx has been submitted, and we are waiting...
-	  await depositTxStatus.wait()
-
-	  const [l1ToL2msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-	    depositTxStatus.hash
-	  )
-	  console.log(' got L1->L2 message hash', l1ToL2msgHash)
-
-	  const l2Receipt = await this.watcher.getL2TransactionReceipt(
-	    l1ToL2msgHash
-	  )
-	  console.log(' completed Deposit! L2 tx hash:', l2Receipt.transactionHash)
-
-	  return l2Receipt
-	} catch(error) {
-	  console.log("NS: depositETHL2 error:",error)
-	  return error
-	}
-}
+      expect(await L1__ERC20.balanceOf(env.l1Wallet.address)).to.deep.equal(
+        BigNumber.from(999500)
+      )
+      expect(await L2__ERC20.balanceOf(env.l2Wallet.address)).to.deep.equal(
+        BigNumber.from(0)
+      )
+    }
+  )
 
 ```
 
@@ -74,7 +67,8 @@ depositETHL2 = async (value_Wei_String) => {
 
 The system is [documented here](../../ops_boba/api/watcher-api). 
 
-> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/   
+> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/ 
+  
 > Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  
 
 For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
