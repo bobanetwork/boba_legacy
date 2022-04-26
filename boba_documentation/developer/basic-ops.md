@@ -203,7 +203,7 @@ The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be cha
 
 The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at [`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
 
-```
+```javascript
 import { iOVM_L1BlockNumber } from "@eth-optimism/contracts/L2/predeploys/iOVM_L1BlockNumber.sol";
 import { Lib_PredeployAddresses } from "@eth-optimism/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 
