@@ -32,5 +32,5 @@ In this package you'll find the actual solidity smart contracts which have been 
 
 This package contains the react app the user actually navigates through. 
 
-Rinkeby: [turing.rinkeby.boba.network](https://turing.rinkeby.boba.network/)
-Mainnet: [turing.boba.network](https://turing.boba.network/)
+* **Rinkeby**: [turing.rinkeby.boba.network](https://turing.rinkeby.boba.network/)
+* **Mainnet**: [turing.boba.network](https://turing.boba.network/)
