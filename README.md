@@ -1,8 +1,6 @@
-<div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
-  <br />
-  <h1> The Boba Monorepo</h1>
-</div>
+# Welcome to Boba
+
+![boba](./packages/boba/gateway/src/images/boba2/logo-boba2.svg)
 
 - [TL;DR](#tl-dr)
 - [Documentation](#documentation)
@@ -89,7 +87,7 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**.
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying your contracts, it's simpler to use https://rinkeby.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
