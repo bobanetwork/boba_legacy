@@ -136,7 +136,7 @@ Witnet is a decentralized oracle network, with multiple price feeds currently li
 
 ### I want my contracts to receive data
 
-It's just as easy to make your contracts listen to Witnet's price feed. Please refer to Witnet's official guide [here](https://docs.witnet.io/ethereum/price-feeds/)
+It's just as easy to make your contracts listen to Witnet's price feed. Please refer to Witnet's official guide [here](https://docs.witnet.io/).
 
 **Boba Rinkeby Price Feeds:**
 
@@ -193,4 +193,4 @@ address public helperAddr;
 
 `_url` is your personal data source
 
-For a more detailed walk through, refer to the [[turing guide]](../../packages/boba/turing/README.md)
+For a more detailed walk through, refer to the [[Turing guide]](../../packages/boba/turing/README.md)
