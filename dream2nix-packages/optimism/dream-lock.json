@@ -1,13 +1,12 @@
 {
   "_generic": {
     "defaultPackage": "optimism",
-    "invalidationHash": "010a8f355c1fb52a4d3a2cff6bc9461d8dceb09965aab6fe3a04d9314dd4bb95",
+    "invalidationHash": "817089b1a2dbea1f7a33eafb9693449f505b13265263a8a234cb13a7c36592fa",
     "location": "",
     "packages": {
       "@boba/contracts": "0.0.1",
       "@boba/gas-price-oracle": "0.1.0",
       "@boba/gateway": "0.0.3",
-      "@boba/message-relayer-fast": "0.1.1",
       "@boba/monitor": "1.0.0",
       "@boba/register": "0.0.1",
       "@boba/turing-hybrid-compute": "0.2.0",
@@ -1133,6 +1132,7 @@
         [ "lodash", "4.17.21" ],
         [ "merkletreejs", "0.2.27" ],
         [ "mocha", "8.4.0" ],
+        [ "node-fetch", "2.6.7" ],
         [ "patch-package", "6.4.7" ],
         [ "prettier", "2.5.1" ],
         [ "rimraf", "3.0.2" ],
@@ -1192,53 +1192,17 @@
         [ "typescript", "4.5.5" ]
       ]
     },
-    "@boba/message-relayer-fast": {
-      "0.1.1": [
-        [ "@eth-optimism/common-ts", "0.2.2" ],
-        [ "@eth-optimism/contracts", "0.5.11" ],
-        [ "@eth-optimism/core-utils", "0.8.1" ],
-        [ "@eth-optimism/ynatm", "0.2.2" ],
-        [ "@ethersproject/providers", "5.5.3" ],
-        [ "@nomiclabs/hardhat-ethers", "2.0.4" ],
-        [ "@openzeppelin/contracts", "3.4.1" ],
-        [ "@openzeppelin/test-helpers", "0.5.4" ],
-        [ "@types/mocha", "8.2.3" ],
-        [ "bcfg", "0.1.7" ],
-        [ "chai", "4.3.6" ],
-        [ "chai-as-promised", "7.1.1" ],
-        [ "chalk", "4.1.2" ],
-        [ "directory-tree", "2.4.0" ],
-        [ "dotenv", "8.6.0" ],
-        [ "ethereum-waffle", "3.4.0" ],
-        [ "ethers", "5.5.4" ],
-        [ "ganache-core", "2.13.2" ],
-        [ "glob", "7.2.0" ],
-        [ "google-spreadsheet", "3.2.0" ],
-        [ "hardhat", "2.8.3" ],
-        [ "merkletreejs", "0.2.27" ],
-        [ "mocha", "8.4.0" ],
-        [ "node-fetch", "2.6.7" ],
-        [ "patch-package", "6.4.7" ],
-        [ "prettier", "2.5.1" ],
-        [ "rimraf", "3.0.2" ],
-        [ "rlp", "2.2.7" ],
-        [ "shx", "0.3.4" ],
-        [ "ts-node", "9.1.1" ],
-        [ "tslint", "6.1.3" ],
-        [ "tslint-config-prettier", "1.18.0" ],
-        [ "tslint-no-focused-test", "0.5.0" ],
-        [ "tslint-plugin-prettier", "2.3.0" ],
-        [ "typescript", "4.5.5" ]
-      ]
-    },
     "@boba/monitor": {
       "1.0.0": [
         [ "@boba/contracts", "0.0.1" ],
+        [ "@boba/register", "0.0.1" ],
         [ "@eth-optimism/common-ts", "0.2.2" ],
         [ "@eth-optimism/contracts", "0.5.11" ],
         [ "@eth-optimism/core-utils", "0.8.1" ],
+        [ "@eth-optimism/sdk", "1.0.1" ],
         [ "@ethersproject/providers", "5.4.5" ],
         [ "async-mutex", "0.3.2" ],
+        [ "axios", "0.26.0" ],
         [ "dotenv", "9.0.2" ],
         [ "eslint", "7.32.0" ],
         [ "eslint-config-airbnb", "18.2.1" ],
@@ -1246,6 +1210,7 @@
         [ "ethers", "5.5.4" ],
         [ "lodash", "4.17.21" ],
         [ "mysql", "2.18.1" ],
+        [ "node-fetch", "2.6.0" ],
         [ "web3", "1.6.0" ],
         [ "winston", "3.3.3" ]
       ]
@@ -1868,6 +1833,7 @@
         [ "eslint-plugin-prettier", "3.4.1" ],
         [ "eslint-plugin-react", "7.28.0" ],
         [ "eslint-plugin-unicorn", "32.0.1" ],
+        [ "eth-sig-util", "2.5.4" ],
         [ "ethereum-waffle", "3.4.0" ],
         [ "ethers", "5.5.4" ],
         [ "hardhat", "2.8.3" ],
@@ -1880,24 +1846,17 @@
     "@eth-optimism/message-relayer": {
       "0.1.12": [
         [ "@eth-optimism/common-ts", "0.2.2" ],
-        [ "@eth-optimism/contracts", "0.5.11" ],
         [ "@eth-optimism/core-utils", "0.8.1" ],
-        [ "@eth-optimism/smock", "1.1.10" ],
+        [ "@eth-optimism/sdk", "1.0.1" ],
         [ "@eth-optimism/ynatm", "0.2.2" ],
-        [ "@nomiclabs/ethereumjs-vm", "4.2.2" ],
         [ "@nomiclabs/hardhat-ethers", "2.0.4" ],
         [ "@nomiclabs/hardhat-waffle", "2.0.2" ],
-        [ "@sentry/node", "6.2.5" ],
-        [ "@types/chai", "4.3.0" ],
-        [ "@types/chai-as-promised", "7.1.4" ],
-        [ "@types/mocha", "8.2.3" ],
+        [ "@sentry/node", "6.17.5" ],
         [ "@typescript-eslint/eslint-plugin", "4.33.0" ],
         [ "@typescript-eslint/parser", "4.33.0" ],
         [ "babel-eslint", "10.1.0" ],
         [ "bcfg", "0.1.7" ],
-        [ "chai", "4.3.6" ],
-        [ "chai-as-promised", "7.1.1" ],
-        [ "dotenv", "8.6.0" ],
+        [ "dotenv", "10.0.0" ],
         [ "eslint", "7.32.0" ],
         [ "eslint-config-prettier", "8.3.0" ],
         [ "eslint-plugin-import", "2.25.4" ],
@@ -1910,12 +1869,8 @@
         [ "ethers", "5.5.4" ],
         [ "hardhat", "2.8.3" ],
         [ "lint-staged", "11.0.0" ],
-        [ "lodash", "4.17.21" ],
-        [ "merkletreejs", "0.2.27" ],
-        [ "mocha", "8.4.0" ],
         [ "node-fetch", "2.6.7" ],
         [ "prettier", "2.5.1" ],
-        [ "rlp", "2.2.7" ],
         [ "typescript", "4.5.5" ]
       ]
     },
@@ -3499,11 +3454,6 @@
       ]
     },
     "@openzeppelin/contract-loader": {
-      "0.4.0": [
-        [ "find-up", "4.1.0" ],
-        [ "fs-extra", "8.1.0" ],
-        [ "try-require", "1.2.1" ]
-      ],
       "0.6.3": [
         [ "find-up", "4.1.0" ],
         [ "fs-extra", "8.1.0" ]
@@ -3512,18 +3462,6 @@
     "@openzeppelin/test-helpers": {
       "0.5.15": [
         [ "@openzeppelin/contract-loader", "0.6.3" ],
-        [ "@truffle/contract", "4.4.7" ],
-        [ "ansi-colors", "3.2.4" ],
-        [ "chai", "4.3.6" ],
-        [ "chai-bn", "0.2.2" ],
-        [ "ethjs-abi", "0.2.1" ],
-        [ "lodash.flatten", "4.4.0" ],
-        [ "semver", "5.7.1" ],
-        [ "web3", "1.7.0" ],
-        [ "web3-utils", "1.7.0" ]
-      ],
-      "0.5.4": [
-        [ "@openzeppelin/contract-loader", "0.4.0" ],
         [ "@truffle/contract", "4.4.7" ],
         [ "ansi-colors", "3.2.4" ],
         [ "chai", "4.3.6" ],
@@ -3578,13 +3516,6 @@
         [ "@sentry/types", "6.17.5" ],
         [ "@sentry/utils", "6.17.5" ],
         [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/hub", "6.2.5" ],
-        [ "@sentry/minimal", "6.2.5" ],
-        [ "@sentry/types", "6.2.5" ],
-        [ "@sentry/utils", "6.2.5" ],
-        [ "tslib", "1.14.1" ]
       ]
     },
     "@sentry/hub": {
@@ -3597,11 +3528,6 @@
         [ "@sentry/types", "6.17.5" ],
         [ "@sentry/utils", "6.17.5" ],
         [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/types", "6.2.5" ],
-        [ "@sentry/utils", "6.2.5" ],
-        [ "tslib", "1.14.1" ]
       ]
     },
     "@sentry/minimal": {
@@ -3613,11 +3539,6 @@
       "6.17.5": [
         [ "@sentry/hub", "6.17.5" ],
         [ "@sentry/types", "6.17.5" ],
-        [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/hub", "6.2.5" ],
-        [ "@sentry/types", "6.2.5" ],
         [ "tslib", "1.14.1" ]
       ]
     },
@@ -3643,17 +3564,6 @@
         [ "https-proxy-agent", "5.0.0" ],
         [ "lru_map", "0.3.3" ],
         [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/core", "6.2.5" ],
-        [ "@sentry/hub", "6.2.5" ],
-        [ "@sentry/tracing", "6.2.5" ],
-        [ "@sentry/types", "6.2.5" ],
-        [ "@sentry/utils", "6.2.5" ],
-        [ "cookie", "0.4.2" ],
-        [ "https-proxy-agent", "5.0.0" ],
-        [ "lru_map", "0.3.3" ],
-        [ "tslib", "1.14.1" ]
       ]
     },
     "@sentry/tracing": {
@@ -3670,13 +3580,6 @@
         [ "@sentry/types", "6.17.5" ],
         [ "@sentry/utils", "6.17.5" ],
         [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/hub", "6.2.5" ],
-        [ "@sentry/minimal", "6.2.5" ],
-        [ "@sentry/types", "6.2.5" ],
-        [ "@sentry/utils", "6.2.5" ],
-        [ "tslib", "1.14.1" ]
       ]
     },
     "@sentry/utils": {
@@ -3686,10 +3589,6 @@
       ],
       "6.17.5": [
         [ "@sentry/types", "6.17.5" ],
-        [ "tslib", "1.14.1" ]
-      ],
-      "6.2.5": [
-        [ "@sentry/types", "6.2.5" ],
         [ "tslib", "1.14.1" ]
       ]
     },
@@ -4660,6 +4559,9 @@
     "axios": {
       "0.21.4": [
         [ "follow-redirects", "1.14.7" ]
+      ],
+      "0.26.0": [
+        [ "follow-redirects", "1.14.9" ]
       ]
     },
     "babel-code-frame": {
@@ -11169,7 +11071,6 @@
         [ "@boba/contracts", "0.0.1" ],
         [ "@boba/gas-price-oracle", "0.1.0" ],
         [ "@boba/gateway", "0.0.3" ],
-        [ "@boba/message-relayer-fast", "0.1.1" ],
         [ "@boba/register", "0.0.1" ],
         [ "@boba/turing-hybrid-compute", "0.2.0" ],
         [ "@eth-optimism/common-ts", "0.2.2" ],
@@ -16598,14 +16499,6 @@
         "type": "path"
       }
     },
-    "@boba/message-relayer-fast": {
-      "0.1.1": {
-        "path": "packages/boba/message-relayer-fast",
-        "rootName": "optimism",
-        "rootVersion": "1.0.0",
-        "type": "path"
-      }
-    },
     "@boba/monitor": {
       "1.0.0": {
         "path": "ops_boba/monitor",
@@ -18343,11 +18236,6 @@
       }
     },
     "@openzeppelin/contract-loader": {
-      "0.4.0": {
-        "hash": "sha512-K+Pl4tn0FbxMSP0H9sgi61ayCbecpqhQmuBshelC7A3q2MlpcqWRJan0xijpwdtv6TORNd5oZNe/+f3l+GD6tw==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@openzeppelin/contract-loader/-/contract-loader-0.4.0.tgz"
-      },
       "0.6.3": {
         "hash": "sha512-cOFIjBjwbGgZhDZsitNgJl0Ye1rd5yu/Yx5LMgeq3u0ZYzldm4uObzHDFq4gjDdoypvyORjjJa3BlFA7eAnVIg==",
         "type": "http",
@@ -18355,11 +18243,6 @@
       }
     },
     "@openzeppelin/contracts": {
-      "3.4.1": {
-        "hash": "sha512-cUriqMauq1ylzP2TxePNdPqkwI7Le3Annh4K9rrpvKfSBB/bdW+Iu1ihBaTIABTAAJ85LmKL5SSPPL9ry8d1gQ==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.4.1.tgz"
-      },
       "3.4.1-solc-0.7-2": {
         "hash": "sha512-tAG9LWg8+M2CMu7hIsqHPaTyG4uDzjr6mhvH96LvOpLZZj6tgzTluBt+LsCf1/QaYrlis6pITvpIaIhE+iZB+Q==",
         "type": "http",
@@ -18383,11 +18266,6 @@
         "hash": "sha512-10fS0kyOjc/UObo9iEWPNbC6MCeiQ7z97LDOJBj68g+AAs5pIGEI2h3V6G9TYTIq8VxOdwMQbfjKrx7Y3YZJtA==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@openzeppelin/test-helpers/-/test-helpers-0.5.15.tgz"
-      },
-      "0.5.4": {
-        "hash": "sha512-sSjft0CcmC6Pwsd/j1uakk2MLamEH4mmphVlF5hzUUVyoxL0KGCbxQgBoLoEpUbw2M9HtFAEMJJPGccEcb9Cog==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@openzeppelin/test-helpers/-/test-helpers-0.5.4.tgz"
       }
     },
     "@popperjs/core": {
@@ -18442,11 +18320,6 @@
         "hash": "sha512-G1bYvZsWM5n0QYbnv89a24HCXex3rMWUnHWFysNqcWmw2YfiQ9RX5SakGbesewBj2Br2XpaDH0pED3QBUrC7yA==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/core/-/core-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-I+AkgIFO6sDUoHQticP6I27TT3L+i6TUS03in3IEtpBcSeP2jyhlxI8l/wdA7gsBqUPdQ4GHOOaNgtFIcr8qag==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/core/-/core-6.2.5.tgz"
       }
     },
     "@sentry/hub": {
@@ -18459,11 +18332,6 @@
         "hash": "sha512-jBRrG0v3nHrymyj13Dv28aRS6xgQjWup45E0rljeksCxDL9frc734C0QGzGjE2MG7vZWtvd2CgP8uNbgYpwlTw==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/hub/-/hub-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-YlEFdEhcfqpl2HC+/dWXBsBJEljyMzFS7LRRjCk8QANcOdp9PhwQjwebUB4/ulOBjHPP2WZk7fBBd/IKDasTUg==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/hub/-/hub-6.2.5.tgz"
       }
     },
     "@sentry/minimal": {
@@ -18476,11 +18344,6 @@
         "hash": "sha512-WY/IQh2tb4XDkvr/2/8LB0mO8W3cgL6S2Uv+YfVRqogGJRdg5wD67aQ9zypNMq+D84cPwRuR/+51Npj6daox4w==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-RKP4Qx3p7Cv0oX1cPKAkNVFYM7p2k1t32cNk1+rrVQS4hwlJ7Eg6m6fsqsO+85jd6Ne/FnyYsfo9cDD3ImTlWQ==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-6.2.5.tgz"
       }
     },
     "@sentry/node": {
@@ -18493,11 +18356,6 @@
         "hash": "sha512-EFdrAOJKAUNjooVXpqvBF1VVUOUqXtOzjSIxNEd/dzCYDfbcycfe/XAhfiZSWqAlXMdIm1c4FHQj27qcDUQa9w==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/node/-/node-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-/iM3khzGnUH713VFhZBAEYJhb/saEQSVz7Udogml+O7mFQ4rutnwJhgoGcB9YYrwMv2m7qOSszkdZbemDV6k2g==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/node/-/node-6.2.5.tgz"
       }
     },
     "@sentry/tracing": {
@@ -18510,11 +18368,6 @@
         "hash": "sha512-SVIDFL/QbNAlv+Rhgq14TqtTBp9WGipkjQXXaD/Pbqcj3/Oil7ZHHKYesW8Z+gtKQs73oQ9a0nCgraLFcQ68PQ==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-j/hM0BoHxfrNLxPeEJ5Vq4R34hO/TOHMEpLR3FdnunBXbsmjoKMMygIkPxnpML5XWtvukAehbwpDXldwMYz83w==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-6.2.5.tgz"
       }
     },
     "@sentry/types": {
@@ -18527,11 +18380,6 @@
         "hash": "sha512-mn7qKuOvmZRTomJ7BiJEw6DM8femAVQcuHa8hdvK1F6ldMfFVLen5Z2LYGE7iY36GEa1Ba/AGGEKyF8D29y2/Q==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/types/-/types-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-1Sux6CLYrV9bETMsGP/HuLFLouwKoX93CWzG8BjMueW+Di0OGxZphYjXrGuDs8xO8bAKEVGCHgVQdcB2jevS0w==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/types/-/types-6.2.5.tgz"
       }
     },
     "@sentry/utils": {
@@ -18544,11 +18392,6 @@
         "hash": "sha512-MMCFCNWW73HRnqPVRGGSaMfSxtvvlNDgu1JFAOT2vnNkuf0mXvH301lyrh4pFJfntrtXOOk4bnGMhyWRlPADdA==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@sentry/utils/-/utils-6.17.5.tgz"
-      },
-      "6.2.5": {
-        "hash": "sha512-fJoLUZHrd5MPylV1dT4qL74yNFDl1Ur/dab+pKNSyvnHPnbZ/LRM7aJ8VaRY/A7ZdpRowU+E14e/Yeem2c6gtQ==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@sentry/utils/-/utils-6.2.5.tgz"
       }
     },
     "@sindresorhus/is": {
@@ -20468,6 +20311,11 @@
         "hash": "sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz"
+      },
+      "0.26.0": {
+        "hash": "sha512-lKoGLMYtHvFrPVt3r+RBMp9nh34N0M8zEfCWqdWZx6phynIEhQqAdydpyBAAG211zlhX9Rgu08cOamy6XjE5Og==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/axios/-/axios-0.26.0.tgz"
       }
     },
     "axobject-query": {
@@ -24972,6 +24820,11 @@
         "hash": "sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz"
+      },
+      "1.14.9": {
+        "hash": "sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz"
       }
     },
     "for-each": {
@@ -29327,6 +29180,11 @@
         "hash": "sha512-NhZ4CsKx7cYm2vSrBAr2PvFOe6sWDf0UYLRqA6svUYg7+/TSfVAu49jYC4BvQ4Sms9SZgdqGBgroqfDhJdTyKQ==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/node-fetch/-/node-fetch-1.7.3.tgz"
+      },
+      "2.6.0": {
+        "hash": "sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz"
       },
       "2.6.1": {
         "hash": "sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==",
@@ -34198,13 +34056,6 @@
         "hash": "sha512-oJLDTdHAk27V+JUUu1vKYezKehx/tECV0vnJ1e8JV/rvre5oLoFMaCLP53ZwiPsw4ZIJzyLoZr/TKQABnaNF6A==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/truncate-middle/-/truncate-middle-1.0.6.tgz"
-      }
-    },
-    "try-require": {
-      "1.2.1": {
-        "hash": "sha1-NEiaLKwMCcHMEO2RugEVlNQzO+I=",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/try-require/-/try-require-1.2.1.tgz"
       }
     },
     "tryer": {
