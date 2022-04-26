@@ -4,18 +4,15 @@ description: How to monitor cross-domain transaction status
 
 # Crossdomain Transaction Status
 
-There are 4 different mechanisms for following the status of a transaction. 
+There are 4 different mechanisms for following the status of a transaction. In addition to using the Boba Blockexplorer (for L2) and Etherscan (for L1), you can use:
 
-1. The Boba Blockexplorer (for L2) and Etherscan (for L1)
-2. Running a typescript `messenger`
-3. Using the Boba `watcher-api`
-4. Third-party analytics
+2. Third-party analytics
+3. A typescript `messenger`
+4. The Boba `watcher-api`
 
-## Blockexplorer
+## Using Third Party Analytics
 
-Mainnet Blockexplorer: `https://blockexplorer.boba.network/address/____VALUE____/transactions`   
-
-Rinkeby Blockexplorer: `https://blockexplorer.rinkeby.boba.network/address/____VALUE____/transactions`
+Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](./packages/boba/subgraph/README.md) for more information.
 
 ## Running a messenger
 
@@ -23,11 +20,11 @@ Internally in all the services, and also in the `gateway`, the status of all tra
 
 ```javascript
 
-	import {
-	  CrossChainMessenger,
-	  MessageStatus,
-	  MessageDirection,
-	} from '@eth-optimism/sdk'
+  import {
+    CrossChainMessenger,
+    MessageStatus,
+    MessageDirection,
+  } from '@eth-optimism/sdk'
 
   const messenger = new CrossChainMessenger({
     l1SignerOrProvider: l1Wallet,
@@ -121,7 +118,3 @@ The system is [documented here](../../ops_boba/api/watcher-api). For example, to
   }
 ]
 ```
-
-## Using Third Party Analytics
-
-Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba as well.

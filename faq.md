@@ -2,8 +2,6 @@
 description: Frequently asked questions
 ---
 
-# FAQ
-
 ## What is Boba Network?
 
 [Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
@@ -74,7 +72,7 @@ You can check decimals using the [blockexplorer](https://blockexplorer.boba.netw
 
 `https://blockexplorer.boba.network/tokens/0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc/token-transfers`
 
-You can also check the decimals of course by calling the token contracts:
+You can also check the decimals by calling the token contracts:
 
 ```javascript
 const decimals = await this.ERC20_Contract.attach(tokenAddress).connect(this.L2Provider).decimals()
