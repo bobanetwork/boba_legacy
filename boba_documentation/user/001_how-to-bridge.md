@@ -4,17 +4,11 @@ description: Boba user guide on how to bridge with Metamask
 
 # How To Bridge
 
-{% hint style="info" %}
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
-{% endhint %}
 
-{% hint style="info" %}
 **Make sure you bridge both ETH and OMG to Boba so that you have ETH to exit later on. Transaction fees on Boba are paid in ETH.**
-{% endhint %}
 
-{% hint style="info" %}
 **If you use a Ledger HW wallet, make sure Ledger Firmware, Ledger ETH App, Ledger Live, and Metamask are all updated to the latest version and smart contracts are enabled in your Ledger Ethereum App!**
-{% endhint %}
 
 ## How to bridge to Boba L2
 

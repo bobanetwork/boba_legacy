@@ -8,7 +8,7 @@
     * [Turing Example Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
   * User Documentation
     * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
-    * [Fraud Detection](boba\_documentation/user/002\_fraud-detection.md)
+    * [Fraud Detection](boba\_community/fraud-detector/README.md)
     * [NFTs](boba\_documentation/user/003\_nfts.md)
   * [Developer Docs](boba\_documentation/developer/README.md)
     * [Welcome to Boba](boba\_documentation/developer/000\_developer\_start.md)
@@ -36,7 +36,7 @@
       * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/03-fast-bridge.md)
     * [Price Oracles](boba\_documentation/developer/price-oracles/README.md)
       * [witnet](boba\_documentation/developer/price-oracles/witnet.md)
-    * [WAGMI Howto](boba\_documentation/system/001\_Wagmi\_Howto.md)
+    * [WAGMI Howto](boba\_documentation/developer/001\_Wagmi\_Howto.md)
   * [Engineering Updates](boba\_documentation/eng\_updates/README.md)
     * [Engineering update #4](boba\_documentation/eng\_updates/Engineering\_update\_4.md)
     * [Engineering update #5](boba\_documentation/eng\_updates/Engineering\_update\_5.md)
@@ -48,7 +48,7 @@
     * [Engineering Update #11](boba\_documentation/eng\_updates/Engineering\_update\_11.md)
 * [Code Examples](boba\_community/README.md)
   * [Running a Boba node (replica)](boba\_community/boba-node/README.md)
-  * [Fraud Detection](boba\_community/fraud-detector/README.md)
+
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
     * [packages](boba\_community/turing-captcha-faucet/packages/README.md)
       * [Contracts](boba\_community/turing-captcha-faucet/packages/contracts/README.md)

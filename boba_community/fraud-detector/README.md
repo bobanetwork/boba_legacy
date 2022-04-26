@@ -1,3 +1,7 @@
+---
+description: Learn how to help detect operator fraud
+---
+
 # Checking Boba Mainnet for Fraud
 
 - [Fraud Detector](#fraud-detector)
