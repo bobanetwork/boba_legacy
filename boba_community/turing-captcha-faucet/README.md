@@ -1,12 +1,12 @@
 ---
-description: Turing Example: CAPTCHA-based token faucet
+description: Turing Example - CAPTCHA-based token faucet
 ---
 
 Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
 
 ## Directory Structure
 
-* [`packages`](./packages): Contains all the typescript packages and contracts
+* [`boba_community/turing-captcha-faucet/packages`](../../boba_community/turing-captcha-faucet/packages): Contains all the typescript packages and contracts
   * [`contracts`](./packages/contracts): Solidity smart contracts implementing the Boba Faucet
   * [`gateway`](./packages/gate): The Boba Web faucet
   * [`deployment`](./packages/deployment): Boba faucet contract addresses
