@@ -1,30 +1,10 @@
 # Price Data Feeds - Overview
 
-- [Price Data Feeds - Overview](#price-data-feeds---overview)
-  * [1. Boba-Straw](#1-boba-straw)
-      - [Feeds supported:](#feeds-supported-)
-    + [1.a I want to be a data source](#1a-i-want-to-be-a-data-source)
-      - [Rounds and on-chain aggregation](#rounds-and-on-chain-aggregation)
-      - [Submitting price data - basics](#submitting-price-data---basics)
-        * [step 0:](#step-0-)
-        * [step 1:](#step-1-)
-      - [Actually submitting price data](#actually-submitting-price-data)
-        * [step 3:](#step-3-)
-    + [1.b I want my contracts to receive data](#1b-i-want-my-contracts-to-receive-data)
-      - [Extracting the price](#extracting-the-price)
-      - [Alternate data queries](#alternate-data-queries)
-  * [2. Witnet Price Feeds](#2-witnet-price-feeds)
-      - [Feeds supported:](#feeds-supported--1)
-    + [I want my contracts to receive data](#i-want-my-contracts-to-receive-data)
-  * [3. Turing](#3-turing)
-      - [Feeds supported:](#feeds-supported--2)
-    + [I want my contracts to receive data](#i-want-my-contracts-to-receive-data-1)
-
 Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume. This list will be updated frequently:
 
 1. Boba-Straw
 2. Witnet
-3. Turing (Rinkeby)
+3. Turing
 
 ## 1. Boba-Straw
 
@@ -94,9 +74,9 @@ Here, `value` is the price to submit, note: in decimals as returned by the contr
 
 For more info refer:
 
-[[contracts]](https://github.com/bobanetwork/boba/tree/develop/packages/boba/contracts/contracts/oracle)
+[[contracts]](../../packages/boba/contracts/contracts/oracle)
 
-[[examples]](https://github.com/bobanetwork/boba/tree/develop/boba_examples/boba-straw)
+[[examples]](../../boba_examples/boba-straw)
 
 ### 1.b I want my contracts to receive data
 
@@ -184,9 +164,9 @@ It's just as easy to make your contracts listen to Witnet's price feed. Please r
 
 ## 3. Turing
 
-Turing is Boba's off-chain compute system, and among many other things - you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data
+Turing is Boba's off-chain compute system, and among many other things - you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data.
 
-In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing)
+In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](../../packages/boba/turing)
 
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to the external endpoint to retrieve the price data - which are subject to unavailability or distortion. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
 
@@ -196,7 +176,7 @@ Note: Unlike a feed contract where every data query remains on-chain, Turing req
 
 *Fee*: 0.01 BOBA for one Turing request
 
-*Quick-Link*: https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
+*Quick-Link*: ../../packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
 
 ### I want my contracts to receive data
 
@@ -225,8 +205,5 @@ address public helperAddr;
 
 `_url` is your personal data source
 
-For a more detailed walk through, refer to:
+For a more detailed walk through, refer to the [[turing guide]](../../packages/boba/turing/README.md)
 
-[[guide]](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/README.md)
-
-[[examples]](https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/contracts/Lending.sol)

@@ -4,9 +4,10 @@ description: Learn how to use basic features of Boba (e.g. bridges, basic L2 ops
 
 # Basic Operations
 
-To see examples of how to perform basic operations on Boba, please see the react code for the [Boba gateway](../../packages/boba/gateway/src/services/networkService.js).
-
 Below, we provide code snippets for several typical operations on the L2, such as checking the gas price and bridging funds. Overall, note that from the perspective of solidity code and rpc calls, Boba is identical to mainchain in most aspects, so your experience (and code) from mainchain should carry over directly. The main practical differences center on Gas and on cross-chain bridging operations.
+
+To see examples of how to perform dozens of basic operations on Boba, you can also look at the react code for the [Boba Gateway](../../packages/boba/gateway/src/services/networkService.js).
+
 
 ## Check the Current Gas Price
 
