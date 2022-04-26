@@ -22,7 +22,7 @@ description: Boba user guide on how to bridge with Metamask
 
 2\) Connect your Metamask wallet&#x20;
 
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.00.09.png)
+![](.gitbook/assets/screen-shot-2021-09-26-at-15.00.09.png)
 
 3\) Click on 'Wallet' on the navigation bar on the left&#x20;
 

@@ -179,7 +179,7 @@ Summary
 
 ````
 
-That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Optimistic Ethereum v2 and Boba! 🅾️
+That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Optimistic Ethereum v2 and Boba!
 
 ## Troubleshooting
 

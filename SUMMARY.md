@@ -3,11 +3,10 @@
 * [README](README.md)
 * [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
-* [Boba Network]
+* Boba Network
   * [Turing Hybrid Compute](packages/boba/turing/README.md)
-    * [AWS code](packages/boba/turing/aws\_code/README.md)
     * [Turing Example Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
-  * [User Documentation](boba\_documentation/user/README.md)
+  * User Documentation
     * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
     * [Fraud Detection](boba\_documentation/user/002\_fraud-detection.md)
     * [NFTs](boba\_documentation/user/003\_nfts.md)
