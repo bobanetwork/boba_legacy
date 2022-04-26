@@ -1,25 +1,5 @@
 # Turing Hybrid Compute
 
-- [Turing Hybrid Compute](#turing-hybrid-compute)
-  * [TLDR](#tldr)
-- [Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction](#feature-highlight-1--using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
-- [Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract](#feature-highlight-2--using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
-- [AWS and Google Cloud Function Examples](#aws-and-google-cloud-function-examples)
-- [Important Properties of Turing](#important-properties-of-turing)
-  * [String length limit](#string-length-limit)
-  * [One Turing call per Transaction](#one-turing-call-per-transaction)
-- [Turing Architecture](#turing-architecture)
-  * [Quickstart for Turing Developers](#quickstart-for-turing-developers)
-- [Technical Appendix: Implementation Details](#technical-appendix--implementation-details)
-  * [Step 1: Invoking Turing for inside a Smart contract](#step-1--invoking-turing-for-inside-a-smart-contract)
-  * [Step 2: Flow of Turing data out of the evm.context](#step-2--flow-of-turing-data-out-of-the-evmcontext)
-  * [Step 3: Batch submitter Turing data injection](#step-3--batch-submitter-turing-data-injection)
-  * [Step 4: Writing to the CTC](#step-4--writing-to-the-ctc)
-  * [Step 5: DTL Turing data extraction; Reading from the CTC](#step-5--dtl-turing-data-extraction--reading-from-the-ctc)
-  * [Step 6: Verifier data ingestion](#step-6--verifier-data-ingestion)
-
-## TLDR
-
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
 Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
