@@ -8,7 +8,7 @@ description: Boba Network docs for Exchanges looking to integrate deposits and w
 
 Although Boba Network is an L2 (and therefore fundamentally connected to Ethereum), it's also a separate blockchain. App developers commonly need to move data and assets between Boba Network and Ethereum. We call the process of moving data and assets between the two networks "bridging".
 
-### Sending tokens betwen L1 and L2
+### Sending tokens between L1 and L2
 
 For the most common usecase, moving tokens around, we've created the Standard Token Bridge. The Standard Token Bridge is a simple smart contract with all the functionality you need to move tokens between Boba Network and Ethereum.
 
@@ -292,20 +292,3 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
 | Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby\_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
-
-### Links
-
-
-#### Mainnet
-
-| Contract Name            | Contract Address                           |
-| ------------------------ | ------------------------------------------ |
-| Proxy\_\_L1LiquidityPool | 0x1A26ef6575B7BBB864d984D9255C069F6c361a14 |
-| Proxy\_\_L2LiquidityPool | 0x3A92cA39476fF84Dc579C868D4D7dE125513B034 |
-
-#### Rinkeby
-
-| Contract Name            | Contract Address                           |
-| ------------------------ | ------------------------------------------ |
-| Proxy\_\_L1LiquidityPool | 0x12F8d1cD442cf1CF94417cE6309c6D2461Bd91a3 |
-| Proxy\_\_L2LiquidityPool | 0x56851CB42F315D0B90496c86E849167B8Cf7108a |
