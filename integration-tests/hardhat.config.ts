@@ -9,7 +9,7 @@ const enableGasReport = !!process.env.ENABLE_GAS_REPORT
 
 const config: HardhatUserConfig = {
   networks: {
-    optimism: {
+    boba: {
       url: process.env.L2_URL || 'http://localhost:8545',
     },
   },
