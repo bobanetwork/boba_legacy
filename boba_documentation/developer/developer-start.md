@@ -12,9 +12,9 @@ Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a un
   * using different gas pricing logic
   * providing a swap-based system for rapid L2->L1 exits (without the 7 day delay)
   * providing a community fraud-detector that allows transactions to be independently verified by anyone
-  * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
+  * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)`) rather than as WETH
   * being organized as a DAO
-  * native [NFT bridging](../../boba_documentation/developer/nft-bridge.md)
+  * native NFT bridging
   * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
 ## Deploying standard contracts
@@ -29,11 +29,11 @@ The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby
 
 2. [Truffle ERC20](../../boba_examples/truffle-erc20/README.md) _A basic ERC20 deployment using Truffle_
 
-3. [Bitcoin Price Feeds](../../packages/boba/turing/test/005_lending.ts) _A smart contract that pulls price data from a connecrcial off-chain endpoint_
+3. [Bitcoin Price Feeds](../../packages/boba/turing/test/005_lending.ts) _A smart contract that pulls price data from a commercial off-chain endpoint_
 
 4. [Stableswap using off-chain compute](../../packages/boba/turing/test/003_stable_swap.ts) _A smart contract using an off-chain compute endpoint to solve the stableswap quadratic using floating point math_
 
-## Boba-feature: Using Turing Hybrid Compute
+## Feature: Using Turing Hybrid Compute
 
 Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
@@ -41,9 +41,9 @@ Turing is a system for interacting with the outside world from within solidity s
 
 [Turing Getting Started - External API](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
 
-## Boba-feature: Obtaining on-chain price data
+## Feature: Obtaining on-chain price data
 
-Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume. This list will be updated frequently:
+Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume:
 
 1. [Boba Straw](../../boba_examples/boba-straw/README.md)
 2. [Witnet](https://docs.witnet.io/ethereum/price-feeds/)
@@ -53,7 +53,7 @@ Price Feed oracles are an essential part of Boba, which allow smart contracts to
 
 ## Boba-feature: Bridging NFTs from L2 to L1
 
-NFTs can be minted on Boba and can also be exported to Ethereum, if desired. The minting process is identical to Ethereum. The Boba-specific interchain NFT bridging system and contracts are [documented here](../../boba_documentation/developer/nft-bridge.md).
+NFTs can be minted on Boba and can also be exported to Ethereum, if desired. The minting process is identical to Ethereum. The Boba-specific interchain NFT bridging system and contracts are [documented here](../../boba_examples/nft_bridging/README.md).
 
 ## Running a Boba rpc node (replica)
 
@@ -66,11 +66,3 @@ The [fraud-detector repo](../../boba_community/fraud-detector/README.md) runs a 
 ## Helping to Develop Boba
 
 If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
-
-
-
-
-
-
-
-
