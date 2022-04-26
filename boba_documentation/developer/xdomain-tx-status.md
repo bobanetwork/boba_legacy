@@ -2,7 +2,7 @@
 description: How to monitor transaction status
 ---
 
-# Transaction Status and Verification
+# Crossdomain Transaction Status
 
 There are 4 different mechanisms for following the status of a transaction. 
 
@@ -68,7 +68,7 @@ Internally in all the services, and also in the `gateway`, the status of all tra
 The system is [documented here](../../ops_boba/api/watcher-api). 
 
 > Mainnet Endpoint: https://api-watcher.mainnet.boba.network/ 
-  
+
 > Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  
 
 For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
