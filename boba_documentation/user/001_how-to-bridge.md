@@ -50,7 +50,7 @@ description: How to bridge with Metamask
 
 ![](../.gitbook/assets/screen-shot-2021-09-26-at-15.13.13.png)
 
-3\) If you want to switch back to Layer 1, simply click on the Layer 1 icon again and confirm the network switch in Metamask once again
+3\) If you want to switch back to Layer 1, simply click on the Layer 1 `Change To` (Ethereum) icon again and confirm the network switch in Metamask once again
 
 ![](../.gitbook/assets/screen-shot-2021-09-26-at-15.14.21.png)
 
