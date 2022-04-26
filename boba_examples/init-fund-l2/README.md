@@ -1,21 +1,7 @@
-# @boba/init-fund-l2
 
-## Guide for Developers
+## Sending funds to L2 using the StandardBridge
 
-### Setup
-
-Install the following:
-
-- [`Node.js` (14+)](https://nodejs.org/en/)
-- [`npm`](https://www.npmjs.com/get-npm)
-- [`yarn`](https://classic.yarnpkg.com/en/docs/install/)
-
-Install npm packages and build package in the root directory:
-
-```bash
-yarn install
-yarn build
-```
+We've creaed a simple example fro you that moves funds to the L2 - see `/boba-examples/init-fund-l2/`.
 
 ### Update .env
 
@@ -30,10 +16,9 @@ PRIVATE_KEY=
 
 ### Move ETH from L1 to L2
 
-Adjust the amount that you want to deposit from L1 to L2 in `/boba-examples/init-fund-l2/src/index.js`
+Adjust the amount that you want to deposit from L1 to L2 in `/boba-examples/init-fund-l2/src/index.js`. Then, run:
 
 ```bash
-cd boba-examples/init-fund-l2
 yarn install
 yarn start
 ```
