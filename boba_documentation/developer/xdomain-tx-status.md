@@ -12,11 +12,11 @@ There are 4 different mechanisms for following the status of a transaction. In a
 
 ## Using Third Party Analytics
 
-Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](./packages/boba/subgraph/README.md) for more information.
+Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../packages/boba/subgraph/README.md) for more information.
 
 ## Running a messenger
 
-Internally in all the services, and also in the `gateway`, the status of all transactions is monitored through a `messenger`. Here is some generic pseudocode.
+Internally in all the services and also in the `gateway`, the status of transactions is monitored through a `messenger`. Here is an example for how that is done.
 
 ```javascript
 
