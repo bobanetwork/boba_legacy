@@ -70,7 +70,6 @@
                     ln -sf ${bobapkgs."@eth-optimism/sdk"} $out/optimism/sdk
                     ln -sf ${bobapkgs."@eth-optimism/hardhat-node"} $out/hardhat
                     ln -sf ${bobapkgs."@boba/contracts"} $out/boba/contracts
-                    ln -sf ${bobapkgs."@boba/message-relayer-fast"} $out/boba/message-relayer-fast
                     ln -sf ${bobapkgs."@boba/gas-price-oracle"} $out/boba/gas-price-oracle
                     ln -sf ${bobapkgs."@boba/gateway"} $out/boba/gateway
                     ln -sf ${bobapkgs."@boba/turing-hybrid-compute"} $out/boba/turing
@@ -78,11 +77,12 @@
                   '';
                 };
               };
+              #docker = import ./nix/docker.nix { inherit pkgs bobapkgs; };
               dtl-image = pkgs.dockerTools.buildLayeredImage {
                 maxLayers = 125;
                 name = "dtl";
                 contents = [
-                  self.packages.${system}."@eth-optimism/data-transport-layer"
+                  bobapkgs."@eth-optimism/data-transport-layer"
                 ];
                 config = {
                   Cmd = [  ];
@@ -93,7 +93,18 @@
                 contents = [
                 ];
                 config = {
-                  Cmd = [ "${self.packages.${system}."@eth-optimism/l2geth"}/bin/geth" ];
+                  Cmd = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
+                };
+              };
+              hardhat-image = pkgs.dockerTools.buildLayeredImage {
+                name = "l1_chain";
+                contents = [
+                ];
+                config = {
+                  ExposedPorts = {
+                    "8545" = {};
+                  };
+                  Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat node --network hardhat" ];
                 };
               };
             };
