@@ -88,12 +88,25 @@
                   Cmd = [  ];
                 };
               };
+              # Adapted from ops/docker/Dockerfile.geth
               l2geth-image = pkgs.dockerTools.buildLayeredImage {
                 name = "l2geth";
-                contents = [
+                contents = with pkgs; [
+                  # From nixpkgs
+                  cacert
+                  curl
+                  jq
+
+                  # From boba
+                  bobapkgs."@eth-optimism/l2geth"
                 ];
                 config = {
-                  Cmd = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
+                  ExposedPorts = {
+                    "8545" = {};
+                    "8546" = {};
+                    "8547" = {};
+                  };
+                  Cmd = [ "${./.}/ops/scripts/geth.sh" ];
                 };
               };
               hardhat-image = pkgs.dockerTools.buildLayeredImage {
