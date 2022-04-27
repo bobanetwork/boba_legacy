@@ -77,7 +77,6 @@
                   '';
                 };
               };
-              #docker = import ./nix/docker.nix { inherit pkgs bobapkgs; };
               dtl-image = pkgs.dockerTools.buildLayeredImage {
                 maxLayers = 125;
                 name = "dtl";
@@ -86,6 +85,30 @@
                 ];
                 config = {
                   Cmd = [  ];
+                };
+              };
+              deployer-image = pkgs.dockerTools.buildLayeredImage {
+                maxLayers = 125;
+                name = "deployer";
+                contents = let
+                  script = pkgs.stdenv.mkDerivation {
+                    name = "startup";
+                    phases = [ "installPhase" ];
+                    installPhase = ''
+                        mkdir -p $out/bin
+                        cp ${./.}/ops/scripts/deployer.sh $out/bin/
+                        chmod +x $out/bin
+                    '';
+                  };
+                in
+                  [
+                    bobapkgs."@boba/turing-hybrid-compute"
+                    bobapkgs."@eth-optimism/contracts"
+                    script
+                  ];
+                config = {
+                  Entrypoint = [ "yarn run deploy" ];
+                  Cmd = [ "${./.}/ops/scripts/deployer.sh" ];
                 };
               };
               # Adapted from ops/docker/Dockerfile.geth
@@ -107,6 +130,7 @@
                     "8547" = {};
                   };
                   Cmd = [ "${./.}/ops/scripts/geth.sh" ];
+                  #Cmd = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
                 };
               };
               hardhat-image = pkgs.dockerTools.buildLayeredImage {
