@@ -1015,13 +1015,22 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ).useETHAsFeeToken()
       await selectETHAsFeeTokenTx.wait()
 
+      const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
+      await delegateTx.wait()
+
+      const delegateTx2 = await L2Boba.connect(env.l2Wallet_2).delegate(env.l2Wallet_2.address)
+      await delegateTx2.wait()
+
       // Transfer all funds
       const bobaBalance = await L2Boba.balanceOf(env.l2Wallet_2.address)
+      console.log('fine till here')
       const transferTx = await L2Boba.connect(env.l2Wallet_2).transfer(
         env.l2Wallet.address,
         bobaBalance
       )
       await transferTx.wait()
+
+      console.log('this does not happen')
 
       await expect(
         Boba_GasPriceOracle.connect(
