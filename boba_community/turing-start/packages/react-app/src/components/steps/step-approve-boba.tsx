@@ -25,20 +25,19 @@ interface IStepApproveBobaState {
 interface IStepApproveBobaProps {
   setAmountBobaTokensToUseWei: Dispatch<SetStateAction<BigNumber>>;
   handleNextStep: () => void;
+  contractBobaToken: L2GovernanceERC20;
 }
 
 let newTransaction: boolean = true;
 export const StepApproveBoba = (props: IStepApproveBobaProps) => {
-  const contractBobaToken: L2GovernanceERC20 = new Contract(addresses.BobaToken, new utils.Interface(abis.bobaToken)) as L2GovernanceERC20;
-
   const {
     state: approveState,
     send: approveBoba
-  } = useContractFunction(contractBobaToken, "approve", { transactionName: "approveBoba" });
+  } = useContractFunction(props.contractBobaToken, "approve", { transactionName: "approveBoba" });
   const loadingState: boolean = isLoading(approveState);
 
   const { account } = useEthers();
-  const bobaTokenBalance = useTokenBalance(contractBobaToken.address, account) ?? BigNumber.from(0);
+  const bobaTokenBalance = useTokenBalance(props.contractBobaToken.address, account) ?? BigNumber.from(0);
 
   const [values, setValues] = React.useState<IStepApproveBobaState>({
     callsToPrepay: '100',
