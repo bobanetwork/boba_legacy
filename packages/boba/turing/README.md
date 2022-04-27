@@ -27,8 +27,8 @@ To obtain **Twitter** or **Spotify** data you could set up a system like this:
   urlStr = 'https://_myAPIURL_/social'
   likes = social.getCurrentLikes(tweetUniqueID)
 
-    // Test/Debug response
-    Tweet 123456789 had: 18 likes by time: 1650534735
+  // Test/Debug response
+  Tweet 123456789 had: 18 likes by time: 1650534735
 
 ```
 
@@ -83,7 +83,7 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](../../packages/boba/turing/test/006_NFT_random.ts).
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts) and a [fully-featured Turing-ready NFT system here](../../boba_community/turing-monsters/README.md).
 
 ## Feature Highlight 2: Using Turing to access APIs from within your solidity smart contract
 
