@@ -4,9 +4,9 @@ description: Learn more about the Standard Token Bridge
 
 # Using the Standard Token Bridge
 
-The standard bridge functionality provides a method for an ERC20 token to be deposited and locked on L1 in exchange of the same amount of an equivalent token on L2. This process is known as "bridging a token", e.g. depositing 100 BOBA on L1 in exchange for 100 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the same amount on L1. In addition to bridging tokens the standard bridge is also used for ETH.
+The standard bridge functionality provides a method for an ERC20 token to be deposited and locked on L1 in order to mint the same amount of an equivalent representation token on L2. This process is known as "bridging a token", e.g. depositing 100 BOBA on L1 in exchange for 100 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the same amount on L1, in which case the representation token on L2 is burned in order to release the funds locked on L1. In addition to bridging tokens(ERC20) the standard bridge can also be used for ETH.
 
-The Standard Bridge is composed of two main contracts the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/IL1StandardBridge.sol)(for Layer 1) and the [`L2StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L2/messaging/L2StandardBridge.sol)(for Layer 2).
+The Standard Bridge is composed of two main contracts the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol)(for Layer 1) and the [`L2StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L2/messaging/L2StandardBridge.sol)(for Layer 2).
 
 Here we'll go over the basics of using this bridge to move ERC20 and ETH assets between Layer 1 and Layer 2.
 
@@ -16,7 +16,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 ### Deposit ERC20s
 
-ERC20 deposits into L2 can triggered via the `depositERC20` and `depositERC20To` functions on the  [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/IL1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the  [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```js
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_STANDARD_BRIDGE_ADDRESS
@@ -58,7 +58,7 @@ await depositToTx.wait()
 
 ### Deposit ETH
 
-ETH deposits into L2 can be triggered via the `depositETH` and `depositETHTo` functions on the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/IL1StandardBridge.sol). ETH deposits can alternatively be triggered by sending ETH directly to the `L1StandardBridge`. Once your deposit is detected and finalized on Boba Network, your account will be funded with the corresponding amount of ETH on L2.
+ETH deposits into L2 can be triggered via the `depositETH` and `depositETHTo` functions on the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). ETH deposits can alternatively be triggered by sending ETH directly to the `L1StandardBridge`. Once your deposit is detected and finalized on Boba Network, your account will be funded with the corresponding amount of ETH on L2.
 
 ```js
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_STANDARD_BRIDGE_ADDRESS
@@ -111,18 +111,18 @@ const Proxy__L2StandardBridge = new ethers.Contract(
 
 // Withdraw ETH
 // ETH address is 0x4200000000000000000000000000000000000006 on L2
-const depositTx = await Proxy__L2StandardBridge.withdraw(
+const withdrawTx = await Proxy__L2StandardBridge.withdraw(
   '0x4200000000000000000000000000000000000006', // l2 token address
   ETHAmount,
   9999999, // l1 gas limit
   ethers.utils.formatBytes32String(new Date().getTime().toString()), // byte data
   {value: ETHAmount}
 )
-await depositTx.wait()
+await withdrawTx.wait()
 
 // Withdraw ETH to another l1 wallet
 // ETH address is 0x4200000000000000000000000000000000000006 on L2
-const depositToTx = await Proxy__L2StandardBridge.withdrawTo(
+const withdrawToTx = await Proxy__L2StandardBridge.withdrawTo(
   '0x4200000000000000000000000000000000000006', // l2 token address
   TargetAddress, // l1 target address
   ETHAmount,
@@ -130,30 +130,30 @@ const depositToTx = await Proxy__L2StandardBridge.withdrawTo(
   ethers.utils.formatBytes32String(new Date().getTime().toString()), // byte data
   {value: ETHAmount}
 )
-await depositToTx.wait()
+await withdrawToTx.wait()
 
 // Approve amounts
 const approveTx = await L2ERC20Contract.approve(Proxy__L2StandardBridge.address, exitAmount)
 await approveTx.wait()
 
 // Withdraw ERC20
-const depositTx = await Proxy__L2StandardBridge.withdraw(
+const withdrawTx = await Proxy__L2StandardBridge.withdraw(
   l2TokenAddress // l2 token address
   exitAmount,
   9999999, // l1 gas limit
   ethers.utils.formatBytes32String(new Date().getTime().toString()), // byte data
 )
-await depositTx.wait()
+await withdrawTx.wait()
 
 // Withdraw ERC20 to another l1 wallet
-const depositToTx = await Proxy__L2StandardBridge.withdrawTo(
+const withdrawToTx = await Proxy__L2StandardBridge.withdrawTo(
   l2TokenAddress, // l2 token address
   TargetAddress, // l1 target address
   exitAmount,
   9999999, // l1 gas limit
   ethers.utils.formatBytes32String(new Date().getTime().toString()), // byte data
 )
-await depositToTx.wait()
+await withdrawToTx.wait()
 ```
 
 ## The Boba token list
@@ -172,12 +172,12 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 | Contract Name           | Contract Address                           |
 | ----------------------- | ------------------------------------------ |
 | Proxy__L1StandardBridge | 0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00 |
-| Proxy__L2StandardBridge | 0x4200000000000000000000000000000000000010 |
+| L2StandardBridge | 0x4200000000000000000000000000000000000010 |
 
 ### Rinkeby
 
 | Contract Name           | Contract Address                           |
 | ----------------------- | ------------------------------------------ |
 | Proxy__L1StandardBridge | 0xDe085C82536A06b40D20654c2AbA342F2abD7077 |
-| Proxy__L2StandardBridge | 0x4200000000000000000000000000000000000010 |
+| L2StandardBridge | 0x4200000000000000000000000000000000000010 |
 
