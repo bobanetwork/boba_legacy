@@ -4,9 +4,9 @@
 
 This Price Feed Oracle is forked from the [Chainlink contracts](https://github.com/smartcontractkit/chainlink). For more information, please see:
 
-https://github.com/smartcontractkit/chainlink
+[https://github.com/smartcontractkit/chainlink](https://github.com/smartcontractkit/chainlink)
 
-https://github.com/smartcontractkit/feed-registry
+[https://github.com/smartcontractkit/feed-registry](https://github.com/smartcontractkit/feed-registry)
 
 ## Overview
 
