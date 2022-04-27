@@ -1,4 +1,4 @@
-import { Button, SmallerParagraph, StyledInputAdornment } from "../index";
+import { CustomButton, SmallerParagraph, StyledInputAdornment } from "../index";
 import React, { Dispatch, SetStateAction } from "react";
 import { useContractFunction, useEthers, useTokenBalance } from "@usedapp/core";
 import { parseEther } from "@ethersproject/units";
@@ -81,14 +81,14 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
         </FormHelperText>}
     </FormControl>
 
-    <Button style={{ marginTop: 14 }} disabled={!account || loadingState || !hasEnoughBOBA}
-            onClick={async () => {
+    <CustomButton style={{ marginTop: 14 }} disabled={!account || loadingState || !hasEnoughBOBA}
+                  onClick={async () => {
               newTransaction = true;
               await approveBoba(addresses.TuringHelperFactory, amountBobaTokensToUseWei);
               props.setAmountBobaTokensToUseWei(amountBobaTokensToUseWei);
             }}>
       {loadingState
         ? <><FontAwesomeIcon icon={solid("spinner")} spin={true} />&nbsp;{getPrettyTransactionStatus(approveState)}</>
-        : `Approve ${amountBobaTokensToUse} BOBA`}</Button>
+        : `Approve ${amountBobaTokensToUse} BOBA`}</CustomButton>
   </div>;
 };

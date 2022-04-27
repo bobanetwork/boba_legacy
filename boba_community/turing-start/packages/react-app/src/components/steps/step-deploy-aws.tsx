@@ -53,7 +53,14 @@ Resources:
           Type: Api
           Properties:
             Path: '/' # overall URL must not be longer than 64 bytes, '/' recommended
-            Method: get`)}
+            Method: get
+        KeepWarm: # Optional
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(5 minutes)'
+            Name: KeepWarmSchedule
+            Description: Used to keep the lambda warm
+            Enabled: true`)}
       </Grid>
     </Grid>
   </div>;
