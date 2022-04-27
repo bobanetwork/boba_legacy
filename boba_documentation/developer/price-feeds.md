@@ -156,15 +156,20 @@ Turing is Boba's off-chain compute system and among many other things - you can 
 
 In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](../../packages/boba/turing/README.md).
 
+
+[here](packages/boba/turing/README.md)
+[here](../../packages/boba/turing/README.md)
+[here](/../../packages/boba/turing/README.md)
+
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to the external endpoint to retrieve the price data - which are subject to unavailability or distortion. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
 
 ### Feeds supported:
 
-*Rinkeby*: [potentially everything, dependent on your source]
+*Rinkeby/Mainnet*: [potentially everything, dependent on your source]
 
 *Fee*: 0.01 BOBA for one Turing request
 
-[*Quick-Link*](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract)
+[*Documentation Quick-Link*](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract)
 
 ### I want my contracts to receive data
 
