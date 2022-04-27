@@ -3,7 +3,6 @@ import { InputAdornment, StepLabel } from "@mui/material";
 import { muiTheme } from "../mui.theme";
 
 const primaryColor = '#ccff00'
-
 export const H1 = styled.h1`
   color: ${primaryColor};
   margin-bottom: 0.2em;
