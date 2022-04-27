@@ -79,7 +79,6 @@
               };
             };
             docker-images = import ./nix/docker.nix { inherit pkgs bobapkgs; };
-            nixpkgs = pkgs;
             defaultPackage = packages.monorepo;
             apps = {
               l2geth = flake-utils.lib.mkApp { drv = packages.l2geth; };
@@ -87,7 +86,7 @@
 
             defaultApp = apps.l2geth;
 
-            shell = import ./devshell.nix { inherit bobapkgs pkgs; };
+            shell = import ./nix/devshell.nix { inherit bobapkgs pkgs; };
             shells =
               let
 
@@ -135,7 +134,7 @@
           source = builtins.path {
             name = "boba";
             path = ./.;
-            filter = path: _: baseNameOf path != "flake.nix" && baseNameOf path != "overrides";
+            filter = path: _: baseNameOf path != "flake.nix" && baseNameOf path != "nix";
           };
           settings = [
             {

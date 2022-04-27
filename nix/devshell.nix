@@ -16,6 +16,7 @@ pkgs.devshell.mkShell {
     { package = "go"; }
     { package = "yarn"; }
     { package = "nodePackages.typescript"; }
+    { package = "arion"; }
     {
       package = "nodePackages.eslint";
       category = "linters";
@@ -41,7 +42,7 @@ pkgs.devshell.mkShell {
       command = "hardhat node --network hardhat";
     }
     {
-      name = "build";
+      name = "boba-build";
       help = "build optimism/boba/package, eg: build '@eth-optimism/core-utils'";
       category = "build";
       command = "nix build $@";
