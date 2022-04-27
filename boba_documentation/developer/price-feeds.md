@@ -68,8 +68,6 @@ For more info please refer to:
 
 [[contracts]](../../packages/boba/contracts/contracts/oracle)
 
-[contracts](../../packages/boba/contracts/contracts/oracle)
-
 [[examples]](../../boba_examples/boba-straw)
 
 ### I want my contracts to receive data
@@ -89,7 +87,7 @@ A quick note on fees and subscription: Currently the feed is free to use for the
 To get the latest price data call method **`latestRoundData(base, quote)`**. To get the price data from a certain past round (historical price) call method **`getRoundData(base, quote, roundId)`**. The `roundId` supplied here is phaseId plus aggregator roundId, for reference query the latest `roundId`. The answer returned will be of the form of decimals specified on the contract call method **`decimals(base, quote)`**. For example,
 
 ```javascript
-import "@boba/contracts/oracle/FeedRegistry.sol";
+import "@boba/contracts/oracle/FeedRegistry.sol"
 
 contract MyContract {
 

@@ -1,17 +1,12 @@
 # Boba Straw Price Feed Oracle
-- [For Price Data Recipients](#for-price-data-recipients)
-- [For Price Data Submitters (Oracles)](#for-price-data-submitters--oracles-)
-  * [Submitting prices](#submitting-prices)
-  * [For single oracle settings](#for-single-oracle-settings)
-  * [For multiple oracle settings](#for-multiple-oracle-settings)
-- [Supported Token Feeds](#supported-token-feeds)
 
+## Credit: Chainlink
 
-**Credit** \
-https://github.com/smartcontractkit/chainlink \
+https://github.com/smartcontractkit/chainlink
+
 https://github.com/smartcontractkit/feed-registry
 
-This Price Feed Oracle is forked from the [Chainlink contracts](https://github.com/smartcontractkit/chainlink). The Price Feed Oracle works to provide the latest or past market price of specific tokens, aggregated from (>=1) trusted external entities (hereafter referred to as oracles). [(Supported tokens/feeds will be released by Feb 1 2022 below)](#Supported-Token-Feeds)
+This Price Feed Oracle is forked from the [Chainlink contracts](https://github.com/smartcontractkit/chainlink). The Price Feed Oracle works to provide the latest or past market price of specific tokens, aggregated from (>=1) trusted external entities (hereafter referred to as oracles).
 
 Token price aggregation happens in rounds, triggered by oracles. For a round of aggregation, multiple oracles submit their 'price' answers and the final determined answer is the median of all submissions. The 'price' answer for the round isn't finalized/accepted until the round has received a certain 'min no of answer submissions' from separate oracles. While the round moves between having min < submissions < max, the computed answer can vary depending on the data received up till that point. And after the 'max no of submissions on the round' the 'price' answer is finalized and fixed. If a round does not receive 'min no of answer submissions', the round can be superseded after a timeout period.
 
@@ -81,15 +76,16 @@ With only a single oracle in charge of the price data submissions the 'min no of
 A round started for reporting by an oracle, will have to meet the min number of submissions to have the answer for that round accepted (or) a timeout(s) should have elapsed, after which a subsequent round can be proposed.
 
 ## Supported Token Feeds
-Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call method ***`getFeed(base, quote)`***). The addresses listed here, might be outdated!
 
-Prices returned are in decimals(8) of the underlying quote.
+Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call method ***`getFeed(base, quote)`***). The addresses listed here, might be outdated! Prices returned are in decimals(8) of the underlying quote.
+
 ### Rinkeby
 
 [ETH-USD](https://blockexplorer.rinkeby.boba.network/address/0xcEb40458ad6Dabe9cfC90A2ad062a071809c4E84/transactions) \
 [BOBA-USD](https://blockexplorer.rinkeby.boba.network/address/0xd05AA5531b8e8DaB3BEe675f133dF3e330d9adA8/transactions) \
 [OMG-USD]() \
 [WBTC-USD]()
+
 ### Mainnet
 
 [ETH-USD](https://blockexplorer.boba.network/address/0x50E383121021F4E8060C794d79Ada77195532c7a/transactions) \
