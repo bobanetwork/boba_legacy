@@ -83,7 +83,7 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts) and a [fully-featured Turing-ready NFT system here](/../../boba_community/turing-monsters/README.md).
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts) and a [fully-featured Turing-ready NFT system here](../../boba_community/turing-monsters/README.md).
 
 ## Feature Highlight 2: Using Turing to access APIs from within your solidity smart contract
 
@@ -122,7 +122,7 @@ You should lock down your off-chain endpoint to only accept queries from your sm
 
 ## AWS and Google Cloud Function Examples
 
-Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for [you to use](./AWS_code). Specific instructions for setting up AWS lambda endpoints are [given here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
+Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for you to use in `packages/boba/turing/AWS_code`). Specific instructions for setting up AWS lambda endpoints are [given here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
 ## Important Properties of Turing
 
