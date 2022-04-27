@@ -89,6 +89,8 @@ in
       ];
       installPhase = ''
         ln -s ${l2geth.geth}/bin $out/bin
+        mkdir -p $out/ops/
+        cp "${../../../ops/scripts/geth.sh}" $out/ops
         rm -rf $out/lib
       '';
     };
@@ -278,10 +280,15 @@ in
   "@eth-optimism/hardhat-node" = {
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/hardhat-node/ | grep -v "package.json\|node_modules\|hardhat.config.js"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/hardhat-node/ | grep -v "package.json\|node_modules\|hardhat.config.js\|.dockerenv"`
         mkdir -p $out/bin
         makeWrapper $out/lib/node_modules/@eth-optimism/hardhat-node/node_modules/hardhat/internal/cli/cli.js $out/bin/hardhat \
           --run "cd $out/lib/node_modules/@eth-optimism/hardhat-node/"
+      '';
+    };
+    install-dockerenv = {
+      postInstall = ''
+        touch $out/lib/node_modules/@eth-optimism/hardhat-node/.dockerenv
       '';
     };
   };

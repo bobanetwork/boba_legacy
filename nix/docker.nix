@@ -64,7 +64,7 @@
       ExposedPorts = {
         "8545" = {};
       };
-      Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat node --network hardhat" ];
+      Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat" "node" "--network" "hardhat" ];
     };
   };
 }
