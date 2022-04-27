@@ -2,19 +2,6 @@
 description: Turing Example - Minting NFTs with Random Attributes
 ---
 
-## Basics
-
-This readme assumes you have certain widely used packages installed on your computer. For example, for Ubuntu Desktop 20.04 the steps would be the following. Open a terminal, and then:
-
-```bash
-$ sudo apt update
-$ sudo apt full-upgrade
-$ sudo apt install git
-$ sudo apt install curl
-$ sudo apt install nodejs
-$ npm install --global yarn
-```
-
 ## Mint your Monster!
 
 Clone the repository, open it, and install packages with `yarn`:
@@ -26,7 +13,7 @@ $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`boba_community/turing-monsters/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`./boba_community/turing-monsters/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
 
 ```javascript
 
@@ -51,11 +38,11 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed but also requires a minimal fee for the Turing call as well.
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network).
 
 ## Testing the Turing Monster NFT
 
-To run the tests you will also need some Rinkeby ETH (not the Boba rinkeby, but the regular ETH Rinkeby) as the tests also test the NFT bridging functionality.
+To run the tests you will also need some Rinkeby ETH on Rinkeby (L1) as the tests also test the NFT bridging functionality.
 
 ```bash
 $ cd boba_community/turing-monsters
