@@ -3,11 +3,9 @@
   dtl-image = pkgs.dockerTools.buildLayeredImage {
     maxLayers = 125;
     name = "dtl";
-    contents = [
-      bobapkgs."@eth-optimism/data-transport-layer"
-    ];
     config = {
       Cmd = [  ];
+      EntryPoint = [ "${pkgs.nodejs}/bin/node" "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js" ];
     };
   };
   deployer-image = pkgs.dockerTools.buildLayeredImage {
@@ -37,23 +35,31 @@
   # Adapted from ops/docker/Dockerfile.geth
   l2geth-image = pkgs.dockerTools.buildLayeredImage {
     name = "l2geth";
-    contents = with pkgs; [
-      # From nixpkgs
-      cacert
-      curl
-      jq
-
-      # From boba
-      bobapkgs."@eth-optimism/l2geth"
-    ];
+    contents = let startup = pkgs.stdenv.mkDerivation {
+      name = "startup";
+      phases = [ "installPhase" ];
+      installPhase = ''
+        mkdir -p $out/bin
+        cp ${./../.}/ops/scripts/geth.sh $out/bin/l2geth-start
+        substituteInPlace $out/bin/l2geth-start --replace \
+          'curl' \
+          '${pkgs.curl}/bin/curl'
+      '';
+    }; in with pkgs; [
+        # From nixpkgs
+        cacert
+        jq
+        # The above script from ops
+        startup
+      ];
     config = {
       ExposedPorts = {
         "8545" = {};
         "8546" = {};
         "8547" = {};
       };
-      Cmd = [ "${./..}/ops/scripts/geth.sh" ];
-      #Cmd = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
+      Cmd = [ ];
+      EntryPoint = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
     };
   };
   hardhat-image = pkgs.dockerTools.buildLayeredImage {
