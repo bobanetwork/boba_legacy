@@ -39,7 +39,7 @@ Turing is a system for interacting with the outside world from within solidity s
 
 [Turing Getting Started - NFTs](../../packages/boba/turing/README.md#feature-highlight-1-using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 
-[Turing Getting Started - External API](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+[Turing Getting Started - External API](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract)
 
 ## Feature: Obtaining on-chain price data
 

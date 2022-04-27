@@ -164,7 +164,7 @@ Note: Unlike a feed contract where every data query remains on-chain, Turing req
 
 *Fee*: 0.01 BOBA for one Turing request
 
-*Quick-Link*: ../../packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
+*Quick-Link*: ../../packages/boba/turing#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract
 
 ### I want my contracts to receive data
 

@@ -2,7 +2,7 @@
 description: Learn how to use Turing hybrid compute
 ---
 
-Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
+Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as social networking or weather data are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
 Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
@@ -20,25 +20,21 @@ Using Turing is as easy as calling specific functions from inside your smart con
 
 ```
 
-To obtain the latest BTC-USD exchange rate, call:
+To obtain **Twitter** or **Spotify** data you could set up a system like this:
 
 ```javascript
 
-  urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
-  rate = lending.getCurrentQuote(urlStr, "BTC/USD")
+  urlStr = 'https://_myAPIURL_/social'
+  likes = social.getCurrentLikes(tweetUniqueID)
 
     // Test/Debug response
-    Bitcoin to usd price is 42406.68
-    timestamp 1642104413221
-    ✓ should get the current Bitcoin - USD price (327ms)
+    Tweet 123456789 had: 18 likes by time: 1650534735
 
 ```
 
-**Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
-
 ## Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
-With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction; everything takes places within one transaction:
+With Turing, your ERC721 contract can generate a cryptographically strong 256 bit random number immediately prior to the execution flow moving to the `mint` function. This is an _atomic_ transaction - everything takes places within one transaction:
 
 ```javascript
 
@@ -87,19 +83,23 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts).
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [working example code and an ERC721 that uses Turing here](../../packages/boba/turing/test/006_NFT_random.ts).
 
-## Feature Highlight 2: Using Turing to access real-time trading data from within your solidity smart contract
+## Feature Highlight 2: Using Turing to access APIs from within your solidity smart contract
 
-**Note - Boba does not provide trading data (except for delayed data for testing).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
+You can use Turing as a pipe to any other computer, such as APIs for social networks, weather and location data, or market data. Please keep in mind however that Turing differs sharply from established providers of market trading data, in particular, since **Turing does not provide a decentalized mechanism to verify the accuracy of the data**. **You should therefore not use Turing for production trading or lending use, but should use proven, decentralized data oracles**.
 
-Once you have an API key from your chosen data vendor, insert that key into your off-chain compute endpoint. See `./AWS_code/turing_oracle.py` for a copy-paste example for querying trading data APIs via a wrapper at AWS Lambda:
+**Data/Oracle best practices** Regardless of your specific use case, minimally, you will need to secure your pipe/contract against data outliers, temporary lack of data, and malicious attempts to distort the data. For example, you could average over multiple on-chain oracles and/or off-chain sources - in this case, the role of Turing could be to 'augment' or separtely estimate the reliability and timeliness of on-chain oracles. 
+
+**Note - Boba does not provide endpoints for you** You are responsible for setting up an endpoint that Turing can access - read on for more information and example code. Assume you have an API access key to a provider of weather data. First, set up a server or endpoint that queries this API, and stores and analyzes the data, if needed. Your own server/endpoint contains your secrets and API access keys. Next, add a simple interface to allow turing to interact with your server. Turing-requests to your server  contain the address of the calling contract and there are multiple ways to control access to your server in very granular manner, if desired. See `./AWS_code/turing_oracle.py` for a copy-paste example for querying data APIs via a wrapper at AWS Lambda:
 
 ```python
 /AWS_code/turing_oracle.py
 
+# Note - This code is running on YOUR server 
+
 ...
-  api_key = 'YOUR_API_KEY' # Insert your Dow Jones, Bloomberg, or Polygon.io API key here
+  api_key = 'YOUR_API_KEY' # Insert your API key here
 
   authorized_contract = None # for open access
   # or...
@@ -108,17 +108,15 @@ Once you have an API key from your chosen data vendor, insert that key into your
 
 ```
 
-You can lock-down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`. You can then call this API in your smart contract:
+You should lock down your off-chain endpoint to only accept queries from your smart contract. To do this, designate your smart contract's address on Boba as the `authorized_contract`. If you wish to allow open access, set this variable to `None`. You can then call this API in your smart contract:
 
 ```javascript
 
-  urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/quote'
-  rate = lending.getCurrentQuote(urlStr, "BTC/USD")
+  urlStr = 'https://_myAPIURL_/social'
+  likes = social.getCurrentLikes(tweetUniqueID)
 
     // Test/Debug response
-    Bitcoin to usd price is 42406.68
-    timestamp 1642104413221
-    ✓ should get the current Bitcoin - USD price (327ms)
+    Tweet 123456789 had: 18 likes by time: 1650534735
 
 ```
 
