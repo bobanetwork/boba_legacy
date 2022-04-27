@@ -46,12 +46,12 @@
           '${pkgs.curl}/bin/curl'
       '';
     }; in with pkgs; [
-        # From nixpkgs
-        cacert
-        jq
-        # The above script from ops
-        startup
-      ];
+      # From nixpkgs
+      cacert
+      jq
+      # The above script from ops
+      startup
+    ];
     config = {
       ExposedPorts = {
         "8545" = {};
