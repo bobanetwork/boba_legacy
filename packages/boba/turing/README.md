@@ -83,7 +83,10 @@ Then, register and fund your Turing Credit account:
 
 ```
 
-**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts) and a [fully-featured Turing-ready NFT system here](../../boba_community/turing-monsters/README.md).
+**All done**! Each Turing request costs 0.01 BOBA, so 1 BOBA is enough for 100 Turing requests. Have fun. You can find [example code and an ERC721 that uses Turing here](./test/006_NFT_random.ts) and a [fully-featured Turing-ready NFT system here](boba_community/turing-monsters/README.md).
+
+
+../../packages/boba/gateway/src/services/networkService.js
 
 ## Feature Highlight 2: Using Turing to access APIs from within your solidity smart contract
 
