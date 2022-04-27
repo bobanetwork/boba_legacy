@@ -97,6 +97,11 @@ in
   };
   "@boba/turing-hybrid-compute" = {
     inherit add-yarn add-solc;
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@boba/turing-hybrid-compute/ | grep -v "package.json\|artifacts\|node_modules\|contracts\|cache"`
+      '';
+    };
   };
   "@boba/contracts" = {
     #inherit correct-tsconfig-path;
@@ -256,14 +261,15 @@ in
   };
   "@eth-optimism/data-transport-layer" = {
     inherit correct-tsconfig-path add-solc;
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/data-transport-layer/ | grep -v "package.json\|node_modules\|dist"`
+      '';
+    };
     install-symlinks = {
       postInstall = ''
         ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
-      '';
-    };
-    cleanup-dir = {
-      postFixup = ''
-
+        mkdir $out/lib/node_modules/@eth-optimism/data-transport-layer/state-dumps
       '';
     };
   };
