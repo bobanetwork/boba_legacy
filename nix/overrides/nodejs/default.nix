@@ -89,8 +89,6 @@ in
       ];
       installPhase = ''
         ln -s ${l2geth.geth}/bin $out/bin
-        mkdir -p $out/ops/
-        cp "${../../../ops/scripts/geth.sh}" $out/ops
         rm -rf $out/lib
       '';
     };
