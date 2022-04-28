@@ -10,12 +10,13 @@
   * [NFTs](boba\_documentation/user/003\_nfts.md)
   * [Running a Boba node](boba\_community/boba-node/README.md)
 
-* [Turing Hybrid Compute](packages/boba/turing/README.md)
+* [Welcome to Turing](boba\_documentation/developer/turing.md)
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
   * [Turing KYC](boba\_community/turing-kyc/README.md)
   * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
   * [Turing Wizard](boba\_community/turing-start/README.md)
   * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
+  * [Turing Implementation](packages/boba/turing/README.md)
 
 * Developer Docs
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
