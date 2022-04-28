@@ -33,35 +33,46 @@
     };
   };
   # Adapted from ops/docker/Dockerfile.geth
-  l2geth-image = pkgs.dockerTools.buildLayeredImage {
-    name = "l2geth";
-    contents = let startup = pkgs.stdenv.mkDerivation {
-      name = "startup";
-      phases = [ "installPhase" ];
-      installPhase = ''
-        mkdir -p $out/bin
-        cp ${./../.}/ops/scripts/geth.sh $out/bin/l2geth-start
-        substituteInPlace $out/bin/l2geth-start --replace \
-          'curl' \
-          '${pkgs.curl}/bin/curl'
-      '';
-    }; in with pkgs; [
-      # From nixpkgs
-      cacert
-      jq
-      # The above script from ops
-      startup
-    ];
-    config = {
-      ExposedPorts = {
-        "8545" = {};
-        "8546" = {};
-        "8547" = {};
+  l2geth-image =
+    let
+      l2geth = pkgs.stdenv.mkDerivation {
+        name = "l2geth";
+        phases = [ "installPhase" ];
+        installPhase = ''
+          mkdir -p $out/bin
+          ln -s ${bobapkgs."@eth-optimism/l2geth"}/bin/geth $out/bin/geth
+          cp ${./../.}/ops/scripts/geth.sh $out/bin/start
+          substituteInPlace $out/bin/start --replace \
+            'curl' \
+            '${pkgs.curl}/bin/curl'
+        '';
       };
-      Cmd = [ ];
-      EntryPoint = [ "${bobapkgs."@eth-optimism/l2geth"}/bin/geth" ];
+    in pkgs.dockerTools.buildLayeredImage {
+      name = "l2geth";
+      contents = with pkgs; [
+        # From nixpkgs
+        cacert
+        jq
+        coreutils
+
+        # The above script from ops
+        l2geth
+      ];
+      config = {
+        ExposedPorts = {
+          "8545" = {};
+          "8546" = {};
+          "8547" = {};
+        };
+        Cmd = [ ];
+        Env = [
+          "PATH=${pkgs.coreutils}/bin/"
+        ];
+        EntryPoint = [
+          "${l2geth}/bin/geth"
+        ];
+      };
     };
-  };
   hardhat-image = pkgs.dockerTools.buildLayeredImage {
     name = "l1_chain";
     contents = [
