@@ -20,7 +20,7 @@ A typical Turing system for gaming or Web3 social networking<>blockchain interop
 
 ## Turing Functions and Feature Set
 
-Turing is a general purpose pipe between computers and this pipe does not have a native feature set (e.h. storage, cron jobs, cryptographic operations, gaming engines, blockchain history lookups, ...). Rather, _it's up to you_ to deploy servers or endpoints to perform those functions and then and expose the right functionality/data to external callers. For many situations, serverless endpoints such as AWS Lambda or Google Cloud Services allow you to build surprisingly complex logic in just a few lines of code, so if you have not done that before, it's surprisingly easy and we provide many examples for you to use and copy.
+Turing is a general purpose pipe between computers and this pipe does not have a native feature set (e.g. storage, cron jobs, cryptographic operations, gaming engines, blockchain history lookups, ...). Rather, _it's up to you_ to deploy servers or endpoints to perform those functions and then expose the right functionality/data to external callers. For many situations, serverless endpoints such as AWS Lambda or Google Cloud Services allow you to build complex logic in just a few lines of code, so if you have not done that before, it's surprisingly easy and we provide many examples for you to use and copy.
 
 ## **Turing is not an Oracle**
 
@@ -30,7 +30,7 @@ Turing is general-purpose pipe between computers and not an `Oracle`. Decentrali
 
 On chain Oracles typically operate in a **push** manner, meaning that they update data on a fixed schedule (e.g. every 15 seconds), even when those data are not being used. This `push` update schedule allows calling smart contracts to have confidence that the data they pull are current, but a fixed push update cycle comes at high gas expense that does not decrease in time of low data utilization. 
 
-A system like Turing is typically configured in the opposite manner, as a **pull** system, where nothing happens until a smart contract needs data or compute. In that case, the external API services the Turing call `just in time` during the EVM execution flow. This means that systems that use Turing have zero baseline gas consumption but rather provide compute or data only when needed. 
+A system like Turing is typically configured in the opposite manner, as a **pull** system, where nothing happens until a smart contract needs data or compute. In that case, the external API services the Turing call `just in time` during the EVM execution flow. This means that systems that use Turing have zero baseline gas consumption and provide compute or data only when needed. 
 
 ## Turing is Atomic
 
@@ -56,11 +56,11 @@ The first mechanism prevents unauthorized use of your on-chain resources and the
 
 Here are five fully worked out examples for you to build on:
 
-* Use Turing to build a [CAPTCHA-gated token faucet](boba\_community/turing-captcha-faucet/README.md)
-* Use Turing to [mint NFTs with random attributives](boba\_community/turing-monsters/README.md)
+* Use Turing to build a [CAPTCHA-gated token faucet](../../boba\_community/turing-captcha-faucet/README.md)
+* Use Turing to [mint NFTs with random attributives](../../boba\_community/turing-monsters/README.md)
 * Do all [stableswap quadratic math off-chain, just in time](../../packages/boba/turing/test/003_stable_swap.ts)
 * Query [centralized off-chain price feeds](../../packages/boba/turing/test/005_lending.ts). Note - these cannot replace on-chain oracles and this approach should not be used for production use. An on-chain oracle such as ChainLink is the better design pattern.
-* Connect [on-chain events with commercial KYC providers](boba\_community/turing-kyc/README.md) 
+* Connect [on-chain events with commercial KYC providers](../../boba\_community/turing-kyc/README.md) 
 
 There is more information on setting up your own servers and computer endpoints here: 
 
