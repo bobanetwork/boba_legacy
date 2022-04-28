@@ -48,3 +48,4 @@
   * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
   * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
   * [Contracts Registration](packages/boba/register/README.md)
+  * [Documentation HowTo](boba\_documentation/developer/documentation.md)
