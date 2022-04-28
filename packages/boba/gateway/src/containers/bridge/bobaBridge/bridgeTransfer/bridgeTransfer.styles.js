@@ -1,5 +1,4 @@
-import { styled } from "@mui/material";
-import { Box } from "@mui/system";
+import { styled, Box } from "@mui/material";
 
 
 export const BridgeTransferContainer = styled(Box)(({ theme }) => ({

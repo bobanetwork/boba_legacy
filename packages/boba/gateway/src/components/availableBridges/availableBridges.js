@@ -4,20 +4,20 @@ import * as G from 'containers/Global.styles'
 
 import AvailableBridgeBg from 'images/boba2/available_bridges_bg.svg'
 import { Link, Typography } from '@mui/material'
-import { tokenBridges } from 'util/bobaBridges'
 import { selectBridgeType } from 'selectors/bridgeSelector'
 import { useSelector } from 'react-redux'
+
+import networkService from 'services/networkService'
 
 function AvailableBridges({ token = null, children }) {
   const [ bridges, setBridges ] = useState([])
 
   const bridgeType = useSelector(selectBridgeType())
 
-  console.log([ `bridgeType`, bridgeType ])
-
   useEffect(() => {
     if (token) {
-      setBridges(tokenBridges[ token.symbol ] || []);
+      let res = networkService.getTokenSpecificBridges(token.symbol);
+      setBridges(res);
     }
   }, [ token ])
 
@@ -31,6 +31,17 @@ function AvailableBridges({ token = null, children }) {
         <G.DividerLine flex={1} />
       </S.LabelContainer>
       <img src={AvailableBridgeBg} title="agregate bridges" width="100%" />
+    </S.BridgesContainer>
+  }
+
+  if (!bridges.length) {
+   return <S.BridgesContainer my={2}>
+      <S.Wrapper>
+        <S.BridgeContent border={1}>
+          <Typography variant="body1"> Boba {bridgeType.toLowerCase().split('_').join(' ')} </Typography>
+          {children}
+        </S.BridgeContent>
+      </S.Wrapper>
     </S.BridgesContainer>
   }
 
@@ -59,7 +70,7 @@ function AvailableBridges({ token = null, children }) {
               sx={{ textDecoration: 'none' }}
             >
               <Typography variant="body1" component="span" my={1}> {bridge.name}
-                <Typography variant="body2" component="span" sx={{ opacity: 0.6, display: 'inline-block', ml:1 }}>
+                <Typography variant="body2" component="span" sx={{ opacity: 0.6, display: 'inline-block', ml: 1 }}>
                   (Third party)
                 </Typography>
               </Typography>
