@@ -1,9 +1,8 @@
-
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'http://10.0.0.162:8545'
 
 x-l1_rpc_geth: &l1_rpc_geth
-  ETH1_HTTP: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  ETH1_HTTP: 'http://10.0.0.162:8545'
 
 version: "3.9"
 
@@ -34,7 +33,7 @@ services:
         max-size: "10m"
     ports:
       - ${DTL_PORT:-7878}:7878
-      - ${REGISTRY_PORT:-8080}:8081
+      - 8081:8081
 
   replica:
     container_name: replica
@@ -46,8 +45,8 @@ services:
     entrypoint: sh ./geth.sh
     env_file:
       - ../../ops/envs/geth.env
-    #volumes:
-    #  - ./<YOUR PERSISTED STORAGE>:/root/.ethereum/
+    volumes:
+     - /data-boba:/root/.ethereum/
     environment:
       << : *l1_rpc_geth
       ROLLUP_TIMESTAMP_REFRESH: 5s
