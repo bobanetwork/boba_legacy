@@ -11,7 +11,6 @@ import {
   DEFAULT_TEST_GAS_L2,
   envConfig,
   withdrawalTest,
-  gasPriceOracleWallet,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
@@ -104,7 +103,7 @@ describe('Native ETH Integration Tests', async () => {
     )
 
     const l1FeePaid = receipt.gasUsed.mul(tx.gasPrice)
-    const postBalances = await getBalances(env)
+    let postBalances = await getBalances(env)
 
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
@@ -112,6 +111,7 @@ describe('Native ETH Integration Tests', async () => {
     expect(postBalances.l2UserBalance).to.deep.eq(
       preBalances.l2UserBalance.add(depositAmount)
     )
+    postBalances = await getBalances(env)
     expect(postBalances.l1UserBalance).to.deep.eq(
       preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
     )
@@ -135,13 +135,14 @@ describe('Native ETH Integration Tests', async () => {
     const l1FeePaid = depositReceipts.receipt.gasUsed.mul(
       depositReceipts.tx.gasPrice
     )
-    const postBalances = await getBalances(env)
+    let postBalances = await getBalances(env)
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
     )
     expect(postBalances.l2BobBalance).to.deep.eq(
       preBalances.l2BobBalance.add(depositAmount)
     )
+    postBalances = await getBalances(env)
     expect(postBalances.l1UserBalance).to.deep.eq(
       preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
     )
@@ -259,21 +260,6 @@ describe('Native ETH Integration Tests', async () => {
 
     const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
-    // Calculate the L1 portion of the fee
-    const raw = serialize({
-      nonce: transaction.nonce,
-      value: transaction.value,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-      to: transaction.to,
-      data: transaction.data,
-    })
-
-    // const l1Fee = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-    //   gasPriceOracleWallet
-    // ).getL1Fee(raw)
-    // const fee = l2Fee.add(l1Fee)
-
     const postBalances = await getBalances(env)
 
     expect(postBalances.l1BridgeBalance).to.deep.eq(
@@ -344,32 +330,6 @@ describe('Native ETH Integration Tests', async () => {
       const l2BalanceAfter = await other.getBalance()
       expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
       expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
-
-      // // Compute the L1 portion of the fee
-      // const l1Fee =
-      //   await await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-      //     gasPriceOracleWallet
-      //   ).getL1Fee(
-      //     serialize({
-      //       nonce: transaction.nonce,
-      //       value: transaction.value,
-      //       gasPrice: transaction.gasPrice,
-      //       gasLimit: transaction.gasLimit,
-      //       to: transaction.to,
-      //       data: transaction.data,
-      //     })
-      //   )
-
-      // // check that correct amount was withdrawn and that fee was charged
-      // const l2Fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
-
-      // const fee = l1Fee.add(l2Fee)
-      // const l1BalanceAfter = await other
-      //   .connect(env.l1Wallet.provider)
-      //   .getBalance()
-      // const l2BalanceAfter = await other.getBalance()
-      // expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
-      // expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))
     },
     envConfig.MOCHA_TIMEOUT * 3
   )
