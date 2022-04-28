@@ -30,7 +30,7 @@ function AvailableBridges({ token = null, children }) {
         </Typography>
         <G.DividerLine flex={1} />
       </S.LabelContainer>
-      <img src={AvailableBridgeBg} title="agregate bridges" width="100%" />
+      <img src={AvailableBridgeBg} alt="agregate bridges" width="100%" />
     </S.BridgesContainer>
   }
 

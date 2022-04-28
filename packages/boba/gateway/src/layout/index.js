@@ -35,8 +35,9 @@ function App () {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
+  const brandAuxiliary = '#1CD6D1'
   const buttonColor = '#228fe5' //blue
-  const darkGrey = '#1b1c1f'
+  // const darkGrey = '#1b1c1f'
 
   let MUItheme = createTheme({
     palette: {
@@ -51,7 +52,7 @@ function App () {
         tabBorderBottom: light ? `solid 2px ${buttonColor}}` : `2px solid ${buttonColor}}`,
       },
       secondary: {
-        main: light ? buttonColor : buttonColor,
+        main: light ? brandAuxiliary : radioGreen,
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
