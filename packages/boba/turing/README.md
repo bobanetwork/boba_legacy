@@ -122,7 +122,7 @@ You should lock down your off-chain endpoint to only accept queries from your sm
 
 ## AWS and Google Cloud Function Examples
 
-Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided for you to use in `packages/boba/turing/AWS_code`). Specific instructions for setting up AWS lambda endpoints are [given here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
+Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided in `./packages/boba/turing/AWS_code`. Specific instructions for setting up AWS lambda endpoints are [here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
 ## Important Properties of Turing
 
