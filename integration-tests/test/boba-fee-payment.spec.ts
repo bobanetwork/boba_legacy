@@ -1058,7 +1058,8 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
       const transferBackTx = await L2Boba.connect(env.l2Wallet).transfer(
         env.l2Wallet_2.address,
-        bobaBalance
+        bobaBalance,
+        { gasLimit: 10000000 }
       )
       await transferBackTx.wait()
     })

@@ -17,11 +17,11 @@
 package core
 
 import (
-	"errors"
 	"encoding/hex"
+	"errors"
+	"fmt"
 	"math"
 	"math/big"
-	"fmt"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
@@ -374,10 +374,14 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 		addressSender := st.state.GetBobaDelegate(st.msg.From()).String()[2:]
 
 		// padding addressTo
-		for len(addressTo) < 64 { addressTo = "0" + addressTo }
+		for len(addressTo) < 64 {
+			addressTo = "0" + addressTo
+		}
 
 		// padding addressSender
-		for len(addressSender) < 64 { addressSender = "0" + addressSender }
+		for len(addressSender) < 64 {
+			addressSender = "0" + addressSender
+		}
 
 		amountStr := fmt.Sprintf("%x", bobaval)
 
@@ -390,7 +394,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 
 		fmt.Println("inputDataHex: ", inputDataHex)
 
-		inputData, err := hex.DecodeString(inputDataHex)
+		inputData, _ := hex.DecodeString(inputDataHex)
 
 		gas := uint64(3000000)
 		value := new(big.Int)
