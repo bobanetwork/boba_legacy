@@ -14,13 +14,14 @@
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
   * [Turing KYC](boba\_community/turing-kyc/README.md)
   * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
-  * [Turing Hello World](boba\_community/turing-start/README.md)
+  * [Turing Wizard](boba\_community/turing-start/README.md)
   * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
 
 * Developer Docs
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
+  * [Dual fee system](boba\_examples/boba-fee/README.md)
   * [Contract Deployment Example](boba\_documentation/developer/contract-deployment.md)
   * [Sending ETH to L2](boba\_examples/init-fund-l2/README.md)
   * [Adding a new ERC20 to Boba](boba\_documentation/developer/add-new-token.md)
@@ -40,7 +41,6 @@
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
 
 * [Other](packages/README.md)
-  * [Dual fee system](boba\_examples/boba-fee/README.md)
   * [Boba Mainnet Addresses](packages/contracts/deployments/mainnet/README.md)
   * [Boba Rinkeby Addresses](packages/contracts/deployments/rinkeby/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
