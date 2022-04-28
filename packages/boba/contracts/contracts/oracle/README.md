@@ -22,9 +22,9 @@ Price is aggregated in individual FluxAggregator contracts, however the FeedRegi
 
 The methods above return additional data that can be used to ensure fresh data are received. Alternatively, you can can query only the price:
 
-* To get the latest price , call ***`latestAnswer(base, quote)`***.
+* To get the latest price, call ***`latestAnswer(base, quote)`***.
 
-* To get the price from a certain past round , call ***`getAnswer(base, quote, roundId)`***. ***`roundId`*** supplied here is phaseId plus aggregator roundId.
+* To get the price from a certain past round, call ***`getAnswer(base, quote, roundId)`***. ***`roundId`*** supplied here is phaseId plus aggregator roundId.
 
 * To get the latest completed round, call ***`latestRound(base, quote)`***.
 

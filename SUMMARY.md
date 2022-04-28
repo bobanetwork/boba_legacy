@@ -41,16 +41,10 @@
 
 * [Other](packages/README.md)
   * [Dual fee system](boba\_examples/boba-fee/README.md)
-  * [Boba Deployments](packages/contracts/deployments/README.md)
-    * [Boba Mainnet](packages/contracts/deployments/mainnet/README.md)
-    * [Boba Rinkeby Testnet](packages/contracts/deployments/rinkeby/README.md)
-  * [Contracts](packages/boba/README.md)
-    * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
-    * [Boba NFT Bridges](packages/boba/contracts/contracts/bridges/README.md)
-  * [Boba Straw Oracle](boba\_examples/boba-straw/README.md)
-    * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
+  * [Boba Mainnet Addresses](packages/contracts/deployments/mainnet/README.md)
+  * [Boba Rinkeby Addresses](packages/contracts/deployments/rinkeby/README.md)
+  * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
+  * [Boba NFT Bridges](packages/boba/contracts/contracts/bridges/README.md)
+  * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
   * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
   * [Contracts Registration](packages/boba/register/README.md)
-
-
-
