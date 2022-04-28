@@ -1,6 +1,7 @@
 #adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
 version: 2.1
 
+jobs:
   integration-tests:
     machine:
       image: ubuntu-2004:202111-02
