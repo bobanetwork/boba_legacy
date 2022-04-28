@@ -1,8 +1,8 @@
 ---
-description: Welcome to Turing
+description: How to build with Turing
 ---
 
-Turing is a system for interacting with the outside world from within solidity smart contracts. Ethereum is a computer with multiple strong constraints on its internal architecture and operations, all required for decentralization. As such, things that most developers take for granted - such as low cost data storage, audio and image processing, advanced math, millisecond response times, random number generation, and the ability to talk to any other computer with an exposed api - can be difficult or even impossible to run on the Ethereum "CPU". Of course, the benefits of decentralization far outweigh those limitations, and therefore, tools are desirable to add missing functionality to the Ethereum ecosystem. 
+Turing is a system for interacting with the outside world from within solidity smart contracts. Ethereum is a computer with multiple strong constraints on its internal architecture and operations, all required for decentralization. As such, things that most developers take for granted - low cost data storage, audio and image processing, advanced math, millisecond response times, random number generation, and the ability to talk to any other computer - can be difficult or even impossible to run on the Ethereum "CPU". Of course, the benefits of decentralization far outweigh those limitations, and therefore, tools are desirable to add missing functionality to the Ethereum ecosystem. Turing is one such tool.
 
 Turing is a **pipe** between (**1**) Boba's Geth (aka sequencer), which takes transactions, advances the state, and forms blocks, and (**2**) your server. To use this pipe, all you need is a smart contract on Boba that makes Turing calls and an external server that accepts these calls and returns data in a format that can be understood by the EVM. This is not hard to do and we provide many examples which will allow you to quickly build a working Turing system. 
 
@@ -10,10 +10,13 @@ Turing is a **pipe** between (**1**) Boba's Geth (aka sequencer), which takes tr
 
 A typical Turing system for gaming or Web3 social networking<>blockchain interoperability has four parts: 
 
-1/ A contract that uses Turing, such as by calling `bytes memory encResponse = myHelper.TuringTx(serverURL, encRequest);`   
-2/ A second contract, the `TuringHelper`, which serves as your standardized door to Turing.
-3/ Some BOBA. Each Turing call costs 0.01 BOBA, equivalent to about 1 cent at the moment. This fee covers the cost of writing all input calldata and responses from your servers to Ethereum Mainnet.
-4/ A server which accepts POST requests from Boba's Geth and returns data to it in the right format. 
+1. A contract that uses Turing, such as by calling `bytes memory encResponse = myHelper.TuringTx(serverURL, encRequest);`   
+
+2. A second contract, the `TuringHelper`, which serves as your standardized door to Turing.
+
+3. Some BOBA. Each Turing call costs 0.01 BOBA, equivalent to about 1 cent at the moment. This fee covers the cost of writing all input calldata and responses from your servers to Ethereum Mainnet.
+
+4. A server which accepts POST requests from Boba's Geth and returns data to it in the right format. 
 
 ## Turing Functions and Feature Set
 
