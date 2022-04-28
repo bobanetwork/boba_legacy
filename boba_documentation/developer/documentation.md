@@ -2,19 +2,28 @@
 description: How to format documentation correctly
 ---
 
-We use both .md files on `GitHub` as well as `GitBooks`. **Our goal is to have a single file display well in both systems**. To that end, we have to be careful about how we do things in the `.md` file. 
+**Our goal is to have a single .md file display well in both GitBook and GitHub**. To that end, we have to be careful about how we do things in the `.md` file. 
+
+## Crazy GitBook things
+
+GitBook disregards the top level header (`# Title`) in the `.md` file and instead will give that page the title defined in the `SUMMARY.md` file that determines the GitBook table of contents and file menu. In general, top level headers are not that critical, so best leave them out of the `.md` file unless you want pages in GitBook to have 2 different titles at the top.  
 
 ## Headers
 
 For all `.md` files, please a description header to the file:
 
 ```
-
 ---
 description: How to format documentation correctly
 ---
 
+# My Great Title <- do not do this unless you know what you are doing 
+
+## Introduction
+
 ```
+
+Note that the header must be right at the top of the file to work.
 
 ## Links
 
