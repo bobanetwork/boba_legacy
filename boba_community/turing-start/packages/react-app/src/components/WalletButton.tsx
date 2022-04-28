@@ -70,7 +70,7 @@ export function WalletButton(props: IWalletButtonProps) {
   }, [error]);
 
   const isTestnet = isTestEnv();
-  const chainName = `Boba ${isTestnet ? "Rinkeby Testnet" : "Mainnet"}`;
+  const chainName = `Boba ${isTestnet ? "Rinkeby" : "Mainnet"}`;
   const chainConfig = getChainConfig();
 
   return <Stack direction="row" spacing={2} justifyContent="right" alignItems="center" marginRight={6}>
