@@ -33,6 +33,7 @@ import InputStep from 'containers/modals/deposit/steps/InputStep'
 import InputStepFast from 'containers/modals/deposit/steps/InputStepFast'
 import InputStepBatch from 'containers/modals/deposit/steps/InputStepBatch'
 import { fetchLookUpPrice } from 'actions/networkAction'
+import AvailableBridges from 'components/availableBridges/availableBridges'
 
 function BridgeTransfer() {
 
@@ -139,6 +140,7 @@ function BridgeTransfer() {
       }
 
       {multibridgeMode ? <InputStepBatch handleClose={onReset} isBridge={true}  /> : null}
+      {!tokens.length ? <AvailableBridges /> : null}
 
     </S.BridgeTransferContainer>
   )

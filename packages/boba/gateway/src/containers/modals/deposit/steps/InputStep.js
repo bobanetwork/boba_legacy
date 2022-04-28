@@ -19,6 +19,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { updateSignatureStatus_depositTRAD } from 'actions/signAction'
+import AvailableBridges from 'components/availableBridges/availableBridges'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -85,7 +86,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading ) buttonLabel_1 = 'Close'

@@ -57,6 +57,7 @@ import {
   selectExitFee,
 } from 'selectors/balanceSelector'
 import { updateSignatureStatus_exitTRAD } from 'actions/signAction'
+import AvailableBridges from 'components/availableBridges/availableBridges'
 
 function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -357,14 +358,15 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           </Typography>
         }
 
-        <BridgeFee
-          estFee={estGas}
-          exitFee={`${exitFee} BOBA`}
-          estReceive={receiveL1}
-          time="In 7 days"
-          timeInfo="Your funds will be available in 7 days."
-        />
-
+        <AvailableBridges token={token} >
+          <BridgeFee
+            estFee={estGas}
+            exitFee={`${exitFee} BOBA`}
+            estReceive={receiveL1}
+            time="In 7 days"
+            timeInfo="Your funds will be available in 7 days."
+          />
+        </AvailableBridges>
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {errorString}
