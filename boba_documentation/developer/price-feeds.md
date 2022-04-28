@@ -10,7 +10,7 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 
-### Feeds supported:
+### Feeds supported
 
 *Mainnet*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
@@ -126,7 +126,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. It easy to listen to Witnet's price feed. Please refer to Witnet's official guide at [https://docs.witnet.io](https://docs.witnet.io).
 
-### Feeds supported:
+### Feeds supported
 
 *Mainnet*: [BOBA/USDT, BTC/USD, ETH/USD, FRAX/USDT, USDC/USD, USDT/USD]
 

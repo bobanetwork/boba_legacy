@@ -14,56 +14,39 @@ The Price Feed Oracle works to provide the latest or past market price of specif
 
 ## For Price Data Recipients
 
-Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point.
+Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point. On the FeedRegistry, use the following methods:
 
-On the FeedRegistry, use the following methods:
+To get the latest price data, call ***`latestRoundData(base, quote)`***.
 
-*To get the latest price data -* \
-call method ***`latestRoundData(base, quote)`***
+To get the price data from a certain past round (historical price) , call ***`getRoundData(base, quote, roundId)`***. ***`roundId`*** supplied here is phaseId plus aggregator roundId.
 
-*To get the price data from a certain past round (historical price) -* \
-call method ***`getRoundData(base, quote, roundId)`*** \
-***`roundId`*** supplied here is phaseId plus aggregator roundId
+The answer returned will be of the form of decimals specified on the contract, call ***`decimals(base, quote)`***.
 
-*The answer returned will be of the form of decimals specified on the contract-* \
-call method ***`decimals(base, quote)`***
+The methods above return additional data that can be used to ensure fresh data are received. Alternatively, you can can query only the price:
 
-The methods above return additional data that can be used to ensure fresh data are received.
+To get the latest price , call ***`latestAnswer(base, quote)`***.
 
-Alternatively, you can can query only the price:
+To get the price from a certain past round , call ***`getAnswer(base, quote, roundId)`***. ***`roundId`*** supplied here is phaseId plus aggregator roundId.
 
-*To get the latest price -* \
-call method ***`latestAnswer(base, quote)`***
+To get the latest completed round, call ***`latestRound(base, quote)`***.
 
-*To get the price from a certain past round -* \
-call method ***`getAnswer(base, quote, roundId)`*** \
-***`roundId`*** supplied here is phaseId plus aggregator roundId
-
-*To get the latest completed round-* \
-call method ***`latestRound(base, quote)`***
-
-*To get the latest timestamp-* \
-call method ***`latestTimestamp(base, quote)`***
+To get the latest timestamp, call ***`latestTimestamp(base, quote)`***.
 
 To extract other informational data please refer to the FeedRegistry contract.
 
 ## For Price Data Submitters (Oracles)
 
-If you are an oracle (someone who is going to help by submitting price data), the main contracts to interact with are the respective FluxAggregators. Boba Network deploys and administers individual FluxAggregators for each asset feed. To be eligible to submit price data, the oracle (and the oracle admin) addresses needs to be added by the admin to respective FluxAggregators. Note - the ***`roundId`*** here is the actual ***`roundId`*** that the oracles use as a submission counter for the specific Aggregator, this is not equal to the ***`roundId`*** obtained from the FeedRegistry, where phaseId combined with ***`roundId`*** is returned.
+If you are an oracle (someone who is going to help by submitting price data), the main contracts to interact with are the respective FluxAggregators. Boba  deploys and administers individual FluxAggregators for each asset feed. To be eligible to submit price data, the oracle (and the oracle admin) addresses needs to be added by the admin to respective FluxAggregators. Note - the ***`roundId`*** here is the actual ***`roundId`*** that the oracles use as a submission counter for the specific Aggregator, this is not equal to the ***`roundId`*** obtained from the FeedRegistry, where phaseId combined with ***`roundId`*** is returned.
 
 ### Submitting prices
 
-Oracle helper methods for data submissions \
-*To get details of queried round, including eligibility-* \
-call method ***`oracleRoundState(oracle, roundId)`***
+Oracle helper methods for data submissions:
 
-*in case an oracle wants the roundId to be suggested instead-* \
-call method ***`oracleRoundState(oracle, 0)`*** \
-This returns the suggested roundId that an oracle can submit next, depending on his past submission stats. Useful for multiple oracle settings.
+To get details of queried round, including eligibility, call ***`oracleRoundState(oracle, roundId)`***.
 
-*To submit data to the feed-* \
-the oracle has to call ***`submit(roundId, value)`*** \
-where value is the price to submit
+In case an oracle wants the roundId to be suggested, call ***`oracleRoundState(oracle, 0)`***. This returns the suggested roundId that an oracle can submit next, depending on his past submission stats. Useful for multiple oracle settings.
+
+To submit data to the feed, the oracle has to call ***`submit(roundId, value)`*** where value is the price to submit.
 
 The ***`roundId`*** is consecutive, an oracle can submit only once for a specific round, for single oracle settings, oracles just need to submit data in consecutive rounds. Note - the price submissions should use the decimals specified in the contract.
 
@@ -77,7 +60,7 @@ A round started for reporting by an oracle, will have to meet the min number of 
 
 ## Supported Token Feeds
 
-Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call method ***`getFeed(base, quote)`***). The addresses listed here, might be outdated! Prices returned are in decimals(8) of the underlying quote.
+Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call ***`getFeed(base, quote)`***). The addresses listed here might be outdated! Prices returned are in decimals (8) of the underlying quote.
 
 ### Rinkeby
 
