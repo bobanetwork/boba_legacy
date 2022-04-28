@@ -1,6 +1,6 @@
 # Price Data Feeds - Overview
 
-Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume. This list will be updated frequently:
+Price Feed oracles allow smart contracts to work with external data and open the path to many more use cases. Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume:
 
 1. Boba-Straw
 2. Witnet
@@ -8,7 +8,7 @@ Price Feed oracles are an essential part of Boba, which allow smart contracts to
 
 ## 1. Boba-Straw
 
-Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below. In the future, BOBA might also be used as a fee token to utilize/subscribe to these feeds.
+Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 
 ### Feeds supported:
 
@@ -16,7 +16,7 @@ Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's imple
 
 *Rinkeby*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
-*Fee*: free, in the future BOBA subscription based
+*Fee*: free
 
 [[*Quick-Link - Mainnet*]](https://blockexplorer.boba.network/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
 
@@ -110,7 +110,7 @@ address feedRegistryAddress = '0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1';
 
 `base` is always the token address and `quote` is fiat in the ISO_4217 form.
 
-#### Alternate data queries
+### Alternate data queries
 
 While the above is the recommended way to ask for the price data, and check time along with it, there is also the option to only query the price:
 
@@ -124,7 +124,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 ## 2. Witnet Price Feeds
 
-Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. Learn more about Witnet protocol at [https://docs.witnet.io](https://docs.witnet.io).
+Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. It easy to listen to Witnet's price feed. Please refer to Witnet's official guide at [https://docs.witnet.io](https://docs.witnet.io).
 
 ### Feeds supported:
 
@@ -132,56 +132,14 @@ Witnet is a decentralized oracle network, with multiple price feeds currently li
 
 *Rinkeby*: [BOBA/USDT, BTC/USD, ETH/USD, FRAX/USDT, FXS/USDT, OMG/BTC, OMG/ETH, OMG/USDT, USDC/USD, USDT/USD]
 
-[*Quick-Link to https://feeds.witnet.io*](https://feeds.witnet.io)
-
-### I want my contracts to receive data
-
-It's just as easy to make your contracts listen to Witnet's price feed. Please refer to Witnet's official guide at [https://docs.witnet.io](https://docs.witnet.io).
-
-**Boba Rinkeby Price Feeds**
-
-* BtcUsdPriceFeed: \[0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0](https://blockexplorer.rinkeby.boba.network/address/0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0)
-
-* EthUsdPriceFeed: \[0xD9465D38f50f364b3263Cb219e58d4dB2D584530](https://blockexplorer.rinkeby.boba.network/address/0xD9465D38f50f364b3263Cb219e58d4dB2D584530)
-
-* OmgBtcPriceFeed: \[0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D](https://blockexplorer.rinkeby.boba.network/address/0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D))
-
-* OmgEthPriceFeed: \[0x225BAd150B9D5202DC805B34A0DF64B1a77459dF](https://blockexplorer.rinkeby.boba.network/address/0x225BAd150B9D5202DC805B34A0DF64B1a77459dF))
-
-* OmgUsdtPriceFeed: [0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0](https://blockexplorer.rinkeby.boba.network/address/0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0))
-
 ## 3. Turing
 
-Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](../../packages/boba/turing/README.md).
+Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../packages/boba/turing/README.md). See [calling APIs](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract) for detailed instructions.
 
-Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to the external endpoint to retrieve the price data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
+Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 
 ### Feeds supported
 
 *Rinkeby/Mainnet*: potentially everything, dependent on your source
 
 *Fee*: 0.01 BOBA per Turing request
-
-[*Documentation Quick-Link*](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract)
-
-To use Turing, deploy your TuringHelper and add credits on behalf of your helper to the TuringCredit contract. With the TuringHelper added, register your contract that would make use of Turing calls. Your contract can now use Turing to query off-chain price data, through the helper. For example,
-
-```javascript
-interface Helper {
-    function TuringTx(string memory, bytes memory) external returns (bytes memory);
-}
-
-contract MyContract {
-
-    address public helperAddr;
-
-    function getCurrentQuote(string memory _url, string memory pair) public returns (uint256, uint256) {
-        Helper myHelper = Helper(helperAddr);
-        bytes memory encRequest = abi.encode(pair);
-        bytes memory encResponse = myHelper.TuringTx(_url, encRequest);
-        (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
-    }
-}
-```
-
-`_url` is your personal data source. For a more detailed walk through and fully worked-out example code, refer to the [Turing guide](../../packages/boba/turing/README.md).
