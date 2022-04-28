@@ -50,9 +50,9 @@ export const ChainInput = styled(Box)(({ theme }) => ({
   width: '100%',
   minWidth: '180px',
   [ theme.breakpoints.down('sm') ]: {
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     gap: '5px',
-    padding: '5px',
+    padding: '5px 10px',
     minWidth: '120px'
   }
 }))
