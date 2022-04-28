@@ -140,46 +140,31 @@ It's just as easy to make your contracts listen to Witnet's price feed. Please r
 
 **Boba Rinkeby Price Feeds**
 
-* BtcUsdPriceFeed: \[0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0]
+* BtcUsdPriceFeed: \[0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0](https://blockexplorer.rinkeby.boba.network/address/0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0)
 
-[https://blockexplorer.rinkeby.boba.network/address/0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0](https://blockexplorer.rinkeby.boba.network/address/0xeD074DA2A76FD2Ca90C1508930b4FB4420e413B0)
+* EthUsdPriceFeed: \[0xD9465D38f50f364b3263Cb219e58d4dB2D584530](https://blockexplorer.rinkeby.boba.network/address/0xD9465D38f50f364b3263Cb219e58d4dB2D584530)
 
-* EthUsdPriceFeed: \[0xD9465D38f50f364b3263Cb219e58d4dB2D584530]
+* OmgBtcPriceFeed: \[0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D](https://blockexplorer.rinkeby.boba.network/address/0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D))
 
-[https://blockexplorer.rinkeby.boba.network/address/0xD9465D38f50f364b3263Cb219e58d4dB2D584530](https://blockexplorer.rinkeby.boba.network/address/0xD9465D38f50f364b3263Cb219e58d4dB2D584530)
+* OmgEthPriceFeed: \[0x225BAd150B9D5202DC805B34A0DF64B1a77459dF](https://blockexplorer.rinkeby.boba.network/address/0x225BAd150B9D5202DC805B34A0DF64B1a77459dF))
 
-* OmgBtcPriceFeed: \[0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D]
-
-[https://blockexplorer.rinkeby.boba.network/address/0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D](https://blockexplorer.rinkeby.boba.network/address/0x56834Ff8D4b27db647Da97CA3bd8540f7fA0e89D))
-
-* OmgEthPriceFeed: \[0x225BAd150B9D5202DC805B34A0DF64B1a77459dF]
-
-[https://blockexplorer.rinkeby.boba.network/address/0x225BAd150B9D5202DC805B34A0DF64B1a77459dF](https://blockexplorer.rinkeby.boba.network/address/0x225BAd150B9D5202DC805B34A0DF64B1a77459dF))
-
-* OmgUsdtPriceFeed: [0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0]
-
-[https://blockexplorer.rinkeby.boba.network/address/0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0](https://blockexplorer.rinkeby.boba.network/address/0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0))
+* OmgUsdtPriceFeed: [0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0](https://blockexplorer.rinkeby.boba.network/address/0xE2Efa3fe66352e63F118bB9165435C5BEDB777d0))
 
 ## 3. Turing
 
-Turing is Boba's off-chain compute system and among many other things - you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data.
-
-In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](../../packages/boba/turing/README.md).
-
+Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data too! Turing gives you the flexibility to select and set up your own data source, if your use case demands it. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting the tx with real world responses. Learn more about Turing [here](../../packages/boba/turing/README.md).
 
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to the external endpoint to retrieve the price data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 
-### Feeds supported:
+### Feeds supported
 
-*Rinkeby/Mainnet*: [potentially everything, dependent on your source]
+*Rinkeby/Mainnet*: potentially everything, dependent on your source
 
-*Fee*: 0.01 BOBA for one Turing request
+*Fee*: 0.01 BOBA per Turing request
 
 [*Documentation Quick-Link*](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract)
 
-### I want my contracts to receive data
-
-To use Turing, deploy your TuringHelper and add credits on behalf of your helper on the TuringCredit contract. With the TuringHelper added, register your contract that would make use of Turing calls. Your contract can now use Turing to query off-chain price data, through the helper. For example,
+To use Turing, deploy your TuringHelper and add credits on behalf of your helper to the TuringCredit contract. With the TuringHelper added, register your contract that would make use of Turing calls. Your contract can now use Turing to query off-chain price data, through the helper. For example,
 
 ```javascript
 interface Helper {
@@ -188,20 +173,15 @@ interface Helper {
 
 contract MyContract {
 
-address public helperAddr;
+    address public helperAddr;
 
     function getCurrentQuote(string memory _url, string memory pair) public returns (uint256, uint256) {
         Helper myHelper = Helper(helperAddr);
         bytes memory encRequest = abi.encode(pair);
         bytes memory encResponse = myHelper.TuringTx(_url, encRequest);
-
         (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
-
     }
-
 }
 ```
 
-`_url` is your personal data source
-
-For a more detailed walk through, refer to the [Turing guide](../../packages/boba/turing/README.md)
+`_url` is your personal data source. For a more detailed walk through and fully worked-out example code, refer to the [Turing guide](../../packages/boba/turing/README.md).
