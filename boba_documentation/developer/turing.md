@@ -66,7 +66,7 @@ There is more information on setting up your own servers and computer endpoints 
 
 * [Turing API Endpoints](../../packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
 
-Separately, there is a new system to help you deploy all the right contracts and set up a working test system at [turing.boba.network](https://turing.boba.network). 
+Separately, there is a new system to help you deploy all the right contracts and set up a working test system at [[Mainnet: turing.boba.network]](https://turing.boba.network) and [[Rinkeby: turing.rinkeby.boba.network]](https://turing.rinkeby.boba.network). 
 
 Have fun using Turing and contact us right away if you run into any problems! 
 
