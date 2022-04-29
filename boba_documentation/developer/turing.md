@@ -24,7 +24,7 @@ Turing is a general purpose pipe between computers and this pipe does not have a
 
 ## **Turing is not an Oracle**
 
-Turing is general-purpose pipe between computers and not an `Oracle`. Decentralized Oracles were invented to solve a very specific problem, which is _decentralized trustless approximation of the truth_ (e.g. temperature in NYC, the price of BTC/USD, ...) for later consumption on-chain (e.g. by a DEX or lending protocol). A pipe between computers such as Turing has no direct bearing on questions of data authenticity, timeliness, and trust, but rather, those must be tackled by the smart contract deployer and data provider(s) in whatever way is most suitable to their specific use case, industry, and application. To reiterate, Turing is a pipe, not an Oracle. 
+Turing is general-purpose pipe between computers and not an Oracle. Decentralized Oracles were invented to solve a very specific problem, which is _decentralized trustless approximation of the truth_ (e.g. temperature in NYC, the price of BTC/USD, ...) for later consumption on-chain (e.g. by a DEX or lending protocol). A pipe between computers such as Turing has no direct bearing on questions of data authenticity, timeliness, and trust, but rather, those must be tackled by the smart contract deployer and data provider(s) in whatever way is most suitable to their specific use case, industry, and application. To reiterate, Turing is a pipe, not an Oracle. 
 
 ## Data Push vs. Just-in-time Data Pull
 
@@ -46,9 +46,9 @@ Since developers (i.e. **you**) control all of their keys and Turing is just a p
 
 Turing has two security/control features: 
 
-* First, when you set up Turing, you register the address of your `TuringHelper` with the `TuringBilling` contract. This prevents unauthorized _contracts_ from using your on chain infrastructure. 
+* First, when you set up Turing, you register the address of your `TuringHelper` with the `TuringBilling` contract. This prevents unauthorized contracts from using your on chain infrastructure. 
 
-* Second, the Boba Geth provides the address of the calling contract to your servers and endpoints. This is allows you to limit use of your public data- or compute- endpoints to contracts that you have specifically approved. 
+* Second, the Boba Geth provides the address of the calling contract to your servers and endpoints. This allows you to limit use of your public data- or compute- endpoints to contracts that you have specifically approved. 
 
 The first mechanism prevents unauthorized use of your on-chain resources and the second one prevents unauthorized use of off-chain resources.
 
