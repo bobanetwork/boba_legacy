@@ -62,7 +62,7 @@ Here are five fully worked out examples for you to build on:
 * Query [centralized off-chain price feeds](../../packages/boba/turing/test/005_lending.ts). Note - these cannot replace on-chain oracles and this approach should not be used for production use. An on-chain oracle such as ChainLink is the better design pattern.
 * Connect [on-chain events with commercial KYC providers](../../boba\_community/turing-kyc/README.md) 
 
-There is more information on setting up your own servers and computer endpoints here: 
+There is more information on setting up your own servers and compute endpoints here: 
 
 * [Turing API Endpoints](../../packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
 
