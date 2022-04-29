@@ -28,7 +28,8 @@ function App() {
         <>
           <H1>Use Turing with ease</H1>
           <P>Simply follow this guide to start using Turing in your project. Feel free to consult the docs to deploy without this DApp.</P>
-          <HorizontalLinearStepper contractBobaToken={contractBobaToken} />
+          <HorizontalLinearStepper
+            contractBobaToken={contractBobaToken} />
         </>
       </Body>
       <ToastContainer position="top-right"/>
