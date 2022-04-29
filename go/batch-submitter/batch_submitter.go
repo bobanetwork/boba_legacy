@@ -117,6 +117,12 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 			Region:      aws.String(cfg.KmsRegion),
 			Endpoint:    aws.String(cfg.KmsEndpoint)},
 		)
+		// AWS uses IAM role for task
+		if cfg.BuildEnv == "production" {
+			sess, _ = session.NewSession(&aws.Config{
+				Region: aws.String(cfg.KmsRegion)},
+			)
+		}
 		svc := kms.New(sess)
 		var services []*bsscore.Service
 		if cfg.RunTxBatchSubmitter {

@@ -44,7 +44,7 @@ functions:
         - ${file(env.yml):SUBNET_ID_2}
     events:
       - schedule:
-          rate: rate(10 minutes)
+          rate: rate(5 minutes)
           description: 'Warm up turing_verifyCAPTCHA'
           name: 'sls-boba-turing-verify-captcha'
       - http:
