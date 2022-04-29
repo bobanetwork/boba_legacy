@@ -41,7 +41,7 @@ describe('Native ETH Integration Tests', async () => {
     }
   }
 
-  before(async () => {
+  beforeEach(async () => {
     env = await OptimismEnv.new()
     l1Bob = Wallet.createRandom().connect(env.l1Wallet.provider)
     l2Bob = l1Bob.connect(env.l2Wallet.provider)
@@ -102,7 +102,7 @@ describe('Native ETH Integration Tests', async () => {
     )
 
     const l1FeePaid = receipt.gasUsed.mul(tx.gasPrice)
-    let postBalances = await getBalances(env)
+    const postBalances = await getBalances(env)
 
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
@@ -110,7 +110,6 @@ describe('Native ETH Integration Tests', async () => {
     expect(postBalances.l2UserBalance).to.deep.eq(
       preBalances.l2UserBalance.add(depositAmount)
     )
-    postBalances = await getBalances(env)
     expect(postBalances.l1UserBalance).to.deep.eq(
       preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
     )
@@ -134,14 +133,13 @@ describe('Native ETH Integration Tests', async () => {
     const l1FeePaid = depositReceipts.receipt.gasUsed.mul(
       depositReceipts.tx.gasPrice
     )
-    let postBalances = await getBalances(env)
+    const postBalances = await getBalances(env)
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
     )
     expect(postBalances.l2BobBalance).to.deep.eq(
       preBalances.l2BobBalance.add(depositAmount)
     )
-    postBalances = await getBalances(env)
     expect(postBalances.l1UserBalance).to.deep.eq(
       preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
     )
