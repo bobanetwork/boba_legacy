@@ -1,7 +1,13 @@
 
+* Step 1: Setting up a suitable endpoint
+* Step 2: Testing your endpoint
+* Step 3: Deploy a solidity smart contract using this endpoint
+* Step 4: Authorize and fund the turinghelper
+* Step 5: Test the complete system
+
 ## Step 1: Setting up a suitable endpoint
 
-Let's use AWS Lambda to set up an python endpoint for you. The `app.py` takes an http POST event, extracts two numbers, adds them, and returns the result in a way that solidity can understand. 
+Let's use AWS Lambda to set up an python endpoint for you. you can of course use whatever system you prefer - there are dozens of ways to set up a server/API. The `app.py` takes an http POST event, extracts two numbers, adds them, and returns the result in a way that solidity can understand. 
 
 ```python
 
@@ -63,17 +69,16 @@ $ sam deploy --guided
 
 ```
 
-Accept all defaults, but answer yes to `HelloTuringFunction may not have authorization defined, Is this okay? [y/N]: `. This gives you a live public Lambda endpoint that accepts two numbers and sums them. 
+Accept all defaults, but answer yes to `HelloTuringFunction may not have authorization defined, Is this okay? [y/N]: `. This gives you a live public Lambda endpoint that accepts two numbers and sums them. The SAM output gives you your new API Gateway endpoint URL:
 
 ```
 CloudFormation outputs from deployed stack
 ----------------------------------------------------------------------------------------------------------------
-Outputs                                                                                                                                                                                          
+Outputs
 ----------------------------------------------------------------------------------------------------------------
-Key                 HelloTuringApi                                                                                                                                                               
-Description         API Gateway endpoint URL for Prod stage for Hello Turing function                                                                                                            
-Value               https://izy1w9anbj.execute-api.us-east-1.amazonaws.com/Prod/                                                                                                                 
-                                                                               
+Key           HelloTuringApi
+Description   API Gateway endpoint URL for Prod stage for Hello Turing Function
+Value         https://izy1w9anbj.execute-api.us-east-1.amazonaws.com/Prod/
 ----------------------------------------------------------------------------------------------------------------
 
 Successfully created/updated stack - HelloTuring in us-east-1
