@@ -131,11 +131,11 @@ WETH9
 </tr>
 <tr>
 <td>
-Lib_ResolvedDelegateBobaProxy
+Proxy__BobaTuringCredit
 </td>
 <td align="center">
-<a href="https://blockexplorer.boba.network/address/0x4200000000000000000000000000000000000020">
-<code>0x4200000000000000000000000000000000000020</code>
+<a href="https://blockexplorer.boba.network/address/0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf">
+<code>0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf</code>
 </a>
 </td>
 </tr>
@@ -144,18 +144,48 @@ Lib_ResolvedDelegateBobaProxy
 BobaTuringCredit
 </td>
 <td align="center">
-<a href="https://blockexplorer.boba.network/address/0x4200000000000000000000000000000000000021">
-<code>0x4200000000000000000000000000000000000021</code>
+<a href="https://blockexplorer.boba.network/address/0xd8E006702bdCbE2582dF13f900bCF750129bB4491">
+<code>0xd8E006702bdCbE2582dF13f900bCF750129bB449</code>
 </a>
 </td>
 </tr>
 <tr>
 <td>
-BobaTuringHelper
+Proxy__Boba_GasPriceOracle
 </td>
 <td align="center">
-<a href="https://blockexplorer.boba.network/address/0x4200000000000000000000000000000000000022">
-<code>0x4200000000000000000000000000000000000022</code>
+<a href="https://blockexplorer.boba.network/address/0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51">
+<code>0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Boba_GasPriceOracle
+</td>
+<td align="center">
+<a href="https://blockexplorer.boba.network/address/0x5d0763cf905DA3689B072FD19baD8dF823b2c349">
+<code>0x5d0763cf905DA3689B072FD19baD8dF823b2c349</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__BobaBillingContract
+</td>
+<td align="center">
+<a href="https://blockexplorer.boba.network/address/0x29F373e4869e69faaeCD3bF747dd1d965328b69f">
+<code>0x29F373e4869e69faaeCD3bF747dd1d965328b69f</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+BobaBillingContract
+</td>
+<td align="center">
+<a href="https://blockexplorer.boba.network/address/0x4a792F51CCc616b82EF74d2478C732e161c5E6b1">
+<code>0x4a792F51CCc616b82EF74d2478C732e161c5E6b1</code>
 </a>
 </td>
 </tr>
