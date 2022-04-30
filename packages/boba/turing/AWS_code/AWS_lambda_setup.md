@@ -13,8 +13,7 @@ Turing can interact with any computer with an API. Examples include dozens of Go
 
 ## Basic Setup
 
-Set up an AWS account if you do not have one. Go to the Amazon **Lambda** web console. Click `Create function` (top right). Select `Author from scratch`.
-Give it a good name (e.g. `basic_math`). Select Runtime: Node.js 14.x (for running javascript code) or Python 3.9 (for running Python code). Leave everything else as is and click `Create function` (bottom right).
+Set up an AWS account if you do not have one. Go to the Amazon **Lambda** web console. Click `Create function` (top right). Select `Author from scratch`. Give it a good name (e.g. `basic_math`). Select Runtime: Node.js 14.x (for running javascript code) or Python 3.9 (for running Python code). Leave everything else as is and click `Create function` (bottom right).
 
 ## Add a simple test
 

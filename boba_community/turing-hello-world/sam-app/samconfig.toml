@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "HelloTuring"
+s3_prefix = "HelloTuring"
+region = "us-east-1"
+image_repositories = []
+capabilities = "CAPABILITY_IAM"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1cj3o6wzl68zo"
