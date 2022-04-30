@@ -65,13 +65,28 @@ $ sam deploy --guided
 
 Accept all defaults, but answer yes to `HelloTuringFunction may not have authorization defined, Is this okay? [y/N]: `. This gives you a live public Lambda endpoint that accepts two numbers and sums them. 
 
+```
+CloudFormation outputs from deployed stack
+----------------------------------------------------------------------------------------------------------------
+Outputs                                                                                                                                                                                          
+----------------------------------------------------------------------------------------------------------------
+Key                 HelloTuringApi                                                                                                                                                               
+Description         API Gateway endpoint URL for Prod stage for Hello Turing function                                                                                                            
+Value               https://izy1w9anbj.execute-api.us-east-1.amazonaws.com/Prod/                                                                                                                 
+                                                                               
+----------------------------------------------------------------------------------------------------------------
+
+Successfully created/updated stack - HelloTuring in us-east-1
+
+```
+
 ## Step 2: Testing your endpoint
 
-You can test this endpoint with `curl`. 
+You can test this endpoint with `curl`. Your endpoint will have a different URL, of course, so please update that.
 
 ```bash
 curl -X POST \
-    'https://n1l6364gl8.execute-api.us-east-1.amazonaws.com/Prod/hello/' \
+    'https://izy1w9anbj.execute-api.us-east-1.amazonaws.com/Prod/' \
     -H 'content-type: application/json' \
     -d '{"jsonrpc": "2.0", "id": 1, "method": "0xd6e1afe5cA8D00A2EFC01B89997abE2De47fdfAf", "params": ["0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000022"]}'
 
@@ -100,17 +115,3 @@ You can do this online at:
 ## Step 5: Test the complete system
 
 To write....
-
-
-
-
-
-
-
-
-
-
-
-
-
-
