@@ -2,35 +2,40 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/ITuringHelper.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./WithRecover.sol";
+import "./LinearlyAssigned.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// TODO: import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract TwitterClaim {
-
+contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
     string public apiUrl;
     ITuringHelper public turingHelper;
-    IERC721 public nftToClaim;
-    mapping(string => bool) hasTwitterUserClaimed;
+    mapping(uint256 => bool) hasTwitterUserClaimed;
     uint256 lastEpochStart;
     uint256 amountClaimsInLastEpoch;
     uint256 maxClaimsPerEpoch;
 
-    event NFTClaimed(string twitterUser);
+    event NFTClaimed(uint256 authorId);
 
     /*modifier isEligible() {
         _;
     }*/
 
-    constructor(string memory apiUrl_, address turingHelper_, address nftAddress_, uint256 maxClaimsPerEpoch_) {
+    constructor(string memory name_, string memory symbol_, uint256 totalSupply_, string memory apiUrl_,
+        address turingHelper_, uint256 maxClaimsPerEpoch_)
+    ERC721(name_, symbol_) LinearlyAssigned(totalSupply_, 0) {
         apiUrl = apiUrl_;
         turingHelper = ITuringHelper(turingHelper_);
         lastEpochStart = block.timestamp;
         amountClaimsInLastEpoch = 0;
         maxClaimsPerEpoch = maxClaimsPerEpoch_;
-        nftToClaim = IERC721(nftAddress_);
     }
 
+    /// @dev Mint/Claim NFT
+    /// @param idToVerify_: Random ID to post on Twitter
+    /// @param twitterPostID_: Tweet ID with the assigned ID.
     function claimNFT(string calldata idToVerify_, string calldata twitterPostID_) external {
-        if(block.timestamp >= (lastEpochStart + 1 hours)) {
+        if (block.timestamp >= (lastEpochStart + 1 hours)) {
             lastEpochStart = block.timestamp;
             amountClaimsInLastEpoch = 1;
         } else {
@@ -38,13 +43,18 @@ contract TwitterClaim {
         }
         require(amountClaimsInLastEpoch < maxClaimsPerEpoch, "Rate limit reached");
 
+        bytes memory encRequest = abi.encode(idToVerify_, twitterPostID_);
+        // TODO: Check if number large enough?
+        (uint256 resp, uint256 authorId) = (1, 100); // TODO: abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256));
+        // 0 = false, 1 = true
+        bool isAllowedToClaim = resp != 0;
 
-        string memory twitterUser = "TODO";
-        // TODO: Add prior requires for better UX (direct error in MetaMask)
-        require(!hasTwitterUserClaimed[twitterUser], "Already claimed");
+        require(isAllowedToClaim, "Tweet invalid");
+        require(!hasTwitterUserClaimed[authorId], "Already claimed");
+        hasTwitterUserClaimed[authorId] = true;
         // TODO: Has enough followers, does exist long enough?
 
-        emit NFTClaimed(twitterUser);
+        _safeMint(_msgSender(), nextToken());
+        emit NFTClaimed(authorId);
     }
-
 }

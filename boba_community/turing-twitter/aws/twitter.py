@@ -6,6 +6,9 @@ import textwrap
 
 authorized_contract = None  # for open access
 
+# TODO: Use AWS Secret Manager
+TWITTER_API_KEY = None # do not push
+
 # or...
 # authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
 
@@ -13,7 +16,7 @@ authorized_contract = None  # for open access
 def lambda_handler(event, context):
 
     print("DEBUG: ", event)
-    
+
     input = json.loads(event["body"])
     print("DEBUG: from Geth:", input)
 
@@ -49,15 +52,21 @@ def lambda_handler(event, context):
     # 000000000000000000000000000000000000000000000000000000000000000c
     # 476574466f6c6c6f776572730000000000000000000000000000000000000000
     print("Params: ", params)
-    str_length_1 = int(params[2], 16) * 2
+    str_length_1 = int(params[3], 16) * 2
+    str_length_2 = int(params[5], 16) * 2
 
-    request = params[3]
+    request = params[4]
     bytes_object = bytes.fromhex(request[0:str_length_1])
-    wallet_addr = bytes_object.decode("ASCII")
+    id_to_verify = bytes_object.decode("ASCII")
 
-    print("Decoded wallet address: ", wallet_addr)
+    request_2 = params[6]
+    bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
+    twitter_post_id = bytes_object_2.decode("ASCII")
 
-    res = load_kyc_status(wallet_addr)
+    print("ID to verify: ", id_to_verify, ", Twitter post id: ", twitter_post_id)
+
+
+    res = load_tweet_status(id_to_verify, twitter_post_id)
 
     # example res:
     # 0x
@@ -77,9 +86,8 @@ def lambda_handler(event, context):
     return returnPayload
 
 
-def load_kyc_status(wallet_address):
+def load_tweet_status(id_to_verify, twitter_post_id):
     # specify your API endpoint here
-    # TODO: wallet_address
     request_url = 'localhost' # TODO: Adapt to real api
 
     # Create a PoolManager instance for sending requests.
@@ -88,14 +96,18 @@ def load_kyc_status(wallet_address):
     # Send a POST request and receive a HTTPResponse object.
     # TODO resp = http.request("GET", request_url)
     # TODO result = json.loads(resp.data)
-    extracted_value = 1 # TODO result['isKYCed'] # TODO: Adapt to real Api response
+    # TODO: Adapt to real Api response
+    isAllowedToClaim = 1 # result['..']
+    authorId = 1000
 
-    print("from endpoint:", extracted_value)
+    print("from endpoint:", isAllowedToClaim)
 
     # create return payload
-    res = '0x' + '{0:0{1}x}'.format(int(32), 64)
+    res = '0x' + '{0:0{1}x}'.format(int(64), 64)
     # 64 denotes the number of bytes in the `bytes` dynamic argument
     # since we are sending back 2 32 byte numbers, 2*32 = 64
-    res = res + '{0:0{1}x}'.format(int(extracted_value), 64)  # the result
+    res = res + '{0:0{1}x}'.format(int(isAllowedToClaim), 64)  # the result
+
+    res = res + '{0:0{1}x}'.format(int(authorId), 64)  # the result
 
     return res

@@ -24,7 +24,7 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 let urlStr
 
-const gasOverride = { gasLimit: 3000000 }
+const gasOverride = { gasLimit: 6_000_000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
@@ -36,7 +36,7 @@ let BobaTuringCreditAddress
 let Factory__BobaTuringCredit: ContractFactory
 let Factory__ERC20Mock: ContractFactory
 let erc20Mock: Contract
-let Factory__KYCExample: ContractFactory
+let Factory__TwitterClaim: ContractFactory
 let twitter: Contract
 let Factory__TuringHelper: ContractFactory
 let turingHelper: Contract
@@ -44,10 +44,10 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
-import KYCExample from '../artifacts/contracts/TwitterClaim.sol/KYCExample.json'
-import TuringHelperJson from '../artifacts/contracts/common/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '../../../../contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import BobaTuringCreditJson from '../../../../../contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
+import TwitterClaim from '../artifacts/contracts/TwitterClaim.sol/TwitterClaim.json'
+import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
 
 //takes a string of hex values and coverts those to ASCII
 function convertHexToASCII(hexString) {
@@ -60,7 +60,7 @@ function convertHexToASCII(hexString) {
   return stringOut.substring(1)
 }
 
-describe('Verify KYC for function calls', function () {
+describe('Verify Twitter post for NFT', function () {
   before(async () => {
     Factory__TuringHelper = new ContractFactory(
       TuringHelperJson.abi,
@@ -71,19 +71,23 @@ describe('Verify KYC for function calls', function () {
     turingHelper = await Factory__TuringHelper.deploy(gasOverride)
     console.log('Helper contract deployed as', turingHelper.address)
 
-    Factory__KYCExample = new ContractFactory(
-      KYCExample.abi,
-      KYCExample.bytecode,
+    Factory__TwitterClaim = new ContractFactory(
+      TwitterClaim.abi,
+      TwitterClaim.bytecode,
       deployerWallet
     )
 
-    twitter = await Factory__KYCExample.deploy(
+    twitter = await Factory__TwitterClaim.deploy(
+      'ClaimNFT',
+      'TBOB',
+      3,
       'https://localhost/kyc', // TODO
       turingHelper.address,
+      10,
       gasOverride
     )
 
-    console.log('KYCExample contract deployed on', twitter.address)
+    console.log('TwitterClaim contract deployed on', twitter.address)
 
     // whitelist the new 'lending' contract in the helper
     const tr1 = await turingHelper.addPermittedCaller(twitter.address)
@@ -159,23 +163,25 @@ describe('Verify KYC for function calls', function () {
     expect(helperAddress).to.equal(turingHelper.address)
   })
 
-  it('should call non KYC function', async () => {
-    await twitter.estimateGas.openForEveryone(gasOverride)
+  // TODO: To test
+  // * Max supply of NFT
+
+  it('should conduct basic twitter claim', async () => {
+    await twitter.estimateGas.claimNFT('abcID', '4567389393939339', gasOverride)
     console.log('Estimated gas')
-    const tr = await twitter.openForEveryone(gasOverride)
-    console.log('Transaction sent')
-    const res = await tr.wait()
-    console.log('TX confirmation: ', res)
+    const claim = await twitter.claimNFT(
+      'abcID',
+      '4567389393939339',
+      gasOverride
+    )
+    const res = await claim.wait()
     expect(res).to.be.ok
   })
 
-  it('should fail when calling KYC function with non KYCed wallet', async () => {
-    //await twitter.estimateGas.onlyForKYCedWallets(gasOverride)
-    //console.log("Estimated gas")
-    const tr = await twitter.onlyForKYCedWallets(gasOverride)
-    const res = tr.wait()
-    console.log('Transaction sent')
-    await expect(res).to.be.reverted
-    console.log('TX confirmation: ', res)
+  it('should fail for second twitter claim', async () => {
+    // try to claim again
+    await expect(
+      twitter.estimateGas.claimNFT('abcID', '4567389393939339', gasOverride)
+    ).to.be.reverted
   })
 })
