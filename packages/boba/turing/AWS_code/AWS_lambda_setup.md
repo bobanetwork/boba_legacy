@@ -1,19 +1,12 @@
-# Turing Example Endpoints 
-
-- [Turing Example Endpoints](#turing-example-endpoints)
-  * [Basic Setup](#basic-setup)
-  * [Add a simple test](#add-a-simple-test)
-  * [Add web API](#add-web-api)
-  * [Test the system](#test-the-system)
-  * [Turing Simple Math Example](#turing-simple-math-example)
-  * [Turing Price Feed example](#turing-price-feed-example)
-  * [Turing StableSwap example](#turing-stableswap-example)
+---
+description: Learn how to set up a simple endpoint for Turing to interact with
+---
 
 Turing can interact with any computer with an API. Examples include dozens of Google Cloud Services and AWS Services. Here are some basic instructions for using an AWS Lambda endpoint. The generic process for setting up an **AWS Lambda endpoint** is described [here](https://docs.aws.amazon.com/lambda/latest/dg/getting-started-create-function.html) but you can also just follow along with this writeup. The generic process for setting up a **Google Cloud Function** is described [here](https://cloud.google.com/functions/) - the example javascript and Python code provided below also works on GCF of course. 
 
 ## Basic Setup
 
-Set up an AWS account if you do not have one. Go to the Amazon **Lambda** web console. Click `Create function` (top right). Select `Author from scratch`.
+Set up an AWS account if you do not have one. Go to the **Amazon Lambda** web console. Click `Create function` (top right). Select `Author from scratch`.
 Give it a good name (e.g. `basic_math`). Select Runtime: Node.js 14.x (for running javascript code) or Python 3.9 (for running Python code). Leave everything else as is and click `Create function` (bottom right).
 
 ## Add a simple test
@@ -27,6 +20,24 @@ Go to the Application Services section of the Amazon **API Gateway** web console
 ## Test the system
 
 Go back to the **Lambda** web console. In the `Function overview`, you will now see an API Gateway trigger. Click it, and then click the `Triggers>API endpoint: https://...`. A new browser tab will open and you will see the string `"Hello from Lambda!"`. The basic system is now in place and working. Next, add some math, or whatever functionality you need. 
+
+## Turing StableSwap example
+
+See `./turing_stableSwap.py` for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in [`./AWS_code/turing_stableSwap.py`](./turing_stableSwap.py). To test it from your terminal, run:
+
+```bash
+#StableSwap Curl Test
+#run from your terminal 
+curl -X POST \
+    'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/stableSwap' \
+    -H 'content-type: application/json' \
+    -d '{"L_x":"10.0","L_y":"10.0","A":"1.00","x_in":"5.00","sol":"true"}'
+
+#returns
+{"x_in": 5.0, "y_out": 4.227083333333334, "x_new": 15.0, "y_prev": 10.0, "y_new": 5.772916666666666, "sol": true}%
+```
+
+So in this example, putting in `5.0` token 'X' would give you `4.227` token 'Y'.
 
 ## Turing Simple Math Example
 
@@ -73,6 +84,7 @@ curl -X POST \
 #returns
 {"sum":10.35,"mul":7.022599999999999}%
 ```
+
 ## Turing Price Feed example
 
 See `./turing_oracle.py` for deployable price feed API query code. Depending on the details of the API you are interating with, you will need to make minor changes. 
@@ -165,21 +177,3 @@ def lambda_handler(event, context):
   return returnPayload
 
 ```
-
-## Turing StableSwap example
-
-See `./turing_stableSwap.py` for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in `turing/AWS_code/turing_stableSwap.py`. To test it from your terminal, run:
-
-```bash
-#StableSwap Curl Test
-#run from your terminal 
-curl -X POST \
-    'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/stableSwap' \
-    -H 'content-type: application/json' \
-    -d '{"L_x":"10.0","L_y":"10.0","A":"1.00","x_in":"5.00","sol":"true"}'
-
-#returns
-{"x_in": 5.0, "y_out": 4.227083333333334, "x_new": 15.0, "y_prev": 10.0, "y_new": 5.772916666666666, "sol": true}%
-```
-
-So in this example, putting in `5.0` token 'X' would give you `4.227` token 'Y'.
