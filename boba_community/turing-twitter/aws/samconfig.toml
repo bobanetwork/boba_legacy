@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "turing-twitter"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-wbjvw3qhdghq"
+s3_prefix = "turing-twitter"
+region = "us-east-1"
+profile = "wavect"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

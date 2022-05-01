@@ -5,6 +5,7 @@ import "./interfaces/ITuringHelper.sol";
 import "./WithRecover.sol";
 import "./LinearlyAssigned.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts/utils/Strings.sol";
 // TODO: import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
@@ -32,9 +33,8 @@ contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
     }
 
     /// @dev Mint/Claim NFT
-    /// @param idToVerify_: Random ID to post on Twitter
     /// @param twitterPostID_: Tweet ID with the assigned ID.
-    function claimNFT(string calldata idToVerify_, string calldata twitterPostID_) external {
+    function claimNFT(string calldata twitterPostID_) external {
         if (block.timestamp >= (lastEpochStart + 1 hours)) {
             lastEpochStart = block.timestamp;
             amountClaimsInLastEpoch = 1;
@@ -43,9 +43,13 @@ contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
         }
         require(amountClaimsInLastEpoch < maxClaimsPerEpoch, "Rate limit reached");
 
-        bytes memory encRequest = abi.encode(idToVerify_, twitterPostID_);
+        // idToVerify = walletAddress
+        // string memory walletAddr = Strings.toHexString(uint256(uint160(_msgSender())), 20);
+        // string memory t = bytes20ToLiteralString(bytes20(_msgSender()));
+        bytes memory encRequest = abi.encode("hhh", "hhk"); // _msgSender(), twitterPostID_);
+
         // TODO: Check if number large enough?
-        (uint256 resp, uint256 authorId) = (1, 100); // TODO: abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256));
+        (uint256 resp, uint256 authorId) = abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256));
         // 0 = false, 1 = true
         bool isAllowedToClaim = resp != 0;
 
@@ -57,4 +61,34 @@ contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
         _safeMint(_msgSender(), nextToken());
         emit NFTClaimed(authorId);
     }
+
+    // TODO: Better way? Strings lib doesn't seem to work sufficiently for addresses
+    /*function bytes20ToLiteralString(bytes20 data)
+    private
+    pure
+    returns (string memory result)
+    {
+        bytes memory temp = new bytes(41);
+        uint256 count;
+
+        for (uint256 i = 0; i < 20; i++) {
+            bytes1 currentByte = bytes1(data << (i * 8));
+
+            uint8 c1 = uint8(
+                bytes1((currentByte << 4) >> 4)
+            );
+
+            uint8 c2 = uint8(
+                bytes1((currentByte >> 4))
+            );
+
+            if (c2 >= 0 && c2 <= 9) temp[++count] = bytes1(c2 + 48);
+            else temp[++count] = bytes1(c2 + 87);
+
+            if (c1 >= 0 && c1 <= 9) temp[++count] = bytes1(c1 + 48);
+            else temp[++count] = bytes1(c1 + 87);
+        }
+
+        result = string(temp);
+    }*/
 }
