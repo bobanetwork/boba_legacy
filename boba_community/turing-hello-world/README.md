@@ -64,6 +64,7 @@ $ aws configure
 $ brew tap aws/tap
 $ brew install aws-sam-cli
 
+# The build command needs to be executed after every change in the template
 $ sam build --use-container
 $ sam deploy --guided
 
@@ -97,7 +98,7 @@ curl -X POST \
 
 # expected result
 
-{"result": "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000042"}% 
+{"result": "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000042"}
 
 ```
 
@@ -111,12 +112,16 @@ This emulates how the data will be sent to the endpoint from the Geth.
 
 ## Step 3: Deploy a solidity smart contract using this endpoint
 
-NEED TO Write this part. When you are done, save the contract address. You will need it soon
+NEED TO Write this part. When you are done, save the contract address. You will need it soon.
 
 ## Step 4: Authorize and fund the turinghelper
 
 You can do this online at: 
+* Testnet: https://turing.rinkeby.boba.network
+* Mainnet: https://turing.boba.network
 
 ## Step 5: Test the complete system
 
-To write....
+We usually recommend TDD (test-driven development). Try to execute your smart contract function which makes use of Turing and your AWS endpoint. Turing usually gives good revert statements if something doesn't work as expected. 
+
+What's also helpful is looking into the AWS error logs server-side, if Turing simply returns a `SERVER_ERROR`. 
