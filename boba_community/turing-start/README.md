@@ -1,135 +1,38 @@
-This project was bootstrapped with [Create Eth App](https://github.com/paulrberg/create-eth-app).
+---
+description: Turing Example - Getting started with Turing 
+---
 
-## Project Structure
+# Turing Start
 
-The default template is a monorepo created with [Yarn Workspaces](https://classic.yarnpkg.com/en/docs/workspaces/).
+Use Turing with ease by navigating through a minimal web-app. 
 
-Workspaces makes it possible to setup multiple packages in such a way that we only need to run `yarn install` once to install all of them in
-a single pass. Dependencies are hoisted at the root.
+![image](https://user-images.githubusercontent.com/28724551/165357134-7ed58663-e887-43bc-814b-0deb3470157e.png)
 
-```
-my-eth-app
-├── README.md
-├── node_modules
-├── package.json
-├── .gitignore
-└── packages
-    ├── contracts
-    │   ├── README.json
-    │   ├── package.json
-    │   └── src
-    │       ├── abis
-    │       │   ├── erc20.json
-    │       │   └── ownable.json
-    │       ├── addresses.ts
-    │       └── index.ts
-    ├── react-app
-    │   ├── README.md
-    │   ├── node_modules
-    │   ├── package.json
-    │   ├── public
-    │   │   ├── favicon.ico
-    │   │   ├── index.html
-    │   │   ├── logo192.png
-    │   │   ├── logo512.png
-    │   │   ├── manifest.json
-    │   │   └── robots.txt
-    │   └── src
-    │       ├── App.css
-    │       ├── App.tsx
-    │       ├── App.test.tsx
-    │       ├── ethereumLogo.svg
-    │       ├── index.css
-    │       ├── index.ts
-    │       ├── serviceWorker.js
-    │       └── setupTests.ts
-    └── subgraph
-        ├── README.md
-        ├── abis
-        │   └── erc20.json
-        ├── package.json
-        ├── schema.graphql
-        ├── src
-        │   └── mappings
-        │       ├── tokens.ts
-        │       └── turing-helper-factory.ts
-        └── subgraph.yaml
-```
+## How does this help me?
 
-Owing to this dependency on Yarn Workspaces, Create Eth App can't be used with npm.
+Using Turing basically requires 3 things: 
 
-## Available Scripts
+1. Deploying the TuringHelper contract
 
-In the project directory, you can run:
+2. Fund the TuringHelper with some BOBA tokens
 
-### React App
+3. Deploy an AWS endpoint which receives the smart contract call and returns the result to your contract in a readable way within the same transaction. 
 
-#### `yarn react-app:start`
+This process can be tedious for new fellow coders, so we decided to build this Turing Starter app, which basically guides you through the process and automatically deploys and funds a new TuringHelper just for you. 
 
-Runs the React app in development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Project structure
 
-The page will automatically reload if you make changes to the code.<br>
-You will see the build errors and lint warnings in the console.
+### [contracts](https://github.com/bobanetwork/boba/tree/docs-in-monrepo/boba_community/turing-start/packages/contracts)
 
-#### `yarn react-app:test`
+This package is used within the react app (referenced via package.json) and contains the deployed contract addresses as well as the ABIs etc.
 
-Runs the React test watcher in an interactive mode.<br>
-By default, runs tests related to files changed since the last commit.
+### [dapp-contracts](https://github.com/bobanetwork/boba/tree/docs-in-monrepo/boba_community/turing-start/packages/dapp-contracts)
 
-[Read more about testing React.](https://facebook.github.io/create-react-app/docs/running-tests)
+In this package you'll find the actual solidity smart contracts which have been deployed for this DApp to work.
 
-#### `yarn react-app:build`
+### [react-app](https://github.com/bobanetwork/boba/tree/docs-in-monrepo/boba_community/turing-start/packages/react-app)
 
-Builds the React app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+This package contains the react app the user actually navigates through. 
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the React documentation on [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-#### `yarn react-app:eject`
-
-**Note: this is a one-way operation. Once you `react-app:eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` the React app at any time. This command will
-remove the single build dependency from your React package.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right
-into the `react-app` package so you have full control over them. All of the commands except `react-app:eject` will still work,
-but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `react-app:eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-### Subgraph
-
-The Graph is a tool for for indexing events emitted on the Ethereum blockchain. It provides you with an easy-to-use GraphQL API. <br/>
-
-To learn more, check out the [The Graph documentation](https://thegraph.com/docs).
-
-#### `yarn subgraph:codegen`
-
-Generates AssemblyScript types for smart contract ABIs and the subgraph schema.
-
-#### `yarn subgraph:build`
-
-Compiles the subgraph to WebAssembly.
-
-#### `yarn subgraph:auth`
-
-Before deploying your subgraph, you need to sign up on the
-[Graph Explorer](https://thegraph.com/explorer/). There, you will be given an access token. Drop it in the command
-below:
-
-```sh
-GRAPH_ACCESS_TOKEN=your-access-token-here yarn subgraph:auth
-```
-
-#### `yarn subgraph:deploy`
-
-Deploys the subgraph to the official Graph Node.<br/>
-
-Replace `paulrberg/create-eth-app` in the package.json script with your subgraph's name.
-
-You may also want to [read more about the hosted service](https://thegraph.com/docs/quick-start#hosted-service).
+* **Rinkeby**: [turing.rinkeby.boba.network](https://turing.rinkeby.boba.network/)
+* **Mainnet**: [turing.boba.network](https://turing.boba.network/)
