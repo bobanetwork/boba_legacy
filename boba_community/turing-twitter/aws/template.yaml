@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Resources:
-  HelloKYC:
+  HelloTwitter:
     Type: AWS::Serverless::Function
     Properties:
       Handler: twitter.lambda_handler
@@ -11,4 +11,4 @@ Resources:
           Type: Api
           Properties:
             Path: '/'
-            Method: get
+            Method: post

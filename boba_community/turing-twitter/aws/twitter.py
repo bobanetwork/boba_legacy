@@ -52,14 +52,14 @@ def lambda_handler(event, context):
     # 000000000000000000000000000000000000000000000000000000000000000c
     # 476574466f6c6c6f776572730000000000000000000000000000000000000000
     print("Params: ", params)
-    str_length_1 = int(params[3], 16) * 2
-    str_length_2 = int(params[5], 16) * 2
+    #str_length_1 = int(params[1], 16) * 2
+    str_length_2 = int(params[3], 16) * 2
 
-    request = params[4]
-    bytes_object = bytes.fromhex(request[0:str_length_1])
-    id_to_verify = bytes_object.decode("ASCII")
+    request = params[1]
+    #bytes_object = bytes.fromhex(request[-40]) # address
+    id_to_verify = request[-40:] #bytes_object.decode("ASCII")
 
-    request_2 = params[6]
+    request_2 = params[4]
     bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
     twitter_post_id = bytes_object_2.decode("ASCII")
 

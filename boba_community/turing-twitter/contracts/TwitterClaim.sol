@@ -46,10 +46,11 @@ contract TwitterClaim is WithRecover, LinearlyAssigned, ERC721 {
         // idToVerify = walletAddress
         // string memory walletAddr = Strings.toHexString(uint256(uint160(_msgSender())), 20);
         // string memory t = bytes20ToLiteralString(bytes20(_msgSender()));
-        bytes memory encRequest = abi.encode("hhh", "hhk"); // _msgSender(), twitterPostID_);
+        bytes memory encRequest = abi.encode(_msgSender(), twitterPostID_);
 
         // TODO: Check if number large enough?
-        (uint256 resp, uint256 authorId) = abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256));
+        bytes memory bRes = turingHelper.TuringTx(apiUrl, encRequest);
+        (uint256 resp, uint256 authorId) = abi.decode(bRes, (uint256, uint256));
         // 0 = false, 1 = true
         bool isAllowedToClaim = resp != 0;
 

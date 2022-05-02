@@ -24,7 +24,7 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 let urlStr
 
-const gasOverride = { gasLimit: 6_000_000 }
+const gasOverride = { gasLimit: 8_000_000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
@@ -81,7 +81,7 @@ describe('Verify Twitter post for NFT', function () {
       'ClaimNFT',
       'TBOB',
       3,
-      'https://hbgu3ake0c.execute-api.us-east-1.amazonaws.com/Prod/', // TODO
+      'https://jhc0pskmc0.execute-api.us-east-1.amazonaws.com/Prod/',
       turingHelper.address,
       10,
       gasOverride
