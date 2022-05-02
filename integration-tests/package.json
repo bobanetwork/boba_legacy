@@ -16,6 +16,7 @@
     "clean": "rimraf cache artifacts"
   },
   "devDependencies": {
+    "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
     "@boba/turing-hybrid-compute": "0.2.0",
     "@eth-optimism/contracts": "^0.5.11",

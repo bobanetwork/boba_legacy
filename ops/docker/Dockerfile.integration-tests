@@ -24,6 +24,8 @@ COPY --from=builder /optimism/packages/contracts ./packages/contracts
 COPY --from=builder /optimism/packages/boba/contracts ./packages/boba/contracts
 COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
 
+COPY --from=builder /optimism/ops_boba/api ./ops_boba/api
+
 # get the needed built artifacts
 WORKDIR /opt/optimism/integration-tests
 COPY --from=builder /optimism/integration-tests ./
