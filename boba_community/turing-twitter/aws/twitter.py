@@ -7,7 +7,8 @@ import textwrap
 authorized_contract = None  # for open access
 
 # TODO: Use AWS Secret Manager
-TWITTER_API_KEY = None # do not push
+# TODO: api key
+TWITTER_API_KEY = "" # do not push
 
 # or...
 # authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
@@ -94,20 +95,22 @@ def load_tweet_status(id_to_verify, twitter_post_id):
     http = urllib3.PoolManager()
 
     # Send a POST request and receive a HTTPResponse object.
-    # TODO resp = http.request("GET", request_url)
-    # TODO result = json.loads(resp.data)
-    # TODO: Adapt to real Api response
-    isAllowedToClaim = 1 # result['..']
-    authorId = 1000
+    headers = {"Authorization", "Bearer "+TWITTER_API_KEY}
+    resp = http.request("GET", "https://api.twitter.com/2/tweets/"+twitter_post_id+"?expansions=author_id",
+                        headers=headers)
+    result = json.loads(resp.data)
 
-    print("from endpoint:", isAllowedToClaim)
+    is_allowed_to_claim = id_to_verify in result["data"]["text"] # result['..']
+    author_id = result["data"]["author_id"]
+
+    print("from endpoint:", is_allowed_to_claim, "Author: ", author_id)
 
     # create return payload
     res = '0x' + '{0:0{1}x}'.format(int(64), 64)
     # 64 denotes the number of bytes in the `bytes` dynamic argument
     # since we are sending back 2 32 byte numbers, 2*32 = 64
-    res = res + '{0:0{1}x}'.format(int(isAllowedToClaim), 64)  # the result
+    res = res + '{0:0{1}x}'.format(int(is_allowed_to_claim), 64)  # the result
 
-    res = res + '{0:0{1}x}'.format(int(authorId), 64)  # the result
+    res = res + '{0:0{1}x}'.format(int(author_id), 64)  # the result
 
     return res
