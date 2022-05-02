@@ -1,0 +1,29 @@
+Searching 40017 files for "Feature Highlight 2"
+
+/Users/janliphardt/Documents/GitHub/boba/packages/boba/turing/README.md:
+   89  **Data/Oracle best practices** The oracle example given above should not be used in production. Minimally, you will need to secure your contract against data outliers, temporary lack of data, and malicious attempts to distort the data. Best practices include using multiple on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles.
+   90  
+   91: ## Feature Highlight 2: Using Turing to access APIs from within your solidity smart contract
+   92  
+   93  **Note - Boba does not provide trading data (except for delayed data for testing).** To obtain real-time trading data, **YOU** will need to subscribe to any one of dozens of well-known trading data sources and obtain an api key from them. Real time data feeds are available from Dow Jones, Polygon.io, Alpha Vantage, Quandl, Marketstack, and dozens of others. The datafeeds will give your App and smart contract access to real-time data for tens of thousands of stocks, financial products, and cryptocurrencies.
+
+1 match in 1 file
+
+
+Searching 40017 files for "Feature-Highlight-2"
+
+/Users/janliphardt/Documents/GitHub/boba/boba_documentation/developer/developer-start.md:
+   40  [Turing Getting Started - NFTs](../../packages/boba/turing/README.md#feature-highlight-1-using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
+   41  
+   42: [Turing Getting Started - External API](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
+   43  
+   44  ## Feature: Obtaining on-chain price data
+
+/Users/janliphardt/Documents/GitHub/boba/boba_documentation/developer/price-feeds.md:
+  165  *Fee*: 0.01 BOBA for one Turing request
+  166  
+  167: *Quick-Link*: ../../packages/boba/turing#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract
+  168  
+  169  ### I want my contracts to receive data
+
+2 matches across 2 files
