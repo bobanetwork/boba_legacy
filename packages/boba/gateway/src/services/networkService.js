@@ -74,8 +74,6 @@ import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
 import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
-import WAGMIv2Json from "../deployment/contracts/WAGMIv1.json"
-import WAGMIv2OLOJson from "../deployment/contracts/WAGMIv1.json"
 
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
@@ -1784,9 +1782,8 @@ class NetworkService {
     try {
 
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
-        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
         this.L2Provider
       )
 
@@ -1829,7 +1826,7 @@ class NetworkService {
       const contractLSP = new ethers.Contract(
         //need to update this address
         '0x353d9d6082aBb5dA7D721ac0f7898484bB5C98F5',
-        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
         this.L2Provider
       )
 
