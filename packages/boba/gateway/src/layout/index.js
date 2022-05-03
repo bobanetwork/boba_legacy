@@ -35,7 +35,6 @@ function App () {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const brandAuxiliary = '#1CD6D1'
   const buttonColor = '#228fe5' //blue
   const darkGrey = '#1b1c1f'
 
