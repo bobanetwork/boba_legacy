@@ -30,7 +30,7 @@ export const TokenInputContent = styled(Box)(({ theme }) => ({
 export const TokenPicker = styled(Box)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.04)',
   border: '1px solid rgba(255, 255, 255, 0.06)',
-  borderRadius: '12px',
+  borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
   display: 'flex',
   justifyContent: 'center',
@@ -51,7 +51,7 @@ export const TokenPicker = styled(Box)(({ theme }) => ({
 export const TextFieldWrapper = styled(Box)(({ theme ,error}) => ({
   background: 'rgba(255, 255, 255, 0.04)',
   border: `1px solid ${error ? 'red' : 'rgba(255, 255, 255, 0.06)'}`,
-  borderRadius: '12px',
+  borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
   width: '70%',
   display: 'flex',
@@ -92,8 +92,7 @@ export const TextFieldTag = styled(TextField)(({ ...props }) => ({
     borderRadius: 4,
     backgroundColor: props.theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255,255,255,0.05)',
   }
-}));
-
+}))
 
 export const TokenPickerAction = styled(Box)(({ theme }) => ({
   display: 'flex',

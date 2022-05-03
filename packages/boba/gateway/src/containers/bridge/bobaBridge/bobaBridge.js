@@ -25,6 +25,7 @@ import { Box, Typography, Switch, useTheme } from "@mui/material"
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import Button from 'components/button/Button.js'
+import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
 import * as G from 'containers/Global.styles'
 import * as S from './bobaBridge.styles'
@@ -208,6 +209,10 @@ function BobaBridge() {
 
       </S.BobaBridgeWrapper>
 
+      {tokens.length === 1 &&
+        <AvailableBridges token={tokens[0]}/>
+      }
+      
       <S.HistoryLink
         onClick={() => {
           dispatch(setPage('History'))

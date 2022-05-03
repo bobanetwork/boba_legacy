@@ -1,7 +1,7 @@
-import styled from '@emotion/styled';
-import { Box } from "@mui/material";
-import bobaGlassBg from 'images/boba2/boba_glass_bg.svg';
-import bobaGlassIcon from 'images/boba2/boba_glass.svg';
+import styled from '@emotion/styled'
+import { Box } from "@mui/material"
+import bobaGlassBg from 'images/boba2/boba_glass_bg.svg'
+import bobaGlassIcon from 'images/boba2/boba_glass.svg'
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
