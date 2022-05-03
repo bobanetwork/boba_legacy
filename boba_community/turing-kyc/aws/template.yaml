@@ -2,11 +2,15 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Resources:
   HelloKYC:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
       Handler: kyc.lambda_handler
       Runtime: python3.9
       Events:
+        KeepWarm:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(5 minutes)'
         HttpGet:
           Type: Api
           Properties:
