@@ -10,14 +10,15 @@ import { useSelector } from 'react-redux'
 import networkService from 'services/networkService'
 
 function AvailableBridges({ token = null, children }) {
+  
   const [ bridges, setBridges ] = useState([])
 
   const bridgeType = useSelector(selectBridgeType())
 
   useEffect(() => {
     if (token) {
-      let res = networkService.getTokenSpecificBridges(token.symbol);
-      setBridges(res);
+      let res = networkService.getTokenSpecificBridges(token.symbol)
+      setBridges(res)
     }
   }, [ token ])
 
@@ -26,11 +27,11 @@ function AvailableBridges({ token = null, children }) {
       <S.LabelContainer>
         <G.DividerLine flex={1} />
         <Typography variant="body2">
-          Aggregate available bridges
+          Ecosystem Bridges
         </Typography>
         <G.DividerLine flex={1} />
       </S.LabelContainer>
-      <img src={AvailableBridgeBg} alt="agregate bridges" width="100%" />
+      <img src={AvailableBridgeBg} alt="ecosystem bridges" width="100%" />
     </S.BridgesContainer>
   }
 
@@ -38,7 +39,7 @@ function AvailableBridges({ token = null, children }) {
    return <S.BridgesContainer my={2}>
       <S.Wrapper>
         <S.BridgeContent border={1}>
-          <Typography variant="body1"> Boba {bridgeType.toLowerCase().split('_').join(' ')} </Typography>
+          <Typography variant="body1"> Boba Classic Bridge </Typography>
           {children}
         </S.BridgeContent>
       </S.Wrapper>
@@ -48,16 +49,23 @@ function AvailableBridges({ token = null, children }) {
   return <S.BridgesContainer>
     <S.LabelContainer>
       <G.DividerLine flex={1} />
-      <Typography variant="body2">
-        {bridges.length} bridge found!
-      </Typography>
+      {bridges.length === 1 &&
+        <Typography variant="body2">
+          One bridge available
+        </Typography>
+      }
+      {bridges.length > 1 &&
+        <Typography variant="body2">
+          {bridges.length} bridges available
+        </Typography>
+      }
       <G.DividerLine flex={1} />
     </S.LabelContainer>
     <S.Wrapper>
       {bridges.map((bridge) => {
         if (bridge.type === 'BOBA') {
           return <S.BridgeContent key={bridge.type} border={1}>
-            <Typography variant="body1"> {bridge.name} {bridgeType.toLowerCase().split('_').join(' ')} </Typography>
+            <Typography variant="body1"> {bridge.name} Classic Bridge </Typography>
             {children}
           </S.BridgeContent>
         } else {
