@@ -1,21 +1,5 @@
 export const bobaBridges = [
   {
-    "name": "Boba",
-    "type": "BOBA",
-    "link": "https://gateway.boba.network/",
-    "tokens": [
-      "ETH",
-      "BOBA",
-      "OMG",
-      "BAT",
-      "DAI",
-      "SUSHI",
-      "USDC",
-      "USDT",
-      "LINK"
-    ]
-  },
-  {
     "name": "Synapse",
     "type": "SYNAPSE",
     "link": "https://synapseprotocol.com/",

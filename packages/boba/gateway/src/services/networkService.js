@@ -201,7 +201,7 @@ class NetworkService {
     })
     window.ethereum.on('chainChanged', () => {
       const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
+      // do not reload window in the special case where the user 
       // changed chains AND conncted at the same time
       // otherwise the user gets confused about why they are going through
       // two window reloads
@@ -1006,7 +1006,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners()
+      this.bindProviderListeners() 
       // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
@@ -4235,7 +4235,7 @@ class NetworkService {
       await approveStatus.wait()
       console.log("Fixed Savings Approval", approveStatus)
     }
-
+    
     if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
       allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
