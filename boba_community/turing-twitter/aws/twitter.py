@@ -4,6 +4,7 @@ import json
 import urllib3
 import certifi
 import textwrap
+from datetime import datetime
 
 authorized_contract = None  # for open access
 
@@ -93,15 +94,18 @@ def load_tweet_status(id_to_verify, twitter_post_id):
 
     # Send a POST request and receive a HTTPResponse object.
     headers = {'Authorization': 'Bearer ' + TWITTER_BEARER_TOKEN}
-    resp = http.request("GET", "https://api.twitter.com/2/tweets/"+twitter_post_id+"?expansions=author_id",
+    resp = http.request("GET", "https://api.twitter.com/2/tweets/"+twitter_post_id+"?expansions=author_id,created_at",
                         headers=headers)
     result = json.loads(resp.data)
     print("result: ", result)
 
     is_allowed_to_claim = id_to_verify.lower() in result["data"]["text"].lower() # result['..']
     author_id = result["data"]["author_id"]
+    print("includes-users: ", result["includes"]["users"])
+    usercreate_timediff_now = abs(datetime.now() - datetime.strptime(result["includes"]["users"][0]["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ")).total_seconds()
+    # todo calc time diff
 
-    print("from endpoint:", is_allowed_to_claim, "Author: ", author_id)
+    print("from endpoint:", is_allowed_to_claim, "Author: ", author_id, "User created at: ", usercreate_timediff_now, datetime.now())
 
     # create return payload
     res = '0x' + '{0:0{1}x}'.format(int(64), 64)

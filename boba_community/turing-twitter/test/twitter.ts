@@ -173,10 +173,11 @@ describe('Verify Twitter post for NFT', function () {
   })
 
   it('should conduct basic twitter claim', async () => {
-    await twitter.estimateGas.claimNFT('1521420350478823424', gasOverride)
+    const tweetId = '1520370421773725698'
+    await twitter.estimateGas.claimNFT(tweetId, gasOverride)
     console.log('Estimated gas')
     const claim = await twitter.claimNFT(
-      '1521420350478823424',
+      tweetId,
       gasOverride
     )
     const res = await claim.wait()
@@ -186,7 +187,7 @@ describe('Verify Twitter post for NFT', function () {
   it('should fail for second twitter claim', async () => {
     // try to claim again
     await expect(
-      twitter.estimateGas.claimNFT('1521420350478823424', gasOverride)
+      twitter.estimateGas.claimNFT('1520370421773725698', gasOverride)
     ).to.be.reverted
   })
 })
