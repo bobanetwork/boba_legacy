@@ -332,9 +332,7 @@ function Home() {
       {! maintenance &&
         <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
-          <Container
-            className={pageDisplay === 'Bridge' ? 'pageContainer': ''}
-            maxWidth={false} sx={{
+          <Container maxWidth={false} sx={{
             height: 'calc(100% - 150px)',
             minHeight: '500px',
             marginLeft: 'unset',

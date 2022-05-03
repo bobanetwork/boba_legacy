@@ -80,11 +80,10 @@ export const AlertInfo = styled(Box)`
   flex: 1;
 `;
 
-export const DividerLine = styled(Divider)(({ theme, ...props}) => ({
+export const DividerLine = styled(Divider)(({ theme }) => ({
   background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
   boxSizing: 'border-box',
-  width: '100%',
-  ...props
+  width: '100%'
 }))
 
 export const footerLink = styled(IconButton)(({ theme }) => ({
