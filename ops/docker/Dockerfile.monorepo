@@ -78,6 +78,7 @@ COPY *.json yarn.lock ./
 # copy over the source
 COPY ./packages ./packages
 COPY ./integration-tests ./integration-tests
+COPY ./ops_boba/api ./ops_boba/api
 # copy over solc to save time building (35+ seconds vs not doing this step)
 COPY --from=downloader solc-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
 COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13

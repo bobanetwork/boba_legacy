@@ -91,7 +91,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncMainnetSwapBOBAForETH = util.promisify(mainnetSwapBOBAForETH)
+        const asyncMainnetSwapBOBAForETH: any = util.promisify(
+          mainnetSwapBOBAForETH
+        )
 
         const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
@@ -152,7 +154,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload_1 = { owner, spender, value, deadline, signature }
-        const asyncMainnetSwapBOBAForETH = util.promisify(mainnetSwapBOBAForETH)
+        const asyncMainnetSwapBOBAForETH: any = util.promisify(
+          mainnetSwapBOBAForETH
+        )
         const response_1 = await asyncMainnetSwapBOBAForETH(
           { body: JSON.stringify(payload_1) },
           null
@@ -262,7 +266,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncMainnetSwapBOBAForETH = util.promisify(mainnetSwapBOBAForETH)
+        const asyncMainnetSwapBOBAForETH: any = util.promisify(
+          mainnetSwapBOBAForETH
+        )
 
         const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
@@ -322,7 +328,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncRinkebySwapBOBAForETH = util.promisify(rinkebySwapBOBAForETH)
+        const asyncRinkebySwapBOBAForETH: any = util.promisify(
+          rinkebySwapBOBAForETH
+        )
 
         const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
@@ -383,7 +391,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload_1 = { owner, spender, value, deadline, signature }
-        const asyncRinkebySwapBOBAForETH = util.promisify(rinkebySwapBOBAForETH)
+        const asyncRinkebySwapBOBAForETH: any = util.promisify(
+          rinkebySwapBOBAForETH
+        )
         const response_1 = await asyncRinkebySwapBOBAForETH(
           { body: JSON.stringify(payload_1) },
           null
@@ -493,7 +503,9 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncRinkebySwapBOBAForETH = util.promisify(rinkebySwapBOBAForETH)
+        const asyncRinkebySwapBOBAForETH: any = util.promisify(
+          rinkebySwapBOBAForETH
+        )
 
         const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
