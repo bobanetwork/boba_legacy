@@ -45,7 +45,7 @@ export const StyledStepLabel = styled(StepLabel)({
   '.MuiSvgIcon-root circle:not(.Mui-active circle)': {color: muiTheme.palette.secondary.contrastText},
 })
 
-export const Button = styled.button`
+export const CustomButton = styled.button`
   background-color: white;
   border: none;
   border-radius: 8px;

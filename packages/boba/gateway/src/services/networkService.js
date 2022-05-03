@@ -1741,7 +1741,6 @@ class NetworkService {
     try {
 
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
         WAGMIv1Json.abi,
         this.L2Provider
@@ -1783,12 +1782,9 @@ class NetworkService {
 
     try {
 
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
-        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
         this.L2Provider
       )
 
@@ -1811,6 +1807,50 @@ class NetworkService {
       return TX
     } catch (error) {
       console.log("NS: settle_v2 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v2OLO() {
+
+    console.log("NS: settle_v2OLO")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x353d9d6082aBb5dA7D721ac0f7898484bB5C98F5',
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv2OLO = new ethers.Contract(
+        '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv2OLO.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv2OLO:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v2OLO error:", error)
       return error
     }
 

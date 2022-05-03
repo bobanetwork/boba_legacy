@@ -202,11 +202,17 @@ export function settle_v1() {
   )
 }
 
-// export function monsterMint() {
-//   return createAction('MONSTER/CREATE', () =>
-//     networkService.monsterMint()
-//   )
-// }
+export function settle_v2() {
+  return createAction('SETTLE_v2/CREATE', () =>
+    networkService.settle_v2()
+  )
+}
+
+export function settle_v2OLO() {
+  return createAction('SETTLE_v2OLO/CREATE', () =>
+    networkService.settle_v2OLO()
+  )
+}
 
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
