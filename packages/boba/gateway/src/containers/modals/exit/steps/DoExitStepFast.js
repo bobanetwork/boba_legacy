@@ -63,8 +63,6 @@ import {
    selectBobaFeeChoice,
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
-import { updateSignatureStatus_exitLP } from 'actions/signAction'
-import AvailableBridges from 'components/availableBridges/availableBridges'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   console.log([`DO EXIT STEP FAST`, token])
@@ -271,7 +269,6 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
-      updateSignatureStatus_exitLP(false)
     }
   }, [ signatureStatus, loading, handleClose ])
 
@@ -416,15 +413,13 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
             Loading...
           </Typography>
         }
-        <AvailableBridges token={token} >
-          <BridgeFee
-            lpFee={`${feeRateN}%`}
-            estFee={estGas}
-            exitFee={`${exitFee} BOBA`}
-            estReceive={receiveL1}
-            time="15 minutes to 3 hours"
-          />
-        </AvailableBridges>
+        <BridgeFee
+           lpFee={`${feeRateN}%`}
+           estFee={estGas}
+           exitFee={`${exitFee} BOBA`}
+           estReceive={receiveL1}
+           time="15 minutes to 3 hours"
+         />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
