@@ -5,6 +5,7 @@ export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   backdropFilter: 'blur(100px)',
   borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
   flex: 1,
   minHeight: 'fit-content',
   padding: '20px',
@@ -26,16 +27,14 @@ export const BobaContentWrapper = styled(Box)(({ theme, flexDirection }) => ({
 }))
 
 export const Divider = styled(MuiDivider)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  background: theme.palette.background.secondary,
   boxSizing: 'border-box',
-  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 
 export const ChainInput = styled(Box)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0 ,0, 0.04)'}`,
-  border: '1px solid',
-  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
   boxSizing: 'border-box',
   borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
@@ -73,6 +72,7 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
   width: '100%',
   padding: '10px',
   '&:hover > span': {
@@ -111,9 +111,8 @@ export const AlertInfo = styled(Box)`
 `;
 
 export const IconSwitcher = styled(IconButton)(({ theme }) => ({
-  background: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.04)",
-  border: '1px solid',
-  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
   borderRadius: theme.palette.primary.borderRadius,
   height: '40px',
   width: '40px',

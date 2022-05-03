@@ -77,7 +77,6 @@ function BobaBridge() {
           <Typography variant="h3">Bridge</Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
-        <G.DividerLine />
         <S.BobaContent>
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
@@ -109,7 +108,6 @@ function BobaBridge() {
           <Typography variant="h3">Bridge</Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
-        <G.DividerLine />
         <S.BobaContent>
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
@@ -168,6 +166,11 @@ function BobaBridge() {
           </Box>
         </S.BobaContentWrapper>
       </S.BobaBridgeWrapper>
+
+      {tokens.length === 1 &&
+        <AvailableBridges token={tokens[0]}/>
+      }
+
       <S.BobaBridgeWrapper>
 
       {layer === 'L1' && !multibridgeMode && tokens.length < 1 &&
@@ -208,10 +211,6 @@ function BobaBridge() {
       <BridgeTransfer />
 
       </S.BobaBridgeWrapper>
-
-      {tokens.length === 1 &&
-        <AvailableBridges token={tokens[0]}/>
-      }
       
       <S.HistoryLink
         onClick={() => {

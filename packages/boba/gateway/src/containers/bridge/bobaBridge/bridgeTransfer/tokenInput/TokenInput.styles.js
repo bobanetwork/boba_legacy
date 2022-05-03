@@ -28,8 +28,8 @@ export const TokenInputContent = styled(Box)(({ theme }) => ({
 }));
 
 export const TokenPicker = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
   borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
   display: 'flex',
@@ -48,19 +48,19 @@ export const TokenPicker = styled(Box)(({ theme }) => ({
   }
 }));
 
-export const TextFieldWrapper = styled(Box)(({ theme ,error}) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: `1px solid ${error ? 'red' : 'rgba(255, 255, 255, 0.06)'}`,
-  borderRadius: theme.palette.primary.borderRadius,
-  height: '50px',
-  width: '70%',
-  display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  [ theme.breakpoints.down('sm') ] : {
-    borderRadius: '0 12px 12px 0'
-  }
-}))
+// export const TextFieldWrapper = styled(Box)(({ theme ,error}) => ({
+//   background: theme.palette.background.secondary,
+//   border: `1px solid ${error ? 'red' : 'rgba(255, 255, 255, 0.06)'}`,
+//   borderRadius: theme.palette.primary.borderRadius,
+//   height: '50px',
+//   width: '70%',
+//   display: 'flex',
+//   justifyContent: 'flex-start',
+//   alignItems: 'center',
+//   [ theme.breakpoints.down('sm') ] : {
+//     borderRadius: '0 12px 12px 0'
+//   }
+// }))
 
 export const TextFieldTag = styled(TextField)(({ ...props }) => ({
   border: 'none',

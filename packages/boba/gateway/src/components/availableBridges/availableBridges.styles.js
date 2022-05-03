@@ -2,8 +2,9 @@ import { Box, styled, Button, Divider as MuiDivider, IconButton, Typography } fr
 
 export const BridgesContainer = styled(Box)(({ theme }) => ({
   background: theme.palette.background.secondary,
-  backdropFilter: 'blur(100px)',
   borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
+  backdropFilter: 'blur(100px)',
   flex: 1,
   minHeight: 'fit-content',
   padding: '20px',
@@ -29,7 +30,7 @@ export const LabelContainer = styled(Box)(({ theme }) => ({
 
 export const BridgeContent = styled(Box)(({ theme, border }) => ({
   borderRadius: theme.palette.primary.borderRadius,
-  background: border ? 'linear-gradient(87.16deg, rgba(203, 254, 0, 0.1) 15.05%, rgba(28, 214, 209, 0.1) 79.66%)' :  theme.palette.background.secondaryLight,
+  background: theme.palette.background.secondaryLight,
   padding: '5px 10px',
-  border: border ? '1px solid transparent': 'none'
+  border: theme.palette.primary.border,
 }))
