@@ -81,7 +81,7 @@ describe('Verify Twitter post for NFT', function () {
       'ClaimNFT',
       'TBOB',
       3,
-      'https://jhc0pskmc0.execute-api.us-east-1.amazonaws.com/Prod/',
+      'https://ch8woe6r29.execute-api.us-east-1.amazonaws.com/Prod/',
       turingHelper.address,
       10,
       gasOverride
@@ -166,11 +166,17 @@ describe('Verify Twitter post for NFT', function () {
   // TODO: To test
   // * Max supply of NFT
 
+  it('should fail for invalid tweet', async () => {
+    await expect(
+      twitter.estimateGas.claimNFT('8392382399393', gasOverride)
+    ).to.be.reverted
+  })
+
   it('should conduct basic twitter claim', async () => {
-    await twitter.estimateGas.claimNFT('4567389393939339', gasOverride)
+    await twitter.estimateGas.claimNFT('1521420350478823424', gasOverride)
     console.log('Estimated gas')
     const claim = await twitter.claimNFT(
-      '4567389393939339',
+      '1521420350478823424',
       gasOverride
     )
     const res = await claim.wait()
@@ -180,7 +186,7 @@ describe('Verify Twitter post for NFT', function () {
   it('should fail for second twitter claim', async () => {
     // try to claim again
     await expect(
-      twitter.estimateGas.claimNFT('4567389393939339', gasOverride)
+      twitter.estimateGas.claimNFT('1521420350478823424', gasOverride)
     ).to.be.reverted
   })
 })
