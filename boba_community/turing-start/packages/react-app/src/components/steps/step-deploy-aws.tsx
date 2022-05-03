@@ -44,7 +44,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Resources:
   HelloOracle:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
       Handler: turing_oracle.lambda_handler # needs to match file and function name
       Runtime: python3.9
@@ -53,7 +53,11 @@ Resources:
           Type: Api
           Properties:
             Path: '/' # overall URL must not be longer than 64 bytes, '/' recommended
-            Method: get`)}
+            Method: get
+        KeepWarm: # Optional
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(5 minutes)'`)}
       </Grid>
     </Grid>
   </div>;

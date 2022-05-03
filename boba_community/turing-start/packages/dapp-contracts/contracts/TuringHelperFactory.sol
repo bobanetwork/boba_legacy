@@ -51,8 +51,7 @@ contract TuringHelperFactory is Ownable {
     function deployMinimalETH(address[] memory permittedCallers, uint256 minAmountOutBoba) payable external returns (TuringHelper) {
         uint256[] memory amounts = router.swapExactETHForTokens{value: msg.value}(
             minAmountOutBoba, pair, address(this), block.timestamp + 100);
-        return TuringHelper(address(0));
-        //TODO: return deployMinimal(permittedCallers, amounts[1]);
+        return deployMinimal(permittedCallers, amounts[1]);
     }
 
     // https://github.com/OolongSwap/oolongswap-deployments
