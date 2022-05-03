@@ -1,18 +1,12 @@
+---
+description: Learn how to help detect operator fraud
+---
+
 # Checking Boba Mainnet for Fraud
 
-- [Fraud Detector](#fraud-detector)
-  * [0. Concepts](#0-concepts)
-  * [1. Errors and State Root Mismatches in Boba](#1-known-errors-and-state-root-mismatches-in-boba)
-  * [2. What do when you discover a state root mismatch](#2-what-do-when-you-discover-a-state-root-mismatch)
-  * [3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)](#3-running-the-fraud-detector--the-verifier--and-the-data-transport-layer--dtl-)
+## Basics
 
-# Fraud Detector
-
-Docker scripts and python source code for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service.
-
-## 0. Concepts
-
-This repo allows you to:
+The `boba_community/fraud-detector` repo contains Docker scripts and python source code for running a *Verifier*, a *DTL* (data transport layer), and a *fraud-detector* service. The allows you to:
 
 1. Run your own Boba geth L2 on your computer. In this case, the geth L2 will run in its `Verifier` mode. In `Verifier` mode, the geth will sync from L1 and use the transaction data from the L1 contracts to compute what the state roots should be, *if the operator is honest*.
 
@@ -20,17 +14,17 @@ This repo allows you to:
 
 The central idea is that if two (or more) geths injects the same transactions, then they should write the same blocks with the same state roots. If they don't, then there is a problem somewhere. Fundamentally, the security of rollups has little to do with math or cryptography - rather, security arises from the operator publicly depositing transactions and their corresponding state roots, and then, **having many independent nodes check those data for possible discrepancies**.
 
-## 1. Known Errors and State Root Mismatches in Boba
+## Known Errors and State Root Mismatches in Boba
 
 * For the first 10 blocks, the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by setting the L1_MAINNET_DEPLOYMENT_BLOCK to 10 blocks past the zero block.
 
 * There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased.
 
-## 2. What do when you discover a state root mismatch
+## What do when you discover a state root mismatch
 
 Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/bobanetwork/boba/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
 
-## 3. Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
+## Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
 
 **Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*.
 

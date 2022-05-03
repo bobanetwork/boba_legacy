@@ -1740,7 +1740,6 @@ class NetworkService {
     try {
 
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
         WAGMIv1Json.abi,
         this.L2Provider
@@ -1782,12 +1781,9 @@ class NetworkService {
 
     try {
 
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
-        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
         this.L2Provider
       )
 
@@ -1810,6 +1806,50 @@ class NetworkService {
       return TX
     } catch (error) {
       console.log("NS: settle_v2 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v2OLO() {
+
+    console.log("NS: settle_v2OLO")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x353d9d6082aBb5dA7D721ac0f7898484bB5C98F5',
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv2OLO = new ethers.Contract(
+        '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv2OLO.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv2OLO:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v2OLO error:", error)
       return error
     }
 
@@ -4015,6 +4055,8 @@ class NetworkService {
         this.provider.getSigner()
       )
 
+      console.log("FixedSavings.address:",FixedSavings.address)
+
       let allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
         .allowance(
@@ -4026,14 +4068,16 @@ class NetworkService {
       let depositAmount_BN = BigNumber.from(value_Wei_String)
       console.log("Deposit:", depositAmount_BN)
 
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
       try {
-        if (depositAmount_BN.gt(allowance_BN)) {
-          console.log("Need to approve YES:", depositAmount_BN)
+        if (approveAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", approveAmount_BN)
           const approveStatus = await this.BobaContract
             .connect(this.provider.getSigner())
             .approve(
               allAddresses.BobaFixedSavings,
-              value_Wei_String
+              approveAmount_BN
             )
           const TX = await approveStatus.wait()
           console.log("approveStatus:", TX)
@@ -4045,23 +4089,6 @@ class NetworkService {
         console.log("NS: addFS_Savings approve error:", error)
         return error
       }
-
-      allowance_BN = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .allowance(
-          this.account,
-          allAddresses.BobaFixedSavings
-        )
-      console.log("Updated Allowance:", allowance_BN.toString())
-
-      if (depositAmount_BN.gt(allowance_BN)) {
-        console.log("Allowance still too small:", allowance_BN.toString(), depositAmount_BN.toString())
-      } else {
-        console.log("Allowance is now sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
-      }
-
-      console.log("allAddresses.BobaFixedSavings", allAddresses.BobaFixedSavings)
-      console.log("FixedSavings.address", FixedSavings.address)
 
       const TX = await FixedSavings.stake(value_Wei_String)
       await TX.wait()

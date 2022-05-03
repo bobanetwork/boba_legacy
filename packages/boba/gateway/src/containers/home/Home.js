@@ -20,7 +20,7 @@ import { selectModalState } from 'selectors/uiSelector'
 import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
-import { Grid, Link, Typography } from '@mui/material'
+import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 import * as S from './Home.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
 
@@ -109,12 +109,16 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 require('dotenv').config()
 
 function Home() {
 
   const dispatch = useDispatch()
+  const theme = useTheme()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
@@ -271,6 +275,8 @@ function Home() {
       >
         {alertMessage}
       </Alert>
+
+      { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
         <Box sx={{

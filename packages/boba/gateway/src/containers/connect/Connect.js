@@ -5,14 +5,13 @@ import { useDispatch } from "react-redux"
 import AlertIcon from 'components/icons/AlertIcon'
 import Button from 'components/button/Button.js'
 
-import { 
-  setConnectETH,
+import {
   setConnectBOBA,
   setConnect
 } from 'actions/setupAction'
 
 const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = '' }) => {
-  
+
   const dispatch = useDispatch()
 
   if(!accountEnabled && !connectToBoba) {
@@ -34,7 +33,7 @@ const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = ''
           onClick={()=>dispatch(setConnect(true))}
         >
           Connect
-        </Button> 
+        </Button>
       </G.LayerAlert>
     )
   }
@@ -57,15 +56,13 @@ const Connect = ({ userPrompt, accountEnabled, connectToBoba = false, layer = ''
           onClick={()=>dispatch(setConnectBOBA(true))}
         >
           Connect to Boba
-        </Button> 
+        </Button>
       </G.LayerAlert>
     )
   }
 
   return null
-  
+
 }
 
 export default Connect
-
-

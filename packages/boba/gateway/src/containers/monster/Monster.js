@@ -4,6 +4,7 @@ import { isEqual } from 'lodash'
 
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Monster.styles'
+import * as G from 'containers/Global.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 
@@ -112,10 +113,10 @@ class Monster extends React.Component {
     let monsterType = 'Monster'
 
     // since it uses FIND, this code will only find one of your monsters
-    // FIX ME to show the 'top' monster for this wallet if you have several 
-    // in which case you are lucky. 
+    // FIX ME to show the 'top' monster for this wallet if you have several
+    // in which case you are lucky.
     if(monsterInfo.length > 0) {
-      
+
       tokenIDverified = monsterInfo.find(e => e.tokenID)
 
       if(typeof(tokenIDverified) !== 'undefined') {
@@ -128,7 +129,7 @@ class Monster extends React.Component {
 
       if(type === 'crowned') {
         monsterType = 'Crowned Monster'
-      } 
+      }
       else if (type === 'wizard') {
         monsterType = 'Wizard Monster'
       }
@@ -143,7 +144,7 @@ class Monster extends React.Component {
 
         <PageTitle title={'MonsterVerse'} />
 
-        <Connect 
+        <Connect
           userPrompt={'Please connect to Boba'}
           accountEnabled={accountEnabled}
           connectToBoba={true}
@@ -162,13 +163,13 @@ class Monster extends React.Component {
                     MonsterVerse
                   </Typography>
                 </Box>
-                <S.DividerLine />
+                <G.DividerLine />
                 <Typography variant="body1" >
                   <br/>Welcome, esteemed {monsterType} {tokenIDverified}
                 </Typography>
-                {tokenIDverified === null && 
+                {tokenIDverified === null &&
                   <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>Wallet>NFT>Add NFT</strong>). 
+                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>{'Wallet > NFT > Add NFT'}</strong>).
                     Please add them to join the MonsterVerse.
                   </Typography>
                 }
@@ -207,9 +208,9 @@ class Monster extends React.Component {
                 </Typography>
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong. 
-                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will 
-                  go live later in April. 
+                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong.
+                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will
+                  go live later in April.
                 </Typography>
 
                 <Typography variant="body2" sx={{ opacity: 0.95 }}>
@@ -218,6 +219,10 @@ class Monster extends React.Component {
 
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   Here is where we will showcase new features and projects, for you to see first.
+                  Check out the top right of the screen to test the new dual fee system. You can toggle
+                  back and forth between ETH and BOBA. This is a beta feature which is currently being tested,
+                  so it might not work smoothly in all circumstances. Any feedback welcome - looking forward to
+                  MUIs!!! Haha.
                 </Typography>
 
               </Box>

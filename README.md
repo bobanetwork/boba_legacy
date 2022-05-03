@@ -1,37 +1,14 @@
-<div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
-  <br />
-  <h1> The Boba Monorepo</h1>
-</div>
+---
+description: Introduction to Boba Network
+---
 
-<p align="center">
-  <a href="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/bobanetwork/boba/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/bobanetwork/boba/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/bobanetwork/boba/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
-</p>
-
-- [TL;DR](#tl-dr)
-- [Documentation](#documentation)
-- [Community and DAO](#community-and-dao)
-- [Directory Structure](#directory-structure)
-- [Contributing](#contributing)
-  * [Dependencies](#dependencies)
-- [Spinning up the stack](#spinning-up-the-stack)
-  * [Helpful commands](#helpful-commands)
-  * [Running unit tests](#running-unit-tests)
-  * [Running integration tests](#running-integration-tests)
-  * [Viewing docker container logs](#viewing-docker-container-logs)
-- [License](#license)
-
-## TL;DR
+# Welcome to Boba
 
 This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
-<a href="https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing">
-  <img alt="Boba" src="https://github.com/bobanetwork/boba/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
-</a>
+![turing](./packages/boba/gateway/src/images/boba2/turing.png)
 
- Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
+Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from it focus on augmenting compute, Boba differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -44,7 +21,13 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
 
 ## Documentation
 
-User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories.
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [`./boba_documentation`](https://github.com/bobanetwork/boba/blob/develop/boba_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://discord.com/invite/YFweUKCb8a) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
+
+### Direct Support
+
+[Telegram for Developers](https://t.me/bobadev)\
+[Project Telegram](https://t.me/bobanetwork )\
+[Discord](https://discord.com/invite/YFweUKCb8a)
 
 ## Directory Structure
 
@@ -93,7 +76,7 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**.
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying your contracts, it's simpler to use https://rinkeby.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 

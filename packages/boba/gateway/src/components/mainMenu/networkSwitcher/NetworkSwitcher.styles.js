@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
-export const WalletPickerContainer = styled.div`
+export const NetworkSwitcherContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -18,7 +18,7 @@ export const Label = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.disabled,
 }));
 
-export const WallerPickerWrapper = styled.div`
+export const NetworkSwitcherWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;

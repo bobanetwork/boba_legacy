@@ -14,7 +14,8 @@ export const Nav = styled('nav')(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
     width: '100%',
     gap: '20px',
-    marginTop: '130px',
+    height: '250px',
+    marginTop: '20px',
     flexWrap: 'nowrap',
     alignItems: 'flex-start',
     backgroundColor: theme.palette.background.default,

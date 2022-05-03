@@ -23,8 +23,4 @@ export const TokenPicker = styled(Box)(({ theme }) => ({
   'img': {
     marginRight: '5px'
   },
-  [ theme.breakpoints.down('sm') ] : {
-    borderRadius: '12px 0 0 12px',
-    width: '40%',
-  }
 }));

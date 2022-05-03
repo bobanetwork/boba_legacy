@@ -13,7 +13,7 @@ import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
 
 /* Imports: ABI */
-import Proxy__Boba_GasPriceOracleJson from '../artifacts/contracts/Proxy__Boba_GasPriceOracle.sol/Proxy__Boba_GasPriceOracle.json'
+import Boba_GasPriceOracleProxyCallJson from '../artifacts/contracts/Boba_GasPriceOracleProxyCall.sol/Boba_GasPriceOracleProxyCall.json'
 
 const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
   const gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
@@ -31,9 +31,10 @@ describe('Boba Fee Payment Integration Tests', async () => {
   let L1Boba: Contract
   let L2Boba: Contract
   let Boba_GasPriceOracle: Contract
-
-  let Factory__Proxy__Boba_GasPriceOracle: ContractFactory
   let Proxy__Boba_GasPriceOracle: Contract
+
+  let Factory__Boba_GasPriceOracleProxyCall: ContractFactory
+  let Boba_GasPriceOracleProxyCall: Contract
 
   const other = '0x1234123412341234123412341234123412341234'
 
@@ -47,20 +48,35 @@ describe('Boba Fee Payment Integration Tests', async () => {
       .attach(predeploys.L2GovernanceERC20)
       .connect(env.l2Wallet)
     Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
-      .attach(predeploys.Boba_GasPriceOracle)
+      .attach(predeploys.Proxy__Boba_GasPriceOracle)
       .connect(env.l2Wallet)
 
-    Factory__Proxy__Boba_GasPriceOracle = new ethers.ContractFactory(
-      Proxy__Boba_GasPriceOracleJson.abi,
-      Proxy__Boba_GasPriceOracleJson.bytecode,
+    Proxy__Boba_GasPriceOracle = getContractFactory(
+      'Lib_ResolvedDelegateBobaProxy'
+    )
+      .attach(predeploys.Proxy__Boba_GasPriceOracle)
+      .connect(env.l2Wallet)
+
+    Factory__Boba_GasPriceOracleProxyCall = new ethers.ContractFactory(
+      Boba_GasPriceOracleProxyCallJson.abi,
+      Boba_GasPriceOracleProxyCallJson.bytecode,
       env.l2Wallet
     )
 
-    Proxy__Boba_GasPriceOracle =
-      await Factory__Proxy__Boba_GasPriceOracle.deploy(
+    Boba_GasPriceOracleProxyCall =
+      await Factory__Boba_GasPriceOracleProxyCall.deploy(
         Boba_GasPriceOracle.address
       )
-    await Proxy__Boba_GasPriceOracle.deployTransaction.wait()
+    await Boba_GasPriceOracleProxyCall.deployTransaction.wait()
+  })
+
+  it('{tag:boba} should have correct proxy target and proxy owner', async () => {
+    expect(
+      await Proxy__Boba_GasPriceOracle.addressManager('proxyOwner')
+    ).to.be.eq(env.l1Wallet.address)
+    expect(
+      await Proxy__Boba_GasPriceOracle.addressManager('proxyTarget')
+    ).to.be.eq(predeploys.Boba_GasPriceOracle)
   })
 
   it('{tag:boba} should register to use boba as the fee token', async () => {
@@ -74,8 +90,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   it('{tag:boba} should not register the fee tokens for non EOA accounts', async () => {
-    await expect(Proxy__Boba_GasPriceOracle.useBobaAsFeeToken()).to.be.reverted
-    await expect(Proxy__Boba_GasPriceOracle.useETHAsFeeToken()).to.be.reverted
+    await expect(Boba_GasPriceOracleProxyCall.useBobaAsFeeToken()).to.be
+      .reverted
+    await expect(Boba_GasPriceOracleProxyCall.useETHAsFeeToken()).to.be.reverted
   })
 
   it('{tag:boba} Paying a nonzero but acceptable boba gasPrice fee for transferring ETH', async () => {
@@ -636,7 +653,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       Boba_GasPriceOracle.address
     )
 
-    const TestContract = await Factory__Proxy__Boba_GasPriceOracle.deploy(
+    const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
       Boba_GasPriceOracle.address
     )
     const receipt = await TestContract.deployTransaction.wait()
@@ -667,7 +684,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   it('{tag:boba} should pay BOBA to deploy contracts for different gas limit', async () => {
     await setPrices(env, 1000)
 
-    const data = Factory__Proxy__Boba_GasPriceOracle.getDeployTransaction(
+    const data = Factory__Boba_GasPriceOracleProxyCall.getDeployTransaction(
       Boba_GasPriceOracle.address
     )
     const estimatedGas = await env.l2Wallet.estimateGas(data)
@@ -683,7 +700,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      const TestContract = await Factory__Proxy__Boba_GasPriceOracle.deploy(
+      const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
         Boba_GasPriceOracle.address
       )
       const receipt = await TestContract.deployTransaction.wait()

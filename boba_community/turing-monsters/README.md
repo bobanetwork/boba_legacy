@@ -1,25 +1,6 @@
-# Turing Monster Minting
-
-- [Turing Monster Minting](#turing-monster-minting)
-  * [Basics](#basics)
-  * [Mint your Monster!](#mint-your-monster)
-  * [Getting Rinkeby ETH and Rinkeby BOBA](#getting-rinkeby-eth-and-rinkeby-boba)
-  * [Testing the Turing Monster NFT](#testing-the-turing-monster-nft)
-  * [Deploy the Turing Monster NFT without running the tests](#deploy-the-turing-monster-nft-without-running-the-tests)
-  * [Solidity Code Walkthrough](#solidity-code-walkthrough)
-
-## Basics
-
-This readme assumes you have certain widely used packages installed on your computer. For example, for Ubuntu Desktop 20.04 the steps would be the following. Open a terminal, and then:
-
-```bash
-$ sudo apt update
-$ sudo apt full-upgrade
-$ sudo apt install git
-$ sudo apt install curl
-$ sudo apt install nodejs
-$ npm install --global yarn
-```
+---
+description: Turing Example - Minting NFTs with Random Attributes
+---
 
 ## Mint your Monster!
 
@@ -32,7 +13,7 @@ $ yarn
 $ yarn build
 ```
 
-As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
+As for every chain, you need an account with some ETH (to deploy contracts) and since you will be using Turing, you also need some BOBA in that same account. In the deploy script (`./boba_community/turing-monsters/test/NFTMonsterV2.ts`), specify your private key or set the environment variable `PRIVATE_KEY=0x..` when running the script.
 
 ```javascript
 
@@ -57,11 +38,11 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For some Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network). The BOBA faucet will also give you some ETH if needed but also requires a minimal fee for the Turing call as well.
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network).
 
 ## Testing the Turing Monster NFT
 
-To run the tests you will also need some Rinkeby ETH (not the Boba rinkeby, but the regular ETH Rinkeby) as the tests also test the NFT bridging functionality.
+To run the tests you will also need some Rinkeby ETH on Rinkeby (L1) as the tests also test the NFT bridging functionality.
 
 ```bash
 $ cd boba_community/turing-monsters
@@ -70,7 +51,6 @@ $ PRIVATE_KEY=0x... yarn test:rinkeby # for testing on rinkeby, for example
 
 # other choices are local and mainnet
 ```
-
 
 Ok, all done. Enjoy. The terminal will give you all the information you need to mint and send a Turing monster to your friends:
 
@@ -100,8 +80,7 @@ $ yarn build
 $ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
 ```
 
-Add the ERC721 as permitted caller to the deployed TuringHelper.
-Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
+Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
 
 ## Solidity Code Walkthrough
 
