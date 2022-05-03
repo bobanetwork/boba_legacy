@@ -82,9 +82,6 @@ in
       };
     in {
       buildInputs = old: old ++ [
-        pkgs.python3
-        pkgs.jq
-        pkgs.nodejs
 
       ];
       installPhase = ''
@@ -111,6 +108,11 @@ in
           '"extends": "./tsconfig.build-copy.json"'
         cp ${./../../..}/tsconfig.build.json \
           ./tsconfig.build-copy.json
+      '';
+    };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@boba/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
       '';
     };
     add-hardhat-cache = let
@@ -216,7 +218,7 @@ in
     inherit correct-tsconfig-path add-solc;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
       '';
     };
     add-inputs = {
