@@ -1,0 +1,39 @@
+#adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
+version: 2.1
+
+jobs:
+  integration-tests:
+    machine:
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
+    environment:
+      DOCKER_BUILDKIT: 1
+    parallelism: 4
+    steps:
+      - checkout
+      - run:
+          name: Bring up the stack
+          command: |
+            ./scripts/build-ci.sh
+            BUILD=2 DAEMON=1 ./up_local.sh
+          working_directory: ops
+      - run:
+          name: Start background logging
+          working_directory: ops
+          background: true
+          command: docker-compose -f docker-compose.yml logs --follow
+      - run:
+          name: Wait for sequencer
+          command: bash scripts/wait-for-sequencer.sh
+          working_directory: ops
+      - run:
+          name: Run integration tests
+          command: |
+            circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split | tee splits.txt
+            docker-compose run integration_tests $(cat splits.txt)
+          working_directory: ops
+
+workflows:
+  main:
+    jobs:
+      - integration-tests
