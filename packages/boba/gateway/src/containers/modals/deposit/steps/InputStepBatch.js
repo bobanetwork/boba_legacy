@@ -50,7 +50,6 @@ import {
   selectL1FeeBalance,
   selectUserAndL2LPBalanceBatch,
 } from 'selectors/balanceSelector'
-import { updateSignatureStatus_depositLP } from 'actions/signAction'
 
 function InputStepBatch({ isBridge, handleClose }) {
 
@@ -131,7 +130,6 @@ function InputStepBatch({ isBridge, handleClose }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
-      updateSignatureStatus_depositLP(false)
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
@@ -354,7 +352,7 @@ function InputStepBatch({ isBridge, handleClose }) {
         <Typography variant="body2" sx={{mb: 3}}>
         Click the + symbol to add additional tokens to bridge.
         <br/>
-        Est. time: less than 10 minutes to 3 hours.
+        Est. time: less than 10 minutes to 3 hours.  
         </Typography>
 
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -376,7 +374,7 @@ function InputStepBatch({ isBridge, handleClose }) {
                   </Typography>
                 )
               }
-              return <React.Fragment key={index}></React.Fragment>
+              return <></>
             })}
           </div>
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
@@ -393,7 +391,7 @@ function InputStepBatch({ isBridge, handleClose }) {
                   </Typography>
                 )
               }
-              return <React.Fragment key={index}></React.Fragment>
+              return <></>
             })}
           </div>
         </div>

@@ -413,13 +413,14 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
             Loading...
           </Typography>
         }
+
         <BridgeFee
-           lpFee={`${feeRateN}%`}
-           estFee={estGas}
-           exitFee={`${exitFee} BOBA`}
-           estReceive={receiveL1}
-           time="15 minutes to 3 hours"
-         />
+          lpFee={`${feeRateN}%`}
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="15 minutes to 3 hours"
+        />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>

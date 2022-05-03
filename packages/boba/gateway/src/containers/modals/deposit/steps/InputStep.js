@@ -18,8 +18,6 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
-import { updateSignatureStatus_depositTRAD } from 'actions/signAction'
-
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -82,10 +80,10 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
-      updateSignatureStatus_depositTRAD(false)
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
+  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading ) buttonLabel_1 = 'Close'
