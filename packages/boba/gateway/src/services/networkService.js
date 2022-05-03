@@ -727,8 +727,11 @@ class NetworkService {
                                'LINK',   'UNI', 'BOBA', 'xBOBA',
                                'OMG',   'FRAX',  'FXS',  'DODO',
                                'UST',   'BUSD',  'BNB',   'FTM',
-                               'MATIC',  'UMA',  'DOM', 'WAGMIv0',
-                               'OLO', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
+                               'MATIC',  'UMA',  'DOM',   'OLO',
+                               'WAGMIv0',
+                               'WAGMIv1', 
+                               'WAGMIv2', 'WAGMIv2-Oolong',
+                               'WAGMIv3', 'WAGMIv3-Oolong'
                               ]
 
       //not all tokens are on Rinkeby
@@ -777,6 +780,18 @@ class NetworkService {
           allTokens[key] = {
             'L1': 'WAGMIv2-Oolong',
             'L2': '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D'
+          }
+        }
+        else if(key === 'WAGMIv3') {
+          allTokens[key] = {
+            'L1': 'WAGMIv3',
+            'L2': '0xC6158B1989f89977bcc3150fC1F2eB2260F6cabE'
+          }
+        }
+        else if(key === 'WAGMIv3-Oolong') {
+          allTokens[key] = {
+            'L1': 'WAGMIv3-Oolong',
+            'L2': '0x70bf3c5B5d80C4Fece8Bde0fCe7ef38B688463d4'
           }
         }
         else if(key === 'OLO') {
@@ -1524,11 +1539,19 @@ class NetworkService {
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'WAGMIv2') {
-          //there is no L2 WAGMIv1
+          //there is no L2 WAGMIv2
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'WAGMIv2-Oolong') {
           //there is no L2 WAGMIv2OLO
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv3') {
+          //there is no L2 WAGMIv3
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv3-Oolong') {
+          //there is no L2 WAGMIv3OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'OLO') {
@@ -1552,7 +1575,9 @@ class NetworkService {
             token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
-            token.symbol !== 'WAGMIv2-Oolong'
+            token.symbol !== 'WAGMIv2-Oolong' &&
+            token.symbol !== 'WAGMIv3' &&
+            token.symbol !== 'WAGMIv3-Oolong'
           ) {
           layer1Balances.push(token)
         } else if (token.layer === 'L2') {
@@ -2593,11 +2618,13 @@ class NetworkService {
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
+        cur !== 'OLO' &&
         cur !== 'WAGMIv0' &&
         cur !== 'WAGMIv1' &&
-        cur !== 'OLO' &&
         cur !== 'WAGMIv2' &&
-        cur !== 'WAGMIv2-Oolong') {
+        cur !== 'WAGMIv2-Oolong' &&
+        cur !== 'WAGMIv3' &&
+        cur !== 'WAGMIv3-Oolong') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -2680,11 +2707,14 @@ class NetworkService {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
-        cur !== 'WAGMIv0' &&
-        cur !== 'WAGMIv1' &&
-        cur !== 'OLO' &&
-        cur !== 'WAGMIv2' &&
-        cur !== 'WAGMIv2-Oolong') {
+         cur !== 'OLO' &&
+         cur !== 'WAGMIv0' &&
+         cur !== 'WAGMIv1' &&
+         cur !== 'WAGMIv2' &&
+         cur !== 'WAGMIv2-Oolong' &&
+         cur !== 'WAGMIv3' &&
+         cur !== 'WAGMIv3-Oolong'
+        ) {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
