@@ -56,8 +56,6 @@ import {
   selectL2BalanceBOBA,
   selectExitFee,
 } from 'selectors/balanceSelector'
-import { updateSignatureStatus_exitTRAD } from 'actions/signAction'
-import AvailableBridges from 'components/availableBridges/availableBridges'
 
 function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -208,7 +206,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
       //we are all set - can close the window
       //transaction has been sent and signed
       handleClose()
-      updateSignatureStatus_exitTRAD(false);
     }
   }, [ signatureStatus, loading, handleClose ])
 
@@ -358,15 +355,14 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
           </Typography>
         }
 
-        <AvailableBridges token={token} >
-          <BridgeFee
-            estFee={estGas}
-            exitFee={`${exitFee} BOBA`}
-            estReceive={receiveL1}
-            time="In 7 days"
-            timeInfo="Your funds will be available in 7 days."
-          />
-        </AvailableBridges>
+        <BridgeFee
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="In 7 days"
+          timeInfo="Your funds will be available in 7 days."
+        />
+
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
             {errorString}
