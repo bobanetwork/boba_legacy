@@ -3,36 +3,42 @@
   dtl-image = pkgs.dockerTools.buildLayeredImage {
     maxLayers = 125;
     name = "dtl";
+    tag = "boba";
     config = {
       Cmd = [  ];
       EntryPoint = [ "${pkgs.nodejs}/bin/node" "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js" ];
     };
   };
-  deployer-image = pkgs.dockerTools.buildLayeredImage {
-    maxLayers = 125;
-    name = "deployer";
-    contents = let
+  deployer-image =
+    let
       script = pkgs.stdenv.mkDerivation {
         name = "startup";
         phases = [ "installPhase" ];
         installPhase = ''
-          mkdir -p $out/bin
-          cp ${./..}/ops/scripts/deployer.sh $out/bin/
-          chmod +x $out/bin
-        '';
+        mkdir -p $out/bin
+        chmod +x $out/bin
+        cp ${./..}/ops/scripts/deployer.sh $out/bin/
+      '';
       };
-    in
-      [
+    in pkgs.dockerTools.buildLayeredImage {
+      maxLayers = 125;
+      name = "deployer";
+      tag = "boba";
+      contents = with pkgs; [
+        # From nixpkgs
+        curl
+        yarn
+
         bobapkgs."@boba/turing-hybrid-compute"
         bobapkgs."@eth-optimism/contracts"
         script
       ];
-    config = {
-      Entrypoint = [ "yarn run deploy" ];
-      Cmd = [ "${./..}/ops/scripts/deployer.sh" ];
+      config = {
+        Entrypoint = [ "yarn run deploy" ];
+      };
     };
-  };
   # Adapted from ops/docker/Dockerfile.geth
+  #boba-deployer-image = {};
   l2geth-image =
     let
       l2geth = pkgs.stdenv.mkDerivation {
@@ -49,6 +55,7 @@
       };
     in pkgs.dockerTools.buildLayeredImage {
       name = "l2geth";
+      tag = "boba";
       contents = with pkgs; [
         # From nixpkgs
         cacert
@@ -75,6 +82,7 @@
     };
   hardhat-image = pkgs.dockerTools.buildLayeredImage {
     name = "l1_chain";
+    tag = "boba";
     contents = [
     ];
     config = {

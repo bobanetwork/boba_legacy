@@ -104,15 +104,72 @@ services:
   #     - ../go/proxyd:/etc/proxyd/
   # this is a helper service used because there's no official hardhat image
   l1_chain:
-    image: l1_chain:zdwmrd2pjml0k3dphqmazl6fd2lpx7qs
+    image: l1_chain:boba
     ports:
       # expose the service to the host for integration testing
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
 
+  deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: deployer:boba
+    entrypoint: ./deployer.sh
+    environment:
+      FRAUD_PROOF_WINDOW_SECONDS: 0
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      # these keys are hardhat's first 2 accounts, DO NOT use in production
+      << : *deployer_pk
+      << : *relayer_pk
+      SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+      PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
+      # setting the whitelist owner to address(0) disables the whitelist
+      WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
+      L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
+      L2_CHAIN_ID: 31338
+      L2_BLOCK_GAS_LIMIT: 11000000
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      GAS_PRICE_ORACLE_OWNER: "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+      GAS_PRICE_ORACLE_OVERHEAD: "2750"
+      GAS_PRICE_ORACLE_SCALAR: "1500000"
+      GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
+      GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
+      GAS_PRICE_ORACLE_DECIMALS: "6"
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+      DTL_REGISTRY_URL: http://dtl:8081/addresses.json
+      DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+    ports:
+        # expose the service to the host for getting the contract addrs
+      - ${DEPLOYER_PORT:-8077}:8082
+
+      # deploys boba contracts and serves contract addresses
+  boba_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_deployer:latest
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      URL: http://dtl:8081/addresses.json
+      # DO NOT use in production
+      << : *deployer_pk
+      << : *relayer_pk
+      << : *fast-relayer_pk
+      RETRIES: 200
+      DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+
   dtl:
     depends_on:
       - l1_chain
-    image: dtl:rq1i82z5q1x6ayx2qpf99lbbvz3fcnz0
+    image: dtl:boba
     # override with the dtl script and the env vars required for it
     env_file:
       -  ./envs/dtl.env
@@ -139,7 +196,7 @@ services:
     depends_on:
       - l1_chain
       - dtl
-    image: l2geth:jpjv6r016a3p8n732cisll01p74fc741
+    image: l2geth:boba
     # override with the geth script and the env vars required for it
     #entrypoint: l2geth-start
     env_file:
@@ -163,3 +220,31 @@ services:
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
+  # verifier:
+  #   depends_on:
+  #     - dtl
+  #   image: l2geth:boba
+  #   deploy:
+  #     replicas: 1
+  #   entrypoint: sh ./geth.sh
+  #   env_file:
+  #     - ./envs/geth.env
+  #   environment:
+  #       ETH1_HTTP: http://l1_chain:8545
+  #       ROLLUP_TIMESTAMP_REFRESH: 5s
+  #       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+  #       ROLLUP_CLIENT_HTTP: http://dtl:7878
+  #       ROLLUP_BACKEND: 'l1'
+  #       ROLLUP_VERIFIER_ENABLE: 'true'
+  #       RETRIES: 60
+  #       # no need to keep this secret, only used internally to sign blocks
+  #       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+  #       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+  #       ROLLUP_POLL_INTERVAL_FLAG: "10s"
+  #       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+  #       EMERGENCY_FORK_NUMBER: 0
+  #       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+  #       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+  #   ports:
+  #     - ${VERIFIER_HTTP_PORT:-8547}:8545
+  #     - ${VERIFIER_WS_PORT:-8548}:8546
