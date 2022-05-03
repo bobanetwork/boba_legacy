@@ -3,7 +3,7 @@ name: gas-oracle unit tests
 on:
   push:
     paths:
-      - 'go/gas-oracle/**'
+      - 'package/boba/gas-price-oracle/**'
     branches:
       - 'master'
       - 'develop'
@@ -11,7 +11,7 @@ on:
       - 'regenesis/*'
   pull_request:
     paths:
-      - 'go/gas-oracle/**'
+      - 'package/boba/gas-price-oracle/**'
     branches:
       - 'master'
       - 'develop'
@@ -19,25 +19,29 @@ on:
       - 'regenesis/*'
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./go/gas-oracle
-
 jobs:
   tests:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16.x
+      # Monorepo tests
+      - uses: actions/checkout@v2
 
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - name: Install
-      run: make
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    - name: Test
-      run: make test
+      - name: Build
+        working-directory: ./
+        run: yarn && yarn install && yarn build
+
+      - name: Run Boba gas oracle unit tests
+        working-directory: ./packages/boba/gas-price-oracle
+        run: yarn test
