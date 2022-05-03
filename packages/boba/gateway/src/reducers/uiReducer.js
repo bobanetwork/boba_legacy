@@ -29,7 +29,6 @@ const initialState = {
   transferModal: false,
   transferNFTModal: false,
   exitModal: false,
-  bridgeTypeSwitch: false,
   tokenPicker: false,
   transferPending: false,
   mergeModal: false,

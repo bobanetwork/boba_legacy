@@ -71,7 +71,6 @@ import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
-import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -134,7 +133,6 @@ function Home() {
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
 
   const exitModalState = useSelector(selectModalState('exitModal'))
-  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
@@ -251,7 +249,6 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
-      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}

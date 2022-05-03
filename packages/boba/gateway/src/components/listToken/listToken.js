@@ -1,12 +1,12 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 
-import { 
-  settle_v0, 
+import {
+  settle_v0,
   settle_v1,
-  settle_v2, 
-  settle_v2OLO  
+  settle_v2,
+  settle_v2OLO
 } from 'actions/networkAction'
 
 import Button from 'components/button/Button'
@@ -29,7 +29,7 @@ function ListToken({
   const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
 
   const theme = useTheme()
-  
+
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch();
   const enabled = (networkLayer === chain) ? true : false
@@ -149,12 +149,12 @@ function ListToken({
                 </>
               }
 
-              {enabled && chain === 'L2' && 
-                token.symbol !== 'OLO' && 
-                token.symbol !== 'xBOBA' && 
-                token.symbol !== 'WAGMIv0' && 
+              {enabled && chain === 'L2' &&
+                token.symbol !== 'OLO' &&
+                token.symbol !== 'xBOBA' &&
+                token.symbol !== 'WAGMIv0' &&
                 token.symbol !== 'WAGMIv1' &&
-                token.symbol !== 'WAGMIv2' && 
+                token.symbol !== 'WAGMIv2' &&
                 token.symbol !== 'WAGMIv2-Oolong' &&
                 <>
                   <Button
@@ -357,10 +357,10 @@ function ListToken({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && 
-            token.symbol !== 'OLO' && 
-            token.symbol !== 'xBOBA' && 
-            token.symbol !== 'WAGMIv0' && 
+          {enabled && chain === 'L2' &&
+            token.symbol !== 'OLO' &&
+            token.symbol !== 'xBOBA' &&
+            token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
@@ -531,7 +531,7 @@ function ListToken({
               </div>
             </div>
           }
-          
+
         </S.TableCell>
       </S.TableBody>
     </S.Content>

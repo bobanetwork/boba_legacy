@@ -27,7 +27,6 @@ import EthereumIcon from 'components/icons/EthereumIcon.js'
 import Button from 'components/button/Button.js'
 import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
-import * as G from 'containers/Global.styles'
 import * as S from './bobaBridge.styles'
 
 import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
@@ -211,7 +210,7 @@ function BobaBridge() {
       <BridgeTransfer />
 
       </S.BobaBridgeWrapper>
-      
+
       <S.HistoryLink
         onClick={() => {
           dispatch(setPage('History'))

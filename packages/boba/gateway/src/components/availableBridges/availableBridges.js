@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import * as S from './availableBridges.styles'
-import * as G from 'containers/Global.styles'
 
-import AvailableBridgeBg from 'images/boba2/available_bridges_bg.svg'
 import { Link, Typography } from '@mui/material'
-import { selectBridgeType } from 'selectors/bridgeSelector'
-import { useSelector } from 'react-redux'
 
 import networkService from 'services/networkService'
 
-function AvailableBridges({ token = null, children }) {
-  
-  const [ bridges, setBridges ] = useState([])
+function AvailableBridges({ token = null }) {
 
-  const bridgeType = useSelector(selectBridgeType())
+  const [ bridges, setBridges ] = useState([])
 
   useEffect(() => {
     if (token) {
