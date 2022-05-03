@@ -26,7 +26,7 @@ import {
 } from '@mui/material'
 
 import * as S from "./Modal.styles"
-import * as G from 'containers/Global.styles';
+import * as LayoutS from 'components/common/common.styles';
 import { useTheme } from '@emotion/react'
 import { HighlightOffOutlined } from '@mui/icons-material';
 import CloseIcon from 'components/icons/CloseIcon';
@@ -72,7 +72,7 @@ function _Modal({
                       <HighlightOffOutlined sx={{ opacity: 0.5 }} />
                     </S.IconButtonTag>
                   </S.ModalHead>
-                  <G.DividerLine sx={{ my: 1 }} />
+                  <LayoutS.DividerLine sx={{ my: 1 }} />
                   <S.Content>
                     {children}
                   </S.Content>

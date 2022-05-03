@@ -62,14 +62,11 @@ export const selectCustomStyles = (newStyle, theme) => {
     option: (provided, state) => ({
       ...provided,
       color: 'auto',
+      backgroundColor: newStyle ? theme.palette.background.input : 'transparent',
       boxShadow: newStyle ? '-13px 15px 19px rgba(0, 0, 0, 0.15), inset 53px 36px 120px rgba(255, 255, 255, 0.06)' : 'none',
       '&:hover': {
         backgroundColor: 'none',
-      },
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      backgroundColor: theme.palette.background.secondary,
+      }
     })
   }
 }
