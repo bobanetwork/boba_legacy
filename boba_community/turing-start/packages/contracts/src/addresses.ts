@@ -7,9 +7,11 @@ const addressesTestnet = {
 }
 
 const addressesMainnet = {
-  // TODO
-  TuringHelper: '',
-  TuringHelperFactory: '',
-  BobaToken: '',
+  // proxy at 0x00DF42117930729995f43C41aC780fe54f7f4459
+  TuringHelper: '0xC1A8Bdfc2f8b67268E44b2C2D868a8f28E007E2D',
+  TuringHelperFactory: '0xCf3887f584B9Ec84E5E39a73fF5c6F327f4656ec',
+  BobaToken: '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7',
 }
 export default isTestEnv() ? addressesTestnet : addressesMainnet
+
+

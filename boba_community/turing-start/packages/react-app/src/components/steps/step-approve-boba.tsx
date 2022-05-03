@@ -1,4 +1,4 @@
-import { Button, SmallerParagraph, StyledInputAdornment } from "../index";
+import { CustomButton, SmallerParagraph, StyledInputAdornment } from "../index";
 import React, { Dispatch, SetStateAction } from "react";
 import { useContractFunction, useEthers, useTokenBalance } from "@usedapp/core";
 import { parseEther } from "@ethersproject/units";
@@ -25,20 +25,19 @@ interface IStepApproveBobaState {
 interface IStepApproveBobaProps {
   setAmountBobaTokensToUseWei: Dispatch<SetStateAction<BigNumber>>;
   handleNextStep: () => void;
+  contractBobaToken: L2GovernanceERC20;
 }
 
 let newTransaction: boolean = true;
 export const StepApproveBoba = (props: IStepApproveBobaProps) => {
-  const contractBobaToken: L2GovernanceERC20 = new Contract(addresses.BobaToken, new utils.Interface(abis.bobaToken)) as L2GovernanceERC20;
-
   const {
     state: approveState,
     send: approveBoba
-  } = useContractFunction(contractBobaToken, "approve", { transactionName: "approveBoba" });
+  } = useContractFunction(props.contractBobaToken, "approve", { transactionName: "approveBoba" });
   const loadingState: boolean = isLoading(approveState);
 
   const { account } = useEthers();
-  const bobaTokenBalance = useTokenBalance(contractBobaToken.address, account) ?? BigNumber.from(0);
+  const bobaTokenBalance = useTokenBalance(props.contractBobaToken.address, account) ?? BigNumber.from(0);
 
   const [values, setValues] = React.useState<IStepApproveBobaState>({
     callsToPrepay: '100',
@@ -82,14 +81,14 @@ export const StepApproveBoba = (props: IStepApproveBobaProps) => {
         </FormHelperText>}
     </FormControl>
 
-    <Button style={{ marginTop: 14 }} disabled={!account || loadingState || !hasEnoughBOBA}
-            onClick={async () => {
+    <CustomButton style={{ marginTop: 14 }} disabled={!account || loadingState || !hasEnoughBOBA}
+                  onClick={async () => {
               newTransaction = true;
               await approveBoba(addresses.TuringHelperFactory, amountBobaTokensToUseWei);
               props.setAmountBobaTokensToUseWei(amountBobaTokensToUseWei);
             }}>
       {loadingState
         ? <><FontAwesomeIcon icon={solid("spinner")} spin={true} />&nbsp;{getPrettyTransactionStatus(approveState)}</>
-        : `Approve ${amountBobaTokensToUse} BOBA`}</Button>
+        : `Approve ${amountBobaTokensToUse} BOBA`}</CustomButton>
   </div>;
 };

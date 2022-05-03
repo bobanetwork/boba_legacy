@@ -3,7 +3,7 @@ import { Contract } from "@ethersproject/contracts";
 import { abis, addresses } from "@turing/contracts";
 import { utils } from "ethers";
 import { shortenAddress, useContractFunction, useEthers } from "@usedapp/core";
-import { Button, SmallerParagraph } from "../index";
+import { CustomButton, SmallerParagraph } from "../index";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
@@ -115,15 +115,15 @@ export const StepDeployTuringHelper = (props: IStepDeployTuringHelperProps) => {
           </FormHelperText>}
     </FormControl>
 
-    <Button style={{ marginTop: 14 }}
-            disabled={account === undefined || loadingState || !values.validInput || !props.amountBobaForFundingWei}
-            onClick={async () => {
+    <CustomButton style={{ marginTop: 14 }}
+                  disabled={account === undefined || loadingState || !values.validInput || !props.amountBobaForFundingWei}
+                  onClick={async () => {
               newTransaction = true;
               await deployTuringHelper(values.parsedPermittedCallers, props.amountBobaForFundingWei);
             }}>
       {loadingState
         ? <><FontAwesomeIcon icon={solid("spinner")} spin={true} />&nbsp;{getPrettyTransactionStatus(deployState)}</>
-        : `Deploy TuringHelper & Deposit ${formatEther(props.amountBobaForFundingWei?.toString())} BOBA`}</Button>
+        : `Deploy TuringHelper & Deposit ${formatEther(props.amountBobaForFundingWei?.toString())} BOBA`}</CustomButton>
 
 
     {newTuringHelper ?

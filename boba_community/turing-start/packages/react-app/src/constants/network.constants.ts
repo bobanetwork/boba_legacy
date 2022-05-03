@@ -6,8 +6,8 @@ const BobaMainnetChain: Chain = {
   chainName: 'Boba Mainnet',
   isTestChain: false,
   isLocalChain: false,
-  multicallAddress: '0x0000000000000000000000000000000000000000', // TODO
-  multicall2Address: '0x0000000000000000000000000000000000000000', // TODO
+  multicallAddress: '0xC5042a76652770d696Cc434026C971fd4DDD27b9',
+  multicall2Address: '0xaD652645014b6d8Ef023d62aF144aAefA08CeCa5',
   getExplorerAddressLink: (address: string) => `https://blockexplorer.boba.network/address/${address}`,
   getExplorerTransactionLink: (transactionHash: string) => `https://blockexplorer.boba.network/tx/${transactionHash}`,
 }
