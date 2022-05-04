@@ -60,7 +60,7 @@ function convertHexToASCII(hexString) {
   return stringOut.substring(1)
 }
 
-describe('Verify Twitter post for NFT', function () {
+describe('Verify Twitter post developer test funds', function () {
   before(async () => {
     Factory__TuringHelper = new ContractFactory(
       TuringHelperJson.abi,
@@ -180,8 +180,10 @@ describe('Verify Twitter post for NFT', function () {
     ).to.be.reverted
   })
 
-  it('should conduct basic twitter claim', async () => {
+  it('should conduct basic twitter dev claim', async () => {
     const tweetId = '1520370421773725698'
+    // the frontend is responsible to extracting the tweetID 
+    // from the longer tweet link
     await twitter.estimateGas.sendFunds(deployerWallet.address, tweetId, {
       value: ethers.utils.parseEther('0.00001'),
       ...gasOverride,
