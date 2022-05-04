@@ -15,22 +15,19 @@ limitations under the License. */
 
 import { ArrowDropDown } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
-import { resetToken, setBridgeType } from 'actions/bridgeAction'
+import { resetToken } from 'actions/bridgeAction'
 import { openModal } from 'actions/uiAction'
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectBridgeTokens, selectBridgeType, selectMultiBridgeMode } from 'selectors/bridgeSelector'
+import { selectBridgeTokens, selectMultiBridgeMode } from 'selectors/bridgeSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 
-import { BRIDGE_TYPE } from 'util/constant'
 import * as S from './bridgeTransfer.styles'
 
 import DoExitStep from 'containers/modals/exit/steps/DoExitStep'
-import DoExitStepFast from 'containers/modals/exit/steps/DoExitStepFast'
 import InputStep from 'containers/modals/deposit/steps/InputStep'
-import InputStepFast from 'containers/modals/deposit/steps/InputStepFast'
 import InputStepBatch from 'containers/modals/deposit/steps/InputStepBatch'
 import { fetchLookUpPrice } from 'actions/networkAction'
 
@@ -38,29 +35,21 @@ function BridgeTransfer() {
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer = useSelector(selectLayer())
-  const bridgeType = useSelector(selectBridgeType())
+  //const bridgeType = useSelector(selectBridgeType())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
   const tokenList = useSelector(selectTokens)
   const tokens = useSelector(selectBridgeTokens())
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    dispatch(setBridgeType(BRIDGE_TYPE.CLASSIC_BRIDGE))
-  }, [ dispatch ])
-
-  const switchBridgeType = () => {
-    dispatch(openModal('bridgeTypeSwitch'))
-  }
-
   const onReset = () => {
+    console.log([`RESET TOKEN onReset`])
     dispatch(resetToken())
   }
 
   const openTokenPicker = (index = 0) => {
     dispatch(openModal('tokenPicker', null, null, index))
   }
-
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -87,7 +76,6 @@ function BridgeTransfer() {
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
-
   return (
     <S.BridgeTransferContainer my={1}>
 
@@ -107,31 +95,16 @@ function BridgeTransfer() {
       {tokens.length > 0 && !multibridgeMode &&
         <Box display="flex" justifyContent="space-between">
           <Typography variant="body2">
-            {bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE ? 'Classic bridge' : 'Fast Bridge'}
-          </Typography>
-          <Typography variant="body2"
-            onClick={switchBridgeType}
-            sx={{
-              textDecoration: 'underline',
-              opacity: 0.6,
-              cursor: 'pointer'
-            }}
-          >To {BRIDGE_TYPE.CLASSIC_BRIDGE !== bridgeType ? 'Classic bridge' : 'Fast Bridge'}
+            {'Boba Classic Bridge'}
           </Typography>
         </Box>
       }
 
       {tokens.length > 0 && !multibridgeMode && <>
-        {layer === 'L1' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
+        {layer === 'L1' && 
           <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
         }
-        {layer === 'L1' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
-          <InputStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
-        }
-        {layer === 'L2' && bridgeType === BRIDGE_TYPE.FAST_BRIDGE &&
-          <DoExitStepFast handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
-        }
-        {layer === 'L2' && bridgeType === BRIDGE_TYPE.CLASSIC_BRIDGE &&
+        {layer === 'L2' && 
           <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
         }
         </>
