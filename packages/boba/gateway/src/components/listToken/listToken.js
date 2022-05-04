@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 
 import { 
@@ -26,8 +26,6 @@ function ListToken({
 }) {
   const [ dropDownBox, setDropDownBox ] = useState(false)
 
-  const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
-
   const theme = useTheme()
   
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -46,10 +44,6 @@ function ListToken({
 
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
-  }
-
-  const handleSliderChange_v1 = (e) => {
-    setSliderValue_v1(e.target.value)
   }
 
   async function doSettle_v0 () {

@@ -15,7 +15,7 @@ limitations under the License. */
 
 import { ArrowDropDown } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
-import { resetToken, setBridgeType } from 'actions/bridgeAction'
+import { resetToken } from 'actions/bridgeAction'
 import { openModal } from 'actions/uiAction'
 
 import React, { useCallback, useEffect } from 'react'
@@ -24,7 +24,6 @@ import { selectBridgeTokens, selectMultiBridgeMode } from 'selectors/bridgeSelec
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 
-import { BRIDGE_TYPE } from 'util/constant'
 import * as S from './bridgeTransfer.styles'
 
 import DoExitStep from 'containers/modals/exit/steps/DoExitStep'
