@@ -9,110 +9,144 @@ from datetime import datetime
 authorized_contract = None  # for open access
 
 # TODO: Use AWS Secret Manager
-TWITTER_BEARER_TOKEN = None # do not push
+TWITTER_BEARER_TOKEN = None  # do not push
+
 
 # or...
 # authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
 
 # NOTE: When taking the data payload from the original event for debugging then remove the first 64 bits!
 def lambda_handler(event, context):
+  print("DEBUG: ", event)
 
-    print("DEBUG: ", event)
+  input = json.loads(event["body"])
+  print("DEBUG: from Geth:", input)
 
-    input = json.loads(event["body"])
-    print("DEBUG: from Geth:", input)
+  if authorized_contract is not None:
+    # check authorisation if desired
+    callerAddress = input['method']
+    if callerAddress.lower() != authorized_contract.lower():
+      returnPayload = {'statusCode': 403}
+      print('return payload:', returnPayload)
+      return returnPayload
 
-    if authorized_contract is not None:
-        # check authorisation if desired
-        callerAddress = input['method']
-        if callerAddress.lower() != authorized_contract.lower():
-            returnPayload = {'statusCode': 403}
-            print('return payload:', returnPayload)
-            return returnPayload
+  # get calling parameters
+  paramsHexString = input['params'][0]
+  paramsHexString = paramsHexString.removeprefix("0x")
+  params = textwrap.wrap(paramsHexString, 64)
 
-    # get calling parameters
-    paramsHexString = input['params'][0]
-    paramsHexString = paramsHexString.removeprefix("0x")
-    params = textwrap.wrap(paramsHexString, 64)
+  # 3 parameter example:
+  # ['0000000000000000000000000000000000000000000000000000000000000120', '0000000000000000000000000000000000000000000000000000000000000060',
+  # '00000000000000000000000000000000000000000000000000000000000000a0', '00000000000000000000000000000000000000000000000000000000000000e0',
+  # '0000000000000000000000000000000000000000000000000000000000000006', '737472696e670000000000000000000000000000000000000000000000000000',
+  # '0000000000000000000000000000000000000000000000000000000000000008', '67656e7265733a30000000000000000000000000000000000000000000000000',
+  # '000000000000000000000000000000000000000000000000000000000000001d', '6172746973742f3158796f347538755843315a6d4d706174463035504a000000']
 
-    # 3 parameter example:
-    # ['0000000000000000000000000000000000000000000000000000000000000120', '0000000000000000000000000000000000000000000000000000000000000060',
-    # '00000000000000000000000000000000000000000000000000000000000000a0', '00000000000000000000000000000000000000000000000000000000000000e0',
-    # '0000000000000000000000000000000000000000000000000000000000000006', '737472696e670000000000000000000000000000000000000000000000000000',
-    # '0000000000000000000000000000000000000000000000000000000000000008', '67656e7265733a30000000000000000000000000000000000000000000000000',
-    # '000000000000000000000000000000000000000000000000000000000000001d', '6172746973742f3158796f347538755843315a6d4d706174463035504a000000']
+  # 2 parameter example:
+  # ['00000000000000000000000000000000000000000000000000000000000000c0', '0000000000000000000000000000000000000000000000000000000000000040',
+  # '0000000000000000000000000000000000000000000000000000000000000080', '0000000000000000000000000000000000000000000000000000000000000008',
+  # '67656e7265733a30000000000000000000000000000000000000000000000000', '000000000000000000000000000000000000000000000000000000000000001d',
+  # '6172746973742f3158796f347538755843315a6d4d706174463035504a000000']
 
-    # 2 parameter example:
-    # ['00000000000000000000000000000000000000000000000000000000000000c0', '0000000000000000000000000000000000000000000000000000000000000040',
-    # '0000000000000000000000000000000000000000000000000000000000000080', '0000000000000000000000000000000000000000000000000000000000000008',
-    # '67656e7265733a30000000000000000000000000000000000000000000000000', '000000000000000000000000000000000000000000000000000000000000001d',
-    # '6172746973742f3158796f347538755843315a6d4d706174463035504a000000']
+  # 1 parameter example:
+  # 0000000000000000000000000000000000000000000000000000000000000060
+  # 0000000000000000000000000000000000000000000000000000000000000020
+  # 000000000000000000000000000000000000000000000000000000000000000c
+  # 476574466f6c6c6f776572730000000000000000000000000000000000000000
+  print("Params: ", params)
+  # str_length_1 = int(params[1], 16) * 2
+  str_length_2 = int(params[3], 16) * 2
 
-    # 1 parameter example:
-    # 0000000000000000000000000000000000000000000000000000000000000060
-    # 0000000000000000000000000000000000000000000000000000000000000020
-    # 000000000000000000000000000000000000000000000000000000000000000c
-    # 476574466f6c6c6f776572730000000000000000000000000000000000000000
-    print("Params: ", params)
-    #str_length_1 = int(params[1], 16) * 2
-    str_length_2 = int(params[3], 16) * 2
+  request = params[1]
+  # bytes_object = bytes.fromhex(request[-40]) # address
+  # e.g. BOBA439E11DD4
+  id_to_verify = "BOBA" + request[-40:9]  # bytes_object.decode("ASCII")
 
-    request = params[1]
-    #bytes_object = bytes.fromhex(request[-40]) # address
-    id_to_verify = request[-40:] #bytes_object.decode("ASCII")
+  request_2 = params[4]
+  bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
+  twitter_post_id = bytes_object_2.decode("ASCII")
 
-    request_2 = params[4]
-    bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
-    twitter_post_id = bytes_object_2.decode("ASCII")
+  print("ID to verify: ", id_to_verify, ", Twitter post id: ", twitter_post_id)
 
-    print("ID to verify: ", id_to_verify, ", Twitter post id: ", twitter_post_id)
+  res = load_tweet_status(id_to_verify, twitter_post_id)
 
+  # example res:
+  # 0x
+  # 0000000000000000000000000000000000000000000000000000000000000040
+  # 0000000000000000000000000000000000000000000000000000000000418b95
+  # 0000000000000000000000000000000000000000000000000000017e60d3b45f
 
-    res = load_tweet_status(id_to_verify, twitter_post_id)
+  returnPayload = {
+    'statusCode': 200,
+    'body': json.dumps({
+      "result": res
+    })
+  }
 
-    # example res:
-    # 0x
-    # 0000000000000000000000000000000000000000000000000000000000000040
-    # 0000000000000000000000000000000000000000000000000000000000418b95
-    # 0000000000000000000000000000000000000000000000000000017e60d3b45f
+  print('return payload:', returnPayload)
 
-    returnPayload = {
-        'statusCode': 200,
-        'body': json.dumps({
-            "result": res
-        })
-    }
-
-    print('return payload:', returnPayload)
-
-    return returnPayload
+  return returnPayload
 
 
 def load_tweet_status(id_to_verify, twitter_post_id):
-    # Create a PoolManager instance for sending requests.
-    http = urllib3.PoolManager(ca_certs=certifi.where())
+  # Create a PoolManager instance for sending requests.
+  http = urllib3.PoolManager(ca_certs=certifi.where())
 
-    # Send a POST request and receive a HTTPResponse object.
-    headers = {'Authorization': 'Bearer ' + TWITTER_BEARER_TOKEN}
-    resp = http.request("GET", "https://api.twitter.com/2/tweets/"+twitter_post_id+"?expansions=author_id,created_at",
-                        headers=headers)
-    result = json.loads(resp.data)
-    print("result: ", result)
+  # Send a POST request and receive a HTTPResponse object.
+  error_reason = 0
+  headers = {'Authorization': 'Bearer ' + TWITTER_BEARER_TOKEN}
+  resp = http.request("GET",
+                      "https://api.twitter.com/2/tweets/" + twitter_post_id + "?expansions=author_id&user.fields=created_at,public_metrics",
+                      headers=headers)
+  result = json.loads(resp.data)
+  print("result: ", result)
 
-    is_allowed_to_claim = id_to_verify.lower() in result["data"]["text"].lower() # result['..']
+  if "errors" in result:
+    is_allowed_to_claim = False
+    author_id = 0
+    error_reason = 1 #result["errors"][0]["title"]  # use title for short error msg
+  else:
+    has_posted = id_to_verify.lower() in result["data"]["text"].lower()
     author_id = result["data"]["author_id"]
     print("includes-users: ", result["includes"]["users"])
-    usercreate_timediff_now = abs(datetime.now() - datetime.strptime(result["includes"]["users"][0]["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ")).total_seconds()
-    # todo calc time diff
 
-    print("from endpoint:", is_allowed_to_claim, "Author: ", author_id, "User created at: ", usercreate_timediff_now, datetime.now())
+    # calc user account created difference to today
+    usercreate_timediff_now = abs(datetime.now() - datetime.strptime(result["includes"]["users"][0]["created_at"],
+                                                                     "%Y-%m-%dT%H:%M:%S.%fZ")).total_seconds()
+    account_exists_long_enough = int(
+      usercreate_timediff_now) > 172800  # account has to exist at least 48 hours (calculated in seconds)
 
-    # create return payload
-    res = '0x' + '{0:0{1}x}'.format(int(64), 64)
-    # 64 denotes the number of bytes in the `bytes` dynamic argument
-    # since we are sending back 2 32 byte numbers, 2*32 = 64
-    res = res + '{0:0{1}x}'.format(int(is_allowed_to_claim), 64)  # the result
 
-    res = res + '{0:0{1}x}'.format(int(author_id), 64)  # the result
+    # calc if enough followers, etc..
+    public_metrics = result["includes"]["users"][0]["public_metrics"]
+    has_enough_follower = int(public_metrics["followers_count"]) > 5
+    has_enough_tweets = int(public_metrics["tweet_count"]) > 2
+    account_public_metrics_check = has_enough_follower and has_enough_tweets
 
-    return res
+    if not account_exists_long_enough: error_reason = 2 #"Account too new"
+    elif not has_posted: error_reason = 3 #"Invalid tweet"
+    elif not has_enough_follower: error_reason = 4 #"Not enough follower"
+    elif not has_enough_tweets: error_reason = 5 #"Not enough tweets"
+
+    # maybe try-catch for better error msgs (tweet not existing, ..)
+    is_allowed_to_claim = has_posted and account_exists_long_enough and account_public_metrics_check
+    print("from endpoint:", has_posted, account_public_metrics_check, account_exists_long_enough, "Author: ", author_id,
+          "User created at: ", usercreate_timediff_now, datetime.now(),
+          datetime.strptime(result["includes"]["users"][0]["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ"))
+
+  # create return payload
+  res = '0x' + '{0:0{1}x}'.format(int(96), 64)
+  # 64 denotes the number of bytes in the `bytes` dynamic argument
+  # since we are sending back 2 32 byte numbers, 2*32 = 64
+  res = res + '{0:0{1}x}'.format(int(is_allowed_to_claim), 64)  # the result
+  res = res + '{0:0{1}x}'.format(int(author_id), 64)  # the result
+  res = res + '{0:0{1}x}'.format(int(error_reason), 64)  # the result
+
+  #print("Original error: ", error_reason)
+  #error_reason = int.from_bytes(error_reason.encode("ascii"), 'big')
+  #print("EXTRA", error_reason)
+  #res = res + '{0:0{1}x}'.format(int(error_reason), 64)
+  #decoded_str = bytes.fromhex(res.removeprefix("0x")).decode("ascii")
+  #print("DECODED: ", decoded_str)
+
+  return res

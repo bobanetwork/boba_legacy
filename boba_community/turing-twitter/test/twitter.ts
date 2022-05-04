@@ -44,7 +44,7 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
-import TwitterClaim from '../artifacts/contracts/TwitterClaim.sol/TwitterClaim.json'
+import TwitterAuthenticatedFaucet from '../artifacts/contracts/AuthenticatedFaucet.sol/AuthenticatedFaucet.json'
 import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
@@ -72,16 +72,13 @@ describe('Verify Twitter post for NFT', function () {
     console.log('Helper contract deployed as', turingHelper.address)
 
     Factory__TwitterClaim = new ContractFactory(
-      TwitterClaim.abi,
-      TwitterClaim.bytecode,
+      TwitterAuthenticatedFaucet.abi,
+      TwitterAuthenticatedFaucet.bytecode,
       deployerWallet
     )
 
     twitter = await Factory__TwitterClaim.deploy(
-      'ClaimNFT',
-      'TBOB',
-      3,
-      'https://ch8woe6r29.execute-api.us-east-1.amazonaws.com/Prod/',
+      'https://p1xhfo2taa.execute-api.us-east-1.amazonaws.com/Prod/',
       turingHelper.address,
       10,
       gasOverride
@@ -163,22 +160,37 @@ describe('Verify Twitter post for NFT', function () {
     expect(helperAddress).to.equal(turingHelper.address)
   })
 
-  // TODO: To test
-  // * Max supply of NFT
+  it('should fail without funds', async () => {
+    await expect(
+      twitter.estimateGas.sendFunds(
+        deployerWallet.address,
+        '1520370421773725698',
+        gasOverride
+      )
+    ).to.be.reverted
+  })
 
   it('should fail for invalid tweet', async () => {
     await expect(
-      twitter.estimateGas.claimNFT('8392382399393', gasOverride)
+      twitter.estimateGas.sendFunds(
+        deployerWallet.address,
+        '8392382399393',
+        {value: ethers.utils.parseEther('0.00001'), ...gasOverride}
+      )
     ).to.be.reverted
   })
 
   it('should conduct basic twitter claim', async () => {
     const tweetId = '1520370421773725698'
-    await twitter.estimateGas.claimNFT(tweetId, gasOverride)
+    await twitter.estimateGas.sendFunds(deployerWallet.address, tweetId, {
+      value: ethers.utils.parseEther('0.00001'),
+      ...gasOverride,
+    })
     console.log('Estimated gas')
-    const claim = await twitter.claimNFT(
+    const claim = await twitter.sendFunds(
+      deployerWallet.address,
       tweetId,
-      gasOverride
+      { value: ethers.utils.parseEther('0.00001'), ...gasOverride}
     )
     const res = await claim.wait()
     expect(res).to.be.ok
@@ -187,7 +199,11 @@ describe('Verify Twitter post for NFT', function () {
   it('should fail for second twitter claim', async () => {
     // try to claim again
     await expect(
-      twitter.estimateGas.claimNFT('1520370421773725698', gasOverride)
+      twitter.estimateGas.sendFunds(
+        deployerWallet.address,
+        '1520370421773725698',
+        { value: ethers.utils.parseEther('0.00001'), ...gasOverride }
+      )
     ).to.be.reverted
   })
 })
