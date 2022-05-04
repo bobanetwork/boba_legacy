@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract AuthenticatedFaucet is WithRecover {
     string public apiUrl;
     ITuringHelper public turingHelper;
-    mapping(uint256 => bool) hasTwitterUserClaimed;
+    mapping(uint256 => uint256) twitterUserLastClaim;
     uint256 lastEpochStart;
     uint256 amountClaimsInLastEpoch;
     uint256 maxClaimsPerEpoch;
@@ -45,8 +45,8 @@ contract AuthenticatedFaucet is WithRecover {
         bool isAllowedToClaim = resp != 0;
 
         require(isAllowedToClaim, string(abi.encodePacked("Invalid request:",Strings.toString(errorMsgVal))));
-        require(!hasTwitterUserClaimed[authorId], "Already claimed");
-        hasTwitterUserClaimed[authorId] = true;
+        require((block.timestamp - twitterUserLastClaim[authorId]) > 1 days, "Cooldown");
+        twitterUserLastClaim[authorId] = block.timestamp;
 
         recipient_.transfer(msg.value);
         emit GasClaimed(authorId);
