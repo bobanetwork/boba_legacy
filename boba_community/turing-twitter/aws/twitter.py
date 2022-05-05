@@ -4,6 +4,7 @@ import json
 import urllib3
 import certifi
 import textwrap
+import hashlib
 from datetime import datetime
 
 authorized_contract = None  # for open access
@@ -53,22 +54,33 @@ def lambda_handler(event, context):
   # 0000000000000000000000000000000000000000000000000000000000000020
   # 000000000000000000000000000000000000000000000000000000000000000c
   # 476574466f6c6c6f776572730000000000000000000000000000000000000000
+  
+  # the input to the contract is
+  # _msgSender(), twitterPostID_
+  # address payable recipient_, string calldata twitterPostID_
+  #
+  # But we also have to make sure that the _msgSender address is the same one 
+  # that corresponds to the Boba Bubble
+  #  
+
   print("Params: ", params)
   # str_length_1 = int(params[1], 16) * 2
-  str_length_2 = int(params[3], 16) * 2
-
-  request = params[1]
+  
+  # the message sender
+  senderAddress = params[1]
   # bytes_object = bytes.fromhex(request[-40]) # address
   # e.g. BOBA439E11DD4
-  id_to_verify = "BOBA" + request[-40:9]  # bytes_object.decode("ASCII")
+  # id_to_verify = #"BOBA" + request[-40:9]  # bytes_object.decode("ASCII")
 
-  request_2 = params[4]
+  # the tweet ID
+  str_length_2 = int(params[3], 16) * 2 # the length of the tweetID field
+  request_2 = params[4]                 # the tweetID
   bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
   twitter_post_id = bytes_object_2.decode("ASCII")
 
-  print("ID to verify: ", id_to_verify, ", Twitter post id: ", twitter_post_id)
+  print("Sender to verify: ", senderAddress, ", Twitter post id: ", twitter_post_id)
 
-  res = load_tweet_status(id_to_verify, twitter_post_id)
+  res = load_tweet_status(senderAddress, twitter_post_id)
 
   # example res:
   # 0x
@@ -88,7 +100,7 @@ def lambda_handler(event, context):
   return returnPayload
 
 
-def load_tweet_status(id_to_verify, twitter_post_id):
+def load_tweet_status(senderAddress, twitter_post_id):
   # Create a PoolManager instance for sending requests.
   http = urllib3.PoolManager(ca_certs=certifi.where())
 
@@ -106,7 +118,21 @@ def load_tweet_status(id_to_verify, twitter_post_id):
     author_id = 0
     error_reason = 1 #result["errors"][0]["title"]  # use title for short error msg
   else:
-    has_posted = id_to_verify.lower() in result["data"]["text"].lower()
+
+    # The senderAddress is a usual walletAddress
+    # The Boba Bubble is the string BOBA plus the uppercase first 9 of the MD5 hash of the walletAddress
+
+    # bobaTag: Md5.hashStr(walletAddress.substring(2)) })
+    # BT = 'BOBA' + bobaTag.substring(0,9).toUpperCase()
+
+    # Step one - take the walletAddress, and generate the Boba Bubble
+    BT = senderAddress[2:] # remove the leading Ox
+    BT = hashlib.md5(BT)   # need to check encoding etc
+    BT = 'BOBA' + BT[0:9].upper()
+    print("Boba Bubble based on input message sender", BT)
+
+    # Step 2 - confirm that the developer who tweeted the Boba Bubble is the same as this caller?
+    has_posted = BT.lower() in result["data"]["text"].lower()
     author_id = result["data"]["author_id"]
     print("includes-users: ", result["includes"]["users"])
 
@@ -115,7 +141,6 @@ def load_tweet_status(id_to_verify, twitter_post_id):
                                                                      "%Y-%m-%dT%H:%M:%S.%fZ")).total_seconds()
     account_exists_long_enough = int(
       usercreate_timediff_now) > 172800  # account has to exist at least 48 hours (calculated in seconds)
-
 
     # calc if enough followers, etc..
     public_metrics = result["includes"]["users"][0]["public_metrics"]

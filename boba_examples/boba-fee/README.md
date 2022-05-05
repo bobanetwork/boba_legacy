@@ -1,44 +1,85 @@
-# @boba/boba-fee
+---
+description: Switch fee token in Boba Network
+---
 
-## Guide for Developers
+## Switch fee token
 
-### Setup
+Boba Network accepts BOBA and ETH as fee tokens. The fee choice is recorded in the `Boba_GasPriceOracle` contract. Users and developers can switch fee tokens by calling the `Boba_GasPriceOracle` contract.
 
-Install the following:
+### For users and developers
 
-- [`Node.js` (14+)](https://nodejs.org/en/)
-- [`npm`](https://www.npmjs.com/get-npm)
-- [`yarn`](https://classic.yarnpkg.com/en/docs/install/)
+* You can switch to BOBA as the fee token calling the `Boba_GasPriceOracle` contract. Since MetaMask doesn't support dual fee tokens, you must have at least **3 BOBA** and **0.002 ETH**  in your wallet before switching fee token from ETH to BOBA. **3 BOBA** are enough for you to swap more BOBA and do more than two transactions.
 
-Install npm packages and build package in the root directory:
+  ```solidity
+  import { ethers } from 'ethers'
+  const BobaGasPriceOracleInterface = new utils.Interface([
+    'function useBobaAsFeeToken()',
+    'function useETHAsFeeToken()',
+    'function bobaFeeTokenUsers(address) view returns (bool)',
+    'function priceRatio() view returns (uint256)'
+  ])
+  const Proxy__Boba_GasPriceOracle = new Contract(
+  	Proxy__Boba_GasPriceOracleAddress,
+  	BobaGasPriceOracleInterface
+  	l2Wallet
+  )
+  await Boba_GasPriceOracle.useBobaAsFeeToken()
+  ```
 
-```bash
-yarn install
-yarn build
-```
+  To avoid any accident, we *only* allow EOA accounts to use BOBA as the fee token. 
 
-### Update .env
+*  The default fee token option is ETH. You can swith the fee token from BOBA to ETH calling the `Boba_GasPriceOracle` contract. Before switching to ETH, you have to have at least **0.002 ETH** in your wallet. Otherwise, you will get stuck due to lack of ETH. We provide a *meta transaction* option for you to swap BOBA for a small amount of ETH. You can see this is option in the offical [gateway](https://gateway.boba.network).
 
-Add .env in `/boba-examples/boba-fee`
+  ```
+  import { ethers } from 'ethers'
+  const BobaGasPriceOracleInterface = new utils.Interface([
+    'function useBobaAsFeeToken()',
+    'function useETHAsFeeToken()',
+    'function bobaFeeTokenUsers(address) view returns (bool)',
+    'function priceRatio() view returns (uint256)'
+  ])
+  const Proxy__Boba_GasPriceOracle = new Contract(
+  	Proxy__Boba_GasPriceOracleAddress,
+  	BobaGasPriceOracleInterface
+  	l2Wallet
+  )
+  await Boba_GasPriceOracle.useETHAsFeeToken()
+  ```
 
-```bash
-# Rinkeby
-ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
-L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/KEY
-L2_NODE_WEB3_URL=https://rinkeby.boba.network
-PRIV_KEY=
-```
+### For frontend and backend developers
 
-### Change fee totkn
+ We provide a simple script as a demo for you to switch fee tokens. Clone the repository, open it, and install nodejs packages with `yarn`:
 
-Use BOBA as the fee token
+  ```bash
+  $ git clone git@github.com:bobanetwork/boba.git
+  $ cd boba/boba_examples/boba-fee
+  $ yarn clean # only needed / will only work if you had it installed previously
+  $ yarn
+  ```
 
-```bash
-yarn use:boba
-```
+  Then, add `.env` in `boba/boba_examples/boba-fee`.
 
-Use ETH as the fee token
+  ```yaml
+  # Rinkeby
+  ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
+  L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/KEY
+  L2_NODE_WEB3_URL=https://rinkeby.boba.network
+  PRIV_KEY=
+  
+  
+  # Mainnet
+  ADDRESS_MANAGER_ADDRESS=0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089
+  L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/KEY
+  L2_NODE_WEB3_URL=https://mainnet.boba.network
+  PRIV_KEY=
+  ```
 
-```bash
-yarn use:eth
-```
+  Finally, you can switch your fee token by running the following command:
+
+  ```bash
+  # Use BOBA as the fee token
+  $ yarn use:boba 
+  
+  # Use ETH as the fee token
+  $ yarn use:eth
+  ```

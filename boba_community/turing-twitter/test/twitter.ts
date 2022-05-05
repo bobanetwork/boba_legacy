@@ -49,7 +49,22 @@ import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelp
 import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
 
+<<<<<<< HEAD
 describe('Verify Twitter post for NFT', function () {
+=======
+//takes a string of hex values and coverts those to ASCII
+function convertHexToASCII(hexString) {
+  let stringOut = ''
+  let tempAsciiCode
+  hexString.match(/.{1,2}/g).map((i) => {
+    tempAsciiCode = parseInt(i, 16)
+    stringOut = stringOut + String.fromCharCode(tempAsciiCode)
+  })
+  return stringOut.substring(1)
+}
+
+describe('Verify Twitter post developer test funds', function () {
+>>>>>>> 47590d9b5a9600bb421b7a813efb5fd31b42151f
   before(async () => {
     Factory__TuringHelper = new ContractFactory(
       TuringHelperJson.abi,
@@ -177,9 +192,20 @@ describe('Verify Twitter post for NFT', function () {
     ).to.be.reverted
   })
 
+<<<<<<< HEAD
   it('should conduct basic twitter claim', async () => {
     const tweetId = '1522128490211991552'
     await twitter.estimateGas.sendFunds(tweetId, gasOverride)
+=======
+  it('should conduct basic twitter dev claim', async () => {
+    const tweetId = '1520370421773725698'
+    // the frontend is responsible to extracting the tweetID 
+    // from the longer tweet link
+    await twitter.estimateGas.sendFunds(deployerWallet.address, tweetId, {
+      value: ethers.utils.parseEther('0.00001'),
+      ...gasOverride,
+    })
+>>>>>>> 47590d9b5a9600bb421b7a813efb5fd31b42151f
     console.log('Estimated gas')
     const claim = await twitter.sendFunds(
       tweetId,

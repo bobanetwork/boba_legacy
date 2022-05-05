@@ -29,9 +29,8 @@ curl \
     --output /dev/null \
     $L2_URL
 
-#sed -i -e "s/grep: '',/grep: '$TEST_GREP_FILTER',/g" ./hardhat.config.ts
 sed -i -e "s/grep: new RegExp(''),/grep: new RegExp('$TEST_GREP_FILTER'),/g" ./hardhat.config.ts
 cat ./hardhat.config.ts
 echo $TEST_GREP_FILTER
 echo "Now run:"
-npx hardhat test --network optimism --no-compile --config ./hardhat.config.ts
+npx hardhat test --network boba --no-compile --config ./hardhat.config.ts "$@"

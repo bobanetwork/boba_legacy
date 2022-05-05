@@ -39,9 +39,11 @@ contract AuthenticatedFaucet is WithRecover {
         } else {
             amountClaimsInLastEpoch++;
         }
+
         require(amountClaimsInLastEpoch < maxClaimsPerEpoch, "Rate limit reached");
 
         bytes memory encRequest = abi.encode(_msgSender(), twitterPostID_);
+
         (uint256 resp, uint256 authorId, uint256 errorMsgVal) = abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256, uint256));
         // 0 = false, 1 = true
         bool isAllowedToClaim = resp != 0;

@@ -131,11 +131,11 @@ WETH9
 </tr>
 <tr>
 <td>
-Lib_ResolvedDelegateBobaProxy
+Proxy__BobaTuringCredit
 </td>
 <td align="center">
-<a href="https://blockexplorer.rinkeby.boba.network/address/0x4200000000000000000000000000000000000020">
-<code>0x4200000000000000000000000000000000000020</code>
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x208c3CE906cd85362bd29467819d3AcbE5FC1614">
+<code>0x208c3CE906cd85362bd29467819d3AcbE5FC1614</code>
 </a>
 </td>
 </tr>
@@ -144,20 +144,48 @@ Lib_ResolvedDelegateBobaProxy
 BobaTuringCredit
 </td>
 <td align="center">
-<a href="https://blockexplorer.rinkeby.boba.network/address/0x4200000000000000000000000000000000000021">
-<code>0x4200000000000000000000000000000000000021</code>
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x208c3CE906cd85362bd29467819d3AcbE5FC1614">
+<code>0x208c3CE906cd85362bd29467819d3AcbE5FC1614</code>
 </a>
 </td>
 </tr>
 <tr>
 <td>
-BobaTuringHelper
+Proxy__Boba_GasPriceOracle
 </td>
 <td align="center">
-<a href="https://blockexplorer.rinkeby.boba.network/address/0x4200000000000000000000000000000000000022">
-<code>0x4200000000000000000000000000000000000022</code>
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b">
+<code>0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b</code>
 </a>
 </td>
 </tr>
+<tr>
+<td>
+Boba_GasPriceOracle
+</td>
+<td align="center">
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x11B987f4C488D00AC5CDfE6FA9dE243be25009e1">
+<code>0x11B987f4C488D00AC5CDfE6FA9dE243be25009e1</code>
+</a>
+</td>
+<tr>
+<td>
+Proxy__BobaBillingContract
+</td>
+<td align="center">
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x39ecF941443851762f58194e1eD54EE9F6987Cd1">
+<code>0x39ecF941443851762f58194e1eD54EE9F6987Cd1</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+BobaBillingContract
+</td>
+<td align="center">
+<a href="https://blockexplorer.rinkeby.boba.network/address/0x1f9cb265A3Ecf4b6330247D73B83B9DBe9393Bea">
+<code>0x1f9cb265A3Ecf4b6330247D73B83B9DBe9393Bea</code>
+</a>
+</td>
 </table>
 

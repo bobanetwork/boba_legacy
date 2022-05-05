@@ -12,9 +12,16 @@ import { StepDeployAWS } from "./steps/step-deploy-aws";
 import { muiTheme } from "../mui.theme";
 import { BigNumber } from "@ethersproject/bignumber";
 import { StepImplementAWSLambda } from "./steps/step-implement-aws-lambda";
+import { L2GovernanceERC20 } from "@turing/contracts/gen/types";
+import { Contract } from "@ethersproject/contracts";
+import { abis, addresses } from "@turing/contracts";
+import { utils } from "ethers";
 
+interface IHorizontalLinearStepperProps {
+  contractBobaToken: L2GovernanceERC20;
+}
 
-export default function HorizontalLinearStepper() {
+export default function HorizontalLinearStepper(props: IHorizontalLinearStepperProps) {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set<number>());
   const [amountBobaTokensToUseWei, setAmountBobaTokensToUseWei] = React.useState(BigNumber.from(0));
@@ -63,7 +70,8 @@ export default function HorizontalLinearStepper() {
 
   const steps = [{
     label: 'Approve BOBA',
-    component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei} handleNextStep={handleNext} />,
+    component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei}
+                                handleNextStep={handleNext} contractBobaToken={props.contractBobaToken} />,
   }, {
     label: 'Deploy/Fund Turing',
     component: <StepDeployTuringHelper amountBobaForFundingWei={amountBobaTokensToUseWei} />,
