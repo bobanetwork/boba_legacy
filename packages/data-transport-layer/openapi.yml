@@ -207,6 +207,7 @@ paths:
           name: number
           schema:
             type: integer
+            format: "int64"
           required: true
       summary: Returns the Ethereum Layer one context at a specific height
       description: |
