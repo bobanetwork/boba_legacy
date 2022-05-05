@@ -9,7 +9,7 @@ from datetime import datetime
 authorized_contract = None  # for open access
 
 # TODO: Use AWS Secret Manager
-TWITTER_BEARER_TOKEN = None  # do not push
+TWITTER_BEARER_TOKEN = None # do not push
 
 
 # or...
