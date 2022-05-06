@@ -86,5 +86,4 @@
   "Proxy__Boba_GasPriceOracle":"0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51",
   "BobaBillingContract": "0x4a792F51CCc616b82EF74d2478C732e161c5E6b1",
   "Proxy__BobaBillingContract": "0x29F373e4869e69faaeCD3bF747dd1d965328b69f",
-  "AuthenticatedFaucet": "TODO"
 }

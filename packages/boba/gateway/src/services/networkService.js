@@ -1289,8 +1289,9 @@ class NetworkService {
   }
 
   async claimAuthenticatedTestnetTokens(tweetId) {
+    // Only Rinkeby
     const contract = new ethers.Contract(
-      allAddresses.AuthenticatedFaucet,
+      addresses_Rinkeby.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     )
