@@ -14,6 +14,7 @@ import Button from 'components/button/Button'
 import networkService from 'services/networkService'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Connect from 'containers/connect/Connect'
+import { openModal } from "../../../actions/uiAction";
 
 class Nft extends React.Component {
 
@@ -130,6 +131,8 @@ class Nft extends React.Component {
       accountEnabled,
     } = this.state
 
+    this.props.dispatch(openModal('monster'))
+
     if (!netLayer) {
 
       return (
@@ -157,7 +160,7 @@ class Nft extends React.Component {
       return (
         <G.Container>
           <G.ContentEmpty>
-            <Connect 
+            <Connect
               userPrompt={'You are on Ethereum. To use Boba NFTs, connect to Boba'}
               accountEnabled={accountEnabled}
               connectToBoba={true}

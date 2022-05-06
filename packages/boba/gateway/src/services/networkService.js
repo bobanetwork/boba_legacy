@@ -69,6 +69,7 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
@@ -201,7 +202,7 @@ class NetworkService {
     })
     window.ethereum.on('chainChanged', () => {
       const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user 
+      // do not reload window in the special case where the user
       // changed chains AND conncted at the same time
       // otherwise the user gets confused about why they are going through
       // two window reloads
@@ -729,7 +730,7 @@ class NetworkService {
                                'UST',   'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM',   'OLO',
                                'WAGMIv0',
-                               'WAGMIv1', 
+                               'WAGMIv1',
                                'WAGMIv2', 'WAGMIv2-Oolong',
                                'WAGMIv3', 'WAGMIv3-Oolong'
                               ]
@@ -1021,7 +1022,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners() 
+      this.bindProviderListeners()
       // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
@@ -1259,27 +1260,57 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
+    try {
+      let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
+
+      if (monsterList.hasOwnProperty('data')) {
+        const monsters = monsterList.data.turingMonstersTransferEvents
+        for (let i = 0; i < monsters.length; i++) {
+          // console.log("adding monster:", i + 1)
+          const tokenId = monsters[i].tokenId
+          const owner = await contract.ownerOf(tokenId)
+          //console.log("owner:", owner)
+          if (owner.toLowerCase() === this.account.toLowerCase()) {
+            await this.addNFT(allAddresses.BobaMonsters, tokenId)
+          }
+        }
+        await this.checkMonster()
+      }
+    } catch(err) {
+      // Catch needed don't break the fetch monsters button
+      console.error(err);
+    }
+  }
+
+  async claimAuthenticatedFaucetTokensdd() {
+    try {
+      const tweetId = 'https://twitter.com/KevinRiedl5/status/1522128490211991552'.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
+      console.log("TWEET: ", tweetId)
+      await networkService.claimAuthenticatedTestnetTokens(tweetId)
+      console.log("DONE")
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async claimAuthenticatedTestnetTokens(tweetId) {
     const contract = new ethers.Contract(
-      allAddresses.BobaMonsters,
-      TuringMonsterJson.abi,
-      this.L2Provider
+      allAddresses.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
     )
 
-    if(monsterList.hasOwnProperty('data')) {
-      const monsters = monsterList.data.turingMonstersTransferEvents
-      for (let i = 0; i < monsters.length; i++) {
-        // console.log("adding monster:", i + 1)
-        const tokenId = monsters[i].tokenId
-        const owner = await contract.ownerOf(tokenId)
-            //console.log("owner:", owner)
-        if(owner.toLowerCase() === this.account.toLowerCase()) {
-          this.addNFT( allAddresses.BobaMonsters, tokenId )
-        }
-      }
-      this.checkMonster()
-    }
+    await contract.estimateGas.sendFunds(tweetId)
+    const claim = await contract.sendFunds(
+      tweetId,
+    )
+    await claim.wait()
   }
 
   async checkMonster() {
@@ -4265,7 +4296,7 @@ class NetworkService {
       await approveStatus.wait()
       console.log("Fixed Savings Approval", approveStatus)
     }
-    
+
     if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
       allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())

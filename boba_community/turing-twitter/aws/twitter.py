@@ -54,18 +54,18 @@ def lambda_handler(event, context):
   # 0000000000000000000000000000000000000000000000000000000000000020
   # 000000000000000000000000000000000000000000000000000000000000000c
   # 476574466f6c6c6f776572730000000000000000000000000000000000000000
-  
+
   # the input to the contract is
   # _msgSender(), twitterPostID_
   # address payable recipient_, string calldata twitterPostID_
   #
-  # But we also have to make sure that the _msgSender address is the same one 
+  # But we also have to make sure that the _msgSender address is the same one
   # that corresponds to the Boba Bubble
-  #  
+  #
 
   print("Params: ", params)
   # str_length_1 = int(params[1], 16) * 2
-  
+
   # the message sender
   senderAddress = params[1]
   # bytes_object = bytes.fromhex(request[-40]) # address

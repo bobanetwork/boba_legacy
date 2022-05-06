@@ -44,7 +44,7 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
-import KYCExample from '../artifacts/contracts/KYCExample.sol/KYCExample.json'
+import KYCExample from '../artifacts/contracts/AuthenticatedFaucet.sol/KYCExample.json'
 import TuringHelperJson from '../artifacts/contracts/common/TuringHelper.sol/TuringHelper.json'
 import L2GovernanceERC20Json from '../../../../contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import BobaTuringCreditJson from '../../../../../contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
