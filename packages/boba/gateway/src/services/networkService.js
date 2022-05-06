@@ -1288,17 +1288,6 @@ class NetworkService {
     }
   }
 
-  async claimAuthenticatedFaucetTokensdd() {
-    try {
-      const tweetId = 'https://twitter.com/KevinRiedl5/status/1522128490211991552'.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
-      console.log("TWEET: ", tweetId)
-      await networkService.claimAuthenticatedTestnetTokens(tweetId)
-      console.log("DONE")
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async claimAuthenticatedTestnetTokens(tweetId) {
     const contract = new ethers.Contract(
       allAddresses.AuthenticatedFaucet,

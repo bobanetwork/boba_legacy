@@ -144,7 +144,7 @@ class listNFT extends React.Component {
     }
 
     let imgSource = URL
-    if (URL && URL.substring(0, 4) === '<svg') {
+    if (URL?.substring(0, 4) === '<svg') {
       imgSource = `data:image/svg+xml;utf8,${URL}`
     }
 
@@ -180,18 +180,18 @@ class listNFT extends React.Component {
           small={small}
           onClick={this.handleClick}
         >
-          {meta && meta.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta.collection}</Typography>}
-          {meta && meta.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta.rank}</Typography>}
-          {meta && meta.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta.rarity_score}</Typography>}
+          {meta?.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta?.collection}</Typography>}
+          {meta?.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta?.rank}</Typography>}
+          {meta?.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta?.rarity_score}</Typography>}
           {rarity !== ''            && <Typography variant="body3">Rarity:{' '}{rarity}</Typography>}
-          {(meta && meta.attributes || []).map((attr, index) => {
+          {(meta?.attributes || []).map((attr, index) => {
             return (
               <Typography variant="body3" key={index}>
                 {attr.trait_type}:{' '}{attr.value}
               </Typography>
             )
           })}
-          {(meta && meta.traits || []).map((attr, index) => {
+          {(meta?.traits || []).map((attr, index) => {
             return (
               <Typography variant="body3" key={index}>
                 {attr.trait_type}:{' '}{attr.trait_value}

@@ -131,8 +131,6 @@ class Nft extends React.Component {
       accountEnabled,
     } = this.state
 
-    this.props.dispatch(openModal('monster'))
-
     if (!netLayer) {
 
       return (
