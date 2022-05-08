@@ -4,13 +4,13 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
 
 # Bobabase (1297)
 
-## BobaBase Addresses
+## Bobabase Addresses
 
-For **primary contracts and addresses** see [packages/contracts/deployments/bobaBase/README.md](../../packages/contracts/deployments/bobabase/README.md)
+For **primary contracts and addresses** see [packages/contracts/deployments/bobabase/README.md](../../packages/contracts/deployments/bobabase/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [BobaBase address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Bobabase address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
 
-## BobaBase Links and Endpoints
+## Bobabase Links and Endpoints
 
 |                 |                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------- |
@@ -23,13 +23,13 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 # Bobabeam (1294)
 
-## Mainnet Addresses
+## Bobabeam Addresses
 
-For **primary contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/bobabeam/README.md)
+For **primary contracts and addresses** see [packages/contracts/deployments/bobabeam/README.md](../../packages/contracts/deployments/bobabeam/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Bobabeam address registration dump](../../packages/boba/register/addresses/addressesBobaBeam_0xTBATBATBATBA.json).
 
-## Mainnet Links and Endpoints
+## Bobabeam Links and Endpoints
 
 |                   |                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------- |
