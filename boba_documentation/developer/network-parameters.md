@@ -8,7 +8,7 @@ description: A collection of links and addresses to get started on Boba-Ethereum
 
 For **primary network contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/rinkeby/README.md)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see [the Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json).
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json).
 
 ## Rinkeby Links and Endpoints
 
