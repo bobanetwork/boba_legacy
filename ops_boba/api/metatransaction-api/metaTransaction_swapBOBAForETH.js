@@ -3,40 +3,8 @@ const ethSigUtil = require('eth-sig-util')
 const YAML = require('yaml')
 const fs = require('fs')
 
-// Load env
-const file = fs.readFileSync('./env.yml', 'utf8')
-const env = YAML.parse(file)
-const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_URL
-const PRIVATE_KEY = env.PRIVATE_KEY
-const BOBA_GASPRICEORACLE_ADDRESS = env.BOBA_GASPRICEORACLE_ADDRESS
-const L2_BOBA_ADDRESS = env.L2_BOBA_ADDRESS
-
-// Get provider and wallet
-const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
-const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
-
-// ABI
-const BobaGasPriceOracleInterface = new ethers.utils.Interface([
-  'function useBobaAsFeeToken()',
-  'function useETHAsFeeToken()',
-  'function bobaFeeTokenUsers(address) view returns (bool)',
-  'function swapBOBAForETHMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
-  'function metaTransactionFee() view returns (uint256)',
-  'function marketPriceRatio() view returns (uint256)',
-  'function receivedETHAmount() view returns (uint256)',
-])
-
-const L2BobaInterface = new ethers.utils.Interface([
-  'function balanceOf(address) view returns (uint256)',
-])
-
-// Load contracts
-const Boba_GasPriceOracle = new ethers.Contract(
-  BOBA_GASPRICEORACLE_ADDRESS,
-  BobaGasPriceOracleInterface,
-  l2Wallet
-)
-const L2Boba = new ethers.Contract(L2_BOBA_ADDRESS, L2BobaInterface, l2Wallet)
+// Support local tests
+require('dotenv').config()
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -49,9 +17,53 @@ const headers = {
   'Permissions-Policy': '*',
 }
 
+// Load contracts
+const loadContracts = () => {
+  // Load env
+  let env = process.env
+  if (fs.existsSync('./env.yml')) {
+    const file = fs.readFileSync('./env.yml', 'utf8')
+    env = YAML.parse(file)
+  }
+  const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_URL || process.env.L2_NODE_WEB3_URL
+  const PRIVATE_KEY = env.PRIVATE_KEY || process.env.PRIVATE_KEY
+  const BOBA_GASPRICEORACLE_ADDRESS =
+    env.BOBA_GASPRICEORACLE_ADDRESS || process.env.BOBA_GASPRICEORACLE_ADDRESS
+  const L2_BOBA_ADDRESS = env.L2_BOBA_ADDRESS || process.env.L2_BOBA_ADDRESS
+
+  // Get provider and wallet
+  const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
+  const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
+
+  // ABI
+  const BobaGasPriceOracleInterface = new ethers.utils.Interface([
+    'function useBobaAsFeeToken()',
+    'function useETHAsFeeToken()',
+    'function bobaFeeTokenUsers(address) view returns (bool)',
+    'function swapBOBAForETHMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+    'function metaTransactionFee() view returns (uint256)',
+    'function marketPriceRatio() view returns (uint256)',
+    'function receivedETHAmount() view returns (uint256)',
+  ])
+
+  const L2BobaInterface = new ethers.utils.Interface([
+    'function balanceOf(address) view returns (uint256)',
+  ])
+
+  // Load contracts
+  const Boba_GasPriceOracle = new ethers.Contract(
+    BOBA_GASPRICEORACLE_ADDRESS,
+    BobaGasPriceOracleInterface,
+    l2Wallet
+  )
+  const L2Boba = new ethers.Contract(L2_BOBA_ADDRESS, L2BobaInterface, l2Wallet)
+
+  return [Boba_GasPriceOracle, L2Boba]
+}
+
 // Decrypt the signature and verify the message
 // Verify the user balance and the value
-const verifyBobay = async (body) => {
+const verifyBobay = async (body, Boba_GasPriceOracle, L2Boba) => {
   const { owner, spender, value, deadline, signature, data } = body
 
   if (
@@ -112,7 +124,8 @@ const verifyBobay = async (body) => {
 module.exports.mainnetHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
-  const isVerified = await verifyBobay(body)
+  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
+  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
   if (isVerified.isVerified === false) {
     return callback(null, {
       headers,
@@ -158,7 +171,8 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 module.exports.rinkebyHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
-  const isVerified = await verifyBobay(body)
+  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
+  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
   if (isVerified.isVerified === false) {
     return callback(null, {
       headers,
