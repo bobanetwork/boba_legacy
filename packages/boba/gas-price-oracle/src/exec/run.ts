@@ -90,6 +90,12 @@ const main = async () => {
     parseFloat(env.BOBA_FEE_RATIO_MIN_PERCENT_CHANGE) || 0.05
   )
 
+  // disable gasPrice=0 for local testing
+  const BOBA_LOCAL_TESTNET_CHAINID = config.uint(
+    'boba-local-testnet-chainid',
+    parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
+  )
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -157,6 +163,7 @@ const main = async () => {
     maxL1BaseFee: MAX_L1_BASE_FEE,
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
+    bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
   })
 
   await service.start()
