@@ -27,7 +27,7 @@
   * [Sending ETH to L2](boba\_examples/init-fund-l2/README.md)
   * [Adding a new ERC20 to Boba](boba\_documentation/developer/add-new-token.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
-  * [Contract Addresses](boba\_documentation/developer/network-parameters.md)
+  * [Contract Addresses Boba/ETH](boba\_documentation/developer/network-parameters.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)
   * [Verifying Contracts](boba\_documentation/developer/verify-smart-contracts.md)
   * [Using The Graph](packages/boba/subgraph/README.md)
