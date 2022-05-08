@@ -1,8 +1,14 @@
 ---
-description: A collection of links to get started on Boba
+description: A collection of links and addresses to get started on Boba
 ---
 
 # Rinkeby Links
+
+## Rinkeby Addresses
+
+For **primary network contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/rinkeby/README.md)
+
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see [the Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json).
 
 ## Rinkeby Links and Endpoints
 
@@ -14,11 +20,11 @@ description: A collection of links to get started on Boba
 | Blockexplorer   | [https://blockexplorer.rinkeby.boba.network](https://blockexplorer.rinkeby.boba.network) |
 | Websocket       | [wss://wss.rinkeby-v2.boba.network](wss://wss.rinkeby-v2.boba.network)                   |
 
-## Rinkeby Contract Addresses
-
-For all current addresses, please see [the address registration dump](../../packages/boba/register/addresses).
-
 # Mainnet Links
+
+For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/mainnet/README.md)
+
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see [the Rinkeby address registration dump](../../packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json).
 
 ## Mainnet Links and Endpoints
 
@@ -30,7 +36,3 @@ For all current addresses, please see [the address registration dump](../../pack
 | Gateway           | [https://gateway.boba.network](https://gateway.boba.network)                     |
 | Blockexplorer     | [https://blockexplorer.boba.network](https://blockexplorer.boba.network)         |
 | Websocket         | [wss://ws.mainnet.boba.network](wss://wss.mainnet.boba.network)                  |
-
-## Mainnet Contract and Token Addresses
-
-For all current addresses, please see [the address registration dump](../../packages/boba/register/addresses).
