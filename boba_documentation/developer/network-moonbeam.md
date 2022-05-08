@@ -2,7 +2,7 @@
 description: A collection of links and addresses to get started on Boba-Moonbeam
 ---
 
-# Bobabase (1297)
+# Bobabase L2 (1297) for the Moonbase Testnet (1287)
 
 ## Bobabase Addresses
 
@@ -12,16 +12,16 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ## Bobabase Links and Endpoints
 
-|                 |                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------- |
-| BobaBase ChainID| 1297                                                                               |
-| BobaBase RPC    | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
-| BobaBas Replica RPC | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network) |
-| Gateway         | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
-| Blockexplorer   | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
-| Websocket       | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
+|               |                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------- |
+| ChainID       | 1297                                                                               |
+| RPC           | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
+| Replica RPC   | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network)     |
+| Gateway       | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
+| Blockexplorer | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
+| Websocket     | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
 
-# Bobabeam (1294)
+# Bobabeam L2 (1294) for the Moonbeam L1 (1284)
 
 ## Bobabeam Addresses
 
@@ -31,11 +31,11 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ## Bobabeam Links and Endpoints
 
-|                   |                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Mainnet ChainID   | 1294                                                                              |
-| Mainnet RPC Read  | [https://tba](https://tba) |
-| Mainnet Write RPC | [https://tba](https://tba)                     |
-| Gateway           | [https://tba](https://tba)                     |
-| Blockexplorer     | [https://tba](https://tba)         |
-| Websocket         | [wss://tba](wss://tba)                  |
+|               |                                                                                  |
+| ------------- | -------------------------------------------------------------------------------- |
+| ChainID       | 1294                                                                             |
+| RPC Read      | [https://tba](https://tba)                     |
+| Write RPC     | [https://tba](https://tba)                     |
+| Gateway       | [https://tba](https://tba)                     |
+| Blockexplorer | [https://tba](https://tba)                     |
+| Websocket     | [wss://tba](wss://tba)                         |
