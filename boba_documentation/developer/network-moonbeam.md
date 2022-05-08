@@ -1,0 +1,43 @@
+---
+description: A collection of links and addresses to get started on Boba-Moonbeam
+---
+
+# Bobabase (TBA)
+
+## Bobabase Rinkeby Addresses
+
+For **primary network contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/moonbeam/rinkeby/README.md)
+
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0xTBATBATBATBA.json).
+
+## Rinkeby Links and Endpoints
+
+|                 |                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------- |
+| Rinkeby ChainID | 1294                                                                               |
+| Rinkeby RPC     | [https://api.bobabase.boba.network](https://api.bobabase.boba.network)             |
+| Gateway         | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
+| Blockexplorer   | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
+| Websocket       | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
+
+
+blockexplorer.bobabase.boba.network
+
+# Bobabeam (TBA)
+
+## Mainnet Addresses
+
+For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/moonbeam/mainnet/README.md)
+
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA).
+
+## Mainnet Links and Endpoints
+
+|                   |                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Mainnet ChainID   | 1297                                                                              |
+| Mainnet RPC Read  | [https://tba](https://tba) |
+| Mainnet Write RPC | [https://tba](https://tba)                     |
+| Gateway           | [https://tba](https://tba)                     |
+| Blockexplorer     | [https://tba](https://tba)         |
+| Websocket         | [wss://tba](wss://tba)                  |
