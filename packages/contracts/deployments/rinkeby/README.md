@@ -1,21 +1,8 @@
 # Boba Rinkeby (public testnet)
 ## Network Info
 - **Chain ID**: 28
-- **Public RPC**: https://rinkeby.boba.netwokr
+- **Public RPC**: https://rinkeby.boba.network
 - **Block Explorer**: https://blockexplorer.rinkeby.boba.network
-## Layer 1 Contracts
-<table>
-<tr>
-<th>
-<img width="506px" height="0px" />
-<p><small>Contract</small></p>
-</th>
-<th>
-<img width="506px" height="0px" />
-<p><small>Address</small></p>
-</th>
-</tr>
-</table>
 
 ## Layer 2 Contracts
 <table>
