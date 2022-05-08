@@ -3,19 +3,6 @@
 - **Chain ID**: 288
 - **Public RPC**: https://mainnet.boba.network
 - **Block Explorer**: https://blockexplorer.boba.network
-## Layer 1 Contracts
-<table>
-<tr>
-<th>
-<img width="506px" height="0px" />
-<p><small>Contract</small></p>
-</th>
-<th>
-<img width="506px" height="0px" />
-<p><small>Address</small></p>
-</th>
-</tr>
-</table>
 
 ## Layer 2 Contracts
 <table>
