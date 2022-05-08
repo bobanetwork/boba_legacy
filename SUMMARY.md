@@ -4,7 +4,7 @@
 * [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
 
-* User Documentation
+* User Docs
   * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
   * [Fraud Detection](boba\_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
