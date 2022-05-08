@@ -2,25 +2,26 @@
 description: A collection of links and addresses to get started on Boba-Moonbeam
 ---
 
-# Bobabase (1294)
+# Bobabase (1297)
 
-## Rinkeby Addresses
+## BobaBase Addresses
 
-For **primary contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/bobabase/README.md)
+For **primary contracts and addresses** see [packages/contracts/deployments/bobaBase/README.md](../../packages/contracts/deployments/bobabase/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [BobaBase address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
 
-## Rinkeby Links and Endpoints
+## BobaBase Links and Endpoints
 
 |                 |                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------- |
-| Rinkeby ChainID | 1294                                                                               |
-| Rinkeby RPC     | [https://api.bobabase.boba.network](https://api.bobabase.boba.network)             |
+| BobaBase ChainID| 1297                                                                               |
+| BobaBase RPC    | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
+| BobaBas Replica RPC | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network) |
 | Gateway         | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
 | Blockexplorer   | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
 | Websocket       | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
 
-# Bobabeam (1297)
+# Bobabeam (1294)
 
 ## Mainnet Addresses
 
@@ -32,7 +33,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [M
 
 |                   |                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------- |
-| Mainnet ChainID   | 1297                                                                              |
+| Mainnet ChainID   | 1294                                                                              |
 | Mainnet RPC Read  | [https://tba](https://tba) |
 | Mainnet Write RPC | [https://tba](https://tba)                     |
 | Gateway           | [https://tba](https://tba)                     |
