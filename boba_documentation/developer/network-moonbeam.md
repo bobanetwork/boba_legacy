@@ -8,7 +8,7 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
 
 For **primary contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/bobabase/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0xTBATBATBATBA.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
 
 ## Rinkeby Links and Endpoints
 
@@ -26,7 +26,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [R
 
 For **primary contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/bobabeam/README.md)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA).
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA.json).
 
 ## Mainnet Links and Endpoints
 
