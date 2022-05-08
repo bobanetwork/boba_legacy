@@ -111,12 +111,12 @@ $white500: rgba(255, 255, 255, 0.5);
     background: transparent;
     border: none;
   }
-  
+
   .react-datepicker__triangle {
     &::after {
       border-bottom-color: #09162B !important;
     }
-    
+
     &::before {
       border-bottom-color: #09162B !important;
     }
@@ -133,7 +133,7 @@ $white500: rgba(255, 255, 255, 0.5);
     color: #FFFFFF !important;
   }
 
-  .react-datepicker__day--disabled { 
+  .react-datepicker__day--disabled {
     opacity: 0.4
   }
   .react-datepicker__day {
@@ -141,15 +141,46 @@ $white500: rgba(255, 255, 255, 0.5);
       background-color: transparent;
       color: #fff;
       border-radius: 50%;
-      border: 0.2px solid #CCFF00; 
+      border: 0.2px solid #CCFF00;
     }
   }
-  .react-datepicker__day--keyboard-selected, 
-  .react-datepicker__month-text--keyboard-selected, 
-  .react-datepicker__quarter-text--keyboard-selected, 
+  .react-datepicker__day--keyboard-selected,
+  .react-datepicker__month-text--keyboard-selected,
+  .react-datepicker__quarter-text--keyboard-selected,
   .react-datepicker__year-text--keyboard-selected {
     border-radius: 50%;
     background-color: #3C5DFC;
     color: #fff;
   }
-}  
+}
+
+
+/*****************************************
+***  Background image specific styling ***
+******************************************/
+.pageContainer::after {
+  content: '';
+  position: absolute;
+  background: url('./images/boba2/wave_bg.svg') no-repeat;
+  top: 40%;
+  margin-left: -1%;
+  left: 0;
+  width: 100%;
+  height: 250px;
+  background-size: 50%;
+  z-index: -1;
+  transform: rotate(-8deg);
+}
+
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  background: url('./images/boba2/grid_bg.svg') no-repeat;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background-size: 100% 81%;
+  z-index: -1;
+  margin-bottom: 30px;
+}

@@ -1,6 +1,4 @@
-import { styled } from "@mui/material";
-import { Box } from "@mui/system";
-
+import { styled, Box } from "@mui/material"
 
 export const BridgeTransferContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -9,9 +7,9 @@ export const BridgeTransferContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TokenPicker = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
-  borderRadius: '12px',
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
   display: 'flex',
   justifyContent: 'center',
