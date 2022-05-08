@@ -4,13 +4,13 @@ import { Box, Button, Divider as MuiDivider, IconButton, Typography } from "@mui
 export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   backdropFilter: 'blur(100px)',
-  borderRadius: '20px',
+  borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
   flex: 1,
   minHeight: 'fit-content',
   padding: '20px',
   width: '100%',
-}));
-
+}))
 
 export const BobaContent = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -24,23 +24,19 @@ export const BobaContentWrapper = styled(Box)(({ theme, flexDirection }) => ({
   justifyContent: 'space-between',
   flexDirection: flexDirection || 'column',
   flexGrow: 1
-}));
-
+}))
 
 export const Divider = styled(MuiDivider)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  background: theme.palette.background.secondary,
   boxSizing: 'border-box',
-  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 
-
 export const ChainInput = styled(Box)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0 ,0, 0.04)'}`,
-  border: '1px solid',
-  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
   boxSizing: 'border-box',
-  borderRadius: '12px',
+  borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
   padding: '5px 10px',
   display: 'flex',
@@ -50,9 +46,9 @@ export const ChainInput = styled(Box)(({ theme }) => ({
   width: '100%',
   minWidth: '180px',
   [ theme.breakpoints.down('sm') ]: {
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     gap: '5px',
-    padding: '5px',
+    padding: '5px 10px',
     minWidth: '120px'
   }
 }))
@@ -73,16 +69,16 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
   alignSelf: 'center'
 }))
 
-
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
-  borderRadius: '20px',
+  borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
   width: '100%',
   padding: '10px',
   '&:hover > span': {
     color: theme.palette.secondary.main
   }
-}));
+}))
 
 export const LayerAlert = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -91,21 +87,21 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: '30px',
-  borderRadius: '8px',
+  borderRadius: theme.palette.primary.borderRadius,
   margin: '20px 0px',
   padding: '25px',
   [theme.breakpoints.up('md')]: {
     padding: '25px 50px',
   },
 
-}));
+}))
 
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
   [theme.breakpoints.up('md')]: {
   },
-}));
+}))
 
 export const AlertInfo = styled(Box)`
   display: flex;
@@ -115,10 +111,9 @@ export const AlertInfo = styled(Box)`
 `;
 
 export const IconSwitcher = styled(IconButton)(({ theme }) => ({
-  background: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.04)",
-  border: '1px solid',
-  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
-  borderRadius: '12px',
+  background: theme.palette.background.secondary,
+  border: theme.palette.primary.border,
+  borderRadius: theme.palette.primary.borderRadius,
   height: '40px',
   width: '40px',
   display: 'flex',
