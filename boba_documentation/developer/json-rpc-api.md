@@ -1,6 +1,8 @@
+
 Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/json-rpc/API) as Ethereum. Some new custom methods have been introduced and some other have been made unsupported for operation.
 
 ### Custom JSON-RPC methods
+
 #### `eth_getBlockRange`
 
 DEPRECATION NOTICE
@@ -24,6 +26,7 @@ An array of `block` objects. See [`eth_getBlockByHash` (opens new window)](https
 ```
 // Request
 curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_getBlockRange","params":["0x1", "0x2", false],"id":1}' <node url>
+
 
 // Result
 {
@@ -105,6 +108,7 @@ None
 // Request
 curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"rollup_getInfo","params":[],"id":1}' <node url>
 
+
 // Result
 {
   "jsonrpc":"2.0",
@@ -145,6 +149,7 @@ None
 ```
 // Request
 curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"rollup_gasPrices","params":[],"id":1}' <node url>
+
 
 // Result
 {
@@ -240,6 +245,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
   "result": "0x5208" // 21000
 }
 ```
+
 ### Unsupported JSON-RPC methods
 
 #### `eth_getAccounts`
