@@ -18,13 +18,13 @@ function BridgeContainer() {
           isMobile && accountEnabled ?
             null
             : <S.TitleContainer>
-              <Typography variant="h1"
+              <Typography variant="h2"
               > Transfer
                 <br />
                 tokens between Ethereum and
                 <br />
                 <Typography
-                  variant="h1"
+                  variant="h2"
                   component="span"
                   sx={{
                     background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',

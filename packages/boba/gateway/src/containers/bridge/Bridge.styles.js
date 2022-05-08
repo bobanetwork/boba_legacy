@@ -1,5 +1,7 @@
-import styled from '@emotion/styled';
-import { Box } from "@mui/material";
+import styled from '@emotion/styled'
+import { Box } from "@mui/material"
+import bobaGlassBg from 'images/boba2/boba_glass_bg.svg'
+import bobaGlassIcon from 'images/boba2/boba_glass.svg'
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
@@ -41,11 +43,41 @@ export const TitleContainer = styled(Box)(({ theme }) => ({
   textTransform: 'uppercase',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
-  padding: '30px',
+  alignItems: 'flex-start',
+  padding: '70px 50px',
+  position: 'relative',
+  minHeight: '500px',
   [ theme.breakpoints.down('sm') ]: {
     padding: '0',
-    width: '100%'
+    width: '100%',
+    minHeight: 'auto',
+    '::after': {
+      display: 'none'
+    },
+    '::before': {
+      display: 'none'
+    }
+  },
+  '::before': {
+    content: '" "',
+    position: 'absolute',
+    top: '5%',
+    right: '25%',
+    width: '50px',
+    height: '50px',
+    background: `url(${bobaGlassIcon}) no-repeat`,
+    backgroundSize: '100% 90%',
+  },
+  '::after': {
+    content: '" "',
+    position: 'absolute',
+    bottom: '20%',
+    left: 0,
+    width: '90%',
+    height: '100%',
+    background: `url(${bobaGlassBg}) no-repeat`,
+    backgroundSize: '100%',
+    zIndex: '-1'
   }
 }))
 

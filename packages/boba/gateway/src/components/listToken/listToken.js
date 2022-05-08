@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 
 import { 
@@ -26,8 +26,6 @@ function ListToken({
 }) {
   const [ dropDownBox, setDropDownBox ] = useState(false)
 
-  const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
-
   const theme = useTheme()
   
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -44,18 +42,8 @@ function ListToken({
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-  let WAGMI_v1 = 1 + (sliderValue_v1 / 11.1)
-  if(sliderValue_v1 === 0) {
-    WAGMI_v1 = 0.5
-  }
-  const TVL_v1 = Number(69 + (sliderValue_v1 / 100) * 305)
-
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
-  }
-
-  const handleSliderChange_v1 = (e) => {
-    setSliderValue_v1(e.target.value)
   }
 
   async function doSettle_v0 () {
@@ -73,6 +61,15 @@ function ListToken({
   async function doSettle_v2OLO () {
     await dispatch(settle_v2OLO())
   }
+
+  async function doSettle_v3 () {
+    //await dispatch(settle_v3())
+  }
+
+  async function doSettle_v3OLO () {
+    //await dispatch(settle_v3OLO())
+  }
+
 
   if (isMobile) {
     return (
@@ -156,6 +153,8 @@ function ListToken({
                 token.symbol !== 'WAGMIv1' &&
                 token.symbol !== 'WAGMIv2' && 
                 token.symbol !== 'WAGMIv2-Oolong' &&
+                token.symbol !== 'WAGMIv3' && 
+                token.symbol !== 'WAGMIv3-Oolong' &&
                 <>
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -292,6 +291,44 @@ function ListToken({
                   </Button>
                 </div>
               }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Button
+                    onClick={() => { doSettle_v3() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv3 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Button
+                    onClick={() => { doSettle_v3OLO() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv3-Oolong long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
             </S.DropdownWrapper>
           </Fade>
         ) : null}
@@ -364,6 +401,8 @@ function ListToken({
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
+            token.symbol !== 'WAGMIv3' &&
+            token.symbol !== 'WAGMIv3-Oolong' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -531,7 +570,62 @@ function ListToken({
               </div>
             </div>
           }
-          
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Button
+                  onClick={() => { doSettle_v3() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv3 long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Button
+                  onClick={() => { doSettle_v3OLO() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv3-Oolong long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
         </S.TableCell>
       </S.TableBody>
     </S.Content>
