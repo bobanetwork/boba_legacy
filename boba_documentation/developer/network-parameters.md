@@ -18,7 +18,7 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 | Rinkeby ChainID | 28                                                                                       |
 | Gateway         | [https://gateway.rinkeby.boba.network](https://gateway.rinkeby.boba.network)             |
 | Blockexplorer   | [https://blockexplorer.rinkeby.boba.network](https://blockexplorer.rinkeby.boba.network) |
-| Websocket       | [wss://wss.rinkeby-v2.boba.network](wss://wss.rinkeby-v2.boba.network)                   |
+| Websocket       | [wss://wss.rinkeby.boba.network](wss://wss.rinkeby.boba.network)                   |
 
 # Mainnet
 
