@@ -42,8 +42,6 @@
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
 
 * [Other](packages/README.md)
-  * [Boba Mainnet Addresses](packages/contracts/deployments/mainnet/README.md)
-  * [Boba Rinkeby Addresses](packages/contracts/deployments/rinkeby/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
   * [Boba NFT Bridges](packages/boba/contracts/contracts/bridges/README.md)
   * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)

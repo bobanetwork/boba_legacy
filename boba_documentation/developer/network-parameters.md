@@ -2,7 +2,7 @@
 description: A collection of links and addresses to get started on Boba
 ---
 
-# Rinkeby Links
+# Rinkeby
 
 ## Rinkeby Addresses
 
@@ -20,7 +20,9 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 | Blockexplorer   | [https://blockexplorer.rinkeby.boba.network](https://blockexplorer.rinkeby.boba.network) |
 | Websocket       | [wss://wss.rinkeby-v2.boba.network](wss://wss.rinkeby-v2.boba.network)                   |
 
-# Mainnet Links
+# Mainnet
+
+## Mainnet Addresses
 
 For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/mainnet/README.md)
 
