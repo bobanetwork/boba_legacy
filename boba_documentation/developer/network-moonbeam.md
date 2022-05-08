@@ -2,7 +2,7 @@
 description: A collection of links and addresses to get started on Boba-Moonbeam
 ---
 
-# Bobabase (TBA)
+# Bobabase (1294)
 
 ## Rinkeby Addresses
 
@@ -20,13 +20,13 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [R
 | Blockexplorer   | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
 | Websocket       | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
 
-# Bobabeam (TBA)
+# Bobabeam (1297)
 
 ## Mainnet Addresses
 
 For **primary contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/bobabeam/README.md)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA.json).
 
 ## Mainnet Links and Endpoints
 
