@@ -23,19 +23,19 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 # Bobabeam L2 (1294) for the Moonbeam L1 (1284)
 
-## Bobabeam Addresses
+## Bobabeam Addresses (tbd)
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobabeam/README.md](../../packages/contracts/deployments/bobabeam/README.md)
 
 For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Bobabeam address registration dump](../../packages/boba/register/addresses/addressesBobaBeam_0xTBATBATBATBA.json).
 
-## Bobabeam Links and Endpoints
+## Bobabeam Links and Endpoints (tbd)
 
 |               |                                                                                  |
 | ------------- | -------------------------------------------------------------------------------- |
 | ChainID       | 1294                                                                             |
-| RPC Read      | [https://tba](https://tba)                     |
-| Write RPC     | [https://tba](https://tba)                     |
-| Gateway       | [https://tba](https://tba)                     |
-| Blockexplorer | [https://tba](https://tba)                     |
-| Websocket     | [wss://tba](wss://tba)                         |
+| RPC Read      | [https://tbd](https://tbd)                     |
+| Write RPC     | [https://tbd](https://tbd)                     |
+| Gateway       | [https://tbd](https://tbd)                     |
+| Blockexplorer | [https://tbd](https://tbd)                     |
+| Websocket     | [wss://tbd](wss://tbd)                         |
