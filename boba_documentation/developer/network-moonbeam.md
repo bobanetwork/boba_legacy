@@ -18,7 +18,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | RPC           | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
 | Replica RPC   | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network)     |
 | Gateway       | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
-| Blockexplorer | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
+| Blockexplorer | [https://blockexplorer.bobabase.boba.network](https://blockexplorer.bobabase.boba.network) |
 | Websocket     | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
 
 # Bobabeam L2 (1294) for the Moonbeam L1 (1284)
