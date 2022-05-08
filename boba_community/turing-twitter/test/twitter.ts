@@ -1,24 +1,21 @@
 // https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/test/005_lending.ts
 
-import {
-  BigNumber,
-  Contract,
-  ContractFactory,
-  providers,
-  Wallet,
-  utils,
-} from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { ethers } from 'hardhat'
+import { Contract, ContractFactory, providers, utils, Wallet } from 'ethers'
+import hre, { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
+import * as request from 'request-promise-native'
+import TwitterAuthenticatedFaucetMeta from '../artifacts/contracts/AuthenticatedFaucetMeta.sol/AuthenticatedFaucetMeta.json'
+import TwitterAuthenticatedFaucet from '../artifacts/contracts/AuthenticatedFaucet.sol/AuthenticatedFaucet.json'
+import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
+import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 chai.use(solidity)
 const abiDecoder = require('web3-eth-abi')
-import * as request from 'request-promise-native'
 
 const fetch = require('node-fetch')
-import hre from 'hardhat'
 
 const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
@@ -37,17 +34,14 @@ let Factory__BobaTuringCredit: ContractFactory
 let Factory__ERC20Mock: ContractFactory
 let erc20Mock: Contract
 let Factory__TwitterClaim: ContractFactory
+let Factory__TwitterClaimMeta: ContractFactory
 let twitter: Contract
+let twitterMeta: Contract
 let Factory__TuringHelper: ContractFactory
 let turingHelper: Contract
 let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
-
-import TwitterAuthenticatedFaucet from '../artifacts/contracts/AuthenticatedFaucet.sol/AuthenticatedFaucet.json'
-import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
 
 describe('Verify Twitter post for testnet funds', function () {
   before(async () => {
@@ -60,13 +54,24 @@ describe('Verify Twitter post for testnet funds', function () {
     turingHelper = await Factory__TuringHelper.deploy(gasOverride)
     console.log('Helper contract deployed as', turingHelper.address)
 
+    Factory__TwitterClaimMeta = new ContractFactory(
+      TwitterAuthenticatedFaucetMeta.abi,
+      TwitterAuthenticatedFaucetMeta.bytecode,
+      deployerWallet
+    )
+
+    twitterMeta = await Factory__TwitterClaimMeta.deploy(gasOverride)
+
     Factory__TwitterClaim = new ContractFactory(
       TwitterAuthenticatedFaucet.abi,
       TwitterAuthenticatedFaucet.bytecode,
       deployerWallet
     )
 
+    console.log('TwitterMeta contract deployed on', twitterMeta.address)
+
     twitter = await Factory__TwitterClaim.deploy(
+      twitterMeta.address,
       'https://rsqtbccfs3.execute-api.us-east-1.amazonaws.com/Stage/',
       turingHelper.address,
       10,
@@ -80,10 +85,19 @@ describe('Verify Twitter post for testnet funds', function () {
     const fTx = await deployerWallet.sendTransaction({
       ...gasOverride,
       to: twitter.address,
-      value: ethers.utils.parseEther('0.000001')
+      value: ethers.utils.parseEther('0.000001'),
     })
     await fTx.wait()
     console.log('Funded faucet..')
+
+    // fund gas
+    const gTx = await deployerWallet.sendTransaction({
+      ...gasOverride,
+      to: twitterMeta.address,
+      value: ethers.utils.parseEther('0.001'),
+    })
+    await gTx.wait()
+    console.log('Funded gas..')
 
     // whitelist the new 'lending' contract in the helper
     const tr1 = await turingHelper.addPermittedCaller(twitter.address)
@@ -161,22 +175,17 @@ describe('Verify Twitter post for testnet funds', function () {
 
   it('should fail without funds', async () => {
     await expect(
-      twitter.estimateGas.sendFunds(
-        '1520370421773725698',
-        gasOverride
-      )
+      twitter.estimateGas.sendFunds('1520370421773725698', gasOverride)
     ).to.be.reverted
   })
 
   it('should fail for invalid tweet', async () => {
-    await expect(
-      twitter.estimateGas.sendFunds(
-        '8392382399393',
-        gasOverride
-      )
-    ).to.be.reverted
+    await expect(twitter.estimateGas.sendFunds('8392382399393', gasOverride)).to
+      .be.reverted
   })
 
+  /*
+  // Still works
   it('should conduct basic twitter claim', async () => {
     const tweetId = '1522128490211991552'
     await twitter.estimateGas.sendFunds(tweetId, gasOverride)
@@ -187,15 +196,86 @@ describe('Verify Twitter post for testnet funds', function () {
     )
     const res = await claim.wait()
     expect(res).to.be.ok
+  })*/
+
+  it('should conduct basic twitter claim via meta transaction', async () => {
+    const tweetId = '1522128490211991552'
+
+    const nonce = await twitterMeta.getNonce(
+      deployerWallet.address,
+      gasOverride
+    )
+    const types = {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ForwardRequest: [
+        { name: 'from', type: 'address' },
+        { name: 'to', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'gas', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'data', type: 'bytes' },
+      ],
+    }
+
+    // The data to sign
+    const value = {
+      from: deployerWallet.address,
+      to: deployerWallet.address,
+      value: 0,
+      gas: gasOverride.gasLimit,
+      nonce: parseInt(nonce, 10),
+      data: [],
+    }
+
+    const chainId = (await twitterMeta.provider.getNetwork()).chainId
+    const SIGNING_DOMAIN_NAME = 'AuthenticatedFaucet'
+    const SIGNING_DOMAIN_VERSION = '1'
+    const domain = {
+      name: SIGNING_DOMAIN_NAME,
+      version: SIGNING_DOMAIN_VERSION,
+      verifyingContract: twitterMeta.address,
+      chainId,
+    }
+    // const signature = await deployerWallet._signTypedData(domain, types, value)
+    const signature = signTypedData({
+      privateKey: ethers.utils.arrayify(deployerPK) as any, // deployerPK,
+      data: { primaryType: 'ForwardRequest', types, domain, message: value },
+      version: SignTypedDataVersion.V4,
+    })
+
+    const originalSigner = await twitterMeta.verifyTEST(
+      value,
+      signature,
+      gasOverride
+    )
+    const verifiedData = ethers.utils.verifyTypedData(
+      domain,
+      types,
+      value,
+      signature
+    )
+    console.log('SIGG', signature, originalSigner, verifiedData)
+
+    console.log('Executing meta tx: ', signature, value)
+    const execTx = await twitterMeta.execute(value, signature, gasOverride)
+    const res = await execTx.wait()
+
+    /*await twitter.estimateGas.sendFunds(tweetId, gasOverride)
+    console.log('Estimated gas')
+    const claim = await twitter.sendFunds(tweetId, gasOverride)
+    const res = await claim.wait()*/
+    expect(res).to.be.ok
   })
 
   it('should fail for second twitter claim', async () => {
     // try to claim again
     await expect(
-      twitter.estimateGas.sendFunds(
-        '1520370421773725698',
-        gasOverride
-      )
+      twitter.estimateGas.sendFunds('1520370421773725698', gasOverride)
     ).to.be.reverted
   })
 })

@@ -2,10 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/ITuringHelper.sol";
-import "./WithRecover.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract AuthenticatedFaucet is WithRecover {
+contract AuthenticatedFaucet is ERC2771Context {
     string public apiUrl;
     ITuringHelper public turingHelper;
     mapping(uint256 => uint256) twitterUserLastClaim;
@@ -16,11 +16,8 @@ contract AuthenticatedFaucet is WithRecover {
 
     event GasClaimed(uint256 authorId);
 
-    /*modifier isEligible() {
-        _;
-    }*/
-
-    constructor(string memory apiUrl_, address turingHelper_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_) {
+    constructor(address trustedForwarder, string memory apiUrl_, address turingHelper_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_)
+            ERC2771Context(trustedForwarder) {
         apiUrl = apiUrl_;
         turingHelper = ITuringHelper(turingHelper_);
         lastEpochStart = block.timestamp;
@@ -57,11 +54,4 @@ contract AuthenticatedFaucet is WithRecover {
     }
 
     receive() external payable {}
-
-    /*function verify(bytes32 _hashedMessage, uint8 _v, bytes32 _r, bytes32 _s) private pure returns (address) {
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, _hashedMessage));
-        address signer = ecrecover(prefixedHashMessage, _v, _r, _s);
-        return signer;
-    }*/
 }
