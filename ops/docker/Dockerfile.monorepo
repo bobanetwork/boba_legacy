@@ -48,6 +48,7 @@ COPY packages/data-transport-layer/package.json ./packages/data-transport-layer/
 COPY packages/message-relayer/package.json ./packages/message-relayer/package.json
 COPY packages/replica-healthcheck/package.json ./packages/replica-healthcheck/package.json
 COPY integration-tests/package.json ./integration-tests/package.json
+COPY ops_boba/api/package.json ./ops_boba/api/package.json
 
 COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
 COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
@@ -70,12 +71,14 @@ WORKDIR /optimism
 COPY --from=builder /optimism/node_modules ./node_modules
 COPY --from=builder /optimism/packages ./packages
 COPY --from=builder /optimism/integration-tests ./integration-tests
+COPY --from=builder /optimism/ops_boba/api ./ops_boba/api
 
 # the following steps are cheap
 COPY *.json yarn.lock ./
 # copy over the source
 COPY ./packages ./packages
 COPY ./integration-tests ./integration-tests
+COPY ./ops_boba/api ./ops_boba/api
 # copy over solc to save time building (35+ seconds vs not doing this step)
 COPY --from=downloader solc-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
 COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
