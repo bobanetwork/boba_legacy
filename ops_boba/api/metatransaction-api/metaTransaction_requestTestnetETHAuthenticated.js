@@ -5,8 +5,8 @@ const fs = require('fs')
 // Load env
 const file = fs.readFileSync('./env.yml', 'utf8')
 const env = YAML.parse(file)
-const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_URL
-const PRIVATE_KEY = env.PRIVATE_KEY
+const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_TESTNET_URL
+const PRIVATE_KEY = env.PRIVATE_KEY_FAUCET
 const BOBA_AUTHENTICATEDFAUCET_ADDRESS = env.BOBA_AUTHENTICATEDFAUCET_ADDRESS
 
 // Get provider and wallet
