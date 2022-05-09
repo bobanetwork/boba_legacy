@@ -59,7 +59,7 @@ Here are five fully worked out examples for you to build on:
 * Use Turing to build a [CAPTCHA-gated token faucet](../../boba\_community/turing-captcha-faucet/README.md)
 * Use Turing to [mint NFTs with random attributives](../../boba\_community/turing-monsters/README.md)
 * Do all [stableswap quadratic math off-chain, just in time](../../packages/boba/turing/test/003_stable_swap.ts)
-* Query [centralized off-chain price feeds](../../packages/boba/turing/test/005_lending.ts). Note - these cannot replace on-chain oracles and this approach should not be used for production use. An on-chain oracle such as ChainLink is the better design pattern.
+* Query [centralized off-chain price feeds](../../packages/boba/turing/test/005_lending.ts). Note - these cannot replace on-chain oracles and this approach should not be used in production. An on-chain oracle such as ChainLink is the better design pattern.
 * Connect [on-chain events with commercial KYC providers](../../boba\_community/turing-kyc/README.md) 
 
 There is more information on setting up your own servers and compute endpoints here: 
