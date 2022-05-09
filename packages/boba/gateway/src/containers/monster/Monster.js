@@ -15,6 +15,8 @@ import networkService from "services/networkService";
 import BobaGlassIcon from "components/icons/BobaGlassIcon";
 import Connect from "containers/connect/Connect";
 import Button from "../../components/button/Button";
+import { getETHMetaTransaction, getTestnetETHAuthenticatedMetaTransaction } from "../../actions/setupAction";
+import { openAlert } from "../../actions/uiAction";
 
 class Monster extends React.Component {
 
@@ -116,7 +118,10 @@ class Monster extends React.Component {
     try {
       this.setState({...this.state, isClaimFaucetLoading: true})
       const tweetId = this.state.tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
-      await networkService.claimAuthenticatedTestnetTokens(tweetId)
+
+      const {dispatch} = this.props
+      const res = await dispatch(getTestnetETHAuthenticatedMetaTransaction(tweetId))
+      if (res) dispatch(openAlert('Faucet request submitted'))
     } catch (err) {
       let error = err.message.match(/execution reverted: (.*)\\+"}}/)
       if (error) {

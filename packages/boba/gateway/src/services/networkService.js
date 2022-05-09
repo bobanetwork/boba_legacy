@@ -574,6 +574,44 @@ class NetworkService {
     }
   }
 
+  /** @dev Only works on testnet, but can be freely called on production app */
+  async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
+
+    console.log("triggering getTestnetETH")
+
+    const Boba_AuthenticatedFaucet = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    )
+
+    const nonce = parseInt(
+      await Boba_AuthenticatedFaucet.getNonce(this.account),
+      10
+    )
+    const signer = this.provider.getSigner(this.account)
+    const hashedMsg = ethers.utils.solidityKeccak256(
+      ['address', 'uint'],
+      [this.account, nonce]
+    )
+    const messageHashBin = ethers.utils.arrayify(hashedMsg)
+    const signature = await signer.signMessage(messageHashBin)
+
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
+      console.log("response",response)
+    } catch (error) {
+      console.log(error)
+      let errorData = error.response.data.error
+      if(errorData.hasOwnProperty('error')) {
+        errorData = errorData.error.error.body
+      }
+      return errorData
+    }
+  }
+
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
     if (address === ERROR_ADDRESS) {
@@ -1294,7 +1332,7 @@ class NetworkService {
       addresses_Rinkeby.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
-    )
+    ).connect()
 
     await contract.estimateGas.sendFunds(tweetId)
     const claim = await contract.sendFunds(
