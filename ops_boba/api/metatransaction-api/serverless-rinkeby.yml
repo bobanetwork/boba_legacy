@@ -32,8 +32,8 @@ functions:
           cors: true
     layers:
       - ${file(env-rinkeby.yml):LAYERS}
-  boba_requestTestnetETHAuthenticated:
-    handler: metaTransaction_requestTestnetETHAuthenticated.rinkebyHandler
+  boba_getTestnetETH:
+    handler: metaTransaction_getTestnetETH.rinkebyHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
@@ -44,7 +44,7 @@ functions:
         - ${file(env-rinkeby.yml):SUBNET_ID_2}
     events:
       - http:
-          path: send.requestTestnetETHAuthenticated
+          path: send.getTestnetETH
           method: post
           cors: true
     layers:

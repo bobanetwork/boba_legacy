@@ -577,7 +577,7 @@ class NetworkService {
   /** @dev Only works on testnet, but can be freely called on production app */
   async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
 
-    console.log("triggering getTestnetETHAuthenticatedMetaTransaction")
+    console.log("triggering getTestnetETH")
 
     const Boba_AuthenticatedFaucet = new ethers.Contract(
       addresses_Rinkeby.AuthenticatedFaucet,
@@ -600,7 +600,7 @@ class NetworkService {
     try {
       const response = await metaTransactionAxiosInstance(
         this.networkGateway
-      ).post('/send.requestTestnetETHAuthenticated', { hashedMsg, signature, tweetId, walletAddress: this.account })
+      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
       console.log("response",response)
     } catch (error) {
       console.log(error)

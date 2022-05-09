@@ -15,7 +15,7 @@ const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
 
 // ABI
 const TwitterAuthenticatedFaucetInterface = new ethers.utils.Interface([
-  'function swapBOBAForETHMetaTransaction(address,string,bytes32,bytes)',
+  'function sendFundsMeta(address,string,bytes32,bytes)',
 ])
 
 // Load contracts
