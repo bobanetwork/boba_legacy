@@ -27,7 +27,8 @@
   * [Sending ETH to L2](boba\_examples/init-fund-l2/README.md)
   * [Adding a new ERC20 to Boba](boba\_documentation/developer/add-new-token.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
-  * [Contract Addresses](boba\_documentation/developer/network-parameters.md)
+  * [Contract Addresses Boba/Ethereum](boba\_documentation/developer/network-parameters.md)
+  * [Contract Addresses Boba/Moonbeam](boba\_documentation/developer/network-moonbeam.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)
   * [Verifying Contracts](boba\_documentation/developer/verify-smart-contracts.md)
   * [Using The Graph](packages/boba/subgraph/README.md)
@@ -42,8 +43,6 @@
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
 
 * [Other](packages/README.md)
-  * [Boba Mainnet Addresses](packages/contracts/deployments/mainnet/README.md)
-  * [Boba Rinkeby Addresses](packages/contracts/deployments/rinkeby/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
   * [Boba NFT Bridges](packages/boba/contracts/contracts/bridges/README.md)
   * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
