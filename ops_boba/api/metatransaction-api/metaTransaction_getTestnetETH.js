@@ -5,7 +5,7 @@ const fs = require('fs')
 // Load env
 const file = fs.readFileSync('./env.yml', 'utf8')
 const env = YAML.parse(file)
-const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_TESTNET_URL
+const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_TESTNET_URL === undefined ? env.L2_NODE_WEB3_URL : env.L2_NODE_WEB3_TESTNET_URL
 const PRIVATE_KEY = env.PRIVATE_KEY_FAUCET
 const BOBA_AUTHENTICATEDFAUCET_ADDRESS = env.BOBA_AUTHENTICATEDFAUCET_TESTNET_ADDRESS
 
@@ -43,6 +43,8 @@ module.exports.mainnetHandler = async (event, context, callback) => {
   const { hashedMsg, signature, tweetId, walletAddress } = body
   // Send transaction to node
   try {
+    console.log("SendFundsMeta: ", walletAddress, tweetId, hashedMsg, signature, L2_NODE_WEB3_URL)
+
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,
       tweetId,
@@ -59,6 +61,7 @@ module.exports.mainnetHandler = async (event, context, callback) => {
     await execTx.wait();
 
   } catch (err) {
+    console.error(err)
     return callback(null, {
       headers,
       statusCode: 400,
@@ -80,6 +83,8 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
   const { hashedMsg, signature, tweetId, walletAddress } = body
   // Send transaction to node
   try {
+    console.log("SendFundsMeta: ", walletAddress, tweetId, hashedMsg, signature)
+
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,
       tweetId,
@@ -96,6 +101,7 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
     await execTx.wait();
 
   } catch (err) {
+    console.error(err)
     return callback(null, {
       headers,
       statusCode: 400,
