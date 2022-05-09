@@ -65,6 +65,10 @@ export function getETHMetaTransaction() {
   return createAction('SETUP/GETETH', () => networkService.getETHMetaTransaction())
 }
 
+export function getTestnetETHAuthenticatedMetaTransaction(tweetId) {
+  return createAction('SETUP/AUTH_FAUCET', () => networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId))
+}
+
 export async function addBobaFee ( bobaFee ) {
   store.dispatch({ type: 'BOBAFEE/ADD/SUCCESS', payload: bobaFee })
 }

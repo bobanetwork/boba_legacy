@@ -32,3 +32,21 @@ functions:
           cors: true
     layers:
       - ${file(env-mainnet.yml):LAYERS}
+  boba_requestTestnetETHAuthenticated:
+    # NOTE: On purpose to use RINKEBY here for mainnet, as AuthFaucet should work on mainnet, but trigger a testnet contract!
+    handler: metaTransaction_requestTestnetETHAuthenticated.rinkebyHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-rinkeby.yml):SUBNET_ID_1}
+        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.requestTestnetETHAuthenticated
+          method: post
+          cors: true
+    layers:
+      - ${file(env-rinkeby.yml):LAYERS}

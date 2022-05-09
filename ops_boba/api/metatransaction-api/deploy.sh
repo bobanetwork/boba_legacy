@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[$STAGE == "all"]]; then
+if [[ $STAGE == "all" ]]; then
   echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
   cp env-rinkeby.yml env.yml &&
   serverless -c serverless-rinkeby.yml deploy &&
