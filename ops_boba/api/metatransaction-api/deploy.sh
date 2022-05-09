@@ -3,12 +3,12 @@
 if [[ $STAGE == "all" ]]; then
   echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
   cp env-rinkeby.yml env.yml &&
-  serverless -c serverless-rinkeby.yml deploy &&
+  serverless -c serverless-rinkeby.yml deploy --aws-profile boba &&
   rm -rf env.yml &&
   rm -rf .serverless &&
   echo 'You set STAGE to mainnet. Deploying to Mainnet...'
   cp env-mainnet.yml env.yml &&
-  serverless -c serverless-mainnet.yml deploy &&
+  serverless -c serverless-mainnet.yml deploy --aws-profile boba &&
   rm -rf env.yml &&
   rm -rf .serverless
 fi
@@ -28,3 +28,5 @@ if [[ $STAGE == "mainnet" ]]; then
   rm -rf env.yml &&
   rm -rf .serverless
 fi
+
+echo 'Done..'
