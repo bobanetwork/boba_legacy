@@ -4,8 +4,9 @@ pragma solidity ^0.8.9;
 import "./interfaces/ITuringHelper.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract AuthenticatedFaucet {
+contract AuthenticatedFaucet is Ownable {
     using ECDSA for bytes32;
 
     string public apiUrl;
@@ -69,6 +70,10 @@ contract AuthenticatedFaucet {
     function verifyMessage(bytes32 _hashedMessage, bytes memory signature) public pure returns (address) {
         bytes32 signedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _hashedMessage));
         return signedHash.recover(signature);
+    }
+
+    function withdraw() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
     }
 
     receive() external payable {}
