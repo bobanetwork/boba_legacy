@@ -105,6 +105,8 @@ function TokenPage() {
         return 'boba-network'
       } else if(i.symbolL1 === 'OLO') {
         return 'oolongswap'
+      } else if(i.symbolL1 === 'USDC') {
+        return 'usd-coin'
       } else {
         return i.symbolL1.toLowerCase()
       }

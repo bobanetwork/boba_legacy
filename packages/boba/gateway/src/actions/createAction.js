@@ -33,6 +33,13 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      if(response && typeof(response) === 'string' && response.includes('Insufficient balance')) {
+        //let errorMessage = JSON.parse(response)
+        dispatch({ type: `UI/ERROR/UPDATE`, payload: "Insufficient BOBA balance for emergency swap" })
+        dispatch({ type: `${key}/ERROR` })
+        return false
+      }
+
       //deal with metamask errors - they will have a 'code' field so we can detect those
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
 
