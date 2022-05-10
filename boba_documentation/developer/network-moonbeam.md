@@ -2,40 +2,40 @@
 description: A collection of links and addresses to get started on Boba-Moonbeam
 ---
 
-# Bobabase (1297)
+# Bobabase L2 (1297) for the Moonbase Testnet (1287)
 
-## BobaBase Addresses
+## Bobabase Addresses
 
-For **primary contracts and addresses** see [packages/contracts/deployments/bobaBase/README.md](../../packages/contracts/deployments/bobabase/README.md)
+For **primary contracts and addresses** see [packages/contracts/deployments/bobabase/README.md](../../packages/contracts/deployments/bobabase/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [BobaBase address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Bobabase address registration dump](../../packages/boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json).
 
-## BobaBase Links and Endpoints
+## Bobabase Links and Endpoints
 
-|                 |                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------- |
-| BobaBase ChainID| 1297                                                                               |
-| BobaBase RPC    | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
-| BobaBas Replica RPC | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network) |
-| Gateway         | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
-| Blockexplorer   | [https://blockexplorer.bobabase.boba.network](blockexplorer.bobabase.boba.network) |
-| Websocket       | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
+|               |                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------- |
+| ChainID       | 1297                                                                               |
+| RPC           | [https://bobabase.boba.network](https://bobabase.boba.network)                     |
+| Replica RPC   | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network)     |
+| Gateway       | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)     |
+| Blockexplorer | [https://blockexplorer.bobabase.boba.network](https://blockexplorer.bobabase.boba.network) |
+| Websocket     | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                 |
 
-# Bobabeam (1294)
+# Bobabeam L2 (1294) for the Moonbeam L1 (1284)
 
-## Mainnet Addresses
+## Bobabeam Addresses (tbd)
 
-For **primary contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/bobabeam/README.md)
+For **primary contracts and addresses** see [packages/contracts/deployments/bobabeam/README.md](../../packages/contracts/deployments/bobabeam/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0xTBATBATBATBA.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Bobabeam address registration dump](../../packages/boba/register/addresses/addressesBobaBeam_0xTBATBATBATBA.json).
 
-## Mainnet Links and Endpoints
+## Bobabeam Links and Endpoints (tbd)
 
-|                   |                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Mainnet ChainID   | 1294                                                                              |
-| Mainnet RPC Read  | [https://tba](https://tba) |
-| Mainnet Write RPC | [https://tba](https://tba)                     |
-| Gateway           | [https://tba](https://tba)                     |
-| Blockexplorer     | [https://tba](https://tba)         |
-| Websocket         | [wss://tba](wss://tba)                  |
+|               |                                                                                  |
+| ------------- | -------------------------------------------------------------------------------- |
+| ChainID       | 1294                                                                             |
+| RPC Read      | [https://tbd](https://tbd)                     |
+| Write RPC     | [https://tbd](https://tbd)                     |
+| Gateway       | [https://tbd](https://tbd)                     |
+| Blockexplorer | [https://tbd](https://tbd)                     |
+| Websocket     | [wss://tbd](wss://tbd)                         |

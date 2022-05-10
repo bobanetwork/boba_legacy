@@ -134,7 +134,7 @@ Witnet is a decentralized oracle network, with multiple price feeds currently li
 
 ## 3. Turing
 
-Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../packages/boba/turing/README.md). See [calling APIs](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract) for detailed instructions.
+Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../boba_documentation/developer/turing.md).
 
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 

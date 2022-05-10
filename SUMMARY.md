@@ -4,7 +4,7 @@
 * [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
 
-* User Documentation
+* User Docs
   * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
   * [Fraud Detection](boba\_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
@@ -18,7 +18,7 @@
   * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
   * [Turing Implementation](packages/boba/turing/README.md)
 
-* Developer Docs
+* For Developers
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
