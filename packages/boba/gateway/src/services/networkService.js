@@ -550,6 +550,7 @@ class NetworkService {
     }
 
     let signature
+
     try {
       signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
     } catch (error) {
@@ -570,6 +571,7 @@ class NetworkService {
       if(errorData.hasOwnProperty('error')) {
         errorData = errorData.error.error.body
       }
+      console.log("returning:",error)
       return errorData
     }
   }
