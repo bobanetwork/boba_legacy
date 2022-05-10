@@ -28,13 +28,13 @@ class Monster extends React.Component {
       list,
       monsterNumber,
       monsterInfo
-    } = this.props.nft;
+    } = this.props.nft
 
     const {
       accountEnabled,
       netLayer,
       walletAddress
-    } = this.props.setup;
+    } = this.props.setup
 
     this.state = {
       list,
@@ -60,35 +60,35 @@ class Monster extends React.Component {
       list,
       monsterNumber,
       monsterInfo
-    } = this.props.nft;
+    } = this.props.nft
 
     const {
       accountEnabled,
       netLayer,
       walletAddress
-    } = this.props.setup;
+    } = this.props.setup
 
     if (!isEqual(prevState.nft.list, list)) {
-      this.setState({ list });
+      this.setState({ list })
     }
 
     if (!isEqual(prevState.nft.monsterNumber, monsterNumber)) {
-      this.setState({ monsterNumber });
+      this.setState({ monsterNumber })
     }
 
     if (!isEqual(prevState.nft.monsterInfo, monsterInfo)) {
-      this.setState({ monsterInfo });
+      this.setState({ monsterInfo })
     }
 
     if (!isEqual(prevState.loading["NFT/ADD"], this.props.loading["NFT/ADD"])) {
       this.setState({ loading: this.props.loading["NFT/ADD"] });
       if (this.props.loading["NFT/ADD"]) {
-        this.setState({ contractAddress: "" });
+        this.setState({ contractAddress: "" })
       }
     }
 
     if (!isEqual(prevState.setup.accountEnabled, accountEnabled)) {
-      this.setState({ accountEnabled });
+      this.setState({ accountEnabled })
     }
 
     if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
@@ -97,7 +97,7 @@ class Monster extends React.Component {
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
-      this.setState({ netLayer });
+      this.setState({ netLayer })
     }
 
   }
@@ -124,7 +124,7 @@ class Monster extends React.Component {
       if (!res) {
         dispatch(openAlert('Faucet request submitted'))
       } else {
-        this.setState({...this.state, faucetErrorMsg: 'Request limit reached'})
+        this.setState({...this.state, faucetErrorMsg: res})
       }
     } catch (err) {
       let error = err.message.match(/execution reverted: (.*)\\+"}}/)
@@ -148,8 +148,11 @@ class Monster extends React.Component {
       netLayer,
       monsterInfo,
       accountEnabled,
-      bobaTag
-    } = this.state;
+      bobaTag,
+      tweetUrl
+    } = this.state
+
+    console.log("tweetUrl:",tweetUrl)
 
     let BT = "";
     if (bobaTag)
@@ -215,7 +218,7 @@ class Monster extends React.Component {
                       <br />Welcome, {monsterType} {tokenIDverified}
                     </Typography>
                   }
-                  {tokenIDverified &&
+                  {accountEnabled &&
                     <Box style={{ display: "inline-block" }}>
                       <Typography variant="body1">
                         Your Boba Bubble:{" "}
@@ -268,7 +271,7 @@ class Monster extends React.Component {
                   Hong Kong.
                   If you would like to host a meetup, or would like to propose one in your city, let us know - a signup
                   system will
-                  go live later in April.
+                  go live later in May.
                 </Typography>
 
                 <Typography variant="body2" sx={{ opacity: 0.95 }}>
@@ -295,10 +298,25 @@ class Monster extends React.Component {
                   the heavy lifting in the background.
                 </Typography>
 
-                <Typography variant='subtitle2'>
-                  Tweet your Boba Bubble and paste the link here:
+                <Typography variant='body2' sx={{ opacity: 0.95 }}>
+                  Developer Twitter/Turing test token fountain
                 </Typography>
-                <Input value={this.state.tweetUrl} onChange={(e) => this.setState({...this.state, tweetUrl: e?.target?.value})} />
+                
+                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+                  To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and 
+                  paste the tweet link here. You can get the link on Twitter by tapping the share icon, then tapping 
+                  "Share Tweet via", and finally selecting "Copy link to Tweet". 
+                  Your link should look something like this: https://twitter.com/name/status/1234567
+                </Typography>
+
+                <Input 
+                  value={tweetUrl} 
+                  onChange={(e) => this.setState({
+                      ...this.state, 
+                      tweetUrl: e?.target?.value.split('?')[0] //remove the superfluous stuff after the "?"
+                    })
+                  } 
+                />
 
                 <Button
                   type="primary"
@@ -306,9 +324,7 @@ class Monster extends React.Component {
                   style={{ marginTop: "10px", marginBottom: "18px" }}
                   disabled={!this.state.tweetUrl || !this.state.tweetUrl?.includes('http')}
                   loading={this.state.isClaimFaucetLoading}
-                  onClick={async (e) => {
-                    await this.claimAuthenticatedFaucetTokens();
-                  }}
+                  onClick={async (e) => {await this.claimAuthenticatedFaucetTokens()}}
                   size="small">
                   Authenticated Faucet
                 </Button>
