@@ -65,6 +65,8 @@ export function amountToUsd(amount, lookupPrice, token) {
     return amount * lookupPrice['oolongswap'].usd
   } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
     return amount * lookupPrice['omisego'].usd
+  } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
+    return amount * lookupPrice['usd-coin'].usd 
   } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {
