@@ -107,6 +107,36 @@
             express-prom-bundle."6.4.1" = [
               ["prom-client" "13.2.0"]
             ];
+            "@nomiclabs/hardhat-ethers"."2.0.4" = [
+              ["hardhat" "2.9.3"]
+            ];
+            "@nomiclabs/hardhat-waffle"."2.0.2" = [
+              ["hardhat" "2.9.3"]
+              ["@nomiclabs/hardhat-ethers" "2.0.4"]
+            ];
+            "@nomiclabs/hardhat-etherscan"."2.1.8" = [
+              ["hardhat" "2.9.3"]
+            ];
+            "@typechain/hardhat"."3.1.0" = [
+              ["hardhat" "2.9.3"]
+              ["typechain" "6.1.0"]
+            ];
+            "hardhat-deploy"."0.9.29" = [
+              ["hardhat" "2.9.3"]
+            ];
+            "hardhat-gas-reporter"."1.0.7" = [
+              ["hardhat" "2.9.3"]
+            ];
+            "hardhat-output-validator"."0.1.19" = [
+              ["hardhat" "2.9.3"]
+            ];
+            "request-promise-native"."1.0.9" = [
+              ["request" "2.88.2"]
+            ];
+            "solidity-coverage"."0.7.18" = [
+              ["hardhat" "2.9.3"]
+            ];
+
             "@eth-optimism/core-utils"."0.8.1"  = [
               [ "@types/node" "15.14.9" ]
             ];
