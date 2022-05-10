@@ -93,7 +93,7 @@ class Monster extends React.Component {
 
     if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
       this.setState({ walletAddress });
-      this.setState({ bobaTag: Md5.hashStr(walletAddress.substring(2)) })
+      this.setState({ bobaTag: Md5.hashStr(walletAddress.toLowerCase().substring(2)) });
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
@@ -118,10 +118,14 @@ class Monster extends React.Component {
     try {
       this.setState({...this.state, isClaimFaucetLoading: true})
       const tweetId = this.state.tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
-      console.log("tweetId:",tweetId)
+
       const {dispatch} = this.props
-      const res = await dispatch(getTestnetETHAuthenticatedMetaTransaction(tweetId))
-      if (res) dispatch(openAlert('Faucet request submitted'))
+      const res = await networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId)
+      if (!res) {
+        dispatch(openAlert('Faucet request submitted'))
+      } else {
+        this.setState({...this.state, faucetErrorMsg: res})
+      }
     } catch (err) {
       let error = err.message.match(/execution reverted: (.*)\\+"}}/)
       if (error) {

@@ -30,6 +30,12 @@ contract AuthenticatedFaucet is Ownable {
         testnetETHPerClaim = testnetETHPerClaim_;
     }
 
+    function setConfig(string memory apiUrl_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_) external onlyOwner {
+        apiUrl = apiUrl_;
+        maxClaimsPerEpoch = maxClaimsPerEpoch_;
+        testnetETHPerClaim = testnetETHPerClaim_;
+    }
+
     function sendFundsMeta(address to_, string calldata twitterPostID_, bytes32 hashedMessage_, bytes memory signature_) external {
         require(verifyMessage(hashedMessage_, signature_) == to_, "Signature faulty");
         _nonces[to_] = _nonces[to_] + 1;

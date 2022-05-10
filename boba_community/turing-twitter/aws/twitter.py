@@ -68,6 +68,7 @@ def lambda_handler(event, context):
 
   # the message sender
   senderAddress = params[1]
+  senderAddress = senderAddress[-40:64]
   # bytes_object = bytes.fromhex(request[-40]) # address
   # e.g. BOBA439E11DD4
   # id_to_verify = #"BOBA" + request[-40:9]  # bytes_object.decode("ASCII")
@@ -126,11 +127,11 @@ def load_tweet_status(senderAddress, twitter_post_id):
     # BT = 'BOBA' + bobaTag.substring(0,9).toUpperCase()
 
     # Step one - take the walletAddress, and generate the Boba Bubble
-    BT = senderAddress[2:] # remove the leading Ox
-    BT = hashlib.md5(BT)   # need to check encoding etc
+    BT = senderAddress # remove the leading Ox
+    BT = hashlib.md5(BT.encode('utf-8')).hexdigest()   # need to check encoding etc
     BT = 'BOBA' + BT[0:9].upper()
-    print("Boba Bubble based on input message sender", BT)
-
+    print("Boba Bubble based on input message sender", BT, senderAddress.encode('utf-8'), hashlib.md5(senderAddress.encode('utf-8')).hexdigest())
+    print("BOBA: ", result["data"]["text"].lower(), BT.lower(), senderAddress, hashlib.md5(senderAddress.encode('ascii')).hexdigest())
     # Step 2 - confirm that the developer who tweeted the Boba Bubble is the same as this caller?
     has_posted = BT.lower() in result["data"]["text"].lower()
     author_id = result["data"]["author_id"]
