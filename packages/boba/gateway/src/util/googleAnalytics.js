@@ -5,6 +5,6 @@ export const initGa = () => {
   ReactGa.initialize(process.env.REACT_APP_GA_TRACKING_ID);
 }
 
-export const gaPageView = (pageName) => {
+export const trackPageView = (pageName) => {
   ReactGa.pageview(pageName);
 }

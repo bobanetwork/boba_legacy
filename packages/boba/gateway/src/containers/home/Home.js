@@ -109,7 +109,7 @@ import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import { gaPageView } from 'util/googleAnalytics'
+import { trackPageView } from 'util/googleAnalytics'
 
 require('dotenv').config()
 
@@ -234,7 +234,7 @@ function Home() {
 
   useEffect(() => {
     console.log(`==>> ${pageDisplay}`)
-    gaPageView(pageDisplay)
+    trackPageView(pageDisplay)
   }, [pageDisplay])
 
 
