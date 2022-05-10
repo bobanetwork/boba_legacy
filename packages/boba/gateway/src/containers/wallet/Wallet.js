@@ -141,7 +141,7 @@ function Wallet() {
             >
               Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
               otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
-              EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
+              EMERGENCY SWAP to swap BOBA for 0.005 ETH at market rates.
             </Typography>
           </G.AlertInfo>
           <Button
