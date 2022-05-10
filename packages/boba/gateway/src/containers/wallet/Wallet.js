@@ -114,7 +114,6 @@ function Wallet() {
   }
 
   async function emergencySwap () {
-    if(network !== 'rinkeby') return
     const res = await dispatch(getETHMetaTransaction())
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
@@ -129,7 +128,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
+      {layer === 'L2' && tooSmallETH &&
         <G.LayerAlert>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
