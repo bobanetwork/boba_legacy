@@ -589,6 +589,7 @@ class NetworkService {
       await Boba_AuthenticatedFaucet.getNonce(this.account),
       10
     )
+
     const signer = this.provider.getSigner(this.account)
     const hashedMsg = ethers.utils.solidityKeccak256(
       ['address', 'uint'],
@@ -608,7 +609,7 @@ class NetworkService {
       if(errorData.hasOwnProperty('error')) {
         errorData = errorData.error.error.body
       }
-      return errorData
+      return errorData ?? 'Request rejected: Limits reached'
     }
   }
 
