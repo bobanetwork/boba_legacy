@@ -115,6 +115,7 @@ function Wallet() {
 
   async function emergencySwap () {
     const res = await dispatch(getETHMetaTransaction())
+    console.log("emergencySwap - res:",res)
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
@@ -129,7 +130,7 @@ function Wallet() {
       />
 
       {layer === 'L2' && tooSmallETH &&
-        <G.LayerAlert>
+        <G.LayerAlert style={{padding: '20px'}}>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
             <Typography
