@@ -126,9 +126,10 @@ function FeeSwitcher() {
     return null
   }
 
-  if (network === 'mainnet' && monsterNumber < 1) {
-    return null
-  }
+  // enable fee switcher for everyone
+  // if (network === 'mainnet' && monsterNumber < 1) {
+  //   return null
+  // }
 
   return (
     <S.FeeSwitcherWrapper>
