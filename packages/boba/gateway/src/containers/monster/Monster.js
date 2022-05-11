@@ -8,15 +8,15 @@ import ListNFT from "components/listNFT/listNFT";
 import * as S from "./Monster.styles";
 import * as G from "containers/Global.styles";
 
-import { Box, Typography, Grid, Input } from "@mui/material";
+import { Box, Typography, Grid, Input } from "@mui/material"
 
-import PageTitle from "components/pageTitle/PageTitle";
-import networkService from "services/networkService";
-import BobaGlassIcon from "components/icons/BobaGlassIcon";
-import Connect from "containers/connect/Connect";
-import Button from "../../components/button/Button";
-import { getETHMetaTransaction, getTestnetETHAuthenticatedMetaTransaction } from "../../actions/setupAction";
-import { openAlert } from "../../actions/uiAction";
+import PageTitle from "components/pageTitle/PageTitle"
+import networkService from "services/networkService"
+import BobaGlassIcon from "components/icons/BobaGlassIcon"
+import Connect from "containers/connect/Connect"
+import Button from "../../components/button/Button"
+import { getETHMetaTransaction, getTestnetETHAuthenticatedMetaTransaction } from "../../actions/setupAction"
+import { openAlert } from "../../actions/uiAction"
 
 class Monster extends React.Component {
 
@@ -92,8 +92,8 @@ class Monster extends React.Component {
     }
 
     if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
-      this.setState({ walletAddress });
-      this.setState({ bobaTag: Md5.hashStr(walletAddress.toLowerCase().substring(2)) });
+      this.setState({ walletAddress })
+      this.setState({ bobaTag: Md5.hashStr(walletAddress.toLowerCase().substring(2)) })
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {

@@ -3,27 +3,32 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectNetwork, selectWalletAddress } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import { fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
+import { openAlert, openError } from 'actions/uiAction'
+
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
 
-import { Box, Typography, CircularProgress } from '@mui/material'
+import { Box, Typography, CircularProgress, Input } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
+import Copy from 'components/copy/Copy'
 
 import { isEqual, orderBy } from 'lodash'
 
 import networkService from 'services/networkService'
+
+import { Md5 } from "ts-md5/dist/md5"
 
 function TokenPage() {
 
@@ -35,6 +40,12 @@ function TokenPage() {
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
   const layer = useSelector(selectLayer())
+  const network = useSelector(selectNetwork())
+  const walletAddress = useSelector(selectWalletAddress())
+
+  const [ tweetUrl, setTweetUrl ] = useState("")
+  const [ isClaimFaucetLoading, setIsClaimFaucetLoading ] = useState(false)
+  const [ faucetErrorMsg, setFaucetErrorMsg ] = useState("")
 
   const [ debug, setDebug ] = useState(false)
 
@@ -46,6 +57,16 @@ function TokenPage() {
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+
+//BOBAB5DAD3D10
+
+  let bobaTag = ''
+  if(walletAddress)
+    bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
+
+  let BT = ''
+  if (bobaTag)
+    BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
 
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
@@ -114,7 +135,6 @@ function TokenPage() {
     dispatch(fetchLookUpPrice(symbolList))
   }, [ tokenList, dispatch, accountEnabled ])
 
-
   useEffect(() => {
     if (!accountEnabled) return
     getLookupPrice()
@@ -123,6 +143,29 @@ function TokenPage() {
   const GasEstimateApprove = () => {
     let approval = networkService.estimateApprove()
     console.log("GasEstimateApprove:",approval)
+  }
+
+  async function claimAuthenticatedFaucetTokens() {
+    try {
+      setIsClaimFaucetLoading(true)
+      const tweetId = tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
+      const res = await networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId)
+      if (!res) {
+        dispatch(openAlert('Faucet request submitted'))
+      } else {
+        setFaucetErrorMsg('Too many requests or Boba Bubble does not match this wallet address')
+      }
+    } catch (err) {
+      let error = err.message.match(/execution reverted: (.*)\\+"}}/)
+      if (error) {
+        error = error[1]
+      } else {
+        error = err?.message ?? err
+      }
+      setFaucetErrorMsg(error)
+    } finally {
+      setIsClaimFaucetLoading(false)
+    }
   }
 
   if (!accountEnabled) {
@@ -174,6 +217,49 @@ function TokenPage() {
               GasEstimateApprove
             </Button>
           }
+        </Box>
+      }
+
+      {layer === 'L2' && network === 'rinkeby' &&
+        <Box sx={{
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: "10px"
+        }}>
+          
+          <Box style={{ display: "inline-block" }}>
+            <Typography variant="body2">
+              Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
+              <span style={{ opacity: 0.65 }}>{BT} <Copy value={BT} light={false} /></span>
+            </Typography>
+          </Box>
+
+          <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+            To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and 
+            paste the tweet link in the field below. You can get the link on Twitter by tapping the share icon, then tapping 
+            "Share Tweet via", and finally selecting "Copy link to Tweet". 
+            Your link should look something like this: https://twitter.com/name/status/1234567
+          </Typography>
+
+          <Input 
+            value={tweetUrl} 
+            onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
+          />
+
+          <Button
+            type="primary"
+            variant="contained"
+            style={{ marginTop: "10px", marginBottom: "18px" }}
+            disabled={!tweetUrl || !tweetUrl?.includes('http')}
+            loading={isClaimFaucetLoading}
+            onClick={async (e) => {await claimAuthenticatedFaucetTokens()}}
+            size="small"
+          >
+            Authenticated Faucet
+          </Button>
+
+          {faucetErrorMsg ? <Typography style={{color: 'red'}}>{faucetErrorMsg}</Typography> : null}
+
         </Box>
       }
 
