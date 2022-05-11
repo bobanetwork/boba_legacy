@@ -153,7 +153,7 @@ function TokenPage() {
       if (!res) {
         dispatch(openAlert('Faucet request submitted'))
       } else {
-        setFaucetErrorMsg('Too many requests or Boba Bubble does not match this wallet address')
+        setFaucetErrorMsg(res)
       }
     } catch (err) {
       let error = err.message.match(/execution reverted: (.*)\\+"}}/)

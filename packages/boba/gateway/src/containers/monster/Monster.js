@@ -15,7 +15,6 @@ import networkService from "services/networkService"
 import BobaGlassIcon from "components/icons/BobaGlassIcon"
 import Connect from "containers/connect/Connect"
 import Button from "../../components/button/Button"
-import { getETHMetaTransaction, getTestnetETHAuthenticatedMetaTransaction } from "../../actions/setupAction"
 import { openAlert } from "../../actions/uiAction"
 
 class Monster extends React.Component {
@@ -301,21 +300,21 @@ class Monster extends React.Component {
                 <Typography variant='body2' sx={{ opacity: 0.95 }}>
                   Developer Twitter/Turing test token fountain
                 </Typography>
-                
+
                 <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-                  To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and 
-                  paste the tweet link here. You can get the link on Twitter by tapping the share icon, then tapping 
-                  "Share Tweet via", and finally selecting "Copy link to Tweet". 
+                  To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and
+                  paste the tweet link here. You can get the link on Twitter by tapping the share icon, then tapping
+                  "Share Tweet via", and finally selecting "Copy link to Tweet".
                   Your link should look something like this: https://twitter.com/name/status/1234567
                 </Typography>
 
-                <Input 
-                  value={tweetUrl} 
+                <Input
+                  value={tweetUrl}
                   onChange={(e) => this.setState({
-                      ...this.state, 
+                      ...this.state,
                       tweetUrl: e?.target?.value.split('?')[0] //remove the superfluous stuff after the "?"
                     })
-                  } 
+                  }
                 />
 
                 <Button
