@@ -176,7 +176,7 @@ class BlockMonitorService extends OptimismEnv {
         for (const blockData of blocksData) {
           await this.databaseService.insertBlockData(blockData)
           // write the transaction data into MySQL
-          if (blockData.transactions.length) {
+          if (blockData !== null && blockData.transactions.length) {
             for (const transactionData of blockData.transactions) {
               transactionData.timestamp = blockData.timestamp
               transactionData.gasUsed = transactionData.gasLimit
@@ -211,13 +211,15 @@ class BlockMonitorService extends OptimismEnv {
         // write the receipt data into MySQL
         // this.logger.info('Writing the receipt data...')
         for (let receiptData of receiptsData) {
-          const correspondingBlock = blocksData.filter(
-            (i) => i && i.hash === receiptData.blockHash
-          )
-          if (correspondingBlock.length) {
-            receiptData.timestamp = correspondingBlock[0].timestamp
-          } else {
-            receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
+          if (receiptData !== null) {
+            const correspondingBlock = blocksData.filter(
+              (i) => i && i.hash === receiptData.blockHash
+            )
+            if (correspondingBlock.length) {
+              receiptData.timestamp = correspondingBlock[0].timestamp
+            } else {
+              receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
+            }
           }
 
           receiptData = await this.getCrossDomainMessageStatusL2(
