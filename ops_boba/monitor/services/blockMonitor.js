@@ -334,8 +334,6 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async getCrossDomainMessageStatusL2(receiptData, blocksData) {
-    this.logger.info(`Searching ${receiptData.transactionHash}...`)
-
     const filteredBlockData = blocksData.filter(
       (i) => i && i.hash === receiptData.blockHash
     )
