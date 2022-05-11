@@ -76,17 +76,25 @@ const main = async () => {
   // block
   const blockService = new BlockMonitorService()
   await blockService.initConnection()
-  await blockService.initScan()
+  await blockService.initConnection()
+  try {
+    await blockService.initScan()
+  } catch (error) {
+    ;`Failed to scan initial blocks - error: ${error}`
+  }
 
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
-  // enable the periodic transaction and check on Mainnet
-  if (process.env.STAGE === 'mainnet') {
+  // enable the tx response time report
+  if (process.env.ENABLE_TX_RESPONSE_TIME === 'true') {
     if (configs.enableTxResponseTime) {
       loop(() => loopLogTx()).catch()
     }
+  }
 
+  // enable the LP balance check
+  if (process.env.ENABLE_BALANCE_MONITOR === 'true') {
     const L1_MONITOR_INTERVAL = process.env.L1_MONITOR_INTERVAL || 5 * 60
     const L2_MONITOR_INTERVAL = process.env.L2_MONITOR_INTERVAL || 5 * 60
 
@@ -112,7 +120,10 @@ const main = async () => {
         'Addresses Monitoring: Env variables for monitoring is missing!'
       )
     }
+  }
 
+  // Enable the periodic transaction
+  if (process.env.ENABLE_LOOP_TRANSFER === 'true') {
     loop(() => loopTransferTx()).catch()
   }
 }

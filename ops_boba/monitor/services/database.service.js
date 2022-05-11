@@ -8,6 +8,8 @@ const OptimismEnv = require('./utilities/optimismEnv')
 class DatabaseService extends OptimismEnv {
   constructor() {
     super(...arguments)
+    this.MySQLStartTimeReceipt = parseInt(new Date().getTime() / 1000, 10)
+    this.MySQLStartTimeLog = parseInt(new Date().getTime() / 1000, 10)
   }
 
   async initMySQL() {
@@ -539,6 +541,20 @@ class DatabaseService extends OptimismEnv {
     const latestBlock = await query(`SELECT MAX(blockNumber) from block`)
     con.end()
     return latestBlock
+  }
+
+  async getNewestReceiptFromReceiptTable() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const latestReceipt = await query(`SELECT MAX(blockNumber) from receipt`)
+    con.end()
+    return latestReceipt
   }
 
   async getNewestBlockFromStateRootTable() {
