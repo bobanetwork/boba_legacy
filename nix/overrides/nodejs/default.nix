@@ -110,9 +110,17 @@ in
           ./tsconfig.build-copy.json
       '';
     };
+    add-ts-node = {
+      postInstall = ''
+        mkdir -p $out/bin
+        ln -s $out/lib/node_modules/@boba/contracts $out/contracts
+        ln -s $out/contracts/node_modules/ts-node/dist/bin.js $out/bin/ts-node
+      '';
+    };
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@boba/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
+        rm -r `ls -A $out/lib/node_modules/@boba/contracts/ | grep -v \
+        "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
       '';
     };
     add-hardhat-cache = let
@@ -216,11 +224,19 @@ in
   "@eth-optimism/message-relayer" = { inherit correct-tsconfig-path; };
   "@eth-optimism/contracts" = {
     inherit correct-tsconfig-path add-solc;
-    cleanup-dir = {
-      postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
+    # cleanup-dir = {
+    #   postFixup = ''
+    #     rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache\|bin"`
+    #   '';
+    # };
+    add-ts-node = {
+      postInstall = ''
+        mkdir -p $out/bin
+        ln -s $out/lib/node_modules/@eth-optimism/contracts $out/contracts
+        ln -s $out/contracts/node_modules/ts-node/dist/bin.js $out/bin/ts-node
       '';
     };
+
     add-inputs = {
       nativeBuildInputs = old: old ++ [
         pkgs.yarn

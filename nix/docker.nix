@@ -1,44 +1,80 @@
 { pkgs, bobapkgs, ... }:
+let
+  tag = "boba";
+  scripts = pkgs.stdenv.mkDerivation {
+    name = "scripts";
+    phases = [ "installPhase" ];
+    installPhase = ''
+      mkdir -p $out/scripts
+      chmod +x $out/scripts
+      cp ${./..}/ops/scripts/deployer.sh $out/scripts/
+      cp ${./..}/ops/scripts/wait-for-l1-and-l2.sh $out/scripts/
+      substituteInPlace $out/scripts/deployer.sh \
+        --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+        --replace 'curl' '${pkgs.curl}/bin/curl'
+      substituteInPlace $out/scripts/wait-for-l1-and-l2.sh \
+        --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+        --replace 'curl' '${pkgs.curl}/bin/curl' \
+        --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
+      chmod +x $out/scripts/wait-for-l1-and-l2.sh
+    '';
+  };
+in
 {
-  dtl-image = pkgs.dockerTools.buildLayeredImage {
-    maxLayers = 125;
+  dtl-image = pkgs.dockerTools.buildImage {
     name = "dtl";
-    tag = "boba";
+    tag = tag;
+    runAsRoot = ''
+      mkdir -p ./state-dumps
+    '';
+    contents = with pkgs; [
+      curl
+      bash
+      jq
+    ];
     config = {
       Cmd = [  ];
-      EntryPoint = [ "${pkgs.nodejs}/bin/node" "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js" ];
+      WorkingDir = "${bobapkgs."@eth-optimism/data-transport-layer"}/lib/node_modules/@eth-optimism/data-transport-layer";
+      EntryPoint = [
+        "${pkgs.nodejs}/bin/node"
+        "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js"
+      ];
     };
   };
   deployer-image =
     let
-      script = pkgs.stdenv.mkDerivation {
-        name = "startup";
-        phases = [ "installPhase" ];
-        installPhase = ''
-        mkdir -p $out/bin
-        chmod +x $out/bin
-        cp ${./..}/ops/scripts/deployer.sh $out/bin/
-      '';
-      };
+      optimism-contracts = bobapkgs."@eth-optimism/contracts";
     in pkgs.dockerTools.buildLayeredImage {
-      maxLayers = 125;
       name = "deployer";
-      tag = "boba";
-      contents = with pkgs; [
-        # From nixpkgs
-        curl
-        yarn
-
-        bobapkgs."@boba/turing-hybrid-compute"
-        bobapkgs."@eth-optimism/contracts"
-        script
-      ];
+      tag = tag;
       config = {
-        Entrypoint = [ "yarn run deploy" ];
+        Env = [ "PATH=${optimism-contracts}/bin/:${scripts}/scripts/:${pkgs.yarn}/bin/" ];
+        WorkingDir = "${optimism-contracts}/contracts";
+        Entrypoint = [
+          "${pkgs.yarn}/bin/yarn"
+          "--cwd"
+          "${optimism-contracts}/contracts"
+          "run"
+          "deploy"
+        ];
+      };
+    };
+  boba-deployer-image =
+    let
+      boba-contracts = bobapkgs."@boba/contracts";
+    in pkgs.dockerTools.buildImage {
+      name = "boba_deployer";
+      tag = tag;
+      config = {
+        Env = [ "PATH=${boba-contracts}/bin/:${scripts}/scripts/" ];
+        WorkingDir = "${boba-contracts}/contracts";
+        Entrypoint = [
+          "${scripts}/scripts/wait-for-l1-and-l2.sh"
+          "${scripts}/scripts/deploy.sh"
+        ];
       };
     };
   # Adapted from ops/docker/Dockerfile.geth
-  #boba-deployer-image = {};
   l2geth-image =
     let
       l2geth = pkgs.stdenv.mkDerivation {
@@ -53,17 +89,13 @@
             '${pkgs.curl}/bin/curl'
         '';
       };
-    in pkgs.dockerTools.buildLayeredImage {
+    in pkgs.dockerTools.buildImage {
       name = "l2geth";
-      tag = "boba";
+      tag = tag;
       contents = with pkgs; [
         # From nixpkgs
         cacert
         jq
-        coreutils
-
-        # The above script from ops
-        l2geth
       ];
       config = {
         ExposedPorts = {
@@ -82,7 +114,7 @@
     };
   hardhat-image = pkgs.dockerTools.buildLayeredImage {
     name = "l1_chain";
-    tag = "boba";
+    tag = tag;
     contents = [
     ];
     config = {

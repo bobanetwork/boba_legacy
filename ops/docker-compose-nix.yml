@@ -114,7 +114,7 @@ services:
       - l1_chain
       - dtl
     image: deployer:boba
-    entrypoint: ./deployer.sh
+    entrypoint: deployer.sh
     environment:
       FRAUD_PROOF_WINDOW_SECONDS: 0
       L1_NODE_WEB3_URL: http://l1_chain:8545
@@ -150,7 +150,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/boba_deployer:latest
+    image: boba_deployer:boba
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
