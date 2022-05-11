@@ -220,18 +220,20 @@ class BlockMonitorService extends OptimismEnv {
             } else {
               receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
             }
-          }
 
-          receiptData = await this.getCrossDomainMessageStatusL2(
-            receiptData,
-            blocksData
-          )
-          // if message is cross domain check if message has been finalized
-          if (receiptData.crossDomainMessage) {
-            receiptData = await this.getCrossDomainMessageStatusL1(receiptData)
+            receiptData = await this.getCrossDomainMessageStatusL2(
+              receiptData,
+              blocksData
+            )
+            // if message is cross domain check if message has been finalized
+            if (receiptData.crossDomainMessage) {
+              receiptData = await this.getCrossDomainMessageStatusL1(
+                receiptData
+              )
+            }
+            await this.databaseService.insertReceiptData(receiptData)
+            await sleep(5)
           }
-          await this.databaseService.insertReceiptData(receiptData)
-          await sleep(5)
         }
         fromBlockForReceipt = toBlockForReceipt
         toBlockForReceipt = Math.min(this.latestBlock, toBlockForReceipt + 1000)
