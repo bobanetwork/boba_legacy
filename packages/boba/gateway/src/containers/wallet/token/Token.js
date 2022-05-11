@@ -246,7 +246,7 @@ function TokenPage() {
             onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
           />
           <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px' }}>
-            Your account needs to have more than 5 followers, more than 2 tweets and needs to exist at least 48 hours. You can get testnet funds every 24 hours per Twitter account. Only 100 requests per hour are allowed in general to prevent hitting Twitter API rate limits. If you already have some ETH you can use our <a href="https://faucets.boba.network/" target='_blank' style={{color: '#BAE21A'}}>less restrictive faucet here</a>.
+            Your account needs to have more than 5 followers, more than 2 tweets and needs to exist for at least 48 hours. You can get testnet funds every 24 hours per Twitter account. Only 100 requests per hour are allowed in general to prevent hitting Twitter API rate limits. If you already have some ETH you can use our <a href="https://faucets.boba.network/" target='_blank' style={{color: '#BAE21A'}}>less restrictive faucet here</a>.
           </Typography>
 
           <Button
