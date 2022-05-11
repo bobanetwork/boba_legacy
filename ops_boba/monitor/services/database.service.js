@@ -142,6 +142,9 @@ class DatabaseService extends OptimismEnv {
   }
 
   async insertBlockData(blockData) {
+    if (blockData === null) {
+      return
+    }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
       port: this.MySQLPort,
@@ -202,7 +205,6 @@ class DatabaseService extends OptimismEnv {
       timestamp='${tx.timestamp}'
     `)
     con.end()
-    this.logger.info('L2 Transaction', tx)
   }
 
   async insertReceiptData(receiptData) {
