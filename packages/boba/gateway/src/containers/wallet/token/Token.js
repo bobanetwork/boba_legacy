@@ -226,7 +226,7 @@ function TokenPage() {
           flexDirection: "column",
           paddingTop: "10px"
         }}>
-          
+
           <Box style={{ display: "inline-block" }}>
             <Typography variant="body2">
               Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
@@ -235,16 +235,19 @@ function TokenPage() {
           </Box>
 
           <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-            To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and 
-            paste the tweet link in the field below. You can get the link on Twitter by tapping the share icon, then tapping 
-            "Share Tweet via", and finally selecting "Copy link to Tweet". 
+            To receive testnet BOBA and ETH for developing on Boba Rinkeby, tweet your Boba Bubble and
+            paste the tweet link in the field below. You can get the link on Twitter by tapping the share icon, then tapping
+            "Share Tweet via", and finally selecting "Copy link to Tweet".
             Your link should look something like this: https://twitter.com/name/status/1234567
           </Typography>
 
-          <Input 
-            value={tweetUrl} 
+          <Input
+            value={tweetUrl}
             onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
           />
+          <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px' }}>
+            Your account needs to have more than 5 followers, more than 2 tweets and needs to exist at least 48 hours. You can get testnet funds every 24 hours per Twitter account. Only 100 requests per hour are allowed in general to prevent hitting Twitter API rate limits. If you already have some ETH you can use our <a href="https://faucets.boba.network/" target='_blank' style={{color: '#BAE21A'}}>less restrictive faucet here</a>.
+          </Typography>
 
           <Button
             type="primary"
@@ -263,9 +266,9 @@ function TokenPage() {
         </Box>
       }
 
-      {!!accountEnabled && inflight.length > 0 && 
+      {!!accountEnabled && inflight.length > 0 &&
         <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
-          <Typography 
+          <Typography
             variant="body2"
             sx={{ cursor: 'pointer' }}
             onClick={() => {
@@ -305,7 +308,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
@@ -319,7 +322,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
