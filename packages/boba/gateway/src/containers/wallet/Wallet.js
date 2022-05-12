@@ -23,11 +23,11 @@ import {
   setConnectBOBA
 } from 'actions/setupAction'
 
-
 import {
   selectAccountEnabled,
   selectLayer,
   selectNetwork,
+  selectWalletAddress,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'

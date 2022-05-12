@@ -40,5 +40,5 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: "/dao"
-  },
+  }
 ]

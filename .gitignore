@@ -7,7 +7,7 @@ coverage.json
 *.tsbuildinfo
 
 .idea/
-
+.serverless/
 build
 dist
 artifacts
