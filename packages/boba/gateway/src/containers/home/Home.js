@@ -366,7 +366,7 @@ function Home() {
             {pageDisplay === "Bridge" &&
               <Bridge />
             }
-            {pageDisplay === "Monster" &&
+            { pageDisplay === "Monster" &&
               <MonsterWrapper />
             }
           </Container>

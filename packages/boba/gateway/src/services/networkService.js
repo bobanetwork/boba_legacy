@@ -69,6 +69,7 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
@@ -201,7 +202,7 @@ class NetworkService {
     })
     window.ethereum.on('chainChanged', () => {
       const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user 
+      // do not reload window in the special case where the user
       // changed chains AND conncted at the same time
       // otherwise the user gets confused about why they are going through
       // two window reloads
@@ -575,6 +576,73 @@ class NetworkService {
     }
   }
 
+  /** @dev Only works on testnet, but can be freely called on production app */
+  async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
+
+    console.log("triggering getTestnetETH")
+
+    const Boba_AuthenticatedFaucet = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    )
+
+    const nonce = parseInt(
+      await Boba_AuthenticatedFaucet.getNonce(this.account),
+      10
+    )
+
+    const signer = this.provider.getSigner(this.account)
+    const hashedMsg = ethers.utils.solidityKeccak256(
+      ['address', 'uint'],
+      [this.account, nonce]
+    )
+    const messageHashBin = ethers.utils.arrayify(hashedMsg)
+    const signature = await signer.signMessage(messageHashBin)
+
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
+      console.log("response",response)
+    } catch (error) {
+      let errorMsg = error?.response?.data?.error?.error?.body
+      if (errorMsg) {
+        errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
+        errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
+      }
+      console.log(`MetaTx error for getTestnetETH: ${errorMsg}`)
+      if (errorMsg?.includes('Invalid request')) {
+        errorMsg = errorMsg.match(/Invalid request:(.+)/)
+        if (errorMsg) {
+          const errorMap = [
+            'Twitter API error - Probably limits hit.',
+            'Twitter account needs to exist at least 48 hours.',
+            'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
+            'Your Twitter account needs more than 5 followers.',
+            'You need to have tweeted more than 2 times.',
+          ]
+          try {
+            errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
+          } catch(err) {
+            console.error(err)
+            errorMsg = 'Unexpected Twitter error.'
+          }
+        } else {
+          errorMsg = 'Not expected Turing error.'
+        }
+      } else {
+        const errorMap = {
+          'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
+          'No testnet funds': 'Faucet drained: Please reach out to us.',
+          'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        }
+        errorMsg = errorMap[errorMsg];
+      }
+      return errorMsg ?? 'Limits reached or Twitter constraints not met.'
+    }
+  }
+
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
     if (address === ERROR_ADDRESS) {
@@ -731,7 +799,7 @@ class NetworkService {
                                'UST',   'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM',   'OLO',
                                'WAGMIv0',
-                               'WAGMIv1', 
+                               'WAGMIv1',
                                'WAGMIv2', 'WAGMIv2-Oolong',
                                'WAGMIv3', 'WAGMIv3-Oolong'
                               ]
@@ -1023,7 +1091,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners() 
+      this.bindProviderListeners()
       // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
@@ -1261,27 +1329,47 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
+    try {
+      let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
-    const contract = new ethers.Contract(
-      allAddresses.BobaMonsters,
-      TuringMonsterJson.abi,
-      this.L2Provider
-    )
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
 
-    if(monsterList.hasOwnProperty('data')) {
-      const monsters = monsterList.data.turingMonstersTransferEvents
-      for (let i = 0; i < monsters.length; i++) {
-        // console.log("adding monster:", i + 1)
-        const tokenId = monsters[i].tokenId
-        const owner = await contract.ownerOf(tokenId)
-            //console.log("owner:", owner)
-        if(owner.toLowerCase() === this.account.toLowerCase()) {
-          this.addNFT( allAddresses.BobaMonsters, tokenId )
+      if (monsterList.hasOwnProperty('data')) {
+        const monsters = monsterList.data.turingMonstersTransferEvents
+        for (let i = 0; i < monsters.length; i++) {
+          // console.log("adding monster:", i + 1)
+          const tokenId = monsters[i].tokenId
+          const owner = await contract.ownerOf(tokenId)
+          //console.log("owner:", owner)
+          if (owner.toLowerCase() === this.account.toLowerCase()) {
+            await this.addNFT(allAddresses.BobaMonsters, tokenId)
+          }
         }
+        await this.checkMonster()
       }
-      this.checkMonster()
+    } catch(err) {
+      // Catch needed don't break the fetch monsters button
+      console.error(err);
     }
+  }
+
+  async claimAuthenticatedTestnetTokens(tweetId) {
+    // Only Rinkeby
+    const contract = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    ).connect()
+
+    await contract.estimateGas.sendFunds(tweetId)
+    const claim = await contract.sendFunds(
+      tweetId,
+    )
+    await claim.wait()
   }
 
   async checkMonster() {
@@ -4267,7 +4355,7 @@ class NetworkService {
       await approveStatus.wait()
       console.log("Fixed Savings Approval", approveStatus)
     }
-    
+
     if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
       allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
