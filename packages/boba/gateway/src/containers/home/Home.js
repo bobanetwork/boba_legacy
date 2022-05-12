@@ -233,7 +233,6 @@ function Home() {
   }, [ dispatch, accountEnabled, maintenance ])
 
   useEffect(() => {
-    console.log(`==>> ${pageDisplay}`)
     trackPageView(pageDisplay)
   }, [pageDisplay])
 
