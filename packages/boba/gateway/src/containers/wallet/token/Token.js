@@ -15,6 +15,8 @@ import { openAlert, openError } from 'actions/uiAction'
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
 
+import twitter from 'images/twitter.png'
+
 import { Box, Typography, CircularProgress, Input } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
 
@@ -58,15 +60,18 @@ function TokenPage() {
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
-//BOBAB5DAD3D10
-
   let bobaTag = ''
   if(walletAddress)
     bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
 
   let BT = ''
-  if (bobaTag)
+  let tweet = ''
+  if (bobaTag) {
     BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
+    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Network%20" + BT
+  }
+
+  console.log("tweet:",tweet)
 
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
@@ -223,7 +228,8 @@ function TokenPage() {
       {layer === 'L2' && network === 'rinkeby' &&
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>
-            <Box style={{ display: "inline-block" }}>
+
+            <Box style={{display: "inline-block"}}>
               <Typography variant="body2">
                 Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
                 <span style={{ opacity: 0.65 }}>{BT} <Copy value={BT} light={false} /></span>
@@ -231,17 +237,41 @@ function TokenPage() {
             </Box>
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-              Welcome to Boba! This is a special fountain for developers with empty wallets.  
-              To receive testnet BOBA and ETH, tweet your Boba Bubble and
-              paste the tweet link in the field below. 
-              You can get the link on Twitter by tapping the share icon, then tapping
-              "Share Tweet via", and finally selecting "Copy link to Tweet".
-              Your link should look something like this: https://twitter.com/name/status/1234567
+              Welcome developers.  
+              For testnet BOBA and ETH, tweet your Boba Bubble and
+              then paste the tweet link in the field below.
+            </Typography>
+
+            <a
+              target='_blank'
+              href={tweet}
+              aria-label="link"
+              style={{
+                backgroundColor: '#1b95e0',
+                color: '#fff',
+                borderRadius: '4px',
+                height: '28px',
+                fontWeight: '500',
+                fontSize: '13px',
+                lineheight: '26px',
+                padding: '8px 8px 8px 30px',
+                textDecoration: 'none',
+                backgroundImage: `url(${twitter})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '16px 13px',
+                backgroundPosition: '8px 10px'
+              }}
+            >Tweet Now
+            </a>
+
+            <Typography variant="body3" sx={{ opacity: 0.65, marginTop: "10px", marginBottom: "10px" }}>
+              For the Tweet link, tap the share icon, tap "Share Tweet via", and finally select "Copy link to Tweet".
             </Typography>
 
             <Input
-              style = {{width: '80%'}}
+              style={{width: '80%'}}
               value={tweetUrl}
+              placeholder="Tweet Link"
               onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
             />
 
@@ -249,13 +279,13 @@ function TokenPage() {
               You are limited to one fountain call per twitter account per day. 
               The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba). 
               If you already have some ETH in your wallet to cover gas you can use our 
-              <span
+              <a
                 target='_blank'
                 href={'https://faucets.boba.network/'}
                 aria-label="link"
-                style={{fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
+                style={{color:'#fff', fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
               >alternative faucet
-              </span>.
+              </a>.
             </Typography>
 
             <Button
