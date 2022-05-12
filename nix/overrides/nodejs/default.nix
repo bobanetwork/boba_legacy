@@ -36,60 +36,6 @@ let
   solc-cache = import ./solc-cache.nix { inherit pkgs; };
 in
 {
-  "@eth-optimism/l2geth" = {
-    build = let
-      l2geth = pkgs.buildGoModule {
-        pname = "l2geth";
-        version = "0.0.1";
-        src = ./../../../l2geth;
-        doCheck = false;
-
-        # Use fakeSha256 when the dependencies change
-        #vendorSha256 = pkgs.lib.fakeSha256;
-        vendorSha256 = "sha256-4/x/ixgTKq9rTqluKZT8JCyjwY+AeKT27SfIfB2rsfA=";
-        outputs = [ "out" "geth" "clef" ];
-
-        # Move binaries to separate outputs and symlink them back to $out
-        postInstall = pkgs.lib.concatStringsSep "\n" (
-          builtins.map (bin: "mkdir -p \$${bin}/bin && mv $out/bin/${bin} \$${bin}/bin/ && ln -s \$${bin}/bin/${bin} $out/bin/") [ "geth" "clef" ]
-        );
-        proxyVendor = true;
-        subPackages = [
-          "cmd/abigen"
-          "cmd/bootnode"
-          "cmd/checkpoint-admin"
-          "cmd/clef"
-          "cmd/devp2p"
-          "cmd/ethkey"
-          "cmd/evm"
-          "cmd/faucet"
-          "cmd/geth"
-          "cmd/p2psim"
-          "cmd/puppeth"
-          "cmd/rlpdump"
-          "cmd/utils"
-          "cmd/wnode"
-        ];
-
-        # Fix for usb-related segmentation faults on darwin
-        propagatedBuildInputs = [ pkgs.libusb1 ] ++
-                                pkgs.lib.optionals pkgs.stdenv.isDarwin [
-                                  pkgs.libobjc pkgs.IOKit
-                                ];
-
-        passthru.tests = { inherit (pkgs.nixosTests) geth; };
-
-      };
-    in {
-      buildInputs = old: old ++ [
-
-      ];
-      installPhase = ''
-        ln -s ${l2geth.geth}/bin $out/bin
-        rm -rf $out/lib
-      '';
-    };
-  };
   "@boba/turing-hybrid-compute" = {
     inherit add-yarn add-solc;
     cleanup-dir = {
@@ -234,6 +180,9 @@ in
         mkdir -p $out/bin
         ln -s $out/lib/node_modules/@eth-optimism/contracts $out/contracts
         ln -s $out/contracts/node_modules/ts-node/dist/bin.js $out/bin/ts-node
+        rm $out/contracts/node_modules/node-hid
+        rm -rf $out/contracts/node_modules/@ledgerhq
+        rm $out/contracts/node_modules/usb
       '';
     };
 

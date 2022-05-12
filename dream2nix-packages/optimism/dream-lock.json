@@ -1,9 +1,10 @@
 {
   "_generic": {
     "defaultPackage": "optimism",
-    "invalidationHash": "817089b1a2dbea1f7a33eafb9693449f505b13265263a8a234cb13a7c36592fa",
+    "invalidationHash": "91fce492f78d0c33ebb4ced2c00f9ebed7ee2905aa1f80ffe1ef61be0aac9267",
     "location": "",
     "packages": {
+      "@boba/api": "0.0.1",
       "@boba/contracts": "0.0.1",
       "@boba/gas-price-oracle": "0.1.0",
       "@boba/gateway": "0.0.3",
@@ -1073,6 +1074,15 @@
         [ "minimist", "1.2.5" ]
       ]
     },
+    "@boba/api": {
+      "0.0.1": [
+        [ "dotenv", "8.6.0" ],
+        [ "eth-sig-util", "3.0.1" ],
+        [ "ethers", "5.5.4" ],
+        [ "fs", "0.0.1-security" ],
+        [ "yaml", "1.10.2" ]
+      ]
+    },
     "@boba/contracts": {
       "0.0.1": [
         [ "@boba/turing-hybrid-compute", "0.2.0" ],
@@ -1801,6 +1811,7 @@
     },
     "@eth-optimism/integration-tests": {
       "0.2.3": [
+        [ "@boba/api", "0.0.1" ],
         [ "@boba/contracts", "0.0.1" ],
         [ "@boba/turing-hybrid-compute", "0.2.0" ],
         [ "@eth-optimism/contracts", "0.5.11" ],
@@ -7233,6 +7244,12 @@
         [ "ethereumjs-util", "5.2.1" ],
         [ "tweetnacl", "1.0.3" ],
         [ "tweetnacl-util", "0.15.1" ]
+      ],
+      "3.0.1": [
+        [ "ethereumjs-abi", "0.6.8" ],
+        [ "ethereumjs-util", "5.2.1" ],
+        [ "tweetnacl", "1.0.3" ],
+        [ "tweetnacl-util", "0.15.1" ]
       ]
     },
     "eth-tx-summary": {
@@ -11023,6 +11040,7 @@
         [ "@eth-optimism/integration-tests", "0.2.3" ],
         [ "@eth-optimism/l2geth", "0.5.11" ],
         [ "@eth-optimism/hardhat-node", "0.1.2" ],
+        [ "@boba/api", "0.0.1" ],
         [ "@boba/monitor", "1.0.0" ],
         [ "@boba/contracts", "0.0.1" ],
         [ "@boba/gas-price-oracle", "0.1.0" ],
@@ -16429,6 +16447,14 @@
         "hash": "sha512-gXcCGGGb2oRM/oeqT861JXsSTJjOxGTBMkj7J5ujEBb6Vmv5I108NcALPYYdGdzFCV6ebdVP+E5k0W1xAbzA7w==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@beam-australia/react-env/-/react-env-2.1.2.tgz"
+      }
+    },
+    "@boba/api": {
+      "0.0.1": {
+        "path": "ops_boba/api",
+        "rootName": "optimism",
+        "rootVersion": "1.0.0",
+        "type": "path"
       }
     },
     "@boba/contracts": {
@@ -24005,6 +24031,11 @@
         "hash": "sha512-4eFkMOhpGbTxBQ3AMzVf0haUX2uTur7DpWiHzWyTURa28BVJJtOkcb9Ok5TV0YvEPG61DODPW7ZUATbJTslioQ==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/eth-sig-util/-/eth-sig-util-3.0.0.tgz"
+      },
+      "3.0.1": {
+        "hash": "sha512-0Us50HiGGvZgjtWTyAI/+qTzYPMLy5Q451D0Xy68bxq1QMWdoOddDwGvsqcFT27uohKgalM9z/yxplyt+mY2iQ==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/eth-sig-util/-/eth-sig-util-3.0.1.tgz"
       }
     },
     "eth-tx-summary": {
@@ -24923,6 +24954,13 @@
         "hash": "sha512-cHEpEQHUg0f8XdtZCc2ZAhrHzKzT0MrFUTcvx+hfxYu7rGMDc5SKoXFh+n4YigxsHXRzc6OrCshdR1bWH6HHyg==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/fromentries/-/fromentries-1.3.2.tgz"
+      }
+    },
+    "fs": {
+      "0.0.1-security": {
+        "hash": "sha1-invTcYa23d84E/I4WLV+yq9eQdQ=",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/fs/-/fs-0.0.1-security.tgz"
       }
     },
     "fs-constants": {
