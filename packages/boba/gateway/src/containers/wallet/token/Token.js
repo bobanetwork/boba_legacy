@@ -195,7 +195,7 @@ function TokenPage() {
 
     return (
     <>
-      {layer === 'L2' &&
+      {layer === 'L2' && network === 'mainnet' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
           <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
@@ -221,49 +221,58 @@ function TokenPage() {
       }
 
       {layer === 'L2' && network === 'rinkeby' &&
-        <Box sx={{
-          display: "flex",
-          flexDirection: "column",
-          paddingTop: "10px"
-        }}>
+          <G.LayerAlert style={{padding: '20px'}}>
+          <Box>
+            <Box style={{ display: "inline-block" }}>
+              <Typography variant="body2">
+                Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
+                <span style={{ opacity: 0.65 }}>{BT} <Copy value={BT} light={false} /></span>
+              </Typography>
+            </Box>
 
-          <Box style={{ display: "inline-block" }}>
-            <Typography variant="body2">
-              Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
-              <span style={{ opacity: 0.65 }}>{BT} <Copy value={BT} light={false} /></span>
+            <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+              Welcome to Boba! This is a special fountain for developers with empty wallets.  
+              To receive testnet BOBA and ETH, tweet your Boba Bubble and
+              paste the tweet link in the field below. 
+              You can get the link on Twitter by tapping the share icon, then tapping
+              "Share Tweet via", and finally selecting "Copy link to Tweet".
+              Your link should look something like this: https://twitter.com/name/status/1234567
             </Typography>
+
+            <Input
+              style = {{width: '80%'}}
+              value={tweetUrl}
+              onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
+            />
+
+            <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px'}}>
+              You are limited to one fountain call per twitter account per day. 
+              The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba). 
+              If you already have some ETH in your wallet to cover gas you can use our 
+              <span
+                target='_blank'
+                href={'https://faucets.boba.network/'}
+                aria-label="link"
+                style={{fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
+              >alternative faucet
+              </span>.
+            </Typography>
+
+            <Button
+              type="primary"
+              variant="contained"
+              style={{ marginTop: "10px", marginBottom: "18px" }}
+              disabled={!tweetUrl || !tweetUrl?.includes('http')}
+              loading={isClaimFaucetLoading}
+              onClick={async (e) => {await claimAuthenticatedFaucetTokens()}}
+              size="small"
+            >
+              Authenticated Faucet
+            </Button>
+
+            {faucetErrorMsg ? <Typography style={{color: 'red'}}>{faucetErrorMsg}</Typography> : null}
           </Box>
-
-          <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-            To receive testnet BOBA and ETH for developing on Boba Rinkeby, tweet your Boba Bubble and
-            paste the tweet link in the field below. You can get the link on Twitter by tapping the share icon, then tapping
-            "Share Tweet via", and finally selecting "Copy link to Tweet".
-            Your link should look something like this: https://twitter.com/name/status/1234567
-          </Typography>
-
-          <Input
-            value={tweetUrl}
-            onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
-          />
-          <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px' }}>
-            You can get testnet funds every 24 hours per Twitter account. Only 100 requests per hour are allowed in general to prevent hitting Twitter API rate limits. If you already have some ETH you can use our <a href="https://faucets.boba.network/" target='_blank' style={{color: '#BAE21A'}}>alternative faucet here</a>.
-          </Typography>
-
-          <Button
-            type="primary"
-            variant="contained"
-            style={{ marginTop: "10px", marginBottom: "18px" }}
-            disabled={!tweetUrl || !tweetUrl?.includes('http')}
-            loading={isClaimFaucetLoading}
-            onClick={async (e) => {await claimAuthenticatedFaucetTokens()}}
-            size="small"
-          >
-            Authenticated Faucet
-          </Button>
-
-          {faucetErrorMsg ? <Typography style={{color: 'red'}}>{faucetErrorMsg}</Typography> : null}
-
-        </Box>
+          </G.LayerAlert>
       }
 
       {!!accountEnabled && inflight.length > 0 &&
