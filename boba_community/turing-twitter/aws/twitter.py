@@ -149,13 +149,13 @@ def load_tweet_status(senderAddress, twitter_post_id):
     has_enough_tweets = int(public_metrics["tweet_count"]) > 2
     account_public_metrics_check = has_enough_follower and has_enough_tweets
 
-    if not account_exists_long_enough: error_reason = 2 #"Account too new"
-    elif not has_posted: error_reason = 3 #"Invalid tweet"
-    elif not has_enough_follower: error_reason = 4 #"Not enough follower"
-    elif not has_enough_tweets: error_reason = 5 #"Not enough tweets"
+    #if not account_exists_long_enough: error_reason = 2 #"Account too new"
+    if not has_posted: error_reason = 3 #"Invalid tweet"
+    #elif not has_enough_follower: error_reason = 4 #"Not enough follower"
+    #elif not has_enough_tweets: error_reason = 5 #"Not enough tweets"
 
     # maybe try-catch for better error msgs (tweet not existing, ..)
-    is_allowed_to_claim = has_posted and account_exists_long_enough and account_public_metrics_check
+    is_allowed_to_claim = has_posted # DISABLED FOR NOW: and account_exists_long_enough and account_public_metrics_check
     print("from endpoint:", has_posted, account_public_metrics_check, account_exists_long_enough, "Author: ", author_id,
           "User created at: ", usercreate_timediff_now, datetime.now(),
           datetime.strptime(result["includes"]["users"][0]["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ"))
