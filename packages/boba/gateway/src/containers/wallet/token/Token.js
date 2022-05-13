@@ -71,8 +71,6 @@ function TokenPage() {
     tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Network%20" + BT
   }
 
-  console.log("tweet:",tweet)
-
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
       i.crossDomainMessage &&
