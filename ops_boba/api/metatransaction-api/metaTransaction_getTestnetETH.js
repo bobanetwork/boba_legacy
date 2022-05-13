@@ -3,8 +3,11 @@ const YAML = require('yaml')
 const fs = require('fs')
 
 // Load env
-const file = fs.readFileSync('./env.yml', 'utf8')
-const env = YAML.parse(file)
+let env = process.env
+if (fs.existsSync('./env.yml')) {
+  const file = fs.readFileSync('./env.yml', 'utf8')
+  env = YAML.parse(file)
+}
 const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_TESTNET_URL === undefined ? env.L2_NODE_WEB3_URL : env.L2_NODE_WEB3_TESTNET_URL
 const PRIVATE_KEY = env.PRIVATE_KEY_FAUCET
 const BOBA_AUTHENTICATEDFAUCET_ADDRESS = env.BOBA_AUTHENTICATEDFAUCET_TESTNET_ADDRESS
