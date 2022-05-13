@@ -46,7 +46,7 @@ export const DropdownWrapper = styled(Box)`
 `;
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '70%',
+  width: '80%',
   display: 'flex',
   justifyContent: 'space-between',
   backgroundColor: 'rgba(255, 255, 255, 0.06)',
