@@ -242,6 +242,7 @@ function TokenPage() {
 
             <a
               target='_blank'
+              rel="noopener noreferrer"
               href={tweet}
               aria-label="link"
               style={{
@@ -279,6 +280,7 @@ function TokenPage() {
               If you already have some ETH in your wallet to cover gas you can use our 
               <a
                 target='_blank'
+                rel="noopener noreferrer"
                 href={'https://faucets.boba.network/'}
                 aria-label="link"
                 style={{color:'#fff', fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
