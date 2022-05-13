@@ -1357,21 +1357,6 @@ class NetworkService {
     }
   }
 
-  async claimAuthenticatedTestnetTokens(tweetId) {
-    // Only Rinkeby
-    const contract = new ethers.Contract(
-      addresses_Rinkeby.AuthenticatedFaucet,
-      AuthenticatedFaucetJson.abi,
-      this.L2Provider,
-    ).connect()
-
-    await contract.estimateGas.sendFunds(tweetId)
-    const claim = await contract.sendFunds(
-      tweetId,
-    )
-    await claim.wait()
-  }
-
   async checkMonster() {
 
     const NFTs = getNFTs()

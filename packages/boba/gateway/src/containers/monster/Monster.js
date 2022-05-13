@@ -46,9 +46,6 @@ class Monster extends React.Component {
       monsterInfo,
       walletAddress,
       bobaTag: "",
-      tweetUrl: "",
-      isClaimFaucetLoading: false,
-      faucetErrorMsg: null,
     };
 
   }
@@ -111,33 +108,6 @@ class Monster extends React.Component {
 
   async addNFT() {
     await networkService.addNFT(this.state.contractAddress, this.state.tokenID);
-  }
-
-  async claimAuthenticatedFaucetTokens() {
-    try {
-      this.setState({...this.state, isClaimFaucetLoading: true})
-      const tweetId = this.state.tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
-
-      const {dispatch} = this.props
-      const res = await networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId)
-      if (!res) {
-        dispatch(openAlert('Faucet request submitted'))
-      } else {
-        this.setState({...this.state, faucetErrorMsg: res})
-      }
-    } catch (err) {
-      let error = err.message.match(/execution reverted: (.*)\\+"}}/)
-      if (error) {
-        error = error[1]
-      } else {
-        error = err?.message ?? err;
-      }
-      console.error(error);
-      this.setState({...this.state, faucetErrorMsg: error})
-
-    } finally {
-      this.setState({...this.state, isClaimFaucetLoading: false})
-    }
   }
 
   render() {
@@ -296,39 +266,6 @@ class Monster extends React.Component {
                   their Boba wallet. The system is powered by Turing, which does all
                   the heavy lifting in the background.
                 </Typography>
-
-                <Typography variant='body2' sx={{ opacity: 0.95 }}>
-                  Developer Twitter/Turing test token fountain
-                </Typography>
-
-                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-                  To receive testnet BOBA and ETH for developing on Boba rinkeby, tweet your Boba Bubble and
-                  paste the tweet link here. You can get the link on Twitter by tapping the share icon, then tapping
-                  "Share Tweet via", and finally selecting "Copy link to Tweet".
-                  Your link should look something like this: https://twitter.com/name/status/1234567
-                </Typography>
-
-                <Input
-                  value={tweetUrl}
-                  onChange={(e) => this.setState({
-                      ...this.state,
-                      tweetUrl: e?.target?.value.split('?')[0] //remove the superfluous stuff after the "?"
-                    })
-                  }
-                />
-
-                <Button
-                  type="primary"
-                  variant="contained"
-                  style={{ marginTop: "10px", marginBottom: "18px" }}
-                  disabled={!this.state.tweetUrl || !this.state.tweetUrl?.includes('http')}
-                  loading={this.state.isClaimFaucetLoading}
-                  onClick={async (e) => {await this.claimAuthenticatedFaucetTokens()}}
-                  size="small">
-                  Authenticated Faucet
-                </Button>
-                {this.state.faucetErrorMsg ? <Typography style={{color: 'red'}}>{this.state.faucetErrorMsg}</Typography> : null}
-
               </Box>
             </S.NFTListContainer>
           </S.NFTPageContainer>
