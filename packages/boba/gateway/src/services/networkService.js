@@ -70,6 +70,7 @@ import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
+import TwitterPayJson from "../deployment/contracts/TwitterPay.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
@@ -85,7 +86,7 @@ import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
-import { sortRawTokens } from 'util/common'
+import { asciiToHex, sortRawTokens } from "util/common";
 import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -169,6 +170,12 @@ class NetworkService {
     // chain ID
     this.chainID = null
     this.networkName = null
+
+    this.TwitterPayContract = new ethers.Contract(
+      allAddresses.TwitterPay,
+      TwitterPayJson.abi,
+      this.L2Provider,
+    )
 
     // gas
     this.L1GasLimit = 9999999
@@ -574,6 +581,38 @@ class NetworkService {
       console.log("returning:",error)
       return errorData
     }
+  }
+
+  async registerBobaBubble(tweetId) {
+    await this.TwitterPayContract.estimateGas.registerBobaBubble(tweetId)
+    console.log('Estimated gas..')
+    const registration = await this.TwitterPayContract.registerBobaBubble(tweetId)
+    return await registration.wait()
+  }
+
+  async sendFundsWithBobaBubble(bobaBubbleTag, amountWei) {
+
+    console.log("triggering sendFundsWithBobaBubble")
+    bobaBubbleTag = asciiToHex(bobaBubbleTag) // convert to hex for smart contract (Turing decoding issue)
+
+    /*const approveTx = await L2BOBAToken.approve(
+      Boba_FundsWithBobaBubble.address,
+      amountWei,
+    )
+    await approveTx.wait()*/
+
+    await this.TwitterPayContract.estimateGas.sendFunds(
+      allAddresses.TK_L2BOBA,
+      bobaBubbleTag,
+      amountWei,
+    )
+
+    const transfer = await this.TwitterPayContract.sendFunds(
+      allAddresses.TK_L2BOBA,
+      bobaBubbleTag,
+      amountWei,
+    )
+    return await transfer.wait()
   }
 
   /** @dev Only works on testnet, but can be freely called on production app */
