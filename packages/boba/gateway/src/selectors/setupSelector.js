@@ -33,10 +33,17 @@ export function selectBaseEnabled () {
   }
 }
 
-// local, rinkeby, mainnet...
+// local, testnet, mainnet...
 export function selectNetwork () {
   return function (state) {
     return state.setup['network']
+  }
+}
+
+// Ethereum, Moonbeam, 
+export function selectBlockchain () {
+  return function (state) {
+    return state.setup['blockchain']
   }
 }
 

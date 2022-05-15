@@ -1,21 +1,22 @@
 import axios from 'axios'
-import { getBaseServices } from 'util/masterConfig'
+import { getNetwork } from 'util/masterConfig'
+const nw = getNetwork()
 
-export default function metaTransactionAxiosInstance(networkGateway){
+export default function metaTransactionAxiosInstance(networkGateway) {
 
-  let axiosInstance = null;
+  let axiosInstance = null
 
   if(networkGateway === 'local') {
-    return null //does not make sense on local
+    return null // does not make sense on local
   }
   else if (networkGateway === 'testnet') {
     axiosInstance = axios.create({
-      baseURL: getBaseServices().TESTNET_META_TRANSACTION,
+      baseURL: nw.testnet.META_TRANSACTION,
     })
   }
   else if (networkGateway === 'mainnet') {
     axiosInstance = axios.create({
-      baseURL: getBaseServices().MAINNET_META_TRANSACTION,
+      baseURL: nw.mainnet.META_TRANSACTION,
     })
   }
 

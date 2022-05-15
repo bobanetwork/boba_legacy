@@ -27,6 +27,7 @@ import {
   selectAccountEnabled,
   selectLayer,
   selectNetwork,
+  selectBlockchain,
   selectWalletAddress,
 } from "selectors/setupSelector"
 
@@ -53,6 +54,7 @@ function Wallet() {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
+  const blockchain = useSelector(selectBlockchain())
 
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
@@ -129,7 +131,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH &&
+      {layer === 'L2' && tooSmallETH && blockchain === 'ethereum' &&
         <G.LayerAlert style={{padding: '20px'}}>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
@@ -155,10 +157,36 @@ function Wallet() {
         </G.LayerAlert>
       }
 
+      {layer === 'L2' && tooSmallETH && blockchain === 'moonbeam' &&
+        <G.LayerAlert style={{padding: '20px'}}>
+          <G.AlertInfo>
+            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Typography
+              flex={4}
+              variant="body2"
+              component="p"
+              ml={2}
+              style={{ opacity: '0.6' }}
+            >
+              Using Boba for Moonbeam requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
+              EMERGENCY SWAP to swap GLMR for 1.0 BOBA at market rates.
+            </Typography>
+          </G.AlertInfo>
+          <Button
+            onClick={()=>{emergencySwap()}}
+            color='primary'
+            variant='outlined'
+          >
+            EMERGENCY SWAP
+          </Button>
+        </G.LayerAlert>
+      }
+
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Ethereum Wallet' ? 'active' : ''}
+            className={chain === 'Mainnet Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -166,7 +194,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Ethereum Wallet
+            Mainnet Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -183,14 +211,18 @@ function Wallet() {
       </S.WalletActionContainer>
 
       <Box sx={{ mt: 2 }}>
-        <Tabs
-          activeTab={page}
-          onClick={(t) => handleSwitch(t)}
-          aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
-        />
+        {blockchain === 'ethereum' && 
+          <Tabs
+            activeTab={page}
+            onClick={(t) => handleSwitch(t)}
+            aria-label="Page Tab"
+            tabs={[ "Token", "NFT" ]}
+          />
+        }
       </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+      {blockchain === 'ethereum' && page === 'Token' && <Token /> }
+      {blockchain === 'ethereum' && page === 'NFT' && <Nft />}
+      {blockchain !== 'ethereum' && <Token /> }
     </S.PageContainer>
   )
 }

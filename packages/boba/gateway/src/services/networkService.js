@@ -677,9 +677,9 @@ class NetworkService {
      return allAddresses
   }
 
-  async initializeBase( networkGateway ) {
+  async initializeBase( networkGateway, blockchain ) {
 
-    console.log('NS: initializeBase() for', networkGateway)
+    console.log('NS: initializeBase() for', networkGateway, 'and', blockchain)
 
     let addresses = null
     this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...

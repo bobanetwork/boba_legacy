@@ -44,7 +44,8 @@ import {
   selectBaseEnabled,
   selectAccountEnabled,
   selectNetwork,
-  selectLayer
+  selectLayer,
+  selectBlockchain
 } from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
@@ -149,9 +150,12 @@ function Home() {
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const network = useSelector(selectNetwork())
+  const blockchain = useSelector(selectBlockchain())
   const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+
+  const full = blockchain === 'ethereum' ? true : false
 
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
@@ -174,10 +178,10 @@ function Home() {
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      console.log("Calling initializeBase for", network)
-      const initialized = await networkService.initializeBase( network )
+      console.log("Calling initializeBase for", network, "and", blockchain)
+      const initialized = await networkService.initializeBase( network, blockchain )
       if (!initialized) {
-        console.log("Failed to boot L1 and L2 base providers for", network)
+        console.log("Failed to boot L1 and L2 base providers for", network, "and", blockchain)
         dispatch(setBaseState(false))
         return false
       }
@@ -185,7 +189,8 @@ function Home() {
         console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
         // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
+        if(blockchain === 'ethereum')
+          dispatch(fetchDaoProposals())
         return true
       }
     }
@@ -193,7 +198,7 @@ function Home() {
   }, [ dispatch, network, baseEnabled, maintenance ])
 
   useInterval(() => {
-    if(accountEnabled /*== MetaMask is connected*/) {
+    if(accountEnabled && blockchain === 'ethereum' /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
       dispatch(fetchAirdropStatusL1()) // account specific
       dispatch(fetchAirdropStatusL2()) // account specific
@@ -205,12 +210,17 @@ function Home() {
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
+    } else if (accountEnabled && blockchain === 'moonbeam') {
+      dispatch(fetchBalances())        // account specific
+      dispatch(fetchExits())           // account specific
     }
-    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
+    if(baseEnabled && blockchain === 'ethereum' /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
+    } else if (baseEnabled && blockchain === 'moonbeam') {
+      dispatch(fetchGas())
     }
   }, POLL_INTERVAL)
 
@@ -219,36 +229,41 @@ function Home() {
     // load the following functions when the home page is open
     checkVersion()
     dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
-    dispatch(getProposalThreshold())
-  }, [ dispatch, maintenance ])
+    if(blockchain === 'ethereum') {
+      dispatch(fetchVerifierStatus())
+      dispatch(getProposalThreshold())
+    }
+  }, [ dispatch, maintenance, blockchain ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
+    }
+    if (accountEnabled && blockchain === 'ethereum') {
       dispatch(getMonsterInfo())
     }
-  }, [ dispatch, accountEnabled, maintenance ])
+  }, [ dispatch, accountEnabled, maintenance, blockchain ])
 
-  console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
+  console.log("Home - account enabled:", accountEnabled, "\nlayer:", layer, "\nBase enabled:", baseEnabled, "\nblockchain:", blockchain, "\nnetwork:", network)
 
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!depositBatchModalState && <DepositBatchModal open={depositBatchModalState} />}
+      {!!depositBatchModalState && full && <DepositBatchModal open={depositBatchModalState} />}
 
       {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
-      {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
+      {!!transferNFTModalState && full && <TransferNFTModal open={transferNFTModalState} token={token} />}
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
-      {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
+      {!!farmDepositModalState && full && <FarmDepositModal open={farmDepositModalState} />}
+      {!!farmWithdrawModalState && full && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
-      {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
-      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
-      {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!delegateBobaDaoModalState && full && <DelegateDaoModal open={delegateBobaDaoModalState} />}
+      {!!delegateBobaDaoXModalState && full && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
+      {!!proposalBobaDaoModalState && full && <NewProposalModal open={proposalBobaDaoModalState} />}
+
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
@@ -345,28 +360,28 @@ function Home() {
             {pageDisplay === "Wallet" &&
               <Wallet />
             }
-            {pageDisplay === "Farm" &&
+            {pageDisplay === "Farm" && full &&
               <FarmWrapper />
             }
-            {pageDisplay === "Save" &&
+            {pageDisplay === "Save" && full &&
               <SaveWrapper />
             }
-            {pageDisplay === "DAO" &&
+            {pageDisplay === "DAO" && full &&
               <DAO />
             }
-            {pageDisplay === "Airdrop" &&
+            {pageDisplay === "Airdrop" && full &&
               <Airdrop />
             }
             {pageDisplay === "Help" &&
               <Help />
             }
-            {pageDisplay === "Ecosystem" &&
+            {pageDisplay === "Ecosystem" && full &&
               <Ecosystem />
             }
-            {pageDisplay === "Bridge" &&
+            {pageDisplay === "Bridge" && full &&
               <Bridge />
             }
-            { pageDisplay === "Monster" &&
+            { pageDisplay === "Monster" && full &&
               <MonsterWrapper />
             }
           </Container>

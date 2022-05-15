@@ -27,6 +27,7 @@ const initialState = {
   netLayer: null,
   walletAddress: null,
   network: process.env.REACT_APP_CHAIN,
+  blockchain: process.env.REACT_APP_BASE,
   justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
   bobaFeePriceRatio: null,
   bobaFeeChoice: null,
@@ -64,6 +65,11 @@ function setupReducer (state = initialState, action) {
       return { 
         ...state, 
         network: action.payload
+      }
+    case 'SETUP/BLOCKCHAIN/SET':
+      return { 
+        ...state, 
+        blockchain: action.payload
       }
     case 'SETUP/CONNECT_ETH':
       return { 

@@ -24,6 +24,7 @@ if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 
       VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
       MM_Label:         `Rinkeby`,
       addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
+      META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
       L1: {
         name: "Rinkeby",
         chainId: 4,
@@ -65,6 +66,7 @@ if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 
       VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
       MM_Label:         `Mainnet`,
       addressManager:   `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`,
+      META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
       L1: {
         name: "Mainnet",
         chainId: 1,
@@ -98,7 +100,35 @@ if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 
       gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
     }
   }
-} else if (process.env.REACT_APP_CHAIN === 'local') {
+} else if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 'moonbeam') {
+   //bobabase testnet
+   NETWORK = {
+     testnet: {
+       OMGX_WATCHER_URL: `https://api-watcher.bobabase.boba.network/`,
+       MM_Label:         `BobaBase`,
+       addressManager:   `0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B`,
+       META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
+       L1: {
+         name: "MoonBase",
+         chainId: 1287,
+         chainIdHex: '0x507',
+         rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
+         blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+         transaction: `https://moonbase.moonscan.io/tx/`,
+       },
+       L2: {
+         name: "BobaBase",
+         chainId: 1297,
+         chainIdHex: '0x511',
+         rpcUrl: `https://bobabase.boba.network`,
+         blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
+         transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
+       },
+       gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
+     }
+  }
+}
+else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORK = {
     local: {
       OMGX_WATCHER_URL: null, //Does not exist on local
@@ -132,10 +162,6 @@ const BaseServices = {
   COIN_GECKO_URL: `https://api.coingecko.com/api/v3/`,
   //ETH gas station
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
-  // Mainnet meta transaction
-  MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
-  // Rinkeby meta transaction
-  TESTNET_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
 }
 
 export function getNetwork () {
