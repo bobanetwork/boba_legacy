@@ -26,9 +26,10 @@ import Copy from "components/copy/Copy";
 
 import { isEqual, orderBy } from "lodash";
 
-import networkService from "services/networkService";
+import networkService, { allAddresses } from "services/networkService";
 
 import { Md5 } from "ts-md5/dist/md5";
+import { ethers } from "ethers";
 
 function TokenPage() {
 
@@ -43,8 +44,14 @@ function TokenPage() {
   const network = useSelector(selectNetwork());
   const walletAddress = useSelector(selectWalletAddress());
 
+  const [showBubbleRegistration, setShowBubbleRegistration] = useState(false);
+  const [bobaBubbleRecipient, setBobaBubbleRecipient] = useState("");
+  const [hasApprovedTokenForBubble, setHasApprovedTokenForBubble] = useState(false);
+  const [bobaBubbleRecipientAmount, setBobaBubbleRecipientAmount] = useState("0");
+  const [bobaBubbleRecipientErrorMsg, setBobaBubbleRecipientErrorMsg] = useState("");
+
   const [tweetUrl, setTweetUrl] = useState("");
-  const [isTwitterActionLoading, setIsTwitterActionLoading] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [twitterActionErrorMsg, setTwitterActionErrorMsg] = useState("");
 
   const [debug, setDebug] = useState(false);
@@ -113,6 +120,17 @@ function TokenPage() {
     }
   }, [accountEnabled]);
 
+  networkService.checkAllowance(
+    allAddresses.TK_L2BOBA,
+    allAddresses.TwitterPay
+  ).then(allowanceBoba => {
+    if (allowanceBoba) {
+      setHasApprovedTokenForBubble(ethers.utils.parseEther(bobaBubbleRecipientAmount).lte(allowanceBoba))
+    }
+  }).catch(e => {
+    console.error(e)
+  })
+
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return;
     // only run once all the tokens have been added to the tokenList
@@ -147,9 +165,9 @@ function TokenPage() {
 
   async function executeTwitterAction(twitterActionCb) {
     try {
-      setIsTwitterActionLoading(true);
+      setIsActionLoading(true);
       const tweetId = tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1];
-      const res =  await twitterActionCb(tweetId)
+      const res = await twitterActionCb(tweetId);
       if (!res) {
         dispatch(openAlert("Request successful"));
       } else {
@@ -164,7 +182,7 @@ function TokenPage() {
       }
       setTwitterActionErrorMsg(error);
     } finally {
-      setIsTwitterActionLoading(false);
+      setIsActionLoading(false);
     }
   }
 
@@ -238,40 +256,102 @@ function TokenPage() {
               </Typography>
             </Box>
 
-            {network !== "rinkeby" &&
+            {//network !== "rinkeby" &&
               <>
-                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-                  To get your own Boba Bubble to use it for payments with Boba, tweet your Bubble and
-                  paste the tweet link in the field below. You can get the link on Twitter by tapping the share icon,
-                  then
-                  tapping
-                  "Share Tweet via", and finally selecting "Copy link to Tweet".
-                  Your link should look something like this: https://twitter.com/name/status/1234567
-                </Typography>
-
-                <Input
-                  value={tweetUrl}
-                  onChange={(e) => setTweetUrl(e?.target?.value.split("?")[0])} //remove the superfluous stuff after the "?"
-                />
-                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: "3px" }}>
-                  After registering your Boba Bubble once, you can freely share it anywhere to make it easier for people to send you Boba tokens.
-                </Typography>
-
                 <Button
                   type="primary"
                   variant="contained"
                   style={{ marginTop: "10px", marginBottom: "18px" }}
-                  disabled={!tweetUrl || !tweetUrl?.includes("http")}
-                  loading={isTwitterActionLoading}
-                  onClick={async (e) => {
-                    await executeTwitterAction((tweetId) => networkService.registerBobaBubble(tweetId));
-                  }}
-                  size="small"
-                >
-                  Register Wallet
+                  onClick={() => setShowBubbleRegistration(!showBubbleRegistration)}
+                  size="small">
+                  {showBubbleRegistration ? "Send funds instead" : "Register your bubble"}
                 </Button>
 
-                {twitterActionErrorMsg ? <Typography style={{ color: "red" }}>{twitterActionErrorMsg}</Typography> : null}}
+                {showBubbleRegistration &&
+                  <>
+                    <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+                      To get your own Boba Bubble to use it for payments with Boba, tweet your Bubble and
+                      paste the tweet link in the field below. You can get the link on Twitter by tapping the share
+                      icon,
+                      then
+                      tapping
+                      "Share Tweet via", and finally selecting "Copy link to Tweet".
+                      Your link should look something like this: https://twitter.com/name/status/1234567
+                    </Typography>
+
+                    <Input
+                      value={tweetUrl}
+                      onChange={(e) => setTweetUrl(e?.target?.value.split("?")[0])} //remove the superfluous stuff after the "?"
+                    />
+                    <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: "3px" }}>
+                      After registering your Boba Bubble once, you can freely share it anywhere to make it easier for
+                      people to send you Boba tokens.
+                    </Typography>
+
+                    <Button
+                      type="primary"
+                      variant="contained"
+                      style={{ marginTop: "10px", marginBottom: "18px" }}
+                      disabled={!tweetUrl || !tweetUrl?.includes("http")}
+                      loading={isActionLoading}
+                      onClick={async (e) => {
+                        await executeTwitterAction((tweetId) => networkService.registerBobaBubble(tweetId));
+                      }}
+                      size="small"
+                    >
+                      Register Wallet
+                    </Button>
+
+                    {twitterActionErrorMsg ?
+                      <Typography style={{ color: "red" }}>{twitterActionErrorMsg}</Typography> : null}}
+                  </>
+                }
+                {!showBubbleRegistration &&
+                  <>
+                    <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+                      You can make payments by providing an user's Boba bubble. The receiving user had to manually
+                      register his wallet by authenticating his Twitter account.
+                    </Typography>
+
+                      <Input
+                        value={bobaBubbleRecipient}
+                        onChange={(e) => setBobaBubbleRecipient(e?.target?.value)}
+                      />
+                      <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: "3px" }}>
+                        Paste an user's Boba bubble above to send him some Boba tokens.
+                      </Typography>
+
+                      <Input
+                        value={bobaBubbleRecipientAmount}
+                        onChange={(e) => setBobaBubbleRecipientAmount(e?.target?.value)}
+                      />
+                      <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: "3px" }}>
+                        How many Boba Tokens to send?
+                      </Typography>
+
+                    <Button
+                      type="primary"
+                      variant="contained"
+                      style={{ marginTop: "10px", marginBottom: "18px" }}
+                      disabled={!bobaBubbleRecipient || !bobaBubbleRecipient?.toLowerCase()?.includes("boba")}
+                      loading={isActionLoading}
+                      onClick={async (e) => {
+                        const successOrError = await networkService.sendFundsWithBobaBubble(bobaBubbleRecipient, ethers.utils.parseEther(bobaBubbleRecipientAmount).toString(), hasApprovedTokenForBubble);
+
+                        if (successOrError === true) {
+                          setHasApprovedTokenForBubble(!hasApprovedTokenForBubble);
+                        }
+                        setBobaBubbleRecipientErrorMsg(successOrError);
+                      }}
+                      size="small"
+                    >
+                      {hasApprovedTokenForBubble ? "Send funds" : "Approve BOBA"}
+                    </Button>
+
+                    {bobaBubbleRecipientErrorMsg ?
+                      <Typography style={{ color: "red" }}>{bobaBubbleRecipientErrorMsg}</Typography> : null}}
+                  </>
+                }
               </>
             }
             {network === "rinkeby" &&
@@ -302,7 +382,7 @@ function TokenPage() {
                   variant="contained"
                   style={{ marginTop: "10px", marginBottom: "18px" }}
                   disabled={!tweetUrl || !tweetUrl?.includes("http")}
-                  loading={isTwitterActionLoading}
+                  loading={isActionLoading}
                   onClick={async (e) => {
                     await executeTwitterAction((tweetId) => networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId));
                   }}
@@ -311,7 +391,8 @@ function TokenPage() {
                   Authenticated Faucet
                 </Button>
 
-                {twitterActionErrorMsg ? <Typography style={{ color: "red" }}>{twitterActionErrorMsg}</Typography> : null}}
+                {twitterActionErrorMsg ?
+                  <Typography style={{ color: "red" }}>{twitterActionErrorMsg}</Typography> : null}}
               </>
             }
           </Box>
