@@ -223,7 +223,7 @@ function TokenPage() {
         </Box>
       }
 
-      {layer === 'L2' && network === 'rinkeby' &&
+      {layer === 'L2' && network === 'testnet' &&
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>
 

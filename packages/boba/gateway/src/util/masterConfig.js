@@ -17,9 +17,9 @@ require('dotenv').config()
 
 let NETWORK
 
-if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 'ethereum') {
   NETWORK = {
-    rinkeby: {
+    testnet: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
       MM_Label:         `Rinkeby`,
@@ -58,7 +58,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
 
     }
   }
-} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+} else if (process.env.REACT_APP_CHAIN === 'mainnet' && process.env.REACT_APP_BASE === 'ethereum') {
   NETWORK = {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
@@ -135,7 +135,7 @@ const BaseServices = {
   // Mainnet meta transaction
   MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
   // Rinkeby meta transaction
-  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
+  TESTNET_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
 }
 
 export function getNetwork () {

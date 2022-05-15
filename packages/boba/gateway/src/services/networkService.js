@@ -103,7 +103,7 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
 // preload allAddresses
-if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+if (process.env.REACT_APP_CHAIN === 'testnet') {
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
@@ -700,7 +700,7 @@ class NetworkService {
       //this.L1ProviderBASE.eth.handleRevert = true
       //this.L2ProviderBASE.eth.handleRevert = true
 
-      if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
+      if (networkGateway === 'mainnet' || networkGateway === 'testnet') {
         this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
         this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
@@ -714,7 +714,7 @@ class NetworkService {
         nw[networkGateway]['L2']['rpcUrl']
       )
 
-      if (networkGateway === 'rinkeby') {
+      if (networkGateway === 'testnet') {
         addresses = addresses_Rinkeby
         console.log('Rinkeby Addresses:', addresses)
       } else if (networkGateway === 'mainnet') {
@@ -805,7 +805,7 @@ class NetworkService {
                               ]
 
       //not all tokens are on Rinkeby
-      if ( networkGateway === 'rinkeby') {
+      if ( networkGateway === 'testnet') {
         this.supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
                                  'BAT',  'ZRX', 'SUSHI',
                                  'LINK', 'UNI', 'BOBA', 'xBOBA',
@@ -961,7 +961,7 @@ class NetworkService {
           l1ChainId: 1,
           fastRelayer: true,
         })
-      } else if (networkGateway === 'rinkeby') {
+      } else if (networkGateway === 'testnet') {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
@@ -1061,11 +1061,11 @@ class NetworkService {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L1ChainId) {
+      } else if (networkGateway === 'testnet' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L2ChainId) {
+      } else if (networkGateway === 'testnet' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
