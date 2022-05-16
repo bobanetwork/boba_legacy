@@ -67,9 +67,9 @@ function Button ({
   }
 
   const styleCombo = {
-    ...style, 
-    minWidth: loading ? '200px' : '103px', 
-    borderRadius: '12px'
+    minWidth: loading ? '200px' : '103px',
+    borderRadius: '12px',
+    ...style,
   }
 
   return (

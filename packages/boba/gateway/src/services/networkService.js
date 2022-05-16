@@ -583,13 +583,17 @@ class NetworkService {
         allAddresses.TwitterPay,
         TwitterPayJson.abi,
         this.L2Provider,
+      ).connect(this.provider.getSigner())
+
+      console.warn("HHH", this.provider.getSigner(), allAddresses.TwitterPay)
+
+      const gasEstimated = await twitterPayContract.estimateGas.registerBobaBubble(tweetId)
+      console.log('Estimated gas..', gasEstimated)
+      const registration = await twitterPayContract.registerBobaBubble(tweetId,
+        { gasLimit: 8_000_000 }
       )
-      await twitterPayContract.estimateGas.registerBobaBubble(tweetId)
-      console.log('Estimated gas..')
-      const registration = await twitterPayContract.registerBobaBubble(tweetId)
-      return await registration.wait()
+      await registration.wait()
     } catch(error) {
-      console.warn("ERRERER", error)
       return this.parseTwitterError(error)
     }
   }
@@ -614,14 +618,15 @@ class NetworkService {
         }
         return true; // allowance large enough
       } else {
-        console.log("triggering sendFundsWithBobaBubble")
-        bobaBubbleTag = asciiToHex(bobaBubbleTag) // convert to hex for smart contract (Turing decoding issue)
+        console.log("triggering sendFundsWithBobaBubble", bobaBubbleTag)
+        bobaBubbleTag = asciiToHex(bobaBubbleTag?.toLowerCase()) // convert to hex for smart contract (Turing decoding issue)
+        console.log("Numeric boba bubble: ", bobaBubbleTag)
 
         const twitterPayContract = new ethers.Contract(
           allAddresses.TwitterPay,
           TwitterPayJson.abi,
           this.L2Provider,
-        )
+        ).connect(this.provider.getSigner(this.account))
 
         await twitterPayContract.estimateGas.sendFunds(
           allAddresses.TK_L2BOBA,
@@ -643,12 +648,13 @@ class NetworkService {
 
 
   parseTwitterError(error) {
-    console.log(`TwitterTx error: ${error}`)
+    console.warn('TwitterTx error:', error)
 
-    let errorMsg = error?.response?.data?.error?.error?.body
+    let errorMsg = error?.response?.data?.error?.error?.body ?? error?.error ?? error?.data?.message
     if (errorMsg) {
-      errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
-      errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
+      errorMsg = JSON.stringify(errorMsg);
+      errorMsg = errorMsg?.match(/execution reverted:\s(.+)\\+"}}/) ?? errorMsg?.match(/execution reverted:\s(.+)"/)
+      errorMsg = errorMsg ? errorMsg[1]?.trim() : errorMsg;
     }
     if (errorMsg?.includes('Invalid request')) {
       errorMsg = errorMsg.match(/Invalid request:(.+)/)
@@ -671,11 +677,12 @@ class NetworkService {
       }
     } else {
       const errorMap = {
-        'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
-        'No testnet funds': 'Faucet drained: Please reach out to us.',
-        'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        'cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
+        'no testnet funds': 'Faucet drained: Please reach out to us.',
+        'rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        'unknown bubble': 'This Boba bubble is not registered yet.',
       }
-      errorMsg = errorMap[errorMsg];
+      errorMsg = errorMap[errorMsg?.toLowerCase()] ?? errorMsg;
     }
     return errorMsg ?? 'Limits reached or Twitter constraints not met.'
   }

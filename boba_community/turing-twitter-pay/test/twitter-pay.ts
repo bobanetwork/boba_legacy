@@ -23,7 +23,9 @@ const gasOverride = { gasLimit: 8_000_000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
+const userPK = hre.network.config.accounts[1]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+const userWallet = new Wallet(userPK, local_provider)
 
 let BOBAL2Address
 let BobaTuringCreditAddress
@@ -193,7 +195,55 @@ describe('Use Boba Bubble for tipping', function () {
     ).to.be.reverted
   })
 
-  it('should transfer funds to boba bubble', async () => {
+  it('should transfer funds to boba bubble (yourself)', async () => {
+    const amount = ethers.utils.parseEther('0.000001')
+    const approveTx = await L2BOBAToken.approve(
+      twitter.address,
+      amount,
+      gasOverride
+    )
+    await approveTx.wait()
+    console.log('Approved..')
+
+    await twitter.estimateGas.sendFunds(
+      BOBAL2Address,
+      bobaBubble,
+      amount,
+      gasOverride
+    )
+    console.log('Estimated gas')
+    const registration = await twitter.sendFunds(
+      BOBAL2Address,
+      bobaBubble,
+      amount,
+      gasOverride
+    )
+    const res = await registration.wait()
+    expect(res).to.be.ok
+  })
+
+  it('should conduct basic twitter registration (2)', async () => {
+    const tweetId = '1526154825297235968'
+    const twitter2 = twitter.connect(userWallet)
+    await twitter2.estimateGas.registerBobaBubble(tweetId, gasOverride)
+    console.log('Estimated gas..')
+    const registration = await twitter2.registerBobaBubble(tweetId, gasOverride)
+    const res = await registration.wait()
+    expect(res).to.be.ok
+
+    const currEvent = res.events.find((e) => e.event === 'BubbleRegistered')
+    const eventArgs = currEvent.args
+    const eventTopics = currEvent.topics
+    console.log(eventArgs.bobaBubble.toString())
+    console.log(eventArgs, eventTopics, currEvent.data) // 0x626f6261356661303763363331
+    const authorId = eventArgs.authorId
+
+    bobaBubble = eventArgs.bobaBubble //convertHexToASCII(eventArgs.bobaBubble.toString().substring(2))
+
+    expect(authorId).to.be.not.null
+  })
+
+  it('should transfer funds to boba bubble (other)', async () => {
     const amount = ethers.utils.parseEther('0.000001')
     const approveTx = await L2BOBAToken.approve(
       twitter.address,
