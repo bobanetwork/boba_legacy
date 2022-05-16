@@ -53,7 +53,7 @@ contract TwitterPay is Ownable {
         // 0 = false, 1 = true
         bool isAllowedToReceive = resp != 0;
         require(twitterRegister[authorId] == false, "Twitter already used");
-        require(bubbleRegister[bobaBubble] != address(0), "Wallet already used or collision");
+        require(bubbleRegister[bobaBubble] == address(0), "Wallet already used or collision");
         require(isAllowedToReceive, string(abi.encodePacked("Invalid request:", Strings.toString(errorMsgVal))));
 
         twitterRegister[authorId] = true;
