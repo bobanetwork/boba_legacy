@@ -70,7 +70,9 @@ import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
+
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
+import Boba_GasPriceOracleMoonJson from "../deployment/contracts/Boba_GasPriceOracleMoon.json"
 
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
@@ -90,32 +92,44 @@ import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
+
 import { bobaBridges } from 'util/bobaBridges'
 
 require('dotenv').config()
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
+
+// used for systems with ETH as the base token
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
+// used for systems with BOBA as the base token
+const L2_BOBA_Address = '0x4200000000000000000000000000000000000006' 
+
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
 // preload allAddresses
-if (process.env.REACT_APP_CHAIN === 'testnet') {
+if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 'ethereum') {
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
     L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
   }
-} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+} else if (process.env.REACT_APP_CHAIN === 'mainnet' && process.env.REACT_APP_BASE === 'ethereum') {
   allAddresses = {
     ...addresses_Mainnet,
     L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
     L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool
   }
+} else if (process.env.REACT_APP_CHAIN === 'testnet' && process.env.REACT_APP_BASE === 'moonbeam') {
+  allAddresses = {
+    ...addresses_BobaBase,
+  }
 }
+
 let allTokens = {}
 
 function handleChangeChainOnce(chainID_hex_string) {
@@ -451,7 +465,13 @@ class NetworkService {
       let priceRatio = await bobaFeeContract.priceRatio()
       console.log("BFO: priceRatio:",priceRatio)
 
-      let feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
+      let feeChoice = null
+
+      if(process.env.REACT_APP_BASE === 'ethereum')
+        feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
+      else
+        feeChoice = await bobaFeeContract.secondaryFeeTokenUsers(this.account)
+
       console.log("BFO: feeChoice:",feeChoice)
 
       const bobaFee = {
@@ -491,9 +511,11 @@ class NetworkService {
       if( targetFee === 'BOBA' ) {
         tx = await bobaFeeContract.useBobaAsFeeToken()
         await tx.wait()
-
       } else if (targetFee === 'ETH') {
         tx = await bobaFeeContract.useETHAsFeeToken()
+        await tx.wait()
+      } else if (targetFee === 'GLMR') {
+        tx = await bobaFeeContract.useSecondaryFeeTokenAsFeeToken()
         await tx.wait()
       }
 
@@ -774,9 +796,16 @@ class NetworkService {
       }
 
       //L2_ETH_Address is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2_ETH_Address': L2_ETH_Address
+      if(process.env.REACT_APP_BASE === 'ethereum') {
+        allAddresses = {
+          ...allAddresses,
+          'L2_ETH_Address': L2_ETH_Address
+        }
+      } else {
+        allAddresses = {
+          ...allAddresses,
+          'L2_ETH_Address': L2_BOBA_Address
+        }
       }
 
       //L1_ETH_Address is a predeploy, so add by hand....
