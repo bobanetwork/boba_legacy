@@ -3,27 +3,34 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectNetwork, selectWalletAddress } from 'selectors/setupSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import { fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
+import { openAlert, openError } from 'actions/uiAction'
+
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
 
-import { Box, Typography, CircularProgress } from '@mui/material'
+import twitter from 'images/twitter.png'
+
+import { Box, Typography, CircularProgress, Input } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
+import Copy from 'components/copy/Copy'
 
 import { isEqual, orderBy } from 'lodash'
 
 import networkService from 'services/networkService'
+
+import { Md5 } from "ts-md5/dist/md5"
 
 function TokenPage() {
 
@@ -35,6 +42,12 @@ function TokenPage() {
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
   const layer = useSelector(selectLayer())
+  const network = useSelector(selectNetwork())
+  const walletAddress = useSelector(selectWalletAddress())
+
+  const [ tweetUrl, setTweetUrl ] = useState("")
+  const [ isClaimFaucetLoading, setIsClaimFaucetLoading ] = useState(false)
+  const [ faucetErrorMsg, setFaucetErrorMsg ] = useState("")
 
   const [ debug, setDebug ] = useState(false)
 
@@ -46,6 +59,17 @@ function TokenPage() {
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+
+  let bobaTag = ''
+  if(walletAddress)
+    bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
+
+  let BT = ''
+  let tweet = ''
+  if (bobaTag) {
+    BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
+    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Network%20" + BT
+  }
 
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
@@ -114,7 +138,6 @@ function TokenPage() {
     dispatch(fetchLookUpPrice(symbolList))
   }, [ tokenList, dispatch, accountEnabled ])
 
-
   useEffect(() => {
     if (!accountEnabled) return
     getLookupPrice()
@@ -123,6 +146,29 @@ function TokenPage() {
   const GasEstimateApprove = () => {
     let approval = networkService.estimateApprove()
     console.log("GasEstimateApprove:",approval)
+  }
+
+  async function claimAuthenticatedFaucetTokens() {
+    try {
+      setIsClaimFaucetLoading(true)
+      const tweetId = tweetUrl?.match(/twitter\.com\/.*\/status\/(\d+)/)[1]
+      const res = await networkService.getTestnetETHAuthenticatedMetaTransaction(tweetId)
+      if (!res) {
+        dispatch(openAlert('Faucet request submitted'))
+      } else {
+        setFaucetErrorMsg(res)
+      }
+    } catch (err) {
+      let error = err.message.match(/execution reverted: (.*)\\+"}}/)
+      if (error) {
+        error = error[1]
+      } else {
+        error = err?.message ?? err
+      }
+      setFaucetErrorMsg(error)
+    } finally {
+      setIsClaimFaucetLoading(false)
+    }
   }
 
   if (!accountEnabled) {
@@ -152,7 +198,7 @@ function TokenPage() {
 
     return (
     <>
-      {layer === 'L2' &&
+      {layer === 'L2' && network === 'mainnet' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
           <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
@@ -177,9 +223,91 @@ function TokenPage() {
         </Box>
       }
 
-      {!!accountEnabled && inflight.length > 0 && 
+      {layer === 'L2' && network === 'rinkeby' &&
+          <G.LayerAlert style={{padding: '20px'}}>
+          <Box>
+
+            <Box style={{display: "inline-block"}}>
+              <Typography variant="body2">
+                Developer Twitter/Turing test token fountain - your Boba Bubble:{" "}
+                <span style={{ opacity: 0.65 }}>{BT} <Copy value={BT} light={false} /></span>
+              </Typography>
+            </Box>
+
+            <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
+              Welcome developers.  
+              For testnet BOBA and ETH, tweet your Boba Bubble and
+              then paste the tweet link in the field below.
+            </Typography>
+
+            <a
+              target='_blank'
+              rel="noopener noreferrer"
+              href={tweet}
+              aria-label="link"
+              style={{
+                backgroundColor: '#1b95e0',
+                color: '#fff',
+                borderRadius: '4px',
+                height: '28px',
+                fontWeight: '500',
+                fontSize: '13px',
+                lineheight: '26px',
+                padding: '8px 8px 8px 30px',
+                textDecoration: 'none',
+                backgroundImage: `url(${twitter})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '16px 13px',
+                backgroundPosition: '8px 10px'
+              }}
+            >Tweet Now
+            </a>
+
+            <Typography variant="body3" sx={{ opacity: 0.65, marginTop: "10px", marginBottom: "10px" }}>
+              For the Tweet link, tap the share icon, tap "Share Tweet via", and finally select "Copy link to Tweet".
+            </Typography>
+
+            <Input
+              style={{width: '80%'}}
+              value={tweetUrl}
+              placeholder="Tweet Link"
+              onChange={(e) => setTweetUrl(e?.target?.value.split('?')[0])} //remove the superfluous stuff after the "?"
+            />
+
+            <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px'}}>
+              You are limited to one fountain call per twitter account per day. 
+              The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba). 
+              If you already have some ETH in your wallet to cover gas you can use our 
+              <a
+                target='_blank'
+                rel="noopener noreferrer"
+                href={'https://faucets.boba.network/'}
+                aria-label="link"
+                style={{color:'#fff', fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
+              >alternative faucet
+              </a>.
+            </Typography>
+
+            <Button
+              type="primary"
+              variant="contained"
+              style={{ marginTop: "10px", marginBottom: "18px" }}
+              disabled={!tweetUrl || !tweetUrl?.includes('http')}
+              loading={isClaimFaucetLoading}
+              onClick={async (e) => {await claimAuthenticatedFaucetTokens()}}
+              size="small"
+            >
+              Authenticated Faucet
+            </Button>
+
+            {faucetErrorMsg ? <Typography style={{color: 'red'}}>{faucetErrorMsg}</Typography> : null}
+          </Box>
+          </G.LayerAlert>
+      }
+
+      {!!accountEnabled && inflight.length > 0 &&
         <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
-          <Typography 
+          <Typography
             variant="body2"
             sx={{ cursor: 'pointer' }}
             onClick={() => {
@@ -219,7 +347,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
@@ -233,7 +361,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}

@@ -144,14 +144,14 @@ class listNFT extends React.Component {
     }
 
     let imgSource = URL
-    if (URL.substring(0, 4) === '<svg') {
+    if (URL?.substring(0, 4) === '<svg') {
       imgSource = `data:image/svg+xml;utf8,${URL}`
     }
 
     return (
       <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical" >
-        <S.ListNFTItem 
-          item 
+        <S.ListNFTItem
+          item
           small={small}
           onClick={this.handleClick}
         >
@@ -165,33 +165,33 @@ class listNFT extends React.Component {
             className={styles.topContainer}>
             {!small && <>
               <Typography variant="body1">
-                {meta.name}{' '}({symbol})
+                {meta?.name}{' '}({symbol})
               </Typography>
               <Typography variant="body3">
                 TokenID:{' '}{tokenID}
               </Typography>
               </>
-            }            
+            }
           </div>
         </S.ListNFTItem>
-        <S.ListNFTItem 
-          active={'true'} 
-          item 
+        <S.ListNFTItem
+          active={'true'}
+          item
           small={small}
           onClick={this.handleClick}
         >
-          {meta.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta.collection}</Typography>}
-          {meta.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta.rank}</Typography>}
-          {meta.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta.rarity_score}</Typography>}
+          {meta?.collection !== ''   && <Typography variant="body3">Collection:{' '}{meta?.collection}</Typography>}
+          {meta?.rank !== ''         && <Typography variant="body3">Rank:{' '}{meta?.rank}</Typography>}
+          {meta?.rarity_score !== '' && <Typography variant="body3">Rarity:{' '}{meta?.rarity_score}</Typography>}
           {rarity !== ''            && <Typography variant="body3">Rarity:{' '}{rarity}</Typography>}
-          {(meta.attributes || []).map((attr, index) => {
+          {(meta?.attributes || []).map((attr, index) => {
             return (
               <Typography variant="body3" key={index}>
                 {attr.trait_type}:{' '}{attr.value}
               </Typography>
             )
           })}
-          {(meta.traits || []).map((attr, index) => {
+          {(meta?.traits || []).map((attr, index) => {
             return (
               <Typography variant="body3" key={index}>
                 {attr.trait_type}:{' '}{attr.trait_value}

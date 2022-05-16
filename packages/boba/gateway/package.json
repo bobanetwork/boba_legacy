@@ -53,6 +53,7 @@
     "react-select": "^5.2.2",
     "redux": "^4.1.2",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.51.0",
     "serve": "^11.3.2",
     "truncate-middle": "^1.0.6",
     "ts-md5": "^1.2.11",
@@ -75,7 +76,6 @@
   },
   "devDependencies": {
     "@beam-australia/react-env": "2.1.2",
-    "audit-ci": "^3.1.1",
-    "sass": "^1.49.7"
+    "audit-ci": "^3.1.1"
   }
 }
