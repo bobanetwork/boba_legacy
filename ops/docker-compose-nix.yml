@@ -75,6 +75,10 @@ x-fast-relayer_pk: &fast-relayer_pk
 x-integration_pk: &integration_pk
   PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
+# Account #19
+x-gas-price-oracle_pk: &gas-price-oracle_pk
+  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
+
 # Account #14 - allows the fee test
 x-integration_2_pk: &integration_2_pk
   PRIVATE_KEY_2: '0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
@@ -274,6 +278,29 @@ services:
   #   ports:
   #     - ${VERIFIER_HTTP_PORT:-8547}:8545
   #     - ${VERIFIER_WS_PORT:-8548}:8546
+
+  gas_oracle:
+    depends_on:
+      - l1_chain
+      - l2geth
+    image: boba_gas-price-oracle:boba
+    environment:
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      << : *gas-price-oracle_pk #same as the deployer
+      << : *relayer_pk
+      << : *fast-relayer_pk
+      SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+      PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
+      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
+      GAS_PRICE_ORACLE_ROOF_PRICE: 5
+      GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
+      POLLING_INTERVAL:
+      RETRIES: 200
+
 
   #in no way should this be running in production
   kms:

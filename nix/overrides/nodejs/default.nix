@@ -137,6 +137,17 @@ in
           ./tsconfig-copy.json
       '';
     };
+    install-symlinks = {
+      postInstall = ''
+        mkdir -p $out/bin
+        ln -s $out/lib/node_modules/@boba/gas-price-oracle/exec/run-gas-price-oracle.js $out/bin/gas-price-oracle.js
+      '';
+    };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@boba/gas-price-oracle/ | grep -v "package.json\|dist\|node_modules\|exec\|scripts"`
+      '';
+    };
   };
   "@boba/message-relayer-fast" = {
     correct-tsconfig-path = {

@@ -157,4 +157,17 @@ in
       Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat" "node" "--network" "hardhat" ];
     };
   };
+  gas-price-oracle-image = pkgs.dockerTools.buildImage {
+    name = "boba_gas-price-oracle";
+    tag = tag;
+    config = {
+      Cmd = [  ];
+      WorkingDir = "${bobapkgs."@boba/gas-price-oracle"}/lib/node_modules/@boba/gas-price-oracle";
+      EntryPoint = [
+        "${scripts}/scripts/wait-for-l1-and-l2.sh"
+        "${pkgs.nodejs}/bin/node"
+        "${bobapkgs."@boba/gas-price-oracle"}/bin/gas-price-oracle"
+      ];
+    };
+  };
 }
