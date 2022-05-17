@@ -33,7 +33,6 @@ in
       jq
     ];
     config = {
-      Cmd = [  ];
       WorkingDir = "${bobapkgs."@eth-optimism/data-transport-layer"}/lib/node_modules/@eth-optimism/data-transport-layer";
       EntryPoint = [
         "${pkgs.nodejs}/bin/node"
@@ -136,7 +135,6 @@ in
           "8546" = {};
           "8547" = {};
         };
-        Cmd = [ ];
         Env = [
           "PATH=${pkgs.coreutils}/bin/"
         ];
@@ -148,8 +146,6 @@ in
   hardhat-image = pkgs.dockerTools.buildLayeredImage {
     name = "l1_chain";
     tag = tag;
-    contents = [
-    ];
     config = {
       ExposedPorts = {
         "8545" = {};
@@ -161,7 +157,6 @@ in
     name = "boba_gas-price-oracle";
     tag = tag;
     config = {
-      Cmd = [  ];
       WorkingDir = "${bobapkgs."@boba/gas-price-oracle"}/lib/node_modules/@boba/gas-price-oracle";
       EntryPoint = [
         "${scripts}/scripts/wait-for-l1-and-l2.sh"
