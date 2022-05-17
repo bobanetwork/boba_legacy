@@ -1,6 +1,6 @@
 { pkgs, bobapkgs, ... }:
 let
-  tag = "boba";
+  tag = "nix";
   scripts = pkgs.stdenv.mkDerivation {
     name = "scripts";
     phases = [ "installPhase" ];

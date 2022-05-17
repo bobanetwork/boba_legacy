@@ -108,7 +108,7 @@ services:
   #     - ../go/proxyd:/etc/proxyd/
   # this is a helper service used because there's no official hardhat image
   l1_chain:
-    image: l1_chain:boba
+    image: l1_chain:nix
     ports:
       # expose the service to the host for integration testing
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
@@ -117,7 +117,7 @@ services:
     depends_on:
       - l1_chain
       - dtl
-    image: deployer:boba
+    image: deployer:nix
     entrypoint: deployer.sh
     environment:
       FRAUD_PROOF_WINDOW_SECONDS: 0
@@ -154,7 +154,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: boba_deployer:boba
+    image: boba_deployer:nix
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -173,7 +173,7 @@ services:
   dtl:
     depends_on:
       - l1_chain
-    image: dtl:boba
+    image: dtl:nix
     # override with the dtl script and the env vars required for it
     env_file:
       -  ./envs/dtl.env
@@ -200,7 +200,7 @@ services:
     depends_on:
       - l1_chain
       - dtl
-    image: l2geth:boba
+    image: l2geth:nix
     # override with the geth script and the env vars required for it
     #entrypoint: l2geth-start
     env_file:
@@ -232,7 +232,7 @@ services:
       - dtl
       - l2geth
       - kms
-    image: go-batch-submitter:boba
+    image: go-batch-submitter:nix
     entrypoint: batch-submitter.sh
     env_file:
       - ./envs/batch-submitter.env
@@ -253,7 +253,7 @@ services:
   # verifier:
   #   depends_on:
   #     - dtl
-  #   image: l2geth:boba
+  #   image: l2geth:nix
   #   deploy:
   #     replicas: 1
   #   entrypoint: sh ./geth.sh
@@ -283,7 +283,7 @@ services:
     depends_on:
       - l1_chain
       - l2geth
-    image: boba_gas-price-oracle:boba
+    image: boba_gas-price-oracle:nix
     environment:
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       L1_NODE_WEB3_URL: http://l1_chain:8545
