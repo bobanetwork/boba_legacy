@@ -82,45 +82,45 @@
       # Generates the bindings using abigen with the contracts derivation
       # Doesn't work as of yet, because they point to imports from ethereum-optimism/l2geth
       #  and not ethereum/go-ethereum as the current directory's bindings have
-      preConfigure =
-        let
-          ctc = "${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/CanonicalTransactionChain.sol/CanonicalTransactionChain.json";
-          scc = "${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json";
-        in
-        ''
-          mkdir -p bindings/{ctc,scc}/
-          temp=$(mktemp)
-          temp2=$(mktemp)
-          cat ${ctc} \
-            | ${pkgs.jq}/bin/jq -r .bytecode > $temp
+      # preConfigure =
+      #   let
+      #     ctc = "${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/CanonicalTransactionChain.sol/CanonicalTransactionChain.json";
+      #     scc = "${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json";
+      #   in
+      #   ''
+      #     mkdir -p bindings/{ctc,scc}/
+      #     temp=$(mktemp)
+      #     temp2=$(mktemp)
+      #     cat ${ctc} \
+      #       | ${pkgs.jq}/bin/jq -r .bytecode > $temp
 
-	        cat ${ctc} \
-            | ${pkgs.jq}/bin/jq .abi \
-            | ${bobapkgs."@eth-optimism/l2geth".abigen}/bin/abigen --pkg ctc \
-            --abi - \
-            --out bindings/ctc/canonical_transaction_chain.go \
-            --type CanonicalTransactionChain \
-            --bin $temp
-          cat ${scc} \
-            | ${pkgs.jq}/bin/jq -r .bytecode > $temp2
+	    #     cat ${ctc} \
+      #       | ${pkgs.jq}/bin/jq .abi \
+      #       | ${bobapkgs."@eth-optimism/l2geth".abigen}/bin/abigen --pkg ctc \
+      #       --abi - \
+      #       --out bindings/ctc/canonical_transaction_chain.go \
+      #       --type CanonicalTransactionChain \
+      #       --bin $temp
+      #     cat ${scc} \
+      #       | ${pkgs.jq}/bin/jq -r .bytecode > $temp2
 
-	        cat ${scc} \
-            | ${pkgs.jq}/bin/jq .abi \
-            | ${bobapkgs."@eth-optimism/l2geth".abigen}/bin/abigen --pkg scc \
-            --abi - \
-            --out bindings/scc/state_commitment_chain.go \
-            --type StateCommitmentChain \
-            --bin $temp2
+	    #     cat ${scc} \
+      #       | ${pkgs.jq}/bin/jq .abi \
+      #       | ${bobapkgs."@eth-optimism/l2geth".abigen}/bin/abigen --pkg scc \
+      #       --abi - \
+      #       --out bindings/scc/state_commitment_chain.go \
+      #       --type StateCommitmentChain \
+      #       --bin $temp2
 
-          rm $temp $temp2
+      #     rm $temp $temp2
 
-          substituteInPlace './bindings/ctc/canonical_transaction_chain.go' \
-            --replace 'ethereum-optimism/optimism/l2geth' 'ethereum/go-ethereum'
+      #     substituteInPlace './bindings/ctc/canonical_transaction_chain.go' \
+      #       --replace 'ethereum-optimism/optimism/l2geth' 'ethereum/go-ethereum'
 
-          substituteInPlace './bindings/scc/state_commitment_chain.go' \
-            --replace 'ethereum-optimism/optimism/l2geth' 'ethereum/go-ethereum'
+      #     substituteInPlace './bindings/scc/state_commitment_chain.go' \
+      #       --replace 'ethereum-optimism/optimism/l2geth' 'ethereum/go-ethereum'
 
-        '';
+      #   '';
       #proxyVendor = true;
       subPackages = [
         "cmd/batch-submitter"

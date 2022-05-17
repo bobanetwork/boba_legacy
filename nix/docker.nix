@@ -74,6 +74,39 @@ in
         ];
       };
     };
+  # Adapted from ops/docker/Dockerfile.batch-submitter
+  batch-submitter-image = let
+    script = pkgs.stdenv.mkDerivation {
+      name = "script";
+      phases = [ "installPhase" ];
+      installPhase = ''
+        mkdir -p $out/scripts
+        cp ${./..}/ops/scripts/batch-submitter.sh $out/scripts/
+        substituteInPlace $out/scripts/batch-submitter.sh \
+          --replace 'jq -r' '${pkgs.jq}/bin/jq' \
+          --replace 'curl' '${pkgs.curl}/bin/curl'
+        chmod +x $out/scripts/batch-submitter.sh
+      '';
+    };
+
+  in pkgs.dockerTools.buildImage {
+    name = "go-batch-submitter";
+    tag = tag;
+    contents = with pkgs; [
+      # From nixpkgs
+      cacert
+      jq
+    ];
+    config = {
+      Env = [
+        "PATH=${bobapkgs."@eth-optimism/batch-submitter"}/bin/:${script}/scripts/"
+      ];
+      EntryPoint = [
+        "${bobapkgs."@eth-optimism/batch-submitter"}/bin/batch-submitter"
+      ];
+    };
+  };
+
   # Adapted from ops/docker/Dockerfile.geth
   l2geth-image =
     let
