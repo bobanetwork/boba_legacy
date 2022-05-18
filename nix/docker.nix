@@ -240,17 +240,17 @@ in
       };
 
     in pkgs.dockerTools.buildImage {
-    name = "integration-tests";
-    tag = tag;
-    config = {
-      WorkingDir = "${bobapkgs."@eth-optimism/integration-tests"}/lib/node_modules/@eth-optimism/integration-tests/";
-      Env = [
-        "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/:${bobapkgs."@eth-optimism/hardhat-node"}/bin/:${script}/scripts/"
-      ];
-      EntryPoint = [
-        "${pkgs.yarn}/bin/yarn"
-        "test:integration"
-      ];
+      name = "integration-tests";
+      tag = tag;
+      config = {
+        WorkingDir = "${bobapkgs."@eth-optimism/integration-tests"}/lib/node_modules/@eth-optimism/integration-tests/";
+        Env = [
+          "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/:${bobapkgs."@eth-optimism/hardhat-node"}/bin/:${script}/scripts/"
+        ];
+        EntryPoint = [
+          "${pkgs.yarn}/bin/yarn"
+          "test:integration"
+        ];
+      };
     };
-  };
 }
