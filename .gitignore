@@ -15,7 +15,7 @@ artifacts
 cache
 
 # nix
-result
+result*
 .direnv/
 
 l2geth/build/bin
