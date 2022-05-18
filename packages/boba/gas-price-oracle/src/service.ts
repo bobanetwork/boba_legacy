@@ -944,14 +944,22 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           )
           await tx.wait()
           this.logger.info('Updated exit fee', {
-            exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
+            exitFeePerMessageBOBA: Number(
+              Number(
+                utils.formatEther(exitFeePerMessageBOBA.toString())
+              ).toFixed(6)
+            ),
             lastRecordedExitRelayTimestamp:
               this.state.lastRecordedExitRelayTimestamp,
             lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
           })
         } else {
           this.logger.info('No need to update exit fee', {
-            exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
+            exitFeePerMessageBOBA: Number(
+              Number(
+                utils.formatEther(exitFeePerMessageBOBA.toString())
+              ).toFixed(6)
+            ),
             lastRecordedExitRelayTimestamp:
               this.state.lastRecordedExitRelayTimestamp,
             lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
