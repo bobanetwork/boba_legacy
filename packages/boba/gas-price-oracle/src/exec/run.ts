@@ -96,6 +96,15 @@ const main = async () => {
     parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
   )
 
+  const EXIT_FEE_RECORDING_INTERVAL = config.uint(
+    'exit-fee-recording-interval',
+    parseInt(env.EXIT_FEE_RECORDING_INTERVAL, 10) || 1000 * 60 * 60 * 24 * 1
+  )
+  const EXIT_FEE_MAX_RECORDING_TIME = config.uint(
+    'exit-fee-max-recording-time',
+    parseInt(env.EXIT_FEE_RECORDING_INTERVAL, 10) || 1000 * 60 * 60 * 24 * 7
+  )
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -164,6 +173,8 @@ const main = async () => {
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
     bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
+    exitFeeRecordingInterval: EXIT_FEE_RECORDING_INTERVAL,
+    exitFeeMaxRecordingTime: EXIT_FEE_MAX_RECORDING_TIME
   })
 
   await service.start()

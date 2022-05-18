@@ -9,6 +9,9 @@ import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
+/* Imports: subgraph */
+import { countRelayMessageEventsFromGraph } from './graph'
+
 import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
 import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
@@ -60,6 +63,13 @@ interface GasPriceOracleOptions {
 
   // local testnet chain ID
   bobaLocalTestnetChainId: number
+
+  // exit fee recording interval - 1 day
+  // once it reaches 7 days, we update the record from 6 days ago
+  exitFeeRecordingInterval: number
+
+  // exit fee maximum recording time - 7 days
+  exitFeeMaxRecordingTime: number
 }
 
 const optionSettings = {}
@@ -75,6 +85,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
     Boba_GasPriceOracle: Contract
+    BobaBillingContract: Contract
     BobaBillingContractAddress: string
     L2BOBA: Contract
     BobaStraw_ETHUSD: Contract
@@ -92,6 +103,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     BOBAUSDPrice: number
     ETHUSDPrice: number
     chainID: number
+    // Exit fee
+    lastRecordedExitRelayBlock: number
+    lastRecordedExitRelayCostFee: BigNumber
+    lastRecordedExitRelayTimestamp: number
   }
 
   protected async _init(): Promise<void> {
@@ -111,6 +126,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       bobaFeeRatio100X: this.options.bobaFeeRatio100X,
       bobaFeeRatioMinPercentChange: this.options.bobaFeeRatioMinPercentChange,
       bobaLocalTestnetChainId: this.options.bobaLocalTestnetChainId,
+      exitFeeRecordingInterval: this.options.exitFeeRecordingInterval,
+      exitFeeMaxRecordingTime: this.options.exitFeeMaxRecordingTime,
     })
 
     this.state = {} as any
@@ -193,6 +210,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this.state.Lib_AddressManager.getAddress(
         'Proxy__BobaBillingContract'
       )
+    this.state.BobaBillingContract = new Contract(
+      this.state.BobaBillingContractAddress,
+      new utils.Interface(['function updateExitFee(uint256)']),
+      this.options.gasPriceOracleOwnerWallet
+    )
     this.logger.info('Connected to Proxy__BobaBillingContract', {
       address: this.state.BobaBillingContractAddress,
     })
@@ -235,9 +257,15 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     // Load history
     await this._loadL1ETHFee()
     await this._loadL2FeeCost()
+    await this._loadExitFee()
 
     // Get chain ID
     this.state.chainID = (await this.options.l2RpcProvider.getNetwork()).chainId
+
+    // Store the current block number
+    this.state.lastRecordedExitRelayBlock = 0
+    this.state.lastRecordedExitRelayCostFee = BigNumber.from('0')
+    this.state.lastRecordedExitRelayTimestamp = 0
   }
 
   protected async _start(): Promise<void> {
@@ -253,6 +281,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
+      // update exit fee
+      await this._updateExitFee()
     }
   }
 
@@ -353,6 +383,28 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     })
   }
 
+  private async _loadExitFee(): Promise<void> {
+    const dumpsPath = path.resolve(__dirname, '../data/exitFeeHistory.json')
+    if (fs.existsSync(dumpsPath)) {
+      this.logger.warn('Loading exit fee history...')
+      const historyJsonRaw = await fsPromise.readFile(dumpsPath)
+      const historyJSON = JSON.parse(historyJsonRaw.toString())
+      if (historyJSON.lastRecordedExitRelayTimestamp) {
+        this.state.lastRecordedExitRelayTimestamp =
+          historyJSON.lastRecordedExitRelayTimestamp
+        this.state.lastRecordedExitRelayBlock =
+          historyJSON.lastRecordedExitRelayBlock
+        this.state.lastRecordedExitRelayCostFee = BigNumber.from(
+          historyJSON.lastRecordedExitRelayCostFee
+        )
+      } else {
+        this.logger.warn('Invalid exit fee history!')
+      }
+    } else {
+      this.logger.warn('No exit fee history Found!')
+    }
+  }
+
   private async _writeL1ETHFee(): Promise<void> {
     const dumpsPath = path.resolve(__dirname, '../data')
     if (!fs.existsSync(dumpsPath)) {
@@ -389,6 +441,29 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           L2BOBACollectFee: this.state.L2BOBACollectFee.toString(),
           L2BOBABillingCollectFee:
             this.state.L2BOBABillingCollectFee.toString(),
+        })
+      )
+    } catch (error) {
+      console.log(error)
+      this.logger.error('Failed to write L1 cost history!')
+    }
+  }
+
+  private async _writeExitFee(): Promise<void> {
+    const dumpsPath = path.resolve(__dirname, '../data')
+    if (!fs.existsSync(dumpsPath)) {
+      fs.mkdirSync(dumpsPath)
+    }
+    try {
+      const addrsPath = path.resolve(dumpsPath, 'exitFeeHistory.json')
+      await fsPromise.writeFile(
+        addrsPath,
+        JSON.stringify({
+          lastRecordedExitRelayTimestamp:
+            this.state.lastRecordedExitRelayTimestamp,
+          lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
+          lastRecordedExitRelayCostFee:
+            this.state.lastRecordedExitRelayCostFee.toString(),
         })
       )
     } catch (error) {
@@ -821,6 +896,85 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
+    }
+  }
+
+  private async _updateExitFee(): Promise<void> {
+    try {
+      const priceRatio = Math.floor(
+        this.state.ETHUSDPrice / this.state.BOBAUSDPrice
+      )
+      const latestBlockNumber =
+        await this.options.l1RpcProvider.getBlockNumber()
+      // load initial values if not set
+      if (this.state.lastRecordedExitRelayTimestamp === 0) {
+        this.state.lastRecordedExitRelayTimestamp = new Date().getTime()
+        this.state.lastRecordedExitRelayBlock = latestBlockNumber
+        this.state.lastRecordedExitRelayCostFee = this.state.L1RelayerCostFee
+        await this._writeExitFee()
+      }
+      const currentTimestamp = new Date().getTime()
+      const numberOfRelayedMessages = await countRelayMessageEventsFromGraph(
+        this.options.l1RpcProvider,
+        this.state.lastRecordedExitRelayBlock,
+        latestBlockNumber
+      )
+      if (numberOfRelayedMessages !== 0) {
+        const exitFee = this.state.L1RelayerCostFee.sub(
+          this.state.lastRecordedExitRelayCostFee
+        )
+        const exitFeePerMessageETH = exitFee.div(
+          BigNumber.from(numberOfRelayedMessages)
+        )
+        // transform ETH to BOBA
+        const exitFeePerMessageBOBA = exitFeePerMessageETH.mul(
+          BigNumber.from(priceRatio)
+        )
+        // Set exit fee
+        const tx = await this.state.BobaBillingContract.updateExitFee(
+          exitFeePerMessageBOBA,
+          this.state.chainID === this.options.bobaLocalTestnetChainId
+            ? {}
+            : { gasPrice: 0 }
+        )
+        await tx.wait()
+        this.logger.info('Updated exit fee', {
+          exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
+          lastRecordedExitRelayTimestamp:
+            this.state.lastRecordedExitRelayTimestamp,
+          lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
+        })
+        if (
+          currentTimestamp - this.state.lastRecordedExitRelayTimestamp >
+          this.options.exitFeeMaxRecordingTime
+        ) {
+          const toBlock =
+            this.state.lastRecordedExitRelayBlock +
+            Math.floor(this.options.exitFeeRecordingInterval / (1000 * 15))
+          const numberOfRelayedMessagesInRecordingInterval =
+            await countRelayMessageEventsFromGraph(
+              this.options.l1RpcProvider,
+              this.state.lastRecordedExitRelayBlock,
+              toBlock
+            )
+          this.state.lastRecordedExitRelayTimestamp =
+            this.state.lastRecordedExitRelayTimestamp +
+            this.options.exitFeeRecordingInterval
+          this.state.lastRecordedExitRelayBlock = toBlock
+          // lastRecordedExitRelayCostFee + averageExitFee * numberOfRelayedMessages
+          this.state.lastRecordedExitRelayCostFee =
+            this.state.lastRecordedExitRelayCostFee.add(
+              BigNumber.from(numberOfRelayedMessagesInRecordingInterval).mul(
+                exitFeePerMessageETH
+              )
+            )
+          await this._writeExitFee()
+        }
+      } else {
+        this.logger.info(`No exit fee record found`)
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T UPDATE EXIT FEE ${error}`)
     }
   }
 

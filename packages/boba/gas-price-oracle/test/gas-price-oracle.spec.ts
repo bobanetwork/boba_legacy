@@ -185,6 +185,9 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31338,
+
+      exitFeeRecordingInterval: 1000,
+      exitFeeMaxRecordingTime: 5000,
     })
 
     await gasPriceOracleService.init()
@@ -212,12 +215,20 @@ describe('gas-price-oracle', () => {
     expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.eq(
       BigNumber.from('0')
     )
+    expect(gasPriceOracleService.state.lastRecordedExitRelayBlock).to.be.eq(0)
+    expect(gasPriceOracleService.state.lastRecordedExitRelayTimestamp).to.be.eq(
+      0
+    )
+    expect(gasPriceOracleService.state.lastRecordedExitRelayCostFee).to.be.eq(
+      BigNumber.from('0')
+    )
   })
 
   it('should write history values', async () => {
-    // Write two files
+    // Write three files
     await gasPriceOracleService._writeL1ETHFee()
     await gasPriceOracleService._writeL2FeeCollect()
+    await gasPriceOracleService._writeExitFee()
 
     // Verify them
     const l2DumpsPath = path.resolve(__dirname, '../data/l2History.json')
@@ -240,6 +251,19 @@ describe('gas-price-oracle', () => {
     expect(l1HistoryJSON.L1ETHCostFee).to.be.eq('0')
     expect(l1HistoryJSON.L1RelayerBalance).to.be.eq('0')
     expect(l1HistoryJSON.L1RelayerCostFee).to.be.eq('0')
+
+    const exitFeeDumpsPath = path.resolve(
+      __dirname,
+      '../data/exitFeeHistory.json'
+    )
+    expect(fs.existsSync(exitFeeDumpsPath)).to.be.true
+
+    const exitFeeHistoryJsonRaw = await fsPromise.readFile(exitFeeDumpsPath)
+    const exitFeeHistoryJSON = JSON.parse(exitFeeHistoryJsonRaw.toString())
+
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayTimestamp).to.be.eq(0)
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayBlock).to.be.eq(0)
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayCostFee).to.be.eq('0')
   })
 
   it('should update and store history values', async () => {
@@ -529,6 +553,9 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
+
+      exitFeeRecordingInterval: 1000,
+      exitFeeMaxRecordingTime: 5000,
     })
 
     await tempGasPriceOracleService.init()
@@ -580,6 +607,9 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
+
+      exitFeeRecordingInterval: 1000,
+      exitFeeMaxRecordingTime: 5000,
     })
 
     await tempGasPriceOracleService.init()
@@ -635,6 +665,9 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 100,
       bobaFeeRatioMinPercentChange: 10,
       bobaLocalTestnetChainId: 31337,
+
+      exitFeeRecordingInterval: 1000,
+      exitFeeMaxRecordingTime: 5000,
     })
 
     await tempGasPriceOracleService.init()

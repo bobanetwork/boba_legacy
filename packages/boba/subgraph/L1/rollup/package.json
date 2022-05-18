@@ -1,0 +1,25 @@
+{
+  "name": "boba_bridges",
+  "version": "0.1.0",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare:mainnet:rollup": "mustache config/mainnet.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "prepare:rinkeby:rollup": "mustache config/rinkeby.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "deploy:subgraph:mainnet:rollup": "graph deploy --product hosted-service bobanetwork/mainnet-rollup",
+    "deploy:subgraph:rinkeby:rollup": "graph deploy --product hosted-service bobanetwork/rinkeby-rollup"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.29.0",
+    "@graphprotocol/graph-ts": "^0.26.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "3.4.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "mustache": "^4.2.0",
+    "truffle": "^5.0.4",
+    "truffle-contract": "^4.0.5",
+    "truffle-hdwallet-provider": "^1.0.4"
+  }
+}

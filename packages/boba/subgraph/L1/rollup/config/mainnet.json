@@ -1,0 +1,13 @@
+{
+  "network": "mainnet",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x6D4528d192dB72E282265D6092F4B872f9Dff69e",
+      "startBlock": 13011949
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0xD05b8fD53614e1569cAC01c6D8d41416d0a7257E",
+      "startBlock": 13238245
+    }
+  }
+}
