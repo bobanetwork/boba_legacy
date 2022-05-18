@@ -257,6 +257,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     this.state.L2BOBABillingBalance = BigNumber.from('0')
     this.state.L2BOBABillingCollectFee = BigNumber.from('0')
 
+    // Store the current block number
+    this.state.lastRecordedExitRelayBlock = 0
+    this.state.lastRecordedExitRelayCostFee = BigNumber.from('0')
+    this.state.lastRecordedExitRelayTimestamp = 0
+
     // Load history
     await this._loadL1ETHFee()
     await this._loadL2FeeCost()
@@ -264,11 +269,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
     // Get chain ID
     this.state.chainID = (await this.options.l2RpcProvider.getNetwork()).chainId
-
-    // Store the current block number
-    this.state.lastRecordedExitRelayBlock = 0
-    this.state.lastRecordedExitRelayCostFee = BigNumber.from('0')
-    this.state.lastRecordedExitRelayTimestamp = 0
   }
 
   protected async _start(): Promise<void> {
@@ -933,7 +933,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         const exitFeePerMessageBOBA = exitFeePerMessageETH.mul(
           BigNumber.from(priceRatio)
         )
-        const lastExitFee = this.state.BobaBillingContract.exitFee()
+        const lastExitFee = await this.state.BobaBillingContract.exitFee()
         if (!lastExitFee.eq(exitFeePerMessageBOBA)) {
           // Set exit fee
           const tx = await this.state.BobaBillingContract.updateExitFee(
