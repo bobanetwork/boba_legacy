@@ -405,6 +405,28 @@ services:
     deploy:
       replicas: 0
 
+  fraud-detector:
+    depends_on:
+     - verifier
+     - dtl
+    image: fraud-detector:nix
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_CONFIRMATIONS: 8
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+
   #in no way should this be running in production
   kms:
     image: bobanetwork/local-kms:latest

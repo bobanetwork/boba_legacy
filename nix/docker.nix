@@ -253,4 +253,28 @@ in
         ];
       };
     };
+  fraud-detector-image =
+    let
+      fraud-detector = pkgs.stdenv.mkDerivation {
+        name = "fraud-detector";
+        phases = [ "installPhase" ];
+        installPhase = ''
+          mkdir -p $out/contracts/
+          cp -r ${./../boba_community/fraud-detector}/packages/jsonrpclib $out/
+          cp ${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json $out/contracts/
+          cp ${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json $out/contracts/
+        '';
+      };
+    in pkgs.dockerTools.buildImage {
+    name = "fraud-detector";
+    tag = tag;
+    runAsRoot = ''
+      #!${pkgs.runtimeShell}
+      mkdir -p /db
+    '';
+    config = {
+      WorkingDir = "${fraud-detector}/";
+      Cmd = [ "${pkgs.python3}/bin/python" "-u" "${./../boba_community/fraud-detector}/fraud-detector.py" ];
+    };
+  };
 }
