@@ -122,16 +122,14 @@ in
   # Adapted from ops/docker/Dockerfile.geth
   l2geth-image =
     let
-      l2geth = pkgs.stdenv.mkDerivation {
-        name = "l2geth";
+      script = pkgs.stdenv.mkDerivation {
+        name = "geth.sh";
         phases = [ "installPhase" ];
         installPhase = ''
-          mkdir -p $out/bin
-          ln -s ${bobapkgs."@eth-optimism/l2geth"}/bin/geth $out/bin/geth
-          cp ${./../.}/ops/scripts/geth.sh $out/bin/start
-          substituteInPlace $out/bin/start --replace \
-            'curl' \
-            '${pkgs.curl}/bin/curl'
+          mkdir -p $out/scripts
+          cp ${./../.}/ops/scripts/geth.sh $out/scripts/
+          substituteInPlace $out/scripts/geth.sh --replace \
+            'curl' '${pkgs.curl}/bin/curl'
         '';
       };
     in pkgs.dockerTools.buildImage {
@@ -148,11 +146,12 @@ in
           "8546" = {};
           "8547" = {};
         };
+        WorkingDir = "${script}/scripts/";
         Env = [
-          "PATH=${pkgs.coreutils}/bin/"
+          "PATH=${bobapkgs."@eth-optimism/l2geth".geth}/bin/"
         ];
         EntryPoint = [
-          "${l2geth}/bin/geth"
+          "geth"
         ];
       };
     };
