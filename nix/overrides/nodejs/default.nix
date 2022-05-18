@@ -178,7 +178,23 @@ in
       '';
     };
   };
-  "@eth-optimism/message-relayer" = { inherit correct-tsconfig-path; };
+  "@eth-optimism/message-relayer" = {
+    inherit correct-tsconfig-path;
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/message-relayer/ | grep -v "package.json\|dist\|node_modules\|exec\|hardhat.config.ts"`
+      '';
+    };
+    install-symlinks = {
+      postInstall = ''
+        mkdir -p $out/bin
+        ln -s $out/lib/node_modules/@eth-optimism/message-relayer/exec/run-message-relayer.js \
+          $out/bin/message-relayer.js
+      '';
+    };
+
+
+  };
   "@eth-optimism/contracts" = {
     inherit correct-tsconfig-path add-solc;
     # cleanup-dir = {

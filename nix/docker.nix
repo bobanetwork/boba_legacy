@@ -1,6 +1,19 @@
 { pkgs, bobapkgs, ... }:
 let
   tag = "nix";
+  wait-script = pkgs.stdenv.mkDerivation {
+    name = "scripts";
+    phases = [ "installPhase" ];
+    installPhase = ''
+      mkdir -p $out/scripts
+      chmod +x $out/scripts
+      cp ${./..}/ops/scripts/wait-for-l1-and-l2.sh $out/scripts/
+      substituteInPlace $out/scripts/wait-for-l1-and-l2.sh \
+        --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+        --replace 'curl' '${pkgs.curl}/bin/curl' \
+        --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
+    '';
+  };
   scripts = pkgs.stdenv.mkDerivation {
     name = "scripts";
     phases = [ "installPhase" ];
@@ -165,4 +178,39 @@ in
       ];
     };
   };
+  relayer-image =
+    let
+      relayer = bobapkgs."@eth-optimism/message-relayer";
+      relayer-scripts = pkgs.stdenv.mkDerivation {
+        name = "scripts";
+        phases = [ "installPhase" ];
+        installPhase = ''
+          mkdir -p $out/scripts
+          chmod +x $out/scripts
+          cp ${./..}/ops/scripts/relayer.sh $out/scripts/
+          cp ${./..}/ops/scripts/relayer-fast.sh $out/scripts/
+          substituteInPlace $out/scripts/relayer.sh \
+            --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+            --replace 'curl' '${pkgs.curl}/bin/curl' \
+            --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
+          substituteInPlace $out/scripts/relayer-fast.sh \
+            --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+            --replace 'curl' '${pkgs.curl}/bin/curl' \
+            --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
+        '';
+      };
+    in pkgs.dockerTools.buildLayeredImage {
+      name = "message-relayer";
+      tag = tag;
+      config = {
+        Env = [ "PATH=${relayer}/bin/:${wait-script}/scripts/:${relayer-scripts}/scripts/:${pkgs.yarn}/bin/" ];
+        WorkingDir = "${relayer}/lib/node_modules/@eth-optimism/message-relayer/";
+        Entrypoint = [
+          "${pkgs.nodePackages.npm}/bin/npm"
+          "run"
+          "start"
+        ];
+      };
+    };
+
 }

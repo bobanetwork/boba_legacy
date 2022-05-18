@@ -224,6 +224,51 @@ services:
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
+  relayer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: message-relayer:nix
+    entrypoint: relayer.sh
+    environment:
+      l1_node_web3_url: http://l1_chain:8545
+      l2_node_web3_url: http://l2geth:8545
+      url: http://dtl:8081/addresses.json
+      # a funded hardhat account
+      << : *relayer_pk
+      retries: 200
+      polling_interval: 6000
+      get_logs_interval: 500
+      filter_endpoint: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
+      filter_polling_interval: 30000
+      max_wait_time_s: 5
+      max_wait_tx_time_s: 5
+
+  # a second relay system for messages that need to get to l1 quickly
+  # note - all withdrawal messages use the standard relayer with its 7 day window
+  boba_message-relayer-fast:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: message-relayer:nix
+    entrypoint: ["wait-for-l1-and-l2.sh", "relayer-fast.sh"]
+    environment:
+      l1_node_web3_url: http://l1_chain:8545
+      l2_node_web3_url: http://l2geth:8545
+      url: http://dtl:8081/addresses.json
+      boba_url: http://dtl:8081/boba-addr.json
+      # this is who pays for the fast message relayer
+      << : *fast-relayer_pk
+      retries: 200
+      polling_interval: 6000
+      get_logs_interval: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
+      FAST_RELAYER: 'true'
 
   batch_submitter:
     restart: always
