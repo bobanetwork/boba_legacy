@@ -176,7 +176,7 @@ services:
     image: dtl:nix
     # override with the dtl script and the env vars required for it
     env_file:
-      -  ./envs/dtl.env
+      -  ../ops/envs/dtl.env
     # set the rest of the env vars for the network whcih do not
     # depend on the docker-compose setup
     environment:
@@ -204,7 +204,7 @@ services:
     # override with the geth script and the env vars required for it
     #entrypoint: l2geth-start
     env_file:
-      - ./envs/geth.env
+      - ../ops/envs/geth.env
     restart: always
     environment:
       ETH1_HTTP: http://l1_chain:8545
@@ -280,7 +280,7 @@ services:
     image: go-batch-submitter:nix
     entrypoint: batch-submitter.sh
     env_file:
-      - ./envs/batch-submitter.env
+      - ../ops/envs/batch-submitter.env
     environment:
       L1_ETH_RPC: http://l1_chain:8545
       L2_ETH_RPC: http://l2geth:8545
@@ -346,6 +346,13 @@ services:
       POLLING_INTERVAL:
       RETRIES: 200
 
+  monitor:
+    depends_on:
+     - l1_chain
+     - l2geth
+    image: monitor:nix
+    deploy:
+      replicas: 0
 
   #in no way should this be running in production
   kms:

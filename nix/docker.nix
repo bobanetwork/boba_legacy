@@ -178,6 +178,18 @@ in
       ];
     };
   };
+  monitor-image = pkgs.dockerTools.buildImage {
+    name = "monitor";
+    tag = tag;
+    config = {
+      WorkingDir = "${bobapkgs."@boba/monitor"}/lib/node_modules/@boba/monitor";
+      Env = [ "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/" ];
+      EntryPoint = [
+        "${pkgs.yarn}/bin/yarn"
+        "start"
+      ];
+    };
+  };
   relayer-image =
     let
       relayer = bobapkgs."@eth-optimism/message-relayer";
