@@ -7,12 +7,8 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { GasPriceOracleService } from '../dist/service'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
-import {
-  AppendSequencerBatchParams,
-  encodeAppendSequencerBatch,
-} from '@eth-optimism/core-utils'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { keccak256 } from 'ethers/lib/utils'
+
+import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
 
 describe('gas-price-oracle', () => {
   let signer1: Signer
@@ -84,6 +80,9 @@ describe('gas-price-oracle', () => {
   let Factory__L2BOBA: ContractFactory
   let L2BOBA: Contract
 
+  let Factory__L2BillingContract: ContractFactory
+  let L2BillingContract: Contract
+
   let Factory__ChainStorageContainer: ContractFactory
   let batches: Contract
   let queue: Contract
@@ -142,11 +141,22 @@ describe('gas-price-oracle', () => {
     L2BOBA = await Factory__L2BOBA.deploy()
     await L2BOBA.deployTransaction.wait()
 
+    Factory__L2BillingContract = new ethers.ContractFactory(
+      L2BillingContractJson.abi,
+      L2BillingContractJson.bytecode,
+      signer1
+    )
+    L2BillingContract = await Factory__L2BillingContract.deploy()
+    await L2BillingContract.deployTransaction.wait()
+
     await Lib_AddressManager.setAddress('TK_L2BOBA', L2BOBA.address)
 
     await Lib_AddressManager.setAddress('Proxy__Boba_GasPriceOracle', address6)
 
-    await Lib_AddressManager.setAddress('Proxy__BobaBillingContract', address7)
+    await Lib_AddressManager.setAddress(
+      'Proxy__BobaBillingContract',
+      L2BillingContract.address
+    )
   })
 
   it('should create GasPriceOracleService', async () => {
@@ -274,10 +284,15 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('5')
     gasPriceOracleService.state.L2ETHCollectFee = BigNumber.from('6')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('7')
+    gasPriceOracleService.state.lastRecordedExitRelayBlock = 8
+    gasPriceOracleService.state.lastRecordedExitRelayTimestamp = 9
+    gasPriceOracleService.state.lastRecordedExitRelayCostFee =
+      BigNumber.from('10')
 
-    // Write two files
+    // Write three files
     await gasPriceOracleService._writeL1ETHFee()
     await gasPriceOracleService._writeL2FeeCollect()
+    await gasPriceOracleService._writeExitFee()
 
     // Verify them
     const l2DumpsPath = path.resolve(__dirname, '../data/l2History.json')
@@ -301,6 +316,19 @@ describe('gas-price-oracle', () => {
     expect(l1HistoryJSON.L1RelayerBalance).to.be.eq('3')
     expect(l1HistoryJSON.L1RelayerCostFee).to.be.eq('4')
 
+    const exitFeeDumpsPath = path.resolve(
+      __dirname,
+      '../data/exitFeeHistory.json'
+    )
+    expect(fs.existsSync(exitFeeDumpsPath)).to.be.true
+
+    const exitFeeHistoryJsonRaw = await fsPromise.readFile(exitFeeDumpsPath)
+    const exitFeeHistoryJSON = JSON.parse(exitFeeHistoryJsonRaw.toString())
+
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayBlock).to.be.eq(8)
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayTimestamp).to.be.eq(9)
+    expect(exitFeeHistoryJSON.lastRecordedExitRelayCostFee).to.be.eq('10')
+
     // Reset history values
     gasPriceOracleService.state.L1ETHBalance = BigNumber.from('0')
     gasPriceOracleService.state.L1ETHCostFee = BigNumber.from('0')
@@ -309,10 +337,15 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('0')
     gasPriceOracleService.state.L2ETHCollectFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('0')
+    gasPriceOracleService.state.lastRecordedExitRelayBlock = 0
+    gasPriceOracleService.state.lastRecordedExitRelayTimestamp = 0
+    gasPriceOracleService.state.lastRecordedExitRelayCostFee =
+      BigNumber.from('0')
 
-    // Write two files
+    // Write three files
     await gasPriceOracleService._writeL1ETHFee()
     await gasPriceOracleService._writeL2FeeCollect()
+    await gasPriceOracleService._writeExitFee()
   })
 
   it('should get l1 balance correctly', async () => {
@@ -455,7 +488,10 @@ describe('gas-price-oracle', () => {
       value: ethers.utils.parseEther('1'),
     })
     await L2BOBA.transfer(address6, ethers.utils.parseEther('1'))
-    await L2BOBA.transfer(address7, ethers.utils.parseEther('1'))
+    await L2BOBA.transfer(
+      L2BillingContract.address,
+      ethers.utils.parseEther('1')
+    )
 
     await gasPriceOracleService._getL2GasCost()
 
@@ -495,14 +531,10 @@ describe('gas-price-oracle', () => {
       signer1Address,
       ethers.utils.parseEther('0.5')
     )
-    await L2BOBA.connect(wallet7).transfer(
-      signer1Address,
-      ethers.utils.parseEther('0.5')
-    )
 
     const ETHVaultBalance = await wallet5.getBalance()
     const BobaVaultBalance = await L2BOBA.balanceOf(address6)
-    const BobaBillingBalance = await L2BOBA.balanceOf(address7)
+    const BobaBillingBalance = await L2BOBA.balanceOf(L2BillingContract.address)
 
     await gasPriceOracleService._getL2GasCost()
 
@@ -524,6 +556,20 @@ describe('gas-price-oracle', () => {
     expect(gasPriceOracleService.state.L2BOBABillingBalance).to.be.equal(
       BobaBillingBalance
     )
+  })
+
+  it('should not update exit fee if the number of relayed message is 0', async () => {
+    gasPriceOracleService.state.ETHUSDPrice = 10
+    gasPriceOracleService.state.BOBAUSDPrice = 1
+    await L2BillingContract.initialize(
+      address7,
+      address7,
+      ethers.utils.parseEther('1')
+    )
+    await gasPriceOracleService._updateExitFee()
+
+    const exitFee = await L2BillingContract.exitFee()
+    expect(exitFee).to.be.equal(BigNumber.from(ethers.utils.parseEther('1')))
   })
 
   it('should update l1 base fee', async () => {

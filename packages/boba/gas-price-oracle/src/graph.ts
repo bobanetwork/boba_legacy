@@ -8,13 +8,15 @@ export const GRAPH_API_URL: any = {
   },
 }
 
-const getEventsFromGraph = async (
-  provider: ethers.providers.Provider,
+export const getEventsFromGraph = async (
   entity: string,
   chainID: number,
   fromBlock?: number,
   toBlock?: number
 ): Promise<any> => {
+  if (!GRAPH_API_URL[chainID]) {
+    return {}
+  }
   const response = await fetch(GRAPH_API_URL[chainID].rollup, {
     method: 'POST',
     headers: {
@@ -57,9 +59,10 @@ const countEventsFromGraph = (entity: any, totalLength: number): number => {
 export const countRelayMessageEventsFromGraph = async (
   provider: ethers.providers.Provider,
   fromBlock?: number,
-  toBlock?: number
+  toBlock?: number,
+  chainId?: number
 ): Promise<Number | 0> => {
-  const chainID = (await provider.getNetwork()).chainId
+  const chainID = chainId || (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return 0
   }
@@ -71,13 +74,7 @@ export const countRelayMessageEventsFromGraph = async (
   ]
   let numberOfEvents = 0
   for (const entity of entities) {
-    const events = await getEventsFromGraph(
-      provider,
-      entity,
-      chainID,
-      fromBlock,
-      toBlock
-    )
+    const events = await getEventsFromGraph(entity, chainID, fromBlock, toBlock)
     numberOfEvents += countEventsFromGraph(events, numberOfEvents)
   }
   return numberOfEvents

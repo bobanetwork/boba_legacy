@@ -212,7 +212,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       )
     this.state.BobaBillingContract = new Contract(
       this.state.BobaBillingContractAddress,
-      new utils.Interface(['function updateExitFee(uint256)']),
+      new utils.Interface([
+        'function updateExitFee(uint256)',
+        'function exitFee() public view returns (uint256)',
+      ]),
       this.options.gasPriceOracleOwnerWallet
     )
     this.logger.info('Connected to Proxy__BobaBillingContract', {
@@ -930,20 +933,30 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         const exitFeePerMessageBOBA = exitFeePerMessageETH.mul(
           BigNumber.from(priceRatio)
         )
-        // Set exit fee
-        const tx = await this.state.BobaBillingContract.updateExitFee(
-          exitFeePerMessageBOBA,
-          this.state.chainID === this.options.bobaLocalTestnetChainId
-            ? {}
-            : { gasPrice: 0 }
-        )
-        await tx.wait()
-        this.logger.info('Updated exit fee', {
-          exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
-          lastRecordedExitRelayTimestamp:
-            this.state.lastRecordedExitRelayTimestamp,
-          lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
-        })
+        const lastExitFee = this.state.BobaBillingContract.exitFee()
+        if (!lastExitFee.eq(exitFeePerMessageBOBA)) {
+          // Set exit fee
+          const tx = await this.state.BobaBillingContract.updateExitFee(
+            exitFeePerMessageBOBA,
+            this.state.chainID === this.options.bobaLocalTestnetChainId
+              ? {}
+              : { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated exit fee', {
+            exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
+            lastRecordedExitRelayTimestamp:
+              this.state.lastRecordedExitRelayTimestamp,
+            lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
+          })
+        } else {
+          this.logger.info('No need to update exit fee', {
+            exitFeePerMessageBOBA: exitFeePerMessageBOBA.toNumber(),
+            lastRecordedExitRelayTimestamp:
+              this.state.lastRecordedExitRelayTimestamp,
+            lastRecordedExitRelayBlock: this.state.lastRecordedExitRelayBlock,
+          })
+        }
         if (
           currentTimestamp - this.state.lastRecordedExitRelayTimestamp >
           this.options.exitFeeMaxRecordingTime
