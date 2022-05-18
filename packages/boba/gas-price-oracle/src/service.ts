@@ -377,11 +377,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
     this.state.L2ETHVaultBalance = ETHVaultBalance
     this.state.L2BOBAVaultBalance = BOBAVaultBalance
+    this.state.L2BOBABillingBalance = BOBABillingBalance
     this.logger.info('Loaded L2 Cost Data', {
       L2ETHVaultBalance: this.state.L2ETHVaultBalance.toString(),
       L2ETHCollectFee: this.state.L2ETHCollectFee.toString(),
       L2BOBAVaultBalance: this.state.L2BOBAVaultBalance.toString(),
       L2BOBACollectFee: this.state.L2BOBACollectFee.toString(),
+      L2BOBABillingBalance: this.state.L2BOBABillingBalance.toString(),
       L2BOBABillingCollectFee: this.state.L2BOBABillingCollectFee.toString(),
     })
   }
