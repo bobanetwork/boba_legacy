@@ -63,41 +63,22 @@ export const countRelayMessageEventsFromGraph = async (
   if (!GRAPH_API_URL[chainID]) {
     return 0
   }
-  const relayedMessageEntities = await getEventsFromGraph(
-    provider,
+  const entities = [
     'relayedMessageEntities',
-    chainID,
-    fromBlock,
-    toBlock
-  )
-  const relayedMessageFastEntities = await getEventsFromGraph(
-    provider,
     'relayedMessageFastEntities',
-    chainID,
-    fromBlock,
-    toBlock
-  )
-  const failedRelayedMessageEntities = await getEventsFromGraph(
-    provider,
     'failedRelayedMessageEntities',
-    chainID,
-    fromBlock,
-    toBlock
-  )
-  const failedRelayedMessageFastEntities = await getEventsFromGraph(
-    provider,
     'failedRelayedMessageFastEntities',
-    chainID,
-    fromBlock,
-    toBlock
-  )
-  let totalLength = 0
-  totalLength = countEventsFromGraph(relayedMessageEntities, totalLength)
-  totalLength = countEventsFromGraph(relayedMessageFastEntities, totalLength)
-  totalLength = countEventsFromGraph(failedRelayedMessageEntities, totalLength)
-  totalLength = countEventsFromGraph(
-    failedRelayedMessageFastEntities,
-    totalLength
-  )
-  return totalLength
+  ]
+  let numberOfEvents = 0
+  for (const entity of entities) {
+    const events = await getEventsFromGraph(
+      provider,
+      entity,
+      chainID,
+      fromBlock,
+      toBlock
+    )
+    numberOfEvents += countEventsFromGraph(events, numberOfEvents)
+  }
+  return numberOfEvents
 }
