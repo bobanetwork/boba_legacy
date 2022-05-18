@@ -295,6 +295,57 @@ services:
       BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
       BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
 
+  integration_tests:
+    image: integration-tests:nix
+    deploy:
+       replicas: 0
+    entrypoint: integration-tests.sh
+    environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
+      L1_URL: http://l1_chain:8545
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BASE_URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      << : *integration_pk
+      << : *integration_2_pk
+      << : *integration_3_pk
+
+  replica:
+    depends_on:
+      - dtl
+      - l2geth
+    image: l2geth:nix
+    deploy:
+      replicas: 1
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ../ops/envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
+
   verifier:
     depends_on:
       - dtl

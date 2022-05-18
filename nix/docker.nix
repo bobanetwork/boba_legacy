@@ -223,5 +223,34 @@ in
         ];
       };
     };
+  integration-tests-image =
+    let
+      script = pkgs.stdenv.mkDerivation {
+        name = "integration-tests.sh";
+        phases = [ "installPhase" ];
+        installPhase = ''
+          mkdir -p $out/scripts
+          cp ${./../.}/ops/scripts/integration-tests.sh $out/scripts/
+          substituteInPlace $out/scripts/integration-tests.sh \
+            --replace '/bin/bash' '${pkgs.bash}/bin/bash' \
+            --replace 'curl' '${pkgs.curl}/bin/curl' \
+            --replace 'cat ./hardhat.config.ts' '${pkgs.coreutils}/bin/cat ./hardhat.config.ts' \
+            --replace 'npx' '${pkgs.nodePackages.npm}/bin/npx'
+        '';
+      };
 
+    in pkgs.dockerTools.buildImage {
+    name = "integration-tests";
+    tag = tag;
+    config = {
+      WorkingDir = "${bobapkgs."@eth-optimism/integration-tests"}/lib/node_modules/@eth-optimism/integration-tests/";
+      Env = [
+        "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/:${bobapkgs."@eth-optimism/hardhat-node"}/bin/:${script}/scripts/"
+      ];
+      EntryPoint = [
+        "${pkgs.yarn}/bin/yarn"
+        "test:integration"
+      ];
+    };
+  };
 }
