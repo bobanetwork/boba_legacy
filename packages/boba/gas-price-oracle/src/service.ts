@@ -671,7 +671,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         this.state.BobaTuringCreditContractAddress
       )
       const BobaTuringCreditContractOwnerRevenue =
-        await this.state.BobaBillingContract.ownerRevenue()
+        await this.state.BobaTuringCreditContract.ownerRevenue()
 
       await this._writeL2FeeCollect()
 
