@@ -87,6 +87,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Boba_GasPriceOracle: Contract
     BobaBillingContract: Contract
     BobaBillingContractAddress: string
+    BobaTuringCreditContractAddress: string
     L2BOBA: Contract
     BobaStraw_ETHUSD: Contract
     BobaStraw_BOBAUSD: Contract
@@ -220,6 +221,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     )
     this.logger.info('Connected to Proxy__BobaBillingContract', {
       address: this.state.BobaBillingContractAddress,
+    })
+
+    this.logger.info('Connecting to Proxy__BobaTuringCredit...')
+    this.state.BobaTuringCreditContractAddress =
+      await this.state.Lib_AddressManager.getAddress('Proxy__BobaTuringCredit')
+    this.logger.info('Connected to Proxy__BobaTuringCredit', {
+      address: this.state.BobaTuringCreditContractAddress,
     })
 
     // Load BOBA straw contracts
@@ -651,6 +659,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.state.L2BOBABillingCollectFee =
         this.state.L2BOBABillingCollectFee.add(L2BOBABillingCollectFeeIncreased)
 
+      // Turing credit contract balance
+      const BobaTuringCreditContractBalance = await this.state.L2BOBA.balanceOf(
+        this.state.BobaTuringCreditContractAddress
+      )
+
       await this._writeL2FeeCollect()
 
       this.logger.info('Got L2 Gas Collect', {
@@ -713,6 +726,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           ),
           BOBAUSDPrice: Number(this.state.BOBAUSDPrice.toFixed(2)),
           ETHUSDPrice: Number(this.state.ETHUSDPrice.toFixed(2)),
+          TuringCreditContractBalance: Number(
+            Number(
+              utils.formatEther(BobaTuringCreditContractBalance.toString())
+            ).toFixed(6)
+          ),
         },
       })
     } catch (error) {

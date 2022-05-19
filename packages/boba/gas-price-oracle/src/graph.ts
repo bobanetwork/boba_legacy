@@ -6,6 +6,10 @@ export const GRAPH_API_URL: any = {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/mainnet-rollup',
   },
+  4: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/rinkeby-rollup',
+  },
 }
 
 export const getEventsFromGraph = async (
