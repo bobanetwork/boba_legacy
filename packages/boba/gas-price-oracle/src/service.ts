@@ -14,6 +14,7 @@ import { countRelayMessageEventsFromGraph } from './graph'
 
 import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
+import BobaTuringCreditJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
 import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
 
 interface GasPriceOracleOptions {
@@ -88,6 +89,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     BobaBillingContract: Contract
     BobaBillingContractAddress: string
     BobaTuringCreditContractAddress: string
+    BobaTuringCreditContract: Contract
     L2BOBA: Contract
     BobaStraw_ETHUSD: Contract
     BobaStraw_BOBAUSD: Contract
@@ -226,8 +228,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     this.logger.info('Connecting to Proxy__BobaTuringCredit...')
     this.state.BobaTuringCreditContractAddress =
       await this.state.Lib_AddressManager.getAddress('Proxy__BobaTuringCredit')
+    this.state.BobaTuringCreditContract = new Contract(
+      this.state.BobaTuringCreditContractAddress,
+      BobaTuringCreditJson.abi,
+      this.options.l2RpcProvider
+    )
     this.logger.info('Connected to Proxy__BobaTuringCredit', {
-      address: this.state.BobaTuringCreditContractAddress,
+      address: this.state.BobaTuringCreditContract.address,
     })
 
     // Load BOBA straw contracts
@@ -663,6 +670,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const BobaTuringCreditContractBalance = await this.state.L2BOBA.balanceOf(
         this.state.BobaTuringCreditContractAddress
       )
+      const BobaTuringCreditContractOwnerRevenue =
+        await this.state.BobaBillingContract.ownerRevenue()
 
       await this._writeL2FeeCollect()
 
@@ -729,6 +738,11 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           TuringCreditContractBalance: Number(
             Number(
               utils.formatEther(BobaTuringCreditContractBalance.toString())
+            ).toFixed(6)
+          ),
+          BobaTuringCreditContractOwnerRevenue: Number(
+            Number(
+              utils.formatEther(BobaTuringCreditContractOwnerRevenue.toString())
             ).toFixed(6)
           ),
         },
