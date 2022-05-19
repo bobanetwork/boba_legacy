@@ -2,12 +2,12 @@
   "network": "rinkeby",
   "contracts": {
     "L1CrossDomainMessenger": {
-      "address": "0x76DB375075F1d5Dcd1D70Fc07F69a5c7b40ab877",
-      "startBlock": 2103507
+      "address": "0xF10EEfC14eB5b7885Ea9F7A631a21c7a82cf5D76",
+      "startBlock": 8845207
     },
     "L1CrossDomainMessengerFast": {
-      "address": "0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6",
-      "startBlock": 2111965
+      "address": "0xe2a82CE9671A283190DD5E3f077027979F2c039E",
+      "startBlock": 9488777
     }
   }
 }
