@@ -10,6 +10,7 @@ const L2LPJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool
 const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
+const fs = require('fs')
 
 const supportedTokens = [
   'USDT',
@@ -131,6 +132,46 @@ const getL2LPInfoPromise = async (tokenAddress) => {
   }
 }
 
+const loadBobaStrawHistory = () => {
+  const dumpsPath = path.resolve(__dirname, '../data/BobaStrawHistory.json')
+  let BobaStrawCostFee = ethers.BigNumber.from('0')
+  let BobaStrawBalance = ethers.BigNumber.from('0')
+  if (fs.existsSync(dumpsPath)) {
+    logger.info('Loading BobaStraw history...')
+    const historyJsonRaw = fs.readFileSync(dumpsPath)
+    const historyJSON = JSON.parse(historyJsonRaw.toString())
+    if (historyJSON.BobaStrawCostFee) {
+      BobaStrawCostFee = ethers.BigNumber.from(historyJSON.BobaStrawCostFee)
+      BobaStrawBalance = ethers.BigNumber.from(historyJSON.BobaStrawBalance)
+    } else {
+      logger.warn('Invalid BobaStraw history!')
+    }
+  } else {
+    logger.warn('Invalid BobaStraw history!')
+  }
+  return [BobaStrawCostFee, BobaStrawBalance]
+}
+
+const writeBobaStrawHistory = (BobaStrawCostFee, BobaStrawBalance) => {
+  const dumpsPath = path.resolve(__dirname, '../data')
+  if (!fs.existsSync(dumpsPath)) {
+    fs.mkdirSync(dumpsPath)
+  }
+  try {
+    const addrsPath = path.resolve(dumpsPath, 'BobaStrawHistory.json')
+    fs.writeFileSync(
+      addrsPath,
+      JSON.stringify({
+        BobaStrawCostFee: BobaStrawCostFee.toString(),
+        BobaStrawBalance: BobaStrawBalance.toString(),
+      })
+    )
+  } catch (error) {
+    console.log(error)
+    logger.error('Failed to write Boba straw history!')
+  }
+}
+
 const logL2Pool = async (blockNumber) => {
   const l2LPInfoPromise = []
   Object.keys(allTokenAddresses).forEach((key) => {
@@ -205,6 +246,8 @@ const logL2Pool = async (blockNumber) => {
 }
 
 const logBalance = (provider, blockNumber, networkName) => {
+  let [BobaStrawCostFee, BobaStrawBalance] = loadBobaStrawHistory()
+  let BobaStrawCostFeeIncreased = ethers.BigNumber.from('0')
   const promiseData =
     networkName === configs.OMGXNetwork.L1
       ? [
@@ -234,11 +277,30 @@ const logBalance = (provider, blockNumber, networkName) => {
               return address.contract.availableFunds()
             })
           )
+          BobaStrawBalanceTemp = ethers.BigNumber.from('0')
           for (let i = 0; i < amounts.length; i++) {
             oracleAddresses[i].amount = ethers.BigNumber.from(amounts[i])
               .div(bobaDecimal)
               .toNumber()
+            BobaStrawBalanceTemp = BobaStrawBalanceTemp.add(
+              ethers.BigNumber.from(amounts[i])
+            )
           }
+          if (BobaStrawBalanceTemp.gt(BobaStrawBalance)) {
+            BobaStrawBalance = BobaStrawBalanceTemp
+          }
+          BobaStrawCostFeeIncreased = BobaStrawBalance.sub(BobaStrawBalanceTemp)
+          BobaStrawBalance = BobaStrawBalanceTemp
+          BobaStrawCostFee = BobaStrawCostFee.add(BobaStrawCostFeeIncreased)
+          writeBobaStrawHistory(BobaStrawCostFee, BobaStrawBalance)
+          logger.info(`BobaStraw balance`, {
+            BobaStrawCostFee: Number(
+              Number(utils.formatEther(BobaStrawCostFee.toString())).toFixed(2)
+            ),
+            BobaStrawBalance: Number(
+              Number(utils.formatEther(BobaStrawBalance.toString())).toFixed(2)
+            ),
+          })
         } catch (e) {
           logError(e.message, 'oracleAddressesFunds')(e)
         }
