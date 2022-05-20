@@ -293,8 +293,7 @@ const logBalance = (provider, blockNumber, networkName) => {
           BobaStrawCostFeeIncreased = BobaStrawBalance.sub(BobaStrawBalanceTemp)
           BobaStrawBalance = BobaStrawBalanceTemp
           BobaStrawCostFee = BobaStrawCostFee.add(BobaStrawCostFeeIncreased)
-          writeBobaStrawHistory(BobaStrawCostFee, BobaStrawBalance)
-          logger.info(`BobaStraw balance`, {
+          console.log({
             BobaStrawCostFee: Number(
               Number(utils.formatEther(BobaStrawCostFee.toString())).toFixed(2)
             ),
@@ -302,6 +301,7 @@ const logBalance = (provider, blockNumber, networkName) => {
               Number(utils.formatEther(BobaStrawBalance.toString())).toFixed(2)
             ),
           })
+          writeBobaStrawHistory(BobaStrawCostFee, BobaStrawBalance)
         } catch (e) {
           logError(e.message, 'oracleAddressesFunds')(e)
         }
