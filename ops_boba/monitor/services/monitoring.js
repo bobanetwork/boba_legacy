@@ -268,6 +268,7 @@ const logBalance = (provider, blockNumber, networkName) => {
         l1PoolBalance = convertWeiToEther(values[0])
         l1GasPrice = parseFloat(values[1].toString())
         l1BlockNumber = blockNumber
+        return [ethers.BigNumber.from('0'), ethers.BigNumber.from('0')]
       } else {
         l2PoolBalance = convertWeiToEther(values[0])
         l2GasPrice = parseFloat(values[1].toString())
@@ -293,21 +294,15 @@ const logBalance = (provider, blockNumber, networkName) => {
           BobaStrawCostFeeIncreased = BobaStrawBalance.sub(BobaStrawBalanceTemp)
           BobaStrawBalance = BobaStrawBalanceTemp
           BobaStrawCostFee = BobaStrawCostFee.add(BobaStrawCostFeeIncreased)
-          console.log({
-            BobaStrawCostFee: Number(
-              Number(utils.formatEther(BobaStrawCostFee.toString())).toFixed(2)
-            ),
-            BobaStrawBalance: Number(
-              Number(utils.formatEther(BobaStrawBalance.toString())).toFixed(2)
-            ),
-          })
           writeBobaStrawHistory(BobaStrawCostFee, BobaStrawBalance)
+          return [BobaStrawCostFee, BobaStrawBalance]
         } catch (e) {
           logError(e.message, 'oracleAddressesFunds')(e)
         }
+        return [ethers.BigNumber.from('0'), ethers.BigNumber.from('0')]
       }
     })
-    .then(() => {
+    .then((bobaStrawBalance) => {
       if (l1PoolBalance !== undefined) {
         logger.info(`${configs.OMGXNetwork.L1} balance`, {
           networkName: configs.OMGXNetwork.L1,
@@ -333,6 +328,18 @@ const logBalance = (provider, blockNumber, networkName) => {
           },
         })
       }
+      logger.info('BobaStraw', {
+        BobaStrawCostFee: Number(
+          Number(
+            ethers.utils.formatEther(bobaStrawBalance[0].toString())
+          ).toFixed(2)
+        ),
+        BobaStrawBalance: Number(
+          Number(
+            ethers.utils.formatEther(bobaStrawBalance[1].toString())
+          ).toFixed(2)
+        ),
+      })
     })
     .catch(
       logError(`Get ${networkName} balance error`, 'balance', { networkName })
