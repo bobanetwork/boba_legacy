@@ -16,18 +16,18 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
 
 ## Testnet Fountain for Developers on Bobabase L2
 
-There is a Bobabeam testnet [fountain for developers](https://gateway.bobabase.boba.network). Authentication is via Twitter - please connect your wallet and connect to the Bobabase L2. In the gateway > wallet, you will the `Developer Twitter/Turing test token fountain`. this system uses Turing hybrid compute to interact with Twitter.
+There is a Bobabase testnet [fountain](https://gateway.bobabase.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Bobabase L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ## Bridging
 
-The standard bridges for GLMR (aka DEV on Moonbase) and BOBA are active, so you can can both bridge and exit GLMR and BOBA from Moonbase to Bobabase and back. The exit delay (the fraud proof window) has been set to 5 minutes (it's normally 7 days) make development easier.
+The standard bridges for `GLMR` (aka `DEV` on Moonbase) and `BOBA` are active, so you can can both bridge and exit `GLMR` and `BOBA` from Moonbase to Bobabase and back. The exit delay (the fraud proof window) has been set to 5 minutes (it's normally 7 days) to make development easier.
 
 ## Analytics and eth_getLogs
 
-If you have unusual getLogs needs, especially calls from 0 to latest, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of BobaBase. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
+If you have unusual `getLogs` needs, especially calls from `0 to latest`, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of Bobabase. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
 
 * clone the `boba_base` repo
-* switch to moonbeam branch. 
+* switch to `moonbeam` branch. 
 
 The docker-compose file is in [`boba-community/boba-node/docker-compose-bobabase.yml`](https://github.com/bobanetwork/boba_base/blob/moonbeam/boba_community/boba-node/docker-compose-bobabase.yml).
 
