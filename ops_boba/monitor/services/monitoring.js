@@ -11,6 +11,7 @@ const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const fs = require('fs')
+const path = require('path')
 
 const supportedTokens = [
   'USDT',
