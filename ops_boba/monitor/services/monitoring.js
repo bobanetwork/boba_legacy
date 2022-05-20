@@ -328,18 +328,20 @@ const logBalance = (provider, blockNumber, networkName) => {
           },
         })
       }
-      logger.info('BobaStraw', {
-        BobaStrawCostFee: Number(
-          Number(
-            ethers.utils.formatEther(bobaStrawBalance[0].toString())
-          ).toFixed(2)
-        ),
-        BobaStrawBalance: Number(
-          Number(
-            ethers.utils.formatEther(bobaStrawBalance[1].toString())
-          ).toFixed(2)
-        ),
-      })
+      if (bobaStrawBalance[0].gt(ethers.BigNumber.from('0'))) {
+        logger.info('BobaStraw', {
+          BobaStrawCostFee: Number(
+            Number(
+              ethers.utils.formatEther(bobaStrawBalance[0].toString())
+            ).toFixed(2)
+          ),
+          BobaStrawBalance: Number(
+            Number(
+              ethers.utils.formatEther(bobaStrawBalance[1].toString())
+            ).toFixed(2)
+          ),
+        })
+      }
     })
     .catch(
       logError(`Get ${networkName} balance error`, 'balance', { networkName })
