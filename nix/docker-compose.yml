@@ -322,7 +322,7 @@ services:
     image: l2geth:nix
     deploy:
       replicas: 1
-    entrypoint: sh ./geth.sh
+    entrypoint: ./geth.sh
     env_file:
       - ../ops/envs/geth.env
     environment:
@@ -352,7 +352,7 @@ services:
     image: l2geth:nix
     deploy:
       replicas: 1
-    entrypoint: sh ./geth.sh
+    entrypoint: ./geth.sh
     env_file:
       - ../ops/envs/geth.env
     environment:
@@ -435,7 +435,7 @@ services:
       KMS_REGION: "us-east-1"
     volumes:
       - type: bind
-        source: ./seed.yaml
+        source: ../ops/seed.yaml
         target: /init/seed.yaml
     ports:
       - 8888:8888

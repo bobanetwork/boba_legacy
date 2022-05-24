@@ -33,8 +33,46 @@ let
     '';
   };
 in
-{
-  dtl-image = pkgs.dockerTools.buildImage {
+rec {
+  docker-images = let
+    image-list = [
+      "dtl"
+      "deployer"
+      "boba-deployer"
+      "batch-submitter"
+      "l2geth"
+      "hardhat"
+      "gas-price-oracle"
+      "monitor"
+      "relayer"
+      "integration-tests"
+      "fraud-detector"
+    ];
+    in pkgs.stdenv.mkDerivation {
+    name = "docker-images";
+    #outputs = [ "out" ] ++ image-list;
+    phases = [ "buildPhase" "installPhase" ];
+    buildPhase = ''
+      mkdir -p $out
+    '';
+    # installPhase = pkgs.lib.concatStringsSep "\n" (
+    #   builtins.map (image: "ln -s \$${image} $out/") image-list
+    # );
+    installPhase = ''
+      ln -s ${dtl} $out/
+      ln -s ${deployer} $out/
+      ln -s ${boba-deployer} $out/
+      ln -s ${batch-submitter} $out/
+      ln -s ${l2geth} $out/
+      ln -s ${hardhat} $out/
+      ln -s ${gas-price-oracle} $out/
+      ln -s ${monitor} $out/
+      ln -s ${relayer} $out/
+      ln -s ${integration-tests} $out/
+      ln -s ${fraud-detector} $out/
+    '';
+  };
+  dtl = pkgs.dockerTools.buildImage {
     name = "dtl";
     tag = tag;
     runAsRoot = ''
@@ -53,7 +91,7 @@ in
       ];
     };
   };
-  deployer-image =
+  deployer =
     let
       optimism-contracts = bobapkgs."@eth-optimism/contracts";
     in pkgs.dockerTools.buildLayeredImage {
@@ -71,7 +109,7 @@ in
         ];
       };
     };
-  boba-deployer-image =
+  boba-deployer =
     let
       boba-contracts = bobapkgs."@boba/contracts";
     in pkgs.dockerTools.buildImage {
@@ -87,7 +125,7 @@ in
       };
     };
   # Adapted from ops/docker/Dockerfile.batch-submitter
-  batch-submitter-image = let
+  batch-submitter = let
     script = pkgs.stdenv.mkDerivation {
       name = "script";
       phases = [ "installPhase" ];
@@ -120,7 +158,7 @@ in
   };
 
   # Adapted from ops/docker/Dockerfile.geth
-  l2geth-image =
+  l2geth =
     let
       script = pkgs.stdenv.mkDerivation {
         name = "geth.sh";
@@ -155,7 +193,7 @@ in
         ];
       };
     };
-  hardhat-image = pkgs.dockerTools.buildLayeredImage {
+  hardhat = pkgs.dockerTools.buildLayeredImage {
     name = "l1_chain";
     tag = tag;
     config = {
@@ -165,7 +203,7 @@ in
       Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat" "node" "--network" "hardhat" ];
     };
   };
-  gas-price-oracle-image = pkgs.dockerTools.buildImage {
+  gas-price-oracle = pkgs.dockerTools.buildImage {
     name = "boba_gas-price-oracle";
     tag = tag;
     config = {
@@ -177,7 +215,7 @@ in
       ];
     };
   };
-  monitor-image = pkgs.dockerTools.buildImage {
+  monitor = pkgs.dockerTools.buildImage {
     name = "monitor";
     tag = tag;
     config = {
@@ -189,7 +227,7 @@ in
       ];
     };
   };
-  relayer-image =
+  relayer =
     let
       relayer = bobapkgs."@eth-optimism/message-relayer";
       relayer-scripts = pkgs.stdenv.mkDerivation {
@@ -210,7 +248,7 @@ in
             --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
         '';
       };
-    in pkgs.dockerTools.buildLayeredImage {
+    in pkgs.dockerTools.buildImage {
       name = "message-relayer";
       tag = tag;
       config = {
@@ -223,7 +261,7 @@ in
         ];
       };
     };
-  integration-tests-image =
+  integration-tests =
     let
       script = pkgs.stdenv.mkDerivation {
         name = "integration-tests.sh";
@@ -253,7 +291,7 @@ in
         ];
       };
     };
-  fraud-detector-image =
+  fraud-detector =
     let
       fraud-detector = pkgs.stdenv.mkDerivation {
         name = "fraud-detector";
