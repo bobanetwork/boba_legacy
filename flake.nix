@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     dream2nix = {
-      url = "github:nix-community/dream2nix/2480581482e3cabe55c938cdaa70d9fc692f6983";
+      url = "github:nix-community/dream2nix";
       #url = "path:/home/tgunnoe/src/boba/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -31,11 +31,12 @@
       boba-monorepo = inputs.dream2nix.lib2.init {
         systems = supportedSystems;
         config.projectRoot = ./. ;
+        #config.packagesDir = ./nix/packages;
         config.overridesDirs = [ ./nix/overrides ];
       };
 
       boba =
-        flake-utils.lib.eachDefaultSystem (system:
+        flake-utils.lib.eachSystem supportedSystems (system:
           let
             pkgs = import nixpkgs {
               inherit system;
