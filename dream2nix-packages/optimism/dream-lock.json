@@ -1197,7 +1197,7 @@
         [ "react-select", "5.2.2" ],
         [ "redux", "4.1.2" ],
         [ "redux-thunk", "2.4.1" ],
-        [ "sass", "1.49.7" ],
+        [ "sass", "1.51.0" ],
         [ "serve", "11.3.2" ],
         [ "truncate-middle", "1.0.6" ],
         [ "ts-md5", "1.2.11" ],
@@ -1654,7 +1654,6 @@
         [ "@codechecks/client", "0.1.12" ],
         [ "@defi-wonderland/smock", "2.0.7" ],
         [ "@eth-optimism/core-utils", "0.8.1" ],
-        [ "@eth-optimism/smock", "1.1.10" ],
         [ "@ethersproject/abstract-provider", "5.5.1" ],
         [ "@ethersproject/abstract-signer", "5.5.0" ],
         [ "@ethersproject/hardware-wallets", "5.5.0" ],
@@ -1714,11 +1713,6 @@
       ]
     },
     "@eth-optimism/core-utils": {
-      "0.5.5": [
-        [ "@ethersproject/abstract-provider", "5.5.1" ],
-        [ "ethers", "5.5.4" ],
-        [ "lodash", "4.17.21" ]
-      ],
       "0.8.1": [
         [ "@ethersproject/abstract-provider", "5.5.1" ],
         [ "@ethersproject/bytes", "5.5.0" ],
@@ -1964,12 +1958,6 @@
         [ "ts-mocha", "8.0.0" ],
         [ "typedoc", "0.22.13" ],
         [ "typescript", "4.5.5" ]
-      ]
-    },
-    "@eth-optimism/smock": {
-      "1.1.10": [
-        [ "@eth-optimism/core-utils", "0.5.5" ],
-        [ "bn.js", "5.2.0" ]
       ]
     },
     "@eth-optimism/specs": {
@@ -12773,7 +12761,7 @@
       ]
     },
     "sass": {
-      "1.49.7": [
+      "1.51.0": [
         [ "chokidar", "3.5.3" ],
         [ "immutable", "4.0.0" ],
         [ "source-map-js", "1.0.2" ]
@@ -16841,11 +16829,6 @@
       }
     },
     "@eth-optimism/core-utils": {
-      "0.5.5": {
-        "hash": "sha512-N/uyZjHltnvnQyBOE498EGlqeYvWRUQTW6BpXhexKljEXZpnria4J4MFO9s1lJOpogLXTaS+lhM1Ic8zUNj8Pg==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.5.5.tgz"
-      },
       "0.8.1": {
         "path": "packages/core-utils",
         "rootName": "optimism",
@@ -16931,13 +16914,6 @@
         "rootName": "optimism",
         "rootVersion": "1.0.0",
         "type": "path"
-      }
-    },
-    "@eth-optimism/smock": {
-      "1.1.10": {
-        "hash": "sha512-XPx1x9odF/noTBHzIhRgL9ihhr769WgUhf9dOm6X7bjSWRAVsII3IqbdB4ssPycaoSuNSmv8HG1xTLgfgcyOYw==",
-        "type": "http",
-        "url": "https://registry.yarnpkg.com/@eth-optimism/smock/-/smock-1.1.10.tgz"
       }
     },
     "@eth-optimism/specs": {
@@ -32384,10 +32360,10 @@
       }
     },
     "sass": {
-      "1.49.7": {
-        "hash": "sha512-13dml55EMIR2rS4d/RDHHP0sXMY3+30e1TKsyXaSz3iLWVoDWEoboY8WzJd5JMnxrRHffKO3wq2mpJ0jxRJiEQ==",
+      "1.51.0": {
+        "hash": "sha512-haGdpTgywJTvHC2b91GSq+clTKGbtkkZmVAb82jZQN/wTy6qs8DdFm2lhEQbEwrY0QDRgSQ3xDurqM977C3noA==",
         "type": "http",
-        "url": "https://registry.yarnpkg.com/sass/-/sass-1.49.7.tgz"
+        "url": "https://registry.yarnpkg.com/sass/-/sass-1.51.0.tgz"
       }
     },
     "sass-loader": {
