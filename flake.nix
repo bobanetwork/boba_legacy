@@ -13,15 +13,22 @@
     devshell = {
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
   outputs = {
     self,
     nixpkgs,
+    dream2nix,
     flake-utils,
     devshell,
-    dream2nix,
+    nix2container
   } @inputs:
     let
       lib = nixpkgs.lib;
@@ -133,7 +140,7 @@
               ["hardhat" "2.9.3"]
             ];
             "@boba/turing-kyc"."0.1.0"  = [
-              [ "@types/node" "15.14.9" ]
+              [ "@types/node" "17.0.23" ]
             ];
             "@eth-optimism/core-utils"."0.8.1"  = [
               [ "@types/node" "15.14.9" ]
