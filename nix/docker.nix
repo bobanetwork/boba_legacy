@@ -1,6 +1,7 @@
-{ pkgs, bobapkgs, ... }:
+{ pkgs, bobapkgs, nix2containerPkgs, ... }:
 let
   tag = "nix";
+  buildImage = nix2containerPkgs.nix2container.buildImage;
   wait-script = pkgs.stdenv.mkDerivation {
     name = "scripts";
     phases = [ "installPhase" ];
@@ -91,6 +92,19 @@ rec {
       ];
     };
   };
+  dtl2 = buildImage {
+    name = "dtl2";
+    tag = tag;
+    #maxLayers = 125;
+    config = {
+      #WorkingDir = "${bobapkgs."@eth-optimism/data-transport-layer"}/lib/node_modules/@eth-optimism/data-transport-layer";
+      entrypoint = [
+        "${pkgs.nodejs}/bin/node"
+        "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js"
+      ];
+    };
+  };
+
   deployer =
     let
       optimism-contracts = bobapkgs."@eth-optimism/contracts";
@@ -140,6 +154,38 @@ rec {
     };
 
   in pkgs.dockerTools.buildImage {
+    name = "go-batch-submitter";
+    tag = tag;
+    contents = with pkgs; [
+      # From nixpkgs
+      cacert
+      jq
+    ];
+    config = {
+      Env = [
+        "PATH=${bobapkgs."@eth-optimism/batch-submitter"}/bin/:${script}/scripts/"
+      ];
+      EntryPoint = [
+        "${bobapkgs."@eth-optimism/batch-submitter"}/bin/batch-submitter"
+      ];
+    };
+  };
+
+  batch-submitter-n2c = let
+    script = pkgs.stdenv.mkDerivation {
+      name = "script";
+      phases = [ "installPhase" ];
+      installPhase = ''
+        mkdir -p $out/scripts
+        cp ${./..}/ops/scripts/batch-submitter.sh $out/scripts/
+        substituteInPlace $out/scripts/batch-submitter.sh \
+          --replace 'jq -r' '${pkgs.jq}/bin/jq' \
+          --replace 'curl' '${pkgs.curl}/bin/curl'
+        chmod +x $out/scripts/batch-submitter.sh
+      '';
+    };
+
+  in buildImage {
     name = "go-batch-submitter";
     tag = tag;
     contents = with pkgs; [

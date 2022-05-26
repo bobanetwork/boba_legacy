@@ -2,8 +2,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     dream2nix = {
-      url = "github:nix-community/dream2nix";
-      #url = "path:/home/tgunnoe/src/boba/dream2nix";
+      #url = "github:nix-community/dream2nix";
+      url = "path:/home/tgunnoe/src/boba/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
@@ -35,13 +35,6 @@
 
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
 
-      boba-monorepo = inputs.dream2nix.lib2.init {
-        systems = supportedSystems;
-        config.projectRoot = ./. ;
-        #config.packagesDir = ./nix/packages;
-        config.overridesDirs = [ ./nix/overrides ];
-      };
-
       boba =
         flake-utils.lib.eachSystem supportedSystems (system:
           let
@@ -51,6 +44,7 @@
             };
             # TODO: Make this an overlay instead
             bobapkgs = self.packages.${system};
+            nix2containerPkgs = nix2container.packages.${system};
           in
           rec {
             packages = flake-utils.lib.flattenTree {
@@ -81,7 +75,7 @@
                 };
               };
             };
-            docker-images = import ./nix/docker.nix { inherit pkgs bobapkgs; };
+            docker-images = import ./nix/docker.nix { inherit pkgs bobapkgs nix2containerPkgs; };
             go-packages = import ./nix/gopkgs.nix { inherit self pkgs bobapkgs; };
             apps = {
               default = apps.l2geth;
@@ -94,8 +88,12 @@
     in
       lib.recursiveUpdate
         # The 2nix translation of boba's monorepo
-        (boba-monorepo.makeFlakeOutputs {
+        (dream2nix.lib.makeFlakeOutputs {
           pname = "boba";
+          systems = supportedSystems;
+          config.projectRoot = ./. ;
+          #config.packagesDir = ./nix/packages;
+          config.overridesDirs = [ ./nix/overrides ];
           source = builtins.path {
             name = "boba";
             path = ./.;
