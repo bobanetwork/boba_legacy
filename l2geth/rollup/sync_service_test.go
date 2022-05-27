@@ -771,7 +771,7 @@ func TestVerifyFee(t *testing.T) {
 	if balance.Cmp(new(big.Int).Mul(tx.GasPrice(), big.NewInt(int64(tx.Gas())))) != 0 {
 		t.Fatal("balance mismatch")
 	}
-	// Sign the dummy tx with the owner key
+	// Sign the dummy tx with the sender key
 	signedTx, err := types.SignTx(tx, signer, key)
 	if err != nil {
 		t.Fatal(err)
@@ -789,7 +789,7 @@ func TestVerifyFee(t *testing.T) {
 	if balance.Cmp(new(big.Int).Mul(badTx.GasPrice(), big.NewInt(int64(badTx.Gas())))) > 0 {
 		t.Fatal("balance match")
 	}
-	// Sign the dummy tx with the owner key
+	// Sign the dummy tx with the sender key
 	signedTx, err = types.SignTx(badTx, signer, key)
 	if err != nil {
 		t.Fatal(err)
