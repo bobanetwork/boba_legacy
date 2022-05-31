@@ -261,6 +261,8 @@ Resources:
                 - "redis://${EndpointAddress}:6379/1"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: ETH_REORG_BLOCKS
+              Value: 10
           Command:
             - "./docker/web/run_web.sh"
           DockerLabels:
@@ -312,6 +314,8 @@ Resources:
                 - "redis://${EndpointAddress}:6379/1"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: ETH_REORG_BLOCKS
+              Value: 10
           Command:
             - "./docker/web/celery/worker/run.sh"
           DockerLabels:
@@ -363,6 +367,8 @@ Resources:
                 - "redis://${EndpointAddress}:6379/1"
                 - EndpointAddress:
                     Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: ETH_REORG_BLOCKS
+              Value: 10
           Command:
             - "./docker/web/celery/scheduler/run.sh"
           DockerLabels:
