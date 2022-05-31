@@ -177,6 +177,16 @@ in
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/common-ts/ | grep -v "package.json\|dist\|node_modules"`
       '';
     };
+    minimize = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@eth-optimism/common-ts $out/common-ts
+      '';
+    };
+    add-inputs = {
+      buildInputs = old: old ++ [
+        #pkgs.nodePackages.typescript
+      ];
+    };
   };
   "@eth-optimism/message-relayer" = {
     inherit correct-tsconfig-path;
@@ -192,16 +202,20 @@ in
           $out/bin/message-relayer.js
       '';
     };
-
+    minimize = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@eth-optimism/message-relayer $out/message-relayer
+      '';
+    };
 
   };
   "@eth-optimism/contracts" = {
     inherit correct-tsconfig-path add-solc;
-    # cleanup-dir = {
-    #   postFixup = ''
-    #     rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache\|bin"`
-    #   '';
-    # };
+    cleanup-dir = {
+      postFixup = ''
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache\|bin"`
+      '';
+    };
     add-ts-node = {
       postInstall = ''
         mkdir -p $out/bin
@@ -212,10 +226,16 @@ in
         rm $out/contracts/node_modules/usb
       '';
     };
-
     add-inputs = {
+      buildInputs = old: old ++ [
+        #pkgs.nodePackages.typescript
+      ];
       nativeBuildInputs = old: old ++ [
         pkgs.yarn
+        # pkgs.python3
+        # pkgs.jq
+        # pkgs.nodePackages.npm
+        # pkgs.nodePackages.typescript
         pkgs.nodePackages.node-pre-gyp
       ];
     };
@@ -230,11 +250,11 @@ in
       ''];
     };
     add-inputs = {
-      buildInputs = old: old ++ [
-      ];
       nativeBuildInputs = old: old ++ [
+        pkgs.nodePackages.typescript
         pkgs.yarn
         pkgs.nodePackages.node-pre-gyp
+        pkgs.python3Full
       ];
     };
     cleanup-dir = {
@@ -242,12 +262,23 @@ in
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/core-utils/ | grep -v "package.json\|dist\|node_modules"`
       '';
     };
+    minimize = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@eth-optimism/core-utils $out/core-utils
+      '';
+    };
+
   };
   "@eth-optimism/sdk" = {
     inherit correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@eth-optimism/sdk/ | grep -v "package.json\|dist\|node_modules"`
+      '';
+    };
+    minimize = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@eth-optimism/sdk $out/sdk
       '';
     };
   };
@@ -262,6 +293,7 @@ in
       postInstall = ''
         ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer/dist $out/dist
         mkdir $out/lib/node_modules/@eth-optimism/data-transport-layer/state-dumps
+        ln -s $out/lib/node_modules/@eth-optimism/data-transport-layer $out/dtl
       '';
     };
   };
@@ -333,6 +365,16 @@ in
       patches = [
         "./patches/@openzeppelin+contracts+4.3.2.patch"
       ];
+    };
+  };
+  errno = {
+    add-inputs = {
+      buildInputs = old: old ++ [
+        pkgs.python3 pkgs.nodejs-14_x
+      ];
+    };
+    remove-deps = {
+      disallowedReferences = [ pkgs.python3 ];
     };
   };
   optimism = {

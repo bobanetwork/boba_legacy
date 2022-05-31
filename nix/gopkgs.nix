@@ -1,5 +1,5 @@
-{ self, pkgs, bobapkgs, ... }:
-{
+{ self, pkgs, bobapkgs, inp, ... }:
+rec {
   "@eth-optimism/l2geth" = pkgs.buildGoModule {
     pname = "l2geth";
     version = "0.5.11";
@@ -133,4 +133,151 @@
       });
 
     };
+  coreutils-min = pkgs.stdenv.mkDerivation {
+    pname = "coreutils-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+        mkdir -p $out/node_modules/@ethersproject
+        cp -r ${bobapkgs."@eth-optimism/core-utils"}/core-utils/dist $out/dist
+        cp ${bobapkgs."@eth-optimism/core-utils"}/core-utils/package.json $out/
+        cp -r ${bobapkgs."@eth-optimism/core-utils"}/core-utils/node_modules/@ethersproject/{abstract-provider,bytes,providers,transactions} \
+          $out/node_modules/@ethersproject/
+        cp -r ${bobapkgs."@eth-optimism/core-utils"}/core-utils/node_modules/{bufio,chai,ethers} \
+          $out/node_modules/
+      '';
+    };
+  };
+  commonts-min = pkgs.stdenv.mkDerivation {
+    pname = "commonts-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/@eth-optimism/
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+
+        mkdir -p $out/node_modules/@sentry/
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/@sentry/node \
+          $out/node_modules/@sentry/
+
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/dist $out/dist
+        cp ${bobapkgs."@eth-optimism/common-ts"}/common-ts/package.json $out/
+
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/{bcfg,commander,dotenv,envalid,ethers,express,lodash,pino,pino-multi-stream,prom-client} \
+          $out/node_modules/
+
+      '';
+    };
+  };
+  contracts-min = pkgs.stdenv.mkDerivation {
+    pname = "contracts-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/
+        cp -r ${bobapkgs."@eth-optimism/contracts"}/contracts/{artifacts,deployments,dist,contracts,package.json,hardhat.config.ts} $out/
+
+        mkdir -p $out/node_modules/@eth-optimism/
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+
+        mkdir -p $out/node_modules/@ethersproject/
+        cp -r ${bobapkgs."@eth-optimism/contracts"}/contracts/node_modules/@ethersproject/{abstract-provider,abstract-signer} $out/node_modules/@ethersproject/
+        cp -r ${bobapkgs."@eth-optimism/contracts"}/contracts/node_modules/ethers \
+          $out/node_modules/
+
+      '';
+    };
+  };
+  dtl-min = pkgs.stdenv.mkDerivation {
+    pname = "dtl-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@eth-optimism,@ethersproject,@sentry,@types}
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${commonts-min} $out/node_modules/@eth-optimism/common-ts
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/node_modules/@ethersproject/{providers,transactions} \
+          $out/node_modules/@ethersproject/
+
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/node_modules/@sentry/{node,tracing} \
+          $out/node_modules/@sentry/
+
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/node_modules/@types/express \
+          $out/node_modules/@types/
+
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/node_modules/{axios,bcfg,bfj,browser-or-node,cors,dotenv,body-parser,ethers,express,express-prom-bundle,level,levelup,node-fetch} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/dist $out/dist
+        cp  ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/package.json $out/
+
+      '';
+    };
+  };
+  sdk-min = pkgs.stdenv.mkDerivation {
+    pname = "sdk-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@eth-optimism,@ethersproject}
+
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+
+        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/@ethersproject/abstract-provider \
+          $out/node_modules/@ethersproject/
+
+
+        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/{lodash,merkletreejs,rlp} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/dist $out/dist
+        cp  ${bobapkgs."@eth-optimism/sdk"}/sdk/package.json $out/
+
+      '';
+    };
+  };
+  message-relayer-min = pkgs.stdenv.mkDerivation {
+    pname = "message-relayer-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@eth-optimism,@sentry}
+        ln -s ${commonts-min} $out/node_modules/@eth-optimism/common-ts
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${sdk-min} $out/node_modules/@eth-optimism/sdk
+
+        ln -s ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/@eth-optimism/ynatm $out/node_modules/@eth-optimism/
+
+        cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/@sentry/node \
+          $out/node_modules/@sentry/
+
+        cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/{bcfg,dotenv,ethers,node-fetch} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/dist $out/dist
+        cp  ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/package.json $out/
+
+      '';
+    };
+  };
 }
