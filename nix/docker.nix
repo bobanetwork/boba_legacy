@@ -73,12 +73,10 @@ rec {
       ln -s ${fraud-detector} $out/
     '';
   };
-  dtl = pkgs.dockerTools.buildImage {
+  dtl = pkgs.dockerTools.streamLayeredImage {
     name = "dtl";
     tag = tag;
-    runAsRoot = ''
-      mkdir -p ./state-dumps
-    '';
+    maxLayers = 125;
     contents = with pkgs; [
       curl
       bash
@@ -92,22 +90,24 @@ rec {
       ];
     };
   };
-  dtl2 = buildImage {
+
+
+  dtl-image-min = buildImage {
     name = "dtl2";
     tag = tag;
-    #maxLayers = 125;
+    maxLayers = 100;
     config = {
-      #WorkingDir = "${bobapkgs."@eth-optimism/data-transport-layer"}/lib/node_modules/@eth-optimism/data-transport-layer";
+      workingdir = "${bobapkgs.dtl-min}/";
       entrypoint = [
         "${pkgs.nodejs}/bin/node"
-        "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js"
+        "${bobapkgs.dtl-min}/dist/src/services/run.js"
       ];
     };
   };
 
   deployer =
     let
-      optimism-contracts = bobapkgs."@eth-optimism/contracts";
+      optimism-contracts = bobapkgs.contracts-min;
     in pkgs.dockerTools.buildLayeredImage {
       name = "deployer";
       tag = tag;
