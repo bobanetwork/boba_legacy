@@ -76,7 +76,7 @@ const main = async () => {
   // block
   const blockService = new BlockMonitorService()
   await blockService.initConnection()
-  await blockService.initConnection()
+
   try {
     await blockService.initScan()
   } catch (error) {

@@ -202,8 +202,9 @@ class OptimismEnv {
       this.L1Provider
     )
 
-    this.sequencerPublishWindow =
+    this.sequencerPublishWindow = (
       await this.StateCommitmentChainContract.SEQUENCER_PUBLISH_WINDOW()
+    ).toNumber()
 
     // Load L1 Standard Bridge
     this.OVM_L1StandardBridgeContract = new ethers.Contract(
