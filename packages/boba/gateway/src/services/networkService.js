@@ -1971,6 +1971,92 @@ class NetworkService {
 
   }
 
+  async settle_v3() {
+
+    console.log("NS: settle_v3")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        '0x878221C39a7a279E6f19858AaE48875d4B1e4f5e',
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv3 = new ethers.Contract(
+        '0xC6158B1989f89977bcc3150fC1F2eB2260F6cabE',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv3.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv3:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v3 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v3OLO() {
+
+    console.log("NS: settle_v3OLO")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0xDd3BDD13b1c123AE340f0Ba63BA4B172d335a92C',
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv3OLO = new ethers.Contract(
+        '0x70bf3c5B5d80C4Fece8Bde0fCe7ef38B688463d4',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv3OLO.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv3OLO:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v3OLO error:", error)
+      return error
+    }
+
+  }
+
   //Transfer funds from one account to another, on the L2
   async transfer(address, value_Wei_String, currency) {
 
