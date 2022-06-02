@@ -73,7 +73,7 @@ rec {
       ln -s ${fraud-detector} $out/
     '';
   };
-  dtl = pkgs.dockerTools.streamLayeredImage {
+  dtl = buildImage {
     name = "dtl";
     tag = tag;
     maxLayers = 125;
@@ -83,22 +83,8 @@ rec {
       jq
     ];
     config = {
-      WorkingDir = "${bobapkgs."@eth-optimism/data-transport-layer"}/lib/node_modules/@eth-optimism/data-transport-layer";
+      WorkingDir = "${bobapkgs.dtl-min}/";
       EntryPoint = [
-        "${pkgs.nodejs}/bin/node"
-        "${bobapkgs."@eth-optimism/data-transport-layer"}/dist/src/services/run.js"
-      ];
-    };
-  };
-
-
-  dtl-image-min = buildImage {
-    name = "dtl2";
-    tag = tag;
-    maxLayers = 100;
-    config = {
-      workingdir = "${bobapkgs.dtl-min}/";
-      entrypoint = [
         "${pkgs.nodejs}/bin/node"
         "${bobapkgs.dtl-min}/dist/src/services/run.js"
       ];
@@ -108,16 +94,16 @@ rec {
   deployer =
     let
       optimism-contracts = bobapkgs.contracts-min;
-    in pkgs.dockerTools.buildLayeredImage {
+    in buildImage {
       name = "deployer";
       tag = tag;
       config = {
-        Env = [ "PATH=${optimism-contracts}/bin/:${scripts}/scripts/:${pkgs.yarn}/bin/" ];
-        WorkingDir = "${optimism-contracts}/contracts";
-        Entrypoint = [
+        env = [ "PATH=${optimism-contracts}/bin/:${scripts}/scripts/:${pkgs.yarn}/bin/" ];
+        workingdir = "${optimism-contracts}/";
+        entrypoint = [
           "${pkgs.yarn}/bin/yarn"
           "--cwd"
-          "${optimism-contracts}/contracts"
+          "${optimism-contracts}/"
           "run"
           "deploy"
         ];
@@ -125,13 +111,13 @@ rec {
     };
   boba-deployer =
     let
-      boba-contracts = bobapkgs."@boba/contracts";
-    in pkgs.dockerTools.buildImage {
+      boba-contracts = bobapkgs.boba-contracts-min;
+    in buildImage {
       name = "boba_deployer";
       tag = tag;
       config = {
         Env = [ "PATH=${boba-contracts}/bin/:${scripts}/scripts/" ];
-        WorkingDir = "${boba-contracts}/contracts";
+        WorkingDir = "${boba-contracts}/";
         Entrypoint = [
           "${scripts}/scripts/wait-for-l1-and-l2.sh"
           "${scripts}/scripts/deploy.sh"
@@ -140,38 +126,6 @@ rec {
     };
   # Adapted from ops/docker/Dockerfile.batch-submitter
   batch-submitter = let
-    script = pkgs.stdenv.mkDerivation {
-      name = "script";
-      phases = [ "installPhase" ];
-      installPhase = ''
-        mkdir -p $out/scripts
-        cp ${./..}/ops/scripts/batch-submitter.sh $out/scripts/
-        substituteInPlace $out/scripts/batch-submitter.sh \
-          --replace 'jq -r' '${pkgs.jq}/bin/jq' \
-          --replace 'curl' '${pkgs.curl}/bin/curl'
-        chmod +x $out/scripts/batch-submitter.sh
-      '';
-    };
-
-  in pkgs.dockerTools.buildImage {
-    name = "go-batch-submitter";
-    tag = tag;
-    contents = with pkgs; [
-      # From nixpkgs
-      cacert
-      jq
-    ];
-    config = {
-      Env = [
-        "PATH=${bobapkgs."@eth-optimism/batch-submitter"}/bin/:${script}/scripts/"
-      ];
-      EntryPoint = [
-        "${bobapkgs."@eth-optimism/batch-submitter"}/bin/batch-submitter"
-      ];
-    };
-  };
-
-  batch-submitter-n2c = let
     script = pkgs.stdenv.mkDerivation {
       name = "script";
       phases = [ "installPhase" ];
@@ -216,7 +170,7 @@ rec {
             'curl' '${pkgs.curl}/bin/curl'
         '';
       };
-    in pkgs.dockerTools.buildImage {
+    in buildImage {
       name = "l2geth";
       tag = tag;
       contents = with pkgs; [
@@ -239,7 +193,7 @@ rec {
         ];
       };
     };
-  hardhat = pkgs.dockerTools.buildLayeredImage {
+  hardhat = buildImage {
     name = "l1_chain";
     tag = tag;
     config = {
@@ -249,23 +203,23 @@ rec {
       Cmd = [ "${bobapkgs."@eth-optimism/hardhat-node"}/bin/hardhat" "node" "--network" "hardhat" ];
     };
   };
-  gas-price-oracle = pkgs.dockerTools.buildImage {
+  gas-price-oracle = buildImage {
     name = "boba_gas-price-oracle";
     tag = tag;
     config = {
-      WorkingDir = "${bobapkgs."@boba/gas-price-oracle"}/lib/node_modules/@boba/gas-price-oracle";
+      WorkingDir = "${bobapkgs.oracle-min}/";
       EntryPoint = [
         "${scripts}/scripts/wait-for-l1-and-l2.sh"
         "${pkgs.nodejs}/bin/node"
-        "${bobapkgs."@boba/gas-price-oracle"}/bin/gas-price-oracle"
+        "${bobapkgs.oracle-min}/exec/run-gas-price-oracle.js"
       ];
     };
   };
-  monitor = pkgs.dockerTools.buildImage {
+  monitor = buildImage {
     name = "monitor";
     tag = tag;
     config = {
-      WorkingDir = "${bobapkgs."@boba/monitor"}/lib/node_modules/@boba/monitor";
+      WorkingDir = "${bobapkgs.monitor-min}/monitor";
       Env = [ "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/" ];
       EntryPoint = [
         "${pkgs.yarn}/bin/yarn"
@@ -275,7 +229,7 @@ rec {
   };
   relayer =
     let
-      relayer = bobapkgs."@eth-optimism/message-relayer";
+      relayer = bobapkgs.message-relayer-min;
       relayer-scripts = pkgs.stdenv.mkDerivation {
         name = "scripts";
         phases = [ "installPhase" ];
@@ -294,12 +248,12 @@ rec {
             --replace 'sleep' '${pkgs.coreutils}/bin/sleep'
         '';
       };
-    in pkgs.dockerTools.buildImage {
+    in buildImage {
       name = "message-relayer";
       tag = tag;
       config = {
         Env = [ "PATH=${relayer}/bin/:${wait-script}/scripts/:${relayer-scripts}/scripts/:${pkgs.yarn}/bin/" ];
-        WorkingDir = "${relayer}/lib/node_modules/@eth-optimism/message-relayer/";
+        WorkingDir = "${relayer}/";
         Entrypoint = [
           "${pkgs.nodePackages.npm}/bin/npm"
           "run"
@@ -323,7 +277,7 @@ rec {
         '';
       };
 
-    in pkgs.dockerTools.buildImage {
+    in buildImage {
       name = "integration-tests";
       tag = tag;
       config = {
@@ -345,17 +299,17 @@ rec {
         installPhase = ''
           mkdir -p $out/contracts/
           cp -r ${./../boba_community/fraud-detector}/packages/jsonrpclib $out/
-          cp ${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json $out/contracts/
-          cp ${bobapkgs."@eth-optimism/contracts"}/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json $out/contracts/
+          cp ${bobapkgs.contracts-min}/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json $out/contracts/
+          cp ${bobapkgs.contracts-min}/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json $out/contracts/
         '';
       };
-    in pkgs.dockerTools.buildImage {
+    in buildImage {
     name = "fraud-detector";
     tag = tag;
-    runAsRoot = ''
-      #!${pkgs.runtimeShell}
-      mkdir -p /db
-    '';
+    # runAsRoot = ''
+    #   #!${pkgs.runtimeShell}
+    #   mkdir -p /db
+    # '';
     config = {
       WorkingDir = "${fraud-detector}/";
       Cmd = [ "${pkgs.python3}/bin/python" "-u" "${./../boba_community/fraud-detector}/fraud-detector.py" ];

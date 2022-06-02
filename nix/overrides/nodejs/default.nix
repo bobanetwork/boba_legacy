@@ -41,6 +41,7 @@ in
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@boba/turing-hybrid-compute/ | grep -v "package.json\|artifacts\|node_modules\|contracts\|cache"`
+        ln -s $out/lib/node_modules/@boba/turing-hybrid-compute $out/turing
       '';
     };
   };
@@ -66,7 +67,7 @@ in
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@boba/contracts/ | grep -v \
-        "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
+        "deployments\|bin\|deploy\|dist\|artifacts\|package.json\|preSupported\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache"`
       '';
     };
     add-hardhat-cache = let
@@ -141,6 +142,7 @@ in
       postInstall = ''
         mkdir -p $out/bin
         ln -s $out/lib/node_modules/@boba/gas-price-oracle/exec/run-gas-price-oracle.js $out/bin/gas-price-oracle.js
+        ln -s $out/lib/node_modules/@boba/gas-price-oracle/ $out/gas-price-oracle
       '';
     };
     cleanup-dir = {
@@ -199,11 +201,7 @@ in
       postInstall = ''
         mkdir -p $out/bin
         ln -s $out/lib/node_modules/@eth-optimism/message-relayer/exec/run-message-relayer.js \
-          $out/bin/message-relayer.js
-      '';
-    };
-    minimize = {
-      postInstall = ''
+          $out/bin/run-message-relayer.js
         ln -s $out/lib/node_modules/@eth-optimism/message-relayer $out/message-relayer
       '';
     };
@@ -344,6 +342,12 @@ in
         rm -r `ls -A $out/lib/node_modules/@boba/register/ | grep -v "package.json\|node_modules\|addresses\|bin"`
       '';
     };
+    install-symlinks = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@boba/register $out/register
+      '';
+    };
+
     correct-tsconfig-path = {
       postPatch = ''
         substituteInPlace ./tsconfig.json --replace \
@@ -353,6 +357,14 @@ in
           ./tsconfig-copy.json
       '';
     };
+  };
+  "@boba/monitor" = {
+    install-symlinks = {
+      postInstall = ''
+        ln -s $out/lib/node_modules/@boba/monitor $out/monitor
+      '';
+    };
+
   };
   "@openzeppelin/contracts" = {
     add-regenesis-patch = {
@@ -368,15 +380,138 @@ in
     };
   };
   errno = {
-    add-inputs = {
-      buildInputs = old: old ++ [
-        pkgs.python3 pkgs.nodejs-14_x
-      ];
-    };
-    remove-deps = {
-      disallowedReferences = [ pkgs.python3 ];
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/errno/cli.js
+        rm -r $out/lib/node_modules/errno/build.js
+      '';
     };
   };
+  pino-sentry = {
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/pino-sentry/dist/cli.*
+      '';
+    };
+  };
+  mime = {
+    remove-nodejs = {
+      _condition = satisfiesSemver "^2.6.0";
+      postFixup = ''
+        rm -r $out/lib/node_modules/mime/cli.js
+      '';
+    };
+    remove-nodejs2 = {
+      _condition = satisfiesSemver "^1.6.0";
+      postFixup = ''
+        rm -r $out/lib/node_modules/mime/cli.js
+        rm -r $out/lib/node_modules/mime/src/build.js
+      '';
+    };
+  };
+  rlp = {
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/rlp/bin/rlp
+      '';
+    };
+  };
+  treeify = {
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/treeify/examples/fs_tree.js
+      '';
+    };
+  };
+  "sha.js" = {
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/sha.js/bin.js
+      '';
+    };
+  };
+  node-addon-api = {
+    remove-nodejs = {
+      postFixup = ''
+        rm -r $out/lib/node_modules/node-addon-api/tools/conversion.js
+      '';
+    };
+  };
+  merkletreejs = {
+    remove-nodegyp = {
+      _condition = satisfiesSemver "^0.2.31";
+      postFixup = ''
+    if [ -h "$out/lib/node_modules/merkletreejs/node_modules/node-gyp-build" ];
+    then
+        rm  $out/lib/node_modules/merkletreejs/node_modules/node-gyp-build
+    fi
+      '';
+    };
+  };
+  keccak = {
+    remove-nodegyp = {
+      _condition = satisfiesSemver "^3.0.2";
+      postFixup = ''
+        rm  $out/lib/node_modules/keccak/node_modules/node-gyp-build
+      '';
+    };
+  };
+
+  ethereumjs-util = {
+    remove-nodegyp = {
+      postFixup = ''
+          if [ -h "$out/lib/node_modules/ethereumjs-util/node_modules/node-gyp-build" ];
+          then
+            rm  $out/lib/node_modules/ethereumjs-util/node_modules/node-gyp-build
+          fi
+
+      '';
+    };
+  };
+  ethereum-cryptography = {
+    remove-nodegyp = {
+      postFixup = ''
+          if [ -h "$out/lib/node_modules/ethereum-cryptography/node_modules/node-gyp-build" ];
+          then
+            rm  $out/lib/node_modules/ethereum-cryptography/node_modules/node-gyp-build
+          fi
+
+      '';
+    };
+  };
+  secp256k1 = {
+    remove-nodegyp = {
+      postFixup = ''
+          if [ -h "$out/lib/node_modules/secp256k1/node_modules/node-gyp-build" ];
+          then
+            rm  $out/lib/node_modules/secp256k1/node_modules/node-gyp-build
+          fi
+
+      '';
+    };
+  };
+  level = {
+    remove-nodegyp = {
+      postFixup = ''
+          if [ -h "$out/lib/node_modules/level/node_modules/node-gyp-build" ];
+          then
+            rm  $out/lib/node_modules/level/node_modules/node-gyp-build
+          fi
+      '';
+    };
+  };
+  # node-gyp-build required for runtime of leveldown?
+  # leveldown = {
+  #   remove-nodegyp = {
+  #     postFixup = ''
+  #         if [ -h "$out/lib/node_modules/leveldown/node_modules/node-gyp-build" ];
+  #         then
+  #           rm  $out/lib/node_modules/leveldown/node_modules/node-gyp-build
+  #         fi
+  #     '';
+  #   };
+  # };
+
   optimism = {
     inherit add-solc;
     add-inputs = {

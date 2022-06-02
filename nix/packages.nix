@@ -1,4 +1,4 @@
-{ self, pkgs, bobapkgs, inp, ... }:
+{ self, pkgs, bobapkgs, ... }:
 rec {
   "@eth-optimism/l2geth" = pkgs.buildGoModule {
     pname = "l2geth";
@@ -133,6 +133,10 @@ rec {
       });
 
     };
+
+  # These minimal scopes are constructed manually,
+  # but ideally they should be built from the outside using nix and noDev
+
   coreutils-min = pkgs.stdenv.mkDerivation {
     pname = "coreutils-min";
     version = "0.0.1";
@@ -158,18 +162,32 @@ rec {
       text = ''
         . $stdenv/setup
 
-        mkdir -p $out/node_modules/@eth-optimism/
+        mkdir -p $out/node_modules/{@eth-optimism,@sentry}
+
         ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
 
-        mkdir -p $out/node_modules/@sentry/
         cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/@sentry/node \
           $out/node_modules/@sentry/
 
         cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/dist $out/dist
         cp ${bobapkgs."@eth-optimism/common-ts"}/common-ts/package.json $out/
 
-        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/{bcfg,commander,dotenv,envalid,ethers,express,lodash,pino,pino-multi-stream,prom-client} \
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/{bcfg,commander,dotenv,envalid,ethers,lodash,pino-sentry,prom-client} \
           $out/node_modules/
+
+        mkdir -p $out/node_modules/{pino,pino-multi-stream,express}
+
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/pino/{node_modules,lib,package.json,pino.js,browser.js,example.js} \
+          $out/node_modules/pino/
+
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/pino-multi-stream/{package.json,index.js,benchmark.js,multistream.js} \
+          $out/node_modules/pino-multi-stream/
+        mkdir -p $out/node_modules/pino-multi-stream/node_modules
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/pino-multi-stream/node_modules/{atomic-sleep,fast-redact,fast-safe-stringify,flatstr,process-warning,quick-format-unescaped,sonic-boom} \
+          $out/node_modules/pino-multi-stream/node_modules/
+        ln -s $out/node_modules/pino $out/node_modules/pino-multi-stream/node_modules/
+        cp -r ${bobapkgs."@eth-optimism/common-ts"}/common-ts/node_modules/express/{node_modules,lib,package.json,index.js} \
+          $out/node_modules/express/
 
       '';
     };
@@ -221,7 +239,8 @@ rec {
         cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/node_modules/{axios,bcfg,bfj,browser-or-node,cors,dotenv,body-parser,ethers,express,express-prom-bundle,level,levelup,node-fetch} \
           $out/node_modules/
 
-        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/dist $out/dist
+        mkdir -p $out/dist
+        cp -r ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/dist/src $out/dist/src
         cp  ${bobapkgs."@eth-optimism/data-transport-layer"}/dtl/package.json $out/
 
       '';
@@ -240,11 +259,11 @@ rec {
         ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
         ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
 
-        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/@ethersproject/abstract-provider \
+        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/@ethersproject/{abstract-provider,abstract-signer,transactions} \
           $out/node_modules/@ethersproject/
 
 
-        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/{lodash,merkletreejs,rlp} \
+        cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/node_modules/{lodash,merkletreejs,rlp,ethers} \
           $out/node_modules/
 
         cp -r ${bobapkgs."@eth-optimism/sdk"}/sdk/dist $out/dist
@@ -266,7 +285,7 @@ rec {
         ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
         ln -s ${sdk-min} $out/node_modules/@eth-optimism/sdk
 
-        ln -s ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/@eth-optimism/ynatm $out/node_modules/@eth-optimism/
+        cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/@eth-optimism/ynatm $out/node_modules/@eth-optimism/
 
         cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/node_modules/@sentry/node \
           $out/node_modules/@sentry/
@@ -275,8 +294,132 @@ rec {
           $out/node_modules/
 
         cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/dist $out/dist
+        cp -r ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/exec $out/exec
         cp  ${bobapkgs."@eth-optimism/message-relayer"}/message-relayer/package.json $out/
 
+      '';
+    };
+  };
+  turing-min = pkgs.stdenv.mkDerivation {
+    pname = "turing-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/@uniswap
+
+        cp -r ${bobapkgs."@boba/turing-hybrid-compute"}/turing/node_modules/@uniswap/sdk $out/node_modules/@uniswap/
+        cp -r ${bobapkgs."@boba/turing-hybrid-compute"}/turing/node_modules/{ip,web3,web3-eth-abi} \
+          $out/node_modules/
+        cp ${bobapkgs."@boba/turing-hybrid-compute"}/turing/package.json \
+          $out/
+        cp -r ${bobapkgs."@boba/turing-hybrid-compute"}/turing/artifacts $out/
+        cp -r ${bobapkgs."@boba/turing-hybrid-compute"}/turing/contracts $out/
+
+      '';
+    };
+  };
+  boba-contracts-min = pkgs.stdenv.mkDerivation {
+    pname = "boba-contracts-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@eth-optimism,@chainlink,@boba,@ethersproject,@nomiclabs,@openzeppelin}
+
+        cp -r ${bobapkgs."@boba/contracts"}/contracts/{artifacts,bin,contracts,deploy,package.json,preSupportedNFTs.json,preSupportedTokens.json,hardhat.config.ts} $out/
+
+
+        ln -s ${sdk-min} $out/node_modules/@eth-optimism/sdk
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+        ln -s ${turing-min} $out/node_modules/@boba/turing-hybrid-compute
+
+        cp -r ${bobapkgs."@boba/contracts"}/contracts/node_modules/@ethersproject/{abstract-provider,abstract-signer} $out/node_modules/@ethersproject/
+        cp -r ${bobapkgs."@boba/contracts"}/contracts/node_modules/@nomiclabs/{hardhat-etherscan,hardhat-waffle} \
+          $out/node_modules/@nomiclabs
+
+        cp -r ${bobapkgs."@boba/contracts"}/contracts/node_modules/@openzeppelin/{contracts,contracts-upgradeable} \
+          $out/node_modules/@openzeppelin
+
+        cp -r ${bobapkgs."@boba/contracts"}/contracts/node_modules/{chalk,dotenv,glob,patch-package} \
+          $out/node_modules/
+      '';
+    };
+  };
+  oracle-min = pkgs.stdenv.mkDerivation {
+    pname = "oracle-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/@eth-optimism
+        ln -s ${commonts-min} $out/node_modules/@eth-optimism/common-ts
+
+        cp -r ${bobapkgs."@boba/gas-price-oracle"}/gas-price-oracle/node_modules/{bcfg,chalk,dotenv,ethers,ganache-core,glob,google-spreadsheet,lodash,merkletreejs,patch-package,rlp,node-fetch} \
+          $out/node_modules/
+        cp -r ${bobapkgs."@boba/gas-price-oracle"}/gas-price-oracle/{package.json,scripts,dist,exec} \
+          $out/
+      '';
+    };
+  };
+  register-min = pkgs.stdenv.mkDerivation {
+    pname = "register-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@eth-optimism,@ethersproject,@nomiclabs,@openzeppelin}
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+
+        cp -r ${bobapkgs."@boba/register"}/register/node_modules/@ethersproject/{abstract-provider,abstract-signer} $out/node_modules/@ethersproject/
+
+        cp -r ${bobapkgs."@boba/register"}/register/node_modules/@nomiclabs/hardhat-waffle \
+          $out/node_modules/@nomiclabs/
+
+        cp -r ${bobapkgs."@boba/register"}/register/node_modules/@openzeppelin/contracts \
+          $out/node_modules/@openzeppelin/
+
+
+        cp -r ${bobapkgs."@boba/register"}/register/node_modules/{chalk,dotenv,glob,patch-package} \
+          $out/node_modules/
+        cp -r ${bobapkgs."@boba/register"}/register/{package.json,addresses,bin} \
+          $out/
+      '';
+    };
+  };
+  monitor-min = pkgs.stdenv.mkDerivation {
+    pname = "monitor-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@boba,@eth-optimism,@ethersproject}
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${commonts-min} $out/node_modules/@eth-optimism/common-ts
+        ln -s ${sdk-min} $out/node_modules/@eth-optimism/sdk
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+        ln -s ${boba-contracts-min} $out/node_modules/@boba/contracts
+        ln -s ${register-min} $out/node_modules/@boba/register
+
+        cp -r ${bobapkgs."@boba/monitor"}/monitor/node_modules/@ethersproject/providers \
+          $out/node_modules/@ethersproject/
+
+        cp -r ${bobapkgs."@boba/monitor"}/monitor/node_modules/{axios,async-mutex,dotenv,ethers,lodash,mysql,node-fetch,web3,winston} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@boba/monitor"}/monitor/{package.json,services,exec,wait-for-l1-and-l2.sh} \
+          $out/
       '';
     };
   };
