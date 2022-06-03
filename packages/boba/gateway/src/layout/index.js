@@ -27,6 +27,7 @@ import Notification from 'containers/notification/Notification'
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
+import { initGa } from 'util/googleAnalytics'
 
 function App () {
 
@@ -253,7 +254,11 @@ function App () {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [dispatch])
+
+    initGa();
+
+  }, [ dispatch ])
+
 
   return (
     <ThemeProvider theme={MUItheme}>

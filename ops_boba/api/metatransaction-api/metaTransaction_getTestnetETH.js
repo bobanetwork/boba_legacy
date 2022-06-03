@@ -2,28 +2,8 @@ const ethers = require('ethers')
 const YAML = require('yaml')
 const fs = require('fs')
 
-// Load env
-const file = fs.readFileSync('./env.yml', 'utf8')
-const env = YAML.parse(file)
-const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_TESTNET_URL === undefined ? env.L2_NODE_WEB3_URL : env.L2_NODE_WEB3_TESTNET_URL
-const PRIVATE_KEY = env.PRIVATE_KEY_FAUCET
-const BOBA_AUTHENTICATEDFAUCET_ADDRESS = env.BOBA_AUTHENTICATEDFAUCET_TESTNET_ADDRESS
-
-// Get provider and wallet
-const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
-const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
-
-// ABI
-const TwitterAuthenticatedFaucetInterface = new ethers.utils.Interface([
-  'function sendFundsMeta(address,string,bytes32,bytes)',
-])
-
-// Load contracts
-const Boba_AuthenticatedFaucet = new ethers.Contract(
-  BOBA_AUTHENTICATEDFAUCET_ADDRESS,
-  TwitterAuthenticatedFaucetInterface,
-  l2Wallet
-)
+// Support local tests
+require('dotenv').config()
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -36,14 +16,58 @@ const headers = {
   'Permissions-Policy': '*',
 }
 
+// Load contracts
+const loadContracts = () => {
+  // Load env
+  let env = process.env
+  if (fs.existsSync('./env.yml')) {
+    const file = fs.readFileSync('./env.yml', 'utf8')
+    env = YAML.parse(file)
+  }
+  const L2_NODE_WEB3_URL =
+    env.L2_NODE_WEB3_TESTNET_URL === undefined
+      ? env.L2_NODE_WEB3_URL
+      : env.L2_NODE_WEB3_TESTNET_URL
+  const PRIVATE_KEY = env.PRIVATE_KEY_FAUCET
+  const BOBA_AUTHENTICATEDFAUCET_ADDRESS =
+    env.BOBA_AUTHENTICATEDFAUCET_TESTNET_ADDRESS
+
+  // Get provider and wallet
+  const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
+  const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
+
+  // ABI
+  const TwitterAuthenticatedFaucetInterface = new ethers.utils.Interface([
+    'function sendFundsMeta(address,string,bytes32,bytes)',
+  ])
+
+  // Load contracts
+  const Boba_AuthenticatedFaucet = new ethers.Contract(
+    BOBA_AUTHENTICATEDFAUCET_ADDRESS,
+    TwitterAuthenticatedFaucetInterface,
+    l2Wallet
+  )
+  return Boba_AuthenticatedFaucet
+}
+
 // Verify message and send to node if it's correct
 module.exports.mainnetHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body
+
+  const Boba_AuthenticatedFaucet = loadContracts()
+
   // Send transaction to node
   try {
-    console.log("SendFundsMeta: ", walletAddress, tweetId, hashedMsg, signature, L2_NODE_WEB3_URL)
+    console.log(
+      'SendFundsMeta: ',
+      walletAddress,
+      tweetId,
+      hashedMsg,
+      signature,
+      L2_NODE_WEB3_URL
+    )
 
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,
@@ -58,8 +82,7 @@ module.exports.mainnetHandler = async (event, context, callback) => {
       hashedMsg,
       signature
     )
-    await execTx.wait();
-
+    await execTx.wait()
   } catch (err) {
     console.error(err)
     return callback(null, {
@@ -81,9 +104,12 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body
+
+  const Boba_AuthenticatedFaucet = loadContracts()
+
   // Send transaction to node
   try {
-    console.log("SendFundsMeta: ", walletAddress, tweetId, hashedMsg, signature)
+    console.log('SendFundsMeta: ', walletAddress, tweetId, hashedMsg, signature)
 
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,
@@ -98,8 +124,7 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
       hashedMsg,
       signature
     )
-    await execTx.wait();
-
+    await execTx.wait()
   } catch (err) {
     console.error(err)
     return callback(null, {
