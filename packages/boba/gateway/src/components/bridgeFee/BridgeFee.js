@@ -43,7 +43,7 @@ function BridgeFee({
     </S.BridgeFeeItemLabel>
   }
 
-  return <Box py={2}>
+  return <Box py={1}>
     {time ? <S.BridgeFeeItem>
       <ItemLabel label="Est. time" info={timeInfo} />
       <Typography variant='body2'>

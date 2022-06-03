@@ -8,7 +8,7 @@ dataSources:
     name: L2LiquidityPool
     network: boba
     source:
-      address: '0x3A92cA39476fF84Dc579C868D4D7dE125513B034'
+      address: '0x8d3866a79aA780BA3DC1a300a1567635F3754a0e'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
@@ -126,7 +126,7 @@ dataSources:
     name: TuringMonsters
     network: boba
     source:
-      address: '0xce458FC7cfC322cDd65eC77Cf7B6410002E2D793'
+      address: '0x757b8E819d91659844E44F2141402831B60Fa4EE'
       abi: TuringMonsters
     mapping:
       kind: ethereum/events
@@ -141,7 +141,8 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTuringMonstersTransferEvent
       file: ./src/TuringMonstersMapping.ts
-
+      
+      
   - kind: ethereum/contract
     name: TuringHelperFactory
     network: boba
@@ -161,4 +162,6 @@ dataSources:
         - event: TuringHelperDeployed(indexed address,address,uint256)
           handler: handleTuringHelperDeployed
       file: ./src/TuringHelperFactoryMapping.ts
+
+
 

@@ -444,7 +444,7 @@ class ListFarm extends React.Component {
           <Fade in={dropDownBox}>
             <S.DropdownContent>
               <S.DropdownWrapper>
-                <Typography sx={{ flex: 1 }} variant="body2" component="div">{`${symbol}`} Earned</Typography>
+                <Typography sx={{ flex: 1 }} variant="body2" component="div">Earned</Typography>
                 <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
                   variant="contained"
@@ -461,7 +461,7 @@ class ListFarm extends React.Component {
               <S.DropdownWrapper>
                 {logAmount(userInfo.amount, decimals) === '0' ?
                   <>
-                    <Typography sx={{ flex: 1 }} variant="body2" component="div">{`${symbol}`} Staked</Typography>
+                    <Typography sx={{ flex: 1 }} variant="body2" component="div">Staked</Typography>
                     <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">0.00</Typography>
                     <Button
                       variant="outlined"
@@ -474,15 +474,11 @@ class ListFarm extends React.Component {
                     </Button>
                   </> :
                   <>
-                    <Typography variant="body2" component="div">{`${symbol}`} Staked</Typography>
+                    <Typography variant="body2" component="div">Staked</Typography>
                     <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                      <Button
-                        variant="outlined"
-                        color="neutral"
-                        onClick={() => { !disabled && this.handleWithdrawToken() }}
-                      >
-                        <RemoveIcon />
+                      <Button variant="contained" onClick={() => { !disabled && this.handleWithdrawToken() }}>
+                        Unstake
                       </Button>
                       <Button variant="contained" onClick={() => { !disabled && this.handleStakeToken() }}>
                         Stake More

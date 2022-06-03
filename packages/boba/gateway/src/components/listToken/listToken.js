@@ -1,7 +1,14 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
-import { settle_v0, settle_v1 } from 'actions/networkAction'
+
+import { 
+  settle_v0, 
+  settle_v1,
+  settle_v2, 
+  settle_v2OLO  
+} from 'actions/networkAction'
+
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -19,8 +26,6 @@ function ListToken({
 }) {
   const [ dropDownBox, setDropDownBox ] = useState(false)
 
-  const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
-
   const theme = useTheme()
   
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -37,18 +42,8 @@ function ListToken({
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-  let WAGMI_v1 = 1 + (sliderValue_v1 / 11.1)
-  if(sliderValue_v1 === 0) {
-    WAGMI_v1 = 0.5
-  }
-  const TVL_v1 = Number(69 + (sliderValue_v1 / 100) * 305)
-
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
-  }
-
-  const handleSliderChange_v1 = (e) => {
-    setSliderValue_v1(e.target.value)
   }
 
   async function doSettle_v0 () {
@@ -56,16 +51,25 @@ function ListToken({
   }
 
   async function doSettle_v1 () {
-    //await dispatch(settle_v1())
+    await dispatch(settle_v1())
   }
 
   async function doSettle_v2 () {
-    //await dispatch(settle_v2())
+    await dispatch(settle_v2())
   }
 
   async function doSettle_v2OLO () {
-    //await dispatch(settle_v2OLO())
+    await dispatch(settle_v2OLO())
   }
+
+  async function doSettle_v3 () {
+    //await dispatch(settle_v3())
+  }
+
+  async function doSettle_v3OLO () {
+    //await dispatch(settle_v3OLO())
+  }
+
 
   if (isMobile) {
     return (
@@ -149,6 +153,8 @@ function ListToken({
                 token.symbol !== 'WAGMIv1' &&
                 token.symbol !== 'WAGMIv2' && 
                 token.symbol !== 'WAGMIv2-Oolong' &&
+                token.symbol !== 'WAGMIv3' && 
+                token.symbol !== 'WAGMIv3-Oolong' &&
                 <>
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -215,9 +221,6 @@ function ListToken({
                   flexDirection: 'column',
                   gap: '10px',
                 }}>
-                  <Typography variant="body3" component="p" >
-                    Settled for 1 BOBA
-                  </Typography>
                   <Button
                     onClick={() => { doSettle_v0() }}
                     variant="contained"
@@ -239,20 +242,10 @@ function ListToken({
                   flexDirection: 'column',
                   gap: '10px',
                 }}>
-                  <Typography variant="body3" component="p" >
-                    If TVL = {TVL_v1.toFixed(0)}k ETH, each option settles for {WAGMI_v1.toFixed(1)} BOBA
-                  </Typography>
-                  <Slider
-                    min={0}
-                    max={100}
-                    value={sliderValue_v1}
-                    onChange={handleSliderChange_v1}
-                    aria-label="WAGMIv1"
-                  />
                   <Button
                     onClick={() => { doSettle_v1() }}
                     variant="contained"
-                    disabled={true}
+                    disabled={false}
                     tooltip="Settle your WAGMv1 long options."
                     fullWidth
                   >
@@ -268,13 +261,10 @@ function ListToken({
                   flexDirection: 'column',
                   gap: '10px',
                 }}>
-                  <Typography variant="body3" component="p" >
-                    Settles for 1 BOBA
-                  </Typography>
                   <Button
                     onClick={() => { doSettle_v2() }}
                     variant="contained"
-                    disabled={true}
+                    disabled={false}
                     tooltip="Settle your WAGMv2 long options."
                     fullWidth
                   >
@@ -290,14 +280,49 @@ function ListToken({
                   flexDirection: 'column',
                   gap: '10px',
                 }}>
-                  <Typography variant="body3" component="p" >
-                    If Oolong volume exceeds &#36;25mm in April, settles for 2 BOBA, otherwise 1 BOBA
-                  </Typography>
                   <Button
                     onClick={() => { doSettle_v2OLO() }}
                     variant="contained"
-                    disabled={true}
+                    disabled={false}
                     tooltip="Settle your WAGMv2-Oolong long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Button
+                    onClick={() => { doSettle_v3() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv3 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Button
+                    onClick={() => { doSettle_v3OLO() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv3-Oolong long options."
                     fullWidth
                   >
                     Settle
@@ -376,6 +401,8 @@ function ListToken({
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
+            token.symbol !== 'WAGMIv3' &&
+            token.symbol !== 'WAGMIv3-Oolong' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -446,9 +473,6 @@ function ListToken({
                 flexDirection: 'row',
                 gap: '10px',
               }}>
-                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  Settled for 1 BOBA
-                </Typography>
                 <Button
                   onClick={() => { doSettle_v0() }}
                   variant="contained"
@@ -470,13 +494,6 @@ function ListToken({
               flexDirection: 'column',
               gap: '10px',
             }}>
-              <Slider
-                min={0}
-                max={100}
-                value={sliderValue_v1}
-                onChange={handleSliderChange_v1}
-                aria-label="WAGMIv1"
-              />
               <div style={{
                 display: 'flex',
                 justifyContent: 'flex-start',
@@ -484,14 +501,11 @@ function ListToken({
                 flexDirection: 'row',
                 gap: '10px',
               }}>
-                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  If TVL = {TVL_v1.toFixed(0)}k ETH each option<br/> settles for {WAGMI_v1.toFixed(1)} BOBA
-                </Typography>
                 <Button
                   onClick={() => { doSettle_v1() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv1 long options"
                   fullWidth
                 >
@@ -515,14 +529,11 @@ function ListToken({
                 flexDirection: 'row',
                 gap: '10px',
               }}>
-                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  Settles for 1 BOBA
-                </Typography>
                 <Button
                   onClick={() => { doSettle_v2() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv2 long options"
                   fullWidth
                 >
@@ -546,14 +557,11 @@ function ListToken({
                 flexDirection: 'row',
                 gap: '10px',
               }}>
-                <Typography variant="body3" component="p" style={{width: '190px', textAlign: 'left'}}>
-                  If Oolong volume exceeds &#36;25mm in April, settles for 2 BOBA, otherwise 1 BOBA
-                </Typography>
                 <Button
                   onClick={() => { doSettle_v2OLO() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv2-Oolong long options"
                   fullWidth
                 >
@@ -562,7 +570,62 @@ function ListToken({
               </div>
             </div>
           }
-          
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Button
+                  onClick={() => { doSettle_v3() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv3 long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: '10px',
+              }}>
+                <Button
+                  onClick={() => { doSettle_v3OLO() }}
+                  variant="contained"
+                  color="primary"
+                  disabled={true}
+                  tooltip="Settle your WAGMIv3-Oolong long options"
+                  fullWidth
+                >
+                  Settle
+                </Button>
+              </div>
+            </div>
+          }
         </S.TableCell>
       </S.TableBody>
     </S.Content>

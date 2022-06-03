@@ -20,6 +20,12 @@ export function selectAccountEnabled () {
   }
 }
 
+export function selectWalletAddress () {
+  return function (state) {
+    return state.setup['walletAddress']
+  }
+}
+
 // do we have basic providers?
 export function selectBaseEnabled () {
   return function (state) {

@@ -741,6 +741,65 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 	}
 }
 
+func TestVerifyFee(t *testing.T) {
+	// Generate a key
+	key, _ := crypto.GenerateKey()
+	sender := crypto.PubkeyToAddress(key.PublicKey)
+	// Generate a new service
+	service, _, _, err := newTestSyncService(true, &sender)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	signer := types.NewEIP155Signer(big.NewInt(420))
+	// Fees must be enforced for this test
+	service.enforceFees = true
+	// Create a mock transaction and sign using the
+	// sender's key
+	tx := mockNoneZeroGasLimitGasPriceTx(100000000000000, big.NewInt(1))
+	// Make sure the gas price is not 0 on the dummy tx
+	if tx.GasPrice().Cmp(common.Big0) == 0 {
+		t.Fatal("gas price is 0")
+	}
+	// Make sure the balance is equal to gas price * gas limit
+	// Get state
+	state, err := service.bc.State()
+	if err != nil {
+		t.Fatal("Cannot get state db")
+	}
+	balance := state.GetBalance(sender)
+	if balance.Cmp(new(big.Int).Mul(tx.GasPrice(), big.NewInt(int64(tx.Gas())))) != 0 {
+		t.Fatal("balance mismatch")
+	}
+	// Sign the dummy tx with the sender key
+	signedTx, err := types.SignTx(tx, signer, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Verify the fee of the signed tx, ensure it does not error
+	if err := service.verifyFee(signedTx); err != nil {
+		t.Fatal(err)
+	}
+	badTx := mockNoneZeroGasLimitGasPriceTx(100000000000000, big.NewInt(2))
+	// Make sure the gas price is not 0 on the dummy tx
+	if tx.GasPrice().Cmp(common.Big0) == 0 {
+		t.Fatal("gas price is 0")
+	}
+	// Make sure the balance is not equal to gas price * gas limit
+	if balance.Cmp(new(big.Int).Mul(badTx.GasPrice(), big.NewInt(int64(badTx.Gas())))) > 0 {
+		t.Fatal("balance match")
+	}
+	// Sign the dummy tx with the sender key
+	signedTx, err = types.SignTx(badTx, signer, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Verify the fee of the signed tx, ensure it does not error
+	if err := service.verifyFee(signedTx); err == nil {
+		t.Fatal(err)
+	}
+}
+
 func TestZeroGasPriceTransactionsUsingBobaAsFeeToken(t *testing.T) {
 	service, _, _, err := newTestSyncService(false, nil)
 	if err != nil {
@@ -802,7 +861,7 @@ func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Create a mock transaction
-	tx := mockNoneZeroGasLimiteTx(100)
+	tx := mockNoneZeroGasLimitTx(100)
 	// Create oracle
 	service.RollupGpo = gasprice.NewRollupOracle()
 	// Get state
@@ -831,7 +890,7 @@ func TestInsufficientGasForL1SecurityFee(t *testing.T) {
 		t.Fatal("err is nil")
 	}
 	// Type 2 -- fee / l2GasPrice <= tx.Gas
-	tx = mockNoneZeroGasLimiteTx(30000)
+	tx = mockNoneZeroGasLimitTx(30000)
 	overhead = big.NewInt(1)
 	state.SetState(rcfg.L2GasPriceOracleAddress, rcfg.OverheadSlot, common.BigToHash(overhead))
 	_, _ = state.Commit(false)
@@ -1242,7 +1301,7 @@ func mockTx() *types.Transaction {
 	return tx
 }
 
-func mockNoneZeroGasLimiteTx(gasLimit uint64) *types.Transaction {
+func mockNoneZeroGasLimitTx(gasLimit uint64) *types.Transaction {
 	address := make([]byte, 20)
 	rand.Read(address)
 
@@ -1256,6 +1315,34 @@ func mockNoneZeroGasLimiteTx(gasLimit uint64) *types.Transaction {
 	l1BlockNumber := big.NewInt(0)
 
 	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, big.NewInt(0), data)
+	meta := types.NewTransactionMeta(
+		l1BlockNumber,
+		timestamp,
+		[]byte{0},
+		&l1TxOrigin,
+		types.QueueOriginSequencer,
+		nil,
+		nil,
+		nil,
+	)
+	tx.SetTransactionMeta(meta)
+	return tx
+}
+
+func mockNoneZeroGasLimitGasPriceTx(gasLimit uint64, gasPrice *big.Int) *types.Transaction {
+	address := make([]byte, 20)
+	rand.Read(address)
+
+	target := common.BytesToAddress(address)
+	timestamp := uint64(0)
+
+	rand.Read(address)
+	l1TxOrigin := common.BytesToAddress(address)
+
+	data := []byte{0x00, 0x00}
+	l1BlockNumber := big.NewInt(0)
+
+	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, gasPrice, data)
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,

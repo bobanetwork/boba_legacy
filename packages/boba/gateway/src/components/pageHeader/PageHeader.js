@@ -11,7 +11,7 @@ import { Box, Container, Drawer, IconButton, Typography, useMediaQuery, useTheme
 import NavIcon from 'components/icons/NavIcon'
 import WalletIcon from 'components/icons/WalletIcon'
 import CloseIcon from 'components/icons/CloseIcon'
-import networkService from 'services/networkService';
+import networkService from 'services/networkService'
 import { makeStyles } from '@mui/styles'
 import Copy from 'components/copy/Copy'
 import { useSelector } from 'react-redux'
@@ -28,8 +28,10 @@ const PageHeader = ({ maintenance }) => {
 
   const classes = useStyles()
   // eslint-disable-next-line no-unused-vars
-  const [ open, setOpen ] = useState();
-  const [ walletOpen, setWalletOpen ] = useState();
+  const [ open, setOpen ] = useState()
+  const [ walletOpen, setWalletOpen ] = useState()
+  const [ feeOpen, setFeeOpen ] = useState()
+
   const theme = useTheme()
   const accountEnabled = useSelector(selectAccountEnabled())
   const monsterNumber = useSelector(selectMonster())
@@ -55,6 +57,9 @@ const PageHeader = ({ maintenance }) => {
             <S.HeaderWrapper>
               <Logo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
               <S.HeaderActionButton>
+                <Box onClick={() => setFeeOpen(!feeOpen)} sx={{ cursor: 'pointer' }}>
+                  <Typography component='p' variant="h3" fontWeight={500}>Fee</Typography>
+                </Box>
                 <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
                 </Box>
@@ -72,6 +77,7 @@ const PageHeader = ({ maintenance }) => {
                       </IconButton>
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
+                  <S.HeaderDivider />
                   <MenuItems setOpen={setOpen} />
                   <ThemeSwitcher />
                 </S.StyleDrawer>
@@ -88,6 +94,20 @@ const PageHeader = ({ maintenance }) => {
                   </S.DrawerHeader>
                   <S.HeaderDivider />
                   <LayerSwitcher />
+                </S.StyleDrawer>
+              </Drawer>
+              <Drawer open={feeOpen} onClose={() => setFeeOpen(false)} classes={{ paper: classes.root }}>
+                <S.StyleDrawer theme={theme}>
+                  <S.DrawerHeader>
+                    <S.WrapperCloseIcon>
+                      <Typography component='p' variant="h1" fontWeight={500}>Select Fee</Typography>
+                      <IconButton size="small" onClick={() => setFeeOpen(false)}>
+                        <CloseIcon />
+                      </IconButton>
+                    </S.WrapperCloseIcon>
+                  </S.DrawerHeader>
+                  <S.HeaderDivider />
+                  <FeeSwitcher style={{paddingTop: '15px', marginTop: '20px'}}/>
                 </S.StyleDrawer>
               </Drawer>
             </S.HeaderWrapper>

@@ -69,6 +69,7 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
@@ -89,6 +90,7 @@ import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+import { bobaBridges } from 'util/bobaBridges'
 
 require('dotenv').config()
 
@@ -200,7 +202,7 @@ class NetworkService {
     })
     window.ethereum.on('chainChanged', () => {
       const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user 
+      // do not reload window in the special case where the user
       // changed chains AND conncted at the same time
       // otherwise the user gets confused about why they are going through
       // two window reloads
@@ -548,6 +550,7 @@ class NetworkService {
     }
 
     let signature
+
     try {
       signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
     } catch (error) {
@@ -568,7 +571,75 @@ class NetworkService {
       if(errorData.hasOwnProperty('error')) {
         errorData = errorData.error.error.body
       }
+      console.log("returning:",error)
       return errorData
+    }
+  }
+
+  /** @dev Only works on testnet, but can be freely called on production app */
+  async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
+
+    console.log("triggering getTestnetETH")
+
+    const Boba_AuthenticatedFaucet = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    )
+
+    const nonce = parseInt(
+      await Boba_AuthenticatedFaucet.getNonce(this.account),
+      10
+    )
+
+    const signer = this.provider.getSigner(this.account)
+    const hashedMsg = ethers.utils.solidityKeccak256(
+      ['address', 'uint'],
+      [this.account, nonce]
+    )
+    const messageHashBin = ethers.utils.arrayify(hashedMsg)
+    const signature = await signer.signMessage(messageHashBin)
+
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
+      console.log("response",response)
+    } catch (error) {
+      let errorMsg = error?.response?.data?.error?.error?.body
+      if (errorMsg) {
+        errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
+        errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
+      }
+      console.log(`MetaTx error for getTestnetETH: ${errorMsg}`)
+      if (errorMsg?.includes('Invalid request')) {
+        errorMsg = errorMsg.match(/Invalid request:(.+)/)
+        if (errorMsg) {
+          const errorMap = [
+            'Twitter API error - Probably limits hit.',
+            'Twitter account needs to exist at least 48 hours.',
+            'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
+            'Your Twitter account needs more than 5 followers.',
+            'You need to have tweeted more than 2 times.',
+          ]
+          try {
+            errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
+          } catch(err) {
+            console.error(err)
+            errorMsg = 'Unexpected Twitter error.'
+          }
+        } else {
+          errorMsg = 'Not expected Turing error.'
+        }
+      } else {
+        const errorMap = {
+          'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
+          'No testnet funds': 'Faucet drained: Please reach out to us.',
+          'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        }
+        errorMsg = errorMap[errorMsg];
+      }
+      return errorMsg ?? 'Limits reached or Twitter constraints not met.'
     }
   }
 
@@ -726,8 +797,11 @@ class NetworkService {
                                'LINK',   'UNI', 'BOBA', 'xBOBA',
                                'OMG',   'FRAX',  'FXS',  'DODO',
                                'UST',   'BUSD',  'BNB',   'FTM',
-                               'MATIC',  'UMA',  'DOM', 'WAGMIv0',
-                               'OLO', 'WAGMIv1', 'WAGMIv2', 'WAGMIv2-Oolong'
+                               'MATIC',  'UMA',  'DOM',   'OLO',
+                               'WAGMIv0',
+                               'WAGMIv1',
+                               'WAGMIv2', 'WAGMIv2-Oolong',
+                               'WAGMIv3', 'WAGMIv3-Oolong'
                               ]
 
       //not all tokens are on Rinkeby
@@ -776,6 +850,18 @@ class NetworkService {
           allTokens[key] = {
             'L1': 'WAGMIv2-Oolong',
             'L2': '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D'
+          }
+        }
+        else if(key === 'WAGMIv3') {
+          allTokens[key] = {
+            'L1': 'WAGMIv3',
+            'L2': '0xC6158B1989f89977bcc3150fC1F2eB2260F6cabE'
+          }
+        }
+        else if(key === 'WAGMIv3-Oolong') {
+          allTokens[key] = {
+            'L1': 'WAGMIv3-Oolong',
+            'L2': '0x70bf3c5B5d80C4Fece8Bde0fCe7ef38B688463d4'
           }
         }
         else if(key === 'OLO') {
@@ -1005,7 +1091,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners() 
+      this.bindProviderListeners()
       // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
@@ -1243,27 +1329,47 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
+    try {
+      let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
-    const contract = new ethers.Contract(
-      allAddresses.BobaMonsters,
-      TuringMonsterJson.abi,
-      this.L2Provider
-    )
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
 
-    if(monsterList.hasOwnProperty('data')) {
-      const monsters = monsterList.data.turingMonstersTransferEvents
-      for (let i = 0; i < monsters.length; i++) {
-        // console.log("adding monster:", i + 1)
-        const tokenId = monsters[i].tokenId
-        const owner = await contract.ownerOf(tokenId)
-            //console.log("owner:", owner)
-        if(owner.toLowerCase() === this.account.toLowerCase()) {
-          this.addNFT( allAddresses.BobaMonsters, tokenId )
+      if (monsterList.hasOwnProperty('data')) {
+        const monsters = monsterList.data.turingMonstersTransferEvents
+        for (let i = 0; i < monsters.length; i++) {
+          // console.log("adding monster:", i + 1)
+          const tokenId = monsters[i].tokenId
+          const owner = await contract.ownerOf(tokenId)
+          //console.log("owner:", owner)
+          if (owner.toLowerCase() === this.account.toLowerCase()) {
+            await this.addNFT(allAddresses.BobaMonsters, tokenId)
+          }
         }
+        await this.checkMonster()
       }
-      this.checkMonster()
+    } catch(err) {
+      // Catch needed don't break the fetch monsters button
+      console.error(err);
     }
+  }
+
+  async claimAuthenticatedTestnetTokens(tweetId) {
+    // Only Rinkeby
+    const contract = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    ).connect()
+
+    await contract.estimateGas.sendFunds(tweetId)
+    const claim = await contract.sendFunds(
+      tweetId,
+    )
+    await claim.wait()
   }
 
   async checkMonster() {
@@ -1523,11 +1629,19 @@ class NetworkService {
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'WAGMIv2') {
-          //there is no L2 WAGMIv1
+          //there is no L2 WAGMIv2
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'WAGMIv2-Oolong') {
           //there is no L2 WAGMIv2OLO
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv3') {
+          //there is no L2 WAGMIv3
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        }
+        else if (token.symbolL1 === 'WAGMIv3-Oolong') {
+          //there is no L2 WAGMIv3OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else if (token.symbolL1 === 'OLO') {
@@ -1551,7 +1665,9 @@ class NetworkService {
             token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
-            token.symbol !== 'WAGMIv2-Oolong'
+            token.symbol !== 'WAGMIv2-Oolong' &&
+            token.symbol !== 'WAGMIv3' &&
+            token.symbol !== 'WAGMIv3-Oolong'
           ) {
           layer1Balances.push(token)
         } else if (token.layer === 'L2') {
@@ -1740,7 +1856,6 @@ class NetworkService {
     try {
 
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x9153ACD675F04Fe16B7df72577F6553526879A6e',
         WAGMIv1Json.abi,
         this.L2Provider
@@ -1782,12 +1897,9 @@ class NetworkService {
 
     try {
 
-      // settle(uint256 longTokensToRedeem, uint256 shortTokensToRedeem)
-      // https://github.com/UMAprotocol/protocol/blob/master/packages/core/contracts/financial-templates/long-short-pair/LongShortPair.sol
       const contractLSP = new ethers.Contract(
-        //need to update this address
         '0x140Ca41a6eeb484E2a7736b2e8DA836Ffd1bFAb9',
-        WAGMIv1Json.abi, // WAGMIv2 constract same as WAGMIv1 contract so can use the same ABI
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
         this.L2Provider
       )
 
@@ -1810,6 +1922,50 @@ class NetworkService {
       return TX
     } catch (error) {
       console.log("NS: settle_v2 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v2OLO() {
+
+    console.log("NS: settle_v2OLO")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0x353d9d6082aBb5dA7D721ac0f7898484bB5C98F5',
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv2OLO = new ethers.Contract(
+        '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv2OLO.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv2OLO:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v2OLO error:", error)
       return error
     }
 
@@ -2552,11 +2708,13 @@ class NetworkService {
 
     let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
+        cur !== 'OLO' &&
         cur !== 'WAGMIv0' &&
         cur !== 'WAGMIv1' &&
-        cur !== 'OLO' &&
         cur !== 'WAGMIv2' &&
-        cur !== 'WAGMIv2-Oolong') {
+        cur !== 'WAGMIv2-Oolong' &&
+        cur !== 'WAGMIv3' &&
+        cur !== 'WAGMIv3-Oolong') {
         acc.push(allTokens[cur].L1.toLowerCase())
       }
       return acc
@@ -2639,11 +2797,14 @@ class NetworkService {
 
     const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
-        cur !== 'WAGMIv0' &&
-        cur !== 'WAGMIv1' &&
-        cur !== 'OLO' &&
-        cur !== 'WAGMIv2' &&
-        cur !== 'WAGMIv2-Oolong') {
+         cur !== 'OLO' &&
+         cur !== 'WAGMIv0' &&
+         cur !== 'WAGMIv1' &&
+         cur !== 'WAGMIv2' &&
+         cur !== 'WAGMIv2-Oolong' &&
+         cur !== 'WAGMIv3' &&
+         cur !== 'WAGMIv3-Oolong'
+        ) {
         acc.push({
           L1: allTokens[cur].L1.toLowerCase(),
           L2: allTokens[cur].L2.toLowerCase()
@@ -4194,7 +4355,7 @@ class NetworkService {
       await approveStatus.wait()
       console.log("Fixed Savings Approval", approveStatus)
     }
-    
+
     if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
       allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
@@ -4364,6 +4525,16 @@ class NetworkService {
     )
     return ethers.utils.formatEther(await L2BillingContract.exitFee())
   }
+
+
+  /***********************************************/
+  /*****            Boba Bridges             *****/
+  /***********************************************/
+
+  getTokenSpecificBridges(tokenSymbol) {
+    return bobaBridges.filter((bridge) => bridge.tokens.includes(tokenSymbol))
+  }
+
 }
 
 const networkService = new NetworkService()

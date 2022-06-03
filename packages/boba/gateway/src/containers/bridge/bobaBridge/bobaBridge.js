@@ -16,18 +16,18 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 
 import { Box, Typography, Switch, useTheme } from "@mui/material"
 
-
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import Button from 'components/button/Button.js'
+import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
-import * as G from 'containers/Global.styles'
-import * as S from './bobaBridge.styles';
+import * as S from './bobaBridge.styles'
 
 import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 
@@ -74,31 +74,28 @@ function BobaBridge() {
       <S.BobaBridgeWrapper>
         <Box sx={{ my: 1 }}>
           <Typography variant="h3">Bridge</Typography>
-          <Typography variant="body2">Select the bridge direction.</Typography>
+          <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
-        <G.DividerLine />
         <S.BobaContent>
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
-              <Box><Typography component="p" variant="body2" sx={{ opacity: 0.8 }}>From</Typography></Box>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><EthereumIcon /> Ethereum</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><EthereumIcon /> From Ethereum</S.ChainLabel>
               </S.ChainInput>
             </Box>
-            <S.IconSwitcher onClick={() => { switchDirection() }}>
+            <S.IconSwitcher onClick={()=> {switchDirection()}}>
               <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
-              <Box><Typography component="p" variant="body2" sx={{ opacity: 0.8 }}>To</Typography></Box>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><BobaIcon /> Boba</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><BobaIcon /> To Boba</S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{marginTop: '30px'}} onClick={() => { connectToETH() }} color='primary' variant='outlined'>Connect to Ethereum</Button>
+            <Button sx={{marginTop: '13px'}} onClick={() => { connectToETH() }} color='primary' variant='outlined'>Connect to Ethereum</Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -108,31 +105,28 @@ function BobaBridge() {
       <S.BobaBridgeWrapper>
         <Box sx={{ my: 1 }}>
           <Typography variant="h3">Bridge</Typography>
-          <Typography variant="body2">Select the bridge direction.</Typography>
+          <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
-        <G.DividerLine />
         <S.BobaContent>
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
-              <Box><Typography component="p" variant="body2" sx={{ opacity: 0.8 }}>From</Typography></Box>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><BobaIcon /> Boba</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><BobaIcon /> From Boba</S.ChainLabel>
               </S.ChainInput>
             </Box>
-            <S.IconSwitcher onClick={() => { switchDirection() }}>
+            <S.IconSwitcher onClick={()=>{switchDirection()}}>
               <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
-              <Box><Typography component="p" variant="body2" sx={{ opacity: 0.8 }}>To</Typography></Box>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><EthereumIcon /> Ethereum</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><EthereumIcon /> To Ethereum</S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{marginTop: '30px'}} onClick={() => { connectToBOBA() }} color='primary' variant='outlined'>Connect to Boba</Button>
+            <Button sx={{marginTop: '13px'}} onClick={() => { connectToBOBA() }} color='primary' variant='outlined'>Connect to Boba</Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -144,28 +138,16 @@ function BobaBridge() {
       <S.BobaBridgeWrapper>
         <S.BobaContentWrapper flexDirection="row" fullWidth={true} gap="10px" alignItems="center">
           <Box width="100%">
-            <Box >
-              <Typography
-                component="p"
-                variant="body2"
-                sx={{ opacity: 0.8 }}
-              >
-                From
-              </Typography>
-            </Box>
             <S.ChainInput
             >
               {layer === 'L1' ?
-                  <S.ChainLabel component="p" variant="body"><EthereumIcon /> Ethereum</S.ChainLabel>
+                  <S.ChainLabel component="p" variant="body"><EthereumIcon /> From Ethereum</S.ChainLabel>
                 :
-                  <S.ChainLabel component="p" variant="body"><BobaIcon /> Boba</S.ChainLabel>
+                  <S.ChainLabel component="p" variant="body"><BobaIcon /> From Boba</S.ChainLabel>
               }
             </S.ChainInput>
           </Box>
           <Box display="flex" flexDirection="column" alignItems="center">
-            <Box>
-              <Typography component="p" variant="body2" sx={{ opacity: 0 }}>&nbsp;</Typography>
-            </Box>
             <S.IconSwitcher onClick={() => { switchDirection() }}>
               <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
@@ -173,25 +155,21 @@ function BobaBridge() {
             </S.IconSwitcher>
           </Box>
           <Box width="100%">
-            <Box>
-              <Typography
-                component="p"
-                variant="body2"
-                sx={{ opacity: 0.8 }}
-              >
-                To
-              </Typography>
-            </Box>
             <S.ChainInput>
               {layer === 'L2' ?
-                  <S.ChainLabel component="p" variant="body"><EthereumIcon /> Ethereum</S.ChainLabel>
+                  <S.ChainLabel component="p" variant="body"><EthereumIcon /> To Ethereum</S.ChainLabel>
                 :
-                  <S.ChainLabel component="p" variant="body"><BobaIcon /> Boba</S.ChainLabel>
+                  <S.ChainLabel component="p" variant="body"><BobaIcon /> To Boba</S.ChainLabel>
               }
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>
       </S.BobaBridgeWrapper>
+
+      {tokens.length === 1 &&
+        <AvailableBridges token={tokens[0]}/>
+      }
+
       <S.BobaBridgeWrapper>
 
       {layer === 'L1' && !multibridgeMode && tokens.length < 1 &&
