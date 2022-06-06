@@ -251,6 +251,20 @@ const logBalance = async (provider, blockNumber, networkName) => {
 
           BobaStrawBalance = BOBAStrawLatestBalance
           BobaStrawCostFee = BobaStrawCostFee.add(BOBAStrawFeeIncreased)
+
+          logger.info({
+            BobaStrawBalance: Number(
+              Number(
+                ethers.utils.formatEther(BobaStrawBalance.toString())
+              ).toFixed(6)
+            ),
+            BobaStrawCostFee: Number(
+              Number(
+                ethers.utils.formatEther(BobaStrawCostFee.toString())
+              ).toFixed(6)
+            ),
+          })
+
           await writeBobaStraw(BobaStrawCostFee, BobaStrawBalance)
 
           for (let i = 0; i < amounts.length; i++) {
@@ -376,17 +390,16 @@ const loadBobaStraw = async () => {
   BobaStrawCostFee = ethers.BigNumber.from('0')
   BobaStrawBalance = ethers.BigNumber.from('0')
   if (fs.existsSync(dumpsPath)) {
-    console.warn('Loading BobaStrawHistory history...')
     const historyJsonRaw = await fs.promises.readFile(dumpsPath)
     const historyJSON = JSON.parse(historyJsonRaw.toString())
     if (historyJSON.BobaStrawCostFee) {
       BobaStrawCostFee = ethers.BigNumber.from(historyJSON.BobaStrawCostFee)
       BobaStrawBalance = ethers.BigNumber.from(historyJSON.BobaStrawBalance)
     } else {
-      console.warn('Invalid BobaStrawHistory history!')
+      logger.warn('Invalid BobaStrawHistory history!')
     }
   } else {
-    console.warn('No BobaStrawHistory Found!')
+    logger.warn('No BobaStrawHistory Found!')
   }
   return [BobaStrawCostFee, BobaStrawBalance]
 }
@@ -405,9 +418,10 @@ const writeBobaStraw = async (BobaStrawCostFee, BobaStrawBalance) => {
         BobaStrawBalance: BobaStrawBalance.toString(),
       })
     )
+    logger.info('Wrote BobaStrawHistory history')
   } catch (error) {
-    console.log(error)
-    this.logger.error('Failed to write BobaStrawHistory history!')
+    logger.error(error)
+    logger.error('Failed to write BobaStrawHistory history!')
   }
 }
 
