@@ -240,7 +240,7 @@ const logBalance = async (provider, blockNumber, networkName) => {
             })
           )
 
-          let BOBAStrawFeeIncreased = BigNumber.from('0')
+          let BOBAStrawFeeIncreased = ethers.Number.from('0')
           const BOBAStrawLatestBalance = amounts.reduce((acc, cur) => {
             return acc.add(cur)
           }, ethers.BigNumber.from('0'))
