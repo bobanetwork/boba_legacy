@@ -208,7 +208,7 @@ const logL2Pool = async (blockNumber) => {
 
 const logBalance = async (provider, blockNumber, networkName) => {
   // load boba straw
-  const [BobaStrawCostFee, BobaStrawBalance] = await loadBobaStraw()
+  let [BobaStrawCostFee, BobaStrawBalance] = await loadBobaStraw()
 
   const promiseData =
     networkName === configs.OMGXNetwork.L1
@@ -240,7 +240,7 @@ const logBalance = async (provider, blockNumber, networkName) => {
             })
           )
 
-          let BOBAStrawFeeIncreased = ethers.Number.from('0')
+          let BOBAStrawFeeIncreased = ethers.BigNumber.from('0')
           const BOBAStrawLatestBalance = amounts.reduce((acc, cur) => {
             return acc.add(cur)
           }, ethers.BigNumber.from('0'))
@@ -251,7 +251,6 @@ const logBalance = async (provider, blockNumber, networkName) => {
 
           BobaStrawBalance = BOBAStrawLatestBalance
           BobaStrawCostFee = BobaStrawCostFee.add(BOBAStrawFeeIncreased)
-
           await writeBobaStraw(BobaStrawCostFee, BobaStrawBalance)
 
           for (let i = 0; i < amounts.length; i++) {
@@ -375,6 +374,7 @@ const logData = (provider, blockNumber, networkName) => {
 const loadBobaStraw = async () => {
   const dumpsPath = path.resolve(__dirname, '../data/BobaStrawHistory.json')
   BobaStrawCostFee = ethers.BigNumber.from('0')
+  BobaStrawBalance = ethers.BigNumber.from('0')
   if (fs.existsSync(dumpsPath)) {
     console.warn('Loading BobaStrawHistory history...')
     const historyJsonRaw = await fs.promises.readFile(dumpsPath)
