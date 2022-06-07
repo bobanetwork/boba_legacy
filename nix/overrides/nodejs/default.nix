@@ -7,20 +7,40 @@
 }:
 let
   l = lib // builtins;
+
+  # To keep subpackages purified, we need to point directly to the monorepo's
+  # tsconfig files, and not to the monorepo itself.
+  tsconfig-build = l.path {
+    name = "tsconfig-build";
+    path = ./../../../tsconfig.build.json;
+  };
+  tsconfig = l.path {
+    name = "tsconfig";
+    path = ./../../../tsconfig.json;
+  };
   postPatch = ''
-    if [ -f "./tsconfig.build.json" ];
-    then
-      substituteInPlace ./tsconfig.build.json --replace \
-        '"extends": "../../tsconfig.build.json"' \
+    if grep -q ../../../ ./tsconfig.json; then
+      if [ -f "./tsconfig.build.json" ];
+      then
+        substituteInPlace ./tsconfig.build.json --replace \
+          '"extends": "../../../tsconfig.build.json"' \
+          '"extends": "./tsconfig.build-copy.json"'
+      fi
+      substituteInPlace ./tsconfig.json --replace \
+        '"extends": "../../../tsconfig.json"' \
+        '"extends": "./tsconfig.build-copy.json"'
+    else
+      if [ -f "./tsconfig.build.json" ];
+      then
+        substituteInPlace ./tsconfig.build.json --replace \
+          '"extends": "../../tsconfig.build.json"' \
+          '"extends": "./tsconfig.build-copy.json"'
+      fi
+      substituteInPlace ./tsconfig.json --replace \
+        '"extends": "../../tsconfig.json"' \
         '"extends": "./tsconfig.build-copy.json"'
     fi
-    substituteInPlace ./tsconfig.json --replace \
-      '"extends": "../../tsconfig.json"' \
-      '"extends": "./tsconfig-copy.json"'
-    cp ${./../../..}/tsconfig.build.json \
-      ./tsconfig.build-copy.json
-    cp ${./../../..}/tsconfig.json \
-      ./tsconfig-copy.json
+    cp ${tsconfig-build} ./tsconfig.build-copy.json
   '';
   correct-tsconfig-path = {
     inherit postPatch;
@@ -46,17 +66,7 @@ in
     };
   };
   "@boba/contracts" = {
-    #inherit correct-tsconfig-path;
-    inherit add-yarn;
-    correct-tsconfig-path = {
-      postPatch = ''
-        substituteInPlace ./tsconfig.json --replace \
-          '"extends": "../../../tsconfig.json"' \
-          '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../../..}/tsconfig.build.json \
-          ./tsconfig.build-copy.json
-      '';
-    };
+    inherit add-yarn correct-tsconfig-path;
     add-ts-node = {
       postInstall = ''
         mkdir -p $out/bin
@@ -124,20 +134,7 @@ in
     };
   };
   "@boba/gas-price-oracle" = {
-    correct-tsconfig-path = {
-      postPatch = ''
-        substituteInPlace ./tsconfig.json --replace \
-          '"extends": "../../../tsconfig.json"' \
-          '"extends": "./tsconfig-copy.json"'
-        substituteInPlace ./tsconfig.build.json --replace \
-          '"extends": "../../../tsconfig.build.json"' \
-          '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../../..}/tsconfig.build.json \
-          ./tsconfig.build-copy.json
-        cp ${./../../..}/tsconfig.json \
-          ./tsconfig-copy.json
-      '';
-    };
+    inherit correct-tsconfig-path;
     install-symlinks = {
       postInstall = ''
         mkdir -p $out/bin
@@ -152,20 +149,7 @@ in
     };
   };
   "@boba/message-relayer-fast" = {
-    correct-tsconfig-path = {
-      postPatch = ''
-        substituteInPlace ./tsconfig.json --replace \
-          '"extends": "../../../tsconfig.json"' \
-          '"extends": "./tsconfig-copy.json"'
-        substituteInPlace ./tsconfig.build.json --replace \
-          '"extends": "../../../tsconfig.build.json"' \
-          '"extends": "./tsconfig.build-copy.json"'
-        cp ${./../../..}/tsconfig.build.json \
-          ./tsconfig.build-copy.json
-        cp ${./../../..}/tsconfig.json \
-          ./tsconfig-copy.json
-      '';
-    };
+    inherit correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@boba/message-relayer-fast/ | grep -v "package.json\|dist\|node_modules"`
@@ -205,7 +189,6 @@ in
         ln -s $out/lib/node_modules/@eth-optimism/message-relayer $out/message-relayer
       '';
     };
-
   };
   "@eth-optimism/contracts" = {
     inherit correct-tsconfig-path add-solc;
@@ -225,15 +208,8 @@ in
       '';
     };
     add-inputs = {
-      buildInputs = old: old ++ [
-        #pkgs.nodePackages.typescript
-      ];
       nativeBuildInputs = old: old ++ [
         pkgs.yarn
-        # pkgs.python3
-        # pkgs.jq
-        # pkgs.nodePackages.npm
-        # pkgs.nodePackages.typescript
         pkgs.nodePackages.node-pre-gyp
       ];
     };
@@ -249,8 +225,6 @@ in
     };
     add-inputs = {
       nativeBuildInputs = old: old ++ [
-        pkgs.nodePackages.typescript
-        pkgs.yarn
         pkgs.nodePackages.node-pre-gyp
         pkgs.python3Full
       ];
@@ -327,8 +301,7 @@ in
         substituteInPlace ./tsconfig.json --replace \
           '"extends": "../tsconfig.json"' \
           '"extends": "./tsconfig-copy.json"'
-        cp ${./../../..}/tsconfig.build.json \
-          ./tsconfig-copy.json
+        cp ${tsconfig-build} ./tsconfig-copy.json
       '';
     };
   };
@@ -353,8 +326,7 @@ in
         substituteInPlace ./tsconfig.json --replace \
           '"extends": "../../../tsconfig.json"' \
           '"extends": "./tsconfig-copy.json"'
-        cp ${./../../..}/tsconfig.build.json \
-          ./tsconfig-copy.json
+        cp ${tsconfig} ./tsconfig-copy.json
       '';
     };
   };
@@ -367,12 +339,20 @@ in
 
   };
   "@openzeppelin/contracts" = {
-    add-regenesis-patch = {
+    add-regenesis-patch = let
+      patches = l.path {
+        name = "patches";
+        path = ../../../patches;
+      };
+      in {
       prePatch = ''
-        cp -r ${../../../.}/patches .
+        set -x
+        cp -r ${patches} patches
+        ls
         substituteInPlace ./patches/@openzeppelin+contracts+4.3.2.patch --replace \
           '/node_modules/@openzeppelin/contracts/' \
           '/'
+
       '';
       patches = [
         "./patches/@openzeppelin+contracts+4.3.2.patch"
