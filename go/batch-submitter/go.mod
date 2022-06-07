@@ -3,6 +3,7 @@ module github.com/ethereum-optimism/optimism/go/batch-submitter
 go 1.16
 
 require (
+	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aws/aws-sdk-go v1.42.6
 	github.com/aws/aws-sdk-go-v2 v1.2.0
 	github.com/btcsuite/btcd/btcec/v2 v2.1.2 // indirect
