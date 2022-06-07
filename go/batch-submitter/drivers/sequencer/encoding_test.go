@@ -65,167 +65,21 @@ type AppendSequencerBatchParamsTest struct {
 	TotalElementsToAppend uint64                   `json:"total_elements_to_append"`
 	Contexts              []sequencer.BatchContext `json:"contexts"`
 	Txs                   []string                 `json:"txs"`
+	Error                 bool                     `json:"error"`
 }
 
-var appendSequencerBatchParamTests = AppendSequencerBatchParamsTestCases{
-	Tests: []AppendSequencerBatchParamsTest{
-		{
-			Name: "empty batch",
-			HexEncoding: "0000000000000000" +
-				"000000",
-			ShouldStartAtElement:  0,
-			TotalElementsToAppend: 0,
-			Contexts:              nil,
-			Txs:                   nil,
-		},
-		{
-			Name: "single tx",
-			HexEncoding: "0000000001000001" +
-				"000000" +
-				"00000ac9808080808080808080",
-			ShouldStartAtElement:  1,
-			TotalElementsToAppend: 1,
-			Contexts:              nil,
-			Txs: []string{
-				"c9808080808080808080",
-			},
-		},
-		{
-			Name: "multiple txs",
-			HexEncoding: "0000000001000004" +
-				"000000" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080",
-			ShouldStartAtElement:  1,
-			TotalElementsToAppend: 4,
-			Contexts:              nil,
-			Txs: []string{
-				"c9808080808080808080",
-				"c9808080808080808080",
-				"c9808080808080808080",
-				"c9808080808080808080",
-			},
-		},
-		{
-			Name: "single context",
-			HexEncoding: "0000000001000000" +
-				"000001" +
-				"000102030405060708090a0b0c0d0e0f",
-			ShouldStartAtElement:  1,
-			TotalElementsToAppend: 0,
-			Contexts: []sequencer.BatchContext{
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-			},
-			Txs: nil,
-		},
-		{
-			Name: "multiple contexts",
-			HexEncoding: "0000000001000000" +
-				"000004" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f",
-			ShouldStartAtElement:  1,
-			TotalElementsToAppend: 0,
-			Contexts: []sequencer.BatchContext{
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-			},
-			Txs: nil,
-		},
-		{
-			Name: "complex",
-			HexEncoding: "0102030405060708" +
-				"000004" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"000102030405060708090a0b0c0d0e0f" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080" +
-				"00000ac9808080808080808080",
-			ShouldStartAtElement:  0x0102030405,
-			TotalElementsToAppend: 0x060708,
-			Contexts: []sequencer.BatchContext{
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-				{
-					NumSequencedTxs:       0x000102,
-					NumSubsequentQueueTxs: 0x030405,
-					Timestamp:             0x060708090a,
-					BlockNumber:           0x0b0c0d0e0f,
-				},
-			},
-			Txs: []string{
-				"c9808080808080808080",
-				"c9808080808080808080",
-				"c9808080808080808080",
-				"c9808080808080808080",
-			},
-		},
-	},
-}
+var appendSequencerBatchParamTests = AppendSequencerBatchParamsTestCases{}
 
-// TestAppendSequencerBatchParamsEncodeDecodeMatchesJSON ensures that the
-// in-memory test vectors for valid encode/decode stay in sync with the JSON
-// version.
-func TestAppendSequencerBatchParamsEncodeDecodeMatchesJSON(t *testing.T) {
-	t.Parallel()
-
-	jsonBytes, err := json.MarshalIndent(appendSequencerBatchParamTests, "", "\t")
-	require.Nil(t, err)
-
+func init() {
 	data, err := os.ReadFile("./testdata/valid_append_sequencer_batch_params.json")
-	require.Nil(t, err)
+	if err != nil {
+		panic(err)
+	}
 
-	require.Equal(t, jsonBytes, data)
+	err = json.Unmarshal(data, &appendSequencerBatchParamTests)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // TestAppendSequencerBatchParamsEncodeDecode asserts the proper encoding and
@@ -273,7 +127,11 @@ func testAppendSequencerBatchParamsEncodeDecode(
 
 	var params sequencer.AppendSequencerBatchParams
 	err = params.Read(bytes.NewReader(rawBytes))
-	require.Nil(t, err)
+	if test.Error {
+		require.ErrorIs(t, err, sequencer.ErrMalformedBatch)
+	} else {
+		require.Nil(t, err)
+	}
 
 	// Assert that the decoded params match the expected params. The
 	// transactions are compared serparetly (via hash), since the internal
@@ -289,9 +147,32 @@ func testAppendSequencerBatchParamsEncodeDecode(
 
 	// Finally, encode the decoded object and assert it matches the original
 	// hex string.
-	paramsBytes, err := params.Serialize()
+	paramsBytes, err := params.Serialize(sequencer.BatchTypeLegacy)
+
+	// Return early when testing error cases, no need to reserialize again
+	if test.Error {
+		require.ErrorIs(t, err, sequencer.ErrMalformedBatch)
+		return
+	}
+
 	require.Nil(t, err)
 	require.Equal(t, test.HexEncoding, hex.EncodeToString(paramsBytes))
+
+	// Serialize the batches in compressed form
+	compressedParamsBytes, err := params.Serialize(sequencer.BatchTypeBrotli)
+	require.Nil(t, err)
+
+	// Deserialize the compressed batch
+	var paramsCompressed sequencer.AppendSequencerBatchParams
+	err = paramsCompressed.Read(bytes.NewReader(compressedParamsBytes))
+	require.Nil(t, err)
+
+	decompressedTxs := paramsCompressed.Txs
+	paramsCompressed.Txs = nil
+
+	require.Equal(t, expParams, paramsCompressed)
+	compareTxs(t, expTxs, decompressedTxs)
+	paramsCompressed.Txs = decompressedTxs
 }
 
 // compareTxs compares a list of two transactions, testing each pair by tx hash.
@@ -302,4 +183,72 @@ func compareTxs(t *testing.T, a []*l2types.Transaction, b []*sequencer.CachedTx)
 	for i, txA := range a {
 		require.Equal(t, txA.Hash(), b[i].Tx().Hash())
 	}
+}
+
+// TestMarkerContext asserts that each batch type returns the correct marker
+// context.
+func TestMarkerContext(t *testing.T) {
+	batchTypes := []sequencer.BatchType{
+		sequencer.BatchTypeLegacy,
+		sequencer.BatchTypeBrotli,
+	}
+
+	for _, batchType := range batchTypes {
+		t.Run(batchType.String(), func(t *testing.T) {
+			markerContext := batchType.MarkerContext()
+			if batchType == sequencer.BatchTypeLegacy {
+				require.Nil(t, markerContext)
+			} else {
+				require.NotNil(t, markerContext)
+
+				// All marker contexts MUST have a zero timestamp.
+				require.Equal(t, uint64(0), markerContext.Timestamp)
+
+				// Currently all other fields besides block number are defined
+				// as zero.
+				require.Equal(t, uint64(0), markerContext.NumSequencedTxs)
+				require.Equal(t, uint64(0), markerContext.NumSubsequentQueueTxs)
+
+				// Assert that the block number for each batch type is set to
+				// the correct constant.
+				switch batchType {
+				case sequencer.BatchTypeBrotli:
+					require.Equal(t, uint64(0), markerContext.BlockNumber)
+				default:
+					t.Fatalf("unknown batch type")
+				}
+
+				// Ensure MarkerBatchType produces the expected BatchType.
+				require.Equal(t, batchType, markerContext.MarkerBatchType())
+			}
+		})
+	}
+}
+
+// TestIsMarkerContext asserts that IsMarkerContext returns true iff the
+// timestamp is zero.
+func TestIsMarkerContext(t *testing.T) {
+	batchContext := sequencer.BatchContext{
+		NumSequencedTxs:       1,
+		NumSubsequentQueueTxs: 2,
+		Timestamp:             3,
+		BlockNumber:           4,
+	}
+	require.False(t, batchContext.IsMarkerContext())
+
+	batchContext = sequencer.BatchContext{
+		NumSequencedTxs:       0,
+		NumSubsequentQueueTxs: 0,
+		Timestamp:             3,
+		BlockNumber:           0,
+	}
+	require.False(t, batchContext.IsMarkerContext())
+
+	batchContext = sequencer.BatchContext{
+		NumSequencedTxs:       1,
+		NumSubsequentQueueTxs: 2,
+		Timestamp:             0,
+		BlockNumber:           4,
+	}
+	require.True(t, batchContext.IsMarkerContext())
 }

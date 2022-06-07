@@ -196,6 +196,12 @@ var (
 		Value:  1,
 		EnvVar: prefixEnvVar("BLOCK_OFFSET"),
 	}
+	SequencerBatchType = cli.StringFlag{
+		Name:   "sequencer-batch-type",
+		Usage:  "The type of sequencer batch to be submitted. Valid arguments are legacy or zlib.",
+		Value:  "legacy",
+		EnvVar: prefixEnvVar("SEQUENCER_BATCH_TYPE"),
+	}
 	MetricsServerEnableFlag = cli.BoolFlag{
 		Name:   "metrics-server-enable",
 		Usage:  "Whether or not to run the embedded metrics server",
@@ -252,6 +258,7 @@ var optionalFlags = []cli.Flag{
 	SentryDsnFlag,
 	SentryTraceRateFlag,
 	BlockOffsetFlag,
+	SequencerBatchType,
 	MetricsServerEnableFlag,
 	MetricsHostnameFlag,
 	MetricsPortFlag,
