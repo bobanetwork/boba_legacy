@@ -545,6 +545,8 @@ Resources:
               Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
+            - Name: DEBUG
+              Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
@@ -607,6 +609,8 @@ Resources:
               Value: config.settings.production
             - Name: C_FORCE_ROOT
               Value: true
+            - Name: DEBUG
+              Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
@@ -668,6 +672,8 @@ Resources:
             - Name: DJANGO_SETTINGS_MODULE
               Value: config.settings.production
             - Name: C_FORCE_ROOT
+              Value: true
+            - Name: DEBUG
               Value: true
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
