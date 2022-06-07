@@ -281,7 +281,7 @@ rec {
       name = "integration-tests";
       tag = tag;
       config = {
-        WorkingDir = "${bobapkgs."@eth-optimism/integration-tests"}/lib/node_modules/@eth-optimism/integration-tests/";
+        WorkingDir = "${bobapkgs.integration-tests-min}/";
         Env = [
           "PATH=${pkgs.nodejs}/bin/:${pkgs.yarn}/bin/:${bobapkgs."@eth-optimism/hardhat-node"}/bin/:${script}/scripts/"
         ];

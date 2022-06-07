@@ -326,6 +326,7 @@ in
         ln -s $out/lib/node_modules/@boba/register $out/register
       '';
     };
+  };
   "@boba/monitor" = {
     install-symlinks = {
       postInstall = ''
