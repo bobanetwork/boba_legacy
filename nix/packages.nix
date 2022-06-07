@@ -423,4 +423,49 @@ rec {
       '';
     };
   };
+  integration-tests-min = pkgs.stdenv.mkDerivation {
+    pname = "integration-tests-min";
+    version = "0.0.1";
+    builder = pkgs.writeTextFile {
+      name = "builder.sh";
+      text = ''
+        . $stdenv/setup
+
+        mkdir -p $out/node_modules/{@boba,@eth-optimism,@openzeppelin,@ethersproject,@nomiclabs,@types,@typescript-eslint,@uniswap}
+        ln -s ${coreutils-min} $out/node_modules/@eth-optimism/core-utils
+        ln -s ${sdk-min} $out/node_modules/@eth-optimism/sdk
+        ln -s ${contracts-min} $out/node_modules/@eth-optimism/contracts
+        ln -s ${boba-contracts-min} $out/node_modules/@boba/contracts
+        ln -s ${turing-min} $out/node_modules/@boba/turing
+        ln -s ${bobapkgs."@boba/api"} $out/node_modules/@boba/api
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@ethersproject/{transactions,abstract-provider,providers} \
+          $out/node_modules/@ethersproject/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@nomiclabs/{hardhat-ethers,hardhat-waffle} \
+          $out/node_modules/@nomiclabs/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@openzeppelin/{contracts,test-helpers} \
+          $out/node_modules/@openzeppelin/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@types/{chai,chai-as-promised,mocha} \
+          $out/node_modules/@types/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@typescript-eslint/{eslint-plugin,parser} \
+          $out/node_modules/@typescript-eslint/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/@uniswap/{v3-core,v3-periphery,v3-sdk} \
+          $out/node_modules/@uniswap/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/{async-mutex,babel-eslint,chai,chai-as,promised,commander,dotenv,envalid,eslint,eslint-config-prettier,eslint-plugin-import,eslint-plugin-jsdoc,eslint-plugin-prefer-arrow,eslint-plugin-prettier,eslint-plugin-react,eslint-plugin-unicorn,ethereum-waffle,ethers,hardhat,hardhat-gas-reporter,rimraf,prom-client,eth-sig-util,mocha} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@eth-optimism/integration-tests"}/monitor/node_modules/{chalk,request-promise-native} \
+          $out/node_modules/
+
+        cp -r ${bobapkgs."@boba/monitor"}/monitor/{package.json,artifacts,contracts,hardhat.config.ts} \
+          $out/
+      '';
+    };
+  };
 }
