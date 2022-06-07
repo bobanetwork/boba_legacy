@@ -60,7 +60,8 @@ in
     inherit add-yarn add-solc;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@boba/turing-hybrid-compute/ | grep -v "package.json\|artifacts\|node_modules\|contracts\|cache"`
+        rm -r `ls -A $out/lib/node_modules/@boba/turing-hybrid-compute/ | \
+          grep -v "package.json\|artifacts\|node_modules\|contracts\|cache"`
         ln -s $out/lib/node_modules/@boba/turing-hybrid-compute $out/turing
       '';
     };
@@ -144,7 +145,8 @@ in
     };
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@boba/gas-price-oracle/ | grep -v "package.json\|dist\|node_modules\|exec\|scripts"`
+        rm -r `ls -A $out/lib/node_modules/@boba/gas-price-oracle/ | \
+          grep -v "package.json\|dist\|node_modules\|exec\|scripts"`
       '';
     };
   };
@@ -152,7 +154,8 @@ in
     inherit correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@boba/message-relayer-fast/ | grep -v "package.json\|dist\|node_modules"`
+        rm -r `ls -A $out/lib/node_modules/@boba/message-relayer-fast/ | \
+          grep -v "package.json\|dist\|node_modules"`
       '';
     };
   };
@@ -160,7 +163,8 @@ in
     inherit add-yarn correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/common-ts/ | grep -v "package.json\|dist\|node_modules"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/common-ts/ | \
+          grep -v "package.json\|dist\|node_modules"`
       '';
     };
     minimize = {
@@ -178,7 +182,8 @@ in
     inherit correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/message-relayer/ | grep -v "package.json\|dist\|node_modules\|exec\|hardhat.config.ts"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/message-relayer/ | \
+          grep -v "package.json\|dist\|node_modules\|exec\|hardhat.config.ts"`
       '';
     };
     install-symlinks = {
@@ -194,9 +199,11 @@ in
     inherit correct-tsconfig-path add-solc;
     cleanup-dir = {
       postFixup = ''
-        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache\|bin"`
+        rm -r `ls -A $out/lib/node_modules/@eth-optimism/contracts/ | \
+          grep -v "deployments\|dist\|artifacts\|package.json\|node_modules\|contracts\|hardhat.config.ts\|tsconfig\|cache\|bin"`
       '';
     };
+    # ts-node needed for runtime
     add-ts-node = {
       postInstall = ''
         mkdir -p $out/bin
@@ -278,7 +285,6 @@ in
   #     '';
   #   };
   # };
-
   "@eth-optimism/hardhat-node" = {
     cleanup-dir = {
       postFixup = ''
@@ -309,7 +315,7 @@ in
     inherit correct-tsconfig-path;
   };
   "@boba/register" = {
-    inherit add-yarn;
+    inherit add-yarn correct-tsconfig-path;
     cleanup-dir = {
       postFixup = ''
         rm -r `ls -A $out/lib/node_modules/@boba/register/ | grep -v "package.json\|node_modules\|addresses\|bin"`
@@ -320,16 +326,6 @@ in
         ln -s $out/lib/node_modules/@boba/register $out/register
       '';
     };
-
-    correct-tsconfig-path = {
-      postPatch = ''
-        substituteInPlace ./tsconfig.json --replace \
-          '"extends": "../../../tsconfig.json"' \
-          '"extends": "./tsconfig-copy.json"'
-        cp ${tsconfig} ./tsconfig-copy.json
-      '';
-    };
-  };
   "@boba/monitor" = {
     install-symlinks = {
       postInstall = ''
@@ -359,6 +355,8 @@ in
       ];
     };
   };
+
+  # Various pruning of dependencies to make scope smaller
   errno = {
     remove-nodejs = {
       postFixup = ''
