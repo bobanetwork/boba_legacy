@@ -48,11 +48,11 @@
     "crane": {
       "flake": false,
       "locked": {
-        "lastModified": 1654129972,
-        "narHash": "sha256-uMbzg3IyJC9VCGQMAWSRxCOzQxHZpEJrus/1X8AYmeY=",
+        "lastModified": 1654444508,
+        "narHash": "sha256-4OBvQ4V7jyt7afs6iKUvRzJ1u/9eYnKzVQbeQdiamuY=",
         "owner": "ipetkov",
         "repo": "crane",
-        "rev": "d64285699a4fae54c7a0d3bf412fc557d1532621",
+        "rev": "db5482bf225acc3160899124a1df5a617cfa27b5",
         "type": "github"
       },
       "original": {
@@ -86,6 +86,22 @@
           "nixpkgs"
         ]
       },
+      "locked": {
+        "lastModified": 1653917170,
+        "narHash": "sha256-FyxOnEE/V4PNEcMU62ikY4FfYPo349MOhMM97HS0XEo=",
+        "owner": "numtide",
+        "repo": "devshell",
+        "rev": "fc7a3e3adde9bbcab68af6d1e3c6eb738e296a92",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "devshell",
+        "type": "github"
+      }
+    },
+    "devshell_2": {
+      "flake": false,
       "locked": {
         "lastModified": 1653917170,
         "narHash": "sha256-FyxOnEE/V4PNEcMU62ikY4FfYPo349MOhMM97HS0XEo=",
@@ -141,6 +157,7 @@
       "inputs": {
         "alejandra": "alejandra",
         "crane": "crane",
+        "devshell": "devshell_2",
         "flake-utils-pre-commit": "flake-utils-pre-commit",
         "gomod2nix": "gomod2nix",
         "mach-nix": "mach-nix",
@@ -152,14 +169,17 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1654529411,
-        "narHash": "sha256-MrvprXf6sxZsUCv41h8rXzwXmTuch+51X6BDjwhQCPc=",
-        "path": "/home/tgunnoe/src/boba/dream2nix",
-        "type": "path"
+        "lastModified": 1654612750,
+        "narHash": "sha256-SrTnpJ9homBycD+vqZao9gXpC1LoZ1AzSMJyomYi/TE=",
+        "owner": "nix-community",
+        "repo": "dream2nix",
+        "rev": "49ec670653e12ffed67c0c87f3c86a37030e0f2e",
+        "type": "github"
       },
       "original": {
-        "path": "/home/tgunnoe/src/boba/dream2nix",
-        "type": "path"
+        "owner": "nix-community",
+        "repo": "dream2nix",
+        "type": "github"
       }
     },
     "dream2nix_2": {
@@ -414,11 +434,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1654019511,
-        "narHash": "sha256-s3fcwUxa2rV2ZmSbdOtisNmXqeqnF9IFrvhPQL5GCBU=",
+        "lastModified": 1654230545,
+        "narHash": "sha256-8Vlwf0x8ow6pPOK2a04bT+pxIeRnM1+O0Xv9/CuDzRs=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "692517bf851f2d8d999f0ad50f53fa1d2dd5c8f9",
+        "rev": "236cc2971ac72acd90f0ae3a797f9f83098b17ec",
         "type": "github"
       },
       "original": {

@@ -2,8 +2,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     dream2nix = {
-      #url = "github:nix-community/dream2nix";
-      url = "path:/home/tgunnoe/src/boba/dream2nix";
+      url = "github:nix-community/dream2nix";
+      #url = "path:/home/tgunnoe/src/boba/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
@@ -106,11 +106,7 @@
           config.projectRoot = ./. ;
           #config.packagesDir = ./nix/packages;
           config.overridesDirs = [ ./nix/overrides ];
-          source = builtins.path {
-            name = "boba";
-            path = ./.;
-            filter = path: _: baseNameOf path != "flake.nix" && baseNameOf path != "nix";
-          };
+          source =  ./.;
           settings = [
             {
               #subsystemInfo.noDev = true;
