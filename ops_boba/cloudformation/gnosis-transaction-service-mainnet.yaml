@@ -136,11 +136,7 @@ Resources:
           Host:
             SourcePath: "/etc/passwd"
         - Name: nginx
-          Host:
-            SourcePath: "/mnt/nginx"
         - Name: nginx2
-          Host:
-            SourcePath: "/mnt/nginx2"
       ContainerDefinitions:
         - Image: datadog/agent:latest
           Name: datadog
