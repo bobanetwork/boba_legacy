@@ -69,10 +69,10 @@ func (c BatchContext) MarkerBatchType() BatchType {
 //  - timestamp:                5 bytes
 //  - block_number:             5 bytes
 func (c *BatchContext) Write(w *bytes.Buffer) {
-	writeUint64(w, c.NumSequencedTxs, 3)
-	writeUint64(w, c.NumSubsequentQueueTxs, 3)
-	writeUint64(w, c.Timestamp, 5)
-	writeUint64(w, c.BlockNumber, 5)
+	_ = writeUint64(w, c.NumSequencedTxs, 3)
+	_ = writeUint64(w, c.NumSubsequentQueueTxs, 3)
+	_ = writeUint64(w, c.Timestamp, 5)
+	_ = writeUint64(w, c.BlockNumber, 5)
 }
 
 // Read decodes the BatchContext from the passed reader. If fewer than 16-bytes

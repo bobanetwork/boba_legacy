@@ -1,4 +1,4 @@
-import zlib from 'zlib'
+import brotli from 'brotli'
 
 import { parse, serialize } from '@ethersproject/transactions'
 import { ethers } from 'ethers'
@@ -15,7 +15,7 @@ export interface BatchContext {
 
 export enum BatchType {
   LEGACY = -1,
-  ZLIB = 0,
+  BROTLI = 0,
 }
 
 export interface AppendSequencerBatchParams {
@@ -321,7 +321,7 @@ export class SequencerBatch extends Struct {
     bw.writeU24BE(this.totalElementsToAppend)
 
     const contexts = this.contexts.slice()
-    if (this.type === BatchType.ZLIB) {
+    if (this.type === BatchType.BROTLI) {
       contexts.unshift(
         new Context({
           blockNumber: 0,
@@ -337,13 +337,16 @@ export class SequencerBatch extends Struct {
       context.write(bw)
     }
 
-    if (this.type === BatchType.ZLIB) {
+    if (this.type === BatchType.BROTLI) {
       const writer = new BufferWriter()
       for (const tx of this.transactions) {
         tx.write(writer)
       }
-      const compressed = zlib.deflateSync(writer.render())
-      bw.writeBytes(compressed)
+      const compressed = brotli.compress(writer.render(), {
+        mode: 1,
+        quality: 11,
+      })
+      bw.writeBytes(Buffer.from(compressed))
     } else {
       // Legacy
       for (const tx of this.transactions) {
@@ -374,10 +377,10 @@ export class SequencerBatch extends Struct {
     if (this.contexts.length > 0 && this.contexts[0].timestamp === 0) {
       switch (this.contexts[0].blockNumber) {
         case 0: {
-          this.type = BatchType.ZLIB
+          this.type = BatchType.BROTLI
           const bytes = br.readBytes(br.left())
-          const inflated = zlib.inflateSync(bytes)
-          br = new BufferReader(inflated)
+          const inflated = brotli.decompress(Uint8Array.from(bytes))
+          br = new BufferReader(Buffer.from(inflated))
 
           // remove the dummy context
           this.contexts = this.contexts.slice(1)
@@ -397,7 +400,7 @@ export class SequencerBatch extends Struct {
   }
 
   getSize(): number {
-    if (this.type === BatchType.ZLIB) {
+    if (this.type === BatchType.BROTLI) {
       return -1
     }
 
