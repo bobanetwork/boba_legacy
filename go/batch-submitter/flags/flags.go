@@ -198,7 +198,7 @@ var (
 	}
 	SequencerBatchType = cli.StringFlag{
 		Name:   "sequencer-batch-type",
-		Usage:  "The type of sequencer batch to be submitted. Valid arguments are legacy or zlib.",
+		Usage:  "The type of sequencer batch to be submitted. Valid arguments are legacy or brotli.",
 		Value:  "legacy",
 		EnvVar: prefixEnvVar("SEQUENCER_BATCH_TYPE"),
 	}

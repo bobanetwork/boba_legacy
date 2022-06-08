@@ -126,7 +126,7 @@ const env = cleanEnv(process.env, {
     default: false,
   }),
   BATCH_SUBMITTER_SEQUENCER_BATCH_TYPE: str({
-    default: 'zlib',
+    default: 'brotli',
   }),
 })
 
