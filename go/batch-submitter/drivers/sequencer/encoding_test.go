@@ -126,6 +126,7 @@ func testAppendSequencerBatchParamsEncodeDecode(
 	require.Nil(t, err)
 
 	var params sequencer.AppendSequencerBatchParams
+
 	err = params.Read(bytes.NewReader(rawBytes))
 	if test.Error {
 		require.ErrorIs(t, err, sequencer.ErrMalformedBatch)
@@ -145,21 +146,12 @@ func testAppendSequencerBatchParamsEncodeDecode(
 	compareTxs(t, expTxs, decodedTxs)
 	params.Txs = decodedTxs
 
-	// Finally, encode the decoded object and assert it matches the original
-	// hex string.
-	paramsBytes, err := params.Serialize(sequencer.BatchTypeLegacy)
-
-	// Return early when testing error cases, no need to reserialize again
+	// Serialize the batches in compressed form
+	compressedParamsBytes, err := params.Serialize()
 	if test.Error {
 		require.ErrorIs(t, err, sequencer.ErrMalformedBatch)
 		return
 	}
-
-	require.Nil(t, err)
-	require.Equal(t, test.HexEncoding, hex.EncodeToString(paramsBytes))
-
-	// Serialize the batches in compressed form
-	compressedParamsBytes, err := params.Serialize(sequencer.BatchTypeBrotli)
 	require.Nil(t, err)
 
 	// Deserialize the compressed batch
@@ -183,72 +175,4 @@ func compareTxs(t *testing.T, a []*l2types.Transaction, b []*sequencer.CachedTx)
 	for i, txA := range a {
 		require.Equal(t, txA.Hash(), b[i].Tx().Hash())
 	}
-}
-
-// TestMarkerContext asserts that each batch type returns the correct marker
-// context.
-func TestMarkerContext(t *testing.T) {
-	batchTypes := []sequencer.BatchType{
-		sequencer.BatchTypeLegacy,
-		sequencer.BatchTypeBrotli,
-	}
-
-	for _, batchType := range batchTypes {
-		t.Run(batchType.String(), func(t *testing.T) {
-			markerContext := batchType.MarkerContext()
-			if batchType == sequencer.BatchTypeLegacy {
-				require.Nil(t, markerContext)
-			} else {
-				require.NotNil(t, markerContext)
-
-				// All marker contexts MUST have a zero timestamp.
-				require.Equal(t, uint64(0), markerContext.Timestamp)
-
-				// Currently all other fields besides block number are defined
-				// as zero.
-				require.Equal(t, uint64(0), markerContext.NumSequencedTxs)
-				require.Equal(t, uint64(0), markerContext.NumSubsequentQueueTxs)
-
-				// Assert that the block number for each batch type is set to
-				// the correct constant.
-				switch batchType {
-				case sequencer.BatchTypeBrotli:
-					require.Equal(t, uint64(0), markerContext.BlockNumber)
-				default:
-					t.Fatalf("unknown batch type")
-				}
-
-				// Ensure MarkerBatchType produces the expected BatchType.
-				require.Equal(t, batchType, markerContext.MarkerBatchType())
-			}
-		})
-	}
-}
-
-// TestIsMarkerContext asserts that IsMarkerContext returns true iff the
-// timestamp is zero.
-func TestIsMarkerContext(t *testing.T) {
-	batchContext := sequencer.BatchContext{
-		NumSequencedTxs:       1,
-		NumSubsequentQueueTxs: 2,
-		Timestamp:             3,
-		BlockNumber:           4,
-	}
-	require.False(t, batchContext.IsMarkerContext())
-
-	batchContext = sequencer.BatchContext{
-		NumSequencedTxs:       0,
-		NumSubsequentQueueTxs: 0,
-		Timestamp:             3,
-		BlockNumber:           0,
-	}
-	require.False(t, batchContext.IsMarkerContext())
-
-	batchContext = sequencer.BatchContext{
-		NumSequencedTxs:       1,
-		NumSubsequentQueueTxs: 2,
-		Timestamp:             0,
-		BlockNumber:           4,
-	}
-	require.True(t, batchContext.IsMarkerContext())
 }

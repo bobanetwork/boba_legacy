@@ -30,11 +30,6 @@ var (
 	ErrKmsEndpointNotSet = errors.New("kms endpoint not set")
 
 	ErrKmsRegionNotSet = errors.New("kms region not Set")
-
-	// ErrInvalidBatchType  signals that an unsupported batch type is being
-	// configured. The default is "legacy" and the options are "legacy" or
-	// "brotli"
-	ErrInvalidBatchType = errors.New("invalid batch type")
 )
 
 type Config struct {
@@ -149,9 +144,6 @@ type Config struct {
 	// blocks.
 	BlockOffset uint64
 
-	// SequencerBatchType represents the type of batch the sequencer submits.
-	SequencerBatchType string
-
 	// MetricsServerEnable if true, will create a metrics client and log to
 	// Prometheus.
 	MetricsServerEnable bool
@@ -200,7 +192,6 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		ProposerKeyId:       ctx.GlobalString(flags.ProposerKeyIdFlag.Name),
 		KmsEndpoint:         ctx.GlobalString(flags.KmsEndpointFlag.Name),
 		KmsRegion:           ctx.GlobalString(flags.KmsRegionFlag.Name),
-		SequencerBatchType:  ctx.GlobalString(flags.SequencerBatchType.Name),
 		MetricsServerEnable: ctx.GlobalBool(flags.MetricsServerEnableFlag.Name),
 		MetricsHostname:     ctx.GlobalString(flags.MetricsHostnameFlag.Name),
 		MetricsPort:         ctx.GlobalUint64(flags.MetricsPortFlag.Name),
@@ -249,12 +240,6 @@ func ValidateConfig(cfg *Config) error {
 	// Ensure the Sentry Data Source Name is set when using Sentry.
 	if cfg.SentryEnable && cfg.SentryDsn == "" {
 		return ErrSentryDSNNotSet
-	}
-
-	usingTypedBatches := cfg.SequencerBatchType != ""
-	validBatchType := cfg.SequencerBatchType == "legacy" || cfg.SequencerBatchType == "brotli"
-	if usingTypedBatches && !validBatchType {
-		return ErrInvalidBatchType
 	}
 
 	return nil

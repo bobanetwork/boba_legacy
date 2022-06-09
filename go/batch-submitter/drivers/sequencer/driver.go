@@ -38,7 +38,6 @@ type Config struct {
 	KeyId       string
 	KeyAddress  common.Address
 	KMS         kms.KMS
-	BatchType   BatchType
 }
 
 type Driver struct {
@@ -204,7 +203,7 @@ func (d *Driver) CraftBatchTx(
 			return nil, totalTxSize, err
 		}
 
-		batchArguments, err := batchParams.Serialize(d.cfg.BatchType)
+		batchArguments, err := batchParams.Serialize()
 		if err != nil {
 			return nil, totalTxSize, err
 		}
