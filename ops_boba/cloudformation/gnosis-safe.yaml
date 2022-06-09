@@ -1,5 +1,5 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: "Enya Gnosis-Safe Application Deployment"
+AWSTemplateFormatVersion: 2010-09-09
+Description: Enya Gnosis-Safe Application Deployment
 
 Parameters:
   EnvironmentName:
@@ -23,9 +23,10 @@ Parameters:
     Type: String
     Default: rinkeby-infrastructure-core
 
-Conditions:
-  IsProduction:
-    !Equals [!Ref EnvironmentName, "production"]
+  SecretName:
+    Description: Name of the AWS Secrets Manager Secret
+    Type: String
+    Default: /rinkeby/gnosis-safe
 
 Resources:
   TaskRole:
@@ -38,57 +39,29 @@ Resources:
             Principal:
               Service: !Sub ecs-tasks.${AWS::URLSuffix}
             Action: sts:AssumeRole
-      Policies:
-        - PolicyName: AllowAccessToELB
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "ec2:AuthorizeSecurityGroupIngress"
-                  - "ec2:Describe*"
-                  - "ec2:*"
-                  - "elasticloadbalancing:*"
-                  - "elasticloadbalancing:Describe*"
-                  - "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
-                  - "elasticloadbalancing:DeregisterTargets"
-                  - "elasticloadbalancing:DescribeTargetGroups"
-                  - "elasticloadbalancing:DescribeTargetHealth"
-                  - "elasticloadbalancing:RegisterTargets"
-                  - "elasticloadbalancing:DeregisterInstancesFromLoadBalancer"
-                  - "s3:*"
-                Resource: "*"
-        - PolicyName: AllowAccessToS3
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "s3:GetObject"
-                  - "s3:GetBucketLocation"
-                Resource: !Sub
-                    - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-                    - S3BucketV2:
-                        Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
 
-        - PolicyName: AllowAccessToSecrets
+  TaskExecRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ecs-tasks.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: SecretsManager
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action:
-                  - "cloudwatch:Describe*"
-                  - "cloudwatch:Get*"
-                  - "cloudwatch:List*"
-                  - "logs:TestMetricFilter"
-                  - "logs:PutSubscriptionFilter"
-                  - "logs:DeleteSubscriptionFilter"
-                  - "logs:DescribeSubscriptionFilters"
-                  - "support:*"
-                  - "tag:GetResources"
-                  - "tag:GetTagKeys"
-                  - "tag:GetTagValues"
-                Resource: "*"
+                Action: secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}-??????
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials-??????
 
   GnosisLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -96,13 +69,14 @@ Resources:
       Port: 80
       Protocol: TCP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue:
+          !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisLBTargetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -110,13 +84,14 @@ Resources:
       Port: 8000
       Protocol: TCP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue:
+          !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisLBTargetGroup3:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -124,13 +99,13 @@ Resources:
       Port: 3666
       Protocol: TCP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       HealthCheckProtocol: TCP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisLBHTTPTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -138,15 +113,15 @@ Resources:
       Port: 80
       Protocol: HTTP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       Matcher:
         HttpCode: 200-499
       HealthCheckProtocol: HTTP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisLBHTTPTargetGroup2:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -154,15 +129,15 @@ Resources:
       Port: 8000
       Protocol: HTTP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       Matcher:
         HttpCode: 200-499
       HealthCheckProtocol: HTTP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisLBHTTPTargetGroup3:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -170,21 +145,21 @@ Resources:
       Port: 3666
       Protocol: HTTP
       VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:VpcId
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
       Matcher:
         HttpCode: 200-499
       HealthCheckProtocol: HTTP
-      HealthCheckPort: "traffic-port"
-      TargetType: "ip"
+      HealthCheckPort: traffic-port
+      TargetType: ip
 
   GnosisListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:LoadBalancerGnosis:ARN
       Port: 443
       Protocol: TLS
       Certificates:
@@ -197,7 +172,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosis:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:ApplicationLoadBalancerGnosis:ARN
       Port: 443
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
@@ -211,7 +186,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisTransaction:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:LoadBalancerGnosisTransaction:ARN
       Port: 443
       Protocol: TLS
       Certificates:
@@ -224,7 +199,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosisTransaction:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:ApplicationLoadBalancerGnosisTransaction:ARN
       Port: 443
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
@@ -238,7 +213,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosisGateway:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:LoadBalancerGnosisGateway:ARN
       Port: 443
       Protocol: TLS
       Certificates:
@@ -251,7 +226,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:ApplicationLoadBalancerGnosisGateway:ARN"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:ApplicationLoadBalancerGnosisGateway:ARN
       Port: 443
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-FS-1-2-Res-2020-10
@@ -264,67 +239,25 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
       Volumes:
-        - Name: docker_sock
-          Host:
-            SourcePath: "/var/run/docker.sock"
-        - Name: docker_logs
-          Host:
-            SourcePath: "/var/lib/docker/containers"
-        - Name: docker_run
-          Host:
-            SourcePath: "/opt/datadog-agent/run"
-        - Name: proc
-          Host:
-            SourcePath: "/proc/"
-        - Name: cgroup
-          Host:
-            SourcePath: "/sys/fs/cgroup/"
-        - Name: password
-          Host:
-            SourcePath: "/etc/passwd"
         - Name: nginx
         - Name: nginx2
       ContainerDefinitions:
-        - Image: datadog/agent:latest
-          Name: datadog
-          Environment:
-            - Name: DD_SITE
-              Value: "datadoghq.com"
-            - Name: DD_PROCESS_AGENT_ENABLED
-              Value: "true"
-            - Name: DD_LOGS_ENABLED
-              Value: "true"
-            - Name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
-              Value: "true"
-            - Name: DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE
-              Value: "true"
-            - Name: DD_CONTAINER_EXCLUDE
-              Value: "name:datadog-agent"
-            - Name: DD_CONTAINER_EXCLUDE
-              Value: "name:amazon-ecs-agent"
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/datadog.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
-          MountPoints:
-            - ContainerPath: "/var/run/docker.sock"
-              SourceVolume: docker_sock
-            - ContainerPath: "/host/sys/fs/cgroup"
-              SourceVolume: cgroup
-            - ContainerPath: "/host/proc"
-              SourceVolume: proc
-            - ContainerPath: "/opt/datadog-agent/run"
-              SourceVolume: docker_run
-            - ContainerPath: "/var/lib/docker/containers"
-              SourceVolume: docker_logs
+        - Image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+          Name: log-router
+          FirelensConfiguration:
+            Type: fluentbit
+            Options:
+              enable-ecs-log-metadata: true
           Essential: true
-          Memory: "256"
-          Cpu: "10"
-        - Image: !Sub "${DockerPrefix}/nginx-safe-transaction-service:latest"
+        - Image: !Sub ${DockerPrefix}/nginx-safe-transaction-service:latest
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: nginx-safe-transaction-service
+          Memory: 1024
           HealthCheck:
             Command:
               - CMD-SHELL
@@ -347,19 +280,28 @@ Resources:
             - ContainerPort: 8000
               HostPort: 8000
           MountPoints:
-            - ContainerPath: "/nginx"
+            - ContainerPath: /nginx
               SourceVolume: nginx
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["nginx-safe-transaction-service"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "nginx-safe-transaction-service", "service": "nginx-safe-transaction-service"}]'
-          Essential: false
-          Memory: "1024"
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: nginx-safe-transaction-service
+              dd_source: nginx-safe-transaction-service
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
           DependsOn:
             - Condition: HEALTHY
               ContainerName: safe-transaction-service
-        - Image: !Sub "${DockerPrefix}/nginx-safe-config-service:latest"
+        - Image: !Sub ${DockerPrefix}/nginx-safe-config-service:latest
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: nginx-safe-config-service
+          Memory: 1024
           HealthCheck:
             Command:
               - CMD-SHELL
@@ -382,14 +324,8 @@ Resources:
             - ContainerPort: 80
               HostPort: 80
           MountPoints:
-            - ContainerPath: "/nginx"
+            - ContainerPath: /nginx
               SourceVolume: nginx2
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
           Environment:
             - Name: GUNICORN_BIND_PORT
               Value: 80
@@ -405,22 +341,31 @@ Resources:
               Value: false
             - Name: CGW_URL
               Value: !Sub
-                - "https://safe-client.${EndpointAddress}/"
+                - https://safe-client.${EndpointAddress}/
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
           DependsOn:
             - Condition: HEALTHY
               ContainerName: safe-config-service
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["nginx-safe-config-service"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "nginx-safe-config-service", "service": "nginx-safe-config-service"}]'
-          Essential: false
-          Memory: "1024"
-        - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: nginx-safe-config-service
+              dd_source: nginx-safe-config-service
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+        - Image: !Sub ${DockerPrefix}/safe-config-service:${ImageTag}
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: safe-config-service
+          Memory: 2000
           HealthCheck:
             Command:
               - CMD-SHELL
@@ -440,21 +385,44 @@ Resources:
               SoftLimit: 0
               HardLimit: 0
           MountPoints:
-            - ContainerPath: "/nginx"
+            - ContainerPath: /nginx
               SourceVolume: nginx2
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
+          Secrets:
+            - Name: POSTGRES_USER
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_USER::"
+            - Name: POSTGRES_NAME
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_NAME_CONFIG_SERVICE::"
+            - Name: POSTGRES_HOST
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_HOST::"
+            - Name: POSTGRES_PORT
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PORT::"
+            - Name: SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:SECRET_KEY::"
+            - Name: POSTGRES_PASSWORD
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PASSWORD::"
+            - Name: DJANGO_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DJANGO_SECRET_KEY::"
+            - Name: DATABASE_URL
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATABASE_URL::"
+            - Name: ROCKET_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
+            - Name: WEBHOOK_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
+            - Name: EXCHANGE_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
+            - Name: REACT_APP_DEFAULT_CHAIN_ID
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:REACT_APP_DEFAULT_CHAIN_ID::"
+            - Name: TRANSACTION_SERVICE_AUTH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:TRANSACTION_SERVICE_AUTH_TOKEN::"
           Environment:
             # in django 4 you need to include scheme
             - Name: CSRF_TRUSTED_ORIGINS
               Value: !Sub
-                - "https://safe-config.${EndpointAddress},http://safe-config.${EndpointAddress}, http://localhost"
+                - https://safe-config.${EndpointAddress},http://safe-config.${EndpointAddress}, http://localhost
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: PYTHONDONTWRITEBYTECODE
               Value: true
             - Name: DJANGO_OTP_ADMIN
@@ -467,7 +435,7 @@ Resources:
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: GUNICORN_BIND_PORT
               Value: 8080
             - Name: DOCKER_NGINX_VOLUME_ROOT
@@ -482,21 +450,31 @@ Resources:
               Value: false
             - Name: CGW_URL
               Value: !Sub
-                - "https://safe-client.${EndpointAddress}/"
+                - https://safe-client.${EndpointAddress}/
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: DEFAULT_FILE_STORAGE
               Value: django.core.files.storage.FileSystemStorage
-          PseudoTerminal: true
-          Interactive: true
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["safe-config-service"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "safe-config-service", "service": "safe-config-service"}]'
-          Essential: false
-          Memory: "2000"
-        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: safe-config-service
+              dd_source: safe-config-service
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+        - Image: !Sub ${DockerPrefix}/safe-transaction-service:${ImageTag}
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: safe-transaction-service
+          DependsOn:
+            - Condition: START
+              ContainerName: worker
+          Memory: 1024
           HealthCheck:
             Command:
               - CMD-SHELL
@@ -516,21 +494,44 @@ Resources:
               SoftLimit: 0
               HardLimit: 0
           MountPoints:
-            - ContainerPath: "/nginx"
+            - ContainerPath: /nginx
               SourceVolume: nginx
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
+          Secrets:
+            - Name: POSTGRES_USER
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_USER::"
+            - Name: POSTGRES_NAME
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_NAME_TRANSACTION_SERVICE::"
+            - Name: POSTGRES_HOST
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_HOST::"
+            - Name: POSTGRES_PORT
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PORT::"
+            - Name: SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:SECRET_KEY::"
+            - Name: POSTGRES_PASSWORD
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PASSWORD::"
+            - Name: DJANGO_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DJANGO_SECRET_KEY::"
+            - Name: DATABASE_URL
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATABASE_URL_TRANSACTION_SERVICE::"
+            - Name: ROCKET_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
+            - Name: WEBHOOK_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
+            - Name: EXCHANGE_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
+            - Name: REACT_APP_DEFAULT_CHAIN_ID
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:REACT_APP_DEFAULT_CHAIN_ID::"
+            - Name: TRANSACTION_SERVICE_AUTH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:TRANSACTION_SERVICE_AUTH_TOKEN::"
           Environment:
           # in django up to 4 you need to not include scheme
             - Name: CSRF_TRUSTED_ORIGINS
               Value: !Sub
-                - "safe-transaction.${EndpointAddress}"
+                - safe-transaction.${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: DOCKER_SHARED_DIR
               Value: /nginx
             - Name: ETH_L2_NETWORK
@@ -542,44 +543,55 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DEBUG
-              Value: true
+              Value: false
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_TRACING_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: REDIS_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/0"
+                - redis://${EndpointAddress}:6379/0
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: CELERY_BROKER_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/1"
+                - redis://${EndpointAddress}:6379/1
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: ETH_REORG_BLOCKS
               Value: 10
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
           Command:
-            - "./docker/web/run_web.sh"
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["safe-transaction-service"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "safe-transaction-service", "service": "safe-transaction-service"}]'
-          Essential: false
-          Memory: "1024"
-        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+            - ./docker/web/run_web.sh
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: safe-transaction-service
+              dd_source: safe-transaction-service
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+        - Image: !Sub ${DockerPrefix}/safe-transaction-service:${ImageTag}
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: worker
+          Memory: 1024
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -590,12 +602,35 @@ Resources:
             - Name: core
               SoftLimit: 0
               HardLimit: 0
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
+          Secrets:
+            - Name: POSTGRES_USER
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_USER::"
+            - Name: POSTGRES_NAME
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_NAME_TRANSACTION_SERVICE::"
+            - Name: POSTGRES_HOST
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_HOST::"
+            - Name: POSTGRES_PORT
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PORT::"
+            - Name: SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:SECRET_KEY::"
+            - Name: POSTGRES_PASSWORD
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PASSWORD::"
+            - Name: DJANGO_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DJANGO_SECRET_KEY::"
+            - Name: DATABASE_URL
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATABASE_URL_TRANSACTION_SERVICE::"
+            - Name: ROCKET_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
+            - Name: WEBHOOK_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
+            - Name: EXCHANGE_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
+            - Name: REACT_APP_DEFAULT_CHAIN_ID
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:REACT_APP_DEFAULT_CHAIN_ID::"
+            - Name: TRANSACTION_SERVICE_AUTH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:TRANSACTION_SERVICE_AUTH_TOKEN::"
           Environment:
             - Name: ETH_L2_NETWORK
               Value: 1
@@ -606,44 +641,58 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DEBUG
-              Value: true
+              Value: false
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_TRACING_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: REDIS_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/0"
+                - redis://${EndpointAddress}:6379/0
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: CELERY_BROKER_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/1"
+                - redis://${EndpointAddress}:6379/1
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: ETH_REORG_BLOCKS
               Value: 10
           Command:
-            - "./docker/web/celery/worker/run.sh"
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["worker"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
-          Essential: false
-          Memory: "1024"
-        - Image: !Sub "${DockerPrefix}/safe-transaction-service:${ImageTag}"
+            - ./docker/web/celery/worker/run.sh
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: worker
+              dd_source: worker
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+        - Image: !Sub ${DockerPrefix}/safe-transaction-service:${ImageTag}
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: scheduler
+          DependsOn:
+            - Condition: HEALTHY
+              ContainerName: safe-transaction-service
+          Memory: 1024
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -654,12 +703,35 @@ Resources:
             - Name: core
               SoftLimit: 0
               HardLimit: 0
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
+          Secrets:
+            - Name: POSTGRES_USER
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_USER::"
+            - Name: POSTGRES_NAME
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_NAME_TRANSACTION_SERVICE::"
+            - Name: POSTGRES_HOST
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_HOST::"
+            - Name: POSTGRES_PORT
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PORT::"
+            - Name: SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:SECRET_KEY::"
+            - Name: POSTGRES_PASSWORD
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:POSTGRES_PASSWORD::"
+            - Name: DJANGO_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DJANGO_SECRET_KEY::"
+            - Name: DATABASE_URL
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATABASE_URL_TRANSACTION_SERVICE::"
+            - Name: ROCKET_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
+            - Name: WEBHOOK_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
+            - Name: EXCHANGE_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
+            - Name: REACT_APP_DEFAULT_CHAIN_ID
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:REACT_APP_DEFAULT_CHAIN_ID::"
+            - Name: TRANSACTION_SERVICE_AUTH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:TRANSACTION_SERVICE_AUTH_TOKEN::"
           Environment:
             - Name: ETH_L2_NETWORK
               Value: 1
@@ -670,44 +742,55 @@ Resources:
             - Name: C_FORCE_ROOT
               Value: true
             - Name: DEBUG
-              Value: true
+              Value: false
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: ETHEREUM_TRACING_NODE_URL
               Value: !Sub
-                - "https://${EndpointAddress}"
+                - https://${EndpointAddress}
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:DomainName
             - Name: REDIS_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/0"
+                - redis://${EndpointAddress}:6379/0
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: CELERY_BROKER_URL
               Value: !Sub
-                - "redis://${EndpointAddress}:6379/1"
+                - redis://${EndpointAddress}:6379/1
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: ETH_REORG_BLOCKS
               Value: 10
           Command:
-            - "./docker/web/celery/scheduler/run.sh"
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["worker"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
-          Essential: false
-          Memory: "1024"
-        - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
+            - ./docker/web/celery/scheduler/run.sh
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: scheduler
+              dd_source: scheduler
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+        - Image: !Sub ${DockerPrefix}/safe-client-gateway:${ImageTag}
+          RepositoryCredentials:
+            CredentialsParameter: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/docker/credentials
           Name: safe-client-gateway
+          Memory: 4000
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -722,14 +805,8 @@ Resources:
             - ContainerPort: 3666
               HostPort: 3666
           MountPoints:
-            - ContainerPath: "/nginx"
+            - ContainerPath: /nginx
               SourceVolume: nginx
-          EnvironmentFiles:
-            - Value: !Sub
-              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-              - S3BucketV2:
-                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-              Type: "s3"
           Environment:
             - Name: CONFIG_SERVICE_URI
               Value: http://localhost:80
@@ -761,28 +838,43 @@ Resources:
               Value: http://api.exchangeratesapi.io/latest
             - Name: REDIS_URI
               Value: !Sub
-                - "redis://${EndpointAddress}:6379"
+                - redis://${EndpointAddress}:6379
                 - EndpointAddress:
-                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+                    Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: ROCKET_PORT
               Value: 3666
             - Name: ROCKET_ADDRESS
               Value: 0.0.0.0
-          DockerLabels:
-            com.datadoghq.ad.check_names: '["safe-client-gateway"]'
-            com.datadoghq.ad.init_configs: '[{}]'
-            com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
-          Essential: false
-          Memory: "4000"
+          LogConfiguration:
+            LogDriver: awsfirelens
+            Options:
+              Name: datadog
+              dd_service: safe-client-gateway
+              dd_source: safe-client-gateway
+              TLS: on
+              provider: ecs
+            SecretOptions:
+              - Name: apiKey
+                ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATADOG_API_KEY::"
+          Essential: true
+      Cpu: 4096
+      Memory: 12288
       NetworkMode: awsvpc
       TaskRoleArn: !GetAtt TaskRole.Arn
-      ExecutionRoleArn: "arn:aws:iam::942431445534:role/ecs-s3-rolw"
-      Family: !Sub "Gnosis-${EnvironmentName}"
+      ExecutionRoleArn: !GetAtt TaskExecRole.Arn
+      Family: !Sub Gnosis-${EnvironmentName}
+
   ECSService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}:EcsClusterGnosis"
+        Fn::ImportValue: !Sub ${InfrastructureStackName}:EcsClusterGnosis
+      DeploymentConfiguration:
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
       LoadBalancers:
         - ContainerName: nginx-safe-config-service
           ContainerPort: 80
@@ -797,15 +889,14 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"
+            - Fn::ImportValue: !Sub ${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup
           Subnets:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+            - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
+            - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
       HealthCheckGracePeriodSeconds: 900
       DesiredCount: !Ref ServiceCount
-      LaunchType: EC2
+      LaunchType: FARGATE
       SchedulingStrategy: REPLICA
-      ServiceName: gnosis-safe
       TaskDefinition: !Ref TaskDefinition
 
   SafeReactBucket:
