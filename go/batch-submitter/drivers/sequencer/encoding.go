@@ -43,25 +43,6 @@ type BatchContext struct {
 	BlockNumber uint64 `json:"block_number"`
 }
 
-// IsMarkerContext returns true if the BatchContext is a marker context used to
-// specify the encoding format. This is only valid if called on the first
-// BatchContext in the calldata.
-func (c BatchContext) IsMarkerContext() bool {
-	return c.Timestamp == 0
-}
-
-// MarkerBatchType returns the BatchType specified by a marker BatchContext.
-// The return value is only valid if called on the first BatchContext in the
-// calldata and IsMarkerContext returns true.
-func (c BatchContext) MarkerBatchType() BatchType {
-	switch c.BlockNumber {
-	case 0:
-		return BatchTypeBrotli
-	default:
-		return BatchTypeLegacy
-	}
-}
-
 // Write encodes the BatchContext into a 16-byte stream using the following
 // encoding:
 //  - num_sequenced_txs:        3 bytes
@@ -109,48 +90,12 @@ const (
 	BatchTypeBrotli BatchType = 0
 )
 
-// BatchTypeFromString returns the BatchType enum based on a human readable
-// string.
-func BatchTypeFromString(s string) BatchType {
-	switch s {
-	case "brotli", "BROTLI":
-		return BatchTypeBrotli
-	case "legacy", "LEGACY":
-		return BatchTypeLegacy
-	default:
-		return BatchTypeLegacy
-	}
-}
-
-// String implements the Stringer interface for BatchType.
-func (b BatchType) String() string {
-	switch b {
-	case BatchTypeLegacy:
-		return "LEGACY"
-	case BatchTypeBrotli:
-		return "BROTLI"
-	default:
-		return ""
-	}
-}
-
 // MarkerContext returns the marker context, if any, for the given batch type.
-func (b BatchType) MarkerContext() *BatchContext {
-	switch b {
-
-	// No marker context for legacy encoding.
-	case BatchTypeLegacy:
-		return nil
-
-	// Zlib marker context sets block number equal to zero.
-	case BatchTypeBrotli:
-		return &BatchContext{
-			Timestamp:   0,
-			BlockNumber: 0,
-		}
-
-	default:
-		return nil
+func MarkerContext() *BatchContext {
+	// Brotli marker context sets block number equal to zero.
+	return &BatchContext{
+		Timestamp:   0,
+		BlockNumber: 0,
 	}
 }
 
@@ -188,10 +133,7 @@ type AppendSequencerBatchParams struct {
 //  - [num txs ommitted]
 //    - tx_len:                       3 bytes
 //    - tx_bytes:                     tx_len bytes
-func (p *AppendSequencerBatchParams) Write(
-	w *bytes.Buffer,
-	batchType BatchType,
-) error {
+func (p *AppendSequencerBatchParams) Write(w *bytes.Buffer) error {
 
 	_ = writeUint64(w, p.ShouldStartAtElement, 5)
 	_ = writeUint64(w, p.TotalElementsToAppend, 3)
@@ -210,10 +152,8 @@ func (p *AppendSequencerBatchParams) Write(
 	// when it is a typed batch
 	contexts := make([]BatchContext, 0, len(p.Contexts)+1)
 	// Add the marker context, if any, for non-legacy encodings.
-	markerContext := batchType.MarkerContext()
-	if markerContext != nil {
-		contexts = append(contexts, *markerContext)
-	}
+	markerContext := MarkerContext()
+	contexts = append(contexts, *markerContext)
 	contexts = append(contexts, p.Contexts...)
 
 	// Write number of contexts followed by each fixed-size BatchContext.
@@ -222,28 +162,18 @@ func (p *AppendSequencerBatchParams) Write(
 		context.Write(w)
 	}
 
-	switch batchType {
-	case BatchTypeLegacy:
-		// Write each length-prefixed tx.
-		for _, tx := range p.Txs {
-			_ = writeUint64(w, uint64(tx.Size()), TxLenSize)
-			_, _ = w.Write(tx.RawTx()) // can't fail for bytes.Buffer
-		}
-	case BatchTypeBrotli:
-		bw := brotli.NewWriterLevel(w, 11)
-		for _, tx := range p.Txs {
-			if err := writeUint64(bw, uint64(tx.Size()), TxLenSize); err != nil {
-				return err
-			}
-			if _, err := bw.Write(tx.RawTx()); err != nil {
-				return err
-			}
-		}
-		if err := bw.Close(); err != nil {
+	// Compress data for each transaction.
+	bw := brotli.NewWriterLevel(w, 11)
+	for _, tx := range p.Txs {
+		if err := writeUint64(bw, uint64(tx.Size()), TxLenSize); err != nil {
 			return err
 		}
-	default:
-		return fmt.Errorf("Unknown batch type: %s", batchType)
+		if _, err := bw.Write(tx.RawTx()); err != nil {
+			return err
+		}
+	}
+	if err := bw.Close(); err != nil {
+		return err
 	}
 
 	return nil
@@ -251,11 +181,9 @@ func (p *AppendSequencerBatchParams) Write(
 
 // Serialize performs the same encoding as Write, but returns the resulting
 // bytes slice.
-func (p *AppendSequencerBatchParams) Serialize(
-	batchType BatchType,
-) ([]byte, error) {
+func (p *AppendSequencerBatchParams) Serialize() ([]byte, error) {
 	var buf bytes.Buffer
-	if err := p.Write(&buf, batchType); err != nil {
+	if err := p.Write(&buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
@@ -284,6 +212,7 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 	if err := readUint64(r, &numContexts, 3); err != nil {
 		return err
 	}
+
 	// Assume that it is a legacy batch at first, this will be overwrritten if
 	// we detect a marker context.
 	var batchType = BatchTypeLegacy
@@ -296,33 +225,22 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 			return err
 		}
 
-		if i == 0 && batchContext.IsMarkerContext() {
-			batchType = batchContext.MarkerBatchType()
+		if i == 0 && batchContext.Timestamp == 0 {
+			batchType = BatchTypeBrotli
 			continue
 		}
 
 		p.Contexts = append(p.Contexts, batchContext)
 	}
 
-	// Define a closure to clean up the reader used by the specified encoding.
-	var closeReader func() error
-	switch batchType {
-
-	// The legacy serialization does not require clsing, so we instatiate a
-	// dummy closure.
-	case BatchTypeLegacy:
-		closeReader = func() error { return nil }
-
-	// The brotli serialization requires decompression before reading the
-	// plaintext bytes, and also requires proper cleanup.
-	case BatchTypeBrotli:
+	// Read the compressed transactions.
+	if batchType == BatchTypeBrotli {
 		br := brotli.NewReader(r)
 		var decodedOutput bytes.Buffer
 		_, _ = io.Copy(&decodedOutput, br)
 		r = bytes.NewReader(decodedOutput.Bytes())
-
-		closeReader = func() error { return nil }
 	}
+
 	// Deserialize any transactions. Since the number of txs is ommitted
 	// from the encoding, loop until the stream is consumed.
 	for {
@@ -338,7 +256,7 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 			if len(p.Txs) == 0 && len(p.Contexts) != 0 {
 				return ErrMalformedBatch
 			}
-			return closeReader()
+			return nil
 		} else if err != nil {
 			return err
 		}

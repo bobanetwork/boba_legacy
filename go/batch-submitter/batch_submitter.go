@@ -143,7 +143,6 @@ func Main(gitVersion string) func(ctx *cli.Context) error {
 				KeyId:       cfg.SequencerKeyId,
 				KeyAddress:  keyAddr,
 				KMS:         *svc,
-				BatchType:   sequencer.BatchTypeFromString(cfg.SequencerBatchType),
 			})
 			if err != nil {
 				return err
