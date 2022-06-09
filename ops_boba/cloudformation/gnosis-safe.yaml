@@ -571,6 +571,8 @@ Resources:
                     Fn::ImportValue: !Sub ${InfrastructureStackName}:RedisClusterGnosis:DNS
             - Name: ETH_REORG_BLOCKS
               Value: 10
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
           Command:
             - ./docker/web/run_web.sh
           LogConfiguration:
@@ -640,6 +642,8 @@ Resources:
               Value: true
             - Name: DEBUG
               Value: false
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
@@ -739,6 +743,8 @@ Resources:
               Value: true
             - Name: DEBUG
               Value: false
+            - Name: ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX
+              Value: 4999
             - Name: DJANGO_ALLOWED_HOSTS
               Value: !Sub
                 - "*,.localhost,127.0.0.1,[::1],safe-client-gateway,safe-client.${EndpointAddress}"
