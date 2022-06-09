@@ -70,7 +70,7 @@ describe('Batch Serialization', () => {
         expect(got).to.not.eq(null)
         expect(verifierGot).to.not.eq(null)
         expect(got.blockNumber).to.be.gt(latest)
-        expect(got.blockNumber).to.be.gt(verifierGot.blockNumber)
+        expect(got.blockNumber).to.be.eq(verifierGot.blockNumber)
         latest = got.blockNumber
       }
     }
