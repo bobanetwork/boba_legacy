@@ -64,13 +64,16 @@ describe('Batch Serialization', () => {
         )
         const transactionHash = ethers.utils.keccak256(serializedTx)
         const got = await env.l2Provider.getTransaction(transactionHash)
-        const verifierGot = await env.verifierProvider.getTransaction(
-          transactionHash
-        )
         expect(got).to.not.eq(null)
-        expect(verifierGot).to.not.eq(null)
         expect(got.blockNumber).to.be.gt(latest)
-        expect(got.blockNumber).to.be.eq(verifierGot.blockNumber)
+        const verifierBlockNumber = await env.verifierProvider.getBlockNumber()
+        if (verifierBlockNumber >= got.blockNumber) {
+          const verifierGot = await env.verifierProvider.getTransaction(
+            transactionHash
+          )
+          expect(verifierGot).to.not.eq(null)
+          expect(got.blockNumber).to.be.eq(verifierGot.blockNumber)
+        }
         latest = got.blockNumber
       }
     }
