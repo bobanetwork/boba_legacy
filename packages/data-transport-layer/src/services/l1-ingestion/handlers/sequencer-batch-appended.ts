@@ -85,10 +85,10 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
   ) => {
     const transactionEntries: TransactionEntry[] = []
 
-    if (extraData.l1TransactionData.length < 26) {
+    if (extraData.l1TransactionData.length < 12) {
       throw new Error(
         `Block ${extraData.blockNumber} transaction data is invalid for decoding: ${extraData.l1TransactionData} , ` +
-          `converted buffer length is < 26.`
+          `converted buffer length is < 12.`
       )
     }
 
@@ -116,9 +116,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           .toNumber()
 
         const decodedTx = buf.toTransaction()
-        console.log(decodedTx, extraData.prevTotalElements
-          .add(BigNumber.from(transactionIndex))
-          .toNumber())
+
         const decodedTxTuring = decodeSequencerBatchTransaction(
           decodedTx,
           l2ChainId,
