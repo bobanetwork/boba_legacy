@@ -214,6 +214,18 @@ export function settle_v2OLO() {
   )
 }
 
+export function settle_v3() {
+  return createAction('SETTLE_v3/CREATE', () =>
+    networkService.settle_v3()
+  )
+}
+
+export function settle_v3OLO() {
+  return createAction('SETTLE_v3OLO/CREATE', () =>
+    networkService.settle_v3OLO()
+  )
+}
+
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>
     networkService.fetchLookUpPrice(params))
