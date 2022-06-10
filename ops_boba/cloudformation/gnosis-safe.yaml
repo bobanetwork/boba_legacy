@@ -404,18 +404,10 @@ Resources:
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DJANGO_SECRET_KEY::"
             - Name: DATABASE_URL
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:DATABASE_URL::"
-            - Name: ROCKET_SECRET_KEY
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
-            - Name: WEBHOOK_TOKEN
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
-            - Name: CGW_FLUSH_TOKEN
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
-            - Name: EXCHANGE_API_KEY
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
-            - Name: REACT_APP_DEFAULT_CHAIN_ID
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:REACT_APP_DEFAULT_CHAIN_ID::"
             - Name: TRANSACTION_SERVICE_AUTH_TOKEN
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:TRANSACTION_SERVICE_AUTH_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
           Environment:
             # in django 4 you need to include scheme
             - Name: CSRF_TRUSTED_ORIGINS
@@ -517,8 +509,6 @@ Resources:
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
             - Name: WEBHOOK_TOKEN
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
-            - Name: CGW_FLUSH_TOKEN
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
             - Name: EXCHANGE_API_KEY
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
             - Name: REACT_APP_DEFAULT_CHAIN_ID
@@ -808,6 +798,38 @@ Resources:
             - ContainerPath: /nginx
               SourceVolume: nginx
           Environment:
+            - Name: SAFE_INFO_CACHE_DURATION
+              Value: 5000
+            - Name: ADDRESS_INFO_CACHE_DURATION
+              Value: 5000
+            - Name: TOKEN_INFO_CACHE_DURATION
+              Value: 5000
+            - Name: CHAIN_INFO_CACHE_DURATION
+              Value: 100000
+            - Name: CHAIN_INFO_RESPONSE_CACHE_DURATION
+              Value: 5000
+            - Name: EXCHANGE_API_CACHE_DURATION
+              Value: 15000
+            - Name: REQUEST_CACHE_DURATION
+              Value: 5000
+            - Name: ABOUT_CACHE_DURATION
+              Value: 5000
+            - Name: BALANCES_REQUEST_CACHE_DURATION
+              Value: 15000
+            - Name: REQS_ERROR_CACHE_DURATION
+              Value: 5000
+            - Name: OWNERS_FOR_SAFES_CACHE_DURATION
+              Value: 5000
+            - Name: INDEFINITE_TIMEOUT
+              Value: 5000
+            - Name: SHORT_ERROR_DURATION
+              Value: 5000
+            - Name: LONG_ERROR_DURATION
+              Value: 5000
+            - Name: SAFE_APPS_CACHE_DURATION
+              Value: 5000
+            - Name: TX_QUEUED_CACHE_DURATION
+              Value: 5000
             - Name: CONFIG_SERVICE_URI
               Value: http://localhost:80
             - Name: FEATURE_FLAG_NESTED_DECODING
@@ -845,6 +867,15 @@ Resources:
               Value: 3666
             - Name: ROCKET_ADDRESS
               Value: 0.0.0.0
+          Secrets:
+            - Name: ROCKET_SECRET_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:ROCKET_SECRET_KEY::"
+            - Name: WEBHOOK_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:WEBHOOK_TOKEN::"
+            - Name: CGW_FLUSH_TOKEN
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:CGW_FLUSH_TOKEN::"
+            - Name: EXCHANGE_API_KEY
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}:EXCHANGE_API_KEY::"
           LogConfiguration:
             LogDriver: awsfirelens
             Options:
