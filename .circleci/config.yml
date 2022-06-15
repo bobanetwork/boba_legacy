@@ -1,6 +1,7 @@
 #adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
 version: 2.1
-
+orbs:
+  nix: eld/nix@1.0.0
 jobs:
   integration-tests:
     machine:
@@ -34,13 +35,14 @@ jobs:
           working_directory: ops
   integration-tests-nix:
     machine:
-      image: nixpkgs/nix-flakes:latest
+      image: ubuntu-2004:202111-02
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
     parallelism: 4
     steps:
       - checkout
+      - nix/install
       - run:
           name: Bring up the stack
           command: |
@@ -65,4 +67,5 @@ jobs:
 workflows:
   main:
     jobs:
+      - integration-tests-nix
       - integration-tests
