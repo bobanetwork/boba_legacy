@@ -1,7 +1,7 @@
 #adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
 version: 2.1
-orbs:
-  nix: eld/nix@1.0.0
+# orbs:
+#   nix: eld/nix@1.0.0
 jobs:
   integration-tests:
     machine:
@@ -42,7 +42,7 @@ jobs:
     parallelism: 4
     steps:
       - checkout
-      - nix/install
+      #- nix/install
       - run:
           name: Bring up the stack
           command: |
