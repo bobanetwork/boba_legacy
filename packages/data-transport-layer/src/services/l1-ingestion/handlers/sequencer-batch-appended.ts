@@ -1,12 +1,13 @@
 /* Imports: External */
 import { BigNumber, ethers, constants } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { serialize } from '@ethersproject/transactions'
 import {
-  fromHexString,
   toHexString,
   toRpcHexString,
   remove0x,
   add0x,
+  SequencerBatch,
 } from '@eth-optimism/core-utils'
 import { SequencerBatchAppendedEvent } from '@eth-optimism/contracts/dist/types/CanonicalTransactionChain'
 
@@ -84,38 +85,40 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
   ) => {
     const transactionEntries: TransactionEntry[] = []
 
-    // It's easier to deal with this data if it's a Buffer.
-    const calldata = fromHexString(extraData.l1TransactionData)
-
-    if (calldata.length < 12) {
+    if (extraData.l1TransactionData.length < 12) {
       throw new Error(
         `Block ${extraData.blockNumber} transaction data is invalid for decoding: ${extraData.l1TransactionData} , ` +
           `converted buffer length is < 12.`
       )
     }
 
-    const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
+    // decompress and decode the transaction data
+    const decoded = (SequencerBatch as any).fromHex(extraData.l1TransactionData)
+
+    // Keep track of the CTC index
     let transactionIndex = 0
+    // Keep track of the number of deposits
     let enqueuedCount = 0
-    let nextTxPointer = 15 + 16 * numContexts
-    for (let i = 0; i < numContexts; i++) {
-      const contextPointer = 15 + 16 * i
-      const context = parseSequencerBatchContext(calldata, contextPointer)
+    // Keep track of the tx index in the current batch
+    let index = 0
 
+    for (const context of decoded.contexts) {
       for (let j = 0; j < context.numSequencedTransactions; j++) {
-        const sequencerTransaction = parseSequencerBatchTransaction(
-          calldata,
-          nextTxPointer
-        )
-
+        // console.log(decoded)
+        const buf = decoded.transactions[index]
+        if (!buf) {
+          throw new Error(
+            `Invalid batch context, tx count: ${decoded.transactions.length}, attempting to parse ${index}`
+          )
+        }
         const indexL2 = extraData.prevTotalElements
           .add(BigNumber.from(transactionIndex))
           .toNumber()
 
-        // console.log('L2 block number for this TX is:', indexL2 + 1)
+        const decodedTx = buf.toTransaction()
 
-        const decoded = decodeSequencerBatchTransaction(
-          sequencerTransaction,
+        const decodedTxTuring = decodeSequencerBatchTransaction(
+          decodedTx,
           l2ChainId,
           indexL2 + 1,
           turing_v0_height,
@@ -132,17 +135,31 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           gasLimit: BigNumber.from(0).toString(),
           target: constants.AddressZero,
           origin: null,
-          data: toHexString(sequencerTransaction),
+          data: serialize(
+            {
+              nonce: decodedTx.nonce,
+              gasPrice: decodedTx.gasPrice,
+              gasLimit: decodedTx.gasLimit,
+              to: decodedTx.to,
+              value: decodedTx.value,
+              data: decodedTx.data,
+            },
+            {
+              v: decodedTx.v,
+              r: decodedTx.r,
+              s: decodedTx.s,
+            }
+          ),
           queueOrigin: 'sequencer',
-          value: decoded.value,
+          value: toRpcHexString(decodedTx.value),
           queueIndex: null,
-          decoded,
+          decoded: decodedTxTuring,
           confirmed: true,
-          turing: decoded.turing,
+          turing: decodedTxTuring.turing,
         })
 
-        nextTxPointer += 3 + sequencerTransaction.length
         transactionIndex++
+        index++
       }
 
       for (let j = 0; j < context.numSubsequentQueueTransactions; j++) {
@@ -233,46 +250,14 @@ interface SequencerBatchContext {
   blockNumber: number
 }
 
-const parseSequencerBatchContext = (
-  calldata: Buffer,
-  offset: number
-): SequencerBatchContext => {
-  return {
-    numSequencedTransactions: BigNumber.from(
-      calldata.slice(offset, offset + 3)
-    ).toNumber(),
-    numSubsequentQueueTransactions: BigNumber.from(
-      calldata.slice(offset + 3, offset + 6)
-    ).toNumber(),
-    timestamp: BigNumber.from(
-      calldata.slice(offset + 6, offset + 11)
-    ).toNumber(),
-    blockNumber: BigNumber.from(
-      calldata.slice(offset + 11, offset + 16)
-    ).toNumber(),
-  }
-}
-
-const parseSequencerBatchTransaction = (
-  calldata: Buffer,
-  offset: number
-): Buffer => {
-  const transactionLength = BigNumber.from(
-    calldata.slice(offset, offset + 3)
-  ).toNumber()
-
-  return calldata.slice(offset + 3, offset + 3 + transactionLength)
-}
-
 const decodeSequencerBatchTransaction = (
-  transaction: Buffer,
+  decodedTx: any,
   l2ChainId: number,
   blockNumber: number,
   turing_v0_height: number,
   turing_v1_height: number
 ): DecodedSequencerBatchTransaction => {
   if (blockNumber < turing_v0_height) {
-    const decodedTx = ethers.utils.parseTransaction(transaction)
     const ret = {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
       gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
@@ -294,8 +279,7 @@ const decodeSequencerBatchTransaction = (
     blockNumber < turing_v1_height
   ) {
     let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
-    ;[transaction, turingBuffer] = turingParse_v0(transaction, turingBuffer)
-    const decodedTx = ethers.utils.parseTransaction(transaction)
+    ;[, turingBuffer] = turingParse_v0(decodedTx.data, turingBuffer)
     const ret = {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
       gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
@@ -315,7 +299,6 @@ const decodeSequencerBatchTransaction = (
   } else if (blockNumber >= turing_v1_height) {
     let restoredData = ''
     let turing = ''
-    const decodedTx = ethers.utils.parseTransaction(transaction)
     ;[restoredData, turing] = turingParse_v1(
       decodedTx.data,
       blockNumber,
@@ -341,14 +324,15 @@ const decodeSequencerBatchTransaction = (
 }
 
 const turingParse_v0 = (
-  sequencerTransaction: Buffer,
+  // sequencerTransaction: Buffer,
+  decodedTxData: string,
   turing: Buffer
 ): [Buffer, Buffer] => {
   // This MIGHT have a Turing payload inside of it...
   // First, parse the version and length field...
-  const sTxHexString = toHexString(sequencerTransaction)
-  const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
-  const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
+  let sequencerTransaction = Buffer.from(decodedTxData, 'hex')
+  const turingVersion = parseInt(remove0x(decodedTxData).slice(0, 2), 16)
+  const turingLength = parseInt(remove0x(decodedTxData).slice(2, 6), 16)
 
   if (turingLength === 0) {
     // The 'slice' chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
