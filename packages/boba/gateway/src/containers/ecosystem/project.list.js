@@ -5,7 +5,9 @@ import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
 import bobaApesLogo from '../../images/ecosystem/bobaapes.webp'
 import bobaDogeLogo from '../../images/ecosystem/bobaDoge.webp'
 import bobaPunksLogo from '../../images/ecosystem/bobaPunks.webp'
+import bodhLogo from '../../images/ecosystem/bodhfinance.svg'
 import boringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
+import brewery from '../../images/ecosystem/brewery.svg'
 import coing98Logo from '../../images/ecosystem/coin98.webp'
 import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
@@ -13,14 +15,17 @@ import defiyieldLogo from '../../images/ecosystem/defiyield.webp'
 import dodoLogo from '../../images/ecosystem/dodo.webp'
 import domFiLogo from '../../images/ecosystem/dominanaceFinanace.webp'
 import fraxLogo from '../../images/ecosystem/frax.webp'
+import koyoLogo from '../../images/ecosystem/koyo.svg'
 import l2ChartsLogo from '../../images/ecosystem/l2Charts.webp'
 import layerSwapLogo from '../../images/ecosystem/layerswap.webp'
 import mewLogo from '../../images/ecosystem/mew.webp'
 import multiChainLogo from '../../images/ecosystem/Multichain.webp'
+import multiSigLogo from '../../images/ecosystem/multiSig.svg'
 import OolongswapLogo from '../../images/ecosystem/Oolongswap.webp'
 import safepalLogo from '../../images/ecosystem/safepal.webp'
 import satisLogo from '../../images/ecosystem/satis.webp'
 import shibuiDAOLogo from '../../images/ecosystem/shibuidao.svg'
+import symbiosisLogo from '../../images/ecosystem/symbiosis.svg'
 import synLogo from '../../images/ecosystem/syn.webp'
 import thetanutsLogo from '../../images/ecosystem/thetanuts.webp'
 import tofuNftLogo from '../../images/ecosystem/tofuNft.webp'
@@ -28,10 +33,6 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
-import multiSigLogo from '../../images/ecosystem/multiSig.svg'
-import brewery from '../../images/ecosystem/brewery.svg'
-import bodhLogo from '../../images/ecosystem/bodhfinance.svg'
-import symbiosisLogo from '../../images/ecosystem/symbiosis.svg'
 
 /**
  * thematical order of type.
@@ -61,6 +62,16 @@ export const projectList = [
     "type": "defi",
     "image": fraxLogo,
     "description": "World’s first fractional-algorithmic stablecoin protocol."
+  },
+  {
+    "title": "Kōyō Finance",
+    "canLaunch": true,
+    "link": "https://koyo.finance/",
+    "twitter": "https://docs.koyo.finance/twitter",
+    "discord": "https://docs.koyo.finance/discord",
+    "type": "defi",
+    "image": koyoLogo,
+    "description": "Kōyō is the first next-generation AMM protocol in the Boba ecosystem. It is inspired by Curve and Balancer. At its core it’s a decentralized exchange (DEX) that minimizes unnecessary losses from swaps between assets of equal value."
   },
   {
     "title": "BoringDAO",
