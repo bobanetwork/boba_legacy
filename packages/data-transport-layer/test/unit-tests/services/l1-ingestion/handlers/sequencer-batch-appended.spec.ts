@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers'
 import { sequencerBatch, add0x, BatchType } from '@eth-optimism/core-utils'
 
-const compressBatchWithZlib = (calldata: string): string => {
+const compressBatchWithBrotli = (calldata: string): string => {
   const batch = sequencerBatch.decode(calldata)
   batch.type = BatchType.BROTLI
   const encoded = sequencerBatch.encode(batch)
@@ -98,7 +98,7 @@ describe('Event Handlers: CanonicalTransactionChain.SequencerBatchAppended', () 
           // Set the type to be brotli
           output.transactionBatchEntry.type = BatchType[BatchType.BROTLI]
 
-          const compressed = compressBatchWithZlib(
+          const compressed = compressBatchWithBrotli(
             input.extraData.l1TransactionData
           )
 
