@@ -235,7 +235,7 @@ function TokenPage() {
             </Box>
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
-              Welcome developers.  
+              Welcome developers.
               For testnet BOBA and ETH, tweet your Boba Bubble and
               then paste the tweet link in the field below.
             </Typography>
@@ -275,17 +275,8 @@ function TokenPage() {
             />
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px'}}>
-              You are limited to one fountain call per twitter account per day. 
-              The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba). 
-              If you already have some ETH in your wallet to cover gas you can use our 
-              <a
-                target='_blank'
-                rel="noopener noreferrer"
-                href={'https://faucets.boba.network/'}
-                aria-label="link"
-                style={{color:'#fff', fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
-              >alternative faucet
-              </a>.
+              You are limited to one fountain call per twitter account per day.
+              The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba).
             </Typography>
 
             <Button
