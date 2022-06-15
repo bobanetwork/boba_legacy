@@ -10,10 +10,8 @@ import * as request from 'request-promise-native'
 const fetch = require('node-fetch')
 import hre from 'hardhat'
 const cfg = hre.network.config
-const hPort = 1235 // Port for local HTTP server
-var urlStr
 
-const gasOverride =  { gasLimit: 3000000 }
+const gasOverride = { /*gasLimit: 3000000*/ }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
@@ -64,8 +62,8 @@ describe("Turing 256 Bit Random Number", function () {
       BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
     } 
     else if(hre.network.name === 'boba_mainnet') {
-      BOBAL2Address = '0x______________________________'
-      BobaTuringCreditAddress = '0x______________________________'
+      BOBAL2Address = '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
+      BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
     } 
     else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
@@ -79,6 +77,9 @@ describe("Turing 256 Bit Random Number", function () {
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
+
+    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
+    console.log("    BOBA Balance in your account", bobaBalance.toString())
 
     // prepare to register/fund your Turing Helper 
     turingCredit = getContractFactory(
