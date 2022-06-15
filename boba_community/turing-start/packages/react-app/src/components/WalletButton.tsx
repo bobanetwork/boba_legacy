@@ -80,7 +80,7 @@ export function WalletButton(props: IWalletButtonProps) {
                 style={{borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRight: 0}}
                 target="_blank"
                 href={isTestnet
-                  ? "https://faucets.boba.network/"
+                  ? "https://gateway.rinkeby.boba.network/"
                   : `https://oolongswap.com/#/swap?outputCurrency=${props.contractBobaToken.address}`}>
           {bobaTokenBalance.lte(0)
             ? <><FontAwesomeIcon bounce={true} icon={regular("credit-card")} />&nbsp;Get</>
