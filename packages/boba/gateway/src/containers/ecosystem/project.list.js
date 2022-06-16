@@ -33,6 +33,7 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
+import webthreenamesLogo from '../../images/ecosystem/webthreenames-logo.png'
 
 /**
  * thematical order of type.
@@ -388,6 +389,16 @@ export const projectList = [
      "image": symbiosisLogo,
      "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
    },
+   {
+    "title": "Boba Name Service",
+    "canLaunch": true,
+    "link": "https://boba.webthreenames.com/",
+    "telegram": "https://t.me/webthreenames",
+    "twitter": "https://twitter.com/webthreenames",
+    "type": "nft",
+    "image": webthreenamesLogo,
+    "description": "Mint your .boba domains as NFT assets that will bind the domain to your wallet address. You can also set records for your website, email, twitter, description and even your own avatar."
+  },
 ]
 
 export const loadProjectByCategory = () => {
