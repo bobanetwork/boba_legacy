@@ -307,6 +307,49 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
       }
     )
 
+    /**
+     * /eth/syncing is for l2geth, but we want to get status of syncing as the replica.
+     * /eth/syncing/l2 returns the actual l2 block number and current l2 block number that
+     * dtl synced to.
+     */
+    this._registerRoute(
+      'get',
+      '/eth/syncing/l2',
+      async (req): Promise<SyncingResponse> => {
+        const currentL2Block =
+          await this.state.db.getLatestUnconfirmedTransaction()
+        const highestL2BlockNumber = await this.state.db.getTargetL2Block()
+
+        if (currentL2Block === null) {
+          if (highestL2BlockNumber === null) {
+            return {
+              syncing: false,
+              currentTransactionIndex: 0,
+            }
+          } else {
+            return {
+              syncing: true,
+              highestKnownTransactionIndex: highestL2BlockNumber,
+              currentTransactionIndex: 0,
+            }
+          }
+        }
+
+        if (highestL2BlockNumber > currentL2Block.index) {
+          return {
+            syncing: true,
+            highestKnownTransactionIndex: highestL2BlockNumber,
+            currentTransactionIndex: currentL2Block.index,
+          }
+        } else {
+          return {
+            syncing: false,
+            currentTransactionIndex: currentL2Block.index,
+          }
+        }
+      }
+    )
+
     this._registerRoute(
       'get',
       '/eth/gasprice',
