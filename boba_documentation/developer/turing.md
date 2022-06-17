@@ -76,4 +76,5 @@ Have fun using Turing and contact us right away if you run into any problems!
 
 There is a community-built factory contract for Turing helper. You can deploy, manage, and fund your Turing helpers all through a graphical interface.
 
-* https://turing-hub.medievaldao.games/
+* dapp: https://turing-hub.medievaldao.games/
+* github: https://github.com/medieval-dao/turing-subscription
