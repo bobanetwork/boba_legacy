@@ -269,6 +269,65 @@ describe('Fee Payment Integration Tests', async () => {
     }
   })
 
+  it('{tag:other} should transfer all ETH with correct gas limit', async () => {
+    await setPrices(env, 1000)
+    const randomWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
+
+    await env.l2Wallet.sendTransaction({
+      to: randomWallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+
+    // estimate gas fee
+    const estimatedGas = await randomWallet.estimateGas({
+      to: env.l2Wallet.address,
+      value: ethers.utils.parseEther('0.1'),
+    })
+    const gasPrice = await env.l2Provider.getGasPrice()
+    const estimatedGasFee = estimatedGas.mul(gasPrice)
+
+    // should transfer funds back
+    const balance = await randomWallet.getBalance()
+    await randomWallet.sendTransaction({
+      to: env.l2Wallet.address,
+      value: balance.sub(estimatedGasFee),
+      gasLimit: estimatedGas.toNumber(),
+    })
+
+    const postBalance = await randomWallet.getBalance()
+    expect(postBalance).to.be.eq(ethers.BigNumber.from('0'))
+
+    await env.l2Wallet.sendTransaction({
+      to: randomWallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+
+    // the gas fee should be constant
+    await randomWallet.sendTransaction({
+      to: env.l2Wallet.address,
+      value: balance.sub(estimatedGasFee).sub(BigNumber.from('10')),
+      gasLimit: estimatedGas.toNumber(),
+    })
+
+    const postBalance2 = await randomWallet.getBalance()
+    expect(postBalance2).to.be.eq(ethers.BigNumber.from('10'))
+
+    // should reject tx if gas limit is not provided
+    await env.l2Wallet.sendTransaction({
+      to: randomWallet.address,
+      value: ethers.utils.parseEther('1'),
+    })
+
+    await expect(
+      randomWallet.sendTransaction({
+        to: env.l2Wallet.address,
+        value: balance.sub(estimatedGasFee),
+      })
+    ).to.be.rejected
+
+    await setPrices(env, 1)
+  })
+
   // https://github.com/bobanetwork/boba/pull/22
   it('{tag:other} should be able to configure l1 gas price in a rare situation', async () => {
     // This blocks all txs, because the gas usage for the l1 security fee is too large

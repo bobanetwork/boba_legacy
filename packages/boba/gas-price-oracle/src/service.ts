@@ -3,21 +3,15 @@ import { Contract, Wallet, BigNumber, providers, utils } from 'ethers'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
 import { orderBy } from 'lodash'
-import fetch from 'node-fetch'
 
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
-import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
-import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
-import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
-import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -58,14 +52,14 @@ interface GasPriceOracleOptions {
   // Max L1 base fee
   maxL1BaseFee: number
 
-  // Polygon.io API key
-  polygonAPIKey: string
-
   // boba fee / eth fee
   bobaFeeRatio100X: number
 
   // minimum percentage change for boba fee / eth fee
   bobaFeeRatioMinPercentChange: number
+
+  // local testnet chain ID
+  bobaLocalTestnetChainId: number
 }
 
 const optionSettings = {}
@@ -78,17 +72,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   private state: {
     Lib_AddressManager: Contract
     OVM_GasPriceOracle: Contract
-    Proxy__L1StandardBridge: Contract
-    DiscretionaryExitBurn: Contract
-    Proxy__L1LiquidityPool: Contract
-    Proxy__L2LiquidityPool: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
-    Proxy__L1NFTBridge: Contract
-    Proxy__L2NFTBridge: Contract
     Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
     L2BOBA: Contract
+    BobaStraw_ETHUSD: Contract
+    BobaStraw_BOBAUSD: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
     L1RelayerBalance: BigNumber
@@ -101,6 +91,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     L2BOBABillingCollectFee: BigNumber
     BOBAUSDPrice: number
     ETHUSDPrice: number
+    chainID: number
   }
 
   protected async _init(): Promise<void> {
@@ -119,6 +110,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       minL1BaseFee: this.options.minL1BaseFee,
       bobaFeeRatio100X: this.options.bobaFeeRatio100X,
       bobaFeeRatioMinPercentChange: this.options.bobaFeeRatioMinPercentChange,
+      bobaLocalTestnetChainId: this.options.bobaLocalTestnetChainId,
     })
 
     this.state = {} as any
@@ -131,77 +123,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     )
     this.logger.info('Connected to Lib_AddressManager', {
       address: this.state.Lib_AddressManager.address,
-    })
-
-    this.logger.info('Connecting to Proxy__L1StandardBridge...')
-    const Proxy__L1StandardBridgeAddress =
-      await this.state.Lib_AddressManager.getAddress('Proxy__L1StandardBridge')
-    this.state.Proxy__L1StandardBridge = new Contract(
-      Proxy__L1StandardBridgeAddress,
-      L1StandardBridgeJson.abi,
-      this.options.l1RpcProvider
-    )
-    this.logger.info('Connected to Proxy__L1StandardBridge', {
-      address: this.state.Proxy__L1StandardBridge.address,
-    })
-
-    this.logger.info('Connecting to DiscretionaryExitBurn...')
-    const DiscretionaryExitBurnAddress =
-      await this.state.Lib_AddressManager.getAddress('DiscretionaryExitBurn')
-    this.state.DiscretionaryExitBurn = new Contract(
-      DiscretionaryExitBurnAddress,
-      DiscretionaryExitBurnJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to DiscretionaryExitBurn', {
-      address: this.state.DiscretionaryExitBurn.address,
-    })
-
-    this.logger.info('Connecting to Proxy__L1LiquidityPool...')
-    const Proxy__L1LiquidityPoolAddress =
-      await this.state.Lib_AddressManager.getAddress('Proxy__L1LiquidityPool')
-    this.state.Proxy__L1LiquidityPool = new Contract(
-      Proxy__L1LiquidityPoolAddress,
-      L1LiquidityPoolJson.abi,
-      this.options.l1RpcProvider
-    )
-    this.logger.info('Connected to Proxy__L1LiquidityPool', {
-      address: this.state.Proxy__L1LiquidityPool.address,
-    })
-
-    this.logger.info('Connecting to Proxy__L2LiquidityPool...')
-    const Proxy__L2LiquidityPoolAddress =
-      await this.state.Lib_AddressManager.getAddress('Proxy__L2LiquidityPool')
-    this.state.Proxy__L2LiquidityPool = new Contract(
-      Proxy__L2LiquidityPoolAddress,
-      L2LiquidityPoolJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to Proxy__L2LiquidityPool', {
-      address: this.state.Proxy__L2LiquidityPool.address,
-    })
-
-    this.logger.info('Connecting to Proxy__L1NFTBridge...')
-    const Proxy__L1NFTBridgeAddress =
-      await this.state.Lib_AddressManager.getAddress('Proxy__L1NFTBridge')
-    this.state.Proxy__L1NFTBridge = new Contract(
-      Proxy__L1NFTBridgeAddress,
-      L1NFTBridgeJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to Proxy__L1NFTBridge', {
-      address: this.state.Proxy__L1NFTBridge.address,
-    })
-
-    const Proxy__L2NFTBridgeAddress =
-      await this.state.Lib_AddressManager.getAddress('Proxy__L2NFTBridge')
-    this.state.Proxy__L2NFTBridge = new Contract(
-      Proxy__L2NFTBridgeAddress,
-      L2NFTBridgeJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to Proxy__L2NFTBridge', {
-      address: this.state.Proxy__L2NFTBridge.address,
     })
 
     this.logger.info('Connecting to CanonicalTransactionChain...')
@@ -276,6 +197,26 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.BobaBillingContractAddress,
     })
 
+    // Load BOBA straw contracts
+    const BobaStraw_ETHUSDAddress =
+      await this.state.Lib_AddressManager.getAddress('BobaStraw_ETHUSD')
+    const BobaStraw_BOBAUSDAddress =
+      await this.state.Lib_AddressManager.getAddress('BobaStraw_BOBAUSD')
+    this.state.BobaStraw_ETHUSD = new Contract(
+      BobaStraw_ETHUSDAddress,
+      FluxAggregatorJson.abi,
+      this.options.l2RpcProvider
+    )
+    this.state.BobaStraw_BOBAUSD = new Contract(
+      BobaStraw_BOBAUSDAddress,
+      FluxAggregatorJson.abi,
+      this.options.l2RpcProvider
+    )
+    this.logger.info('Connected to BobaStraw', {
+      BobaStraw_ETHUSD: BobaStraw_ETHUSDAddress,
+      BobaStraw_BOBAUSD: BobaStraw_BOBAUSDAddress,
+    })
+
     // Total cost
     this.state.L1ETHBalance = BigNumber.from('0')
     this.state.L1ETHCostFee = BigNumber.from('0')
@@ -294,6 +235,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     // Load history
     await this._loadL1ETHFee()
     await this._loadL2FeeCost()
+
+    // Get chain ID
+    this.state.chainID = (await this.options.l2RpcProvider.getNetwork()).chainId
   }
 
   protected async _start(): Promise<void> {
@@ -733,7 +677,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           await this.state.Boba_GasPriceOracle.updatePriceRatio(
             targetUpdatedPriceRatio,
             targetMarketPriceRatio,
-            { gasPrice: 0 }
+            this.state.chainID === this.options.bobaLocalTestnetChainId
+              ? {}
+              : { gasPrice: 0 }
           )
         await gasPriceTx.wait()
         this.logger.info('Updated price ratio', {
@@ -856,7 +802,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       ) {
         const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
           l1GasPrice,
-          { gasPrice: 0 }
+          this.state.chainID === this.options.bobaLocalTestnetChainId
+            ? {}
+            : { gasPrice: 0 }
         )
         await tx.wait()
         this.logger.info('Updated l1BaseFee', {
@@ -876,18 +824,35 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
   }
 
-  private async _queryTokenPrice(tokenPair): Promise<void> {
-    const RequestURL = `https://api.polygon.io/v1/last/crypto/${tokenPair}?apiKey=${this.options.polygonAPIKey}`
-    const response = await fetch(RequestURL)
-    if (response.status === 200) {
-      const json = await response.json()
-      if (json.status === 'success') {
-        if (tokenPair === 'BOBA/USD') {
-          this.state.BOBAUSDPrice = Number(json.last.price)
-        }
-        if (tokenPair === 'ETH/USD') {
-          this.state.ETHUSDPrice = Number(json.last.price)
-        }
+  private async _queryTokenPrice(tokenPair: string): Promise<void> {
+    if (tokenPair === 'ETH/USD') {
+      const latestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
+      const decimals = await this.state.BobaStraw_ETHUSD.decimals()
+      // Keep two decimal places
+      if (decimals >= 2) {
+        const preETHUSDPrice = latestAnswer.div(
+          BigNumber.from(10).pow(decimals - 2)
+        )
+        this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
+      } else {
+        this.state.ETHUSDPrice = latestAnswer
+          .div(BigNumber.from(10).pow(decimals))
+          .toNumber()
+      }
+    }
+    if (tokenPair === 'BOBA/USD') {
+      const latestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
+      const decimals = await this.state.BobaStraw_BOBAUSD.decimals()
+      // Keep two decimal places
+      if (decimals >= 2) {
+        const preBOBAUSDPrice = latestAnswer.div(
+          BigNumber.from(10).pow(decimals - 2)
+        )
+        this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
+      } else {
+        this.state.BOBAUSDPrice = latestAnswer
+          .div(BigNumber.from(10).pow(decimals))
+          .toNumber()
       }
     }
   }

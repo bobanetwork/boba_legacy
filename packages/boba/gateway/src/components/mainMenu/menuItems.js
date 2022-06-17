@@ -1,5 +1,11 @@
 export const menuItems = [
   {
+    key: 'Bridge',
+    icon: "WalletIcon",
+    title: "Bridge",
+    url: "/Bridge"
+  },
+  {
     key: 'Ecosystem',
     icon: "SafeIcon",
     title: "Ecosystem",
@@ -17,12 +23,6 @@ export const menuItems = [
     title: "History",
     url: "/history"
   },
-  // {
-  //   key: 'Bridge',
-  //   icon: "WalletIcon",
-  //   title: "Bridge",
-  //   url: "/"
-  // },
   {
     key: 'Farm',
     icon: "EarnIcon",
@@ -40,5 +40,5 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: "/dao"
-  },
+  }
 ]

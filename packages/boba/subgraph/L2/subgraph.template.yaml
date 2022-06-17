@@ -122,7 +122,6 @@ dataSources:
           handler: handleUseETHAsFeeToken
       file: ./src/Boba_GasPriceOracleMapping.ts
 
-
   - kind: ethereum/contract
     name: TuringMonsters
     network: {{network}}
@@ -142,3 +141,27 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTuringMonstersTransferEvent
       file: ./src/TuringMonstersMapping.ts
+      
+      
+  - kind: ethereum/contract
+    name: TuringHelperFactory
+    network: {{network}}
+    source:
+      address: '{{contracts.TuringHelperFactory.address}}'
+      abi: TuringHelperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - TuringHelperFactory
+      abis:
+        - name: TuringHelperFactory
+          file: ./abis/TuringHelperFactory.json
+      eventHandlers:
+        - event: TuringHelperDeployed(indexed address,address,uint256)
+          handler: handleTuringHelperDeployed
+      file: ./src/TuringHelperFactoryMapping.ts
+
+
+

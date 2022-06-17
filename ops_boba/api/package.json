@@ -1,0 +1,15 @@
+{
+  "name": "@boba/api",
+  "version": "0.0.1",
+  "description": "BOBA API",
+  "private": true,
+  "author": "Enya.ai",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "eth-sig-util": "^3.0.1",
+    "ethers": "^5.4.5",
+    "fs": "^0.0.1-security",
+    "yaml": "^1.10.0"
+  }
+}

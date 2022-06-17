@@ -25,6 +25,7 @@ import { openAlert } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector'
@@ -39,7 +40,6 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import parse from 'html-react-parser'
 
 import BN from 'bignumber.js'
 
@@ -57,15 +57,15 @@ import {
   selectExitFee,
 } from 'selectors/balanceSelector'
 
-function DoExitStep({ handleClose, token }) {
+function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  // support for Use Max - amount to transfer in wei_string
   const [ max_Float, setMax_Float ] = useState(0.0)                // support for Use Max - a number like 0.09 ETH
-
   const [ errorString, setErrorString ] = useState('')
+
 
   const [ feeETH, setFeeETH ] = useState(0.0)
   const [ feeBOBA, setFeeBOBA ] = useState(0.0)
@@ -86,7 +86,10 @@ function DoExitStep({ handleClose, token }) {
 
   const exitFee = useSelector(selectExitFee)
 
+
   function setAmount(value) {
+    // (Number(value) + feeBOBA + exitFee) > balance)
+
 
     const balance = Number(logAmount(token.balance, token.decimals))
 
@@ -95,73 +98,71 @@ function DoExitStep({ handleClose, token }) {
 
     setErrorString('')
 
-    if (tooSmall || tooBig) {
-      setErrorString('Warning: Value out of bounds')
+    if (value <= 0) {
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (tooSmall) {
+      setValidValue(false)
+      setValue(value)
+      return false
+    }
+    else if (tooBig) {
       setValidValue(false)
       setValue(value)
       return false
     }
     else if (
-      !feeUseBoba && // check is needed regardless of fee token choice
+       exitFee > Number(feeBalanceBOBA)) {
+       setErrorString(`Insufficient BOBA balance to cover xChain message relay. You need at least ${exitFee} BOBA.`)
+       setValidValue(false)
+       setValue(value)
+       return false
+    }
+    else if (
       token.symbol === 'ETH' &&
-      (Number(value) + feeETH) > balance)
-    {
-      // insufficient ETH to cover the ETH amount plus gas
-      // due to MetaMask issue, this is needed even if you are paying in ETH
-      setErrorString('Warning: ETH amount + fees > balance')
+      (Number(value) + feeETH) > balance) {
+      if(feeUseBoba)
+        setErrorString('Warning: ETH amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+      else
+        setErrorString('Warning: ETH amount + fees > balance')
       setValidValue(false)
       setValue(value)
       return false
     }
     else if (
-      feeUseBoba && // check is needed regardless of fee token choice
-      token.symbol === 'ETH' &&
-      (Number(value) + feeETH) > balance)
-    {
-      // insufficient ETH to cover the ETH amount plus gas
-      // due to MetaMask issue, this is needed even if you are paying in ETH
-      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
-      setValidValue(false)
-      setValue(value)
-      return false
-    }
-    else if (
+      //pay BOBA, exit BOBA - check BOBA amount
       feeUseBoba &&
       token.symbol === 'BOBA' &&
-      (Number(value) + feeBOBA) > balance)
+      (Number(value) + feeBOBA + exitFee) > balance)
     {
-      // insufficient BOBA to cover the BOBA amount plus gas
+      // insufficient BOBA to cover the BOBA amount plus gas plus exitFee
       setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
       setValue(value)
       return false
     }
     else if (
-      !feeUseBoba &&
+      // insufficient ETH to cover exit fees
+      // it does not matter if you are paying in ETH or BOBA
       feeETH > Number(feeBalanceETH))
     {
       // insufficient ETH to cover exit fees
-      setErrorString('Warning: ETH balance too low.')
+      if(feeUseBoba)
+        setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+      else
+        setErrorString('Warning: ETH balance too low to cover gas')
       setValidValue(false)
       setValue(value)
       return false
     }
     else if (
-      feeUseBoba &&
-      feeETH > Number(feeBalanceETH))
-    {
-      // insufficient ETH to cover exit fees
-      setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet.')
-      setValidValue(false)
-      setValue(value)
-      return false
-    }
-    else if (
-      feeUseBoba &&
-      feeBOBA > Number(feeBalanceBOBA))
-    {
       // insufficient BOBA to cover exit fees
-      setErrorString('Warning: BOBA balance too low')
+      feeUseBoba &&
+      (feeBOBA + exitFee) > Number(feeBalanceBOBA))
+    {
+      setErrorString('Warning: BOBA balance too low to cover gas/fees')
       setValidValue(false)
       setValue(value)
       return false
@@ -176,16 +177,18 @@ function DoExitStep({ handleClose, token }) {
 
   async function doExit() {
 
-    console.log("Amount to exit:", value_Wei_String)
-
-    let res = await dispatch(exitBOBA(token.address, value_Wei_String))
+    let res = await dispatch(
+      exitBOBA(
+        token.address,
+        value_Wei_String
+      )
+    )
 
     if (res) {
       dispatch(
         openAlert(
           `${token.symbol} was bridged to L1. You will receive
-          ${Number(value).toFixed(3)} ${token.symbol}
-          on L1 in 7 days.`
+          ${Number(value).toFixed(3)} ${token.symbol} on L1 in 7 days.`
         )
       )
       handleClose()
@@ -208,7 +211,6 @@ function DoExitStep({ handleClose, token }) {
 
   useEffect(() => {
     if (typeof(token) !== 'undefined') {
-      console.log("Token:",token)
       dispatch(fetchClassicExitCost(token.address))
       dispatch(fetchL2BalanceETH())
       dispatch(fetchL2BalanceBOBA())
@@ -221,8 +223,6 @@ function DoExitStep({ handleClose, token }) {
     function estimateMax() {
 
       const safeCost = Number(cost) * 1.04 // 1.04 = safety margin on the cost
-      console.log("ETH fees:", safeCost)
-      console.log("BOBA fees:", safeCost * feePriceRatio)
 
       setFeeETH(safeCost)
       setFeeBOBA(safeCost * feePriceRatio)
@@ -237,8 +237,14 @@ function DoExitStep({ handleClose, token }) {
           setMax_Float(0.0)
       }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
+          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+        else
+          setMax_Float(0.0)
+      }
+      else if (token.symbol === 'BOBA' && !feeUseBoba) {
+        if(balance - exitFee > 0.0)
+          setMax_Float(balance - exitFee)
         else
           setMax_Float(0.0)
       }
@@ -247,33 +253,77 @@ function DoExitStep({ handleClose, token }) {
       }
     }
     if (Number(cost) > 0) estimateMax()
-  }, [ token, cost, feeUseBoba, feePriceRatio ])
+  }, [ token, cost, feeUseBoba, feePriceRatio, exitFee ])
 
-  let ETHstring = ''
+  let estGas = ''
+
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      ETHstring = `Estimated gas (approval + exit): ${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ETH`
     }
   }
 
   // prohibit ExitAll when paying with the token that is to be exited
-  let allowExitall = true
+  let allowUseAll = true
   if(token.symbol === 'ETH') {
-    allowExitall = false
+    allowUseAll = false
   }
   else if (token.symbol === 'BOBA' && feeUseBoba) {
-    allowExitall = false
+    allowUseAll = false
+  }
+
+  let receiveL1 = `${Number(value).toFixed(3)} ${token.symbol}
+              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}`
+
+  if( Number(logAmount(token.balance, token.decimals)) === 0) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          Sorry, nothing to exit - no {token.symbol} in this wallet
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+        >
+          Cancel
+        </Button>
+      </Box>)
+  } else if ( exitFee > Number(feeBalanceBOBA) ) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+          <br/>
+          BOBA balance: {Number(feeBalanceBOBA)}
+          <br/>
+          Insufficient BOBA balance to cover xChain message relay. You need at least {exitFee} BOBA.
+        </Typography>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+        >
+          Cancel
+        </Button>
+      </Box>)
   }
 
   return (
     <>
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Classic Bridge to L1 ({`${token ? token.symbol : ''}`})
-        </Typography>
+
+        {!isBridge &&
+          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
+            Classic Bridge to L1 ({`${token ? token.symbol : ''}`})
+          </Typography>
+        }
 
         {max_Float > 0.0 &&
           <Input
@@ -285,39 +335,33 @@ function DoExitStep({ handleClose, token }) {
               setAmount(i.target.value)
               setValue_Wei_String(toWei_String(i.target.value, token.decimals))
             }}
-            onUseMax={(i)=>{//they want to use the maximum
-              console.log(i)
+            onUseMax={(i)=>{       //they want to use the maximum
               setAmount(max_Float) //so the display value updates for the user
               setValue_Wei_String(token.balance.toString())
             }}
-            allowUseAll={allowExitall}
+            allowUseAll={allowUseAll}
             unit={token.symbol}
             maxValue={max_Float}
             variant="standard"
             newStyle
+            isBridge={isBridge}
+            openTokenPicker={openTokenPicker}
           />
         }
+
         {max_Float === 0 &&
           <Typography variant="body1" sx={{mt: 2}}>
             Loading...
           </Typography>
         }
-        {validValue && token && (
-          <Typography variant="body2" sx={{mt: 2}}>
-            {value &&
-              `You will receive ${Number(value).toFixed(3)} ${token.symbol}
-              ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`: ''}
-              on L1. Your funds will be available on L1 in 7 days.`}
-          </Typography>
-        )}
 
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(ETHstring)}
-        </Typography>
-
-        <Typography variant="body2" sx={{mt: 2}}>
-          {parse(`Exit Fee: ${exitFee} BOBA`)}
-        </Typography>
+        <BridgeFee
+          estFee={estGas}
+          exitFee={`${exitFee} BOBA`}
+          estReceive={receiveL1}
+          time="In 7 days"
+          timeInfo="Your funds will be available in 7 days."
+        />
 
         {errorString !== '' &&
           <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
@@ -325,7 +369,7 @@ function DoExitStep({ handleClose, token }) {
           </Typography>
         }
 
-        {loading && (
+        { !isBridge && loading && (
           <Typography variant="body2" sx={{mt: 2, color: 'green'}}>
             This window will close when your transaction has been signed and submitted.
           </Typography>
@@ -333,29 +377,30 @@ function DoExitStep({ handleClose, token }) {
       </Box>
 
       <WrapperActionsModal>
+        <Button
+          onClick={handleClose}
+          disabled={false}
+          variant='outlined'
+          color='primary'
+        >
+          {buttonLabel}
+        </Button>
+        {token && (
           <Button
-            onClick={handleClose}
-            color="neutral"
-            size="large"
+            onClick={doExit}
+            color="primary"
+            variant="contained"
+            loading={loading}
+            tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
+            disabled={!validValue}
+            triggerTime={new Date()}
+            fullWidth={isMobile}
           >
-            {buttonLabel}
+            Bridge to L1
           </Button>
-          {token && (
-            <Button
-              onClick={doExit}
-              color="primary"
-              variant="contained"
-              loading={loading}
-              tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L1"}
-              disabled={!validValue}
-              triggerTime={new Date()}
-              fullWidth={isMobile}
-              size="large"
-            >
-              Bridge to L1
-            </Button>
-          )}
+        )}
       </WrapperActionsModal>
+
     </>
   )
 }

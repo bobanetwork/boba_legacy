@@ -1019,7 +1019,7 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	// If gas price is 0 or nil, the returned gas limit doesn't include the
 	// l1 security fee
 	gasPrice := new(big.Int)
-	price, err := b.SuggestPrice(ctx)
+	price, err := b.SuggestL2GasPrice(context.Background())
 	if err == nil && isFeeTokenUpdate {
 		if args.GasPrice == nil {
 			// gasPrice is used to calculate the l2ExtraFee

@@ -202,11 +202,29 @@ export function settle_v1() {
   )
 }
 
-// export function monsterMint() {
-//   return createAction('MONSTER/CREATE', () =>
-//     networkService.monsterMint()
-//   )
-// }
+export function settle_v2() {
+  return createAction('SETTLE_v2/CREATE', () =>
+    networkService.settle_v2()
+  )
+}
+
+export function settle_v2OLO() {
+  return createAction('SETTLE_v2OLO/CREATE', () =>
+    networkService.settle_v2OLO()
+  )
+}
+
+export function settle_v3() {
+  return createAction('SETTLE_v3/CREATE', () =>
+    networkService.settle_v3()
+  )
+}
+
+export function settle_v3OLO() {
+  return createAction('SETTLE_v3OLO/CREATE', () =>
+    networkService.settle_v3OLO()
+  )
+}
 
 export function fetchLookUpPrice(params) {
   return createAction('PRICE/GET', () =>

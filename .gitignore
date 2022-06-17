@@ -6,8 +6,10 @@ temp
 coverage.json
 *.tsbuildinfo
 
+.aws-sam/
 .idea/
-
+.serverless/
+build
 dist
 cache
 

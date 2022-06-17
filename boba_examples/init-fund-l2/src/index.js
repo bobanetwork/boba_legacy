@@ -1,6 +1,6 @@
 const ethers = require('ethers')
 const chalk = require('chalk')
-const { Watcher } = require('../../../packages/core-utils/dist/watcher')
+const { CrossChainMessenger } = require('../../../packages/sdk')
 const { loadContract } = require('../../../packages/contracts/dist/index.js')
 require('dotenv').config()
 
@@ -25,6 +25,14 @@ const main = async () => {
   )
   const L1Wallet = new ethers.Wallet(PRIVATE_KEY).connect(L1Provider)
   const L2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(L2Provider)
+
+  const network = await L1Provider.getNetwork()
+  const messenger = new CrossChainMessenger({
+    l1SignerOrProvider: L1Wallet,
+    l2SignerOrProvider: L2Wallet,
+    l1ChainId: network.chainId,
+    fastRelayer: false,
+  })
 
   const Lib_AddressManager = loadContract(
     'Lib_AddressManager',
@@ -56,37 +64,33 @@ const main = async () => {
     )}`
   )
 
-  const watcher = new Watcher({
-    l1: {
-      provider: L1Provider,
-      messengerAddress: Proxy__L1CrossDomainMessengerAddress,
-    },
-    l2: {
-      provider: L2Provider,
-      messengerAddress: L2CrossDomainMessengerAddress,
-    },
-  })
-
   const Proxy__L1StandardBridge = loadContract(
     'L1StandardBridge',
     Proxy__L1StandardBridgeAddress,
     L1Wallet
   )
 
-  const depositTxStatus = await Proxy__L1StandardBridge.depositETH(
+  const depositTx = await Proxy__L1StandardBridge.depositETH(
     L2_GAS_LIMIT,
     ethers.utils.formatBytes32String(new Date().getTime().toString()),
     {
       value: TRANSFER_AMOUNT,
     }
   )
-  await depositTxStatus.wait()
-  const [l1ToL2msgHash] = await watcher.getMessageHashesFromL1Tx(
-    depositTxStatus.hash
+
+  const receiptL1Tx = await depositTx.wait()
+  console.log(' got L1->L2 message hash:', receiptL1Tx.transactionHash)
+
+  const currentBlock = await L2Provider.getBlockNumber()
+  const fromBlock = currentBlock - 1000 > 0 ? currentBlock - 1000 : 0
+
+  const receiptL2Tx = await messenger.waitForMessageReceipt(depositTx, {
+    fromBlock,
+  })
+  console.log(
+    ' completed Deposit! L2 tx hash:',
+    receiptL2Tx.transactionReceipt.transactionHash
   )
-  console.log(' got L1->L2 message hash', l1ToL2msgHash)
-  const l2Receipt = await watcher.getL2TransactionReceipt(l1ToL2msgHash)
-  console.log(' completed Deposit! L2 tx hash:', l2Receipt.transactionHash)
 }
 
 try {

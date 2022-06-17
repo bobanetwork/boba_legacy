@@ -13,7 +13,7 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 var urlStr
 
-const gasOverride = { gasLimit: 3000000 }
+const gasOverride = { /*gasLimit: 3000000*/ }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
@@ -60,6 +60,8 @@ describe("Stableswap at AWS Lambda", function () {
       (TuringHelperJson.abi),
       (TuringHelperJson.bytecode),
       deployerWallet)
+
+    console.log("    Factory__Helper", Factory__Helper)
     
     helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed as", helper.address)
@@ -90,8 +92,8 @@ describe("Stableswap at AWS Lambda", function () {
       BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
     } 
     else if(hre.network.name === 'boba_mainnet') {
-      BOBAL2Address = '0x_______________'
-      BobaTuringCreditAddress = '0x_______________________'
+      BOBAL2Address = '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
+      BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
     } 
     else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
@@ -105,6 +107,9 @@ describe("Stableswap at AWS Lambda", function () {
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
+
+    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
+    console.log("    BOBA Balance in your account", bobaBalance.toString())
 
     // prepare to register/fund your Turing Helper 
     turingCredit = getContractFactory(
@@ -128,9 +133,6 @@ describe("Stableswap at AWS Lambda", function () {
     const depositAmount = utils.parseEther('0.1') //enough for 10 Turing Transactions - should ocver the entire test suite
 
     const preBalance = await turingCredit.prepaidBalance(helper.address)
-
-    const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
-    console.log("    BOBA Balance in your account", bobaBalance.toString())
 
     const approveTx = await L2BOBAToken.approve(
       turingCredit.address,

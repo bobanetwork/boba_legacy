@@ -14,7 +14,7 @@ if [[ ! -z "$URL" ]]; then
 fi
 
 
-# waits for l2geth to be up
+echo "waits for l2geth to be up"
 curl --fail \
     --show-error \
     --silent \

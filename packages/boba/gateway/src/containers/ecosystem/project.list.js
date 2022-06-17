@@ -5,7 +5,9 @@ import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
 import bobaApesLogo from '../../images/ecosystem/bobaapes.webp'
 import bobaDogeLogo from '../../images/ecosystem/bobaDoge.webp'
 import bobaPunksLogo from '../../images/ecosystem/bobaPunks.webp'
+import bodhLogo from '../../images/ecosystem/bodhfinance.svg'
 import boringDaoLogo from '../../images/ecosystem/BoringDAO.webp'
+import brewery from '../../images/ecosystem/brewery.svg'
 import coing98Logo from '../../images/ecosystem/coin98.webp'
 import deBankLogo from '../../images/ecosystem/deBank.webp'
 import decentWalletLogo from '../../images/ecosystem/decentWallet.webp'
@@ -13,14 +15,17 @@ import defiyieldLogo from '../../images/ecosystem/defiyield.webp'
 import dodoLogo from '../../images/ecosystem/dodo.webp'
 import domFiLogo from '../../images/ecosystem/dominanaceFinanace.webp'
 import fraxLogo from '../../images/ecosystem/frax.webp'
+import koyoLogo from '../../images/ecosystem/koyo.svg'
 import l2ChartsLogo from '../../images/ecosystem/l2Charts.webp'
 import layerSwapLogo from '../../images/ecosystem/layerswap.webp'
 import mewLogo from '../../images/ecosystem/mew.webp'
 import multiChainLogo from '../../images/ecosystem/Multichain.webp'
+import multiSigLogo from '../../images/ecosystem/multiSig.svg'
 import OolongswapLogo from '../../images/ecosystem/Oolongswap.webp'
 import safepalLogo from '../../images/ecosystem/safepal.webp'
 import satisLogo from '../../images/ecosystem/satis.webp'
 import shibuiDAOLogo from '../../images/ecosystem/shibuidao.svg'
+import symbiosisLogo from '../../images/ecosystem/symbiosis.svg'
 import synLogo from '../../images/ecosystem/syn.webp'
 import thetanutsLogo from '../../images/ecosystem/thetanuts.webp'
 import tofuNftLogo from '../../images/ecosystem/tofuNft.webp'
@@ -28,8 +33,6 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
-import multiSigLogo from '../../images/ecosystem/multiSig.svg'
-import brewery from '../../images/ecosystem/brewery.svg'
 
 /**
  * thematical order of type.
@@ -48,7 +51,7 @@ export const projectList = [
     "discord": "http://discord.gg/savwHHXsmU",
     "type": "defi",
     "image": OolongswapLogo,
-    "description": "The leading DEX built on Boba Network (Ethereum’s newest L2). OolongSwap incorporates all of the features you need from a traditional DEX while pioneering new ideas from DeFi 2.0 such as Protocol Controlled Value."
+    "description": "The leading DEX on Boba. OolongSwap incorporates all of the features you need from a traditional DEX while pioneering new ideas from DeFi 2.0 such as Protocol Controlled Value."
   },
   {
     "title": "FRAX",
@@ -59,6 +62,16 @@ export const projectList = [
     "type": "defi",
     "image": fraxLogo,
     "description": "World’s first fractional-algorithmic stablecoin protocol."
+  },
+  {
+    "title": "Kōyō Finance",
+    "canLaunch": true,
+    "link": "https://koyo.finance/",
+    "twitter": "https://docs.koyo.finance/twitter",
+    "discord": "https://docs.koyo.finance/discord",
+    "type": "defi",
+    "image": koyoLogo,
+    "description": "Kōyō is the first next-generation AMM protocol in the Boba ecosystem. It is inspired by Curve and Balancer. At its core it’s a decentralized exchange (DEX) that minimizes unnecessary losses from swaps between assets of equal value."
   },
   {
     "title": "BoringDAO",
@@ -78,7 +91,7 @@ export const projectList = [
     "twitter": "https://twitter.com/AnyswapNetwork",
     "type": "bridge",
     "image": multiChainLogo,
-    "description": "Cross-Chain Router Protocol, envisioned to be the ultimate router for Web3"
+    "description": "Cross-Chain Router Protocol, envisioned to be the ultimate router for Web3."
   },
   {
     "title": "Synapse",
@@ -89,7 +102,7 @@ export const projectList = [
     "discord": "https://discord.com/invite/synapseprotocol",
     "type": "bridge",
     "image": synLogo,
-    "description": "The most widely used cross-chain liquidity network connecting all blockchains"
+    "description": "A widely used cross-chain liquidity network connecting all blockchains."
   },
   {
     "title": "Domination Finance",
@@ -110,7 +123,7 @@ export const projectList = [
     "discord": "https://discord.com/invite/DwjPNvAwdd",
     "type": "defi",
     "image": zenchaLogo,
-    "description": "The First StableSwap Exchange & Liquidity Pool on Boba Network"
+    "description": "The First StableSwap Exchange & Liquidity Pool on Boba."
   },
   {
     "title": "Unidex",
@@ -131,7 +144,7 @@ export const projectList = [
     "discord": "http://discord.gg/KhwYN35sHy",
     "type": "bridge",
     "image": layerSwapLogo,
-    "description": "Bridge Crypto from CEX to Layer2 faster and cheaper"
+    "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
   },
   {
     "title": "WitNet",
@@ -152,7 +165,7 @@ export const projectList = [
     "twitter": "https://twitter.com/boba_punks",
     "type": "nft",
     "image": bobaPunksLogo,
-    "description": "The first and only punks on Boba Network"
+    "description": "The first punks on Boba."
   },
   {
     "title": "Boba Doge",
@@ -163,7 +176,7 @@ export const projectList = [
     "discord": "http://discord.gg/jvXBqpKgdt",
     "type": "token",
     "image": bobaDogeLogo,
-    "description": "The first dog coin on Boba Network"
+    "description": "The first dog coin on Boba."
   },
   {
     "title": "ApeBoard",
@@ -173,7 +186,7 @@ export const projectList = [
     "twitter": "https://twitter.com/ape_board",
     "type": "wallet",
     "image": apeBoardLogo,
-    "description": "Multi-chain DeFi dashboard. Built by apes, for apes"
+    "description": "Multi-chain DeFi dashboard. Built by apes, for apes."
   },
   {
     "title": "DeBank",
@@ -184,7 +197,7 @@ export const projectList = [
     "discord": "https://discordapp.com/invite/KYuj8DE",
     "type": "defi",
     "image": deBankLogo,
-    "description": "The leading DeFi portfolio tracker that supports the largest number of DeFi protocols across 19 chains"
+    "description": "A leading DeFi portfolio tracker that supports a large number of DeFi protocols across 19 chains."
   },
   {
     "title": "SafePal",
@@ -192,17 +205,17 @@ export const projectList = [
     "link": "https://safepal.io/",
     "type": "wallet",
     "image": safepalLogo,
-    "description": "1st tokenized crypto hardware wallet"
+    "description": "1st tokenized crypto hardware wallet."
   },
   {
     "title": "Dodo",
     "canLaunch": true,
     "link": "https://dodoex.io/",
-    "twitter": "https://twitter.com/BreederDodo?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor",
+    "twitter": "https://twitter.com/BreederDodo",
     "discord": "http://discord.gg/tyKReUK",
     "type": "defi",
     "image": dodoLogo,
-    "description": "Decentralized Trading Protocol for Web3, Powered by the Proactive Marketing Making"
+    "description": "Decentralized Trading Protocol for Web3, Powered by Proactive Market Making."
   },
   {
     "title": "tofuNFT",
@@ -213,7 +226,7 @@ export const projectList = [
     "discord": "https://discord.gg/3wFUTZmTm7",
     "type": "nft",
     "image": tofuNftLogo,
-    "description": "NFT marketplace for Boba Network"
+    "description": "NFT marketplace for Boba Network."
   },
   {
     "title": "Band Protocol",
@@ -224,7 +237,7 @@ export const projectList = [
     "discord": "https://discord.com/invite/3t4bsY7",
     "type": "tool",
     "image": bandProtocolLogo,
-    "description": "Secure, scalable cross-chain decentralized "
+    "description": "Secure, scalable cross-chain decentralized oracle."
   },
   {
     "title": "Boba MultiSig",
@@ -232,7 +245,7 @@ export const projectList = [
     "link": "https://multisig.boba.network/",
     "type": "wallet",
     "image": multiSigLogo,
-    "description": "The most trusted platform to manage digital assets on Ethereum"
+    "description": "The most trusted platform to manage digital assets on Ethereum."
   },
   {
     "title": "MEW",
@@ -242,7 +255,7 @@ export const projectList = [
     "twitter": "https://twitter.com/myetherwallet",
     "type": "wallet",
     "image": mewLogo,
-    "description": "Free, client-side interface helping you interact with the Ethereum blockchain"
+    "description": "Free, client-side interface helping you interact with the Ethereum blockchain,"
   },
   {
     "title": "Coin98",
@@ -262,7 +275,7 @@ export const projectList = [
     "twitter": "https://twitter.com/L2Charts",
     "type": "tool",
     "image": l2ChartsLogo,
-    "description": "Your Favorite charts on L2"
+    "description": "Your Favorite charts on L2."
   },
   {
     "title": "Boba Apes",
@@ -271,7 +284,7 @@ export const projectList = [
     "twitter": "https://twitter.com/bobaapes",
     "type": "nft",
     "image": bobaApesLogo,
-    "description": "Christmas collection of 10000 randomized and unique digital collectibles"
+    "description": "Christmas collection of 10000 randomized and unique digital collectibles."
   },
   {
     "title": "D’CENT Wallet",
@@ -300,7 +313,7 @@ export const projectList = [
     "discord": "https://discord.gg/across",
     "type": "bridge",
     "image": acrossLogo,
-    "description": "Across is the fastest, cheapest and most secure bridge between L1 and L2s."
+    "description": "Across is a fast, cheap, and secure bridge between L1 and L2s."
   },
   {
     "title": "UMA Protocol",
@@ -310,7 +323,7 @@ export const projectList = [
     "discord": "https://discord.com/invite/jsb9XQJ",
     "type": "tool",
     "image": umaprotocolLogo,
-    "description": "Optimistic Oracle built for Web3"
+    "description": "Optimistic Oracle built for Web3."
   },
   {
     "title": "Thetanuts",
@@ -320,7 +333,7 @@ export const projectList = [
     "discord": "https://discord.gg/XnSYqutaB3",
     "type": "defi",
     "image": thetanutsLogo,
-    "description": "Sustainable yield through automated yield generating vault strategies implemented on cross-chain structured products"
+    "description": "Sustainable yield through automated yield generating vault strategies implemented on cross-chain structured products."
   },
   {
     "title": "Satis",
@@ -331,7 +344,7 @@ export const projectList = [
     "discord": "https://discord.gg/JUmcTGbUWr",
     "type": "defi",
     "image": satisLogo,
-    "description": "The DEX for the Interoperable Future - First multichain order book derivatives DEX powered by concentrated liquidity"
+    "description": "The DEX for the Interoperable Future - First multichain order book derivatives DEX powered by concentrated liquidity."
   },
   {
     "title": "ShibuiNFT",
@@ -342,7 +355,7 @@ export const projectList = [
     "discord": "https://docs.shibuidao.com/discord",
     "type": "nft",
     "image": shibuiDAOLogo,
-    "description": ""
+    "description": "An NFT marketplace on Boba."
   },
   {
     "title": "Boba Brewery",
@@ -352,10 +365,30 @@ export const projectList = [
     "twitter": "https://twitter.com/boba_brewery",
     "type": "defi",
     "image": brewery,
-    "description": "Boba Brewery is the first exclusive launchpad for decentralized fundraising in Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
-  }
+    "description": "Boba Brewery is the first launchpad for decentralized fundraising in the Boba ecosystem, offering the hottest and innovative projects in a fair, secure, and efficient way."
+  },
+  {
+    "title": "Bodh Finance",
+    "canLaunch": true,
+    "link": "https://bodh.finance/",
+    "twitter": "https://twitter.com/BodhFinance",
+    "discord": "https://discord.gg/za9KXX5m6E",
+    "type": "defi",
+    "image": bodhLogo,
+    "description": "The leading Lending protocol on Boba Network."
+  },
+  {
+     "title": "Symbiosis",
+     "canLaunch": true,
+     "link": "https://symbiosis.finance/",
+     "telegram": "https://t.me/symbiosis_finance",
+     "twitter": "https://twitter.com/symbiosis_fi",
+     "discord": "https://discord.gg/vmQjR2d7WC",
+     "type": "defi",
+     "image": symbiosisLogo,
+     "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
+   },
 ]
-
 
 export const loadProjectByCategory = () => {
   const typeOrder = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]

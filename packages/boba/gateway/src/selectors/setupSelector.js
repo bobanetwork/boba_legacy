@@ -20,6 +20,12 @@ export function selectAccountEnabled () {
   }
 }
 
+export function selectWalletAddress () {
+  return function (state) {
+    return state.setup['walletAddress']
+  }
+}
+
 // do we have basic providers?
 export function selectBaseEnabled () {
   return function (state) {
@@ -37,6 +43,24 @@ export function selectNetwork () {
 export function selectLayer () {
   return function (state) {
     return state.setup['netLayer']
+  }
+}
+
+export function selectConnectETH () {
+  return function (state) {
+    return state.setup['connectETH']
+  }
+}
+
+export function selectConnectBOBA () {
+  return function (state) {
+    return state.setup['connectBOBA']
+  }
+}
+
+export function selectConnect () {
+  return function (state) {
+    return state.setup['connect']
   }
 }
 

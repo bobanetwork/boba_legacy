@@ -22,8 +22,8 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  //selectBobaPriceRatio,
-  selectNetwork
+  selectNetwork,
+  selectMonster
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -38,14 +38,15 @@ import { isEqual } from 'lodash'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
+import { HelpOutline } from '@mui/icons-material'
 
 function FeeSwitcher() {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  //const feePriceRatio = useSelector(selectBobaPriceRatio())
   const network = useSelector(selectNetwork())
+  const monsterNumber = useSelector(selectMonster())
 
   const layer = useSelector(selectLayer())
 
@@ -125,17 +126,17 @@ function FeeSwitcher() {
     return null
   }
 
-  if (network === 'mainnet') {
-    return null
-  }
+  // enable fee switcher for everyone
+  // if (network === 'mainnet' && monsterNumber < 1) {
+  //   return null
+  // }
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip
-        title={'BOBA or ETH will be used across Boba according to your choice.'}
-      >
-        <Typography variant="body2">Fee</Typography>
+      <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
+      <Typography variant="body2">Fee</Typography>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)

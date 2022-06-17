@@ -22,17 +22,9 @@ const main = async () => {
     'gas-price-oracle-owner-key',
     env.GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY
   )
-  const SEQUENCER_PRIVATE_KEY = config.str(
-    'sequencer-private-key',
-    env.SEQUENCER_PRIVATE_KEY
-  )
   const SEQUENCER_ADDRESS = config.str(
     'sequencer-address',
     env.SEQUENCER_ADDRESS
-  )
-  const PROPOSER_PRIVATE_KEY = config.str(
-    'proposer-private-key',
-    env.PROPOSER_PRIVATE_KEY
   )
   const PROPOSER_ADDRESS = config.str('proposer-address', env.PROPOSER_ADDRESS)
   const RELAYER_PRIVATE_KEY = config.str(
@@ -88,11 +80,6 @@ const main = async () => {
     parseInt(env.MAX_L1_BASE_FEE, 10) || 225000000000
   )
 
-  // boba gas fee
-  const POLYGON_IO_API_KEY = config.str(
-    'polygon-io-api-key',
-    env.POLYGON_IO_API_KEY
-  )
   // boba gas fee / eth gas fee = BOBA_AS_FEE_TOKEN_RATIO_100X
   const BOBA_FEE_RATIO_100X = config.uint(
     'boba-fee-ratio-100x',
@@ -101,6 +88,12 @@ const main = async () => {
   const BOBA_FEE_RATIO_MIN_PERCENT_CHANGE = config.uint(
     'boba-fee-ratio-min-percent-change',
     parseFloat(env.BOBA_FEE_RATIO_MIN_PERCENT_CHANGE) || 0.05
+  )
+
+  // disable gasPrice=0 for local testing
+  const BOBA_LOCAL_TESTNET_CHAINID = config.uint(
+    'boba-local-testnet-chainid',
+    parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
   )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
@@ -115,11 +108,11 @@ const main = async () => {
   if (!GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY) {
     throw new Error('Must pass GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY')
   }
-  if (!SEQUENCER_ADDRESS && !SEQUENCER_PRIVATE_KEY) {
-    throw new Error('Must pass SEQUENCER_ADDRESS or SEQUENCER_PRIVATE_KEY')
+  if (!SEQUENCER_ADDRESS) {
+    throw new Error('Must pass SEQUENCER_ADDRESS')
   }
-  if (!PROPOSER_ADDRESS && !PROPOSER_PRIVATE_KEY) {
-    throw new Error('Must pass PROPOSER_ADDRESS or PROPOSER_PRIVATE_KEY')
+  if (!PROPOSER_ADDRESS) {
+    throw new Error('Must pass PROPOSER_ADDRESS')
   }
   if (!RELAYER_ADDRESS && !RELAYER_PRIVATE_KEY) {
     throw new Error('Must pass RELAYER_ADDRESS or RELAYER_PRIVATE_KEY')
@@ -143,11 +136,7 @@ const main = async () => {
 
   // sequencer, proposer, relayer and fast relayer addresses
   const sequencerAddress = SEQUENCER_ADDRESS
-    ? SEQUENCER_ADDRESS
-    : new Wallet(SEQUENCER_PRIVATE_KEY, l2Provider).address
   const proposerAddress = PROPOSER_ADDRESS
-    ? PROPOSER_ADDRESS
-    : new Wallet(PROPOSER_PRIVATE_KEY, l2Provider).address
   const relayerAddress = RELAYER_ADDRESS
     ? RELAYER_ADDRESS
     : new Wallet(RELAYER_PRIVATE_KEY, l2Provider).address
@@ -172,9 +161,9 @@ const main = async () => {
     minOverhead: MIN_OVERHEAD,
     minL1BaseFee: MIN_L1_BASE_FEE,
     maxL1BaseFee: MAX_L1_BASE_FEE,
-    polygonAPIKey: POLYGON_IO_API_KEY,
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
+    bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
   })
 
   await service.start()

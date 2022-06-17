@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Typography } from '@mui/material';
 
 export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: `${theme.palette.mode === 'light' ? '#FFFFFF' : "rgba(255, 255, 255, 0.06)"}`,
+  background: theme.palette.background.secondary,
   borderRadius: '12px',
   padding: '0'
 }));
@@ -22,7 +22,6 @@ export const LayerContent = styled(Box)(({ theme }) => ({
 }))
 
 export const Label = styled(Typography)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
   color: theme.palette.text.disabled,
 }));
 
@@ -51,20 +50,12 @@ export const LayerDivider = styled(Divider)(({ theme }) => ({
   width: '100%'
 }))
 
-export const LayerSwitcherIconWrapper = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
+
+export const IconSwitcher = styled(IconButton)(({ theme }) => ({
+  background: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.04)",
+  border: '1px solid',
+  borderColor: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0 ,0, 0.06)'}`,
   borderRadius: '12px',
   height: '40px',
-  width: '40px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  cursor: 'pointer'
-}))
-
-export const LayerSwitcherIcon = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 'fit-content'
+  width: '40px'
 }))

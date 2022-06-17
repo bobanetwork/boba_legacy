@@ -7,6 +7,9 @@ export const FeeSwitcherWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   my: 1,
   gap: '5px',
+  [ theme.breakpoints.down('md') ]: {
+    marginTop: '30px'
+  }
 }))
 
 export const FeeSwitcherLabel = styled(Typography)(({ theme }) => ({

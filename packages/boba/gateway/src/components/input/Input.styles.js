@@ -8,7 +8,7 @@ export const Wrapper = styled(Box)`
   background-color: ${(props) => props.newstyle ? props.theme.palette.background.input : 'transparent' };
   border-radius: 4px;
   padding: ${(props) => props.newstyle ? '10px 20px' : '0' };
-  border: ${(props) => props.newstyle ? '1px solid #5E6170' : 'none' };
+  border: ${(props) => props.newstyle ? '1px solid rgba(255, 255, 255, 0.06)' : 'none' };
 `;
 
 export const TextFieldTag = styled(TextField)(({ ...props }) => ({
