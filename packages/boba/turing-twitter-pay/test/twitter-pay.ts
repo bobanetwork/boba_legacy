@@ -34,9 +34,7 @@ let Factory__BobaTuringCredit: ContractFactory
 let Factory__ERC20Mock: ContractFactory
 let erc20Mock: Contract
 let Factory__TwitterPay: ContractFactory
-let Factory__TwitterClaimMeta: ContractFactory
 let twitter: Contract
-let twitterMeta: Contract
 let Factory__TuringHelper: ContractFactory
 let turingHelper: Contract
 let turingCredit: Contract
@@ -269,47 +267,4 @@ describe('Use Boba Bubble for tipping', function () {
     const res = await registration.wait()
     expect(res).to.be.ok
   })
-
-  /*it('should conduct basic twitter claim via meta transaction', async () => {
-    const tweetId = '1522128490211991552'
-
-    const nonce = parseInt(
-      await twitter.getNonce(deployerWallet.address, gasOverride),
-      10
-    )
-    const [signer] = await ethers.getSigners()
-    const hashedMsg = ethers.utils.solidityKeccak256(
-      ['address', 'uint'],
-      [signer.address, nonce]
-    )
-    const messageHashBin = ethers.utils.arrayify(hashedMsg)
-    const signature = await signer.signMessage(messageHashBin)
-
-    const verifiedOnChain = await twitter.verifyMessage(hashedMsg, signature)
-    console.log('SIG', verifiedOnChain) // await sigTest.connect(userWallet).isDataValid(timestamp, signature);
-
-    console.log('Executing meta tx (backend): ', signature, nonce)
-    await twitter.estimateGas.sendFundsMeta(
-      deployerWallet.address,
-      tweetId,
-      hashedMsg,
-      signature,
-      gasOverride
-    )
-
-    const execTx = await twitter.sendFundsMeta(
-      deployerWallet.address,
-      tweetId,
-      hashedMsg,
-      signature,
-      gasOverride
-    )
-    const res = await execTx.wait()
-
-    /*await twitter.estimateGas.sendFunds(tweetId, gasOverride)
-    console.log('Estimated gas')
-    const claim = await twitter.sendFunds(tweetId, gasOverride)
-    const res = await claim.wait()*
-    expect(res).to.be.ok
-  })*/
 })

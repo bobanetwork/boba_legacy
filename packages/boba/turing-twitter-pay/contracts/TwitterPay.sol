@@ -62,12 +62,6 @@ contract TwitterPay is Ownable {
         emit BubbleRegistered(authorId, bobaBubble);
     }
 
-    function sendFundsMeta(address token_, address from_, uint256 bobaBubble_, uint256 amount_, bytes32 hashedMessage_, bytes memory signature_) external {
-        require(verifyMessage(hashedMessage_, signature_) == from_, "Signature faulty");
-        _nonces[from_] = _nonces[from_] + 1;
-        sendFunds(token_, bobaBubble_, amount_);
-    }
-
     /// @dev Send funds to authenticated user.
     function sendFunds(address token_, uint256 bobaBubble_, uint256 amount_) public {
         require(bubbleRegister[bobaBubble_] != address(0), "Unknown bubble");
