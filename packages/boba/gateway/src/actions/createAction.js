@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import * as Sentry from '@sentry/react';
+
 export function createAction (key, asyncAction) {
 
   return async function (dispatch) {
@@ -30,6 +32,7 @@ export function createAction (key, asyncAction) {
         let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage.error.message })
         dispatch({ type: `${key}/ERROR` })
+        Sentry.captureMessage(errorMessage.error.message);
         return false
       }
 
@@ -37,6 +40,7 @@ export function createAction (key, asyncAction) {
         //let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: "Insufficient BOBA balance for emergency swap" })
         dispatch({ type: `${key}/ERROR` })
+        Sentry.captureMessage("Insufficient BOBA balance for emergency swap");
         return false
       }
 
@@ -92,7 +96,7 @@ export function createAction (key, asyncAction) {
     } catch (error) {
 
       console.log("Unhandled error RAW:", {error, key, asyncAction})
-
+      Sentry.captureException(error);
       return false
     }
   }
