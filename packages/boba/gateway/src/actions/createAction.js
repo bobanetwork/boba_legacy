@@ -49,6 +49,7 @@ export function createAction (key, asyncAction) {
 
         console.log("Error keys:", Object.keys(response))
         console.log("Error code:", response.code)
+        Sentry.captureMessage(response.reason)
         if(response.hasOwnProperty('reason')) console.log("Error reason:", response.reason)
 
         // the basic error message
