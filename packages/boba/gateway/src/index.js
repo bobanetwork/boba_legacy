@@ -33,7 +33,15 @@ Sentry.init({
   tracesSampleRate: 1.0,
   initialScope: {
     tags: { 'network': process.env.REACT_APP_CHAIN }
+  },
+  beforeSend: (event) => {
+    // Avoid sending the sentry events on local env.
+    if (window.location.hostname === 'localhost') {
+      return null;
+    }
+    return event
   }
+
 })
 
 // https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
