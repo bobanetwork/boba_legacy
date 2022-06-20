@@ -114,13 +114,22 @@ function FeeSwitcher() {
 
   }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
 
-  if (!accountEnabled) {
-    return null
+  if (!accountEnabled && layer !== 'L2') {
+    return <S.FeeSwitcherWrapper>
+      <Tooltip title={'After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ETH as the gas fee token according to your choice.'}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+      </Tooltip>
+      <Typography variant="body2">Fee</Typography>
+    </S.FeeSwitcherWrapper>
   }
 
-  if (layer !== 'L2') {
-    return null
-  }
+  // if (!accountEnabled) {
+  //   return null
+  // }
+
+  // if (layer !== 'L2') {
+  //   return null
+  // }
 
   // enable fee switcher for everyone
   // if (network === 'mainnet' && monsterNumber < 1) {
@@ -145,6 +154,7 @@ function FeeSwitcher() {
         {
           value: 'BOBA',
           title: 'BOBA',
+          description: 'Save another 25% by using Boba as your gas fee token'
         }
         ]}
       />
