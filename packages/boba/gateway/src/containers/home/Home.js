@@ -100,6 +100,7 @@ import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
 import Bridge from 'containers/bridge/Bridge'
 import MonsterWrapper from 'containers/monster/MonsterWrapper'
+import Lock from 'containers/lock/Lock'
 
 import { Box, Container } from '@mui/material'
 
@@ -238,6 +239,7 @@ function Home() {
 
 
   console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
+  console.log(pageDisplay);
 
   return (
     <>
@@ -374,6 +376,9 @@ function Home() {
             }
             { pageDisplay === "Monster" &&
               <MonsterWrapper />
+            }
+            { pageDisplay === "Lock" &&
+              <Lock />
             }
           </Container>
           <PageFooter/>
