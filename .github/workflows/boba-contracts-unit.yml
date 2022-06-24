@@ -11,6 +11,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  boba-python-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Python tests
+        id: python-unit-tests
+        working-directory: ./packages/boba/turing-twitter-pay/aws/
+        run: python -m unittest discover -s . -t . # also works recursive if we add __init__ everywhere
 
   boba-unit-tests:
     runs-on: ubuntu-latest
