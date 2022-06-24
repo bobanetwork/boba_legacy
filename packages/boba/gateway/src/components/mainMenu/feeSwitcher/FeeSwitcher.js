@@ -123,19 +123,6 @@ function FeeSwitcher() {
     </S.FeeSwitcherWrapper>
   }
 
-  // if (!accountEnabled) {
-  //   return null
-  // }
-
-  // if (layer !== 'L2') {
-  //   return null
-  // }
-
-  // enable fee switcher for everyone
-  // if (network === 'mainnet' && monsterNumber < 1) {
-  //   return null
-  // }
-
   return (
     <S.FeeSwitcherWrapper>
       <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
