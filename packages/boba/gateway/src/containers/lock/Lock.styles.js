@@ -1,6 +1,5 @@
 import { Box, Grid } from "@mui/material";
-import { styled } from '@mui/material/styles'
-
+import { styled } from '@mui/material/styles';
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
@@ -22,7 +21,6 @@ export const PageContainer = styled(Box)(({ theme }) => ({
     padding: '0px',
   },
 }));
-
 
 export const LockFormContainer = styled(Grid)(({ theme }) => ({
   borderRadius: theme.palette.primary.borderRadius,
