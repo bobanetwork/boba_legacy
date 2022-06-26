@@ -16,7 +16,7 @@ fi
 if [[ $STAGE == "rinkeby" ]]; then
   echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
   cp env-rinkeby.yml env.yml &&
-  npx serverless -c serverless-rinkeby.yml deploy &&
+  serverless -c serverless-rinkeby.yml deploy &&
   rm -rf env.yml &&
   rm -rf .serverless
 fi
