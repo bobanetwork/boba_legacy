@@ -6,6 +6,7 @@ temp
 coverage.json
 *.tsbuildinfo
 
+env.yml
 .aws-sam/
 .idea/
 .serverless/
