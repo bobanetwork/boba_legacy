@@ -28,7 +28,7 @@ credentials. Look at `.env-docker.example` for an example.
 You will use this file to set environment variables:
 ```bash
 # Set environment variables
-source ./.env-docker
+source ./env-rinkeby.yml-docker
 ```
 To run the docker image:
 ```bash

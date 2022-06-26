@@ -9,7 +9,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import './tasks/deploy'
 
-// Load environment variables from .env
+// Load environment variables from env-rinkeby.yml
 dotenv.config()
 
 // Fix lint

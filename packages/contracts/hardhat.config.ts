@@ -25,7 +25,7 @@ import 'hardhat-gas-reporter'
 //import '@primitivefi/hardhat-dodoc'
 import 'hardhat-output-validator'
 
-// Load environment variables from .env
+// Load environment variables from env-rinkeby.yml
 dotenv.config()
 
 const enableGasReport = !!process.env.ENABLE_GAS_REPORT
