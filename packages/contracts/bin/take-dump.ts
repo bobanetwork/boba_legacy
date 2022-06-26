@@ -5,6 +5,7 @@ import * as mkdirp from 'mkdirp'
 import { utils, Wallet } from 'ethers'
 
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import TwitterPayJson from '../../boba/turing-twitter-pay/artifacts/contracts/TwitterPay.sol/TwitterPay.json'
 
 const ensure = (value, key) => {
   if (typeof value === 'undefined' || value === null || Number.isNaN(value)) {
@@ -113,6 +114,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     TuringHelperJson,
     berlinBlock,
     l1BobaTokenAddress,
+    TwitterPayJson,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))

@@ -69,6 +69,12 @@ const deployFn: DeployFunction = async (hre) => {
     name: 'Boba_GasPriceOracle',
     address: predeploys.Boba_GasPriceOracle,
   })
+
+  await registerAddress({
+    hre,
+    name: 'TwitterPay',
+    address: predeploys.TwitterPay,
+  })
 }
 
 deployFn.tags = ['Lib_AddressManager']

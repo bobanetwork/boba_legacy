@@ -585,8 +585,6 @@ class NetworkService {
         this.L2Provider,
       ).connect(this.provider.getSigner())
 
-      console.warn("HHH", this.provider.getSigner(), allAddresses.TwitterPay)
-
       const gasEstimated = await twitterPayContract.estimateGas.registerBobaBubble(tweetId)
       console.log('Estimated gas..', gasEstimated)
       const registration = await twitterPayContract.registerBobaBubble(tweetId,
