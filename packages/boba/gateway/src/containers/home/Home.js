@@ -100,7 +100,7 @@ import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
 import Bridge from 'containers/bridge/Bridge'
 import MonsterWrapper from 'containers/monster/MonsterWrapper'
-import Lock from 'containers/lock/Lock'
+import Lock from 'containers/veboba/Lock'
 
 import { Box, Container } from '@mui/material'
 
@@ -111,6 +111,7 @@ import Alert from 'components/alert/Alert'
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { trackPageView } from 'util/googleAnalytics'
+import { fetchLockRecords } from 'actions/veBobaAction'
 
 require('dotenv').config()
 
@@ -213,6 +214,7 @@ function Home() {
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
+      dispatch(fetchLockRecords())
     }
   }, POLL_INTERVAL)
 

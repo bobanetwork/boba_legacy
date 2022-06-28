@@ -1,30 +1,43 @@
-import { Box, FormControlLabel, Radio, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { BigNumber, utils } from 'ethers'
+import moment from 'moment'
+import DatePicker from 'react-datepicker'
+
+import { Box, FormControlLabel, Radio, Typography, useTheme, IconButton } from '@mui/material'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
+import CalenderIcon from 'components/icons/CalenderIcon'
+
+import * as G from 'containers/Global.styles'
 
 import { setConnectBOBA } from 'actions/setupAction'
-import CalenderIcon from 'components/icons/CalenderIcon'
-import * as G from 'containers/Global.styles'
-import { BigNumber, utils } from 'ethers'
-import { useDispatch, useSelector } from 'react-redux'
+
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectVeBobaRatio, selectVotingPower } from 'selectors/veBobaSelector'
+
 import { toWei_String } from 'util/amountConvert'
+import { openAlert } from 'actions/uiAction'
+
 import * as S from './CreateLock.styles'
+import * as Styles from './CreateLock.module.scss'
+import "react-datepicker/dist/react-datepicker.css"
+import { useRef } from 'react'
+
 
 const EXPIRY_OPTIONS = [
   {
-    value: '3',
+    value: moment().add(3, 'M').format("YYYY-MM-DD"),
     label: '3 Months',
   },
   {
-    value: '6',
+    value: moment().add(6, 'M').format("YYYY-MM-DD"),
     label: '6 Months',
   },
   {
-    value: '12',
+    value: moment().add(1, 'y').format("YYYY-MM-DD"),
     label: '1 Year',
   },
 ]
@@ -32,16 +45,23 @@ const EXPIRY_OPTIONS = [
 function CreateLock() {
 
   const dispatch = useDispatch()
+
+  const theme = useTheme()
+  const datePickerRef = useRef()
+
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer2 = useSelector(selectlayer2Balance)
 
+  const veBobaRatio = useSelector(selectVeBobaRatio);
+  const votingPower = useSelector(selectVotingPower)
+
   const [ value, setValue ] = useState('0');
-  const [ selectedExpiry, setselectedExpiry ] = useState('3');
+
+  const [ expiry, setExpiry ] = useState(EXPIRY_OPTIONS[ 0 ].value);
   const [ maxBalance, setMaxBalance ] = useState(0);
 
   useEffect(() => {
-    //  set boba balance,
     if (layer2 && layer2.length > 0) {
       const token = Object.values(layer2).find((t) => t[ 'symbolL2' ] === 'BOBA')
       if (token) {
@@ -53,8 +73,8 @@ function CreateLock() {
   }, [ layer2 ]);
 
   const optionsProps = ({ value, label }) => ({
-    checked: selectedExpiry === value,
-    onChange: (e) => setselectedExpiry(e.target.value),
+    checked: expiry === value,
+    onChange: (e) => setExpiry(e.target.value),
     value: value,
     label: <Typography variant="body4">{label}</Typography>
   })
@@ -63,68 +83,30 @@ function CreateLock() {
     dispatch(setConnectBOBA(true))
   }
 
-
-  const createLock = () => {
-    console.log('value', value);
-    console.log('toWeigString', toWei_String(value, 18));
-    console.log('Expires', selectedExpiry);
-    /*
-      Dispatch the event for createLock
-    */
+  const openDatePicker = () => {
+    let ele = datePickerRef.current;
+    ele.setFocus(true);
   }
 
 
-  if (!accountEnabled) {
-    return <S.LockFormContainer>
-      <Box>
-        <Typography px={4} pt={2} variant="h2">Create New Lock</Typography>
-        <G.DividerLine sx={{ my: 1 }} />
-      </Box>
-      <Box display="flex" flexDirection="column" py={2} px={4} gap={2}>
-        <S.InlineContainer>
-          <Typography variant="body2"> BOBA Balance: </Typography>
-          <Typography variant="body2"> 0.0 </Typography>
-        </S.InlineContainer>
-        <Input
-          value={0}
-          type="number"
-          newStyle
-          disabled={true}
-          variant="standard"
-        />
+  const createLock = async () => {
+    console.table({
+      'value': value,
+      'toWeigString': toWei_String(value, 18),
+      'Expires': expiry
+    });
 
-        <S.InlineContainer>
-          <Typography variant="body2"> Expires:</Typography>
-          <S.InlineContainer gap="1" justifyContent="flex-end">
-            {
-              EXPIRY_OPTIONS.map((item) => <FormControlLabel sx={{ mx: "0" }} size="small" key={item.value} {...optionsProps(item)} control={<Radio size='small' />}>
-              </FormControlLabel>)
-            }
-          </S.InlineContainer>
-        </S.InlineContainer>
+    const res = await dispatch(createLock({
+      amount: toWei_String(value, 18),
+      expiry: expiry
+    }))
 
-        <G.DividerLine sx={{ my: 1 }} />
+    console.log('LOCK CREATE ', res);
 
-        <S.InlineContainer>
-          <Typography variant="body2">Convert ve BOBA Ratio</Typography>
-          <Typography variant="body2"> 0 </Typography>
-        </S.InlineContainer>
-        <S.InlineContainer>
-          <Typography variant="body2">Your voting power will be</Typography>
-          <Typography variant="body2"> 0 ve BOBA </Typography>
-        </S.InlineContainer>
+    if (res) {
+      dispatch(openAlert('Lock has been created!'))
+    }
 
-        <Button
-          fullWidth={true}
-          variant="outlined"
-          color="primary"
-          size="large"
-          onClick={() => connectToBOBA()}
-        >
-          Connect to BOBA
-        </Button>
-      </Box>
-    </S.LockFormContainer>
   }
 
   return <S.LockFormContainer>
@@ -145,7 +127,7 @@ function CreateLock() {
         onChange={i => { setValue(i.target.value) }}
         onUseMax={i => { setValue(maxBalance) }}
         newStyle
-        disabled={layer !== 'L2'}
+        disabled={!accountEnabled || layer !== 'L2'}
         variant="standard"
       />
 
@@ -153,9 +135,24 @@ function CreateLock() {
         <Typography variant="body2"> Lock for</Typography>
       </S.InlineContainer>
       <S.InlineContainer>
-        <Typography variant="h2"> 2022-07-31 </Typography>
-        <CalenderIcon />
+        <DatePicker
+          ref={datePickerRef}
+          wrapperClassName={Styles.datePickerInput}
+          popperClassName={Styles.popperStyle}
+          dateFormat="yyyy-MM-dd"
+          selected={new Date(expiry)}
+          minDate={new Date(moment().add(1, 'd'))}
+          onChange={(date) => {setExpiry(moment(date).format('yyyy-MM-DD'))}}
+          calendarClassName={theme.palette.mode}
+        />
+
+        <IconButton onClick={() => {
+          openDatePicker()
+        }} component="span">
+          <CalenderIcon />
+        </IconButton>
       </S.InlineContainer>
+
       <S.InlineContainer>
         <Typography variant="body2"> Expires:</Typography>
         <S.InlineContainer gap="1" justifyContent="flex-end">
@@ -169,24 +166,34 @@ function CreateLock() {
       <G.DividerLine sx={{ my: 1 }} />
 
       <S.InlineContainer>
-        <Typography variant="body2">Convert veBOBA Ratio</Typography>
-        <Typography variant="body2"> 0 </Typography>
+        <Typography variant="body2">Convert ve BOBA Ratio</Typography>
+        <Typography variant="body2"> {veBobaRatio} </Typography>
       </S.InlineContainer>
       <S.InlineContainer>
         <Typography variant="body2">Your voting power will be</Typography>
-        <Typography variant="body2"> 2.9 ve BOBA </Typography>
+        <Typography variant="body2"> {votingPower} ve BOBA </Typography>
       </S.InlineContainer>
-
-      <Button
-        fullWidth={true}
-        variant="contained"
-        color="primary"
-        size="large"
-        disabled={Number(value) > Number(maxBalance)}
-        onClick={createLock}
-      >
-        {Number(value) > Number(maxBalance) ? 'Insufficient balance' : 'Lock'}
-      </Button>
+      {
+        !accountEnabled ?
+          <Button
+            fullWidth={true}
+            variant="outlined"
+            color="primary"
+            size="large"
+            onClick={() => connectToBOBA()}
+          >
+            Connect to BOBA
+          </Button> :
+          <Button
+            fullWidth={true}
+            variant="contained"
+            color="primary"
+            size="large"
+            disabled={Number(value) > Number(maxBalance)}
+            onClick={createLock}
+          >
+            {Number(value) > Number(maxBalance) ? 'Insufficient balance' : 'Lock'}
+          </Button>}
     </Box>
   </S.LockFormContainer>
 }

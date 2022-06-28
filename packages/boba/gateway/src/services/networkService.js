@@ -4894,6 +4894,84 @@ class NetworkService {
     return bobaBridges.filter((bridge) => bridge.tokens.includes(tokenSymbol))
   }
 
+  /***********************************************/
+  /*****              VeBoba                 *****/
+  /***********************************************/
+
+
+  async createLock(payload) {
+     try {
+
+     } catch (error) {
+        console.log("NS: createLock error:",error)
+       return error;
+     }
+  }
+
+  async withdrawLock(payload) {
+     try {
+
+     } catch (error) {
+        console.log("NS: withdrawLock error:",error)
+       return error;
+     }
+  }
+
+  async increaseLockAmount(payload) {
+     try {
+
+     } catch (error) {
+        console.log("NS: increaseLockAmount error:",error)
+       return error;
+     }
+  }
+
+  async extendLockTime(payload) {
+     try {
+
+     } catch (error) {
+        console.log("NS: extendLockTime error:",error)
+       return error;
+     }
+  }
+
+  async fetchLockRecords() {
+     try {
+
+       return {
+        records: []
+       }
+     } catch (error) {
+        console.log("NS: fetchLockRecords error:",error)
+       return error;
+     }
+  }
+
+  async fetchVotingPower(payload) {
+     try {
+
+       return {
+         votingPower: 0
+       }
+     } catch (error) {
+        console.log("NS: fetchVotingPower error:",error)
+       return error;
+     }
+  }
+
+  async fetchVeBobaRatio(payload) {
+     try {
+
+
+       return {
+         bobaRatio: 0
+       }
+     } catch (error) {
+        console.log("NS: fetchVeBobaRatio error:",error)
+       return error;
+     }
+  }
+
 }
 
 const networkService = new NetworkService()

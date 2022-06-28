@@ -3,8 +3,22 @@ import React, { Fragment } from 'react'
 import RecordItem from './RecordItem'
 
 import * as G from 'containers/Global.styles'
+import { useSelector } from 'react-redux'
+import { selectLockRecords } from 'selectors/veBobaSelector'
+import { selectLoading } from 'selectors/loadingSelector'
 
 function LockRecords() {
+
+
+  const loading = useSelector(selectLoading([ 'LOCK/RECORDS/GET' ]));
+  const records = useSelector(selectLockRecords);
+
+  console.log([ 'records', records ])
+  console.log([ 'LOCK/RECORDS/GET > loading', loading ])
+
+  if (!!loading) {
+    return <Grid container p={2} > loading lock records..</Grid>
+  }
 
   return <>
     <Grid container p={2} >
