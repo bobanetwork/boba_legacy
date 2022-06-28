@@ -1,23 +1,20 @@
 // https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/test/005_lending.ts
 
 import { Contract, ContractFactory, providers, utils, Wallet } from 'ethers'
-import hre, { ethers } from 'hardhat'
+import hre from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 import * as request from 'request-promise-native'
 import TwitterPay from '../artifacts/contracts/TwitterPay.sol/TwitterPay.json'
 import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
+import L2GovernanceERC20Json from '../../../contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import BobaTuringCreditJson from '../../../contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
+import { spawn } from 'child_process'
 
 chai.use(solidity)
-const abiDecoder = require('web3-eth-abi')
-
-const fetch = require('node-fetch')
 
 const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
-let urlStr
 
 const gasOverride = { gasLimit: 8_000_000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
@@ -29,10 +26,9 @@ const userWallet = new Wallet(userPK, local_provider)
 
 let BOBAL2Address
 let BobaTuringCreditAddress
+let preDeployedTwitterPayAddress
 
 let Factory__BobaTuringCredit: ContractFactory
-let Factory__ERC20Mock: ContractFactory
-let erc20Mock: Contract
 let Factory__TwitterPay: ContractFactory
 let twitter: Contract
 let Factory__TuringHelper: ContractFactory
@@ -41,54 +37,94 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
-function convertHexToASCII(hexString) {
-  let stringOut = ''
-  let tempAsciiCode
-  hexString.match(/.{1,2}/g).map((i) => {
-    tempAsciiCode = parseInt(i, 16)
-    stringOut = stringOut + String.fromCharCode(tempAsciiCode)
-  })
-  return stringOut
-}
-const ascii_to_hex = (str) => {
-  const arr1 = []
-  for (let n = 0, l = str.length; n < l; n++) {
-    const hex = Number(str.charCodeAt(n)).toString(16)
-    arr1.push(hex)
+// To run tests on pre-deployed TwitterPay (only takes effect on local L2Geth)
+const useAlreadyDeployedTwitterPay = true
+const USE_LOCAL_BACKEND = true
+let localTuringUrl
+
+describe('Use Boba Bubble for tipping', () => {
+  //#region setup
+  const loadPythonResult = (params) => {
+    return new Promise((resolve, reject) => {
+      const childPython = spawn('python', ['./aws/run-local-server.py', params])
+      let result = ''
+      childPython.stdout.on(`data`, (data) => {
+        result += data.toString()
+      })
+
+      childPython.on('close', (code) => {
+        resolve(result)
+      })
+
+      childPython.stderr.on('data', (err) => {
+        console.error('Python error stderr: ', err.toString())
+      })
+
+      childPython.on('error', (err) => {
+        console.error('Python error: ', err)
+        reject(err)
+      })
+    })
   }
-  return arr1.join('')
-}
 
-describe('Use Boba Bubble for tipping', function () {
+  const createServer = () => {
+    const http = require('http')
+    const ip = require('ip')
+
+    const server = (module.exports = http
+      .createServer(async function (req, res) {
+        if (req.headers['content-type'] === 'application/json') {
+          let bodyStr = ''
+
+          req.on('data', (chunk) => {
+            bodyStr += chunk.toString()
+          })
+
+          req.on('end', async () => {
+            const jBody = JSON.stringify({ body: bodyStr, logs: false })
+            let result
+
+            if (req.url === '/test') {
+              result = ((await loadPythonResult(jBody)) as string).replace(
+                '\r\n',
+                ''
+              ) // load Python directly, since examples are currently in Python & to have common test-base
+            } else {
+              throw new Error('Invalid route: ' + req.route)
+            }
+
+            if (!result) {
+              throw new Error('No server response..')
+            }
+
+            const jResp2 = {
+              id: JSON.parse(bodyStr).id,
+              jsonrpc: '2.0',
+              result: JSON.parse(JSON.parse(result).body).result,
+            }
+
+            res.end(JSON.stringify(jResp2))
+            server.emit('success', bodyStr)
+          })
+        } else {
+          console.log('Other request:', req)
+          res.writeHead(400, { 'Content-Type': 'text/plain' })
+          res.end('Expected content-type: application/json')
+        }
+      })
+      .listen(hPort))
+
+    // Get a non-localhost IP address of the local machine, as the target for the off-chain request
+    const urlBase = 'http://' + ip.address() + ':' + hPort
+    localTuringUrl = urlBase + '/test'
+
+    console.log('Created local HTTP server at', localTuringUrl)
+  }
+
   before(async () => {
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
-      deployerWallet
-    )
-
-    turingHelper = await Factory__TuringHelper.deploy(gasOverride)
-    console.log('Helper contract deployed as', turingHelper.address)
-
-    Factory__TwitterPay = new ContractFactory(
-      TwitterPay.abi,
-      TwitterPay.bytecode,
-      deployerWallet
-    )
-
-    twitter = await Factory__TwitterPay.deploy(
-      'https://zci1n9pde8.execute-api.us-east-1.amazonaws.com/Prod/',
-      turingHelper.address,
-      10,
-      gasOverride
-    )
-
-    console.log('TwitterPay contract deployed on', twitter.address)
-
-    // whitelist the new 'lending' contract in the helper
-    const tr1 = await turingHelper.addPermittedCaller(twitter.address)
-    const res1 = await tr1.wait()
-    console.log('addingPermittedCaller to TuringHelper', res1.events[0].data)
+    if (USE_LOCAL_BACKEND) {
+      createServer()
+    }
 
     if (hre.network.name === 'boba_rinkeby') {
       BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
@@ -103,6 +139,62 @@ describe('Use Boba Bubble for tipping', function () {
       addressesBOBA = JSON.parse(result)
       BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
       BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+      preDeployedTwitterPayAddress = addressesBOBA.TwitterPay
+    }
+
+    Factory__TuringHelper = new ContractFactory(
+      TuringHelperJson.abi,
+      TuringHelperJson.bytecode,
+      deployerWallet
+    )
+
+    Factory__TwitterPay = new ContractFactory(
+      TwitterPay.abi,
+      TwitterPay.bytecode,
+      deployerWallet
+    )
+
+    const turingUrl = USE_LOCAL_BACKEND
+      ? localTuringUrl
+      : 'https://zci1n9pde8.execute-api.us-east-1.amazonaws.com/Prod/'
+
+    if (useAlreadyDeployedTwitterPay && preDeployedTwitterPayAddress) {
+      // use already deployed version (local l2geth deployer)
+      console.log(
+        'Using already deployed TuringHelper & TwitterPay contract: ',
+        preDeployedTwitterPayAddress
+      )
+
+      twitter = await Factory__TwitterPay.attach(preDeployedTwitterPayAddress)
+      console.log('Attached to pre-deployed TuringHelper.')
+
+      turingHelper = await Factory__TuringHelper.attach(
+        await twitter.turingHelper()
+      )
+      console.log('Attached to pre-deployed TwitterPay.')
+
+      // Since this is a onlyOwner function, you NEED to use the local deployer PK in your .env-file
+      const tx = await twitter.setConfig(turingUrl, 10)
+      const configRes = await tx.wait()
+      expect(configRes).to.be.ok
+      console.log('Have set Turing endpoint for TwitterPay.')
+    } else {
+      turingHelper = await Factory__TuringHelper.deploy(gasOverride)
+      console.log('Helper contract deployed as', turingHelper.address)
+
+      twitter = await Factory__TwitterPay.deploy(
+        turingUrl,
+        turingHelper.address,
+        10,
+        gasOverride
+      )
+
+      console.log('TwitterPay contract deployed on', twitter.address)
+
+      // whitelist the new 'lending' contract in the helper
+      const tr1 = await turingHelper.addPermittedCaller(twitter.address)
+      const res1 = await tr1.wait()
+      console.log('addingPermittedCaller to TuringHelper', res1.events[0].data)
     }
 
     L2BOBAToken = new Contract(
@@ -122,6 +214,7 @@ describe('Use Boba Bubble for tipping', function () {
       BobaTuringCreditAddress
     )
   })
+  //#endregion
 
   it('contract should be whitelisted', async () => {
     const tr2 = await turingHelper.checkPermittedCaller(
@@ -194,7 +287,7 @@ describe('Use Boba Bubble for tipping', function () {
   })
 
   it('should transfer funds to boba bubble (yourself)', async () => {
-    const amount = ethers.utils.parseEther('0.000001')
+    const amount = utils.parseEther('0.000001')
     const approveTx = await L2BOBAToken.approve(
       twitter.address,
       amount,
@@ -242,7 +335,7 @@ describe('Use Boba Bubble for tipping', function () {
   })
 
   it('should transfer funds to boba bubble (other)', async () => {
-    const amount = ethers.utils.parseEther('0.000001')
+    const amount = utils.parseEther('0.000001')
     const approveTx = await L2BOBAToken.approve(
       twitter.address,
       amount,

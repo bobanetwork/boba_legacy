@@ -5,11 +5,12 @@ import certifi
 import textwrap
 import hashlib
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 authorized_contract = None  # for open access
 
 TWITTER_BEARER_TOKEN = os.environ.get('TWITTER_BEARER_TOKEN')  # is None if not found
-
 
 # or...
 # authorized_contract = '0xOF_YOUR_HELPER_CONTRACT' # to restrict access to only your smart contract
@@ -17,28 +18,34 @@ TWITTER_BEARER_TOKEN = os.environ.get('TWITTER_BEARER_TOKEN')  # is None if not 
 
 # NOTE: When taking the data payload from the original event for debugging then remove the first 64 bits!
 def lambda_handler(event, context):
-  print("DEBUG: ", event)
+  print_logs = True
+  if "logs" in event:
+    print_logs = event["logs"]
 
   req_input = json.loads(event["body"])
-  print("DEBUG: from Geth:", req_input)
+
+  if print_logs:
+    print("DEBUG: ", event)
+    print("DEBUG: from Geth:", req_input)
 
   if authorized_contract is not None:
     # check authorisation if desired
     callerAddress = req_input['method']
     if callerAddress.lower() != authorized_contract.lower():
       returnPayload = {'statusCode': 403}
-      print('return payload:', returnPayload)
+      if print_logs:
+        print('return payload:', returnPayload)
       return returnPayload
 
-  (sender_address, twitter_post_id) = get_request_params(req_input)
+  (sender_address, twitter_post_id) = get_request_params(req_input, print_logs=print_logs)
 
-  result = load_tweet_status(twitter_post_id)
+  result = load_tweet_status(twitter_post_id, print_logs=print_logs)
 
-  (BT, is_allowed_to_claim, author_id, error_reason) = parse_api_response(result=result, sender_address=sender_address)
+  (BT, is_allowed_to_claim, author_id, error_reason) = parse_api_response(result=result, sender_address=sender_address, print_logs=print_logs)
 
   # create return payload
   res = build_resp_payload(BT=BT, is_allowed_to_claim=is_allowed_to_claim, author_id=author_id,
-                           error_reason=error_reason)
+                           error_reason=error_reason, print_logs=print_logs)
 
   returnPayload = {
     'statusCode': 200,
@@ -47,27 +54,20 @@ def lambda_handler(event, context):
     })
   }
 
-  print('return payload:', returnPayload)
+  if print_logs:
+    print('return payload:', returnPayload)
 
   return returnPayload
 
 
-def get_request_params(req_input):
+def get_request_params(req_input, print_logs=True):
   # get calling parameters
   paramsHexString = req_input['params'][0]
   paramsHexString = paramsHexString.removeprefix("0x")
   params = textwrap.wrap(paramsHexString, 64)
 
-  # the input to the contract is
-  # _msgSender(), twitterPostID_
-  # address payable recipient_, string calldata twitterPostID_
-  #
-  # But we also have to make sure that the _msgSender address is the same one
-  # that corresponds to the Boba Bubble
-  #
-
-  print("Params: ", params)
-  # str_length_1 = int(params[1], 16) * 2
+  if print_logs:
+    print("Params: ", params)
 
   # the message sender
   sender_address = params[1]
@@ -82,11 +82,12 @@ def get_request_params(req_input):
   bytes_object_2 = bytes.fromhex(request_2[0:str_length_2])
   twitter_post_id = bytes_object_2.decode("ASCII")
 
-  print("Sender to verify: ", sender_address, ", Twitter post id: ", twitter_post_id)
+  if print_logs:
+    print("Sender to verify: ", sender_address, ", Twitter post id: ", twitter_post_id)
   return sender_address, twitter_post_id
 
 
-def build_resp_payload(BT, is_allowed_to_claim, author_id, error_reason):
+def build_resp_payload(BT, is_allowed_to_claim, author_id, error_reason, print_logs=True):
   res = '0x' + '{0:0{1}x}'.format(int(128), 64)
   # 64 denotes the number of bytes in the `bytes` dynamic argument
   # since we are sending back 2 32 byte numbers, 2*32 = 64
@@ -94,14 +95,17 @@ def build_resp_payload(BT, is_allowed_to_claim, author_id, error_reason):
   res = res + '{0:0{1}x}'.format(int(author_id), 64)  # the result
   res = res + '{0:0{1}x}'.format(int(error_reason), 64)  # the result
 
-  print("Original boba tag: ", BT)
   BT = int.from_bytes(BT.encode("ascii"), 'big')
-  print("EXTRA", BT)
   res = res + '{0:0{1}x}'.format(int(BT), 64)
+
+  if print_logs:
+    print("Original boba tag: ", BT)
+    print("EXTRA", BT)
+
   return res
 
 
-def parse_api_response(result, sender_address):
+def parse_api_response(result, sender_address, print_logs=True):
   BT = ""
   error_reason = 0
 
@@ -121,14 +125,15 @@ def parse_api_response(result, sender_address):
     BT = sender_address  # remove the leading Ox
     BT = hashlib.md5(BT.encode('utf-8')).hexdigest()  # need to check encoding etc
     BT = 'boba' + BT[0:9].lower()
-    print("Boba Bubble based on input message sender", BT, sender_address.encode('utf-8'),
+
+    if print_logs:
+      print("Boba Bubble based on input message sender", BT, sender_address.encode('utf-8'),
           hashlib.md5(sender_address.encode('utf-8')).hexdigest())
-    print("BOBA: ", result["data"]["text"].lower(), BT.lower(), sender_address,
+      print("BOBA: ", result["data"]["text"].lower(), BT.lower(), sender_address,
           hashlib.md5(sender_address.encode('ascii')).hexdigest())
     # Step 2 - confirm that the developer who tweeted the Boba Bubble is the same as this caller?
     has_posted = BT in result["data"]["text"].lower()
     author_id = result["data"]["author_id"]
-    print("includes-users: ", result["includes"]["users"])
 
     # calc user account created difference to today
     usercreate_timediff_now = abs(datetime.now() - datetime.strptime(result["includes"]["users"][0]["created_at"],
@@ -152,14 +157,16 @@ def parse_api_response(result, sender_address):
 
     # maybe try-catch for better error msgs (tweet not existing, ..)
     is_allowed_to_claim = has_posted and account_exists_long_enough and account_public_metrics_check
-    print("from endpoint:", has_posted, account_public_metrics_check, account_exists_long_enough, "Author: ", author_id,
+
+    if print_logs:
+      print("from endpoint:", has_posted, account_public_metrics_check, account_exists_long_enough, "Author: ", author_id,
           "User created at: ", usercreate_timediff_now, datetime.now(),
           datetime.strptime(result["includes"]["users"][0]["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ"))
 
   return BT, is_allowed_to_claim, author_id, error_reason
 
 
-def load_tweet_status(twitter_post_id):
+def load_tweet_status(twitter_post_id, print_logs=True):
   # Create a PoolManager instance for sending requests.
   http = urllib3.PoolManager(ca_certs=certifi.where())
 
@@ -169,6 +176,8 @@ def load_tweet_status(twitter_post_id):
                       "https://api.twitter.com/2/tweets/" + twitter_post_id + "?expansions=author_id&user.fields=created_at,public_metrics",
                       headers=headers)
   result = json.loads(resp.data)
-  print("result: ", result)
+
+  if print_logs:
+    print("result: ", result)
 
   return result

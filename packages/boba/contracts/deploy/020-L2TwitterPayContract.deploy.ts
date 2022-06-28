@@ -40,7 +40,7 @@ const deployFn: DeployFunction = async (hre) => {
   )*/
 
   TwitterPayContract = await Factory__TwitterPayContract.deploy(
-    'https://zci1n9pde8.execute-api.us-east-1.amazonaws.com/Prod/',
+    'http://dummy_link.io', // needs to be set to a non-localhost IP address before usage
     TuringHelperContract.address,
     10
   )
