@@ -176,7 +176,7 @@ export const makeL2GenesisFile = async (
       // Add a default BobaTuringHelper for testing purposes
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
     } else if (predeployName === 'TwitterPay') {
-      // Add a default BobaTuringHelper for testing purposes
+      // Add TwitterPay
       dump[predeployAddress].code = cfg.TwitterPayJson.deployedBytecode
     } else if (predeployName === 'L2GovernanceERC20') {
       // Fix the address(this) of L2GovernanceERC20
@@ -193,12 +193,13 @@ export const makeL2GenesisFile = async (
 
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
-      if (predeployName === 'BobaTuringHelper') {
+
+      if (predeployName === 'BobaTuringHelper' || predeployName === 'TwitterPay') {
         // Add a default BobaTuringHelper for testing purposes
         const indexOwner = BigNumber.from('0').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
-        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
+        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys[predeployName]
         continue
       }
       if (predeployName === 'Proxy__Boba_GasPriceOracle') {

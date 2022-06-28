@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@boba/turing-hybrid-compute": "^0.2.0",
+    "@boba/turing-twitter-pay": "^0.1.0",
     "@openzeppelin/contracts": "4.3.2",
     "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@codechecks/client": "^0.1.11",

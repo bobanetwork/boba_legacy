@@ -10,5 +10,6 @@ ignores: [
   "yargs",
   "@ethersproject/abi",
   "@ethersproject/providers",
-  "@boba/turing-hybrid-compute"
+  "@boba/turing-hybrid-compute",
+  "@boba/turing-twitter-pay"
 ]

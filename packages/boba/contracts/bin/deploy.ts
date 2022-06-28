@@ -64,6 +64,10 @@ const main = async () => {
     'BobaTuringHelper'
   )
 
+  const TwitterPayAddress = await addressManager.getAddress(
+    'TwitterPay'
+  )
+
   await hre.run('deploy', {
     l1MessengerAddress,
     l2MessengerAddress,
@@ -79,6 +83,7 @@ const main = async () => {
     fastRelayerAddress,
     BobaTuringCreditAddress,
     BobaTuringHelperAddress,
+    TwitterPayAddress,
     noCompile: process.env.NO_COMPILE ? true : false,
   })
 }

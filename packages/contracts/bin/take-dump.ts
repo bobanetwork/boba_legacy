@@ -5,7 +5,7 @@ import * as mkdirp from 'mkdirp'
 import { utils, Wallet } from 'ethers'
 
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import TwitterPayJson from '../../boba/turing-twitter-pay/artifacts/contracts/TwitterPay.sol/TwitterPay.json'
+import TwitterPayJson from '@boba/turing-twitter-pay/artifacts/contracts/TwitterPay.sol/TwitterPay.json'
 
 const ensure = (value, key) => {
   if (typeof value === 'undefined' || value === null || Number.isNaN(value)) {
