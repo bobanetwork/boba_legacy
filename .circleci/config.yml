@@ -29,9 +29,13 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split | tee splits.txt
+            circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split --split-by=timings | tee splits.txt
             docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit
 
 workflows:
   main:
