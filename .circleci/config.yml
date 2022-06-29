@@ -15,7 +15,7 @@ jobs:
           name: Bring up the stack
           command: |
             ./scripts/build-ci.sh
-            BUILD=2 DAEMON=1 ./up_local.sh
+            BUILD=1 DAEMON=1 ./up_local.sh
           working_directory: ops
       - run:
           name: Start background logging
