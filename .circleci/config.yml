@@ -33,9 +33,9 @@ jobs:
             docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
       - store_test_results:
-          path: /opt/optimism/integration-tests/result/
+          path: /home/circleci/result/
       - store_artifacts:
-          path: /opt/optimism/integration-tests/result/
+          path: /home/circleci/result/
 
 workflows:
   main:
