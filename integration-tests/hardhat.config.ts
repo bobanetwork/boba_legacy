@@ -3,10 +3,7 @@ import { HardhatUserConfig } from 'hardhat/types'
 // Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import 'hardhat-gas-reporter'
-
-// const enableGasReport = !!process.env.ENABLE_GAS_REPORT
-const enableGasReport = false
+import 'mocha-multi-reporters'
 
 const config: HardhatUserConfig = {
   networks: {
@@ -18,10 +15,9 @@ const config: HardhatUserConfig = {
     timeout: 80000,
     grep: new RegExp(''),
     parallel: false,
-    reporter: 'mocha-junit-reporter',
+    reporter: 'mocha-multi-reporters',
     reporterOptions: {
-      mochaFile: './result/output.xml',
-      toConsole: true,
+      configFile: './config.json',
     },
   },
   solidity: {
@@ -52,12 +48,6 @@ const config: HardhatUserConfig = {
         },
       },
     ],
-  },
-  gasReporter: {
-    enabled: enableGasReport,
-    currency: 'USD',
-    gasPrice: 100,
-    outputFile: process.env.CI ? 'gas-report.txt' : undefined,
   },
 }
 
