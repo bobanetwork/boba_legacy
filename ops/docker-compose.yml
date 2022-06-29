@@ -349,7 +349,7 @@ services:
       << : *integration_2_pk
       << : *integration_3_pk
     volumes:
-      /home/circleci/result:/opt/optimism/integration-tests/result
+      - /home/circleci/result:/opt/optimism/integration-tests/result
 
 
   replica:
