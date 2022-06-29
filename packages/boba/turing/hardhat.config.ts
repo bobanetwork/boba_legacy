@@ -1,33 +1,24 @@
 import { HardhatUserConfig } from 'hardhat/types'
-import '@nomiclabs/hardhat-ethers'
-import * as dotenv from "dotenv";
-import '@openzeppelin/hardhat-upgrades';
-import { providers } from "ethers";
 
-dotenv.config();
+// Hardhat plugins
+import '@nomiclabs/hardhat-ethers'
 
 const config: HardhatUserConfig = {
   mocha: {
     timeout: 300000,
   },
   networks: {
-    hardhat: {
-      forking: {
-        url: "https://mainnet.boba.network",
-      }
-    },
     boba_local: {
       url: 'http://localhost:8545',
-      url_l1: 'http://localhost:9545',
-      accounts: process.env.LOCAL_PRIVATE_KEY !== undefined ? [process.env.LOCAL_PRIVATE_KEY] : [],
-    } as any,
+      accounts: ['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80']
+    },
     boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
     boba_mainnet: {
-      url: 'https://mainnet.boba.network',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      url: 'http://mainnet.boba.network',
+      accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
   },
   solidity: {
