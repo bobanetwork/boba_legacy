@@ -17,6 +17,10 @@ const config: HardhatUserConfig = {
     timeout: 80000,
     grep: new RegExp(''),
     parallel: false,
+    reporter: 'mocha-junit-reporter',
+    reporterOptions: {
+      mochaFile: './output.xml',
+    },
   },
   solidity: {
     compilers: [
