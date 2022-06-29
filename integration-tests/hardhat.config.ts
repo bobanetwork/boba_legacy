@@ -19,7 +19,7 @@ const config: HardhatUserConfig = {
     parallel: false,
     reporter: 'mocha-junit-reporter',
     reporterOptions: {
-      mochaFile: './output.xml',
+      mochaFile: './result/output.xml',
     },
   },
   solidity: {
