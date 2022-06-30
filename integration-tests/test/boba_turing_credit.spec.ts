@@ -7,7 +7,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 import TuringTestJson from '../artifacts/contracts/TuringTest.sol/TuringTest.json'
 
