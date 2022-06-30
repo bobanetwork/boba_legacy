@@ -5,7 +5,8 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import 'hardhat-gas-reporter'
 
-const enableGasReport = !!process.env.ENABLE_GAS_REPORT
+// const enableGasReport = !!process.env.ENABLE_GAS_REPORT
+const enableGasReport = false
 
 const config: HardhatUserConfig = {
   networks: {
