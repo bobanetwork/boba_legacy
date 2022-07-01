@@ -34,8 +34,8 @@ jobs:
           working_directory: ops
       - run:
           name: Rewrite test name for next run
-          command:
-            mkdir result
+          command: |
+            mkdir -p result
             cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
           working_directory: ops
       - store_test_results:
