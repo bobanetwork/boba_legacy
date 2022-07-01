@@ -35,11 +35,13 @@ jobs:
       - run:
           name: Rewrite test name for next run
           command:
-            sed -i 's/\/opt\/optimism/../g' /home/circleci/result/output.xml
+            mkdir result
+            cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
+          working_directory: ops
       - store_test_results:
-          path: /home/circleci/result/
+          path: /home/circleci/project/ops/result
       - store_artifacts:
-          path: /home/circleci/result/
+          path: /home/circleci/project/ops/result
 
 workflows:
   main:
