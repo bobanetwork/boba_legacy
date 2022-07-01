@@ -32,6 +32,10 @@ jobs:
             circleci tests glob "/opt/optimisim/integration-tests/test/basic*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
             docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
+      - run:
+          name: Rewrite test name for next run
+          command:
+            sed -i 's/\/opt\/optimism/../g' /home/circle/result/output.xml
       - store_test_results:
           path: /home/circleci/result/
       - store_artifacts:
