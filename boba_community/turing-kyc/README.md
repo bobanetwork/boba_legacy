@@ -12,8 +12,12 @@ DeFi apps currently face a huge problem when trying to comply with those new reg
 
 With Turing you can build your own KYC gatekeeper for specific smart contract functions with ease. We have written a simple `modifier` for that, which does the check for you. All you need to do, is checking a wallet's KYC status on the AWS backend and return if the wallet is allowed to call the smart contract function. 
 
+## How does it work (user perspective)?
+The idea is, that the user has to once KYC his wallet on any KYC provider that supports KYCing wallets (we are on it). The KYC process itself is completely independent of this code base, as well as the process associated with it. 
 
-## How does it work? 
+This means, that smart contracts that implement this KYC gatekeeper, will actually query the KYC status of the user's wallet and will revert for a KYC-only function, if the user hasn't KYCed his/her wallet yet. That's the magic :-). 
+
+## How does it work (developer perspective)? 
 This example basically consists just like all other Turing use cases, of a `TuringHelper.sol` and its corresponding interface called `ITuringHelper.sol`. The TuringHelper is just as usual needed, to actually be charged for your off-chain calls and to limit unauthorized access (refer to `permittedCallers` etc.). Please refer to the appendix of this ReadMe or to the general Turing documentation. 
 
 Our actual example lives in `KYCExample.sol` and its only purpose is to show you that you can constrain the access to specific smart contract functions based on whether a wallet has been KYCed (associated with a person's identity) by using a trusted KYC provider of your choice or not. As you can see, the example actually doesn't contain much code, but uses actually a so-called `modifier` named `onlyKYCed` which limits access to that function to KYCed wallets. 
@@ -25,6 +29,8 @@ function onlyForKYCedWallets() external onlyKYCed {
 ```
 
 As you can see above, simply annotating a function with the specified modifier limits the wallets that have access to this function. If a wallet is not KYCed then it simply reverts. Your TuringCall basically returns `true` for KYCed or `false` for non-kyced wallets. 
+
+For that reason the real magic happens on the Turing backend, which basically queries the KYC status of the sender's wallet and returns either `true` or `false` depending on a wallet's KYC status. What type of provider you support and add to your Turing API is completely up to you. 
 
 ### Project structure
 
