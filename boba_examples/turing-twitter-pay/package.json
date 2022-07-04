@@ -1,10 +1,9 @@
 {
-  "name": "@boba/turing-twitter-pay",
+  "name": "@boba/turing-twitter",
   "version": "0.1.0",
-  "description": "Turing Twitter Pay to send funds via Boba Tag",
+  "description": "Turing Twitter example",
   "main": "index.js",
-  "repository": "git@github.com:bobanetwork/boba/packages/boba/turing-twitter-pay",
-  "author": "Kevin Riedl <kevin@enya.ai>",
+  "repository": "git@github.com:bobanetwork/boba/packages/boba/boba_community/turing-twitter",
   "license": "Internal use only",
   "private": true,
   "scripts": {

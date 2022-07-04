@@ -15,7 +15,6 @@ COPY --from=builder /optimism/packages/core-utils/dist ./packages/core-utils/dis
 
 # copy turing
 COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
-COPY --from=builder /optimism/packages/boba/turing-twitter-pay ./packages/boba/turing-twitter-pay
 
 # get the needed built artifacts
 WORKDIR /opt/optimism/packages/contracts

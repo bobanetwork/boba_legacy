@@ -1,10 +1,14 @@
-# Turing KYC example
+# Turing Twitter Pay example
+
+## What does it do?
+This example demonstrates how you can use your Boba Bubble ([get it here](https://gateway.rinkeby.boba.network/)) to send money to the associated wallet address (similar to ENS and other providers, but in a quite different manner from a technical perspective).
+
 
 ## Basics
 
-Inside the folder, run `yarn install`. You will also need Docker. 
+Inside the folder, run `yarn install`. You will also need Docker.
 
-0. Make sure that your have *AWS SAM* installed. 
+0. Make sure that your have *AWS SAM* installed.
 
 You can find instructions [here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html). Assuming you have the AWS CLI and have everything set up correctly, installing SAM should just take two commands. On a Mac with `homebrew`, for example,
 

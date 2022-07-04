@@ -46,7 +46,6 @@ export interface RollupDeployConfig {
   bobaTuringPrice: string
   // Turing helper json
   TuringHelperJson: any
-  TwitterPayJson: any
   // L1 Boba Token address
   l1BobaTokenAddress: any
   // Block height to activate berlin hardfork
@@ -152,10 +151,7 @@ export const makeL2GenesisFile = async (
       metaTransactionFee: utils.parseEther('3'),
       receivedETHAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
-    },
-    TwitterPay: {
-      Self: predeploys.TwitterPay,
-    },
+    }
   }
 
   const dump = {}
@@ -175,9 +171,6 @@ export const makeL2GenesisFile = async (
     } else if (predeployName === 'BobaTuringHelper') {
       // Add a default BobaTuringHelper for testing purposes
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
-    } else if (predeployName === 'TwitterPay') {
-      // Add TwitterPay
-      dump[predeployAddress].code = cfg.TwitterPayJson.deployedBytecode
     } else if (predeployName === 'L2GovernanceERC20') {
       // Fix the address(this) of L2GovernanceERC20
       dump[predeployAddress].code = L2GovernanceERC20Helper.L2GovernanceERC20Bytecode
@@ -193,13 +186,12 @@ export const makeL2GenesisFile = async (
 
     // Compute and set the required storage slots for each contract that needs it.
     if (predeployName in variables) {
-
-      if (predeployName === 'BobaTuringHelper' || predeployName === 'TwitterPay') {
+      if (predeployName === 'BobaTuringHelper') {
         // Add a default BobaTuringHelper for testing purposes
         const indexOwner = BigNumber.from('0').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
-        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys[predeployName]
+        dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
         continue
       }
       if (predeployName === 'Proxy__Boba_GasPriceOracle') {

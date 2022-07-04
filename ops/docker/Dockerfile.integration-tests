@@ -23,7 +23,6 @@ COPY --from=builder /optimism/packages/contracts ./packages/contracts
 
 COPY --from=builder /optimism/packages/boba/contracts ./packages/boba/contracts
 COPY --from=builder /optimism/packages/boba/turing ./packages/boba/turing
-COPY --from=builder /optimism/packages/boba/turing-twitter-pay ./packages/boba/turing-twitter-pay
 
 COPY --from=builder /optimism/ops_boba/api ./ops_boba/api
 

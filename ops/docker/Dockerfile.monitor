@@ -14,7 +14,6 @@ COPY packages/boba/contracts ./packages/boba/contracts
 COPY packages/boba/register ./packages/boba/register
 COPY packages/contracts ./packages/contracts
 COPY packages/boba/turing ./packages/boba/turing
-COPY packages/boba/turing-twitter-pay ./packages/boba/turing-twitter-pay
 COPY packages/sdk ./packages/sdk
 
 RUN yarn install && yarn build
