@@ -23,6 +23,27 @@ jobs:
           background: true
           command: docker-compose -f docker-compose.yml logs --follow
       - run:
+          name: Retry boba deployer on failure
+          working_directory: ops
+          background: true
+          command: |
+            export SHELL=/bin/bash
+            set +eo pipefail
+            until $(docker-compose -f docker-compose.yml logs | grep "BobaDao.deploy.ts:"); do
+              _counter=$(docker-compose -f docker-compose.yml logs | grep -c "BobaDao.deploy.ts:")
+              echo $counter
+              if [ $_counter -ge 1 ]; then
+                echo "Detected a failure in Boba Deployer. Will retry."
+                docker-compose logs boba_deployer
+                docker-compose stop boba_deployer
+                docker-compose up -d boba_deployer
+                exit 0
+              else
+                echo "Nothing really"
+                sleep 10
+              fi
+            done
+      - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
           working_directory: ops
