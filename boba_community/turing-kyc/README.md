@@ -12,6 +12,9 @@ DeFi apps currently face a huge problem when trying to comply with those new reg
 
 With Turing you can build your own KYC gatekeeper for specific smart contract functions with ease. We have written a simple `modifier` for that, which does the check for you. All you need to do, is checking a wallet's KYC status on the AWS backend and return if the wallet is allowed to call the smart contract function. 
 
+![Exemplary KYC process with Turing](https://user-images.githubusercontent.com/28724551/177171348-751329c3-d7dc-45d6-ae6e-f6b83d08ffb1.png)
+
+
 ## How does it work (user perspective)?
 The idea is, that the user has to once KYC his wallet on any KYC provider that supports KYCing wallets. The KYC process itself is completely independent of this code base, as well as the process associated with it. 
 
