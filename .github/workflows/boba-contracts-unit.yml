@@ -11,26 +11,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  boba-python-unit-tests:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9"]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest urllib3 certifi
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run Python tests
-        id: python-unit-tests
-        working-directory: ./packages/boba/turing-twitter-pay/aws/
-        run: python -m unittest discover -s . -t . # also works recursive if we add __init__ everywhere
 
   boba-unit-tests:
     runs-on: ubuntu-latest
