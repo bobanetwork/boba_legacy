@@ -8,7 +8,7 @@ Regulation is coming, there is no doubt. Some examples:
 * The famous Otherside contract from YugaLabs required KYC on launch
 * Some DeFi applications will be required to add KYC as well, depending on how regulations progress (EU, US, ..).
 
-DeFi apps currently face a huge problem when trying to comply with those new regulations. But the good news are, Turing can help with this! 
+DeFi apps currently face a huge problem when trying to comply with those new regulations. But the good news is, Turing can help with this! 
 
 With Turing you can build your own KYC gatekeeper for specific smart contract functions with ease. We have written a simple `modifier` for that, which does the check for you. All you need to do, is checking a wallet's KYC status on the AWS backend and return if the wallet is allowed to call the smart contract function. 
 
