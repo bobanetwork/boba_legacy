@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "./ITuringHelper.sol";
+interface ITuringHelper {
+    function TuringTx(string memory _url, bytes memory _payload) external returns (bytes memory);
+}
 
 contract TuringTest is ITuringHelper {
 

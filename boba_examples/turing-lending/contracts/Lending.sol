@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.9;
 
-interface Helper {
-    function TuringTx(string memory, bytes memory) external returns (bytes memory);
-}
+import "./ITuringHelper.sol";
 
- contract Lending {
+contract Lending {
 
     event GetCurrentQuote(string _url, string pair, uint256 market_price, uint256 time);
     event Debug(bytes response);
 
     address public helperAddr;
-    Helper myHelper;
+    ITuringHelper myHelper;
 
     constructor(
         address _helper
@@ -19,7 +17,7 @@ interface Helper {
         public
     {
         helperAddr = _helper;
-        myHelper = Helper(helperAddr);
+        myHelper = ITuringHelper(helperAddr);
     }
 
 
