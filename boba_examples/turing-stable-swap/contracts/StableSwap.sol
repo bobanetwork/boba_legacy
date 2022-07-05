@@ -3,12 +3,9 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/SignedSafeMath.sol";
+import "./ITuringHelper.sol";
 
-interface Helper {
-    function TuringTx(string memory, bytes memory) external returns (bytes memory);
-}
-
- contract StableSwap {
+contract StableSwap {
 
     using SafeMath for uint256;
     using SignedSafeMath for int256;
@@ -22,7 +19,7 @@ interface Helper {
     uint256 public k;
     uint256 public A;
     address public helperAddr;
-    Helper myHelper;
+    ITuringHelper myHelper;
 
     /**
      * @dev initialize x tokens, y tokens to form invariant with A = 0
@@ -33,10 +30,10 @@ interface Helper {
         uint256 _x,
         uint256 _y
     )
-        public
+    public
     {
         helperAddr = _helper;
-        myHelper = Helper(helperAddr);
+        myHelper = ITuringHelper(helperAddr);
         require(_x > 0 && _y > 0, "x or y !> 0");
         x = _x;
         y = _y;
@@ -49,7 +46,7 @@ interface Helper {
      * @param _x, _y balances
      */
     function addLiquidity(uint256 _x, uint256 _y)
-        public {
+    public {
 
         require(_x > 0 && _y > 0, "x or y !> 0");
         x = x.add(_x);
@@ -62,7 +59,7 @@ interface Helper {
      * @param _x, _y balances
      */
     function setTo(uint256 _x, uint256 _y)
-        public {
+    public {
 
         require(_x > 0 && _y > 0, "x or y !> 0");
         x = _x;
@@ -75,7 +72,7 @@ interface Helper {
      * @param percOut such that percentage of liquidity removed
      */
     function removeLiquidity(uint256 percOut)
-        public returns (uint256 x_back, uint256 y_back) {
+    public returns (uint256 x_back, uint256 y_back) {
 
         require(percOut > 0 && percOut <= 100, "percOut not > 0 or <= 100");
         x_back = (x.mul(percOut)).div(100);
@@ -90,7 +87,7 @@ interface Helper {
      * @param _A dictating shape of stable swap curve
      */
     function changeA(uint256 _A)
-        public {
+    public {
 
         require(A >= 0, "A !>= 0");
         A = _A;
@@ -102,7 +99,7 @@ interface Helper {
      * Adapted from https://github.com/ethereum/dapp-bin/pull/50/files (an open PR for solidity)
      */
     function sqrt(uint a)
-        public  returns (uint b) {
+    public returns (uint b) {
 
         require(a >= 0);
         if (a == 0) return 0;
@@ -123,9 +120,9 @@ interface Helper {
      * Adapted from https://ethereum.stackexchange.com/questions/84390/absolute-value-in-solidity/
      */
     function abs(int256 d)
-        private pure returns (int256 val) {
+    private pure returns (int256 val) {
 
-        val = ((d >= 0)? d : -d);
+        val = ((d >= 0) ? d : - d);
     }
 
     /**
@@ -134,7 +131,7 @@ interface Helper {
      * Adapted from https://forum.openzeppelin.com/t/does-safemath-library-need-a-safe-power-function/871/8
      */
     function pow(int256 base, int256 exponent)
-        public pure returns (int256) {
+    public pure returns (int256) {
 
         if (exponent == 0) {
             return 1;
@@ -157,7 +154,7 @@ interface Helper {
      * @dev Boolean function enforcing stable swap invariant
      */
     function invariant()
-        public returns (bool pass){
+    public returns (bool pass){
         pass = invariant(x, y);
     }
 
@@ -165,13 +162,13 @@ interface Helper {
      * @dev Boolean function enforcing stable swap invariant
      */
     function invariant(uint256 _x, uint256 _y)
-        public returns (bool pass){
+    public returns (bool pass){
 
         require(_x > 0 && _x <= k);
         require(_y > 0 && _y <= k);
         uint256 rootK = sqrt(k);
         uint256 LHS = ((A.mul(4)).mul(_x.add(_y))).add(rootK.mul(2));
-        uint256 RHS = ((A.mul(4)).mul(rootK.mul(2))).add((uint256(pow(int256(rootK.mul(2)),3))).div((_x.mul(4)).mul(_y)));
+        uint256 RHS = ((A.mul(4)).mul(rootK.mul(2))).add((uint256(pow(int256(rootK.mul(2)), 3))).div((_x.mul(4)).mul(_y)));
         pass = (abs(int256(LHS) - int256(RHS)) < 50);
     }
 
@@ -180,7 +177,7 @@ interface Helper {
      * @param x_in to return y_out
      */
     function swap_x(string memory _url, uint256 x_in)
-        public returns (uint256 y_out){
+    public returns (uint256 y_out){
 
         //call offchain
         //get the return
@@ -217,7 +214,7 @@ interface Helper {
      * @param y_in to return x_out
      */
     function swap_y(uint256 y_in)
-        public returns (uint256 x_out){
+    public returns (uint256 x_out){
 
         uint256 newY = y.add(y_in);
         uint256 a = (A.mul(4));
@@ -225,17 +222,17 @@ interface Helper {
         uint256 newX;
 
         int256 alpha = int256((a.mul(4)).mul(newY));
-        int256 beta = (int256((a.mul(4)).mul(uint256(pow(int256(newY),2))))).add(int256((newY.mul(4)).mul(K))).sub(int256(((a.mul(4)).mul(K).mul(newY))));
-        int256 gamma = -(pow(int256(K),3));
+        int256 beta = (int256((a.mul(4)).mul(uint256(pow(int256(newY), 2))))).add(int256((newY.mul(4)).mul(K))).sub(int256(((a.mul(4)).mul(K).mul(newY))));
+        int256 gamma = - (pow(int256(K), 3));
 
         // Solve quadratic
         int256 d = (beta.mul(beta)).sub((alpha.mul(4)).mul(gamma));
         int256 sqrtD = int256(sqrt(uint256(abs(d))));
 
-        if(d >= 0){
-            int256 root1 = ((-beta).add(sqrtD)).div(alpha.mul(2));
-            int256 root2 = ((-beta).sub(sqrtD)).div(alpha.mul(2));
-            newX = uint256((root1 > 0 && root1 <= int256(k))? root1 : root2);
+        if (d >= 0) {
+            int256 root1 = ((- beta).add(sqrtD)).div(alpha.mul(2));
+            int256 root2 = ((- beta).sub(sqrtD)).div(alpha.mul(2));
+            newX = uint256((root1 > 0 && root1 <= int256(k)) ? root1 : root2);
 
             //check for quality of the math
             require(invariant(newX, newY), "not invariant");
@@ -249,7 +246,7 @@ interface Helper {
 
             emit SwapY(y_in, x_out);
         }
-        else{
+        else {
             revert("Wrong swap amount provided");
         }
     }

@@ -13,8 +13,8 @@ const cfg = hre.network.config
 const gasOverride = { /*gasLimit: 3000000*/ }
 
 import ERC721Json from "../artifacts/contracts/ERC721min.sol/ERC721min.json"
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import L2GovernanceERC20Json from '../../../packages/boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 let Factory__ERC721: ContractFactory
 let erc721: Contract
@@ -37,13 +37,13 @@ var BobaTuringCreditAddress
 describe("Turing NFT Random 256", function () {
 
   before(async () => {
-    
+
     // Deploy your Turing Helper
     Factory__Helper = new ContractFactory(
       (TuringHelperJson.abi),
       (TuringHelperJson.bytecode),
       deployerWallet)
-    
+
     helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Turing Helper contract deployed at", helper.address)
 
@@ -52,11 +52,11 @@ describe("Turing NFT Random 256", function () {
       (ERC721Json.abi),
       (ERC721Json.bytecode),
       deployerWallet)
-    
+
     erc721 = await Factory__ERC721.deploy(
       "RandomERC721",
       "RER",
-      helper.address, 
+      helper.address,
       gasOverride)
     console.log("    ERC721 contract deployed at", erc721.address)
 
@@ -73,7 +73,7 @@ describe("Turing NFT Random 256", function () {
     else if(hre.network.name === 'boba_mainnet') {
       BOBAL2Address = '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
       BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
-    } 
+    }
     else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
       addressesBOBA = JSON.parse(result)
@@ -90,7 +90,7 @@ describe("Turing NFT Random 256", function () {
     const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
     console.log("    BOBA Balance in your account", bobaBalance.toString())
 
-    // prepare to register/fund your Turing Helper 
+    // prepare to register/fund your Turing Helper
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet

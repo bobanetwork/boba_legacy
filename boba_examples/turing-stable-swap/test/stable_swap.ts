@@ -33,7 +33,7 @@ let addressesBOBA
 
 import StableSwapJson from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import L2GovernanceERC20Json from '../../../packages/boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 //takes a string of hex values and coverts those to ASCII
 function convertHexToASCII(hexString) {
@@ -52,7 +52,7 @@ describe("Stableswap at AWS Lambda", function () {
 
     urlStr = 'https://i9iznmo33e.execute-api.us-east-1.amazonaws.com/swapy'
     console.log("    URL set to", urlStr)
-    
+
     const balance = await local_provider.getBalance(deployerWallet.address)
     console.log("    ETH balance in your account", balance.toString())
 
@@ -62,7 +62,7 @@ describe("Stableswap at AWS Lambda", function () {
       deployerWallet)
 
     console.log("    Factory__Helper", Factory__Helper)
-    
+
     helper = await Factory__Helper.deploy(gasOverride)
     console.log("    Helper contract deployed as", helper.address)
 
@@ -70,7 +70,7 @@ describe("Stableswap at AWS Lambda", function () {
       (StableSwapJson.abi),
       (StableSwapJson.bytecode),
       deployerWallet)
-    
+
     stable = await Factory__Stable.deploy(
       helper.address,
       800,  //initial X
@@ -78,8 +78,8 @@ describe("Stableswap at AWS Lambda", function () {
       gasOverride
     )
 
-    await stable.changeA(5) 
-    
+    await stable.changeA(5)
+
     console.log("    Stableswap contract deployed as", stable.address)
 
     // whitelist the 'stable' contract in the helper
@@ -90,11 +90,11 @@ describe("Stableswap at AWS Lambda", function () {
     if(hre.network.name === 'boba_rinkeby') {
       BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
       BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
-    } 
+    }
     else if(hre.network.name === 'boba_mainnet') {
       BOBAL2Address = '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
       BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
-    } 
+    }
     else {
       const result = await request.get({ uri: 'http://127.0.0.1:8080/boba-addr.json' })
       addressesBOBA = JSON.parse(result)
@@ -111,7 +111,7 @@ describe("Stableswap at AWS Lambda", function () {
     const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
     console.log("    BOBA Balance in your account", bobaBalance.toString())
 
-    // prepare to register/fund your Turing Helper 
+    // prepare to register/fund your Turing Helper
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       deployerWallet
@@ -162,7 +162,7 @@ describe("Stableswap at AWS Lambda", function () {
     //testing with 800, y=1200, A=5 - this also sets the k
     const gas = await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
     console.log("    Stableswap gas estimate:", gas.toString())
-    
+
     const tr = await stable.swap_x(urlStr, 12, { gasLimit: gas })
 
     //await stable.estimateGas.swap_x(urlStr, 12, gasOverride)
@@ -170,7 +170,7 @@ describe("Stableswap at AWS Lambda", function () {
 
     const res = await tr.wait()
     expect(res).to.be.ok
-    const rawData = res.events[2].data //the event returns 
+    const rawData = res.events[2].data //the event returns
     const numberHexString = rawData.slice(-64)
     let result = parseInt(numberHexString, 16)
     console.log("      result of x_in 12 -> y_out =",result)

@@ -2,10 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-interface Helper {
-  function TuringRandom() external returns (uint256);
-}
+import "./ITuringHelper.sol";
 
 /**
  * @title ERC721Mock
@@ -14,16 +11,16 @@ interface Helper {
 contract ERC721min is ERC721 {
 
     address public helperAddr;
-    Helper myHelper;
+    ITuringHelper myHelper;
 
     event MintedRandom(uint256, uint8, uint8);
 
     constructor(
-      string memory name, 
+      string memory name,
       string memory symbol,
       address _helper) ERC721(name, symbol) {
         helperAddr = _helper;
-        myHelper = Helper(helperAddr);
+        myHelper = ITuringHelper(helperAddr);
     }
 
     function baseURI() public view returns (string memory) {
