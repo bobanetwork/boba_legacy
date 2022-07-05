@@ -6,6 +6,8 @@ temp
 coverage.json
 *.tsbuildinfo
 
+.aws-sam/
+__pycache__/
 .idea/
 .serverless/
 build
