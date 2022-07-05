@@ -22,12 +22,10 @@ describe('Batch Serialization', () => {
   before(async () => {
     env = await OptimismEnv.new()
     const mocha = new Mocha()
-    mocha.timeout(20000)
+    mocha.timeout(30000)
     mocha.addFile('./test/turing.spec.ts')
     const failures = (fails: number): void => {
-      console.log('failures')
-      console.log(fails)
-      console.log(mocha.files)
+      expect(fails).to.eq(0)
     }
     mocha.run(failures)
   })
