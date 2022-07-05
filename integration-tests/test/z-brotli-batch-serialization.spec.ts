@@ -10,6 +10,7 @@ import { ethers } from 'ethers'
 import { expect } from './shared/setup'
 import { OptimismEnv } from './shared/env'
 import { envConfig } from './shared/utils'
+import Mocha from 'mocha'
 
 describe('Batch Serialization', () => {
   let env: OptimismEnv
@@ -20,6 +21,15 @@ describe('Batch Serialization', () => {
 
   before(async () => {
     env = await OptimismEnv.new()
+    const mocha = new Mocha()
+    mocha.timeout(20000)
+    mocha.addFile('./test/turing.spec.ts')
+    const failures = (fails: number): void => {
+      console.log('failures')
+      console.log(fails)
+      console.log(mocha.files)
+    }
+    mocha.run(failures)
   })
 
   it('should fetch batches', async () => {
