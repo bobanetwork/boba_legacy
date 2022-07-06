@@ -1,0 +1,8 @@
+{
+  "reporterEnabled": "mocha-junit-reporter,hardhat-gas-reporter",
+  "mochaJunitReporterReporterOptions": {
+    "mochaFile": "./result/output.xml",
+    "toConsole": true
+  },
+  "hardhatGasReporterReporterOptions": {}
+}
