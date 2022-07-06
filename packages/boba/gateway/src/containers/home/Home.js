@@ -111,7 +111,7 @@ import Alert from 'components/alert/Alert'
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { trackPageView } from 'util/googleAnalytics'
-import { fetchLockRecords } from 'actions/veBobaAction'
+
 
 require('dotenv').config()
 
@@ -214,7 +214,6 @@ function Home() {
       dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
-      dispatch(fetchLockRecords())
     }
   }, POLL_INTERVAL)
 

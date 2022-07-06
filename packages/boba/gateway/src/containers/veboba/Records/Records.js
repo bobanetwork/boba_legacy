@@ -40,8 +40,8 @@ function LockRecords() {
       <Grid item md={3}> </Grid>
     </Grid>
     <G.DividerLine />
-    {[ 1, 2, 3, 4, 5 ].map((item, index) => <Fragment key={index}>
-      <RecordItem />
+    {records.map((nftRecord, index) => <Fragment key={index}>
+      <RecordItem {...nftRecord} />
       {(index < 4) ? <G.DividerLine variant='middle' /> : null}
     </Fragment>)}
   </>

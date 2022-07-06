@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
-import React from 'react'
-
+import React, { useEffect } from 'react'
+import { fetchLockRecords } from 'actions/veBobaAction'
 import AreaChart from 'components/areaChart/AreaChart'
 
 import * as G from '../Global.styles'
@@ -8,6 +8,8 @@ import * as S from './Lock.styles'
 
 import CreateLock from './createLock/CreateLock'
 import LockRecords from './Records/Records'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 const data = [
   { name: '6', uv: 4000, pv: 2400, amt: 2400 },
@@ -21,6 +23,15 @@ const data = [
 
 
 function Lock() {
+  const dispatch = useDispatch();
+  const accountEnabled = useSelector(selectAccountEnabled())
+
+  useEffect(() => {
+    if (!!accountEnabled) {
+      dispatch(fetchLockRecords());
+    }
+  }, [accountEnabled]);
+
 
   return <S.PageContainer>
     <Box display="flex" container gap={3} flexDirection="column">

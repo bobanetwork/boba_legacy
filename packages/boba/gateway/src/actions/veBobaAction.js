@@ -21,7 +21,7 @@ import { createAction } from "./createAction";
  */
 
 export function createLock(payload) {
-  return createAction('LOCK/CREATE', () => networkService.createProposal(payload))
+  return createAction('LOCK/CREATE', () => networkService.createLock(payload))
 }
 
 export function withdrawLock(payload) {
@@ -38,12 +38,4 @@ export function extendLockTime(payload) {
 
 export function fetchLockRecords() {
   return createAction('LOCK/RECORDS/GET', () => networkService.fetchLockRecords())
-}
-
-export function fetchVotingPower(payload) {
-  return createAction('LOCK/VOTINGPOWER/GET', () => networkService.fetchVotingPower(payload))
-}
-
-export function fetchVeBobaRatio(payload) {
-  return createAction('LOCK/RATIO/GET', () => networkService.fetchVeBobaRatio(payload))
 }

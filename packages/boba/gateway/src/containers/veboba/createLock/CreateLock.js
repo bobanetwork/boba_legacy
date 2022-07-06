@@ -13,6 +13,7 @@ import CalenderIcon from 'components/icons/CalenderIcon'
 import * as G from 'containers/Global.styles'
 
 import { setConnectBOBA } from 'actions/setupAction'
+import { createLock, fetchLockRecords } from 'actions/veBobaAction'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
@@ -42,7 +43,9 @@ const EXPIRY_OPTIONS = [
   },
 ]
 
-function CreateLock() {
+function CreateLock({
+  onCreateSuccess
+}) {
 
   const dispatch = useDispatch()
 
@@ -89,22 +92,21 @@ function CreateLock() {
   }
 
 
-  const createLock = async () => {
-    console.table({
-      'value': value,
-      'toWeigString': toWei_String(value, 18),
-      'Expires': expiry
-    });
+  const onCreateLock = async () => {
+
+    const endD = moment(expiry);
+    const currD = moment();
+    // expiry duration in seconds
+    const diffD = endD.diff(currD, 'days') * 24 * 3600;
 
     const res = await dispatch(createLock({
-      amount: toWei_String(value, 18),
-      expiry: expiry
+      value_Wei_String: toWei_String(value, 18),
+      lock_duration: diffD
     }))
-
-    console.log('LOCK CREATE ', res);
-
+    console.log('create lock',res);
+    dispatch(fetchLockRecords());
     if (res) {
-      dispatch(openAlert('Lock has been created!'))
+      dispatch(openAlert('Lock has been created!'));
     }
 
   }
@@ -190,7 +192,7 @@ function CreateLock() {
             color="primary"
             size="large"
             disabled={Number(value) > Number(maxBalance)}
-            onClick={createLock}
+            onClick={onCreateLock}
           >
             {Number(value) > Number(maxBalance) ? 'Insufficient balance' : 'Lock'}
           </Button>}

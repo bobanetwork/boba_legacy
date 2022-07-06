@@ -22,6 +22,7 @@ const initialState = {
 function veBobaReducer(state = initialState, action) {
   switch (action.type) {
     case 'LOCK/RECORDS/GET/SUCCESS':
+      console.log(JSON.stringify(action.payload.records[0]))
       return { ...state, ...action.payload }
 
     case 'LOCK/VOTINGPOWER/GET/SUCCESS':
