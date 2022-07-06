@@ -1,13 +1,7 @@
 {
-  "reporterEnabled": "mocha-junit-reporter,hardhat-gas-reporter",
+  "reporterEnabled": "mocha-junit-reporter",
   "mochaJunitReporterReporterOptions": {
     "mochaFile": "./result/output.xml",
     "toConsole": true
-  },
-  "hardhatGasReporterReporterOptions": {
-    "enabled": true,
-    "currency": "USD",
-    "gasPrice": 100,
-    "outputFile": "gas-report.txt"
   }
 }
