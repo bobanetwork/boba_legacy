@@ -164,6 +164,9 @@ services:
       - dtl
       - l2geth
     image: bobanetwork/boba_deployer:latest
+    restart: on-failure
+    volumes:
+      - my-datavolume:/opt/optimism/packages/boba
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_deployer
@@ -447,3 +450,5 @@ services:
         target: /init/seed.yaml
     ports:
       - 8888:8888
+volumes:
+  my-datavolume:

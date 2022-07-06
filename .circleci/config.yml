@@ -22,37 +22,37 @@ jobs:
           working_directory: ops
           background: true
           command: docker-compose -f docker-compose.yml logs --follow
-      - run:
-          name: Retry boba deployer on failure
-          working_directory: ops
-          background: true
-          command: |
-            export SHELL=/bin/bash
-            set +eo pipefail
-            until $(docker-compose -f docker-compose.yml logs | grep "BobaDao.deploy.ts:"); do
-              _logs=$(docker-compose -f docker-compose.yml logs)
-              _counter=$(echo $_logs | grep -c "BobaDao.deploy.ts:")
-              echo $counter
-              if [ $_counter -ge 1 ]; then
-                echo "Detected a failure in Boba Deployer. Will retry."
-                docker-compose logs boba_deployer
-                docker-compose stop boba_deployer
-                docker-compose up -d boba_deployer
-                exit 0
-              else
-                _counter=$(echo $_logs | grep -c "Will upload addresses.json to http://dtl:8081/boba-addr.json")
-                echo $counter
-                if [ $_counter -ge 1 ]
-                then
-                  echo $_logs
-                  echo "Boba deployer finished OK"
-                  exit 0
-                else
-                  echo "Nothing really"
-                  sleep 10
-                fi
-              fi
-            done
+      # - run:
+      #     name: Retry boba deployer on failure
+      #     working_directory: ops
+      #     background: true
+      #     command: |
+      #       export SHELL=/bin/bash
+      #       set +eo pipefail
+      #       until $(docker-compose -f docker-compose.yml logs | grep "BobaDao.deploy.ts:"); do
+      #         _logs=$(docker-compose -f docker-compose.yml logs)
+      #         _counter=$(echo $_logs | grep -c "BobaDao.deploy.ts:")
+      #         echo $counter
+      #         if [ $_counter -ge 1 ]; then
+      #           echo "Detected a failure in Boba Deployer. Will retry."
+      #           docker-compose logs boba_deployer
+      #           docker-compose stop boba_deployer
+      #           docker-compose up -d boba_deployer
+      #           exit 0
+      #         else
+      #           _counter=$(echo $_logs | grep -c "Will upload addresses.json to http://dtl:8081/boba-addr.json")
+      #           echo $counter
+      #           if [ $_counter -ge 1 ]
+      #           then
+      #             echo $_logs
+      #             echo "Boba deployer finished OK"
+      #             exit 0
+      #           else
+      #             echo "Nothing really"
+      #             sleep 10
+      #           fi
+      #         fi
+      #       done
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
