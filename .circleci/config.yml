@@ -44,6 +44,7 @@ jobs:
                 echo $counter
                 if [ $_counter -ge 1 ]
                 then
+                  echo $_logs
                   echo "Boba deployer finished OK"
                   exit 0
                 else
