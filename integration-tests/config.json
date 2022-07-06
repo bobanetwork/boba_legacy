@@ -4,5 +4,10 @@
     "mochaFile": "./result/output.xml",
     "toConsole": true
   },
-  "hardhatGasReporterReporterOptions": {}
+  "hardhatGasReporterReporterOptions": {
+    "enabled": true,
+    "currency": "USD",
+    "gasPrice": 100,
+    "outputFile": "gas-report.txt"
+  }
 }
