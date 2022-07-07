@@ -173,14 +173,13 @@ const deployFn: DeployFunction = async (hre) => {
   console.log('Queue setPendingAdmin...')
 
   let eta1
-  let setPendingAdminTx
-  ;[eta1, setPendingAdminTx] = try {
-     await setPendingAdmin(hre, eta_delay_s)
+  let setPendingAdminData
+  try {
+    ;[eta1, setPendingAdminData] = await setPendingAdmin(hre, eta_delay_s)
   } catch (error) {
     console.log(`setPendingAdmin failed because of : ${error}`)
-    await setPendingAdmin(hre, eta_delay_s)
+    ;[eta1, setPendingAdminData] = await setPendingAdmin(hre, eta_delay_s)
   }
-
 
   console.log('Queued setPendingAdmin!')
   console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
@@ -284,7 +283,7 @@ const setPendingAdmin = async (hre, eta_delay_s) => {
   )
 
   await setPendingAdminTx.wait()
-  return [eta1, setPendingAdminTx]
+  return [eta1, setPendingAdminData]
 }
 
 deployFn.tags = ['DAO', 'BOBA']
