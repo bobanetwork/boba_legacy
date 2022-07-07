@@ -78,8 +78,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         chainId: 288,
         chainIdHex: '0x120',
         rpcUrl: `https://mainnet.boba.network`,
-        blockExplorer: `http://bobascan.com/`,
-        transaction: `http://bobascan.com/tx/`,
+        blockExplorer: `https://bobascan.com/`,
+        transaction: `https://bobascan.com/tx/`,
       },
       payloadForL1SecurityFee: {
         from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',

@@ -81,7 +81,7 @@ const PageFooter = ({maintenance}) => {
             }}
           >BobaScope</S.FooterLink>
           <S.FooterLink
-            href="http://bobascan.com/"
+            href="https://bobascan.com/"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
