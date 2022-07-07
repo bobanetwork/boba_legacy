@@ -345,9 +345,9 @@ export class SequencerBatch extends Struct {
       const options = {
         params: {
           [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
-          [zlib.constants.BROTLI_PARAM_QUALITY]: 11
-        }
-      };
+          [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+        },
+      }
       const compressed = zlib.brotliCompressSync(writer.render(), options)
       bw.writeBytes(Buffer.from(compressed))
     } else {
