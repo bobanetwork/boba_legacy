@@ -8,14 +8,12 @@ import ListNFT from "components/listNFT/listNFT";
 import * as S from "./Monster.styles";
 import * as G from "containers/Global.styles";
 
-import { Box, Typography, Grid, Input } from "@mui/material"
+import { Box, Typography, Grid } from "@mui/material"
 
 import PageTitle from "components/pageTitle/PageTitle"
 import networkService from "services/networkService"
 import BobaGlassIcon from "components/icons/BobaGlassIcon"
 import Connect from "containers/connect/Connect"
-import Button from "../../components/button/Button"
-import { openAlert } from "../../actions/uiAction"
 
 class Monster extends React.Component {
 
@@ -97,7 +95,7 @@ class Monster extends React.Component {
       this.setState({ walletAddress })
       const bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
       const tag = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
-      this.setState({ 
+      this.setState({
         walletAddress,
         BT: tag
       })
@@ -269,9 +267,9 @@ class Monster extends React.Component {
                   also, to support content creators, journalists, artists, and developers. When they use their
                   Boba Bubble on social media and in their art, you will be able to send BOBA and ETH to
                   their Boba wallet. The system is powered by Turing, which does all
-                  the heavy lifting in the background. 
-                  The new Twitter/Turing based fountain has been launched and is available 
-                  to developers on Rinkeby. 
+                  the heavy lifting in the background.
+                  The new Twitter/Turing based fountain has been launched and is available
+                  to developers on Rinkeby.
                 </Typography>
 
               </Box>
