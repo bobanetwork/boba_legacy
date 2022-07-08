@@ -37,8 +37,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         chainId: 28,
         chainIdHex: '0x1C',
         rpcUrl: `https://rinkeby.boba.network`,
-        blockExplorer: `https://blockexplorer.rinkeby.boba.network/`,
-        transaction: `https://blockexplorer.rinkeby.boba.network/tx/`
+        blockExplorer: `https://testnet.bobascan.com/address/`,
+        transaction: `https://testnet.bobascan.com/address/tx/`
       },
       payloadForL1SecurityFee: {
         from: '0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA',
@@ -78,8 +78,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         chainId: 288,
         chainIdHex: '0x120',
         rpcUrl: `https://mainnet.boba.network`,
-        blockExplorer: `https://blockexplorer.boba.network/`,
-        transaction: `https://blockexplorer.boba.network/tx/`,
+        blockExplorer: `https://bobascan.com/`,
+        transaction: `https://bobascan.com/tx/`,
       },
       payloadForL1SecurityFee: {
         from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
