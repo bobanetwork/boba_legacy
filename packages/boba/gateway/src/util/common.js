@@ -33,3 +33,13 @@ export const sortRawTokens = (tokens) => {
 
     return [ ...start, ...last ]
 }
+
+
+export const asciiToHex = (str) => {
+  const arr1 = []
+  for (let n = 0, l = str.length; n < l; n++) {
+    const hex = Number(str.charCodeAt(n)).toString(16)
+    arr1.push(hex)
+  }
+  return `0x${arr1.join('')}`
+}

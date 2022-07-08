@@ -70,6 +70,7 @@ import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
+import TwitterPayJson from "../deployment/contracts/TwitterPay.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
@@ -85,7 +86,7 @@ import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
-import { sortRawTokens } from 'util/common'
+import { asciiToHex, sortRawTokens } from "util/common";
 import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
@@ -101,7 +102,7 @@ const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
-let allAddresses = {}
+export let allAddresses = {}
 // preload allAddresses
 if (process.env.REACT_APP_CHAIN === 'rinkeby') {
   allAddresses = {
@@ -576,6 +577,114 @@ class NetworkService {
     }
   }
 
+  async registerBobaBubble(tweetId) {
+    try {
+      const twitterPayContract = new ethers.Contract(
+        allAddresses.TwitterPay,
+        TwitterPayJson.abi,
+        this.L2Provider,
+      ).connect(this.provider.getSigner())
+
+      const gasEstimated = await twitterPayContract.estimateGas.registerBobaBubble(tweetId)
+      console.log('Estimated gas..', gasEstimated)
+      const registration = await twitterPayContract.registerBobaBubble(tweetId,
+        { gasLimit: 8_000_000 }
+      )
+      await registration.wait()
+    } catch(error) {
+      return this.parseTwitterError(error)
+    }
+  }
+
+  async sendFundsWithBobaBubble(bobaBubbleTag, amountWei, hasApproved) {
+
+    try {
+      // before making non-needed requests
+      if (!hasApproved) {
+        const BobaAllowance = await this.checkAllowance(
+          allAddresses.TK_L2BOBA,
+          allAddresses.TwitterPay
+        )
+
+        if (BobaAllowance.lt(amountWei)) {
+          const approveStatus = await this.approveERC20(
+            amountWei,
+            allAddresses.TK_L2BOBA,
+            allAddresses.TwitterPay
+          )
+          return !!approveStatus
+        }
+        return true; // allowance large enough
+      } else {
+        console.log("triggering sendFundsWithBobaBubble", bobaBubbleTag)
+        bobaBubbleTag = asciiToHex(bobaBubbleTag?.toLowerCase()) // convert to hex for smart contract (Turing decoding issue)
+        console.log("Numeric boba bubble: ", bobaBubbleTag)
+
+        const twitterPayContract = new ethers.Contract(
+          allAddresses.TwitterPay,
+          TwitterPayJson.abi,
+          this.L2Provider,
+        ).connect(this.provider.getSigner(this.account))
+
+        await twitterPayContract.estimateGas.sendFunds(
+          allAddresses.TK_L2BOBA,
+          bobaBubbleTag,
+          amountWei,
+        )
+
+        const transfer = await twitterPayContract.sendFunds(
+          allAddresses.TK_L2BOBA,
+          bobaBubbleTag,
+          amountWei,
+        )
+        return await transfer.wait()
+      }
+    } catch (error) {
+      return this.parseTwitterError(error)
+    }
+  }
+
+
+  parseTwitterError(error) {
+    console.warn('TwitterTx error:', error)
+
+    let errorMsg = error?.response?.data?.error?.error?.body ?? error?.error ?? error?.data?.message
+    if (errorMsg) {
+      errorMsg = JSON.stringify(errorMsg);
+      errorMsg = errorMsg?.match(/execution reverted:\s(.+)\\+"}}/) ?? errorMsg?.match(/execution reverted:\s(.+)"/)
+      errorMsg = errorMsg ? errorMsg[1]?.trim() : errorMsg;
+    }
+    if (errorMsg?.includes('Invalid request')) {
+      errorMsg = errorMsg.match(/Invalid request:(.+)/)
+      if (errorMsg) {
+        const errorMap = [
+          'Twitter API error - Probably limits hit.',
+          'Twitter account needs to exist at least 48 hours.',
+          'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
+          'Your Twitter account needs more than 5 followers.',
+          'You need to have tweeted more than 2 times.',
+        ]
+        try {
+          errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
+        } catch(err) {
+          console.error(err)
+          errorMsg = 'Unexpected Twitter error.'
+        }
+      } else {
+        errorMsg = 'Not expected Turing error.'
+      }
+    } else {
+      const errorMap = {
+        'cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
+        'no testnet funds': 'Faucet drained: Please reach out to us.',
+        'rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        'unknown bubble': 'This Boba bubble is not registered yet.',
+      }
+      errorMsg = errorMap[errorMsg?.toLowerCase()] ?? errorMsg;
+    }
+    return errorMsg ?? 'Limits reached or Twitter constraints not met.'
+  }
+
   /** @dev Only works on testnet, but can be freely called on production app */
   async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
 
@@ -606,40 +715,7 @@ class NetworkService {
       ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
       console.log("response",response)
     } catch (error) {
-      let errorMsg = error?.response?.data?.error?.error?.body
-      if (errorMsg) {
-        errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
-        errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
-      }
-      console.log(`MetaTx error for getTestnetETH: ${errorMsg}`)
-      if (errorMsg?.includes('Invalid request')) {
-        errorMsg = errorMsg.match(/Invalid request:(.+)/)
-        if (errorMsg) {
-          const errorMap = [
-            'Twitter API error - Probably limits hit.',
-            'Twitter account needs to exist at least 48 hours.',
-            'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
-            'Your Twitter account needs more than 5 followers.',
-            'You need to have tweeted more than 2 times.',
-          ]
-          try {
-            errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
-          } catch(err) {
-            console.error(err)
-            errorMsg = 'Unexpected Twitter error.'
-          }
-        } else {
-          errorMsg = 'Not expected Turing error.'
-        }
-      } else {
-        const errorMap = {
-          'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
-          'No testnet funds': 'Faucet drained: Please reach out to us.',
-          'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
-        }
-        errorMsg = errorMap[errorMsg];
-      }
-      return errorMsg ?? 'Limits reached or Twitter constraints not met.'
+      return this.parseTwitterError(error)
     }
   }
 
