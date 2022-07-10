@@ -7,8 +7,9 @@
   "ethGasReporterReporterOptions": {
     "currency": "USD",
     "gasPrice": 100,
-    "outputFile": "gas-report.txt",
+    "outputFile": "../result/gas-report.txt",
     "url": "http://l1_chain:8545",
-    "src": "../contracts"
+    "src": "../contracts",
+    "forceConsoleOutput": true
   }
 }
