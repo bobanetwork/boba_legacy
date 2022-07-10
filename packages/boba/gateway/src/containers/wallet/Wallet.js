@@ -26,8 +26,6 @@ import {
 import {
   selectAccountEnabled,
   selectLayer,
-  selectNetwork,
-  selectWalletAddress,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -52,7 +50,6 @@ function Wallet() {
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
-  const network = useSelector(selectNetwork())
 
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)

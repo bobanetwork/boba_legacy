@@ -8,20 +8,18 @@ import ListNFT from "components/listNFT/listNFT";
 import * as S from "./Monster.styles";
 import * as G from "containers/Global.styles";
 
-import { Box, Typography, Grid, Input } from "@mui/material"
+import { Box, Typography, Grid } from "@mui/material"
 
 import PageTitle from "components/pageTitle/PageTitle"
 import networkService from "services/networkService"
 import BobaGlassIcon from "components/icons/BobaGlassIcon"
 import Connect from "containers/connect/Connect"
-import Button from "../../components/button/Button"
-import { openAlert } from "../../actions/uiAction"
 
 class Monster extends React.Component {
 
   constructor(props) {
 
-    super(props);
+    super(props)
 
     const {
       list,
@@ -35,6 +33,12 @@ class Monster extends React.Component {
       walletAddress
     } = this.props.setup
 
+    let tag = ''
+    if(walletAddress) {
+      const bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
+      tag = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
+    }
+
     this.state = {
       list,
       contractAddress: "",
@@ -45,7 +49,7 @@ class Monster extends React.Component {
       monsterNumber,
       monsterInfo,
       walletAddress,
-      bobaTag: "",
+      BT: tag,
     };
 
   }
@@ -89,7 +93,12 @@ class Monster extends React.Component {
 
     if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
       this.setState({ walletAddress })
-      this.setState({ bobaTag: Md5.hashStr(walletAddress.toLowerCase().substring(2)) })
+      const bobaTag = Md5.hashStr(walletAddress.toLowerCase().substring(2))
+      const tag = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
+      this.setState({
+        walletAddress,
+        BT: tag
+      })
     }
 
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
@@ -117,19 +126,13 @@ class Monster extends React.Component {
       netLayer,
       monsterInfo,
       accountEnabled,
-      bobaTag,
-      tweetUrl
+      BT,
+      walletAddress
     } = this.state
-
-    console.log("tweetUrl:",tweetUrl)
-
-    let BT = "";
-    if (bobaTag)
-      BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase();
 
     let tokenIDverified = null;
 
-    //figure out which monster type we are dealing with
+    // figure out which monster type we are dealing with
     let monsterType = "Monster";
 
     // since it uses FIND, this code will only find one of your monsters
@@ -187,7 +190,7 @@ class Monster extends React.Component {
                       <br />Welcome, {monsterType} {tokenIDverified}
                     </Typography>
                   }
-                  {accountEnabled &&
+                  {walletAddress &&
                     <Box style={{ display: "inline-block" }}>
                       <Typography variant="body1">
                         Your Boba Bubble:{" "}
@@ -265,7 +268,10 @@ class Monster extends React.Component {
                   Boba Bubble on social media and in their art, you will be able to send BOBA and ETH to
                   their Boba wallet. The system is powered by Turing, which does all
                   the heavy lifting in the background.
+                  The new Twitter/Turing based fountain has been launched and is available
+                  to developers on Rinkeby.
                 </Typography>
+
               </Box>
             </S.NFTListContainer>
           </S.NFTPageContainer>
