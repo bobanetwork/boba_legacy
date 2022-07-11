@@ -10,14 +10,17 @@ function RecordItem({
   tokenId,
   lockedAmount,
   balance,
-  expiry
+  expiry,
+  onManage
 }) {
+
+
 
   return <Grid container px={2} py={1} >
     <Grid item md={3}>
       <Box display="flex" alignItems="center" gap={2}>
         <S.ThumbnailContainer px={2} py={1}>
-          <img src={BobaNFTGlass} alt="glass"/>
+          <img src={BobaNFTGlass} alt="glass" />
         </S.ThumbnailContainer>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">#{tokenId}</Typography>
@@ -40,10 +43,11 @@ function RecordItem({
     </Grid>
     <Grid item md={3} >
       <Box display="flex" justifyContent="flex-end" alignItems="center">
-      <Button
-        variant='outlined'
-        color='primary'
-        size="small">Manage</Button>
+        <Button
+          onClick={onManage}
+          variant='outlined'
+          color='primary'
+          size="small">Manage</Button>
       </Box>
     </Grid>
   </Grid>

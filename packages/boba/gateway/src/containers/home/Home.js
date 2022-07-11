@@ -74,6 +74,7 @@ import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
+import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 
 import {
   fetchDaoBalance,
@@ -111,6 +112,7 @@ import Alert from 'components/alert/Alert'
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { trackPageView } from 'util/googleAnalytics'
+import { fetchLockRecords } from 'actions/veBobaAction'
 
 
 require('dotenv').config()
@@ -139,10 +141,12 @@ function Home() {
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const manageLockModalState = useSelector(selectModalState('manageLock'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
+  const lock = useSelector(selectModalState('lock'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -208,6 +212,7 @@ function Home() {
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
+      dispatch(fetchLockRecords())
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
@@ -261,6 +266,7 @@ function Home() {
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
+      {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
 
       <Alert
         type='error'

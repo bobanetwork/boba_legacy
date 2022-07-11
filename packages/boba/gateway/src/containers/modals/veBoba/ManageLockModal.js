@@ -1,26 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Box, Typography } from '@mui/material'
 
-import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
-import Input from 'components/input/Input'
 
 import { closeModal } from 'actions/uiAction'
 
-import * as S from './ManageLockModal.style'
+import WithdrawLock from './WithdrawLock'
 
 
-const ManageLockModal = ({
+function ManageLockModal({
   open,
-
-}) => {
-
-  const layer = useSelector(selectLayer())
+  lock
+}) {
   const dispatch = useDispatch()
 
+  const [isWithdrawable, setisWithdrawable] = useState(false);
+
+  useEffect(() => {
+    /**
+      Write condition to check wether it's withdrawable or not.
+      update the state accordingly.
+    */
+    console.log('Lock details', lock);
+
+  }, [lock]);
+
   const handleClose = () => {
-    dispatch(closeModal('ManageLock'))
+    dispatch(closeModal('manageLock'))
   }
 
 
@@ -31,38 +37,10 @@ const ManageLockModal = ({
     title={'Manage Existing Lock'}
     newStyle={true}
   >
-
-    <Input
-      type="number"
-      newStyle
-      variant="standard"
+    <WithdrawLock
+      handleClose={handleClose}
+      lockInfo={lock}
     />
-
-    <Button
-      fullWidth={true}
-      variant="contained"
-      color="primary"
-      size="large"
-    >
-      Withdraw
-    </Button>
-    <Button
-      fullWidth={true}
-      variant="contained"
-      color="primary"
-      size="large"
-    >
-      Increase Lock Amount
-    </Button>
-    <Button
-      fullWidth={true}
-      variant="contained"
-      color="primary"
-      size="large"
-    >
-      Extend Lock Time
-    </Button>
-
   </Modal>
 }
 

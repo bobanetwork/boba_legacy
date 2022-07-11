@@ -4899,22 +4899,6 @@ class NetworkService {
      }
   }
 
-
-  /**
-   * On discussion with sourdeep.
-   *
-            // getVeBalanceCount
-            // getTokenIdOfOwner
-            // getTokenBalance (veBoba (Vote Value))
-
-            await ve.locked(tokenId);
-                     // getLockBobaBalance
-                    // getExpiryTime
-   *
-   *
-   *
-   */
-
   async fetchLockRecords() {
     if (this.account === null) {
       console.log('NS: fetchLockRecords() error - called but account === null')
