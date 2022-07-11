@@ -14,10 +14,6 @@ import { createAction } from "./createAction";
  *  - extendLockTime
  *  - withdrawLock
  *  - fetchLockRecords
- *  - fetchVotingPower
- *  - fetchVeBobaRatio
- *
- *  TODO: write function for fetching the data for the locking period vs convert ration.
  */
 
 export function createLock(payload) {
@@ -37,5 +33,5 @@ export function extendLockTime(payload) {
 }
 
 export function fetchLockRecords() {
-  return createAction('LOCK/RECORDS/GET', () => networkService.fetchLockRecords())
+  return createAction('LOCK/RECORDS', () => networkService.fetchLockRecords())
 }

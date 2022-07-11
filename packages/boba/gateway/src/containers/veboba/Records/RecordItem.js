@@ -6,15 +6,28 @@ import React from 'react'
 import * as S from './RecordItem.styles'
 
 function RecordItem({
-  key,
-  tokenId,
-  lockedAmount,
-  balance,
-  expiry,
-  onManage
+  onManage,
+  lock
 }) {
 
+  const {
+    tokenId,
+    lockedAmount,
+    balance,
+    expiry } = lock
 
+  const expired = moment(expiry).isBefore(moment());
+
+  const sameMonth = moment(expiry).isSame(moment(), 'month');
+  const sameWeek = moment(expiry).isSame(moment(), 'week');
+
+  let expiryText = '';
+  if (sameMonth) {
+    expiryText= 'Expires in month'
+  }
+  if (sameWeek) {
+    expiryText= 'Expires in week'
+  }
 
   return <Grid container px={2} py={1} >
     <Grid item md={3}>
@@ -24,27 +37,31 @@ function RecordItem({
         </S.ThumbnailContainer>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">#{tokenId}</Typography>
-          <Typography variant="body2" >{moment(expiry).format('YYYY-MM-DD')}</Typography>
-          {/* <Typography variant="body4" sx={{ opacity: 0.5 }} >Expires in month</Typography> */}
+          <Typography variant="body2" >
+            {
+            expired ? 'Expired':
+            moment(expiry).format('YYYY-MM-DD')}</Typography>
+          <Typography variant="body4" sx={{ opacity: 0.5 }} >{expiryText}</Typography>
+
         </Box>
       </Box>
     </Grid>
     <Grid item md={3}>
-      <Box display="flex" flexDirection="column" alignItems="flex-start">
+      <Box display="flex" flexDirection="column" alignItems="flex-start" py={2}>
         <Typography variant="body2">{lockedAmount}</Typography>
-        <Typography variant="body4" sx={{ opacity: 0.5 }} >Boba</Typography>
+        <Typography variant="body3" sx={{ opacity: 0.5 }} >Boba</Typography>
       </Box>
     </Grid>
     <Grid item md={3}>
-      <Box display="flex" flexDirection="column" alignItems="flex-start">
+      <Box display="flex" flexDirection="column" alignItems="flex-start" py={2}>
         <Typography variant="body2">{balance}</Typography>
-        <Typography variant="body4" sx={{ opacity: 0.5 }}>veBoba</Typography>
+        <Typography variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography>
       </Box>
     </Grid>
     <Grid item md={3} >
-      <Box display="flex" justifyContent="flex-end" alignItems="center">
+      <Box display="flex" justifyContent="flex-end" alignItems="center" py={2}>
         <Button
-          onClick={onManage}
+          onClick={() => onManage(lock)}
           variant='outlined'
           color='primary'
           size="small">Manage</Button>

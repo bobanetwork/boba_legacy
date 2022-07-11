@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 import React, { Fragment } from 'react'
 import RecordItem from './RecordItem'
 
@@ -8,25 +8,16 @@ import { selectLockRecords } from 'selectors/veBobaSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { useDispatch } from 'react-redux'
 import { openModal } from 'actions/uiAction'
-import Button from 'components/button/Button'
 
 const LockRecords = () => {
 
   const dispatch = useDispatch();
-  const loading = useSelector(selectLoading([ 'LOCK/RECORDS/GET' ]));
+  const loading = useSelector(selectLoading([ 'LOCK/RECORDS' ]));
+
   const records = useSelector(selectLockRecords);
 
-  const onManage = () => {
-    dispatch(openModal('manageLock', null, null, null, {
-      tokenId: 1,
-      expiry: new Date(1664409600 * 1000),
-      balance: 100,
-      lockedAmount: 85,
-    }))
-  }
-
-  if (!!loading) {
-    return <Grid container p={2} > loading lock records..</Grid>
+  const onManage = (lock) => {
+    dispatch(openModal('manageLock', null, null, null, lock))
   }
 
   return <>
@@ -47,18 +38,19 @@ const LockRecords = () => {
         </Typography>
       </Grid>
       <Grid item md={3}>
-        <Box display="flex" justifyContent="flex-end" alignItems="center">
-          <Button
-            onClick={onManage}
-            variant='outlined'
-            color='primary'
-            size="small">Manage</Button>
-        </Box>
+
       </Grid>
     </Grid>
     <G.DividerLine />
+    {loading ? <Grid container>
+      <Grid item md={12} p={2}>
+        <Typography variant="body">
+          loading...
+        </Typography>
+      </Grid>
+    </Grid> : null}
     {records.map((nftRecord, index) => <Fragment key={index}>
-      <RecordItem onManage={onManage} {...nftRecord} />
+      <RecordItem onManage={onManage} lock={nftRecord} />
       {(index < 4) ? <G.DividerLine variant='middle' /> : null}
     </Fragment>)}
   </>

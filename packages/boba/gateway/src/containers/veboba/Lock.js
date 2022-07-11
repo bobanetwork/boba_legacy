@@ -12,13 +12,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled } from 'selectors/setupSelector'
 
 const data = [
-  { name: '6', uv: 4000, pv: 2400, amt: 2400 },
-  { name: '12', uv: 3000, pv: 1398, amt: 2210 },
-  { name: '18', uv: 2000, pv: -9800, amt: 2290 },
-  { name: '24', uv: 2780, pv: 3908, amt: 2000 },
-  { name: '30', uv: 2500, pv: 4800, amt: 2181 },
-  { name: '36', uv: 1220, pv: 3800, amt: 2500 },
-  { name: '42', uv: 2300, pv: 4300, amt: 2100 },
+  { name: '0', uv: 0 },
+  { name: '3M', uv: 25 },
+  { name: '6M', uv: 50 },
+  { name: '9M', uv: 75 },
+  { name: '12M', uv: 100 }
 ]
 
 
@@ -30,7 +28,7 @@ function Lock() {
     if (!!accountEnabled) {
       dispatch(fetchLockRecords());
     }
-  }, [accountEnabled]);
+  }, [ accountEnabled, dispatch ]);
 
 
   return <S.PageContainer>
@@ -41,7 +39,7 @@ function Lock() {
           <Typography variant="body2" sx={{ opacity: 0.6 }}>More tokens locked for longer = greater voting power = higher rewards</Typography>
           <G.DividerLine sx={{ my: 2 }} />
           <Typography variant="h3">Locking Period vs Convert Ration</Typography>
-          <Typography variant="body2">100 Boba locked for 36M = 84 veBoba</Typography>
+          <Typography variant="body2">100 Boba locked for 6M = 50 veBoba</Typography>
           <Box py={2}>
             <AreaChart data={data} />
           </Box>

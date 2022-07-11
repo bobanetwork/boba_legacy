@@ -19,15 +19,14 @@ function WithdrawLock({
 
   const {
     tokenId,
-    balance,
-    lockAmount,
+    lockedAmount,
     expiry
   } = lockInfo
 
   const dispatch = useDispatch()
 
   const onWithdraw = async (tokenId) => {
-    const res = await dispatch(withdrawLock());
+    const res = await dispatch(withdrawLock({tokenId}));
     if (res) {
       dispatch(openAlert('Lock Withdraw successful.'))
     }
@@ -62,7 +61,7 @@ function WithdrawLock({
         Available Withdraw Amount
       </Typography>
       <Typography variant="h3">
-        10,000 Boba
+        {lockedAmount} Boba
       </Typography>
     </Box>
     <Button

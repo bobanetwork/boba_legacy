@@ -6,6 +6,8 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import WithdrawLock from './WithdrawLock'
+import moment from 'moment'
+import IncreaseLock from './IncreaseLock'
 
 
 function ManageLockModal({
@@ -14,21 +16,21 @@ function ManageLockModal({
 }) {
   const dispatch = useDispatch()
 
-  const [isWithdrawable, setisWithdrawable] = useState(false);
+  const [ isWithdrawable, setisWithdrawable ] = useState(false);
 
   useEffect(() => {
-    /**
-      Write condition to check wether it's withdrawable or not.
-      update the state accordingly.
-    */
-    console.log('Lock details', lock);
+    if (lock) {
+      let today = moment()
+      let expiry = moment(lock.expiry);
 
-  }, [lock]);
+      let expired = expiry.isBefore(today);
+      setisWithdrawable(expired); // whether lock is withdrawable or not base expiry.
+    }
+  }, [ lock ]);
 
   const handleClose = () => {
     dispatch(closeModal('manageLock'))
   }
-
 
   return <Modal
     open={open}
@@ -37,10 +39,15 @@ function ManageLockModal({
     title={'Manage Existing Lock'}
     newStyle={true}
   >
-    <WithdrawLock
-      handleClose={handleClose}
-      lockInfo={lock}
-    />
+    {isWithdrawable ?
+      <WithdrawLock
+        handleClose={handleClose}
+        lockInfo={lock}
+      />
+      : <IncreaseLock
+        handleClose={handleClose}
+        lockInfo={lock} />
+    }
   </Modal>
 }
 

@@ -15,20 +15,11 @@ limitations under the License. */
 
 const initialState = {
   records: [],
-  votingPower: 0,
-  bobaRatio: 0,
 }
 
 function veBobaReducer(state = initialState, action) {
   switch (action.type) {
-    case 'LOCK/RECORDS/GET/SUCCESS':
-      console.log(JSON.stringify(action.payload.records[0]))
-      return { ...state, ...action.payload }
-
-    case 'LOCK/VOTINGPOWER/GET/SUCCESS':
-      return { ...state, ...action.payload }
-
-    case 'LOCK/RATIO/GET/SUCCESS':
+    case 'LOCK/RECORDS/SUCCESS':
       return { ...state, ...action.payload }
 
     default:

@@ -1,12 +1,32 @@
+import { Typography } from '@mui/material';
 import React from 'react';
 import { AreaChart as ReAreaChart, Area, Tooltip, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { dataFormatter } from './formatter';
+
+
+import * as S from './AreaChart.styles'
 
 /*
 TODO:
   - make the chart label to be correct on X-Axis and Y-Axis
   - prepare the tooltip.
 */
+
+function CustomToolTip({
+  active,
+  payload,
+  label
+}) {
+
+  if (!active) {
+    return null;
+  }
+
+  return <S.ToolTipContainer borderRadius={2} p={2}>
+    <Typography variant='body2'>Locking period: {label} </Typography>
+    <Typography variant='body2'>Convert ration: {payload[ 0 ].value}</Typography>
+  </S.ToolTipContainer>
+}
+
 function AreaChart({ data }) {
 
   return <ResponsiveContainer width="90%" height={300}>
@@ -19,9 +39,14 @@ function AreaChart({ data }) {
           <stop offset="100%" stopColor="rgba(186, 226, 26, 0)" />
         </linearGradient>
       </defs>
+      <CartesianGrid
+        vertical={false}
+        strokeDasharray="3 3"
+        horizontalFill={[ 'rgba(255, 255, 255, 0.06)' ]}
+        fillOpacity={0.2} />
       <XAxis dataKey="name" />
-      <YAxis tickFormatter={dataFormatter} />
-      <Tooltip />
+      <YAxis tickFormatter={(n) => `${n}%`} />
+      <Tooltip content={<CustomToolTip />} />
       <Area
         type="monotone"
         dataKey="uv"

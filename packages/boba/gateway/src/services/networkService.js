@@ -4633,6 +4633,10 @@ class NetworkService {
   /***********************************************/
 
 
+  /**
+   * CreateLock
+   *  - to create veboba lock
+   */
   async createLock({
     value_Wei_String,
     lock_duration
@@ -4643,14 +4647,11 @@ class NetworkService {
     }
 
     try {
-
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA,
         veJson.abi,
         this.provider.getSigner()
       )
-
-      console.log("ve.address:", ve.address)
 
       let allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
@@ -4658,16 +4659,13 @@ class NetworkService {
           this.account,
           allAddresses.Ve_BOBA
         )
-      console.log("Allowance:", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
-      console.log("Lock Amount:", depositAmount_BN)
 
       let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
 
       try {
         if (approveAmount_BN.gt(allowance_BN)) {
-          console.log("Need to approve YES:", approveAmount_BN)
           const approveStatus = await this.BobaContract
             .connect(this.provider.getSigner())
             .approve(
@@ -4695,107 +4693,10 @@ class NetworkService {
     }
   }
 
-   // gets number of NFTs owned by account
-   async getVeBalanceCount() {
-
-    if(this.account === null) {
-      console.log('NS: getVeBalanceCount() error - called but account === null')
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        allAddresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider
-      )
-      let nftCount = await ve.balanceOf(this.account)
-      return { nftCount: Number(nftCount) }
-    } catch (error) {
-      console.log('NS: ve:getBalanceCount error:', error)
-      return error
-    }
-  }
-
-  // gets tokenIds owned by the address
-  async getTokenIdOfOwner(_index) {
-
-    if(this.account === null) {
-      console.log('NS: getTokenIdOfOwner() error - called but account === null')
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        allAddresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider
-      )
-      let tokenId = await ve.tokenOfOwnerByIndex(this.account, _index)
-      return { tokenId: Number(tokenId) }
-    } catch (error) {
-      console.log('NS: ve:getTokenIdOfOwner error:', error)
-      return error
-    }
-  }
-
-  // gets the "current" balance of a NFT, synonymous with voting power
-  async getTokenBalance(tokenId) {
-
-    if(this.account === null) {
-      console.log('NS: getTokenBalance() error - called but account === null')
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        allAddresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider
-      )
-      let veBalance = await ve.balanceOfNFT(tokenId)
-      return { veBalance: Number(veBalance) }
-    } catch (error) {
-      console.log('NS: ve:getTokenBalance error:', error)
-      return error
-    }
-  }
-
-  // get ve Tokens for an account
-  async getVeTokens() {
-
-    if(this.account === null) {
-      console.log('NS: getVeTokens() error - called but account === null')
-      return
-    }
-
-    try {
-
-      const ve = new ethers.Contract(
-        allAddresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider
-      )
-
-      let balanceInfo = []
-
-      const nftCount = await ve.balanceOf(this.account)
-
-      for (let i = 0; i < nftCount; i++) {
-
-        const tokenId = await ve.tokenOfOwnerByIndex(this.account, i)
-
-        balanceInfo.push(tokenId)
-      }
-      return { balanceInfo }
-    } catch (error) {
-      console.log("NS: getVeTokens error:",error)
-      return error
-    }
-
-  }
-
-
+  /**
+   * withdrawLock
+   *  - To withdraw existing expired lock
+   */
   async withdrawLock({tokenId}) {
     if(!this.account) {
       console.log('NS: withdrawLock() error - called but account === null')
@@ -4806,7 +4707,7 @@ class NetworkService {
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,
-        this.provider
+        this.provider.getSigner()
       )
 
       const TX = await ve.withdraw(tokenId)
@@ -4818,6 +4719,10 @@ class NetworkService {
      }
   }
 
+  /**
+   * increaseLockAmount
+   *  - To increse amount of existing lock
+   */
   async increaseLockAmount({
     tokenId, value_Wei_String
   }) {
@@ -4829,7 +4734,7 @@ class NetworkService {
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,
-        this.provider
+        this.provider.getSigner()
       )
 
       let allowance_BN = await this.BobaContract
@@ -4874,9 +4779,17 @@ class NetworkService {
      }
   }
 
+  /**
+   * extendLockTime
+   *  - To extend lock time of existing lock
+   */
   async extendLockTime({
     tokenId, lock_duration
   }) {
+
+    console.log('tokenId, lock_duration', {
+      tokenId, lock_duration
+    })
     if(this.account === null) {
       console.log('NS: increaseUnlockTime() error - called but account === null')
       return
@@ -4886,7 +4799,7 @@ class NetworkService {
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,
-        this.provider
+        this.provider.getSigner()
       )
 
       const TX = await ve.increase_unlock_time(tokenId, lock_duration)
@@ -4899,6 +4812,10 @@ class NetworkService {
      }
   }
 
+  /**
+   * fetchLockRecords
+   *  - To to fetch list of existing lock records.
+   */
   async fetchLockRecords() {
     if (this.account === null) {
       console.log('NS: fetchLockRecords() error - called but account === null')
@@ -4929,7 +4846,8 @@ class NetworkService {
           tokenId,
           balance: Number(utils.formatUnits(balance, 18)).toFixed(2),
           lockedAmount: Number(utils.formatUnits(locked.amount, 18)).toFixed(2),
-          expiry: new Date(locked.end.toString() * 1000)
+          expiry: new Date(locked.end.toString() * 1000),
+          expirySeconds: locked.end.toString() * 1000,
         })
       }
 

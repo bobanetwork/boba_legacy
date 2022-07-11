@@ -17,7 +17,6 @@ import { createLock, fetchLockRecords } from 'actions/veBobaAction'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectVeBobaRatio, selectVotingPower } from 'selectors/veBobaSelector'
 
 import { toWei_String } from 'util/amountConvert'
 import { openAlert } from 'actions/uiAction'
@@ -56,9 +55,6 @@ function CreateLock({
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer2 = useSelector(selectlayer2Balance)
 
-  const veBobaRatio = useSelector(selectVeBobaRatio);
-  const votingPower = useSelector(selectVotingPower)
-
   const [ value, setValue ] = useState('0');
 
   const [ expiry, setExpiry ] = useState(EXPIRY_OPTIONS[ 0 ].value);
@@ -91,6 +87,15 @@ function CreateLock({
     ele.setFocus(true);
   }
 
+  const conversioRation = () => {
+    const endD = moment(expiry);
+    const currD = moment();
+    let secondsYear = 365 * 24 * 3600;
+    let secondsTillExpiry = endD.diff(currD, 'days') * 24 * 3600
+    let ratio = (secondsTillExpiry / secondsYear);
+    return ratio.toFixed(2);
+  }
+
 
   const onCreateLock = async () => {
 
@@ -103,7 +108,8 @@ function CreateLock({
       value_Wei_String: toWei_String(value, 18),
       lock_duration: diffD
     }))
-    console.log('create lock',res);
+    setValue('0')
+    setValue(EXPIRY_OPTIONS[ 0 ].value)
     dispatch(fetchLockRecords());
     if (res) {
       dispatch(openAlert('Lock has been created!'));
@@ -169,11 +175,11 @@ function CreateLock({
 
       <S.InlineContainer>
         <Typography variant="body2">Convert ve BOBA Ratio</Typography>
-        <Typography variant="body2"> {veBobaRatio} </Typography>
+        <Typography variant="body2"> {conversioRation()} </Typography>
       </S.InlineContainer>
       <S.InlineContainer>
         <Typography variant="body2">Your voting power will be</Typography>
-        <Typography variant="body2"> {votingPower} ve BOBA </Typography>
+        <Typography variant="body2"> {conversioRation()* value } ve BOBA </Typography>
       </S.InlineContainer>
       {
         !accountEnabled ?
