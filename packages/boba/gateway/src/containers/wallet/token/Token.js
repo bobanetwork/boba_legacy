@@ -10,7 +10,7 @@ import { selectTransactions } from 'selectors/transactionSelector'
 import { fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
-import { openAlert, openError } from 'actions/uiAction'
+import { openAlert } from 'actions/uiAction'
 
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'

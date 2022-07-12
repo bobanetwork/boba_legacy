@@ -1,5 +1,4 @@
-import brotli from 'brotli'
-
+import zlib from 'zlib'
 import { parse, serialize } from '@ethersproject/transactions'
 import { ethers } from 'ethers'
 import { Struct, BufferWriter, BufferReader } from 'bufio'
@@ -342,10 +341,13 @@ export class SequencerBatch extends Struct {
       for (const tx of this.transactions) {
         tx.write(writer)
       }
-      const compressed = brotli.compress(writer.render(), {
-        mode: 1,
-        quality: 11,
-      })
+      const options = {
+        params: {
+          [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+          [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+        },
+      }
+      const compressed = zlib.brotliCompressSync(writer.render(), options)
       bw.writeBytes(Buffer.from(compressed))
     } else {
       // Legacy
@@ -379,7 +381,7 @@ export class SequencerBatch extends Struct {
         case 0: {
           this.type = BatchType.BROTLI
           const bytes = br.readBytes(br.left())
-          const inflated = brotli.decompress(Uint8Array.from(bytes))
+          const inflated = zlib.brotliDecompressSync(Uint8Array.from(bytes))
           br = new BufferReader(Buffer.from(inflated))
 
           // remove the dummy context

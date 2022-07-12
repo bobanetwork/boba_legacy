@@ -10,7 +10,6 @@ import { getFarmInfo, updateStakeToken, updateWithdrawToken } from 'actions/farm
 import Button from 'components/button/Button';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import RemoveIcon from '@mui/icons-material/Remove';
 
 import networkService from 'services/networkService'
 
