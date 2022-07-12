@@ -29,12 +29,12 @@ export const menuItems = [
     title: "Earn",
     url: "/earn",
   },
-  {
-    key: 'Lock',
-    icon: "LockIcon",
-    title: "Lock",
-    url: "/lock",
-  },
+  // {
+  //   key: 'Lock',
+  //   icon: "LockIcon",
+  //   title: "Lock",
+  //   url: "/lock",
+  // },
   {
     key: 'Save',
     icon: "SaveIcon",
