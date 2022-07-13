@@ -25,6 +25,7 @@ import * as S from './CreateLock.styles'
 import * as Styles from './CreateLock.module.scss'
 import "react-datepicker/dist/react-datepicker.css"
 import { useRef } from 'react'
+import { selectLoading } from 'selectors/loadingSelector'
 
 
 const EXPIRY_OPTIONS = [
@@ -54,8 +55,9 @@ function CreateLock({
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer2 = useSelector(selectlayer2Balance)
+  const loading = useSelector(selectLoading([ 'LOCK/CREATE' ]))
 
-  const [ value, setValue ] = useState('0');
+  const [ value, setValue ] = useState(0);
 
   const [ expiry, setExpiry ] = useState(EXPIRY_OPTIONS[ 0 ].value);
   const [ maxBalance, setMaxBalance ] = useState(0);
@@ -108,13 +110,12 @@ function CreateLock({
       value_Wei_String: toWei_String(value, 18),
       lock_duration: diffD
     }))
-    setValue('0')
+    setValue(0)
     setValue(EXPIRY_OPTIONS[ 0 ].value)
     dispatch(fetchLockRecords());
     if (res) {
       dispatch(openAlert('Lock has been created!'));
     }
-
   }
 
   return <S.LockFormContainer>
@@ -129,6 +130,7 @@ function CreateLock({
         <Typography variant="body2"> {maxBalance} </Typography>
       </S.InlineContainer>
       <Input
+        placeholder="Enter amount to lock"
         value={value}
         type="number"
         maxValue={maxBalance}
@@ -197,7 +199,8 @@ function CreateLock({
             variant="contained"
             color="primary"
             size="large"
-            disabled={Number(value) > Number(maxBalance)}
+            loading={loading}
+            disabled={!value || Number(value) > Number(maxBalance)}
             onClick={onCreateLock}
           >
             {Number(value) > Number(maxBalance) ? 'Insufficient balance' : 'Lock'}

@@ -12,6 +12,7 @@ import { openAlert } from 'actions/uiAction';
 import { extendLockTime, increaseLockAmount } from 'actions/veBobaAction';
 import { selectlayer2Balance } from 'selectors/balanceSelector';
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector';
+import { selectLoading } from 'selectors/loadingSelector';
 
 import Button from 'components/button/Button';
 import CalenderIcon from 'components/icons/CalenderIcon';
@@ -20,8 +21,11 @@ import Input from 'components/input/Input';
 import { useRef } from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import { toWei_String } from 'util/amountConvert';
+
 import * as Styles from './ManageLockModal.module.scss';
 import * as S from './ManageLockModal.styles';
+import * as G from 'containers/Global.styles';
+import { info } from 'sass';
 
 
 function IncreaseLock({
@@ -31,7 +35,9 @@ function IncreaseLock({
 
   const {
     tokenId,
-    expiry
+    lockedAmount,
+    expiry,
+    balance
   } = lockInfo
 
   const dispatch = useDispatch()
@@ -41,9 +47,13 @@ function IncreaseLock({
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer2 = useSelector(selectlayer2Balance)
 
+  const increaseLoading = useSelector(selectLoading([ 'LOCK/INCREASE_AMOUNT' ]))
+  const extendLoading = useSelector(selectLoading([ 'LOCK/EXTEND_TIME' ]))
+
   const datePickerRef = useRef()
 
   const [ amountTo, setAmountTo ] = useState(0);
+  const [ votingPower, setVotingPower ] = useState(0);
   const [ expirtyTo, setExpiryTo ] = useState(moment(expiry).format("YYYY-MM-DD"));
 
   const [ maxBalance, setMaxBalance ] = useState(0);
@@ -52,7 +62,16 @@ function IncreaseLock({
     if (expiry) {
       setExpiryTo(moment(expiry).format("YYYY-MM-DD"));
     }
-  }, [expiry])
+  }, [ expiry ])
+
+  useEffect(() => {
+    const endD = moment(expirtyTo);
+    const currD = moment();
+    let secondsYear = 365 * 24 * 3600;
+    let secondsTillExpiry = endD.diff(currD, 'days') * 24 * 3600
+    let vpower = (secondsTillExpiry / secondsYear) * (lockedAmount + amountTo);
+    setVotingPower(vpower.toFixed(2))
+  }, [ amountTo, lockedAmount, expirtyTo ])
 
   useEffect(() => {
     if (layer2 && layer2.length > 0) {
@@ -103,6 +122,7 @@ function IncreaseLock({
     ele.setFocus(true);
   }
 
+
   return <Box py={2} display="flex" gap={4} flexDirection="column">
     <Box display="flex" flexDirection="column" gap={2}>
       <S.InlineContainer>
@@ -124,7 +144,9 @@ function IncreaseLock({
         variant="outlined"
         color="primary"
         size="large"
-        onClick={() => onIncreaseAmount()}
+        loading={increaseLoading}
+        disabled={extendLoading}
+        onClick={onIncreaseAmount}
       >
         Increase Lock Amount
       </Button>
@@ -143,8 +165,8 @@ function IncreaseLock({
             popperClassName={Styles.popperStyle}
             dateFormat="yyyy-MM-dd"
             selected={new Date(expirtyTo)}
-            minDate={new Date(moment(expiry).add(8,'days'))}
-            maxDate={new Date(moment().add(1,'year'))}
+            minDate={new Date(moment(expiry).add(8, 'days'))}
+            maxDate={new Date(moment().add(1, 'year'))}
             onChange={(date) => { setExpiryTo(moment(date).format('yyyy-MM-DD')) }}
             calendarClassName={theme.palette.mode}
           />
@@ -153,8 +175,8 @@ function IncreaseLock({
         <IconButton
           flex={1}
           onClick={() => {
-          openDatePicker()
-        }} component="span">
+            openDatePicker()
+          }} component="span">
           <CalenderIcon />
         </IconButton>
       </S.InlineContainer>
@@ -163,10 +185,33 @@ function IncreaseLock({
         variant="outlined"
         color="primary"
         size="large"
-        onClick={() => onExtendTime()}
+        disabled={increaseLoading}
+        loading={extendLoading}
+        onClick={onExtendTime}
       >
         Extend Lock Time
       </Button>
+    </Box>
+
+    <G.DividerLine />
+
+    <Box display="flex" justifyContent="space-between">
+      <Box display="flex" flexDirection="column" alignItems="flex-start">
+        <Typography variant='body2'>
+          Your voting power will be
+        </Typography>
+        <Typography variant='body2'>
+          {balance} {'->'} {votingPower}
+        </Typography>
+      </Box>
+      <Box display="flex" flexDirection="column" alignItems="flex-end">
+        <Typography variant='body2'>
+          {lockedAmount} locked
+        </Typography>
+        <Typography variant='body2'>
+          until {moment(expiry).format('YYYY/MM/DD')}
+        </Typography>
+      </Box>
     </Box>
   </Box>
 }
