@@ -12,10 +12,10 @@
     "start:lambda-sam": "cd aws && sam build && sam local invoke -e event.json && cd ..",
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.ts",
+    "setconfig": "hardhat run scripts/set_claim-amounts.ts",
     "test:local": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test",
-    "test:mainnet": "hardhat --network boba_mainnet test"
+    "test:base": "hardhat --network boba_base test",
+    "test": "hardhat test"
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.11",

@@ -75,6 +75,12 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   const berlinBlock = parseInt(env.BERLIN_BLOCK, 10) || 0
   // The L1 boba token address
   const l1BobaTokenAddress = env.L1_BOBA_TOKEN_ADDRESS
+  // The L1 native token - name
+  const l1NativeTokenName = env.L1_NATIVE_TOKEN_NAME
+  // The L1 native token - symbol
+  const l1NativeTokenSymbol = env.L1_NATIVE_TOKEN_SYMBOL
+  // The L1 native token - decimals
+  const l1NativeTokenDecimals = parseInt(env.L1_NATIVE_TOKEN_DECIMALS, 10)
 
   ensure(whitelistOwner, 'WHITELIST_OWNER')
   ensure(gasPriceOracleOwner, 'GAS_PRICE_ORACLE_OWNER')
@@ -86,6 +92,9 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   ensure(l1CrossDomainMessengerAddress, 'L1_CROSS_DOMAIN_MESSENGER_ADDRESS')
   ensure(berlinBlock, 'BERLIN_BLOCK')
   ensure(l1BobaTokenAddress, 'L1_BOBA_TOKEN_ADDRESS')
+  ensure(l1NativeTokenName, 'L1_NATIVE_TOKEN_NAME')
+  ensure(l1NativeTokenSymbol, 'L1_NATIVE_TOKEN_SYMBOL')
+  ensure(l1NativeTokenDecimals, 'L1_NATIVE_TOKEN_DECIMALS')
 
   // Basic warning so users know that the whitelist will be disabled if the owner is the zero address.
   if (env.WHITELIST_OWNER === '0x' + '00'.repeat(20)) {
@@ -113,6 +122,9 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     TuringHelperJson,
     berlinBlock,
     l1BobaTokenAddress,
+    l1NativeTokenName,
+    l1NativeTokenSymbol,
+    l1NativeTokenDecimals,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))

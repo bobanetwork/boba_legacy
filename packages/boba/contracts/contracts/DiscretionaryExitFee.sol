@@ -43,20 +43,28 @@ contract DiscretionaryExitFee is Ownable {
         uint32 _l1Gas,
         bytes calldata _data
     ) external payable onlyWithBillingContract {
+        // Load billingContract contract
+        L2BillingContract billingContract = L2BillingContract(payable(billingContractAddress));
+        // Check Boba amount
+        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
         // Collect the exit fee
-        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        (bool sent,) = billingContractAddress.call{value: billingContract.exitFee()}("");
+        require(sent, "Failed to collect exit fee");
 
-        require(!(msg.value != 0 && _l2Token != Lib_PredeployAddresses.OVM_ETH), "Amount Incorrect");
+        // BOBA amount
+        uint256 netBobaAmount = msg.value - billingContract.exitFee();
 
-        if (msg.value != 0) {
+        require(netBobaAmount != 0 || _l2Token != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
+        require(!(netBobaAmount != 0 && _l2Token != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
+
+        if (netBobaAmount != 0) {
             // override the _amount and token address
-            _amount = msg.value;
-            _l2Token = Lib_PredeployAddresses.OVM_ETH;
+            _amount = netBobaAmount;
+            _l2Token = Lib_PredeployAddresses.L2_BOBA;
         }
 
         // transfer funds if users deposit ERC20
-        if (_l2Token != Lib_PredeployAddresses.OVM_ETH) {
+        if (_l2Token != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_l2Token).safeTransferFrom(msg.sender, address(this), _amount);
         }
 

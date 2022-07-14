@@ -12,12 +12,16 @@ import {
   getContractFactory,
   getContractInterface,
   predeploys,
+  loadContract
 } from '@eth-optimism/contracts'
 import { remove0x } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
   NumberLike,
   asL2Provider,
+  DEFAULT_L2_CONTRACT_ADDRESSES,
+  StandardBridgeAdapter,
+  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
@@ -32,11 +36,14 @@ export const isLiveNetwork = () => {
 }
 
 export const HARDHAT_CHAIN_ID = 31337
+export const MOONBEAM_CHAIN_ID = 1281
+export const FANTOM_CHAIN_ID = 4003
+export const NON_ETHEREUM_CHAIN = [ MOONBEAM_CHAIN_ID, FANTOM_CHAIN_ID]
 export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
 export const GWEI = BigNumber.from(1e9)
-export const OVM_ETH_ADDRESS = predeploys.OVM_ETH
+export const L2_BOBA_ADDRESS = predeploys.L2_BOBA
 
 const gasPriceValidator = makeValidator((gasPrice) => {
   if (gasPrice === 'onchain') {
@@ -74,24 +81,24 @@ const env = cleanEnv(process.env, {
 
   PRIVATE_KEY: str({
     default:
-      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      '0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133',
   }),
   //0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199
   GAS_PRICE_ORACLE_PRIVATE_KEY: str({
     default:
-      '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+      '0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18',
   }),
   PRIVATE_KEY_2: str({
     default:
-      '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
+      '0xb9d2ea9a615f3165812e8d44de0d24da9bbd164b65c4f0573e1ce2c8dbd9c8df',
   }),
   PRIVATE_KEY_3: str({
     default:
-      '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
+      '0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18',
   }),
   PRIVATE_KEY_4: str({
     default:
-      '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+      '0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18',
   }),
 
   IS_LIVE_NETWORK: bool({ default: false }),
@@ -216,29 +223,38 @@ export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   return L1StandardBridge
 }
 
-export const getOvmEth = (wallet: Wallet) => {
-  const OVM_ETH = new Contract(
-    OVM_ETH_ADDRESS,
-    getContractInterface('OVM_ETH'),
+export const getL2BOBA = (wallet: Wallet) => {
+  const L2_BOBA = new Contract(
+    L2_BOBA_ADDRESS,
+    getContractInterface('L2_BOBA'),
     wallet
   )
 
-  return OVM_ETH
+  return L2_BOBA
 }
 
+// NEED TO FIX
 export const fundUser = async (
   messenger: CrossChainMessenger,
   amount: NumberLike,
   recipient?: string
 ) => {
+  console.log("DEPOSIT ETH");
+
+  const mes = await messenger.depositNativeToken(amount, {
+    l2GasLimit: DEFAULT_TEST_GAS_L2,
+    // overrides: {
+    //   gasPrice: DEFAULT_TEST_GAS_L1,
+    // },
+  });
+
+  console.log("WAIT FOR RECEIPT");
+
   await messenger.waitForMessageReceipt(
-    await messenger.depositETH(amount, {
-      l2GasLimit: DEFAULT_TEST_GAS_L2,
-      overrides: {
-        gasPrice: DEFAULT_TEST_GAS_L1,
-      },
-    })
+    mes
   )
+
+  console.log("TRANSFER");
 
   if (recipient !== undefined) {
     const tx = await messenger.l2Signer.sendTransaction({
@@ -247,6 +263,15 @@ export const fundUser = async (
     })
     await tx.wait()
   }
+}
+
+export const approveERC20 = async (
+  ERC20: Contract,
+  targetAddress: string,
+  amount: any
+) => {
+  const approveTx = await ERC20.approve(targetAddress, amount)
+  await approveTx.wait()
 }
 
 export const conditionalTest = (
@@ -319,6 +344,11 @@ export const gasPriceForL1 = async () => {
 export const isHardhat = async () => {
   const chainId = await l1Wallet.getChainId()
   return chainId === HARDHAT_CHAIN_ID
+}
+
+export const isNonEthereumChain = async () => {
+  const chainId = await l1Wallet.getChainId()
+  return NON_ETHEREUM_CHAIN.indexOf(chainId) !== -1
 }
 
 export const die = (...args) => {

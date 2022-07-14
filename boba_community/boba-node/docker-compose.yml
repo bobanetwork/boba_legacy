@@ -26,7 +26,7 @@ services:
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 381145
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 381145
     volumes:
-      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+      - ./state-dumps/boba-mainnet:/opt/optimism/packages/data-transport-layer/state-dumps/
     logging:
       driver: "json-file"
       options:

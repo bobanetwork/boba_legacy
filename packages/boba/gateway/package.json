@@ -12,8 +12,8 @@
     "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_ENV=dev react-scripts build",
     "audit-check": "audit-ci --moderate",
     "postinstall": "patch-package",
-    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:rinkeby": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=rinkeby react-scripts build && aws s3 rm s3://boba-gateway-rinkeby --recursive && aws s3 sync build s3://boba-gateway-rinkeby && aws s3 cp s3://boba-gateway-rinkeby/index.html s3://boba-gateway-rinkeby/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
+    "deploy:bobabase": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=bobaBase REACT_APP_L1_NATIVE_TOKEN_SYMBOL=GLMR react-scripts build && aws s3 rm s3://gateway.bobabase.boba.network --recursive && aws s3 sync build s3://gateway.bobabase.boba.network && aws s3 cp s3://gateway.bobabase.boba.network/index.html s3://gateway.bobabase.boba.network/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
+    "deploy:bobaoperatestnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=bobaOperaTestnet REACT_APP_L1_NATIVE_TOKEN_SYMBOL=FTM react-scripts build && aws s3 rm s3://gateway.testnet.bobaopera.boba.network --recursive && aws s3 sync build s3://gateway.testnet.bobaopera.boba.network && aws s3 cp s3://gateway.testnet.bobaopera.boba.network/index.html s3://gateway.testnet.bobaopera.boba.network/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",

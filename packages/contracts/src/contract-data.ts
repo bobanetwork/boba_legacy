@@ -64,16 +64,17 @@ export const getL1ContractData = (network: Network) => {
   }
 }
 
-const OVM_ETH = require('../artifacts/contracts/L2/predeploys/OVM_ETH.sol/OVM_ETH.json')
+const L2_BOBA = require('../artifacts/contracts/L2/predeploys/L2_BOBA.sol/L2_BOBA.json')
 const L2CrossDomainMessenger = require('../artifacts/contracts/L2/messaging/L2CrossDomainMessenger.sol/L2CrossDomainMessenger.json')
 const OVM_L2ToL1MessagePasser = require('../artifacts/contracts/L2/predeploys/OVM_L2ToL1MessagePasser.sol/OVM_L2ToL1MessagePasser.json')
 const OVM_DeployerWhitelist = require('../artifacts/contracts/L2/predeploys/OVM_DeployerWhitelist.sol/OVM_DeployerWhitelist.json')
+const L2_L1NativeToken = require('../artifacts/contracts/L2/predeploys/L2_L1NativeToken.sol/L2_L1NativeToken.json')
 
 export const getL2ContractData = () => {
   return {
-    OVM_ETH: {
-      abi: OVM_ETH.abi,
-      address: l2Addresses.OVM_ETH,
+    L2_BOBA: {
+      abi: L2_BOBA.abi,
+      address: l2Addresses.L2_BOBA,
     },
     L2CrossDomainMessenger: {
       abi: L2CrossDomainMessenger.abi,
@@ -87,5 +88,9 @@ export const getL2ContractData = () => {
       abi: OVM_DeployerWhitelist.abi,
       address: l2Addresses.OVM_DeployerWhitelist,
     },
+    L2_L1NativeToken: {
+      abi: L2_L1NativeToken.abi,
+      address: l2Addresses.L2_L1NativeToken,
+    }
   }
 }

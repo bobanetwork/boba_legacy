@@ -18,6 +18,7 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
+import { ethers } from 'ethers'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -54,7 +55,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
     console.log("Amount to bridge to L2:", value_Wei_String)
 
-    if(token.symbol === 'ETH') {
+    if(token.address === ethers.constants.AddressZero) {
       //console.log("Bridging ETH to L2")
       res = await dispatch(
         depositETHL2(value_Wei_String)

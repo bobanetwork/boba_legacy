@@ -21,9 +21,7 @@ export const fundRandomWallet = async (
   value: ethers.BigNumber
 ): Promise<ethers.Wallet> => {
   const fundTx = await env.l1Wallet.sendTransaction({
-    gasLimit: 25_000,
     to: wallet.address,
-    gasPrice: await gasPriceForL1(),
     value,
   })
   await fundTx.wait()
@@ -45,10 +43,7 @@ export const executeL1ToL2Transaction = async (
         tx.functionName,
         tx.functionParams
       ),
-      MESSAGE_GAS,
-      {
-        gasPrice: await gasPriceForL1(),
-      }
+      MESSAGE_GAS
     )
   )
   await env.waitForXDomainTransaction(receipt)
@@ -153,16 +148,19 @@ export const executeL2TransactionsParallel = async (
 const retryOnNonceError = async (cb: () => Promise<any>): Promise<any> => {
   while (true) {
     try {
-      return await cb()
+      const tx = await cb()
+      await tx.wait()
+      return tx
     } catch (err) {
       const msg = err.message.toLowerCase()
-
       if (
         msg.includes('nonce too low') ||
         msg.includes('nonce has already been used') ||
         msg.includes('transaction was replaced') ||
         msg.includes('another transaction with same nonce in the queue') ||
-        msg.includes('reverted without a reason')
+        msg.includes('reverted without a reason') ||
+        msg.includes('replacement transaction underpriced') ||
+        msg.includes('Cannot commit transaction in miner')
       ) {
         console.warn('Retrying transaction after nonce error.')
         await sleep(5000)

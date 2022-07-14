@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 import { MockMessenger } from "./MockMessenger.sol";
 
 contract MockBridge {
-    event ETHDepositInitiated(
+    event NativeTokenDepositInitiated(
         address indexed _from,
         address indexed _to,
         uint256 _amount,
@@ -118,14 +118,14 @@ contract MockBridge {
         emit DepositFailed(_params.l1Token, _params.l2Token, _params.from, _params.to, _params.amount, _params.data);
     }
 
-    function depositETH(
+    function depositNativeToken(
         uint32 _l2GasLimit,
         bytes memory _data
     )
         public
         payable
     {
-        emit ETHDepositInitiated(
+        emit NativeTokenDepositInitiated(
             msg.sender,
             msg.sender,
             msg.value,

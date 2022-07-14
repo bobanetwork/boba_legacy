@@ -33,10 +33,10 @@ export interface OEL2Contracts {
   OVM_L1BlockNumber: Contract
   OVM_L2ToL1MessagePasser: Contract
   OVM_DeployerWhitelist: Contract
-  OVM_ETH: Contract
+  L2_BOBA: Contract
   OVM_GasPriceOracle: Contract
   OVM_SequencerFeeVault: Contract
-  WETH: Contract
+  L2_L1NativeToken: Contract
 }
 
 /**

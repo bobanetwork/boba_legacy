@@ -1,27 +1,34 @@
 import { BigNumber, Contract, ContractFactory, Wallet } from 'ethers'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
-import { GWEI, fundUser, encodeSolidityRevertMessage } from './shared/utils'
+import { encodeSolidityRevertMessage, approveERC20 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { solidity } from 'ethereum-waffle'
-import { sleep } from '@eth-optimism/core-utils'
-import {
-  getContractFactory,
-  getContractInterface,
-} from '../../packages/contracts/dist'
-import { Interface } from 'ethers/lib/utils'
+import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
 chai.use(solidity)
 
-describe('Native ETH value integration tests', () => {
+describe('Native BOBA value integration tests', () => {
   let env: OptimismEnv
   let wallet: Wallet
   let other: Wallet
+
+  let L1BOBAToken: Contract
+  let L1StandardBridge: Contract
 
   before(async () => {
     env = await OptimismEnv.new()
     wallet = env.l2Wallet
     other = Wallet.createRandom().connect(wallet.provider)
+
+    L1StandardBridge = getContractFactory(
+      'L1StandardBridge',
+      env.l1Wallet
+    ).attach(env.addressesBASE.Proxy__L1StandardBridge)
+
+    L1BOBAToken = getContractFactory('BOBA', env.l1Wallet).attach(
+      env.addressesBOBA.TOKENS.BOBA.L1
+    )
   })
 
   it('{tag:other} should allow an L2 EOA to send to a new account and back again', async () => {
@@ -52,13 +59,24 @@ describe('Native ETH value integration tests', () => {
     // from state_transition.go, because the calculation for the l1 security fee is based on
     // the gas price.
     // This requires users to have enough balance to pypass the estimateGas checks and they
-    // can't transfer all ETH balance without providing the gas limit,
+    // can't transfer all BOBA balance without providing the gas limit,
     // because all balance + l1securityfee is larger than the total balance
     // In the production environment, this problem doesn't exist, because
     // users can't use zero gas price and they have to have enough balance to
     // cover the cost
     const value = ethers.utils.parseEther('1')
-    await fundUser(env.messenger, value, wallet.address)
+
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, value)
+    await env.waitForXDomainTransaction(
+      L1StandardBridge.depositERC20To(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
+        wallet.address,
+        value,
+        9999999,
+        ethers.utils.formatBytes32String(new Date().getTime().toString())
+      )
+    )
 
     const initialBalances = await getBalances()
 
@@ -86,7 +104,7 @@ describe('Native ETH value integration tests', () => {
     await checkBalances(initialBalances)
   })
 
-  describe(`calls between OVM contracts with native ETH value and relevant opcodes`, async () => {
+  describe(`calls between OVM contracts with native BOBA value and relevant opcodes`, async () => {
     const initialBalance0 = 42000
 
     let Factory__ValueCalls: ContractFactory
@@ -126,15 +144,15 @@ describe('Native ETH value integration tests', () => {
         'geth RPC does not match ovmSELFBALANCE'
       )
       // query ovmSELFBALANCE() opcode via eth_call as another check
-      const ovmEthBalanceOf0 = await env.ovmEth.balanceOf(ValueCalls0.address)
-      const ovmEthBalanceOf1 = await env.ovmEth.balanceOf(ValueCalls1.address)
-      expect(ovmEthBalanceOf0).to.deep.eq(
+      const L2BOBABalanceOf0 = await env.L2BOBA.balanceOf(ValueCalls0.address)
+      const L2BOBABalanceOf1 = await env.L2BOBA.balanceOf(ValueCalls1.address)
+      expect(L2BOBABalanceOf0).to.deep.eq(
         BigNumber.from(expectedBalances[0]),
-        'geth RPC does not match OVM_ETH.balanceOf'
+        'geth RPC does not match L2BOBA.balanceOf'
       )
-      expect(ovmEthBalanceOf1).to.deep.eq(
+      expect(L2BOBABalanceOf1).to.deep.eq(
         BigNumber.from(expectedBalances[1]),
-        'geth RPC does not match OVM_ETH.balanceOf'
+        'geth RPC does not match L2BOBA.balanceOf'
       )
       // query address(this).balance solidity via eth_call as final check
       const ovmAddressThisBalance0 =
@@ -161,12 +179,22 @@ describe('Native ETH value integration tests', () => {
     beforeEach(async () => {
       ValueCalls0 = await Factory__ValueCalls.deploy()
       ValueCalls1 = await Factory__ValueCalls.deploy()
-      await fundUser(env.messenger, initialBalance0, ValueCalls0.address)
+      await approveERC20(L1BOBAToken, L1StandardBridge.address, initialBalance0)
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20To(
+          L1BOBAToken.address,
+          predeploys.L2_BOBA,
+          ValueCalls0.address,
+          initialBalance0,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        )
+      )
       // These tests assume ValueCalls0 starts with a balance, but ValueCalls1 does not.
       await checkBalances([initialBalance0, 0])
     })
 
-    it('{tag:other} should allow ETH to be sent', async () => {
+    it('{tag:other} should allow BOBA to be sent', async () => {
       const sendAmount = 15
       const tx = await ValueCalls0.simpleSend(ValueCalls1.address, sendAmount, {
         gasPrice: 0,
@@ -188,7 +216,7 @@ describe('Native ETH value integration tests', () => {
       expect(returndata).to.eq('0x')
     })
 
-    it('{tag:other} should allow ETH to be sent and have the correct ovmCALLVALUE', async () => {
+    it('{tag:other} should allow BOBA to be sent and have the correct ovmCALLVALUE', async () => {
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(
         ValueCalls1.address,
@@ -204,7 +232,17 @@ describe('Native ETH value integration tests', () => {
       // give an initial balance which the ovmCALLVALUE should be added to when calculating ovmSELFBALANCE
       const initialBalance = 10
 
-      await fundUser(env.messenger, initialBalance, ValueCalls1.address)
+      await approveERC20(L1BOBAToken, L1StandardBridge.address, initialBalance)
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20To(
+          L1BOBAToken.address,
+          predeploys.L2_BOBA,
+          ValueCalls1.address,
+          initialBalance,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        )
+      )
 
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(
@@ -314,15 +352,15 @@ describe('Native ETH value integration tests', () => {
     })
 
     it('{tag:other} should allow delegate calls which preserve msg.value even with no balance going into the inner call', async () => {
-      const Factory__SendETHAwayAndDelegateCall: ContractFactory =
+      const Factory__SendBOBAAwayAndDelegateCall: ContractFactory =
         await ethers.getContractFactory('SendETHAwayAndDelegateCall', wallet)
-      const SendETHAwayAndDelegateCall: Contract =
-        await Factory__SendETHAwayAndDelegateCall.deploy()
-      await SendETHAwayAndDelegateCall.deployTransaction.wait()
+      const SendBOBAAwayAndDelegateCall: Contract =
+        await Factory__SendBOBAAwayAndDelegateCall.deploy()
+      await SendBOBAAwayAndDelegateCall.deployTransaction.wait()
 
       const value = 17
       const [delegatedSuccess, delegatedReturndata] =
-        await SendETHAwayAndDelegateCall.callStatic.emptySelfAndDelegateCall(
+        await SendBOBAAwayAndDelegateCall.callStatic.emptySelfAndDelegateCall(
           ValueCalls0.address,
           ValueCalls0.interface.encodeFunctionData('getCallValue'),
           {

@@ -22,28 +22,10 @@ const deployFn: DeployFunction = async (hre) => {
   // verify min/max submission values before deployment
   const tokens = [
     {
-      name: 'ETH',
-      address: '0x4200000000000000000000000000000000000006',
-      minSubmissionValue: 1,
-      maxSubmissionValue: utils.parseUnits('50000', 8),
-    },
-    {
       name: 'BOBA',
       address: (await hre.deployments.getOrNull('TK_L2BOBA')).address,
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
-    },
-    {
-      name: 'OMG',
-      address: (await hre.deployments.getOrNull('TK_L2OMG')).address,
-      minSubmissionValue: 1,
-      maxSubmissionValue: utils.parseUnits('500', 8),
-    },
-    {
-      name: 'WBTC',
-      address: (await hre.deployments.getOrNull('TK_L2WBTC')).address,
-      minSubmissionValue: utils.parseUnits('100', 8),
-      maxSubmissionValue: utils.parseUnits('500000', 8),
     },
   ]
 

@@ -38,7 +38,7 @@ actor('Funds depositor', () => {
       await env.waitForXDomainTransaction(
         env.l1Bridge
           .connect(l1Wallet)
-          .depositETH(DEFAULT_TEST_GAS_L2, '0xFFFF', {
+          .depositNativeToken(DEFAULT_TEST_GAS_L2, '0xFFFF', {
             value: 0x42,
             gasLimit: DEFAULT_TEST_GAS_L1,
           })

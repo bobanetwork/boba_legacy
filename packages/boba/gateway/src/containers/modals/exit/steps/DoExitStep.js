@@ -40,6 +40,7 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
+import networkService from 'services/networkService'
 
 import BN from 'bignumber.js'
 
@@ -66,7 +67,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
   const [ max_Float, setMax_Float ] = useState(0.0)                // support for Use Max - a number like 0.09 ETH
   const [ errorString, setErrorString ] = useState('')
 
-
   const [ feeETH, setFeeETH ] = useState(0.0)
   const [ feeBOBA, setFeeBOBA ] = useState(0.0)
 
@@ -88,8 +88,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
 
   function setAmount(value) {
-    // (Number(value) + feeBOBA + exitFee) > balance)
-
 
     const balance = Number(logAmount(token.balance, token.decimals))
 
@@ -260,9 +258,9 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} ${networkService.L1NativeTokenSymbol}`
     } else {
-      estGas = `${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} BOBA`
     }
   }
 

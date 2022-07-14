@@ -9,7 +9,13 @@ library Lib_PredeployAddresses {
     address internal constant L2_TO_L1_MESSAGE_PASSER = 0x4200000000000000000000000000000000000000;
     address internal constant L1_MESSAGE_SENDER = 0x4200000000000000000000000000000000000001;
     address internal constant DEPLOYER_WHITELIST = 0x4200000000000000000000000000000000000002;
-    address payable internal constant OVM_ETH = payable(0x4200000000000000000000000000000000000006);
+
+    // BOBA is the L2 native token
+    address payable internal constant L2_BOBA = payable(0x4200000000000000000000000000000000000006);
+    // L1 native token is a ERC20 token on L2
+    address internal constant L1_NATIVE_TOKEN_L2_ADDRESS =
+        0x4200000000000000000000000000000000000023;
+
     // solhint-disable-next-line max-line-length
     address internal constant L2_CROSS_DOMAIN_MESSENGER =
         0x4200000000000000000000000000000000000007;
@@ -25,7 +31,6 @@ library Lib_PredeployAddresses {
         0x4200000000000000000000000000000000000020;
     address internal constant BOBA_TURING_PREPAY = 0x4200000000000000000000000000000000000021;
     address internal constant BOBA_TURING_HELPER = 0x4200000000000000000000000000000000000022;
-    address internal constant L2_BOBA = 0x4200000000000000000000000000000000000023;
     address internal constant PROXY__BOBA_GAS_PRICE_ORACLE =
         0x4200000000000000000000000000000000000024;
     address internal constant BOBA_GAS_PRICE_ORACLE = 0x4200000000000000000000000000000000000025;

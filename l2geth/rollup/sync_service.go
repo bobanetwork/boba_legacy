@@ -998,7 +998,10 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		// Ensure that the BOBA balance is enough for the gas fee
 		if isBobaFeeTokenSelect {
 			bobaPriceRatio := state.GetBobaPriceRatio()
-			bobaCost := new(big.Int).Mul(bobaPriceRatio, estimateGas.Mul(estimateGas, tx.GasPrice()))
+			bobaPriceRatioDecimals := state.GetBobaPriceRatioDecimals()
+			bobaPriceRatioDivisor := new(big.Int).Exp(big.NewInt(10), bobaPriceRatioDecimals, nil)
+			preBobaCost := new(big.Int).Mul(bobaPriceRatio, estimateGas.Mul(estimateGas, tx.GasPrice()))
+			bobaCost := new(big.Int).Div(preBobaCost, bobaPriceRatioDivisor)
 			if state.GetBobaBalance(from).Cmp(bobaCost) < 0 {
 				return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientBobaFunds)
 			}

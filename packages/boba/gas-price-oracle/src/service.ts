@@ -9,10 +9,6 @@ import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
-import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
-import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
-
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
   l1RpcProvider: providers.StaticJsonRpcProvider
@@ -74,23 +70,15 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     OVM_GasPriceOracle: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
-    Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
-    L2BOBA: Contract
-    BobaStraw_ETHUSD: Contract
-    BobaStraw_BOBAUSD: Contract
-    L1ETHBalance: BigNumber
-    L1ETHCostFee: BigNumber
+    L1SecondaryFeeTokenBalance: BigNumber
+    L1SecondaryFeeTokenCostFee: BigNumber
     L1RelayerBalance: BigNumber
     L1RelayerCostFee: BigNumber
-    L2ETHVaultBalance: BigNumber
-    L2ETHCollectFee: BigNumber
     L2BOBAVaultBalance: BigNumber
     L2BOBACollectFee: BigNumber
     L2BOBABillingBalance: BigNumber
     L2BOBABillingCollectFee: BigNumber
-    BOBAUSDPrice: number
-    ETHUSDPrice: number
     chainID: number
   }
 
@@ -161,33 +149,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.OVM_GasPriceOracle.address,
     })
 
-    this.logger.info('Connecting to Boba_GasPriceOracle...')
-    const Boba_GasPriceOracleAddress =
-      await this.state.Lib_AddressManager.getAddress(
-        'Proxy__Boba_GasPriceOracle'
-      )
-    this.state.Boba_GasPriceOracle = new Contract(
-      Boba_GasPriceOracleAddress,
-      Boba_GasPriceOracleJson.abi,
-      this.options.l2RpcProvider
-    ).connect(this.options.gasPriceOracleOwnerWallet)
-    this.logger.info('Connected to Boba_GasPriceOracle', {
-      address: this.state.Boba_GasPriceOracle.address,
-    })
-
-    this.logger.info('Connecting to L2BOBA...')
-    const L2BOBAAddress = await this.state.Lib_AddressManager.getAddress(
-      'TK_L2BOBA'
-    )
-    this.state.L2BOBA = new Contract(
-      L2BOBAAddress,
-      L2GovernanceERC20Json.abi,
-      this.options.l2RpcProvider
-    )
-    this.logger.info('Connected to L2BOBA', {
-      address: this.state.L2BOBA.address,
-    })
-
     this.logger.info('Connecting to Proxy__BobaBillingContract...')
     this.state.BobaBillingContractAddress =
       await this.state.Lib_AddressManager.getAddress(
@@ -197,38 +158,16 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.BobaBillingContractAddress,
     })
 
-    // Load BOBA straw contracts
-    const BobaStraw_ETHUSDAddress =
-      await this.state.Lib_AddressManager.getAddress('BobaStraw_ETHUSD')
-    const BobaStraw_BOBAUSDAddress =
-      await this.state.Lib_AddressManager.getAddress('BobaStraw_BOBAUSD')
-    this.state.BobaStraw_ETHUSD = new Contract(
-      BobaStraw_ETHUSDAddress,
-      FluxAggregatorJson.abi,
-      this.options.l2RpcProvider
-    )
-    this.state.BobaStraw_BOBAUSD = new Contract(
-      BobaStraw_BOBAUSDAddress,
-      FluxAggregatorJson.abi,
-      this.options.l2RpcProvider
-    )
-    this.logger.info('Connected to BobaStraw', {
-      BobaStraw_ETHUSD: BobaStraw_ETHUSDAddress,
-      BobaStraw_BOBAUSD: BobaStraw_BOBAUSDAddress,
-    })
-
     // Total cost
-    this.state.L1ETHBalance = BigNumber.from('0')
-    this.state.L1ETHCostFee = BigNumber.from('0')
+    this.state.L1SecondaryFeeTokenBalance = BigNumber.from('0')
+    this.state.L1SecondaryFeeTokenCostFee = BigNumber.from('0')
     // For ajusting the billing price
     this.state.L1RelayerBalance = BigNumber.from('0')
     this.state.L1RelayerCostFee = BigNumber.from('0')
     // Total ETH revenuse
-    this.state.L2ETHCollectFee = BigNumber.from('0')
-    this.state.L2ETHVaultBalance = BigNumber.from('0')
-    // BOBA revenue
-    this.state.L2BOBAVaultBalance = BigNumber.from('0')
     this.state.L2BOBACollectFee = BigNumber.from('0')
+    this.state.L2BOBAVaultBalance = BigNumber.from('0')
+    // BOBA revenue
     this.state.L2BOBABillingBalance = BigNumber.from('0')
     this.state.L2BOBABillingCollectFee = BigNumber.from('0')
 
@@ -243,13 +182,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   protected async _start(): Promise<void> {
     while (this.running) {
       await sleep(this.options.pollingInterval)
-      // token price
-      await this._queryTokenPrice('BOBA/USD')
-      await this._queryTokenPrice('ETH/USD')
       // l2 gas price
       await this._getL1Balance()
       await this._getL2GasCost()
-      await this._updatePriceRatio()
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
@@ -262,9 +197,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.logger.warn('Loading L1 cost history...')
       const historyJsonRaw = await fsPromise.readFile(dumpsPath)
       const historyJSON = JSON.parse(historyJsonRaw.toString())
-      if (historyJSON.L1ETHCostFee) {
-        this.state.L1ETHBalance = BigNumber.from(historyJSON.L1ETHBalance)
-        this.state.L1ETHCostFee = BigNumber.from(historyJSON.L1ETHCostFee)
+      if (historyJSON.L1SecondaryFeeTokenCostFee) {
+        this.state.L1SecondaryFeeTokenBalance = BigNumber.from(
+          historyJSON.L1SecondaryFeeTokenBalance
+        )
+        this.state.L1SecondaryFeeTokenCostFee = BigNumber.from(
+          historyJSON.L1SecondaryFeeTokenCostFee
+        )
         this.state.L1RelayerBalance = BigNumber.from(
           historyJSON.L1RelayerBalance
         )
@@ -287,10 +226,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
       ).toString()
     )
-    const BOBAVaultBalance = await this.state.L2BOBA.balanceOf(
-      this.state.Boba_GasPriceOracle.address
-    )
-    const BOBABillingBalance = await this.state.L2BOBA.balanceOf(
+    const L2BOBABillingBalance = await this.options.l2RpcProvider.getBalance(
       this.state.BobaBillingContractAddress
     )
     // load data
@@ -300,20 +236,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const historyJsonRaw = await fsPromise.readFile(dumpsPath)
       const historyJSON = JSON.parse(historyJsonRaw.toString())
       // Load ETH
-      if (historyJSON.L2ETHCollectFee) {
-        this.state.L2ETHCollectFee = BigNumber.from(historyJSON.L2ETHCollectFee)
-      } else {
-        this.logger.warn('Invalid L2 ETH cost history!')
-        this.state.L2ETHCollectFee = ETHVaultBalance
-      }
-      // Load Boba
       if (historyJSON.L2BOBACollectFee) {
         this.state.L2BOBACollectFee = BigNumber.from(
           historyJSON.L2BOBACollectFee
         )
       } else {
-        this.logger.warn('Invalid L2 BOBA cost history!')
-        this.state.L2BOBACollectFee = BOBAVaultBalance
+        this.logger.warn('Invalid L2 ETH cost history!')
+        this.state.L2BOBACollectFee = ETHVaultBalance
       }
       // Load Boba billing
       if (historyJSON.L2BOBABillingCollectFee) {
@@ -322,31 +251,23 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         )
       } else {
         this.logger.warn('Invalid L2 BOBA billing history!')
-        this.state.L2BOBABillingCollectFee = BOBABillingBalance
+        this.state.L2BOBABillingCollectFee = L2BOBABillingBalance
       }
     } else {
       this.logger.warn('No L2 cost history Found!')
-      this.state.L2ETHCollectFee = ETHVaultBalance
-      this.state.L2BOBACollectFee = BOBAVaultBalance
-      this.state.L2BOBABillingCollectFee = BOBABillingBalance
-    }
-    // adjust the L2ETHCollectFee if it is not correct
-    if (this.state.L2ETHCollectFee.lt(ETHVaultBalance)) {
-      this.state.L2ETHCollectFee = ETHVaultBalance
+      this.state.L2BOBACollectFee = ETHVaultBalance
+      this.state.L2BOBABillingCollectFee = L2BOBABillingBalance
     }
     // adjust the L2BOBACollectFee if it is not correct
-    if (this.state.L2BOBACollectFee.lt(BOBAVaultBalance)) {
-      this.state.L2BOBACollectFee = BOBAVaultBalance
+    if (this.state.L2BOBACollectFee.lt(ETHVaultBalance)) {
+      this.state.L2BOBACollectFee = ETHVaultBalance
     }
     // adjust the L2BOBABillingCollectFee if it is not correct
-    if (this.state.L2BOBABillingCollectFee.lt(BOBABillingBalance)) {
-      this.state.L2BOBABillingCollectFee = BOBABillingBalance
+    if (this.state.L2BOBABillingCollectFee.lt(L2BOBABillingBalance)) {
+      this.state.L2BOBABillingCollectFee = L2BOBABillingBalance
     }
-    this.state.L2ETHVaultBalance = ETHVaultBalance
-    this.state.L2BOBAVaultBalance = BOBAVaultBalance
+    this.state.L2BOBAVaultBalance = ETHVaultBalance
     this.logger.info('Loaded L2 Cost Data', {
-      L2ETHVaultBalance: this.state.L2ETHVaultBalance.toString(),
-      L2ETHCollectFee: this.state.L2ETHCollectFee.toString(),
       L2BOBAVaultBalance: this.state.L2BOBAVaultBalance.toString(),
       L2BOBACollectFee: this.state.L2BOBACollectFee.toString(),
       L2BOBABillingCollectFee: this.state.L2BOBABillingCollectFee.toString(),
@@ -363,8 +284,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await fsPromise.writeFile(
         addrsPath,
         JSON.stringify({
-          L1ETHBalance: this.state.L1ETHBalance.toString(),
-          L1ETHCostFee: this.state.L1ETHCostFee.toString(),
+          L1SecondaryFeeTokenBalance:
+            this.state.L1SecondaryFeeTokenBalance.toString(),
+          L1SecondaryFeeTokenCostFee:
+            this.state.L1SecondaryFeeTokenCostFee.toString(),
           L1RelayerBalance: this.state.L1RelayerBalance.toString(),
           L1RelayerCostFee: this.state.L1RelayerCostFee.toString(),
         })
@@ -385,7 +308,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await fsPromise.writeFile(
         addrsPath,
         JSON.stringify({
-          L2ETHCollectFee: this.state.L2ETHCollectFee.toString(),
           L2BOBACollectFee: this.state.L2BOBACollectFee.toString(),
           L2BOBABillingCollectFee:
             this.state.L2BOBABillingCollectFee.toString(),
@@ -421,24 +343,31 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         ),
       })
 
-      const L1ETHBalanceLatest = balances.reduce((acc, cur) => {
+      const L1SecondaryFeeTokenBalanceLatest = balances.reduce((acc, cur) => {
         return acc.add(cur)
       }, BigNumber.from('0'))
 
       const L1RelayerETHBalanceLatest = balances[2].add(balances[3])
 
       // ETH balance
-      if (!this.state.L1ETHBalance.eq(BigNumber.from('0'))) {
-        // condition 1 - L1ETHBalance <= L1ETHBalanceLatest -- do nothing
-        // condition 2 - L1ETHBalance > L1ETHBalanceLatest
-        if (this.state.L1ETHBalance.gt(L1ETHBalanceLatest)) {
-          this.state.L1ETHCostFee = this.state.L1ETHCostFee.add(
-            this.state.L1ETHBalance.sub(L1ETHBalanceLatest)
+      if (!this.state.L1SecondaryFeeTokenBalance.eq(BigNumber.from('0'))) {
+        // condition 1 - L1SecondaryFeeTokenBalance <= L1SecondaryFeeTokenBalanceLatest -- do nothing
+        // condition 2 - L1SecondaryFeeTokenBalance > L1SecondaryFeeTokenBalanceLatest
+        if (
+          this.state.L1SecondaryFeeTokenBalance.gt(
+            L1SecondaryFeeTokenBalanceLatest
           )
+        ) {
+          this.state.L1SecondaryFeeTokenCostFee =
+            this.state.L1SecondaryFeeTokenCostFee.add(
+              this.state.L1SecondaryFeeTokenBalance.sub(
+                L1SecondaryFeeTokenBalanceLatest
+              )
+            )
         }
       } else {
         // start from the point that L1ETHCost = L2ETHCollect
-        this.state.L1ETHCostFee = BigNumber.from(
+        this.state.L1SecondaryFeeTokenCostFee = BigNumber.from(
           (
             await this.options.l2RpcProvider.getBalance(
               this.options.OVM_SequencerFeeVault
@@ -461,7 +390,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         this.state.L1RelayerCostFee = BigNumber.from(0)
       }
 
-      this.state.L1ETHBalance = L1ETHBalanceLatest
+      this.state.L1SecondaryFeeTokenBalance = L1SecondaryFeeTokenBalanceLatest
       this.state.L1RelayerBalance = L1RelayerETHBalanceLatest
 
       // write history
@@ -470,37 +399,28 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.logger.info('Got L1 ETH balances', {
         network: 'L1',
         data: {
-          L1ETHBalance: this.state.L1ETHBalance.toString(),
-          L1ETHCostFee: Number(
+          L1SecondaryFeeTokenBalance:
+            this.state.L1SecondaryFeeTokenBalance.toString(),
+          L1SecondaryFeeTokenCostFee: Number(
             Number(
-              utils.formatEther(this.state.L1ETHCostFee.toString())
+              utils.formatEther(
+                this.state.L1SecondaryFeeTokenCostFee.toString()
+              )
             ).toFixed(6)
           ),
-          L1ETHCostFee10X: Number(
-            (
-              Number(utils.formatEther(this.state.L1ETHCostFee.toString())) * 10
-            ).toFixed(6)
-          ),
-          L1ETHCostFeeUSD: Number(
+          L1SecondaryFeeTokenCostFee10X: Number(
             (
               Number(
-                Number(utils.formatEther(this.state.L1ETHCostFee.toString()))
-              ) * this.state.ETHUSDPrice
-            ).toFixed(2)
+                utils.formatEther(
+                  this.state.L1SecondaryFeeTokenCostFee.toString()
+                )
+              ) * 10
+            ).toFixed(6)
           ),
           L1RelayerCostFee: Number(
             Number(
               utils.formatEther(this.state.L1RelayerCostFee.toString())
             ).toFixed(6)
-          ),
-          L1RelayerCostFeeUSD: Number(
-            (
-              Number(
-                Number(
-                  utils.formatEther(this.state.L1RelayerCostFee.toString())
-                )
-              ) * this.state.ETHUSDPrice
-            ).toFixed(2)
           ),
         },
       })
@@ -512,7 +432,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   private async _getL2GasCost(): Promise<void> {
     try {
       // Get L2 ETH Fee from contract
-      const L2ETHCollectFee = BigNumber.from(
+      const L2BOBACollectFee = BigNumber.from(
         (
           await this.options.l2RpcProvider.getBalance(
             this.options.OVM_SequencerFeeVault
@@ -520,25 +440,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         ).toString()
       )
       // The oETH in OVM_SequencerFeeVault is zero after withdrawing it
-      let L2ETHCollectFeeIncreased = BigNumber.from('0')
-
-      if (L2ETHCollectFee.lt(this.state.L2ETHVaultBalance)) {
-        this.state.L2ETHVaultBalance = L2ETHCollectFee
-      }
-      L2ETHCollectFeeIncreased = L2ETHCollectFee.sub(
-        this.state.L2ETHVaultBalance
-      )
-      this.state.L2ETHVaultBalance = L2ETHCollectFee
-
-      this.state.L2ETHCollectFee = this.state.L2ETHCollectFee.add(
-        L2ETHCollectFeeIncreased
-      )
-
-      // Get L2 BOBA balance from contract
-      const L2BOBACollectFee = await this.state.L2BOBA.balanceOf(
-        this.state.Boba_GasPriceOracle.address
-      )
-      // The BOBA in Boba_GasPriceOracle is zero after withdrawing it
       let L2BOBACollectFeeIncreased = BigNumber.from('0')
 
       if (L2BOBACollectFee.lt(this.state.L2BOBAVaultBalance)) {
@@ -554,9 +455,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       )
 
       // Get L2 BOBA Billing balance from contract
-      const L2BOBABillingCollectFee = await this.state.L2BOBA.balanceOf(
-        this.state.BobaBillingContractAddress
-      )
+      const L2BOBABillingCollectFee =
+        await this.options.l2RpcProvider.getBalance(
+          this.state.BobaBillingContractAddress
+        )
       // The BOBA in BobaBillingContract is zero after withdrawing it
       let L2BOBABillingCollectFeeIncreased = BigNumber.from('0')
 
@@ -576,17 +478,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.logger.info('Got L2 Gas Collect', {
         network: 'L2',
         data: {
-          L2ETHCollectFee: Number(
-            Number(
-              utils.formatEther(this.state.L2ETHCollectFee.toString())
-            ).toFixed(6)
-          ),
-          L2ETHCollectFee10X: Number(
-            (
-              Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
-              10
-            ).toFixed(6)
-          ),
           L2BOBACollectFee: Number(
             Number(
               utils.formatEther(this.state.L2BOBACollectFee.toString())
@@ -611,91 +502,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
               ) * 10
             ).toFixed(6)
           ),
-          L2ETHCollectFeeUSD: Number(
-            (
-              Number(utils.formatEther(this.state.L2ETHCollectFee.toString())) *
-              this.state.ETHUSDPrice
-            ).toFixed(2)
-          ),
-          L2BOBACollectFeeUSD: Number(
-            (
-              Number(
-                utils.formatEther(this.state.L2BOBACollectFee.toString())
-              ) * this.state.BOBAUSDPrice
-            ).toFixed(2)
-          ),
-          L2BOBABillingCollectFeeUSD: Number(
-            (
-              Number(
-                utils.formatEther(this.state.L2BOBABillingCollectFee.toString())
-              ) * this.state.BOBAUSDPrice
-            ).toFixed(2)
-          ),
-          BOBAUSDPrice: Number(this.state.BOBAUSDPrice.toFixed(2)),
-          ETHUSDPrice: Number(this.state.ETHUSDPrice.toFixed(2)),
         },
       })
     } catch (error) {
       this.logger.warn(`CAN\'T GET L2 GAS COST ${error}`)
-    }
-  }
-
-  private async _updatePriceRatio(): Promise<void> {
-    const priceRatio = await this.state.Boba_GasPriceOracle.priceRatio()
-    const priceRatioInt = priceRatio.toNumber()
-    this.logger.info('Got Boba and ETH price ratio', {
-      priceRatio: priceRatioInt,
-    })
-    try {
-      const targetPriceRatio = Math.floor(
-        ((this.state.ETHUSDPrice / this.state.BOBAUSDPrice) *
-          this.options.bobaFeeRatio100X) /
-          100
-      )
-      const targetMarketPriceRatio = Math.floor(
-        this.state.ETHUSDPrice / this.state.BOBAUSDPrice
-      )
-      if (targetPriceRatio !== priceRatioInt) {
-        let targetUpdatedPriceRatio = targetPriceRatio
-        if (targetPriceRatio > priceRatio) {
-          targetUpdatedPriceRatio = Math.min(
-            Math.floor(
-              (1 + this.options.bobaFeeRatioMinPercentChange) * priceRatioInt
-            ),
-            targetPriceRatio
-          )
-        } else {
-          targetUpdatedPriceRatio = Math.max(
-            Math.floor(
-              (1 - this.options.bobaFeeRatioMinPercentChange) * priceRatioInt
-            ),
-            targetPriceRatio
-          )
-        }
-        this.logger.info('Updating price ratio...')
-        const gasPriceTx =
-          await this.state.Boba_GasPriceOracle.updatePriceRatio(
-            targetUpdatedPriceRatio,
-            targetMarketPriceRatio,
-            this.state.chainID === this.options.bobaLocalTestnetChainId
-              ? {}
-              : { gasPrice: 0 }
-          )
-        await gasPriceTx.wait()
-        this.logger.info('Updated price ratio', {
-          priceRatio: targetUpdatedPriceRatio,
-          targetMarketPriceRatio,
-        })
-      } else {
-        this.logger.info('No need to update price ratio', {
-          priceRatio: priceRatioInt,
-          targetPriceRatio,
-        })
-      }
-    } catch (error) {
-      this.logger.info('Failed to update price ratio', {
-        error,
-      })
     }
   }
 
@@ -821,39 +631,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
-    }
-  }
-
-  private async _queryTokenPrice(tokenPair: string): Promise<void> {
-    if (tokenPair === 'ETH/USD') {
-      const latestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
-      const decimals = await this.state.BobaStraw_ETHUSD.decimals()
-      // Keep two decimal places
-      if (decimals >= 2) {
-        const preETHUSDPrice = latestAnswer.div(
-          BigNumber.from(10).pow(decimals - 2)
-        )
-        this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
-      } else {
-        this.state.ETHUSDPrice = latestAnswer
-          .div(BigNumber.from(10).pow(decimals))
-          .toNumber()
-      }
-    }
-    if (tokenPair === 'BOBA/USD') {
-      const latestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
-      const decimals = await this.state.BobaStraw_BOBAUSD.decimals()
-      // Keep two decimal places
-      if (decimals >= 2) {
-        const preBOBAUSDPrice = latestAnswer.div(
-          BigNumber.from(10).pow(decimals - 2)
-        )
-        this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
-      } else {
-        this.state.BOBAUSDPrice = latestAnswer
-          .div(BigNumber.from(10).pow(decimals))
-          .toNumber()
-      }
     }
   }
 }

@@ -31,6 +31,7 @@ describe('Fee Payment Integration Tests', async () => {
   let env: OptimismEnv
 
   let Factory__L2ERC20: ContractFactory
+  let L1Boba: Contract
   let L2ERC20: Contract
 
   const other = '0x1234123412341234123412341234123412341234'
@@ -50,6 +51,10 @@ describe('Fee Payment Integration Tests', async () => {
       18
     )
     await L2ERC20.deployTransaction.wait()
+
+    L1Boba = getContractFactory('BOBA')
+      .attach(env.addressesBOBA.TOKENS.BOBA.L1)
+      .connect(env.l1Wallet)
   })
 
   hardhatTest(
@@ -117,11 +122,7 @@ describe('Fee Payment Integration Tests', async () => {
 
     const preBalance = await env.l2Wallet.getBalance()
 
-    const WETH = getContractFactory('OVM_ETH')
-      .attach(predeploys.OVM_ETH)
-      .connect(env.l2Wallet)
-
-    const feeVaultBefore = await WETH.balanceOf(
+    const feeVaultBefore = await env.l2Provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
 
@@ -134,7 +135,9 @@ describe('Fee Payment Integration Tests', async () => {
     const receipt = await tx.wait()
     const fee = receipt.gasUsed.mul(tx.gasPrice)
     const postBalance = await env.l2Wallet.getBalance()
-    const feeVaultAfter = await WETH.balanceOf(predeploys.OVM_SequencerFeeVault)
+    const feeVaultAfter = await env.l2Provider.getBalance(
+      predeploys.OVM_SequencerFeeVault
+    )
     const balanceDiff = preBalance.sub(postBalance)
     const feeReceived = feeVaultAfter.sub(feeVaultBefore)
     expect(balanceDiff).to.deep.equal(fee)
@@ -147,10 +150,6 @@ describe('Fee Payment Integration Tests', async () => {
   it('{tag:other} should compute correct fee with different gas limit', async () => {
     await setPrices(env, 1000)
 
-    const WETH = getContractFactory('OVM_ETH')
-      .attach(predeploys.OVM_ETH)
-      .connect(env.l2Wallet)
-
     const estimatedGas = await L2ERC20.estimateGas.transfer(
       env.l2Wallet.address,
       ethers.utils.parseEther('1')
@@ -160,7 +159,7 @@ describe('Fee Payment Integration Tests', async () => {
     while (gasLimit < estimatedGas.toNumber() + 1000) {
       const preBalance = await env.l2Wallet.getBalance()
 
-      const feeVaultBefore = await WETH.balanceOf(
+      const feeVaultBefore = await env.l2Provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
 
@@ -171,7 +170,7 @@ describe('Fee Payment Integration Tests', async () => {
       const receipt = await tx.wait()
       const fee = receipt.gasUsed.mul(tx.gasPrice)
       const postBalance = await env.l2Wallet.getBalance()
-      const feeVaultAfter = await WETH.balanceOf(
+      const feeVaultAfter = await env.l2Provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
       const balanceDiff = preBalance.sub(postBalance)
@@ -197,7 +196,7 @@ describe('Fee Payment Integration Tests', async () => {
     async () => {
       const l1FeeWallet =
         await env.messenger.contracts.l2.OVM_SequencerFeeVault.l1FeeWallet()
-      const balanceBefore = await env.l1Wallet.provider.getBalance(l1FeeWallet)
+      const balanceBefore = await L1Boba.balanceOf(l1FeeWallet)
       const withdrawalAmount =
         await env.messenger.contracts.l2.OVM_SequencerFeeVault.MIN_WITHDRAWAL_AMOUNT()
 
@@ -209,7 +208,7 @@ describe('Fee Payment Integration Tests', async () => {
       })
       await tx.wait()
 
-      const vaultBalance = await env.messenger.contracts.l2.OVM_ETH.balanceOf(
+      const vaultBalance = await env.l2Provider.getBalance(
         env.messenger.contracts.l2.OVM_SequencerFeeVault.address
       )
 
@@ -222,7 +221,8 @@ describe('Fee Payment Integration Tests', async () => {
       await env.waitForXDomainTransaction(withdrawTx)
 
       // Balance difference should be equal to old L2 balance.
-      const balanceAfter = await env.l1Wallet.provider.getBalance(l1FeeWallet)
+      const balanceAfter = await L1Boba.balanceOf(l1FeeWallet)
+
       expect(balanceAfter.sub(balanceBefore)).to.deep.equal(
         BigNumber.from(vaultBalance)
       )
@@ -233,16 +233,12 @@ describe('Fee Payment Integration Tests', async () => {
   it('{tag:other} should compute correct fee with different gas price', async () => {
     await setPrices(env, 1)
 
-    const WETH = getContractFactory('OVM_ETH')
-      .attach(predeploys.OVM_ETH)
-      .connect(env.l2Wallet)
-
     let gasPrice = 1
 
     while (gasPrice < 10) {
       const preBalance = await env.l2Wallet.getBalance()
 
-      const feeVaultBefore = await WETH.balanceOf(
+      const feeVaultBefore = await env.l2Provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
 
@@ -256,7 +252,7 @@ describe('Fee Payment Integration Tests', async () => {
       const receipt = await tx.wait()
       const fee = receipt.gasUsed.mul(tx.gasPrice)
       const postBalance = await env.l2Wallet.getBalance()
-      const feeVaultAfter = await WETH.balanceOf(
+      const feeVaultAfter = await env.l2Provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
       const balanceDiff = preBalance.sub(postBalance)

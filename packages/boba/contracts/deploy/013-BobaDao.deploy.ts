@@ -30,6 +30,9 @@ const getTimestamp = async (hre) => {
 }
 
 const deployFn: DeployFunction = async (hre) => {
+  // BOBA is not DAO token on other chains
+  return
+
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any

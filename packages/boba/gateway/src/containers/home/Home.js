@@ -33,10 +33,6 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
-import {
-  getMonsterInfo
-} from 'actions/nftAction'
-
 import networkService from 'services/networkService'
 
 import { setBaseState } from 'actions/setupAction'
@@ -54,52 +50,15 @@ import { closeAlert, closeError } from 'actions/uiAction'
 import { selectAlert, selectError } from 'selectors/uiSelector'
 
 import DepositModal from 'containers/modals/deposit/DepositModal'
-import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
-
 import TransferModal from 'containers/modals/transfer/TransferModal'
-import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
-
 import ExitModal from 'containers/modals/exit/ExitModal'
-
-import FarmWrapper from 'containers/farm/FarmWrapper'
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
-
-import SaveWrapper from 'containers/save/SaveWrapper'
-
-import DAO from 'containers/dao/Dao'
-import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
-import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
-import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 
-import {
-  fetchDaoBalance,
-  fetchDaoVotes,
-  fetchDaoBalanceX,
-  fetchDaoVotesX,
-  fetchDaoProposals,
-  getProposalThreshold
-} from 'actions/daoAction'
-
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2
-} from 'actions/airdropAction'
-
-import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
-import { fetchVerifierStatus } from 'actions/verifierAction'
-
-import Airdrop from 'containers/airdrop/Airdrop'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
-import Help from 'containers/help/Help'
-import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
-import Bridge from 'containers/bridge/Bridge'
-import MonsterWrapper from 'containers/monster/MonsterWrapper'
 
 import { Box, Container } from '@mui/material'
 
@@ -128,10 +87,8 @@ function Home() {
   const pageDisplay = useSelector(selectModalState('page'))
 
   const depositModalState = useSelector(selectModalState('depositModal'))
-  const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
 
   const transferModalState = useSelector(selectModalState('transferModal'))
-  const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
 
   const exitModalState = useSelector(selectModalState('exitModal'))
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
@@ -141,13 +98,6 @@ function Home() {
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
-
-  const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
-  const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
-
-  const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
-  const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
-  const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const network = useSelector(selectNetwork())
   const layer = useSelector(selectLayer())
@@ -185,8 +135,6 @@ function Home() {
       if (initialized === 'enabled') {
         console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
-        // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
         return true
       }
     }
@@ -196,22 +144,10 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
       dispatch(fetchExits())           // account specific
-      dispatch(getFS_Saves())          // account specific
-      dispatch(getFS_Info())           // account specific
-      dispatch(getMonsterInfo())       // account specific
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
-      dispatch(getProposalThreshold())
-      dispatch(fetchDaoProposals())
     }
   }, POLL_INTERVAL)
 
@@ -220,15 +156,12 @@ function Home() {
     // load the following functions when the home page is open
     checkVersion()
     dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
-    dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
-      dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -242,19 +175,11 @@ function Home() {
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!depositBatchModalState && <DepositBatchModal open={depositBatchModalState} />}
 
       {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
-      {!!transferNFTModalState && <TransferNFTModal open={transferNFTModalState} token={token} />}
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
-      {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
-
-      {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
-      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
-      {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
@@ -350,30 +275,6 @@ function Home() {
             }
             {pageDisplay === "Wallet" &&
               <Wallet />
-            }
-            {pageDisplay === "Farm" &&
-              <FarmWrapper />
-            }
-            {pageDisplay === "Save" &&
-              <SaveWrapper />
-            }
-            {pageDisplay === "DAO" &&
-              <DAO />
-            }
-            {pageDisplay === "Airdrop" &&
-              <Airdrop />
-            }
-            {pageDisplay === "Help" &&
-              <Help />
-            }
-            {pageDisplay === "Ecosystem" &&
-              <Ecosystem />
-            }
-            {pageDisplay === "Bridge" &&
-              <Bridge />
-            }
-            { pageDisplay === "Monster" &&
-              <MonsterWrapper />
             }
           </Container>
           <PageFooter/>

@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 const L1ETH = '0x0000000000000000000000000000000000000000'
-const L2ETH = '0x4200000000000000000000000000000000000006'
+const L2ETH = '0x4200000000000000000000000000000000000023'
 
 const initialState = {
   [L1ETH]: {
     currency:  L1ETH,
     addressL1: L1ETH,
     addressL2: L2ETH,
-    symbolL1:  'ETH',
-    symbolL2:  'ETH',
+    symbolL1:  process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+    symbolL2:  process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
     decimals:     18,
-    name: 'Ethereum',
+    name: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
     redalert:  false,
   },
 }

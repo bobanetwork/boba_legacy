@@ -209,7 +209,7 @@ const deployFn: DeployFunction = async (hre) => {
   const L1Boba = getContractFactory('BOBA')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(L1BobaAddress) as any
-  const L2Boba = getContractFactory('L2GovernanceERC20')
+  const L2Boba = getContractFactory('L2_BOBA')
     .connect((hre as any).deployConfig.deployer_l2)
     .attach(L2BobaAddress) as any
 
@@ -231,36 +231,6 @@ const deployFn: DeployFunction = async (hre) => {
 
   await registerLPToken(L1BobaAddress, L2BobaAddress)
   console.log(`BOBA was registered in LPs`)
-
-  // Deploy xBoba
-  L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)
-  await L2ERC20.deployTransaction.wait()
-
-  const xL2BobaDeploymentSubmission: DeploymentSubmission = {
-    ...L2ERC20,
-    receipt: L2ERC20.receipt,
-    address: L2ERC20.address,
-    abi: xL2GovernanceERC20Json.abi,
-  }
-  await hre.deployments.save('TK_L2' + 'xBOBA', xL2BobaDeploymentSubmission)
-  await registerBobaAddress(addressManager, 'TK_L2' + 'xBOBA', L2ERC20.address)
-  console.log(`TK_L2xBOBA was deployed to ${L2ERC20.address}`)
-
-  // Register BOBA and xBOBA
-  const deployments = await hre.deployments.all()
-  const registerBOBA = await Proxy__L2LiquidityPool.registerBOBA(
-    deployments['TK_L2BOBA'].address,
-    deployments['TK_L2xBOBA'].address
-  )
-  await registerBOBA.wait()
-  console.log(`BOBA and xBOBA were registered in L2 LP`)
-
-  // Add controller
-  const addController = await L2ERC20.addController(
-    Proxy__L2LiquidityPool.address
-  )
-  await addController.wait()
-  console.log(`L2 LP has the power to mint and burn xBOBA`)
 }
 
 deployFn.tags = ['L1ERC20', 'test']

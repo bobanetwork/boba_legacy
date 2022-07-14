@@ -715,7 +715,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
 
         if (_tokenAddress == address(0)) {
             require(_amount <= address(this).balance, "Failed to Rebalance LP");
-            L1StandardBridge(L1StandardBridgeAddress).depositETHTo{value: _amount}(
+            L1StandardBridge(L1StandardBridgeAddress).depositNativeTokenTo{value: _amount}(
                 L2LiquidityPoolAddress,
                 SETTLEMENT_L2_GAS,
                 ""
@@ -897,7 +897,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         uint256 _ownerRewardFeeRate
     )
         external
-        onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
+        onlyOwner()
         onlyInitialized()
     {
         require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");

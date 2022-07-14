@@ -17,20 +17,15 @@ export const predeploys = {
   L2StandardTokenFactory: '0x4200000000000000000000000000000000000012',
   OVM_L1BlockNumber: '0x4200000000000000000000000000000000000013',
 
-  // We're temporarily disabling OVM_ETH because the jury is still out on whether or not ETH as an
-  // ERC20 is desirable.
-  OVM_ETH: '0x4200000000000000000000000000000000000006',
-
-  // We're also putting WETH9 at the old OVM_ETH address.
-  WETH9: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+  // L2 BOBA Token Address
+  L2_BOBA: "0x4200000000000000000000000000000000000006",
+  // L1 Native token on L2
+  L2_L1NativeToken: '0x4200000000000000000000000000000000000023',
 
   // Proxy contract for BobaTuringCredit
   Lib_ResolvedDelegateBobaProxy: "0x4200000000000000000000000000000000000020",
   BobaTuringCredit: "0x4200000000000000000000000000000000000021",
   BobaTuringHelper: "0x4200000000000000000000000000000000000022",
-
-  // L2 BOBA Token Address
-  L2GovernanceERC20: "0x4200000000000000000000000000000000000023",
 
   // Boba gas price oracle
   Proxy__Boba_GasPriceOracle: "0x4200000000000000000000000000000000000024",

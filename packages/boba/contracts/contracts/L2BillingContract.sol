@@ -45,6 +45,12 @@ contract L2BillingContract {
     }
 
     /*************
+     * Call back *
+     *************/
+
+    receive() external payable {}
+
+    /*************
      * Functions *
      *************/
 
@@ -75,17 +81,16 @@ contract L2BillingContract {
         emit UpdateExitFee(_exitFee);
     }
 
-    function collectFee() external onlyInitialized {
-        IERC20(feeTokenAddress).safeTransferFrom(msg.sender, address(this), exitFee);
-
+    function collectFee() external payable onlyInitialized {
+        require(exitFee == msg.value, "exit fee does not match");
         emit CollectFee(msg.sender, exitFee);
     }
 
     function withdraw() external onlyInitialized {
-        uint256 balance = IERC20(feeTokenAddress).balanceOf(address(this));
-        require(balance >= 150e18, "Balance is too low");
-        IERC20(feeTokenAddress).safeTransfer(l2FeeWallet, balance);
-
+        uint256 balance = address(this).balance;
+        require(balance >= 15e18, "Balance is too low");
+        (bool sent,) = l2FeeWallet.call{value: balance}("");
+        require(sent, "Failed to withdraw BOBA");
         emit Withdraw(l2FeeWallet, balance);
     }
 }

@@ -21,10 +21,10 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 
 import { setActiveDataTab } from 'actions/uiAction'
-import { fetchSevens, fetchFastExits } from 'actions/networkAction'
+import { fetchSevens } from 'actions/networkAction'
 
 import { selectActiveDataTab } from 'selectors/uiSelector'
-import { selectSevens, selectFastExits } from 'selectors/dataSelector'
+import { selectSevens } from 'selectors/dataSelector'
 import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import Tabs from 'components/tabs/Tabs'
@@ -32,7 +32,6 @@ import Input from 'components/input/Input'
 import PageTitle from 'components/pageTitle/PageTitle'
 
 import Sevens from './Sevens'
-import FastExits from './FastExits'
 
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
@@ -41,8 +40,6 @@ import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 import Connect from 'containers/connect/Connect'
-
-
 
 function BobaScope() {
 
@@ -57,15 +54,10 @@ function BobaScope() {
   const orderedSevens = orderBy(unorderedSevens, i => i.timeStamp, 'desc')
   const sevens = orderedSevens
 
-  const unorderedFastExits = useSelector(selectFastExits, isEqual)
-  const orderedFastExits = orderBy(unorderedFastExits, i => i.timeStamp, 'desc')
-  const fastExits = orderedFastExits
-
   useInterval(() => {
     if (accountEnabled) {
       batch(() => {
         dispatch(fetchSevens())
-        dispatch(fetchFastExits())
       })
     }
   }, POLL_INTERVAL)
@@ -96,19 +88,13 @@ function BobaScope() {
               <Tabs
                 onClick={tab => { dispatch(setActiveDataTab(tab)) }}
                 activeTab={activeTab}
-                tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
+                tabs={[ 'Seven Day Queue' ]}
               />
 
               {activeTab === 'Seven Day Queue' && (
                 <Sevens
                   searchData={searchData}
                   sevens={sevens}
-                />
-              )}
-              {activeTab === 'Fast Exits' && (
-                <FastExits
-                  searchData={searchData}
-                  data={fastExits}
                 />
               )}
             </div>

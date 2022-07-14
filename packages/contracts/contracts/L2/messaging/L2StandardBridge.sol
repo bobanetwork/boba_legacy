@@ -17,7 +17,7 @@ import { IL2StandardERC20 } from "../../standards/IL2StandardERC20.sol";
 /**
  * @title L2StandardBridge
  * @dev The L2 Standard bridge is a contract which works together with the L1 Standard bridge to
- * enable ETH and ERC20 transitions between L1 and L2.
+ * enable native token and ERC20 transitions between L1 and L2.
  * This contract acts as a minter for new tokens when it hears about deposits into the L1 Standard
  * bridge.
  * This contract also acts as a burner of the tokens intended for withdrawal, informing the L1
@@ -101,9 +101,9 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
         address l1Token = IL2StandardERC20(_l2Token).l1Token();
         bytes memory message;
 
-        if (_l2Token == Lib_PredeployAddresses.OVM_ETH) {
+        if (_l2Token == Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS) {
             message = abi.encodeWithSelector(
-                IL1StandardBridge.finalizeETHWithdrawal.selector,
+                IL1StandardBridge.finalizeNativeTokenWithdrawal.selector,
                 _from,
                 _to,
                 _amount,

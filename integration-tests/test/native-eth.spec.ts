@@ -1,6 +1,7 @@
 /* Imports: External */
-import { Wallet, utils, BigNumber } from 'ethers'
-import { predeploys } from '@eth-optimism/contracts'
+import { Wallet, utils, BigNumber, Contract } from 'ethers'
+import { serialize } from '@ethersproject/transactions'
+import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
@@ -10,25 +11,29 @@ import {
   DEFAULT_TEST_GAS_L2,
   envConfig,
   withdrawalTest,
+  approveERC20,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
 // TX size enforced by CTC:
 const MAX_ROLLUP_TX_SIZE = 50_000
 
-describe('Native ETH Integration Tests', async () => {
+describe('Native BOBA Integration Tests', async () => {
   let env: OptimismEnv
   let l1Bob: Wallet
   let l2Bob: Wallet
 
+  let L1BOBAToken: Contract
+  let L1StandardBridge: Contract
+
   const getBalances = async (_env: OptimismEnv) => {
-    const l1UserBalance = await _env.l1Wallet.getBalance()
+    const l1UserBalance = await L1BOBAToken.balanceOf(_env.l2Wallet.address)
     const l2UserBalance = await _env.l2Wallet.getBalance()
 
-    const l1BobBalance = await l1Bob.getBalance()
+    const l1BobBalance = await L1BOBAToken.balanceOf(l1Bob.address)
     const l2BobBalance = await l2Bob.getBalance()
 
-    const l1BridgeBalance = await _env.l1Wallet.provider.getBalance(
+    const l1BridgeBalance = await L1BOBAToken.balanceOf(
       _env.messenger.contracts.l1.L1StandardBridge.address
     )
 
@@ -45,14 +50,23 @@ describe('Native ETH Integration Tests', async () => {
     env = await OptimismEnv.new()
     l1Bob = Wallet.createRandom().connect(env.l1Wallet.provider)
     l2Bob = l1Bob.connect(env.l2Wallet.provider)
+
+    L1BOBAToken = getContractFactory('BOBA', env.l1Wallet).attach(
+      env.addressesBOBA.TOKENS.BOBA.L1
+    )
+
+    L1StandardBridge = getContractFactory(
+      'L1StandardBridge',
+      env.l1Wallet
+    ).attach(env.addressesBASE.Proxy__L1StandardBridge)
   })
 
   describe('estimateGas', () => {
-    it('{tag:other} Should estimate gas for ETH withdraw', async () => {
+    it('{tag:other} Should estimate gas for BOBA withdraw', async () => {
       const amount = utils.parseEther('0.0000001')
       const gas =
         await env.messenger.contracts.l2.L2StandardBridge.estimateGas.withdraw(
-          predeploys.OVM_ETH,
+          predeploys.L2_BOBA,
           amount,
           0,
           '0xFFFF'
@@ -62,46 +76,20 @@ describe('Native ETH Integration Tests', async () => {
     })
   })
 
-  it('{tag:other} receive', async () => {
+  it('{tag:other} receive BOBA', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     const { tx, receipt } = await env.waitForXDomainTransaction(
-      env.l1Wallet.sendTransaction({
-        to: env.messenger.contracts.l1.L1StandardBridge.address,
-        value: depositAmount,
-        gasLimit: DEFAULT_TEST_GAS_L1,
-      })
-    )
-
-    const l1FeePaid = receipt.gasUsed.mul(tx.gasPrice)
-    const postBalances = await getBalances(env)
-
-    expect(postBalances.l1BridgeBalance).to.deep.eq(
-      preBalances.l1BridgeBalance.add(depositAmount)
-    )
-    expect(postBalances.l2UserBalance).to.deep.eq(
-      preBalances.l2UserBalance.add(depositAmount)
-    )
-    expect(postBalances.l1UserBalance).to.deep.eq(
-      preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
-    )
-  })
-
-  it('{tag:other} depositETH', async () => {
-    const depositAmount = 10
-    const preBalances = await getBalances(env)
-    const { tx, receipt } = await env.waitForXDomainTransaction(
-      env.messenger.contracts.l1.L1StandardBridge.depositETH(
-        DEFAULT_TEST_GAS_L2,
-        '0xFFFF',
-        {
-          value: depositAmount,
-          gasLimit: DEFAULT_TEST_GAS_L1,
-        }
+      L1StandardBridge.depositERC20(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
+        depositAmount,
+        DEFAULT_TEST_GAS_L1,
+        '0xFFFF'
       )
     )
 
-    const l1FeePaid = receipt.gasUsed.mul(tx.gasPrice)
     const postBalances = await getBalances(env)
 
     expect(postBalances.l1BridgeBalance).to.deep.eq(
@@ -111,28 +99,52 @@ describe('Native ETH Integration Tests', async () => {
       preBalances.l2UserBalance.add(depositAmount)
     )
     expect(postBalances.l1UserBalance).to.deep.eq(
-      preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
+      preBalances.l1UserBalance.sub(depositAmount)
     )
   })
 
-  it('{tag:other} depositETHTo', async () => {
+  it('{tag:other} depositERC20 BOBA', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
+    const { tx, receipt } = await env.waitForXDomainTransaction(
+      L1StandardBridge.depositERC20(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
+        depositAmount,
+        DEFAULT_TEST_GAS_L1,
+        '0xFFFF'
+      )
+    )
+
+    const postBalances = await getBalances(env)
+
+    expect(postBalances.l1BridgeBalance).to.deep.eq(
+      preBalances.l1BridgeBalance.add(depositAmount)
+    )
+    expect(postBalances.l2UserBalance).to.deep.eq(
+      preBalances.l2UserBalance.add(depositAmount)
+    )
+    expect(postBalances.l1UserBalance).to.deep.eq(
+      preBalances.l1UserBalance.sub(depositAmount)
+    )
+  })
+
+  it('{tag:other} depositERC20To BOBA', async () => {
+    const depositAmount = 10
+    const preBalances = await getBalances(env)
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     const depositReceipts = await env.waitForXDomainTransaction(
-      env.messenger.contracts.l1.L1StandardBridge.depositETHTo(
+      L1StandardBridge.depositERC20To(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
         l2Bob.address,
-        DEFAULT_TEST_GAS_L2,
-        '0xFFFF',
-        {
-          value: depositAmount,
-          gasLimit: DEFAULT_TEST_GAS_L1,
-        }
+        depositAmount,
+        DEFAULT_TEST_GAS_L1,
+        '0xFFFF'
       )
     )
 
-    const l1FeePaid = depositReceipts.receipt.gasUsed.mul(
-      depositReceipts.tx.gasPrice
-    )
     const postBalances = await getBalances(env)
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
@@ -141,7 +153,7 @@ describe('Native ETH Integration Tests', async () => {
       preBalances.l2BobBalance.add(depositAmount)
     )
     expect(postBalances.l1UserBalance).to.deep.eq(
-      preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
+      preBalances.l1UserBalance.sub(depositAmount)
     )
   })
 
@@ -153,18 +165,17 @@ describe('Native ETH Integration Tests', async () => {
     // Set data length slightly less than MAX_ROLLUP_TX_SIZE
     // to allow for encoding and other arguments
     const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 500)
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     const { tx, receipt } = await env.waitForXDomainTransaction(
-      env.messenger.contracts.l1.L1StandardBridge.depositETH(
+      L1StandardBridge.depositERC20(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
+        depositAmount,
         ASSUMED_L2_GAS_LIMIT,
-        data,
-        {
-          value: depositAmount,
-          gasLimit: 4_000_000,
-        }
+        data
       )
     )
 
-    const l1FeePaid = receipt.gasUsed.mul(tx.gasPrice)
     const postBalances = await getBalances(env)
     expect(postBalances.l1BridgeBalance).to.deep.eq(
       preBalances.l1BridgeBalance.add(depositAmount)
@@ -173,21 +184,22 @@ describe('Native ETH Integration Tests', async () => {
       preBalances.l2UserBalance.add(depositAmount)
     )
     expect(postBalances.l1UserBalance).to.deep.eq(
-      preBalances.l1UserBalance.sub(l1FeePaid.add(depositAmount))
+      preBalances.l1UserBalance.sub(depositAmount)
     )
   })
 
-  it('{tag:other} depositETH fails with a TOO large data argument', async () => {
+  it('{tag:other} deposit BOBA fails with a TOO large data argument', async () => {
     const depositAmount = 10
 
     const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE + 1)
+    await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     await expect(
-      env.messenger.contracts.l1.L1StandardBridge.depositETH(
-        DEFAULT_TEST_GAS_L2,
-        data,
-        {
-          value: depositAmount,
-        }
+      L1StandardBridge.depositERC20(
+        L1BOBAToken.address,
+        predeploys.L2_BOBA,
+        depositAmount,
+        DEFAULT_TEST_GAS_L1,
+        data
       )
     ).to.be.reverted
   })
@@ -202,7 +214,7 @@ describe('Native ETH Integration Tests', async () => {
 
     const transaction =
       await env.messenger.contracts.l2.L2StandardBridge.withdraw(
-        predeploys.OVM_ETH,
+        predeploys.L2_BOBA,
         withdrawAmount,
         DEFAULT_TEST_GAS_L2,
         '0xFFFF'
@@ -244,7 +256,7 @@ describe('Native ETH Integration Tests', async () => {
 
     const transaction =
       await env.messenger.contracts.l2.L2StandardBridge.withdrawTo(
-        predeploys.OVM_ETH,
+        predeploys.L2_BOBA,
         l1Bob.address,
         withdrawAmount,
         DEFAULT_TEST_GAS_L2,
@@ -280,14 +292,14 @@ describe('Native ETH Integration Tests', async () => {
     async () => {
       // 1. deposit
       const amount = utils.parseEther('1')
+      await approveERC20(L1BOBAToken, L1StandardBridge.address, amount)
       await env.waitForXDomainTransaction(
-        env.messenger.contracts.l1.L1StandardBridge.depositETH(
-          DEFAULT_TEST_GAS_L2,
-          '0xFFFF',
-          {
-            value: amount,
-            gasLimit: DEFAULT_TEST_GAS_L1,
-          }
+        L1StandardBridge.depositERC20(
+          L1BOBAToken.address,
+          predeploys.L2_BOBA,
+          amount,
+          DEFAULT_TEST_GAS_L1,
+          '0xFFFF'
         )
       )
 
@@ -299,9 +311,7 @@ describe('Native ETH Integration Tests', async () => {
       })
       await tx.wait()
 
-      const l1BalanceBefore = await other
-        .connect(env.l1Wallet.provider)
-        .getBalance()
+      const l1BalanceBefore = await L1BOBAToken.balanceOf(other.address)
 
       // 3. do withdrawal
       const withdrawnAmount = utils.parseEther('0.5')
@@ -309,7 +319,7 @@ describe('Native ETH Integration Tests', async () => {
         await env.messenger.contracts.l2.L2StandardBridge.connect(
           other
         ).withdraw(
-          predeploys.OVM_ETH,
+          predeploys.L2_BOBA,
           withdrawnAmount,
           DEFAULT_TEST_GAS_L1,
           '0xFFFF'
@@ -321,9 +331,7 @@ describe('Native ETH Integration Tests', async () => {
       // check that correct amount was withdrawn and that fee was charged
       const fee = receipts.tx.gasPrice.mul(receipts.receipt.gasUsed)
 
-      const l1BalanceAfter = await other
-        .connect(env.l1Wallet.provider)
-        .getBalance()
+      const l1BalanceAfter = await L1BOBAToken.balanceOf(other.address)
       const l2BalanceAfter = await other.getBalance()
       expect(l1BalanceAfter).to.deep.eq(l1BalanceBefore.add(withdrawnAmount))
       expect(l2BalanceAfter).to.deep.eq(amount.sub(withdrawnAmount).sub(fee))

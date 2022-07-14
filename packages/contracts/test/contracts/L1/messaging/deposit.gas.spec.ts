@@ -126,9 +126,9 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge [ @skip-on-coverage
         '0x1234'
       )
     })
-    it('cost to deposit ETH', async () => {
+    it('cost to deposit native token', async () => {
       // Alice calls deposit on the bridge and the L1 bridge calls transferFrom on the token.
-      const res = await L1StandardBridge.connect(alice).depositETH(
+      const res = await L1StandardBridge.connect(alice).depositNativeToken(
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
         {

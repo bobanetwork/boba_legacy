@@ -80,6 +80,7 @@ func TestNewStateTransition(t *testing.T) {
 	// Set boba as the fee token
 	statedb.SetBobaAsFeeToken(msg.From())
 	statedb.SetBobaPriceRatio(big.NewInt(1))
+	statedb.SetBobaPriceRatioDecimals(big.NewInt(0))
 
 	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
 
@@ -117,6 +118,7 @@ func TestNewStateTransition(t *testing.T) {
 	statedb.SetState(rcfg.L2GasPriceOracleAddress, rcfg.ScalarSlot, common.BigToHash(big.NewInt(1)))
 	statedb.SetState(rcfg.L2GasPriceOracleAddress, rcfg.L2GasPriceSlot, common.BigToHash(big.NewInt(1)))
 	statedb.SetBobaPriceRatio(big.NewInt(2000))
+	statedb.SetBobaPriceRatioDecimals(big.NewInt(1))
 
 	unsignedTx = types.NewTransaction(2, common.HexToAddress("0x00000000000000000000000000000000deadbeef"), new(big.Int), 5000000, big.NewInt(1), []byte{})
 	tx, err = types.SignTx(unsignedTx, signer, privateKeyECDSA)
@@ -143,7 +145,9 @@ func TestNewStateTransition(t *testing.T) {
 		t.Fatal("failed to charge boba fee")
 	}
 
-	estimatedCost := new(big.Int).Mul(new(big.Int).Mul(big.NewInt(int64(gasUsed)), common.Big1), big.NewInt(2000))
+	preEstimatedCost := new(big.Int).Mul(new(big.Int).Mul(big.NewInt(int64(gasUsed)), common.Big1), big.NewInt(2000))
+	bobaPriceRatioDivisor := new(big.Int).Exp(big.NewInt(10), big.NewInt(1), nil)
+	estimatedCost := new(big.Int).Div(preEstimatedCost, bobaPriceRatioDivisor)
 	if userPaidBobaFee.Cmp(estimatedCost) != 0 {
 		t.Fatal("failed to charge l1 security fee")
 	}

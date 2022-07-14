@@ -439,9 +439,9 @@ export interface ICrossChainMessenger {
   ): Promise<TransactionResponse>
 
   /**
-   * Deposits some ETH into the L2 chain.
+   * Deposits some l1 native token into the L2 chain.
    *
-   * @param amount Amount of ETH to deposit (in wei).
+   * @param amount Amount of l1 native token to deposit (in wei).
    * @param opts Additional options.
    * @param opts.signer Optional signer to use to send the transaction.
    * @param opts.recipient Optional address to receive the funds on L2. Defaults to sender.
@@ -449,7 +449,7 @@ export interface ICrossChainMessenger {
    * @param opts.overrides Optional transaction overrides.
    * @returns Transaction response for the deposit transaction.
    */
-  depositETH(
+  depositNativeToken(
     amount: NumberLike,
     opts?: {
       signer?: Signer
@@ -460,16 +460,16 @@ export interface ICrossChainMessenger {
   ): Promise<TransactionResponse>
 
   /**
-   * Withdraws some ETH back to the L1 chain.
+   * Withdraws some l1 native token on L2 back to the L1 chain.
    *
-   * @param amount Amount of ETH to withdraw.
+   * @param amount Amount of l1 native token on L2 to withdraw.
    * @param opts Additional options.
    * @param opts.signer Optional signer to use to send the transaction.
    * @param opts.recipient Optional address to receive the funds on L1. Defaults to sender.
    * @param opts.overrides Optional transaction overrides.
    * @returns Transaction response for the withdraw transaction.
    */
-  withdrawETH(
+  withdrawSecondaryFeeToken(
     amount: NumberLike,
     opts?: {
       signer?: Signer
@@ -659,16 +659,16 @@ export interface ICrossChainMessenger {
     ): Promise<TransactionRequest>
 
     /**
-     * Generates a transaction for depositing some ETH into the L2 chain.
+     * Generates a transaction for depositing some l1 native token into the L2 chain.
      *
-     * @param amount Amount of ETH to deposit.
+     * @param amount Amount of l1 native token to deposit.
      * @param opts Additional options.
      * @param opts.recipient Optional address to receive the funds on L2. Defaults to sender.
      * @param opts.l2GasLimit Optional gas limit to use for the transaction on L2.
      * @param opts.overrides Optional transaction overrides.
-     * @returns Transaction that can be signed and executed to deposit the ETH.
+     * @returns Transaction that can be signed and executed to deposit the l1 native token.
      */
-    depositETH(
+    depositNativeToken(
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -678,15 +678,15 @@ export interface ICrossChainMessenger {
     ): Promise<TransactionRequest>
 
     /**
-     * Generates a transaction for withdrawing some ETH back to the L1 chain.
+     * Generates a transaction for withdrawing some secondary fee token back to the L1 chain.
      *
-     * @param amount Amount of ETH to withdraw.
+     * @param amount Amount of secondary fee token to withdraw.
      * @param opts Additional options.
      * @param opts.recipient Optional address to receive the funds on L1. Defaults to sender.
      * @param opts.overrides Optional transaction overrides.
      * @returns Transaction that can be signed and executed to withdraw the ETH.
      */
-    withdrawETH(
+    withdrawSecondaryFeeToken(
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -828,16 +828,16 @@ export interface ICrossChainMessenger {
     ): Promise<BigNumber>
 
     /**
-     * Estimates gas required to deposit some ETH into the L2 chain.
+     * Estimates gas required to deposit some l1 native token into the L2 chain.
      *
-     * @param amount Amount of ETH to deposit.
+     * @param amount Amount of l1 native token to deposit.
      * @param opts Additional options.
      * @param opts.recipient Optional address to receive the funds on L2. Defaults to sender.
      * @param opts.l2GasLimit Optional gas limit to use for the transaction on L2.
      * @param opts.overrides Optional transaction overrides.
      * @returns Gas estimate for the transaction.
      */
-    depositETH(
+    depositNativeToken(
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -847,15 +847,15 @@ export interface ICrossChainMessenger {
     ): Promise<BigNumber>
 
     /**
-     * Estimates gas required to withdraw some ETH back to the L1 chain.
+     * Estimates gas required to withdraw some secondary fee token back to the L1 chain.
      *
-     * @param amount Amount of ETH to withdraw.
+     * @param amount Amount of some secondary fee token to withdraw.
      * @param opts Additional options.
      * @param opts.recipient Optional address to receive the funds on L1. Defaults to sender.
      * @param opts.overrides Optional transaction overrides.
      * @returns Gas estimate for the transaction.
      */
-    withdrawETH(
+    withdrawSecondaryFeeToken(
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike

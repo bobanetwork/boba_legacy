@@ -1,0 +1,16 @@
+{
+  "BondManager": "0xa97a909D967B150E27AB58ca6d0cb40B39200Be1",
+  "CanonicalTransactionChain": "0xE66Bd40BBeC97397758E22858331752f0ecBE02e",
+  "ChainStorageContainer-CTC-batches": "0x524747b1CdCAcA43aF8d9002fA67869A2932d600",
+  "ChainStorageContainer-CTC-queue": "0xE7Da2a8EBcbBa0Dc6082B8D0faBAcA0176920760",
+  "ChainStorageContainer-SCC-batches": "0xAb7d7eFA03204C11E0e141dDE95C022EA2A8c6b1",
+  "L1MultiMessageRelayer": "0xD7Cbc979C909d864c38670AcccD57209F7B556e3",
+  "AddressManager": "0x12ad9f501149D3FDd703cC10c567F416B7F0af8b",
+  "OVM_L1CrossDomainMessenger": "0x1bc8Bd8FCAd96ee663b6325F71F818Cce678083D",
+  "Proxy__L1CrossDomainMessenger": "0xEecAD665ca933eeA4a9a2db600E538c1391930d1",
+  "Proxy__L1StandardBridge": "0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f",
+  "StateCommitmentChain": "0x352d964E9aD016f122dc78Afa5164417907E0FaF",
+  "TK_L1BOBA": "0x5E747DfA79b8f9e46BE0CC67e378b7600350B2eF",
+  "OVM_Sequencer": "0x743d4b67554f1d72fbb2c786a4865d3c90be5155",
+  "Deployer": "0x4Df901607d84183870172C6BB6c44BD9791e9DC1"
+}

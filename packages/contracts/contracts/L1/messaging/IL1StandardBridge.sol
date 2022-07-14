@@ -10,14 +10,14 @@ interface IL1StandardBridge is IL1ERC20Bridge {
     /**********
      * Events *
      **********/
-    event ETHDepositInitiated(
+    event NativeTokenDepositInitiated(
         address indexed _from,
         address indexed _to,
         uint256 _amount,
         bytes _data
     );
 
-    event ETHWithdrawalFinalized(
+    event NativeTokenWithdrawalFinalized(
         address indexed _from,
         address indexed _to,
         uint256 _amount,
@@ -29,23 +29,23 @@ interface IL1StandardBridge is IL1ERC20Bridge {
      ********************/
 
     /**
-     * @dev Deposit an amount of the ETH to the caller's balance on L2.
+     * @dev Deposit an amount of the native token to the caller's balance on L2.
      * @param _l2Gas Gas limit required to complete the deposit on L2.
      * @param _data Optional data to forward to L2. This data is provided
      *        solely as a convenience for external contracts. Aside from enforcing a maximum
      *        length, these contracts provide no guarantees about its content.
      */
-    function depositETH(uint32 _l2Gas, bytes calldata _data) external payable;
+    function depositNativeToken(uint32 _l2Gas, bytes calldata _data) external payable;
 
     /**
-     * @dev Deposit an amount of ETH to a recipient's balance on L2.
+     * @dev Deposit an amount of native token to a recipient's balance on L2.
      * @param _to L2 address to credit the withdrawal to.
      * @param _l2Gas Gas limit required to complete the deposit on L2.
      * @param _data Optional data to forward to L2. This data is provided
      *        solely as a convenience for external contracts. Aside from enforcing a maximum
      *        length, these contracts provide no guarantees about its content.
      */
-    function depositETHTo(
+    function depositNativeTokenTo(
         address _to,
         uint32 _l2Gas,
         bytes calldata _data
@@ -66,7 +66,7 @@ interface IL1StandardBridge is IL1ERC20Bridge {
      *        solely as a convenience for external contracts. Aside from enforcing a maximum
      *        length, these contracts provide no guarantees about its content.
      */
-    function finalizeETHWithdrawal(
+    function finalizeNativeTokenWithdrawal(
         address _from,
         address _to,
         uint256 _amount,

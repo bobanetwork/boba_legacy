@@ -44,7 +44,7 @@ describe('OVM_SequencerFeeVault', () => {
       await expect(OVM_SequencerFeeVault.withdraw()).to.not.be.reverted
 
       expect(Mock__L2StandardBridge.smocked.withdrawTo.calls[0]).to.deep.equal([
-        predeploys.OVM_ETH,
+        predeploys.L2_BOBA,
         await signer1.getAddress(),
         amount,
         0,
@@ -65,7 +65,7 @@ describe('OVM_SequencerFeeVault', () => {
       await expect(OVM_SequencerFeeVault.withdraw()).to.not.be.reverted
 
       expect(Mock__L2StandardBridge.smocked.withdrawTo.calls[0]).to.deep.equal([
-        predeploys.OVM_ETH,
+        predeploys.L2_BOBA,
         await signer1.getAddress(),
         amount,
         0,

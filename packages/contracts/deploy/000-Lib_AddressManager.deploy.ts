@@ -61,7 +61,7 @@ const deployFn: DeployFunction = async (hre) => {
   await registerAddress({
     hre,
     name: 'TK_L2BOBA',
-    address: predeploys.L2GovernanceERC20,
+    address: predeploys.L2_BOBA,
   })
 
   await registerAddress({

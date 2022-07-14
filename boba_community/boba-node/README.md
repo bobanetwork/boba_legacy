@@ -44,7 +44,7 @@ x-l1_rpc_geth: &l1_rpc_geth
   ETH1_HTTP: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 ```
 
-For Rinkeby, replace `https://mainnet.infura.io/` with `https://rinkeby.infura.io/`. Then, select the correct state dump file from `/state-dumps`, move it up one level, and rename it to `state-dump.latest.json`. Then, bring up the services:
+For Rinkeby, replace `https://mainnet.infura.io/` with `https://rinkeby.infura.io/`. Then, bring up the services:
 
 ```bash
 $ docker-compose up  # for mainnet

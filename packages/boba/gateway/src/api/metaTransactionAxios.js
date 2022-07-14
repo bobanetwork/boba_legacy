@@ -8,14 +8,9 @@ export default function metaTransactionAxiosInstance(networkGateway){
   if(networkGateway === 'local') {
     return null //does not make sense on local
   }
-  else if (networkGateway === 'rinkeby') {
+  else {
     axiosInstance = axios.create({
-      baseURL: getBaseServices().RINKEBY_META_TRANSACTION,
-    })
-  }
-  else if (networkGateway === 'mainnet') {
-    axiosInstance = axios.create({
-      baseURL: getBaseServices().MAINNET_META_TRANSACTION,
+      baseURL: getBaseServices()[`${networkGateway.toUpperCase()}_META_TRANSACTION`]
     })
   }
 

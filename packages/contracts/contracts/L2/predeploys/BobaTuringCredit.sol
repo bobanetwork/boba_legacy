@@ -105,9 +105,10 @@ contract BobaTuringCredit {
      */
     function addBalanceTo(uint256 _addBalanceAmount, address _helperContractAddress)
         public
+        payable
         onlyInitialized
     {
-        require(_addBalanceAmount != 0, "Invalid amount");
+        require(_addBalanceAmount != 0 && msg.value == _addBalanceAmount, "Invalid amount");
         require(Address.isContract(_helperContractAddress), "Address is EOA");
         require(
             ERC165Checker.supportsInterface(_helperContractAddress, 0x2f7adf43),
@@ -117,9 +118,6 @@ contract BobaTuringCredit {
         prepaidBalance[_helperContractAddress] += _addBalanceAmount;
 
         emit AddBalanceTo(msg.sender, _addBalanceAmount, _helperContractAddress);
-
-        // Transfer token to this contract
-        IERC20(turingToken).safeTransferFrom(msg.sender, address(this), _addBalanceAmount);
     }
 
     /**
@@ -140,8 +138,9 @@ contract BobaTuringCredit {
 
         ownerRevenue -= _withdrawAmount;
 
-        emit WithdrawRevenue(msg.sender, _withdrawAmount);
+        (bool sent, ) = owner.call{ value: _withdrawAmount }("");
+        require(sent, "Failed to send BOBA");
 
-        IERC20(turingToken).safeTransfer(owner, _withdrawAmount);
+        emit WithdrawRevenue(msg.sender, _withdrawAmount);
     }
 }

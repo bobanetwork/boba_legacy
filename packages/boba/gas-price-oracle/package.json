@@ -26,7 +26,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@boba/contracts": "0.0.1",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/providers": "^5.0.24",

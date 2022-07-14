@@ -54,8 +54,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         data:
           '0xa44c80e3000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000006a6676813d3d4317442cf84667425c13553f4a760000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000038d7ea4c68000'
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
-
+      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20for%20Rinkeby%20`
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'mainnet') {
@@ -98,6 +98,60 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
     }
   }
+} else if (process.env.REACT_APP_CHAIN === 'bobaBase') {
+  NETWORK = {
+    bobaBase: {
+      OMGX_WATCHER_URL: `https://api-watcher.bobabase.boba.network/`,
+      MM_Label:         `BobaBase`,
+      addressManager:   `0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B`,
+      L1: {
+        name: "MoonBase",
+        chainId: 1287,
+        chainIdHex: '0x507',
+        rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
+        blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://moonbase.moonscan.io/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "BobaBase",
+        chainId: 1297,
+        chainIdHex: '0x511',
+        rpcUrl: `https://bobabase.boba.network`,
+        blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
+        transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20`
+    }
+ }
+} else if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
+  NETWORK = {
+    bobaOperaTestnet: {
+      OMGX_WATCHER_URL: `https://api-watcher.testnet.bobaopera.boba.network/`,
+      MM_Label:         `bobaOperaTestnet`,
+      addressManager:   `0x12ad9f501149D3FDd703cC10c567F416B7F0af8b`,
+      L1: {
+        name: "Fantom Testnet",
+        chainId: 4002,
+        chainIdHex: '0xFA2',
+        rpcUrl: `https://rpc.testnet.fantom.network`,
+        blockExplorer: `https://api-testnet.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://testnet.ftmscan.com/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "BobaOpera Testnet",
+        chainId: 4051,
+        chainIdHex: '0xFD3',
+        rpcUrl: `https://testnet.bobaopera.boba.network`,
+        blockExplorer: `https://blockexplorer.testnet.bobaopera.boba.network/`,
+        transaction: `https://blockexplorer.testnet.bobaopera.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORK = {
     local: {
@@ -133,9 +187,13 @@ const BaseServices = {
   //ETH gas station
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
   // Mainnet meta transaction
-  MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
-  // Rinkeby meta transaction
-  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
+  BOBABEAM_META_TRANSACTION: `https://api-meta-transaction.bobabeam.boba.network/`,
+  // Testnet meta transaction
+  BOBABASE_META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
+  // Mainnet meta transaction
+  BOBAOPERA_META_TRANSACTION: `https://api-meta-transaction.bobaopera.boba.network/`,
+  // Testnet meta transaction
+  BOBAOPERATESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.bobaopera.boba.network/`,
 }
 
 export function getNetwork () {

@@ -1,7 +1,7 @@
 /* Imports: External */
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, ethers } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
 import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
@@ -99,14 +99,14 @@ const deployFn: DeployFunction = async (hre) => {
 
   const registerL1LPETHTX = await Proxy__L1LiquidityPool.registerPool(
     '0x0000000000000000000000000000000000000000',
-    '0x4200000000000000000000000000000000000006'
+    predeploys.L2_L1NativeToken
   )
   await registerL1LPETHTX.wait()
   console.log(`Proxy__L1LiquidityPool registered: ${registerL1LPETHTX.hash}`)
 
   const registerL2LPETHTX = await Proxy__L2LiquidityPool.registerPool(
     '0x0000000000000000000000000000000000000000',
-    '0x4200000000000000000000000000000000000006'
+    predeploys.L2_L1NativeToken
   )
   await registerL2LPETHTX.wait()
   console.log(`Proxy__L2LiquidityPool registered: ${registerL2LPETHTX.hash}`)

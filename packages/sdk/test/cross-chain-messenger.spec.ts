@@ -1458,7 +1458,7 @@ describe('CrossChainMessenger', () => {
     })
   })
 
-  describe('depositETH', () => {
+  describe('depositNativeToken', () => {
     let l1Messenger: Contract
     let l2Messenger: Contract
     let l1Bridge: Contract
@@ -1502,9 +1502,9 @@ describe('CrossChainMessenger', () => {
       })
     })
 
-    it('should trigger the deposit ETH function with the given amount', async () => {
-      await expect(messenger.depositETH(100000))
-        .to.emit(l1Bridge, 'ETHDepositInitiated')
+    it('should trigger the deposit l1 native token function with the given amount', async () => {
+      await expect(messenger.depositNativeToken(100000))
+        .to.emit(l1Bridge, 'NativeTokenDepositInitiated')
         .withArgs(
           await l1Signer.getAddress(),
           await l1Signer.getAddress(),
@@ -1514,7 +1514,7 @@ describe('CrossChainMessenger', () => {
     })
   })
 
-  describe('withdrawETH', () => {
+  describe('withdrawNativeToken', () => {
     let l1Messenger: Contract
     let l2Messenger: Contract
     let l1Bridge: Contract
@@ -1558,12 +1558,12 @@ describe('CrossChainMessenger', () => {
       })
     })
 
-    it('should trigger the withdraw ETH function with the given amount', async () => {
-      await expect(messenger.withdrawETH(100000))
+    it('should trigger the withdraw native token function with the given amount', async () => {
+      await expect(messenger.withdrawSecondaryFeeToken(100000))
         .to.emit(l2Bridge, 'WithdrawalInitiated')
         .withArgs(
           ethers.constants.AddressZero,
-          predeploys.OVM_ETH,
+          predeploys.L2_L1NativeToken,
           await l2Signer.getAddress(),
           await l2Signer.getAddress(),
           100000,

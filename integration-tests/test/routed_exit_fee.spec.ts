@@ -2,15 +2,15 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
 import DiscretionaryExitFeeJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
 import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
+import { approveERC20 } from './shared/utils'
 
 describe('Standard Exit Fee', async () => {
   let Factory__L1ERC20: ContractFactory
@@ -25,7 +25,7 @@ describe('Standard Exit Fee', async () => {
   let OMGLIkeToken: Contract
   let L2OMGLikeToken: Contract
 
-  let L2BOBAToken: Contract
+  let L1BOBAToken: Contract
   let BOBABillingContract: Contract
 
   let env: OptimismEnv
@@ -105,10 +105,10 @@ describe('Standard Exit Fee', async () => {
     )
     await L2OMGLikeToken.deployTransaction.wait()
 
-    L2BOBAToken = new Contract(
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
-      env.l2Wallet
+    L1BOBAToken = new Contract(
+      env.addressesBOBA.TOKENS.BOBA.L1,
+      L1ERC20Json.abi,
+      env.l1Wallet
     )
 
     BOBABillingContract = new Contract(
@@ -156,6 +156,14 @@ describe('Standard Exit Fee', async () => {
 
       const updatedExitFee = await BOBABillingContract.exitFee()
       expect(newExitFee).to.eq(updatedExitFee)
+
+      const restoreExitFeeTx = await BOBABillingContract.connect(
+        env.l2Wallet
+      ).updateExitFee(exitFeeBefore)
+      await restoreExitFeeTx.wait()
+
+      const restoredExitFee = await BOBABillingContract.exitFee()
+      expect(exitFeeBefore).to.eq(restoredExitFee)
     })
   })
 
@@ -193,37 +201,35 @@ describe('Standard Exit Fee', async () => {
       )
       await approveL2ERC20TX.wait()
 
-      // Approve BOBA
       const exitFee = await BOBABillingContract.exitFee()
-      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-        ExitFeeContract.address,
-        exitFee
-      )
-      await approveBOBATX.wait()
-
-      const preBobaBalanceBillingContract = await L2BOBAToken.balanceOf(
+      const preBobaBalanceBillingContract = await env.l2Provider.getBalance(
         BOBABillingContract.address
       )
-      const preBobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      const preBobaBalance = await env.l2Wallet.getBalance()
 
       await env.waitForXDomainTransaction(
         ExitFeeContract.payAndWithdraw(
           L2ERC20.address,
           exitAmount,
           9999999,
-          ethers.utils.formatBytes32String(new Date().getTime().toString())
+          ethers.utils.formatBytes32String(new Date().getTime().toString()),
+          { value: exitFee }
         )
       )
+
+      const latestBlock = await env.l2Provider.getBlock('latest')
+      const gasPrice = await env.l2Provider.getGasPrice()
+      const gasFee = latestBlock.gasUsed.mul(gasPrice)
 
       const postBalanceExitorL1 = await L1ERC20.balanceOf(env.l1Wallet.address)
       const postBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
       const ExitFeeContractBalance = await L2ERC20.balanceOf(
         ExitFeeContract.address
       )
-      const postBobaBalanceBillingContract = await L2BOBAToken.balanceOf(
+      const postBobaBalanceBillingContract = await env.l2Provider.getBalance(
         BOBABillingContract.address
       )
-      const postBobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      const postBobaBalance = await env.l2Wallet.getBalance()
 
       expect(postBalanceExitorL2).to.eq(preBalanceExitorL2.sub(exitAmount))
       expect(postBalanceExitorL1).to.eq(preBalanceExitorL1.add(exitAmount))
@@ -231,129 +237,90 @@ describe('Standard Exit Fee', async () => {
       expect(postBobaBalanceBillingContract).to.eq(
         preBobaBalanceBillingContract.add(exitFee)
       )
-      expect(postBobaBalance).to.eq(preBobaBalance.sub(exitFee))
+      expect(postBobaBalance).to.eq(preBobaBalance.sub(exitFee).sub(gasFee))
     })
 
-    it('{tag:other} should fail if not enough erc20 balance', async () => {
+    it('{tag:other} should fail if not enough Boba balance', async () => {
       const preBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
 
       expect(preBalanceExitorL2).to.eq(0)
       const exitAmount = utils.parseEther('10')
 
-      // Approve BOBA
       const exitFee = await BOBABillingContract.exitFee()
-      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-        ExitFeeContract.address,
-        exitFee
-      )
-      await approveBOBATX.wait()
-
       await expect(
         ExitFeeContract.payAndWithdraw(
           L2ERC20.address,
           exitAmount,
           9999999,
-          ethers.utils.formatBytes32String(new Date().getTime().toString())
+          ethers.utils.formatBytes32String(new Date().getTime().toString()),
+          { value: exitFee.sub(BigNumber.from('1')) }
         )
-      ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
-    })
-
-    it('{tag:other} should fail if not enough Boba balance', async () => {
-      const exitAmount = utils.parseEther('10')
-
-      const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
-      await env.l2Wallet.sendTransaction({
-        to: newWallet.address,
-        value: ethers.utils.parseEther('1'),
-      })
-
-      await expect(
-        ExitFeeContract.payAndWithdraw(
-          L2ERC20.address,
-          exitAmount,
-          9999999,
-          ethers.utils.formatBytes32String(new Date().getTime().toString())
-        )
-      ).to.be.revertedWith(
-        'execution reverted: ERC20: transfer amount exceeds balance'
-      )
-    })
-
-    it('{tag:other} should fail if not approving Boba', async () => {
-      const exitAmount = utils.parseEther('10')
-
-      // Approve BOBA
-      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-        ExitFeeContract.address,
-        0
-      )
-      await approveBOBATX.wait()
-
-      await expect(
-        ExitFeeContract.payAndWithdraw(
-          L2ERC20.address,
-          exitAmount,
-          9999999,
-          ethers.utils.formatBytes32String(new Date().getTime().toString())
-        )
-      ).to.be.revertedWith(
-        'execution reverted: ERC20: transfer amount exceeds allowance'
-      )
+      ).to.be.revertedWith('execution reverted: Insufficient Boba amount')
     })
   })
 
-  describe('Eth withdraw', async () => {
+  describe('Boba withdraw', async () => {
     before(async () => {
       // deposit eth to l2
-      const addLiquidityAmount = utils.parseEther('100')
+      const addLiquidityAmount = utils.parseEther('200')
 
-      const deposit = L1StandardBridge.depositETH(
-        9999999,
-        utils.formatBytes32String(new Date().getTime().toString()),
-        { value: addLiquidityAmount }
+      await approveERC20(
+        L1BOBAToken,
+        L1StandardBridge.address,
+        addLiquidityAmount
       )
-      await env.waitForXDomainTransaction(deposit)
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20(
+          L1BOBAToken.address,
+          predeploys.L2_BOBA,
+          addLiquidityAmount,
+          9999999,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
+      )
     })
 
-    it('{tag:other} should burn and withdraw ovm_eth', async () => {
-      const preBalanceExitorL1 = await env.l1Wallet.getBalance()
+    it('{tag:other} should burn and withdraw Boba', async () => {
+      const preBalanceExitorL1 = await L1BOBAToken.balanceOf(
+        env.l1Wallet.address
+      )
       const preBalanceExitorL2 = await env.l2Wallet.getBalance()
 
       expect(preBalanceExitorL2).to.not.eq(0)
       const exitAmount = utils.parseEther('10')
 
-      // Approve BOBA
       const exitFee = await BOBABillingContract.exitFee()
-      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-        ExitFeeContract.address,
-        exitFee
-      )
-      await approveBOBATX.wait()
 
-      const preBobaBalanceBillingContract = await L2BOBAToken.balanceOf(
+      const preBobaBalanceBillingContract = await env.l2Provider.getBalance(
         BOBABillingContract.address
       )
-      const preBobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      const preBobaBalance = await env.l2Wallet.getBalance()
 
       await env.waitForXDomainTransaction(
         ExitFeeContract.payAndWithdraw(
-          env.ovmEth.address,
+          predeploys.L2_BOBA,
           exitAmount,
           9999999,
           ethers.utils.formatBytes32String(new Date().getTime().toString()),
-          { value: exitAmount }
+          { value: exitFee.add(exitAmount) }
         )
       )
 
-      const postBalanceExitorL1 = await env.l1Wallet.getBalance()
+      const latestBlock = await env.l2Provider.getBlock('latest')
+      const gasPrice = await env.l2Provider.getGasPrice()
+      const gasFee = latestBlock.gasUsed.mul(gasPrice)
+
+      const postBalanceExitorL1 = await L1BOBAToken.balanceOf(
+        env.l1Wallet.address
+      )
       const postBalanceExitorL2 = await env.l2Wallet.getBalance()
       const ExitFeeContractBalance = await env.l2Provider.getBalance(
         ExitFeeContract.address
       )
-      const postBobaBalanceBillingContract = await L2BOBAToken.balanceOf(
+      const postBobaBalanceBillingContract = await env.l2Provider.getBalance(
         BOBABillingContract.address
       )
-      const postBobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      const postBobaBalance = await env.l2Wallet.getBalance()
 
       expect(postBalanceExitorL2).to.be.lt(preBalanceExitorL2.sub(exitAmount))
       expect(postBalanceExitorL1).to.eq(preBalanceExitorL1.add(exitAmount))
@@ -361,7 +328,36 @@ describe('Standard Exit Fee', async () => {
       expect(postBobaBalanceBillingContract).to.eq(
         preBobaBalanceBillingContract.add(exitFee)
       )
-      expect(postBobaBalance).to.eq(preBobaBalance.sub(exitFee))
+      expect(postBobaBalance).to.eq(
+        preBobaBalance.sub(exitFee.add(gasFee).add(exitAmount))
+      )
+    })
+
+    it('{tag:other} should fail if not enough Boba balance', async () => {
+      const exitAmount = utils.parseEther('10')
+
+      const exitFee = await BOBABillingContract.exitFee()
+      await expect(
+        ExitFeeContract.payAndWithdraw(
+          predeploys.L2_BOBA,
+          exitAmount,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString()),
+          { value: exitFee.sub(BigNumber.from('1')) }
+        )
+      ).to.be.revertedWith('execution reverted: Insufficient Boba amount')
+
+      await expect(
+        ExitFeeContract.payAndWithdraw(
+          predeploys.L2_BOBA,
+          exitAmount,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString()),
+          { value: exitFee }
+        )
+      ).to.be.revertedWith(
+        'execution reverted: Either Amount Incorrect or Token Address Incorrect'
+      )
     })
   })
 

@@ -5,6 +5,7 @@ const DatabaseService = require('./database.service')
 const OptimismEnv = require('./utilities/optimismEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
+const { getRelayedMessageEventsFromGraph } = require('@eth-optimism/sdk')
 
 class BlockMonitorService extends OptimismEnv {
   constructor() {
@@ -328,7 +329,7 @@ class BlockMonitorService extends OptimismEnv {
       crossDomainMessageEstimateFinalizedTime = fastRelay
         ? crossDomainMessageSendTime +
           Number(this.l2CrossDomainMessageWaitingTime)
-        : crossDomainMessageSendTime + 60 * 60 * 24 * 6
+        : crossDomainMessageSendTime + this.sequencerPublishWindow
     }
 
     receiptData.crossDomainMessageSendTime = crossDomainMessageSendTime
@@ -459,20 +460,11 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async getL1TransactionReceipt(msgHash, fast = false) {
-    const blockNumber = await this.L1Provider.getBlockNumber()
-    const startingBlock = Math.max(blockNumber - this.numberBlockToFetch, 0)
-
-    const filter = {
-      address: fast
-        ? this.L1CrossDomainMessengerFast
-        : this.L1CrossDomainMessenger,
-      topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
-      fromBlock: startingBlock,
-    }
-
-    const logs = await this.L1Provider.getLogs(filter)
-    const matches = logs.filter((i) => i.topics[1] === msgHash)
-
+    const matches = await getRelayedMessageEventsFromGraph(
+      this.L1Provider,
+      msgHash,
+      fast ? true : false
+    )
     if (matches.length > 0) {
       if (matches.length > 1) {
         return false

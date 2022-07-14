@@ -28,6 +28,13 @@ export function createAction (key, asyncAction) {
         return false
       }
 
+      // Meta transaction response
+      if(response && typeof(response) === 'string' && response.includes('Insufficient')) {
+        dispatch({ type: `UI/ERROR/UPDATE`, payload: response })
+        dispatch({ type: `${key}/ERROR` })
+        return false
+      }
+
       if(response && typeof(response) === 'string' && response.includes('execution reverted: ERC20Permit')) {
         let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage.error.message })

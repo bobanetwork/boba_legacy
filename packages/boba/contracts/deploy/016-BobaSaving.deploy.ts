@@ -14,6 +14,9 @@ let Factory__Proxy__BobaFixedSavings: ContractFactory
 let Proxy__BobaFixedSavings: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  // We don't need BobaSaving contract for other chains
+  return
+
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any

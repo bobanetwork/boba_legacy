@@ -163,6 +163,8 @@ class OptimismEnv {
     this.watcher = null
 
     this.l1BlockConfirmation = L1_BLOCK_CONFIRMATION
+
+    this.sequencerPublishWindow = 0
   }
 
   async initOptimismEnv() {
@@ -201,6 +203,11 @@ class OptimismEnv {
       StateCommitmentChainJson.abi,
       this.L1Provider
     )
+
+    this.sequencerPublishWindow = (
+      await this.StateCommitmentChainContract.SEQUENCER_PUBLISH_WINDOW()
+    ).toNumber()
+
     // Load L1 Standard Bridge
     this.OVM_L1StandardBridgeContract = new ethers.Contract(
       this.Proxy__L1StandardBridge,

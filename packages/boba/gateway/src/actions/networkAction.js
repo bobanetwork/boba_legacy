@@ -41,12 +41,6 @@ export function fetchSevens() {
   )
 }
 
-export function fetchFastExits() {
-  return createAction('FASTEXITS/GETALL', () =>
-    networkService.getFastExits()
-  )
-}
-
 export function fetchExits() {
   return createAction('EXIT/GETALL', () => networkService.getExits())
 }
@@ -54,34 +48,6 @@ export function fetchExits() {
 export function exitBOBA(token, value) {
   return createAction('EXIT/CREATE', () =>
     networkService.exitBOBA(token, value)
-  )
-}
-
-//SWAP RELATED
-export function depositL1LP(currency, value, decimals) {
-  return createAction('DEPOSIT/CREATE', () =>
-    networkService.depositL1LP(currency, value, decimals)
-  )
-}
-
-export function depositL1LPBatch(payload) {
-  return createAction('DEPOSIT/CREATE', () =>
-    networkService.depositL1LPBatch(payload)
-  )
-}
-
-//SWAP RELATED - Depositing into the L2LP triggers the swap-exit
-export function depositL2LP(token, value) {
-  return createAction('EXIT/CREATE', () =>
-    networkService.depositL2LP(token, value)
-  )
-}
-
-//SWAP RELATED - Depositing into the L2LP triggers the swap-exit - variant of depositL2LP
-//that handles Exit All
-export function fastExitAll(token) {
-  return createAction('EXIT/CREATE', () =>
-    networkService.fastExitAll(token)
   )
 }
 
@@ -100,30 +66,6 @@ export function depositErc20(value, currency, currencyL2) {
   )
 }
 
-//FARM
-export function farmL1(value_Wei_String, currencyAddress) {
-  return createAction('FARM/CREATE', () =>
-    networkService.approveERC20_L1LP(value_Wei_String, currencyAddress)
-  )
-}
-export function farmL2(value_Wei_String, currencyAddress) {
-  return createAction('FARM/CREATE', () =>
-    networkService.approveERC20_L2LP(value_Wei_String, currencyAddress)
-  )
-}
-export function getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
-  return createAction('FARM/HARVEST', () =>
-    networkService.getReward(currencyAddress, value_Wei_String, L1orL2Pool)
-  )
-}
-
-export function withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool) {
-  console.log("Withdrawing ERC20 Liquidity")
-  return createAction('FARM/WITHDRAW', () =>
-    networkService.withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool)
-  )
-}
-
 export function approveERC20(
   value,
   currency,
@@ -136,14 +78,6 @@ export function approveERC20(
       currency,
       approveContractAddress,
       contractABI
-    )
-  )
-}
-
-export function approveFastDepositBatch(payload) {
-  return createAction('APPROVE/CREATE', () =>
-    networkService.approveFastDepositBatch(
-      payload
     )
   )
 }

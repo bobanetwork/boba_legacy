@@ -147,15 +147,10 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const bobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
     console.log('    BOBA Balance in your account', bobaBalance.toString())
 
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositAmount
-    )
-    await approveTx.wait()
-
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositAmount,
-      TuringHelper.address
+      TuringHelper.address,
+      { value: depositAmount }
     )
     await depositTx.wait()
 

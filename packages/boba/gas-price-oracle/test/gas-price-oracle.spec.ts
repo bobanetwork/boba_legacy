@@ -83,6 +83,7 @@ describe('gas-price-oracle', () => {
 
   let Factory__L2BOBA: ContractFactory
   let L2BOBA: Contract
+  let L2SecondaryFeeToken: Contract
 
   let Factory__ChainStorageContainer: ContractFactory
   let batches: Contract
@@ -144,6 +145,16 @@ describe('gas-price-oracle', () => {
 
     await Lib_AddressManager.setAddress('TK_L2BOBA', L2BOBA.address)
 
+    L2SecondaryFeeToken = await Factory__L2BOBA.deploy()
+    await L2SecondaryFeeToken.deployTransaction.wait()
+
+    await Lib_AddressManager.setAddress('TK_L2BOBA', L2BOBA.address)
+
+    await Lib_AddressManager.setAddress(
+      'L2_L1NativeToken',
+      L2SecondaryFeeToken.address
+    )
+
     await Lib_AddressManager.setAddress('Proxy__Boba_GasPriceOracle', address6)
 
     await Lib_AddressManager.setAddress('Proxy__BobaBillingContract', address7)
@@ -188,22 +199,21 @@ describe('gas-price-oracle', () => {
     })
 
     await gasPriceOracleService.init()
+
+    gasPriceOracleService.state.BOBAUSDPrice = 1
   })
 
   it('should set history values to 0', async () => {
-    expect(gasPriceOracleService.state.L1ETHBalance).to.be.eq(
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenBalance).to.be.eq(
       BigNumber.from('0')
     )
-    expect(gasPriceOracleService.state.L1ETHCostFee).to.be.eq(
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenCostFee).to.be.eq(
       BigNumber.from('0')
     )
     expect(gasPriceOracleService.state.L1RelayerBalance).to.be.eq(
       BigNumber.from('0')
     )
     expect(gasPriceOracleService.state.L1RelayerCostFee).to.be.eq(
-      BigNumber.from('0')
-    )
-    expect(gasPriceOracleService.state.L2ETHCollectFee).to.be.eq(
       BigNumber.from('0')
     )
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.eq(
@@ -227,7 +237,6 @@ describe('gas-price-oracle', () => {
     const l2HistoryJSON = JSON.parse(l2HistoryJsonRaw.toString())
 
     expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('0')
-    expect(l2HistoryJSON.L2ETHCollectFee).to.be.eq('0')
     expect(l2HistoryJSON.L2BOBABillingCollectFee).to.be.eq('0')
 
     const l1DumpsPath = path.resolve(__dirname, '../data/l1History.json')
@@ -236,19 +245,18 @@ describe('gas-price-oracle', () => {
     const l1HistoryJsonRaw = await fsPromise.readFile(l1DumpsPath)
     const l1HistoryJSON = JSON.parse(l1HistoryJsonRaw.toString())
 
-    expect(l1HistoryJSON.L1ETHBalance).to.be.eq('0')
-    expect(l1HistoryJSON.L1ETHCostFee).to.be.eq('0')
+    expect(l1HistoryJSON.L1SecondaryFeeTokenBalance).to.be.eq('0')
+    expect(l1HistoryJSON.L1SecondaryFeeTokenCostFee).to.be.eq('0')
     expect(l1HistoryJSON.L1RelayerBalance).to.be.eq('0')
     expect(l1HistoryJSON.L1RelayerCostFee).to.be.eq('0')
   })
 
   it('should update and store history values', async () => {
-    gasPriceOracleService.state.L1ETHBalance = BigNumber.from('1')
-    gasPriceOracleService.state.L1ETHCostFee = BigNumber.from('2')
+    gasPriceOracleService.state.L1SecondaryFeeTokenBalance = BigNumber.from('1')
+    gasPriceOracleService.state.L1SecondaryFeeTokenCostFee = BigNumber.from('2')
     gasPriceOracleService.state.L1RelayerBalance = BigNumber.from('3')
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('4')
-    gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('5')
-    gasPriceOracleService.state.L2ETHCollectFee = BigNumber.from('6')
+    gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('6')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('7')
 
     // Write two files
@@ -262,8 +270,7 @@ describe('gas-price-oracle', () => {
     const l2HistoryJsonRaw = await fsPromise.readFile(l2DumpsPath)
     const l2HistoryJSON = JSON.parse(l2HistoryJsonRaw.toString())
 
-    expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('5')
-    expect(l2HistoryJSON.L2ETHCollectFee).to.be.eq('6')
+    expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('6')
     expect(l2HistoryJSON.L2BOBABillingCollectFee).to.be.eq('7')
 
     const l1DumpsPath = path.resolve(__dirname, '../data/l1History.json')
@@ -272,18 +279,17 @@ describe('gas-price-oracle', () => {
     const l1HistoryJsonRaw = await fsPromise.readFile(l1DumpsPath)
     const l1HistoryJSON = JSON.parse(l1HistoryJsonRaw.toString())
 
-    expect(l1HistoryJSON.L1ETHBalance).to.be.eq('1')
-    expect(l1HistoryJSON.L1ETHCostFee).to.be.eq('2')
+    expect(l1HistoryJSON.L1SecondaryFeeTokenBalance).to.be.eq('1')
+    expect(l1HistoryJSON.L1SecondaryFeeTokenCostFee).to.be.eq('2')
     expect(l1HistoryJSON.L1RelayerBalance).to.be.eq('3')
     expect(l1HistoryJSON.L1RelayerCostFee).to.be.eq('4')
 
     // Reset history values
-    gasPriceOracleService.state.L1ETHBalance = BigNumber.from('0')
-    gasPriceOracleService.state.L1ETHCostFee = BigNumber.from('0')
+    gasPriceOracleService.state.L1SecondaryFeeTokenBalance = BigNumber.from('0')
+    gasPriceOracleService.state.L1SecondaryFeeTokenCostFee = BigNumber.from('0')
     gasPriceOracleService.state.L1RelayerBalance = BigNumber.from('0')
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('0')
-    gasPriceOracleService.state.L2ETHCollectFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('0')
 
     // Write two files
@@ -310,10 +316,10 @@ describe('gas-price-oracle', () => {
     })
     await gasPriceOracleService._getL1Balance()
 
-    expect(gasPriceOracleService.state.L1ETHBalance).to.be.eq(
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenBalance).to.be.eq(
       ethers.utils.parseEther('4')
     )
-    expect(gasPriceOracleService.state.L1ETHCostFee).to.be.eq(
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenCostFee).to.be.eq(
       BigNumber.from('0')
     )
     console.log(await signer1.provider.getBalance(address1))
@@ -357,8 +363,10 @@ describe('gas-price-oracle', () => {
     const relayerCostFee = ethers.utils
       .parseEther('2')
       .sub(relayerBalance.add(fastRelayerBalance))
-    expect(costFee).to.be.equal(gasPriceOracleService.state.L1ETHCostFee)
-    expect(gasPriceOracleService.state.L1ETHBalance).to.be.equal(
+    expect(costFee).to.be.equal(
+      gasPriceOracleService.state.L1SecondaryFeeTokenCostFee
+    )
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenBalance).to.be.equal(
       sequencerBalance
         .add(proposerBalance)
         .add(relayerBalance)
@@ -373,7 +381,8 @@ describe('gas-price-oracle', () => {
   })
 
   it('should record l1 cost correctly after adding more funds to l1 wallets', async () => {
-    const preL1ETHCostFee = gasPriceOracleService.state.L1ETHCostFee
+    const preL1SecondaryFeeTokenCostFee =
+      gasPriceOracleService.state.L1SecondaryFeeTokenCostFee
     const preL1RelayerCostFee = gasPriceOracleService.state.L1RelayerCostFee
 
     await signer1.sendTransaction({
@@ -398,16 +407,18 @@ describe('gas-price-oracle', () => {
     const postRelayerBalance = await wallet3.getBalance()
     const postFastRelayerBalance = await wallet4.getBalance()
 
-    // Update L1ETHBalance and keep L1ETHCostFee
+    // Update L1SecondaryFeeTokenBalance and keep L1SecondaryFeeTokenCostFee
     // Update L1RelayerBalance and keep L1RelayerCostFee
     await gasPriceOracleService._getL1Balance()
-    expect(gasPriceOracleService.state.L1ETHBalance).to.be.equal(
+    expect(gasPriceOracleService.state.L1SecondaryFeeTokenBalance).to.be.equal(
       postSequencerBalance
         .add(postProposerBalance)
         .add(postRelayerBalance)
         .add(postFastRelayerBalance)
     )
-    expect(preL1ETHCostFee).to.be.eq(gasPriceOracleService.state.L1ETHCostFee)
+    expect(preL1SecondaryFeeTokenCostFee).to.be.eq(
+      gasPriceOracleService.state.L1SecondaryFeeTokenCostFee
+    )
 
     expect(gasPriceOracleService.state.L1RelayerBalance).to.be.equal(
       postRelayerBalance.add(postFastRelayerBalance)
@@ -430,18 +441,15 @@ describe('gas-price-oracle', () => {
       to: address7,
       value: ethers.utils.parseEther('1'),
     })
-    await L2BOBA.transfer(address6, ethers.utils.parseEther('1'))
-    await L2BOBA.transfer(address7, ethers.utils.parseEther('1'))
+    await L2SecondaryFeeToken.transfer(address6, ethers.utils.parseEther('1'))
+    await L2SecondaryFeeToken.transfer(address7, ethers.utils.parseEther('1'))
 
     await gasPriceOracleService._getL2GasCost()
 
-    expect(gasPriceOracleService.state.L2ETHCollectFee).to.be.eq(
-      ethers.utils.parseEther('1')
-    )
-    expect(gasPriceOracleService.state.L2ETHVaultBalance).to.be.eq(
-      ethers.utils.parseEther('1')
-    )
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.eq(
+      ethers.utils.parseEther('1')
+    )
+    expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
       ethers.utils.parseEther('1')
     )
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
@@ -456,7 +464,6 @@ describe('gas-price-oracle', () => {
   })
 
   it('should record l2 revenue correctly after withdrawing fees', async () => {
-    const preL2ETHCollectFee = gasPriceOracleService.state.L2ETHCollectFee
     const preL2BOBACollectFee = gasPriceOracleService.state.L2BOBACollectFee
     const preL2BOBABillingCollectFee =
       gasPriceOracleService.state.L2BOBABillingCollectFee
@@ -467,38 +474,35 @@ describe('gas-price-oracle', () => {
       to: signer1Address,
       value: ethers.utils.parseEther('0.5'),
     })
-    await L2BOBA.connect(wallet6).transfer(
+    await signer1.sendTransaction({
+      to: wallet5.address,
+      value: ethers.utils.parseEther('0.5'),
+    })
+    await L2SecondaryFeeToken.connect(wallet6).transfer(
       signer1Address,
       ethers.utils.parseEther('0.5')
     )
-    await L2BOBA.connect(wallet7).transfer(
+    await L2SecondaryFeeToken.connect(wallet7).transfer(
       signer1Address,
       ethers.utils.parseEther('0.5')
     )
 
-    const ETHVaultBalance = await wallet5.getBalance()
-    const BobaVaultBalance = await L2BOBA.balanceOf(address6)
-    const BobaBillingBalance = await L2BOBA.balanceOf(address7)
+    const L2BOBAVaultBalance = await wallet5.getBalance()
+    const L2BOBABillingBalance = await wallet5.provider.getBalance(address7)
 
     await gasPriceOracleService._getL2GasCost()
 
-    expect(gasPriceOracleService.state.L2ETHCollectFee).to.be.equal(
-      preL2ETHCollectFee
-    )
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.equal(
       preL2BOBACollectFee
     )
     expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.equal(
       preL2BOBABillingCollectFee
     )
-    expect(gasPriceOracleService.state.L2ETHVaultBalance).to.be.equal(
-      ETHVaultBalance
-    )
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.equal(
-      BobaVaultBalance
+      L2BOBAVaultBalance
     )
     expect(gasPriceOracleService.state.L2BOBABillingBalance).to.be.equal(
-      BobaBillingBalance
+      L2BOBABillingBalance
     )
   })
 
@@ -591,75 +595,5 @@ describe('gas-price-oracle', () => {
 
     const postL1BaseFee = await gasPriceOracle.l1BaseFee()
     expect(postL1BaseFee).to.be.equal(ethers.utils.parseEther('0'))
-  })
-
-  it('should update price ratio', async () => {
-    const Factory__Boba_GasPriceOracle = getContractFactory(
-      'Boba_GasPriceOracle',
-      wallet8
-    )
-    const Boba_GasPriceOracle = await Factory__Boba_GasPriceOracle.deploy()
-    await Boba_GasPriceOracle.deployTransaction.wait()
-
-    await Boba_GasPriceOracle.initialize(address1, address2)
-
-    const registerBoba_GasPriceOralceTx = await Lib_AddressManager.setAddress(
-      'Proxy__Boba_GasPriceOracle',
-      Boba_GasPriceOracle.address
-    )
-    await registerBoba_GasPriceOralceTx.wait()
-
-    // Initialize GasPriceOracleService
-    tempGasPriceOracleService = new GasPriceOracleService({
-      l1RpcProvider: ethers.provider,
-      l2RpcProvider: ethers.provider,
-
-      addressManagerAddress: Lib_AddressManager.address,
-      gasPriceOracleAddress: gasPriceOracle.address,
-
-      OVM_SequencerFeeVault: address5,
-
-      gasPriceOracleOwnerWallet: wallet8,
-
-      sequencerAddress: address1,
-      proposerAddress: address2,
-      relayerAddress: address3,
-      fastRelayerAddress: address4,
-
-      pollingInterval: 0,
-      overheadRatio1000X: 10,
-      overheadMinPercentChange: 10,
-      minOverhead: 2000,
-      minL1BaseFee: 50_000_000_000,
-      maxL1BaseFee: 100_000_000_000,
-      bobaFeeRatio100X: 100,
-      bobaFeeRatioMinPercentChange: 10,
-      bobaLocalTestnetChainId: 31337,
-    })
-
-    await tempGasPriceOracleService.init()
-
-    tempGasPriceOracleService.state.ETHUSDPrice = 10
-    tempGasPriceOracleService.state.BOBAUSDPrice = 1
-
-    const prePriceRatio = await Boba_GasPriceOracle.priceRatio()
-
-    await tempGasPriceOracleService._updatePriceRatio()
-
-    const postPriceRatio = await Boba_GasPriceOracle.priceRatio()
-    expect(postPriceRatio).to.be.equal(prePriceRatio)
-
-    tempGasPriceOracleService.state.ETHUSDPrice = 2500
-    tempGasPriceOracleService.state.BOBAUSDPrice = 1
-
-    console.log({
-      ETHUSDPrice: tempGasPriceOracleService.state.ETHUSDPrice,
-      BOBAUSDPrice: tempGasPriceOracleService.state.BOBAUSDPrice,
-    })
-
-    await tempGasPriceOracleService._updatePriceRatio()
-
-    const updatedPriceRatio = await Boba_GasPriceOracle.priceRatio()
-    expect(updatedPriceRatio).to.be.equal(BigNumber.from('2500'))
   })
 })

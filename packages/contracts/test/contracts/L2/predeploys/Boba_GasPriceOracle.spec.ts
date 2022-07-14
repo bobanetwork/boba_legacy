@@ -2,7 +2,7 @@ import { expect } from '../../../setup'
 
 /* External Imports */
 import { ethers } from 'hardhat'
-import { ContractFactory, Contract, Signer, utils } from 'ethers'
+import { ContractFactory, Contract, Signer, utils, BigNumber } from 'ethers'
 
 import { calculateL1Fee } from '@eth-optimism/core-utils'
 
@@ -431,126 +431,184 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('receivedETHAmount', () => {
+  describe('receivedBOBAAmount', () => {
     it('should revert if called by someone other than the owner', async () => {
       await expect(
         Boba_GasPriceOracle.connect(signer2).updateMetaTransactionFee(address1)
       ).to.be.reverted
     })
 
-    it('should revert if the new receivedETHAmount is below 0.001 ETH', async () => {
+    it('should revert if the new receivedBOBAAmount is below 0.001 BOBA', async () => {
       await expect(
-        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
           utils.parseEther('0.0009')
         )
       ).to.be.reverted
     })
 
-    it('should revert if the new receivedETHAmount is larger than 0.01 ETH', async () => {
+    it('should revert if the new receivedBOBAAmount is larger than 10 BOBA', async () => {
       await expect(
-        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
-          utils.parseEther('0.011')
+        Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
+          utils.parseEther('10.1')
         )
       ).to.be.reverted
     })
 
     it('should succeed if called by the owner', async () => {
       await expect(
-        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+        Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
           ethers.utils.parseEther('0.003')
         )
       ).to.not.be.reverted
     })
 
     it('should emit event', async () => {
-      const receivedETHAmount = ethers.utils.parseEther('0.006')
+      const receivedBOBAAmount = ethers.utils.parseEther('0.006')
       await expect(
-        Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
-          receivedETHAmount
+        Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
+          receivedBOBAAmount
         )
       )
-        .to.emit(Boba_GasPriceOracle, 'UpdateReceivedETHAmount')
-        .withArgs(await signer1.getAddress(), receivedETHAmount)
+        .to.emit(Boba_GasPriceOracle, 'UpdateReceivedBOBAAmount')
+        .withArgs(await signer1.getAddress(), receivedBOBAAmount)
     })
   })
 
-  describe('get receivedETHAmount', () => {
+  describe('get receivedBOBAAmount', () => {
     it('should revert if caller is not owner', async () => {
       await expect(
-        Boba_GasPriceOracle.connect(signer2).updateReceivedETHAmount(
+        Boba_GasPriceOracle.connect(signer2).updateReceivedBOBAAmount(
           utils.parseEther('0.006')
         )
       ).to.be.reverted
     })
-    it('should change when updateReceivedETHAmount is called', async () => {
-      await Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
+    it('should change when updateReceivedBOBAAmount is called', async () => {
+      await Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
         ethers.utils.parseEther('0.005')
       )
-      expect(await Boba_GasPriceOracle.receivedETHAmount()).to.equal(
+      expect(await Boba_GasPriceOracle.receivedBOBAAmount()).to.equal(
         ethers.utils.parseEther('0.005')
       )
     })
 
     it('is the 9th storage slot', async () => {
-      const receivedETHAmount = ethers.utils.parseEther('0.003')
+      const receivedBOBAAmount = ethers.utils.parseEther('0.003')
       const slot = 9
 
       // set the price
-      await Boba_GasPriceOracle.connect(signer1).updateReceivedETHAmount(
-        receivedETHAmount
+      await Boba_GasPriceOracle.connect(signer1).updateReceivedBOBAAmount(
+        receivedBOBAAmount
       )
 
       // get the storage slot value
-      const receivedETHAmountSlot = await signer1.provider.getStorageAt(
+      const receivedBOBAAmountSlot = await signer1.provider.getStorageAt(
         Boba_GasPriceOracle.address,
         slot
       )
-      expect(await Boba_GasPriceOracle.receivedETHAmount()).to.equal(
-        receivedETHAmountSlot
+      expect(await Boba_GasPriceOracle.receivedBOBAAmount()).to.equal(
+        receivedBOBAAmountSlot
       )
     })
   })
 
-  describe('withdrawBOBA', () => {
+  describe('decimals', () => {
+    it('should revert if called by someone other than the owner', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer2).updateDecimals(4)).to.be
+        .reverted
+    })
+
+    it('should revert if the new decimals is larger than 9', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer1).updateDecimals(10)).to
+        .be.reverted
+    })
+
+    it('should succeed if called by the owner', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer1).updateDecimals(1)).to
+        .not.be.reverted
+    })
+
+    it('should emit event', async () => {
+      const newDecimals = 5
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateDecimals(newDecimals)
+      )
+        .to.emit(Boba_GasPriceOracle, 'UpdateDecimals')
+        .withArgs(await signer1.getAddress(), newDecimals)
+    })
+  })
+
+  describe('get decimals', () => {
+    it('should revert if caller is not owner', async () => {
+      await expect(Boba_GasPriceOracle.connect(signer2).updateDecimals(3)).to.be
+        .reverted
+    })
+    it('should change when updateDecimals is called', async () => {
+      await Boba_GasPriceOracle.connect(signer1).updateDecimals(2)
+      expect(await Boba_GasPriceOracle.decimals()).to.equal(BigNumber.from(2))
+    })
+
+    it('are the 11th storage slots', async () => {
+      const newDecimals = 4
+
+      // set the price
+      await Boba_GasPriceOracle.connect(signer1).updateDecimals(newDecimals)
+
+      // get the storage slot value
+      const decimalsSlot = await signer1.provider.getStorageAt(
+        Boba_GasPriceOracle.address,
+        11
+      )
+      expect(await Boba_GasPriceOracle.decimals()).to.equal(decimalsSlot)
+    })
+  })
+
+  describe('withdrawSecondaryFeeToken', () => {
     it('should revert if the balance is not enough', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).withdrawSecondaryFeeToken()
+      ).to.be.reverted
+    })
+  })
+
+  describe('withdrawBOBA', () => {
+    it('should revert if called by someone other than the owner', async () => {
       await expect(Boba_GasPriceOracle.connect(signer2).withdrawBOBA()).to.be
         .reverted
     })
   })
 
-  describe('withdrawETH', () => {
-    it('should revert if called by someone other than the owner', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer2).withdrawETH()).to.be
-        .reverted
-    })
-  })
-
-  describe('receive ETH', () => {
-    it('should receive ETH', async () => {
+  describe('receive BOBA', () => {
+    it('should receive BOBA', async () => {
       const depositAmount = utils.parseEther('1')
-      const ETHBalanceBefore = await signer1.provider.getBalance(
+      const BOBABalanceBefore = await signer1.provider.getBalance(
         Boba_GasPriceOracle.address
       )
       await signer1.sendTransaction({
         to: Boba_GasPriceOracle.address,
         value: depositAmount,
       })
-      const ETHBalanceAfter = await signer1.provider.getBalance(
+      const BOBABalanceAfter = await signer1.provider.getBalance(
         Boba_GasPriceOracle.address
       )
-      expect(ETHBalanceAfter.sub(ETHBalanceBefore)).to.equal(depositAmount)
+      expect(BOBABalanceAfter.sub(BOBABalanceBefore)).to.equal(depositAmount)
     })
   })
 
-  describe('getBOBAForSwap', () => {
-    it('should get correct BOBA for swapping BOBA for ETH', async () => {
-      const BobaCost = await Boba_GasPriceOracle.getBOBAForSwap()
-      const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
+  describe('getSecondaryFeeTokenForSwap', () => {
+    it('should get correct BOBA for swapping L1 native token for BOBA', async () => {
+      const SecondaryFeeTokenCost =
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+      const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
       const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
+      const decimals = await Boba_GasPriceOracle.decimals()
+      const multiplier = BigNumber.from(10).pow(decimals)
       expect(
-        receivedETHAmount.mul(marketPriceRatio).add(metaTransactionFee)
-      ).to.equal(BobaCost)
+        receivedBOBAAmount
+          .mul(marketPriceRatio)
+          .div(multiplier)
+          .add(metaTransactionFee)
+      ).to.equal(SecondaryFeeTokenCost)
     })
   })
 
@@ -580,7 +638,11 @@ describe('Boba_GasPriceOracle', () => {
         )
         await tx.wait()
         const priceRatio = await Boba_GasPriceOracle.priceRatio()
-        const bobaFee = await Boba_GasPriceOracle.getL1BobaFee(input)
+        const SecondaryFeeTokenFee =
+          await Boba_GasPriceOracle.getSecondaryFeeTokenFee(input)
+
+        const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
+        const multiplier = BigNumber.from(10).pow(priceRatioDecimals)
 
         const expected = calculateL1Fee(
           input,
@@ -588,8 +650,10 @@ describe('Boba_GasPriceOracle', () => {
           l1BaseFee,
           scalar,
           decimals
-        ).mul(priceRatio)
-        expect(bobaFee).to.deep.equal(expected)
+        )
+          .mul(priceRatio)
+          .div(multiplier)
+        expect(SecondaryFeeTokenFee).to.deep.equal(expected)
       })
     }
   })

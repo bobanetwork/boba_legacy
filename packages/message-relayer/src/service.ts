@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Wallet, utils, constants, BigNumber } from 'ethers'
+import { Wallet, utils, constants, BigNumber, ethers } from 'ethers'
 import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
@@ -81,6 +81,8 @@ interface MessageRelayerOptions {
   maxWaitTxTimeS: number
 
   isFastRelayer: boolean
+
+  baseAddresses: any
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -143,6 +145,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
+
     this.state.messenger = new CrossChainMessenger({
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,
@@ -290,6 +293,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                       gasPrice: _gasPrice,
                       nonce,
                     },
+                    fromBlock: this.options.l1StartOffset,
                   })
                 const txReceipt = await txResponse.wait(
                   this.options.numConfirmations

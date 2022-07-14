@@ -31,13 +31,13 @@ describe('L1StandardBridge', () => {
   let aliceAddress
 
   // we can just make up this string since it's on the "other" Layer
-  let Mock__OVM_ETH: MockContract
+  let Mock__L2_BOBA: MockContract
   let Factory__L1ERC20: ContractFactory
   let IL2ERC20Bridge: Interface
   before(async () => {
     ;[l1MessengerImpersonator, alice, bob] = await ethers.getSigners()
 
-    Mock__OVM_ETH = await smockit(await ethers.getContractFactory('OVM_ETH'))
+    Mock__L2_BOBA = await smockit(await ethers.getContractFactory('L2_BOBA'))
 
     // deploy an ERC20 contract on L1
     Factory__L1ERC20 = await smoddit(
@@ -90,15 +90,15 @@ describe('L1StandardBridge', () => {
     })
   })
 
-  describe('ETH deposits', () => {
+  describe('L1 native token deposits', () => {
     const depositAmount = 1_000
 
-    it('depositETH() escrows the deposit amount and sends the correct deposit message', async () => {
+    it('depositNativeToken() escrows the deposit amount and sends the correct deposit message', async () => {
       const depositer = await alice.getAddress()
       const initialBalance = await ethers.provider.getBalance(depositer)
 
       // alice calls deposit on the bridge and the L1 bridge calls transferFrom on the token
-      await L1StandardBridge.connect(alice).depositETH(
+      await L1StandardBridge.connect(alice).depositNativeToken(
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
         {
@@ -123,13 +123,13 @@ describe('L1StandardBridge', () => {
       // Check the correct cross-chain call was sent:
       // Message should be sent to the L2 bridge
       expect(depositCallToMessenger._target).to.equal(DUMMY_L2_BRIDGE_ADDRESS)
-      // Message data should be a call telling the L2ETHToken to finalize the deposit
+      // Message data should be a call telling the L2 native token to finalize the deposit
 
       // the L1 bridge sends the correct message to the L1 messenger
       expect(depositCallToMessenger._message).to.equal(
         IL2ERC20Bridge.encodeFunctionData('finalizeDeposit', [
           constants.AddressZero,
-          predeploys.OVM_ETH,
+          predeploys.L2_L1NativeToken,
           depositer,
           depositer,
           depositAmount,
@@ -139,11 +139,11 @@ describe('L1StandardBridge', () => {
       expect(depositCallToMessenger._gasLimit).to.equal(FINALIZATION_GAS)
     })
 
-    it('depositETHTo() escrows the deposit amount and sends the correct deposit message', async () => {
+    it('depositNativeTokenTo() escrows the deposit amount and sends the correct deposit message', async () => {
       // depositor calls deposit on the bridge and the L1 bridge calls transferFrom on the token
       const initialBalance = await ethers.provider.getBalance(aliceAddress)
 
-      await L1StandardBridge.connect(alice).depositETHTo(
+      await L1StandardBridge.connect(alice).depositNativeTokenTo(
         bobsAddress,
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
@@ -167,13 +167,13 @@ describe('L1StandardBridge', () => {
       // Check the correct cross-chain call was sent:
       // Message should be sent to the L2 bridge
       expect(depositCallToMessenger._target).to.equal(DUMMY_L2_BRIDGE_ADDRESS)
-      // Message data should be a call telling the L2ETHToken to finalize the deposit
+      // Message data should be a call telling the L2 native token to finalize the deposit
 
       // the L1 bridge sends the correct message to the L1 messenger
       expect(depositCallToMessenger._message).to.equal(
         IL2ERC20Bridge.encodeFunctionData('finalizeDeposit', [
           constants.AddressZero,
-          predeploys.OVM_ETH,
+          predeploys.L2_L1NativeToken,
           aliceAddress,
           bobsAddress,
           depositAmount,
@@ -183,21 +183,25 @@ describe('L1StandardBridge', () => {
       expect(depositCallToMessenger._gasLimit).to.equal(FINALIZATION_GAS)
     })
 
-    it('cannot depositETH from a contract account', async () => {
+    it('cannot depositNativeToken from a contract account', async () => {
       expect(
-        L1StandardBridge.depositETH(FINALIZATION_GAS, NON_NULL_BYTES32, {
-          value: depositAmount,
-          gasPrice: 0,
-        })
+        L1StandardBridge.depositNativeToken(
+          FINALIZATION_GAS,
+          NON_NULL_BYTES32,
+          {
+            value: depositAmount,
+            gasPrice: 0,
+          }
+        )
       ).to.be.revertedWith('Account not EOA')
     })
   })
 
-  describe('ETH withdrawals', () => {
+  describe('Native token withdrawals', () => {
     it('onlyFromCrossDomainAccount: should revert on calls from a non-crossDomainMessenger L1 account', async () => {
       // Deploy new bridge, initialize with random messenger
       await expect(
-        L1StandardBridge.connect(alice).finalizeETHWithdrawal(
+        L1StandardBridge.connect(alice).finalizeNativeTokenWithdrawal(
           constants.AddressZero,
           constants.AddressZero,
           1,
@@ -209,7 +213,7 @@ describe('L1StandardBridge', () => {
       ).to.be.revertedWith(ERR_INVALID_MESSENGER)
     })
 
-    it('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2ETHToken)', async () => {
+    it('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2 native token)', async () => {
       L1StandardBridge = await (
         await ethers.getContractFactory('L1StandardBridge')
       ).deploy()
@@ -223,7 +227,7 @@ describe('L1StandardBridge', () => {
       )
 
       await expect(
-        L1StandardBridge.finalizeETHWithdrawal(
+        L1StandardBridge.finalizeNativeTokenWithdrawal(
           constants.AddressZero,
           constants.AddressZero,
           1,
@@ -245,7 +249,7 @@ describe('L1StandardBridge', () => {
       )
 
       // thanks Alice
-      await L1StandardBridge.connect(alice).depositETH(
+      await L1StandardBridge.connect(alice).depositNativeToken(
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
         {
@@ -254,7 +258,7 @@ describe('L1StandardBridge', () => {
         }
       )
 
-      await L1StandardBridge.finalizeETHWithdrawal(
+      await L1StandardBridge.finalizeNativeTokenWithdrawal(
         NON_ZERO_ADDRESS,
         NON_ZERO_ADDRESS,
         withdrawalAmount,

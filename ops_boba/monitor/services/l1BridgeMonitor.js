@@ -319,16 +319,11 @@ class l1BridgeMonitorService extends OptimismEnv {
       )
       const resolved = await this.watcher.toCrossChainMessage(transaction)
       const latestL2Block = await this.L2Provider.getBlockNumber()
-      let CDMReceipt = null
-      let i = 0
       let l2Message = null
-      while (i < 4 && CDMReceipt == null) {
-        CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
-          fromBlock: latestL2Block - (i + 1) * 5000,
-          toBlock: latestL2Block - i * 5000,
-        })
-        i += 1
-      }
+      const CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
+        fromBlock: latestL2Block - 10 * 5000,
+        toBlock: latestL2Block,
+      })
       if (CDMReceipt !== null) {
         l2Message = CDMReceipt.transactionReceipt
       }

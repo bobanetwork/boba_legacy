@@ -4,6 +4,7 @@ import { Logger, LoggerOptions } from '@eth-optimism/common-ts'
 import * as Sentry from '@sentry/node'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
+import * as request from 'request-promise-native'
 
 import { MessageRelayerService } from '../service'
 
@@ -115,6 +116,19 @@ const main = async () => {
     parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
   )
 
+  const ADDRESSES_URL =
+    config.str('addresses-url', env.ADDRESSES_URL) ||
+    'http://dtl:8081/addresses.json'
+
+  let baseAddresses: Object
+  if (ADDRESSES_URL) {
+    const options = {
+      uri: ADDRESSES_URL,
+    }
+    const result = await request.get(options)
+    baseAddresses = JSON.parse(result)
+  }
+
   if (!L1_NODE_WEB3_URL) {
     throw new Error('Must pass L1_NODE_WEB3_URL')
   }
@@ -163,6 +177,7 @@ const main = async () => {
     multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
     isFastRelayer: FAST_RELAYER,
+    baseAddresses,
   })
 
   await service.start()

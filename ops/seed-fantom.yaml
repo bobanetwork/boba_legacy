@@ -1,0 +1,20 @@
+Keys:
+  Asymmetric:
+    Ecc:
+      - Metadata:
+          KeyId: 0x6236C601FfD52c4793e3B49B15bcdc1137E6339D
+          KeyUsage: SIGN_VERIFY
+          Description: ECC key for SEQUENCER with curve secp256k1
+        PrivateKeyHex: b9ab4c66395f29a60e80ff2a12fb9cd0db82d0003456a7c34729b685501245ac
+      - Metadata:
+          KeyId: 0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9
+          KeyUsage: SIGN_VERIFY
+          Description: ECC key for PROPOSER with curve secp256k1
+        PrivateKeyHex: 154f06858ef1600eddc8c2e10ca995569363b056fc0fdd56cfd1186b557ef1c8
+
+Aliases:
+  - AliasName: alias/0x6236C601FfD52c4793e3B49B15bcdc1137E6339D
+    TargetKeyId: 0x6236C601FfD52c4793e3B49B15bcdc1137E6339D
+
+  - AliasName: alias/0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9
+    TargetKeyId: 0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9

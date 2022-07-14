@@ -58,7 +58,7 @@ contract OVM_SequencerFeeVault {
         );
 
         L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
-            Lib_PredeployAddresses.OVM_ETH,
+            Lib_PredeployAddresses.L2_BOBA,
             l1FeeWallet,
             address(this).balance,
             0,

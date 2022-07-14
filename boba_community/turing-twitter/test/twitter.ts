@@ -40,51 +40,16 @@ let turingHelper: Contract
 let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
+const ethClaimAmount = ethers.utils.parseEther('0.000001')
+const bobaClaimAmount = ethers.utils.parseEther('0.1')
 
 describe('Verify Twitter post for testnet funds', function () {
   before(async () => {
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
-      deployerWallet
-    )
-
-    turingHelper = await Factory__TuringHelper.deploy(gasOverride)
-    console.log('Helper contract deployed as', turingHelper.address)
-
-    Factory__TwitterClaim = new ContractFactory(
-      TwitterAuthenticatedFaucet.abi,
-      TwitterAuthenticatedFaucet.bytecode,
-      deployerWallet
-    )
-
-    twitter = await Factory__TwitterClaim.deploy(
-      'https://rsqtbccfs3.execute-api.us-east-1.amazonaws.com/Stage/',
-      turingHelper.address,
-      10,
-      ethers.utils.parseEther('0.000001'),
-      gasOverride
-    )
-
-    console.log('TwitterClaim contract deployed on', twitter.address)
-
-    // fund faucet
-    const fTx = await deployerWallet.sendTransaction({
-      ...gasOverride,
-      to: twitter.address,
-      value: ethers.utils.parseEther('0.000001'),
-    })
-    await fTx.wait()
-    console.log('Funded faucet..')
-
-    // whitelist the new 'lending' contract in the helper
-    const tr1 = await turingHelper.addPermittedCaller(twitter.address)
-    const res1 = await tr1.wait()
-    console.log('addingPermittedCaller to TuringHelper', res1.events[0].data)
-
-    if (hre.network.name === 'boba_rinkeby') {
-      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    if (hre.network.name === 'boba_base') {
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
+    } else if (hre.network.name === 'boba_opera_testnet') {
+      BOBAL2Address = '0x4200000000000000000000000000000000000023'
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
     } else if (hre.network.name === 'boba_mainnet') {
       BOBAL2Address = '0x_________________'
       BobaTuringCreditAddress = '0x___________________'
@@ -97,11 +62,63 @@ describe('Verify Twitter post for testnet funds', function () {
       BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
     }
 
+    Factory__TuringHelper = new ContractFactory(
+      TuringHelperJson.abi,
+      TuringHelperJson.bytecode,
+      deployerWallet
+    )
+    /*turingHelper = await Factory__TuringHelper.attach(
+      '0x37479c112E9AADB52803b596F9feCA2a0cECBc96'
+    )*/
+    turingHelper = await Factory__TuringHelper.deploy(gasOverride)
+    console.log('Helper contract deployed as', turingHelper.address)
+
+    Factory__TwitterClaim = new ContractFactory(
+      TwitterAuthenticatedFaucet.abi,
+      TwitterAuthenticatedFaucet.bytecode,
+      deployerWallet
+    )
+
+    /*twitter = await Factory__TwitterClaim.attach(
+      '0xCED1459C6B56a85363426a502a24De99fBbF5a83'
+    )*/
+    twitter = await Factory__TwitterClaim.deploy(
+      'https://o9gvgzsjw5.execute-api.us-east-1.amazonaws.com/Prod/',
+      turingHelper.address,
+      BOBAL2Address,
+      10,
+      ethClaimAmount,
+      bobaClaimAmount,
+      gasOverride
+    )
+
+    console.log('TwitterClaim contract deployed on', twitter.address)
+
     L2BOBAToken = new Contract(
       BOBAL2Address,
       L2GovernanceERC20Json.abi,
       deployerWallet
     )
+
+    // fund faucet
+    const fTx = await deployerWallet.sendTransaction({
+      ...gasOverride,
+      to: twitter.address,
+      value: ethClaimAmount,
+    })
+    await fTx.wait()
+    console.log('Funded faucet with ETH..')
+    const tokenFund = await L2BOBAToken.transfer(
+      twitter.address,
+      bobaClaimAmount
+    )
+    await tokenFund.wait()
+    console.log('Funded faucet with BOBA..')
+
+    // whitelist the new 'lending' contract in the helper
+    const tr1 = await turingHelper.addPermittedCaller(twitter.address)
+    const res1 = await tr1.wait()
+    console.log('addingPermittedCaller to TuringHelper', res1.events[0].data)
 
     // prepare to register/fund your Turing Helper
     Factory__BobaTuringCredit = new ContractFactory(
@@ -143,6 +160,12 @@ describe('Verify Twitter post for testnet funds', function () {
       depositAmount,
       turingHelper.address
     )
+    /* For some chains:
+    const depositTx = await turingCredit.addBalanceTo(
+      depositAmount,
+      turingHelper.address,
+      { value: depositAmount }
+    )*/
     await depositTx.wait()
   })
 
@@ -186,7 +209,13 @@ describe('Verify Twitter post for testnet funds', function () {
   })*/
 
   it('should conduct basic twitter claim via meta transaction', async () => {
-    const tweetId = '1522128490211991552'
+    const tweetId = '1523935323096506368'
+    const balanceETHBefore = await local_provider.getBalance(
+      deployerWallet.address
+    )
+    const balanceBobaBefore = await L2BOBAToken.balanceOf(
+      deployerWallet.address
+    )
 
     const nonce = parseInt(
       await twitter.getNonce(deployerWallet.address, gasOverride),
@@ -221,11 +250,15 @@ describe('Verify Twitter post for testnet funds', function () {
     )
     const res = await execTx.wait()
 
-    /*await twitter.estimateGas.sendFunds(tweetId, gasOverride)
-    console.log('Estimated gas')
-    const claim = await twitter.sendFunds(tweetId, gasOverride)
-    const res = await claim.wait()*/
     expect(res).to.be.ok
+
+    const balanceETHAfter = await local_provider.getBalance(
+      deployerWallet.address
+    )
+    const balanceBobaAfter = await L2BOBAToken.balanceOf(deployerWallet.address)
+
+    expect(balanceETHBefore.add(ethClaimAmount)).to.be.gt(balanceETHAfter)
+    expect(balanceBobaBefore.add(bobaClaimAmount)).to.be.equal(balanceBobaAfter)
   })
 
   it('should fail for second twitter claim', async () => {

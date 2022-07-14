@@ -36,7 +36,9 @@ function GasSwitcher({ isMobile }) {
   return (
     <S.Menu>
       <S.MenuItem>
-        <S.Label component="p" variant="body2">Ethereum</S.Label>
+        <S.Label component="p" variant="body2">
+          {networkService.L1ChainAsset.name}
+        </S.Label>
         <S.Value component="p" variant="body2">{gas.gasL1} Gwei</S.Value>
       </S.MenuItem>
       <S.MenuItem>

@@ -2,11 +2,11 @@
 
 March 9, 2022
 
-Greetings from your engineering team. Last week saw the deployment of the final version of Turing (on Rinkeby), a regenesis of Rinkeby, and the deployment of Turing on Mainnet. This is a major milestone, since it marks our first big step towards the Boba we envision. As you know, Boba is not just an L2 scaling solution, but a hybrid computer which allows a distributed computer, namely Ethereum, to interact seamlessly with all non-distributed computers (the Web 2 world). As part of this milestone, the online presence of Boba network will become more differentiated and more focused on the needs of Web2 and Metaverse developers looking to build compelling Web3 experiences. 
+Greetings from your engineering team. Last week saw the deployment of the final version of Turing (on Rinkeby), a regenesis of Rinkeby, and the deployment of Turing on Mainnet. This is a major milestone, since it marks our first big step towards the Boba we envision. As you know, Boba is not just an L2 scaling solution, but a hybrid computer which allows a distributed computer, namely Ethereum, to interact seamlessly with all non-distributed computers (the Web 2 world). As part of this milestone, the online presence of Boba network will become more differentiated and more focused on the needs of Web2 and Metaverse developers looking to build compelling Web3 experiences.
 
-## 1. Boba Development will move to github.com/bobanetwork; Hackathons 
+## 1. Boba Development will move to github.com/bobanetwork; Hackathons
 
-As of next week, the main Boba repo and associated repos will migrate to `github.com/bobanetwork` to provide a less confusing developer experience. The timing of this transition is in part due to *three* upcoming hackathons focusing on distributed compute and Web2/Web3 interoperability. As we engage hundreds of recent graduates and developers, we want them to have an easy and straightforward onboarding experience and clear documentation. Relatedly, as we prepare for the hackathons, please contribute to our ideas list, which will form the basis of the various topic areas and challenges. The document is [here](https://github.com/bobanetwork/hackathons/blob/main/README.md) - just open an issue or add your ideas. 
+As of next week, the main Boba repo and associated repos will migrate to `github.com/bobanetwork` to provide a less confusing developer experience. The timing of this transition is in part due to *three* upcoming hackathons focusing on distributed compute and Web2/Web3 interoperability. As we engage hundreds of recent graduates and developers, we want them to have an easy and straightforward onboarding experience and clear documentation. Relatedly, as we prepare for the hackathons, please contribute to our ideas list, which will form the basis of the various topic areas and challenges. The document is [here](https://github.com/bobanetwork/hackathons/blob/main/README.md) - just open an issue or add your ideas.
 
 ## 2. Mainnet Turing Monster mint next week
 
@@ -22,7 +22,7 @@ Please help out Ethereum and all L2s by putting your support behind [EIP-4844](h
 
 ## 5. Etherscan for Boba Development Start
 
-Etherscan is now working on Bobascan for both Mainnet and Rinkeby. This means that soon, Boba will have a powerful, fully featured block explorer that virtually everyone is familiar with.  
+Etherscan is now working on Bobascan for both Mainnet and Rinkeby. This means that soon, Boba will have a powerful, fully featured block explorer that virtually everyone is familiar with.
 
 ## 6. Gateway updates per MitchellUnknown
 

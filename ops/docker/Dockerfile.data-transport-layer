@@ -22,6 +22,9 @@ COPY --from=builder /optimism/packages/contracts/deployments ./packages/contract
 COPY --from=builder /optimism/packages/contracts/dist ./packages/contracts/dist
 COPY --from=builder /optimism/packages/contracts/artifacts ./packages/contracts/artifacts
 
+COPY --from=builder /optimism/packages/sdk/package.json ./packages/sdk/package.json
+COPY --from=builder /optimism/packages/sdk/dist ./packages/sdk/dist
+
 # copy the service
 WORKDIR /opt/optimism/packages/data-transport-layer
 

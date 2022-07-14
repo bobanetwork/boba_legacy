@@ -200,7 +200,6 @@ class DatabaseService extends OptimismEnv {
       timestamp='${tx.timestamp}'
     `)
     con.end()
-    this.logger.info('L2 Transaction', tx)
   }
 
   async insertReceiptData(receiptData) {

@@ -33,7 +33,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
     }
   ): Promise<TokenBridgeMessage[]> {
     const events = await this.l1Bridge.queryFilter(
-      this.l1Bridge.filters.ETHDepositInitiated(address),
+      this.l1Bridge.filters.NativeTokenDepositInitiated(address),
       opts?.fromBlock,
       opts?.toBlock
     )
@@ -45,7 +45,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
           from: event.args._from,
           to: event.args._to,
           l1Token: ethers.constants.AddressZero,
-          l2Token: predeploys.OVM_ETH,
+          l2Token: predeploys.L2_L1NativeToken,
           amount: event.args._amount,
           data: event.args._data,
           logIndex: event.logIndex,
@@ -77,7 +77,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
         // Only find ETH withdrawals.
         return (
           hexStringEquals(event.args._l1Token, ethers.constants.AddressZero) &&
-          hexStringEquals(event.args._l2Token, predeploys.OVM_ETH)
+          hexStringEquals(event.args._l2Token, predeploys.L2_L1NativeToken)
         )
       })
       .map((event) => {
@@ -107,7 +107,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
     // Only support ETH deposits and withdrawals.
     return (
       hexStringEquals(toAddress(l1Token), ethers.constants.AddressZero) &&
-      hexStringEquals(toAddress(l2Token), predeploys.OVM_ETH)
+      hexStringEquals(toAddress(l2Token), predeploys.L2_L1NativeToken)
     )
   }
 
@@ -138,7 +138,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
       }
 
       if (opts?.recipient === undefined) {
-        return this.l1Bridge.populateTransaction.depositETH(
+        return this.l1Bridge.populateTransaction.depositNativeToken(
           opts?.l2GasLimit || 200_000, // Default to 200k gas limit.
           '0x', // No data.
           {
@@ -147,7 +147,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
           }
         )
       } else {
-        return this.l1Bridge.populateTransaction.depositETHTo(
+        return this.l1Bridge.populateTransaction.depositNativeTokenTo(
           toAddress(opts.recipient),
           opts?.l2GasLimit || 200_000, // Default to 200k gas limit.
           '0x', // No data.

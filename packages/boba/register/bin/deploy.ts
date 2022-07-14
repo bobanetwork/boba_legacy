@@ -10,7 +10,7 @@ import { sleep, hexStringEquals } from '@eth-optimism/core-utils'
 require('dotenv').config()
 
 import hre from 'hardhat'
-import toRegister from '../addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json'
+import toRegister from '../addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B.json'
 
 const waitUntilTrue = async (
   check: () => Promise<boolean>,

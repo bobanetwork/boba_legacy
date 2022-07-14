@@ -1,6 +1,7 @@
 /* Imports: External */
 import { Contract, Wallet, utils } from 'ethers'
 import { ethers } from 'hardhat'
+import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
 /* Imports: Internal */
 import { expect } from './shared/setup'
@@ -15,7 +16,7 @@ import {
   fundRandomWallet,
 } from './shared/stress-test-helpers'
 /* Imports: Artifacts */
-import { envConfig, fundUser } from './shared/utils'
+import { envConfig, approveERC20 } from './shared/utils'
 
 // Need a big timeout to allow for all transactions to be processed.
 // For some reason I can't figure out how to set the timeout on a per-suite basis
@@ -26,6 +27,9 @@ describe('stress tests', () => {
   const numTransactions = 3
 
   let env: OptimismEnv
+
+  let L1StandardBridge: Contract
+  let L1BOBAToken: Contract
 
   const wallets: Wallet[] = []
 
@@ -38,6 +42,15 @@ describe('stress tests', () => {
 
     env = await OptimismEnv.new()
 
+    L1StandardBridge = getContractFactory(
+      'L1StandardBridge',
+      env.l1Wallet
+    ).attach(env.addressesBASE.Proxy__L1StandardBridge)
+
+    L1BOBAToken = getContractFactory('BOBA', env.l1Wallet).attach(
+      env.addressesBOBA.TOKENS.BOBA.L1
+    )
+
     for (let i = 0; i < numTransactions; i++) {
       wallets.push(Wallet.createRandom())
     }
@@ -47,7 +60,21 @@ describe('stress tests', () => {
     }
 
     for (const wallet of wallets) {
-      await fundUser(env.messenger, utils.parseEther('0.1'), wallet.address)
+      await approveERC20(
+        L1BOBAToken,
+        L1StandardBridge.address,
+        utils.parseEther('0.1')
+      )
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20To(
+          L1BOBAToken.address,
+          predeploys.L2_BOBA,
+          wallet.address,
+          utils.parseEther('0.1'),
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        )
+      )
     }
   })
 

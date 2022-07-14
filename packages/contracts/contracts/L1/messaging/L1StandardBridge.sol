@@ -15,7 +15,7 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 
 /**
  * @title L1StandardBridge
- * @dev The L1 ETH and ERC20 Bridge is a contract which stores deposited L1 funds and standard
+ * @dev The L1 native token and ERC20 Bridge is a contract which stores deposited L1 funds and standard
  * tokens that are in use on L2. It synchronizes a corresponding L2 Bridge, informing it of deposits
  * and listening to it for newly finalized withdrawals.
  *
@@ -73,34 +73,34 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
 
     /**
      * @dev This function can be called with no data
-     * to deposit an amount of ETH to the caller's balance on L2.
+     * to deposit an amount of native token to the caller's balance on L2.
      * Since the receive function doesn't take data, a conservative
      * default amount is forwarded to L2.
      */
     receive() external payable onlyEOA {
-        _initiateETHDeposit(msg.sender, msg.sender, 1_300_000, bytes(""));
+        _initiateNativeTokenDeposit(msg.sender, msg.sender, 1_300_000, bytes(""));
     }
 
     /**
      * @inheritdoc IL1StandardBridge
      */
-    function depositETH(uint32 _l2Gas, bytes calldata _data) external payable onlyEOA {
-        _initiateETHDeposit(msg.sender, msg.sender, _l2Gas, _data);
+    function depositNativeToken(uint32 _l2Gas, bytes calldata _data) external payable onlyEOA {
+        _initiateNativeTokenDeposit(msg.sender, msg.sender, _l2Gas, _data);
     }
 
     /**
      * @inheritdoc IL1StandardBridge
      */
-    function depositETHTo(
+    function depositNativeTokenTo(
         address _to,
         uint32 _l2Gas,
         bytes calldata _data
     ) external payable {
-        _initiateETHDeposit(msg.sender, _to, _l2Gas, _data);
+        _initiateNativeTokenDeposit(msg.sender, _to, _l2Gas, _data);
     }
 
     /**
-     * @dev Performs the logic for deposits by storing the ETH and informing the L2 ETH Gateway of
+     * @dev Performs the logic for deposits by storing the nativa token and informing the L2 Gateway of
      * the deposit.
      * @param _from Account to pull the deposit from on L1.
      * @param _to Account to give the deposit to on L2.
@@ -109,7 +109,7 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
      *        solely as a convenience for external contracts. Aside from enforcing a maximum
      *        length, these contracts provide no guarantees about its content.
      */
-    function _initiateETHDeposit(
+    function _initiateNativeTokenDeposit(
         address _from,
         address _to,
         uint32 _l2Gas,
@@ -119,7 +119,7 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
         bytes memory message = abi.encodeWithSelector(
             IL2ERC20Bridge.finalizeDeposit.selector,
             address(0),
-            Lib_PredeployAddresses.OVM_ETH,
+            Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS,
             _from,
             _to,
             msg.value,
@@ -130,9 +130,15 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
         sendCrossDomainMessage(l2TokenBridge, _l2Gas, message);
 
         // compute and update deposit hash
-        _updateDepositHash(address(0), Lib_PredeployAddresses.OVM_ETH, _from, _to, msg.value);
+        _updateDepositHash(
+            address(0),
+            Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS,
+            _from,
+            _to,
+            msg.value
+        );
 
-        emit ETHDepositInitiated(_from, _to, msg.value, _data);
+        emit NativeTokenDepositInitiated(_from, _to, msg.value, _data);
     }
 
     /**
@@ -236,16 +242,16 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
     /**
      * @inheritdoc IL1StandardBridge
      */
-    function finalizeETHWithdrawal(
+    function finalizeNativeTokenWithdrawal(
         address _from,
         address _to,
         uint256 _amount,
         bytes calldata _data
     ) external onlyFromCrossDomainAccount(l2TokenBridge) {
         (bool success, ) = _to.call{ value: _amount }(new bytes(0));
-        require(success, "TransferHelper::safeTransferETH: ETH transfer failed");
+        require(success, "TransferHelper::safeTransferNativeToken: NativeToken transfer failed");
 
-        emit ETHWithdrawalFinalized(_from, _to, _amount, _data);
+        emit NativeTokenWithdrawalFinalized(_from, _to, _amount, _data);
     }
 
     /**
@@ -267,15 +273,15 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
         emit ERC20WithdrawalFinalized(_l1Token, _l2Token, _from, _to, _amount, _data);
     }
 
-    /*****************************
-     * Temporary - Migrating ETH *
-     *****************************/
+    /**************************************
+     * Temporary - Migrating Native Token *
+     **************************************/
 
     /**
-     * @dev Adds ETH balance to the account. This is meant to allow for ETH
+     * @dev Adds native token balance to the account. This is meant to allow for native token
      * to be migrated from an old gateway to a new gateway.
-     * NOTE: This is left for one upgrade only so we are able to receive the migrated ETH from the
-     * old contract
+     * NOTE: This is left for one upgrade only so we are able to receive the migrated
+     * native token from the old contract
      */
-    function donateETH() external payable {}
+    function donateNativeToken() external payable {}
 }

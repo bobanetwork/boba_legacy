@@ -49,16 +49,16 @@ contract DiscretionaryExitBurn {
             i++;
         }
 
-        require(msg.value != 0 || _l2Token != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
+        require(msg.value != 0 || _l2Token != Lib_PredeployAddresses.L2_BOBA, "Amount Incorrect");
 
         if (msg.value != 0) {
             // override the _amount and token address
             _amount = msg.value;
-            _l2Token = Lib_PredeployAddresses.OVM_ETH;
+            _l2Token = Lib_PredeployAddresses.L2_BOBA;
         }
 
         // transfer funds if users deposit ERC20
-        if (_l2Token != Lib_PredeployAddresses.OVM_ETH) {
+        if (_l2Token != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_l2Token).safeTransferFrom(msg.sender, address(this), _amount);
         }
 

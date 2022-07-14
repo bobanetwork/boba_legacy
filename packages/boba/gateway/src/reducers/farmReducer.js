@@ -27,7 +27,7 @@ const initialState = {
       [allAddresses.L1_ETH_Address]: {},
     },
     L2LP: {
-      [allAddresses.L2_ETH_Address]: {},
+      [allAddresses.L2_BOBA_Address]: {},
     }
   },
   userInfo: {
@@ -35,7 +35,7 @@ const initialState = {
       [allAddresses.L1_ETH_Address]: {},
     },
     L2LP: {
-      [allAddresses.L2_ETH_Address]: {},
+      [allAddresses.L2_BOBA_Address]: {},
     }
   },
   stakeToken: {
@@ -76,14 +76,14 @@ function farmReducer (state = initialState, action) {
     // case 'GET_L2FEE':
     //   return state;
     // case 'GET_L1FEE_SUCCESS':
-    //   return { 
-    //     ...state, 
+    //   return {
+    //     ...state,
     //     userL1RewardFeeRate: action.payload.userRewardFeeRate,
     //     totalL1FeeRate: action.payload.totalFeeRate,
     //   }
     // case 'GET_L2FEE_SUCCESS':
-    //   return { 
-    //     ...state, 
+    //   return {
+    //     ...state,
     //     userL2RewardFeeRate: action.payload.userRewardFeeRate,
     //     totalL2FeeRate: action.payload.totalFeeRate,
     //   }

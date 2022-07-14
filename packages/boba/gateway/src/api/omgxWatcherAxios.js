@@ -9,17 +9,10 @@ export default function omgxWatcherAxiosInstance(networkGateway){
   if(networkGateway === 'local') {
     return null //does not make sense on local
   }
-  else if (networkGateway === 'rinkeby') {
-    if(nw.rinkeby.OMGX_WATCHER_URL === null) return
+  else {
+    if(nw[networkGateway].OMGX_WATCHER_URL === null) return
     axiosInstance = axios.create({
-      baseURL: nw.rinkeby.OMGX_WATCHER_URL,
-    })
-  }
-  else if (networkGateway === 'mainnet') {
-
-    if(nw.mainnet.OMGX_WATCHER_URL === null) return
-    axiosInstance = axios.create({
-      baseURL: nw.mainnet.OMGX_WATCHER_URL,
+      baseURL: nw[networkGateway].OMGX_WATCHER_URL,
     })
   }
 
