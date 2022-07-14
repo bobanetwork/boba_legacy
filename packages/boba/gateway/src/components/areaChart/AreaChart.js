@@ -5,12 +5,6 @@ import { AreaChart as ReAreaChart, Area, Tooltip, XAxis, YAxis, ResponsiveContai
 
 import * as S from './AreaChart.styles'
 
-/*
-TODO:
-  - make the chart label to be correct on X-Axis and Y-Axis
-  - prepare the tooltip.
-*/
-
 function CustomToolTip({
   active,
   payload,
