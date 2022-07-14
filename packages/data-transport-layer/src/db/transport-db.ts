@@ -25,6 +25,7 @@ const TRANSPORT_DB_KEYS = {
   STARTING_L1_BLOCK: `l1:starting`,
   HIGHEST_L2_BLOCK: `l2:highest`,
   HIGHEST_SYNCED_BLOCK: `synced:highest`,
+  TARGET_L2_BLOCK: `l2:target`,
 }
 
 interface Indexed {
@@ -213,6 +214,22 @@ export class TransportDB {
     return this.db.put<number>([
       {
         key: TRANSPORT_DB_KEYS.UNCONFIRMED_HIGHEST,
+        index: 0,
+        value: block,
+      },
+    ])
+  }
+
+  public async getTargetL2Block(): Promise<number> {
+    return (
+      (await this.db.get<number>(TRANSPORT_DB_KEYS.TARGET_L2_BLOCK, 0)) || 0
+    )
+  }
+
+  public async setTargetL2Block(block: number): Promise<void> {
+    return this.db.put<number>([
+      {
+        key: TRANSPORT_DB_KEYS.TARGET_L2_BLOCK,
         index: 0,
         value: block,
       },
