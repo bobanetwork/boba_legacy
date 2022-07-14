@@ -15,7 +15,6 @@ const data = [
   { name: '0', uv: 0 },
   { name: '3M', uv: 25 },
   { name: '6M', uv: 50 },
-  { name: '9M', uv: 75 },
   { name: '12M', uv: 100 }
 ]
 

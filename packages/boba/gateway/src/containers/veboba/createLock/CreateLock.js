@@ -26,22 +26,8 @@ import * as Styles from './CreateLock.module.scss'
 import "react-datepicker/dist/react-datepicker.css"
 import { useRef } from 'react'
 import { selectLoading } from 'selectors/loadingSelector'
+import { EXPIRY_OPTIONS } from 'util/constant'
 
-
-const EXPIRY_OPTIONS = [
-  {
-    value: moment().add(3, 'M').format("YYYY-MM-DD"),
-    label: '3 Months',
-  },
-  {
-    value: moment().add(6, 'M').format("YYYY-MM-DD"),
-    label: '6 Months',
-  },
-  {
-    value: moment().add(1, 'y').format("YYYY-MM-DD"),
-    label: '1 Year',
-  },
-]
 
 function CreateLock({
   onCreateSuccess
