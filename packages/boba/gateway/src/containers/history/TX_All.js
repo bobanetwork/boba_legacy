@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ function TX_All({ searchHistory, transactions }) {
               <S.Disclaimer>Loading...</S.Disclaimer>
             )}
             {paginatedTransactions.map((i, index) => {
-                
+
               let metaData = ''
 
               if(i.crossDomainMessage && i.crossDomainMessage.fast === 1) {
@@ -82,7 +82,7 @@ function TX_All({ searchHistory, transactions }) {
               } else if (i.crossDomainMessage && i.crossDomainMessage.fast === 0) {
                 metaData = 'Classic Bridge'
               }
-              
+
               let annotation = ''
 
               if(metaData === '' && typeof(i.activity) === 'undefined') {
@@ -100,7 +100,7 @@ function TX_All({ searchHistory, transactions }) {
 
               const time = moment.unix(i.timeStamp).format('lll')
               const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
-              
+
               let details = null
               let amountTx = null
 

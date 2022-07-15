@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ const initialState = {
 
 function nftReducer (state = initialState, action) {
   switch (action.type) {
-    
+
     case 'NFT/ADD/SUCCESS':
 
       localStorage.setItem("nftList", JSON.stringify({
@@ -43,34 +43,34 @@ function nftReducer (state = initialState, action) {
         })
       )
 
-      return { 
+      return {
         ...state,
         list: {
           ...state.list,
           [action.payload.UUID]: action.payload
-        } 
+        }
       }
 
     case 'MONSTER/INFO/SUCCESS':
-      return { 
+      return {
         ...state,
         monsterInfo: action.payload
       }
 
     case 'MONSTER/NUMBER/SUCCESS':
-      return { 
+      return {
         ...state,
         monsterNumber: action.payload
       }
-      
+
     case 'NFT/REMOVE/SUCCESS':
 
       let listN = state.list
       delete listN[action.payload]
-      
+
       localStorage.setItem("nftList", JSON.stringify(listN))
 
-      return { 
+      return {
         ...state,
         list: listN
       }

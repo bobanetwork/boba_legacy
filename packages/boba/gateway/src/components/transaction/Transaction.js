@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -77,9 +77,9 @@ function Transaction({
 
            <Typography variant="body3" style={{lineHeight: '0.7em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
             {prefix} Hash:&nbsp;
-            <a 
-              href={chainLink({ chain: prefix, hash:detail.hash})} 
-              target={'_blank'} 
+            <a
+              href={chainLink({ chain: prefix, hash:detail.hash})}
+              target={'_blank'}
               rel="noopener noreferrer"
               style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
             >
@@ -110,27 +110,27 @@ function Transaction({
   return (
     <S.Wrapper dropDownBox={dropDownBox}>
 
-      <S.GridContainer 
-        container 
-        spacing={2} 
-        direction="row" 
-        justifyContent="flex-start" 
+      <S.GridContainer
+        container
+        spacing={2}
+        direction="row"
+        justifyContent="flex-start"
         alignItems="flex-start"
         minHeight={20}
       >
 
-      <S.GridItemTag 
-        item 
-        xs={6} 
-        md={6} 
+      <S.GridItemTag
+        item
+        xs={6}
+        md={6}
         >
           <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start', paddingLeft: '3px' }}>
             <Typography variant="overline" style={{lineHeight: '1.1em'}}>{chain}</Typography>
             <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{time}</Typography>
-            {completion === '' && 
+            {completion === '' &&
               <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>&nbsp;</Typography>
             }
-            {completion !== '' && 
+            {completion !== '' &&
               <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{completion}</Typography>
             }
             <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
@@ -147,9 +147,9 @@ function Transaction({
           </div>
       </S.GridItemTag>
 
-      <S.GridItemTag 
-        item 
-        xs={3} 
+      <S.GridItemTag
+        item
+        xs={3}
         md={3}
       >
         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start'}}>
@@ -159,20 +159,20 @@ function Transaction({
           <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
             {typeTX}
           </Typography>
-          {amountTx ? 
-            <Typography 
+          {amountTx ?
+            <Typography
               variant="overline"
               style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}
-             > 
+             >
                {amountTx}
              </Typography> : null
            }
         </div>
       </S.GridItemTag>
 
-      <S.GridItemTag 
-        item 
-        xs={3} 
+      <S.GridItemTag
+        item
+        xs={3}
         md={3}
       >
         {!!detail &&
@@ -188,7 +188,7 @@ function Transaction({
     </S.GridContainer>
 
     {dropDownBox ? renderDetailRedesign() : null }
-    
+
     </S.Wrapper>
   )
 }

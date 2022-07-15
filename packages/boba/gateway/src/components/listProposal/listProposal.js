@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,11 +74,11 @@ function ListProposal({
             let descList = description.split('@@')
             if (descList[ 1 ] !== '') {
                 //should validate http link
-                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link 
-                    color="inherit" 
-                    variant="body2" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link
+                    color="inherit"
+                    variant="body2"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     href={descList[ 1 ]}
                   >MORE DETAILS</Link></>
             } else {
@@ -91,8 +91,8 @@ function ListProposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
-    let hasVoted = false     
-    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true 
+    let hasVoted = false
+    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true
 
     return (
         <S.Wrapper>
@@ -164,7 +164,7 @@ function ListProposal({
                         </Typography>
                     </Box>
                 </S.GridItemTag>
-                
+
                 {proposal.totalVotes > 0 &&
                     <S.GridItemTagR
                     item
@@ -182,8 +182,8 @@ function ListProposal({
                     <Box sx={{ width: '100%', my: 2 }}>
                         <LinearProgress
                             classes={{ colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary }}
-                            variant="determinate" 
-                            value={votePercent} 
+                            variant="determinate"
+                            value={votePercent}
                         />
                     </Box>
                     <Box sx={{

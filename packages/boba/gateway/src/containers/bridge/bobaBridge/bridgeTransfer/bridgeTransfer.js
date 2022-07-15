@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -101,10 +101,10 @@ function BridgeTransfer() {
       }
 
       {tokens.length > 0 && !multibridgeMode && <>
-        {layer === 'L1' && 
+        {layer === 'L1' &&
           <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
         }
-        {layer === 'L2' && 
+        {layer === 'L2' &&
           <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
         }
         </>

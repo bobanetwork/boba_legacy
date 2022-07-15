@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -69,26 +69,26 @@ function TransferModal ({ open, token, minHeight }) {
   useEffect(() => {
 
     async function estimateCost() {
-      
+
       let cost_BN = await networkService.transferEstimate(recipient, token.balance.toString(), token.address)
-      
+
       //sigh - convert from BN.js to ethers.BigNumber
-      let max_BN = BigNumber.from(token.balance.toString()) 
+      let max_BN = BigNumber.from(token.balance.toString())
 
       // both ETH and BOBA have 18 decimals so this is safe
       if(token.symbol === 'ETH') {
         // we are transferring ETH and paying in either token
-        // since MetaMask does not know about BOBA, we need to subtract the ETH fee 
-        // regardless of how we are paying, otherwise will get an error in MetaMask 
+        // since MetaMask does not know about BOBA, we need to subtract the ETH fee
+        // regardless of how we are paying, otherwise will get an error in MetaMask
         max_BN = max_BN.sub(cost_BN)
-      } 
+      }
       else if (token.symbol === 'BOBA' && feeUseBoba) {
         // we are transferring BOBA and paying in BOBA
         // so need to subtract the BOBA fee
         max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(feePriceRatio)))
       }
-      
-      // if the transferrable amount is less than the gas, 
+
+      // if the transferrable amount is less than the gas,
       // set the transferrable amount to zero
       if(max_BN.lt(BigNumber.from('0'))) {
         max_BN = BigNumber.from('0')
@@ -98,7 +98,7 @@ function TransferModal ({ open, token, minHeight }) {
       setMax_Float(utils.formatUnits(max_BN, token.decimals))
 
       // display the correct Fee amount to the user
-      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio)) 
+      if(feeUseBoba) cost_BN = cost_BN.mul(BigNumber.from(feePriceRatio))
       setFee(utils.formatUnits(cost_BN, token.decimals))
     }
     if (recipient !== '') estimateCost()
@@ -111,10 +111,10 @@ function TransferModal ({ open, token, minHeight }) {
 
     if (tooSmall || tooBig) {
       setValidValue(false)
-    } 
+    }
     else if (!recipient) {
       setValidValue(false)
-    } 
+    }
     else {
       setValidValue(true)
     }
@@ -156,7 +156,7 @@ function TransferModal ({ open, token, minHeight }) {
   return (
     <Modal open={open} onClose={handleClose} maxWidth="md" minHeight="500px">
       <Box>
-      
+
         <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
           Transfer to another Boba wallet
         </Typography>
@@ -215,7 +215,7 @@ function TransferModal ({ open, token, minHeight }) {
 
         <Typography variant="body2" sx={{mt: 2, fontWeight: '700', color: 'red'}}>
           CAUTION: This function is only for transfers from one Boba wallet to another Boba wallet.
-          You cannot directly transfer funds from a Boba wallet to an L1 address or to another chain. 
+          You cannot directly transfer funds from a Boba wallet to an L1 address or to another chain.
           Your funds will be lost if you try to do so.
         </Typography>
 

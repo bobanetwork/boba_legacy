@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ function Button ({
   }
 
   const styleCombo = {
-    ...style, 
-    minWidth: loading ? '200px' : '103px', 
+    ...style,
+    minWidth: loading ? '200px' : '103px',
     borderRadius: '12px'
   }
 
