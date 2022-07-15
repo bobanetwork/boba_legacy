@@ -725,7 +725,7 @@ class DatabaseService extends OptimismEnv {
       `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawCostFee'`
     )
     con.end()
-    return payload.length === 0 ? { value: '0' } : JSON.parse(payload)
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
   }
 
   async updateBobaStrawBalance(payload) {
@@ -758,7 +758,7 @@ class DatabaseService extends OptimismEnv {
       `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawBalance'`
     )
     con.end()
-    return payload.length === 0 ? { value: '0' } : JSON.parse(payload)
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
   }
 }
 
