@@ -137,6 +137,12 @@ class DatabaseService extends OptimismEnv {
         status VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
+    await query(`CREATE TABLE IF NOT EXISTS dataStorage
+    (
+      ${'`'}name${'`'} VARCHAR(255) NOT NULL,
+      ${'`'}value${'`'} TEXT NOT NULL,
+      PRIMARY KEY ( ${'`'}name${'`'} )
+    )`)
     con.end()
     this.logger.info('Initialized the database.')
   }
@@ -687,6 +693,72 @@ class DatabaseService extends OptimismEnv {
       })
     }
     con.end()
+  }
+
+  async updateBobaStrawCostFee(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawCostFee', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawCostFee() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawCostFee'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload)
+  }
+
+  async updateBobaStrawBalance(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawBalance', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawBalance() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawBalance'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload)
   }
 }
 

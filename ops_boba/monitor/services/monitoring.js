@@ -12,6 +12,7 @@ const configs = require('./utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
 const fs = require('fs')
 const path = require('path')
+const DatabaseService = require('./database.service')
 
 const supportedTokens = [
   'USDT',
@@ -386,43 +387,17 @@ const logData = (provider, blockNumber, networkName) => {
 }
 
 const loadBobaStraw = async () => {
-  const dumpsPath = path.resolve(__dirname, '../data/BobaStrawHistory.json')
-  BobaStrawCostFee = ethers.BigNumber.from('0')
-  BobaStrawBalance = ethers.BigNumber.from('0')
-  if (fs.existsSync(dumpsPath)) {
-    const historyJsonRaw = await fs.promises.readFile(dumpsPath)
-    const historyJSON = JSON.parse(historyJsonRaw.toString())
-    if (historyJSON.BobaStrawCostFee) {
-      BobaStrawCostFee = ethers.BigNumber.from(historyJSON.BobaStrawCostFee)
-      BobaStrawBalance = ethers.BigNumber.from(historyJSON.BobaStrawBalance)
-    } else {
-      logger.warn('Invalid BobaStrawHistory history!')
-    }
-  } else {
-    logger.warn('No BobaStrawHistory Found!')
-  }
+  const db = new DatabaseService()
+  const BobaStrawBalance = ethers.BigNumber.from((await db.getBobaStrawBalance()).value)
+  const BobaStrawCostFee = ethers.BigNumber.from((await db.getBobaStrawCostFee()).value)
+
   return [BobaStrawCostFee, BobaStrawBalance]
 }
 
 const writeBobaStraw = async (BobaStrawCostFee, BobaStrawBalance) => {
-  const dumpsPath = path.resolve(__dirname, '../data')
-  if (!fs.existsSync(dumpsPath)) {
-    fs.mkdirSync(dumpsPath)
-  }
-  try {
-    const addrsPath = path.resolve(dumpsPath, 'BobaStrawHistory.json')
-    await fs.promises.writeFile(
-      addrsPath,
-      JSON.stringify({
-        BobaStrawCostFee: BobaStrawCostFee.toString(),
-        BobaStrawBalance: BobaStrawBalance.toString(),
-      })
-    )
-    logger.info('Wrote BobaStrawHistory history')
-  } catch (error) {
-    logger.error(error)
-    logger.error('Failed to write BobaStrawHistory history!')
-  }
+  const db = new DatabaseService()
+  await db.updateBobaStrawBalance(JSON.stringify({"value": BobaStrawBalance.toString()}))
+  await db.updateBobaStrawCostFee(JSON.stringify({"value": BobaStrawCostFee.toString()}))
 }
 
 module.exports.validateMonitoring = () => {
