@@ -62,14 +62,14 @@ Note - It's highly recommended to obtain the feed addresses from the FeedRegsitr
 
 ### Rinkeby
 
-[ETH-USD](https://blockexplorer.rinkeby.boba.network/address/0xcEb40458ad6Dabe9cfC90A2ad062a071809c4E84/transactions) \
-[BOBA-USD](https://blockexplorer.rinkeby.boba.network/address/0xd05AA5531b8e8DaB3BEe675f133dF3e330d9adA8/transactions) \
+[ETH-USD](https://testnet.bobascan.com/address/0xcEb40458ad6Dabe9cfC90A2ad062a071809c4E84#transactions) \
+[BOBA-USD](https://testnet.bobascan.com/address/0xd05AA5531b8e8DaB3BEe675f133dF3e330d9adA8#transactions) \
 [OMG-USD]() \
 [WBTC-USD]()
 
 ### Mainnet
 
-[ETH-USD](https://blockexplorer.boba.network/address/0x50E383121021F4E8060C794d79Ada77195532c7a/transactions) \
-[BOBA-USD](https://blockexplorer.boba.network/address/0x987AEd89f5BDC3eb863282DBB76065bFe398be17/transactions) \
+[ETH-USD](https://bobascan.com/address/0x50E383121021F4E8060C794d79Ada77195532c7a#transactions) \
+[BOBA-USD](https://bobascan.com/address/0x987AEd89f5BDC3eb863282DBB76065bFe398be17#transactions) \
 [OMG-USD]() \
 [WBTC-USD]()
