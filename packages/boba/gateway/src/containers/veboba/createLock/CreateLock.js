@@ -43,7 +43,7 @@ function CreateLock({
   const layer2 = useSelector(selectlayer2Balance)
   const loading = useSelector(selectLoading([ 'LOCK/CREATE' ]))
 
-  const [ value, setValue ] = useState(0);
+  const [ value, setValue ] = useState('');
 
   const [ expiry, setExpiry ] = useState(EXPIRY_OPTIONS[ 0 ].value);
   const [ maxBalance, setMaxBalance ] = useState(0);
@@ -96,8 +96,8 @@ function CreateLock({
       value_Wei_String: toWei_String(value, 18),
       lock_duration: diffD
     }))
-    setValue(0)
-    setValue(EXPIRY_OPTIONS[ 0 ].value)
+    setValue('')
+    setExpiry(EXPIRY_OPTIONS[ 0 ].value)
     dispatch(fetchLockRecords());
     if (res) {
       dispatch(openAlert('Lock has been created!'));
@@ -116,7 +116,7 @@ function CreateLock({
         <Typography variant="body2"> {maxBalance} </Typography>
       </S.InlineContainer>
       <Input
-        placeholder="Enter amount to lock"
+        placeholder="0"
         value={value}
         type="number"
         maxValue={maxBalance}
@@ -138,6 +138,7 @@ function CreateLock({
           dateFormat="yyyy-MM-dd"
           selected={new Date(expiry)}
           minDate={new Date(moment().add(1, 'd'))}
+          maxDate={new Date(moment().add(1, 'year'))}
           onChange={(date) => {setExpiry(moment(date).format('yyyy-MM-DD'))}}
           calendarClassName={theme.palette.mode}
         />

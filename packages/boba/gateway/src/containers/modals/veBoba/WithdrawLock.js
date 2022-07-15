@@ -31,7 +31,7 @@ function WithdrawLock({
       dispatch(openAlert('Lock Withdraw successful.'))
     }
 
-    handleClose();
+    handleClose(true);
   }
 
   return <Box p={2} display="flex" gap={4} flexDirection="column">

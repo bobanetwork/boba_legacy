@@ -25,8 +25,6 @@ import { toWei_String } from 'util/amountConvert';
 import * as Styles from './ManageLockModal.module.scss';
 import * as S from './ManageLockModal.styles';
 import * as G from 'containers/Global.styles';
-import { info } from 'sass';
-
 
 function IncreaseLock({
   handleClose,
@@ -52,7 +50,7 @@ function IncreaseLock({
 
   const datePickerRef = useRef()
 
-  const [ amountTo, setAmountTo ] = useState(0);
+  const [ amountTo, setAmountTo ] = useState('');
   const [ votingPower, setVotingPower ] = useState(0);
   const [ expirtyTo, setExpiryTo ] = useState(moment(expiry).format("YYYY-MM-DD"));
 
@@ -98,7 +96,7 @@ function IncreaseLock({
       dispatch(openAlert('Lock time extended.'))
     }
 
-    handleClose();
+    handleClose(true);
   }
 
   const onIncreaseAmount = async () => {
@@ -114,7 +112,7 @@ function IncreaseLock({
       dispatch(openAlert('Lock amount increased.'))
     }
 
-    handleClose();
+    handleClose(true);
   }
 
   const openDatePicker = () => {
@@ -132,6 +130,7 @@ function IncreaseLock({
       <Input
         value={amountTo}
         type="number"
+        placeholder="0"
         maxValue={maxBalance}
         onChange={i => { setAmountTo(i.target.value) }}
         onUseMax={i => { setAmountTo(maxBalance) }}

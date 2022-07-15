@@ -8,6 +8,7 @@ import { closeModal } from 'actions/uiAction'
 import WithdrawLock from './WithdrawLock'
 import moment from 'moment'
 import IncreaseLock from './IncreaseLock'
+import { fetchLockRecords } from 'actions/veBobaAction'
 
 
 function ManageLockModal({
@@ -28,13 +29,16 @@ function ManageLockModal({
     }
   }, [ lock ]);
 
-  const handleClose = () => {
+  const handleClose = (doReload = false) => {
     dispatch(closeModal('manageLock'))
+    if (doReload) {
+      dispatch(fetchLockRecords())
+    }
   }
 
   return <Modal
     open={open}
-    onClose={handleClose}
+    onClose={()=> handleClose()}
     maxWidth="xs"
     title={'Manage Existing Lock'}
     newStyle={true}
