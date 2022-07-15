@@ -8,7 +8,6 @@ import { registerBobaAddress } from './000-Messenger.deploy'
 import GovernorBravoDelegateJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json'
 import GovernorBravoDelegatorJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 import TimelockJson from '../artifacts/contracts/DAO/governance/Timelock.sol/Timelock.json'
-import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
 // let Factory__Comp: ContractFactory
 // let Comp: Contract
@@ -21,8 +20,6 @@ let GovernorBravoDelegator: Contract
 
 let Factory__Timelock: ContractFactory
 let Timelock: Contract
-
-let Proxy__L2LiquidityPool: Contract
 
 const getTimestamp = async (hre) => {
   const blockNumber = await (
@@ -175,24 +172,14 @@ const deployFn: DeployFunction = async (hre) => {
   // set admin Timelock
   console.log('Queue setPendingAdmin...')
 
-  // set eta to be the current timestamp for local and rinkeby
-  const eta1 = (await getTimestamp(hre)) + eta_delay_s
-
-  const setPendingAdminData = utils.defaultAbiCoder.encode(
-    // the parameters for the setPendingAdmin function
-    ['address'],
-    [GovernorBravoDelegator.address]
-  )
-
-  const setPendingAdminTx = await Timelock.queueTransaction(
-    Timelock.address,
-    0, //is the amount of ETH you want to send with an execution to the Timelock
-    'setPendingAdmin(address)', // the function to be called
-    setPendingAdminData,
-    eta1 // end of timelock in unix time
-  )
-
-  await setPendingAdminTx.wait()
+  let eta1
+  let setPendingAdminData
+  try {
+    ;[eta1, setPendingAdminData] = await setPendingAdmin(hre, eta_delay_s)
+  } catch (error) {
+    console.log(`setPendingAdmin failed because of : ${error}`)
+    ;[eta1, setPendingAdminData] = await setPendingAdmin(hre, eta_delay_s)
+  }
 
   console.log('Queued setPendingAdmin!')
   console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
@@ -275,6 +262,28 @@ const deployFn: DeployFunction = async (hre) => {
     console.log('data :', initiateData)
     console.log('eta :', eta2)
   }
+}
+
+const setPendingAdmin = async (hre, eta_delay_s) => {
+  // set eta to be the current timestamp for local and rinkeby
+  const eta1 = (await getTimestamp(hre)) + eta_delay_s
+
+  const setPendingAdminData = utils.defaultAbiCoder.encode(
+    // the parameters for the setPendingAdmin function
+    ['address'],
+    [GovernorBravoDelegator.address]
+  )
+
+  const setPendingAdminTx = await Timelock.queueTransaction(
+    Timelock.address,
+    0, //is the amount of ETH you want to send with an execution to the Timelock
+    'setPendingAdmin(address)', // the function to be called
+    setPendingAdminData,
+    eta1 // end of timelock in unix time
+  )
+
+  await setPendingAdminTx.wait()
+  return [eta1, setPendingAdminData]
 }
 
 deployFn.tags = ['DAO', 'BOBA']

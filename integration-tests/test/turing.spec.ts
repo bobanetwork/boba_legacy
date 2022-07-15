@@ -1,11 +1,4 @@
-import {
-  BigNumber,
-  Contract,
-  ContractFactory,
-  providers,
-  Wallet,
-  utils,
-} from 'ethers'
+import { Contract, ContractFactory, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
@@ -22,7 +15,6 @@ import { verifyStateRoots } from './shared/state-root-verification'
 
 describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
-  let BobaTuringHelper: Contract
   let BobaTuringCredit: Contract
   let L1StandardBridge: Contract
 
@@ -31,9 +23,6 @@ describe('Turing 256 Bit Random Number Test', async () => {
 
   let TuringHelper: Contract
   let Factory__TuringHelper: ContractFactory
-
-  let TuringTest: Contract
-  let Factory__TuringTest: ContractFactory
 
   let Factory__Random: ContractFactory
   let random: Contract
@@ -99,7 +88,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     console.log('Verified state roots.')
   })
 
-  it('{tag:boba} Should transfer BOBA to L2', async () => {
+  it('Should transfer BOBA to L2', async () => {
     const depositBOBAAmount = utils.parseEther('10')
 
     const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
@@ -133,7 +122,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
   })
 
-  it('{tag:boba} contract should be whitelisted', async () => {
+  it('contract should be whitelisted', async () => {
     const tr2 = await TuringHelper.checkPermittedCaller(random.address)
     const res2 = await tr2.wait()
     const rawData = res2.events[0].data
@@ -145,7 +134,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     )
   })
 
-  it('{tag:boba} Should register and fund your Turing helper contract in turingCredit', async () => {
+  it('Should register and fund your Turing helper contract in turingCredit', async () => {
     env = await OptimismEnv.new()
 
     const depositAmount = utils.parseEther('0.1')
@@ -177,7 +166,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it('{tag:boba} should get a 256 bit random number', async () => {
+  it('should get a 256 bit random number', async () => {
     const tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
