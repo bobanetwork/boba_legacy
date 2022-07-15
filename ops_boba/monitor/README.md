@@ -37,7 +37,7 @@ docker-compose up
 ```
 
 
-## Transaction Monitor
+## Monitor
 
 It scans the L2 and write the new block data, transaction data and receipt data into MySQL and checks whether the message from L2 to L1 has been finalized.
 
@@ -61,7 +61,7 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `L2_NODE_WEB3_WS`                       | Yes       | N/A                                             | Websocket endpoint for a Layer 2 (Optimism) node.            |
 | `MONITORING_RECONNECT_SECS`             | No        | 15                                              | Time (in second) to wait for reconnecting after network is disconnected. |
 | `MYSQL_DBNAME_TX`                       | Yes       | N/A                                             | MySQL database name for TX Log.                              |
-| `MYSQL_DBNAME_RECEIPT`                  | Yes       | N/A                                             | MySQL database name for Receipt Log.     
+| `MYSQL_DBNAME_RECEIPT`                  | Yes       | N/A                                             | MySQL database name for Receipt Log.                         |
 | `ENABLE_TX_RESPONSE_TIME`               | Yes       | N/A                                             | set to `true` if you want to log tx and receipt              |
 | `PERIODIC_TRANSACTION_PRIVATE_KEY`      | Yes       | N/A                                             | private key of address that you want to send transaction periodically |
 | `PERIODIC_INTERVAL_IN_MINUTE`           | No        | 15                                              | periodic interval time in minute                             |
@@ -69,3 +69,5 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `BOBA_CONTRACT_L2_ADDRESS`              | Yes       | N/A                                             | Boba token contract address in L2                            |
 | `PERIODIC_L2_WEB3_URL`                  | Yes       | N/A                                             | L2 Web3 Url for send transaction                             |
 | `ORACLE_ADDRESSES`                      | Yes       | N/A                                             | Oracle contract address keys, eg: BobaStraw_ETHUSD,BobaStraw_BOBAUSD |
+| `ENABLE_LOOP_TRANSFER`                  | No        | false                                           | Whether enable the feature of sending the test transaction   |
+| `NUMBER_OF_BLOCKS_TO_FETCH`             | No        | 10000000                                        | block range for querying data                                |

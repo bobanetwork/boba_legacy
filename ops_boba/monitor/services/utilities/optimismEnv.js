@@ -79,7 +79,7 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
-const NUMBER_OF_BLOCK_TO_FETCH = env.NUMBER_OF_BLOCK_TO_FETCH || 10000000
+const NUMBER_OF_BLOCKS_TO_FETCH = env.NUMBER_OF_BLOCKS_TO_FETCH || 10000000
 
 class OptimismEnv {
   constructor() {
@@ -111,7 +111,7 @@ class OptimismEnv {
     this.OVM_L2CrossDomainMessenger = L2_MESSENGER_ADDRESS
     this.OVM_L2StandardBridge = OVM_L2_STANDARD_BRIDGE_ADDRESS
 
-    this.numberBlockToFetch = NUMBER_OF_BLOCK_TO_FETCH
+    this.numberBlockToFetch = NUMBER_OF_BLOCKS_TO_FETCH
     this.transactionMonitorInterval = TRANSACTION_MONITOR_INTERVAL
     this.crossDomainMessageMonitorInterval =
       CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL
