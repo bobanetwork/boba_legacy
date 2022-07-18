@@ -26,7 +26,7 @@ function RecordItem({
     expiryText= 'Expires this month'
   }
   if (sameWeek) {
-    expiryText= 'Expires in week'
+    expiryText= 'Expires in a week'
   }
 
   return <Grid container px={2} py={1} >
