@@ -36,9 +36,9 @@ Sentry.init({
   },
   beforeSend: (event) => {
     // Avoid sending the sentry events on local env.
-    // if (window.location.hostname === 'localhost') {
-    //   return null;
-    // }
+    if (window.location.hostname === 'localhost') {
+      return null;
+    }
     return event
   }
 
