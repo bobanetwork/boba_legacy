@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import ReactZendesk, { ZendeskAPI } from "react-zendesk";
+import React from 'react';
+import ReactZendesk from "react-zendesk";
 
 const setting = {
   color: {
