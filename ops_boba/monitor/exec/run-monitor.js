@@ -87,14 +87,19 @@ const main = async () => {
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
   // enable the tx response time report
-  if (process.env.ENABLE_TX_RESPONSE_TIME === 'true') {
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_TX_RESPONSE_TIME?.toLowerCase() ===
+    'true'
+  ) {
     if (configs.enableTxResponseTime) {
       loop(() => loopLogTx()).catch()
     }
   }
 
   // enable the LP balance check
-  if (process.env.ENABLE_BALANCE_MONITOR === 'true') {
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_BALANCE_MONITOR?.toLowerCase() === 'true'
+  ) {
     const L1_MONITOR_INTERVAL = process.env.L1_MONITOR_INTERVAL || 5 * 60
     const L2_MONITOR_INTERVAL = process.env.L2_MONITOR_INTERVAL || 5 * 60
 
@@ -123,7 +128,9 @@ const main = async () => {
   }
 
   // Enable the periodic transaction
-  if (process.env.ENABLE_LOOP_TRANSFER === 'true') {
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_LOOP_TRANSFER?.toLowerCase() === 'true'
+  ) {
     loop(() => loopTransferTx()).catch()
   }
 }
