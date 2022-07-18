@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../interfaces/ILayerZeroReceiver.sol";
 import "../interfaces/ILayerZeroUserApplicationConfig.sol";
 import "../interfaces/ILayerZeroEndpoint.sol";
+import "./LzLib.sol";
 
 /*
  * a generic LzReceiver implementation
@@ -14,12 +15,17 @@ abstract contract LzApp is OwnableUpgradeable, ILayerZeroReceiver, ILayerZeroUse
     ILayerZeroEndpoint public lzEndpoint;
 
     mapping(uint16 => bytes) public trustedRemoteLookup;
+    mapping(uint16 => mapping(uint => uint)) public minDstGasLookup;
 
     event SetTrustedRemote(uint16 _srcChainId, bytes _srcAddress);
 
     function __LzApp_init(address _endpoint) internal initializer {
         OwnableUpgradeable.__Ownable_init();
 
+        __LzApp_init_unchained(_endpoint);
+    }
+
+    function __LzApp_init_unchained(address _endpoint) internal initializer {
         lzEndpoint = ILayerZeroEndpoint(_endpoint);
     }
 
@@ -41,6 +47,13 @@ abstract contract LzApp is OwnableUpgradeable, ILayerZeroReceiver, ILayerZeroUse
         bytes memory trustedRemote = trustedRemoteLookup[_dstChainId];
         require(trustedRemote.length != 0, "LzApp: destination chain is not a trusted source");
         lzEndpoint.send{value: msg.value}(_dstChainId, trustedRemote, _payload, _refundAddress, _zroPaymentAddress, _adapterParams);
+    }
+
+    function _checkGasLimit(uint16 _dstChainId, uint _type, bytes memory _adapterParams, uint _extraGas) internal view {
+        uint providedGasLimit = LzLib.getGasLimit(_adapterParams);
+        uint minGasLimit = minDstGasLookup[_dstChainId][_type] + _extraGas;
+        require(minGasLimit > 0, "LzApp: minGasLimit not set");
+        require(providedGasLimit >= minGasLimit, "LzApp: gas limit is too low");
     }
 
     //---------------------------UserApplication config----------------------------------------
@@ -71,10 +84,21 @@ abstract contract LzApp is OwnableUpgradeable, ILayerZeroReceiver, ILayerZeroUse
         emit SetTrustedRemote(_srcChainId, _srcAddress);
     }
 
-    //--------------------------- VIEW FUNCTION ----------------------------------------
+    function setMinDstGasLookup(uint16 _dstChainId, uint _type, uint _dstGasAmount) external onlyOwner {
+        require(_dstGasAmount > 0, "LzApp: invalid _dstGasAmount");
+        minDstGasLookup[_dstChainId][_type] = _dstGasAmount;
+    }
 
+    //--------------------------- VIEW FUNCTION ----------------------------------------
     function isTrustedRemote(uint16 _srcChainId, bytes calldata _srcAddress) external view returns (bool) {
         bytes memory trustedSource = trustedRemoteLookup[_srcChainId];
         return keccak256(trustedSource) == keccak256(_srcAddress);
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[50] private __gap;
 }
