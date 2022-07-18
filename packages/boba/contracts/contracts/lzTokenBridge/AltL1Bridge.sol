@@ -24,6 +24,11 @@ import "./lzApp/NonblockingLzApp.sol";
     // dstChainId is primarily ethereum
     uint16 public dstChainId;
 
+    // set allowance for custom gas limit
+    bool public useCustomAdapterParams;
+    uint public constant NO_EXTRA_GAS = 0;
+    uint public constant FUNCTION_TYPE_SEND = 1;
+
     // Note: Specify the _lzEndpoint on this layer, _dstChainId is not the actual evm chainIds, but the layerZero
     // proprietary ones, pass the chainId of the destination for _dstChainId
     function initialize(address _lzEndpoint, uint16 _dstChainId, address _ethBridgeAddress) public initializer {
@@ -43,18 +48,22 @@ import "./lzApp/NonblockingLzApp.sol";
     function withdraw(
         address _l2Token,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external virtual payable {
-        _initiateWithdrawal(_l2Token, msg.sender, msg.sender, _amount, _data);
+        _initiateWithdrawal(_l2Token, msg.sender, msg.sender, _amount, _zroPaymentAddress, _adapterParams, _data);
     }
 
     function withdrawTo(
         address _l2Token,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external virtual payable {
-        _initiateWithdrawal(_l2Token, msg.sender, _to, _amount, _data);
+        _initiateWithdrawal(_l2Token, msg.sender, _to, _amount, _zroPaymentAddress, _adapterParams, _data);
     }
 
     function _initiateWithdrawal(
@@ -62,6 +71,8 @@ import "./lzApp/NonblockingLzApp.sol";
         address _from,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) internal {
         // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
@@ -79,9 +90,14 @@ import "./lzApp/NonblockingLzApp.sol";
             _amount,
             _data
         );
+        if (useCustomAdapterParams) {
+            _checkGasLimit(dstChainId, FUNCTION_TYPE_SEND, _adapterParams, NO_EXTRA_GAS);
+        } else {
+            require(_adapterParams.length == 0, "LzApp: _adapterParams must be empty.");
+        }
 
         // Send payload to Ethereum
-        _lzSend(dstChainId, payload, payable(msg.sender), address(0x0), bytes(""));
+        _lzSend(dstChainId, payload, payable(msg.sender), _zroPaymentAddress, _adapterParams);
 
         emit WithdrawalInitiated(l1Token, _l2Token, msg.sender, _to, _amount, _data);
     }
@@ -138,8 +154,18 @@ import "./lzApp/NonblockingLzApp.sol";
 
             // this is going to fail on the original relay, to get refund back in this case, user would
             // have to call retryMessage, also paying for the xMessage fee
+            // custom adapters would not be applicable for this
             _lzSend(dstChainId, payload, payable(msg.sender), address(0x0), bytes(""));
         }
     }
 
+    /**************
+     *    Admin    *
+     **************/
+
+    function setUseCustomAdapterParams(bool _useCustomAdapterParams, uint _dstGasAmount) external onlyOwner() {
+        useCustomAdapterParams = _useCustomAdapterParams;
+        // set dstGas lookup, since only one dstchainId is allowed and its known
+        setMinDstGasLookup(dstChainId, FUNCTION_TYPE_SEND, _dstGasAmount);
+    }
  }

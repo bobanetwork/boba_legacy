@@ -22,6 +22,11 @@ import "./lzApp/NonblockingLzApp.sol";
     // set altl1 bridge address as setTrustedDomain()
     uint16 public dstChainId;
 
+    // set allowance for custom gas limit
+    bool public useCustomAdapterParams;
+    uint public constant NO_EXTRA_GAS = 0;
+    uint public constant FUNCTION_TYPE_SEND = 1;
+
     // Maps L1 token to wrapped token on alt l1 to balance of the L1 token deposited
     mapping(address => mapping(address => uint256)) public deposits;
 
@@ -54,9 +59,11 @@ import "./lzApp/NonblockingLzApp.sol";
         address _l1Token,
         address _l2Token,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external virtual payable onlyEOA {
-        _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, msg.sender, _amount, _data);
+        _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, msg.sender, _amount, _zroPaymentAddress, _adapterParams, _data);
     }
 
     function depositERC20To(
@@ -64,9 +71,11 @@ import "./lzApp/NonblockingLzApp.sol";
         address _l2Token,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external virtual payable {
-        _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, _to, _amount, _data);
+        _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, _to, _amount, _zroPaymentAddress, _adapterParams, _data);
     }
 
     // add nonreentrant
@@ -76,6 +85,8 @@ import "./lzApp/NonblockingLzApp.sol";
         address _from,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) internal {
         // When a deposit is initiated on Ethereum, the Eth Bridge transfers the funds to itself for future
@@ -93,11 +104,16 @@ import "./lzApp/NonblockingLzApp.sol";
             _amount,
             _data
         );
+        if (useCustomAdapterParams) {
+            _checkGasLimit(dstChainId, FUNCTION_TYPE_SEND, _adapterParams, NO_EXTRA_GAS);
+        } else {
+            require(_adapterParams.length == 0, "LzApp: _adapterParams must be empty.");
+        }
 
         deposits[_l1Token][_l2Token] = deposits[_l1Token][_l2Token] + _amount;
 
         // Send payload to the other L1
-        _lzSend(dstChainId, payload, payable(msg.sender), address(0x0), bytes(""));
+        _lzSend(dstChainId, payload, payable(msg.sender), _zroPaymentAddress, _adapterParams);
 
         emit ERC20DepositInitiated(_l1Token, _l2Token, _from, _to, _amount, _data);
     }
@@ -128,5 +144,15 @@ import "./lzApp/NonblockingLzApp.sol";
         IERC20(_l1Token).safeTransfer(_to, _amount);
 
         emit ERC20WithdrawalFinalized(_l1Token, _l2Token, _from, _to, _amount, _data);
+    }
+
+    /**************
+     *    Admin    *
+     **************/
+
+    function setUseCustomAdapterParams(bool _useCustomAdapterParams, uint _dstGasAmount) external onlyOwner() {
+        useCustomAdapterParams = _useCustomAdapterParams;
+        // set dstGas lookup, since only one dstchainId is allowed and its known
+        setMinDstGasLookup(dstChainId, FUNCTION_TYPE_SEND, _dstGasAmount);
     }
  }

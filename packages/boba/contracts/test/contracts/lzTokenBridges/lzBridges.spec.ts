@@ -123,7 +123,9 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       AltL1Boba.address,
       depositAmount,
-      '0x',
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x', // data
       { value: estimatedFee._nativeFee }
     )
     expect(
@@ -162,6 +164,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       AltL1Boba.address,
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -200,6 +204,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       AltL1Boba.address,
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -218,9 +224,16 @@ describe('LayerZero Bridges', () => {
         '0x'
       )
     const withdrawAmount = depositAmount
-    await AltL1Bridge.withdraw(AltL1Boba.address, withdrawAmount, '0x', {
-      value: estimatedFeeWithdraw._nativeFee,
-    })
+    await AltL1Bridge.withdraw(
+      AltL1Boba.address,
+      withdrawAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x',
+      {
+        value: estimatedFeeWithdraw._nativeFee,
+      }
+    )
 
     const postAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
     const postL1Balance = await L1Boba.balanceOf(this.owner.address)
@@ -259,6 +272,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       AltL1Boba.address,
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -279,6 +294,8 @@ describe('LayerZero Bridges', () => {
       AltL1Bridge.connect(signer1).withdraw(
         AltL1Boba.address,
         withdrawAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
         '0x',
         {
           value: estimatedFeeWithdraw._nativeFee,
@@ -317,6 +334,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       L1Boba.address, // invalid AltL1 token address
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -418,6 +437,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       PreDetAltL1Boba2, // contract which does not exist yet
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -506,6 +527,8 @@ describe('LayerZero Bridges', () => {
       L1Boba.address,
       L1Boba.address, // invalid AltL1 token address
       depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
       '0x',
       { value: estimatedFee._nativeFee }
     )
@@ -538,5 +561,110 @@ describe('LayerZero Bridges', () => {
         { value: estimatedFeeRetry._nativeFee }
       )
     ).to.be.revertedWith('NonblockingLzApp: invalid payload')
+  })
+
+  it('only the owner should be able to allow custom adapter params', async function () {
+    const [, signer1] = await ethers.getSigners()
+    await expect(
+      EthBridge.connect(signer1).setUseCustomAdapterParams(true, 220000)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
+    await EthBridge.connect(this.owner).setUseCustomAdapterParams(true, 220000)
+
+    const ethBridgeMinGasLimit = await EthBridge.minDstGasLookup(
+      await EthBridge.dstChainId(),
+      await EthBridge.FUNCTION_TYPE_SEND()
+    )
+    expect(ethBridgeMinGasLimit).to.be.deep.eq(ethers.BigNumber.from(220000))
+    expect(await EthBridge.useCustomAdapterParams()).to.be.deep.eq(true)
+
+    await expect(
+      AltL1Bridge.connect(signer1).setUseCustomAdapterParams(true, 180000)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
+    await AltL1Bridge.connect(this.owner).setUseCustomAdapterParams(
+      true,
+      180000
+    )
+
+    const altL1BridgeMinGasLimit = await AltL1Bridge.minDstGasLookup(
+      await AltL1Bridge.dstChainId(),
+      await AltL1Bridge.FUNCTION_TYPE_SEND()
+    )
+    expect(altL1BridgeMinGasLimit).to.be.deep.eq(ethers.BigNumber.from(180000))
+    expect(await AltL1Bridge.useCustomAdapterParams()).to.be.deep.eq(true)
+
+    // should also be able to reset
+    await EthBridge.connect(this.owner).setUseCustomAdapterParams(false, 200000)
+    await AltL1Bridge.connect(this.owner).setUseCustomAdapterParams(
+      false,
+      200000
+    )
+    expect(await EthBridge.useCustomAdapterParams()).to.be.deep.eq(false)
+    expect(await AltL1Bridge.useCustomAdapterParams()).to.be.deep.eq(false)
+  })
+
+  it('should be able to send messages with custom adapter parameter', async function () {
+    await EthBridge.connect(this.owner).setUseCustomAdapterParams(true, 180000)
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('100')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    const priorL1Balance = await L1Boba.balanceOf(this.owner.address)
+    const priorAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+
+    const adapterParam = ethers.utils.solidityPack(
+      ['uint16', 'uint256'],
+      [1, 180000]
+    )
+
+    const incorrectAdapterParam = ethers.utils.solidityPack(
+      ['uint16', 'uint256'],
+      [1, 179000]
+    )
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      adapterParam
+    )
+    await expect(
+      EthBridge.depositERC20(
+        L1Boba.address,
+        AltL1Boba.address,
+        depositAmount,
+        ethers.constants.AddressZero,
+        incorrectAdapterParam, // adapterParams
+        '0x',
+        { value: estimatedFee._nativeFee }
+      )
+    ).to.be.revertedWith('LzApp: gas limit is too low')
+
+    await EthBridge.depositERC20(
+      L1Boba.address,
+      AltL1Boba.address,
+      depositAmount,
+      ethers.constants.AddressZero,
+      adapterParam, // adapterParams
+      '0x',
+      { value: estimatedFee._nativeFee }
+    )
+    const postL1Balance = await L1Boba.balanceOf(this.owner.address)
+    const postAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+
+    expect(postL1Balance).to.deep.eq(priorL1Balance.sub(depositAmount))
+    expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.add(depositAmount))
   })
 })

@@ -84,7 +84,7 @@ abstract contract LzApp is OwnableUpgradeable, ILayerZeroReceiver, ILayerZeroUse
         emit SetTrustedRemote(_srcChainId, _srcAddress);
     }
 
-    function setMinDstGasLookup(uint16 _dstChainId, uint _type, uint _dstGasAmount) external onlyOwner {
+    function setMinDstGasLookup(uint16 _dstChainId, uint _type, uint _dstGasAmount) public onlyOwner {
         require(_dstGasAmount > 0, "LzApp: invalid _dstGasAmount");
         minDstGasLookup[_dstChainId][_type] = _dstGasAmount;
     }

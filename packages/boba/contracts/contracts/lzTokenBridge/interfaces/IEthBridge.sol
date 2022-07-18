@@ -24,6 +24,8 @@ interface IEthBridge {
         address _l1Token,
         address _l2Token,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external payable;
 
@@ -32,6 +34,8 @@ interface IEthBridge {
         address _l2Token,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external payable;
 }

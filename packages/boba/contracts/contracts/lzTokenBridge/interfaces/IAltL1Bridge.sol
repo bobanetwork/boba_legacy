@@ -23,6 +23,8 @@ interface IAltL1Bridge {
     function withdraw(
         address _l2Token,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external payable;
 
@@ -30,6 +32,8 @@ interface IAltL1Bridge {
         address _l2Token,
         address _to,
         uint256 _amount,
+        address _zroPaymentAddress,
+        bytes memory _adapterParams,
         bytes calldata _data
     ) external payable;
 }
