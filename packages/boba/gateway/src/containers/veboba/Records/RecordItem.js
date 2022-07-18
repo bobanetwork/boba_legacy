@@ -23,7 +23,7 @@ function RecordItem({
 
   let expiryText = '';
   if (sameMonth) {
-    expiryText= 'Expires in month'
+    expiryText= 'Expires this month'
   }
   if (sameWeek) {
     expiryText= 'Expires in week'

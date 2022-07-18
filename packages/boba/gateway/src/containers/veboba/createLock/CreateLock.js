@@ -137,7 +137,7 @@ function CreateLock({
           popperClassName={Styles.popperStyle}
           dateFormat="yyyy-MM-dd"
           selected={new Date(expiry)}
-          minDate={new Date(moment().add(1, 'd'))}
+          minDate={new Date(moment().add(8, 'days'))}
           maxDate={new Date(moment().add(1, 'year'))}
           onChange={(date) => {setExpiry(moment(date).format('yyyy-MM-DD'))}}
           calendarClassName={theme.palette.mode}

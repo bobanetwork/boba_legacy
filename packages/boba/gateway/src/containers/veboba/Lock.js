@@ -37,7 +37,7 @@ function Lock() {
           <Typography variant="h2">Lock for Vote</Typography>
           <Typography variant="body2" sx={{ opacity: 0.6 }}>More tokens locked for longer = greater voting power = higher rewards</Typography>
           <G.DividerLine sx={{ my: 2 }} />
-          <Typography variant="h3">Locking Period vs Convert Ration</Typography>
+          <Typography variant="h3">Locking Period vs Convert Ratio</Typography>
           <Typography variant="body2">100 Boba locked for 6M = 50 veBoba</Typography>
           <Box py={2}>
             <AreaChart data={data} />

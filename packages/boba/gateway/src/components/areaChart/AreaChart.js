@@ -17,7 +17,7 @@ function CustomToolTip({
 
   return <S.ToolTipContainer borderRadius={2} p={2}>
     <Typography variant='body2'>Locking period: {label} </Typography>
-    <Typography variant='body2'>Convert ration: {payload[ 0 ].value}</Typography>
+    <Typography variant='body2'>Convert ratio: {payload[ 0 ].value}</Typography>
   </S.ToolTipContainer>
 }
 

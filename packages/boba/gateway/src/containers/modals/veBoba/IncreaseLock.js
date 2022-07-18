@@ -200,7 +200,7 @@ function IncreaseLock({
           Your voting power will be
         </Typography>
         <Typography variant='body2'>
-          {balance} {'->'} {votingPower}
+          {balance} {'->'} {votingPower}'
         </Typography>
       </Box>
       <Box display="flex" flexDirection="column" alignItems="flex-end">
