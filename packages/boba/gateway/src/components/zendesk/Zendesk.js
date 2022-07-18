@@ -18,31 +18,20 @@ const setting = {
     mobile: {
       labelVisible: false
     }
-  },
-  contactOptions: {
-    enabled: true,
-    contactFormLabel: { '*': 'Leave us a message' }
-  },
-  contactForm: {
-    fields: [
-      { id: "description", prefill: { "*": "My pre-filled description" } }
-    ]
   }
 };
 
 const Zendesk = () => {
-  useEffect(() => {
-    console.log('ZENDESK :LOADING ZENDESK WIDGET');
-    ZendeskAPI('webWidget', 'setLocale', 'en')
-  }, []);
 
-  console.log('ZENDESK key', process.env.REACT_APP_ZENDESK_KEY)
+  if (!process.env.REACT_APP_ZENDESK_KEY) {
+    // incase of no zendesk key return
+    return null;
+  }
 
   return <ReactZendesk
     {...setting}
     defer={true}
     onLoaded={() => {
-      console.log('ZENDESK: loaded!')
       window.zE("webWidget", "open");
       window.zE("webWidget:on", "close", function () {
         window.zE("webWidget", "open");
