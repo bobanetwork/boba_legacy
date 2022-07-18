@@ -67,7 +67,7 @@ function IncreaseLock({
     const currD = moment();
     let secondsYear = 365 * 24 * 3600;
     let secondsTillExpiry = endD.diff(currD, 'days') * 24 * 3600
-    let vpower = (secondsTillExpiry / secondsYear) * (lockedAmount + amountTo);
+    let vpower = (secondsTillExpiry / secondsYear) * (Number(lockedAmount) + Number(amountTo));
     setVotingPower(vpower.toFixed(2))
   }, [ amountTo, lockedAmount, expirtyTo ])
 
