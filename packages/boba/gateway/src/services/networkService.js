@@ -76,6 +76,13 @@ import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
 import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
 
+//veBoba ABIs
+import veJson from "../deployment/contracts/ve.json"
+// import gaugeFactoryJson from "../deployment/contracts/BaseV1GaugeFactory.json"
+// import gaugeJson from "../deployment/contracts/Gauge.json"
+// import voterJson from "../deployment/contracts/BaseV1Voter.json"
+// import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
+
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
@@ -4619,6 +4626,238 @@ class NetworkService {
 
   getTokenSpecificBridges(tokenSymbol) {
     return bobaBridges.filter((bridge) => bridge.tokens.includes(tokenSymbol))
+  }
+
+  /***********************************************/
+  /*****              VeBoba                 *****/
+  /***********************************************/
+
+
+  /**
+   * CreateLock
+   *  - to create veboba lock
+   */
+  async createLock({
+    value_Wei_String,
+    lock_duration
+  }) {
+    if (!this.account) {
+      console.log('NS: createLock() error - called but account === null');
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA,
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      let allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.Ve_BOBA
+        )
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
+      try {
+        if (approveAmount_BN.gt(allowance_BN)) {
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.Ve_BOBA,
+              approveAmount_BN
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: ve:lock approve error:", error)
+        return error
+      }
+
+      const TX = await ve.create_lock(value_Wei_String, lock_duration)
+      await TX.wait()
+      return TX
+
+    } catch (error) {
+      console.log("NS: Ve: createLock error:", error)
+      return error;
+    }
+  }
+
+  /**
+   * withdrawLock
+   *  - To withdraw existing expired lock
+   */
+  async withdrawLock({tokenId}) {
+    if(!this.account) {
+      console.log('NS: withdrawLock() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await ve.withdraw(tokenId)
+      await TX.wait()
+      return TX
+     } catch (error) {
+        console.log("NS: Ve: withdrawLock error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * increaseLockAmount
+   *  - To increse amount of existing lock
+   */
+  async increaseLockAmount({
+    tokenId, value_Wei_String
+  }) {
+    if(this.account === null) {
+      console.log('NS: increaseLockAmount() error - called but account === null')
+      return
+    }
+     try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      let allowance_BN = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .allowance(
+        this.account,
+        allAddresses.Ve_BOBA
+      )
+      console.log("Allowance:", allowance_BN.toString())
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+      console.log("Increase Amount:", depositAmount_BN)
+
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
+      try {
+        if (approveAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", approveAmount_BN)
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.Ve_BOBA,
+              approveAmount_BN
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: ve:increaseLockAmount approve error:", error)
+        return error
+      }
+
+      const TX = await ve.increase_amount(tokenId, value_Wei_String)
+      await TX.wait()
+      return TX
+     } catch (error) {
+        console.log("NS: Ve: increaseLockAmount error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * extendLockTime
+   *  - To extend lock time of existing lock
+   */
+  async extendLockTime({
+    tokenId, lock_duration
+  }) {
+
+    console.log('tokenId, lock_duration', {
+      tokenId, lock_duration
+    })
+    if(this.account === null) {
+      console.log('NS: increaseUnlockTime() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await ve.increase_unlock_time(tokenId, lock_duration)
+      await TX.wait()
+      return TX
+
+     } catch (error) {
+        console.log("NS: Ve: extendLockTime error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * fetchLockRecords
+   *  - To to fetch list of existing lock records.
+   */
+  async fetchLockRecords() {
+    if (this.account === null) {
+      console.log('NS: fetchLockRecords() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider
+      )
+
+      let tokenIdList = [];
+      let balanceInfo = [];
+
+      let nftCount = await ve.balanceOf(this.account)
+      for (let index = 0; index < Number(nftCount); index++) {
+        const tokenId = await ve.tokenOfOwnerByIndex(this.account, index)
+        tokenIdList.push(Number(tokenId))
+      }
+
+      for (let tokenId of tokenIdList) {
+        const balance = await ve.balanceOfNFT(tokenId);
+        const locked = await ve.locked(tokenId);
+
+        balanceInfo.push({
+          tokenId,
+          balance: Number(utils.formatUnits(balance, 18)).toFixed(2),
+          lockedAmount: Number(utils.formatUnits(locked.amount, 18)).toFixed(2),
+          expiry: new Date(locked.end.toString() * 1000),
+          expirySeconds: locked.end.toString() * 1000,
+        })
+      }
+
+      return {
+        records: balanceInfo,
+      }
+    } catch (error) {
+      console.log("NS: Ve: fetchLockRecords error:", error)
+      return error;
+    }
   }
 
 }

@@ -46,6 +46,7 @@ const initialState = {
   ledger: false,
   alert: null,
   error: null,
+  lock: null,
   activeHistoryTab: 'All',
   activeDataTab: 'Seven Day Queue',
 };
@@ -67,6 +68,7 @@ function uiReducer (state = initialState, action) {
         fast: action.fast,
         token: action.token,
         tokenIndex: action.tokenIndex,
+        lock: action.lock, // incase of lock record
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }
