@@ -565,9 +565,11 @@ describe('LayerZero Bridges', () => {
 
   it('only the owner should be able to allow custom adapter params', async function () {
     const [, signer1] = await ethers.getSigners()
+    // EthBridge
     await expect(
       EthBridge.connect(signer1).setUseCustomAdapterParams(true, 220000)
     ).to.be.revertedWith('Ownable: caller is not the owner')
+    // set useCustomParams on EthBridge
     await EthBridge.connect(this.owner).setUseCustomAdapterParams(true, 220000)
 
     const ethBridgeMinGasLimit = await EthBridge.minDstGasLookup(
@@ -577,9 +579,11 @@ describe('LayerZero Bridges', () => {
     expect(ethBridgeMinGasLimit).to.be.deep.eq(ethers.BigNumber.from(220000))
     expect(await EthBridge.useCustomAdapterParams()).to.be.deep.eq(true)
 
+    // AltL1Bridge
     await expect(
       AltL1Bridge.connect(signer1).setUseCustomAdapterParams(true, 180000)
     ).to.be.revertedWith('Ownable: caller is not the owner')
+    // set useCustomParams on AltL1Bridge
     await AltL1Bridge.connect(this.owner).setUseCustomAdapterParams(
       true,
       180000
@@ -593,7 +597,9 @@ describe('LayerZero Bridges', () => {
     expect(await AltL1Bridge.useCustomAdapterParams()).to.be.deep.eq(true)
 
     // should also be able to reset
+    // reset EthBridge
     await EthBridge.connect(this.owner).setUseCustomAdapterParams(false, 200000)
+    // reset AltL1Bridge
     await AltL1Bridge.connect(this.owner).setUseCustomAdapterParams(
       false,
       200000
