@@ -38,6 +38,7 @@ import airdropReducer from './airdropReducer'
 import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
+import veBobaReducer from './veBobaReducer';
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -63,6 +64,7 @@ const rootReducer = combineReducers({
   fixed: fixedReducer,
   verifier: verifierReducer,
   bridge: bridgeReducer,
+  veboba: veBobaReducer,
 })
 
 export default rootReducer

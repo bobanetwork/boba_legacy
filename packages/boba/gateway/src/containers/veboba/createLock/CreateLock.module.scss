@@ -1,0 +1,31 @@
+@import 'index.scss';
+
+.datePickerInput {
+  position: relative;
+
+  &::after {
+    content: '';
+    width: 0;
+    height: 0;
+    position: absolute;
+    right: 10px;
+    font-size: 25px;
+    bottom: 15px;
+  }
+
+  input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: 300;
+    font-size: 2rem;
+
+    &:focus-visible {
+      outline: none
+    }
+  }
+}
+
+.popperStyle {
+  z-index: 3;
+}
