@@ -114,6 +114,7 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { trackPageView } from 'util/googleAnalytics'
 import { fetchLockRecords } from 'actions/veBobaAction'
 
+import Zendesk from 'components/zendesk/Zendesk'
 
 require('dotenv').config()
 
@@ -287,7 +288,7 @@ function Home() {
       >
         {alertMessage}
       </Alert>
-
+      <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
