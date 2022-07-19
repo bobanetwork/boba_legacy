@@ -11,7 +11,7 @@ import util from 'util'
 /* Imports: Internal */
 import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
-import { rinkebySwapBOBAForETH, mainnetSwapBOBAForETH } from '@boba/api'
+import { mainnetSwapBOBAForETH } from '@boba/api'
 
 describe('Boba API Tests', async () => {
   let env: OptimismEnv
@@ -68,8 +68,8 @@ describe('Boba API Tests', async () => {
       process.env.L2_BOBA_ADDRESS = L2Boba.address
     })
 
-    describe('Mainnet', async () => {
-      it('{tag:boba} should swap BOBA for ETH', async () => {
+    describe('Mainnet and Rinkeby', async () => {
+      it('should swap BOBA for ETH', async () => {
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
         const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
@@ -125,7 +125,7 @@ describe('Boba API Tests', async () => {
         )
       })
 
-      it('{tag:boba} should return error messages using the wrong payload', async () => {
+      it('should return error messages using the wrong payload', async () => {
         // Get balance
         const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
@@ -237,7 +237,7 @@ describe('Boba API Tests', async () => {
         expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
       })
 
-      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
+      it('should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
         // withdraw ETH first
         await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawETH()
         const Boba_GasPriceOracleBalance = await env.l2Provider.getBalance(
