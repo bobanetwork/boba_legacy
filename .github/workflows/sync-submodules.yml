@@ -38,7 +38,7 @@ jobs:
         git config --global user.name 'Github bot'
         git config --global user.email '<>'
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
-        git push origin HEAD:wsdt/erigon || echo "Nothing to push"
+        git push origin HEAD:bot/erigon-merge || echo "Nothing to push"
       
     - uses: tgymnich/fork-sync@v1.4
       with:
