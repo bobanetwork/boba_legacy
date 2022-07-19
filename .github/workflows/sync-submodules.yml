@@ -30,23 +30,33 @@ jobs:
         git branch -M bot/erigon-merge
         cd bedrock/erigon
         git checkout devel
-        git config --global user.name 'Github bot'
-        git config --global user.email '<>'
         git pull origin devel
         git pull --tags
         cd ../..
         git add .
+        git config --global user.name 'Github bot'
+        git config --global user.email '<>'
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
         git push origin HEAD:wsdt/erigon || echo "Nothing to push"
-        
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
+      
+    - uses: tgymnich/fork-sync@v1.4
       with:
-        branch: develop
-        reviewers: wsdt,InoMurko,souradeep-das,Boyuan-Chen
-        title: Update Erigon submodule
-        author: Github Bot <noreply@github.com>
-        committer: Github Bot <noreply@github.com>
+          owner: bobanetwork
+          base: develop
+          head: bot/erigon-merge
+          merge_method: merge
+          pr_message: Sync Erigon submodule
+          pr_title: Update from origin
+          ignore_fail: true # to just have a PR
+      
+    #- name: Create Pull Request
+     # uses: peter-evans/create-pull-request@v4
+      #with:
+       # branch: develop
+        #reviewers: wsdt,InoMurko,souradeep-das,Boyuan-Chen
+        #title: Update Erigon submodule
+        #author: Github Bot <noreply@github.com>
+        #committer: Github Bot <noreply@github.com>
         
         #git pull --recurse-submodules
         #git submodule update --remote --recursive
