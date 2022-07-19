@@ -8,7 +8,7 @@ jobs:
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
-    parallelism: 4
+    parallelism: 5
     steps:
       - checkout
       - run:
@@ -27,9 +27,12 @@ jobs:
           command: bash scripts/wait-for-sequencer.sh
           working_directory: ops
       - run:
+          name: Split tests
+          command: circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
+          working_directory: ops
+      - run:
           name: Run integration tests
           command: |
-            circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
             docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
       - run:
