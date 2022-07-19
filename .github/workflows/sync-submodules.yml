@@ -27,19 +27,19 @@ jobs:
     - name: Git Submodule Update
       run: |
         # If we want to update all, just commented bc. we already have a sync for tests
-        cd bedrock/erigon
-        git remote remove origin
-        git remote add origin https://github.com/bobanetwork/erigon.git
-        git branch --set-upstream-to=origin/devel devel
-        git checkout devel
-        git config --global user.name 'Github bot'
-        git config --global user.email '<>'
-        git pull origin devel
-        git pull --tags
-        cd ../..
-        git add .
-        git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
-        git push || echo "Nothing to push"
+        #cd bedrock/erigon
+        #git remote remove origin
+        #git remote add origin https://github.com/bobanetwork/erigon.git
+        #git branch --set-upstream-to=origin/devel devel
+        #git checkout devel
+        #git config --global user.name 'Github bot'
+        #git config --global user.email '<>'
+        #git pull origin devel
+        #git pull --tags
+        #cd ../..
+        #git add .
+        #git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
+        #git push || echo "Nothing to push"
         
-      # git pull --recurse-submodules
-      # git submodule update --remote --recursive
+        git pull --recurse-submodules
+        git submodule update --remote --recursive
