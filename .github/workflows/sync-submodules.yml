@@ -30,7 +30,7 @@ jobs:
         cd bedrock/erigon
         git checkout devel
         git config --global user.name 'Github bot'
-        git config --global user.email 'bot@noreply.github.com'
+        git config --global user.email '<>'
         git pull origin devel
         git pull --tags
         cd ../..
