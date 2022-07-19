@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RETRIES=100
+RETRIES=60
 URL=http://127.0.0.1:8080/addresses.json
 until $(curl --silent --fail --output /dev/null "$URL");
 do
@@ -14,7 +14,7 @@ do
 done
 
 echo "BOBA base contracts are deployed"
-RETRIES=100
+RETRIES=60
 URL2=http://127.0.0.1:8080/boba-addr.json
 
 until $(curl --silent --fail --output /dev/null "$URL2");

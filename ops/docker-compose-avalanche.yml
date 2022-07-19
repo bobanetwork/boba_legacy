@@ -27,7 +27,7 @@ version: "3"
 # ETH Address 0x4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F
 # C-Chain PrivKey 0xb135c8deb7e4f283ad3b8a5e8b557d88f32ccdca730a7d1ee6a02263d565c39c
 
-# Integration PK
+# Integration PK 2
 # PUB KEY 7nfXp7SfoWuexpuawJtyMiSTetUpSDWpR8pVT8bCuqFiQzGeYF
 # Ava ADDRESS C-custom1mp5hjf2vlpvk50e7ma4f8lss08w39y9m6gw43e
 # Ava PRIV KEY PrivateKey-2p38JqqbFQ3yruv22mFQFToPfMeZVKPa3Vud2wvorCkHetNxr9
@@ -35,7 +35,7 @@ version: "3"
 # C-Chain PrivKey 0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437
 
 
-# Integration PK 2
+# Integration PK 3
 # PUB KEY 7wxExVLHmceCuno8pGuTy1zs5fqNFmwTdep3tXqrNB8SiYCCrn
 # ADDRESS C-custom1pckvggf8rl8pq6utu30psm7nd5m8c0uzd665ls
 # PRIV KEY PrivateKey-2UaBWxCEeVjzo2314c62CEcujuRocQxdQgcBoWbbQFsiD4DikJ
@@ -43,7 +43,7 @@ version: "3"
 # C-Chain PrivKey 0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c
 
 
-# Integration PK 3
+# Sequencer / Gas Price Oracle
 # PUB KEY 6D1Fs4Ty4PFLq5DnvymnMvtTnHxRWT3uPLqRZejd1WrkMavTc7
 # ADDRESS C-custom1eeftxyzhjlu6hx95ycvskcvwnj6vxx7rkaujas
 # PRIV KEY PrivateKey-Vmr4BTLYkPKcaw4nYW6SxEbr275chp3MBktoGkc5auUhjV7wM
@@ -51,7 +51,7 @@ version: "3"
 # C-Chain PrivKey 0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a
 
 
-# Integration PK 4
+# Proposer
 # PUB KEY 64h63VM7DaBc1t9QHg7kwqoLroSjrsZXyy7MwSxTo6eCseFQbn
 # ADDRESS C-custom1qq26q3pp2qrgyte0hquqdeh4pau82z0tk2l0pc
 # PRIV KEY PrivateKey-nnqZLTSthVBRQbc1kzLt7LMC68XiWcnVbDukKbJHrBSfBiFK6
@@ -71,18 +71,18 @@ x-fast-relayer_pk: &fast-relayer_pk
 
 # Account #0 - allows the fee test
 x-integration_pk: &integration_pk
-  PRIVATE_KEY: '0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437'
+  PRIVATE_KEY: '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027'
 
 # Account #10 - allows the fee test
 x-integration_2_pk: &integration_2_pk
-  PRIVATE_KEY_2: '0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c'
+  PRIVATE_KEY_2: '0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437'
 
 # Account #7 - allows the fee test
 x-integration_3_pk: &integration_3_pk
-  PRIVATE_KEY_3: '0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a'
+  PRIVATE_KEY_3: '0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c'
 
 x-integration_4_pk: &integration_4_pk
-  GAS_PRICE_ORACLE_PRIVATE_KEY: '0x67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e'
+  GAS_PRICE_ORACLE_PRIVATE_KEY: '0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a'
 
 services:
   builder:
@@ -131,7 +131,7 @@ services:
       L2_CHAIN_ID: 31338
       L2_BLOCK_GAS_LIMIT: 11000000
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      GAS_PRICE_ORACLE_OWNER: "0xbA77c1e7d75aE7e34e2378641FE45EEC7Ad87935"
+      GAS_PRICE_ORACLE_OWNER: "0x91eF3b19Cdb344C5010358718e9347dd5CB2f362"
       GAS_PRICE_ORACLE_OVERHEAD: "2750"
       GAS_PRICE_ORACLE_SCALAR: "1500000"
       GAS_PRICE_ORACLE_L1_BASE_FEE: "1"

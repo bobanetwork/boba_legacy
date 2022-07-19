@@ -38,7 +38,12 @@ export const isLiveNetwork = () => {
 export const HARDHAT_CHAIN_ID = 31337
 export const MOONBEAM_CHAIN_ID = 1281
 export const FANTOM_CHAIN_ID = 4003
-export const NON_ETHEREUM_CHAIN = [ MOONBEAM_CHAIN_ID, FANTOM_CHAIN_ID]
+export const AVALANCHE_CHAIN_ID = 43112
+export const NON_ETHEREUM_CHAIN = [
+  MOONBEAM_CHAIN_ID,
+  FANTOM_CHAIN_ID,
+  AVALANCHE_CHAIN_ID,
+]
 export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
