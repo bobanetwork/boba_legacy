@@ -29,6 +29,7 @@ jobs:
       run: |
         # If we want to update all, just commented bc. we already have a sync for tests
         git branch -M bot/erigon-merge
+        git pull || echo "Nothing to pull"
         cd bedrock/erigon
         git checkout devel
         git pull origin devel
@@ -38,15 +39,19 @@ jobs:
         git config --global user.name 'Github bot'
         git config --global user.email '<>'
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
-        git pull origin HEAD:bot/erigon-merge || echo "Nothing to pull"
         git push origin HEAD:bot/erigon-merge || echo "Nothing to push"
    
     - name: pull-request
       uses: repo-sync/pull-request@v2
       with:
+        source_branch: bot/erigon-merge
         destination_branch: "develop"
         github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-   
+        pr_title: "Pulling ${{ github.ref }} into develop"
+        pr_body: ":crown: *An automated PR*"
+        pr_label: "auto-pr"
+        pr_allow_empty: true
+        pr_reviewer: wsdt,InoMurko,souradeep-das,Boyuan-Chen
    
   #  - uses: tgymnich/fork-sync@v1.4
   #    with:
