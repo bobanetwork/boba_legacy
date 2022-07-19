@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,19 +38,19 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
   const loading = useSelector(selectLoading(['EXIT/GETALL']))
   const tokenList = useSelector(selectTokens)
   const allAddresses = networkService.getAllAddresses()
-  
+
   const _exits = transactions.filter(i => {
     return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
   })
 
   const renderExits = _exits.map((i, index) => {
-    
+
     const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
-    
+
     let metaData = ''
 
     //i.crossDomainMessage.fast can be either 1 or null,
-    //where null denotes the classic 7 day exit 
+    //where null denotes the classic 7 day exit
 
     if(i.crossDomainMessage.fast === 1) {
       metaData = 'Fast Bridge'
@@ -66,7 +66,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     const to = i.to.toLowerCase()
 
     let amountTx = null;
-    
+
     if (i.action && i.action.token) {
       const token = Object.values(tokenList).find(t => t.addressL2.toLowerCase() === i.action.token.toLowerCase());
       if (!!token) {

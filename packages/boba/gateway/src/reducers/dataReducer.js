@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,16 +24,16 @@ function dataReducer (state = initialState, action) {
   switch (action.type) {
     case 'SEVENS/GETALL/SUCCESS':
       return {
-        ...state, 
+        ...state,
         sevens: {
-          ...keyBy(action.payload, 'blockNumber', 'hash') 
+          ...keyBy(action.payload, 'blockNumber', 'hash')
         }
       }
   case 'FASTEXITS/GETALL/SUCCESS':
-    return { 
-      ...state, 
-      fastExits: { 
-        ...keyBy(action.payload, 'blockNumber', 'hash') 
+    return {
+      ...state,
+      fastExits: {
+        ...keyBy(action.payload, 'blockNumber', 'hash')
       }
     }
   default:

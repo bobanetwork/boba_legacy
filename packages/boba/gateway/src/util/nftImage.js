@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ const isIpfsUrl = (url) =>{
 }
 
 const getIpfsUrl = (url) => {
-    let payload = url.split('://')[1]; 
+    let payload = url.split('://')[1];
     return `https://ipfs.io/ipfs/${payload}`
 }
 
@@ -31,16 +31,16 @@ export const getNftImageUrl = async (url) => {
         if(url.substring(0,29) === 'data:application/json;base64,') { // we have an svg
             const json = Buffer.from(url.substring(29), "base64").toString()
             const resultSVG = JSON.parse(json)
-            return { 
+            return {
                 url: resultSVG.image_data,
-                meta: { 
+                meta: {
                     attributes: resultSVG.attributes,
                     traits: [],
                     collection: resultSVG.description,
                     rank: '',
                     id: '',
                     rarity_score: '',
-                    name: resultSVG.name,  
+                    name: resultSVG.name,
                 }
             }
         }
@@ -50,27 +50,27 @@ export const getNftImageUrl = async (url) => {
 
         if (res.headers && res.headers['content-type'].includes('application/json')) {
 
-            const { 
-                image, 
-                attributes = [], 
-                traits = [], 
-                collection = '', 
-                rank = '', 
+            const {
+                image,
+                attributes = [],
+                traits = [],
+                collection = '',
+                rank = '',
                 id = '',
                 rarity_score = '',
-                name = '' 
+                name = ''
             } = res.data
 
-            return { 
+            return {
                 url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image,
-                meta: { 
+                meta: {
                     attributes,
                     traits,
                     collection,
                     rank,
                     id,
                     rarity_score,
-                    name 
+                    name
                 }
             }
 
@@ -84,5 +84,3 @@ export const getNftImageUrl = async (url) => {
         return { url }
     }
 }
-
-
