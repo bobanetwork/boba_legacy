@@ -5,6 +5,4 @@
 [submodule "erigon"]
 	path = bedrock/erigon
 	url = https://github.com/bobanetwork/erigon
-[submodule "bedrock/bedrock/erigon"]
-	path = bedrock/bedrock/erigon
-	url = https://github.com/bobanetwork/erigon
+
