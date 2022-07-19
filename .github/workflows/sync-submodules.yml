@@ -28,6 +28,7 @@ jobs:
       run: |
         # If we want to update all, just commented bc. we already have a sync for tests
         cd bedrock/erigon
+        git remote add origin https://github.com/bobanetwork/erigon.git
         git checkout devel
         git config --global user.name 'Github bot'
         git config --global user.email '<>'
