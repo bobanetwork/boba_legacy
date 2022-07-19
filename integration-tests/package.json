@@ -10,7 +10,7 @@
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint .",
     "build": "hardhat compile",
-    "test:integration": "hardhat --network boba test test/basic-l1-l2-communication.spec.ts",
+    "test:integration": "hardhat --network boba test",
     "test:integration:live": "IS_LIVE_NETWORK=true hardhat --network boba test",
     "test:sync": "hardhat --network boba test sync-tests/*.spec.ts --no-compile",
     "clean": "rimraf cache artifacts"
