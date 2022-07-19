@@ -29,7 +29,7 @@ jobs:
         # If we want to update all, just commented bc. we already have a sync for tests
         cd bedrock/erigon
         git checkout devel
-        git config --global user.name 'Git bot'
+        git config --global user.name 'Github bot'
         git config --global user.email 'bot@noreply.github.com'
         git pull origin devel
         git pull --tags
