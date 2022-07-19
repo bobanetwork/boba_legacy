@@ -171,7 +171,7 @@ services:
       << : *deployer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      RETRIES: 200
+      RETRIES: 500
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
       # skip compilation when run in docker-compose, since the contracts
       # were already compiled in the builder step
