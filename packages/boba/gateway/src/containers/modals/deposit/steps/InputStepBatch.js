@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -352,7 +352,7 @@ function InputStepBatch({ isBridge, handleClose }) {
         <Typography variant="body2" sx={{mb: 3}}>
         Click the + symbol to add additional tokens to bridge.
         <br/>
-        Est. time: less than 10 minutes to 3 hours.  
+        Est. time: less than 10 minutes to 3 hours.
         </Typography>
 
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
