@@ -24,7 +24,7 @@ jobs:
         submodules: true
 
     # Update references
-    - name: Git Sumbodule Update
+    - name: Git Submodule Update
       run: |
         # If we want to update all, just commented bc. we already have a sync for tests
         cd bedrock/erigon
