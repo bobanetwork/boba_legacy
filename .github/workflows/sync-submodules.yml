@@ -35,8 +35,8 @@ jobs:
         git pull --tags
         cd ../..
         git add .
-        git commit -m "Updated Erigon submodule"
-        git push
+        git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
+        git push || echo "Nothing to push"
         
       # git pull --recurse-submodules
       # git submodule update --remote --recursive
