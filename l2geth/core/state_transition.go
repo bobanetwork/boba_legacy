@@ -419,7 +419,7 @@ func (st *StateTransition) refundGas() {
 	// st.msg.Gas() * gasPrice / divisor = st.gas * gasPrice / divisor + st.gasUsed() * gasPrice / divisor
 	// refundedBoba = st.gas * gasPrice / divisor = st.msg.Gas() * gasPrice / divisor - st.gasUsed() * gasPrice / divisor
 	// This is used to cover a sitution like
-	// initialDeductedBoba = 97,277,000, refundedBoba = 96,488,800, bobaToVault = 788,200, decimals = 3 - haven't devided by 10^3
+	// initialDeductedBoba = 97,277,000, refundedBoba = 96,488,800, bobaToVault = 788,200, decimals = 3 - haven't divided by 10^3
 	// initialDeductedBoba = 97,277, refundedBoba = 96,488, bobaToVault = 788
 	// refundedBoba + bobaToVault != initialDeductedBoba
 	// By using refundedBoba = initialDeductedBoba - bobaToVault, to make sure that refundedBoba + bobaToVault = initialDeductedBoba
