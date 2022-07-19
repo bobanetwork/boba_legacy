@@ -47,30 +47,11 @@ jobs:
         source_branch: bot/erigon-merge
         destination_branch: "develop"
         github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-        pr_title: "Pulling ${{ github.ref }} into develop"
+        pr_title: "Submodule:Erigon Update -> develop"
         pr_body: ":crown: *An automated PR*"
         pr_label: "auto-pr"
         pr_allow_empty: true
         pr_reviewer: wsdt,InoMurko,souradeep-das,Boyuan-Chen
-   
-  #  - uses: tgymnich/fork-sync@v1.4
-  #    with:
-  #        owner: bobanetwork
-  #        base: develop
-  #        head: bot/erigon-merge
-  #        merge_method: merge
-  #        pr_message: Sync Erigon submodule
-  #        pr_title: Update from origin
-  #        ignore_fail: true # to just have a PR
-      
-    #- name: Create Pull Request
-     # uses: peter-evans/create-pull-request@v4
-      #with:
-       # branch: develop
-        #reviewers: wsdt,InoMurko,souradeep-das,Boyuan-Chen
-        #title: Update Erigon submodule
-        #author: Github Bot <noreply@github.com>
-        #committer: Github Bot <noreply@github.com>
         
         #git pull --recurse-submodules
         #git submodule update --remote --recursive
