@@ -1,23 +1,9 @@
 {
+  "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
-    "declaration": true,
-    "noImplicitAny": false,
-    "removeComments": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "outDir": "dist",
-    "lib": [
-      "es7"
-    ],
+    "outDir": "./dist",
+    "resolveJsonModule": true
   },
-    "include": [],
-  	"files": ["./hardhat.config.ts"]
+  "include": ["./hardhat.config.ts", "./deploy", "./test"],
+   "files": ["./hardhat.config.ts"]
 }
