@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ limitations under the License. */
 const initialLoadingState = {}
 
 function loadingReducer (state = initialLoadingState, action) {
-  
+
   const segments = action.type.split('/')
   const requestName = `${segments[0]}/${segments[1]}`
   const requestState = segments[2]
