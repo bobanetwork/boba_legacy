@@ -1,0 +1,32 @@
+{
+  "name": "@boba/ve-boba",
+  "version": "1.0.0",
+  "repository": "https://github.com/bobanetwork/boba/packages/boba/ve-boba",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "hardhat compile",
+    "deploy": "hardhat run deploy/000-veBoba.ts ",
+    "test": "hardhat test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "4.3.2",
+    "dotenv": "^16.0.1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.0",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.9",
+    "hardhat": "^2.9.2",
+    "hardhat-deploy": "^0.11.10",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.2.4"
+  }
+}
