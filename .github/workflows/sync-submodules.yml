@@ -37,7 +37,7 @@ jobs:
         cd ../..
         git add .
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
-        git push || echo "Nothing to push"
+        git push origin HEAD:wsdt/erigon || echo "Nothing to push"
         
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v4
