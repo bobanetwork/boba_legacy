@@ -20,7 +20,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        token: ${{ secrets.CI_TOKEN }}
+        token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         submodules: true
 
     # Update references
