@@ -1,7 +1,7 @@
 name: 'Submodules Sync'
 
 on:
-  push:
+  push: 
   # Allows you to run this workflow manually from the Actions tab or through HTTP API
   workflow_dispatch:
 
@@ -27,10 +27,8 @@ jobs:
     - name: Git Submodule Update
       run: |
         # If we want to update all, just commented bc. we already have a sync for tests
+        git branch -M bot/erigon-merge
         cd bedrock/erigon
-        #git remote remove origin
-        #git remote add origin https://github.com/bobanetwork/erigon.git
-        #git branch --set-upstream-to=origin/devel devel
         git checkout devel
         git config --global user.name 'Github bot'
         git config --global user.email '<>'
@@ -40,6 +38,15 @@ jobs:
         git add .
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
         git push || echo "Nothing to push"
+        
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        branch: develop
+        reviewers: wsdt,InoMurko,souradeep-das,Boyuan-Chen
+        title: Update Erigon submodule
+        author: Github Bot <noreply@github.com>
+        committer: Github Bot <noreply@github.com>
         
         #git pull --recurse-submodules
         #git submodule update --remote --recursive
