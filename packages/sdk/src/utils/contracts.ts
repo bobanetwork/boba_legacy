@@ -345,6 +345,18 @@ export const BRIDGE_ADAPTER_DATA: {
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
+  43112: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
 }
 
 // TODO: PR is big enough as-is, will add support for SNX in another PR
