@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ export function amountToUsd(amount, lookupPrice, token) {
   } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
     return amount * lookupPrice['omisego'].usd
   } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
-    return amount * lookupPrice['usd-coin'].usd 
+    return amount * lookupPrice['usd-coin'].usd
   } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {

@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  ComplexType:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: complex_type.lambda_handler
+      Runtime: python3.9
+      Events:
+        HttpGet:
+          Type: Api
+          Properties:
+            Path: '/'
+            Method: post

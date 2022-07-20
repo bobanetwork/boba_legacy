@@ -49,16 +49,16 @@ if [[ $BUILD == 1 ]]; then
     docker-compose build -- verifier
     docker-compose build -- replica
 elif [[ $BUILD == 0 ]]; then
-  docker-compose -f $DIR/$DOCKERFILE pull
+  docker-compose -f "$DIR/$DOCKERFILE" pull
   echo 1
 fi
 
 if [[ $DAEMON == 1 ]]; then
     docker-compose \
-    -f $DIR/$DOCKERFILE \
+    -f "$DIR/$DOCKERFILE" \
     up --no-build --detach -V
 else
     docker-compose \
-    -f $DIR/$DOCKERFILE \
+    -f "$DIR/$DOCKERFILE" \
     up --no-build -V
 fi

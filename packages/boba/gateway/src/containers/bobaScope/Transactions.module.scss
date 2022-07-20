@@ -54,11 +54,8 @@
 }
 
 .transactions {
-  /*height: 100%;*/
   overflow: auto;
-  background: $background400; //white;
-  // border-bottom: 1px solid rgb(233, 234, 235);
-  // box-shadow: rgb(100 100 111 / 20%) 0px 7px 10px 0px;
+  background: $background400;
   border-radius: 8px;
   margin-top: 10px;
   min-height: 100px;
@@ -75,7 +72,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
   margin-bottom: 32px;
   span {
     margin-right: 20px;

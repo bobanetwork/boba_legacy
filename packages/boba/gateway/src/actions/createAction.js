@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
+
+import * as Sentry from '@sentry/react';
 
 export function createAction (key, asyncAction) {
 
@@ -30,6 +32,15 @@ export function createAction (key, asyncAction) {
         let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage.error.message })
         dispatch({ type: `${key}/ERROR` })
+        Sentry.captureMessage(errorMessage.error.message);
+        return false
+      }
+
+      if(response && typeof(response) === 'string' && response.includes('Insufficient balance')) {
+        //let errorMessage = JSON.parse(response)
+        dispatch({ type: `UI/ERROR/UPDATE`, payload: "Insufficient BOBA balance for emergency swap" })
+        dispatch({ type: `${key}/ERROR` })
+        Sentry.captureMessage("Insufficient BOBA balance for emergency swap");
         return false
       }
 
@@ -45,6 +56,7 @@ export function createAction (key, asyncAction) {
 
         console.log("Error keys:", Object.keys(response))
         console.log("Error code:", response.code)
+        Sentry.captureMessage(response.reason)
         if(response.hasOwnProperty('reason')) console.log("Error reason:", response.reason)
 
         // the basic error message
@@ -92,7 +104,7 @@ export function createAction (key, asyncAction) {
     } catch (error) {
 
       console.log("Unhandled error RAW:", {error, key, asyncAction})
-
+      Sentry.captureException(error);
       return false
     }
   }

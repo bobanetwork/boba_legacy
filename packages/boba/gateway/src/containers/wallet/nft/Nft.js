@@ -157,7 +157,7 @@ class Nft extends React.Component {
       return (
         <G.Container>
           <G.ContentEmpty>
-            <Connect 
+            <Connect
               userPrompt={'You are on Ethereum. To use Boba NFTs, connect to Boba'}
               accountEnabled={accountEnabled}
               connectToBoba={true}

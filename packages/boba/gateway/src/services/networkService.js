@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -69,11 +69,19 @@ import OMGJson from '../deployment/contracts/OMG.json'
 import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
 import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
+import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
 import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
+
+//veBoba ABIs
+import veJson from "../deployment/contracts/ve.json"
+// import gaugeFactoryJson from "../deployment/contracts/BaseV1GaugeFactory.json"
+// import gaugeJson from "../deployment/contracts/Gauge.json"
+// import voterJson from "../deployment/contracts/BaseV1Voter.json"
+// import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
@@ -201,7 +209,7 @@ class NetworkService {
     })
     window.ethereum.on('chainChanged', () => {
       const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user 
+      // do not reload window in the special case where the user
       // changed chains AND conncted at the same time
       // otherwise the user gets confused about why they are going through
       // two window reloads
@@ -575,6 +583,73 @@ class NetworkService {
     }
   }
 
+  /** @dev Only works on testnet, but can be freely called on production app */
+  async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
+
+    console.log("triggering getTestnetETH")
+
+    const Boba_AuthenticatedFaucet = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    )
+
+    const nonce = parseInt(
+      await Boba_AuthenticatedFaucet.getNonce(this.account),
+      10
+    )
+
+    const signer = this.provider.getSigner(this.account)
+    const hashedMsg = ethers.utils.solidityKeccak256(
+      ['address', 'uint'],
+      [this.account, nonce]
+    )
+    const messageHashBin = ethers.utils.arrayify(hashedMsg)
+    const signature = await signer.signMessage(messageHashBin)
+
+    try {
+      const response = await metaTransactionAxiosInstance(
+        this.networkGateway
+      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
+      console.log("response",response)
+    } catch (error) {
+      let errorMsg = error?.response?.data?.error?.error?.body
+      if (errorMsg) {
+        errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
+        errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
+      }
+      console.log(`MetaTx error for getTestnetETH: ${errorMsg}`)
+      if (errorMsg?.includes('Invalid request')) {
+        errorMsg = errorMsg.match(/Invalid request:(.+)/)
+        if (errorMsg) {
+          const errorMap = [
+            'Twitter API error - Probably limits hit.',
+            'Twitter account needs to exist at least 48 hours.',
+            'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
+            'Your Twitter account needs more than 5 followers.',
+            'You need to have tweeted more than 2 times.',
+          ]
+          try {
+            errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
+          } catch(err) {
+            console.error(err)
+            errorMsg = 'Unexpected Twitter error.'
+          }
+        } else {
+          errorMsg = 'Not expected Turing error.'
+        }
+      } else {
+        const errorMap = {
+          'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
+          'No testnet funds': 'Faucet drained: Please reach out to us.',
+          'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
+        }
+        errorMsg = errorMap[errorMsg];
+      }
+      return errorMsg ?? 'Limits reached or Twitter constraints not met.'
+    }
+  }
+
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
     if (address === ERROR_ADDRESS) {
@@ -731,7 +806,7 @@ class NetworkService {
                                'UST',   'BUSD',  'BNB',   'FTM',
                                'MATIC',  'UMA',  'DOM',   'OLO',
                                'WAGMIv0',
-                               'WAGMIv1', 
+                               'WAGMIv1',
                                'WAGMIv2', 'WAGMIv2-Oolong',
                                'WAGMIv3', 'WAGMIv3-Oolong'
                               ]
@@ -1023,7 +1098,7 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners() 
+      this.bindProviderListeners()
       // this should not do anything unless we changed chains
 
       await this.getBobaFeeChoice()
@@ -1261,27 +1336,47 @@ class NetworkService {
 
   async fetchMyMonsters() {
 
-    let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
+    try {
+      let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
 
-    const contract = new ethers.Contract(
-      allAddresses.BobaMonsters,
-      TuringMonsterJson.abi,
-      this.L2Provider
-    )
+      const contract = new ethers.Contract(
+        allAddresses.BobaMonsters,
+        TuringMonsterJson.abi,
+        this.L2Provider
+      )
 
-    if(monsterList.hasOwnProperty('data')) {
-      const monsters = monsterList.data.turingMonstersTransferEvents
-      for (let i = 0; i < monsters.length; i++) {
-        // console.log("adding monster:", i + 1)
-        const tokenId = monsters[i].tokenId
-        const owner = await contract.ownerOf(tokenId)
-            //console.log("owner:", owner)
-        if(owner.toLowerCase() === this.account.toLowerCase()) {
-          this.addNFT( allAddresses.BobaMonsters, tokenId )
+      if (monsterList.hasOwnProperty('data')) {
+        const monsters = monsterList.data.turingMonstersTransferEvents
+        for (let i = 0; i < monsters.length; i++) {
+          // console.log("adding monster:", i + 1)
+          const tokenId = monsters[i].tokenId
+          const owner = await contract.ownerOf(tokenId)
+          //console.log("owner:", owner)
+          if (owner.toLowerCase() === this.account.toLowerCase()) {
+            await this.addNFT(allAddresses.BobaMonsters, tokenId)
+          }
         }
+        await this.checkMonster()
       }
-      this.checkMonster()
+    } catch(err) {
+      // Catch needed don't break the fetch monsters button
+      console.error(err);
     }
+  }
+
+  async claimAuthenticatedTestnetTokens(tweetId) {
+    // Only Rinkeby
+    const contract = new ethers.Contract(
+      addresses_Rinkeby.AuthenticatedFaucet,
+      AuthenticatedFaucetJson.abi,
+      this.L2Provider,
+    ).connect()
+
+    await contract.estimateGas.sendFunds(tweetId)
+    const claim = await contract.sendFunds(
+      tweetId,
+    )
+    await claim.wait()
   }
 
   async checkMonster() {
@@ -1878,6 +1973,92 @@ class NetworkService {
       return TX
     } catch (error) {
       console.log("NS: settle_v2OLO error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v3() {
+
+    console.log("NS: settle_v3")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        '0x878221C39a7a279E6f19858AaE48875d4B1e4f5e',
+        WAGMIv1Json.abi, // WAGMIv2 contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv3 = new ethers.Contract(
+        '0xC6158B1989f89977bcc3150fC1F2eB2260F6cabE',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv3.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv3:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v3 error:", error)
+      return error
+    }
+
+  }
+
+  async settle_v3OLO() {
+
+    console.log("NS: settle_v3OLO")
+
+    // ONLY SUPPORTED on L2
+    if( this.L1orL2 !== 'L2' ) return
+
+    // ONLY SUPPORTED on MAINNET
+    if (this.networkGateway !== 'mainnet') return
+
+    try {
+
+      const contractLSP = new ethers.Contract(
+        //need to update this address
+        '0xDd3BDD13b1c123AE340f0Ba63BA4B172d335a92C',
+        WAGMIv1Json.abi, // WAGMIv2OLO contract same as WAGMIv1 contract so can use the same ABI
+        this.L2Provider
+      )
+
+      const contractWAGMIv3OLO = new ethers.Contract(
+        '0x70bf3c5B5d80C4Fece8Bde0fCe7ef38B688463d4',
+        L1ERC20Json.abi,
+        this.L2Provider
+      )
+
+      const balance = await contractWAGMIv3OLO.connect(this.provider).balanceOf(this.account)
+      console.log("You have WAGMIv3OLO:", balance.toString())
+
+      const TX = await contractLSP
+        .connect(this.provider.getSigner())
+        .settle(
+          balance,
+          ethers.utils.parseEther("0")
+        )
+
+      await TX.wait()
+      return TX
+    } catch (error) {
+      console.log("NS: settle_v3OLO error:", error)
       return error
     }
 
@@ -4267,7 +4448,7 @@ class NetworkService {
       await approveStatus.wait()
       console.log("Fixed Savings Approval", approveStatus)
     }
-    
+
     if(allAddresses.hasOwnProperty('DiscretionaryExitFee')) {
       allowance_BN = await this.BobaContract
         .connect(this.provider.getSigner())
@@ -4445,6 +4626,238 @@ class NetworkService {
 
   getTokenSpecificBridges(tokenSymbol) {
     return bobaBridges.filter((bridge) => bridge.tokens.includes(tokenSymbol))
+  }
+
+  /***********************************************/
+  /*****              VeBoba                 *****/
+  /***********************************************/
+
+
+  /**
+   * CreateLock
+   *  - to create veboba lock
+   */
+  async createLock({
+    value_Wei_String,
+    lock_duration
+  }) {
+    if (!this.account) {
+      console.log('NS: createLock() error - called but account === null');
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA,
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      let allowance_BN = await this.BobaContract
+        .connect(this.provider.getSigner())
+        .allowance(
+          this.account,
+          allAddresses.Ve_BOBA
+        )
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
+      try {
+        if (approveAmount_BN.gt(allowance_BN)) {
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.Ve_BOBA,
+              approveAmount_BN
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: ve:lock approve error:", error)
+        return error
+      }
+
+      const TX = await ve.create_lock(value_Wei_String, lock_duration)
+      await TX.wait()
+      return TX
+
+    } catch (error) {
+      console.log("NS: Ve: createLock error:", error)
+      return error;
+    }
+  }
+
+  /**
+   * withdrawLock
+   *  - To withdraw existing expired lock
+   */
+  async withdrawLock({tokenId}) {
+    if(!this.account) {
+      console.log('NS: withdrawLock() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await ve.withdraw(tokenId)
+      await TX.wait()
+      return TX
+     } catch (error) {
+        console.log("NS: Ve: withdrawLock error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * increaseLockAmount
+   *  - To increse amount of existing lock
+   */
+  async increaseLockAmount({
+    tokenId, value_Wei_String
+  }) {
+    if(this.account === null) {
+      console.log('NS: increaseLockAmount() error - called but account === null')
+      return
+    }
+     try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      let allowance_BN = await this.BobaContract
+      .connect(this.provider.getSigner())
+      .allowance(
+        this.account,
+        allAddresses.Ve_BOBA
+      )
+      console.log("Allowance:", allowance_BN.toString())
+
+      let depositAmount_BN = BigNumber.from(value_Wei_String)
+      console.log("Increase Amount:", depositAmount_BN)
+
+      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
+
+      try {
+        if (approveAmount_BN.gt(allowance_BN)) {
+          console.log("Need to approve YES:", approveAmount_BN)
+          const approveStatus = await this.BobaContract
+            .connect(this.provider.getSigner())
+            .approve(
+              allAddresses.Ve_BOBA,
+              approveAmount_BN
+            )
+          const TX = await approveStatus.wait()
+          console.log("approveStatus:", TX)
+        }
+        else {
+          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
+        }
+      } catch (error) {
+        console.log("NS: ve:increaseLockAmount approve error:", error)
+        return error
+      }
+
+      const TX = await ve.increase_amount(tokenId, value_Wei_String)
+      await TX.wait()
+      return TX
+     } catch (error) {
+        console.log("NS: Ve: increaseLockAmount error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * extendLockTime
+   *  - To extend lock time of existing lock
+   */
+  async extendLockTime({
+    tokenId, lock_duration
+  }) {
+
+    console.log('tokenId, lock_duration', {
+      tokenId, lock_duration
+    })
+    if(this.account === null) {
+      console.log('NS: increaseUnlockTime() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider.getSigner()
+      )
+
+      const TX = await ve.increase_unlock_time(tokenId, lock_duration)
+      await TX.wait()
+      return TX
+
+     } catch (error) {
+        console.log("NS: Ve: extendLockTime error:",error)
+       return error;
+     }
+  }
+
+  /**
+   * fetchLockRecords
+   *  - To to fetch list of existing lock records.
+   */
+  async fetchLockRecords() {
+    if (this.account === null) {
+      console.log('NS: fetchLockRecords() error - called but account === null')
+      return
+    }
+
+    try {
+      const ve = new ethers.Contract(
+        allAddresses.Ve_BOBA, //check ve address is present
+        veJson.abi,
+        this.provider
+      )
+
+      let tokenIdList = [];
+      let balanceInfo = [];
+
+      let nftCount = await ve.balanceOf(this.account)
+      for (let index = 0; index < Number(nftCount); index++) {
+        const tokenId = await ve.tokenOfOwnerByIndex(this.account, index)
+        tokenIdList.push(Number(tokenId))
+      }
+
+      for (let tokenId of tokenIdList) {
+        const balance = await ve.balanceOfNFT(tokenId);
+        const locked = await ve.locked(tokenId);
+
+        balanceInfo.push({
+          tokenId,
+          balance: Number(utils.formatUnits(balance, 18)).toFixed(2),
+          lockedAmount: Number(utils.formatUnits(locked.amount, 18)).toFixed(2),
+          expiry: new Date(locked.end.toString() * 1000),
+          expirySeconds: locked.end.toString() * 1000,
+        })
+      }
+
+      return {
+        records: balanceInfo,
+      }
+    } catch (error) {
+      console.log("NS: Ve: fetchLockRecords error:", error)
+      return error;
+    }
   }
 
 }

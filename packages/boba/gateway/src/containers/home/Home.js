@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
+import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 
 import {
   fetchDaoBalance,
@@ -100,6 +101,7 @@ import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
 import Bridge from 'containers/bridge/Bridge'
 import MonsterWrapper from 'containers/monster/MonsterWrapper'
+import Lock from 'containers/veboba/Lock'
 
 import { Box, Container } from '@mui/material'
 
@@ -109,6 +111,10 @@ import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import { trackPageView } from 'util/googleAnalytics'
+import { fetchLockRecords } from 'actions/veBobaAction'
+
+import Zendesk from 'components/zendesk/Zendesk'
 
 require('dotenv').config()
 
@@ -136,10 +142,12 @@ function Home() {
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const manageLockModalState = useSelector(selectModalState('manageLock'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
+  const lock = useSelector(selectModalState('lock'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -205,6 +213,7 @@ function Home() {
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
+      dispatch(fetchLockRecords())
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
@@ -231,7 +240,13 @@ function Home() {
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
+  useEffect(() => {
+    trackPageView(pageDisplay)
+  }, [pageDisplay])
+
+
   console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
+  console.log(pageDisplay);
 
   return (
     <>
@@ -252,6 +267,7 @@ function Home() {
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
+      {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
 
       <Alert
         type='error'
@@ -272,7 +288,7 @@ function Home() {
       >
         {alertMessage}
       </Alert>
-
+      <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
@@ -366,8 +382,11 @@ function Home() {
             {pageDisplay === "Bridge" &&
               <Bridge />
             }
-            {pageDisplay === "Monster" &&
+            { pageDisplay === "Monster" &&
               <MonsterWrapper />
+            }
+            { pageDisplay === "Lock" &&
+              <Lock />
             }
           </Container>
           <PageFooter/>

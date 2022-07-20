@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import Notification from 'containers/notification/Notification'
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
+import { initGa } from 'util/googleAnalytics'
 
 function App () {
 
@@ -253,7 +254,11 @@ function App () {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [dispatch])
+
+    initGa();
+
+  }, [ dispatch ])
+
 
   return (
     <ThemeProvider theme={MUItheme}>

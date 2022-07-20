@@ -30,6 +30,12 @@ export const menuItems = [
     url: "/earn",
   },
   {
+    key: 'Lock',
+    icon: "LockIcon",
+    title: "Lock",
+    url: "/lock",
+  },
+  {
     key: 'Save',
     icon: "SaveIcon",
     title: "Stake",
@@ -40,5 +46,5 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: "/dao"
-  },
+  }
 ]

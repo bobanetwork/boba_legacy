@@ -67,16 +67,16 @@ describe('BatchEncoder', function () {
         })
 
         it(`${hash} (compressed)`, () => {
-          // Set the batch type to be zlib so that the batch
+          // Set the batch type to be brotli so that the batch
           // is compressed
-          decoded.type = BatchType.ZLIB
+          decoded.type = BatchType.BROTLI
           // Encode a compressed batch
           const encodedCompressed = decoded.encode()
           // Decode a compressed batch
           const decodedPostCompressed =
             SequencerBatch.decode<SequencerBatch>(encodedCompressed)
           // Expect that the batch type is detected
-          expect(decodedPostCompressed.type).to.eq(BatchType.ZLIB)
+          expect(decodedPostCompressed.type).to.eq(BatchType.BROTLI)
           // Expect that the contexts match
           expect(decoded.contexts).to.deep.equal(decodedPostCompressed.contexts)
           for (const [i, tx] of decoded.transactions.entries()) {

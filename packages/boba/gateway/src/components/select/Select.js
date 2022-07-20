@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { Select as MuiSelect, MenuItem, useTheme } from '@mui/material';
+import { Select as MuiSelect, MenuItem, useTheme, Typography } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
 import { ArrowDropDownOutlined } from '@mui/icons-material';
@@ -71,7 +71,16 @@ function Select ({
             key={index}
             value={i.value}
           >
-            {renderOption(i)}
+            {i.description ?
+              <div>
+                <Typography variant="body2">
+                  {i.title}
+                </Typography>
+                <Typography variant="body3" sx={{ opacity: 0.65, color: 'inherit' }}>
+                    {i.description}
+                </Typography>
+              </div>
+            : renderOption(i)}
           </MenuItem>
         ))}
       </MuiSelect>

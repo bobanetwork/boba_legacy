@@ -2,11 +2,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 
-import { 
-  settle_v0, 
+import {
+  settle_v0,
   settle_v1,
-  settle_v2, 
-  settle_v2OLO  
+  settle_v2,
+  settle_v2OLO,
+  settle_v3,
+  settle_v3OLO,
 } from 'actions/networkAction'
 
 import Button from 'components/button/Button'
@@ -27,7 +29,7 @@ function ListToken({
   const [ dropDownBox, setDropDownBox ] = useState(false)
 
   const theme = useTheme()
-  
+
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch();
   const enabled = (networkLayer === chain) ? true : false
@@ -63,11 +65,11 @@ function ListToken({
   }
 
   async function doSettle_v3 () {
-    //await dispatch(settle_v3())
+    await dispatch(settle_v3())
   }
 
   async function doSettle_v3OLO () {
-    //await dispatch(settle_v3OLO())
+    await dispatch(settle_v3OLO())
   }
 
 
@@ -146,14 +148,14 @@ function ListToken({
                 </>
               }
 
-              {enabled && chain === 'L2' && 
-                token.symbol !== 'OLO' && 
-                token.symbol !== 'xBOBA' && 
-                token.symbol !== 'WAGMIv0' && 
+              {enabled && chain === 'L2' &&
+                token.symbol !== 'OLO' &&
+                token.symbol !== 'xBOBA' &&
+                token.symbol !== 'WAGMIv0' &&
                 token.symbol !== 'WAGMIv1' &&
-                token.symbol !== 'WAGMIv2' && 
+                token.symbol !== 'WAGMIv2' &&
                 token.symbol !== 'WAGMIv2-Oolong' &&
-                token.symbol !== 'WAGMIv3' && 
+                token.symbol !== 'WAGMIv3' &&
                 token.symbol !== 'WAGMIv3-Oolong' &&
                 <>
                   <Button
@@ -394,10 +396,10 @@ function ListToken({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && 
-            token.symbol !== 'OLO' && 
-            token.symbol !== 'xBOBA' && 
-            token.symbol !== 'WAGMIv0' && 
+          {enabled && chain === 'L2' &&
+            token.symbol !== 'OLO' &&
+            token.symbol !== 'xBOBA' &&
+            token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
@@ -589,7 +591,7 @@ function ListToken({
                   onClick={() => { doSettle_v3() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv3 long options"
                   fullWidth
                 >
@@ -617,7 +619,7 @@ function ListToken({
                   onClick={() => { doSettle_v3OLO() }}
                   variant="contained"
                   color="primary"
-                  disabled={true}
+                  disabled={false}
                   tooltip="Settle your WAGMIv3-Oolong long options"
                   fullWidth
                 >

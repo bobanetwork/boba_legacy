@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -211,6 +211,18 @@ export function settle_v2() {
 export function settle_v2OLO() {
   return createAction('SETTLE_v2OLO/CREATE', () =>
     networkService.settle_v2OLO()
+  )
+}
+
+export function settle_v3() {
+  return createAction('SETTLE_v3/CREATE', () =>
+    networkService.settle_v3()
+  )
+}
+
+export function settle_v3OLO() {
+  return createAction('SETTLE_v3OLO/CREATE', () =>
+    networkService.settle_v3OLO()
   )
 }
 

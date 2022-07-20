@@ -937,6 +937,11 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	nextBlockNumber := new(big.Int).Add(s.bc.CurrentBlock().Number(), big.NewInt(1))
 	isFeeTokenUpdate := s.bc.Config().IsFeeTokenUpdate(nextBlockNumber)
 
+	// After fee token hard fork, tx.Gas() includes l1 security fee
+	if isFeeTokenUpdate {
+		fee = new(big.Int).Mul(tx.GasPrice(), new(big.Int).SetUint64(tx.Gas()))
+	}
+
 	state, err := s.bc.State()
 	if err != nil {
 		return err

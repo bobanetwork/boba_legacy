@@ -34,9 +34,9 @@ class GraphQLService {
 
     const client = new apollo.ApolloClient({
       uri: this.getBridgeEndpoint(),
-      link: new apollo.HttpLink({ 
-        uri: this.getBridgeEndpoint(), 
-        fetch 
+      link: new apollo.HttpLink({
+        uri: this.getBridgeEndpoint(),
+        fetch
       }),
       cache: new apollo.InMemoryCache()
     })
@@ -46,10 +46,10 @@ class GraphQLService {
 
   async queryMonsterTransfer(walletAddress) {
 
-    const query = apollo.gql(`query GetTUMOEvents($wallet: Bytes!) { 
+    const query = apollo.gql(`query GetTUMOEvents($wallet: Bytes!) {
       turingMonstersTransferEvents(where: {
         to: $wallet }) { tokenId, to, from } }`)
-    
+
     /*
     curl -g -X POST \
       -H "Content-Type: application/json" \
@@ -66,25 +66,25 @@ class GraphQLService {
       -d '{"query":"{ turingMonstersTransferEvents(where: {to: \"0xADDRESS\"}) { to from tokenId }}"}' \
       https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
 
-    query GetTUMOEvents($wallet: Bytes!) { 
-        turingMonstersTransferEvents(where:{ 
+    query GetTUMOEvents($wallet: Bytes!) {
+        turingMonstersTransferEvents(where:{
             to: $wallet
           }) {
         tokenId, to, from
-      } 
+      }
     }
     */
 
     const client = new apollo.ApolloClient({
       uri: this.getBridgeEndpoint(),
-      link: new apollo.HttpLink({ 
-        uri: this.getBridgeEndpoint(), 
-        fetch 
+      link: new apollo.HttpLink({
+        uri: this.getBridgeEndpoint(),
+        fetch
       }),
       cache: new apollo.InMemoryCache()
     })
 
-    return await client.query({ 
+    return await client.query({
       query,
       variables: {
         wallet: walletAddress

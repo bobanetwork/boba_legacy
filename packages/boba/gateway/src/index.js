@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,8 +18,31 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import store from 'store'
 
+//  Sentry error tracking packages
+import * as Sentry from '@sentry/react'
+import { BrowserTracing } from '@sentry/tracing'
+
 import App from 'layout'
 import './index.scss'
+
+// Sentry initializations.
+Sentry.init({
+  dsn: process.env.REACT_APP_SENTRY_DSN,
+  environment: process.env.REACT_APP_ENV,
+  integrations: [ new BrowserTracing() ],
+  tracesSampleRate: 1.0,
+  initialScope: {
+    tags: { 'network': process.env.REACT_APP_CHAIN }
+  },
+  beforeSend: (event) => {
+    // Avoid sending the sentry events on local env.
+    if (window.location.hostname === 'localhost') {
+      return null;
+    }
+    return event
+  }
+
+})
 
 // https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
 if (window.ethereum) {

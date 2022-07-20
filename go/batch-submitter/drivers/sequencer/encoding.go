@@ -3,10 +3,12 @@ package sequencer
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"math"
 
+	"github.com/andybalholm/brotli"
 	l2types "github.com/ethereum-optimism/optimism/l2geth/core/types"
 	l2rlp "github.com/ethereum-optimism/optimism/l2geth/rlp"
 )
@@ -17,7 +19,10 @@ const (
 	TxLenSize = 3
 )
 
-var byteOrder = binary.BigEndian
+var (
+	byteOrder         = binary.BigEndian
+	ErrMalformedBatch = errors.New("malformed batch")
+)
 
 // BatchContext denotes a range of transactions that belong the same batch. It
 // is used to compress shared fields that would otherwise be repeated for each
@@ -45,10 +50,10 @@ type BatchContext struct {
 //  - timestamp:                5 bytes
 //  - block_number:             5 bytes
 func (c *BatchContext) Write(w *bytes.Buffer) {
-	writeUint64(w, c.NumSequencedTxs, 3)
-	writeUint64(w, c.NumSubsequentQueueTxs, 3)
-	writeUint64(w, c.Timestamp, 5)
-	writeUint64(w, c.BlockNumber, 5)
+	_ = writeUint64(w, c.NumSequencedTxs, 3)
+	_ = writeUint64(w, c.NumSubsequentQueueTxs, 3)
+	_ = writeUint64(w, c.Timestamp, 5)
+	_ = writeUint64(w, c.BlockNumber, 5)
 }
 
 // Read decodes the BatchContext from the passed reader. If fewer than 16-bytes
@@ -69,6 +74,29 @@ func (c *BatchContext) Read(r io.Reader) error {
 		return err
 	}
 	return readUint64(r, &c.BlockNumber, 5)
+}
+
+// BatchType represents the type of batch being submitted. When the first
+// context in the batch has a timestamp of 0, the blocknumber is interpreted as
+// an enum that represets the type.
+type BatchType int8
+
+const (
+	// BatchTypeLegacy represets the legacy batch type.
+	BatchTypeLegacy BatchType = -1
+
+	// BatchTypeBrotli represents a batch type where the transaction data is
+	// compressed using brotli.
+	BatchTypeBrotli BatchType = 0
+)
+
+// MarkerContext returns the marker context, if any, for the given batch type.
+func MarkerContext() *BatchContext {
+	// Brotli marker context sets block number equal to zero.
+	return &BatchContext{
+		Timestamp:   0,
+		BlockNumber: 0,
+	}
 }
 
 // AppendSequencerBatchParams holds the raw data required to submit a batch of
@@ -106,19 +134,46 @@ type AppendSequencerBatchParams struct {
 //    - tx_len:                       3 bytes
 //    - tx_bytes:                     tx_len bytes
 func (p *AppendSequencerBatchParams) Write(w *bytes.Buffer) error {
-	writeUint64(w, p.ShouldStartAtElement, 5)
-	writeUint64(w, p.TotalElementsToAppend, 3)
+
+	_ = writeUint64(w, p.ShouldStartAtElement, 5)
+	_ = writeUint64(w, p.TotalElementsToAppend, 3)
+
+	// There must be contexts if there are transactions
+	if len(p.Contexts) == 0 && len(p.Txs) != 0 {
+		return ErrMalformedBatch
+	}
+
+	// There must be transactions if there are contexts
+	if len(p.Txs) == 0 && len(p.Contexts) != 0 {
+		return ErrMalformedBatch
+	}
+
+	// copy the contexts as to not malleate the struct
+	// when it is a typed batch
+	contexts := make([]BatchContext, 0, len(p.Contexts)+1)
+	// Add the marker context, if any, for non-legacy encodings.
+	markerContext := MarkerContext()
+	contexts = append(contexts, *markerContext)
+	contexts = append(contexts, p.Contexts...)
 
 	// Write number of contexts followed by each fixed-size BatchContext.
-	writeUint64(w, uint64(len(p.Contexts)), 3)
-	for _, context := range p.Contexts {
+	_ = writeUint64(w, uint64(len(contexts)), 3)
+	for _, context := range contexts {
 		context.Write(w)
 	}
 
-	// Write each length-prefixed tx.
+	// Compress data for each transaction.
+	bw := brotli.NewWriterLevel(w, 11)
 	for _, tx := range p.Txs {
-		writeUint64(w, uint64(tx.Size()), TxLenSize)
-		_, _ = w.Write(tx.RawTx()) // can't fail for bytes.Buffer
+		if err := writeUint64(bw, uint64(tx.Size()), TxLenSize); err != nil {
+			return err
+		}
+		if _, err := bw.Write(tx.RawTx()); err != nil {
+			return err
+		}
+	}
+	if err := bw.Close(); err != nil {
+		return err
 	}
 
 	return nil
@@ -152,12 +207,17 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 	if err := readUint64(r, &p.TotalElementsToAppend, 3); err != nil {
 		return err
 	}
-
 	// Read number of contexts and deserialize each one.
 	var numContexts uint64
 	if err := readUint64(r, &numContexts, 3); err != nil {
 		return err
 	}
+
+	// Assume that it is a legacy batch at first, this will be overwrritten if
+	// we detect a marker context.
+	var batchType = BatchTypeLegacy
+	// Ensure that contexts is never nil
+	p.Contexts = make([]BatchContext, 0)
 
 	for i := uint64(0); i < numContexts; i++ {
 		var batchContext BatchContext
@@ -165,7 +225,20 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 			return err
 		}
 
+		if i == 0 && batchContext.Timestamp == 0 {
+			batchType = BatchTypeBrotli
+			continue
+		}
+
 		p.Contexts = append(p.Contexts, batchContext)
+	}
+
+	// Read the compressed transactions.
+	if batchType == BatchTypeBrotli {
+		br := brotli.NewReader(r)
+		var decodedOutput bytes.Buffer
+		_, _ = io.Copy(&decodedOutput, br)
+		r = bytes.NewReader(decodedOutput.Bytes())
 	}
 
 	// Deserialize any transactions. Since the number of txs is ommitted
@@ -174,24 +247,29 @@ func (p *AppendSequencerBatchParams) Read(r io.Reader) error {
 		var txLen uint64
 		err := readUint64(r, &txLen, TxLenSize)
 		// Getting an EOF when reading the txLen expected for a cleanly
-		// encoded object. Silece the error and return success.
+		// encoded object. Silence the error and return success if
+		// the batch is well formed.
 		if err == io.EOF {
+			if len(p.Contexts) == 0 && len(p.Txs) != 0 {
+				return ErrMalformedBatch
+			}
+			if len(p.Txs) == 0 && len(p.Contexts) != 0 {
+				return ErrMalformedBatch
+			}
 			return nil
 		} else if err != nil {
 			return err
 		}
-
 		tx := new(l2types.Transaction)
 		if err := tx.DecodeRLP(l2rlp.NewStream(r, txLen)); err != nil {
 			return err
 		}
-
 		p.Txs = append(p.Txs, NewCachedTx(tx))
 	}
 }
 
 // writeUint64 writes a the bottom `n` bytes of `val` to `w`.
-func writeUint64(w *bytes.Buffer, val uint64, n uint) {
+func writeUint64(w io.Writer, val uint64, n uint) error {
 	if n < 1 || n > 8 {
 		panic(fmt.Sprintf("invalid number of bytes %d must be 1-8", n))
 	}
@@ -204,7 +282,8 @@ func writeUint64(w *bytes.Buffer, val uint64, n uint) {
 
 	var buf [8]byte
 	byteOrder.PutUint64(buf[:], val)
-	_, _ = w.Write(buf[8-n:]) // can't fail for bytes.Buffer
+	_, err := w.Write(buf[8-n:]) // can't fail for bytes.Buffer
+	return err
 }
 
 // readUint64 reads `n` bytes from `r` and returns them in the lower `n` bytes

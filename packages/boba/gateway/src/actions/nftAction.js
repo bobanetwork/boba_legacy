@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ export function getNFTs () {
 }
 
 export async function addNFT ( NFT ) {
-  
+
   const info = {
     UUID: NFT.UUID,
     address: NFT.address,
-    name:  NFT.name, 
+    name:  NFT.name,
     tokenID: NFT.tokenID,
     symbol:  NFT.symbol,
     url: NFT.url,

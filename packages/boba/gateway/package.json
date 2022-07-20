@@ -26,6 +26,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.4.0",
     "@mui/styles": "^5.3.0",
+    "@sentry/react": "^7.7.0",
+    "@sentry/tracing": "^7.7.0",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "axios": "^0.21.1",
@@ -46,13 +48,17 @@
     "react-copy-to-clipboard": "^5.0.4",
     "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.2",
+    "react-ga4": "^1.4.1",
     "react-multi-carousel": "^2.6.5",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.1",
     "react-scripts": "^3.4.3",
     "react-select": "^5.2.2",
+    "recharts": "^2.1.10",
+    "react-zendesk": "^0.1.13",
     "redux": "^4.1.2",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.51.0",
     "serve": "^11.3.2",
     "truncate-middle": "^1.0.6",
     "ts-md5": "^1.2.11",
@@ -75,7 +81,6 @@
   },
   "devDependencies": {
     "@beam-australia/react-env": "2.1.2",
-    "audit-ci": "^3.1.1",
-    "sass": "^1.49.7"
+    "audit-ci": "^3.1.1"
   }
 }

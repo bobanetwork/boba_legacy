@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-
-	"github.com/ethereum/go-ethereum/log"
 )
 
 type RPCReq struct {
@@ -83,7 +81,6 @@ func ParseRPCReq(r io.Reader) ([]RPCReq, bool, error) {
 		return nil, true, wrapErr(err, "error reading request body")
 	}
 	if isBatch(body) {
-		log.Info("THIS WAS A BATCH REQUEST")
 		var arr []RPCReq
 		err := json.Unmarshal(body, &arr)
 		if err != nil {
@@ -101,7 +98,6 @@ func ParseRPCReq(r io.Reader) ([]RPCReq, bool, error) {
 		return arr, true, nil
 	} else {
 
-		log.Info("THIS WAS NOT A BATCH REQUEST")
 		req := new(RPCReq)
 		if err := json.Unmarshal(body, req); err != nil {
 			return nil, false, ErrParseErr
