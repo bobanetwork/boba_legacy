@@ -235,7 +235,7 @@ describe('Boba API Tests', async () => {
         expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
         expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
         expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
-      })
+      }).retries(3)
 
       it('should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
         // withdraw ETH first
@@ -302,7 +302,7 @@ describe('Boba API Tests', async () => {
           to: Boba_GasPriceOracle.address,
           value: ethers.utils.parseEther('10'),
         })
-      })
+      }).retries(3)
     })
   })
 })
