@@ -1,0 +1,16 @@
+# syntax = docker/dockerfile:1.2
+# Use an upstream erigon image in place of hardhat for local L1
+FROM thorax/erigon:v2022.07.02
+USER root
+
+#FROM golang:1.15-alpine3.13
+
+#ADD ./ops/scripts /home/boba/scripts
+RUN apk add --no-cache bash
+
+RUN adduser -D -u 1100 -g 1100 boba
+COPY ./ops/scripts/l1-erigon.sh /home/boba/
+RUN mkdir -p /home/boba/datadir
+
+EXPOSE 8545 8551 9090
+ENTRYPOINT ["/home/boba/l1-erigon.sh"]
