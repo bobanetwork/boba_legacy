@@ -187,6 +187,7 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Avalanche
   43112: {
     l1: {
       AddressManager: '0x52C84043CD9c865236f11d9Fc9F56aa003c1f922',
