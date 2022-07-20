@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Run integration tests
           command: |
-            docker-compose run integration_tests $(cat splits.txt)
+            docker-compose run integration_tests $(shuf splits.txt)
           working_directory: ops
       - run:
           name: Rewrite test name for next run
