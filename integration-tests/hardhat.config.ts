@@ -13,8 +13,6 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 80000,
-    grep: new RegExp(''),
-    parallel: false,
     reporter: 'mocha-multi-reporters',
     reporterOptions: {
       configFile: './config.json',
