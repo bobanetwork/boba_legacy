@@ -29,6 +29,7 @@
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [Contract Addresses Boba/Ethereum](boba\_documentation/developer/network-parameters.md)
   * [Contract Addresses Boba/Moonbeam](boba\_documentation/developer/network-moonbeam.md)
+  * [Contract Addresses Boba/Fantom](boba\_documentation/developer/network-fantom.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)
   * [Verifying Contracts](boba\_documentation/developer/verify-smart-contracts.md)
   * [Using The Graph](packages/boba/subgraph/README.md)
