@@ -165,7 +165,7 @@ services:
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
       L2_NODE_WEB3_URL: http://l2geth:8545
-      ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
+      ADDRESS_MANAGER_ADDRESS: "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922"
       URL: http://dtl:8081/addresses.json
       # DO NOT use in production
       << : *deployer_pk
@@ -389,7 +389,7 @@ services:
       ROLLUP_CLIENT_HTTP: http://dtl:7878
       ROLLUP_BACKEND: 'l2'
       ROLLUP_VERIFIER_ENABLE: 'true'
-      RETRIES: 60
+      RETRIES: 200
       # CTC height
       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
       # no need to keep this secret, only used internally to sign blocks
@@ -428,7 +428,7 @@ services:
         ROLLUP_CLIENT_HTTP: http://dtl:7878
         ROLLUP_BACKEND: 'l1'
         ROLLUP_VERIFIER_ENABLE: 'true'
-        RETRIES: 60
+        RETRIES: 200
         # CTC height
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
         # no need to keep this secret, only used internally to sign blocks
@@ -462,7 +462,7 @@ services:
       L2_NODE_WEB3_URL: http://l2geth:8545
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier:8545
-      ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
+      ADDRESS_MANAGER_ADDRESS: "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922"
       L1_DEPLOYMENT_BLOCK: 8
       L2_START_BLOCK: 1
     ports:
