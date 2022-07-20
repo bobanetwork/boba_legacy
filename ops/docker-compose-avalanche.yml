@@ -117,8 +117,6 @@ services:
       dockerfile: ./ops/docker/Dockerfile.deployer
     container_name: deployer
     entrypoint: ./deployer.sh
-    volumes:
-      - ../packages/contracts/deployments:/opt/optimism/packages/contracts/deployments
     environment:
       FRAUD_PROOF_WINDOW_SECONDS: 0
       L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
