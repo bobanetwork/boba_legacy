@@ -28,6 +28,7 @@ const deployerWallet = new Wallet(deployerPK, local_provider)
 let BOBAL2Address
 let BobaTuringCreditAddress
 
+import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
 import HelloTuringJson from '../artifacts/contracts/HelloTuring.sol/HelloTuring.json'
 import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L2GovernanceERC20Json from '../../../packages/boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -93,10 +94,11 @@ describe('Turing 256 Bit Random Number', () => {
     console.log('    BOBA Balance in your account', bobaBalance.toString())
 
     // prepare to register/fund your Turing Helper
-    turingCredit = getContractFactory(
-      'BobaTuringCredit',
+    turingCredit = new ContractFactory(
+      BobaTuringCreditJson.abi,
+      BobaTuringCreditJson.bytecode,
       deployerWallet
-    ).attach(BobaTuringCreditAddress)
+    ).attach(BobaTuringCreditAddress);
   })
 
   it('contract should be whitelisted', async () => {
