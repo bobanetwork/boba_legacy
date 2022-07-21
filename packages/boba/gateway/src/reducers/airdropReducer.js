@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ function airdropReducer(state = initialState, action) {
   switch (action.type) {
     case 'FETCH/AIRDROPL1/STATUS/SUCCESS':
       return {
-        ...state, 
+        ...state,
         claimDetailsL1: action.payload
       }
     case 'FETCH/AIRDROPL2/STATUS/SUCCESS':
       return {
-        ...state, 
+        ...state,
         claimDetailsL2: action.payload
       }
     default:

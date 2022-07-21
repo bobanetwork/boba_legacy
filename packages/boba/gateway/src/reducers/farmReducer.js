@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -76,14 +76,14 @@ function farmReducer (state = initialState, action) {
     // case 'GET_L2FEE':
     //   return state;
     // case 'GET_L1FEE_SUCCESS':
-    //   return { 
-    //     ...state, 
+    //   return {
+    //     ...state,
     //     userL1RewardFeeRate: action.payload.userRewardFeeRate,
     //     totalL1FeeRate: action.payload.totalFeeRate,
     //   }
     // case 'GET_L2FEE_SUCCESS':
-    //   return { 
-    //     ...state, 
+    //   return {
+    //     ...state,
     //     userL2RewardFeeRate: action.payload.userRewardFeeRate,
     //     totalL2FeeRate: action.payload.totalFeeRate,
     //   }
