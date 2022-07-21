@@ -38,5 +38,18 @@ jobs:
         git commit -m "Updated Erigon submodule" || echo "Nothing to commit"
         git push || echo "Nothing to push"
         
+    - name: Reference-Optimistic-Geth Submodule Update
+      run: |
+        # If we want to update all, just commented bc. we already have a sync for tests
+        cd bedrock/reference-optimistic-geth
+        git checkout optimism-prototype
+        git config --global user.name 'Github bot'
+        git config --global user.email '<>'
+        git pull origin optimism-prototype
+        git pull --tags
+        cd ../..
+        git add .
+        git commit -m "Updated Reference-Optimistic-Geth submodule" || echo "Nothing to commit"
+        git push || echo "Nothing to push"
       # git pull --recurse-submodules
       # git submodule update --remote --recursive
