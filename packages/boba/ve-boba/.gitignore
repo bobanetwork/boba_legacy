@@ -1,0 +1,13 @@
+.DS_Store
+node_modules
+results
+temp
+.nyc_output
+coverage.json
+*.tsbuildinfo
+
+dist
+artifacts
+cache
+
+.env
