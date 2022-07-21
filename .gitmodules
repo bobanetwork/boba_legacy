@@ -1,3 +1,8 @@
 [submodule "tests"]
 	path = l2geth/tests/testdata
 	url = https://github.com/ethereum/tests
+
+[submodule "erigon"]
+	path = bedrock/erigon
+	url = https://github.com/bobanetwork/erigon
+
