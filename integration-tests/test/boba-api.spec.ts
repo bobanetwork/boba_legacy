@@ -105,7 +105,7 @@ describe('Boba API Tests', async () => {
           { body: JSON.stringify(payload) },
           null
         )
-
+        console.log(response)
         const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
         const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
         const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
@@ -286,7 +286,7 @@ describe('Boba API Tests', async () => {
         const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
-
+        console.log(response)
         expect(response.statusCode).to.equal(400)
         expect(
           JSON.parse(JSON.parse(response.body).error.error.error.body).error

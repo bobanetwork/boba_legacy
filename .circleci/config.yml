@@ -32,17 +32,7 @@ jobs:
           working_directory: ops
       - run:
           name: Run integration tests
-          command: |
-            export SHELL=/bin/bash
-            set +eo pipefail
-            n=$(wc -l splits.txt | awk '{ print $1 }')
-            for (( i=1 ; i<=$n ; i++ ));
-            do
-              test=$(sed -n "$i"p splits.txt)
-              echo "Running test:"
-              echo $test
-              docker-compose run integration_tests $test
-            done
+          command: docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
       - run:
           name: Rewrite test name for next run
