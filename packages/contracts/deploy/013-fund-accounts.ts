@@ -120,6 +120,10 @@ const AvalancheDev = {
       privateKey:
         '0x67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e',
     },
+    {
+      privateKey:
+        '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de',
+    },
   ],
   depositL2Gas: 1_000_000,
   gasLimitOption: { gasLimit: 400_000 },
