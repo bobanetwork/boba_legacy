@@ -27,6 +27,12 @@ jobs:
           command: bash scripts/wait-for-sequencer.sh
           working_directory: ops
       - run:
+          name: Run examples integration tests
+          command: |
+            circleci tests glob "../boba_examples/*/test/*.ts" | circleci tests split | tee splits.txt
+            docker-compose run integration_tests $(cat splits.txt)
+          working_directory: ops
+      - run:
           name: Run integration tests
           command: |
             circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split | tee splits.txt
