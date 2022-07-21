@@ -115,6 +115,15 @@ type Context struct {
 	Sequencer   bool
 }
 
+// Maximum allowed length of the modified calldata (selector + req + response).
+// This cannot exceed 65535 due to a 16-bit length field when the batch_submitter
+// writes it to the CTC. There is also a limit in core/types/transaction_meta.go
+// which restricts this value to at most 65508.
+const turingMaxLenCD = 65508
+
+// Maximum allowed length of hex-encoded response (with "0x" prefix).
+const turingMaxLenEnc = 2*(turingMaxLenCD-4) + 2
+
 // EVM is the Ethereum Virtual Machine base object and provides
 // the necessary tools to run a contract on the given state with
 // the provided context. It should be noted that any error
@@ -229,7 +238,7 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 	// Check the rType
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
-	if rType != 1 {
+        if rType != 1 {
 		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
@@ -376,6 +385,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	// Check the rType
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
+	rVersion := int(rest[28]) // 0 for legacy, 1 for current
+
 	if rType != 1 {
 		log.Error("TURING bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
@@ -458,6 +469,24 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	// At this point, we have the API endpoint and the payload that needs to go there...
 	payload := restHexUtil[startIDXpayload:] //using hex here since that makes it easy to get the string
 
+	// We want the body of the payload without the ABI-encoding length prefix
+	if len(payload) < 64 || (len(payload)%32) != 0 {
+		log.Error("TURING bad request payload", "len", len(payload))
+		retError[35] = 11 // Overloading the "calldata too short", could assign a new error
+		return retError, 11
+	}
+
+	pLen := new(big.Int).SetBytes(payload[:32])
+	if rVersion > 0 {
+		payload = payload[32:]
+
+		if pLen.Cmp(big.NewInt(int64(len(payload)))) != 0 {
+			log.Error("TURING bad request payload (length mismatch)", "claimed", pLen, "actual", len(payload))
+			retError[35] = 11
+			return retError, 11
+		}
+	}
+
 	log.Debug("TURING bobaTuringCall:Have URL and payload",
 		"url", url,
 		"payload", payload)
@@ -473,8 +502,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 			retError[35] = 13 // Client Error
 			return retError, 13
 		}
-		if len(responseStringEnc) > 322 {
-			log.Error("TURING bobaTuringCall:Raw response too long (> 322)", "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
+		if len(responseStringEnc) > turingMaxLenEnc {
+			log.Error("TURING bobaTuringCall:Raw response too long", "limit", turingMaxLenEnc, "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
 			retError[35] = 17 // Raw Response too long
 			return retError, 17
 		}
@@ -484,27 +513,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 			retError[35] = 14 // Client Response Decode Error
 			return retError, 14
 		}
-		// if we get back, for example,
-		// 0x
-		// 0000000000000000000000000000000000000000000000000000000000000040
-		// 0000000000000000000000000000000000000000000000000000000000418b95
-		// 0000000000000000000000000000000000000000000000000000017e60d3b45f
-		// this leads to len(responseString) of 3*32 = 96
-		// let's cap the byte payload at 32 + 4*32 = 160 - this allows encoding of 4 uint256
-		// Security perspective - we locally construct the revised calldata, EXCEPT the last field
-		// the `bytes memory _payload`, which is limited to 160 bytes max
-		// Garbage-in scenario: Assuming the payload is filled with garbage, this will break downstream
-		// abi.decode(encResponse,(uint256))'s for example, but that's a problem at the contract level not at the Geth level
-		// DDOS scenario: Assuming the payload is filled with lots of garbage, this will burn ETH
-		// reflecting the cost of storing junk on L1.
-		// Evil-in scenario: Assume a long / specially crafted payload is returned from the external API
-		// In this attack, the idea would be to break client.Call as it is trying to pack the response into &responseStringEnc
-		// Alternatively, could attack hexutil.Decode
-		if len(responseString) > 160 {
-			log.Error("TURING bobaTuringCall:Response too big (> 160 bytes)", "length", len(responseString), "responseString", responseString)
-			retError[35] = 18 // Response too big
-			return retError, 18
-		}
+		// Reassigned the "retError 18: Response too big" check which used to be here
+
 		t := time.Now()
 		elapsed := t.Sub(startT)
 		log.Debug("TURING API response time", "elapsed", elapsed)
@@ -524,7 +534,25 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	ret = make([]byte, startIDXpayload+4)
 	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
-	ret = append(ret, responseString...)         // and tack on the payload
+
+	// Calculate the calldata limit for a legacy request
+	lenLimit := startIDXpayload+4 + 160
+
+	if rVersion > 0 {
+		lenLimit = turingMaxLenCD // Absolute maximum; actual limit will depend on gas
+
+		rLen := big.NewInt(int64(len(responseString)))
+		lenStr := hexutil.MustDecode(fmt.Sprintf("0x%064x", rLen))
+
+		ret = append(ret, lenStr...) // Prefix w. ABI-encoding length
+	}
+	ret = append(ret, responseString...) // and tack on the payload
+
+	if len(ret) > lenLimit {
+		log.Error("TURING bobaTuringCall:Calldata too long", "limit", turingMaxLenCD, "length", len(ret))
+		retError[35] = 18 // Calldata too long
+		return retError, 18
+	}
 
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
