@@ -50,8 +50,7 @@ const loadContracts = () => {
   return Boba_AuthenticatedFaucet
 }
 
-// Verify message and send to node if it's correct
-module.exports.mainnetHandler = async (event, context, callback) => {
+const handle = async(event, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body
@@ -99,44 +98,12 @@ module.exports.mainnetHandler = async (event, context, callback) => {
   })
 }
 
+// Verify message and send to node if it's correct
+module.exports.mainnetHandler = async (event, context, callback) => {
+  return handle(event, callback)
+}
+
 // Return error message
 module.exports.rinkebyHandler = async (event, context, callback) => {
-  const body = JSON.parse(event.body)
-
-  const { hashedMsg, signature, tweetId, walletAddress } = body
-
-  const Boba_AuthenticatedFaucet = loadContracts()
-
-  // Send transaction to node
-  try {
-    console.log('SendFundsMeta: ', walletAddress, tweetId, hashedMsg, signature)
-
-    await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
-      walletAddress,
-      tweetId,
-      hashedMsg,
-      signature
-    )
-
-    const execTx = await Boba_AuthenticatedFaucet.sendFundsMeta(
-      walletAddress,
-      tweetId,
-      hashedMsg,
-      signature
-    )
-    await execTx.wait()
-  } catch (err) {
-    console.error(err)
-    return callback(null, {
-      headers,
-      statusCode: 400,
-      body: JSON.stringify({ status: 'failure', error: err }),
-    })
-  }
-
-  return callback(null, {
-    headers,
-    statusCode: 201,
-    body: JSON.stringify({ status: 'success' }),
-  })
+  return handle(event, callback)
 }

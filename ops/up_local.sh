@@ -35,30 +35,26 @@ if [[ $BUILD == 1 ]]; then
   yarn build
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 DOCKERFILE="docker-compose.yml"
 
 if [[ $BUILD == 1 ]]; then
-    docker-compose build --parallel -- builder l2geth l1_chain
-    docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
-    docker-compose build -- boba_message-relayer-fast
-    docker-compose build -- gas_oracle
-    docker-compose build -- boba_deployer
-    docker-compose build -- fraud-detector
-    docker-compose build -- monitor
-    docker-compose build -- verifier
-    docker-compose build -- replica
+  docker-compose build --parallel -- builder l2geth l1_chain
+  docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
+  docker-compose build --parallel -- boba_message-relayer-fast gas_oracle boba_deployer
+  docker-compose build --parallel -- fraud-detector monitor
+  docker-compose build --parallel -- verifier replica
 elif [[ $BUILD == 0 ]]; then
   docker-compose -f "$DIR/$DOCKERFILE" pull
   echo 1
 fi
 
 if [[ $DAEMON == 1 ]]; then
-    docker-compose \
+  docker-compose \
     -f "$DIR/$DOCKERFILE" \
     up --no-build --detach -V
 else
-    docker-compose \
+  docker-compose \
     -f "$DIR/$DOCKERFILE" \
     up --no-build -V
 fi
