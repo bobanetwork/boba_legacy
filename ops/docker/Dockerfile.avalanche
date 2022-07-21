@@ -1,29 +1,30 @@
 # Build Geth in a stock Go builder container
- FROM golang:1.17.9-alpine
+FROM golang:1.17.9-alpine
 
- RUN apk add --no-cache git bash gcc musl-dev curl jq
+RUN apk add --no-cache git bash gcc musl-dev curl jq
 
- WORKDIR $GOPATH
- RUN mkdir -p src/github.com/ava-labs/avalanchego && cd src/github.com/ava-labs
- WORKDIR $GOPATH/src/github.com/ava-labs
+WORKDIR $GOPATH
+RUN mkdir -p src/github.com/ava-labs/avalanchego && cd src/github.com/ava-labs
+WORKDIR $GOPATH/src/github.com/ava-labs
 
- # RUN curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-cli/main/scripts/install.sh | sh -s
- RUN git clone https://github.com/ava-labs/avalanchego
- RUN cd avalanchego && ./scripts/build.sh
+# RUN curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-cli/main/scripts/install.sh | sh -s
+RUN git clone https://github.com/ava-labs/avalanchego
+RUN cd avalanchego && ./scripts/build.sh
 
- RUN git clone https://github.com/ava-labs/avalanche-network-runner.git
- WORKDIR $GOPATH/src/github.com/ava-labs/avalanche-network-runner
- RUN go mod vendor
- RUN sed -i 's/127.0.0.1/0.0.0.0/g' local/default/node0/config.json local/default/node1/config.json local/default/node2/config.json local/default/node3/config.json local/default/node4/config.json
- RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node0/config.json > local/default/node0/config.json.tmp && mv local/default/node0/config.json.tmp local/default/node0/config.json
- RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node1/config.json > local/default/node1/config.json.tmp && mv local/default/node1/config.json.tmp local/default/node1/config.json
- RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node2/config.json > local/default/node2/config.json.tmp && mv local/default/node2/config.json.tmp local/default/node2/config.json
- RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node3/config.json > local/default/node3/config.json.tmp && mv local/default/node3/config.json.tmp local/default/node3/config.json
- RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node4/config.json > local/default/node4/config.json.tmp && mv local/default/node4/config.json.tmp local/default/node4/config.json
- RUN jq --argjson key "[{\"ethAddr\":\"0x56faE09531C4985188BA78B7fB93739eaf1fBF98\",\"avaxAddr\":\"X-custom1etenrecgr0lhywpcuvdc7crkgu4f7pdgx7qrdx\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]},{\"ethAddr\":\"0x4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F\",\"avaxAddr\":\"X-custom17qjusw0fy9d52tgwpjpak2p6qgu9pc2y6qgpqy\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]},{\"ethAddr\":\"0xdae74D7327d123a1E1732C14a75599ceAd1aeeC0\",\"avaxAddr\":\"X-custom1mp5hjf2vlpvk50e7ma4f8lss08w39y9m6gw43e\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]}]" '.allocations += $key' local/default/genesis.json > local/default/genesis.json.new && mv local/default/genesis.json.new local/default/genesis.json
- RUN jq --arg key "{\"config\":{\"chainId\":43112,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC\":{\"balance\":\"0x295BE96E64066972000000\"},\"56faE09531C4985188BA78B7fB93739eaf1fBF98\":{\"balance\":\"0x295BE96E64066972000000\"},\"4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F\":{\"balance\":\"0x295BE96E64066972000000\"},\"dae74D7327d123a1E1732C14a75599ceAd1aeeC0\":{\"balance\":\"0x295BE96E64066972000000\"},\"b57255024fa928e3d296c41528171b5f67e8d447\":{\"balance\":\"0x295BE96E64066972000000\"},\"91ef3b19cdb344c5010358718e9347dd5cb2f362\":{\"balance\":\"0x295BE96E64066972000000\"},\"f31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea\":{\"balance\":\"0x295BE96E64066972000000\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}" '.cChainGenesis = $key' local/default/genesis.json > local/default/genesis.json.new && mv local/default/genesis.json.new local/default/genesis.json
+RUN git clone https://github.com/ava-labs/avalanche-network-runner.git
+WORKDIR $GOPATH/src/github.com/ava-labs/avalanche-network-runner
+RUN go mod vendor
+RUN sed -i 's/127.0.0.1/0.0.0.0/g' local/default/node0/config.json local/default/node1/config.json local/default/node2/config.json local/default/node3/config.json local/default/node4/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node0/config.json > local/default/node0/config.json.tmp && mv local/default/node0/config.json.tmp local/default/node0/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node1/config.json > local/default/node1/config.json.tmp && mv local/default/node1/config.json.tmp local/default/node1/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node2/config.json > local/default/node2/config.json.tmp && mv local/default/node2/config.json.tmp local/default/node2/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node3/config.json > local/default/node3/config.json.tmp && mv local/default/node3/config.json.tmp local/default/node3/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node4/config.json > local/default/node4/config.json.tmp && mv local/default/node4/config.json.tmp local/default/node4/config.json
+RUN jq --argjson key "[{\"ethAddr\":\"0x56faE09531C4985188BA78B7fB93739eaf1fBF98\",\"avaxAddr\":\"X-custom1etenrecgr0lhywpcuvdc7crkgu4f7pdgx7qrdx\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]},{\"ethAddr\":\"0x4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F\",\"avaxAddr\":\"X-custom17qjusw0fy9d52tgwpjpak2p6qgu9pc2y6qgpqy\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]},{\"ethAddr\":\"0xdae74D7327d123a1E1732C14a75599ceAd1aeeC0\",\"avaxAddr\":\"X-custom1mp5hjf2vlpvk50e7ma4f8lss08w39y9m6gw43e\",\"initialAmount\":300000000000000000,\"unlockSchedule\":[{\"amount\":20000000000000000},{\"amount\":10000000000000000,\"locktime\":1633824000}]}]" '.allocations += $key' local/default/genesis.json > local/default/genesis.json.new && mv local/default/genesis.json.new local/default/genesis.json
+RUN jq --arg key "{\"config\":{\"chainId\":43112,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC\":{\"balance\":\"0x295BE96E64066972000000\"},\"56faE09531C4985188BA78B7fB93739eaf1fBF98\":{\"balance\":\"0x295BE96E64066972000000\"},\"4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F\":{\"balance\":\"0x295BE96E64066972000000\"},\"dae74D7327d123a1E1732C14a75599ceAd1aeeC0\":{\"balance\":\"0x295BE96E64066972000000\"},\"b57255024fa928e3d296c41528171b5f67e8d447\":{\"balance\":\"0x295BE96E64066972000000\"},\"91ef3b19cdb344c5010358718e9347dd5cb2f362\":{\"balance\":\"0x295BE96E64066972000000\"},\"f31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea\":{\"balance\":\"0x295BE96E64066972000000\"},\"8a4b16f666b4e91943c6d5bc9fea4274f57e8848\":{\"balance\":\"0x295BE96E64066972000000\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}" '.cChainGenesis = $key' local/default/genesis.json > local/default/genesis.json.new && mv local/default/genesis.json.new local/default/genesis.json
 
 
- EXPOSE 9650 9652 9654 9656 9658
- ENV AVALANCHEGO_EXEC_PATH $GOPATH/src/github.com/ava-labs/avalanchego/bin/avalanche
- ENTRYPOINT ["go", "run", "examples/local/fivenodenetwork/main.go"]
+
+EXPOSE 9650 9652 9654 9656 9658
+ENV AVALANCHEGO_EXEC_PATH $GOPATH/src/github.com/ava-labs/avalanchego/bin/avalanche
+ENTRYPOINT ["go", "run", "examples/local/fivenodenetwork/main.go"]

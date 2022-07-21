@@ -43,7 +43,7 @@ version: "3"
 # C-Chain PrivKey 0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c
 
 
-# Sequencer / Gas Price Oracle
+# Sequencer
 # PUB KEY 6D1Fs4Ty4PFLq5DnvymnMvtTnHxRWT3uPLqRZejd1WrkMavTc7
 # ADDRESS C-custom1eeftxyzhjlu6hx95ycvskcvwnj6vxx7rkaujas
 # PRIV KEY PrivateKey-Vmr4BTLYkPKcaw4nYW6SxEbr275chp3MBktoGkc5auUhjV7wM
@@ -57,6 +57,14 @@ version: "3"
 # PRIV KEY PrivateKey-nnqZLTSthVBRQbc1kzLt7LMC68XiWcnVbDukKbJHrBSfBiFK6
 # ETH Address 0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea
 # C-Chain PrivKey 0x67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e
+
+
+# Gas Price Oracle
+# PUB KEY 4xpZF5yxqGc5ahLFRcRSDPYaQqR5rv3Pt2p5znLcRwdGrdrX68
+# Address C-custom1wq32vs9gfvhzrgle36tqdqc5pk5wres3f4fv3e
+# Private Key PrivateKey-23ZgZBmzqiBeJLKTCG2AAsvbAGExwZjyRvVNcqUAMVowQdTguP
+# ETH Address 0x8a4b16f666b4e91943c6d5bc9fea4274f57e8848
+# C-Chain PrivKey 0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de
 
 
 x-deployer_pk: &deployer_pk
@@ -82,7 +90,7 @@ x-integration_3_pk: &integration_3_pk
   PRIVATE_KEY_3: '0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c'
 
 x-integration_4_pk: &integration_4_pk
-  GAS_PRICE_ORACLE_PRIVATE_KEY: '0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a'
+  GAS_PRICE_ORACLE_PRIVATE_KEY: '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de'
 
 services:
   builder:
@@ -131,7 +139,7 @@ services:
       L2_CHAIN_ID: 31338
       L2_BLOCK_GAS_LIMIT: 11000000
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      GAS_PRICE_ORACLE_OWNER: "0x91eF3b19Cdb344C5010358718e9347dd5CB2f362"
+      GAS_PRICE_ORACLE_OWNER: "0x8a4b16f666b4e91943c6d5bc9fea4274f57e8848"
       GAS_PRICE_ORACLE_OVERHEAD: "2750"
       GAS_PRICE_ORACLE_SCALAR: "1500000"
       GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
