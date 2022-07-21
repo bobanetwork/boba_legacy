@@ -5,4 +5,6 @@ ignores: [
   "@uniswap/v3-core",
   "mocha",
   "typescript",
+  "eth-gas-reporter",
+  "mocha-junit-reporter"
 ]

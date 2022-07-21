@@ -1,0 +1,14 @@
+{
+  "reporterEnabled": "mocha-junit-reporter, eth-gas-reporter",
+  "mochaJunitReporterReporterOptions": {
+    "mochaFile": "./result/output.xml",
+    "toConsole": true
+  },
+  "ethGasReporterReporterOptions": {
+    "currency": "USD",
+    "gasPrice": 100,
+    "url": "http://l1_chain:8545",
+    "src": "../contracts",
+    "forceConsoleOutput": true
+  }
+}

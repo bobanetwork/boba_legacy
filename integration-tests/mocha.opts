@@ -1,1 +1,1 @@
---file ./test/setup-docker-compose-network.js
+--file ./test/setup-docker-compose-network.js --reporter mocha-junit-reporter --reporter-options mochaFile=./result/output.xml toConsole=true
