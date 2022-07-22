@@ -16,6 +16,7 @@ interface ITuringHelper {
        need to include a timestamp and/or more details about the
        offchain interaction.
     */
+    function TuringTxV1(string memory _url, bytes memory _payload) external returns (bytes memory);
     function TuringTx(string memory _url, bytes memory _payload) external returns (bytes memory);
 
     function TuringRandom() external returns (uint256);

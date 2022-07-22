@@ -52,6 +52,7 @@ contract TuringHelper is ITuringHelper, Ownable {
 
   function GetErrorCode(uint32 rType)
     internal view returns (string memory) {
+      rType = rType & 0x00ffffff; // Remove the 'version' field
       if(rType ==  1) return "TURING: Geth intercept failure";
       if(rType == 10) return "TURING: Incorrect input state";
       if(rType == 11) return "TURING: Calldata too short";
@@ -64,6 +65,7 @@ contract TuringHelper is ITuringHelper, Ownable {
       if(rType == 18) return "TURING: API Response >160 bytes";
       if(rType == 19) return "TURING: Insufficient credit";
       if(rType == 20) return "TURING: Missing cache entry";
+      return "TURING: Unknown error";
   }
 
   /* This is the interface to the off-chain mechanism. Although
@@ -81,7 +83,7 @@ contract TuringHelper is ITuringHelper, Ownable {
 
     require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
     require (_payload.length > 0, "Turing:GetResponse:no payload");
-    require (rType == 2, string(GetErrorCode(rType))); // l2geth can pass values here to provide debug information
+    require ((rType & 0x00ffffff) == 2, string(GetErrorCode(rType))); // l2geth can pass values here to provide debug information
     return _payload;
   }
 
@@ -113,6 +115,22 @@ contract TuringHelper is ITuringHelper, Ownable {
      root as during the initial execution. Note - a future version might
      need to include a timestamp and/or more details about the
      offchain interaction.
+  */
+  function TuringTxV1(string memory _url, bytes memory _payload)
+    public onlyPermittedCaller override returns (bytes memory) {
+      require (_payload.length > 0, "Turing:TuringTx:no payload");
+
+      /* Initiate the request. This can't be a local function call
+         because that would stay inside the EVM and not give l2geth
+         a place to intercept and re-write the call.
+      */
+      bytes memory response = Self.GetResponse(0x01000001, _url, _payload);
+      emit OffchainResponse(0x01, response);
+      return response;
+  }
+
+  /* Legacy version which inserts an extra length parameter into
+     the off-chain request and response.
   */
   function TuringTx(string memory _url, bytes memory _payload)
     public onlyPermittedCaller override returns (bytes memory) {
