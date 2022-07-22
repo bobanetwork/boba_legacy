@@ -12,6 +12,7 @@ import {
   envConfig,
   withdrawalTest,
   approveERC20,
+  isAvalanche,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
@@ -164,7 +165,10 @@ describe('Native BOBA Integration Tests', async () => {
 
     // Set data length slightly less than MAX_ROLLUP_TX_SIZE
     // to allow for encoding and other arguments
-    const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 500)
+    let data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 500)
+    if (await isAvalanche(env.l2Provider)) {
+      data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 1500)
+    }
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     const { tx, receipt } = await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(

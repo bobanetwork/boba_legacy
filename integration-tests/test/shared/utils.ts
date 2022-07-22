@@ -453,6 +453,10 @@ export const getFilteredLogIndex = async (
   return filteredLogs[0].logIndex
 }
 
+export const isAvalanche = async (network) => {
+  return (await network.getNetwork()).chainId === AVALANCHE_CHAIN_ID
+}
+
 // // eslint-disable-next-line @typescript-eslint/no-shadow
 // export const isMainnet = async () => {
 //   const chainId = await l1Wallet.getChainId()
