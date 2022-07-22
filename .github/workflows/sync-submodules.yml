@@ -55,7 +55,7 @@ jobs:
           pr_body: ":crown: *An automated PR*"
           pr_label: "auto-pr"
           pr_allow_empty: true
-          pr_reviewer: wsdt,InoMurko,souradeep-das,Boyuan-Chen
+          pr_reviewer: wsdt,InoMurko,souradeep-das,Boyuan-Chen,trangtran-enya,mmontour1306
 
         # git pull --recurse-submodules
         # git submodule update --remote --recursive
