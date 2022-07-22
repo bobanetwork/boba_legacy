@@ -2,7 +2,7 @@ name: 'Submodules Sync'
 
 on:
   push:
-  # branches: develop # TODO: UNCOMMENT!
+    branches: develop 
   # Allows you to run this workflow manually from the Actions tab or through HTTP API
   workflow_dispatch:
 
@@ -28,8 +28,8 @@ jobs:
       - name: Git Submodule Update
         run: |
           # If we want to update all, just commented bc. we already have a sync for tests
-          git branch -M bot/submodules-merge
           git pull || echo "Nothing to pull"
+          git branch -M bot/submodules-merge
           cd bedrock/erigon
           git checkout devel
           git pull origin devel
