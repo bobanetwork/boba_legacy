@@ -167,7 +167,7 @@ describe('Native BOBA Integration Tests', async () => {
     // to allow for encoding and other arguments
     let data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 500)
     if (await isAvalanche(env.l2Provider)) {
-      data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 1500)
+      data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 10000)
     }
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
     const { tx, receipt } = await env.waitForXDomainTransaction(
