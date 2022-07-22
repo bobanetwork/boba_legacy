@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ const initialState = {
   ledger: false,
   alert: null,
   error: null,
+  lock: null,
   activeHistoryTab: 'All',
   activeDataTab: 'Seven Day Queue',
 };
@@ -67,6 +68,7 @@ function uiReducer (state = initialState, action) {
         fast: action.fast,
         token: action.token,
         tokenIndex: action.tokenIndex,
+        lock: action.lock, // incase of lock record
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }

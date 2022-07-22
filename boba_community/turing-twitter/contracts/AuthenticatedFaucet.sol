@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/ITuringHelper.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -11,29 +12,35 @@ contract AuthenticatedFaucet is Ownable {
 
     string public apiUrl;
     ITuringHelper public turingHelper;
+    IERC20 public bobaToken;
     mapping(uint256 => uint256) twitterUserLastClaim;
     uint256 lastEpochStart;
     uint256 amountClaimsInLastEpoch;
     uint256 maxClaimsPerEpoch;
     uint256 testnetETHPerClaim;
+    uint256 bobaTokenPerClaim;
 
     event GasClaimed(uint256 authorId);
 
     mapping(address => uint256) private _nonces;
 
-    constructor(string memory apiUrl_, address turingHelper_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_) {
+    constructor(string memory apiUrl_, address turingHelper_, address bobaToken_, uint256 maxClaimsPerEpoch_,
+        uint256 testnetETHPerClaim_, uint256 bobaTokenPerClaim_) {
         apiUrl = apiUrl_;
         turingHelper = ITuringHelper(turingHelper_);
+        bobaToken = IERC20(bobaToken_);
         lastEpochStart = block.timestamp;
         amountClaimsInLastEpoch = 0;
         maxClaimsPerEpoch = maxClaimsPerEpoch_;
         testnetETHPerClaim = testnetETHPerClaim_;
+        bobaTokenPerClaim = bobaTokenPerClaim_;
     }
 
-    function setConfig(string memory apiUrl_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_) external onlyOwner {
+    function setConfig(string memory apiUrl_, uint256 maxClaimsPerEpoch_, uint256 testnetETHPerClaim_, uint256 bobaTokenPerClaim_) external onlyOwner {
         apiUrl = apiUrl_;
         maxClaimsPerEpoch = maxClaimsPerEpoch_;
         testnetETHPerClaim = testnetETHPerClaim_;
+        bobaTokenPerClaim = bobaTokenPerClaim_;
     }
 
     function sendFundsMeta(address to_, string calldata twitterPostID_, bytes32 hashedMessage_, bytes memory signature_) external {
@@ -66,6 +73,7 @@ contract AuthenticatedFaucet is Ownable {
         twitterUserLastClaim[authorId] = block.timestamp;
 
         payable(to_).transfer(testnetETHPerClaim);
+        bobaToken.transfer(to_, bobaTokenPerClaim);
         emit GasClaimed(authorId);
     }
 
@@ -80,6 +88,7 @@ contract AuthenticatedFaucet is Ownable {
 
     function withdraw() external onlyOwner {
         payable(owner()).transfer(address(this).balance);
+        bobaToken.transfer(owner(), bobaToken.balanceOf(address(this)));
     }
 
     receive() external payable {}
