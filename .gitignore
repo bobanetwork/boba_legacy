@@ -16,6 +16,7 @@ build
 dist
 artifacts
 cache
+__pycache__
 
 l2geth/build/bin
 packages/contracts/deployments/custom
