@@ -89,6 +89,7 @@ contract AuthenticatedFaucet is Ownable {
 
     function withdraw() external onlyOwner {
         payable(owner()).transfer(address(this).balance);
+        bobaToken.transfer(owner(), bobaToken.balanceOf(address(this)));
     }
 
     receive() external payable {}

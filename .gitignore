@@ -7,13 +7,16 @@ coverage.json
 *.tsbuildinfo
 
 env.yml
+env.yaml
 .aws-sam/
+__pycache__/
 .idea/
 .serverless/
 build
 dist
 artifacts
 cache
+__pycache__
 
 l2geth/build/bin
 packages/contracts/deployments/custom

@@ -201,7 +201,9 @@ describe('stress tests', () => {
       expect((await L1SimpleStorage.totalCount()).toNumber()).to.equal(
         wallets.length
       )
-    }).timeout(STRESS_TEST_TIMEOUT)
+    })
+      .timeout(STRESS_TEST_TIMEOUT)
+      .retries(3)
   })
 
   // These tests depend on an archive node due to the historical `eth_call`s

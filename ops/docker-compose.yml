@@ -318,6 +318,7 @@ services:
       #KMS access setup
       AWS_ACCESS_KEY_ID: "1"
       AWS_SECRET_ACCESS_KEY: "11"
+      BATCH_SUBMITTER_LOG_LEVEL: "info"
       BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
       BATCH_SUBMITTER_KMS_REGION: us-east-1
       #aliases are setup, check seed.yml
@@ -342,10 +343,13 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
+      RETRIES: 200
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
+    volumes:
+      - ~/result:/opt/optimism/integration-tests/result
 
   replica:
     depends_on:

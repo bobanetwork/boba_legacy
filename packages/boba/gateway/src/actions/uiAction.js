@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ export function setTheme (theme) {
   }
 }
 
-export function openModal (modal, token, fast, tokenIndex) {
+export function openModal (modal, token, fast, tokenIndex, lock) {
   return function (dispatch) {
-    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast, tokenIndex });
+    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast, tokenIndex, lock });
   }
 }
 
