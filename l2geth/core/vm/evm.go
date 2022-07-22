@@ -488,7 +488,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	}
 
 	log.Debug("TURING bobaTuringCall:Have URL and payload",
-		"url", url,
+		"version", rVersion,
+                "url", url,
 		"payload", payload)
 
 	client, err := rpc.Dial(url)
@@ -503,7 +504,10 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 			return retError, 13
 		}
 		if len(responseStringEnc) > turingMaxLenEnc {
-			log.Error("TURING bobaTuringCall:Raw response too long", "limit", turingMaxLenEnc, "length", len(responseStringEnc), "responseStringEnc", responseStringEnc)
+			log.Error("TURING bobaTuringCall:Raw response too long",
+				"limit", turingMaxLenEnc,
+                                "length", len(responseStringEnc),
+                                "responseStringEnc", responseStringEnc[:turingMaxLenEnc])
 			retError[35] = 17 // Raw Response too long
 			return retError, 17
 		}
@@ -528,7 +532,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		"Target", url,
 		"Payload", payload,
 		"ResponseStringEnc", responseStringEnc,
-		"ResponseString", responseString)
+		"ResponseString", hexutil.Bytes(responseString))
 
 	// build the modified calldata
 	ret = make([]byte, startIDXpayload+4)
@@ -643,8 +647,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	var updated_input hexutil.Bytes
 
 	// Sanity and depth checks
+	prefix_str := "Regular"
 	if isTuring2 || isGetRand2 {
-		log.Debug("TURING REQUEST START", "input", input, "len(evm.Context.Turing)", len(evm.Context.Turing))
+		prefix_str = "TURING"
+		log.Debug("TURING REQUEST START", "input", hexutil.Bytes(input), "len(evm.Context.Turing)", len(evm.Context.Turing))
 		// Check 1. can only run Turing once anywhere in the call stack
 		if evm.Context.TuringDepth > 1 {
 			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
@@ -674,7 +680,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
-			log.Debug("TURING NEW CALL", "updated_input", updated_input)
+			log.Debug("TURING NEW CALL", "updated_input", updated_input, "ret", hexutil.Bytes(ret), "err", err)
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
 			evm.Context.TuringDepth++
@@ -694,7 +700,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		ret, err = run(evm, contract, input, false)
 	}
 
-	log.Debug("TURING evm.go run",
+	log.Debug(prefix_str+" evm.go run", // Tagged as Regular or TURING
 		"depth", evm.depth,
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
