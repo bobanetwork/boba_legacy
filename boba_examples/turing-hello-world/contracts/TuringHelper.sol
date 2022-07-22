@@ -61,8 +61,8 @@ contract TuringHelper is ITuringHelper, Ownable {
       if(rType == 14) return "TURING: Could not decode server response";
       if(rType == 15) return "TURING: Could not create rpc client";
       if(rType == 16) return "TURING: RNG failure";
-      if(rType == 17) return "TURING: API Response >322 chars";
-      if(rType == 18) return "TURING: API Response >160 bytes";
+      if(rType == 17) return "TURING: API Response too long";
+      if(rType == 18) return "TURING: Calldata too long";
       if(rType == 19) return "TURING: Insufficient credit";
       if(rType == 20) return "TURING: Missing cache entry";
       return "TURING: Unknown error";

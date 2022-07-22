@@ -207,6 +207,7 @@ if (hre.network.name === "boba_local") {
 
       expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
     })
+
     it("should support floating point volume of sphere", async () => {
       await hello.estimateGas.multFloatNumbers(urlStr, '2.123', gasOverride)
       let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
@@ -229,7 +230,7 @@ if (hre.network.name === "boba_local") {
       expect(result.toFixed(5)).to.equal('33.51000')
     })
 
-    it.skip("should handle arrays", async() => {
+    it("should handle arrays", async() => {
       await hello.estimateGas.multArray(urlStr2, 48, 19, gasOverride)
       let tr = await hello.multArray(urlStr2, 48, 19, gasOverride)
       const res = await tr.wait()
@@ -240,18 +241,18 @@ if (hre.network.name === "boba_local") {
       expect(result).to.equal(912)
     })
 
-    it.skip("should limit the API response size", async() => {
+    it("should limit the API response size", async() => {
       try {
-        await hello.estimateGas.multArray(urlStr2, 64, 19, gasOverride)
+        await hello.estimateGas.multArray(urlStr2, 2046, 67, gasOverride)
         expect(1).to.equal(0)
       } catch (e) {
         expect(e.error.toString()).to.contain("TURING: API Response too long")
       }
     })
 
-    it.skip("should limit the Calldata size", async() => {
+    it("should limit the Calldata size", async() => {
       try {
-        await hello.estimateGas.multArray(urlStr2, 57, 19, gasOverride)
+        await hello.estimateGas.multArray(urlStr2, 2045, 56, gasOverride)
         expect(1).to.equal(0)
       } catch (e) {
         expect(e.error.toString()).to.contain("TURING: Calldata too long")
