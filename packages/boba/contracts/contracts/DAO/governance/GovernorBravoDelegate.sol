@@ -298,6 +298,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
           Receipt storage receipt = veReceipts[proposalId][tokenIds[i]];
           require(receipt.hasVoted == false, "GovernorBravo::castVoteInternal: tokenId already used for proposal");
           // check if owner or approved
+          // ve locks that have been merged with other locks are burned, and cannot be used here
           require(ve.isApprovedOrOwner(voter, tokenIds[i]), "GovernorBravo::castVoteInternal: Invalid tokenId provided");
           // get ve balance at startTimestamp of this proposal
           uint veBalance = ve.ve_for_at(tokenIds[i], proposal.startTimestamp);
