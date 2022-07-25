@@ -2,7 +2,10 @@
 	path = l2geth/tests/testdata
 	url = https://github.com/ethereum/tests
 
-[submodule "erigon"]
+[submodule "bedrock/erigon"]
 	path = bedrock/erigon
 	url = https://github.com/bobanetwork/erigon
 
+[submodule "bedrock/reference-optimistic-geth"]
+	path = bedrock/reference-optimistic-geth
+	url = https://github.com/bobanetwork/reference-optimistic-geth
