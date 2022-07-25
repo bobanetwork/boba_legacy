@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
 
-import { expectLogs, isNonEthereumChain, isAvalanche } from './shared/utils'
+import { expectLogs, isNonEthereumChain, getGasLimitOption } from './shared/utils'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
@@ -50,7 +50,7 @@ describe('Liquidity Pool Test', async () => {
   const tokenName = 'JLKN'
   const tokenSymbol = 'JLKN'
 
-  let gasLimitOption = { gasLimit: 9000000 }
+  let gasLimitOption: any
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -150,10 +150,7 @@ describe('Liquidity Pool Test', async () => {
       env.l2Wallet
     ).attach(predeploys.L2_L1NativeToken)
 
-    // Update gas limit on Aavalanche
-    if (await isAvalanche(env.l1Provider)) {
-      gasLimitOption = { gasLimit: 8000000 }
-    }
+    gasLimitOption = await getGasLimitOption(env.l1Provider)
   })
 
   it('{tag:mrf} should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
