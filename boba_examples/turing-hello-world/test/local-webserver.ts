@@ -259,6 +259,18 @@ if (hre.network.name === "boba_local") {
       }
     })
 
+    it("should charge extra gas for L1 calldata storage", async() => {
+      const g1 = (await hello.estimateGas.multArray(urlStr2, 1, 10, gasOverride)).toNumber()
+      const g2 = (await hello.estimateGas.multArray(urlStr2, 101, 10, gasOverride)).toNumber()
+      const g3 = (await hello.estimateGas.multArray(urlStr2, 1001, 10, gasOverride)).toNumber()
+      console.log("Gas", g1.toString(), g2.toString(), g3)
+
+      // Larger calldata costs more gas inside the contract itself. We need to test for
+      // additional usage on top of this from the L1 calldata calculation. The exact value
+      // depends on the L1 gas price so this test doesn't look for a specific number
+      expect (g2 - g1).to.be.above(110000)
+    })
+
     it("final balance", async () => {
       const postBalance = await turingCredit.prepaidBalance(
         helper.address

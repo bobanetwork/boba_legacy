@@ -676,6 +676,16 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
 				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
 				updated_input, _ = evm.bobaTuringCall(input, caller.Address(), mayBlock)
+
+                                // This does not yet account for the L1/L2 gas price ratio
+                                turingGas := uint64(len(updated_input)) * 500 / 32
+                                if contract.Gas <= turingGas {
+				log.Error("TURING ERROR: Insufficient gas for calldata", "have", contract.Gas, "need", turingGas)
+					return nil, 0, ErrTuringTooLong
+                                } else {
+					log.Debug("MMDBG Deducting Turing gas", "len", len(updated_input),"had", contract.Gas, "deducting", turingGas)
+					contract.UseGas(turingGas)
+                                }
 			} else if isGetRand2 {
 				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option
