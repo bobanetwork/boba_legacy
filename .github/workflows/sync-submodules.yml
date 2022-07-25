@@ -48,7 +48,7 @@ jobs:
       - name: pull-request
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: bot/erigon-merge
+          source_branch: bot/submodules-merge
           destination_branch: "develop"
           github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           pr_title: "Submodules Update -> develop"
