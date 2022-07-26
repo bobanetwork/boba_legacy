@@ -191,7 +191,7 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamBytecode
       }
       // Avalanche local
-      if (cfg.l1NativeTokenSymbol === 'AVAX') {
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 31338) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheByteCode
       }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {

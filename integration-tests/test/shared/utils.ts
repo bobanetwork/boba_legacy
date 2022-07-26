@@ -50,6 +50,12 @@ export const ON_CHAIN_GAS_PRICE = 'onchain'
 export const GWEI = BigNumber.from(1e9)
 export const L2_BOBA_ADDRESS = predeploys.L2_BOBA
 
+// { chainID: gasLimit }
+// The default gas limit for L1 transaction is 9_000_000
+export const GAS_LIMIT_OPTION = {
+  43112: 8000000,
+}
+
 const gasPriceValidator = makeValidator((gasPrice) => {
   if (gasPrice === 'onchain') {
     return gasPrice
@@ -451,6 +457,19 @@ export const getFilteredLogIndex = async (
   )
 
   return filteredLogs[0].logIndex
+}
+
+export const getGasLimitOption = async (network) => {
+  const chainID = (await network.getNetwork()).chainId
+  const gasLimitOption = GAS_LIMIT_OPTION[chainID]
+  if (typeof gasLimitOption !== 'undefined') {
+    return { gasLimit: gasLimitOption }
+  }
+  return { gasLimit: 9_000_000 }
+}
+
+export const isAvalanche = async (network) => {
+  return (await network.getNetwork()).chainId === AVALANCHE_CHAIN_ID
 }
 
 // // eslint-disable-next-line @typescript-eslint/no-shadow
