@@ -127,6 +127,8 @@ const deployFn: DeployFunction = async (hre) => {
     Timelock.address,
     BobaL2.address,
     xBobaL2.address,
+    // update this temp var
+    BobaL2.address, // pass ve address
     Timelock.address,
     GovernorBravoDelegate.address,
     governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
