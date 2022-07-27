@@ -342,6 +342,8 @@ services:
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
+    volumes:
+       - ~/result:/opt/optimism/integration-tests/result
 
   replica:
     depends_on:
