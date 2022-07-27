@@ -70,11 +70,23 @@ jobs:
           command: bash scripts/wait-for-sequencer.sh docker-compose-fantom.yml
           working_directory: ops
       - run:
+          name: Split tests
+          command: circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
+          working_directory: ops
+      - run:
           name: Run integration tests
+          command: docker-compose run integration_tests $(cat splits.txt)
+          working_directory: ops
+      - run:
+          name: Rewrite test name for next run
           command: |
             mkdir -p result
             cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
           working_directory: ops
+      - store_test_results:
+          path: /home/circleci/project/ops/result
+      - store_artifacts:
+          path: /home/circleci/project/ops/result
 
 workflows:
   main:
