@@ -53,7 +53,7 @@ contract AuthenticatedFaucet is Ownable {
     /// @param twitterPostID_: Tweet ID with the assigned ID.
     function sendFunds(address to_, string calldata twitterPostID_) public {
         require(address(this).balance >= testnetETHPerClaim, "No testnet funds");
-        require(bobaToken.balanceOf(address(this)) >= bobaTokenPerClaim, "No testnet tokens");
+        require(bobaToken.balanceOf(address(this)) >= bobaTokenPerClaim, "No boba token");
         if (block.timestamp >= (lastEpochStart + 1 hours)) {
             lastEpochStart = block.timestamp;
             amountClaimsInLastEpoch = 1;

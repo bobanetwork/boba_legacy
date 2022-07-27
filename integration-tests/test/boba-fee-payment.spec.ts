@@ -1411,9 +1411,9 @@ describe('Boba Fee Payment Integration Tests', async () => {
         .connect(env.l2Wallet)
         .transfer(env.l2Wallet_2.address, bobaBalance)
       await transferBackTx.wait()
-    })
+    }).retries(3)
 
-    it('{tag:boba} should revert transaction if spender is not correct', async () => {
+    it('should revert transaction if spender is not correct', async () => {
       const owner = env.l2Wallet_2.address
       const spender = env.addressesBOBA.FeedRegistry
       const value = (

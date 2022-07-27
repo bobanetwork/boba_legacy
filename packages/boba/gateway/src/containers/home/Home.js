@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import ExitModal from 'containers/modals/exit/ExitModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
+import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
@@ -69,6 +70,9 @@ import Alert from 'components/alert/Alert'
 import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { trackPageView } from 'util/googleAnalytics'
+import { fetchLockRecords } from 'actions/veBobaAction'
+
+import Zendesk from 'components/zendesk/Zendesk'
 
 require('dotenv').config()
 
@@ -94,10 +98,12 @@ function Home() {
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const manageLockModalState = useSelector(selectModalState('manageLock'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
+  const lock = useSelector(selectModalState('lock'))
 
   const network = useSelector(selectNetwork())
   const layer = useSelector(selectLayer())
@@ -171,6 +177,7 @@ function Home() {
 
 
   console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
+  console.log(pageDisplay);
 
   return (
     <>
@@ -183,6 +190,7 @@ function Home() {
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
+      {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
 
       <Alert
         type='error'
@@ -203,7 +211,7 @@ function Home() {
       >
         {alertMessage}
       </Alert>
-
+      <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&

@@ -1,16 +1,16 @@
 
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://rinkeby.infura.io/v3/YOUR_INFURA_KEY'
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: ${L1_NODE_WEB3_URL}
 
 x-l1_rpc_geth: &l1_rpc_geth
-  ETH1_HTTP: 'https://rinkeby.infura.io/v3/YOUR_INFURA_KEY'
+  ETH1_HTTP: ${L1_NODE_WEB3_URL}
 
 version: "3.9"
 
 services:
   dtl:
     container_name: dtl
-    image: bobanetwork/data-transport-layer:release
+    image: bobanetwork/data-transport-layer:${RELEASE_VERSION}
     env_file:
       -  ../../ops/envs/dtl-rinkeby.env
     environment:
@@ -25,7 +25,7 @@ services:
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     volumes:
-      - ./state-dumps/boba-rinkeby:/opt/optimism/packages/data-transport-layer/state-dumps/
+      - ./state-dumps/rinkeby/:/opt/optimism/packages/data-transport-layer/state-dumps/
     logging:
       driver: "json-file"
       options:
@@ -39,7 +39,7 @@ services:
     container_name: replica
     depends_on:
       - dtl
-    image: bobanetwork/l2geth:release
+    image: bobanetwork/l2geth:${RELEASE_VERSION}
     deploy:
       replicas: 1
     entrypoint: sh ./geth.sh

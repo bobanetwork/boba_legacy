@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -81,8 +81,8 @@ function TransferNFTModal ({ open, token, minHeight }) {
 
         <Typography variant="body2" sx={{mt: 2, fontWeight: '700', color: 'red'}}>
           CAUTION: This function is only for transfering an NFT from one Boba wallet to another Boba wallet.
-          You cannot directly transfer an NFT from a Boba wallet to an L1 address or to another chain. 
-          Your NFT will be lost if you try to do so. You can bridge NFTs to other chains on NFT marketplaces 
+          You cannot directly transfer an NFT from a Boba wallet to an L1 address or to another chain.
+          Your NFT will be lost if you try to do so. You can bridge NFTs to other chains on NFT marketplaces
           that support bridging.
         </Typography>
 

@@ -145,7 +145,7 @@ describe('Boba API Tests', async () => {
         )
       })
 
-      it('{tag:boba} should return error messages using the wrong payload', async () => {
+      it('should return error messages using the wrong payload', async () => {
         // Get balance
         const L2SecondaryFeeTokenBalanceBefore =
           await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
@@ -598,7 +598,7 @@ describe('Boba API Tests', async () => {
           to: Boba_GasPriceOracle.address,
           value: ethers.utils.parseEther('10'),
         })
-      })
+      }).retries(3)
     })
   })
 })
