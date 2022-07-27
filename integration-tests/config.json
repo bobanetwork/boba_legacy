@@ -7,6 +7,7 @@
   "ethGasReporterReporterOptions": {
     "currency": "USD",
     "gasPrice": 100,
+    "url": "http://l2geth:8545",
     "src": "../contracts",
     "forceConsoleOutput": true
   }
