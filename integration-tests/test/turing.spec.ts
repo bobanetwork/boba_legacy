@@ -84,7 +84,8 @@ describe('Turing 256 Bit Random Number Test', async () => {
   })
 
   after(async () => {
-    expect(await verifyStateRoots()).to.equal(true)
+    const stateRootsVerified = await verifyStateRoots()
+    expect(stateRootsVerified).to.equal(true)
     console.log('Verified state roots.')
   })
 
@@ -169,5 +170,5 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const numberHexString = '0x' + rawData.slice(-64)
     const result = BigInt(numberHexString)
     console.log('    Turing VRF 256 =', result)
-  })
+  }).timeout(100000)
 })

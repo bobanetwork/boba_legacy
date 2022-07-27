@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -62,18 +62,18 @@ function Seven({
 
     return (
       <S.Wrapper>
-          <S.GridContainer container 
-            spacing={2} 
-            direction="row" 
-            justifyContent="flex-start" 
+          <S.GridContainer container
+            spacing={2}
+            direction="row"
+            justifyContent="flex-start"
             alignItems="center"
           >
-            <S.GridItemTag item 
-              xs={12} 
-              md={12} 
+            <S.GridItemTag item
+              xs={12}
+              md={12}
               style={{
-                justifyContent: 'flex-start', 
-                alignItems:'center', 
+                justifyContent: 'flex-start',
+                alignItems:'center',
               }}
             >
                 <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>

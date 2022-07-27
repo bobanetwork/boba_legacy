@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ class OracleService {
     this.exchangeRateAVG = [];
     this.ws = null;
   }
-  
+
   initialize = () => (dispatch) => {
 
     console.log("OracleService: Trying to connect to:", getBaseServices().WEBSOCKET_API_URL)
 
     this.ws = new WebSocket(getBaseServices().WEBSOCKET_API_URL);
-    
+
     this.ws.onopen = () => {
       console.log("WebSocket Connected!");
       this.ws.send(JSON.stringify({action: "sendMessage", actionType: "postID" }));
@@ -52,7 +52,7 @@ class OracleService {
   check = () => (dispatch) => {
     dispatch(this.initialize());
   };
-  
+
   publish (content) {
     this.ws.send(JSON.stringify({action: "sendMessage", actionType: "postBidData", content }));
   }
