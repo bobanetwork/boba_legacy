@@ -373,6 +373,8 @@ services:
       << : *integration_2_pk
       << : *integration_3_pk
       << : *integration_4_pk
+    volumes:
+      - ~/result:/opt/optimism/integration-tests/result
     networks:
       - ava-network
 
