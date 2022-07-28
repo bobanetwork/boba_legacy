@@ -7,7 +7,7 @@ RPC_FLAGS=" \
   --datadir /home/boba/datadir \
   --http.port 8545 \
   --http.addr 0.0.0.0 \
-  --http.vhosts "l1_chain" \
+  --http.vhosts "l1_chain,localhost" \
   --http.corsdomain "*" \
   --http.api "eth,debug,net,erigon,web3" \
   --verbosity 4 \
