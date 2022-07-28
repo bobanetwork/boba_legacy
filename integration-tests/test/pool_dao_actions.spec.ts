@@ -663,6 +663,13 @@ describe('Dao Action Test', async () => {
         ).to.be.revertedWith(
           'GovernorBravo::castVoteInternal: tokenId already used for proposal'
         )
+        // token used for proposal cannot be used to vote
+        invalidTokenId = [1]
+        await expect(
+          Governor.castVote(proposalID, 1, invalidTokenId)
+        ).to.be.revertedWith(
+          'GovernorBravo::castVoteInternal: tokenId already used for proposal'
+        )
 
         // this should succeed
         const tokenIds = [3]
