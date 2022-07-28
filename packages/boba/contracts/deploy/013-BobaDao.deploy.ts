@@ -50,7 +50,7 @@ const deployFn: DeployFunction = async (hre) => {
       eta_delay_s = 182800
       governor_voting_period = 259200 // 3 days
       governor_voting_delay = 172800 // 2 days
-      governor_proposal_threshold = utils.parseEther('100000')
+      governor_proposal_threshold = utils.parseEther('50000')
     } else {
       // set config for local/rinkeby
       delay_before_execute_s = 0
@@ -59,13 +59,6 @@ const deployFn: DeployFunction = async (hre) => {
       governor_voting_delay = 172800 // 2 days in seconds
       governor_proposal_threshold = utils.parseEther('50000')
     }
-
-    // get deployed BOBA L2
-
-    const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
-    const xBobaL2 = await hre.deployments.getOrNull('TK_L2xBOBA')
-    console.log(`L2_BOBA is located at: ${BobaL2.address}`)
-    console.log(`L2_xBOBA is located at: ${xBobaL2.address}`)
 
     Factory__Timelock = new ContractFactory(
       TimelockJson.abi,
@@ -129,8 +122,6 @@ const deployFn: DeployFunction = async (hre) => {
 
     GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
       Timelock.address,
-      BobaL2.address,
-      xBobaL2.address,
       // update this temp var
       veAddress, // pass ve address
       Timelock.address,

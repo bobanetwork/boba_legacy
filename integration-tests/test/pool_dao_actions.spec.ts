@@ -91,7 +91,6 @@ describe('Dao Action Test', async () => {
     Factory__Ve = new ContractFactory(VeJson.abi, VeJson.bytecode, env.l2Wallet)
 
     const BobaL2 = env.addressesBOBA.TOKENS.BOBA.L2
-    const xBobaL2 = env.addressesBOBA.TOKENS.xBOBA.L2
 
     Factory__Timelock = new ContractFactory(
       TimelockJson.abi,
@@ -131,8 +130,6 @@ describe('Dao Action Test', async () => {
 
     GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
       Timelock.address,
-      BobaL2,
-      xBobaL2,
       Ve.address,
       Timelock.address,
       GovernorBravoDelegate.address,
@@ -313,7 +310,7 @@ describe('Dao Action Test', async () => {
         await moveTimeForward()
 
         // create a ve lock
-        const depositAmount = utils.parseEther('110000')
+        const depositAmount = utils.parseEther('300000')
         const lockDuration = 1 * 365 * 86400
         await L2Boba.approve(Ve.address, depositAmount)
         await Ve.create_lock(depositAmount, lockDuration)
@@ -425,7 +422,7 @@ describe('Dao Action Test', async () => {
       )
 
       // create a fresh lock
-      const depositAmount = utils.parseEther('110000')
+      const depositAmount = utils.parseEther('300000')
       const lockDuration = 1 * 365 * 86400
       await L2Boba.approve(Ve.address, depositAmount)
       await Ve.create_lock(depositAmount, lockDuration)
@@ -478,7 +475,7 @@ describe('Dao Action Test', async () => {
       try {
         // create a fresh lock
         // amount more than quorumVotes
-        const depositAmount = utils.parseEther('1100000')
+        const depositAmount = utils.parseEther('300000')
         const lockDuration = 1 * 365 * 86400
         await L2Boba.approve(Ve.address, depositAmount)
         await Ve.create_lock(depositAmount, lockDuration)

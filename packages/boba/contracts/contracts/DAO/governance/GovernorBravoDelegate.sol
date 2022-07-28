@@ -11,10 +11,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     string public constant name = "Boba Governor";
 
     /// @notice The minimum setable proposal threshold
-    uint public constant MIN_PROPOSAL_THRESHOLD = 50000e18;  //  50,000 BOBA
+    uint public constant MIN_PROPOSAL_THRESHOLD = 25000e18;  //  25,000 veBOBA
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 500000e18; // 500,000 BOBA
+    uint public constant MAX_PROPOSAL_THRESHOLD = 100000e18; // 100,000 veBOBA
 
     /// @notice The minimum setable voting period
     uint public constant MIN_VOTING_PERIOD = 3 days;     // seconds
@@ -29,7 +29,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     uint public constant MAX_VOTING_DELAY = 7 days; // 1 week
 
     /// @notice The number of votes in support of a proposal required for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 1000000e18; // 1,000,000 BOBA
+    uint public constant quorumVotes = 250000e18; // 250,000 veBOBA
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint public constant proposalMaxOperations = 10; // 10 actions
@@ -43,27 +43,21 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /**
       * @notice Used to initialize the contract during delegator contructor
       * @param timelock_ The address of the Timelock
-      * @param bobaToken_ The address of the L2 BOBA token
-      * @param xbobaToken_ The address of the L2 xBOBA token
       * @param ve_ The address of the ve lock contract
       * @param votingPeriod_ The initial voting period in seconds
       * @param votingDelay_ The initial voting delay in seconds
       * @param proposalThreshold_ The initial proposal threshold
       */
-    function initialize(address timelock_, address bobaToken_, address xbobaToken_, address ve_, uint votingPeriod_, uint votingDelay_, uint proposalThreshold_) public {
+    function initialize(address timelock_, address ve_, uint votingPeriod_, uint votingDelay_, uint proposalThreshold_) public {
         require(address(timelock) == address(0), "GovernorBravo::initialize: can only initialize once");
         require(msg.sender == admin, "GovernorBravo::initialize: admin only");
         require(timelock_ != address(0), "GovernorBravo::initialize: invalid timelock address");
-        require(bobaToken_ != address(0), "GovernorBravo::initialize: invalid l2 boba address");
-        require(xbobaToken_ != address(0), "GovernorBravo::initialize: invalid l2 xboba address");
         require(ve_ != address(0), "GovernorBravo::initialize: invalid ve address");
         require(votingPeriod_ >= MIN_VOTING_PERIOD && votingPeriod_ <= MAX_VOTING_PERIOD, "GovernorBravo::initialize: invalid voting period");
         require(votingDelay_ >= MIN_VOTING_DELAY && votingDelay_ <= MAX_VOTING_DELAY, "GovernorBravo::initialize: invalid voting delay");
         require(proposalThreshold_ >= MIN_PROPOSAL_THRESHOLD && proposalThreshold_ <= MAX_PROPOSAL_THRESHOLD, "GovernorBravo::initialize: invalid proposal threshold");
 
         timelock = TimelockInterface(timelock_);
-        boba = BobaInterface(bobaToken_);
-        xboba = BobaInterface(xbobaToken_);
         ve = VeInterface(ve_);
         votingPeriod = votingPeriod_;
         votingDelay = votingDelay_;
@@ -127,7 +121,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             signatures: signatures,
             calldatas: calldatas,
             description: description,
-            startBlock: 0,
             startTimestamp: startTimestamp,
             endTimestamp: endTimestamp,
             forVotes: 0,

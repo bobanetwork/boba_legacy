@@ -80,12 +80,6 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice The address of the Boba Timelock
     TimelockInterface public timelock;
 
-    /// @notice The address of the L2 BOBA governance token, isn't used anymore
-    BobaInterface public boba;
-
-    /// @notice The address of the L2 xBOBA governance token, isn't used anymore
-    BobaInterface public xboba;
-
     /// @notice The official record of all proposals ever proposed
     mapping (uint => Proposal) public proposals;
 
@@ -118,9 +112,6 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
         /// @notice Proposal metadata such as description and URI
         string description;
 
-        /// @notice The startBlock isn't used anymore
-        uint startBlock;
-
         /// @notice The time at which voting begins
         uint startTimestamp;
 
@@ -141,9 +132,6 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
 
         /// @notice Flag marking whether the proposal has been executed
         bool executed;
-
-        /// @notice The individual receipts, isnt used anymore
-        mapping (address => Receipt) receipts;
     }
 
     /// @notice Ballot receipt record for a voter
@@ -187,10 +175,6 @@ interface TimelockInterface {
     function queueTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external returns (bytes32);
     function cancelTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external;
     function executeTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external payable returns (bytes memory);
-}
-
-interface BobaInterface {
-    function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
 }
 
 interface VeInterface {
