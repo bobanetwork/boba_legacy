@@ -53,8 +53,12 @@ $ docker compose -f docker-compose-rinkeby.yml pull #for rinkeby
 
 ```bash
 $ docker-compose up  # for mainnet
-# or...
+# or
 $ docker compose -f docker-compose-rinkeby.yml up #for rinkeby
+# or
+$ docker compose -f docker-compose-bobabase.yml up #for bobabase
+# or
+$ docker compose -f docker-compose-bobaopera-testnet.yml up #for bobaopera testnet
 ```
 
 The DTL will first sync with the chain. During the sync, you will see the DTL and Replica gradually catch up with the Boba L2. This can take several minutes to several hours, depending on which chain you are replicating.
@@ -83,6 +87,12 @@ There will be occasional updates to both services. You can update them by updati
 
 ```bash
 docker compose pull
+# or
+$ docker compose -f docker-compose-rinkeby.yml pull #for rinkeby
+# or
+$ docker compose -f docker-compose-bobabase.yml pull #for bobabase
+# or
+$ docker compose -f docker-compose-bobaopera-testnet.yml pull #for bobaopera testnet
 ```
 
 and bringing the services up again. **We suggest you keep the storage volume of the replica mounted on the host**. The replica stores its data in `/root/.ethereum/`.
