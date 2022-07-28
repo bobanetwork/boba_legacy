@@ -277,7 +277,7 @@ export const getAddressSetEventsFromGraph = async (
             orderDirection: desc
             first: 1
             where: {
-              _name: "${name}"
+              _name: "${ethers.utils.keccak256(ethers.utils.toUtf8Bytes(name))}"
               ${fromBlock != null ? `blockNumber_gte: ${fromBlock}` : ''}
               ${toBlock != null ? `blockNumber_lte: ${toBlock}` : ''}
             }

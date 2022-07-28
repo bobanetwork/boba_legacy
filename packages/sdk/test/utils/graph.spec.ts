@@ -8,7 +8,7 @@ import {
 
 describe('subgraph tests', () => {
   let provider: ethers.providers.Provider
-  before(async () => {
+  beforeEach(async () => {
     provider = new ethers.providers.JsonRpcProvider(
       'https://rpc.testnet.fantom.network'
     )
@@ -47,11 +47,14 @@ describe('subgraph tests', () => {
   })
 
   it('should get AddressSet events', async () => {
+    provider = new ethers.providers.JsonRpcProvider(
+      'https://api.avax-test.network/ext/bc/C/rpc'
+    )
     const event = await getAddressSetEventsFromGraph(
       provider,
-      'Proxy__L2LiquidityPool',
-      9393760,
-      9393764
+      'L2CrossDomainMessenger',
+      11967648,
+      11967648
     )
     expect(event).to.have.lengthOf(1)
 
