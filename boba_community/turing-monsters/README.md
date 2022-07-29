@@ -38,7 +38,7 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 ## Getting Rinkeby ETH and Rinkeby BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network).
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://gateway.rinkeby.boba.network/).
 
 ## Testing the Turing Monster NFT
 
