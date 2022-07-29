@@ -102,9 +102,10 @@ services:
   l1_chain:
     image: bobanetwork/avalanche:latest
     container_name: l1_chain
-    build:
-      context: ./docker
-      dockerfile: Dockerfile.avalanche
+    # we can image from docker hub
+    # build:
+    #   context: ./docker
+    #   dockerfile: Dockerfile.avalanche
     ports:
       # expose the service to the host for integration testing
       - "9650:9650"
