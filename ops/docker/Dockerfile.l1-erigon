@@ -1,6 +1,12 @@
 # syntax = docker/dockerfile:1.2
-# Use an upstream erigon image in place of hardhat for local L1
-FROM thorax/erigon:v2022.07.02
+# Use an erigon image in place of hardhat for local L1
+
+# For a clean upstream image, use:
+#FROM thorax/erigon:v2022.07.02
+
+# For an image build from the local git submodule
+FROM bobanetwork/erigon-base
+
 USER root
 
 #FROM golang:1.15-alpine3.13
