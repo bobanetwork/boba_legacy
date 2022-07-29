@@ -44,6 +44,7 @@ let L2BOBAToken: Contract;
 let addressesBOBA;
 const ethClaimAmount = ethers.utils.parseEther("0.000001")
 const bobaClaimAmount = ethers.utils.parseEther("0.1")
+const depositAmount = utils.parseEther("0.10"); // for TuringCredit!
 
 describe("Verify Twitter post for testnet funds", function() {
   before(async () => {
@@ -142,7 +143,6 @@ describe("Verify Twitter post for testnet funds", function() {
   });
 
   it("Should register and fund your Turing helper contract in turingCredit", async () => {
-    const depositAmount = utils.parseEther("0.10");
 
     const approveTx = await L2BOBAToken.approve(
       turingCredit.address,
