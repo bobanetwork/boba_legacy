@@ -112,7 +112,7 @@ type Context struct {
 	// Turing information
 	Turing       []byte
 	TuringDepth  int
-	TuringGasMul float64	// L1/L2 price ratio for Turing calldata charge
+	TuringGasMul float64 // L1/L2 price ratio for Turing calldata charge
 	Sequencer    bool
 }
 
@@ -239,7 +239,7 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 	// Check the rType
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
-        if rType != 1 {
+	if rType != 1 {
 		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
@@ -490,7 +490,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 
 	log.Debug("TURING bobaTuringCall:Have URL and payload",
 		"version", rVersion,
-                "url", url,
+		"url", url,
 		"payload", payload)
 
 	client, err := rpc.Dial(url)
@@ -507,8 +507,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		if len(responseStringEnc) > turingMaxLenEnc {
 			log.Error("TURING bobaTuringCall:Raw response too long",
 				"limit", turingMaxLenEnc,
-                                "length", len(responseStringEnc),
-                                "responseStringEnc", responseStringEnc[:turingMaxLenEnc])
+				"length", len(responseStringEnc),
+				"responseStringEnc", responseStringEnc[:turingMaxLenEnc])
 			retError[35] = 17 // Raw Response too long
 			return retError, 17
 		}
@@ -541,7 +541,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
 
 	// Calculate the calldata limit for a legacy request
-	lenLimit := startIDXpayload+4 + 160
+	lenLimit := startIDXpayload + 4 + 160
 
 	if rVersion > 0 {
 		lenLimit = turingMaxLenCD // Absolute maximum; actual limit will depend on gas
@@ -646,7 +646,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
-        var turingGas uint64
+	var turingGas uint64
 
 	// Sanity and depth checks
 	prefix_str := "Regular"
@@ -683,15 +683,15 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				if len(updated_input) > 160 {
 					feePerByte := evm.Context.TuringGasMul * 500.0 / 32.0
 					turingGas = uint64(float64(len(updated_input)) * feePerByte)
-                                }
+				}
 
-                                if contract.Gas <= turingGas {
+				if contract.Gas <= turingGas {
 					log.Error("TURING ERROR: Insufficient gas for calldata", "have", contract.Gas, "need", turingGas)
 					return nil, 0, ErrTuringTooLong
-                                } else {
+				} else {
 					log.Debug("TURING Deducting calldata gas", "had", contract.Gas, "len", len(updated_input), "Mul", evm.Context.TuringGasMul, "deducting", turingGas)
 					contract.UseGas(turingGas)
-                                }
+				}
 			} else if isGetRand2 {
 				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option

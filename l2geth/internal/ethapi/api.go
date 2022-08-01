@@ -928,7 +928,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	}
 
 	if p2.BitLen() > 0 {
-		evm.Context.TuringGasMul = float64(p1.Uint64())/float64(p2.Uint64())
+		evm.Context.TuringGasMul = float64(p1.Uint64()) / float64(p2.Uint64())
 	}
 
 	if evm.Context.TuringGasMul < 0.001 || evm.Context.TuringGasMul > 1000 {
