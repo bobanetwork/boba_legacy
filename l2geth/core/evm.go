@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/core/vm"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
-	"github.com/ethereum-optimism/optimism/l2geth/log")
+)
 
 // ChainContext supports retrieving headers and consensus parameters from the
 // current blockchain to be used during transaction processing.
@@ -60,7 +60,6 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			turingDepth = 1
 			sequencer = false
 		}
-                log.Debug("MMDBG", "msg", msg);
 		return vm.Context{
 			CanTransfer:   CanTransfer,
 			Transfer:      Transfer,
@@ -75,6 +74,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			L1BlockNumber: msg.L1BlockNumber(),
 			Turing:        msg.L1Turing(),
 			TuringDepth:   turingDepth,
+                        TuringGasMul:  0.0,
 			Sequencer:     sequencer,
 		}
 	} else {

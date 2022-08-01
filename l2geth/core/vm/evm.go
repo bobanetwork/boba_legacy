@@ -110,9 +110,10 @@ type Context struct {
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
 
 	// Turing information
-	Turing      []byte
-	TuringDepth int
-	Sequencer   bool
+	Turing       []byte
+	TuringDepth  int
+	TuringGasMul float64	// L1/L2 price ratio for Turing calldata charge
+	Sequencer    bool
 }
 
 // Maximum allowed length of the modified calldata (selector + req + response).
@@ -645,6 +646,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
+        var turingGas uint64
 
 	// Sanity and depth checks
 	prefix_str := "Regular"
@@ -677,13 +679,17 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
 				updated_input, _ = evm.bobaTuringCall(input, caller.Address(), mayBlock)
 
-                                // This does not yet account for the L1/L2 gas price ratio
-                                turingGas := uint64(len(updated_input)) * 500 / 32
+				// For compatibility, only apply a charge beyond the legacy size limit
+				if len(updated_input) > 160 {
+					feePerByte := evm.Context.TuringGasMul * 500.0 / 32.0
+					turingGas = uint64(float64(len(updated_input)) * feePerByte)
+                                }
+
                                 if contract.Gas <= turingGas {
-				log.Error("TURING ERROR: Insufficient gas for calldata", "have", contract.Gas, "need", turingGas)
+					log.Error("TURING ERROR: Insufficient gas for calldata", "have", contract.Gas, "need", turingGas)
 					return nil, 0, ErrTuringTooLong
                                 } else {
-					log.Debug("MMDBG Deducting Turing gas", "len", len(updated_input),"had", contract.Gas, "deducting", turingGas)
+					log.Debug("TURING Deducting calldata gas", "had", contract.Gas, "len", len(updated_input), "Mul", evm.Context.TuringGasMul, "deducting", turingGas)
 					contract.UseGas(turingGas)
                                 }
 			} else if isGetRand2 {

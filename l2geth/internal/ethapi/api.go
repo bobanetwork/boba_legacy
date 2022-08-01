@@ -915,6 +915,27 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	if err != nil {
 		return nil, 0, false, err
 	}
+
+	p1, err := b.SuggestL1GasPrice(ctx)
+	if err != nil {
+		log.Error("TURING Can't get L1 gas price")
+		return nil, 0, false, err
+	}
+	p2, err := b.SuggestL2GasPrice(ctx)
+	if err != nil {
+		log.Error("TURING Can't get L2 gas price")
+		return nil, 0, false, err
+	}
+
+	if p2.BitLen() > 0 {
+		evm.Context.TuringGasMul = float64(p1.Uint64())/float64(p2.Uint64())
+	}
+
+	if evm.Context.TuringGasMul < 0.001 || evm.Context.TuringGasMul > 1000 {
+		// Could turn this into an error or clamp the value within limits. For now, only warns.
+		log.Warn("TURING Implausible gas price ratio", "mul", evm.Context.TuringGasMul, "L1", p1, "L2", p2)
+	}
+
 	// Wait for the context to be done and cancel the evm. Even if the
 	// EVM has finished, cancelling may be done (repeatedly)
 	go func() {
