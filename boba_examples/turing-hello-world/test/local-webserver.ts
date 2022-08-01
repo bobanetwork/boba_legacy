@@ -14,7 +14,7 @@ var urlStr
 var urlStr2
 import { getContractFactory } from '@eth-optimism/contracts'
 const gasOverride =  {
-  gasLimit: 3000000 //3,000,000
+  gasLimit: 11000000 //3,000,000
 }
 
 import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
@@ -262,13 +262,25 @@ if (hre.network.name === "boba_local") {
     it("should charge extra gas for L1 calldata storage", async() => {
       const g1 = (await hello.estimateGas.multArray(urlStr2, 1, 10, gasOverride)).toNumber()
       const g2 = (await hello.estimateGas.multArray(urlStr2, 101, 10, gasOverride)).toNumber()
-      const g3 = (await hello.estimateGas.multArray(urlStr2, 1001, 10, gasOverride)).toNumber()
-      console.log("Gas", g1.toString(), g2.toString(), g3)
 
       // Larger calldata costs more gas inside the contract itself. We need to test for
       // additional usage on top of this from the L1 calldata calculation. The exact value
       // depends on the L1 gas price so this test doesn't look for a specific number
       expect (g2 - g1).to.be.above(110000)
+    })
+
+    it("should support a large response", async() => {
+      const nElem = 2038
+      const g3 = (await hello.estimateGas.multArray(urlStr2, nElem, 55, gasOverride)).toNumber()
+      console.log("Gas estimate:", g3)
+
+      let tr = await hello.multArray(urlStr2, nElem, 55, gasOverride)
+      const res = await tr.wait()
+      expect(res).to.be.ok
+
+      const ev = res.events.find(e => e.event === "MultArray")
+      const result = parseInt(ev.data.slice(-64), 16)
+      expect(result).to.equal(nElem * 55)
     })
 
     it("final balance", async () => {

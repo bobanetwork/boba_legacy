@@ -115,6 +115,8 @@ services:
     build:
       context: ./docker/hardhat
       dockerfile: Dockerfile
+    environment:
+      GAS_PRICE: 54321012345
     ports:
       # expose the service to the host for integration testing
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
@@ -145,7 +147,7 @@ services:
       GAS_PRICE_ORACLE_OWNER: "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
       GAS_PRICE_ORACLE_OVERHEAD: "2750"
       GAS_PRICE_ORACLE_SCALAR: "1500000"
-      GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
+      GAS_PRICE_ORACLE_L1_BASE_FEE: "4321001234"
       GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
       GAS_PRICE_ORACLE_DECIMALS: "6"
       # skip compilation when run in docker-compose, since the contracts
