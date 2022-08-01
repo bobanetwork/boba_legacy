@@ -26,8 +26,10 @@ async function main() {
     Factory__dispatcher = await ethers.getContractFactory("BaseV1Dispatcher", deployer_l2)
 
     console.log('Deploying ve...')
-    ve = await Factory__ve.deploy(l2BobaAddress)
+    ve = await Factory__ve.deploy()
     await ve.deployTransaction.wait()
+    const veInitTx = await ve.initialize(l2BobaAddress, { gasLimit: 3000000 })
+    await veInitTx.wait()
     console.log('👉 Deployed ve at ', ve.address)
 
     console.log('Deploying gauge factory...')
@@ -36,13 +38,17 @@ async function main() {
     console.log('👉 Deployed gauge factory at ', gauges.address)
 
     console.log('Deploying voter...')
-    voter = await Factory__voter.deploy(ve.address, gauges.address)
+    voter = await Factory__voter.deploy()
     await voter.deployTransaction.wait()
+    const voterInitTx = await voter.initialize(ve.address, gauges.address, { gasLimit: 3000000 })
+    await voterInitTx.wait()
     console.log('👉 Deployed voter at ', voter.address)
 
     console.log('Deploying dispatcher...')
-    dispatcher = await Factory__dispatcher.deploy(voter.address, ve.address)
+    dispatcher = await Factory__dispatcher.deploy()
     await dispatcher.deployTransaction.wait()
+    const dispatcherInitTx = await dispatcher.initialize(voter.address, ve.address, { gasLimit: 3000000 })
+    await dispatcherInitTx.wait()
     console.log('👉 Deployed dispatcher at ', dispatcher.address)
 
     console.log('Initializing contracts..')
@@ -51,14 +57,14 @@ async function main() {
     console.log('Registered Voter on Ve')
 
     // add initialize guages if any here
-    const initVoterTx = await voter.initialize([], dispatcher.address, { gasLimit: 3000000 })
+    const initVoterTx = await voter.initiate_([], dispatcher.address, { gasLimit: 3000000 })
     await initVoterTx.wait()
     console.log('Initialized Voter')
 
     // TODO: this should come from a file
     // add if there's initial ve receipients
     // approve and have boba ready on the deployer if you want to supply boba to the contract
-    const initDispatcherTx = await dispatcher.initialize([],[], 0, { gasLimit: 3000000 })
+    const initDispatcherTx = await dispatcher.initiate_([],[], 0, { gasLimit: 3000000 })
     await initDispatcherTx.wait()
     console.log('Initialized Dispatcher')
 

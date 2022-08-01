@@ -356,7 +356,7 @@ contract ve is IERC721, IERC721Metadata {
     int128 internal constant iMAXTIME = 1 * 365 * 86400;
     uint internal constant MULTIPLIER = 1 ether;
 
-    address immutable public token;
+    address public token;
     uint public supply;
     mapping(uint => LockedBalance) public locked;
 
@@ -421,11 +421,17 @@ contract ve is IERC721, IERC721Metadata {
         _entered_state = _not_entered;
     }
 
-    /// @notice Contract constructor
+    modifier onlyNotInitialized() {
+        require(address(token) == address(0), "Contract has been initialized");
+        _;
+    }
+
+    constructor() {
+    }
+
     /// @param token_addr `ERC20CRV` token address
-    constructor(
-        address token_addr
-    ) {
+    function initialize(address token_addr) public onlyNotInitialized {
+        require(token_addr != address(0), "Token cannot be zero address");
         token = token_addr;
         voter = msg.sender;
         point_history[0].blk = block.number;
@@ -1136,7 +1142,7 @@ contract ve is IERC721, IERC721Metadata {
     /// NOTE: WARNING, this method returns hypothetical balance if _t specified is prior to the lock timestamp
     /// Use with caution if this is used for determining balance at a prior timestamp
     /// To return correct values, consider using ve_for_at()
-    /// this method also uses 
+    /// this method also uses
     /// last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts)); instead of
     /// last_point.bias -= last_point.slope * int128(int256(_t - last_point.ts));
     /// @notice Get the current voting power for `_tokenId`
@@ -1193,7 +1199,7 @@ contract ve is IERC721, IERC721Metadata {
 
     /// NOTE: WARNING, this method returns hypothetical balance if _t specified is prior to the lock timestamp
     /// Use with caution if this is used for determining balance at a prior timestamp
-    /// To return correct values, consider using ve_for_at() 
+    /// To return correct values, consider using ve_for_at()
     function balanceOfNFTAt(uint _tokenId, uint _t) external view returns (uint) {
         return _balanceOfNFT(_tokenId, _t);
     }

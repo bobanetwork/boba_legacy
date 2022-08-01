@@ -36,27 +36,30 @@ describe("ve Boba endToEnd tets", function () {
         await ve_underlying.deployed();
         await ve_underlying.mint(owner.address, ve_underlying_amount);
         let vecontract = await ethers.getContractFactory("contracts/ve.sol:ve");
-        ve = await vecontract.deploy(ve_underlying.address);
+        ve = await vecontract.deploy();
         await ve.deployed();
+        await ve.initialize(ve_underlying.address);
 
         const BaseV1GaugeFactory = await ethers.getContractFactory("BaseV1GaugeFactory");
         gauges_factory = await BaseV1GaugeFactory.deploy();
         await gauges_factory.deployed();
 
         const BaseV1Voter = await ethers.getContractFactory("BaseV1Voter");
-        voter = await BaseV1Voter.deploy(ve.address, gauges_factory.address);
+        voter = await BaseV1Voter.deploy();
         await voter.deployed();
+        await voter.initialize(ve.address, gauges_factory.address);
 
         const BaseV1Dispatcher = await ethers.getContractFactory("BaseV1Dispatcher")
-        dispatcher = await BaseV1Dispatcher.deploy(voter.address, ve.address)
+        dispatcher = await BaseV1Dispatcher.deploy()
         await dispatcher.deployed()
+        await dispatcher.initialize(voter.address, ve.address)
 
         await ve.setVoter(voter.address);
-        
-        await voter.initialize([], dispatcher.address)
+
+        await voter.initiate_([], dispatcher.address)
 
         await ve_underlying.approve(dispatcher.address, ve_underlying_amount)
-        await dispatcher.initialize([], [], ve_underlying_amount)
+        await dispatcher.initiate_([], [], ve_underlying_amount)
 
         // set weekly emission
         await dispatcher.set_weekly_emission(utils.parseEther('1000'))
@@ -67,7 +70,7 @@ describe("ve Boba endToEnd tets", function () {
         await ve_underlying.mint(userOne.address, ve_underlying_amount);
         await ve_underlying.connect(userOne).approve(ve.address, ve_underlying_amount);
         const lockDurationOne = 6 * 7 * 24 * 3600; // 6 weeks
-    
+
         await ve.connect(userOne).create_lock(ve_underlying_amount, lockDurationOne);
         expect(await ve.ownerOf(1)).to.deep.eq(userOne.address);
         expect(await ve.balanceOf(userOne.address)).to.deep.eq(BigNumber.from(1));
@@ -76,7 +79,7 @@ describe("ve Boba endToEnd tets", function () {
         await ve_underlying.mint(userTwo.address, ve_underlying_amount);
         await ve_underlying.connect(userTwo).approve(ve.address, ve_underlying_amount);
         const lockDurationTwo = 8 * 7 * 24 * 3600; // 8 weeks
-    
+
         await ve.connect(userTwo).create_lock(ve_underlying_amount, lockDurationTwo);
         expect(await ve.ownerOf(2)).to.deep.eq(userTwo.address);
         expect(await ve.balanceOf(userTwo.address)).to.deep.eq(BigNumber.from(1));
@@ -121,7 +124,7 @@ describe("ve Boba endToEnd tets", function () {
         expect(await voter.totalWeight()).to.be.deep.eq((await voter.usedWeights(1)).add(await voter.usedWeights(2)));
         expect(await ve.voted(1)).to.be.deep.eq(true)
         expect(await ve.voted(2)).to.be.deep.eq(true)
-    }) 
+    })
 
     it("distribute emission to gaugeOne", async function () {
         // move two weeks
@@ -137,7 +140,7 @@ describe("ve Boba endToEnd tets", function () {
         expect(postGaugeBalance).to.be.gt(priorGaugeBalance)
         // the tokens for gaugeTwo should be present on the voter
         expect(postVoterTotalBalance).to.not.eq(0)
-    }) 
+    })
 
     it("distribute emission to remaining gauges", async function () {
         let priorVoterTotalBalance = await ve_underlying.balanceOf(voter.address)
@@ -151,12 +154,12 @@ describe("ve Boba endToEnd tets", function () {
         expect(postVoterTotalBalance).to.be.lt(priorVoterTotalBalance)
         expect(postGaugeOneBalance).to.be.deep.eq(priorGaugeOneBalance)
         expect(postGaugeTwoBalance).to.be.gt(priorGaugeTwoBalance)
-    }) 
+    })
 
     it("gauge operators can withdraw emissions", async function () {
         const Gauge = await ethers.getContractFactory('Gauge')
         const gaugeOneContract = new Contract(gaugeOne, Gauge.interface)
-        
+
         // gaugeOne
         const priorGaugeOneBalance = await ve_underlying.balanceOf(gaugeOne)
         let priorGaugeOperatorBalance = await ve_underlying.balanceOf(gaugeOperator.address)

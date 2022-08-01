@@ -29,24 +29,27 @@ describe("emissions", function () {
         await ve_underlying.deployed();
         await ve_underlying.mint(owner.address, ve_underlying_amount);
         let vecontract = await ethers.getContractFactory("contracts/ve.sol:ve");
-        ve = await vecontract.deploy(ve_underlying.address);
+        ve = await vecontract.deploy();
         await ve.deployed();
+        await ve.initialize(ve_underlying.address);
 
         const BaseV1GaugeFactory = await ethers.getContractFactory("BaseV1GaugeFactory");
         gauges_factory = await BaseV1GaugeFactory.deploy();
         await gauges_factory.deployed();
 
         const BaseV1Voter = await ethers.getContractFactory("BaseV1Voter");
-        voter = await BaseV1Voter.deploy(ve.address, gauges_factory.address);
+        voter = await BaseV1Voter.deploy();
         await voter.deployed();
+        await voter.initialize(ve.address, gauges_factory.address);
 
         const BaseV1Dispatcher = await ethers.getContractFactory("BaseV1Dispatcher")
-        dispatcher = await BaseV1Dispatcher.deploy(voter.address, ve.address)
+        dispatcher = await BaseV1Dispatcher.deploy()
         await dispatcher.deployed()
+        await dispatcher.initialize(voter.address, ve.address)
 
         await ve.setVoter(voter.address);
-        
-        await voter.initialize([], dispatcher.address)
+
+        await voter.initiate_([], dispatcher.address)
     });
 
     it("initial ve allocations without funds", async function () {
@@ -54,7 +57,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await expect(dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)).to.be.reverted
+        await expect(dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)).to.be.reverted
     })
 
     it("initial ve allocations", async function () {
@@ -67,7 +70,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
+        await dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
 
         // check ve locks created
         expect(await ve.ownerOf(1)).to.deep.eq(addressOne);
@@ -86,7 +89,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
+        await dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
 
         await dispatcher.set_weekly_emission(utils.parseEther('100'))
         const updatedWeeklyEmission = await dispatcher.weekly_emission()
@@ -100,7 +103,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
+        await dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
 
         // add a gauge
         const listingFee = await voter.listing_fee()
@@ -118,7 +121,7 @@ describe("emissions", function () {
         await dispatcher.set_weekly_emission(utils.parseEther('10'))
         const updatedWeeklyEmission = await dispatcher.weekly_emission()
         expect(updatedWeeklyEmission).to.be.deep.eq(utils.parseEther('10'))
-        
+
         const oneWeek = 1 * 7 * 24 * 3600;
         const twoWeeks = oneWeek * 2;
         // contract activates one week after initialization
@@ -144,7 +147,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
+        await dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
 
         const priorActivePeriod = await dispatcher.active_period()
         await dispatcher.update_period()
@@ -158,7 +161,7 @@ describe("emissions", function () {
         const addressTwo = await (await ethers.getSigners())[2].getAddress()
         const initAmountOne = ve_underlying_amount.div(3)
         const initAmountTwo = ve_underlying_amount.div(2)
-        await dispatcher.initialize([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
+        await dispatcher.initiate_([addressOne, addressTwo], [initAmountOne, initAmountTwo], ve_underlying_amount)
 
         // add a gauge
         const listingFee = await voter.listing_fee()
@@ -181,9 +184,9 @@ describe("emissions", function () {
         ethers.provider.send("evm_increaseTime", [twoWeek]);
         ethers.provider.send("evm_mine", []); // mine the next block
         await dispatcher.update_period()
-        expect(await ve_underlying.balanceOf(voter.address)).to.be.eq(utils.parseEther('100')) 
+        expect(await ve_underlying.balanceOf(voter.address)).to.be.eq(utils.parseEther('100'))
         // updating further does nothing for the same week
         await dispatcher.update_period()
-        expect(await ve_underlying.balanceOf(voter.address)).to.be.eq(utils.parseEther('100')) 
+        expect(await ve_underlying.balanceOf(voter.address)).to.be.eq(utils.parseEther('100'))
     })
 })
