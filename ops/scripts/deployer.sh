@@ -16,7 +16,6 @@ curl \
     -d $JSON \
     $L1_NODE_WEB3_URL
 
-sleep 30
 yarn run deploy
 
 if [ -n "$DTL_REGISTRY_URL" ] ; then

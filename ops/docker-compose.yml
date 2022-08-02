@@ -136,6 +136,8 @@ services:
       replicas: 0
 
   l1_chain:
+    depends_on:
+      - erigon_base
     image: bobanetwork/l1-erigon
     build:
       context: ..
