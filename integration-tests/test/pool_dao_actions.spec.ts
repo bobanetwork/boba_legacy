@@ -110,7 +110,8 @@ describe('Dao Action Test', async () => {
       await Timelock.deployTransaction.wait()
     }
 
-    Ve = await Factory__Ve.deploy(BobaL2)
+    Ve = await Factory__Ve.deploy()
+    await Ve.initialize(BobaL2)
 
     Factory__GovernorBravoDelegate = new ContractFactory(
       GovernorBravoDelegateJson.abi,
