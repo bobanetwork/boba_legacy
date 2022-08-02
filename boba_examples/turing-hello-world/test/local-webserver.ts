@@ -18,6 +18,7 @@ const gasOverride =  {
 }
 
 import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
+import GasOracleJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json"
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -38,6 +39,7 @@ const testPrivateKey = '0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a84
 const testWallet = new Wallet(testPrivateKey, local_provider)
 const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
+const oracleWallet = new Wallet("0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e", local_provider) // Hardhat 19
 
 if (hre.network.name === "boba_local") {
   describe("Basic Math", function () {
@@ -153,6 +155,18 @@ if (hre.network.name === "boba_local") {
       BobaTuringCreditJson.bytecode,
       deployerWallet
     ).attach(BobaTuringCreditAddress);
+
+    const gasOracle = new ContractFactory(
+      GasOracleJson.abi,
+      GasOracleJson.bytecode,
+      oracleWallet
+    ).attach("0x420000000000000000000000000000000000000F");
+
+    const oldFee = await gasOracle.l1BaseFee()
+    const gasTx = await gasOracle.setL1BaseFee(4321001234)
+    await gasTx.wait()
+    const newFee = await gasOracle.l1BaseFee()
+    console.log("Updated L1BaseFee from", oldFee.toNumber(), "to", newFee.toNumber())
   })      // prepare to register/fund your Turing Helper
 
     it("should return the helper address", async () => {
