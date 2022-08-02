@@ -32,6 +32,30 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     l1Explorer: 'https://rinkeby.etherscan.io',
     l2Explorer: 'https://blockexplorer.rinkeby.boba.network',
   },
+  {
+    folder: 'fuji',
+    name: 'Boba Avalanche (public testnet)',
+    chainid: 3428,
+    rpc: 'https://testnet.avax.boba.netwokr',
+    l1Explorer: 'https://testnet.snowtrace.io',
+    l2Explorer: 'https://blockexplorer.testnet.avax.boba.network',
+  },
+  {
+    folder: 'bobabase',
+    name: 'Bobabase (public testnet)',
+    chainid: 1297,
+    rpc: 'https://bobabase.boba.netwokr',
+    l1Explorer: 'https://moonbase.moonscan.io',
+    l2Explorer: 'https://blockexplorer.bobabase.boba.network',
+  },
+  {
+    folder: 'bobaoperatestnet',
+    name: 'Bobaopera (public testnet)',
+    chainid: 4051,
+    rpc: 'https://testnet.bobaopera.boba.netwokr',
+    l1Explorer: 'https://testnet.ftmscan.com/',
+    l2Explorer: 'https://blockexplorer.testnet.bobaopera.boba.network',
+  },
 ]
 
 // List of contracts that are part of a deployment but aren't meant to be used by the general
