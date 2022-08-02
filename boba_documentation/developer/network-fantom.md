@@ -27,9 +27,14 @@ The standard bridges for `FTM` and `BOBA` are active, so you can can both bridge
 If you have unusual `getLogs` needs, especially calls from `0 to latest`, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of Bobaopera. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
 
 * clone the `boba_base` repo
-* switch to `fantom` branch.
+* switch to `alt-l1` branch.
+* Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) folder
 
-The docker-compose file is in [`boba-community/boba-node/docker-compose-bobaopera-testnet.yml`](https://github.com/bobanetwork/boba_base/blob/fantom/boba_community/boba-node/docker-compose-bobaopera-testnet.yml).
+  ```
+  RELEASE_VERSION=v0.X.X
+  ```
+
+The docker-compose file is in [`boba-community/boba-node/docker-compose-bobaopera-testnet.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node).
 
 ```bash
 $ docker compose -f docker-compose-bobaopera-testnet.yml pull
