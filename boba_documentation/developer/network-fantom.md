@@ -2,7 +2,7 @@
 description: A collection of links and addresses to get started on Boba-Fantom
 ---
 
-- [Bobaopera Testnet L2 (4051) for the Fantom Testnet (4002)](#bobopera-testnet-l2--4051--for-the-fantom-testnet--4002-)
+- [Bobaopera Testnet L2 (4051) for the Fantom Testnet (4002)](#bobaopera-testnet-l2--4051--for-the-fantom-testnet--4002-)
   * [Testnet Fountain for Developers on Bobaopera L2](#testnet-fountain-for-developers-on-bobaopera-testnet-l2)
   * [Bridging](#bridging)
   * [Analytics and eth_getLogs](#Analytics-and-eth-getlogs)
