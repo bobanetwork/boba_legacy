@@ -13,6 +13,7 @@
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
     "setconfig": "hardhat run scripts/set_claim-amounts.ts",
+    "deploy": "hardhat run scripts/deploy.ts",
     "test:local": "hardhat --network boba_local test",
     "test:base": "hardhat --network boba_base test",
     "test": "hardhat test"

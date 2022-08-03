@@ -18,6 +18,13 @@ const config: HardhatUserConfig = {
     },
     boba_base: {
       url: 'https://bobabase.boba.network/',
+    },
+    boba_mainnet: {
+      url: 'http://mainnet.boba.network',
+    },
+    avax_boba_testnet: {
+      url: 'https://testnet.avax.boba.network',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     }
   },
   solidity: {
