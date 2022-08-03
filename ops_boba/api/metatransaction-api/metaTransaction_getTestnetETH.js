@@ -59,14 +59,7 @@ const handle = async(event, callback) => {
 
   // Send transaction to node
   try {
-    console.log(
-      'SendFundsMeta: ',
-      walletAddress,
-      tweetId,
-      hashedMsg,
-      signature,
-      L2_NODE_WEB3_URL
-    )
+    console.log('SendFundsMeta: ', walletAddress, tweetId, hashedMsg, signature)
 
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,

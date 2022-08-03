@@ -176,7 +176,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         transaction: `https://blockexplorer.testnet.avax.boba.network/tx/`,
       },
       gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
-      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%Avalanche%20`
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
     }
  }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
@@ -224,7 +224,7 @@ const BaseServices = {
   // Mainnet meta transaction
   BOBAAVALANCHE_META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
   // Testnet meta transaction
-  BOBAAVALANCHETESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
+  BOBAFUJI_META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
 }
 
 export function getNetwork () {

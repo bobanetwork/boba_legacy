@@ -1216,24 +1216,27 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": false, //since we are going L2->L1
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      /**************************/
+      /*   Remove speed check   */
+      /**************************/
+      // const data = {
+      //   "key": process.env.REACT_APP_SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": false, //since we are going L2->L1
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkGateway
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
       return receipt
     } catch(error) {
@@ -1492,24 +1495,27 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      /**************************/
+      /*   Remove speed check   */
+      /**************************/
+      // const data = {
+      //   "key": process.env.REACT_APP_SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": true,
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkGateway
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
       this.getBalances()
 
