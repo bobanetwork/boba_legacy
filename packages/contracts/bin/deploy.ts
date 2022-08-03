@@ -49,6 +49,8 @@ const parseEnv = () => {
 const main = async () => {
   const config = parseEnv()
 
+  console.log("CONFIG", config)
+
   await hre.run('deploy', {
     l1BlockTimeSeconds: config.l1BlockTimeSeconds,
     ctcMaxTransactionGasLimit: config.ctcMaxTransactionGasLimit,

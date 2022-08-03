@@ -121,12 +121,7 @@ services:
   erigon_base:
     # Adapted from ../bedrock/erigon/docker-compose.yml
     image: bobanetwork/erigon-base:${TAG:-latest}
-    build:
-        args:
-            UID: ${DOCKER_UID}
-            GID: ${DOCKER_GID}
-        context: ..
-        dockerfile: bedrock/erigon/Dockerfile
+
     user: "${DOCKER_UID}:${DOCKER_GID}"
     command: |
       erigon ${ERIGON_FLAGS-} --private.api.addr=0.0.0.0:9090
@@ -145,7 +140,7 @@ services:
         BLOCK_INTERVAL: 0  # 0 = auto-mine
     ports:
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
-      
+
   deployer:
     depends_on:
       - l1_chain
