@@ -1,7 +1,9 @@
 import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 
-export const WHITELIST_CHAIN_ID: Array<number> = [1287, 1284, 4002, 250]
+export const WHITELIST_CHAIN_ID: Array<number> = [
+  1287, 1284, 4002, 250, 43113, 43114,
+]
 
 export const GRAPH_API_URL: any = {
   // Bobabase
@@ -35,6 +37,22 @@ export const GRAPH_API_URL: any = {
     // The process of syncing Lib_addressManager is super slow
     addressManager:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-address-manager',
+  },
+  // Avalanche Testnet (fuji)
+  43113: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobafuji-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobafuji-address-manager',
+  },
+  // Avalanche Mainnet
+  43114: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaavax-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaavax-address-manager',
   },
 }
 
@@ -259,7 +277,7 @@ export const getAddressSetEventsFromGraph = async (
             orderDirection: desc
             first: 1
             where: {
-              _name: "${name}"
+              _name: "${ethers.utils.keccak256(ethers.utils.toUtf8Bytes(name))}"
               ${fromBlock != null ? `blockNumber_gte: ${fromBlock}` : ''}
               ${toBlock != null ? `blockNumber_lte: ${toBlock}` : ''}
             }

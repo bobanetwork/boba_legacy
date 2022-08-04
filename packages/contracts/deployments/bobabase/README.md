@@ -1,9 +1,21 @@
-# BobaBase Rinkeby (public testnet)
-
+# Bobabase (public testnet)
 ## Network Info
 - **Chain ID**: 1297
-- **Public RPC**: https://bobabase.boba.network
+- **Public RPC**: https://bobabase.boba.netwokr
 - **Block Explorer**: https://blockexplorer.bobabase.boba.network
+## Layer 1 Contracts
+<table>
+<tr>
+<th>
+<img width="506px" height="0px" />
+<p><small>Contract</small></p>
+</th>
+<th>
+<img width="506px" height="0px" />
+<p><small>Address</small></p>
+</th>
+</tr>
+</table>
 
 ## Layer 2 Contracts
 <table>
@@ -109,7 +121,7 @@ L2_BOBA
 </tr>
 <tr>
 <td>
-L2_GLMR (DEV)
+L2_L1NativeToken
 </td>
 <td align="center">
 <a href="https://blockexplorer.bobabase.boba.network/address/0x4200000000000000000000000000000000000023">
@@ -119,7 +131,7 @@ L2_GLMR (DEV)
 </tr>
 <tr>
 <td>
-Proxy__BobaTuringCredit
+Lib_ResolvedDelegateBobaProxy
 </td>
 <td align="center">
 <a href="https://blockexplorer.bobabase.boba.network/address/0x4200000000000000000000000000000000000020">
@@ -134,6 +146,16 @@ BobaTuringCredit
 <td align="center">
 <a href="https://blockexplorer.bobabase.boba.network/address/0x4200000000000000000000000000000000000021">
 <code>0x4200000000000000000000000000000000000021</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+BobaTuringHelper
+</td>
+<td align="center">
+<a href="https://blockexplorer.bobabase.boba.network/address/0x4200000000000000000000000000000000000022">
+<code>0x4200000000000000000000000000000000000022</code>
 </a>
 </td>
 </tr>
@@ -156,24 +178,6 @@ Boba_GasPriceOracle
 <code>0x4200000000000000000000000000000000000025</code>
 </a>
 </td>
-<tr>
-<td>
-Proxy__BobaBillingContract
-</td>
-<td align="center">
-<a href="https://blockexplorer.bobabase.boba.network/address/0x05C9f36D901594D220311B211fA26DbD58B87717">
-<code>0x05C9f36D901594D220311B211fA26DbD58B87717</code>
-</a>
-</td>
 </tr>
-<tr>
-<td>
-BobaBillingContract
-</td>
-<td align="center">
-<a href="https://blockexplorer.bobabase.boba.network/address/0x17CC69Adc242f9C50132503A2e5d5d9cD4889786">
-<code>0x17CC69Adc242f9C50132503A2e5d5d9cD4889786</code>
-</a>
-</td>
 </table>
 

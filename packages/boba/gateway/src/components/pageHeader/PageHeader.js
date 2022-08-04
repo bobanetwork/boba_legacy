@@ -5,6 +5,7 @@ import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
+import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
 import { useState } from 'react'
 import { Box, Container, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import NavIcon from 'components/icons/NavIcon'
@@ -106,6 +107,7 @@ const PageHeader = ({ maintenance }) => {
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
                   <S.HeaderDivider />
+                  <FeeSwitcher style={{paddingTop: '15px', marginTop: '20px'}}/>
                 </S.StyleDrawer>
               </Drawer>
             </S.HeaderWrapper>
@@ -114,6 +116,7 @@ const PageHeader = ({ maintenance }) => {
           : (<S.HeaderWrapper>
             <Logo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px' }} />
             <MenuItems setOpen={setOpen} />
+            <FeeSwitcher />
             <LayerSwitcher />
             {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
             <ThemeSwitcher />

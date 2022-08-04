@@ -190,6 +190,13 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'GLMR') {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamBytecode
       }
+      // Avalanche local
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheLocalByteCode
+      }
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 4328) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheTestnetByteCode
+      }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')

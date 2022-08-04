@@ -187,6 +187,36 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Avalanche
+  43112: {
+    l1: {
+      AddressManager: '0x52C84043CD9c865236f11d9Fc9F56aa003c1f922',
+      L1CrossDomainMessenger: '0xDFBb4b49DfAe39720f68f8297ADb2368FeffaDdb',
+      L1CrossDomainMessengerFast: '0xD054149e4345Cc00cc2f2465C02a864f60d6bd46',
+      L1StandardBridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      StateCommitmentChain: '0xF5f1f185cF359dC48469e410Aeb6983cD4DC5812',
+      CanonicalTransactionChain: '0xa1E47689f396fED7d18D797d9D31D727d2c0d483',
+      BondManager: '0x97C0FE6aB595cbFD50ad3860DA5B2017d8B35c2E',
+      L1MultiMessageRelayer: '0xEC1bf080BDFBbBa102603Cc1C55aFd215C694a2b',
+      L1MultiMessageRelayerFast: '0x59289F9Ea2432226c8430e3057E2642aD5f979aE',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Avalanche testnet
+  43113: {
+    l1: {
+      AddressManager: '0xcE78de95b85212BC348452e91e0e74c17cf37c79',
+      L1CrossDomainMessenger: '0x68c19B7FbAe4F8034cf6316b2045ba6aB6978F6b',
+      L1CrossDomainMessengerFast: '0xBc5249095c890F58C0b75795bd21667eFd123F5F',
+      L1StandardBridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      StateCommitmentChain: '0x57B9C47F2Ae857005238096486C5B107447dE221',
+      CanonicalTransactionChain: '0xA36D21C0125b5Dc52d95ED8FF1eF7188d4666EAE',
+      BondManager: '0x067cD503bd734a779830dafF0Db582B6a347c3df',
+      L1MultiMessageRelayer: '0x74546A4c6D5543Be7e8447159c47BAe7f5431C49',
+      L1MultiMessageRelayerFast: '0x5e6B412b4fA8373a17aD85B269fA5c354ea57e63',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
 }
 
 /**
@@ -328,6 +358,30 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  43112: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  43113: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },

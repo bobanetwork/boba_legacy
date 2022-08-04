@@ -21,7 +21,4 @@ dataSources:
       eventHandlers:
         - event: AddressSet(indexed string,address,address)
           handler: handleAddressSet
-      callHandlers:
-        - function: setAddress(string,address)
-          handler: handleSetAddress
       file: ./src/Lib_AddressManagermapping.ts

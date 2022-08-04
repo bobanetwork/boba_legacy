@@ -89,9 +89,50 @@ const FantomDev = {
   gasLimitOption: { gasLimit: 400_000 },
 }
 
+const AvalancheDev = {
+  chainID: 43112,
+  accounts: [
+    {
+      privateKey:
+        '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027',
+    },
+    {
+      privateKey:
+        '0x119c49b6a55123600ce73fbfad852f45c015d328b593fb20aca9a68f1588bd7e',
+    },
+    {
+      privateKey:
+        '0xb135c8deb7e4f283ad3b8a5e8b557d88f32ccdca730a7d1ee6a02263d565c39c',
+    },
+    {
+      privateKey:
+        '0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437',
+    },
+    {
+      privateKey:
+        '0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c',
+    },
+    {
+      privateKey:
+        '0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a',
+    },
+    {
+      privateKey:
+        '0x67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e',
+    },
+    {
+      privateKey:
+        '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de',
+    },
+  ],
+  depositL2Gas: 1_000_000,
+  gasLimitOption: { gasLimit: 400_000 },
+}
+
 const supportedTestNetwork = {
   1281: MoonbeamDev,
   4003: FantomDev,
+  43112: AvalancheDev,
 }
 
 // This is a TEMPORARY way to fund the default hardhat accounts on L2. The better way to do this is

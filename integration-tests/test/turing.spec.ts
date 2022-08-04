@@ -89,11 +89,15 @@ describe('Turing 256 Bit Random Number Test', async () => {
     console.log('Verified state roots.')
   })
 
-  it('Should transfer BOBA to L2', async () => {
+  it('Should transfer BOBA to L2', async function () {
     const depositBOBAAmount = utils.parseEther('10')
 
     const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
     const preL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+
+    if (preL2BOBABalance.gt(depositBOBAAmount)) {
+      this.skip()
+    }
 
     const approveL1BOBATX = await L1BOBAToken.approve(
       L1StandardBridge.address,

@@ -152,6 +152,33 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
     }
  }
+} else if (process.env.REACT_APP_CHAIN === 'bobaFuji') {
+  NETWORK = {
+    bobaFuji: {
+      OMGX_WATCHER_URL: `https://api-watcher.testnet.avax.boba.network/`,
+      MM_Label:         `bobaAvalancheTestnet`,
+      addressManager:   `0xcE78de95b85212BC348452e91e0e74c17cf37c79`,
+      L1: {
+        name: "Avalanche Testnet",
+        chainId: 43113,
+        chainIdHex: '0xA869',
+        rpcUrl: `https://api.avax-test.network/ext/bc/C/rpc`,
+        blockExplorer: `https://api-testnet.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://testnet.snowtrace.io/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "Boba Avalanche Testnet",
+        chainId: 4328,
+        chainIdHex: '0x10E8',
+        rpcUrl: `https://testnet.avax.boba.network`,
+        blockExplorer: `https://blockexplorer.testnet.avax.boba.network/`,
+        transaction: `https://blockexplorer.testnet.avax.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORK = {
     local: {
@@ -194,6 +221,10 @@ const BaseServices = {
   BOBAOPERA_META_TRANSACTION: `https://api-meta-transaction.bobaopera.boba.network/`,
   // Testnet meta transaction
   BOBAOPERATESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.bobaopera.boba.network/`,
+  // Mainnet meta transaction
+  BOBAAVALANCHE_META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
+  // Testnet meta transaction
+  BOBAFUJI_META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
 }
 
 export function getNetwork () {

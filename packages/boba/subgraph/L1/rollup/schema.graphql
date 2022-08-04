@@ -39,7 +39,7 @@ type StateBatchAppendedEntity @entity {
 
 type AddressSetEntity @entity {
   id: ID!
-  _name: String
+  _name: Bytes!
   _newAddress: Bytes!
   _oldAddress: Bytes
   blockNumber: BigInt!

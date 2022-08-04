@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
 
-import { expectLogs, isNonEthereumChain } from './shared/utils'
+import { expectLogs, isNonEthereumChain, getGasLimitOption } from './shared/utils'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
@@ -49,6 +49,8 @@ describe('Liquidity Pool Test', async () => {
   const initialSupply = utils.parseEther('10000000000')
   const tokenName = 'JLKN'
   const tokenSymbol = 'JLKN'
+
+  let gasLimitOption: any
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -147,6 +149,8 @@ describe('Liquidity Pool Test', async () => {
       'L2_L1NativeToken',
       env.l2Wallet
     ).attach(predeploys.L2_L1NativeToken)
+
+    gasLimitOption = await getGasLimitOption(env.l1Provider)
   })
 
   it('{tag:mrf} should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
@@ -655,14 +659,16 @@ describe('Liquidity Pool Test', async () => {
     const approveL1LPTX = await L1ERC20.approve(
       L1LiquidityPool.address,
       depositAmount,
-      { gasLimit: 9000000 }
+      gasLimitOption
     )
     await approveL1LPTX.wait()
 
     const depositTx = await env.waitForXDomainTransaction(
-      L1LiquidityPool.clientDepositL1(depositAmount, L1ERC20.address, {
-        gasLimit: 9000000,
-      })
+      L1LiquidityPool.clientDepositL1(
+        depositAmount,
+        L1ERC20.address,
+        gasLimitOption
+      )
     )
 
     const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -2121,7 +2127,7 @@ describe('Liquidity Pool Test', async () => {
               l1TokenAddress: ethers.constants.AddressZero,
             },
           ],
-          { value: depositAmount, gasLimit: 9000000 }
+          { value: depositAmount, ...gasLimitOption }
         )
       )
 
@@ -2183,7 +2189,7 @@ describe('Liquidity Pool Test', async () => {
             },
             { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
           ],
-          { value: depositAmount, gasLimit: 9000000 }
+          { value: depositAmount, ...gasLimitOption }
         )
       )
 
@@ -2340,7 +2346,7 @@ describe('Liquidity Pool Test', async () => {
             { amount: depositAmount, l1TokenAddress: L1ERC20_2.address },
             { amount: depositAmount, l1TokenAddress: L1ERC20_3.address },
           ],
-          { value: depositAmount, gasLimit: 9000000 }
+          { value: depositAmount, ...gasLimitOption }
         )
       )
 
@@ -2829,7 +2835,7 @@ describe('Liquidity Pool Test', async () => {
             },
             { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
           ],
-          { value: swapOnAmount, gasLimit: 9000000 }
+          { value: swapOnAmount, ...gasLimitOption }
         )
       )
 
@@ -2936,7 +2942,7 @@ describe('Liquidity Pool Test', async () => {
             { amount: depositAmount, l1TokenAddress: L1ERC20_1.address },
             { amount: swapOnERC20Amount, l1TokenAddress: L1ERC20_2.address },
           ],
-          { value: swapOnETHAmount, gasLimit: 9000000 }
+          { value: swapOnETHAmount, ...gasLimitOption }
         )
       )
 

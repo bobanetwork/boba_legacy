@@ -80,6 +80,7 @@ import GraphQLService from "./graphQLService"
 
 import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
 import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOperaTestnet_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b"
+import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79.json"
 
 import { bobaBridges } from 'util/bobaBridges'
 
@@ -87,6 +88,7 @@ import { bobaBridges } from 'util/bobaBridges'
 import * as React from 'react';
 import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
 import FantomIcon from 'components/icons/FantomIcon.js'
+import AvaxIcon from 'components/icons/AvaxIcon.js'
 
 require('dotenv').config()
 
@@ -110,9 +112,14 @@ if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
     ...addresses_BobaOperaTestnet,
   }
 }
+if (process.env.REACT_APP_CHAIN === 'bobaFuji') {
+  allAddresses = {
+    ...addresses_BobaFuji,
+  }
+}
 
 // suported chains
-const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet']
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji']
 
 // assets for different chains
 const L1ChainAssets = {
@@ -124,6 +131,11 @@ const L1ChainAssets = {
   'bobaOperaTestnet': {
     name: 'Fantom Testenet',
     icon: (bool) => <FantomIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+  },
+  'bobaFuji': {
+    name: 'Avalanche Testnet',
+    icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   }
 }
@@ -1204,24 +1216,27 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": false, //since we are going L2->L1
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      /**************************/
+      /*   Remove speed check   */
+      /**************************/
+      // const data = {
+      //   "key": process.env.REACT_APP_SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": false, //since we are going L2->L1
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkGateway
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
       return receipt
     } catch(error) {
@@ -1480,24 +1495,27 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      /**************************/
+      /*   Remove speed check   */
+      /**************************/
+      // const data = {
+      //   "key": process.env.REACT_APP_SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": true,
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkGateway
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
       this.getBalances()
 

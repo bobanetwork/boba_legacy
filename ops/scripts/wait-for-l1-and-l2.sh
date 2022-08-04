@@ -22,7 +22,7 @@ until $(curl --silent --fail \
 done
 echo "Connected to L1 Node at $L1_NODE_WEB3_URL"
 
-RETRIES=${RETRIES:-60}
+RETRIES=${RETRIES:-500}
 until $(curl --silent --fail \
     --output /dev/null \
     -H "Content-Type: application/json" \
