@@ -9,6 +9,7 @@ export const DaoPageContainer = styled(Box)(({ theme }) => ({
   padding: '10px',
   paddingTop: '0px',
   width: '70%',
+  gap: '10px',
   [theme.breakpoints.between('md', 'lg')]: {
     width: '90%',
     padding: '0px',
@@ -77,7 +78,7 @@ export const DaoProposalHead = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   alignSelf: 'flex-start',
   justifyContent: 'space-between',
-  padding: '24px 0px',
+  padding: '15px 0px',
   width: '100%',
   margin: '5px',
   [theme.breakpoints.down('sm')]: {

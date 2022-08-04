@@ -4070,6 +4070,7 @@ class NetworkService {
     let description = ''
     let address = ['']
     let callData = ['']
+    let tokenIds = payload.tokenIds
 
     const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
@@ -4124,13 +4125,14 @@ class NetworkService {
           values,
           signatures,
           callData,
+          tokenIds,
           description
       )
 
       return res
 
     } catch (error) {
-      console.log("NS: getProposalThreshold error:",error)
+      console.log("NS: createProposal error:",error)
       return error
     }
   }

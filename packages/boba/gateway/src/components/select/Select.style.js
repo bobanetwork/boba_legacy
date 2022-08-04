@@ -11,3 +11,11 @@ export const Field = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   borderRadius: '12px',
 }))
+
+
+export const SelectOptionContainer = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.secondary,
+  border: '1px solid rgba(255, 255, 255, 0.15)',
+  display: 'flex',
+  alignItems: 'center'
+}));
