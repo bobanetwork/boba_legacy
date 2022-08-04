@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
-import { openError, openModal } from 'actions/uiAction'
+import { openModal } from 'actions/uiAction'
 import { orderBy } from 'lodash'
 
 import Button from 'components/button/Button'
@@ -25,9 +25,9 @@ import ListProposal from 'components/listProposal/listProposal'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Select from 'components/select/Select'
 
-import { selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
+import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import { setConnectBOBA } from 'actions/setupAction'
 import { fetchLockRecords } from 'actions/veBobaAction'
@@ -36,7 +36,6 @@ import { selectLockRecords } from 'selectors/veBobaSelector'
 import * as styles from './Dao.module.scss'
 import * as S from './Dao.styles'
 
-const PER_PAGE = 8
 const PROPOSAL_STATES = [
   { value: 'All', label: 'All' },
   { value: 'Pending', label: 'Pending' },
@@ -49,23 +48,21 @@ const PROPOSAL_STATES = [
   { value: 'Executed', label: 'Executed' }
 ]
 
-
 function DAO() {
 
   const dispatch = useDispatch()
 
-  const proposalThreshold = useSelector(selectProposalThreshold)
   const nftRecords = useSelector(selectLockRecords);
-
-  let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
+  let proposals = useSelector(selectProposals)
 
-  const [ balance, setBalance ] = useState(0);
+  const [ balance, setBalance ] = useState('--');
   const [ selectedState, setSelectedState ] = useState('All')
 
-  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
-  const proposals = useSelector(selectProposals)
-  console.log([ 'proposals', proposals ])
+  async function connectToBOBA() {
+    dispatch(setConnectBOBA(true))
+  }
 
   useEffect(() => {
     if (!!accountEnabled) {
@@ -78,36 +75,21 @@ function DAO() {
       const veBoba = nftRecords.reduce((s, record) => s + Number(record.balance), 0);
       setBalance(veBoba.toFixed(2))
     }
-
-    return () => {
-      setBalance(0);
-    }
   }, [ accountEnabled, nftRecords ]);
 
-  async function connectToBOBA() {
-    dispatch(setConnectBOBA(true))
-  }
-
-
-  const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
-  const paginatedProposals = orderedProposals
-
-  let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE)
-  if (totalNumberOfPages === 0) totalNumberOfPages = 1
+  proposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
   return (
     <div className={styles.container}>
 
       <S.DaoPageContainer>
-
         <PageTitle title={'Dao'} />
-
         <S.DaoPageContent>
           <S.DaoWalletContainer>
             <Box sx={{ padding: '24px 0px' }}>
               <Typography variant="h4">Voting power</Typography>
               <Typography variant="body1" style={{ opacity: '0.5' }}>veBOBA:</Typography>
-              <Typography variant="h4" >{!!layer ? balance : '--'}</Typography>
+              <Typography variant="h4" >{balance}</Typography>
             </Box>
             <G.DividerLine />
             <Box
@@ -152,9 +134,14 @@ function DAO() {
               }
             </Box>
 
-            {accountEnabled && nftRecords && !nftRecords.length ? <Typography variant="body2">
-              Oh! You don't have veBoba NFT, Please go to Lock to get them.
-            </Typography> : null}
+            {accountEnabled
+              && nftRecords
+              && !nftRecords.length
+              ? <Typography variant="body2">
+                Oh! You don't have veBoba NFT, Please go to Lock to get them.
+              </Typography>
+              : null
+            }
           </S.DaoWalletContainer>
           <S.DaoProposalContainer>
             <S.DaoProposalHead>
@@ -170,7 +157,7 @@ function DAO() {
             <G.DividerLine />
             <S.DaoProposalListContainer>
               {!!loading && !proposals.length ? <div className={styles.loadingContainer}> Loading... </div> : null}
-              {paginatedProposals
+              {proposals
                 // eslint-disable-next-line array-callback-return
                 .filter((p) => {
                   if (selectedState === 'All') {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { components } from 'react-select';
 import * as G from 'containers/Global.styles';
 import * as S from './Select.style';
