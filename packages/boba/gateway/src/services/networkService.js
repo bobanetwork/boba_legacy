@@ -4150,6 +4150,8 @@ class NetworkService {
 
       const proposalCounts = await delegateCheck.proposalCount()
       const totalProposals = await proposalCounts.toNumber()
+      const latestProposalId = await delegateCheck.latestProposalId();
+      const latestProposalState = await delegateCheck.state(latestProposalId);
 
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
@@ -4208,7 +4210,7 @@ class NetworkService {
         })
 
       }
-      return { proposalList }
+      return { proposalList, hasLiveProposal: !!['Active','Pending'].includes(latestProposalState) }
     } catch (error) {
       console.log("NS: fetchProposals error:",error)
       return error

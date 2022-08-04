@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
-import { openModal } from 'actions/uiAction'
+import { openError, openModal } from 'actions/uiAction'
 import { orderBy } from 'lodash'
 
 import Button from 'components/button/Button'
@@ -25,7 +25,7 @@ import ListProposal from 'components/listProposal/listProposal'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Select from 'components/select/Select'
 
-import { selectProposals } from 'selectors/daoSelector'
+import { selectLatestProposalState, selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled } from 'selectors/setupSelector'
 
@@ -55,6 +55,7 @@ function DAO() {
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
   const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
+  const hasLiveProposal = useSelector(selectLatestProposalState)
   let proposals = useSelector(selectProposals)
 
   const [ balance, setBalance ] = useState('--');
@@ -116,17 +117,12 @@ function DAO() {
                     color="neutral"
                     variant="outlined"
                     onClick={() => {
-                      // TODO: if there is active proposal then disable the create proposal button show tooltip.
-                      // TOTOD:
-                      /*
-                        get the latest proposal Id from latestProposalIds for specific user.
-                        check it's status by invoking state. to enable the button.
-                      */
-                      // if (Number(votes + votesX) < Number(proposalThreshold)) {
-                      //   dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-                      // } else {
-                      // }
-                      dispatch(openModal('newProposalModal'))
+                      if (hasLiveProposal) {
+                        // If proposer has active proposal so user can create new one.
+                        dispatch(openError(`You already have one live proposal.`))
+                      } else {
+                        dispatch(openModal('newProposalModal'))
+                      }
                     }}
                   >
                     Create new proposal
