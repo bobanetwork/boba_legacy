@@ -74,13 +74,13 @@ function ListProposal({
             let descList = description.split('@@')
             if (descList[ 1 ] !== '') {
                 //should validate http link
-                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link
-                    color="inherit"
-                    variant="body2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={descList[ 1 ]}
-                  >MORE DETAILS</Link></>
+              return <Typography variant="body2" display="flex">&nbsp;{descList[ 0 ]}&nbsp;&nbsp;<Link
+                color="inherit"
+                variant="body2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={descList[ 1 ]}
+              >More details</Link></Typography>
             } else {
                 return <>{descList[ 0 ]}</>
             }
@@ -91,8 +91,7 @@ function ListProposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
-    let hasVoted = false
-    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true
+    let hasVoted = proposal.hasVoted
 
     return (
         <S.Wrapper>
@@ -106,26 +105,30 @@ function ListProposal({
                     xs={12}
                     md={12}
                 >
-                    <Typography variant="body2" style={{ fontWeight: '700' }}>
-                        Proposal {proposal.id} : <FormatDescription description={proposal.description} />
-                    </Typography>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" component="span" style={{ fontWeight: '700' }}> Proposal {proposal.id} : </Typography> <FormatDescription description={proposal.description} />
+                    </Box>
                     <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', my: '10px' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography style={{ fontSize: '0.8em', opacity: '0.65', lineHeight: '1.2em' }}>
-                                Voting Time
-                            </Typography>
-                            <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
-                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
-                                    {startTime}
-                                </Typography >
-                                &nbsp; - &nbsp;
-                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
-                                    {endTime}
-                                </Typography >
-                            </Typography>
+                          <Typography style={{ fontSize: '0.8em', opacity: '0.65', lineHeight: '1.2em' }}>
+                            Voting Time
+                          </Typography>
+                          <Box display="flex" alignItems="center">
+                            <Typography component="span" variant='body3' sx={{ opacity: 0.65, fontSize: '0.8em' }}>
+                              {startTime}
+                            </Typography >
+                            &nbsp; - &nbsp;
+                            <Typography component="span" variant='body3' sx={{ opacity: 0.65, fontSize: '0.8em' }}>
+                              {endTime}
+                            </Typography >
+                          </Box>
+
+                          <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
+
+                          </Typography>
                         </Box>
                         <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
-                            Status: &nbsp;
+                            {/* Status: &nbsp; */}
                             {proposal.state === 'Defeated' && proposal.totalVotes < 1000000 &&
                                 <span style={{ color: 'red' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp;

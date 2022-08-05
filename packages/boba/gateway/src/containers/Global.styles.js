@@ -133,6 +133,6 @@ export const ThumbnailContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '4rem',
-  width: '4rem',
+  height: '3rem',
+  width: '3rem',
 }))

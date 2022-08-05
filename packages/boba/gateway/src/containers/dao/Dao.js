@@ -156,7 +156,7 @@ function DAO() {
               {proposals
                 // eslint-disable-next-line array-callback-return
                 .filter((p) => {
-                  if (selectedState === 'All') {
+                  if (selectedState.value === 'All') {
                     return true;
                   }
                   return selectedState.value === p.state;

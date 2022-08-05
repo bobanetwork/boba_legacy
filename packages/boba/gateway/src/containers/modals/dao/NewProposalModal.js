@@ -23,7 +23,7 @@ import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-// import Select from 'react-select'
+
 import Select from 'components/select/Select'
 
 import { createDaoProposal } from 'actions/daoAction'

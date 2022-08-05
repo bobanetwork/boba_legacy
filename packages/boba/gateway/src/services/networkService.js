@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { parseEther, formatEther } from '@ethersproject/units'
-
 import {
   CrossChainMessenger,
 } from '@eth-optimism/sdk'
@@ -23,7 +22,7 @@ import {
 import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
-import { orderBy } from 'lodash'
+import { orderBy, groupBy } from 'lodash'
 import BN from 'bn.js'
 
 import { logAmount } from 'util/amountConvert'
@@ -213,6 +212,7 @@ class NetworkService {
     this.xBobaContract = null
     this.delegateContract = null
     this.delegatorContract = null
+    this.delegatorContractV2 = null
 
     // Gas oracle
     this.gasOracleContract = null
@@ -921,7 +921,6 @@ class NetworkService {
 
       }))
 
-      console.log("tokens:",allTokens)
       this.tokenAddresses = allTokens
 
       if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
@@ -1039,6 +1038,12 @@ class NetworkService {
 
       this.delegatorContract = new ethers.Contract(
         allAddresses.GovernorBravoDelegator,
+        GovernorBravoDelegator.abi,
+        this.L2Provider
+      )
+
+      this.delegatorContractV2 = new ethers.Contract(
+        allAddresses.GovernorBravoDelegatorV2,
         GovernorBravoDelegator.abi,
         this.L2Provider
       )
@@ -4071,8 +4076,8 @@ class NetworkService {
     let address = ['']
     let callData = ['']
     let tokenIds = payload.tokenIds
-
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+    // create proposal only on latest contracts.
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
 
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
@@ -4138,83 +4143,113 @@ class NetworkService {
   }
 
   //Fetch DAO Proposals
+  /**
+   * Supporting the old (boba, xboba) and new proposals (govBoba / veNft) based.
+   * group created proposals by `to` and make use of respective contract to prepare the proposal data list.
+   *
+  */
+
   async fetchProposals() {
 
-    if( !this.delegateContract ) return
+    if (!this.delegateContract) return
 
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+    const delegateCheckV1 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+    const delegateCheckV2 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
 
     try {
 
       let proposalList = []
-
-      const proposalCounts = await delegateCheck.proposalCount()
-      const totalProposals = await proposalCounts.toNumber()
-
-      const latestProposalIdRaw = await delegateCheck.latestProposalIds(this.account);
-      const latestProposalId = await latestProposalIdRaw.toNumber();
-      const latestProposalState = await delegateCheck.state(latestProposalId);
-
-      /// @notice An event emitted when a new proposal is created
+      /// @notice An event emitted when a new proposal is create
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+      const descriptionList = await GraphQLService.queryBridgeProposalCreated()
+      const proposalGroup = groupBy(descriptionList.data.governorProposalCreateds, 'to');
 
-      for (let i = 0; i < totalProposals; i++) {
+      const delegatorList = [ allAddresses.GovernorBravoDelegator, allAddresses.GovernorBravoDelegatorV2 ];
 
-        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+      for (let delegator of delegatorList) {
+        let delegateCheck;
+        if (delegator === allAddresses.GovernorBravoDelegator) {
+          delegateCheck = delegateCheckV1;
+        } else if(delegator === allAddresses.GovernorBravoDelegatorV2) {
+          delegateCheck = delegateCheckV2;
+        }
+        const proposals = proposalGroup[delegator.toLowerCase()]
+        const proposalCounts = await delegateCheck.proposalCount()
+        const totalProposals = await proposalCounts.toNumber()
 
-        if(typeof(proposalRaw) === 'undefined') continue
+        for (let i = 0; i < totalProposals; i++) {
+          const proposalRaw = proposals[i]
 
-        let proposalID = proposalRaw.proposalId
+          if(typeof(proposalRaw) === 'undefined') continue
 
-        //this is a number such as 2
-        let proposalData = await delegateCheck.proposals(proposalID)
+          let proposalID = proposalRaw.proposalId
 
-        const proposalStates = [
-          'Pending',
-          'Active',
-          'Canceled',
-          'Defeated',
-          'Succeeded',
-          'Queued',
-          'Expired',
-          'Executed',
-        ]
+          let proposalData = await delegateCheck.proposals(proposalID)
 
-        let state = await delegateCheck.state(proposalID)
+          const proposalStates = [
+            'Pending',
+            'Active',
+            'Canceled',
+            'Defeated',
+            'Succeeded',
+            'Queued',
+            'Expired',
+            'Executed',
+          ]
 
-        let againstVotes = parseInt(formatEther(proposalData.againstVotes))
-        let forVotes = parseInt(formatEther(proposalData.forVotes))
-        let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
+          let state = await delegateCheck.state(proposalID)
 
-        let startTimestamp = proposalData.startTimestamp.toString()
-        let endTimestamp = proposalData.endTimestamp.toString()
+          let againstVotes = parseInt(formatEther(proposalData.againstVotes))
+          let forVotes = parseInt(formatEther(proposalData.forVotes))
+          let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        let proposal = await delegateCheck.getActions(i+2)
+          let proposal = await delegateCheck.getActions(i+2)
 
-        let hasVoted = null
+          let hasVoted = null
 
-        let description = proposalRaw.description.toString()
+          /*
+            if (
+              this.account
+              && delegator === allAddresses.GovernorBravoDelegator
+            ) {
+              // as incase of v2 delegator contract is looking for proposalId & tokenId
+              const reciept = await delegateCheck.getReceipt(proposalID, this.account)
+              hasVoted = reciept.hasVoted;
+            }
+          */
 
-        proposalList.push({
-           id: proposalID?.toString(),
-           proposal,
-           description,
-           totalVotes: forVotes + againstVotes,
-           forVotes,
-           againstVotes,
-           abstainVotes,
-           state: proposalStates[state],
-           startTimestamp,
-           endTimestamp,
-           hasVoted: hasVoted
-        })
+          let description = proposalRaw.description.toString()
 
+          proposalList.push({
+             id: proposalID.toString(),
+             proposal,
+             description,
+             totalVotes: forVotes + againstVotes,
+             forVotes,
+             againstVotes,
+             abstainVotes,
+             state: proposalStates[state],
+             startTimestamp : proposalRaw.startTimestamp,
+             endTimestamp: proposalRaw.endTimestamp,
+             hasVoted
+          })
+        }
       }
+
+      // hasLive proposal only checking for GovernorBravoDelegatorV2 contracts
+      let hasLiveProposal = false
+
+      if (this.account) {
+        const latestProposalIdRaw = await delegateCheckV2.latestProposalIds(this.account);
+        const latestProposalId = await latestProposalIdRaw.toNumber();
+        const latestProposalState = await delegateCheckV2.state(latestProposalId);
+        hasLiveProposal = [ 0, 1 ].includes(latestProposalState) /// pending & active proposal check.
+      }
+
       return {
         proposalList,
-        hasLiveProposal: !![ 0, 1 ].includes(latestProposalState) /// state is pending and active.
+        hasLiveProposal
       }
     } catch (error) {
       console.log("NS: fetchProposals error:",error)
@@ -4252,8 +4287,6 @@ class NetworkService {
       return
     }
 
-    console.log("ProposalID:",Number(proposalID))
-
     try {
       const delegateCheck = await this.delegateContract
         .connect(this.provider.getSigner())
@@ -4275,8 +4308,6 @@ class NetworkService {
       console.log('NS: executeProposal() error - called but account === null')
       return
     }
-
-    console.log("ProposalID:",Number(proposalID))
 
     try {
       const delegateCheck = await this.delegateContract
