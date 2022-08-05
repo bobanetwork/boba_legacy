@@ -187,7 +187,7 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
-  // Avalanche
+  // Avalanche local
   43112: {
     l1: {
       AddressManager: '0x52C84043CD9c865236f11d9Fc9F56aa003c1f922',
@@ -214,6 +214,21 @@ export const CONTRACT_ADDRESSES: {
       BondManager: '0x067cD503bd734a779830dafF0Db582B6a347c3df',
       L1MultiMessageRelayer: '0x74546A4c6D5543Be7e8447159c47BAe7f5431C49',
       L1MultiMessageRelayerFast: '0x5e6B412b4fA8373a17aD85B269fA5c354ea57e63',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // BSC local
+  99: {
+    l1: {
+      AddressManager: '0xC194E4CFa59D2DfC520217dA22E23DF8D4658a37',
+      L1CrossDomainMessenger: '0x8b8656D5d37C3DC620B80817972E0d9a5267761b',
+      L1CrossDomainMessengerFast: '0x07B43F437c3A13eeb17EF2beBea046e61502151f',
+      L1StandardBridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      StateCommitmentChain: '0x57a243B34F9232515Fa9FD8D4c2daFd611cF1BCA',
+      CanonicalTransactionChain: '0x3717E342Bc746c01244fb40e47521945091238ce',
+      BondManager: '0xcF8dDe2accE564024B4b92ef7db81B0e6698F07f',
+      L1MultiMessageRelayer: '0x90f502229E1fAa70cCf900B2D14595a5C55B3bE8',
+      L1MultiMessageRelayerFast: '0x64160054BdD6e53915C221cBBfAAbaf1f80c7f20',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -382,6 +397,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  99: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
