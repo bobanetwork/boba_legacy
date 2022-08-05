@@ -7,8 +7,11 @@
     "OVM_L2StandardBridge": {
       "address": "0x4200000000000000000000000000000000000010"
     },
-    "GovernorBravoDelegate": {
+    "GovernorBravoDelegateV1": {
       "address": "0x472e5C097C790c6a44366a89a987Ec996A4d83e0"
+    },
+    "GovernorBravoDelegateV2": {
+      "address": "0x6e95118f381F60B09FA8Ba750470DA6136d872F9"
     },
     "Boba_GasPriceOracle": {
       "address": "0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b"
