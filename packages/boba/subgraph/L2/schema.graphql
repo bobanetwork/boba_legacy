@@ -80,23 +80,27 @@ type GovernorNewAdmin @entity {
   id: ID!
   oldAdmin: Bytes
   newAdmin: Bytes
+  to: Bytes
 }
 
 type GovernorNewImplementation @entity {
   id: ID!
   oldImplementation: Bytes
   newImplementation: Bytes
+  to: Bytes
 }
 
 type GovernorNewPendingAdmin @entity {
   id: ID!
   oldPendingAdmin: Bytes
   newPendingAdmin: Bytes
+  to: Bytes
 }
 
 type GovernorProposalCanceled @entity {
   id: ID!
   proposalId: String
+  to: Bytes
 }
 
 type GovernorProposalCreated @entity {
@@ -110,23 +114,27 @@ type GovernorProposalCreated @entity {
   startTimestamp: String
   endTimestamp: String
   description: String
+  to: Bytes
 }
 
 type GovernorProposalExecuted @entity {
   id: ID!
   proposalId: String
+  to: Bytes
 }
 
 type GovernorProposalQueued @entity {
   id: ID!
   proposalId: String
   eta: String
+  to: Bytes
 }
 
 type GovernorProposalThresholdSet @entity {
   id: ID!
   oldProposalThreshold: String
   newProposalThreshold: String
+  to: Bytes
 }
 
 type GovernorVoteCast @entity {
@@ -136,18 +144,21 @@ type GovernorVoteCast @entity {
   support: String
   votes: String
   reason: String
+  to: Bytes
 }
 
 type GovernorVotingDelaySet @entity {
   id: ID!
   oldVotingDelay: String
   newVotingDelay: String
+  to: Bytes
 }
 
 type GovernorVotingPeriodSet @entity {
   id: ID!
   oldVotingPeriod: String
   newVotingPeriod: String
+  to: Bytes
 }
 
 type UseBobaAsFeeTokenEvent @entity {

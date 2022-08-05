@@ -99,7 +99,7 @@ dataSources:
       file: ./src/GovernorBravoDelegateMapping.ts
 
   - kind: ethereum/contract
-    name: GovernorBravoDelegateNewV1
+    name: GovernorBravoDelegateV2
     network: boba
     source:
       address: '0x6e95118f381F60B09FA8Ba750470DA6136d872F9'
@@ -181,7 +181,6 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTuringMonstersTransferEvent
       file: ./src/TuringMonstersMapping.ts
-
 
   - kind: ethereum/contract
     name: TuringHelperFactory
