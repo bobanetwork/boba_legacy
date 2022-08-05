@@ -18,25 +18,22 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 import CheckMarkIcon from '@mui/icons-material/CheckCircleOutline'
-import { openError, openModal } from 'actions/uiAction'
-import { orderBy } from 'lodash'
 
 import Button from 'components/button/Button'
-import ListProposal from 'components/listProposal/listProposal'
 import PageTitle from 'components/pageTitle/PageTitle'
-import Select from 'components/select/Select'
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
-
-import { selectLatestProposalState, selectProposals } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import Input from 'components/input/Input'
 
 import { setConnectBOBA } from 'actions/setupAction'
 import { fetchLockRecords } from 'actions/veBobaAction'
-import * as G from 'containers/Global.styles'
+
+import { selectAccountEnabled } from 'selectors/setupSelector'
 import { selectLockRecords } from 'selectors/veBobaSelector'
+
+import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+
+import * as G from 'containers/Global.styles'
 import * as S from './Vote.style'
-import Input from 'components/input/Input'
+
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
@@ -65,8 +62,6 @@ function Vote() {
 
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
-  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
-  let proposals = useSelector(selectProposals)
 
   const [ balance, setBalance ] = useState('--');
   const [ nftSearch, setNftSearch ] = useState('');
@@ -88,8 +83,6 @@ function Vote() {
       setBalance(veBoba.toFixed(2))
     }
   }, [ accountEnabled, nftRecords ]);
-
-  console.log(['nftRecords',nftRecords])
 
   return < S.VotePageContainer >
     <PageTitle title={'Vote'} />
