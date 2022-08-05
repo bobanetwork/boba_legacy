@@ -41,6 +41,8 @@ function NewProposalModal({ open }) {
   const [ tokens, setTokens ] = useState([])
   const [ votingThreshold, setVotingThreshold ] = useState('')
 
+  const [ errorText, setErrorText ] = useState('')
+
   const [ LPfeeMin, setLPfeeMin ] = useState('')
   const [ LPfeeMax, setLPfeeMax ] = useState('')
   const [ LPfeeOwn, setLPfeeOwn ] = useState('')
@@ -58,6 +60,7 @@ function NewProposalModal({ open }) {
     if (records && records.length > 0) {
       const options = records.map((token) => ({
         value: token.tokenId,
+        balance: token.balance,
         label: `#${token.tokenId}`,
         title: `VeBoba - ${token.balance}`,
         subTitle: `Lock Amount - ${token.lockedAmount}`,
@@ -69,7 +72,17 @@ function NewProposalModal({ open }) {
     return () => {
       setNftOptions([]);
     };
-  }, [records]);
+  }, [ records ]);
+
+  useEffect(() => {
+    let tokensSum = tokens.reduce((c, i) => c + Number(i.balance), 0);
+    if (tokensSum < proposalThreshold) {
+      setErrorText(`Insufficient govBOBA to create a new proposal. You need at least ${proposalThreshold} govBOBA to create a proposal.`)
+    } else {
+      setErrorText('')
+    }
+  },[tokens, proposalThreshold])
+
 
   const onActionChange = (e) => {
     setVotingThreshold('')
@@ -141,6 +154,9 @@ function NewProposalModal({ open }) {
   }
 
   const disabled = () => {
+    if (!proposalThreshold) {
+      return true
+    }
     if (action === 'change-threshold') {
       return !votingThreshold
     } else if (action === 'text-proposal') {
@@ -288,6 +304,7 @@ function NewProposalModal({ open }) {
               />
             </>
           }
+        {errorText ? <Typography variant="body2" color="danger" sx={{ mt: 1 }}>{errorText}</Typography> : null}
         </Box>
       </Box>
       <Box sx={{ width: '100%', my: 2 }}>
@@ -297,7 +314,7 @@ function NewProposalModal({ open }) {
           variant='outlined'
           tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}
           loading={loading}
-          disabled={disabled()}
+          disabled={disabled() || !!errorText}
           fullWidth={true}
           size="large"
         >

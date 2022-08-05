@@ -89,7 +89,7 @@ function DAO() {
           <S.DaoWalletContainer>
             <Box sx={{ padding: '24px 0px' }}>
               <Typography variant="h4">Voting power</Typography>
-              <Typography variant="body1" style={{ opacity: '0.5' }}>veBOBA:</Typography>
+              <Typography variant="body1" style={{ opacity: '0.5' }}>govBOBA:</Typography>
               <Typography variant="h4" >{balance}</Typography>
             </Box>
             <G.DividerLine />
