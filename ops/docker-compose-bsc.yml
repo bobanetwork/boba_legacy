@@ -452,7 +452,7 @@ services:
       - 8888:8888
 
 networks:
-  default:
+  bsc-network:
     enable_ipv6: true
     ipam:
       config:
