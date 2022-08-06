@@ -30,7 +30,10 @@ if [[ $(uname -m) == 'arm64' ]]; then
 fi
 
 # Remove docker network
-docker network prune -f
+if [[ $NETWORK_PRUNE == 1 ]]; then
+  echo 'You set NETWORK_PRUNE to 1, which means that we will remove the docker network'
+  docker network rm bsc-network
+fi
 
 #Build dependencies, if needed
 if [[ $BUILD == 1 ]]; then

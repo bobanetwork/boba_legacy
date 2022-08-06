@@ -101,7 +101,7 @@ jobs:
             name: Bring up the stack
             command: |
               ./scripts/build-ci-avalanche.sh
-              BUILD=2 DAEMON=1 ./up_local_avalanche.sh
+              BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_avalanche.sh
             working_directory: ops
         - run:
             name: Start background logging
@@ -144,7 +144,7 @@ jobs:
             name: Bring up the stack
             command: |
               ./scripts/build-ci-bsc.sh
-              BUILD=2 DAEMON=1 ./up_local_bsc.sh
+              BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_bsc.sh
             working_directory: ops
         - run:
             name: Start background logging
