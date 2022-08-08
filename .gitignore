@@ -6,6 +6,8 @@ temp
 coverage.json
 *.tsbuildinfo
 
+ops/volumes/**/*
+jwt.hex
 env.yml
 env.yaml
 .aws-sam/

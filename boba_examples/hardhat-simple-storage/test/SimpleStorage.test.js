@@ -1,10 +1,17 @@
 /* External Imports */
 const { ethers, network } = require('hardhat')
+const { providers, Wallet } = require('ethers')
 const chai = require('chai')
 const { solidity } = require('ethereum-waffle')
 const { expect } = chai
+const hre = require('hardhat')
+
 
 chai.use(solidity)
+
+const cfg = hre.network.config
+const local_provider = new providers.JsonRpcProvider(cfg['url'])
+const gasOverride = { gasLimit: 8_000_000 }
 
 describe(`SimpleStorage`, () => {
 
@@ -17,9 +24,11 @@ describe(`SimpleStorage`, () => {
   let Store
 
   before(`deploy SimpleStorage contract`, async () => {
+    const accountBalance = await local_provider.getBalance(account1.address)
+    console.log('Balance: ', accountBalance)
     console.log('Deploying SimpleStorage contract')
     const Factory__SimpleStorage = await ethers.getContractFactory('SimpleStorage')
-    Store = await Factory__SimpleStorage.connect(account1).deploy(41)
+    Store = await Factory__SimpleStorage.connect(account1).deploy(41, gasOverride)
     await Store.deployTransaction.wait()
   })
 

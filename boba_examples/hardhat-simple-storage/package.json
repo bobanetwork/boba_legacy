@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "deploy": "hardhat deploy --network boba_rinkeby",
-    "test": "hardhat test --network boba_rinkeby"
+    "test:rinkeby": "hardhat test --network boba_rinkeby",
+    "test": "hardhat test"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",

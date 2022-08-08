@@ -7,10 +7,13 @@ RPC_FLAGS=" \
   --datadir /home/boba/datadir \
   --http.port 8545 \
   --http.addr 0.0.0.0 \
-  --http.vhosts "l1_chain,localhost" \
+  --http.vhosts "l1_execution_client,localhost" \
   --http.corsdomain "*" \
-  --http.api "eth,debug,net,erigon,web3" \
+  --http.api "eth,debug,net,erigon,web3,engine" \
+  --ws \
   --verbosity 4 \
+  --engine.addr l1_execution_client \
+  --authrpc.jwtsecret=/erigon-data/jwt.hex \
 "
 
 ERIGON_FLAGS=" \
@@ -29,7 +32,13 @@ ERIGON_FLAGS=" \
   --pprof.addr=0.0.0.0 \
   --pprof.port=6061 \
   --verbosity 4 \
+  --prune.r.before=4367322 \
+  --http.api=engine,eth,net \
+  --authrpc.jwtsecret=/erigon-data/jwt.hex \
+  --prune htc \
+  --override.terminaltotaldifficulty=0x152d02c7e14af6800000 \
   "
+  #   --override.terminaltotaldifficulty=17000000000000000 \
 
 if [ ! -f ${DATADIR}/l1_genesis.json ] ; then
   echo "Creating genesis file"
@@ -102,6 +111,6 @@ erigon ${ERIGON_FLAGS} &
 sleep 5
 rpcdaemon ${RPC_FLAGS}
 
-  
 
- 
+
+

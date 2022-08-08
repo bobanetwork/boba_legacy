@@ -14,6 +14,10 @@ module.exports = {
       url: 'https://rinkeby.boba.network',
       accounts: [env.PK1],
     },
+    local: {
+      url: 'http://localhost:9545',
+      accounts: [env.PK1],
+    }
   },
   solidity: {
     compilers: [
