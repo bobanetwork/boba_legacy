@@ -82,13 +82,15 @@ services:
     environment:
       NODE_ID: "l1_chain"
       BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "fd00:1::/64"
+      CLUSTER_CIDR: "2001:db8:abc1::/64"
       NETSTATS_URL: "bscpwd@netstats:3000"
       BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
       BOOTSTRAP_TCP_PORT: 30311
       VERBOSE: 3
     ports:
       - '9545:8545'
+    networks:
+      - bsc-network
 
   l1_chain_validator:
     image: bobanetwork/bsc:validator
@@ -98,11 +100,13 @@ services:
       NODE_ID: "l1_chain_validator"
       BOOTSTRAP_HOST: "l1_chain"
       BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "fd00:1::/64"
+      CLUSTER_CIDR: "2001:db8:abc1::/64"
       NETSTATS_URL: "bscpwd@netstats:3000"
       BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
       BOOTSTRAP_TCP_PORT: 30311
       VERBOSE: 3
+    networks:
+      - bsc-network
 
   deployer:
     depends_on:
@@ -144,7 +148,8 @@ services:
     ports:
         # expose the service to the host for getting the contract addrs
       - ${DEPLOYER_PORT:-8077}:8082
-
+    networks:
+      - bsc-network
 
   boba_deployer:
     depends_on:
@@ -169,7 +174,8 @@ services:
       # skip compilation when run in docker-compose, since the contracts
       # were already compiled in the builder step
       NO_COMPILE: 1
-
+    networks:
+      - bsc-network
 
   dtl:
     depends_on:
@@ -202,6 +208,8 @@ services:
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
+    networks:
+      - bsc-network
 
   l2geth:
     depends_on:
@@ -236,6 +244,8 @@ services:
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
+    networks:
+      - bsc-network
 
   relayer:
     depends_on:
@@ -262,6 +272,8 @@ services:
       MAX_WAIT_TX_TIME_S: 5
       RESUBMISSION_TIMEOUT: 5
       MULTI_RELAY_LIMIT: 5
+    networks:
+      - bsc-network
 
   # a second relay system for messages that need to get to L1 quickly
   # NOTE - all withdrawal messages use the standard relayer with its 7 day window
@@ -292,6 +304,8 @@ services:
       RESUBMISSION_TIMEOUT: 5
       MULTI_RELAY_LIMIT: 5
       FAST_RELAYER: 'true'
+    networks:
+      - bsc-network
 
   batch_submitter:
     restart: always
@@ -320,6 +334,8 @@ services:
       #aliases are setup, check seed.yml
       BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x91ef3b19cdb344c5010358718e9347dd5cb2f362"
       BATCH_SUBMITTER_PROPOSER_KEY_ID: "0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea"
+    networks:
+      - bsc-network
 
   integration_tests:
     image: bobanetwork/integration-tests:latest
@@ -347,6 +363,8 @@ services:
       << : *integration_4_pk
     volumes:
        - ~/result:/opt/optimism/integration-tests/result
+    networks:
+      - bsc-network
 
   replica:
     depends_on:
@@ -383,6 +401,8 @@ services:
     ports:
       - ${L2GETH_HTTP_PORT:-8549}:8545
       - ${L2GETH_WS_PORT:-8550}:8546
+    networks:
+      - bsc-network
 
   verifier:
     depends_on:
@@ -417,6 +437,8 @@ services:
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
+    networks:
+      - bsc-network
 
   fraud-detector:
     depends_on:
@@ -439,6 +461,8 @@ services:
       L2_START_BLOCK: 1
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+    networks:
+      - bsc-network
 
   #in no way should this be running in production
   kms:
@@ -452,10 +476,12 @@ services:
         target: /init/seed.yaml
     ports:
       - 8888:8888
+    networks:
+      - bsc-network
 
 networks:
-  default:
+  bsc-network:
     enable_ipv6: true
     ipam:
       config:
-        - subnet: "fd00:1::/64"
+        - subnet: "2001:db8:abc1::/64"
