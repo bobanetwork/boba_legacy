@@ -15,7 +15,7 @@ jobs:
           name: Bring up the stack
           command: |
             ./scripts/build-ci-moonbeam.sh
-            BUILD=2 DAEMON=1 ./up_local_moonbeam.sh
+            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_moonbeam.sh
           working_directory: ops
       - run:
           name: Start background logging
@@ -62,7 +62,7 @@ jobs:
           name: Bring up the stack
           command: |
             ./scripts/build-ci-fantom.sh
-            BUILD=2 DAEMON=1 ./up_local_fantom.sh
+            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_fantom.sh
           working_directory: ops
       - run:
           name: Start background logging
