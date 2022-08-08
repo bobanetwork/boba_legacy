@@ -32,7 +32,7 @@ fi
 # Remove docker network
 if [[ $NETWORK_PRUNE == 1 ]]; then
   echo 'You set NETWORK_PRUNE to 1, which means that we will remove the docker network'
-  docker network rm ops_bsc-network
+  docker network prune -f
 fi
 
 #Build dependencies, if needed
