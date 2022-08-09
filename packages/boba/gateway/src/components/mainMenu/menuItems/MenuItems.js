@@ -19,7 +19,7 @@ function MenuItems ({ setOpen }) {
       title: "MonsterVerse",
       url: "/"
     })
-  }   
+  }
 
   const pageDisplay = useSelector(selectModalState('page'))
   const dispatch = useDispatch()
@@ -27,6 +27,9 @@ function MenuItems ({ setOpen }) {
   return (
     <S.Nav>
       {menuItems.map((item) => {
+        if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE && item.key === 'Lock') {
+          return null;
+        }
         const isActive = pageDisplay === item.key
         return (
             <S.MenuItem

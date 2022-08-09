@@ -28,6 +28,7 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
+import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
 import LendingJson from "../artifacts/contracts/Lending.sol/Lending.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '../../../packages/boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -100,10 +101,11 @@ describe("Pull Bitcoin - USD quote", function () {
     console.log("    BOBA Balance in your account", bobaBalance.toString())
 
     // prepare to register/fund your Turing Helper
-    turingCredit = getContractFactory(
-      'BobaTuringCredit',
-      deployerWallet
-    ).attach(BobaTuringCreditAddress)
+      turingCredit = new ContractFactory(
+        BobaTuringCreditJson.abi,
+        BobaTuringCreditJson.bytecode,
+        deployerWallet
+      ).attach(BobaTuringCreditAddress);
   })
 
   it("contract should be whitelisted", async () => {
