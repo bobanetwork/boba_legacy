@@ -46,7 +46,7 @@ describe('Batch Serialization', () => {
     const lastestL2Block = await env.l2Provider.getBlockNumber()
     while (
       _prevTotalElements + _batchSize < lastestL2Block &&
-      logs.length !== 0
+      logs.length === 0
     ) {
       await sleep(1000)
       tip = await env.l1Provider.getBlockNumber()
