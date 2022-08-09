@@ -79,82 +79,12 @@ class BlockMonitorService extends OptimismEnv {
       await this.databaseService.getNewestBlockFromBlockTable()
     const latestSQLBlock = latestSQLBlockQuery[0]['MAX(blockNumber)'] || 0
 
-    // Insert block data
-    let fromBlockForBlock = latestSQLBlock
-    let toBlockForBlock = Math.min(this.latestBlock, fromBlockForBlock + 1000)
-    while (fromBlockForBlock < this.latestBlock) {
-      let blocksData = await this.getBlockData(
-        fromBlockForBlock,
-        toBlockForBlock
-      )
-      blocksData = orderBy(blocksData, 'number')
-      for (const blockData of blocksData) {
-        await this.databaseService.insertBlockData(blockData)
-        // write the transaction data into MySQL
-        if (blockData.transactions.length) {
-          for (const transactionData of blockData.transactions) {
-            transactionData.timestamp = blockData.timestamp
-            transactionData.gasUsed = transactionData.gasLimit
-            await this.databaseService.insertTransactionData(transactionData)
-          }
-        }
-      }
-      fromBlockForBlock = toBlockForBlock
-      toBlockForBlock = Math.min(this.latestBlock, toBlockForBlock + 1000)
-    }
-
     // check the receipt on MySQL
     const latestSQLReceiptQuery =
       await this.databaseService.getNewestReceiptFromReceiptTable()
     const latestSQLReceipt = latestSQLReceiptQuery[0]['MAX(blockNumber)'] || 0
 
-    // Insert receipt data
-    let fromBlockForReceipt = latestSQLReceipt
-    let toBlockForReceipt = Math.min(
-      this.latestBlock,
-      fromBlockForReceipt + 200
-    )
-    while (fromBlockForReceipt < this.latestBlock) {
-      const result = await this.getReceiptData(
-        fromBlockForReceipt,
-        toBlockForReceipt
-      )
-      const blocksData = result[0]
-      const receiptsData = orderBy(result[1], 'blockNumber')
-      const receipts = {}
-      for (const receipt of receiptsData) {
-        if (receipt !== null) {
-          receipts[receipt.transactionHash] = receipt
-        }
-      }
-      // write the receipt data into MySQL
-      for (let receiptData of receiptsData) {
-        const correspondingBlock = blocksData.filter(
-          (i) => i && i.hash === receiptData.blockHash
-        )
-        if (correspondingBlock.length) {
-          receiptData.timestamp = correspondingBlock[0].timestamp
-        } else {
-          receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
-        }
-
-        receiptData = await this.getCrossDomainMessageStatusL2(
-          receiptData,
-          blocksData
-        )
-        // if message is cross domain check if message has been finalized
-        if (receiptData.crossDomainMessage) {
-          receiptData = await this.getCrossDomainMessageStatusL1(receiptData)
-        }
-        await this.databaseService.insertReceiptData(receiptData)
-        await sleep(5)
-      }
-      fromBlockForReceipt = toBlockForReceipt
-      toBlockForReceipt = Math.min(this.latestBlock, toBlockForReceipt + 1000)
-    }
-
-    // update scannedLastBlock
-    this.scannedLastBlock = this.latestBlock
+    await this.storeBlockAndReceipt(latestSQLBlock, latestSQLReceipt)
   }
 
   async startTransactionMonitor() {
@@ -164,82 +94,10 @@ class BlockMonitorService extends OptimismEnv {
       // this.logger.info('Finding new blocks...')
       this.latestBlock = latestBlock
 
-      // Insert block data
-      let fromBlockForBlock = this.scannedLastBlock
-      let toBlockForBlock = Math.min(this.latestBlock, fromBlockForBlock + 1000)
-      while (fromBlockForBlock < this.latestBlock) {
-        let blocksData = await this.getBlockData(
-          fromBlockForBlock,
-          toBlockForBlock
-        )
-        blocksData = orderBy(blocksData, 'number')
-        for (const blockData of blocksData) {
-          await this.databaseService.insertBlockData(blockData)
-          // write the transaction data into MySQL
-          if (blockData !== null && blockData.transactions.length) {
-            for (const transactionData of blockData.transactions) {
-              transactionData.timestamp = blockData.timestamp
-              transactionData.gasUsed = transactionData.gasLimit
-              await this.databaseService.insertTransactionData(transactionData)
-            }
-          }
-        }
-        fromBlockForBlock = toBlockForBlock
-        toBlockForBlock = Math.min(this.latestBlock, toBlockForBlock + 1000)
-      }
-
-      // Insert receipt data
-      let fromBlockForReceipt = this.scannedLastBlock
-      let toBlockForReceipt = Math.min(
-        this.latestBlock,
-        fromBlockForReceipt + 200
+      await this.storeBlockAndReceipt(
+        this.scannedLastBlock,
+        this.scannedLastBlock
       )
-      while (fromBlockForReceipt < this.latestBlock) {
-        const result = await this.getReceiptData(
-          fromBlockForReceipt,
-          toBlockForReceipt
-        )
-        const blocksData = result[0]
-        const receiptsData = orderBy(result[1], 'blockNumber')
-        const receipts = {}
-        for (const receipt of receiptsData) {
-          if (receipt !== null) {
-            receipts[receipt.transactionHash] = receipt
-          }
-        }
-
-        // write the receipt data into MySQL
-        // this.logger.info('Writing the receipt data...')
-        for (let receiptData of receiptsData) {
-          if (receiptData !== null) {
-            const correspondingBlock = blocksData.filter(
-              (i) => i && i.hash === receiptData.blockHash
-            )
-            if (correspondingBlock.length) {
-              receiptData.timestamp = correspondingBlock[0].timestamp
-            } else {
-              receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
-            }
-
-            receiptData = await this.getCrossDomainMessageStatusL2(
-              receiptData,
-              blocksData
-            )
-            // if message is cross domain check if message has been finalized
-            if (receiptData.crossDomainMessage) {
-              receiptData = await this.getCrossDomainMessageStatusL1(
-                receiptData
-              )
-            }
-            await this.databaseService.insertReceiptData(receiptData)
-            await sleep(5)
-          }
-        }
-        fromBlockForReceipt = toBlockForReceipt
-        toBlockForReceipt = Math.min(this.latestBlock, toBlockForReceipt + 1000)
-      }
-      // update scannedLastBlock
-      this.scannedLastBlock = this.latestBlock
     }
 
     await sleep(this.transactionMonitorInterval)
@@ -525,6 +383,75 @@ class BlockMonitorService extends OptimismEnv {
     } else {
       return false
     }
+  }
+
+  async storeBlockAndReceipt(blockStartNumber, receiptStartNumber) {
+    // Insert block data
+    let fromBlockForBlock = blockStartNumber
+    let toBlockForBlock = Math.min(this.latestBlock, fromBlockForBlock + 1000)
+    while (fromBlockForBlock < this.latestBlock) {
+      let blocksData = await this.getBlockData(
+        fromBlockForBlock,
+        toBlockForBlock
+      )
+      blocksData = orderBy(blocksData, 'number')
+      for (const blockData of blocksData) {
+        await this.databaseService.insertBlockData(blockData)
+        // write the transaction data into MySQL
+        if (blockData.transactions.length) {
+          for (const transactionData of blockData.transactions) {
+            transactionData.timestamp = blockData.timestamp
+            transactionData.gasUsed = transactionData.gasLimit
+            await this.databaseService.insertTransactionData(transactionData)
+          }
+        }
+      }
+      fromBlockForBlock = toBlockForBlock
+      toBlockForBlock = Math.min(this.latestBlock, toBlockForBlock + 1000)
+    }
+
+    // Insert receipt data
+    let fromBlockForReceipt = receiptStartNumber
+    let toBlockForReceipt = Math.min(
+      this.latestBlock,
+      fromBlockForReceipt + 200
+    )
+    while (fromBlockForReceipt < this.latestBlock) {
+      const result = await this.getReceiptData(
+        fromBlockForReceipt,
+        toBlockForReceipt
+      )
+      const blocksData = result[0]
+      const receiptsData = orderBy(result[1], 'blockNumber')
+
+      // write the receipt data into MySQL
+      for (let receiptData of receiptsData) {
+        const correspondingBlock = blocksData.filter(
+          (i) => i && i.hash === receiptData.blockHash
+        )
+        if (correspondingBlock.length) {
+          receiptData.timestamp = correspondingBlock[0].timestamp
+        } else {
+          receiptData.timestamp = (new Date().getTime() / 1000).toFixed(0)
+        }
+
+        receiptData = await this.getCrossDomainMessageStatusL2(
+          receiptData,
+          blocksData
+        )
+        // if message is cross domain check if message has been finalized
+        if (receiptData.crossDomainMessage) {
+          receiptData = await this.getCrossDomainMessageStatusL1(receiptData)
+        }
+        await this.databaseService.insertReceiptData(receiptData)
+        await sleep(5)
+      }
+      fromBlockForReceipt = toBlockForReceipt
+      toBlockForReceipt = Math.min(this.latestBlock, toBlockForReceipt + 1000)
+    }
+
+    // update scannedLastBlock
+    this.scannedLastBlock = this.latestBlock
   }
 
   // gets list of addresses whose messages may finalize fast
