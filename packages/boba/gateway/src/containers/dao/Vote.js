@@ -85,14 +85,6 @@ function Vote() {
   }, [ accountEnabled, nftRecords ]);
 
   return < S.VotePageContainer >
-    <PageTitle title={'Vote'} />
-
-    <Box mb={2} gap={2}>
-      <Typography variant="body2" style={{ opacity: '0.5' }}>My total voting power</Typography>
-      <Typography variant="h2" >{balance}</Typography>
-      <Typography variant="body2" style={{ opacity: '0.5' }}>govBOBA</Typography>
-    </Box>
-
     <Box display="flex" flexDirection="column" gap={2}>
       <Typography variant="body2" style={{ opacity: '0.5' }}>Please select a govBoba to vote</Typography>
       {
@@ -155,7 +147,7 @@ function Vote() {
               >
                 Connect to BOBA
               </Button> : <Box display="flex" gap={2} alignItems="center">
-                {selectedNft && <Typography variant="body2">Selected #{selectedNft.tokenId}, Voting power {selectedNft.balance}</Typography>}
+                {selectedNft && <Typography variant="body2">Selected #{selectedNft.tokenId}, Voting power used {selectedNft.balance}</Typography>}
                 <Button
                   fullWidth={true}
                   variant="outlined"
@@ -169,7 +161,6 @@ function Vote() {
         </Box>
       </S.VoteContentAction>
     </S.VoteContent>
-
   </S.VotePageContainer >
 }
 
