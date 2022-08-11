@@ -149,8 +149,7 @@ function ListToken({
                     onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                     color='primary'
                     disabled={disabled}
-                    variant="outlined"
-                    tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                    variant="contained"
                     fullWidth
                   >
                     Bridge to alt L1
@@ -408,8 +407,7 @@ function ListToken({
                 onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                 color='primary'
                 disabled={disabled}
-                variant="outlined"
-                tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                variant="contained"
                 fullWidth
               >
                 Bridge to alt L1
