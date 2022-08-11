@@ -36,6 +36,7 @@ import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
 import All from './TX_All'
 import Pending from './TX_Pending'
+import Transfers from './TX_Transfers'
 
 import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
@@ -138,7 +139,7 @@ function History() {
           <Tabs
             onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
             activeTab={activeTab}
-            tabs={['All', 'Bridge to L2', 'Bridge to L1', 'Pending']}
+            tabs={['All', 'Ethereum to Boba Ethereum L2', 'Boba Ethereum L2 to Ethereum', 'Bridge between L1s', 'Pending']}
           />
 
           {activeTab === 'All' && (
@@ -148,15 +149,22 @@ function History() {
             />
           )}
 
-          {activeTab === 'Bridge to L2' &&
+          {activeTab === 'Ethereum to Boba Ethereum L2' &&
             <Deposits
               searchHistory={searchHistory}
               transactions={transactions}
             />
           }
 
-          {activeTab === 'Bridge to L1' &&
+          {activeTab === 'Boba Ethereum L2 to Ethereum' &&
             <Exits
+              searchHistory={searchHistory}
+              transactions={transactions}
+            />
+          }
+
+          {activeTab === 'Bridge between L1s' &&
+            <Transfers
               searchHistory={searchHistory}
               transactions={transactions}
             />

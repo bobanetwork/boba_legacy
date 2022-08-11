@@ -32,18 +32,27 @@ import * as S from './History.styles'
 
 const PER_PAGE = 8
 
-function TX_Exits({ searchHistory, transactions, chainLink }) {
+/**
+ * NOTE:
+ * TODO:
+ * FIXME:
+ *  - Update this once the api is ready from trang.
+ *
+ */
+
+
+function TX_Transfers({ searchHistory, transactions, chainLink }) {
 
   const [page, setPage] = useState(1)
   const loading = useSelector(selectLoading(['EXIT/GETALL']))
   const tokenList = useSelector(selectTokens)
   const allAddresses = networkService.getAllAddresses()
 
-  const _exits = transactions.filter(i => {
+  const _transfers = transactions.filter(i => {
     return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
   })
 
-  const renderExits = _exits.map((i, index) => {
+  const renderTransfers = _transfers.map((i, index) => {
 
     const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
@@ -106,7 +115,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     return (
       <Transaction
         key={`${index}`}
-        chain='Boba Ethereum L2 to Ethereum'
+        chain='Bridge between L1s'
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
         time={timeLabel}
@@ -122,9 +131,9 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
 
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
   const endingIndex = page * PER_PAGE
-  const paginatedExits = renderExits.slice(startingIndex, endingIndex)
+  const paginatedExits = renderTransfers.slice(startingIndex, endingIndex)
 
-  let totalNumberOfPages = Math.ceil(renderExits.length / PER_PAGE)
+  let totalNumberOfPages = Math.ceil(renderTransfers.length / PER_PAGE)
 
   //if totalNumberOfPages === 0, set to one so we don't get the strange "Page 1 of 0" display
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
@@ -142,10 +151,10 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
       <Grid item xs={12}>
         <Box>
           <S.Content>
-            {!renderExits.length && !loading && (
+            {!renderTransfers.length && !loading && (
               <S.Disclaimer>Scanning for exits...</S.Disclaimer>
             )}
-            {!renderExits.length && loading && (
+            {!renderTransfers.length && loading && (
               <S.Disclaimer>Loading...</S.Disclaimer>
             )}
             {React.Children.toArray(paginatedExits)}
@@ -156,4 +165,4 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
   );
 }
 
-export default React.memo(TX_Exits)
+export default React.memo(TX_Transfers)

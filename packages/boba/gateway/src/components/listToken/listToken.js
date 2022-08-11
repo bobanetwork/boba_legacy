@@ -18,6 +18,7 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
+import { BRIDGE_TYPE } from 'util/constant'
 
 function ListToken({
   token,
@@ -125,7 +126,7 @@ function ListToken({
               {enabled && chain === 'L1' &&
                 <>
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, false) }}
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
                     color='neutral'
                     variant="outlined"
                     disabled={disabled}
@@ -134,9 +135,8 @@ function ListToken({
                   >
                     Bridge to L2
                   </Button>
-
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, true) }}
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                     color='primary'
                     disabled={disabled}
                     variant="contained"
@@ -144,6 +144,16 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L2
+                  </Button>
+                  <Button
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                    color='primary'
+                    disabled={disabled}
+                    variant="outlined"
+                    tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                    fullWidth
+                  >
+                    Bridge to alt L1
                   </Button>
                 </>
               }
@@ -374,7 +384,7 @@ function ListToken({
           {enabled && chain === 'L1' &&
             <>
               <Button
-                onClick={() => { handleModalClick('depositModal', token, false) }}
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
                 color='neutral'
                 variant="outlined"
                 disabled={disabled}
@@ -385,7 +395,7 @@ function ListToken({
               </Button>
 
               <Button
-                onClick={() => { handleModalClick('depositModal', token, true) }}
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                 color='primary'
                 disabled={disabled}
                 variant="outlined"
@@ -393,6 +403,16 @@ function ListToken({
                 fullWidth
               >
                 Fast Bridge to L2
+              </Button>
+              <Button
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                color='primary'
+                disabled={disabled}
+                variant="outlined"
+                tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                fullWidth
+              >
+                Bridge to alt L1
               </Button>
             </>
           }

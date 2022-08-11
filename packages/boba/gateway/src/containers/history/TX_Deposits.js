@@ -125,7 +125,7 @@ function TX_Deposits({ searchHistory, transactions }) {
                     title={`Hash: ${i.hash}`}
                     time={moment.unix(i.timeStamp).format('lll')}
                     blockNumber={`Block ${i.blockNumber}`}
-                    chain={`Bridge to L2 ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
+                    chain={`Ethereum to Boba Ethereum L2 ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}
                     detail={details}
                     oriChain={chain}
