@@ -19,7 +19,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 
-function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
+function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
 
@@ -52,8 +52,13 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
     let res
 
-    console.log("Amount to bridge to L2:", value_Wei_String)
-
+    /**
+     * TODO:
+     *  - dispatch alt L1 specific functions.
+     *
+     *
+    */
+/*
     if(token.symbol === 'ETH') {
       //console.log("Bridging ETH to L2")
       res = await dispatch(
@@ -64,9 +69,9 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       res = await dispatch(
         depositErc20(value_Wei_String, token.address, token.addressL2)
       )
-    }
+    } */
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(setActiveHistoryTab('Bridge between L1s'))
       handleClose()
     }
 
@@ -82,8 +87,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       handleClose()
     }
   }, [ signatureStatus, depositLoading, handleClose ])
-
-  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if( depositLoading ) buttonLabel_1 = 'Close'
@@ -120,13 +123,11 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        {!isBridge &&
-          <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-            Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
-          </Typography>
-        }
+        <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
+          Bridge {token && token.symbol ? token.symbol : ''} to Alt L1s
+        </Typography>
         <Input
-          label="Amount to bridge to L2"
+          label="Amount to bridge to alt L1s"
           placeholder="0.0"
           value={value}
           type="number"
@@ -191,4 +192,4 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   )
 }
 
-export default React.memo(InputStep)
+export default React.memo(InputStepMultiChain)
