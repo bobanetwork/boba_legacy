@@ -94,6 +94,10 @@ const config: HardhatUserConfig = {
       default: 0,
     },
   },
+  paths: {
+    deploy: './deploy',
+    deployments: './deployments',
+  },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,
   },
