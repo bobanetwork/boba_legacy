@@ -143,7 +143,7 @@ jobs:
       - store_artifacts:
           path: /home/circleci/project/ops/result
 
-  integration-tests-bsc:
+  integration-tests-bnb:
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -155,17 +155,17 @@ jobs:
       - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci-bsc.sh
-            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_bsc.sh
+            ./scripts/build-ci-bnb.sh
+            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_bnb.sh
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f docker-compose-bsc.yml logs --follow
+          command: docker-compose -f docker-compose-bnb.yml logs --follow
       - run:
           name: Wait for sequencer
-          command: bash scripts/wait-for-sequencer.sh docker-compose-bsc.yml
+          command: bash scripts/wait-for-sequencer.sh docker-compose-bnb.yml
           working_directory: ops
       - run:
           name: Split tests
@@ -173,7 +173,7 @@ jobs:
           working_directory: ops
       - run:
           name: Run integration tests
-          command: docker-compose -f docker-compose-bsc.yml run integration_tests $(cat splits.txt)
+          command: docker-compose -f docker-compose-bnb.yml run integration_tests $(cat splits.txt)
           working_directory: ops
       - run:
           name: Rewrite test name for next run
@@ -183,7 +183,7 @@ jobs:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f docker-compose-bsc.yml down -v
+          command: docker-compose -f docker-compose-bnb.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
@@ -196,4 +196,4 @@ workflows:
       - integration-tests-moonbeam
       - integration-tests-fantom
       - integration-tests-avalanche
-      - integration-tests-bsc
+      - integration-tests-bnb

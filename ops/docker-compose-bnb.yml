@@ -76,7 +76,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.monorepo
 
   l1_chain:
-    image: bobanetwork/bsc:bootstrap
+    image: bobanetwork/bnb:bootstrap
     restart: always
     command: ash /scripts/bsc-rpc.sh
     environment:
@@ -93,7 +93,7 @@ services:
       - bsc-network
 
   l1_chain_validator:
-    image: bobanetwork/bsc:validator
+    image: bobanetwork/bnb:validator
     restart: always
     command: ash /scripts/bsc-validator.sh
     environment:

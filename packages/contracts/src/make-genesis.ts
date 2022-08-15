@@ -198,7 +198,7 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheTestnetByteCode
       }
       if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 31338) {
-        dump[predeployAddress].code = L2_L1NativeTokenHepler.BscLocalBytecode
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbLocalBytecode
       }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle

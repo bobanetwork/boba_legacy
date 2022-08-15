@@ -217,7 +217,7 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
-  // BSC local
+  // BNB local
   99: {
     l1: {
       AddressManager: '0xC194E4CFa59D2DfC520217dA22E23DF8D4658a37',

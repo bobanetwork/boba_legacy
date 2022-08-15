@@ -42,14 +42,14 @@ if [[ $BUILD == 1 ]]; then
 fi
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-DOCKERFILE="docker-compose-bsc.yml"
+DOCKERFILE="docker-compose-bnb.yml"
 
 if [[ $BUILD == 1 ]]; then
-  docker-compose -f docker-compose-bsc.yml build --parallel -- builder l2geth l1_chain
-  docker-compose -f docker-compose-bsc.yml build --parallel -- deployer dtl batch_submitter relayer integration_tests
-  docker-compose -f docker-compose-bsc.yml build --parallel -- boba_message-relayer-fast gas_oracle boba_deployer
-  docker-compose -f docker-compose-bsc.yml build --parallel -- fraud-detector monitor
-  docker-compose -f docker-compose-bsc.yml build --parallel -- verifier replica
+  docker-compose -f docker-compose-bnb.yml build --parallel -- builder l2geth l1_chain
+  docker-compose -f docker-compose-bnb.yml build --parallel -- deployer dtl batch_submitter relayer integration_tests
+  docker-compose -f docker-compose-bnb.yml build --parallel -- boba_message-relayer-fast gas_oracle boba_deployer
+  docker-compose -f docker-compose-bnb.yml build --parallel -- fraud-detector monitor
+  docker-compose -f docker-compose-bnb.yml build --parallel -- verifier replica
 elif [[ $BUILD == 0 ]]; then
   docker-compose -f $DIR/$DOCKERFILE pull
   echo 1

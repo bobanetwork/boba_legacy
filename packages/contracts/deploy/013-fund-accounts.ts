@@ -129,7 +129,7 @@ const AvalancheDev = {
   gasLimitOption: { gasLimit: 400_000 },
 }
 
-const BscDev = {
+const BnbDev = {
   chainID: 99,
   accounts: [
     {
@@ -173,7 +173,7 @@ const supportedTestNetwork = {
   1281: MoonbeamDev,
   4003: FantomDev,
   43112: AvalancheDev,
-  99: BscDev,
+  99: BnbDev,
 }
 
 // This is a TEMPORARY way to fund the default hardhat accounts on L2. The better way to do this is
