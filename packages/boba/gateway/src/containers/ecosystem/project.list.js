@@ -403,7 +403,7 @@ export const projectList = [
 ]
 
 export const loadProjectByCategory = () => {
-  const typeOrder = [ 'gamefi', 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
+  const typeOrder = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
   const projectByType = groupBy(projectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {
