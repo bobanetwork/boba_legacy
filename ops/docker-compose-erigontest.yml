@@ -174,7 +174,7 @@ services:
       #- "${PWD}/ops/volumes/l1_execution_client_data/:/app/cmd/beacon-chain/beacon-chain.runfiles/prysm/" # for auth
       #--checkpoint-sync-url=http://l1_execution_client --genesis-beacon-api-url=http://l1_execution_client --enable-debug-rpc-endpoints
       # --weak-subjectivity-checkpoint
-    command: --datadir=/data --bootstrap-node /root/sbc/config/bootnodes.yml --min-sync-peers=0 --p2p-max-peers 1 --config-file=/root/sbc/config/config.yml --chain-config-file=/root/sbc/config/config.yml  --chain-id=31337 --suggested-fee-recipient=0x21709a12f1aa73A6758905F5e92fFaD03d394E89 --grpc-gateway-host 0.0.0.0 --p2p-local-ip 0.0.0.0 --p2p-host-ip 127.0.0.1  --force-clear-db --rpc-host=0.0.0.0 --monitoring-host=0.0.0.0 --http-web3provider=http://l1_execution_client:8551 --jwt-secret="/erigon-data/jwt.hex" --accept-terms-of-use --genesis-state=/root/sbc/config/genesis.ssz  #--terminal-total-difficulty-override=17000000000000000
+    command: --datadir=/data --bootstrap-node /root/sbc/config/bootnodes.yml --min-sync-peers=0 --p2p-max-peers 1 --config-file=/root/sbc/config/config.yml --chain-config-file=/root/sbc/config/config.yml  --chain-id=31337 --suggested-fee-recipient=0x21709a12f1aa73A6758905F5e92fFaD03d394E89 --grpc-gateway-host 0.0.0.0 --p2p-local-ip 0.0.0.0 --p2p-host-ip 127.0.0.1  --force-clear-db --rpc-host=0.0.0.0 --monitoring-host=0.0.0.0 --http-web3provider=http://l1_execution_client:8551 --jwt-secret="/erigon-data/jwt.hex" --accept-terms-of-use #--genesis-state=/root/sbc/config/genesis.ssz  #--terminal-total-difficulty-override=17000000000000000
     # NOTE: p2p-host-ip (public ip) might need to be modified or removed (worked before as well)
     mem_swappiness: 0
 
