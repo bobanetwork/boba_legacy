@@ -108,6 +108,7 @@ export const makeL2GenesisFile = async (
       l1FeeWallet: cfg.l1FeeWalletAddress,
     },
     L2_BOBA: {
+      _owner: cfg.deployer,
       _name: 'Boba Network',
       _symbol: 'BOBA',
       l1Token: cfg.l1BobaTokenAddress,
