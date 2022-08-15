@@ -18,6 +18,8 @@ import TimelockJson from '../artifacts/contracts/MockTimelock.sol/MockTimelock.j
 
 import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 
+import VeJson from '@boba/ve-boba/artifacts/contracts/ve.sol/ve.json'
+
 import { OptimismEnv } from './shared/env'
 import { isNonEthereumChain } from './shared/utils'
 
@@ -35,6 +37,9 @@ describe('Dao Action Test', async () => {
 
   let Factory__Timelock: ContractFactory
   let Timelock: Contract
+
+  let Factory__Ve: ContractFactory
+  let Ve: Contract
 
   let L1LiquidityPool: Contract
   let L2LiquidityPool: Contract
@@ -89,8 +94,9 @@ describe('Dao Action Test', async () => {
     const governor_voting_delay = 172800 // 2 days in seconds
     const governor_proposal_threshold = utils.parseEther('50000')
 
+    Factory__Ve = new ContractFactory(VeJson.abi, VeJson.bytecode, env.l2Wallet)
+
     const BobaL2 = env.addressesBOBA.TOKENS.BOBA.L2
-    const xBobaL2 = env.addressesBOBA.TOKENS.xBOBA.L2
 
     Factory__Timelock = new ContractFactory(
       TimelockJson.abi,
@@ -110,6 +116,9 @@ describe('Dao Action Test', async () => {
       await Timelock.deployTransaction.wait()
     }
 
+    Ve = await Factory__Ve.deploy()
+    await Ve.initialize(BobaL2)
+
     Factory__GovernorBravoDelegate = new ContractFactory(
       GovernorBravoDelegateJson.abi,
       GovernorBravoDelegateJson.bytecode,
@@ -128,8 +137,7 @@ describe('Dao Action Test', async () => {
 
     GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
       Timelock.address,
-      BobaL2,
-      xBobaL2,
+      Ve.address,
       Timelock.address,
       GovernorBravoDelegate.address,
       governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
@@ -260,7 +268,7 @@ describe('Dao Action Test', async () => {
     const L2Balance = await L2Boba.balanceOf(env.l2Wallet.address)
 
     quorumVotesPlus = (await Governor.quorumVotes()).add(
-      utils.parseEther('100000')
+      utils.parseEther('1000000')
     )
 
     if (L2Balance.lt(quorumVotesPlus)) {
@@ -282,39 +290,6 @@ describe('Dao Action Test', async () => {
     }
   })
 
-  describe('Get xBOBA', async () => {
-    before(async () => {
-      const depositAmount = utils.parseEther('110000')
-
-      const prexBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
-
-      const approveL2BobaTX = await L2Boba.approve(
-        L2LiquidityPool.address,
-        depositAmount
-      )
-      await approveL2BobaTX.wait()
-
-      const addLiquidityTX = await L2LiquidityPool.addLiquidity(
-        depositAmount,
-        L2Boba.address
-      )
-      await addLiquidityTX.wait()
-
-      const postBobaAmount = await xBoba.balanceOf(env.l2Wallet.address)
-      expect(prexBobaAmount).to.deep.equal(postBobaAmount.sub(depositAmount))
-    })
-
-    it('{tag:other} should delegate voting rights', async () => {
-      const delegateTx = await xBoba.delegate(env.l2Wallet.address)
-      await delegateTx.wait()
-      const updatedDelegate = await xBoba.delegates(env.l2Wallet.address)
-      expect(updatedDelegate).to.eq(env.l2Wallet.address)
-      const xBobaBalance = await xBoba.balanceOf(env.l2Wallet.address)
-      const currentVotes = await xBoba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(xBobaBalance)
-    })
-  })
-
   describe('Config fee L2 LP', async () => {
     before(async () => {
       // get the initial fee config
@@ -323,16 +298,6 @@ describe('Dao Action Test', async () => {
       initialL2LPUserRewardMaxFeeRate =
         await L2LiquidityPool.userRewardMaxFeeRate()
       initialL2LPOwnerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
-    })
-
-    it('{tag:other} should delegate voting rights', async () => {
-      const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
-      await delegateTx.wait()
-      const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
-      expect(updatedDelegate).to.eq(env.l2Wallet.address)
-      const L2BobaBalance = await L2Boba.balanceOf(env.l2Wallet.address)
-      const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(L2BobaBalance)
     })
 
     it('{tag:other} should create a new proposal to configure fee', async () => {
@@ -350,6 +315,12 @@ describe('Dao Action Test', async () => {
           }
         }
         await moveTimeForward()
+
+        // create a ve lock
+        const depositAmount = utils.parseEther('300000')
+        const lockDuration = 1 * 365 * 86400
+        await L2Boba.approve(Ve.address, depositAmount)
+        await Ve.create_lock(depositAmount, lockDuration)
 
         const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
         const values = [0] // the eth necessary to send to the contract above
@@ -375,12 +346,14 @@ describe('Dao Action Test', async () => {
 
         const description = '# Update Fee for swap-ons' // the description of the proposal
 
+        const tokenIds = [1]
         // submit the proposal
         const proposeTx = await Governor.propose(
           addresses,
           values,
           signatures,
           calldatas,
+          tokenIds,
           description
         )
         await proposeTx.wait()
@@ -400,8 +373,119 @@ describe('Dao Action Test', async () => {
       }
     })
 
+    it('{tag:other} should not allow non-owned token', async () => {
+      const addresses = [env.addressesBOBA.Proxy__L2LiquidityPool] // the address of the contract where the function will be called
+      const values = [0] // the eth necessary to send to the contract above
+      const signatures = ['configureFee(uint256,uint256,uint256)'] // the function that will carry out the proposal
+      const updatedUserRewardMinFeeRate =
+        initialL2LPUserRewardMinFeeRate.toNumber() + 1
+      const updatedUserRewardMaxFeeRate =
+        initialL2LPUserRewardMaxFeeRate.toNumber() + 1
+      const updatedOwnerRewardFeeRate =
+        initialL2LPOwnerRewardFeeRate.toNumber() + 1
+
+      const calldatas = [
+        ethers.utils.defaultAbiCoder.encode(
+          // the parameter for the above function
+          ['uint256', 'uint256', 'uint256'],
+          [
+            updatedUserRewardMinFeeRate,
+            updatedUserRewardMaxFeeRate,
+            updatedOwnerRewardFeeRate,
+          ]
+        ),
+      ]
+
+      const description = '# Update Fee for swap-ons' // the description of the proposal
+
+      // lock not created yet or not owned
+      let tokenIds = [2]
+
+      // submit the proposal
+      await expect(
+        Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          tokenIds,
+          description
+        )
+      ).to.be.revertedWith('GovernorBravo::propose: Invalid tokenId provided')
+
+      // one active proposal per tokenId
+      tokenIds = [1]
+      await expect(
+        Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          tokenIds,
+          description
+        )
+      ).to.be.revertedWith(
+        'GovernorBravo::propose: one live proposal per proposer, found an already pending proposal'
+      )
+
+      // create a fresh lock
+      const depositAmount = utils.parseEther('300000')
+      const lockDuration = 1 * 365 * 86400
+      await L2Boba.approve(Ve.address, depositAmount)
+      await Ve.create_lock(depositAmount, lockDuration)
+
+      // tokenId repeated
+      tokenIds = [2, 2]
+      await expect(
+        Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          tokenIds,
+          description
+        )
+      ).to.be.revertedWith(
+        'GovernorBravo::propose: tokenId already used for proposal'
+      )
+
+      // at least one token is not valid
+      // here - 1, because token 1 is already used for an active proposal
+      tokenIds = [1, 2]
+      await expect(
+        Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          tokenIds,
+          description
+        )
+      ).to.be.revertedWith(
+        'GovernorBravo::propose: one live proposal per proposer, found an already pending proposal'
+      )
+
+      tokenIds = []
+      await expect(
+        Governor.propose(
+          addresses,
+          values,
+          signatures,
+          calldatas,
+          tokenIds,
+          description
+        )
+      ).to.be.revertedWith('GovernorBravo::propose: must provide tokenIds')
+    })
+
     it('{tag:other} should cast vote to the proposal and wait for voting period to end', async () => {
       try {
+        // create a fresh lock
+        // amount more than quorumVotes
+        const depositAmount = utils.parseEther('300000')
+        const lockDuration = 1 * 365 * 86400
+        await L2Boba.approve(Ve.address, depositAmount)
+        await Ve.create_lock(depositAmount, lockDuration)
         // get current voting delay from contract
         const votingDelay = (await Governor.votingDelay()).toNumber()
         console.log('\twaiting for voting period to start...')
@@ -409,9 +493,18 @@ describe('Dao Action Test', async () => {
         // convert to milliseconds
         await moveTimeForward((votingDelay + 1) * 1000)
 
+        const tokenIds = [3, 2]
+
         const proposalID = (await Governor.proposalCount())._hex
 
-        await Governor.castVote(proposalID, 1)
+        await Governor.castVote(proposalID, 1, tokenIds)
+
+        const proposal = await Governor.proposals(proposalID)
+        expect(proposal.forVotes).to.be.eq(
+          (await Ve.ve_for_at(3, proposal.startTimestamp)).add(
+            await Ve.ve_for_at(2, proposal.startTimestamp)
+          )
+        )
 
         // const proposal = await Governor.proposals(proposalID)
         // console.log(`Proposal End Block:`, proposal.endBlock.toString())
@@ -517,12 +610,14 @@ describe('Dao Action Test', async () => {
 
         const description = '# Update Fee for swap-offs' // the description of the proposal
 
+        const tokenIds = [1]
         // submitting the proposal
         const proposeTx = await Governor.propose(
           addresses,
           values,
           signatures,
           calldatas,
+          tokenIds,
           description
         )
         await proposeTx.wait()
@@ -552,7 +647,37 @@ describe('Dao Action Test', async () => {
 
         const proposalID = (await Governor.proposalCount())._hex
 
-        await Governor.castVote(proposalID, 1)
+        // check invalid tokenIds should not allow for voting
+        let invalidTokenId = [4]
+        await expect(
+          Governor.castVote(proposalID, 1, invalidTokenId)
+        ).to.be.revertedWith(
+          'GovernorBravo::castVoteInternal: Invalid tokenId provided'
+        )
+
+        invalidTokenId = [3, 4]
+        await expect(
+          Governor.castVote(proposalID, 1, invalidTokenId)
+        ).to.be.revertedWith(
+          'GovernorBravo::castVoteInternal: Invalid tokenId provided'
+        )
+        invalidTokenId = [3, 3]
+        await expect(
+          Governor.castVote(proposalID, 1, invalidTokenId)
+        ).to.be.revertedWith(
+          'GovernorBravo::castVoteInternal: tokenId already used for proposal'
+        )
+        // token used for proposal cannot be used to vote
+        invalidTokenId = [1]
+        await expect(
+          Governor.castVote(proposalID, 1, invalidTokenId)
+        ).to.be.revertedWith(
+          'GovernorBravo::castVoteInternal: tokenId already used for proposal'
+        )
+
+        // this should succeed
+        const tokenIds = [3]
+        await Governor.castVote(proposalID, 1, tokenIds)
 
         // const proposal = await Governor.proposals(proposalID)
         // console.log(`Proposal End Block:`, proposal.endBlock.toString())
@@ -612,16 +737,6 @@ describe('Dao Action Test', async () => {
   })
 
   describe('Text Only Proposal', async () => {
-    it('{tag:other} should delegate voting rights', async () => {
-      const delegateTx = await L2Boba.delegate(env.l2Wallet.address)
-      await delegateTx.wait()
-      const updatedDelegate = await L2Boba.delegates(env.l2Wallet.address)
-      expect(updatedDelegate).to.eq(env.l2Wallet.address)
-      const L2BobaBalance = await L2Boba.balanceOf(env.l2Wallet.address)
-      const currentVotes = await L2Boba.getCurrentVotes(env.l2Wallet.address)
-      expect(currentVotes).to.eq(L2BobaBalance)
-    })
-
     it('{tag:other} should create a new proposal to configure fee', async () => {
       try {
         const priorProposalID = (await Governor.proposalCount())._hex
@@ -649,12 +764,14 @@ describe('Dao Action Test', async () => {
 
         const description = '# Text only proposal' // the description of the proposal
 
+        const tokenIds = [1]
         // submit the proposal
         const proposeTx = await Governor.propose(
           addresses,
           values,
           signatures,
           calldatas,
+          tokenIds,
           description
         )
         await proposeTx.wait()
@@ -685,7 +802,8 @@ describe('Dao Action Test', async () => {
 
         const proposalID = (await Governor.proposalCount())._hex
 
-        await Governor.castVote(proposalID, 1)
+        const tokenIds = [3]
+        await Governor.castVote(proposalID, 1, tokenIds)
 
         // const proposal = await Governor.proposals(proposalID)
         // console.log(`Proposal End Block:`, proposal.endBlock.toString())

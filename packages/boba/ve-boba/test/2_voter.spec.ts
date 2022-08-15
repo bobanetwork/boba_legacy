@@ -28,16 +28,18 @@ describe("voter", function () {
         await ve_underlying.deployed();
         await ve_underlying.mint(owner.address, ve_underlying_amount);
         let vecontract = await ethers.getContractFactory("contracts/ve.sol:ve");
-        ve = await vecontract.deploy(ve_underlying.address);
+        ve = await vecontract.deploy();
         await ve.deployed();
+        await ve.initialize(ve_underlying.address);
 
         const BaseV1GaugeFactory = await ethers.getContractFactory("BaseV1GaugeFactory");
         gauges_factory = await BaseV1GaugeFactory.deploy();
         await gauges_factory.deployed();
 
         const BaseV1Voter = await ethers.getContractFactory("BaseV1Voter");
-        voter = await BaseV1Voter.deploy(ve.address, gauges_factory.address);
+        voter = await BaseV1Voter.deploy();
         await voter.deployed();
+        await voter.initialize(ve.address, gauges_factory.address);
 
         await ve.setVoter(voter.address);
     });

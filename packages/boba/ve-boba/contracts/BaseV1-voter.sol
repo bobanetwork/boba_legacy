@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.11;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 library Math {
     function min(uint a, uint b) internal pure returns (uint) {
@@ -40,11 +40,11 @@ interface IMinter {
     function update_period() external returns (uint);
 }
 
-contract BaseV1Voter is Ownable {
+contract BaseV1Voter is OwnableUpgradeable {
 
-    address public immutable _ve; // the ve token that governs these contracts
-    address internal immutable base;
-    address public immutable gaugefactory;
+    address public _ve; // the ve token that governs these contracts
+    address internal base;
+    address public gaugefactory;
     uint internal constant DURATION = 7 days;
     uint internal constant BASEMAXSUPPLY = 500000000e18;
     address public minter;
@@ -71,11 +71,17 @@ contract BaseV1Voter is Ownable {
     event DistributeReward(address indexed sender, address indexed gauge, uint amount);
     event GaugeRequested(address indexed requester, address indexed pool);
 
-    constructor(address __ve, address  _gauges) {
+    constructor() {
+    }
+
+    function initialize(address __ve, address  _gauges) public initializer {
         _ve = __ve;
         base = ve(__ve).token();
         gaugefactory = _gauges;
         minter = msg.sender;
+
+        __Context_init_unchained();
+        __Ownable_init_unchained();
     }
 
     // simple re-entrancy check
@@ -87,11 +93,11 @@ contract BaseV1Voter is Ownable {
         _unlocked = 1;
     }
 
-    // allow to initialize with some guages
+    // allow to initiate with some guages
     // token whitelisting and allowing to create gauges only with whitelisted tokens is removed
     // beause a project might not be an AMM, and hence might not have conform to token requirements
     // instead we allow projects to request gauges, and then Boba whitelists gauges
-    function initialize(address[] memory _pools, address _minter) external {
+    function initiate_(address[] memory _pools, address _minter) external {
         require(msg.sender == minter);
         for (uint i = 0; i < _pools.length; i++) {
             _requestGauge(_pools[i]);
