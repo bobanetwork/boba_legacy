@@ -26,14 +26,15 @@ describe("ve", function () {
         await ve_underlying.deployed();
         await ve_underlying.mint(owner.address, ve_underlying_amount);
         let vecontract = await ethers.getContractFactory("contracts/ve.sol:ve");
-        ve = await vecontract.deploy(ve_underlying.address);
+        ve = await vecontract.deploy();
         await ve.deployed();
+        await ve.initialize(ve_underlying.address)
     });
 
     it("create lock", async function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
-    
+
         // Balance should be zero before and 1 after creating the lock
         expect(await ve.balanceOf(owner.address)).to.deep.eq(BigNumber.from(0));
         await ve.create_lock(ve_underlying_amount, lockDuration);
@@ -52,7 +53,7 @@ describe("ve", function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
         await ve.create_lock(ve_underlying_amount, lockDuration);
-    
+
         // Try withdraw early
         const tokenId = 1;
         await expect(ve.withdraw(tokenId)).to.be.reverted;
@@ -60,7 +61,7 @@ describe("ve", function () {
         ethers.provider.send("evm_increaseTime", [lockDuration]);
         ethers.provider.send("evm_mine", []); // mine the next block
         await ve.withdraw(tokenId);
-    
+
         expect(await ve_underlying.balanceOf(owner.address)).to.equal(ve_underlying_amount);
         // Check that the NFT is burnt
         expect(await ve.balanceOfNFT(tokenId)).to.equal(0);
@@ -73,17 +74,17 @@ describe("ve", function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
         await ve.create_lock(ve_underlying_amount, lockDuration);
-    
+
         const tokenId = 1;
         ethers.provider.send("evm_increaseTime", [lockDuration]);
         ethers.provider.send("evm_mine", []); // mine the next block
-    
+
         // Just check that this doesn't revert
         await ve.tokenURI(tokenId);
-    
+
         // Withdraw, which destroys the NFT
         await ve.withdraw(tokenId);
-    
+
         // tokenURI should not work for this anymore as the NFT is burnt
         await expect(ve.tokenURI(tokenId)).to.be.reverted;
     });
@@ -93,7 +94,7 @@ describe("ve", function () {
         const ERC165_INTERFACE_ID = 0x01ffc9a7;
         const ERC721_INTERFACE_ID = 0x80ac58cd;
         const ERC721_METADATA_INTERFACE_ID = 0x5b5e139f;
-    
+
         expect(await ve.supportsInterface(ERC165_INTERFACE_ID)).to.be.true;
         expect(await ve.supportsInterface(ERC721_INTERFACE_ID)).to.be.true;
         expect(await ve.supportsInterface(ERC721_METADATA_INTERFACE_ID)).to.be.true;
@@ -107,7 +108,7 @@ describe("ve", function () {
     it("merge ve locks", async function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
-    
+
         await ve.create_lock(ve_underlying_amount.div(2), lockDuration);
         await ve.create_lock(ve_underlying_amount.div(2), lockDuration);
 
@@ -124,7 +125,7 @@ describe("ve", function () {
     it("increase ve lock time", async function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
-    
+
         const tokenId = 1;
         const oneWeek = 7 * 24 * 3600;
         await ve.create_lock(ve_underlying_amount, lockDuration);
@@ -138,7 +139,7 @@ describe("ve", function () {
     it("increase ve amount", async function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
-    
+
         const tokenId = 1;
         await ve.create_lock(ve_underlying_amount.div(2), lockDuration);
         const priorEnd = await ve.locked__end(tokenId)
@@ -152,7 +153,7 @@ describe("ve", function () {
         await ve_underlying.approve(ve.address, ve_underlying_amount);
         const lockDuration = 7 * 24 * 3600; // 1 week
         await ve.create_lock(ve_underlying_amount, lockDuration);
-        
+
         const address2 = await (await ethers.getSigners())[1].getAddress()
         // Transfer token
         const tokenId = 1;
