@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { poolsTableHeads } from './pools.tableHeads'
 
@@ -21,12 +21,11 @@ import * as G from 'containers/Global.styles'
 import PoolListItem from './poolListItem'
 import Pager from 'components/pager/Pager'
 import { PER_PAGE } from 'util/constant'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { selectPools } from 'selectors/veBobaSelector'
 
 
-function PoolList({}) {
-  const dispatch = useDispatch();
+function PoolList() {
   const [ page, setPage ] = useState(1)
   const pools = [ 1, 2, 4, 5 ];
   const listOfPools = useSelector(selectPools)

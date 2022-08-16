@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Box, Typography, Slider } from '@mui/material'
 
 import bobaLogo from 'images/boba-token.svg'
@@ -21,9 +21,7 @@ import bobaLogo from 'images/boba-token.svg'
 import * as G from 'containers/Global.styles'
 import * as S from './poolList.style'
 
-
-function PoolListItem({}) {
-
+function PoolListItem() {
 
   return <S.ListItemContent>
     <G.TableBody>
