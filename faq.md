@@ -117,56 +117,27 @@ Categories:
 - Hybrid Compute
 
 ## Smart Contracts
-### Q1: How Can I Verify My Smart Contracts?
 
-After your smart contract has already been uploaded into the Boba network, you can verify it by using the search bar in Boba’s block explorer and searching for your smart contract’s unique address.
-
-
-<kbd><img width="1055" alt="Screen Shot 2022-06-13 at 1 54 27 PM" src="https://user-images.githubusercontent.com/107710263/184890853-40312e50-0c52-4113-9956-8cdf2e97d1e8.png"></kbd>
-
-
-Navigate to the “logs” tab, and you’ll find a prompt:
-
-
-<kbd><img width="598" alt="Screen Shot 2022-08-16 at 3 35 18 PM" src="https://user-images.githubusercontent.com/107710263/184892996-56ac1653-8291-4944-942d-6a41bf98d334.png"></kbd>
-
-
-<center><p>(To see accurate decoded input data, the contract must be verified. Verify the contract here)</p></center>
-
-Click on the associated link, and you’ll be taken to a page where you can enter your contract’s information.
-
-Once you’re finished, hit “Verify & Publish”
-
-
-<kdb><img width="598" alt="Screen Shot 2022-08-16 at 3 35 35 PM" src="https://user-images.githubusercontent.com/107710263/184893126-3f0197fb-caf5-46d6-9c90-1aa091cbc245.png"></kbd>
-
-
-Alternatively, you could also [use services like Souricify](https://sourcify.dev/) to verify your smart contract as well.
-
-The full details of this process [can be found in the docs](https://docs.boba.network/for-developers/verify-smart-contracts)
-
-If you’re unfamiliar with what a smart contract is, please [go to the Ethereum documentation](https://ethereum.org/en/developers/docs/smart-contracts/) on smart contracts.
-
-### Q2: Why Can't I Deploy My 100kb Copy/Paste Contract?
+### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 
 Instead of deploying just one contract, you need to deploy several. 
 
-### Q3: Are There Any Technical Changes or Differences in Smart Contract and Gas Table from Boba Network’s Side in Comparison to BSC or Ethereum Networks?
+### Q2: Are There Any Technical Changes or Differences in Smart Contract and Gas Table from Boba Network’s Side in Comparison to BSC or Ethereum Networks?
 
 Nope. It's the same.
 
-### Q4: DEX is Built in 0.7.6. Is it Safe to Use Solc Optimization on it?
+### Q3: DEX is Built in 0.7.6. Is it Safe to Use Solc Optimization on it?
 Yes!
 
-### Q5: Is It OK With the Boba Network if the Source Code of Our App Is Closed Source?
+### Q4: Is It OK With the Boba Network if the Source Code of Our App Is Closed Source?
 
 Boba network is a permissionless network, therefore we cannot influence project decisions about the disclosure of their source code. However, we would advise End Users not to interact with smart contracts with code that is not verified in the Blockexplorer.
 
-### Q6: Is There a Way to Run Arbitrary Compiled Native Code or WASM in a Smart Contract?
+### Q5: Is There a Way to Run Arbitrary Compiled Native Code or WASM in a Smart Contract?
 
 Unfortunately no, not at the moment.
 
-### Q7: I’m Trying to Deploy a Smart Contract to Boba Rinkeby With Remix But Get This Error - "creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'
+### Q6: I’m Trying to Deploy a Smart Contract to Boba Rinkeby With Remix But Get This Error - "creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'
 See Q2 of Transactions
 
 
@@ -239,9 +210,6 @@ Below is the js code needed to utilize the API:
 ```
 const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
    await registerTx.wait()
-expect(
-     await Boba_GasPriceOracle.bobaFeeTokenUsers(env.l2Wallet.address)
-   ).to.be.deep.eq(true)
 
 ```
 
