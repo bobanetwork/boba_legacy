@@ -28,12 +28,12 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     folder: 'Rinkeby',
     name: 'Boba Rinkeby (public testnet)',
     chainid: 28,
-    rpc: 'https://rinkeby.boba.netwokr',
+    rpc: 'https://rinkeby.boba.network',
     l1Explorer: 'https://rinkeby.etherscan.io',
     l2Explorer: 'https://blockexplorer.rinkeby.boba.network',
   },
   {
-    folder: 'fuji',
+    folder: 'bobafuji',
     name: 'Boba Avalanche (public testnet)',
     chainid: 3428,
     rpc: 'https://testnet.avax.boba.netwokr',
@@ -55,6 +55,14 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     rpc: 'https://testnet.bobaopera.boba.netwokr',
     l1Explorer: 'https://testnet.ftmscan.com/',
     l2Explorer: 'https://blockexplorer.testnet.bobaopera.boba.network',
+  },
+  {
+    folder: 'bobabnbtestnet',
+    name: 'Boba BNB (public testnet)',
+    chainid: 9728,
+    rpc: 'https://testnet.bnb.boba.netwokr',
+    l1Explorer: 'https://testnet.bscscan.com/',
+    l2Explorer: 'https://blockexplorer.testnet.bnb.boba.network',
   },
 ]
 
