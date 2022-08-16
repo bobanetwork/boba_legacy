@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Typography } from '@mui/material'
+import Button from 'components/button/Button'
 
-import { openError } from 'actions/uiAction'
+import { Info } from "@mui/icons-material"
+import { Icon, Typography } from '@mui/material'
+
+import { getETHMetaTransaction } from 'actions/setupAction'
+import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Token from './token/Token'
@@ -97,6 +101,13 @@ function Wallet() {
     }
   }, [ layer ])
 
+
+  async function emergencySwap () {
+    const res = await dispatch(getETHMetaTransaction())
+    console.log("emergencySwap - res:",res)
+    if (res) dispatch(openAlert('Emergency Swap submitted'))
+  }
+
   return (
     <S.PageContainer>
 
@@ -106,6 +117,32 @@ function Wallet() {
         userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
         accountEnabled={accountEnabled}
       />
+
+      {layer === 'L2' && tooSmallBOBA &&
+        <G.LayerAlert style={{padding: '20px'}}>
+          <G.AlertInfo>
+            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Typography
+              flex={4}
+              variant="body2"
+              component="p"
+              ml={2}
+              style={{ opacity: '0.6' }}
+            >
+              Using Boba requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
+              EMERGENCY SWAP to swap BOBA for 1 BOBA at market rates.
+            </Typography>
+          </G.AlertInfo>
+          <Button
+            onClick={()=>{emergencySwap()}}
+            color='primary'
+            variant='outlined'
+          >
+            EMERGENCY SWAP
+          </Button>
+        </G.LayerAlert>
+      }
 
       <S.WalletActionContainer>
         <G.PageSwitcher>
