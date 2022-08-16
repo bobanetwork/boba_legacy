@@ -15,11 +15,14 @@ limitations under the License. */
 
 const initialState = {
   records: [],
+  pools: []
 }
 
 function veBobaReducer(state = initialState, action) {
   switch (action.type) {
     case 'LOCK/RECORDS/SUCCESS':
+      return { ...state, ...action.payload }
+    case 'VOTE/POOLS/SUCCESS':
       return { ...state, ...action.payload }
 
     default:

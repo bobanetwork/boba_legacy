@@ -77,10 +77,10 @@ import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
 
 //veBoba ABIs
 import veJson from "../deployment/contracts/ve.json"
-// import gaugeFactoryJson from "../deployment/contracts/BaseV1GaugeFactory.json"
-// import gaugeJson from "../deployment/contracts/Gauge.json"
-// import voterJson from "../deployment/contracts/BaseV1Voter.json"
-// import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
+import gaugeFactoryJson from "../deployment/contracts/BaseV1GaugeFactory.json"
+import gaugeJson from "../deployment/contracts/Gauge.json"
+import voterJson from "../deployment/contracts/BaseV1Voter.json"
+import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
 // multi chain alt l1s ABI's
 // import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
@@ -4858,9 +4858,6 @@ class NetworkService {
     tokenId, lock_duration
   }) {
 
-    console.log('tokenId, lock_duration', {
-      tokenId, lock_duration
-    })
     if(this.account === null) {
       console.log('NS: increaseUnlockTime() error - called but account === null')
       return
@@ -5105,6 +5102,59 @@ class NetworkService {
       return true;
     } catch (error) {
       console.log("NS: Ve: depositErc20ToL1 error:", error)
+      return error;
+    }
+  }
+
+  /************************************/
+  /********* Vote & Dao Pools *********/
+  /************************************/
+
+  async fetchPools() {
+    if (this.account === null) {
+      console.log('NS: fetchPools() error - called but account === null')
+      return
+    }
+
+    try {
+
+      const pools = []
+      console.log([
+        allAddresses.BASE_V1_VOTER,
+        voterJson.abi,
+        this.provider
+      ])
+      const baseVoter = new ethers.Contract(
+        allAddresses.BASE_V1_VOTER,
+        voterJson.abi,
+        this.provider
+      )
+
+      const poolListA = await baseVoter.pools(1);
+      // const poolList = await baseVoter.pools();
+
+
+      console.log([ 'poolList',poolListA ]);
+
+      /*
+
+          poolId,
+          name,
+          description,
+          totalVotes,
+          gaugeAddress,
+          totalVotesPercentage
+          votes,
+          votesPercentage
+
+      */
+
+      return {
+        pools
+      }
+
+    } catch (error) {
+      console.log("NS: Ve: fetchPools error:", error)
       return error;
     }
   }

@@ -20,11 +20,11 @@ import { Box, Typography } from '@mui/material'
 import CheckMarkIcon from '@mui/icons-material/CheckCircleOutline'
 
 import Button from 'components/button/Button'
-import PageTitle from 'components/pageTitle/PageTitle'
+
 import Input from 'components/input/Input'
 
 import { setConnectBOBA } from 'actions/setupAction'
-import { fetchLockRecords } from 'actions/veBobaAction'
+import { fetchLockRecords, fetchPools } from 'actions/veBobaAction'
 
 import { selectAccountEnabled } from 'selectors/setupSelector'
 import { selectLockRecords } from 'selectors/veBobaSelector'
@@ -36,6 +36,7 @@ import * as S from './Vote.style'
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import PoolList from './Pools/poolList'
 
 const responsive = {
   superLargeDesktop: {
@@ -74,6 +75,7 @@ function Vote() {
   useEffect(() => {
     if (!!accountEnabled) {
       dispatch(fetchLockRecords());
+      dispatch(fetchPools());
     }
   }, [ accountEnabled, dispatch ]);
 
@@ -91,38 +93,38 @@ function Vote() {
         !nftRecords.length ? <S.Card p={4}>
           <Typography variant="body2" style={{ opacity: '0.5' }}>Oh! You don't have veBoba NFT, Please go to Lock to get them.</Typography>
         </S.Card> :
-        <Carousel
-          showDots={false}
-          responsive={responsive}
-          keyBoardControl={true}
-          customTransition="all .5"
-        >
-          {nftRecords.map((nft) => {
-            return <S.NftContainer
-              key={nft.tokenId}
-              m={1}
-              p={1}
-              active={nft.tokenId === selectedNft?.tokenId}
-              onClick={() => { setSelectedNft(nft) }}
-            >
-              {nft.tokenId === selectedNft?.tokenId ?
-                <CheckMarkIcon fontSize='small' color="warning"
-                  sx={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px'
-                  }}
-                /> : null}
-              <G.ThumbnailContainer p={1} m={1}>
-                <img src={BobaNFTGlass} alt={nft.tokenId} width='100%' height='100%' />
-              </G.ThumbnailContainer>
-              <Box display="flex" flexDirection="column">
-                <Typography variant="body1">#{nft.tokenId}</Typography>
-                <Typography variant="body2">{nft.balance} <Typography component="span" variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography> </Typography>
-              </Box>
-            </S.NftContainer>
-          })}
-        </Carousel>}
+          <Carousel
+            showDots={false}
+            responsive={responsive}
+            keyBoardControl={true}
+            customTransition="all .5"
+          >
+            {nftRecords.map((nft) => {
+              return <S.NftContainer
+                key={nft.tokenId}
+                m={1}
+                p={1}
+                active={nft.tokenId === selectedNft?.tokenId}
+                onClick={() => { setSelectedNft(nft) }}
+              >
+                {nft.tokenId === selectedNft?.tokenId ?
+                  <CheckMarkIcon fontSize='small' color="warning"
+                    sx={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px'
+                    }}
+                  /> : null}
+                <G.ThumbnailContainer p={1} m={1}>
+                  <img src={BobaNFTGlass} alt={nft.tokenId} width='100%' height='100%' />
+                </G.ThumbnailContainer>
+                <Box display="flex" flexDirection="column">
+                  <Typography variant="body1">#{nft.tokenId}</Typography>
+                  <Typography variant="body2">{nft.balance} <Typography component="span" variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography> </Typography>
+                </Box>
+              </S.NftContainer>
+            })}
+          </Carousel>}
     </Box>
 
     <S.VoteContent gap={2}>
@@ -160,6 +162,7 @@ function Vote() {
           }
         </Box>
       </S.VoteContentAction>
+      <PoolList />
     </S.VoteContent>
   </S.VotePageContainer >
 }

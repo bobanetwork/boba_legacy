@@ -97,10 +97,21 @@ function DAO() {
       <S.DaoPageContainer>
         <PageTitle title={'My voting power'} />
 
-        <Box mb={1} gap={1}>
-          <Typography variant="body2" style={{ opacity: '0.5' }}>My total voting power</Typography>
-          <Typography variant="h2" >{balance}</Typography>
-          <Typography variant="body2" style={{ opacity: '0.5' }}>govBOBA</Typography>
+        <Box display="flex" justifyContent="space-around" gap={2}>
+          <Box mb={1} gap={1} flex={1}>
+            <Typography variant="body2" style={{ opacity: '0.5' }}>My total voting power</Typography>
+            <Typography variant="h2" >{balance}</Typography>
+            <Typography variant="body2" style={{ opacity: '0.5' }}>govBOBA</Typography>
+          </Box>
+          <G.Content flex={1} p={2}>
+            <Typography variant='body2'>
+              Votes are due by Wednesday at 23:59 UTC, when the next epoch begins. Each veNFT can only cast votes once per epoch. Your vote will allocate 100% of that veNFT's vote-power. Each veNFT's votes will carry over into the next epoch. However, you must resubmit each veNFT's vote in each epoch to earn the bribes placed in that epoch. Voters will earn bribes no matter when in the epoch the bribes are added.
+            </Typography>
+            <Typography variant='body2' component="p" width="100%" sx={{opacity: 0.65}}>
+              For details refer to our Docs
+            </Typography>
+          </G.Content>
+
         </Box>
 
         <Box sx={{ mt: 2 }}>

@@ -16,3 +16,7 @@ limitations under the License. */
 export function selectLockRecords(state) {
     return state.veboba.records
 }
+
+export function selectPools(state) {
+    return state.veboba.pools
+}

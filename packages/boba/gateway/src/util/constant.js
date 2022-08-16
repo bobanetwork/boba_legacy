@@ -71,3 +71,4 @@ export const ROUTES_PATH = {
   AIRDROP: '/airdrop',
   MONSTER: '/monster',
 }
+export const PER_PAGE = 8

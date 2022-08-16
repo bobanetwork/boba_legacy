@@ -136,3 +136,50 @@ export const ThumbnailContainer = styled(Box)(({ theme }) => ({
   height: '3rem',
   width: '3rem',
 }))
+
+
+// Table Styled Component
+export const TableHeading = styled(Box)(({ theme }) => ({
+  width: '100%',
+  padding: "10px",
+  display: "flex",
+  alignItems: "center",
+  flexDirection: 'row',
+  justifyContent: "space-between",
+  borderBottom: theme.palette.primary.borderBottom,
+  [ theme.breakpoints.down('md') ]: {
+    justifyContent: 'flex-start',
+    marginBottom: "5px",
+    'div:last-child': {
+      display: 'none'
+     }
+  },
+}));
+
+export const TableHeadingItem = styled(Typography)`
+  width: 20%;
+  gap: 5px;
+`;
+
+export const TableBody = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+  width: '100%',
+  [ theme.breakpoints.down('sm') ]: {
+    gap: '10px'
+  }
+}))
+
+export const TableCell = styled(Box)(({ theme, isMobile, width, flex }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  width: width || '20%',
+  flex: flex || 1,
+  [ theme.breakpoints.down('sm') ]: {
+    minWidth: '20%',
+    width: isMobile ? '10%' : 'unset'
+  }
+}));

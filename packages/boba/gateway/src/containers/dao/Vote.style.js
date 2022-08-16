@@ -42,3 +42,10 @@ export const Card = styled(Box)(({ theme}) => ({
   borderRadius: theme.palette.primary.borderRadius,
   width: '100%',
 }))
+
+export const PoolListContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  background: theme.palette.background.secondary,
+  borderRadius: theme.palette.primary.borderRadius,
+  width: '100%',
+}))

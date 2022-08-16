@@ -14,6 +14,9 @@ import { createAction } from "./createAction";
  *  - extendLockTime
  *  - withdrawLock
  *  - fetchLockRecords
+ *
+ * // Vote page
+ *  - fetchPools
  */
 
 export function createLock(payload) {
@@ -34,4 +37,8 @@ export function extendLockTime(payload) {
 
 export function fetchLockRecords() {
   return createAction('LOCK/RECORDS', () => networkService.fetchLockRecords())
+}
+
+export function fetchPools() {
+  return createAction('VOTE/POOLS', () => networkService.fetchPools())
 }
