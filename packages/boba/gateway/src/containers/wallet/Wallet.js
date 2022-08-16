@@ -129,7 +129,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Boba Wallet
+            {`${networkService.L1ChainAsset.l2Name} Wallet`}
           </Typography>
         </G.PageSwitcher>
       </S.WalletActionContainer>

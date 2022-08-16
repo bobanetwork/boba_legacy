@@ -30,6 +30,7 @@ import wagmiv3Logo from 'images/wagmiv3.png'
 import wagmiv2OLOLogo from 'images/wagmiv2olo.png'
 import oloLogo from 'images/olo.svg'
 import glmrLogo from 'images/glmr.svg'
+import moonbase from 'images/moonbase.png'
 import avaxLogo from 'images/avax.svg'
 
 export const getCoinImage = (symbol) => {
@@ -140,7 +141,7 @@ export const getCoinImage = (symbol) => {
       logo = glmrLogo;
       break;
     case "DEV":
-      logo = glmrLogo;
+      logo = moonbase;
       break;
     case "AVAX":
       logo = avaxLogo;

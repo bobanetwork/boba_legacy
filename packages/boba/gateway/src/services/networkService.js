@@ -87,6 +87,7 @@ import { bobaBridges } from 'util/bobaBridges'
 // Icon
 import * as React from 'react';
 import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
+import MoonbaseIcon from 'components/icons/MoonbaseIcon.js'
 import FantomIcon from 'components/icons/FantomIcon.js'
 import AvaxIcon from 'components/icons/AvaxIcon.js'
 
@@ -125,7 +126,8 @@ const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji']
 const L1ChainAssets = {
   'bobaBase': {
     name: 'Moonbase',
-    icon: (bool) => <MoonbeamIcon selected={bool}/>,
+    l2Name: 'Bobabase',
+    icon: (bool) => <MoonbaseIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   },
   'bobaOperaTestnet': {
