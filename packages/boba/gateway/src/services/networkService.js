@@ -132,11 +132,13 @@ const L1ChainAssets = {
   },
   'bobaOperaTestnet': {
     name: 'Fantom Testenet',
+    l2Name: 'Boba',
     icon: (bool) => <FantomIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   },
   'bobaFuji': {
     name: 'Avalanche Testnet',
+    l2Name: 'Boba',
     icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   }
