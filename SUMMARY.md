@@ -31,6 +31,7 @@
   * [Contract Addresses Boba/Moonbeam](boba\_documentation/developer/network-moonbeam.md)
   * [Contract Addresses Boba/Fantom](boba\_documentation/developer/network-fantom.md)
   * [Contract Addresses Boba/Avalanche](boba\_documentation/developer/network-avalanche.md)
+  * [Contract Addresses Boba/BNB](boba\_documentation/developer/network-bnb.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)
   * [Verifying Contracts](boba\_documentation/developer/verify-smart-contracts.md)
   * [Using The Graph](packages/boba/subgraph/README.md)
