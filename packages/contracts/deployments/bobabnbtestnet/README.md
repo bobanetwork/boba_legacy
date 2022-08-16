@@ -1,7 +1,7 @@
 # Boba BNB (public testnet)
 ## Network Info
 - **Chain ID**: 9728
-- **Public RPC**: https://testnet.bnb.boba.netwokr
+- **Public RPC**: https://testnet.bnb.boba.network
 - **Block Explorer**: https://blockexplorer.testnet.bnb.boba.network
 ## Layer 1 Contracts
 <table>
