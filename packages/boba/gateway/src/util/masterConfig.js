@@ -179,6 +179,33 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
     }
  }
+} else if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
+  NETWORK = {
+    bobaBnbTestnet: {
+      OMGX_WATCHER_URL: `https://api-watcher.testnet.bnb.boba.network/`,
+      MM_Label:         `bobaBnbTestnet`,
+      addressManager:   `0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa`,
+      L1: {
+        name: "BNB Testnet",
+        chainId: 97,
+        chainIdHex: '0x61',
+        rpcUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+        blockExplorer: `https://api-testnet.bscscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://https://testnet.bscscan.com//tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "Boba BNB Testnet",
+        chainId: 9728,
+        chainIdHex: '0x2600',
+        rpcUrl: `https://testnet.bnb.boba.network`,
+        blockExplorer: `https://blockexplorer.testnet.bnb.boba.network/`,
+        transaction: `https://blockexplorer.testnet.bnb.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20BNB%20Testnet%20for%20BNB%20`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORK = {
     local: {
@@ -225,6 +252,10 @@ const BaseServices = {
   BOBAAVALANCHE_META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
   // Testnet meta transaction
   BOBAFUJI_META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
+  // Mainnet meta transaction
+  BOBABNB_META_TRANSACTION: `https://api-meta-transaction.bnb.boba.network/`,
+  // Testnet meta transaction
+  BOBABNBTESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.bnb.boba.network/`,
 }
 
 export function getNetwork () {

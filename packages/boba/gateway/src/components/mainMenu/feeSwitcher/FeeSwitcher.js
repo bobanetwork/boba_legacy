@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { openError, openAlert } from 'actions/uiAction'
 
 import {
-  selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer
 } from 'selectors/setupSelector'
@@ -43,7 +42,6 @@ import networkService from 'services/networkService'
 function FeeSwitcher() {
 
   const dispatch = useDispatch()
-  const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const layer = useSelector(selectLayer())
@@ -130,7 +128,7 @@ function FeeSwitcher() {
 
   }, [ dispatch, feeUseBoba, balanceL1NativeToken, balanceBOBA ])
 
-  if (!accountEnabled && layer !== 'L2') {
+  if (layer !== 'L2') {
     return <S.FeeSwitcherWrapper>
       <Tooltip title={'After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ETH as the gas fee token according to your choice.'}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
@@ -141,7 +139,7 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across Bobabeam according to your choice.`}>
+      <Tooltip title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across ${networkService.L1ChainAsset.l2Name} according to your choice.`}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
       <Typography variant="body2">Fee</Typography>
