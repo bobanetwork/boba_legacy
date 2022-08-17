@@ -12,9 +12,8 @@ RPC_FLAGS=" \
   --http.api "eth,debug,net,erigon,web3,engine" \
   --ws \
   --verbosity 4 \
-  --engine.addr l1_execution_client \
-  --authrpc.jwtsecret=/erigon-data/jwt.hex \
 "
+#   --engine.addr l1_execution_client \ # doesn't exist anymore
 
 ERIGON_FLAGS=" \
   --chain dev \
