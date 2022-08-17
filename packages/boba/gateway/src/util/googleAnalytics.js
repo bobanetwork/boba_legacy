@@ -2,7 +2,7 @@ import ReactGA from "react-ga4"
 
 export const initGa = () => {
   if (window.location.hostname === 'localhost') {
-  return null;
+    return null;
   }
 
   ReactGA.initialize(process.env.REACT_APP_GA4_MEASUREMENT_ID);
