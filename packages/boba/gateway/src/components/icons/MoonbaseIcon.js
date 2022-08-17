@@ -1,12 +1,6 @@
 import * as React from "react"
-import { useTheme } from '@mui/material'
 
 function MoonbaseIcon({ selected = true }) {
-
-  const theme = useTheme();
-
-  const recColor = theme.palette.mode === 'light' ? '#031313' : '#ffffff'
-
   if (!selected) {
     return (
       <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" >

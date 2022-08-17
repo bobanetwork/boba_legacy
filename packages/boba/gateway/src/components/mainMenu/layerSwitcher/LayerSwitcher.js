@@ -177,7 +177,7 @@ function LayerSwitcher({
 
       connectRequest();
     }
-  }, [ connectETHRequest, dispatchBootAccount ])
+  }, [ dispatch, connectETHRequest, dispatchBootAccount ])
 
   useEffect(() => {
     console.log(['connectBOBARequest',connectBOBARequest])
@@ -194,7 +194,7 @@ function LayerSwitcher({
 
       connectRequest();
     }
-  }, [ connectBOBARequest, dispatchBootAccount ])
+  }, [ dispatch, connectBOBARequest, dispatchBootAccount ])
 
   useEffect(() => {
     if(connectRequest) {
