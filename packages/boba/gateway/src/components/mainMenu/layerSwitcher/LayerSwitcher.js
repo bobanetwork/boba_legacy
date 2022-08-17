@@ -16,7 +16,7 @@ limitations under the License. */
 
 import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setLayer } from 'actions/setupAction.js'
+import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -165,17 +165,34 @@ function LayerSwitcher({
 
   useEffect(() => {
     if(connectETHRequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L1'))
-      networkService.switchChain('L1')
-      dispatchBootAccount()
+      async function connectRequest(){
+        const res = await networkService.switchChain('L1')
+        if(res.code === 4001) { // check for rejection from MM
+          dispatch(setConnectETH(false))
+        } else {
+          localStorage.setItem('wantChain', JSON.stringify('L1'))
+          dispatchBootAccount()
+        }
+      }
+
+      connectRequest();
     }
   }, [ connectETHRequest, dispatchBootAccount ])
 
   useEffect(() => {
+    console.log(['connectBOBARequest',connectBOBARequest])
     if (connectBOBARequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L2'))
-      networkService.switchChain('L2')
-      dispatchBootAccount()
+      async function connectRequest(){
+        const res = await networkService.switchChain('L2')
+        if(res.code === 4001) { // check for rejection from MM
+          dispatch(setConnectBOBA(false))
+        } else {
+          localStorage.setItem('wantChain', JSON.stringify('L2'))
+          dispatchBootAccount()
+        }
+      }
+
+      connectRequest();
     }
   }, [ connectBOBARequest, dispatchBootAccount ])
 
