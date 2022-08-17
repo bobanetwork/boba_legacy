@@ -32,7 +32,7 @@ const ETHL2 = '0x4200000000000000000000000000000000000006'
 
 export async function getToken ( tokenContractAddressL1 ) {
 
-  if( tokenContractAddressL1 === null) return
+  if(!tokenContractAddressL1) return
 
   //this *might* be coming from a person, and or copy-paste from Etherscan
   //so need toLowerCase()

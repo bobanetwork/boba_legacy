@@ -27,7 +27,7 @@ import Notification from 'containers/notification/Notification'
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
-import { initGa } from 'util/googleAnalytics'
+// import { initGa } from 'util/googleAnalytics'
 
 function App () {
 
@@ -255,7 +255,7 @@ function App () {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
 
-    initGa();
+    // initGa(); disable GA at this place better and single liner.
 
   }, [ dispatch ])
 
