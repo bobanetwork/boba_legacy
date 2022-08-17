@@ -4,7 +4,8 @@
   "description": "boba monitor",
   "main": "index.js",
   "scripts": {
-    "start": "node ./exec/run-monitor.js"
+    "start": "node ./exec/run-monitor.js",
+    "test": "node ./exec/test-monitor.js"
   },
   "license": "MIT",
   "dependencies": {

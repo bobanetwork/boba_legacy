@@ -135,6 +135,22 @@ class DatabaseService extends OptimismEnv {
         status VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
+    await query(`CREATE TABLE IF NOT EXISTS layerZeroTx
+      (
+        hash VARCHAR(255) NOT NULL,
+        blockHash VARCHAR(255) NOT NULL,
+        blockNumber INT NOT NULL,
+        txFrom VARCHAR(255),
+        txTo VARCHAR(255),
+        l1Token VARCHAR(255),
+        l2Token VARCHAR(255),
+        crossTxFrom VARCHAR(255),
+        crossTxTo VARCHAR(255),
+        amount VARCHAR(255),
+        event VARCHAR(255),
+        PRIMARY KEY ( hash, blockNumber)
+      )`)
+
     con.end()
     this.logger.info('Initialized the database.')
   }
@@ -221,43 +237,34 @@ class DatabaseService extends OptimismEnv {
       cumulativeGasUsed='${receiptData.cumulativeGasUsed.toString()}',
       crossDomainMessage=${receiptData.crossDomainMessage},
       crossDomainMessageFinalize=${receiptData.crossDomainMessageFinalize},
-      crossDomainMessageSendTime=${
-        receiptData.crossDomainMessageSendTime
-          ? receiptData.crossDomainMessageSendTime
-          : null
+      crossDomainMessageSendTime=${receiptData.crossDomainMessageSendTime
+        ? receiptData.crossDomainMessageSendTime
+        : null
       },
-      crossDomainMessageEstimateFinalizedTime=${
-        receiptData.crossDomainMessage
-          ? receiptData.crossDomainMessageEstimateFinalizedTime
-          : null
+      crossDomainMessageEstimateFinalizedTime=${receiptData.crossDomainMessage
+        ? receiptData.crossDomainMessageEstimateFinalizedTime
+        : null
       },
-      crossDomainMessageFinalizedTime = ${
-        receiptData.crossDomainMessageFinalizedTime
-          ? receiptData.crossDomainMessageFinalizedTime
-          : null
+      crossDomainMessageFinalizedTime = ${receiptData.crossDomainMessageFinalizedTime
+        ? receiptData.crossDomainMessageFinalizedTime
+        : null
       },
       fastRelay=${receiptData.fastRelay ? receiptData.fastRelay : null},
-      contractAddress=${
-        receiptData.contractAddress
-          ? "'" + receiptData.contractAddress + "'"
-          : null
+      contractAddress=${receiptData.contractAddress
+        ? "'" + receiptData.contractAddress + "'"
+        : null
       },
-      timestamp=${
-        receiptData.timestamp ? receiptData.timestamp.toString() : null
+      timestamp=${receiptData.timestamp ? receiptData.timestamp.toString() : null
       },
-      l1Hash=${
-        receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
+      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
       },
-      l1BlockNumber=${
-        receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
+      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
       },
-      l1BlockHash=${
-        receiptData.l1BlockHash
-          ? `'${receiptData.l1BlockHash.toString()}'`
-          : null
+      l1BlockHash=${receiptData.l1BlockHash
+        ? `'${receiptData.l1BlockHash.toString()}'`
+        : null
       },
-      l1From=${
-        receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
+      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
       },
       l1To=${receiptData.l1To ? `'${receiptData.l1To.toString()}'` : null}
     `)
@@ -312,23 +319,18 @@ class DatabaseService extends OptimismEnv {
     await query(`USE ${this.MySQLDatabaseName}`)
     await query(`UPDATE receipt
       SET crossDomainMessageFinalize=${receiptData.crossDomainMessageFinalize},
-      crossDomainMessageFinalizedTime=${
-        receiptData.crossDomainMessageFinalizedTime
+      crossDomainMessageFinalizedTime=${receiptData.crossDomainMessageFinalizedTime
       },
       fastRelay = ${receiptData.fastRelay},
-      l1Hash=${
-        receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
+      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
       },
-      l1BlockNumber=${
-        receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
+      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
       },
-      l1BlockHash=${
-        receiptData.l1BlockHash
-          ? `'${receiptData.l1BlockHash.toString()}'`
-          : null
+      l1BlockHash=${receiptData.l1BlockHash
+        ? `'${receiptData.l1BlockHash.toString()}'`
+        : null
       },
-      l1From=${
-        receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
+      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
       },
       l1To=${receiptData.l1To ? `'${receiptData.l1To.toString()}'` : null}
       WHERE hash='${receiptData.transactionHash.toString()}'
@@ -398,43 +400,34 @@ class DatabaseService extends OptimismEnv {
       blockNumber='${bridgeData.blockNumber.toString()}',
       \`from\`=${bridgeData.from ? "'" + bridgeData.from + "'" : null},
       \`to\`=${bridgeData.to ? "'" + bridgeData.to + "'" : null},
-      contractAddress=${
-        bridgeData.contractAddress
-          ? "'" + bridgeData.contractAddress + "'"
-          : null
+      contractAddress=${bridgeData.contractAddress
+        ? "'" + bridgeData.contractAddress + "'"
+        : null
       },
-      contractName=${
-        bridgeData.contractName ? "'" + bridgeData.contractName + "'" : null
+      contractName=${bridgeData.contractName ? "'" + bridgeData.contractName + "'" : null
       },
-      \`activity\`=${
-        bridgeData.activity ? "'" + bridgeData.activity + "'" : null
+      \`activity\`=${bridgeData.activity ? "'" + bridgeData.activity + "'" : null
       },
       crossDomainMessage=${bridgeData.crossDomainMessage},
       crossDomainMessageFinalize=${bridgeData.crossDomainMessageFinalize},
-      crossDomainMessageSendTime=${
-        bridgeData.crossDomainMessageSendTime
-          ? bridgeData.crossDomainMessageSendTime
-          : null
+      crossDomainMessageSendTime=${bridgeData.crossDomainMessageSendTime
+        ? bridgeData.crossDomainMessageSendTime
+        : null
       },
-      crossDomainMessageEstimateFinalizedTime=${
-        bridgeData.crossDomainMessage
-          ? bridgeData.crossDomainMessageEstimateFinalizedTime
-          : null
+      crossDomainMessageEstimateFinalizedTime=${bridgeData.crossDomainMessage
+        ? bridgeData.crossDomainMessageEstimateFinalizedTime
+        : null
       },
-      crossDomainMessageFinalizedTime = ${
-        bridgeData.crossDomainMessageFinalizedTime
-          ? bridgeData.crossDomainMessageFinalizedTime
-          : null
+      crossDomainMessageFinalizedTime = ${bridgeData.crossDomainMessageFinalizedTime
+        ? bridgeData.crossDomainMessageFinalizedTime
+        : null
       },
-      timestamp=${
-        bridgeData.timestamp ? bridgeData.timestamp.toString() : null
+      timestamp=${bridgeData.timestamp ? bridgeData.timestamp.toString() : null
       },
       l2Hash=${bridgeData.l2Hash ? `'${bridgeData.l2Hash.toString()}'` : null},
-      l2BlockNumber=${
-        bridgeData.l2BlockNumber ? Number(bridgeData.l2BlockNumber) : null
+      l2BlockNumber=${bridgeData.l2BlockNumber ? Number(bridgeData.l2BlockNumber) : null
       },
-      l2BlockHash=${
-        bridgeData.l2BlockHash ? `'${bridgeData.l2BlockHash.toString()}'` : null
+      l2BlockHash=${bridgeData.l2BlockHash ? `'${bridgeData.l2BlockHash.toString()}'` : null
       },
       l2From=${bridgeData.l2From ? `'${bridgeData.l2From.toString()}'` : null},
       l2To=${bridgeData.l2To ? `'${bridgeData.l2To.toString()}'` : null},
@@ -499,8 +492,7 @@ class DatabaseService extends OptimismEnv {
       l2BlockHash='${l1BridgeData.l2BlockHash}',
       l2From='${l1BridgeData.l2From}',
       l2To='${l1BridgeData.l2To}',
-      crossDomainMessageFinalizedTime=${
-        l1BridgeData.crossDomainMessageFinalizedTime
+      crossDomainMessageFinalizedTime=${l1BridgeData.crossDomainMessageFinalizedTime
       },
       crossDomainMessageFinalize=${l1BridgeData.crossDomainMessageFinalize}
       WHERE blockNumber=${Number(l1BridgeData.blockNumber)} AND
@@ -522,6 +514,44 @@ class DatabaseService extends OptimismEnv {
       SET status='${depositL2Data.status}'
       WHERE blockNumber=${Number(depositL2Data.blockNumber)}
       AND hash='${depositL2Data.hash}'
+    `)
+    con.end()
+  }
+
+  async insertLayerZeroTx(eventData) {
+    const tx = {
+      hash: eventData.hash.toString(),
+      blockHash: eventData.blockHash.toString(),
+      blockNumber: eventData.blockNumber.toString(),
+      txFrom: eventData.txFrom,
+      txTo: eventData.txTo,
+      l1Token: eventData.l1Token,
+      l2Token: eventData.l2Token,
+      crossTxFrom: eventData.crossTxFrom,
+      crossTxTo: eventData.crossTxTo,
+      amount: eventData.amount.toString(),
+      event: eventData.event,
+    }
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT IGNORE INTO layerZeroTx
+      SET hash='${tx.hash}',
+      blockHash='${tx.blockHash}',
+      blockNumber='${tx.blockNumber}',
+      txFrom='${tx.txFrom}',
+      txTo='${tx.txTo}',
+      l1Token='${tx.l1Token}',
+      l2Token='${tx.l2Token}',
+      crossTxFrom='${tx.crossTxFrom}',
+      crossTxTo='${tx.crossTxTo}',
+      amount='${tx.amount}',
+      event='${tx.event}'
     `)
     con.end()
   }
@@ -630,6 +660,20 @@ class DatabaseService extends OptimismEnv {
       })
     }
     con.end()
+  }
+
+  async getNewestBlockFromLayerZeroTx() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const latestBlock = await query(`SELECT MAX(blockNumber) from layerZeroTx`)
+    con.end()
+    return latestBlock[0]['MAX(blockNumber)']
   }
 
   async getLatestReceipt(logger) {

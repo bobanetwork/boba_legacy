@@ -81,6 +81,10 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
+// layerZero env
+const LAYER_ZERO_ETH_LATEST_BLOCK = Number(env.LAYER_ZERO_ETH_LATEST_BLOCK) || 0
+const LAYER_ZERO_ETH_BRIDGE_ADDRESS = env.LAYER_ZERO_ETH_BRIDGE_ADDRESS || ''
+
 class OptimismEnv {
   constructor() {
     this.logger = new Logger({ name: this.name })
@@ -165,6 +169,9 @@ class OptimismEnv {
     this.l1BlockConfirmation = L1_BLOCK_CONFIRMATION
 
     this.sequencerPublishWindow = 0
+
+    this.layerZeroEthLatestBlock = LAYER_ZERO_ETH_LATEST_BLOCK
+    this.ethBridgeAddress = LAYER_ZERO_ETH_BRIDGE_ADDRESS
   }
 
   async initOptimismEnv() {
