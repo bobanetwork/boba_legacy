@@ -25,6 +25,10 @@ const config: HardhatUserConfig = {
     avax_boba_testnet: {
       url: 'https://testnet.avax.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    bnb_boba_testnet: {
+      url: 'https://testnet.bnb.boba.network',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     }
   },
   solidity: {
