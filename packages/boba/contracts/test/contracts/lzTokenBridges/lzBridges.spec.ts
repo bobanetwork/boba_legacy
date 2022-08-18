@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat'
-import { Contract, utils } from 'ethers'
+import { Contract, utils, BigNumber } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { expect } from '../../setup'
 import { bytes32ify } from '@eth-optimism/core-utils'
@@ -90,6 +90,24 @@ describe('LayerZero Bridges', () => {
     ).to.be.revertedWith('Initializable: contract is already initialized')
   })
 
+  it('should set transferTimestampCheckPoint and maxTransferAmountPerDay', async () => {
+    const EthBridgetransferTimestampCheckPoint =
+      await EthBridge.transferTimestampCheckPoint()
+    const EthMaxTransferAmountPerDay = await EthBridge.maxTransferAmountPerDay()
+    expect(EthBridgetransferTimestampCheckPoint).not.to.be.eq(BigNumber.from('0'))
+    expect(EthMaxTransferAmountPerDay).to.eq(
+      BigNumber.from(utils.parseEther('500000'))
+    )
+
+    const AlttransferTimestampCheckPoint = await AltL1Bridge.transferTimestampCheckPoint()
+    const AltMaxTransferAmountPerDay =
+      await AltL1Bridge.maxTransferAmountPerDay()
+    expect(AlttransferTimestampCheckPoint).not.to.be.eq(BigNumber.from('0'))
+    expect(AltMaxTransferAmountPerDay).to.eq(
+      BigNumber.from(utils.parseEther('500000'))
+    )
+  })
+
   it('should estimate correct fee and send message', async function () {
     // approve tokens to EthBridge
     const depositAmount = utils.parseEther('100')
@@ -131,6 +149,10 @@ describe('LayerZero Bridges', () => {
     expect(
       await EthBridge.deposits(L1Boba.address, AltL1Boba.address)
     ).to.be.deep.eq(priorDeposits.add(depositAmount))
+
+    expect(await EthBridge.transferredAmount()).to.be.eq(
+      BigNumber.from(depositAmount)
+    )
   })
 
   it('should deposit and receive token on alt L1', async function () {
@@ -215,6 +237,43 @@ describe('LayerZero Bridges', () => {
     ).to.be.revertedWith('_to cannot be zero address')
   })
 
+  it('should block deposit if the total amount is larger than the maximum transfer amount per day', async function () {
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('500001')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      '0x'
+    )
+    await expect(
+      EthBridge.depositERC20(
+        L1Boba.address,
+        AltL1Boba.address,
+        depositAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        { value: estimatedFee._nativeFee }
+      )
+    ).to.be.revertedWith('max amount per day exceeded')
+  })
+
   it('should be able to withdraw back to L1', async function () {
     // approve tokens to EthBridge
     const depositAmount = utils.parseEther('100')
@@ -281,6 +340,9 @@ describe('LayerZero Bridges', () => {
     expect(await AltL1Boba.totalSupply()).to.deep.eq(0)
     expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.sub(withdrawAmount))
     expect(postL1Balance).to.deep.eq(priorL1Balance.add(withdrawAmount))
+    expect(await AltL1Bridge.transferredAmount()).to.be.eq(
+      BigNumber.from(depositAmount)
+    )
   })
 
   it('should not be able to withdraw token to the zero address', async function () {
@@ -340,6 +402,68 @@ describe('LayerZero Bridges', () => {
         }
       )
     ).to.be.revertedWith('_to cannot be zero address')
+  })
+
+  it('should block withdraw if the total amount is larger than the maximum transfer amount per day', async function () {
+    const depositAmount = utils.parseEther('100')
+    // Update maxTransferAmountPerDay for AltL1Bridge]
+    await AltL1Bridge.setMaxTransferAmountPerDay(
+      BigNumber.from(depositAmount).sub('1')
+    )
+    // approve tokens to EthBridge
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      '0x'
+    )
+    await EthBridge.depositERC20(
+      L1Boba.address,
+      AltL1Boba.address,
+      depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x',
+      { value: estimatedFee._nativeFee }
+    )
+
+    const payloadWithdraw = payload
+    const estimatedFeeWithdraw =
+      await this.layerZeroEndpointMockSrc.estimateFees(
+        this.chainIdEth,
+        AltL1Bridge.address,
+        payloadWithdraw,
+        false,
+        '0x'
+      )
+    const withdrawAmount = depositAmount
+    await expect(
+      AltL1Bridge.withdraw(
+        AltL1Boba.address,
+        withdrawAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        {
+          value: estimatedFeeWithdraw._nativeFee,
+        }
+      )
+    ).to.be.revertedWith('max amount per day exceeded')
   })
 
   it('should fail withdraw without tokens', async function () {
@@ -770,5 +894,189 @@ describe('LayerZero Bridges', () => {
 
     expect(postL1Balance).to.deep.eq(priorL1Balance.sub(depositAmount))
     expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.add(depositAmount))
+  })
+
+  it('should be able to send messages with custom adapter parameter', async function () {
+    await EthBridge.connect(this.owner).setUseCustomAdapterParams(true, 180000)
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('100')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    const priorL1Balance = await L1Boba.balanceOf(this.owner.address)
+    const priorAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+
+    const adapterParam = ethers.utils.solidityPack(
+      ['uint16', 'uint256'],
+      [1, 180000]
+    )
+
+    const incorrectAdapterParam = ethers.utils.solidityPack(
+      ['uint16', 'uint256'],
+      [1, 179000]
+    )
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      adapterParam
+    )
+    await expect(
+      EthBridge.depositERC20(
+        L1Boba.address,
+        AltL1Boba.address,
+        depositAmount,
+        ethers.constants.AddressZero,
+        incorrectAdapterParam, // adapterParams
+        '0x',
+        { value: estimatedFee._nativeFee }
+      )
+    ).to.be.revertedWith('LzApp: gas limit is too low')
+
+    await EthBridge.depositERC20(
+      L1Boba.address,
+      AltL1Boba.address,
+      depositAmount,
+      ethers.constants.AddressZero,
+      adapterParam, // adapterParams
+      '0x',
+      { value: estimatedFee._nativeFee }
+    )
+    const postL1Balance = await L1Boba.balanceOf(this.owner.address)
+    const postAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+
+    expect(postL1Balance).to.deep.eq(priorL1Balance.sub(depositAmount))
+    expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.add(depositAmount))
+  })
+
+  it('should reset transferTimestampCheckPoint', async function () {
+    const preEthTransferTimestampCheckPoint =
+      await EthBridge.transferTimestampCheckPoint()
+    const preAltTransferTimestampCheckPoint =
+      await AltL1Bridge.transferTimestampCheckPoint()
+
+    await ethers.provider.send('evm_increaseTime', [86401])
+
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('100')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      '0x'
+    )
+    await EthBridge.depositERC20(
+      L1Boba.address,
+      AltL1Boba.address,
+      depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x',
+      { value: estimatedFee._nativeFee }
+    )
+
+    const priorAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+    const priorL1Balance = await L1Boba.balanceOf(this.owner.address)
+
+    // assuming the payload size is the same on withdraw
+    const payloadWithdraw = payload
+    const estimatedFeeWithdraw =
+      await this.layerZeroEndpointMockSrc.estimateFees(
+        this.chainIdEth,
+        AltL1Bridge.address,
+        payloadWithdraw,
+        false,
+        '0x'
+      )
+    const withdrawAmount = depositAmount
+    await AltL1Bridge.withdraw(
+      AltL1Boba.address,
+      withdrawAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x',
+      {
+        value: estimatedFeeWithdraw._nativeFee,
+      }
+    )
+
+    const postAltL1Balance = await AltL1Boba.balanceOf(this.owner.address)
+    const postL1Balance = await L1Boba.balanceOf(this.owner.address)
+    const postEthTransferTimestampCheckPoint =
+      await EthBridge.transferTimestampCheckPoint()
+    const postAltTransferTimestampCheckPoint =
+      await AltL1Bridge.transferTimestampCheckPoint()
+
+    expect(postAltL1Balance).to.deep.eq(0)
+    expect(await AltL1Boba.totalSupply()).to.deep.eq(0)
+    expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.sub(withdrawAmount))
+    expect(postL1Balance).to.deep.eq(priorL1Balance.add(withdrawAmount))
+    expect(await AltL1Bridge.transferredAmount()).to.be.eq(
+      BigNumber.from(depositAmount)
+    )
+    expect(postEthTransferTimestampCheckPoint).to.be.gt(
+      preEthTransferTimestampCheckPoint.add(BigNumber.from('86400'))
+    )
+    expect(await EthBridge.transferredAmount()).to.be.eq(
+      BigNumber.from(depositAmount)
+    )
+    expect(postAltTransferTimestampCheckPoint).to.be.gt(
+      preAltTransferTimestampCheckPoint.add(BigNumber.from('86400'))
+    )
+    expect(await AltL1Bridge.transferredAmount()).to.be.eq(
+      BigNumber.from(depositAmount)
+    )
+  })
+
+  it('should set maxTransferAmountPerDay', async () => {
+    await AltL1Bridge.setMaxTransferAmountPerDay('1')
+    await EthBridge.setMaxTransferAmountPerDay('1')
+
+    expect(await EthBridge.maxTransferAmountPerDay()).to.be.eq(
+      BigNumber.from('1')
+    )
+    expect(await AltL1Bridge.maxTransferAmountPerDay()).to.be.eq(
+      BigNumber.from('1')
+    )
+  })
+
+  it('Only the owner should be able to set maxTransferAmountPerDay', async () => {
+    const [, signer1] = await ethers.getSigners()
+    // EthBridge
+    await expect(
+      EthBridge.connect(signer1).setMaxTransferAmountPerDay(2)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
+    // AltL1Bridge
+    await expect(
+      AltL1Bridge.connect(signer1).setMaxTransferAmountPerDay(2)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
   })
 })
