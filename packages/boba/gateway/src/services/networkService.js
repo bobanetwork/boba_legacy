@@ -841,7 +841,12 @@ class NetworkService {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
       rpcUrls: [nw[network].L2.rpcUrl],
-      blockExplorerUrls
+      nativeCurrency: {
+        name: 'BOBA Token',
+        symbol: 'BOBA',
+        decimals: 18,
+      },
+      blockExplorerUrls,
     }
 
     const targetIDHex = nw[network][targetLayer].chainIdHex
