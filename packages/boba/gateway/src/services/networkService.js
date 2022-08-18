@@ -4864,6 +4864,123 @@ class NetworkService {
     }
   }
 
+  /**
+   * Multichain Deposit to alt l1s
+   * Only support boba as of now.
+   *
+  */
+
+  async depositErc20ToL1({ value,
+    type }) {
+    if (this.account === null) {
+      console.log('NS: depositErc20ToL1() error - called but account === null')
+      return
+    }
+
+    try {
+      let PROXY_ETH_L1_BRIDGE_ADDRESS = allAddresses[ `PROXY_ETH_L1_BRIDGE_ADDRESS_${type}` ];
+      let PROXY_ALT_L1_BRIDGE_ADDRESS = allAddresses[ `PROXY_ALT_L1_BRIDGE_ADDRESS_${type}` ];
+      let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
+      let ALT_L1_BOBA_ADDRESS = allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
+      let L0_ETH_ENDPOINT = allAddresses[ `L0_ETH_ENDPOINT` ];
+      let L0_TARGET_CHAIN_ENDPOINT = allAddresses[ `L0_TARGET_CHAIN_ENDPOINT_${type}` ];
+
+      console.table({
+        PROXY_ETH_L1_BRIDGE_ADDRESS,
+        PROXY_ALT_L1_BRIDGE_ADDRESS,
+        ETH_L1_BOBA_ADDRESS,
+        ALT_L1_BOBA_ADDRESS,
+        L0_ETH_ENDPOINT,
+        L0_TARGET_CHAIN_ENDPOINT
+      })
+
+      /* proxy eth bridge contract */
+      const Proxy__EthBridge = new ethers.Contract(
+        PROXY_ETH_L1_BRIDGE_ADDRESS,
+        ETHL1BridgeJson.abi,
+        ethWallet
+      );
+
+      /* proxy alt l1 bridge contract */
+      const Proxy__AltL1Bridge = new ethers.Contract(
+        PROXY_ALT_L1_BRIDGE_ADDRESS,
+        AltL1BridgeJson.abi,
+        altL1Wallet
+      );
+
+      /* eth boba bridge contract */
+      const EthBOBA = new ethers.Contract(
+        ETH_L1_BOBA_ADDRESS,
+        L2StandardERC20Json.abi,
+        ethWallet
+      );
+
+      /* alt l1 boba bridge contract */
+      const AltL1BOBA = new ethers.Contract(
+        ALT_L1_BOBA_ADDRESS,
+        L2StandardERC20Json.abi,
+        altL1Wallet
+      );
+
+      /* L0 endpoint contract*/
+      const ETHLayzerZeroEndpoint = new ethers.Contract(
+        L0_ETH_ENDPOINT,
+        LZEndpointMockJson.abi,
+        ethWallet
+      );
+
+      /* L0 target endpoint contract */
+      const AltL1LayerZeroEndpoint = new ethers.Contract(
+        L0_TARGET_CHAIN_ENDPOINT,
+        LZEndpointMockJson.abi,
+        altL1Wallet
+      );
+
+
+      /**
+       * Sending The ETH to alt L1
+       * STEP: 1 - aprove transanctions
+       * STEP: 2
+       *
+       * */
+
+      let approveTx = await EthBOBA.approve(
+        Proxy__EthBridge.address,
+        ethers.utils.parseEther("0.5")
+      );
+      await approveTx.wait();
+
+      let payload = ethers.utils.defaultAbiCoder.encode(
+        ["address", "address", "address", "address", "uint256", "bytes"],
+        [
+          ETH_L1_BOBA_ADDRESS,
+          ALT_L1_BOBA_ADDRESS,
+          ethWallet.address,
+          altL1Wallet.address,
+          ethers.utils.parseEther("0.5"),
+          "0x",
+        ]
+      );
+
+      let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
+        LAYER_ZERO_ALT_L1_CHAIN_ID,
+        Proxy__EthBridge.address,
+        payload,
+        false,
+        "0x"
+      );
+
+
+
+      return {
+        data: 'success'
+      }
+    } catch (error) {
+      console.log("NS: Ve: depositErc20ToL1 error:", error)
+      return error;
+    }
+  }
+
 }
 
 const networkService = new NetworkService()

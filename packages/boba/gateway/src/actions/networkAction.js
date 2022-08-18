@@ -100,6 +100,23 @@ export function depositErc20(value, currency, currencyL2) {
   )
 }
 
+//DEPOSIT ERC20 to Alt L1 bridge
+export function depositErc20ToL1({
+  value,
+  currency,
+  currencyL2,
+  type
+}) {
+  return createAction('DEPOSIT/ALTL1/CREATE', () =>
+    networkService.depositErc20ToL1({
+      value,
+      currency,
+      currencyL2,
+      type
+    })
+  )
+}
+
 //FARM
 export function farmL1(value_Wei_String, currencyAddress) {
   return createAction('FARM/CREATE', () =>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { depositETHL2, depositErc20 } from 'actions/networkAction'
+import { depositErc20ToL1 } from 'actions/networkAction'
 import { setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
@@ -18,16 +18,36 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
+import Select from 'components/select/Select'
+
+/**
+ * TODO:
+ *
+ if (
+    preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther("0.5")))
+  ) {
+    throw new Error("EthBOBA balance is too low");
+  }
+ *
+*/
 
 function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) {
+
+  const options = [
+    { value: 'BNB', label: 'BNB', title: 'BNB' },
+    { value: 'AVALANCHE', label: 'Avalanche', title: 'Avalanche' },
+    { value: 'FANTOM', label: 'Fantom', title: 'Fantom' },
+    { value: 'MOONBEAM', label: 'Moonbeam', title: 'Moonbeam' }
+  ]
 
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
+  const [ altL1Bridge, setAltL1Bridge ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 
   const [ validValue, setValidValue ] = useState(false)
-  const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
+  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
@@ -37,7 +57,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   function setAmount(value) {
 
     const tooSmall = new BN(value).lte(new BN(0.0))
-    const tooBig   = new BN(value).gt(new BN(maxValue))
+    const tooBig = new BN(value).gt(new BN(maxValue))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -50,7 +70,9 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   async function doDeposit() {
 
-    let res
+    const res = await dispatch(depositErc20ToL1(
+      // pass required params.
+    ))
 
     /**
      * TODO:
@@ -58,18 +80,18 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
      *
      *
     */
-/*
-    if(token.symbol === 'ETH') {
-      //console.log("Bridging ETH to L2")
-      res = await dispatch(
-        depositETHL2(value_Wei_String)
-      )
-    } else {
-      //console.log("Bridging ERC20 to L2")
-      res = await dispatch(
-        depositErc20(value_Wei_String, token.address, token.addressL2)
-      )
-    } */
+    /*
+        if(token.symbol === 'ETH') {
+          //console.log("Bridging ETH to L2")
+          res = await dispatch(
+            depositETHL2(value_Wei_String)
+          )
+        } else {
+          //console.log("Bridging ERC20 to L2")
+          res = await dispatch(
+            depositErc20(value_Wei_String, token.address, token.addressL2)
+          )
+        } */
     if (res) {
       dispatch(setActiveHistoryTab('Bridge between L1s'))
       handleClose()
@@ -89,23 +111,23 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   }, [ signatureStatus, depositLoading, handleClose ])
 
   let buttonLabel_1 = 'Cancel'
-  if( depositLoading ) buttonLabel_1 = 'Close'
+  if (depositLoading) buttonLabel_1 = 'Close'
 
   let convertToUSD = false
 
-  if( Object.keys(lookupPrice) &&
-      !!value &&
-      validValue &&
-      !!amountToUsd(value, lookupPrice, token)
+  if (Object.keys(lookupPrice) &&
+    !!value &&
+    validValue &&
+    !!amountToUsd(value, lookupPrice, token)
   ) {
     convertToUSD = true
   }
 
-  if( Number(logAmount(token.balance, token.decimals)) === 0) {
+  if (Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
     return (
       <Box>
-        <Typography variant="body2" sx={{fontWeight: 700, mb: 1, color: 'yellow'}}>
+        <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
         <Button
@@ -120,22 +142,52 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
       </Box>)
   }
 
+  const onBridgeChange = (e) => {
+    setAltL1Bridge(e.target.value)
+    const res =  dispatch(depositErc20ToL1(
+      {
+        value: 1,
+        type: e.target.value
+      }
+    ))
+  }
+
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      color: state.isSelected ? '#282828' : '#909090',
+    }),
+  }
+
   return (
     <>
       <Box>
         <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
           Bridge {token && token.symbol ? token.symbol : ''} to Alt L1s
         </Typography>
+
+        <Box display="flex" fullWidth py={2} flexDirection="column"
+        >
+          <Select
+            options={options}
+            label="Select Alt L1 Bridge"
+            onSelect={onBridgeChange}
+            styles={customStyles}
+            sx={{ marginBottom: '20px' }}
+            value={altL1Bridge}
+          />
+        </Box>
+
         <Input
           label="Amount to bridge to alt L1s"
           placeholder="0.0"
           value={value}
           type="number"
-          onChange={(i)=>{
+          onChange={(i) => {
             setAmount(i.target.value)
             setValue_Wei_String(toWei_String(i.target.value, token.decimals))
           }}
-          onUseMax={(i)=>{//they want to use the maximum
+          onUseMax={(i) => {//they want to use the maximum
             setAmount(maxValue) //so the input value updates for the user - just for display purposes
             setValue_Wei_String(token.balance.toString()) //this is the one that matters
           }}
@@ -149,13 +201,13 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
         />
 
         {!!convertToUSD && (
-          <Typography variant="body2" sx={{mt: 2}}>
+          <Typography variant="body2" sx={{ mt: 2 }}>
             {`Amount in USD ${amountToUsd(value, lookupPrice, token).toFixed(2)}`}
           </Typography>
         )}
 
         {!!token && token.symbol === 'OMG' && (
-          <Typography variant="body2" sx={{mt: 2}}>
+          <Typography variant="body2" sx={{ mt: 2 }}>
             NOTE: The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
             In some cases, three interactions with MetaMask are needed. If you are bridging out of a
             new wallet, it starts out with a 0 approval, and therefore, only two interactions with
