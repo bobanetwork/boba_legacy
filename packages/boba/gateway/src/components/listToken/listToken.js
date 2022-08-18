@@ -144,7 +144,9 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L2
-                  </Button>
+                </Button>
+                {token.symbol === 'BOBA' &&
+
                   <Button
                     onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                     color='primary'
@@ -154,7 +156,8 @@ function ListToken({
                   >
                     Bridge to alt L1
                   </Button>
-                </>
+                }
+              </>
               }
 
               {enabled && chain === 'L2' &&
@@ -377,7 +380,8 @@ function ListToken({
         <S.TableCell
           sx={{
             gap: '5px',
-            width: '40%'
+            width: '40%',
+            justifyContent: 'flex-start'
           }}
         >
           {enabled && chain === 'L1' &&
@@ -402,7 +406,9 @@ function ListToken({
                 fullWidth
               >
                 Fast Bridge to L2
-              </Button>
+            </Button>
+            {token.symbol === 'BOBA' &&
+
               <Button
                 onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                 color='primary'
@@ -412,6 +418,7 @@ function ListToken({
               >
                 Bridge to alt L1
               </Button>
+            }
             </>
           }
           {enabled && chain === 'L2' &&
