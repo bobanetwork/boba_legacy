@@ -10,13 +10,13 @@ import "./LzApp.sol";
  * NOTE: if the srcAddress is not configured properly, it will still block the message pathway from (srcChainId, srcAddress)
  */
 abstract contract NonblockingLzApp is LzApp {
-    function __NonblockingLzApp_init(address _endpoint) internal initializer {
-        LzApp.__LzApp_init(_endpoint);
-    }
-
     mapping(uint16 => mapping(bytes => mapping(uint64 => bytes32))) public failedMessages;
 
     event MessageFailed(uint16 _srcChainId, bytes _srcAddress, uint64 _nonce, bytes _payload);
+
+    function __NonblockingLzApp_init(address _endpoint) internal initializer {
+        LzApp.__LzApp_init(_endpoint);
+    }
 
     // overriding the virtual function in LzReceiver
     function _blockingLzReceive(uint16 _srcChainId, bytes memory _srcAddress, uint64 _nonce, bytes memory _payload) internal virtual override {
