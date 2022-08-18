@@ -17,32 +17,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import store from 'store'
-
-//  Sentry error tracking packages
-import * as Sentry from '@sentry/react'
-import { BrowserTracing } from '@sentry/tracing'
-
 import App from 'layout'
 import './index.scss'
-
-// Sentry initializations.
-Sentry.init({
-  dsn: process.env.REACT_APP_SENTRY_DSN,
-  environment: process.env.REACT_APP_ENV,
-  integrations: [ new BrowserTracing() ],
-  tracesSampleRate: 1.0,
-  initialScope: {
-    tags: { 'network': process.env.REACT_APP_CHAIN }
-  },
-  beforeSend: (event) => {
-    // Avoid sending the sentry events on local env.
-    if (window.location.hostname === 'localhost') {
-      return null;
-    }
-    return event
-  }
-
-})
+import SentryWrapper from 'components/SentryWrapper/SentryWrapper'
 
 // https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
 if (window.ethereum) {
@@ -50,8 +27,10 @@ if (window.ethereum) {
 }
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <SentryWrapper>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </SentryWrapper>,
   document.getElementById('root')
 )
