@@ -43,7 +43,7 @@ let addressesBOBA
 const ethClaimAmount = ethers.utils.parseEther('0.1')
 const bobaClaimAmount = ethers.utils.parseEther('0.01')
 const depositAmount = utils.parseEther('20') // for TuringCredit!
-const alreadyDeployed = true; // for retry with existing contracts --> NOTE: ALWAYS ADAPT ADDRESSES
+const alreadyDeployed = false; // for retry with existing contracts --> NOTE: ALWAYS ADAPT ADDRESSES
 
 describe('Verify Twitter post for testnet funds', function () {
   let useGasForTuringCredit = false
