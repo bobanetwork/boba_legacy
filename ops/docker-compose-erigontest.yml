@@ -129,7 +129,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.l1-erigon
     environment:
       CHAIN_ID: 31337    # 31337 matches Hardhat's default
-      BLOCK_INTERVAL: 0  # 0 = auto-mine
+      BLOCK_INTERVAL: 1  # >0 = allow empty blocks
     volumes:
       - type: bind
         source: "${PWD}/ops/volumes/l1_execution_client_data"
@@ -210,6 +210,8 @@ services:
 
   validator:
     image: ghcr.io/gnosischain/gbc-prysm-validator:v2.1.2-gbc
+    depends_on:
+      - l1_consensus_client
     restart: always
     command: |
       --accept-terms-of-use

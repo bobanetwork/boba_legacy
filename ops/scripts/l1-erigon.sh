@@ -19,7 +19,7 @@ ERIGON_FLAGS=" \
   --chain dev \
   --datadir /home/boba/datadir \
   --mine \
-  --dev.period 1 \
+  --dev.period ${BLOCK_INTERVAL} \
   --miner.etherbase=0x123463a4B065722E99115D6c222f267d9cABb524 \
   --miner.sigfile /home/boba/datadir/nodekey \
   --http.port 8888 \
