@@ -194,8 +194,17 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 31338) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheLocalByteCode
       }
+      // Avalanche Testnet
       if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 4328) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheTestnetByteCode
+      }
+      // Bnb local
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbLocalBytecode
+      }
+      // Bnb Testnet
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 9728) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbTestnetBytecode
       }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle

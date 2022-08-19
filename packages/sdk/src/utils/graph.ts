@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 
 export const WHITELIST_CHAIN_ID: Array<number> = [
-  1287, 1284, 4002, 250, 43113, 43114,
+  1287, 1284, 4002, 250, 43113, 43114, 97, 56,
 ]
 
 export const GRAPH_API_URL: any = {
@@ -53,6 +53,22 @@ export const GRAPH_API_URL: any = {
     // The process of syncing Lib_addressManager is super slow
     addressManager:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaavax-address-manager',
+  },
+  // BNB Testnet
+  97: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-tn-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-tn-address-manager',
+  },
+  // BNB Mainnet
+  56: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-address-manager',
   },
 }
 

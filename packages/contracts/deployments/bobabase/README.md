@@ -1,7 +1,7 @@
 # Bobabase (public testnet)
 ## Network Info
 - **Chain ID**: 1297
-- **Public RPC**: https://bobabase.boba.netwokr
+- **Public RPC**: https://bobabase.boba.network
 - **Block Explorer**: https://blockexplorer.bobabase.boba.network
 ## Layer 1 Contracts
 <table>

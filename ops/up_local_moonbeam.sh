@@ -29,6 +29,12 @@ if [[ $(uname -m) == 'arm64' ]]; then
   echo 'Building for Mac silicon using linux/arm64'
 fi
 
+# Remove docker network
+if [[ $NETWORK_PRUNE == 1 ]]; then
+  echo 'You set NETWORK_PRUNE to 1, which means that we will remove the docker network'
+  docker network prune -f
+fi
+
 #Build dependencies, if needed
 if [[ $BUILD == 1 ]]; then
   yarn

@@ -1,7 +1,7 @@
 # Bobaopera (public testnet)
 ## Network Info
 - **Chain ID**: 4051
-- **Public RPC**: https://testnet.bobaopera.boba.netwokr
+- **Public RPC**: https://testnet.bobaopera.boba.network
 - **Block Explorer**: https://blockexplorer.testnet.bobaopera.boba.network
 ## Layer 1 Contracts
 <table>

@@ -81,6 +81,7 @@ import GraphQLService from "./graphQLService"
 import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
 import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOperaTestnet_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b"
 import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79.json"
+import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa.json"
 
 import { bobaBridges } from 'util/bobaBridges'
 
@@ -90,6 +91,7 @@ import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
 import MoonbaseIcon from 'components/icons/MoonbaseIcon.js'
 import FantomIcon from 'components/icons/FantomIcon.js'
 import AvaxIcon from 'components/icons/AvaxIcon.js'
+import BnbIcon from 'components/icons/BnbIcon.js'
 
 require('dotenv').config()
 
@@ -118,9 +120,14 @@ if (process.env.REACT_APP_CHAIN === 'bobaFuji') {
     ...addresses_BobaFuji,
   }
 }
+if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
+  allAddresses = {
+    ...addresses_BobaBnbTestnet,
+  }
+}
 
 // suported chains
-const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji']
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet']
 
 // assets for different chains
 const L1ChainAssets = {
@@ -140,6 +147,12 @@ const L1ChainAssets = {
     name: 'Avalanche Testnet',
     l2Name: 'Boba',
     icon: (bool) => <AvaxIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+  },
+  'bobaBnbTestnet': {
+    name: 'BNB Testnet',
+    l2Name: 'Boba',
+    icon: (bool) => <BnbIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   }
 }
@@ -828,7 +841,12 @@ class NetworkService {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
       rpcUrls: [nw[network].L2.rpcUrl],
-      blockExplorerUrls
+      nativeCurrency: {
+        name: 'BOBA Token',
+        symbol: 'BOBA',
+        decimals: 18,
+      },
+      blockExplorerUrls,
     }
 
     const targetIDHex = nw[network][targetLayer].chainIdHex
