@@ -15,6 +15,116 @@
 <p><small>Address</small></p>
 </th>
 </tr>
+<tr>
+<td>
+BondManager
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xa97a909D967B150E27AB58ca6d0cb40B39200Be1">
+<code>0xa97a909D967B150E27AB58ca6d0cb40B39200Be1</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+CanonicalTransactionChain
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xE66Bd40BBeC97397758E22858331752f0ecBE02e">
+<code>0xE66Bd40BBeC97397758E22858331752f0ecBE02e</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-batches
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0x524747b1CdCAcA43aF8d9002fA67869A2932d600">
+<code>0x524747b1CdCAcA43aF8d9002fA67869A2932d600</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-queue
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xE7Da2a8EBcbBa0Dc6082B8D0faBAcA0176920760">
+<code>0xE7Da2a8EBcbBa0Dc6082B8D0faBAcA0176920760</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-SCC-batches
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xAb7d7eFA03204C11E0e141dDE95C022EA2A8c6b1">
+<code>0xAb7d7eFA03204C11E0e141dDE95C022EA2A8c6b1</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+L1MultiMessageRelayer
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xD7Cbc979C909d864c38670AcccD57209F7B556e3">
+<code>0xD7Cbc979C909d864c38670AcccD57209F7B556e3</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Lib_AddressManager
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0x12ad9f501149D3FDd703cC10c567F416B7F0af8b">
+<code>0x12ad9f501149D3FDd703cC10c567F416B7F0af8b</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1CrossDomainMessenger
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0xEecAD665ca933eeA4a9a2db600E538c1391930d1">
+<code>0xEecAD665ca933eeA4a9a2db600E538c1391930d1</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1StandardBridge
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f">
+<code>0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+StateCommitmentChain
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0x352d964E9aD016f122dc78Afa5164417907E0FaF">
+<code>0x352d964E9aD016f122dc78Afa5164417907E0FaF</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+TK_L1BOBA
+</td>
+<td align="center">
+<a href="https://testnet.ftmscan.com//address/0x5E747DfA79b8f9e46BE0CC67e378b7600350B2eF">
+<code>0x5E747DfA79b8f9e46BE0CC67e378b7600350B2eF</code>
+</a>
+</td>
+</tr>
 </table>
 
 ## Layer 2 Contracts
