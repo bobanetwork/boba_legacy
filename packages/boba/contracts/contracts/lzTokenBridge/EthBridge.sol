@@ -89,6 +89,7 @@ import "./lzApp/NonblockingLzApp.sol";
         bytes memory _adapterParams,
         bytes calldata _data
     ) internal {
+        require(_to != address(0), "_to cannot be zero address");
         // When a deposit is initiated on Ethereum, the Eth Bridge transfers the funds to itself for future
         // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
         // _from is an EOA or address(0).

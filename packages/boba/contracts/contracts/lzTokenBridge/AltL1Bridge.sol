@@ -75,6 +75,7 @@ import "./lzApp/NonblockingLzApp.sol";
         bytes memory _adapterParams,
         bytes calldata _data
     ) internal {
+        require(_to != address(0), "_to cannot be zero address");
         // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
         // usage
         IL2StandardERC20(_l2Token).burn(msg.sender, _amount);

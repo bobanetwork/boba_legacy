@@ -176,6 +176,45 @@ describe('LayerZero Bridges', () => {
     expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.add(depositAmount))
   })
 
+  it('should not be able to deposit token to the zero address', async function () {
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('100')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      '0x'
+    )
+
+    await expect(
+      EthBridge.depositERC20To(
+        L1Boba.address,
+        AltL1Boba.address,
+        ethers.constants.AddressZero,
+        depositAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        { value: estimatedFee._nativeFee }
+      )
+    ).to.be.revertedWith('_to cannot be zero address')
+  })
+
   it('should be able to withdraw back to L1', async function () {
     // approve tokens to EthBridge
     const depositAmount = utils.parseEther('100')
@@ -242,6 +281,65 @@ describe('LayerZero Bridges', () => {
     expect(await AltL1Boba.totalSupply()).to.deep.eq(0)
     expect(postAltL1Balance).to.deep.eq(priorAltL1Balance.sub(withdrawAmount))
     expect(postL1Balance).to.deep.eq(priorL1Balance.add(withdrawAmount))
+  })
+
+  it('should not be able to withdraw token to the zero address', async function () {
+    // approve tokens to EthBridge
+    const depositAmount = utils.parseEther('100')
+    await L1Boba.approve(EthBridge.address, depositAmount)
+
+    // users would need to supply native fees in order to send xDomain messages through LayerZero
+    const payload = utils.defaultAbiCoder.encode(
+      ['address', 'address', 'address', 'address', 'uint256', 'bytes'],
+      [
+        L1Boba.address,
+        AltL1Boba.address,
+        this.owner.address,
+        this.owner.address,
+        depositAmount,
+        '0x',
+      ]
+    )
+    const estimatedFee = await this.layerZeroEndpointMockSrc.estimateFees(
+      this.chainIdAltL1,
+      EthBridge.address,
+      payload,
+      false,
+      '0x'
+    )
+    await EthBridge.depositERC20(
+      L1Boba.address,
+      AltL1Boba.address,
+      depositAmount,
+      ethers.constants.AddressZero,
+      '0x', // adapterParams
+      '0x',
+      { value: estimatedFee._nativeFee }
+    )
+
+    const payloadWithdraw = payload
+    const estimatedFeeWithdraw =
+      await this.layerZeroEndpointMockSrc.estimateFees(
+        this.chainIdEth,
+        AltL1Bridge.address,
+        payloadWithdraw,
+        false,
+        '0x'
+      )
+    const withdrawAmount = depositAmount
+    await expect(
+      AltL1Bridge.withdrawTo(
+        AltL1Boba.address,
+        ethers.constants.AddressZero,
+        withdrawAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        {
+          value: estimatedFeeWithdraw._nativeFee,
+        }
+      )
+    ).to.be.revertedWith('_to cannot be zero address')
   })
 
   it('should fail withdraw without tokens', async function () {
