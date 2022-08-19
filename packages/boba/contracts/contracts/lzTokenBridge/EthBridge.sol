@@ -27,6 +27,11 @@ import "./lzApp/NonblockingLzApp.sol";
     uint public constant NO_EXTRA_GAS = 0;
     uint public constant FUNCTION_TYPE_SEND = 1;
 
+    // set maximum amount of tokens can be transferred in 24 hours
+    uint256 public maxTransferAmountPerDay;
+    uint256 public transferredAmount;
+    uint256 public transferTimestampCheckPoint;
+
     // Maps L1 token to wrapped token on alt l1 to balance of the L1 token deposited
     mapping(address => mapping(address => uint256)) public deposits;
 
@@ -40,6 +45,10 @@ import "./lzApp/NonblockingLzApp.sol";
         dstChainId = _dstChainId;
         // set altl1 bridge address on destination as setTrustedDomain()
         setTrustedRemote(_dstChainId, abi.encodePacked(_altL1BridgeAddress));
+
+        // set maximum amount of tokens can be transferred in 24 hours
+        transferTimestampCheckPoint = block.timestamp;
+        maxTransferAmountPerDay = 500_000e18;
     }
 
     /**************
@@ -89,6 +98,18 @@ import "./lzApp/NonblockingLzApp.sol";
         bytes memory _adapterParams,
         bytes calldata _data
     ) internal {
+        require(_to != address(0), "_to cannot be zero address");
+
+        // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
+        // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
+        if (block.timestamp < transferTimestampCheckPoint + 86400) {
+            transferredAmount += _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
+        } else {
+            transferredAmount = _amount;
+            transferTimestampCheckPoint = block.timestamp;
+        }
+
         // When a deposit is initiated on Ethereum, the Eth Bridge transfers the funds to itself for future
         // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
         // _from is an EOA or address(0).
@@ -155,4 +176,8 @@ import "./lzApp/NonblockingLzApp.sol";
         // set dstGas lookup, since only one dstchainId is allowed and its known
         setMinDstGasLookup(dstChainId, FUNCTION_TYPE_SEND, _dstGasAmount);
     }
- }
+
+    function setMaxTransferAmountPerDay(uint256 _maxTransferAmountPerDay) external onlyOwner() {
+        maxTransferAmountPerDay = _maxTransferAmountPerDay;
+    }
+}
