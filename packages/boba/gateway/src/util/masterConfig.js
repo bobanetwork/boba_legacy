@@ -40,6 +40,14 @@ if (APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://testnet.bobascan.com/`,
         transaction: `https://testnet.bobascan.com/tx/`
       },
+      ALTL1: {
+        name: "Alt L1s",
+        // chainId: 28,
+        // chainIdHex: '0x1C',
+        rpcUrl: ``,
+        // blockExplorer: `https://testnet.bobascan.com/`,
+        // transaction: `https://testnet.bobascan.com/tx/`
+      },
       payloadForL1SecurityFee: {
         from: '0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA',
         to: '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A',

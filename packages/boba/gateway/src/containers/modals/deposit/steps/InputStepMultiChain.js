@@ -72,6 +72,10 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
     const res = await dispatch(depositErc20ToL1(
       // pass required params.
+      {
+        value: value,
+        type: altL1Bridge
+      }
     ))
 
     /**
