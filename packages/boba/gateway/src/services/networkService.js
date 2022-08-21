@@ -83,6 +83,12 @@ import veJson from "../deployment/contracts/ve.json"
 // import voterJson from "../deployment/contracts/BaseV1Voter.json"
 // import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
+// multi chain alt l1s ABI's
+import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
+import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
+import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
+import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
+
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
@@ -141,6 +147,7 @@ class NetworkService {
     this.account = null    // the user's account
     this.L1Provider = null // L1 Infura
     this.L2Provider = null // L2 to Boba replica
+    this.AltL1Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
 
     this.environment = null
@@ -716,6 +723,10 @@ class NetworkService {
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L1']['rpcUrl']
+      )
+      // alt l1's provider
+      this.AltL1Provider = new ethers.providers.StaticJsonRpcProvider(
+        nw[networkGateway]['ALTL1']['rpcUrl']
       )
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L2']['rpcUrl']
@@ -4866,8 +4877,10 @@ class NetworkService {
    *
   */
 
-  async depositErc20ToL1({ value,
-    type }) {
+  async depositErc20ToL1({
+    value,
+    type
+  }) {
     if (this.account === null) {
       console.log('NS: depositErc20ToL1() error - called but account === null')
       return
@@ -4894,43 +4907,59 @@ class NetworkService {
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS,
         ETHL1BridgeJson.abi,
-        ethWallet
+        this.provider
       );
 
       /* proxy alt l1 bridge contract */
       const Proxy__AltL1Bridge = new ethers.Contract(
         PROXY_ALT_L1_BRIDGE_ADDRESS,
         AltL1BridgeJson.abi,
-        altL1Wallet
+        this.AltL1Provider
       );
 
       /* eth boba bridge contract */
       const EthBOBA = new ethers.Contract(
         ETH_L1_BOBA_ADDRESS,
         L2StandardERC20Json.abi,
-        ethWallet
+        this.provider
       );
 
       /* alt l1 boba bridge contract */
       const AltL1BOBA = new ethers.Contract(
         ALT_L1_BOBA_ADDRESS,
         L2StandardERC20Json.abi,
-        altL1Wallet
+        this.AltL1Provider
       );
 
       /* L0 endpoint contract*/
       const ETHLayzerZeroEndpoint = new ethers.Contract(
         L0_ETH_ENDPOINT,
         LZEndpointMockJson.abi,
-        ethWallet
+        this.provider
       );
 
       /* L0 target endpoint contract */
       const AltL1LayerZeroEndpoint = new ethers.Contract(
         L0_TARGET_CHAIN_ENDPOINT,
         LZEndpointMockJson.abi,
-        altL1Wallet
+        this.AltL1Provider
       );
+
+
+        // FIXME: refactor in better way to show on UI.
+      let preEthBOBABalance = await EthBOBA.balanceOf(this.provider.address);
+      let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.AltL1Provider.address);
+
+      console.log({
+        preEthBOBABalance: ethers.utils.formatEther(preEthBOBABalance),
+        preAltL1BOBABalance: ethers.utils.formatEther(preAltL1BOBABalance),
+      });
+
+      if (
+        preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther("value")))
+      ) {
+        throw new Error("EthBOBA balance is too low");
+      }
 
 
       /**
@@ -4942,8 +4971,9 @@ class NetworkService {
 
       let approveTx = await EthBOBA.approve(
         Proxy__EthBridge.address,
-        ethers.utils.parseEther("0.5")
+        ethers.utils.parseEther(value)
       );
+
       await approveTx.wait();
 
       let payload = ethers.utils.defaultAbiCoder.encode(
@@ -4951,21 +4981,36 @@ class NetworkService {
         [
           ETH_L1_BOBA_ADDRESS,
           ALT_L1_BOBA_ADDRESS,
-          ethWallet.address,
-          altL1Wallet.address,
-          ethers.utils.parseEther("0.5"),
+          this.provider.address,
+          this.AltL1Provider.address,
+          ethers.utils.parseEther(value),
           "0x",
         ]
       );
 
       let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-        LAYER_ZERO_ALT_L1_CHAIN_ID,
+        process.env.LAYER_ZERO_ALT_L1_CHAIN_ID, /// pull from env or masterconfig.
         Proxy__EthBridge.address,
         payload,
         false,
         "0x"
       );
 
+
+
+      console.log({
+        estimatedFee: ethers.utils.formatEther(estimatedFee._nativeFee),
+      });
+
+      await Proxy__EthBridge.depositERC20(
+        ETH_L1_BOBA_ADDRESS,
+        ALT_L1_BOBA_ADDRESS,
+        ethers.utils.parseEther(value),
+        ethers.constants.AddressZero,
+        "0x", // adapterParams
+        "0x",
+        { value: estimatedFee._nativeFee }
+      );
 
 
       return {
