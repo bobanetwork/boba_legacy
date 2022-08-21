@@ -10,7 +10,10 @@ import Input from 'components/input/Input'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector'
-import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
+import {
+  amountToUsd, logAmount,
+  // toWei_String
+} from 'util/amountConvert'
 
 import { selectLookupPrice } from 'selectors/lookupSelector'
 import { Box, Typography, useMediaQuery } from '@mui/material'
@@ -19,17 +22,6 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import Select from 'components/select/Select'
-
-/**
- * TODO:
- *
- if (
-    preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther("0.5")))
-  ) {
-    throw new Error("EthBOBA balance is too low");
-  }
- *
-*/
 
 function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -44,7 +36,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const [ value, setValue ] = useState('')
   const [ altL1Bridge, setAltL1Bridge ] = useState('')
-  const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
+  // const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
@@ -78,6 +70,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
       }
     ))
 
+    console.log(res);
     /**
      * TODO:
      *  - dispatch alt L1 specific functions.
@@ -148,12 +141,6 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const onBridgeChange = (e) => {
     setAltL1Bridge(e.target.value)
-    const res =  dispatch(depositErc20ToL1(
-      {
-        value: 1,
-        type: e.target.value
-      }
-    ))
   }
 
   const customStyles = {
@@ -189,11 +176,11 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           type="number"
           onChange={(i) => {
             setAmount(i.target.value)
-            setValue_Wei_String(toWei_String(i.target.value, token.decimals))
+            // setValue_Wei_String(toWei_String(i.target.value, token.decimals))
           }}
           onUseMax={(i) => {//they want to use the maximum
             setAmount(maxValue) //so the input value updates for the user - just for display purposes
-            setValue_Wei_String(token.balance.toString()) //this is the one that matters
+            // setValue_Wei_String(token.balance.toString()) //this is the one that matters
           }}
           allowUseAll={true}
           unit={token.symbol}
