@@ -84,7 +84,7 @@ import veJson from "../deployment/contracts/ve.json"
 // import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
 // multi chain alt l1s ABI's
-import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
+// import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
 import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
 import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
 import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
@@ -103,7 +103,11 @@ import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+
+import chain_Rinkeby from "@boba/register/addresses/chainRinkeby"
+
 import { bobaBridges } from 'util/bobaBridges'
+import { TARGET_CHAIN_URL } from 'util/constant'
 
 require('dotenv').config()
 
@@ -147,7 +151,6 @@ class NetworkService {
     this.account = null    // the user's account
     this.L1Provider = null // L1 Infura
     this.L2Provider = null // L2 to Boba replica
-    this.AltL1Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
 
     this.environment = null
@@ -724,10 +727,7 @@ class NetworkService {
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L1']['rpcUrl']
       )
-      // alt l1's provider
-      this.AltL1Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[networkGateway]['ALTL1']['rpcUrl']
-      )
+
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L2']['rpcUrl']
       )
@@ -4885,36 +4885,19 @@ class NetworkService {
       console.log('NS: depositErc20ToL1() error - called but account === null')
       return
     }
-
     try {
       let PROXY_ETH_L1_BRIDGE_ADDRESS = allAddresses[ `PROXY_ETH_L1_BRIDGE_ADDRESS_${type}` ];
-      let PROXY_ALT_L1_BRIDGE_ADDRESS = allAddresses[ `PROXY_ALT_L1_BRIDGE_ADDRESS_${type}` ];
       let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
       let ALT_L1_BOBA_ADDRESS = allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
       let L0_ETH_ENDPOINT = allAddresses[ `L0_ETH_ENDPOINT` ];
-      let L0_TARGET_CHAIN_ENDPOINT = allAddresses[ `L0_TARGET_CHAIN_ENDPOINT_${type}` ];
 
-      console.table({
-        PROXY_ETH_L1_BRIDGE_ADDRESS,
-        PROXY_ALT_L1_BRIDGE_ADDRESS,
-        ETH_L1_BOBA_ADDRESS,
-        ALT_L1_BOBA_ADDRESS,
-        L0_ETH_ENDPOINT,
-        L0_TARGET_CHAIN_ENDPOINT
-      })
+      const AltL1Provider = new ethers.providers.StaticJsonRpcProvider(TARGET_CHAIN_URL);
 
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS,
         ETHL1BridgeJson.abi,
-        this.provider
-      );
-
-      /* proxy alt l1 bridge contract */
-      const Proxy__AltL1Bridge = new ethers.Contract(
-        PROXY_ALT_L1_BRIDGE_ADDRESS,
-        AltL1BridgeJson.abi,
-        this.AltL1Provider
+        this.provider.getSigner()
       );
 
       /* eth boba bridge contract */
@@ -4928,48 +4911,33 @@ class NetworkService {
       const AltL1BOBA = new ethers.Contract(
         ALT_L1_BOBA_ADDRESS,
         L2StandardERC20Json.abi,
-        this.AltL1Provider
+        AltL1Provider
       );
+
+      let preEthBOBABalance = await EthBOBA.balanceOf(this.account)
+      let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.account)
+
+      console.table({
+        preEthBOBABalance: ethers.utils.formatEther(preEthBOBABalance),
+        preAltL1BOBABalance: ethers.utils.formatEther(preAltL1BOBABalance),
+      });
 
       /* L0 endpoint contract*/
       const ETHLayzerZeroEndpoint = new ethers.Contract(
         L0_ETH_ENDPOINT,
         LZEndpointMockJson.abi,
-        this.provider
+        this.provider.getSigner()
       );
-
-      /* L0 target endpoint contract */
-      const AltL1LayerZeroEndpoint = new ethers.Contract(
-        L0_TARGET_CHAIN_ENDPOINT,
-        LZEndpointMockJson.abi,
-        this.AltL1Provider
-      );
-
-
-        // FIXME: refactor in better way to show on UI.
-      let preEthBOBABalance = await EthBOBA.balanceOf(this.provider.address);
-      let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.AltL1Provider.address);
-
-      console.log({
-        preEthBOBABalance: ethers.utils.formatEther(preEthBOBABalance),
-        preAltL1BOBABalance: ethers.utils.formatEther(preAltL1BOBABalance),
-      });
 
       if (
-        preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther("value")))
+        preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther('0.5')))
       ) {
         throw new Error("EthBOBA balance is too low");
       }
 
-
-      /**
-       * Sending The ETH to alt L1
-       * STEP: 1 - aprove transanctions
-       * STEP: 2
-       *
-       * */
-
-      let approveTx = await EthBOBA.approve(
+      let approveTx = await EthBOBA
+        .connect(this.provider.getSigner())
+        .approve(
         Proxy__EthBridge.address,
         ethers.utils.parseEther(value)
       );
@@ -4981,22 +4949,20 @@ class NetworkService {
         [
           ETH_L1_BOBA_ADDRESS,
           ALT_L1_BOBA_ADDRESS,
-          this.provider.address,
-          this.AltL1Provider.address,
+          this.account,
+          this.account,
           ethers.utils.parseEther(value),
           "0x",
         ]
       );
 
       let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-        process.env.LAYER_ZERO_ALT_L1_CHAIN_ID, /// pull from env or masterconfig.
+        chain_Rinkeby.LAYER_ZERO_ALT_L1_CHAIN_ID, /// pull from env or masterconfig.
         Proxy__EthBridge.address,
         payload,
         false,
         "0x"
       );
-
-
 
       console.log({
         estimatedFee: ethers.utils.formatEther(estimatedFee._nativeFee),
@@ -5012,6 +4978,7 @@ class NetworkService {
         { value: estimatedFee._nativeFee }
       );
 
+      console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER 🔥 🔥 🔥 `);
 
       return {
         data: 'success'

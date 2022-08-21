@@ -43,8 +43,7 @@ import { setBaseState } from 'actions/setupAction'
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectNetwork,
-  selectLayer
+  selectNetwork
 } from 'selectors/setupSelector'
 
 /**** ACTIONS and SELECTORS *****/
@@ -157,7 +156,6 @@ function Home() {
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const network = useSelector(selectNetwork())
-  const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
 
