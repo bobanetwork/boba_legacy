@@ -85,9 +85,8 @@ describe('gas-price-oracle', () => {
   let L2BOBA: Contract
   let L2SecondaryFeeToken: Contract
 
-  let Factory__ChainStorageContainer: ContractFactory
-  let batches: Contract
-  let queue: Contract
+  let Factory__Boba_GasPriceOracle: ContractFactory
+  let Boba_GasPriceOracle: Contract
 
   before(async () => {
     Factory__Lib_AddressManager = getContractFactory(
@@ -155,7 +154,23 @@ describe('gas-price-oracle', () => {
       L2SecondaryFeeToken.address
     )
 
-    await Lib_AddressManager.setAddress('Proxy__Boba_GasPriceOracle', address6)
+    Factory__Boba_GasPriceOracle = getContractFactory(
+      'Boba_GasPriceOracle',
+      wallet8
+    )
+    Boba_GasPriceOracle = await Factory__Boba_GasPriceOracle.deploy()
+    await Boba_GasPriceOracle.deployTransaction.wait()
+
+    await Boba_GasPriceOracle.initialize(address6, L2SecondaryFeeToken.address)
+    await Boba_GasPriceOracle.updateDecimals(2)
+    await Boba_GasPriceOracle.updateMinPriceRatio(1)
+    await Boba_GasPriceOracle.updateMaxPriceRatio(500)
+    await Boba_GasPriceOracle.updatePriceRatio(120, 100)
+
+    await Lib_AddressManager.setAddress(
+      'Proxy__Boba_GasPriceOracle',
+      Boba_GasPriceOracle.address
+    )
 
     await Lib_AddressManager.setAddress('Proxy__BobaBillingContract', address7)
   })
@@ -196,6 +211,7 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31338,
+      l1TokenId: 'moonbeam',
     })
 
     await gasPriceOracleService.init()
@@ -533,6 +549,7 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
+      l1TokenId: 'moonbeam',
     })
 
     await tempGasPriceOracleService.init()
@@ -584,6 +601,7 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
+      l1TokenId: 'moonbeam',
     })
 
     await tempGasPriceOracleService.init()
@@ -596,4 +614,65 @@ describe('gas-price-oracle', () => {
     const postL1BaseFee = await gasPriceOracle.l1BaseFee()
     expect(postL1BaseFee).to.be.equal(ethers.utils.parseEther('0'))
   })
+
+  it('should get Boba and l1 native token prices', async () => {
+    // Initialize GasPriceOracleService
+    tempGasPriceOracleService = new GasPriceOracleService({
+      l1RpcProvider: ethers.provider,
+      l2RpcProvider: ethers.provider,
+
+      addressManagerAddress: Lib_AddressManager.address,
+      gasPriceOracleAddress: gasPriceOracle.address,
+
+      OVM_SequencerFeeVault: address5,
+
+      gasPriceOracleOwnerWallet: wallet8,
+
+      sequencerAddress: address1,
+      proposerAddress: address2,
+      relayerAddress: address3,
+      fastRelayerAddress: address4,
+
+      pollingInterval: 0,
+      overheadRatio1000X: 10,
+      overheadMinPercentChange: 10,
+      minOverhead: 2000,
+      minL1BaseFee: 50_000_000_000,
+      maxL1BaseFee: 100_000_000_000,
+      bobaFeeRatio100X: 120,
+      bobaFeeRatioMinPercentChange: 3000,
+      bobaLocalTestnetChainId: 31337,
+      l1TokenId: 'moonbeam',
+    })
+
+    await tempGasPriceOracleService.init()
+
+    const BobaPrice = await tempGasPriceOracleService._getTokenPrice(
+      'boba-network'
+    )
+    const l1NativeTokenPrice = await tempGasPriceOracleService._getTokenPrice(
+      tempGasPriceOracleService.options.l1TokenId
+    )
+    expect(BobaPrice).not.to.be.equal(0)
+    expect(l1NativeTokenPrice).not.to.be.equal(0)
+
+    await tempGasPriceOracleService._updatePriceRatio()
+
+    const decimals = (await Boba_GasPriceOracle.decimals()).toNumber()
+    const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
+    const priceRatio = await Boba_GasPriceOracle.priceRatio()
+
+    const calculatedMarketPriceRatio = Math.round(
+      (BobaPrice / l1NativeTokenPrice) * 10 ** decimals
+    )
+    const calculatedPriceRatio = Math.round(
+      ((BobaPrice / l1NativeTokenPrice) *
+        10 ** decimals *
+        tempGasPriceOracleService.options.bobaFeeRatio100X) /
+        100
+    )
+    expect(marketPriceRatio.toNumber()).to.be.eq(calculatedMarketPriceRatio)
+    expect(priceRatio.toNumber()).to.be.eq(calculatedPriceRatio)
+  })
+
 })

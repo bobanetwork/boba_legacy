@@ -3,11 +3,14 @@ import { Contract, Wallet, BigNumber, providers, utils } from 'ethers'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
 import { orderBy } from 'lodash'
+import fetch from 'node-fetch'
 
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
+
+import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -56,6 +59,9 @@ interface GasPriceOracleOptions {
 
   // local testnet chain ID
   bobaLocalTestnetChainId: number
+
+  // L1 token ID
+  l1TokenId: string
 }
 
 const optionSettings = {}
@@ -70,6 +76,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     OVM_GasPriceOracle: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
+    Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
     L1SecondaryFeeTokenBalance: BigNumber
     L1SecondaryFeeTokenCostFee: BigNumber
@@ -149,6 +156,20 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.OVM_GasPriceOracle.address,
     })
 
+    this.logger.info('Connecting to Boba_GasPriceOracle...')
+    const Boba_GasPriceOracleAddress =
+      await this.state.Lib_AddressManager.getAddress(
+        'Proxy__Boba_GasPriceOracle'
+      )
+    this.state.Boba_GasPriceOracle = new Contract(
+      Boba_GasPriceOracleAddress,
+      Boba_GasPriceOracleJson.abi,
+      this.options.l2RpcProvider
+    ).connect(this.options.gasPriceOracleOwnerWallet)
+    this.logger.info('Connected to Boba_GasPriceOracle', {
+      address: this.state.Boba_GasPriceOracle.address,
+    })
+
     this.logger.info('Connecting to Proxy__BobaBillingContract...')
     this.state.BobaBillingContractAddress =
       await this.state.Lib_AddressManager.getAddress(
@@ -188,6 +209,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
+      // update price ratio
+      await this._updatePriceRatio()
     }
   }
 
@@ -631,6 +654,57 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
+    }
+  }
+
+  private async _updatePriceRatio(): Promise<void> {
+    try {
+      const BobaPrice = await this._getTokenPrice('boba-network')
+      const l1NativeTokenPrice = await this._getTokenPrice(
+        this.options.l1TokenId
+      )
+      if (BobaPrice === 0 || l1NativeTokenPrice === 0) {
+        this.logger.warn(`Token price is 0, skipping update`)
+      } else {
+        const decimals = (
+          await this.state.Boba_GasPriceOracle.decimals()
+        ).toNumber()
+        const marketPriceRatio = Math.round(
+          (BobaPrice / l1NativeTokenPrice) * 10 ** decimals
+        )
+        const priceRatio = Math.round(
+          (marketPriceRatio * this.options.bobaFeeRatio100X) / 100
+        )
+        const tx = await this.state.Boba_GasPriceOracle.updatePriceRatio(
+          priceRatio,
+          marketPriceRatio,
+          this.state.chainID === this.options.bobaLocalTestnetChainId
+            ? {}
+            : { gasPrice: 0 }
+        )
+        await tx.wait()
+        this.logger.info('Updated price ratio', {
+          priceRatio,
+          marketPriceRatio,
+          BobaPrice,
+          l1NativeTokenPrice,
+        })
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${error}`)
+    }
+  }
+
+  // Data provided by CoinGecko
+  private async _getTokenPrice(id: string): Promise<number> {
+    try {
+      const URL = `https:///api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_date=false&developer_data=false&sparkline=false`
+      const payload = await fetch(URL)
+      const payloadParsed = await payload.json()
+      return Number(payloadParsed.market_data.current_price.usd)
+    } catch (err) {
+      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${err} - ${id}`)
+      return 0
     }
   }
 }

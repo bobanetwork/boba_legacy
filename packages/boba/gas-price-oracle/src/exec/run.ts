@@ -96,6 +96,10 @@ const main = async () => {
     parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
   )
 
+  // Data provided by CoinGecko
+  // Coin ID in CoinGecko
+  const L1_TOKEN_ID = config.str('L1_TOKEN_ID', env.L1_TOKEN_ID)
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -164,6 +168,7 @@ const main = async () => {
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
     bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
+    l1TokenId: L1_TOKEN_ID,
   })
 
   await service.start()
