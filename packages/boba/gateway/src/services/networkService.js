@@ -80,8 +80,9 @@ import GraphQLService from "./graphQLService"
 
 import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
 import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOperaTestnet_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b"
-import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79.json"
-import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa.json"
+import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79"
+import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa"
+import addresses_BobaBeam from "@boba/register/addresses/addressBobaBeam_0x564c10A60af35a07f0EA8Be3106a4D81014b21a0"
 
 import { bobaBridges } from 'util/bobaBridges'
 
@@ -110,6 +111,11 @@ if (process.env.REACT_APP_CHAIN === 'bobaBase') {
     ...addresses_BobaBase,
   }
 }
+if (process.env.REACT_APP_CHAIN === 'bobaBeam') {
+  allAddresses = {
+    ...addresses_BobaBeam,
+  }
+}
 if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
   allAddresses = {
     ...addresses_BobaOperaTestnet,
@@ -127,7 +133,7 @@ if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
 }
 
 // suported chains
-const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet']
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet', 'bobaBeam']
 
 // assets for different chains
 const L1ChainAssets = {
@@ -135,25 +141,36 @@ const L1ChainAssets = {
     name: 'Moonbase',
     l2Name: 'Bobabase',
     icon: (bool) => <MoonbaseIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: true,
+  },
+  'bobaBeam': {
+    name: 'Moonbeam',
+    l2Name: 'Bobabeam',
+    icon: (bool) => <MoonbeamIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: false,
   },
   'bobaOperaTestnet': {
     name: 'Fantom Testenet',
     l2Name: 'Boba',
     icon: (bool) => <FantomIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: true,
   },
   'bobaFuji': {
     name: 'Avalanche Testnet',
     l2Name: 'Boba',
     icon: (bool) => <AvaxIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: true,
   },
   'bobaBnbTestnet': {
     name: 'BNB Testnet',
     l2Name: 'Boba',
     icon: (bool) => <BnbIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: true,
   }
 }
 
@@ -1627,6 +1644,8 @@ class NetworkService {
     const gasPrice = await this.L2Provider.getGasPrice()
     console.log("Classical exit gas price", gasPrice.toString())
 
+    console.log(allAddresses.DiscretionaryExitFee)
+
     if( currencyAddress !== allAddresses.L2_BOBA_Address ) {
 
       const ERC20Contract = new ethers.Contract(
@@ -1658,6 +1677,8 @@ class NetworkService {
     )
     const exitFee = await L2BillingContract.exitFee()
 
+    console.log(exitFee)
+
     const tx2 = await DiscretionaryExitFeeContract.populateTransaction.payAndWithdraw(
       allAddresses.L2_BOBA_Address,
       utils.parseEther('0.00001'),
@@ -1665,6 +1686,8 @@ class NetworkService {
       ethers.utils.formatBytes32String(new Date().getTime().toString()),
       { value: utils.parseEther('0.00001').add(exitFee) }
     )
+
+    console.log(tx2, this.gasEstimateAccount, L2_BOBA_Address)
 
     const gas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
     console.log("Classical exit gas", gas_BN.toString())

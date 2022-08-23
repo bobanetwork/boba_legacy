@@ -182,7 +182,7 @@ function TokenPage() {
     return (
     <>
 
-      {layer === 'L2' && networkService.supportedMultiChains.includes(network) &&
+      {layer === 'L2' && networkService.supportedMultiChains.includes(network) && networkService.L1ChainAsset.foundation &&
 
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>

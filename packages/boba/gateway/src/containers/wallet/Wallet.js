@@ -118,7 +118,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallBOBA &&
+      {layer === 'L2' &&
         <G.LayerAlert style={{padding: '20px'}}>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
