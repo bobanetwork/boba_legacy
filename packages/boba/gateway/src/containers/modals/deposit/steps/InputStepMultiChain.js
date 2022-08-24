@@ -93,7 +93,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   useEffect(() => {
     dispatch(fetchAltL1DepositFee())
-  },[])
+  },[dispatch])
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
