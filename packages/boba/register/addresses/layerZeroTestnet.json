@@ -1,6 +1,6 @@
 {
   "Layer_Zero_Protocol": {
-    "Rinkeby":{
+    "Testnet":{
       "Layer_Zero_Endpoint": "0x79a63d6d8BBD5c6dfc774dA79bCcD948EAcb53FA",
       "Layer_Zero_ChainId": "10001"
     },
@@ -18,7 +18,7 @@
     }
   },
   "BOBA_Bridges": {
-    "Rinkeby":{
+    "Testnet":{
       "Proxy__EthBridgeToBNB": "0xe15DccaB449aC06eE8eC068a75BA61968ba8BFBC",
       "Proxy__EthBridgeToFantom": "0xE3D9a12677dE08D250c20BFe22009d5e34EB4ba5",
       "Proxy__EthBridgeToAvalanche": "0x78Af7bF02fEBa4D979Ea2dBc5388cDC768E7b34E",

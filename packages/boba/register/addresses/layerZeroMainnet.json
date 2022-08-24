@@ -1,0 +1,76 @@
+{
+  "Layer_Zero_Protocol": {
+    "Mainnet":{
+      "Layer_Zero_Endpoint": "0x66A71Dcef29A0fFBDBE3c6a460a3B5BC225Cd675",
+      "Layer_Zero_ChainId": "1"
+    },
+    "BNB": {
+      "Layer_Zero_Endpoint": "0x3c2269811836af69497E5F486A85D7316753cf62",
+      "Layer_Zero_ChainId": "2"
+    },
+    "Fantom": {
+      "Layer_Zero_Endpoint": "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
+      "Layer_Zero_ChainId": "12"
+    },
+    "Avalanche": {
+      "Layer_Zero_Endpoint": "0x3c2269811836af69497E5F486A85D7316753cf62",
+      "Layer_Zero_ChainId": "6"
+    },
+    "Moonbeam": {
+      "Layer_Zero_Endpoint": "0x9740FF91F1985D8d2B71494aE1A2f723bb3Ed9E4",
+      "Layer_Zero_ChainId": "26"
+    }
+  },
+  "BOBA_Bridges": {
+    "Mainnet":{
+      "Proxy__EthBridgeToBNB": "",
+      "Proxy__EthBridgeToFantom": "",
+      "Proxy__EthBridgeToAvalanche": "",
+      "Proxy__EthBridgeToMoonbeam": "0x6F537839714761388B6d7ED61Bc09579d5dA2F41",
+      "EthBridgeToBNB": "",
+      "EthBridgeToFantom": "",
+      "EthBridgeToAvalanche": "",
+      "EthBridgeToMoonbeam": "0x76b82285fb4A75481645e5F3771E33bc4D207d72",
+      "Proxy__BNBBridgeToEth": "",
+      "Proxy__FantomBridgeToEth": "",
+      "Proxy__AvalancheBridgeToEth": "",
+      "Proxy__MoonbeamBridgeToEth": "0x9F868333DB1720Fb1412AFfb1AeF47e8C6cFc8c3",
+      "BNBBridgeToEth": "",
+      "FantomBridgeToEth": "",
+      "AvalancheBridgeToEth": "",
+      "MoonbeamBridgeToEth": "0x891b8c55E471f6a2ce8E055D553733b0126D49a1",
+      "BNB_TK_BOBA": "",
+      "Avalanche_TK_BOBA": "",
+      "Fantom_TK_BOBA": "",
+      "Moonbeam_TK_BOBA": "0x18D17A9fD652D7d6a59903E23792ab97F832Ed6C"
+    },
+    "BNB": {
+      "Proxy__EthBridgeToBNB": "",
+      "EthBridgeToBNB": "",
+      "Proxy__BNBBridgeToEth": "",
+      "BNBBridgeToEth": "",
+      "BNB_TK_BOBA": ""
+    },
+    "Fantom": {
+      "Proxy__EthBridgeToFantom": "",
+      "EthBridgeToFantom": "",
+      "Proxy__FantomBridgeToEth": "",
+      "FantomBridgeToEth": "",
+      "Fantom_TK_BOBA": ""
+    },
+    "Avalanche": {
+      "Proxy__EthBridgeToAvalanche": "",
+      "EthBridgeToAvalanche": "",
+      "Proxy__AvalancheBridgeToEth": "",
+      "AvalancheBridgeToEth": "",
+      "Avalanche_TK_BOBA": ""
+    },
+    "Moonbeam": {
+      "Proxy__EthBridgeToMoonbeam": "0x6F537839714761388B6d7ED61Bc09579d5dA2F41",
+      "EthBridgeToMoonbeam": "0x76b82285fb4A75481645e5F3771E33bc4D207d72",
+      "Proxy__MoonbeamBridgeToEth": "0x9F868333DB1720Fb1412AFfb1AeF47e8C6cFc8c3",
+      "MoonbeamBridgeToEth": "0x891b8c55E471f6a2ce8E055D553733b0126D49a1",
+      "Moonbeam_TK_BOBA": "0x18D17A9fD652D7d6a59903E23792ab97F832Ed6C"
+    }
+  }
+}

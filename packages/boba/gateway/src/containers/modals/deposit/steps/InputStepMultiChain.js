@@ -26,6 +26,7 @@ import Select from 'components/select/Select'
 import { selectAltL1DepositCost } from 'selectors/balanceSelector'
 import { fetchAltL1DepositFee } from 'actions/balanceAction'
 
+import networkService from 'services/networkService'
 
 /**
  * @NOTE
@@ -44,7 +45,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
     { value: 'Avalanche', label: 'Avalanche', title: 'Avalanche', image: getImageComponent('AVAX') },
     { value: 'Fantom', label: 'Fantom', title: 'Fantom', image: getImageComponent('FTM') },
     { value: 'Moonbeam', label: 'Moonbeam', title: 'Moonbeam', image: getImageComponent('GLMR') },
-  ]
+  ].filter(i => networkService.supportedAltL1Chains.includes(i.value))
 
   const dispatch = useDispatch()
 
