@@ -2,7 +2,6 @@ import moment from 'moment'
 
 require('dotenv').config()
 export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL
-export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
