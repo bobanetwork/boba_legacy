@@ -137,6 +137,7 @@ class DatabaseService extends OptimismEnv {
       )`)
     await query(`CREATE TABLE IF NOT EXISTS layerZeroTx
       (
+        chainID INT NOT NULL,
         hash VARCHAR(255) NOT NULL,
         blockHash VARCHAR(255) NOT NULL,
         blockNumber INT NOT NULL,
@@ -520,6 +521,7 @@ class DatabaseService extends OptimismEnv {
 
   async insertLayerZeroTx(eventData) {
     const tx = {
+      chainID: eventData.chainID,
       hash: eventData.hash.toString(),
       blockHash: eventData.blockHash.toString(),
       blockNumber: eventData.blockNumber.toString(),
@@ -542,6 +544,7 @@ class DatabaseService extends OptimismEnv {
     await query(`USE ${this.MySQLDatabaseName}`)
     await query(`INSERT IGNORE INTO layerZeroTx
       SET hash='${tx.hash}',
+      chainID='${tx.chainID}',
       blockHash='${tx.blockHash}',
       blockNumber='${tx.blockNumber}',
       txFrom='${tx.txFrom}',
@@ -662,7 +665,7 @@ class DatabaseService extends OptimismEnv {
     con.end()
   }
 
-  async getNewestBlockFromLayerZeroTx() {
+  async getNewestBlockFromLayerZeroTx(chainID) {
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
       port: this.MySQLPort,
@@ -671,7 +674,9 @@ class DatabaseService extends OptimismEnv {
     })
     const query = util.promisify(con.query).bind(con)
     await query(`USE ${this.MySQLDatabaseName}`)
-    const latestBlock = await query(`SELECT MAX(blockNumber) from layerZeroTx`)
+    const latestBlock = await query(
+      `SELECT MAX(blockNumber) from layerZeroTx where chainID = ${chainID}`
+    )
     con.end()
     return latestBlock[0]['MAX(blockNumber)']
   }
