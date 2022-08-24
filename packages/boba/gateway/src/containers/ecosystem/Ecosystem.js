@@ -11,7 +11,7 @@ import { loadProjectByCategory } from './project.list'
 import Tooltip from 'components/tooltip/Tooltip'
 import Button from 'components/button/Button'
 
-const PROJECT_CAT = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
+const PROJECT_CAT = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
 
 function ECOSYSTEM() {
 
