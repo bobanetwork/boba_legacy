@@ -42,12 +42,18 @@ const loopTransferTx = async () => {
 }
 
 const main = async () => {
-  const LayerZeroBridgeMonitor = require('../services/layerZeroBridge')
-  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
+  const LayerZeroBridgeETHMonitor = require('../services/layerZeroBridge_eth')
+  const layerZeroBridgeMonitor = new LayerZeroBridgeETHMonitor()
 
   // await layerZeroBridgeMonitor.initConnection()
-  await layerZeroBridgeMonitor.initScan()
-  await layerZeroBridgeMonitor.startMonitor()
+  // await layerZeroBridgeMonitor.initScan()
+  // await layerZeroBridgeMonitor.startMonitor()
+
+  const LayerZeroBridgeAltL1Monitor = require('../services/layerZeroBridge_altL1')
+  const layerZeroAltL1Monitor = new LayerZeroBridgeAltL1Monitor()
+
+  await layerZeroAltL1Monitor.initScan()
+  await layerZeroAltL1Monitor.startMonitor()
 };
 
 ; (async () => {
