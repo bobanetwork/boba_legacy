@@ -107,7 +107,6 @@ import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376a
 import chain_Rinkeby from "@boba/register/addresses/chainRinkeby"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { TARGET_CHAIN_URL } from 'util/constant'
 
 require('dotenv').config()
 
@@ -117,6 +116,7 @@ const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
+const AltL1ChainNames = [ 'BNB', 'Fantom', 'Avalanche', 'Moonbeam' ]
 
 let allAddresses = {}
 // preload allAddresses
@@ -1412,7 +1412,7 @@ class NetworkService {
 
       if(NFTs && Number(monsterBalance) > 0) {
         //console.log("checking monsters")
-        for (const [ key, value ] of Object.entries(NFTs)) {
+        for (const [ , value ] of Object.entries(NFTs)) {
           //console.log(`${key} value: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
@@ -4892,22 +4892,17 @@ class NetworkService {
     try {
 
       console.log(`🏃 Estimate Fee Cross Chain Deposit`);
-      const pResponse = [ 'BNB', 'FANTOM', 'AVALANCHE' ].map(async (type) => {
+      const pResponse = AltL1ChainNames.map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
         let ETH_L1_BOBA_ADDRESS = allAddresses.ETH_BOBA_ADDRESS;
         let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
-        let ALT_L1_BOBA_ADDRESS = '';
-        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = '';
+        let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
+        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
 
-        if (type === 'BNB') {
-          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToBNB;
-          ALT_L1_BOBA_ADDRESS = allAddresses.BNB_TK_BOBA
-        } else if (type === 'FANTOM') {
-          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToFantom;
-          ALT_L1_BOBA_ADDRESS = allAddresses.Fantom_TK_BOBA
-        } else if (type === 'AVALANCHE') {
-          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToAvalanche;
-          ALT_L1_BOBA_ADDRESS = allAddresses.Avalanche_TK_BOBA
+        // Layer zero doesn't support moonbase
+        // return 0 for those bridges that haven't been implemented yet
+        if (typeof ALT_L1_BOBA_ADDRESS === 'undefined' || typeof PROXY_ETH_L1_BRIDGE_ADDRESS_TO === 'undefined') {
+          return {type, fee: '0' }
         }
 
         const Proxy__EthBridge = new ethers.Contract(
@@ -4975,22 +4970,10 @@ class NetworkService {
     }
     try {
       console.log(`Start 🏃 🏃`)
-      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = '';
-      let ALT_L1_BOBA_ADDRESS = '';
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
-
-      if (type === 'BNB') {
-        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToBNB;
-        ALT_L1_BOBA_ADDRESS = allAddresses.BNB_TK_BOBA
-      } else if (type === 'FANTOM') {
-        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToFantom;
-        ALT_L1_BOBA_ADDRESS = allAddresses.Fantom_TK_BOBA
-      } else if (type === 'AVALANCHE') {
-        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToAvalanche;
-        ALT_L1_BOBA_ADDRESS = allAddresses.Avalanche_TK_BOBA
-      }
-
-      let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
+      let ETH_L1_BOBA_ADDRESS = allAddresses.ETH_BOBA_ADDRESS;
+      let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
 
       console.log({
         type,
@@ -4999,10 +4982,6 @@ class NetworkService {
         ALT_L1_BOBA_ADDRESS,
         L0_ETH_ENDPOINT
       })
-
-      //  allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
-
-      // const AltL1Provider = new ethers.providers.StaticJsonRpcProvider(TARGET_CHAIN_URL);
 
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(

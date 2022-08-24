@@ -14,6 +14,7 @@ import {
   amountToUsd, logAmount,
   // toWei_String
 } from 'util/amountConvert'
+import { getCoinImage } from 'util/coinImage'
 
 import { selectLookupPrice } from 'selectors/lookupSelector'
 import { Box, Typography, useMediaQuery } from '@mui/material'
@@ -34,11 +35,15 @@ import { fetchAltL1DepositFee } from 'actions/balanceAction'
 
 function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) {
 
+  const getImageComponent = (symbol) => {
+    return <img src={getCoinImage(symbol)} height="35" width="35" alt={symbol} style={{padding: 5}}/>
+  }
+
   const options = [
-    { value: 'BNB', label: 'BNB', title: 'BNB' },
-    { value: 'AVALANCHE', label: 'Avalanche', title: 'Avalanche' },
-    { value: 'FANTOM', label: 'Fantom', title: 'Fantom' },
-    { value: 'MOONBEAM', label: 'Moonbeam', title: 'Moonbeam' }
+    { value: 'BNB', label: 'BNB', title: 'BNB', image: getImageComponent("BNB") },
+    { value: 'Avalanche', label: 'Avalanche', title: 'Avalanche', image: getImageComponent('AVAX') },
+    { value: 'Fantom', label: 'Fantom', title: 'Fantom', image: getImageComponent('FTM') },
+    { value: 'Moonbeam', label: 'Moonbeam', title: 'Moonbeam', image: getImageComponent('GLMR') },
   ]
 
   const dispatch = useDispatch()
@@ -93,7 +98,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   useEffect(() => {
     dispatch(fetchAltL1DepositFee())
-  },[])
+  },[dispatch])
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
@@ -190,7 +195,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
         {!!altL1Bridge && depositFees? <>
           <Typography variant='body2' sx={{ mt: 2 }}>
-            Estimated fee for bridging {value} {token.symbol} is {depositFees[altL1Bridge].fee}
+            Estimated fee for bridging {value} {token.symbol} is {depositFees[altL1Bridge].fee} ETH
           </Typography>
         </> : null}
 

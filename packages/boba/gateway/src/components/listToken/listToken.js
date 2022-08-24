@@ -146,12 +146,12 @@ function ListToken({
                     Fast Bridge to L2
                 </Button>
                 {token.symbol === 'BOBA' &&
-
                   <Button
                     onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                     color='primary'
                     disabled={disabled}
                     variant="contained"
+                    tooltip="A multi-chain bridge to Alt L1."
                     fullWidth
                   >
                     Bridge to alt L1
