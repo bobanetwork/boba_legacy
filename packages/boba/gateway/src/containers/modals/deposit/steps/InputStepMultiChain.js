@@ -22,6 +22,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import Select from 'components/select/Select'
+import { selectAltL1DepositCost } from 'selectors/balanceSelector'
+import { fetchAltL1DepositFee } from 'actions/balanceAction'
 
 
 /**
@@ -50,6 +52,8 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
+  const depositFees = useSelector(selectAltL1DepositCost)
+  console.log([`depositFes`, depositFees]);
 
   const maxValue = logAmount(token.balance, token.decimals)
 
@@ -79,12 +83,17 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
       dispatch(setActiveHistoryTab('Bridge between L1s'))
       handleClose()
     } else {
+      console.log(`🤦 opps something wrong!`)
       handleClose()
     }
   }
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  useEffect(() => {
+    dispatch(fetchAltL1DepositFee())
+  },[])
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
@@ -177,6 +186,13 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           isBridge={isBridge}
           openTokenPicker={openTokenPicker}
         />
+
+
+        {!!altL1Bridge && depositFees? <>
+          <Typography variant='body2' sx={{ mt: 2 }}>
+            Estimated fee for bridging {value} {token.symbol} is {depositFees[altL1Bridge].fee}
+          </Typography>
+        </> : null}
 
         {!!convertToUSD && (
           <Typography variant="body2" sx={{ mt: 2 }}>
