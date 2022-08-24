@@ -121,10 +121,14 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 let allAddresses = {}
 // preload allAddresses
 if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+  const bobaBridges = chain_Rinkeby.BOBA_Bridges.Rinkeby;
+  const l0Protocols = chain_Rinkeby.Layer_Zero_Protocol.Rinkeby;
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool,
+    ...bobaBridges,
+    ...l0Protocols
   }
 } else if (process.env.REACT_APP_CHAIN === 'mainnet') {
   allAddresses = {
@@ -734,10 +738,8 @@ class NetworkService {
 
       if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
-        console.log('Rinkeby Addresses:', addresses)
       } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
-        console.log('Mainnet Addresses:', addresses)
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
@@ -808,7 +810,6 @@ class NetworkService {
         L1StandardBridgeJson.abi,
         this.L1Provider
       )
-      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       this.supportedTokens = [ 'USDT',   'DAI', 'USDC',  'WBTC',
                                'REP',    'BAT',  'ZRX', 'SUSHI',
@@ -4871,7 +4872,12 @@ class NetworkService {
     }
   }
 
-  /**
+
+  /*************************************************
+   **************** Alt L1 Functions ***************
+   *************************************************/
+
+   /**
    * Multichain Deposit to alt l1s
    * Only support boba as of now.
    *
@@ -4886,16 +4892,39 @@ class NetworkService {
       return
     }
     try {
-      let PROXY_ETH_L1_BRIDGE_ADDRESS = allAddresses[ `PROXY_ETH_L1_BRIDGE_ADDRESS_${type}` ];
-      let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
-      let ALT_L1_BOBA_ADDRESS = allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
-      let L0_ETH_ENDPOINT = allAddresses[ `L0_ETH_ENDPOINT` ];
+      console.log(`Start 🏃 🏃`)
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = '';
+      let ALT_L1_BOBA_ADDRESS = '';
+      let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
 
-      const AltL1Provider = new ethers.providers.StaticJsonRpcProvider(TARGET_CHAIN_URL);
+      if (type === 'BNB') {
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToBNB;
+        ALT_L1_BOBA_ADDRESS = allAddresses.BNB_TK_BOBA
+      } else if (type === 'FANTOM') {
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToFantom;
+        ALT_L1_BOBA_ADDRESS = allAddresses.Fantom_TK_BOBA
+      } else if (type === 'AVALANCHE') {
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToAvalanche;
+        ALT_L1_BOBA_ADDRESS = allAddresses.Avalanche_TK_BOBA
+      }
+
+      let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
+
+      console.log({
+        type,
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
+        ETH_L1_BOBA_ADDRESS,
+        ALT_L1_BOBA_ADDRESS,
+        L0_ETH_ENDPOINT
+      })
+
+      //  allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
+
+      // const AltL1Provider = new ethers.providers.StaticJsonRpcProvider(TARGET_CHAIN_URL);
 
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
-        PROXY_ETH_L1_BRIDGE_ADDRESS,
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
         ETHL1BridgeJson.abi,
         this.provider.getSigner()
       );
@@ -4908,19 +4937,16 @@ class NetworkService {
       );
 
       /* alt l1 boba bridge contract */
-      const AltL1BOBA = new ethers.Contract(
-        ALT_L1_BOBA_ADDRESS,
-        L2StandardERC20Json.abi,
-        AltL1Provider
-      );
+      // const AltL1BOBA = new ethers.Contract(
+      //   ALT_L1_BOBA_ADDRESS,
+      //   L2StandardERC20Json.abi,
+      //   AltL1Provider
+      // );
 
       let preEthBOBABalance = await EthBOBA.balanceOf(this.account)
-      let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.account)
+      // let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.account)
 
-      console.table({
-        preEthBOBABalance: ethers.utils.formatEther(preEthBOBABalance),
-        preAltL1BOBABalance: ethers.utils.formatEther(preAltL1BOBABalance),
-      });
+      console.log(`💵 Existing ETH Boba BALANCE  ${ethers.utils.formatEther(preEthBOBABalance)}`)
 
       /* L0 endpoint contract*/
       const ETHLayzerZeroEndpoint = new ethers.Contract(
@@ -4929,12 +4955,6 @@ class NetworkService {
         this.provider.getSigner()
       );
 
-      if (
-        preEthBOBABalance.lt(ethers.BigNumber.from(ethers.utils.parseEther('0.5')))
-      ) {
-        throw new Error("EthBOBA balance is too low");
-      }
-
       let approveTx = await EthBOBA
         .connect(this.provider.getSigner())
         .approve(
@@ -4942,7 +4962,11 @@ class NetworkService {
         ethers.utils.parseEther(value)
       );
 
+      console.log(`⏲  Waiting for approval`)
+
       await approveTx.wait();
+
+      console.log(`✅  approval done`)
 
       let payload = ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "address", "address", "uint256", "bytes"],
@@ -4957,16 +4981,14 @@ class NetworkService {
       );
 
       let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-        chain_Rinkeby.LAYER_ZERO_ALT_L1_CHAIN_ID, /// pull from env or masterconfig.
+        allAddresses.Layer_Zero_ChainId,
         Proxy__EthBridge.address,
         payload,
         false,
         "0x"
       );
 
-      console.log({
-        estimatedFee: ethers.utils.formatEther(estimatedFee._nativeFee),
-      });
+      console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
       await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,
@@ -4978,7 +5000,7 @@ class NetworkService {
         { value: estimatedFee._nativeFee }
       );
 
-      console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER 🔥 🔥 🔥 `);
+      console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER  👉  ${type} !`);
 
       return {
         data: 'success'

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20ToL1 } from 'actions/networkAction'
-import { setActiveHistoryTab } from 'actions/uiAction'
+import { openAlert, setActiveHistoryTab } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -23,6 +23,13 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BN from 'bignumber.js'
 import Select from 'components/select/Select'
 
+
+/**
+ * @NOTE
+ *  Cross Chain Bridging to alt L1 is only supported for BOBA as of now!
+ *
+ */
+
 function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) {
 
   const options = [
@@ -36,10 +43,10 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const [ value, setValue ] = useState('')
   const [ altL1Bridge, setAltL1Bridge ] = useState('')
-  // const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 
   const [ validValue, setValidValue ] = useState(false)
-  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
+  const depositLoading = useSelector(selectLoading([ 'DEPOSIT_ALTL1/CREATE' ]))
+  console.log(`😄  depositLoading`,depositLoading)
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
@@ -62,38 +69,18 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   async function doDeposit() {
 
-    const res = await dispatch(depositErc20ToL1(
-      // pass required params.
-      {
-        value: value,
-        type: altL1Bridge
-      }
-    ))
+    const res = await dispatch(depositErc20ToL1({
+      value: value,
+      type: altL1Bridge
+    }))
 
-    console.log(res);
-    /**
-     * TODO:
-     *  - dispatch alt L1 specific functions.
-     *
-     *
-    */
-    /*
-        if(token.symbol === 'ETH') {
-          //console.log("Bridging ETH to L2")
-          res = await dispatch(
-            depositETHL2(value_Wei_String)
-          )
-        } else {
-          //console.log("Bridging ERC20 to L2")
-          res = await dispatch(
-            depositErc20(value_Wei_String, token.address, token.addressL2)
-          )
-        } */
     if (res) {
+      dispatch(openAlert(`Successfully bridge ${token.symbol} to alt L1 ${altL1Bridge}!`))
       dispatch(setActiveHistoryTab('Bridge between L1s'))
       handleClose()
+    } else {
+      handleClose()
     }
-
   }
 
   const theme = useTheme()
@@ -197,15 +184,6 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           </Typography>
         )}
 
-        {!!token && token.symbol === 'OMG' && (
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            NOTE: The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
-            In some cases, three interactions with MetaMask are needed. If you are bridging out of a
-            new wallet, it starts out with a 0 approval, and therefore, only two interactions with
-            MetaMask will be needed.
-          </Typography>
-        )}
-
       </Box>
       <WrapperActionsModal>
         <Button
@@ -223,8 +201,8 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           size="large"
           variant="contained"
           loading={depositLoading}
-          tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to L2"}
-          disabled={!validValue}
+          tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to alt L1"}
+          disabled={!validValue || !altL1Bridge}
           triggerTime={new Date()}
           fullWidth={isMobile}
         >
