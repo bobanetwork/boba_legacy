@@ -4908,7 +4908,6 @@ class NetworkService {
         let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
         let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
 
-        console.log({ ALT_L1_BOBA_ADDRESS, PROXY_ETH_L1_BRIDGE_ADDRESS_TO, L0_ETH_ENDPOINT, ETH_L1_BOBA_ADDRESS, L0_CHAIN_ID })
         // Layer zero doesn't support moonbase
         // return 0 for those bridges that haven't been implemented yet
         if (typeof ALT_L1_BOBA_ADDRESS === 'undefined' || typeof PROXY_ETH_L1_BRIDGE_ADDRESS_TO === 'undefined') {
@@ -4938,7 +4937,7 @@ class NetworkService {
             "0x",
           ]
         );
-        console.log(payload)
+
         console.log(`🆙 loading 💵 FEE for ${type}`);
         const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
           L0_CHAIN_ID,
