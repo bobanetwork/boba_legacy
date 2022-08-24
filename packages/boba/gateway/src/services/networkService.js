@@ -107,7 +107,6 @@ import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376a
 import chain_Rinkeby from "@boba/register/addresses/chainRinkeby"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { TARGET_CHAIN_URL } from 'util/constant'
 
 require('dotenv').config()
 
@@ -4890,7 +4889,6 @@ class NetworkService {
       return
     }
     try {
-
       console.log(`🏃 Estimate Fee Cross Chain Deposit`);
       const pResponse = [ 'BNB', 'FANTOM', 'AVALANCHE' ].map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
@@ -4922,7 +4920,6 @@ class NetworkService {
           this.provider.getSigner()
         );
 
-
         const payload = ethers.utils.defaultAbiCoder.encode(
           [ "address", "address", "address", "address", "uint256", "bytes" ],
           [
@@ -4935,7 +4932,6 @@ class NetworkService {
           ]
         );
 
-
         console.log(`🆙 loading 💵 FEE for ${type}`);
         const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
           L0_CHAIN_ID,
@@ -4944,9 +4940,9 @@ class NetworkService {
           false,
           "0x"
         );
-        console.log(`🆙 loading 💵 FEE for ${type} => ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
+        console.log(`💵 FEE for ${type} => ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
-        return {type, ...estimatedFee, fee: ethers.utils.formatEther(estimatedFee._nativeFee) }
+        return { type, ...estimatedFee, fee: ethers.utils.formatEther(estimatedFee._nativeFee) }
       })
       const fees = await Promise.all(pResponse);
       let result = {};
@@ -4960,8 +4956,7 @@ class NetworkService {
   }
 
    /**
-   * Multichain Deposit to alt l1s
-   * Only support boba as of now.
+   * Multichain Deposit to alt l1s Only support boba as of now.
    *
   */
 
@@ -4974,7 +4969,6 @@ class NetworkService {
       return
     }
     try {
-      console.log(`Start 🏃 🏃`)
       let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = '';
       let ALT_L1_BOBA_ADDRESS = '';
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
@@ -4992,18 +4986,6 @@ class NetworkService {
 
       let ETH_L1_BOBA_ADDRESS = allAddresses[ 'ETH_BOBA_ADDRESS' ];
 
-      console.log({
-        type,
-        PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
-        ETH_L1_BOBA_ADDRESS,
-        ALT_L1_BOBA_ADDRESS,
-        L0_ETH_ENDPOINT
-      })
-
-      //  allAddresses[ `ALT_L1_BOBA_ADDRESS_${type}` ];
-
-      // const AltL1Provider = new ethers.providers.StaticJsonRpcProvider(TARGET_CHAIN_URL);
-
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
@@ -5020,7 +5002,6 @@ class NetworkService {
 
 
       let preEthBOBABalance = await EthBOBA.balanceOf(this.account)
-      // let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.account)
 
       console.log(`💵 Existing ETH Boba BALANCE  ${ethers.utils.formatEther(preEthBOBABalance)}`)
 
@@ -5066,7 +5047,7 @@ class NetworkService {
 
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
-      const res = await Proxy__EthBridge.depositERC20(
+      await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,
         ALT_L1_BOBA_ADDRESS,
         ethers.utils.parseEther(value),
@@ -5076,12 +5057,7 @@ class NetworkService {
         { value: estimatedFee._nativeFee }
       );
 
-      console.log([
-        'DepositERC20,',
-        res
-      ])
       console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER  👉  ${type} !`);
-
       return true;
     } catch (error) {
       console.log("NS: Ve: depositErc20ToL1 error:", error)
