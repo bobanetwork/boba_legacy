@@ -4880,6 +4880,88 @@ class NetworkService {
    **************** Alt L1 Functions ***************
    *************************************************/
 
+  /**
+   * Get Cross Chain Deposit Fee
+   * @getAltL1DepositFee
+   *   - as of now we are just supporting BOBA so no need to check for other tokens.
+  */
+
+
+  async getAltL1DepositFee() {
+    if (this.account === null) {
+      console.log('NS: depositErc20ToL1() error - called but account === null')
+      return
+    }
+    try {
+
+      console.log(`🏃 Estimate Fee Cross Chain Deposit`);
+      const pResponse = [ 'BNB', 'FANTOM', 'AVALANCHE' ].map(async (type) => {
+        let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
+        let ETH_L1_BOBA_ADDRESS = allAddresses.ETH_BOBA_ADDRESS;
+        let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
+        let ALT_L1_BOBA_ADDRESS = '';
+        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = '';
+
+        if (type === 'BNB') {
+          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToBNB;
+          ALT_L1_BOBA_ADDRESS = allAddresses.BNB_TK_BOBA
+        } else if (type === 'FANTOM') {
+          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToFantom;
+          ALT_L1_BOBA_ADDRESS = allAddresses.Fantom_TK_BOBA
+        } else if (type === 'AVALANCHE') {
+          PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses.Proxy__EthBridgeToAvalanche;
+          ALT_L1_BOBA_ADDRESS = allAddresses.Avalanche_TK_BOBA
+        }
+
+        const Proxy__EthBridge = new ethers.Contract(
+          PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
+          ETHL1BridgeJson.abi,
+          this.provider.getSigner()
+        );
+
+        const ETHLayzerZeroEndpoint = new ethers.Contract(
+          L0_ETH_ENDPOINT,
+          LZEndpointMockJson.abi,
+          this.provider.getSigner()
+        );
+
+
+        const payload = ethers.utils.defaultAbiCoder.encode(
+          [ "address", "address", "address", "address", "uint256", "bytes" ],
+          [
+            ETH_L1_BOBA_ADDRESS,
+            ALT_L1_BOBA_ADDRESS,
+            this.account,
+            this.account,
+            ethers.utils.parseEther('1'),
+            "0x",
+          ]
+        );
+
+
+        console.log(`🆙 loading 💵 FEE for ${type}`);
+        const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
+          L0_CHAIN_ID,
+          Proxy__EthBridge.address,
+          payload,
+          false,
+          "0x"
+        );
+        console.log(`🆙 loading 💵 FEE for ${type} => ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
+
+        return {type, ...estimatedFee, fee: ethers.utils.formatEther(estimatedFee._nativeFee) }
+      })
+      const fees = await Promise.all(pResponse);
+      let result = {};
+      fees.forEach((fee) => result[ fee.type ] = fee);
+      return result
+
+    } catch (error) {
+      console.log('NS: getAltL1DepositFee() error - called but account === null')
+      return error
+    }
+  }
+
    /**
    * Multichain Deposit to alt l1s
    * Only support boba as of now.
@@ -4939,12 +5021,6 @@ class NetworkService {
         this.provider
       );
 
-      /* alt l1 boba bridge contract */
-      // const AltL1BOBA = new ethers.Contract(
-      //   ALT_L1_BOBA_ADDRESS,
-      //   L2StandardERC20Json.abi,
-      //   AltL1Provider
-      // );
 
       let preEthBOBABalance = await EthBOBA.balanceOf(this.account)
       // let preAltL1BOBABalance = await AltL1BOBA.balanceOf(this.account)
@@ -4993,7 +5069,7 @@ class NetworkService {
 
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
-      await Proxy__EthBridge.depositERC20(
+      const res = await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,
         ALT_L1_BOBA_ADDRESS,
         ethers.utils.parseEther(value),
@@ -5003,11 +5079,13 @@ class NetworkService {
         { value: estimatedFee._nativeFee }
       );
 
+      console.log([
+        'DepositERC20,',
+        res
+      ])
       console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER  👉  ${type} !`);
 
-      return {
-        data: 'success'
-      }
+      return true;
     } catch (error) {
       console.log("NS: Ve: depositErc20ToL1 error:", error)
       return error;
