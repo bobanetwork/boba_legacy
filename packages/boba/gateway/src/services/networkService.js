@@ -4977,8 +4977,8 @@ class NetworkService {
     try {
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
       let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
-      let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
-      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
+      let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
 
       console.log({
         type,
