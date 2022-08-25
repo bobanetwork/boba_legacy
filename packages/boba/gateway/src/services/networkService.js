@@ -104,7 +104,8 @@ import GraphQLService from "./graphQLService"
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
 
-import chain_Rinkeby from "@boba/register/addresses/chainRinkeby"
+import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
+import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 
 import { bobaBridges } from 'util/bobaBridges'
 import { TARGET_CHAIN_URL, APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
@@ -115,7 +116,7 @@ const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
-const AltL1ChainNames = [ 'BNB', 'Fantom', 'Avalanche', 'Moonbeam' ]
+let supportedAltL1Chains = []
 
 let allAddresses = {}
 // preload allAddresses
@@ -129,12 +130,18 @@ if (APP_CHAIN === 'rinkeby') {
     ...bobaBridges,
     ...l0Protocols
   }
+  supportedAltL1Chains = ['BNB', 'Fantom', 'Avalanche']
 } else if (APP_CHAIN === 'mainnet') {
+  const bobaBridges = layerZeroMainnet.BOBA_Bridges.Mainnet;
+  const l0Protocols = layerZeroMainnet.Layer_Zero_Protocol.Mainnet;
   allAddresses = {
     ...addresses_Mainnet,
     L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool,
+    ...bobaBridges,
+    ...l0Protocols
   }
+  supportedAltL1Chains = ['Moonbeam']
 }
 let allTokens = {}
 
@@ -214,6 +221,9 @@ class NetworkService {
 
     // support token
     this.supportedTokens = []
+
+    // support alt l1 tokens
+    this.supportedAltL1Chains = supportedAltL1Chains
   }
 
   bindProviderListeners() {
@@ -4895,9 +4905,9 @@ class NetworkService {
     }
     try {
       console.log(`🏃 Estimate Fee Cross Chain Deposit`);
-      const pResponse = AltL1ChainNames.map(async (type) => {
+      const pResponse = supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
-        let ETH_L1_BOBA_ADDRESS = allAddresses.ETH_BOBA_ADDRESS;
+        let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
         let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
         let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
         let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
@@ -4970,9 +4980,9 @@ class NetworkService {
     }
     try {
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
-      let ETH_L1_BOBA_ADDRESS = allAddresses.ETH_BOBA_ADDRESS;
-      let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
-      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
+      let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
+      let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
 
       console.log({
         type,
