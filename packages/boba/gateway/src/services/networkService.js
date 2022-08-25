@@ -850,27 +850,11 @@ class NetworkService {
 
     //local does not have a blockexplorer
     if( network !== 'local') {
-      blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
-    }
-
-    //the chainParams are only needed for the L2s
-    const chainParam = {
-      chainId: '0x' + nw[network].L2.chainId.toString(16),
-      chainName: nw[network].L2.name,
-      rpcUrls: [nw[network].L2.rpcUrl],
-      nativeCurrency: {
-        name: 'BOBA Token',
-        symbol: 'BOBA',
-        decimals: 18,
-      },
-      blockExplorerUrls,
+      blockExplorerUrls = [nw[network][targetLayer].blockExplorer.slice(0, -1)]
     }
 
     const targetIDHex = nw[network][targetLayer].chainIdHex
-
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
-    console.log("switchChain to:", targetLayer)
 
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
@@ -878,11 +862,41 @@ class NetworkService {
       window.ethereum.on('chainChanged', handleChangeChainOnce)
       return true
     } catch (error) {
-      // 4902 = the chain has not been added to MetaMask.
-      // So, lets add it
+
       if (error.code === 4902) {
+        /**
+         * 4902 = the chain has not been added to MetaMask.
+         * So, lets add it
+         *  - prepare chain params and send event to add chain.
+         *  - the chain param to be prepare and for L1 fetch token from config.
+         */
+        let chainParam = {
+          chainId: '0x' + nw[network][targetLayer].chainId.toString(16),
+          chainName: nw[network][targetLayer].name,
+          rpcUrls: [nw[network][targetLayer].rpcUrl],
+          nativeCurrency: {
+            name: 'BOBA Token',
+            symbol: 'BOBA',
+            decimals: 18,
+          },
+          blockExplorerUrls,
+        }
+        // In case of L1 layer get the symbol from config.
+        if (targetLayer === 'L1') {
+          chainParam = {
+            ...chainParam,
+            blockExplorerUrls: null,
+            nativeCurrency: {
+              name: `${nw[network][targetLayer].name} Token`,
+              symbol: nw[network][targetLayer].symbol,
+              decimals: 18,
+            },
+          }
+        }
+
+        console.log(['chainParam',chainParam])
         try {
-          await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
+          await this.provider.send('wallet_addEthereumChain', [ chainParam, this.account ])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
         } catch (addError) {
