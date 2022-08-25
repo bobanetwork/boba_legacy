@@ -211,7 +211,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31338,
-      l1TokenId: 'moonbeam',
     })
 
     await gasPriceOracleService.init()
@@ -549,7 +548,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
-      l1TokenId: 'moonbeam',
     })
 
     await tempGasPriceOracleService.init()
@@ -601,7 +599,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
-      l1TokenId: 'moonbeam',
     })
 
     await tempGasPriceOracleService.init()
@@ -639,22 +636,28 @@ describe('gas-price-oracle', () => {
       minOverhead: 2000,
       minL1BaseFee: 50_000_000_000,
       maxL1BaseFee: 100_000_000_000,
-      bobaFeeRatio100X: 120,
+      bobaFeeRatio100X: 100,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
-      l1TokenId: 'moonbeam',
+      l1TokenCoinGeckoId: 'moonbeam',
+      l1TokenCoinMarketCapId: '6836',
+      // CoinMarketCap free key
+      coinMarketCapApiKey: '19841722-df8b-493c-b6b3-d7290e4c24d9',
     })
 
     await tempGasPriceOracleService.init()
 
-    const BobaPrice = await tempGasPriceOracleService._getTokenPrice(
-      'boba-network'
-    )
-    const l1NativeTokenPrice = await tempGasPriceOracleService._getTokenPrice(
-      tempGasPriceOracleService.options.l1TokenId
-    )
-    expect(BobaPrice).not.to.be.equal(0)
-    expect(l1NativeTokenPrice).not.to.be.equal(0)
+    /* eslint-disable */
+    const BobaPriceFromCoinGecko = await tempGasPriceOracleService._getTokenPriceFromCoinGecko('boba-network')
+    const l1NativeTokenPriceFromCoinGecko = await tempGasPriceOracleService._getTokenPriceFromCoinGecko(tempGasPriceOracleService.options.l1TokenCoinGeckoId)
+    const BobaPriceFromCoinMarketCap = await tempGasPriceOracleService._getTokenPriceFromCoinMarketCap('14556')
+    const l1NativeTokenPriceFromCoinMarketCap = await tempGasPriceOracleService._getTokenPriceFromCoinMarketCap(tempGasPriceOracleService.options.l1TokenCoinMarketCapId)
+    /* eslint-enable */
+
+    expect(BobaPriceFromCoinGecko).not.to.be.equal(0)
+    expect(l1NativeTokenPriceFromCoinGecko).not.to.be.equal(0)
+    expect(BobaPriceFromCoinMarketCap).not.to.be.equal(0)
+    expect(l1NativeTokenPriceFromCoinMarketCap).not.to.be.equal(0)
 
     await tempGasPriceOracleService._updatePriceRatio()
 
@@ -662,17 +665,27 @@ describe('gas-price-oracle', () => {
     const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
 
+    /* eslint-disable */
+    // calculate the average price of the two sources
+    const BobaPrice = (BobaPriceFromCoinGecko ? BobaPriceFromCoinGecko: BobaPriceFromCoinMarketCap + BobaPriceFromCoinMarketCap ? BobaPriceFromCoinMarketCap: BobaPriceFromCoinGecko) / 2
+    const l1NativeTokenPrice = (l1NativeTokenPriceFromCoinGecko ? l1NativeTokenPriceFromCoinGecko: l1NativeTokenPriceFromCoinMarketCap + l1NativeTokenPriceFromCoinMarketCap ? l1NativeTokenPriceFromCoinMarketCap: l1NativeTokenPriceFromCoinGecko) / 2
+    /* eslint-enable */
+
     const calculatedMarketPriceRatio = Math.round(
       (BobaPrice / l1NativeTokenPrice) * 10 ** decimals
     )
     const calculatedPriceRatio = Math.round(
-      ((BobaPrice / l1NativeTokenPrice) *
-        10 ** decimals *
+      (calculatedMarketPriceRatio *
         tempGasPriceOracleService.options.bobaFeeRatio100X) /
         100
     )
     expect(marketPriceRatio.toNumber()).to.be.eq(calculatedMarketPriceRatio)
     expect(priceRatio.toNumber()).to.be.eq(calculatedPriceRatio)
-  })
 
+    // Don't update the price ratio if the price is the same
+    const preBlockNumber = await wallet8.provider.getBlockNumber()
+    await tempGasPriceOracleService._updatePriceRatio()
+    const postBlockNumber = await wallet8.provider.getBlockNumber()
+    expect(preBlockNumber).to.be.eq(postBlockNumber)
+  })
 })

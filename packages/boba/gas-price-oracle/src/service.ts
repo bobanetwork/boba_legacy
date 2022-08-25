@@ -60,8 +60,14 @@ interface GasPriceOracleOptions {
   // local testnet chain ID
   bobaLocalTestnetChainId: number
 
-  // L1 token ID
-  l1TokenId: string
+  // L1 token CoinGecko ID
+  l1TokenCoinGeckoId?: string
+
+  // l1 token Coinmarketcap ID
+  l1TokenCoinMarketCapId?: string
+
+  // Coinmarketcap API key
+  coinMarketCapApiKey?: string
 }
 
 const optionSettings = {}
@@ -659,10 +665,17 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   private async _updatePriceRatio(): Promise<void> {
     try {
-      const BobaPrice = await this._getTokenPrice('boba-network')
-      const l1NativeTokenPrice = await this._getTokenPrice(
-        this.options.l1TokenId
-      )
+      /* eslint-disable */
+      const BobaPriceFromCoinGecko = await this._getTokenPriceFromCoinGecko('boba-network')
+      const l1NativeTokenPriceFromCoinGecko = await this._getTokenPriceFromCoinGecko(this.options.l1TokenCoinGeckoId)
+      const BobaPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap('14556')
+      const l1NativeTokenPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap(this.options.l1TokenCoinMarketCapId)
+
+      // calculate the average price of the two sources
+      const BobaPrice = (BobaPriceFromCoinGecko ? BobaPriceFromCoinGecko: BobaPriceFromCoinMarketCap + BobaPriceFromCoinMarketCap ? BobaPriceFromCoinMarketCap: BobaPriceFromCoinGecko) / 2
+      const l1NativeTokenPrice = (l1NativeTokenPriceFromCoinGecko ? l1NativeTokenPriceFromCoinGecko: l1NativeTokenPriceFromCoinMarketCap + l1NativeTokenPriceFromCoinMarketCap ? l1NativeTokenPriceFromCoinMarketCap: l1NativeTokenPriceFromCoinGecko) / 2
+      /* eslint-enable */
+
       if (BobaPrice === 0 || l1NativeTokenPrice === 0) {
         this.logger.warn(`Token price is 0, skipping update`)
       } else {
@@ -675,20 +688,40 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
         const priceRatio = Math.round(
           (marketPriceRatio * this.options.bobaFeeRatio100X) / 100
         )
-        const tx = await this.state.Boba_GasPriceOracle.updatePriceRatio(
-          priceRatio,
-          marketPriceRatio,
-          this.state.chainID === this.options.bobaLocalTestnetChainId
-            ? {}
-            : { gasPrice: 0 }
-        )
-        await tx.wait()
-        this.logger.info('Updated price ratio', {
-          priceRatio,
-          marketPriceRatio,
-          BobaPrice,
-          l1NativeTokenPrice,
-        })
+
+        /* eslint-disable */
+        const originalPriceRatio = (await this.state.Boba_GasPriceOracle.priceRatio()).toNumber()
+        const originalMarketPriceRatio = (await this.state.Boba_GasPriceOracle.marketPriceRatio()).toNumber()
+        /* eslint-enable */
+
+        if (
+          priceRatio !== originalPriceRatio ||
+          marketPriceRatio !== originalMarketPriceRatio
+        ) {
+          const tx = await this.state.Boba_GasPriceOracle.updatePriceRatio(
+            priceRatio,
+            marketPriceRatio,
+            this.state.chainID === this.options.bobaLocalTestnetChainId
+              ? {}
+              : { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated price ratio', {
+            priceRatio,
+            marketPriceRatio,
+            BobaPriceFromCoinGecko,
+            BobaPriceFromCoinMarketCap,
+            l1NativeTokenPriceFromCoinGecko,
+            l1NativeTokenPriceFromCoinMarketCap,
+          })
+        } else {
+          this.logger.info('No need to update price ratio', {
+            priceRatio,
+            originalPriceRatio,
+            marketPriceRatio,
+            originalMarketPriceRatio,
+          })
+        }
       }
     } catch (error) {
       this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${error}`)
@@ -696,14 +729,32 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   // Data provided by CoinGecko
-  private async _getTokenPrice(id: string): Promise<number> {
+  private async _getTokenPriceFromCoinGecko(id: string): Promise<number> {
     try {
       const URL = `https:///api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_date=false&developer_data=false&sparkline=false`
       const payload = await fetch(URL)
       const payloadParsed = await payload.json()
       return Number(payloadParsed.market_data.current_price.usd)
     } catch (err) {
-      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${err} - ${id}`)
+      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinGecko`)
+      return 0
+    }
+  }
+
+  // Data provided by Coinmarketcap
+  private async _getTokenPriceFromCoinMarketCap(id: string): Promise<number> {
+    try {
+      const URL = `https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount=1&id=${id}`
+      const payload = await fetch(URL, {
+        method: 'GET',
+        headers: { 'x-cmc_pro_api_key': this.options.coinMarketCapApiKey },
+      })
+      const payloadParsed = await payload.json()
+      return Number(payloadParsed.data.quote.USD.price)
+    } catch (err) {
+      this.logger.warn(
+        `CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinMarketCap`
+      )
       return 0
     }
   }
